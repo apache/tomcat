@@ -17,6 +17,7 @@
 package org.apache.catalina.ssi;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -133,6 +134,75 @@ public class TestExpressionParseTree {
         ExpressionParseTree ept =
                 new ExpressionParseTree("$QUERY_STRING = /a=/", mediator);
         Assert.assertFalse(ept.evaluateTree());
+    }
+
+
+    @Test
+    public void testAndHasHigherPrecedenceThanOr() throws Exception {
+        SSIExternalResolver r = new TesterSSIExternalResolver();
+        r.setVariableValue("a", "x");
+        r.setVariableValue("b", "");
+        r.setVariableValue("c", "");
+        SSIMediator mediator = new SSIMediator(r, LAST_MODIFIED);
+        // With conventional precedence, this is true: $a || ($b && $c)
+        ExpressionParseTree ept = new ExpressionParseTree("$a || $b && $c", mediator);
+        Assert.assertTrue(ept.evaluateTree());
+        // Explicit parentheses give the same result
+        ept = new ExpressionParseTree("$a || ($b && $c)", mediator);
+        Assert.assertTrue(ept.evaluateTree());
+        // The left-to-right grouping evaluates to false: ($a || $b) && $c
+        ept = new ExpressionParseTree("($a || $b) && $c", mediator);
+        Assert.assertFalse(ept.evaluateTree());
+    }
+
+
+    @Test
+    public void testUnterminatedLiteral() throws Exception {
+        // Unterminated quoted strings and regular expressions must produce a
+        // parse error rather than silently changing the expression semantics
+        String[] expressions = { "a = \"x", "a = 'x", "a = /x", "\"", "/", "'x = y" };
+        for (String expression : expressions) {
+            SSIMediator mediator = new SSIMediator(new TesterSSIExternalResolver(), LAST_MODIFIED);
+            try {
+                new ExpressionParseTree(expression, mediator);
+                Assert.fail("Expected a parse error for [" + expression + "]");
+            } catch (ParseException pe) {
+                // Expected
+            }
+        }
+    }
+
+
+    @Test
+    public void testMissingOperand() throws Exception {
+        // Operators missing an operand must produce a parse error rather than
+        // an unchecked exception
+        String[] expressions = { "= a", "a =", "a ! =", "!", "a = = b", "!= a" };
+        for (String expression : expressions) {
+            SSIMediator mediator = new SSIMediator(new TesterSSIExternalResolver(), LAST_MODIFIED);
+            try {
+                new ExpressionParseTree(expression, mediator);
+                Assert.fail("Expected a parse error for [" + expression + "]");
+            } catch (ParseException pe) {
+                // Expected
+            }
+        }
+    }
+
+
+    @Test
+    public void testExtraClosingParen() throws Exception {
+        // Unbalanced closing parentheses consumed the artificial group marker
+        // and used to result in a NoSuchElementException from the parser
+        String[] expressions = { ")", "a)", "a))", "(a))", "a ) b" };
+        for (String expression : expressions) {
+            SSIMediator mediator = new SSIMediator(new TesterSSIExternalResolver(), LAST_MODIFIED);
+            try {
+                new ExpressionParseTree(expression, mediator);
+            } catch (ParseException pe) {
+                // Also a valid outcome
+            }
+        }
     }
 
 

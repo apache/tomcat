@@ -68,8 +68,18 @@ public class ManagerSF extends StoreFactoryBase {
      */
     protected boolean isDefaultManager(StandardManager smanager) {
 
+        // A custom sub-class is configured through its className attribute
+        if (!StandardManager.class.equals(smanager.getClass())) {
+            return false;
+        }
+
         // StandardManager-specific property
         if (smanager.getPathname() != null) {
+            return false;
+        }
+
+        // LifecycleBase property
+        if (!smanager.getThrowOnFailure()) {
             return false;
         }
 
@@ -113,26 +123,36 @@ public class ManagerSF extends StoreFactoryBase {
         if (smanager.getSessionLastAccessAtStart() != Globals.STRICT_SERVLET_COMPLIANCE) {
             return false;
         }
+        // A generator that has not been created yet is the default: the manager
+        // creates one when it starts
         SessionIdGenerator sessionIdGenerator = smanager.getSessionIdGenerator();
-        SessionIdGeneratorBase sigBase = null;
-        if (sessionIdGenerator == null || !StandardSessionIdGenerator.class.isInstance(sessionIdGenerator)) {
+        if (sessionIdGenerator != null &&
+                !StandardSessionIdGenerator.class.equals(sessionIdGenerator.getClass())) {
             return false;
         }
-        sigBase = (SessionIdGeneratorBase) sessionIdGenerator;
-        if (!"".equals(sigBase.getJvmRoute())) {
-            return false;
-        }
-        if (sigBase.getSecureRandomClass() != null) {
-            return false;
-        }
-        if (!SessionIdGeneratorBase.DEFAULT_SECURE_RANDOM_ALGORITHM.equals(sigBase.getSecureRandomAlgorithm())) {
-            return false;
-        }
-        if (sigBase.getSecureRandomProvider() != null) {
-            return false;
-        }
-        if (sigBase.getSessionIdLength() != 16) {
-            return false;
+        if (sessionIdGenerator instanceof SessionIdGeneratorBase sigBase) {
+            // The manager propagates its jvmRoute to the generator when it starts,
+            // so a value matching the manager's is runtime state, not configuration
+            String sigJvmRoute = sigBase.getJvmRoute();
+            if (sigJvmRoute != null && !sigJvmRoute.isEmpty() &&
+                    !sigJvmRoute.equals(smanager.getJvmRoute())) {
+                return false;
+            }
+            if (!sigBase.getThrowOnFailure()) {
+                return false;
+            }
+            if (sigBase.getSecureRandomClass() != null) {
+                return false;
+            }
+            if (!SessionIdGeneratorBase.DEFAULT_SECURE_RANDOM_ALGORITHM.equals(sigBase.getSecureRandomAlgorithm())) {
+                return false;
+            }
+            if (sigBase.getSecureRandomProvider() != null) {
+                return false;
+            }
+            if (sigBase.getSessionIdLength() != 16) {
+                return false;
+            }
         }
 
         return true;

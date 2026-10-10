@@ -16,6 +16,10 @@
  */
 package org.apache.catalina.ant.jmx;
 
+import java.lang.management.ManagementFactory;
+
+import javax.management.MBeanServer;
+import javax.management.MBeanServerConnection;
 import javax.management.openmbean.CompositeDataSupport;
 import javax.management.openmbean.CompositeType;
 import javax.management.openmbean.OpenDataException;
@@ -23,9 +27,15 @@ import javax.management.openmbean.OpenType;
 import javax.management.openmbean.SimpleType;
 import javax.management.openmbean.TabularDataSupport;
 import javax.management.openmbean.TabularType;
+import javax.management.remote.JMXConnectorServer;
+import javax.management.remote.JMXConnectorServerFactory;
+import javax.management.remote.JMXServiceURL;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
 
 public class TestJMXAccessorTask {
 
@@ -41,6 +51,91 @@ public class TestJMXAccessorTask {
         Assert.assertEquals("1", task.getProperty("tabular.1.id"));
         Assert.assertEquals("beta", task.getProperty("tabular.1.details.name"));
         Assert.assertEquals("11", task.getProperty("tabular.1.count"));
+    }
+
+
+    @Test
+    public void testConvertStringToType() {
+        JMXAccessorTask task = new JMXAccessorTask();
+
+        Assert.assertEquals("x", task.convertStringToType("x", "java.lang.String"));
+        Assert.assertEquals(Integer.valueOf(7), task.convertStringToType("7", "int"));
+        Assert.assertEquals(Long.valueOf(7), task.convertStringToType("7", "java.lang.Long"));
+        Assert.assertEquals(Boolean.TRUE, task.convertStringToType("true", "boolean"));
+        Assert.assertEquals(Double.valueOf(1.5), task.convertStringToType("1.5", "double"));
+    }
+
+
+    @Test
+    public void testConvertStringToTypeInvalid() {
+        JMXAccessorTask task = new JMXAccessorTask();
+
+        assertConvertFails(task, "x", "int");
+        assertConvertFails(task, "x", "java.lang.Long");
+        assertConvertFails(task, "1.5", "java.lang.Integer");
+        assertConvertFails(task, "x", "javax.management.ObjectName");
+    }
+
+
+    @Test
+    public void testConvertStringToTypeUnsupportedType() {
+        JMXAccessorTask task = new JMXAccessorTask();
+
+        assertConvertFails(task, "x", "java.lang.Int");
+        assertConvertFails(task, "x", "java.util.List");
+        assertConvertFails(task, "x", null);
+    }
+
+
+    private static void assertConvertFails(JMXAccessorTask task, String value, String type) {
+        try {
+            task.convertStringToType(value, type);
+            Assert.fail("Expected a BuildException for value '" + value + "' and type '" + type + "'");
+        } catch (BuildException expected) {
+            // Expected
+        }
+    }
+
+
+    /*
+     * A cached connection reference is reused. If the caller explicitly specifies a different target than the one the
+     * reference was opened to, a BuildException is raised instead of the explicit parameters being silently ignored.
+     */
+    @Test
+    public void testAccessJMXConnectionReuseAndMismatch() throws Exception {
+        // Force the use of localhost to resolve CI failures
+        System.setProperty("java.rmi.server.hostname", "127.0.0.1");
+        MBeanServer mbeanServer = ManagementFactory.getPlatformMBeanServer();
+        // No registry and no fixed port: RMI chooses the port for the connector's own remote object and the
+        // resulting address is self-contained, so there is no window in which another process can take the port
+        JMXConnectorServer connectorServer = JMXConnectorServerFactory
+                .newJMXConnectorServer(new JMXServiceURL("service:jmx:rmi://127.0.0.1"), null, mbeanServer);
+        connectorServer.start();
+        try {
+            Project project = new Project();
+            String ref = "jmx.server.test";
+            String url = connectorServer.getAddress().toString();
+
+            // First call opens the connection and stores it under the reference.
+            MBeanServerConnection first =
+                    JMXAccessorTask.accessJMXConnection(project, url, null, null, null, null, ref);
+            Assert.assertNotNull(first);
+
+            // Reuse with no explicit target: the cached connection is returned.
+            MBeanServerConnection reused =
+                    JMXAccessorTask.accessJMXConnection(project, null, null, null, null, null, ref);
+            Assert.assertSame(first, reused);
+
+            // Explicitly specifying a different port than the open connection must fail rather than be ignored.
+            try {
+                JMXAccessorTask.accessJMXConnection(project, null, "127.0.0.1", "1", null, null, ref);
+                Assert.fail("Expected a BuildException for an explicit conflicting target");
+            } catch (BuildException expected) {
+                // Expected
+            }
+        } finally {
+            connectorServer.stop();
+        }
     }
 
 

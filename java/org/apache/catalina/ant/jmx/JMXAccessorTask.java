@@ -95,6 +95,12 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
      */
     public static final String JMX_SERVICE_SUFFIX = "/jmxrmi";
 
+    /*
+     * Suffix of the project reference under which the JMX service URL of a connection stored under reference
+     * <em>refId</em> is recorded, to be able to detect later requests that explicitly specify a different target.
+     */
+    private static final String JMX_SERVICE_URL_REF_SUFFIX = "-jmx-service-url";
+
     // ----------------------------------------------------- Instance Variables
 
     private String name = null;
@@ -103,9 +109,14 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
 
     private String url = null;
 
-    private String host = "localhost";
+    /*
+     * A null host or port means the attribute was not specified. The defaults (localhost and 8050) are applied when
+     * the JMX service URL is built, so an explicitly specified value can be detected and compared against an existing
+     * connection reference.
+     */
+    private String host = null;
 
-    private String port = "8050";
+    private String port = null;
 
     private String password = null;
 
@@ -124,6 +135,12 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
     private String ifCondition;
 
     private final Properties properties = new Properties();
+
+    /*
+     * Connector owned by this task for the duration of a single execution. Only set when the connection was created
+     * by this task and is not shared via a project reference, so it can be closed when the task completes.
+     */
+    private JMXConnector jmxConnector;
 
     // ------------------------------------------------------------- Properties
 
@@ -386,10 +403,14 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
 
                 MBeanServerConnection jmxServerConnection = getJMXConnection();
                 error = jmxExecute(jmxServerConnection);
-                if (error != null && isFailOnError()) {
-                    // exception should be thrown only if failOnError == true
-                    // or error line will be logged twice
-                    throw new BuildException(error);
+                if (error != null) {
+                    if (isFailOnError()) {
+                        // exception should be thrown only if failOnError == true
+                        // or error line will be logged twice
+                        throw new BuildException(error);
+                    }
+                    // Ant semantics for failOnError="false" are to report the error and continue
+                    handleErrorOutput(error);
                 }
             } catch (Exception e) {
                 if (isFailOnError()) {
@@ -398,6 +419,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
                     handleErrorOutput(e.getMessage());
                 }
             } finally {
+                closeJMXConnector();
                 closeRedirector();
             }
         }
@@ -420,12 +442,30 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
      */
     public static MBeanServerConnection createJMXConnection(String url, String host, String port, String username,
             String password) throws MalformedURLException, IOException {
-        String urlForJMX;
-        if (url != null) {
-            urlForJMX = url;
-        } else {
-            urlForJMX = JMX_SERVICE_PREFIX + host + ":" + port + JMX_SERVICE_SUFFIX;
-        }
+        return createJMXConnector(url, host, port, username, password).getMBeanServerConnection();
+    }
+
+    /**
+     * Create a new JMX Connection with auth when username and password is set. The caller is responsible for closing
+     * the returned connector.
+     *
+     * @param url      URL to be used for the JMX connection (if specified, it is a complete URL so host and port will
+     *                     not be used)
+     * @param host     Host name of the JMX server ({@code null} selects the default host)
+     * @param port     Port number for the JMX server ({@code null} selects the default port)
+     * @param username User name for the connection
+     * @param password Credentials corresponding to the specified user
+     *
+     * @throws MalformedURLException Invalid URL specified
+     * @throws IOException           Other connection error
+     *
+     * @return the JMX connector
+     *
+     * @since 12.0.x
+     */
+    public static JMXConnector createJMXConnector(String url, String host, String port, String username,
+            String password) throws MalformedURLException, IOException {
+        String urlForJMX = resolveJMXServiceURL(url, host, port);
         Map<String,String[]> environment = null;
         if (username != null && password != null) {
             String[] credentials = new String[2];
@@ -434,9 +474,31 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
             environment = new HashMap<>();
             environment.put(JMXConnector.CREDENTIALS, credentials);
         }
-        // FIXME: Referencing JMXConnector instead of MBeanServerConnection is needed to close the connection
-        return JMXConnectorFactory.connect(new JMXServiceURL(urlForJMX), environment).getMBeanServerConnection();
+        return JMXConnectorFactory.connect(new JMXServiceURL(urlForJMX), environment);
+    }
 
+    /*
+     * Build the JMX service URL from the connection parameters, applying the default host and port when they are not
+     * specified.
+     */
+    private static String resolveJMXServiceURL(String url, String host, String port) {
+        if (url != null) {
+            return url;
+        }
+        String effectiveHost = host != null ? host : "localhost";
+        String effectivePort = port != null ? port : "8050";
+        return JMX_SERVICE_PREFIX + effectiveHost + ":" + effectivePort + JMX_SERVICE_SUFFIX;
+    }
+
+    /*
+     * The JMX service URL targeted by the given connection parameters, or null when no target was specified at all
+     * (in which case the parameters say nothing about which server the caller wants to reach).
+     */
+    private static String specifiedJMXServiceURL(String url, String host, String port) {
+        if (url == null && host == null && port == null) {
+            return null;
+        }
+        return resolveJMXServiceURL(url, host, port);
     }
 
     /**
@@ -487,18 +549,32 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
         boolean isRef = project != null && refId != null && !refId.isEmpty();
         if (isRef) {
             Object pref = project.getReference(refId);
-            try {
-                jmxServerConnection = (MBeanServerConnection) pref;
-            } catch (ClassCastException cce) {
-                project.log("wrong object reference " + refId + " - " + pref.getClass());
-                return null;
+            if (pref != null) {
+                try {
+                    jmxServerConnection = (MBeanServerConnection) pref;
+                } catch (ClassCastException cce) {
+                    project.log("wrong object reference " + refId + " - " + pref.getClass());
+                    return null;
+                }
+            }
+            if (jmxServerConnection != null) {
+                // The reference already holds an open connection and is reused. If this call explicitly specifies a
+                // different target, the explicit parameters would be silently ignored, so fail instead.
+                String specified = specifiedJMXServiceURL(url, host, port);
+                Object openedTo = project.getReference(refId + JMX_SERVICE_URL_REF_SUFFIX);
+                if (specified != null && openedTo != null && !specified.equals(openedTo)) {
+                    throw new BuildException("The JMX connection reference '" + refId + "' already refers to a "
+                            + "connection to '" + openedTo + "'. This task specifies a connection to '" + specified
+                            + "'. Open the second server under a different ref or omit the connection parameters "
+                            + "to reuse the existing connection.");
+                }
+                return jmxServerConnection;
             }
         }
-        if (jmxServerConnection == null) {
-            jmxServerConnection = createJMXConnection(url, host, port, username, password);
-        }
+        jmxServerConnection = createJMXConnection(url, host, port, username, password);
         if (isRef && jmxServerConnection != null) {
             project.addReference(refId, jmxServerConnection);
+            project.addReference(refId + JMX_SERVICE_URL_REF_SUFFIX, resolveJMXServiceURL(url, host, port));
         }
         return jmxServerConnection;
     }
@@ -515,28 +591,46 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
      */
     protected MBeanServerConnection getJMXConnection() throws MalformedURLException, IOException {
         MBeanServerConnection jmxServerConnection = null;
-        if (isUseRef()) {
-            Object pref;
-            if (getProject() != null) {
-                pref = getProject().getReference(getRef());
-                if (pref != null) {
-                    try {
-                        jmxServerConnection = (MBeanServerConnection) pref;
-                    } catch (ClassCastException cce) {
-                        getProject().log("Wrong object reference " + getRef() + " - " + pref.getClass());
-                        return null;
-                    }
+        boolean refAvailable = isUseRef() && getProject() != null;
+        if (refAvailable) {
+            Object pref = getProject().getReference(getRef());
+            if (pref != null) {
+                try {
+                    jmxServerConnection = (MBeanServerConnection) pref;
+                } catch (ClassCastException cce) {
+                    getProject().log("Wrong object reference " + getRef() + " - " + pref.getClass());
+                    return null;
                 }
             }
-            if (jmxServerConnection == null) {
+        }
+        if (jmxServerConnection == null) {
+            if (refAvailable) {
+                // A reference is available: the connection is stored in the project for reuse by later tasks in
+                // the same build and is intentionally left open, so this task does not own it.
                 jmxServerConnection = accessJMXConnection(getProject(), getUrl(), getHost(), getPort(), getUsername(),
                         getPassword(), getRef());
+            } else {
+                // No reference to store it in: this task owns the connection and closes it when it completes.
+                jmxConnector = createJMXConnector(getUrl(), getHost(), getPort(), getUsername(), getPassword());
+                jmxServerConnection = jmxConnector.getMBeanServerConnection();
             }
-        } else {
-            jmxServerConnection = accessJMXConnection(getProject(), getUrl(), getHost(), getPort(), getUsername(),
-                    getPassword(), null);
         }
         return jmxServerConnection;
+    }
+
+    /**
+     * Close the JMX connection owned by this task, if any. Connections shared through a project reference are not
+     * owned by this task and are left open for reuse.
+     */
+    private void closeJMXConnector() {
+        if (jmxConnector != null) {
+            try {
+                jmxConnector.close();
+            } catch (IOException e) {
+                // Ignore errors while closing
+            }
+            jmxConnector = null;
+        }
     }
 
     /**
@@ -564,65 +658,57 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
      * @param valueType The type
      *
      * @return The converted object
+     *
+     * @throws BuildException The value cannot be converted to the requested type, or the type is not supported
      */
     protected Object convertStringToType(String value, String valueType) {
         if ("java.lang.String".equals(valueType)) {
             return value;
         }
+        if (valueType == null) {
+            throw new BuildException("Unable to convert value '" + value + "': no target type available");
+        }
 
-        Object convertValue = value;
         if ("java.lang.Integer".equals(valueType) || "int".equals(valueType)) {
             try {
-                convertValue = Integer.valueOf(value);
+                return Integer.valueOf(value);
             } catch (NumberFormatException ex) {
-                if (isEcho()) {
-                    handleErrorOutput("Unable to convert to integer:" + value);
-                }
+                throw new BuildException("Unable to convert to integer:" + value, ex);
             }
         } else if ("java.lang.Long".equals(valueType) || "long".equals(valueType)) {
             try {
-                convertValue = Long.valueOf(value);
+                return Long.valueOf(value);
             } catch (NumberFormatException ex) {
-                if (isEcho()) {
-                    handleErrorOutput("Unable to convert to long:" + value);
-                }
+                throw new BuildException("Unable to convert to long:" + value, ex);
             }
         } else if ("java.lang.Boolean".equals(valueType) || "boolean".equals(valueType)) {
-            convertValue = Boolean.valueOf(value);
+            return Boolean.valueOf(value);
         } else if ("java.lang.Float".equals(valueType) || "float".equals(valueType)) {
             try {
-                convertValue = Float.valueOf(value);
+                return Float.valueOf(value);
             } catch (NumberFormatException ex) {
-                if (isEcho()) {
-                    handleErrorOutput("Unable to convert to float:" + value);
-                }
+                throw new BuildException("Unable to convert to float:" + value, ex);
             }
         } else if ("java.lang.Double".equals(valueType) || "double".equals(valueType)) {
             try {
-                convertValue = Double.valueOf(value);
+                return Double.valueOf(value);
             } catch (NumberFormatException ex) {
-                if (isEcho()) {
-                    handleErrorOutput("Unable to convert to double:" + value);
-                }
+                throw new BuildException("Unable to convert to double:" + value, ex);
             }
         } else if ("javax.management.ObjectName".equals(valueType) || "name".equals(valueType)) {
             try {
-                convertValue = new ObjectName(value);
+                return new ObjectName(value);
             } catch (MalformedObjectNameException e) {
-                if (isEcho()) {
-                    handleErrorOutput("Unable to convert to ObjectName:" + value);
-                }
+                throw new BuildException("Unable to convert to ObjectName:" + value, e);
             }
         } else if ("java.net.InetAddress".equals(valueType)) {
             try {
-                convertValue = InetAddress.getByName(value);
+                return InetAddress.getByName(value);
             } catch (UnknownHostException exc) {
-                if (isEcho()) {
-                    handleErrorOutput("Unable to resolve host name:" + value);
-                }
+                throw new BuildException("Unable to resolve host name:" + value, exc);
             }
         }
-        return convertValue;
+        throw new BuildException("Unsupported conversion type '" + valueType + "' for value '" + value + "'");
     }
 
     /**

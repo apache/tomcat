@@ -54,6 +54,7 @@ import org.apache.jasper.TrimSpacesOption;
 import org.apache.jasper.compiler.Node.ChildInfoBase;
 import org.apache.jasper.compiler.Node.JspAttribute;
 import org.apache.jasper.compiler.Node.NamedAttribute;
+import org.apache.jasper.compiler.Node.PageTerminationGenerator;
 import org.apache.jasper.runtime.JspRuntimeLibrary;
 import org.xml.sax.Attributes;
 
@@ -1183,16 +1184,20 @@ class Generator {
             out.print(pageParam);
             printParams(n, pageParam, page.isLiteral());
             out.println(");");
-            if (isTagFile || isFragment) {
-                out.printil("throw new jakarta.servlet.jsp.SkipPageException();");
-            } else {
-                out.printil((methodNesting > 0) ? "return true;" : "return;");
-            }
+            terminatePage();
             out.popIndent();
             out.printil("}");
 
             n.setEndJavaLine(out.getJavaLine());
             // XXX Not sure if we can eliminate dead codes after this.
+        }
+
+        private void terminatePage() {
+            if (isTagFile || isFragment) {
+                out.printil("throw new jakarta.servlet.jsp.SkipPageException();");
+            } else {
+                out.printil((methodNesting > 0) ? "return true;" : "return;");
+            }
         }
 
         @Override
@@ -2045,6 +2050,16 @@ class Generator {
             }
         }
 
+
+        @Override
+        public void visit(PageTerminationGenerator n) throws JasperException {
+            /*
+             * This node is a marker that the TagPluginManager needed to terminate the current page. How to do that is
+             * context dependent and GeneratorVisitor has the context.
+             */
+            terminatePage();
+        }
+
         private TagHandlerInfo getTagHandlerInfo(Node.CustomTag n) throws JasperException {
             Map<String,TagHandlerInfo> handlerInfosByShortName =
                     handlerInfos.computeIfAbsent(n.getPrefix(), k -> new HashMap<>());
@@ -2249,11 +2264,7 @@ class Generator {
             out.print(tagHandlerVar);
             out.println(".doEndTag() == jakarta.servlet.jsp.tagext.Tag.SKIP_PAGE) {");
             out.pushIndent();
-            if (isTagFile || isFragment) {
-                out.printil("throw new jakarta.servlet.jsp.SkipPageException();");
-            } else {
-                out.printil((methodNesting > 0) ? "return true;" : "return;");
-            }
+            terminatePage();
             out.popIndent();
             out.printil("}");
             // Synchronize AT_BEGIN scripting variables

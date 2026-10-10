@@ -655,7 +655,7 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
      * @return the index of the character, or -1 if not found
      */
     public int indexOf(char c) {
-        return indexOf(c, start);
+        return indexOf(c, 0);
     }
 
 

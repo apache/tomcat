@@ -876,21 +876,26 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
 
     final void close(Http2Exception http2Exception) {
-        if (http2Exception instanceof StreamException) {
+        if (http2Exception instanceof ConnectionException) {
+            handler.closeConnection(http2Exception);
+        } else {
             try {
                 StreamException se = (StreamException) http2Exception;
-                if (log.isTraceEnabled()) {
-                    log.trace(sm.getString("stream.reset.send", getConnectionId(), getIdAsString(), se.getError()));
-                }
+                // se may be null when the clean-up is required without sending the reset
+                if (se != null) {
+                    if (log.isTraceEnabled()) {
+                        log.trace(sm.getString("stream.reset.send", getConnectionId(), getIdAsString(), se.getError()));
+                    }
 
-                // Need to update state atomically with the sending of the RST
-                // frame else other threads currently working with this stream
-                // may see the state change and send a RST frame before the RST
-                // frame triggered by this thread. If that happens the client
-                // may see out of order RST frames which may hard to follow if
-                // the client is unaware the RST frames may be received out of
-                // order.
-                handler.sendStreamReset(state, se);
+                    // Need to update state atomically with the sending of the RST
+                    // frame else other threads currently working with this stream
+                    // may see the state change and send a RST frame before the RST
+                    // frame triggered by this thread. If that happens the client
+                    // may see out of order RST frames which may hard to follow if
+                    // the client is unaware the RST frames may be received out of
+                    // order.
+                    handler.sendStreamReset(state, se);
+                }
 
                 cancelAllocationRequests();
                 inputBuffer.swallowUnread();
@@ -900,8 +905,6 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                                 Http2Error.PROTOCOL_ERROR, ioe);
                 handler.closeConnection(ce);
             }
-        } else {
-            handler.closeConnection(http2Exception);
         }
         replace();
     }
@@ -940,10 +943,14 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
      *
      * - this method is called once the StreamProcessor considers the Stream closed
      *
+     * - the request and response are only added to the pool for re-use if the StreamProcessor considers the Stream to
+     * have completed cleanly. If the Stream was closed due to an error, an application thread may still be using the
+     * request and/or response (e.g. blocked in a write when an asynchronous timeout fired) so they must not be re-used.
+     *
      * In theory, the protection against duplicate calls is not required in this method (the code in StreamProcessor
      * should be sufficient) but it is implemented as precaution along with the WARN level logging.
      */
-    final void recycle() {
+    final void recycle(boolean reuseRequestAndResponse) {
         if (recycled) {
             log.warn(sm.getString("stream.recycle.duplicate", getConnectionId(), getIdAsString()));
             return;
@@ -962,7 +969,9 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         coyoteRequest.setNote(Request.NOTE_BAD_REQUEST, null);
         coyoteRequest.recycle();
         coyoteResponse.recycle();
-        handler.getProtocol().pushRequestAndResponse(coyoteRequest);
+        if (reuseRequestAndResponse) {
+            handler.getProtocol().pushRequestAndResponse(coyoteRequest);
+        }
     }
 
 

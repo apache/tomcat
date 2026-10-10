@@ -83,11 +83,27 @@ public abstract class FrameworkListener implements LifecycleListener, ContainerL
         for (Service service : server.findServices()) {
             Engine engine = service.getContainer();
             if (engine != null) {
-                engine.addContainerListener(this);
                 registerListenersForEngine(engine);
             }
         }
     }
+
+
+    /**
+     * Registers this as a container listener on the given container unless it is already registered, so that repeated
+     * Server start events do not result in duplicate registrations.
+     *
+     * @param container The container on which to register this listener
+     */
+    private void addContainerListenerIfAbsent(Container container) {
+        for (ContainerListener listener : container.findContainerListeners()) {
+            if (listener == this) {
+                return;
+            }
+        }
+        container.addContainerListener(this);
+    }
+
 
     /**
      * Registers listeners on all hosts of the given engine.
@@ -95,12 +111,13 @@ public abstract class FrameworkListener implements LifecycleListener, ContainerL
      * @param engine The engine to register listeners for
      */
     protected void registerListenersForEngine(Engine engine) {
+        addContainerListenerIfAbsent(engine);
         for (Container hostContainer : engine.findChildren()) {
             Host host = (Host) hostContainer;
-            host.addContainerListener(this);
             registerListenersForHost(host);
         }
     }
+
 
     /**
      * Registers listeners on all contexts of the given host.
@@ -108,11 +125,13 @@ public abstract class FrameworkListener implements LifecycleListener, ContainerL
      * @param host The host to register listeners for
      */
     protected void registerListenersForHost(Host host) {
+        addContainerListenerIfAbsent(host);
         for (Container contextContainer : host.findChildren()) {
             Context context = (Context) contextContainer;
             registerContextListener(context);
         }
     }
+
 
     /**
      * Creates and registers a lifecycle listener for the given context.
@@ -120,6 +139,12 @@ public abstract class FrameworkListener implements LifecycleListener, ContainerL
      * @param context The context to register a listener for
      */
     protected void registerContextListener(Context context) {
+        // Reuse an existing listener if one is already registered, so that
+        // repeated Server start events do not create duplicate listeners that
+        // stay attached to the context after the map reference is replaced
+        if (contextListeners.containsKey(context)) {
+            return;
+        }
         LifecycleListener listener = createLifecycleListener(context);
         contextListeners.put(context, listener);
         context.addLifecycleListener(listener);

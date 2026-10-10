@@ -110,10 +110,10 @@ import org.apache.tomcat.util.file.ConfigurationSource;
  * <li>As part of the login process, JAASRealm registers its own <code>CallbackHandler</code>, called (unsurprisingly)
  * <code>JAASCallbackHandler</code>. This handler supplies the HTTP requests' username and credentials to the
  * user-supplied <code>LoginModule</code></li>
- * <li>As with other <code>Realm</code> implementations, digested passwords are supported if the
- * <code>&lt;Realm&gt;</code> element in <code>server.xml</code> contains a <code>digest</code> attribute;
- * <code>JAASCallbackHandler</code> will digest the password prior to passing it back to the
- * <code>LoginModule</code></li>
+ * <li>As with other <code>Realm</code> implementations, digested passwords are supported via the configured
+ * <code>CredentialHandler</code>. The credentials are passed to the <code>LoginModule</code> unchanged; any digest
+ * comparison is expected to be performed by the <code>LoginModule</code> when it calls back into the
+ * <code>Realm</code></li>
  * </ul>
  */
 public class JAASRealm extends RealmBase {

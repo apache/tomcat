@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.ant;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -27,6 +28,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.catalina.util.IOTools;
 import org.apache.tomcat.util.http.Method;
@@ -51,7 +53,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
     /**
      * The charset used during URL encoding.
      */
-    protected String charset = "ISO-8859-1";
+    protected String charset = "UTF-8";
 
     /**
      * Returns the charset used during URL encoding.
@@ -93,6 +95,35 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
      */
     public void setPassword(String password) {
         this.password = password;
+    }
+
+
+    /**
+     * The timeout, in seconds, used when establishing a connection to the server and when reading data from it. The
+     * default value of zero means no timeout, in which case an unresponsive server may cause the build to block
+     * indefinitely.
+     */
+    protected int timeout = 0;
+
+    /**
+     * Returns the connection and read timeout, in seconds.
+     *
+     * @return the timeout in seconds; zero means no timeout
+     */
+    public int getTimeout() {
+        return this.timeout;
+    }
+
+    /**
+     * Sets the connection and read timeout, in seconds.
+     *
+     * @param timeout the timeout in seconds; zero (the default) means no timeout
+     */
+    public void setTimeout(int timeout) {
+        if (timeout < 0) {
+            throw new IllegalArgumentException("timeout may not be negative");
+        }
+        this.timeout = timeout;
     }
 
 
@@ -227,6 +258,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
             hconn.setAllowUserInteraction(false);
             hconn.setDoInput(true);
             hconn.setUseCaches(false);
+            configureTimeout(hconn, timeout);
 
             // Set up authorization with our credentials
             Authenticator authenticator = new TaskAuthenticator(username, password);
@@ -244,6 +276,11 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                     hconn.setRequestProperty("Content-Length", "" + contentLength);
 
                     hconn.setFixedLengthStreamingMode(contentLength);
+                } else {
+                    // The length is unknown. Use chunked streaming to avoid the
+                    // default HttpURLConnection behaviour of buffering the
+                    // entire request body in memory.
+                    hconn.setChunkedStreamingMode(0);
                 }
             } else {
                 hconn.setDoOutput(false);
@@ -260,6 +297,11 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                     IOTools.flow(istream, ostream);
                 }
             }
+
+            // For error responses, getInputStream() below would throw and
+            // the response body - which typically explains the error -
+            // would be discarded. Include its first line in the message.
+            reportErrorResponse(hconn, command);
 
             // Process the response message
             reader = new InputStreamReader(hconn.getInputStream(), StandardCharsets.UTF_8);
@@ -325,6 +367,60 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
     }
 
 
+    /**
+     * Configures the given connection with the given timeout.
+     *
+     * @param urlConn The connection for which the timeout should be configured
+     * @param seconds Timeout to configure in seconds
+     */
+    protected void configureTimeout(URLConnection urlConn, int seconds) {
+        if (seconds > 0) {
+            // timeout is in seconds.
+            long millis = TimeUnit.SECONDS.toMillis(seconds);
+            // This is about 24 days so is unlikely to happen but limit it to avoid an IAE in setConnectTimeout()
+            if (millis > Integer.MAX_VALUE) {
+                millis = Integer.MAX_VALUE;
+            }
+            urlConn.setConnectTimeout((int) millis);
+            urlConn.setReadTimeout((int) millis);
+        }
+    }
+
+
+    /**
+     * Checks the response status code and throws an IOException with the response body in the message if the status
+     * code is 400 or above.
+     *
+     * @param hconn   The HTTP connection to be checked
+     * @param command The command associated with the request
+     *
+     * @throws IOException if the response has a status code of 400 or above
+     */
+    protected void reportErrorResponse(HttpURLConnection hconn, String command) throws IOException {
+        int responseCode = hconn.getResponseCode();
+        if (responseCode >= HttpURLConnection.HTTP_BAD_REQUEST) {
+            String errorBody = null;
+            try (InputStream errorStream = hconn.getErrorStream()) {
+                if (errorStream != null) {
+                    BufferedReader errorReader = new BufferedReader(
+                            new InputStreamReader(errorStream, StandardCharsets.UTF_8));
+                    errorBody = errorReader.readLine();
+                }
+            }
+            StringBuilder message = new StringBuilder();
+            message.append("Server returned HTTP response code: ");
+            message.append(responseCode);
+            message.append(" for URL: ");
+            message.append(url);
+            message.append(command);
+            if (errorBody != null && !errorBody.isEmpty()) {
+                message.append(" - ");
+                message.append(errorBody);
+            }
+            throw new IOException(message.toString());
+        }
+    }
+
     /*
      * This is a hack. We need to use streaming to avoid OOME on large uploads. We'd like to use
      * Authenticator.setDefault() for authentication as the JRE then provides the DIGEST client implementation. However,
@@ -346,6 +442,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
         hconn.setAllowUserInteraction(false);
         hconn.setDoInput(true);
         hconn.setUseCaches(false);
+        configureTimeout(hconn, timeout);
         hconn.setDoOutput(false);
         hconn.setAuthenticator(authenticator);
         hconn.setRequestMethod(Method.OPTIONS);
@@ -353,6 +450,11 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
 
         // Establish the connection with the server
         hconn.connect();
+
+        // For error responses, getInputStream() below would throw and
+        // the response body - which typically explains the error -
+        // would be discarded. Include its first line in the message.
+        reportErrorResponse(hconn, " pre-authentication");
 
         // Swallow response message
         try (InputStream is = hconn.getInputStream()) {

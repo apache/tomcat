@@ -145,10 +145,7 @@ public class ClassLoaderLogManager extends LogManager {
         info.loggers.put(loggerName, logger);
 
         // Apply initial level for new logger
-        final String levelString = getProperty(loggerName + ".level");
-        if (levelString != null) {
-            logger.setLevel(Level.parse(levelString.trim()));
-        }
+        applyLevel(logger);
 
         // Always instantiate parent loggers so that
         // we can control log categories even during runtime
@@ -173,6 +170,43 @@ public class ClassLoaderLogManager extends LogManager {
 
         // Add associated handlers, if any are defined using the .handlers property.
         // In this case, handlers of the parent logger(s) will not be used
+        applyHandlers(classLoader, logger);
+
+        return true;
+    }
+
+
+    /**
+     * Apply the level property of the given logger, if it has one, as it is resolved for the current thread's class
+     * loader. This matches the initial registration: when the logger has no level property its level is left
+     * untouched, so that it inherits from its parent.
+     */
+    private void applyLevel(Logger logger) {
+        String levelString = getProperty(logger.getName() + ".level");
+        if (levelString != null) {
+            logger.setLevel(Level.parse(levelString.trim()));
+        }
+    }
+
+
+    /**
+     * Set the level of the given logger to the level it resolves to, clearing it (so the logger inherits from its
+     * parent) when the logger has no level property. This is the reconfiguration counterpart of {@link #applyLevel}:
+     * a level property that has been removed from the configuration must no longer apply to an existing logger.
+     */
+    private void resetLevel(Logger logger) {
+        String levelString = getProperty(logger.getName() + ".level");
+        logger.setLevel(levelString == null ? null : Level.parse(levelString.trim()));
+    }
+
+
+    /**
+     * Apply the handler list and the useParentHandlers property of the given logger, as they are resolved for the given
+     * class loader. Handlers are looked up (also in the parent class loaders, as during registration) by the name they
+     * are configured with.
+     */
+    private void applyHandlers(ClassLoader classLoader, Logger logger) {
+        String loggerName = logger.getName();
         String handlers = getProperty(loggerName + ".handlers");
         if (handlers != null) {
             logger.setUseParentHandlers(false);
@@ -182,7 +216,7 @@ public class ClassLoaderLogManager extends LogManager {
                 Handler handler = null;
                 ClassLoader current = classLoader;
                 while (current != null) {
-                    info = classLoaderLoggers.get(current);
+                    ClassLoaderLogInfo info = classLoaderLoggers.get(current);
                     if (info != null) {
                         handler = info.handlers.get(handlerName);
                         if (handler != null) {
@@ -204,8 +238,6 @@ public class ClassLoaderLogManager extends LogManager {
         if (Boolean.parseBoolean(useParentHandlersString)) {
             logger.setUseParentHandlers(true);
         }
-
-        return true;
     }
 
 
@@ -306,6 +338,146 @@ public class ClassLoaderLogManager extends LogManager {
     public void readConfiguration(InputStream is) throws IOException, SecurityException {
         reset();
         readConfiguration(is, getClassLoader());
+    }
+
+    /**
+     * Re-read the logging configuration of the class loader associated with the current thread, replacing the
+     * configuration that is in effect. In contrast to {@link #readConfiguration(InputStream)}, which keeps the
+     * previously loaded properties and configures only the loggers created afterwards, this method
+     * <ul>
+     * <li>replaces (rather than merges) the configuration properties,</li>
+     * <li>closes the handlers owned by this class loader and creates the handlers of the new configuration,</li>
+     * <li>applies the resulting levels and handler lists to the loggers that exist already.</li>
+     * </ul>
+     * The change therefore takes effect for code that holds a static reference to a logger. The root logger keeps its
+     * identity (the local root loggers of child class loaders delegate to it); only its handlers are replaced.
+     * <p>
+     * Levels and handlers configured programmatically are overwritten by the configuration. The level of the local root
+     * logger defaults to {@code INFO} (as during the initial configuration) when it has no parent and the
+     * configuration does not set {@code .level}.
+     *
+     * @param is InputStream containing the new configuration
+     *
+     * @throws IOException       Error reading the configuration
+     * @throws SecurityException Not allowed by the security manager
+     */
+    public void reconfigure(InputStream is) throws IOException, SecurityException {
+        reconfigure(is, getClassLoader());
+    }
+
+
+    /**
+     * Re-read the logging configuration of the given class loader as {@link #reconfigure(InputStream)}. Note that the
+     * lookup of the properties during the creation of the handlers uses the thread context class loader (see
+     * {@link #getClassLoader()}), so the caller should have set the context class loader to {@code classLoader} before
+     * calling this method.
+     *
+     * @param is          InputStream containing the new configuration
+     * @param classLoader Class loader whose configuration is replaced
+     *
+     * @throws IOException Error reading the configuration
+     */
+    public synchronized void reconfigure(InputStream is, ClassLoader classLoader) throws IOException {
+
+        if (classLoader == null) {
+            classLoader = this.getClass().getClassLoader();
+        }
+        ClassLoaderLogInfo info = getClassLoaderInfo(classLoader);
+
+        // Remove the handler wiring of the previous configuration. Handlers owned by this class loader are
+        // closed; handlers owned by a parent class loader are only detached (they are closed when that class
+        // loader is itself reconfigured, and their replacements are found again by name below).
+        resetLoggers(info);
+
+        // Replace, rather than merge, the configuration properties: a property that is no longer in the
+        // configuration must no longer apply, neither here nor to the loggers created later.
+        info.props.clear();
+        readConfiguration(is, classLoader);
+
+        // Re-apply the configuration to the loggers that exist already.
+        Logger rootLogger = info.rootNode.logger;
+        if (info.props.getProperty(".handlers") == null) {
+            // readConfiguration() has attached the handlers of the new configuration to the root logger
+            // (that is where the "handlers" property applies); only the level handling remains.
+            resetLevel(rootLogger);
+        } else {
+            // The handlers named by the ".handlers" property are applied as during the initial
+            // registration, when the lookup of the ".handlers" property was enabled by the thread local.
+            try {
+                addingLocalRootLogger.set(Boolean.TRUE);
+                reconfigureLogger(classLoader, rootLogger);
+            } finally {
+                addingLocalRootLogger.set(Boolean.FALSE);
+            }
+        }
+        if (rootLogger.getParent() == null && rootLogger.getLevel() == null) {
+            rootLogger.setLevel(Level.INFO);
+        }
+        for (Logger logger : info.loggers.values()) {
+            if (logger != rootLogger) {
+                reconfigureLogger(classLoader, logger);
+            }
+        }
+    }
+
+
+    /**
+     * Re-apply the configuration that the class loader associated with the current thread resolves to (its own
+     * properties, with the fallback to the parent class loaders that also applies when a logger is registered) to the
+     * loggers registered for that class loader.
+     * <p>
+     * This method reads no configuration file, creates no handler and closes nothing: it re-wires the existing loggers
+     * against the properties and the handler instances as they are now, detaching the handlers that the loggers carry
+     * from an earlier configuration (including handlers configured programmatically, which the configuration does not
+     * know about and therefore removes). It is the companion of {@link #reconfigure(InputStream)} for the class loaders
+     * whose configuration is owned by a parent class loader: after the parent is reconfigured, the loggers of the child
+     * class loaders (the ones a container class holds a static reference to) pick up the new levels and the new
+     * handler instances with this call.
+     */
+    public void refreshLoggers() {
+        refreshLoggers(getClassLoader());
+    }
+
+
+    /**
+     * Re-apply the configuration to the loggers of the given class loader as {@link #refreshLoggers()}. As with
+     * {@link #reconfigure(InputStream, ClassLoader)}, the caller should have set the thread context class loader to
+     * {@code classLoader} so that the property resolution (including the fallback to the parent class loaders) is the
+     * one the loggers of that class loader see.
+     *
+     * @param classLoader Class loader whose loggers are reconfigured
+     */
+    public synchronized void refreshLoggers(ClassLoader classLoader) {
+
+        if (classLoader == null) {
+            classLoader = this.getClass().getClassLoader();
+        }
+        ClassLoaderLogInfo info = getClassLoaderInfo(classLoader);
+        Logger rootLogger = info.rootNode.logger;
+        for (Logger logger : info.loggers.values()) {
+            // The root logger owns the handlers of this class loader. Its wiring is only changed by
+            // readConfiguration()/reconfigure() of the class loader that owns the handlers, never by a refresh.
+            if (logger == rootLogger) {
+                continue;
+            }
+            reconfigureLogger(classLoader, logger);
+        }
+    }
+
+
+    /**
+     * Reset the wiring of an existing logger and re-apply the level and handler configuration it resolves to, so that
+     * the result is equivalent to the configuration of a newly registered logger.
+     */
+    private void reconfigureLogger(ClassLoader classLoader, Logger logger) {
+        for (Handler handler : logger.getHandlers()) {
+            logger.removeHandler(handler);
+        }
+        // A newly registered logger delegates to its parent. Restore that default before re-applying, so that a
+        // logger that no longer has its own handler list delegates again.
+        logger.setUseParentHandlers(true);
+        resetLevel(logger);
+        applyHandlers(classLoader, logger);
     }
 
     @Override

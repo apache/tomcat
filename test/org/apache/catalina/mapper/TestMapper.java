@@ -217,6 +217,55 @@ public class TestMapper extends LoggingBaseTest {
     }
 
     @Test
+    public void testRemoveDefaultHost() throws Exception {
+        Mapper defaultHostMapper = new Mapper();
+
+        Host host = createHost("defaulthostobject");
+        defaultHostMapper.addHost("defaulthost", new String[0], host);
+        defaultHostMapper.addContextVersion("defaulthost", host, "", "0", createContext("defaulthostcontext"),
+                new String[0], null, null);
+        defaultHostMapper.setDefaultHostName("defaulthost");
+
+        defaultHostMapper.removeHost("defaulthost");
+
+        MappingData mappingData = new MappingData();
+        MessageBytes hostMB = MessageBytes.newInstance();
+        hostMB.setString("unknown.example");
+        MessageBytes uriMB = MessageBytes.newInstance();
+        char[] uri = "/index.html".toCharArray();
+        uriMB.setChars(uri, 0, uri.length);
+
+        defaultHostMapper.map(hostMB, uriMB, null, mappingData);
+
+        Assert.assertNull(mappingData.host);
+    }
+
+    @Test
+    public void testRemoveDefaultHostAlias() throws Exception {
+        Mapper defaultHostMapper = new Mapper();
+
+        Host host = createHost("aliasdefaulthostobject");
+        defaultHostMapper.addHost("hostname", new String[0], host);
+        defaultHostMapper.addHostAlias("hostname", "aliasname");
+        defaultHostMapper.addContextVersion("hostname", host, "", "0", createContext("aliasdefaulthostcontext"),
+                new String[0], null, null);
+        defaultHostMapper.setDefaultHostName("aliasname");
+
+        defaultHostMapper.removeHostAlias("aliasname");
+
+        MappingData mappingData = new MappingData();
+        MessageBytes hostMB = MessageBytes.newInstance();
+        hostMB.setString("unknown.example");
+        MessageBytes uriMB = MessageBytes.newInstance();
+        char[] uri = "/index.html".toCharArray();
+        uriMB.setChars(uri, 0, uri.length);
+
+        defaultHostMapper.map(hostMB, uriMB, null, mappingData);
+
+        Assert.assertNull(mappingData.host);
+    }
+
+    @Test
     public void testMap() throws Exception {
         MappingData mappingData = new MappingData();
         MessageBytes host = MessageBytes.newInstance();

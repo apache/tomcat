@@ -228,7 +228,16 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     public final SocketState dispatch(SocketEvent status) throws IOException {
 
         if (status == SocketEvent.OPEN_WRITE && response.getWriteListener() != null) {
-            asyncStateMachine.asyncOperation();
+            if (!asyncStateMachine.asyncOperation()) {
+                // The notification raced with async completion on another
+                // thread. Nothing to notify; returning LONG lets
+                // asyncPostProcess() complete the cycle as usual.
+                if (getLog().isTraceEnabled()) {
+                    getLog().trace(sm.getString("abstractProcessor.lateWriteNotification",
+                            request.requestURI()));
+                }
+                return SocketState.LONG;
+            }
             try {
                 if (flushBufferedWrite()) {
                     return SocketState.LONG;
@@ -241,7 +250,16 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
                 request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, ioe);
             }
         } else if (status == SocketEvent.OPEN_READ && request.getReadListener() != null) {
-            dispatchNonBlockingRead();
+            if (!dispatchNonBlockingRead()) {
+                // The notification raced with async completion on another
+                // thread. Nothing to notify; returning LONG lets
+                // asyncPostProcess() complete the cycle as usual.
+                if (getLog().isTraceEnabled()) {
+                    getLog().trace(sm.getString("abstractProcessor.lateReadNotification",
+                            request.requestURI()));
+                }
+                return SocketState.LONG;
+            }
         } else if (status == SocketEvent.ERROR) {
             // An I/O error occurred on a non-container thread. This includes:
             // - read/write timeouts fired by the Poller in NIO
@@ -700,9 +718,11 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
     /**
      * Perform any necessary processing for a non-blocking read before dispatching to the adapter.
+     *
+     * @return {@code true} if the read listener should be notified, otherwise {@code false}
      */
-    protected void dispatchNonBlockingRead() {
-        asyncStateMachine.asyncOperation();
+    protected boolean dispatchNonBlockingRead() {
+        return asyncStateMachine.asyncOperation();
     }
 
 

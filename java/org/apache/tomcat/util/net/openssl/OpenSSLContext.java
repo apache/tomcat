@@ -114,6 +114,14 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         this(certificate, negotiableProtocols, false);
     }
 
+    /**
+     * Constructs an OpenSSLContext for the given certificate, protocols and client/server mode.
+     *
+     * @param certificate The SSL host config certificate
+     * @param negotiableProtocols The list of negotiable protocols
+     * @param clientMode {@code true} for client mode, otherwise server mode
+     * @throws SSLException if initialization fails
+     */
     public OpenSSLContext(SSLHostConfigCertificate certificate, List<String> negotiableProtocols, boolean clientMode)
             throws SSLException {
         this.sslHostConfig = certificate.getSSLHostConfig();

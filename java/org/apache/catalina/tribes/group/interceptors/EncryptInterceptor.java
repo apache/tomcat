@@ -113,7 +113,9 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
 
     @Override
     public void stop(int svc) throws ChannelException {
-        if (Channel.SND_TX_SEQ == (svc & Channel.SND_TX_SEQ)) {
+        // The manager is null if start() failed or was never called with the SND_TX_SEQ
+        // option. Avoid an NPE at shutdown that would mask the original configuration error.
+        if (Channel.SND_TX_SEQ == (svc & Channel.SND_TX_SEQ) && encryptionManager != null) {
             encryptionManager.shutdown();
         }
 

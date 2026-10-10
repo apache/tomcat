@@ -30,6 +30,7 @@ import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.UniqueId;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 import org.apache.catalina.tribes.group.InterceptorPayload;
+import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.util.ExecutorFactory;
 import org.apache.catalina.tribes.util.StringManager;
 import org.apache.catalina.tribes.util.TcclThreadFactory;
@@ -58,7 +59,8 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
      */
     protected volatile boolean run = false;
     /**
-     * Whether to use deep clone.
+     * Whether to use deep clone. When false, the message is still detached from the caller's buffer by a shallow
+     * clone before it is queued, but the unique id and address are shared rather than re-serialized.
      */
     protected boolean useDeepClone = true;
     /**
@@ -113,11 +115,22 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
             // add to queue
             if (useDeepClone) {
                 msg = (ChannelMessage) msg.deepclone();
+            } else if (msg instanceof ChannelData channelData) {
+                // The caller of sendMessage() may reuse the buffer that backs the
+                // message as soon as this method returns, e.g. GroupChannel.send()
+                // returns it to the BufferPool. Clone, which copies the message
+                // data, so the queued message is independent of that buffer.
+                msg = channelData.clone();
             }
-            if (!addToQueue(msg, destination, payload)) {
+            // Record the queue size before the send task is submitted. Downstream
+            // interceptors may replace or extend the message payload while the message
+            // is being sent, so the accounting must use a single snapshot of the length.
+            long queuedLength = msg.getMessage().getLength();
+            addAndGetCurrentSize(queuedLength);
+            if (!addToQueue(msg, destination, payload, queuedLength)) {
+                addAndGetCurrentSize(-queuedLength);
                 throw new ChannelException(sm.getString("messageDispatchInterceptor.unableAdd.queue"));
             }
-            addAndGetCurrentSize(msg.getMessage().getLength());
         } else {
             super.sendMessage(destination, msg, payload);
         }
@@ -132,8 +145,14 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
      * @return true if added
      */
     public boolean addToQueue(final ChannelMessage msg, final Member[] destination, final InterceptorPayload payload) {
+        return addToQueue(msg, destination, payload, msg.getMessage().getLength());
+    }
+
+
+    private boolean addToQueue(final ChannelMessage msg, final Member[] destination,
+            final InterceptorPayload payload, final long queuedLength) {
         try {
-            executor.execute(() -> sendAsyncData(msg, destination, payload));
+            executor.execute(() -> sendAsyncData(msg, destination, payload, queuedLength));
             return true;
         } catch (RejectedExecutionException ree) {
             return false;
@@ -154,6 +173,9 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
         }
         executor = ExecutorFactory.newThreadPool(maxSpareThreads, maxThreads, keepAliveTime, TimeUnit.MILLISECONDS,
                 new TcclThreadFactory("MessageDispatchInterceptor.MessageDispatchThread" + channelName));
+        // Tasks that were still in flight when a previous queue run was stopped may have
+        // adjusted the recorded size after stopQueue() reset it. Start from a clean state.
+        setAndGetCurrentSize(0);
         run = true;
     }
 
@@ -187,7 +209,8 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
 
 
     /**
-     * Set whether to use deep clone.
+     * Set whether to use deep clone. When false, the queued message is a shallow clone of the original with the
+     * message bytes copied to a new buffer rather than a fully re-serialized deep clone.
      * @param useDeepClone whether to use deep clone
      */
     public void setUseDeepClone(boolean useDeepClone) {
@@ -323,8 +346,10 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
      * @param msg the message
      * @param destination the destination
      * @param payload the payload
+     * @param queuedLength the message length as recorded when the message was enqueued
      */
-    protected void sendAsyncData(ChannelMessage msg, Member[] destination, InterceptorPayload payload) {
+    protected void sendAsyncData(ChannelMessage msg, Member[] destination, InterceptorPayload payload,
+            long queuedLength) {
         ErrorHandler handler = null;
         if (payload != null) {
             handler = payload.getErrorHandler();
@@ -356,7 +381,7 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
                 log.error(sm.getString("messageDispatchInterceptor.errorMessage.failed"), ex);
             }
         } finally {
-            addAndGetCurrentSize(-msg.getMessage().getLength());
+            addAndGetCurrentSize(-queuedLength);
         }
     }
 

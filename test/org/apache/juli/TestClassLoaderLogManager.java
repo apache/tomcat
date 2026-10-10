@@ -24,10 +24,13 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Random;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import org.junit.Assert;
@@ -109,6 +112,131 @@ public class TestClassLoaderLogManager {
             Assert.assertEquals(Level.INFO, rootLogger.getLevel());
         } finally {
             currentThread.setContextClassLoader(oldCL);
+        }
+    }
+
+    /*
+     * reconfigure() must replace the configuration and apply it to the loggers that already exist (which a container
+     * class holds a static reference to), unlike readConfiguration() which only configures loggers created afterwards.
+     */
+    @Test
+    public void testReconfigureReappliesToExistingLoggers() throws IOException {
+        final ClassLoader cl = new TestClassLoader();
+        final Thread currentThread = Thread.currentThread();
+        final ClassLoader oldCL = currentThread.getContextClassLoader();
+        try {
+            currentThread.setContextClassLoader(cl);
+            final ClassLoaderLogManager logManager = new ClassLoaderLogManager();
+
+            final String config1 = "handlers = " + StubHandler.class.getName() + System.lineSeparator()
+                    + "foo.level = INFO" + System.lineSeparator() + "bar.level = FINE" + System.lineSeparator();
+            logManager.reconfigure(config(config1), cl);
+
+            final Logger foo = new TesterLogger("foo");
+            Assert.assertTrue(logManager.addLogger(foo));
+            final Logger bar = new TesterLogger("bar");
+            Assert.assertTrue(logManager.addLogger(bar));
+            Assert.assertEquals(Level.INFO, foo.getLevel());
+            Assert.assertEquals(Level.FINE, bar.getLevel());
+
+            final Logger root = logManager.getLogger("");
+            Assert.assertNotNull("root logger is null", root);
+            final Handler[] before = root.getHandlers();
+            Assert.assertEquals(1, before.length);
+            final StubHandler oldHandler = (StubHandler) before[0];
+
+            // New configuration: foo changes level, bar's level property is removed entirely.
+            final String config2 = "handlers = " + StubHandler.class.getName() + System.lineSeparator()
+                    + "foo.level = FINE" + System.lineSeparator();
+            logManager.reconfigure(config(config2), cl);
+
+            // The level of an existing logger is updated ...
+            Assert.assertEquals(Level.FINE, foo.getLevel());
+            // ... and a property that has been removed no longer applies (the logger inherits again).
+            Assert.assertNull(bar.getLevel());
+
+            // The handler is recreated and the previous one closed.
+            final Handler[] after = root.getHandlers();
+            Assert.assertEquals(1, after.length);
+            Assert.assertNotSame(oldHandler, after[0]);
+            Assert.assertTrue("the previous handler was not closed", oldHandler.isClosed());
+            Assert.assertFalse(((StubHandler) after[0]).isClosed());
+        } finally {
+            currentThread.setContextClassLoader(oldCL);
+        }
+    }
+
+    /*
+     * refreshLoggers() re-applies the resolved configuration to the existing loggers, discarding levels and handlers
+     * that were set programmatically.
+     */
+    @Test
+    public void testRefreshLoggersReappliesConfiguration() throws IOException {
+        final ClassLoader cl = new TestClassLoader();
+        final Thread currentThread = Thread.currentThread();
+        final ClassLoader oldCL = currentThread.getContextClassLoader();
+        try {
+            currentThread.setContextClassLoader(cl);
+            final ClassLoaderLogManager logManager = new ClassLoaderLogManager();
+
+            final String config = "handlers = " + StubHandler.class.getName() + System.lineSeparator()
+                    + "foo.level = FINE" + System.lineSeparator();
+            logManager.reconfigure(config(config), cl);
+
+            final Logger foo = new TesterLogger("foo");
+            Assert.assertTrue(logManager.addLogger(foo));
+            Assert.assertEquals(Level.FINE, foo.getLevel());
+
+            // A level and a handler set programmatically, off-configuration.
+            foo.setLevel(Level.OFF);
+            final StubHandler extra = new StubHandler();
+            foo.addHandler(extra);
+
+            logManager.refreshLoggers();
+
+            // Back to the configured state: the configured level, and only the configuration knows the handlers.
+            Assert.assertEquals(Level.FINE, foo.getLevel());
+            Assert.assertEquals(0, foo.getHandlers().length);
+            Assert.assertFalse("a programmatic handler must not be closed by a refresh", extra.isClosed());
+        } finally {
+            currentThread.setContextClassLoader(oldCL);
+        }
+    }
+
+    private static InputStream config(String text) {
+        return new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8));
+    }
+
+    // A logger that can be instantiated directly so it can be registered on a ClassLoaderLogManager
+    // instance that is not the JVM's global log manager.
+    private static class TesterLogger extends Logger {
+        TesterLogger(String name) {
+            super(name, null);
+        }
+    }
+
+    // A no-op handler that records whether close() was called, so handler replacement can be observed.
+    public static class StubHandler extends Handler {
+
+        private volatile boolean closed = false;
+
+        public boolean isClosed() {
+            return closed;
+        }
+
+        @Override
+        public void publish(LogRecord record) {
+            // No output
+        }
+
+        @Override
+        public void flush() {
+            // Nothing to flush
+        }
+
+        @Override
+        public void close() throws SecurityException {
+            closed = true;
         }
     }
 

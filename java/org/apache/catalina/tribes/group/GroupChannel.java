@@ -493,7 +493,9 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
             ownExecutor = true;
         }
         super.start(svc);
-        monitorFuture = utilityExecutor.scheduleWithFixedDelay(this::startHeartbeat, 0, 60, TimeUnit.SECONDS);
+        if (monitorFuture == null || monitorFuture.isDone()) {
+            monitorFuture = utilityExecutor.scheduleWithFixedDelay(this::startHeartbeat, 0, 60, TimeUnit.SECONDS);
+        }
     }
 
     /**
@@ -516,27 +518,34 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
 
     @Override
     public synchronized void stop(int svc) throws ChannelException {
-        if (monitorFuture != null) {
-            monitorFuture.cancel(true);
-            monitorFuture = null;
-        }
-        if (heartbeatFuture != null) {
-            heartbeatFuture.cancel(true);
-            heartbeatFuture = null;
-        }
         super.stop(svc);
-        if ((svc & DEFAULT) == DEFAULT && sslContext != null) {
-            sslContext.close();
-            sslContext = null;
-        }
-        if (ownExecutor) {
-            utilityExecutor.shutdown();
-            utilityExecutor = null;
-            ownExecutor = false;
-        }
-        if (oname != null) {
-            JmxRegistry.getRegistry(this).unregisterJmx(oname);
-            oname = null;
+        if (coordinator.getStartLevel() == 0) {
+            // The monitor and the heartbeat only make sense while services
+            // are running. Cancel them, and release an executor that this
+            // channel owns, only once all services have been stopped. A
+            // partial stop must not tear down what the started services
+            // still rely on.
+            if (monitorFuture != null) {
+                monitorFuture.cancel(true);
+                monitorFuture = null;
+            }
+            if (heartbeatFuture != null) {
+                heartbeatFuture.cancel(true);
+                heartbeatFuture = null;
+            }
+            if ((svc & DEFAULT) == DEFAULT && sslContext != null) {
+                sslContext.close();
+                sslContext = null;
+            }
+            if (ownExecutor && utilityExecutor != null) {
+                utilityExecutor.shutdown();
+                utilityExecutor = null;
+                ownExecutor = false;
+            }
+            if (oname != null) {
+                JmxRegistry.getRegistry(this).unregisterJmx(oname);
+                oname = null;
+            }
         }
     }
 
@@ -663,6 +672,11 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
         return secure;
     }
 
+    /**
+     * Enables or disables the use of TLS to secure channel communication using a pre-shared key.
+     *
+     * @param secure boolean
+     */
     public void setSecure(boolean secure) {
         this.secure = secure;
     }
@@ -672,6 +686,11 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
         return pskDigest;
     }
 
+    /**
+     * Sets the name of the message digest algorithm used to derive the pre-shared key.
+     *
+     * @param pskDigest the digest algorithm name, for example <code>SHA256</code>
+     */
     public void setPskDigest(String pskDigest) {
         this.pskDigest = pskDigest;
     }
@@ -681,10 +700,22 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
         return pskIdentity;
     }
 
+    /**
+     * Sets the identity associated with the pre-shared key. Both the identity and the key must be set for the channel
+     * to use a pre-shared key.
+     *
+     * @param pskIdentity the pre-shared key identity
+     */
     public void setPskIdentity(String pskIdentity) {
         this.pskIdentity = pskIdentity;
     }
 
+    /**
+     * Sets the pre-shared key as a hex encoded string. Both the identity and the key must be set for the channel to
+     * use a pre-shared key.
+     *
+     * @param pskKey the hex encoded pre-shared key
+     */
     public void setPskKey(String pskKey) {
         this.pskKey = pskKey;
     }
@@ -694,10 +725,20 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
         return pskProtocol;
     }
 
+    /**
+     * Sets the TLS protocol name used for secure channel communication.
+     *
+     * @param pskProtocol the TLS protocol name, for example <code>TLSv1.3</code>
+     */
     public void setPskProtocol(String pskProtocol) {
         this.pskProtocol = pskProtocol;
     }
 
+    /**
+     * Returns the SSL context used to secure the channel with TLS.
+     *
+     * @return the SSL context, or <code>null</code> if the channel is not secure
+     */
     public TribesSslContext getSslContext() {
         return sslContext;
     }

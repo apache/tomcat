@@ -185,6 +185,8 @@ public class StoreConfig implements IStoreConfig {
                             desc.setBackup(oldBackup);
                             desc.setExternalAllowed(oldExternalAllowed);
                         }
+                    } else {
+                        log.warn(sm.getString("factory.storeNoDescriptor", aContext.getClass()));
                     }
                 } else {
                     log.error(sm.getString("config.missingContextFile", aContext.getPath()));
@@ -223,14 +225,16 @@ public class StoreConfig implements IStoreConfig {
     public synchronized boolean store(Context aContext) {
         try {
             StoreDescription desc = getRegistry().findDescription(aContext.getClass());
-            if (desc != null) {
-                boolean old = desc.isStoreSeparate();
-                try {
-                    desc.setStoreSeparate(true);
-                    desc.getStoreFactory().store(null, -2, aContext);
-                } finally {
-                    desc.setStoreSeparate(old);
-                }
+            if (desc == null) {
+                log.warn(sm.getString("factory.storeNoDescriptor", aContext.getClass()));
+                return false;
+            }
+            boolean old = desc.isStoreSeparate();
+            try {
+                desc.setStoreSeparate(true);
+                desc.getStoreFactory().store(null, -2, aContext);
+            } finally {
+                desc.setStoreSeparate(old);
             }
             return true;
         } catch (Exception e) {

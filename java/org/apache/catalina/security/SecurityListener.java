@@ -101,6 +101,7 @@ public class SecurityListener implements LifecycleListener {
         } else {
             String[] userNames = userNameList.split(",");
             for (String userName : userNames) {
+                userName = userName.trim();
                 if (!userName.isEmpty()) {
                     checkedOsUsers.add(userName.toLowerCase(Locale.getDefault()));
                 }

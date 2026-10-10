@@ -1497,7 +1497,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
                 clazz = Class.forName(jaspicCallbackHandlerClass);
             }
             callbackHandler = (CallbackHandler) clazz.getConstructor().newInstance();
-        } catch (ReflectiveOperationException e) {
+        } catch (ReflectiveOperationException | ClassCastException e) {
             throw new SecurityException(e);
         }
 

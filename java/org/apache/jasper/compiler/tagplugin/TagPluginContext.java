@@ -140,5 +140,12 @@ public interface TagPluginContext {
      * @return <code>true</code> if inside a tag file
      */
     boolean isTagFile();
+
+    /**
+     * Generate the code to terminate the current page.
+     */
+    default void generatePageTermination() {
+        throw new UnsupportedOperationException();
+    }
 }
 

@@ -169,6 +169,14 @@
       will be used.</p>
     </attribute>
 
+    <attribute name="maxLocaleCount" required="false">
+      <p>The maximum number of locales (obtained from the
+      <code>Accept-Language</code> header(s)) that are permitted for a request.
+      Requests that exceed this limit will be rejected when the locales are
+      parsed. A value of less than 0 means no limit. If not specified, a
+      default of 10 is used.</p>
+    </attribute>
+
     <attribute name="maxParameterCount" required="false">
       <p>The maximum total number of request parameters (including uploaded
       files) obtained from the query string and, for POST requests, the request
@@ -1120,6 +1128,14 @@
   in a <strong>Certificate</strong> element within an
   <strong>SSLHostConfig</strong>. For further information, see the SSL Support
   section below.</p>
+
+  <p>Using name-based virtual hosts on a secured connection requires careful
+  configuration of the names specified in a single certificate or the use of
+  SNI. SNI allows multiple certificates with different names to be associated
+  with a single TLS connector. Administrators should be aware that virtual host
+  matching using the HTTP host name header and TLS configuration (including
+  certificate) matching using SNI are completely separate processes and that it
+  is likely that they will want to keep the two configurations synchronized.</p>
 
   <p>When OpenSSL is providing the TLS implementation, one or more
   <strong>OpenSSLConfCmd</strong> elements may be nested inside a

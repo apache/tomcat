@@ -170,6 +170,14 @@ public class RpcChannel implements ChannelListener {
             boolean asyncReply =
                     ((replyMessageOptions & Channel.SEND_OPTIONS_ASYNCHRONOUS) == Channel.SEND_OPTIONS_ASYNCHRONOUS);
             Serializable reply = callback.replyRequest(rmsg.message, sender);
+            if (reply == null) {
+                // The callback is documented to return null when no reply
+                // should be sent
+                if (excallback != null && !asyncReply) {
+                    excallback.replySucceeded(msg, null, sender);
+                }
+                return;
+            }
             ErrorHandler handler = null;
             final Serializable request = msg;
             final Serializable response = reply;

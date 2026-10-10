@@ -40,6 +40,7 @@ public abstract class BaseCatalinaMBean<T> extends BaseModelMBean {
      * Returns the managed resource associated with this MBean.
      *
      * @return the managed resource
+     *
      * @throws MBeanException if the resource cannot be retrieved
      */
     protected T doGetManagedResource() throws MBeanException {
@@ -57,7 +58,9 @@ public abstract class BaseCatalinaMBean<T> extends BaseModelMBean {
      * Creates a new instance of the specified class.
      *
      * @param type the fully qualified class name
+     *
      * @return the new instance
+     *
      * @throws MBeanException if the instance cannot be created
      */
     protected static Object newInstance(String type) throws MBeanException {

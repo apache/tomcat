@@ -81,6 +81,7 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
      */
     public RestCsrfPreventionFilter() {
     }
+
     private enum MethodType {
         NON_MODIFYING_METHOD,
         MODIFYING_METHOD
@@ -204,14 +205,18 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
         public boolean apply(HttpServletRequest request, HttpServletResponse response) {
             String nonceFromRequest = nonceFromRequestHeader.getNonce(request, Constants.CSRF_REST_NONCE_HEADER_NAME);
             if (Objects.nonNull(nonceFromRequest) && fetchRequest.test(nonceFromRequest)) {
-                String nonceFromSessionStr = nonceFromSession.getNonce(request.getSession(false),
-                        Constants.CSRF_REST_NONCE_SESSION_ATTR_NAME);
-                if (nonceFromSessionStr == null) {
-                    nonceFromSessionStr = generateNonce(request);
-                    nonceToSession.setNonce(Objects.requireNonNull(request.getSession(true)),
-                            Constants.CSRF_REST_NONCE_SESSION_ATTR_NAME, nonceFromSessionStr);
+                HttpSession session = request.getSession(true);
+                Objects.requireNonNull(session);
+                synchronized (session) {
+                    String nonceFromSessionStr =
+                            nonceFromSession.getNonce(session, Constants.CSRF_REST_NONCE_SESSION_ATTR_NAME);
+                    if (nonceFromSessionStr == null) {
+                        nonceFromSessionStr = generateNonce(request);
+                        nonceToSession.setNonce(session, Constants.CSRF_REST_NONCE_SESSION_ATTR_NAME,
+                                nonceFromSessionStr);
+                    }
+                    nonceToResponse.setNonce(response, Constants.CSRF_REST_NONCE_HEADER_NAME, nonceFromSessionStr);
                 }
-                nonceToResponse.setNonce(response, Constants.CSRF_REST_NONCE_HEADER_NAME, nonceFromSessionStr);
                 if (getLogger().isDebugEnabled()) {
                     getLogger().debug(sm.getString("restCsrfPreventionFilter.fetch.debug", request.getMethod(),
                             request.getRequestURI()));

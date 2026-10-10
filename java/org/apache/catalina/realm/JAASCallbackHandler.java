@@ -32,8 +32,8 @@ import org.apache.tomcat.util.res.StringManager;
  * Implementation of the JAAS <code>CallbackHandler</code> interface, used to negotiate delivery of the username and
  * credentials that were specified to our constructor. No interaction with the user is required (or possible).
  * <p>
- * This <code>CallbackHandler</code> will pre-digest the supplied password, if required by the
- * <code>&lt;Realm&gt;</code> element in <code>server.xml</code>.
+ * The supplied password or client digest is passed to the <code>LoginModule</code> unchanged. Any digest comparison is
+ * expected to be performed by the <code>LoginModule</code> when it calls back into the <code>Realm</code>.
  * <p>
  * At present, <code>JAASCallbackHandler</code> knows how to handle callbacks of type
  * <code>javax.security.auth.callback.NameCallback</code>,
@@ -46,8 +46,7 @@ public class JAASCallbackHandler implements CallbackHandler {
 
 
     /**
-     * Construct a callback handler configured with the specified values. Note that if the <code>JAASRealm</code>
-     * instance specifies digested passwords, the <code>password</code> parameter will be pre-digested here.
+     * Construct a callback handler configured with the specified values.
      *
      * @param realm    Our associated JAASRealm instance
      * @param username Username to be authenticated with
@@ -64,7 +63,9 @@ public class JAASCallbackHandler implements CallbackHandler {
      *
      * @param realm      Our associated JAASRealm instance
      * @param username   Username to be authenticated with
-     * @param password   Password to be authenticated with
+     * @param password   Password to be authenticated with. For DIGEST authentication this is the client digest, which
+     *                       is passed through unchanged since the digest comparison is performed by the LoginModule
+     *                       when it calls back into the Realm
      * @param nonce      Server generated nonce
      * @param nc         Nonce count
      * @param cnonce     Client generated nonce
@@ -78,12 +79,7 @@ public class JAASCallbackHandler implements CallbackHandler {
             String cnonce, String qop, String realmName, String digestA2, String algorithm, String authMethod) {
         this.realm = realm;
         this.username = username;
-
-        if (password != null && realm.hasMessageDigest(algorithm)) {
-            this.password = realm.getCredentialHandler().mutate(password);
-        } else {
-            this.password = password;
-        }
+        this.password = password;
         this.nonce = nonce;
         this.nc = nc;
         this.cnonce = cnonce;

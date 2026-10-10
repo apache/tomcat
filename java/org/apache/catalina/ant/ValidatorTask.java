@@ -97,6 +97,7 @@ public class ValidatorTask extends BaseRedirectorHelperTask {
         ClassLoader oldCL = currentThread.getContextClassLoader();
         currentThread.setContextClassLoader(ValidatorTask.class.getClassLoader());
 
+        // External entities are not blocked since they are always fully trusted
         Digester digester = DigesterFactory.newDigester(true, true, null, false);
         try (InputStream stream = new BufferedInputStream(new FileInputStream(file.getCanonicalFile()))) {
             InputSource is = new InputSource(file.toURI().toURL().toExternalForm());

@@ -112,7 +112,7 @@
     <changelog>
       <scode>
         This release contains all of the changes up to and including those in
-        Apache Tomcat 11.0.26 plus the additional changes listed below. (markt)
+        Apache Tomcat 11.0.27 plus the additional changes listed below. (markt)
       </scode>
       <update>
         The minimum Java version has been updated to Java 21. (markt)
@@ -253,33 +253,99 @@
       </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
-        When starting a web application, don't try and use the web application
-        class loader until after the web application class loader has started.
-        (markt)
+        Use the resolved <code>roleBase</code> value when computing the
+        distinguished name of a group found during a nested role search in
+        <code>JNDIRealm</code>, so that groups nested more than one level deep
+        are found when <code>roleBase</code> uses pattern replacements. (remm)
       </fix>
       <fix>
-        Fix various concurrency issues around adding and removing
-        <code>Realm</code>s from a <code>CombinedRealm</code>, in particular
-        doing so while the <code>CombinedRealm</code> is in use. Note that once
-        a <code>Realm</code> instance has been removed from a
-        <code>CombinedRealm</code> instance at run-time, the removed
-        <code>Realm</code> instance may not be reused apart from re-adding it to
-        the same <code>CombinedRealm</code>. (markt)
-      </fix>
-      <update>
-        When <code>StoreConfig</code> re-writes an existing
-        <code>server.xml</code> or context configuration file, preserve the
-        layout of the existing file (comments, blank lines and attribute
-        order) on a best effort basis. (remm)
-      </update>
-      <fix>
-        Track in <code>StandardContext</code> whether the context was
-        deployed from a <code>Context</code> element in
-        <code>server.xml</code>. Use it to have <code>StoreConfig</code>
-        save to a new config file. (remm)
+        Track the <code>StartTlsResponse</code> used by <code>JNDIRealm</code>
+        per connection rather than in a single realm-wide field, so that
+        closing one pooled connection when <code>useStartTls</code> is enabled
+        no longer terminates the TLS session of another, still active pooled
+        connection. (remm)
       </fix>
       <fix>
-        Improve error handling on start-up. (markt)
+        Select the primary or alternate directory server URL for each
+        <code>JNDIRealm</code> connection attempt individually rather than via
+        a realm-wide mutable flag that concurrent pooled connections raced on,
+        which could transiently cause a connection to use the wrong URL. Note
+        that this removes the <code>connectionAttempt</code> protected field
+        and changes the signature of the protected
+        <code>getDirectoryContextEnvironment()</code> method. (remm)
+      </fix>
+      <fix>
+        Stop pre-digesting the HTTP DIGEST client digest in
+        <code>JAASCallbackHandler</code>. The pre-digest, a leftover from the
+        pre-<code>CredentialHandler</code> design, could never match the
+        deterministic server digest and so made DIGEST authentication via
+        <code>JAASRealm</code> always fail whenever the realm's credential
+        handler algorithm matched the digest algorithm. The client digest is
+        now passed to the <code>LoginModule</code> unchanged, consistent with
+        the non-JAAS realms. (remm)
+      </fix>
+      <fix>
+        Give the SSI conditional expression operators <code>&amp;&amp;</code>
+        and <code>||</code> distinct precedences, <code>&amp;&amp;</code>
+        binding more tightly than <code>||</code>, consistent with the
+        convention used by the C-like languages and by Apache HTTP Server
+        expressions. Previously, mixed chains were evaluated strictly left to
+        right, so <code>$a || $b &amp;&amp; $c</code> was evaluated as
+        <code>($a || $b) &amp;&amp; $c</code> rather than the expected
+        <code>$a || ($b &amp;&amp; $c)</code>. Note that this changes the
+        evaluation of existing documents using unparenthesized mixed
+        <code>&amp;&amp;</code> and <code>||</code> chains. (remm)
+      </fix>
+      <fix>
+        Fix the built-in SSI variables <code>DATE_GMT</code>,
+        <code>DATE_LOCAL</code> and <code>LAST_MODIFIED</code> always
+        resolving to <code>null</code> and rendering as
+        <code>(none)</code>. The mediator stored and looked them up as
+        external variables using names starting with its own fully qualified
+        class name, which the servlet resolver rejects since those names fall
+        under the reserved <code>org.apache.catalina.</code> prefix. Hold the
+        built-in variables in the mediator itself and resolve them there, as
+        they are per-document values that do not need to be stored in the
+        external resolver. (remm)
+      </fix>
+      <fix>
+        Fix multiple data races in annotation scanning when the
+        <code>parallelAnnotationScanning</code> attribute of the
+        <code>StandardContext</code> is enabled. Classes matched for a
+        <code>ServletContainerInitializer</code> were collected into
+        non-thread-safe sets, which could silently lose matches. A scanner
+        thread could also cache an incomplete set of initializers for a class
+        when another thread had not finished adding that class' super class or
+        interfaces to the shared class cache, and the lazily computed set was
+        not safely published between threads. Matched classes could therefore
+        be missing from the set passed to
+        <code>ServletContainerInitializer.onStartup()</code>, misconfiguring
+        the application at runtime. (remm)
+      </fix>
+      <fix>
+        When automatic migration of a legacy Java EE web application from
+        the <code>legacyAppBase</code> to the <code>appBase</code> failed
+        after the previous version of the application had been moved aside,
+        the previous application was left in a temporary location from which
+        it was neither restored nor cleaned up, making it effectively lost.
+        The previous application is now restored to the deployment location
+        when the migrated application cannot be placed, and is retained with
+        a warning in the temporary location only in the rare cases where
+        restoring it is not possible. (remm)
+      </fix>
+      <fix>
+        Fix the <code>ManagerSF</code> store configuration factory always
+        treating a started <code>StandardManager</code> as non-default, since
+        the manager propagates its (possibly <code>null</code>) node identifier
+        to its session ID generator when it starts, which the default check
+        compared against an empty string. This caused a redundant
+        <code>Manager</code> element with a nested
+        <code>SessionIdGenerator</code> to be written for every context using
+        the default manager configuration when the running configuration was
+        stored. The default check was strengthened to require the exact
+        manager and session ID generator classes and to test
+        <code>throwOnFailure</code>, so the now reachable skip path cannot
+        silently drop a customised configuration. (remm)
       </fix>
     </changelog>
   </subsection>
@@ -320,16 +386,6 @@
         (remm)
       </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <update>
-        Allow UDP based protocols (without conflicting with a TCP based
-        protocol on the same port), and setting a <code>Alt-Svc</code>
-        header using the <code>altService</code> attribute of the
-        <code>Connector</code> element. (remm)
-      </update>
-      <fix>
-        <pr>1073</pr>: Fix possible corruption when using HTTP/2 and async IO
-        on uploads. Submitted by Tim Burke. (remm)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -367,6 +423,10 @@
         Add support for <code>java.util.Optional</code> to the empty operator.
         (markt)
       </add>
+      <fix>
+        Route <code>JspC</code> servlet context logging through Ant when used as
+        an Ant task. (sainadh777)
+      </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
     </changelog>
   </subsection>
@@ -408,11 +468,90 @@
   </subsection>
   <subsection name="Web applications">
     <changelog>
+      <add>
+        Add Manager 2.0 webapp with a modern reactive design. Provided as a
+        module in the <code>modules/manager2</code> folder in the source
+        package. (remm)
+      </add>
       <update>
         Manager: Drop session handling dedicated to extracting the locale from
         Tapestry attributes, used for locale session sorting. (remm)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Host Manager: Host names are now always converted to lower case before
+        use. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        When the <code>MessageDispatchInterceptor</code> is configured with
+        <code>useDeepClone="false"</code>, asynchronously sent messages are now
+        detached from the caller's buffer with a shallow clone before being
+        queued. Previously, the buffer could be returned to the send buffer pool
+        and reused by a concurrent send while the queued message still
+        referenced it, corrupting the transmitted data. (remm)
+      </fix>
+      <fix>
+        Fix the queue size accounting of the
+        <code>MessageDispatchInterceptor</code>. The message length
+        recorded when a message is queued is now also the length used
+        to release the accounting when the send completes. Previously,
+        when a downstream interceptor like
+        <code>EncryptInterceptor</code> or
+        <code>FragmentationInterceptor</code> replaced or extended the
+        message payload while the message was sent, the recorded queue
+        size drifted towards negative values and the
+        <code>maxQueueSize</code> limit eventually stopped being
+        enforced. (remm)
+      </fix>
+      <fix>
+        The <code>NonBlockingCoordinator</code> now uses a separate,
+        configurable <code>mergeAliveTimeout</code> with a default of
+        one second for the TCP liveness checks that run while merging
+        an arriving coordination message, instead of the 15 second
+        coordination message wait timeout. Members that do not respond
+        within this timeout are excluded from the merged view and the
+        exclusion is now logged. (remm)
+      </fix>
+      <fix>
+        The <code>TcpFailureDetector</code> now performs its TCP
+        liveness checks outside the membership monitor, and only
+        applies the result after re-acquiring the monitor and
+        re-checking that the membership state has not changed in the
+        meantime. Previously, the network I/O, up to the configured
+        connection timeout for each member, was performed while
+        holding the monitor, which blocked every other membership
+        operation and update for seconds during a network outage.
+        Member events forwarded by the interceptor are also no longer
+        sent while holding the monitor, removing a potential deadlock
+        with membership listeners that call back into the
+        interceptor. (remm)
+      </fix>
+      <fix>
+        The <code>TwoPhaseCommitInterceptor</code> now forwards the
+        interceptor payload, and with it the <code>ErrorHandler</code>
+        supplied by the application, with the original message instead
+        of with its internal confirmation message. When the
+        <code>MessageDispatchInterceptor</code> performed the actual
+        send, completion and error callbacks were previously reported
+        under the confirmation message's random id, which the
+        application cannot correlate with the id returned by the send,
+        and failures of the original message were never reported at
+        all. (remm)
+      </fix>
+      <fix>
+        The <code>TwoPhaseCommitInterceptor</code> now remembers a
+        confirmation message that arrives before the original message
+        it confirms, and releases the original as soon as it arrives.
+        Previously, the confirmation was consumed as an error and the
+        original message was silently dropped when it arrived and no
+        further confirmation ever followed, so a single moment of
+        network reordering cost one lost cluster message. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
@@ -445,9 +584,6 @@
         Update Checkstyle to 14.1.0. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <update>
-        Update the internal fork of Apache Commons BCEL to 6.13.0. (markt)
-      </update>
     </changelog>
   </subsection>
 </section>

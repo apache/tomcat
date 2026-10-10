@@ -169,9 +169,10 @@ public class StoreFactoryBase implements IStoreFactory {
             for (Object element : elements) {
                 try {
                     storeElement(aWriter, indent, element);
-                } catch (IOException ignore) {
-                    // Ignore. Children do not report the error themselves (e.g.
-                    // StandardContextSF.storeWithBackup() throws without logging).
+                } catch (IOException ioe) {
+                    // Keep storing the other elements but report the failure since some children throw without
+                    // logging the error themselves (e.g. StandardContextSF.storeWithBackup())
+                    log.warn(sm.getString("factory.storeElementFailed", element.getClass().getName()), ioe);
                 }
             }
         }

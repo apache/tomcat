@@ -153,6 +153,12 @@ public class NamingResourcesMBean extends BaseModelMBean {
         env.setType(type);
         env.setValue(value);
         nresources.addEnvironment(env);
+        if (nresources.findEnvironment(envName) == null) {
+            // The name is already claimed by another entry type and the entry
+            // was not added
+            throw new IllegalArgumentException(
+                    sm.getString("namingResourcesMBean.addAlreadyExists.environment", envName));
+        }
 
         // Return the corresponding MBean name
         ManagedBean managed = registry.findManagedBean("ContextEnvironment");
@@ -186,6 +192,12 @@ public class NamingResourcesMBean extends BaseModelMBean {
         resource.setName(resourceName);
         resource.setType(type);
         nresources.addResource(resource);
+        if (nresources.findResource(resourceName) == null) {
+            // The name is already claimed by another entry type and the entry
+            // was not added
+            throw new IllegalArgumentException(
+                    sm.getString("namingResourcesMBean.addAlreadyExists.resource", resourceName));
+        }
 
         // Return the corresponding MBean name
         ManagedBean managed = registry.findManagedBean("ContextResource");
@@ -219,6 +231,12 @@ public class NamingResourcesMBean extends BaseModelMBean {
         resourceLink.setName(resourceLinkName);
         resourceLink.setType(type);
         nresources.addResourceLink(resourceLink);
+        if (nresources.findResourceLink(resourceLinkName) == null) {
+            // The name is already claimed by another entry type and the entry
+            // was not added
+            throw new IllegalArgumentException(
+                    sm.getString("namingResourcesMBean.addAlreadyExists.resourceLink", resourceLinkName));
+        }
 
         // Return the corresponding MBean name
         ManagedBean managed = registry.findManagedBean("ContextResourceLink");
@@ -252,7 +270,6 @@ public class NamingResourcesMBean extends BaseModelMBean {
      * @param resourceName Name of the resource reference to remove
      */
     public void removeResource(String resourceName) {
-        resourceName = ObjectName.unquote(resourceName);
         NamingResourcesImpl nresources = (NamingResourcesImpl) this.resource;
         if (nresources == null) {
             return;
@@ -272,7 +289,6 @@ public class NamingResourcesMBean extends BaseModelMBean {
      * @param resourceLinkName Name of the resource link reference to remove
      */
     public void removeResourceLink(String resourceLinkName) {
-        resourceLinkName = ObjectName.unquote(resourceLinkName);
         NamingResourcesImpl nresources = (NamingResourcesImpl) this.resource;
         if (nresources == null) {
             return;

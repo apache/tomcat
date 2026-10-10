@@ -32,6 +32,8 @@ import org.apache.catalina.util.IOTools;
 
 public class TesterOpenSSL {
 
+    public static final String VERSION_STRING;
+
     public static final int VERSION;
 
     public static final Set<Cipher> OPENSSL_UNIMPLEMENTED_CIPHERS;
@@ -49,8 +51,12 @@ public class TesterOpenSSL {
         } catch (IOException ioe) {
             versionString = "";
         }
-        // Note: Gump currently tests 12.x with OpenSSL HEAD which is currently 4.1.x
-        if (versionString.startsWith("OpenSSL 4.1.")) {
+        VERSION_STRING = versionString;
+
+        // Note: Gump currently tests 12.x with OpenSSL HEAD which is currently 4.2.x
+        if (versionString.startsWith("OpenSSL 4.2.")) {
+            VERSION = 40200;
+        } else if (versionString.startsWith("OpenSSL 4.1.")) {
             VERSION = 40100;
         } else if (versionString.startsWith("OpenSSL 4.0.")) {
             VERSION = 40000;

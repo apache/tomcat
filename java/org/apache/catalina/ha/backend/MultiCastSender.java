@@ -68,6 +68,9 @@ public class MultiCastSender implements Sender {
                 s.joinGroup(new InetSocketAddress(group, 0), null);
             } catch (Exception e) {
                 log.error(sm.getString("multiCastSender.multiCastFailed"), e);
+                if (s != null) {
+                    s.close();
+                }
                 s = null;
                 return -1;
             }

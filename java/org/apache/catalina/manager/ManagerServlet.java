@@ -1288,17 +1288,23 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             int expired = 0;
             for (Session session : sessions) {
                 int time = (int) (session.getIdleTimeInternal() / 1000L);
-                if (idle >= 0 && time >= idle * 60) {
+                if (idle >= 0 && time >= (long) idle * 60) {
                     session.expire();
                     expired++;
                 }
-                time = time / 60 / histoInterval;
-                if (time < 0) {
+                // Non-positive interval: session never times out (a context
+                // session timeout of zero is stored as -1 minutes which
+                // becomes -60 seconds on the session)
+                if (session.getMaxInactiveInterval() <= 0) {
                     notimeout++;
-                } else if (time >= maxCount) {
-                    timeout[maxCount]++;
                 } else {
-                    timeout[time]++;
+                    // Clamp negative idle time (system clock went backwards)
+                    time = Math.max(time, 0) / 60 / histoInterval;
+                    if (time >= maxCount) {
+                        timeout[maxCount]++;
+                    } else {
+                        timeout[time]++;
+                    }
                 }
             }
             if (timeout[0] > 0) {

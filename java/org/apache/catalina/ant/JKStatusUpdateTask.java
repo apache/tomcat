@@ -32,8 +32,6 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
 
     private String workerType = "lb";
 
-    private int internalid = 0;
-
     private Integer lbRetries;
 
     private Integer lbRecovertime;
@@ -62,24 +60,6 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
     public JKStatusUpdateTask() {
         super();
         setUrl("http://localhost/status");
-    }
-
-    /**
-     * Get the internal ID.
-     *
-     * @return the internal ID
-     */
-    public int getInternalid() {
-        return internalid;
-    }
-
-    /**
-     * Set the internal ID.
-     *
-     * @param internalid the internal ID to set
-     */
-    public void setInternalid(int internalid) {
-        this.internalid = internalid;
     }
 
     /**

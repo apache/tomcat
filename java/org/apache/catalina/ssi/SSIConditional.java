@@ -20,10 +20,14 @@ package org.apache.catalina.ssi;
 import java.io.PrintWriter;
 import java.text.ParseException;
 
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * SSI command that handles all conditional directives.
  */
 public class SSIConditional implements SSICommand {
+
+    private static final StringManager sm = StringManager.getManager(SSIConditional.class);
 
 
     /**
@@ -50,7 +54,7 @@ public class SSIConditional implements SSICommand {
             }
             state.nestingCount = 0;
             // Evaluate the expression
-            if (evaluateArguments(paramNames, paramValues, ssiMediator)) {
+            if (evaluateArguments(paramNames, paramValues, ssiMediator, writer)) {
                 // No more branches can be taken for this if block
                 state.branchTaken = true;
             } else {
@@ -71,7 +75,7 @@ public class SSIConditional implements SSICommand {
                 return lastModified;
             }
             // Evaluate the expression
-            if (evaluateArguments(paramNames, paramValues, ssiMediator)) {
+            if (evaluateArguments(paramNames, paramValues, ssiMediator, writer)) {
                 // Turn back on output and mark the branch
                 state.processConditionalCommandsOnly = false;
                 state.branchTaken = true;
@@ -106,6 +110,8 @@ public class SSIConditional implements SSICommand {
             // in the first place.
             state.branchTaken = true;
         } else {
+            ssiMediator.log(sm.getString("ssiConditional.unknownCommand", commandName));
+            writer.write(ssiMediator.getConfigErrMsg());
             throw new SSIStopProcessingException();
         }
         return lastModified;
@@ -115,16 +121,20 @@ public class SSIConditional implements SSICommand {
     /**
      * Retrieves the expression from the specified arguments and performs the necessary evaluation steps.
      */
-    private boolean evaluateArguments(String[] names, String[] values, SSIMediator ssiMediator)
+    private boolean evaluateArguments(String[] names, String[] values, SSIMediator ssiMediator, PrintWriter writer)
             throws SSIStopProcessingException {
         String expr = getExpression(names, values);
         if (expr == null) {
+            ssiMediator.log(sm.getString("ssiConditional.noExpression"));
+            writer.write(ssiMediator.getConfigErrMsg());
             throw new SSIStopProcessingException();
         }
         try {
             ExpressionParseTree tree = new ExpressionParseTree(expr, ssiMediator);
             return tree.evaluateTree();
         } catch (ParseException e) {
+            ssiMediator.log(sm.getString("ssiConditional.errorEvaluatingExpression", expr), e);
+            writer.write(ssiMediator.getConfigErrMsg());
             throw new SSIStopProcessingException();
         }
     }

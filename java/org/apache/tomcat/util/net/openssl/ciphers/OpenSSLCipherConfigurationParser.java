@@ -541,8 +541,32 @@ public class OpenSSLCipherConfigurationParser {
         ciphers.addAll(originalCiphers);
     }
 
-    static void add(final LinkedHashSet<Cipher> ciphers, final String alias) {
-        ciphers.addAll(aliases.get(alias));
+    static void add(final LinkedHashSet<Cipher> ciphers, final String alias,
+            final LinkedHashSet<Cipher> orderedAllAddedCiphers) {
+        List<Cipher> toAddForAlias = aliases.get(alias);
+        add(ciphers, toAddForAlias, orderedAllAddedCiphers);
+    }
+
+    static void add(final LinkedHashSet<Cipher> ciphers, List<Cipher> toAdd,
+            final LinkedHashSet<Cipher> orderedAllAddedCiphers) {
+        /*
+         * Ensure that ciphers are added in the same order as they would be by OpenSSL.
+         *
+         * Once a cipher has been added to the results, if it is removed and re-added then, at the point it is re-added,
+         * all the ciphers in that addition that are being re-added are added to the results first in the order they
+         * were originally added to the results followed by the ciphers in the current addition that are being added to
+         * the results for the first time.
+         *
+         * Practically, this only becomes a factor if ciphers are added, removed and then re-added.
+         */
+        List<Cipher> toAddFirst = new ArrayList<>(orderedAllAddedCiphers);
+        toAddFirst.retainAll(toAdd);
+
+        ciphers.addAll(toAddFirst);
+        // Then re-add the whole alias to add ciphers that weren't previously removed
+        ciphers.addAll(toAdd);
+
+        orderedAllAddedCiphers.addAll(toAdd);
     }
 
     static void remove(final Set<Cipher> ciphers, final String alias) {
@@ -757,7 +781,9 @@ public class OpenSSLCipherConfigurationParser {
             }
         }
         LinkedHashSet<Cipher> ciphers = new LinkedHashSet<>();
-        Set<Cipher> removedCiphers = new HashSet<>();
+        Set<Cipher> excludedCiphers = new HashSet<>();
+        // Need to track the order in which ciphers were first added
+        LinkedHashSet<Cipher> orderedAllAddedCiphers = new LinkedHashSet<>();
         for (String element : elements) {
             if (element.startsWith(DELETE)) {
                 String alias = element.substring(1);
@@ -767,7 +793,7 @@ public class OpenSSLCipherConfigurationParser {
             } else if (element.startsWith(EXCLUDE)) {
                 String alias = element.substring(1);
                 if (aliases.containsKey(alias)) {
-                    removedCiphers.addAll(aliases.get(alias));
+                    excludedCiphers.addAll(aliases.get(alias));
                 } else {
                     log.warn(sm.getString("opensslCipherConfigurationParser.unknownElement", alias));
                 }
@@ -775,11 +801,13 @@ public class OpenSSLCipherConfigurationParser {
                 String alias = element.substring(1);
                 if (aliases.containsKey(alias)) {
                     moveToEnd(ciphers, alias);
+                    moveToEnd(orderedAllAddedCiphers, alias);
                 }
             } else if ("@STRENGTH".equals(element)) {
                 ciphers = strengthSort(ciphers);
+                orderedAllAddedCiphers = strengthSort(orderedAllAddedCiphers);
             } else if (aliases.containsKey(element)) {
-                add(ciphers, element);
+                add(ciphers, element, orderedAllAddedCiphers);
             } else if (element.contains(AND)) {
                 String[] intersections = element.split("\\" + AND);
                 if (intersections.length > 0 && aliases.containsKey(intersections[0])) {
@@ -789,11 +817,11 @@ public class OpenSSLCipherConfigurationParser {
                             result.retainAll(aliases.get(intersections[i]));
                         }
                     }
-                    ciphers.addAll(result);
+                    add(ciphers, result, orderedAllAddedCiphers);
                 }
             }
         }
-        ciphers.removeAll(removedCiphers);
+        ciphers.removeAll(excludedCiphers);
         return ciphers;
     }
 

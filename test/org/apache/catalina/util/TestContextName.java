@@ -203,6 +203,19 @@ public class TestContextName {
     }
 
     @Test
+    public void testPathNormalisation() {
+        ContextName malformed = new ContextName("foo", null);
+        Assert.assertEquals("/foo", malformed.getPath());
+        Assert.assertEquals("/foo", malformed.getName());
+        Assert.assertEquals("foo", malformed.getBaseName());
+
+        ContextName malformedVersion = new ContextName("foo", "A");
+        Assert.assertEquals("/foo", malformedVersion.getPath());
+        Assert.assertEquals("/foo##A", malformedVersion.getName());
+        Assert.assertEquals("foo##A", malformedVersion.getBaseName());
+    }
+
+    @Test
     public void testConstructorString() {
         doTestConstructorString(cn1);
         doTestConstructorString(cn2);

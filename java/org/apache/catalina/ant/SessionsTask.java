@@ -65,7 +65,12 @@ public class SessionsTask extends AbstractCatalinaCommandTask {
         if (path != null && idle != null) {
             buffer.append("&idle=");
             try {
-                buffer.append(Integer.valueOf(idle));
+                int idleMinutes = Integer.parseInt(idle);
+                if (idleMinutes < 0 || idleMinutes > Integer.MAX_VALUE / 60) {
+                    throw new BuildException("Invalid 'idle' attribute (must be a non-negative integer no greater "
+                            + "than " + (Integer.MAX_VALUE / 60) + "): [" + idle + "]");
+                }
+                buffer.append(idleMinutes);
             } catch (NumberFormatException nfe) {
                 throw new BuildException("Invalid 'idle' attribute (must be an integer): [" + idle + "]",  nfe);
             }

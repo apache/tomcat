@@ -141,11 +141,21 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
                     Object moduleClassName = mergedProperties.get(key);
                     while (moduleClassName instanceof String) {
                         try {
-                            Class<?> clazz = Class.forName((String) moduleClassName);
+                            Class<?> clazz = null;
+                            try {
+                                clazz = Class.forName((String) moduleClassName, true,
+                                        Thread.currentThread().getContextClassLoader());
+                            } catch (ClassNotFoundException ignore) {
+                                // Ignore so the re-try below can proceed
+                            }
+                            if (clazz == null) {
+                                clazz = Class.forName((String) moduleClassName);
+                            }
                             ServerAuthModule module = (ServerAuthModule) clazz.getConstructor().newInstance();
                             module.initialize(null, null, handler, mergedProperties);
                             modules.add(module);
-                        } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException e) {
+                        } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException |
+                                ClassCastException e) {
                             throw new AuthException(e);
                         }
 

@@ -48,6 +48,8 @@ public class ExpressionTokenizer {
     public static final int TOKEN_LT = 11;
     /** Token type indicating end of expression. */
     public static final int TOKEN_END = 12;
+    /** Token type indicating an unterminated string or regular expression. */
+    public static final int TOKEN_ERROR = 13;
     private final char[] expr;
     private String tokenVal = null;
     private int index;
@@ -109,7 +111,7 @@ public class ExpressionTokenizer {
         }
         // Clear the current token val
         tokenVal = null;
-        if (index == length) {
+        if (index >= length) {
             return TOKEN_END; // End of string
         }
         int start = index;
@@ -176,6 +178,10 @@ public class ExpressionTokenizer {
                 }
                 escaped = false;
             }
+            if (index == length) {
+                // The closing quote is missing
+                return TOKEN_ERROR;
+            }
             end = index;
             index++; // Skip the end quote
         } else if (currentChar == '/') {
@@ -191,6 +197,11 @@ public class ExpressionTokenizer {
                 }
                 escaped = false;
             }
+            if (index == length) {
+                // The closing slash is missing
+                return TOKEN_ERROR;
+            }
+            // The token includes the closing slash
             end = ++index;
         } else {
             // End is the next whitespace character

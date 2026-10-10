@@ -70,4 +70,29 @@ public class TestDeltaRequest {
         Assert.assertEquals("One", copySession.getAttribute("A"));
         Assert.assertEquals("Two", copySession.getAttribute("B"));
     }
+
+    /*
+     * Attributes and notes are separate stores. Setting an attribute and setting a note with the same name are two
+     * distinct changes and both must be replicated.
+     */
+    @Test
+    public void testAttributeAndNoteWithSameNameBothRecorded() {
+        DeltaRequest request = new DeltaRequest();
+        request.setSessionId("1234");
+        request.setAttribute("name", "value");
+        request.setNote("name", Integer.valueOf(1));
+        Assert.assertEquals(2, request.getSize());
+    }
+
+    /*
+     * Setting the same attribute twice should be recorded as a single action.
+     */
+    @Test
+    public void testRepeatedSetAttributeRecordedOnce() {
+        DeltaRequest request = new DeltaRequest();
+        request.setSessionId("1234");
+        request.setAttribute("name", "value1");
+        request.setAttribute("name", "value2");
+        Assert.assertEquals(1, request.getSize());
+    }
 }

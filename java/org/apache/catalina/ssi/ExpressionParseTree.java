@@ -86,9 +86,12 @@ public class ExpressionParseTree {
     /**
      * Pushes a new operator onto the opp stack, resolving existing opps as needed.
      *
-     * @param node The operator node
+     * @param node  The operator node
+     * @param index The current tokenizer index, for error reporting
+     *
+     * @throws ParseException An operator was missing one of its operands
      */
-    private void pushOpp(OppNode node) {
+    private void pushOpp(OppNode node, int index) throws ParseException {
         // If node is null then it's just a group marker
         if (node == null) {
             oppStack.addFirst(null);
@@ -109,6 +112,7 @@ public class ExpressionParseTree {
             if (top.getPrecedence() < node.getPrecedence()) {
                 break;
             }
+            checkOperands(top, index);
             // Remove the top node
             oppStack.removeFirst();
             // Let it fill its branches
@@ -122,11 +126,38 @@ public class ExpressionParseTree {
 
 
     /**
-     * Resolves all pending opp nodes on the stack until the next group marker is reached.
+     * Checks that the node stack holds at least the number of operands the given
+     * operator needs.
+     *
+     * @param node  The operator to check the operands for
+     * @param index The current tokenizer index, for error reporting
+     *
+     * @throws ParseException The operator is missing one of its operands
      */
-    private void resolveGroup() {
-        OppNode top;
-        while ((top = oppStack.removeFirst()) != null) {
+    private void checkOperands(OppNode node, int index) throws ParseException {
+        if (nodeStack.size() < node.getOperandCount()) {
+            throw new ParseException(sm.getString("expressionParseTree.missingOperand"), index);
+        }
+    }
+
+
+    /**
+     * Resolves all pending opp nodes on the stack until the next group marker is reached.
+     *
+     * @param index The current tokenizer index, for error reporting
+     *
+     * @throws ParseException An operator was missing one of its operands
+     */
+    private void resolveGroup(int index) throws ParseException {
+        // The stack may be empty if the expression contained more closing
+        // parentheses than opening ones, which consumed the artificial group
+        // marker
+        while (!oppStack.isEmpty()) {
+            OppNode top = oppStack.removeFirst();
+            if (top == null) {
+                break;
+            }
+            checkOperands(top, index);
             // Let it fill its branches
             top.popValues(nodeStack);
             // Stick it on the resolved node stack
@@ -146,7 +177,7 @@ public class ExpressionParseTree {
         StringNode currStringNode = null;
         // We cheat a little and start an artificial
         // group right away. It makes finishing easier.
-        pushOpp(null);
+        pushOpp(null, 0);
         ExpressionTokenizer et = new ExpressionTokenizer(expr);
         while (et.hasMoreTokens()) {
             int token = et.nextToken();
@@ -165,55 +196,58 @@ public class ExpressionParseTree {
                     }
                     break;
                 case ExpressionTokenizer.TOKEN_AND:
-                    pushOpp(new AndNode());
+                    pushOpp(new AndNode(), et.getIndex());
                     break;
                 case ExpressionTokenizer.TOKEN_OR:
-                    pushOpp(new OrNode());
+                    pushOpp(new OrNode(), et.getIndex());
                     break;
                 case ExpressionTokenizer.TOKEN_NOT:
-                    pushOpp(new NotNode());
+                    pushOpp(new NotNode(), et.getIndex());
                     break;
                 case ExpressionTokenizer.TOKEN_EQ:
-                    pushOpp(new EqualNode());
+                    pushOpp(new EqualNode(), et.getIndex());
                     break;
                 case ExpressionTokenizer.TOKEN_NOT_EQ:
-                    pushOpp(new NotNode());
+                    pushOpp(new NotNode(), et.getIndex());
                     // Sneak the regular node in. They will NOT
                     // be resolved when the next opp comes along.
                     oppStack.addFirst(new EqualNode());
                     break;
                 case ExpressionTokenizer.TOKEN_RBRACE:
                     // Closeout the current group
-                    resolveGroup();
+                    resolveGroup(et.getIndex());
                     break;
                 case ExpressionTokenizer.TOKEN_LBRACE:
                     // Push a group marker
-                    pushOpp(null);
+                    pushOpp(null, et.getIndex());
                     break;
                 case ExpressionTokenizer.TOKEN_GE:
-                    pushOpp(new NotNode());
+                    pushOpp(new NotNode(), et.getIndex());
                     // Similar strategy to NOT_EQ above, except this
                     // is NOT less than
                     oppStack.addFirst(new LessThanNode());
                     break;
                 case ExpressionTokenizer.TOKEN_LE:
-                    pushOpp(new NotNode());
+                    pushOpp(new NotNode(), et.getIndex());
                     // Similar strategy to NOT_EQ above, except this
                     // is NOT greater than
                     oppStack.addFirst(new GreaterThanNode());
                     break;
                 case ExpressionTokenizer.TOKEN_GT:
-                    pushOpp(new GreaterThanNode());
+                    pushOpp(new GreaterThanNode(), et.getIndex());
                     break;
                 case ExpressionTokenizer.TOKEN_LT:
-                    pushOpp(new LessThanNode());
+                    pushOpp(new LessThanNode(), et.getIndex());
                     break;
                 case ExpressionTokenizer.TOKEN_END:
                     break;
+                case ExpressionTokenizer.TOKEN_ERROR:
+                    throw new ParseException(sm.getString("expressionParseTree.unterminatedLiteral"),
+                            et.getIndex());
             }
         }
         // Finish off the rest of the opps
-        resolveGroup();
+        resolveGroup(et.getIndex());
         if (nodeStack.isEmpty()) {
             throw new ParseException(sm.getString("expressionParseTree.noNodes"), et.getIndex());
         }
@@ -279,7 +313,8 @@ public class ExpressionParseTree {
 
     private static final int PRECEDENCE_NOT = 5;
     private static final int PRECEDENCE_COMPARE = 4;
-    private static final int PRECEDENCE_LOGICAL = 1;
+    private static final int PRECEDENCE_AND = 2;
+    private static final int PRECEDENCE_OR = 1;
 
     /**
      * A node implementation that represents an operation.
@@ -299,6 +334,14 @@ public class ExpressionParseTree {
          * @return a precedence level suitable for comparison to other OppNode preference levels.
          */
         public abstract int getPrecedence();
+
+
+        /**
+         * @return the number of operands this operator pops from the node stack, two by default.
+         */
+        public int getOperandCount() {
+            return 2;
+        }
 
 
         /**
@@ -322,6 +365,12 @@ public class ExpressionParseTree {
         @Override
         public int getPrecedence() {
             return PRECEDENCE_NOT;
+        }
+
+
+        @Override
+        public int getOperandCount() {
+            return 1;
         }
 
 
@@ -352,7 +401,7 @@ public class ExpressionParseTree {
 
         @Override
         public int getPrecedence() {
-            return PRECEDENCE_LOGICAL;
+            return PRECEDENCE_AND;
         }
 
 
@@ -374,7 +423,7 @@ public class ExpressionParseTree {
 
         @Override
         public int getPrecedence() {
-            return PRECEDENCE_LOGICAL;
+            return PRECEDENCE_OR;
         }
 
 

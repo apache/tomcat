@@ -358,25 +358,27 @@ public class SparseUserDatabaseMBean extends BaseModelMBean {
         try {
             UserDatabase database = (UserDatabase) this.resource;
             if (database.isSparse()) {
+                String quotedDatabase = ObjectName.quote(database.getId());
+
                 ObjectName query;
                 Set<ObjectName> results;
 
                 // Groups
-                query = new ObjectName("Users:type=Group,database=" + database.getId() + ",*");
+                query = new ObjectName("Users:type=Group,database=" + quotedDatabase + ",*");
                 results = mserver.queryNames(query, null);
                 for (ObjectName result : results) {
                     mserver.unregisterMBean(result);
                 }
 
                 // Roles
-                query = new ObjectName("Users:type=Role,database=" + database.getId() + ",*");
+                query = new ObjectName("Users:type=Role,database=" + quotedDatabase + ",*");
                 results = mserver.queryNames(query, null);
                 for (ObjectName result : results) {
                     mserver.unregisterMBean(result);
                 }
 
                 // Users
-                query = new ObjectName("Users:type=User,database=" + database.getId() + ",*");
+                query = new ObjectName("Users:type=User,database=" + quotedDatabase + ",*");
                 results = mserver.queryNames(query, null);
                 for (ObjectName result : results) {
                     mserver.unregisterMBean(result);

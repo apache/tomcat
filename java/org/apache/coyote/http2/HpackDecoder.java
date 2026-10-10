@@ -18,6 +18,7 @@ package org.apache.coyote.http2;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -37,6 +38,10 @@ public class HpackDecoder {
      * The object that receives the headers that are emitted from this decoder
      */
     private final AtomicReference<HeaderEmitter> headerEmitter = new AtomicReference<>();
+    /**
+     * The lock used to avoid a race between replacing the stream and emitting a header.
+     */
+    private final ReentrantLock streamEmitterLock = new ReentrantLock();
 
     /**
      * The header table
@@ -449,8 +454,18 @@ public class HpackDecoder {
             if (log.isTraceEnabled()) {
                 log.trace(sm.getString("hpackdecoder.emitHeader", name, value));
             }
-            headerEmitter.get().emitHeader(name, value);
+            streamEmitterLock.lock();
+            try {
+                headerEmitter.get().emitHeader(name, value);
+            } finally {
+                streamEmitterLock.unlock();
+            }
         }
+    }
+
+
+    ReentrantLock getStreamEmitterLock() {
+        return streamEmitterLock;
     }
 
 

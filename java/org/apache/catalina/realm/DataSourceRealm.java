@@ -537,9 +537,9 @@ public class DataSourceRealm extends RealmBase {
      */
     protected ArrayList<String> getRoles(Connection dbConnection, String username) {
 
-        if (allRolesMode != AllRolesMode.STRICT_MODE && !isRoleStoreDefined()) {
-            // Using an authentication only configuration and no role store has
-            // been defined so don't spend cycles looking
+        if (!isRoleStoreDefined()) {
+            // No role store has been defined so there is nothing to look up.
+            // The all roles mode is interpreted centrally in RealmBase.
             return new ArrayList<>(0);
         }
 
@@ -591,18 +591,23 @@ public class DataSourceRealm extends RealmBase {
             throw new LifecycleException(sm.getString("dataSourceRealm.roleConfigMismatch"));
         }
 
-        // Create the roles PreparedStatement string
-        StringBuilder temp = new StringBuilder("SELECT ");
-        temp.append(roleNameCol);
-        temp.append(" FROM ");
-        temp.append(userRoleTable);
-        temp.append(" WHERE ");
-        temp.append(userNameCol);
-        temp.append(" = ?");
-        preparedRoles = temp.toString();
+        // Create the roles PreparedStatement string. When no role store is
+        // defined there is nothing to query and no statement to build.
+        if (isRoleStoreDefined()) {
+            StringBuilder temp = new StringBuilder("SELECT ");
+            temp.append(roleNameCol);
+            temp.append(" FROM ");
+            temp.append(userRoleTable);
+            temp.append(" WHERE ");
+            temp.append(userNameCol);
+            temp.append(" = ?");
+            preparedRoles = temp.toString();
+        } else {
+            preparedRoles = null;
+        }
 
         // Create the credentials PreparedStatement string
-        temp = new StringBuilder("SELECT ");
+        StringBuilder temp = new StringBuilder("SELECT ");
         temp.append(userCredCol);
         temp.append(" FROM ");
         temp.append(userTable);

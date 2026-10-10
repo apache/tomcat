@@ -58,6 +58,9 @@ public class FindLeaksTask extends AbstractCatalinaTask {
     @Override
     public void execute() throws BuildException {
         super.execute();
+        if (!statusLine) {
+            setIgnoreResponseConstraint(true);
+        }
         execute("/findleaks?statusLine=" + Boolean.toString(statusLine));
     }
 }

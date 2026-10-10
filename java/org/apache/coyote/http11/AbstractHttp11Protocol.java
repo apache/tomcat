@@ -829,6 +829,15 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         upgradeProtocols.add(upgradeProtocol);
     }
 
+    /**
+     * Remove specified upgrade protocol.
+     * @param upgradeProtocol the upgrade protocol
+     * @return <code>true</code> if the protocol was removed
+     */
+    public boolean removeUpgradeProtocol(UpgradeProtocol upgradeProtocol) {
+        return upgradeProtocols.remove(upgradeProtocol);
+    }
+
     @Override
     public UpgradeProtocol[] findUpgradeProtocols() {
         return upgradeProtocols.toArray(new UpgradeProtocol[0]);

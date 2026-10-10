@@ -105,4 +105,27 @@ public class TestDeltaSession {
         Assert.assertNull(setAttributeException.get());
         Assert.assertNull(expireException.get());
     }
+
+
+    @Test
+    public void testIsAccessReplicateNonPositiveInterval() {
+        DeltaSession session = new DeltaSession(new StandardManager());
+        // Last replicated long enough ago to exceed any reasonable interval
+        session.setLastTimeReplicated(System.currentTimeMillis() - 3600 * 1000L);
+
+        // Zero or negative means the session never times out so there is no
+        // need to replicate access
+        session.setMaxInactiveInterval(0);
+        Assert.assertFalse(session.isAccessReplicate());
+        session.setMaxInactiveInterval(-1);
+        Assert.assertFalse(session.isAccessReplicate());
+
+        // Positive interval that has elapsed since last replication
+        session.setMaxInactiveInterval(60);
+        Assert.assertTrue(session.isAccessReplicate());
+
+        // Positive interval that has not yet elapsed
+        session.setLastTimeReplicated(System.currentTimeMillis());
+        Assert.assertFalse(session.isAccessReplicate());
+    }
 }

@@ -21,6 +21,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
 
 import org.apache.catalina.Globals;
@@ -176,30 +179,50 @@ public class StoreFileMover {
     }
 
     /**
-     * Shuffle old-&gt;save and new-&gt;old.
+     * Install the new configuration file, saving the previous one as a backup when it exists. The backup is a copy and
+     * the active file is replaced by a single move, so the configuration file is never absent.
      *
      * @throws IOException a file operation error occurred
      */
     public void move() throws IOException {
-        if (configOld.renameTo(configSave)) {
-            if (!configNew.renameTo(configOld)) {
-                if (!configSave.renameTo(configOld)) {
-                    throw new IOException(sm.getString("storeFileMover.restoreError", configNew.getAbsolutePath(),
-                            configOld.getAbsolutePath()));
-                }
+        if (configOld.exists()) {
+            // Copy the existing configuration file to the backup location rather
+            // than renaming it away. Replacing the configuration file with a move
+            // is atomic, so the active configuration file is never absent, even
+            // when the process dies before the replacement happens
+            try {
+                Files.copy(configOld.toPath(), configSave.toPath(), StandardCopyOption.COPY_ATTRIBUTES);
+            } catch (IOException ioe) {
+                throw new IOException(sm.getString("storeFileMover.copyError", configOld.getAbsolutePath(),
+                        configSave.getAbsolutePath()), ioe);
+            }
+            try {
+                Files.move(configNew.toPath(), configOld.toPath(), StandardCopyOption.REPLACE_EXISTING,
+                        StandardCopyOption.ATOMIC_MOVE);
+            } catch (AtomicMoveNotSupportedException amns) {
+                // Fall back to a plain replace when atomic moves are unsupported
+                moveWithReplace();
+            } catch (IOException ioe) {
                 throw new IOException(sm.getString("storeFileMover.renameError", configNew.getAbsolutePath(),
-                        configOld.getAbsolutePath()));
+                        configOld.getAbsolutePath()), ioe);
             }
         } else {
-            if (!configOld.exists()) {
-                if (!configNew.renameTo(configOld)) {
-                    throw new IOException(sm.getString("storeFileMover.renameError", configNew.getAbsolutePath(),
-                            configOld.getAbsolutePath()));
-                }
-            } else {
-                throw new IOException(sm.getString("storeFileMover.renameError", configOld.getAbsolutePath(),
-                        configSave.getAbsolutePath()));
+            // Nothing to back up: install the new file directly
+            try {
+                Files.move(configNew.toPath(), configOld.toPath());
+            } catch (IOException ioe) {
+                throw new IOException(sm.getString("storeFileMover.renameError", configNew.getAbsolutePath(),
+                        configOld.getAbsolutePath()), ioe);
             }
+        }
+    }
+
+    private void moveWithReplace() throws IOException {
+        try {
+            Files.move(configNew.toPath(), configOld.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException ioe) {
+            throw new IOException(sm.getString("storeFileMover.renameError", configNew.getAbsolutePath(),
+                    configOld.getAbsolutePath()), ioe);
         }
     }
 
