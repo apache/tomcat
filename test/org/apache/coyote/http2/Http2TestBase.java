@@ -174,6 +174,25 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         output.clearTrace();
     }
 
+    protected void validateHttp2InitialErrorResponse() throws Exception {
+        // - 101 response acts as acknowledgement of the HTTP2-Settings header
+        // Need to read 5 frames
+        // - settings (server settings - must be first)
+        // - settings ack (for the settings frame in the client preface)
+        // - ping
+        // - headers (for response)
+        // - data (for response body)
+        parser.readFrame(true);
+        parser.readFrame(true);
+        parser.readFrame(true);
+        parser.readFrame(true);
+        parser.readFrame(true);
+
+        Assert.assertTrue(output.getTrace().contains("1-Header-[:status]-[500]"));
+        output.clearTrace();
+    }
+
+
 
     protected void sendEmptyGetRequest(int streamId) throws IOException {
         byte[] frameHeader = new byte[9];
