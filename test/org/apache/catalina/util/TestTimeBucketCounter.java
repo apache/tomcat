@@ -80,7 +80,7 @@ public class TestTimeBucketCounter {
     @Test
     public void testGetMillisUntilNextBucket() throws InterruptedException {
         long millis;
-        int tb1, tb2;
+        long tb1, tb2;
 
         TimeBucketCounter tbc = new TimeBucketCounter(2, new java.util.concurrent.ScheduledThreadPoolExecutor(1));
         tb1 = tbc.getCurrentBucketPrefix();
