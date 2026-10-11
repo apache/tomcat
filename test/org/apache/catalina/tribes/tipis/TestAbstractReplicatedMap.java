@@ -1,0 +1,214 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.apache.catalina.tribes.tipis;
+
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serial;
+import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+import org.apache.catalina.tribes.Member;
+import org.apache.catalina.tribes.group.GroupChannel;
+import org.apache.catalina.tribes.membership.MemberImpl;
+import org.apache.catalina.tribes.tipis.AbstractReplicatedMap.MapMessage;
+
+public class TestAbstractReplicatedMap {
+
+    /*
+     * The channel resolves any looked up member directly, so that a member can be added to the map
+     * members without starting a channel.
+     */
+    private static final class TestChannel extends GroupChannel {
+
+        @Override
+        public Member getMember(Member mbr) {
+            return mbr;
+        }
+    }
+
+    /*
+     * A value whose first serialization blocks until it is released, to simulate the long lasting
+     * serialization of a full map content.
+     */
+    private static final class BlockingValue implements Serializable {
+
+        @Serial
+        private static final long serialVersionUID = 1L;
+
+        private final transient CountDownLatch release;
+        private final transient CountDownLatch serializationStarted = new CountDownLatch(1);
+        private transient boolean serializedOnce = false;
+
+        BlockingValue(CountDownLatch release) {
+            this.release = release;
+        }
+
+        private void writeObject(ObjectOutputStream out) throws IOException {
+            out.defaultWriteObject();
+            if (!serializedOnce) {
+                serializedOnce = true;
+                serializationStarted.countDown();
+                try {
+                    release.await();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new IOException(e);
+                }
+            }
+        }
+    }
+
+    /*
+     * Whether another thread could enter the given monitor while the current thread stays inside
+     * the operation that is expected to run outside of that monitor.
+     */
+    private static boolean monitorAvailable(Object monitor, long timeoutMs) {
+        CountDownLatch acquired = new CountDownLatch(1);
+        Thread probe = new Thread(() -> {
+            synchronized (monitor) {
+                acquired.countDown();
+            }
+        });
+        probe.setDaemon(true);
+        probe.start();
+        try {
+            return acquired.await(timeoutMs, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return false;
+        }
+    }
+
+    /*
+     * The expiry handling of the ping aborts the entries of a timed out member, which sends to the
+     * remaining members and may block until they acknowledge. It must not run while holding the
+     * map members lock, since every session operation needs that lock.
+     */
+    @Test
+    public void testPingExpiresOutsideMapMembersLock() throws Exception {
+        Member member = new MemberImpl("localhost", 4011, -1);
+        AtomicInteger disappeared = new AtomicInteger();
+        AtomicBoolean lockAvailable = new AtomicBoolean();
+
+        LazyReplicatedMap<String,String> map = new LazyReplicatedMap<String,String>(
+                (key, value) -> {
+                    // Not made primary here
+                }, new TestChannel(), 1000, "TestAbstractReplicatedMap", null) {
+
+            @Override
+            public void memberDisappeared(Member disappearedMember) {
+                disappeared.incrementAndGet();
+                lockAvailable.set(monitorAvailable(mapMembers, 2000));
+            }
+        };
+
+        map.memberAlive(member);
+        Thread.sleep(10);
+        // A timeout of zero expires every member that was not refreshed just now
+        map.ping(0);
+
+        Assert.assertEquals(1, disappeared.get());
+        Assert.assertTrue("The ping must expire members outside the map members lock", lockAvailable.get());
+    }
+
+    /*
+     * Adding a member selects backups for the primary entries that have none, which blocks until
+     * the selected backups acknowledge. That must not run while holding the state lock, since the
+     * state transfer of joining members needs that lock.
+     */
+    @Test
+    public void testMapMemberAddedPublishesOutsideStateLock() throws Exception {
+        AtomicBoolean probeOnPublish = new AtomicBoolean();
+        AtomicBoolean lockAvailable = new AtomicBoolean();
+        AtomicInteger published = new AtomicInteger();
+
+        LazyReplicatedMap<String,String> map = new LazyReplicatedMap<String,String>(
+                (key, value) -> {
+                    // Not made primary here
+                }, new TestChannel(), 1000, "TestAbstractReplicatedMap", null) {
+
+            @Override
+            protected Member[] publishEntryInfo(Object key, Object value) {
+                if (probeOnPublish.get()) {
+                    lockAvailable.set(monitorAvailable(stateMutex, 2000));
+                }
+                published.incrementAndGet();
+                return new Member[0];
+            }
+        };
+
+        // Stores a primary entry without a backup, without probing the publication it attempts
+        map.put("key", "value");
+        probeOnPublish.set(true);
+        map.mapMemberAdded(new MemberImpl("localhost", 4012, -1));
+
+        Assert.assertEquals(2, published.get());
+        Assert.assertTrue("The member addition must publish backups outside the state lock", lockAvailable.get());
+    }
+
+    /*
+     * Answering a state request serializes the whole map content, which must not happen while
+     * holding the state lock, since it blocks the state transfer of other joining members for the
+     * duration of that serialization.
+     */
+    @Test
+    public void testStateRequestSerializesOutsideStateLock() throws Exception {
+        CountDownLatch release = new CountDownLatch(1);
+        BlockingValue value = new BlockingValue(release);
+
+        LazyReplicatedMap<String,BlockingValue> map = new LazyReplicatedMap<String,BlockingValue>(
+                (key, val) -> {
+                    // Not made primary here
+                }, new TestChannel(), 1000, "TestAbstractReplicatedMap", null);
+        map.put("key", value);
+
+        MapMessage stateRequest = new MapMessage("TestAbstractReplicatedMap".getBytes(StandardCharsets.UTF_8),
+                MapMessage.MSG_STATE_COPY, false, null, null, null, null, null);
+        AtomicReference<Serializable> reply = new AtomicReference<>();
+        Member sender = new MemberImpl("localhost", 4013, -1);
+        Thread replyThread = new Thread(() -> reply.set(map.replyRequest(stateRequest, sender)));
+        replyThread.setDaemon(true);
+        replyThread.start();
+
+        // Once the value serialization has started, the map scan is complete
+        try {
+            Assert.assertTrue("The state request must serialize the map content",
+                    value.serializationStarted.await(5, TimeUnit.SECONDS));
+            boolean available = monitorAvailable(map.stateMutex, 2000);
+            Assert.assertTrue("The state request must serialize outside the state lock", available);
+        } finally {
+            release.countDown();
+        }
+        replyThread.join(5000);
+        Assert.assertTrue(reply.get() instanceof MapMessage);
+        Object list = ((MapMessage) reply.get()).getValue();
+        Assert.assertTrue(list instanceof ArrayList);
+        Assert.assertEquals(1, ((ArrayList<?>) list).size());
+        Assert.assertTrue(((ArrayList<?>) list).get(0) instanceof MapMessage);
+        Assert.assertEquals(MapMessage.MSG_COPY, ((MapMessage) ((ArrayList<?>) list).get(0)).getMsgType());
+    }
+}

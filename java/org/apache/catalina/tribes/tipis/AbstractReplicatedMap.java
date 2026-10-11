@@ -361,17 +361,30 @@ public abstract class AbstractReplicatedMap<K, V>
             }
         }
         // update our map of members, expire some if we didn't receive a ping back
+        List<Member> expiredMembers = new ArrayList<>();
         synchronized (mapMembers) {
             Member[] members = mapMembers.keySet().toArray(new Member[0]);
             long now = System.currentTimeMillis();
             for (Member member : members) {
                 long access = mapMembers.get(member).longValue();
                 if ((now - access) > timeout) {
-                    log.warn(sm.getString("abstractReplicatedMap.ping.timeout", member, mapname));
-                    memberDisappeared(member);
+                    expiredMembers.add(member);
                 }
             }
         } // synch
+        // The expiry handling relocates entries, which sends to other members and may block
+        // until they acknowledge, so it must not run while holding the map members lock
+        for (Member member : expiredMembers) {
+            boolean expired;
+            synchronized (mapMembers) {
+                Long access = mapMembers.get(member);
+                expired = access != null && (System.currentTimeMillis() - access.longValue()) > timeout;
+            }
+            if (expired) {
+                log.warn(sm.getString("abstractReplicatedMap.ping.timeout", member, mapname));
+                memberDisappeared(member);
+            }
+        }
     }
 
     /**
@@ -623,12 +636,26 @@ public abstract class AbstractReplicatedMap<K, V>
                 Response[] resp = rpcChannel.send(new Member[] { backup }, msg, RpcChannel.FIRST_REPLY,
                         channelSendOptions, rpcTimeout);
                 if (resp.length > 0) {
+                    msg = (MapMessage) resp[0].getMessage();
+                    msg.deserialize(getExternalLoaders());
+                    ArrayList<?> list = (ArrayList<?>) msg.getValue();
+                    // Deserialize the state messages outside of the state lock below, so that
+                    // it is held only for the application of the entries to the map
+                    List<Serializable> messages = new ArrayList<>(list.size());
+                    for (Object o : list) {
+                        if (o instanceof MapMessage mapMessage) {
+                            try {
+                                mapMessage.deserialize(getExternalLoaders());
+                            } catch (ClassNotFoundException | IOException x) {
+                                log.error(sm.getString("abstractReplicatedMap.unable.deserialize.MapMessage"), x);
+                                continue;
+                            }
+                        }
+                        messages.add((Serializable) o);
+                    }
                     synchronized (stateMutex) {
-                        msg = (MapMessage) resp[0].getMessage();
-                        msg.deserialize(getExternalLoaders());
-                        ArrayList<?> list = (ArrayList<?>) msg.getValue();
-                        for (Object o : list) {
-                            messageReceived((Serializable) o, resp[0].getSource());
+                        for (Serializable message : messages) {
+                            messageReceived(message, resp[0].getSource());
                         } // for
                     }
                     stateTransferred = true;
@@ -682,23 +709,27 @@ public abstract class AbstractReplicatedMap<K, V>
 
         // state transfer request
         if (mapmsg.getMsgType() == MapMessage.MSG_STATE || mapmsg.getMsgType() == MapMessage.MSG_STATE_COPY) {
-            synchronized (stateMutex) { // make sure we don't do two things at the same time
-                ArrayList<MapMessage> list = new ArrayList<>();
+            boolean copy = (mapmsg.getMsgType() == MapMessage.MSG_STATE_COPY);
+            List<MapEntry<K,V>> snapshot = new ArrayList<>();
+            synchronized (stateMutex) { // scan under the lock, so that a concurrent state operation cannot overlap it
                 for (Entry<K,MapEntry<K,V>> e : innerMap.entrySet()) {
                     MapEntry<K,V> entry = innerMap.get(e.getKey());
                     if (entry != null && entry.isSerializable()) {
-                        boolean copy = (mapmsg.getMsgType() == MapMessage.MSG_STATE_COPY);
-                        MapMessage me =
-                                new MapMessage(mapContextName, copy ? MapMessage.MSG_COPY : MapMessage.MSG_PROXY, false,
-                                        (Serializable) entry.getKey(), copy ? (Serializable) entry.getValue() : null,
-                                        null, entry.getPrimary(), entry.getBackupNodes());
-                        list.add(me);
+                        snapshot.add(entry);
                     }
                 }
-                mapmsg.setValue(list);
-                return mapmsg;
-
             } // synchronized
+            // Serialize the snapshot outside of the state lock, as serializing the whole
+            // map content blocks every other state operation for a long time otherwise
+            ArrayList<MapMessage> list = new ArrayList<>(snapshot.size());
+            for (MapEntry<K,V> entry : snapshot) {
+                MapMessage me = new MapMessage(mapContextName, copy ? MapMessage.MSG_COPY : MapMessage.MSG_PROXY,
+                        false, (Serializable) entry.getKey(), copy ? (Serializable) entry.getValue() : null, null,
+                        entry.getPrimary(), entry.getBackupNodes());
+                list.add(me);
+            }
+            mapmsg.setValue(list);
+            return mapmsg;
         }
 
         // ping
@@ -934,6 +965,7 @@ public abstract class AbstractReplicatedMap<K, V>
             }
         }
         if (memberAdded) {
+            List<MapEntry<K,V>> entriesWithoutBackup = new ArrayList<>();
             synchronized (stateMutex) {
                 for (Entry<K,MapEntry<K,V>> e : innerMap.entrySet()) {
                     MapEntry<K,V> entry = innerMap.get(e.getKey());
@@ -941,16 +973,26 @@ public abstract class AbstractReplicatedMap<K, V>
                         continue;
                     }
                     if (entry.isPrimary() && (entry.getBackupNodes() == null || entry.getBackupNodes().length == 0)) {
-                        try {
-                            Member[] backup = publishEntryInfo(entry.getKey(), entry.getValue());
-                            entry.setBackupNodes(backup);
-                            entry.setPrimary(channel.getLocalMember(false));
-                        } catch (ChannelException x) {
-                            log.error(sm.getString("abstractReplicatedMap.unableSelect.backup"), x);
-                        } // catch
+                        entriesWithoutBackup.add(entry);
                     } // end if
                 } // while
             } // synchronized
+            // Select and publish the backups outside of the state lock, as the replication
+            // blocks until the backup acknowledges, while session operations and the state
+            // transfer of joining members need that lock
+            for (MapEntry<K,V> entry : entriesWithoutBackup) {
+                if (!entry.isPrimary() || (entry.getBackupNodes() != null && entry.getBackupNodes().length > 0)) {
+                    // The entry found its backup in the meantime
+                    continue;
+                }
+                try {
+                    Member[] backup = publishEntryInfo(entry.getKey(), entry.getValue());
+                    entry.setBackupNodes(backup);
+                    entry.setPrimary(channel.getLocalMember(false));
+                } catch (ChannelException x) {
+                    log.error(sm.getString("abstractReplicatedMap.unableSelect.backup"), x);
+                } // catch
+            } // for
         } // end if
     }
 
