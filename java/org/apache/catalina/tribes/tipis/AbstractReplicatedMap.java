@@ -701,7 +701,16 @@ public abstract class AbstractReplicatedMap<K, V>
 
         // backup request
         if (mapmsg.getMsgType() == MapMessage.MSG_RETRIEVE_BACKUP) {
-            MapEntry<K,V> entry = innerMap.get(mapmsg.getKey());
+            MapEntry<K,V> entry;
+            try {
+                // Deserialize the key with the external loaders, like the other receive paths do,
+                // since the default loaders cannot see the class of a key from an application
+                mapmsg.deserialize(getExternalLoaders());
+                entry = innerMap.get(mapmsg.getKey());
+            } catch (ClassNotFoundException | IOException x) {
+                log.error(sm.getString("abstractReplicatedMap.unable.deserialize.MapMessage"), x);
+                return null;
+            }
             if (entry == null || (!entry.isSerializable())) {
                 return null;
             }
