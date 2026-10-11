@@ -35,6 +35,7 @@ import org.apache.catalina.tribes.ErrorHandler;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.UniqueId;
 import org.apache.catalina.tribes.group.GroupChannel;
+import org.apache.catalina.tribes.io.XByteBuffer;
 import org.apache.catalina.tribes.membership.MemberImpl;
 import org.apache.catalina.tribes.tipis.AbstractReplicatedMap.MapMessage;
 
@@ -265,5 +266,74 @@ public class TestAbstractReplicatedMap {
         Assert.assertEquals(2, map.values().size());
         Assert.assertFalse(map.isEmpty());
         Assert.assertTrue(map.values().contains(null));
+    }
+
+    private static final class SerialKey implements Serializable {
+
+        @Serial
+        private static final long serialVersionUID = 1L;
+
+        private final String id;
+
+        SerialKey(String id) {
+            this.id = id;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return o instanceof SerialKey && id.equals(((SerialKey) o).id);
+        }
+
+        @Override
+        public int hashCode() {
+            return id.hashCode();
+        }
+    }
+
+    /*
+     * A received backup request carries its key only in serialized form. The reply must deserialize
+     * that key with the loaders of the map, like the other receive paths do, and must fail the
+     * request without throwing when the key cannot be deserialized, so that the requester gets a
+     * normal timeout instead of being answered by a failure of the responder.
+     */
+    @Test
+    public void testBackupRequestDeserializesKeyOfReceivedMessage() throws Exception {
+        LazyReplicatedMap<Object,String> map = new LazyReplicatedMap<Object,String>(
+                (key, value) -> {
+                    // Not made primary here
+                }, new TestChannel(), 1000, "TestAbstractReplicatedMap", null);
+        map.put(new SerialKey("key"), "value");
+        Member sender = new MemberImpl("localhost", 4017, -1);
+
+        // Round trip over the serialization to get a message with the key data but no live key
+        byte[] wire = XByteBuffer.serialize(new MapMessage(
+                "TestAbstractReplicatedMap".getBytes(StandardCharsets.UTF_8), MapMessage.MSG_RETRIEVE_BACKUP, false,
+                new SerialKey("key"), null, null, null, null));
+
+        MapMessage received = (MapMessage) XByteBuffer.deserialize(wire);
+        Serializable reply = map.replyRequest(received, sender);
+        Assert.assertTrue(reply instanceof MapMessage);
+        Assert.assertEquals("value", ((MapMessage) reply).getValue());
+
+        // Corrupt the class name inside the serialized key, so it cannot be deserialized
+        byte[] corrupted = wire.clone();
+        int at = indexOf(corrupted, "SerialKey".getBytes(StandardCharsets.US_ASCII));
+        Assert.assertTrue(at > 0);
+        corrupted[at] = 'X';
+        MapMessage broken = (MapMessage) XByteBuffer.deserialize(corrupted);
+        Assert.assertNull(map.replyRequest(broken, sender));
+    }
+
+    private static int indexOf(byte[] data, byte[] pattern) {
+        outer:
+        for (int i = 0; i <= data.length - pattern.length; i++) {
+            for (int j = 0; j < pattern.length; j++) {
+                if (data[i + j] != pattern[j]) {
+                    continue outer;
+                }
+            }
+            return i;
+        }
+        return -1;
     }
 }
