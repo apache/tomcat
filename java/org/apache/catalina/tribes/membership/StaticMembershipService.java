@@ -164,11 +164,12 @@ public class StaticMembershipService extends MembershipServiceBase implements St
     }
 
     /**
-     * Returns the list of static members.
-     * @return the static members list
+     * Returns a copy of the list of static members. Mutating the returned list has no effect on
+     * this service. The provider uses the configured list directly while it runs.
+     * @return a copy of the static members list
      */
     public ArrayList<StaticMember> getStaticMembers() {
-        return staticMembers;
+        return new ArrayList<>(staticMembers);
     }
 
     /**
