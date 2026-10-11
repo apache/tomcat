@@ -2614,6 +2614,14 @@
         configured with the default buffer sizes and the configured values were
         silently ignored. (remm)
       </fix>
+      <fix>
+        The start of the cluster receiver now fails when the configured bind
+        address cannot be resolved. Previously, the resolution failure was only
+        logged and the receiver bound to the wildcard address, silently
+        exposing the cluster listener on all interfaces instead of the
+        configured address, while the unresolvable host was advertised to the
+        other cluster members. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
