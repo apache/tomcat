@@ -125,26 +125,56 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
      * @throws IOException If binding fails
      */
     protected void bind() throws IOException {
-        // allocate an unbound server socket channel
-        serverChannel = ServerSocketChannel.open();
-        // Get the associated ServerSocket to bind it with
-        ServerSocket serverSocket = serverChannel.socket();
-        // create a new Selector for use below
-        this.selector.set(Selector.open());
-        // set the port the server channel will listen to
-        // serverSocket.bind(new InetSocketAddress(getBind(), getTcpListenPort()));
-        bind(serverSocket, getPort(), getAutoBind());
-        // set non-blocking mode for the listening socket
-        serverChannel.configureBlocking(false);
-        // register the ServerSocketChannel with the Selector
-        serverChannel.register(this.selector.get(), SelectionKey.OP_ACCEPT);
+        try {
+            // allocate an unbound server socket channel
+            serverChannel = ServerSocketChannel.open();
+            // Get the associated ServerSocket to bind it with
+            ServerSocket serverSocket = serverChannel.socket();
+            // create a new Selector for use below
+            this.selector.set(Selector.open());
+            // set the port the server channel will listen to
+            // serverSocket.bind(new InetSocketAddress(getBind(), getTcpListenPort()));
+            bind(serverSocket, getPort(), getAutoBind());
+            // set non-blocking mode for the listening socket
+            serverChannel.configureBlocking(false);
+            // register the ServerSocketChannel with the Selector
+            serverChannel.register(this.selector.get(), SelectionKey.OP_ACCEPT);
 
-        // set up the datagram channel
-        if (this.getUdpPort() > 0) {
-            datagramChannel = DatagramChannel.open();
-            configureDatagramChannel();
-            // bind to the address to avoid security checks
-            bindUdp(datagramChannel.socket(), getUdpPort(), getAutoBind());
+            // set up the datagram channel
+            if (this.getUdpPort() > 0) {
+                datagramChannel = DatagramChannel.open();
+                configureDatagramChannel();
+                // bind to the address to avoid security checks
+                bindUdp(datagramChannel.socket(), getUdpPort(), getAutoBind());
+            }
+        } catch (IOException | RuntimeException e) {
+            // The caller of start() only sees the exception, so release
+            // everything that was opened up to the failure point. Without
+            // this, every failed start leaks the server channel descriptor,
+            // the selector and, when the UDP bind is what failed, a bound
+            // datagram channel that nothing will ever listen on.
+            if (datagramChannel != null) {
+                try {
+                    datagramChannel.close();
+                } catch (IOException ioe) {
+                    e.addSuppressed(ioe);
+                }
+                datagramChannel = null;
+            }
+            if (serverChannel != null) {
+                try {
+                    serverChannel.close();
+                } catch (IOException ioe) {
+                    e.addSuppressed(ioe);
+                }
+                serverChannel = null;
+            }
+            try {
+                closeSelector();
+            } catch (IOException ioe) {
+                e.addSuppressed(ioe);
+            }
+            throw e;
         }
     }
 
