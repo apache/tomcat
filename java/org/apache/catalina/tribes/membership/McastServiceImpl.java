@@ -700,9 +700,11 @@ public class McastServiceImpl extends MembershipProviderBase {
                     } else {
                         log.debug(sm.getString("mcastServiceImpl.send.failed"), e);
                     }
-                    if ((++errorCounter) >= recoveryCounter) {
-                        errorCounter = 0;
-                        RecoveryThread.recover(McastServiceImpl.this);
+                    if (doRunSender) {
+                        if ((++errorCounter) >= recoveryCounter) {
+                            errorCounter = 0;
+                            RecoveryThread.recover(McastServiceImpl.this);
+                        }
                     }
                 }
                 try {
