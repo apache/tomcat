@@ -2517,6 +2517,18 @@
         further confirmation ever followed, so a single moment of
         network reordering cost one lost cluster message. (remm)
       </fix>
+      <fix>
+        The <code>AbstractReplicatedMap</code> now holds the map
+        members lock and the state lock only briefly. The entry
+        relocation triggered by the ping expiry runs outside the map
+        members lock, the backup selection for a newly added member
+        outside the state lock, and the (de)serialization of the map
+        content for a member joining or transferring its state
+        likewise outside the state lock. Previously, a slow send to a
+        dead member or the serialization of a large map blocked every
+        session operation and the state transfer of joining members
+        for the duration of that work. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
