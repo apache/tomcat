@@ -69,4 +69,54 @@ public class TestMcastService {
 
         Assert.assertNull("the membership implementation must be released on stop", service.impl);
     }
+
+    /*
+     * The soTimeout and ttl reported through MBean must reflect the configuration, whether it is
+     * supplied through the properties file or through the setters. Previously the getters read
+     * private fields that only the setters wrote, so a property-based configuration that the socket
+     * did apply was reported as the default 0.
+     */
+    @Test
+    public void testSoTimeoutAndTtlReflectProperties() throws Exception {
+        Properties properties = new Properties();
+        properties.setProperty("mcastAddress", "228.0.0.4");
+        properties.setProperty("mcastPort", "45564");
+        properties.setProperty("memberDropTime", "3000");
+        properties.setProperty("mcastFrequency", "500");
+        properties.setProperty("tcpListenHost", "127.0.0.1");
+        properties.setProperty("tcpListenPort", "4000");
+        properties.setProperty("mcastSoTimeout", "1234");
+        properties.setProperty("mcastTTL", "5");
+
+        McastService service = new McastService();
+        service.setProperties(properties);
+
+        Assert.assertEquals(1234, service.getSoTimeout());
+        Assert.assertEquals(5, service.getTtl());
+
+        // The setters keep overriding, with the setter value taking precedence
+        service.setSoTimeout(7);
+        service.setTtl(9);
+        Assert.assertEquals(7, service.getSoTimeout());
+        Assert.assertEquals(9, service.getTtl());
+
+        // A later setProperties replaces the whole configuration, and with it the setter values,
+        // as that is what a subsequent start() would apply
+        properties.remove("mcastSoTimeout");
+        properties.remove("mcastTTL");
+        service.setProperties(properties);
+        Assert.assertEquals(0, service.getSoTimeout());
+        Assert.assertEquals(0, service.getTtl());
+    }
+
+    /*
+     * When neither the properties nor a setter provides a value, the reported soTimeout and ttl
+     * default to 0, as they did before.
+     */
+    @Test
+    public void testSoTimeoutAndTtlDefaultToZero() throws Exception {
+        McastService service = new McastService();
+        Assert.assertEquals(0, service.getSoTimeout());
+        Assert.assertEquals(0, service.getTtl());
+    }
 }
