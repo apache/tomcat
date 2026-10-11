@@ -23,7 +23,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.tribes.Channel;
+import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.group.GroupChannel;
+import org.apache.catalina.tribes.io.ChannelData;
+import org.apache.catalina.tribes.io.XByteBuffer;
 
 public class TestMcastService {
 
@@ -118,5 +121,59 @@ public class TestMcastService {
         McastService service = new McastService();
         Assert.assertEquals(0, service.getSoTimeout());
         Assert.assertEquals(0, service.getTtl());
+    }
+
+    /*
+     * The 65535 byte protocol limit of an IP packet includes the IP and UDP headers, so a
+     * broadcast that fits within it can still exceed what the socket is able to send. Such a
+     * broadcast must be rejected by the size check rather than fail later in the send.
+     */
+    @Test(timeout = 60000)
+    public void testBroadcastRejectsPacketsTheSocketCannotCarry() throws Exception {
+        int base = 40000 + (int) Math.floorMod(System.nanoTime(), 10000);
+        Properties props = new Properties();
+        props.setProperty("mcastAddress", "228.0.0.4");
+        props.setProperty("mcastPort", String.valueOf(base));
+        props.setProperty("tcpListenHost", "127.0.0.1");
+        props.setProperty("tcpListenPort", String.valueOf(base + 1));
+        props.setProperty("tcpSecurePort", "0");
+        props.setProperty("udpListenPort", "0");
+        props.setProperty("mcastFrequency", "100");
+        props.setProperty("memberDropTime", "3000");
+        props.setProperty("recoveryEnabled", "false");
+        props.setProperty("recoveryCounter", "10");
+        props.setProperty("recoverySleepTime", "3000");
+
+        GroupChannel channel = new GroupChannel();
+        channel.setName("TestMcastService-" + System.nanoTime());
+
+        McastService service = new McastService();
+        service.setChannel(channel);
+        service.setProperties(props);
+        service.start(Channel.MBR_TX_SEQ);
+        try {
+            // Build a packet just above the sendable size but still within the 65535 byte packet
+            // limit the old check used, and small enough for this platform to actually send
+            ChannelData probe = new ChannelData();
+            probe.setMessage(new XByteBuffer(new byte[0], false));
+            int overhead = XByteBuffer.createDataPackage(probe).length;
+            Assert.assertTrue(overhead > 0 && overhead < 128);
+            byte[] messageBytes = new byte[McastServiceImpl.MAX_SEND_SIZE + 8 - overhead];
+            Assert.assertEquals(McastServiceImpl.MAX_SEND_SIZE + 8,
+                    XByteBuffer.createDataPackage(new ChannelData(probe.getUniqueId(),
+                            new XByteBuffer(messageBytes, false), 0)).length);
+
+            ChannelData message = new ChannelData();
+            message.setMessage(new XByteBuffer(messageBytes, false));
+            message.setTimestamp(System.currentTimeMillis());
+            try {
+                service.broadcast(message);
+                Assert.fail("A broadcast above the sendable size must be rejected");
+            } catch (ChannelException expected) {
+                // The size check must reject it
+            }
+        } finally {
+            service.stop(Channel.MBR_TX_SEQ);
+        }
     }
 }
