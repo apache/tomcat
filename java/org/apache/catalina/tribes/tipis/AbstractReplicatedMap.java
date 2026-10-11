@@ -322,10 +322,11 @@ public abstract class AbstractReplicatedMap<K, V>
     protected void ping(long timeout) throws ChannelException {
         MapMessage msg = new MapMessage(this.mapContextName, MapMessage.MSG_PING, false, null, null, null,
                 channel.getLocalMember(false), null);
-        if (channel.getMembers().length > 0) {
+        Member[] channelMembers = channel.getMembers();
+        if (channelMembers.length > 0) {
             try {
                 // send a ping, wait for all nodes to reply
-                Response[] resp = rpcChannel.send(channel.getMembers(), msg, RpcChannel.ALL_REPLY, (channelSendOptions),
+                Response[] resp = rpcChannel.send(channelMembers, msg, RpcChannel.ALL_REPLY, (channelSendOptions),
                         (int) accessTimeout);
                 for (Response response : resp) {
                     MapMessage mapMsg = (MapMessage) response.getMessage();
@@ -429,7 +430,7 @@ public abstract class AbstractReplicatedMap<K, V>
                 log.warn(sm.getString("abstractReplicatedMap.broadcast.noReplies"));
             }
         } else {
-            channel.send(channel.getMembers(), msg, channelSendOptions);
+            channel.send(members, msg, channelSendOptions);
         }
     }
 
