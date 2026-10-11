@@ -103,7 +103,10 @@ public class ReplicationTransmitter implements ChannelSender {
     public synchronized void stop() {
         getTransport().disconnect();
         if (oname != null) {
-            JmxRegistry.getRegistry(channel).unregisterJmx(oname);
+            JmxRegistry jmxRegistry = JmxRegistry.getRegistry(channel);
+            if (jmxRegistry != null) {
+                jmxRegistry.unregisterJmx(oname);
+            }
             oname = null;
         }
         channel = null;

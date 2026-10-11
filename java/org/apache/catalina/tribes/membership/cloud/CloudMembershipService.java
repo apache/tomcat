@@ -180,7 +180,10 @@ public class CloudMembershipService extends MembershipServiceBase implements Clo
         try {
             if (membershipProvider != null && membershipProvider.stop(level)) {
                 if (oname != null) {
-                    JmxRegistry.getRegistry(channel).unregisterJmx(oname);
+                    JmxRegistry jmxRegistry = JmxRegistry.getRegistry(channel);
+                    if (jmxRegistry != null) {
+                        jmxRegistry.unregisterJmx(oname);
+                    }
                     oname = null;
                 }
                 membershipProvider = null;
