@@ -502,7 +502,10 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
                 ownExecutor = false;
             }
             if (oname != null) {
-                JmxRegistry.getRegistry(this).unregisterJmx(oname);
+                JmxRegistry jmxRegistry = JmxRegistry.getRegistry(this);
+                if (jmxRegistry != null) {
+                    jmxRegistry.unregisterJmx(oname);
+                }
                 oname = null;
             }
         }
