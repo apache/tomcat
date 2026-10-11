@@ -68,6 +68,11 @@ public class StaticMembershipService extends MembershipServiceBase implements St
             provider.start(level);
             return;
         }
+        if (localMember == null) {
+            // The local member is resolved when the channel receiver starts, or is configured
+            // explicitly. Starting the membership without either leaves it unknown.
+            throw new IllegalStateException(sm.getString("staticMembershipService.localMemberNotSet"));
+        }
         localMember.setServiceStartTime(System.currentTimeMillis());
         localMember.setMemberAliveTime(100);
         // build membership provider

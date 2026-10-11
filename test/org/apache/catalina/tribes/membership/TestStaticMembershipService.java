@@ -74,4 +74,25 @@ public class TestStaticMembershipService {
         service.start(level);
         service.stop(level);
     }
+
+    /*
+     * The local member is resolved when the channel receiver starts, or is configured
+     * explicitly. Starting the membership alone, without either, must fail with a clear error
+     * rather than the null pointer exception that dereferencing the missing member caused.
+     */
+    @Test
+    public void testStartWithoutLocalMemberFails() throws Exception {
+        GroupChannel channel = new GroupChannel();
+        channel.setName("TestStaticMembershipService-" + System.nanoTime());
+
+        StaticMembershipService service = new StaticMembershipService();
+        service.setChannel(channel);
+        try {
+            service.start(Channel.MBR_TX_SEQ);
+            Assert.fail("start() must fail when the local member is unknown");
+        } catch (IllegalStateException expected) {
+            // A clear configuration error rather than a null pointer exception
+        }
+        Assert.assertNull(service.getMembershipProvider());
+    }
 }
