@@ -90,16 +90,31 @@ public class BufferPool {
      * @param buffer the buffer to return
      */
     public void returnBuffer(XByteBuffer buffer) {
-        if ((size.get() + buffer.getCapacity()) <= maxSize) {
-            size.addAndGet(buffer.getCapacity());
-            queue.offer(buffer);
-        }
+        // the pool size limit is enforced with a compare-and-set loop so that
+        // concurrent returns cannot all pass the limit check against the same
+        // stale total and admit more than maxSize bytes between them
+        int capacity = buffer.getCapacity();
+        int current;
+        do {
+            current = size.get();
+            if ((long) current + capacity > maxSize) {
+                return;
+            }
+        } while (!size.compareAndSet(current, current + capacity));
+        queue.offer(buffer);
     }
 
     /** Clears all buffers from the pool. */
     public void clear() {
-        queue.clear();
-        size.set(0);
+        // drain the queue buffer by buffer, removing each capacity from the
+        // size total as the buffer leaves the queue; setting the size to zero
+        // separately would race with concurrent returns and skew the
+        // accounting permanently
+        XByteBuffer buffer = queue.poll();
+        while (buffer != null) {
+            size.addAndGet(-buffer.getCapacity());
+            buffer = queue.poll();
+        }
     }
 
     /** Maximum pool size in bytes. */
