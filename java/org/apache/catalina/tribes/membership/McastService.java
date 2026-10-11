@@ -466,9 +466,9 @@ public class McastService extends MembershipServiceBase implements MessageListen
         }
 
         byte[] data = XByteBuffer.createDataPackage((ChannelData) message);
-        if (data.length > McastServiceImpl.MAX_PACKET_SIZE) {
+        if (data.length > McastServiceImpl.MAX_SEND_SIZE) {
             throw new ChannelException(sm.getString("mcastService.exceed.maxPacketSize", Integer.toString(data.length),
-                    Integer.toString(McastServiceImpl.MAX_PACKET_SIZE)));
+                    Integer.toString(McastServiceImpl.MAX_SEND_SIZE)));
         }
         DatagramPacket packet = new DatagramPacket(data, 0, data.length);
         try {
