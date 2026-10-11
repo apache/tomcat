@@ -644,7 +644,8 @@ public abstract class AbstractReplicatedMap<K, V>
                     // it is held only for the application of the entries to the map
                     List<Serializable> messages = new ArrayList<>(list.size());
                     for (Object o : list) {
-                        if (o instanceof MapMessage mapMessage) {
+                        if (o instanceof MapMessage) {
+                            MapMessage mapMessage = (MapMessage) o;
                             try {
                                 mapMessage.deserialize(getExternalLoaders());
                             } catch (ClassNotFoundException | IOException x) {
