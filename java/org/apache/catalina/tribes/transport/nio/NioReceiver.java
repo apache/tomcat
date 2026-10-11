@@ -90,7 +90,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
             }
         }
         try {
-            getBind();
+            resolveBind();
             bind();
             String channelName = "";
             if (getChannel().getName() != null) {
