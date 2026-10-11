@@ -16,8 +16,14 @@
  */
 package org.apache.catalina.tribes.transport.nio;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.nio.channels.DatagramChannel;
+import java.nio.channels.ServerSocketChannel;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -120,5 +126,74 @@ public class TestNioReceiver {
         Assert.assertFalse("the datagram channel was not closed", datagramChannel.isOpen());
         Assert.assertNull("the datagram channel reference was not cleared", field.get(receiver));
         Assert.assertFalse(receiver.isListening());
+    }
+
+    /*
+     * A TCP bind that exhausts the auto-bind retries throws out of bind()
+     * after the server channel and the selector were already opened. Both
+     * must be released, or every failed start leaks a descriptor and a
+     * selector that nothing can reach any more.
+     */
+    @Test
+    public void testFailedTcpBindReleasesTheOpenedResources() throws Exception {
+        NioReceiver receiver = new NioReceiver();
+        receiver.setChannel(new GroupChannel());
+        receiver.setAddress("127.0.0.1");
+        receiver.setAutoBind(1);
+        try (ServerSocket blocker = new ServerSocket(0, 1, InetAddress.getByName("127.0.0.1"))) {
+            receiver.setPort(blocker.getLocalPort());
+            try {
+                receiver.bind();
+                Assert.fail("the bind to an occupied port did not fail");
+            } catch (IOException expected) {
+                // expected
+            }
+        }
+        assertReleased(receiver);
+    }
+
+    /*
+     * When the UDP bind is what fails, the TCP server channel was already
+     * bound and registered with the selector. The failed start must release
+     * the server channel and the selector as well, not just the half set up
+     * datagram channel.
+     */
+    @Test
+    public void testFailedUdpBindReleasesTheOpenedResources() throws Exception {
+        NioReceiver receiver = new NioReceiver();
+        receiver.setChannel(new GroupChannel());
+        receiver.setAddress("127.0.0.1");
+        receiver.setAutoBind(1);
+        receiver.setPort(0);
+        // Without SO_REUSEADDR on the receiver side as well, the bind to the
+        // occupied UDP port fails deterministically on every platform
+        receiver.setSoReuseAddress(false);
+        try (DatagramSocket blocker = new DatagramSocket(0, InetAddress.getByName("127.0.0.1"))) {
+            receiver.setUdpPort(blocker.getLocalPort());
+            try {
+                receiver.bind();
+                Assert.fail("the UDP bind to an occupied port did not fail");
+            } catch (IOException expected) {
+                // expected
+            }
+        }
+        assertReleased(receiver);
+    }
+
+    private void assertReleased(NioReceiver receiver) throws Exception {
+        Field serverChannelField = NioReceiver.class.getDeclaredField("serverChannel");
+        serverChannelField.setAccessible(true);
+        ServerSocketChannel serverChannel = (ServerSocketChannel) serverChannelField.get(receiver);
+        Assert.assertNull("the server channel reference was not cleared", serverChannel);
+
+        Field datagramChannelField = NioReceiver.class.getDeclaredField("datagramChannel");
+        datagramChannelField.setAccessible(true);
+        DatagramChannel datagramChannel = (DatagramChannel) datagramChannelField.get(receiver);
+        Assert.assertNull("the datagram channel reference was not cleared", datagramChannel);
+
+        Field selectorField = NioReceiver.class.getDeclaredField("selector");
+        selectorField.setAccessible(true);
+        AtomicReference<?> selector = (AtomicReference<?>) selectorField.get(receiver);
+        Assert.assertNull("the selector reference was not cleared", selector.get());
     }
 }
