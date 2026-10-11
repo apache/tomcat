@@ -121,6 +121,16 @@ public class StaticMembershipProvider extends MembershipProviderBase
         // All the default properties have been set by StaticMembershipService.setDefaults, so no need to check
         String expirationTimeStr = properties.getProperty("expirationTime");
         this.expirationTime = Long.parseLong(expirationTimeStr);
+        if (expirationTime <= 0) {
+            throw new IllegalArgumentException(sm.getString("membershipService.invalidTimingProperty", "expirationTime",
+                    Long.valueOf(expirationTime)));
+        }
+        String pingIntervalStr = properties.getProperty("pingInterval");
+        this.pingInterval = Long.parseLong(pingIntervalStr);
+        if (pingInterval <= 0) {
+            throw new IllegalArgumentException(sm.getString("membershipService.invalidTimingProperty", "pingInterval",
+                    Long.valueOf(pingInterval)));
+        }
         String connectTimeoutStr = properties.getProperty("connectTimeout");
         this.connectTimeout = Integer.parseInt(connectTimeoutStr);
         String rpcTimeouStr = properties.getProperty("rpcTimeout");
@@ -132,8 +142,6 @@ public class StaticMembershipProvider extends MembershipProviderBase
         this.channel.addChannelListener(this);
         String useThreadStr = properties.getProperty("useThread");
         this.useThread = Boolean.parseBoolean(useThreadStr);
-        String pingIntervalStr = properties.getProperty("pingInterval");
-        this.pingInterval = Long.parseLong(pingIntervalStr);
     }
 
     @Override
