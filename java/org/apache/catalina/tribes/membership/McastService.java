@@ -383,8 +383,18 @@ public class McastService extends MembershipServiceBase implements MessageListen
             }
         }
 
-        impl = new McastServiceImpl(localMember, Long.parseLong(properties.getProperty("mcastFrequency")),
-                Long.parseLong(properties.getProperty("memberDropTime")),
+        long frequency = Long.parseLong(properties.getProperty("mcastFrequency"));
+        if (frequency <= 0) {
+            throw new IllegalArgumentException(
+                    sm.getString("membershipService.invalidTimingProperty", "mcastFrequency", Long.valueOf(frequency)));
+        }
+        long dropTime = Long.parseLong(properties.getProperty("memberDropTime"));
+        if (dropTime <= 0) {
+            throw new IllegalArgumentException(
+                    sm.getString("membershipService.invalidTimingProperty", "memberDropTime", Long.valueOf(dropTime)));
+        }
+
+        impl = new McastServiceImpl(localMember, frequency, dropTime,
                 Integer.parseInt(properties.getProperty("mcastPort")), bind,
                 java.net.InetAddress.getByName(properties.getProperty("mcastAddress")), ttl, soTimeout, this, this,
                 Boolean.parseBoolean(properties.getProperty("localLoopbackDisabled")));

@@ -124,6 +124,43 @@ public class TestMcastService {
     }
 
     /*
+     * A non-positive send frequency makes the sender spin sending pings without a pause, and a
+     * non-positive drop time expires every member on every cycle. Such configuration must be
+     * rejected when the service starts, before any socket or thread is created.
+     */
+    @Test
+    public void testStartRejectsNonPositiveTimingProperties() throws Exception {
+        String[] invalid = { "mcastFrequency=0", "mcastFrequency=-1", "memberDropTime=0", "memberDropTime=-5" };
+        for (String entry : invalid) {
+            String[] property = entry.split("=");
+            Properties props = new Properties();
+            props.setProperty("mcastAddress", "228.0.0.4");
+            props.setProperty("mcastPort", "45564");
+            props.setProperty("tcpListenHost", "127.0.0.1");
+            props.setProperty("tcpListenPort", "4000");
+            props.setProperty("tcpSecurePort", "0");
+            props.setProperty("udpListenPort", "0");
+            props.setProperty("mcastFrequency", "500");
+            props.setProperty("memberDropTime", "3000");
+            props.setProperty(property[0], property[1]);
+
+            GroupChannel channel = new GroupChannel();
+            channel.setName("TestMcastService-" + System.nanoTime());
+
+            McastService service = new McastService();
+            service.setChannel(channel);
+            service.setProperties(props);
+            try {
+                service.start(Channel.MBR_TX_SEQ);
+                Assert.fail("start() must reject a non-positive " + property[0]);
+            } catch (IllegalArgumentException expected) {
+                // The configuration must be rejected before anything is started
+            }
+            Assert.assertNull(service.impl);
+        }
+    }
+
+    /*
      * The 65535 byte protocol limit of an IP packet includes the IP and UDP headers, so a
      * broadcast that fits within it can still exceed what the socket is able to send. Such a
      * broadcast must be rejected by the size check rather than fail later in the send.
