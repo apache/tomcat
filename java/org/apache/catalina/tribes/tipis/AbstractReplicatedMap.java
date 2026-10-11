@@ -1537,7 +1537,7 @@ public abstract class AbstractReplicatedMap<K, V>
         int counter = 0;
         for (Entry<K,MapEntry<K,V>> e : innerMap.entrySet()) {
             MapEntry<K,V> entry = e.getValue();
-            if (entry != null && entry.isActive() && entry.getValue() != null) {
+            if (entry != null && entry.isActive()) {
                 counter++;
             }
         }
@@ -1564,7 +1564,7 @@ public abstract class AbstractReplicatedMap<K, V>
         List<V> values = new ArrayList<>();
         for (Entry<K,MapEntry<K,V>> e : innerMap.entrySet()) {
             MapEntry<K,V> entry = e.getValue();
-            if (entry != null && entry.isActive() && entry.getValue() != null) {
+            if (entry != null && entry.isActive()) {
                 values.add(entry.getValue());
             }
         }

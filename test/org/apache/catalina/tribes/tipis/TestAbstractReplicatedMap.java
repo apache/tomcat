@@ -244,4 +244,26 @@ public class TestAbstractReplicatedMap {
         Assert.assertNull(map.getInternal(key));
         Assert.assertEquals(0, channel.sendCalls.get());
     }
+
+    /*
+     * A put stores an entry with a null value, so the size must count it like the entry and key
+     * views do. The size previously filtered such an entry out, breaking the map contract that the
+     * size equals the size of the entry set, and the isEmpty inherited the inconsistency.
+     */
+    @Test
+    public void testSizeCountsActiveEntriesWithNullValue() throws Exception {
+        LazyReplicatedMap<String,String> map = new LazyReplicatedMap<String,String>(
+                (key, value) -> {
+                    // Not made primary here
+                }, new TestChannel(), 1000, "TestAbstractReplicatedMap", null);
+        map.put("key", "value");
+        map.put("other", null);
+
+        Assert.assertEquals(2, map.size());
+        Assert.assertEquals(2, map.entrySet().size());
+        Assert.assertEquals(2, map.keySet().size());
+        Assert.assertEquals(2, map.values().size());
+        Assert.assertFalse(map.isEmpty());
+        Assert.assertTrue(map.values().contains(null));
+    }
 }
