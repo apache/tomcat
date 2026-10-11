@@ -115,6 +115,12 @@ public class TestStoreConfig extends TomcatBaseTest {
         tc_CloudMembershipService_53.setMembershipProviderClassName("org.apache.catalina.tribes.membership.cloud.KubernetesMembershipProvider");
         tc_GroupChannel_52.setMembershipService(tc_CloudMembershipService_53);
         tc_SimpleTcpCluster_51.setChannel(tc_GroupChannel_52);
+        // Cloud membership needs the Kubernetes API when it starts. Start the channel's receiver
+        // and sender only, so the storeconfig round-trip does not depend on the API. The start
+        // options are not default, so they are stored in server.xml and apply to the restart from
+        // the written configuration as well.
+        tc_SimpleTcpCluster_51.setChannelStartOptions(
+                org.apache.catalina.tribes.Channel.SND_RX_SEQ | org.apache.catalina.tribes.Channel.SND_TX_SEQ);
         tomcat.getEngine().setCluster(tc_SimpleTcpCluster_51);
 
         org.apache.catalina.realm.LockOutRealm tc_LockOutRealm_55 = new org.apache.catalina.realm.LockOutRealm();
@@ -161,6 +167,9 @@ public class TestStoreConfig extends TomcatBaseTest {
         }
         Assert.assertTrue(serverXmlDump.contains("StoreConfigLifecycleListener"));
         Assert.assertTrue(serverXmlDump.contains("UserDatabaseRealm"));
+        // The cluster must round-trip the channel start options the test had to restrict, as the
+        // restart from the written configuration must keep the membership service unstarted
+        Assert.assertTrue(serverXmlDump.contains("channelStartOptions"));
         Assert.assertTrue(serverXmlDump.contains("SecretKeyCredentialHandler"));
         Assert.assertTrue(serverXmlDump.contains("certificateKeystorePassword="));
         // The attributes of a stored element wrap at 60 columns, so check
