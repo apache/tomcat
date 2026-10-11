@@ -64,8 +64,6 @@ public class McastService extends MembershipServiceBase implements MessageListen
      * The local member
      */
     protected MemberImpl localMember;
-    private int mcastSoTimeout;
-    private int mcastTTL;
 
     /**
      * The payload for multicast messages.
@@ -482,7 +480,11 @@ public class McastService extends MembershipServiceBase implements MessageListen
 
     @Override
     public int getSoTimeout() {
-        return mcastSoTimeout;
+        String p = properties.getProperty("mcastSoTimeout");
+        if (p != null) {
+            return Integer.parseInt(p);
+        }
+        return 0;
     }
 
     /**
@@ -490,13 +492,16 @@ public class McastService extends MembershipServiceBase implements MessageListen
      * @param mcastSoTimeout the timeout in milliseconds
      */
     public void setSoTimeout(int mcastSoTimeout) {
-        this.mcastSoTimeout = mcastSoTimeout;
         properties.setProperty("mcastSoTimeout", String.valueOf(mcastSoTimeout));
     }
 
     @Override
     public int getTtl() {
-        return mcastTTL;
+        String p = properties.getProperty("mcastTTL");
+        if (p != null) {
+            return Integer.parseInt(p);
+        }
+        return 0;
     }
 
     /**
@@ -517,7 +522,6 @@ public class McastService extends MembershipServiceBase implements MessageListen
      * @param mcastTTL the TTL value
      */
     public void setTtl(int mcastTTL) {
-        this.mcastTTL = mcastTTL;
         properties.setProperty("mcastTTL", String.valueOf(mcastTTL));
     }
 
