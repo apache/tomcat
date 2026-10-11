@@ -97,8 +97,11 @@ public class StaticMembershipService extends MembershipServiceBase implements St
         provider.setMembershipListener(this);
         provider.setMembershipService(this);
         provider.setStaticMembers(staticMembers);
-        properties.setProperty("membershipName", getMembershipName());
-        provider.init(properties);
+        // Pass the derived membership name to the provider on a copy of the configuration, so the
+        // internal key does not leak into the properties this service exposes
+        Properties providerProperties = (Properties) properties.clone();
+        providerProperties.setProperty("membershipName", getMembershipName());
+        provider.init(providerProperties);
         return provider;
     }
 
