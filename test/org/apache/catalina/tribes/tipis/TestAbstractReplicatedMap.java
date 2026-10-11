@@ -31,7 +31,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.catalina.tribes.ErrorHandler;
 import org.apache.catalina.tribes.Member;
+import org.apache.catalina.tribes.UniqueId;
 import org.apache.catalina.tribes.group.GroupChannel;
 import org.apache.catalina.tribes.membership.MemberImpl;
 import org.apache.catalina.tribes.tipis.AbstractReplicatedMap.MapMessage;
@@ -44,9 +46,17 @@ public class TestAbstractReplicatedMap {
      */
     private static final class TestChannel extends GroupChannel {
 
+        private final AtomicInteger sendCalls = new AtomicInteger();
+
         @Override
         public Member getMember(Member mbr) {
             return mbr;
+        }
+
+        @Override
+        public UniqueId send(Member[] destination, Serializable msg, int options, ErrorHandler handler) {
+            sendCalls.incrementAndGet();
+            return new UniqueId();
         }
     }
 
@@ -210,5 +220,28 @@ public class TestAbstractReplicatedMap {
         Assert.assertEquals(1, ((ArrayList<?>) list).size());
         Assert.assertTrue(((ArrayList<?>) list).get(0) instanceof MapMessage);
         Assert.assertEquals(MapMessage.MSG_COPY, ((MapMessage) ((ArrayList<?>) list).get(0)).getMsgType());
+    }
+
+    /*
+     * The put silently accepts keys that cannot be replicated, so the remove must not fail on such
+     * a key either, but just skip the notification to the other members. The removal previously
+     * threw an unchecked exception from the message construction, which also escaped a put that
+     * replaced such an entry before the new value was stored.
+     */
+    @Test
+    public void testRemoveNonSerializableKeySkipsNotification() throws Exception {
+        TestChannel channel = new TestChannel();
+        LazyReplicatedMap<Object,String> map = new LazyReplicatedMap<Object,String>(
+                (key, value) -> {
+                    // Not made primary here
+                }, channel, 1000, "TestAbstractReplicatedMap", null);
+        map.memberAlive(new MemberImpl("localhost", 4016, -1));
+
+        Object key = new Object();
+        map.put(key, "value");
+
+        Assert.assertEquals("value", map.remove(key));
+        Assert.assertNull(map.getInternal(key));
+        Assert.assertEquals(0, channel.sendCalls.get());
     }
 }
