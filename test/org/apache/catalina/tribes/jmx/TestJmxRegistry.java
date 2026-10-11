@@ -100,4 +100,18 @@ public class TestJmxRegistry {
             JmxRegistry.removeRegistry(channel, true);
         }
     }
+
+    /*
+     * Removing the registry of a channel that never had one, or that cannot have one, must degrade
+     * to a no-op, as getRegistry does, rather than throw.
+     */
+    @Test
+    public void testRemoveRegistryNullGuards() throws Exception {
+        JmxRegistry.removeRegistry(null, false);
+        JmxRegistry.removeRegistry(null, true);
+
+        GroupChannel channel = new GroupChannel();
+        JmxRegistry.removeRegistry(channel, false);
+        JmxRegistry.removeRegistry(channel, true);
+    }
 }
