@@ -151,8 +151,8 @@ public abstract class TimeBucketCounterBase {
      *
      * @return bucket index
      */
-    public int getCurrentBucketPrefix() {
-        return (int) getBucketIndex(System.currentTimeMillis());
+    public long getCurrentBucketPrefix() {
+        return getBucketIndex(System.currentTimeMillis());
     }
 
 
