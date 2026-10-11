@@ -263,8 +263,20 @@ public class StaticMembershipService extends MembershipServiceBase implements St
         properties.setProperty("pingInterval", String.valueOf(pingInterval));
     }
 
+    /**
+     * Sets the properties for this service. The values are read when the membership provider is
+     * built, as the service starts. Replacing the properties while the service runs therefore has
+     * no effect on the running provider. It keeps the values it started with until the service is
+     * fully stopped and started again, even though the attribute getters of the service report the
+     * new values.
+     *
+     * @param properties the new configuration
+     */
     @Override
     public void setProperties(Properties properties) {
+        if (provider != null) {
+            log.warn(sm.getString("staticMembershipService.propertiesWhileRunning"));
+        }
         setDefaults(properties);
         this.properties = properties;
     }
