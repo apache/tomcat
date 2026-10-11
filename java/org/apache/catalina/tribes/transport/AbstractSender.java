@@ -88,6 +88,8 @@ public abstract class AbstractSender implements DataSender {
     public static void transferProperties(AbstractSender from, AbstractSender to) {
         to.rxBufSize = from.rxBufSize;
         to.txBufSize = from.txBufSize;
+        to.udpRxBufSize = from.udpRxBufSize;
+        to.udpTxBufSize = from.udpTxBufSize;
         to.directBuffer = from.directBuffer;
         to.keepAliveCount = from.keepAliveCount;
         to.keepAliveTime = from.keepAliveTime;
