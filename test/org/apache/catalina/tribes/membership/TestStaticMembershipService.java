@@ -95,4 +95,29 @@ public class TestStaticMembershipService {
         }
         Assert.assertNull(service.getMembershipProvider());
     }
+
+    /*
+     * The membership name is derived for the provider alone. It must not leak into the
+     * configuration properties that the service exposes, while the provider must still receive
+     * it, which the start itself proves, as it would fail without the name.
+     */
+    @Test
+    public void testMembershipNameStaysOutOfTheExposedProperties() throws Exception {
+        GroupChannel channel = new GroupChannel();
+        channel.setName("TestStaticMembershipService-" + System.nanoTime());
+
+        StaticMembershipService service = new StaticMembershipService();
+        service.setChannel(channel);
+        service.addStaticMember(new StaticMember("127.0.0.1", 4004, -1));
+        service.setLocalMemberProperties("127.0.0.1", 4004, 0, 0);
+
+        int level = Channel.MBR_RX_SEQ | Channel.MBR_TX_SEQ;
+        service.start(level);
+        try {
+            Assert.assertFalse("the internal membership name must not leak into the properties",
+                    service.getProperties().containsKey("membershipName"));
+        } finally {
+            service.stop(level);
+        }
+    }
 }
