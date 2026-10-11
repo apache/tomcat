@@ -102,7 +102,10 @@ public class StaticMembershipService extends MembershipServiceBase implements St
         try {
             if (provider != null && provider.stop(level)) {
                 if (oname != null) {
-                    JmxRegistry.getRegistry(channel).unregisterJmx(oname);
+                    JmxRegistry jmxRegistry = JmxRegistry.getRegistry(channel);
+                    if (jmxRegistry != null) {
+                        jmxRegistry.unregisterJmx(oname);
+                    }
                     oname = null;
                 }
                 provider = null;

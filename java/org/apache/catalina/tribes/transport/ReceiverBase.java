@@ -139,7 +139,10 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
         }
         executor = null;
         if (oname != null) {
-            JmxRegistry.getRegistry(channel).unregisterJmx(oname);
+            JmxRegistry jmxRegistry = JmxRegistry.getRegistry(channel);
+            if (jmxRegistry != null) {
+                jmxRegistry.unregisterJmx(oname);
+            }
             oname = null;
         }
         channel = null;
