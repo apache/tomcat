@@ -18,7 +18,6 @@ package org.apache.catalina.tribes.tipis;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.io.Serial;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -67,7 +66,6 @@ public class TestAbstractReplicatedMap {
      */
     private static final class BlockingValue implements Serializable {
 
-        @Serial
         private static final long serialVersionUID = 1L;
 
         private final transient CountDownLatch release;
@@ -270,7 +268,6 @@ public class TestAbstractReplicatedMap {
 
     private static final class SerialKey implements Serializable {
 
-        @Serial
         private static final long serialVersionUID = 1L;
 
         private final String id;
