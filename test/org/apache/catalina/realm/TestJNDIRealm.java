@@ -168,10 +168,79 @@ public class TestJNDIRealm {
         realm.setUserPattern("(");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testParseUserPatternStringEscapedOpenParenOnly() throws Exception {
         JNDIRealm realm = new JNDIRealm();
-        realm.setUserPattern("cn=\\(");
+        // Escaped parens are treated as a single pattern, wherever they appear
+        Assert.assertArrayEquals(new String[] { "cn=\\(" }, realm.parseUserPatternString("cn=\\("));
+        Assert.assertArrayEquals(new String[] { "cn=\\(x\\)" }, realm.parseUserPatternString("cn=\\(x\\)"));
+    }
+
+    @Test
+    public void testParseUserPatternStringEscapedCloseParenInPattern() throws Exception {
+        JNDIRealm realm = new JNDIRealm();
+        Assert.assertArrayEquals(new String[] { "cn={0}\\)x" }, realm.parseUserPatternString("(cn={0}\\)x)"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testParseUserPatternStringWrapperWithoutPatterns() throws Exception {
+        // Previously looped forever
+        new JNDIRealm().parseUserPatternString("(|x)");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testParseUserPatternStringUnclosedWrapper() throws Exception {
+        new JNDIRealm().parseUserPatternString("(|(cn={0})");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testParseUserPatternStringExtraCloseParen() throws Exception {
+        new JNDIRealm().parseUserPatternString("(cn={0}))");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testParseUserPatternStringTextBetweenPatterns() throws Exception {
+        new JNDIRealm().parseUserPatternString("(cn={0})junk(cn={0},o=myorg)");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testParseUserPatternStringTextBeforePattern() throws Exception {
+        new JNDIRealm().parseUserPatternString("junk(cn={0})");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testParseUserPatternStringTextAfterPattern() throws Exception {
+        new JNDIRealm().parseUserPatternString("(cn={0})junk");
+    }
+
+    @Test
+    public void testParseUserPatternStringWhitespaceBetweenPatterns() throws Exception {
+        JNDIRealm realm = new JNDIRealm();
+        Assert.assertArrayEquals(new String[] { "cn={0}", "cn={0},o=myorg" },
+                realm.parseUserPatternString("(cn={0}) (cn={0},o=myorg)"));
+        Assert.assertArrayEquals(new String[] { "cn={0}", "cn={0},o=myorg" },
+                realm.parseUserPatternString("(|(cn={0}) (cn={0},o=myorg) )"));
+    }
+
+    @Test
+    public void testParseUserPatternStringCloseParenWithoutOpenParen() throws Exception {
+        // A close paren is not special in a DN so a pattern with no open paren is a single pattern
+        Assert.assertArrayEquals(new String[] { "cn={0},ou=Users),dc=example,dc=com" },
+                new JNDIRealm().parseUserPatternString("cn={0},ou=Users),dc=example,dc=com"));
+    }
+
+    @Test
+    public void testSetUserPatternRejectedPatternKeepsPrevious() throws Exception {
+        JNDIRealm realm = new JNDIRealm();
+        realm.setUserPattern("(cn={0})(cn={0},o=myorg)");
+        try {
+            realm.setUserPattern("(cn={0}");
+            Assert.fail("Unbalanced pattern must be rejected");
+        } catch (IllegalArgumentException e) {
+            // Expected
+        }
+        Assert.assertEquals("(cn={0})(cn={0},o=myorg)", realm.getUserPattern());
+        Assert.assertArrayEquals(new String[] { "cn={0}", "cn={0},o=myorg" }, realm.userPatternArray);
     }
 
 
