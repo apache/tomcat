@@ -16,37 +16,14 @@
  */
 package org.apache.catalina.tribes.transport;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Before;
 import org.junit.Test;
 
-import org.apache.catalina.tribes.group.TribesSslContext;
 import org.apache.catalina.tribes.membership.MemberImpl;
 import org.apache.catalina.tribes.transport.nio.NioSender;
 import org.apache.catalina.tribes.transport.nio.PooledParallelSender;
 
 public class TestAbstractSender {
-
-    private TribesSslContext sslContext;
-
-    @Before
-    public void setUp() {
-        try {
-            sslContext = new TribesSslContext("tribes-test",
-                    "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f", "SHA256", "TLSv1.3");
-        } catch (Exception e) {
-            Assume.assumeNoException(e);
-        }
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        if (sslContext != null) {
-            sslContext.close();
-        }
-    }
 
     @Test
     public void testTransferProperties() throws Exception {
@@ -90,7 +67,6 @@ public class TestAbstractSender {
         sender.setThrowOnFailedAck(false);
         sender.setUdpBased(true);
         sender.setUdpPort(5000);
-        sender.setSslContext(sslContext);
     }
 
     private void assertTransferred(AbstractSender expected, AbstractSender actual) {
@@ -116,6 +92,5 @@ public class TestAbstractSender {
         Assert.assertEquals("soTrafficClass", expected.getSoTrafficClass(), actual.getSoTrafficClass());
         Assert.assertEquals("throwOnFailedAck", expected.getThrowOnFailedAck(), actual.getThrowOnFailedAck());
         Assert.assertEquals("udpBased", expected.isUdpBased(), actual.isUdpBased());
-        Assert.assertEquals("sslContext", expected.getSslContext(), actual.getSslContext());
     }
 }
