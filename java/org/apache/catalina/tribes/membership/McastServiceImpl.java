@@ -341,7 +341,14 @@ public class McastServiceImpl extends MembershipProviderBase {
         if (startLevel == 0) {
             // send a stop message
             member.setCommand(Member.SHUTDOWN_PAYLOAD);
-            send(false);
+            try {
+                send(false);
+            } catch (Exception e) {
+                // Shutting down. Only log at debug.
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("mcastServiceImpl.error.stop"), e);
+                }
+            }
             // leave mcast group
             try {
                 socket.leaveGroup(new InetSocketAddress(address, 0), null);
