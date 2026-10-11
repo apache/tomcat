@@ -2605,6 +2605,15 @@
         session operation and the state transfer of joining members
         for the duration of that work. (remm)
       </fix>
+      <fix>
+        The <code>udpRxBufSize</code> and <code>udpTxBufSize</code> configured
+        on the cluster channel <code>Sender</code> now take effect for messages
+        sent using UDP. These two properties were missing from the properties
+        transferred from the configured sender to the pooled senders and on to
+        the per-member senders those create, so the datagram socket was always
+        configured with the default buffer sizes and the configured values were
+        silently ignored. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
