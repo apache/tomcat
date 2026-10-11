@@ -237,7 +237,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
             }
         }
         try {
-            getBind();
+            resolveBind();
             boolean tlsOnly = getChannel() instanceof GroupChannel groupChannel && groupChannel.getSecure();
             if (!tlsOnly) {
                 bind();
