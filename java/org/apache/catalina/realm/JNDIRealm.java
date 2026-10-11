@@ -63,6 +63,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 
 import org.apache.catalina.LifecycleException;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.ietf.jgss.GSSContext;
@@ -2813,30 +2814,49 @@ public class JNDIRealm extends RealmBase {
             }
         }
         LdapContext result = null;
+        StartTlsResponse tls = null;
         try {
             result = new InitialLdapContext(env, null);
-            StartTlsResponse tls = (StartTlsResponse) result.extendedOperation(new StartTlsRequest());
+            tls = (StartTlsResponse) result.extendedOperation(new StartTlsRequest());
+            if (getHostnameVerifier() != null) {
+                tls.setHostnameVerifier(getHostnameVerifier());
+            }
+            if (getCipherSuitesArray() != null) {
+                tls.setEnabledCipherSuites(getCipherSuitesArray());
+            }
+            SSLSession negotiate = tls.negotiate(getSSLSocketFactory());
+            containerLog.debug(sm.getString("jndiRealm.negotiatedTls", negotiate.getProtocol()));
+            for (Map.Entry<String,Object> savedEntry : savedEnv.entrySet()) {
+                result.addToEnvironment(savedEntry.getKey(), savedEntry.getValue());
+            }
+            connection.tls = tls;
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            NamingException ne;
+            if (t instanceof NamingException) {
+                ne = (NamingException) t;
+            } else {
+                ne = new NamingException(t.getMessage());
+                ne.initCause(t);
+            }
             try {
-                if (getHostnameVerifier() != null) {
-                    tls.setHostnameVerifier(getHostnameVerifier());
+                if (tls != null) {
+                    tls.close();
                 }
-                if (getCipherSuitesArray() != null) {
-                    tls.setEnabledCipherSuites(getCipherSuitesArray());
-                }
-                SSLSession negotiate = tls.negotiate(getSSLSocketFactory());
-                containerLog.debug(sm.getString("jndiRealm.negotiatedTls", negotiate.getProtocol()));
-                connection.tls = tls;
-            } catch (IOException ioe) {
-                NamingException ne = new NamingException(ioe.getMessage());
-                ne.initCause(ioe);
-                throw ne;
+            } catch (Throwable t1) {
+                ExceptionUtils.handleThrowable(t1);
+                ne.addSuppressed(t1);
             }
-        } finally {
-            if (result != null) {
-                for (Map.Entry<String,Object> savedEntry : savedEnv.entrySet()) {
-                    result.addToEnvironment(savedEntry.getKey(), savedEntry.getValue());
+            try {
+                if (result != null) {
+                    result.close();
                 }
+            } catch (Throwable t2) {
+                ExceptionUtils.handleThrowable(t2);
+                ne.addSuppressed(t2);
             }
+            result = null;
+            throw ne;
         }
         return result;
     }
