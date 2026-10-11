@@ -418,7 +418,10 @@ public class McastService extends MembershipServiceBase implements MessageListen
         try {
             if (impl != null && impl.stop(svc)) {
                 if (oname != null) {
-                    JmxRegistry.getRegistry(channel).unregisterJmx(oname);
+                    JmxRegistry jmxRegistry = JmxRegistry.getRegistry(channel);
+                    if (jmxRegistry != null) {
+                        jmxRegistry.unregisterJmx(oname);
+                    }
                     oname = null;
                 }
                 impl.setChannel(null);
