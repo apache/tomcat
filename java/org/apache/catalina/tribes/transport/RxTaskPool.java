@@ -17,7 +17,6 @@
 package org.apache.catalina.tribes.transport;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -151,12 +150,13 @@ public class RxTaskPool {
     public void stop() {
         running = false;
         synchronized (mutex) {
-            Iterator<AbstractRxTask> i = idle.iterator();
-            while (i.hasNext()) {
-                AbstractRxTask worker = i.next();
-                returnWorker(worker);
-                i.remove();
+            for (AbstractRxTask worker : idle) {
+                worker.close();
             }
+            idle.clear();
+            // Wake up any thread parked in getRxTask() so that it sees that
+            // running is false and returns rather than waiting forever
+            mutex.notifyAll();
         }
     }
 
