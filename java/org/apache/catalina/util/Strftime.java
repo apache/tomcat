@@ -110,7 +110,8 @@ public class Strftime {
     /**
      * Create an instance of this date formatting class
      *
-     * @param origFormat the strftime-style formatting string
+     * @param origFormat the strftime-style formatting string. A single quote character within it is an ordinary
+     *                       literal character.
      * @param locale     the locale to use for locale-specific conversions
      */
     public Strftime(String origFormat, Locale locale) {
@@ -185,23 +186,28 @@ public class Strftime {
                         }
                     }
                 } else {
-                    if (!inside && c != ' ') {
-                        // We start a literal, which we need to quote
-                        buf.append('\'');
-                        inside = true;
-                    }
+                    if (c == '\'') {
+                        // A single quote in the source format is an ordinary literal character. In a
+                        // SimpleDateFormat pattern it is written as two quotes, both inside and outside a quoted
+                        // literal, and in either case the quote state is unchanged.
+                        buf.append("''");
+                    } else {
+                        if (!inside && c != ' ') {
+                            // We start a literal, which we need to quote
+                            buf.append('\'');
+                            inside = true;
+                        }
 
-                    buf.append(c);
+                        buf.append(c);
+                    }
                 }
             }
         }
 
-        if (!buf.isEmpty()) {
-            char lastChar = buf.charAt(buf.length() - 1);
-
-            if (lastChar != '\'' && inside) {
-                buf.append('\'');
-            }
+        if (inside && !buf.isEmpty()) {
+            // Close the quoted literal. The quote state is tracked exactly, so a trailing quote character in
+            // buf never means an already closed literal.
+            buf.append('\'');
         }
         return buf.toString();
     }
