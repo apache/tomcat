@@ -53,6 +53,13 @@ public class McastServiceImpl extends MembershipProviderBase {
     protected static final int MAX_PACKET_SIZE = 65535;
 
     /**
+     * The maximum payload size of a packet that can be sent. This is lower than the maximum
+     * packet size because the protocol limit for a UDP datagram includes the IP and UDP headers,
+     * and the IP header may be extended by options.
+     */
+    protected static final int MAX_SEND_SIZE = MAX_PACKET_SIZE - 48;
+
+    /**
      * The string manager for this class.
      */
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
