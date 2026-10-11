@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.tribes.membership;
 
+import java.util.ArrayList;
 import java.util.Properties;
 
 import org.junit.Assert;
@@ -119,5 +120,26 @@ public class TestStaticMembershipService {
         } finally {
             service.stop(level);
         }
+    }
+
+    /*
+     * The accessor hands out the list that the provider iterates while it runs. A caller that
+     * mutated the returned list raced that iteration, so the accessor must hand out a copy
+     * instead of the live list.
+     */
+    @Test
+    public void testGetStaticMembersReturnsACopy() throws Exception {
+        StaticMembershipService service = new StaticMembershipService();
+        StaticMember member = new StaticMember("127.0.0.1", 4005, -1);
+        service.addStaticMember(member);
+
+        ArrayList<StaticMember> members = service.getStaticMembers();
+        Assert.assertNotSame("the accessor must not hand out the same list twice", members,
+                service.getStaticMembers());
+        Assert.assertTrue(members.remove(member));
+        Assert.assertFalse(members.contains(member));
+
+        // The live list that the provider reads must be untouched by the copy mutation
+        Assert.assertTrue(service.getStaticMembers().contains(member));
     }
 }
