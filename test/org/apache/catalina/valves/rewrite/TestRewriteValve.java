@@ -280,6 +280,16 @@ public class TestRewriteValve extends TomcatBaseTest {
         doTestRewrite("RewriteRule /b/(.*).html$ /c%{SERVLET_PATH}", "/b/x.html", "/c/b/x.html");
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testRewriteRuleExtraToken() throws Exception {
+        doTestRewrite("RewriteRule /b/.* /c [L] extra", "/b/a.html", "/c");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testRewriteCondExtraToken() throws Exception {
+        doTestRewrite("RewriteCond %{REQUEST_URI} ^/b.* [NC] extra\n" + "RewriteRule /b/.* /c", "/b/a.html", "/c");
+    }
+
     @Test
     public void testRewriteEnvVarAndServerVar() throws Exception {
         System.setProperty("some_variable", "something");
