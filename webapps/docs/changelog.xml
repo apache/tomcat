@@ -1999,6 +1999,17 @@
         <code>throwOnFailure</code>, so the now reachable skip path cannot
         silently drop a customised configuration. (remm)
       </fix>
+      <fix>
+        Correctly handle error reports that cannot be proxied by
+        <code>ProxyErrorReportValve</code>. Previously, a relative location
+        or an unreachable, non-HTTP or failing proxy target resulted in an
+        empty response with only the error status set. The valve now falls
+        back to the error report of the default <code>ErrorReportValve</code>
+        in these cases, no longer applies proxy target metadata to the
+        response before the target response has been received, restricts
+        proxying to absolute HTTP and HTTPS URLs and applies connect and
+        read timeouts to the connection to the proxy target. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
