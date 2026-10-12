@@ -100,22 +100,27 @@ public class CompressionConfig {
      * Set compression level.
      *
      * @param compression One of <code>on</code>, <code>force</code>, <code>off</code> or the minimum compression size
-     *                        in bytes which implies <code>on</code>
+     *                        in bytes which implies <code>on</code>. Surrounding whitespace is ignored. An invalid
+     *                        value is logged and disables compression.
      */
     public void setCompression(String compression) {
-        if (compression.equals("on")) {
+        // Trim the value so that surrounding whitespace in the configuration
+        // does not silently disable compression
+        String value = compression == null ? "" : compression.trim();
+        if (value.equals("on")) {
             this.compressionLevel = 1;
-        } else if (compression.equals("force")) {
+        } else if (value.equals("force")) {
             this.compressionLevel = 2;
-        } else if (compression.equals("off")) {
+        } else if (value.equals("off")) {
             this.compressionLevel = 0;
         } else {
             try {
                 // Try to parse compression as an int, which would give the
                 // minimum compression size
-                setCompressionMinSize(Integer.parseInt(compression));
+                setCompressionMinSize(Integer.parseInt(value));
                 this.compressionLevel = 1;
-            } catch (Exception e) {
+            } catch (NumberFormatException e) {
+                log.warn(sm.getString("compressionConfig.invalidCompressionValue", value));
                 this.compressionLevel = 0;
             }
         }
