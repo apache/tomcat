@@ -45,13 +45,17 @@ import org.easymock.IMocksControl;
 public class TestLoadBalancerDrainingValve {
 
     @Parameters(name = "{index}: activation[{0}], validSessionID[{1}], expectInvokeNext[{2}], enableIgnore[{3}], " +
-            "leadingSlashes[{4}], queryString[{5}]]")
+            "leadingSlashes[{4}], queryString[{5}], sessionState[{8}]]")
     public static Collection<Object[]> parameters() {
 
         String[] jkActivations = new String[] { "ACT", "DIS" };
         Boolean[] booleans = new Boolean[] { Boolean.TRUE, Boolean.FALSE };
         Integer[] integers = new Integer[] { Integer.valueOf(0), Integer.valueOf(1), Integer.valueOf(2) };
         String[] queryStrings = new String[] { null, "foo=bar" };
+        // The states with a missing requested session id or a missing context
+        // are only meaningful for the draining of a request with an invalid
+        // session
+        String[] sessionStates = new String[] { "idPresent", "idAbsent", "contextAbsent" };
 
         List<Object[]> parameterSets = new ArrayList<>();
         for (String jkActivation : jkActivations) {
@@ -63,9 +67,13 @@ public class TestLoadBalancerDrainingValve {
                         for (String queryString : queryStrings) {
                             for (Boolean secureRequest : booleans) {
                                 for (Boolean secureSessionConfig : booleans) {
-                                    parameterSets.add(new Object[] { jkActivation, validSessionId, expectInvokeNext,
-                                            enableIgnore, leadingSlashes, queryString, secureRequest,
-                                            secureSessionConfig });
+                                    for (String sessionState : "DIS".equals(jkActivation) &&
+                                            !validSessionId.booleanValue() ? sessionStates : new String[] {
+                                                    "idPresent" }) {
+                                        parameterSets.add(new Object[] { jkActivation, validSessionId,
+                                                expectInvokeNext, enableIgnore, leadingSlashes, queryString,
+                                                secureRequest, secureSessionConfig, sessionState });
+                                    }
                                 }
                             }
                         }
@@ -100,6 +108,9 @@ public class TestLoadBalancerDrainingValve {
 
     @Parameter(7)
     public boolean secureSessionConfig;
+
+    @Parameter(8)
+    public String sessionState;
 
 
     @Test
@@ -146,33 +157,39 @@ public class TestLoadBalancerDrainingValve {
 
             cookies.add(cookie);
 
-            EasyMock.expect(request.getRequestedSessionId()).andStubReturn(sessionId);
+            EasyMock.expect(request.getRequestedSessionId())
+                    .andStubReturn("idPresent".equals(sessionState) ? sessionId : null);
             EasyMock.expect(request.getRequestURI()).andStubReturn("/".repeat(leadingSlashes.intValue()) + requestURI);
             EasyMock.expect(request.getCookies()).andStubReturn(cookies.toArray(new Cookie[0]));
-            EasyMock.expect(request.getContext()).andStubReturn(ctx);
+            EasyMock.expect(request.getContext())
+                    .andStubReturn("contextAbsent".equals(sessionState) ? null : ctx);
             EasyMock.expect(ctx.getSessionCookieName()).andStubReturn(sessionCookieName);
             EasyMock.expect(servletContext.getSessionCookieConfig()).andStubReturn(cookieConfig);
             EasyMock.expect(request.getQueryString()).andStubReturn(queryString);
             EasyMock.expect(ctx.getSessionCookiePath()).andStubReturn("/");
 
             if (!enableIgnore) {
-                EasyMock.expect(Boolean.valueOf(ctx.getSessionCookiePathUsesTrailingSlash()))
-                        .andStubReturn(Boolean.TRUE);
-                EasyMock.expect(request.getQueryString()).andStubReturn(queryString);
-                // Response will have cookie deleted
-                MyCookie expectedCookie = new MyCookie(cookieConfig.getName(), "");
-                expectedCookie.setPath(cookieConfig.getPath());
-                expectedCookie.setMaxAge(0);
-
-                EasyMock.expect(Boolean.valueOf(request.isSecure())).andReturn(secureRequest);
-
-                // These two lines just mean EasyMock.expect(response.addCookie) but for a void method
-                response.addCookie(expectedCookie);
-                EasyMock.expect(ctx.getSessionCookieName()).andReturn(sessionCookieName); // Indirect call
                 String expectedRequestURI = requestURI;
                 if (null != queryString) {
                     expectedRequestURI = expectedRequestURI + '?' + queryString;
                 }
+                if ("idPresent".equals(sessionState)) {
+                    EasyMock.expect(Boolean.valueOf(ctx.getSessionCookiePathUsesTrailingSlash()))
+                            .andStubReturn(Boolean.TRUE);
+                    EasyMock.expect(request.getQueryString()).andStubReturn(queryString);
+                    // Response will have cookie deleted
+                    MyCookie expectedCookie = new MyCookie(cookieConfig.getName(), "");
+                    expectedCookie.setPath(cookieConfig.getPath());
+                    expectedCookie.setMaxAge(0);
+
+                    EasyMock.expect(Boolean.valueOf(request.isSecure())).andReturn(secureRequest);
+
+                    // These two lines just mean EasyMock.expect(response.addCookie) but for a void method
+                    response.addCookie(expectedCookie);
+                    EasyMock.expect(ctx.getSessionCookieName()).andReturn(sessionCookieName); // Indirect call
+                }
+                // Without a requested session id the cookie cannot match, so it
+                // is not deleted, but the redirect is still expected
                 response.sendRedirect(expectedRequestURI, 307);
             }
         }
