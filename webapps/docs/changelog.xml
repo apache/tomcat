@@ -395,6 +395,14 @@
   </subsection>
   <subsection name="Coyote">
     <changelog>
+      <fix>
+        Keep the asynchronous timeout in place until the timeout event has
+        been processed, rather than clearing it when the event is dispatched.
+        A dispatched event may be discarded without being processed, for
+        example when no container thread is available to process it, which
+        previously left the asynchronous request running without any timeout.
+        (remm)
+      </fix>
       <update>
         Change the default value of the <code>cookiesWithoutEquals</code>
         attribute of the <code>Rfc6265CookieProcessor</code> from
