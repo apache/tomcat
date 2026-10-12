@@ -19,6 +19,7 @@ package org.apache.catalina.valves;
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -131,6 +132,78 @@ public class TestStuckThreadDetectionValve extends TomcatBaseTest {
         Assert.assertTrue(stickingServlet.wasInterrupted);
         Assert.assertEquals(0, valve.getStuckThreadIds().length);
         Assert.assertTrue(result.toString().startsWith("OK"));
+    }
+
+    @Test
+    public void testInterruptStuckThreadOnlyOnce() throws Exception {
+        // A servlet whose work is not interruptible: it stays busy even after
+        // being interrupted and records every interrupt that is delivered
+        UninterruptibleStickingServlet stickingServlet =
+                new UninterruptibleStickingServlet(TimeUnit.SECONDS.toMillis(8L));
+        Wrapper servlet = Tomcat.addServlet(context, "myservlet", stickingServlet);
+        servlet.addMapping("/myservlet");
+
+        StuckThreadDetectionValve valve = new StuckThreadDetectionValve();
+        valve.setThreshold(2);
+        valve.setInterruptThreadThreshold(3);
+        context.addValve(valve);
+        context.setBackgroundProcessorDelay(1);
+        tomcat.start();
+
+        final ByteChunk result = new ByteChunk();
+        Thread asyncThread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    getUrl("http://localhost:" + getPort() + "/myservlet", result, null);
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                }
+            }
+
+        };
+        asyncThread.start();
+        asyncThread.join(20000);
+        // check that we did not reach the join timeout
+        Assert.assertFalse(asyncThread.isAlive());
+
+        // The thread should have been interrupted, but only once. A thread
+        // that remains stuck despite the interrupt must not be interrupted,
+        // and logged, again on every background process cycle.
+        Assert.assertEquals(1, stickingServlet.getInterruptCount());
+        Assert.assertTrue(result.toString().startsWith("OK"));
+    }
+
+    private static class UninterruptibleStickingServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+        private final long duration;
+        private final AtomicInteger interruptCount = new AtomicInteger();
+
+        UninterruptibleStickingServlet(long duration) {
+            this.duration = duration;
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+            // Busy wait, like work that ignores the interrupt. Each delivered
+            // interrupt is observed once and cleared, so a new interrupt of
+            // the same request is counted separately.
+            long end = System.currentTimeMillis() + duration;
+            while (System.currentTimeMillis() < end) {
+                if (Thread.interrupted()) {
+                    interruptCount.incrementAndGet();
+                }
+            }
+            // Do not hand an interrupt flag back to the container
+            Thread.interrupted();
+            resp.setContentType("text/plain");
+            resp.getWriter().println("OK");
+        }
+
+        public int getInterruptCount() {
+            return interruptCount.get();
+        }
     }
 
     private static class StickingServlet extends HttpServlet {
