@@ -20,7 +20,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -30,6 +32,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.connector.Request;
+import org.apache.catalina.connector.Response;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -172,6 +176,93 @@ public class TestStuckThreadDetectionValve extends TomcatBaseTest {
         // and logged, again on every background process cycle.
         Assert.assertEquals(1, stickingServlet.getInterruptCount());
         Assert.assertTrue(result.toString().startsWith("OK"));
+    }
+
+    @Test
+    public void testInterruptFlagNotLeftSetForNextRequest() throws Exception {
+        // A servlet that works until interrupted and then completes without
+        // consuming the interrupt flag, as work that is not interruptible
+        // would leave it
+        InterruptUntilDoneServlet stickingServlet = new InterruptUntilDoneServlet();
+        Wrapper servlet = Tomcat.addServlet(context, "myservlet", stickingServlet);
+        servlet.addMapping("/myservlet");
+
+        // A valve added before the detection valve sees the state of the
+        // worker thread once the detection valve is done with the request,
+        // which is the state the thread would carry into the next request
+        AtomicReference<Boolean> flagAfterRequest = new AtomicReference<>();
+        ValveBase observer = new ValveBase(true) {
+            @Override
+            public void invoke(Request request, Response response) throws IOException, ServletException {
+                try {
+                    getNext().invoke(request, response);
+                } finally {
+                    // Consume any flag so the pooled worker thread is left
+                    // clean for the next request
+                    flagAfterRequest.set(Boolean.valueOf(Thread.interrupted()));
+                }
+            }
+        };
+
+        context.addValve(observer);
+
+        StuckThreadDetectionValve valve = new StuckThreadDetectionValve();
+        valve.setThreshold(2);
+        valve.setInterruptThreadThreshold(3);
+        context.addValve(valve);
+        context.setBackgroundProcessorDelay(1);
+        tomcat.start();
+
+        final ByteChunk result = new ByteChunk();
+        Thread asyncThread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    getUrl("http://localhost:" + getPort() + "/myservlet", result, null);
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                }
+            }
+
+        };
+        asyncThread.start();
+        asyncThread.join(30000);
+        // check that we did not reach the join timeout
+        Assert.assertFalse(asyncThread.isAlive());
+
+        Assert.assertTrue(stickingServlet.wasInterrupted);
+        // The detection valve must not leave the interrupt flag it set on the
+        // worker thread set once it is done with the request
+        Assert.assertEquals(Boolean.FALSE, flagAfterRequest.get());
+        Assert.assertTrue(result.toString().startsWith("OK"));
+    }
+
+    private static class InterruptUntilDoneServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+        volatile boolean wasInterrupted = false;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+            // Wait for the interrupt without consuming it, then complete.
+            // Non-interruptible work that ignores the interrupt leaves the
+            // flag set when it finishes.
+            long end = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(25L);
+            while (!Thread.currentThread().isInterrupted() && System.currentTimeMillis() < end) {
+                try {
+                    Thread.sleep(50L);
+                } catch (InterruptedException e) {
+                    // The loop condition observes the flag below. Re-arm the
+                    // flag since this test checks that the valve clears the
+                    // interrupt it set.
+                    Thread.currentThread().interrupt();
+                }
+            }
+            wasInterrupted = Thread.currentThread().isInterrupted();
+            // Deliberately do not consume the interrupt flag here
+            resp.setContentType("text/plain");
+            resp.getWriter().println("OK");
+        }
     }
 
     private static class UninterruptibleStickingServlet extends HttpServlet {
