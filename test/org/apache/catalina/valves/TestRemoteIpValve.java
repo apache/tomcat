@@ -151,6 +151,46 @@ public class TestRemoteIpValve {
 
     }
 
+    /*
+     * A remote IP header value that contains nothing but whitespace (or commas) must leave the request untouched,
+     * just like an absent header, rather than setting an empty remote address.
+     */
+    @Test
+    public void testInvokeAllowedRemoteAddrWithWhitespaceOnlyRemoteIpHeader() throws Exception {
+        // PREPARE
+        RemoteIpValve remoteIpValve = new RemoteIpValve();
+        remoteIpValve.setInternalProxies("192.168.0.10/31");
+        remoteIpValve.setTrustedProxies("200.0.0.1, 200.0.0.2, 200.0.0.3");
+        remoteIpValve.setRemoteIpHeader("x-forwarded-for");
+        remoteIpValve.setProxiesHeader("x-forwarded-by");
+        RemoteAddrAndHostTrackerValve remoteAddrAndHostTrackerValve = new RemoteAddrAndHostTrackerValve();
+        remoteIpValve.setNext(remoteAddrAndHostTrackerValve);
+
+        Request request = new MockRequest(new org.apache.coyote.Request());
+        request.setRemoteAddr("192.168.0.10");
+        request.setRemoteHost("remote-host-original-value");
+        request.getCoyoteRequest().getMimeHeaders().addValue("x-forwarded-for").setString(" ");
+
+        // TEST
+        remoteIpValve.invoke(request, null);
+
+        // VERIFY
+        String actualXForwardedBy = remoteAddrAndHostTrackerValve.getForwardedBy();
+        Assert.assertNull("x-forwarded-by must not be added", actualXForwardedBy);
+
+        String actualRemoteAddr = remoteAddrAndHostTrackerValve.getRemoteAddr();
+        Assert.assertEquals("remoteAddr", "192.168.0.10", actualRemoteAddr);
+
+        String actualRemoteHost = remoteAddrAndHostTrackerValve.getRemoteHost();
+        Assert.assertEquals("remoteHost", "remote-host-original-value", actualRemoteHost);
+
+        String actualPostInvokeRemoteAddr = request.getRemoteAddr();
+        Assert.assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteAddr);
+
+        String actualPostInvokeRemoteHost = request.getRemoteHost();
+        Assert.assertEquals("postInvoke remoteAddr", "remote-host-original-value", actualPostInvokeRemoteHost);
+    }
+
     @Test
     public void testInvokeAllProxiesAreTrusted() throws Exception {
 
