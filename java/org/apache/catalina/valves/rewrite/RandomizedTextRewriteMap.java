@@ -52,6 +52,7 @@ public class RandomizedTextRewriteMap implements RewriteMap {
         try (Resource txtResource = ConfigFileLoader.getSource().getResource(txtFilePath);
                 BufferedReader reader = new BufferedReader(new InputStreamReader(txtResource.getInputStream()))) {
             while ((line = reader.readLine()) != null) {
+                line = line.trim();
                 if (line.startsWith("#") || line.isEmpty()) {
                     // Ignore comment line or empty lines
                     continue;
@@ -59,7 +60,9 @@ public class RandomizedTextRewriteMap implements RewriteMap {
                     // Ignore comment characters after '#'
                     line = line.substring(0, line.indexOf('#')).trim();
                 }
-                String[] keyValuePair = line.split(" ", 2);
+                // Like mod_rewrite, any whitespace separates the key from the
+                // value. The value may itself contain whitespace.
+                String[] keyValuePair = line.split("\\s+", 2);
                 if (keyValuePair.length > 1) {
                     String key = keyValuePair[0];
                     String value = keyValuePair[1];
