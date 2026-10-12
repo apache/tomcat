@@ -591,6 +591,43 @@ public class TestParameterLimitValve extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testInvalidConfigLeavesLimitsUnchanged() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
+
+        ParameterLimitValve parameterLimitValve = new ParameterLimitValve();
+        ctx.getPipeline().addValve(parameterLimitValve);
+        parameterLimitValve.setUrlPatternLimits("/special/.*=2");
+
+        // An invalid configuration update must fail and must leave the
+        // previously configured limits in effect. Previously, the limits were
+        // cleared first and the lines parsed before the failure remained.
+        try {
+            parameterLimitValve.setUrlPatternLimits(
+                    "/other/.*=5" + CRLF + "invalid-line-without-equals");
+            Assert.fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException expected) {
+            // Expected
+        }
+
+        Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
+        ctx.addServletMapping("/special/endpoint", "snoop");
+
+        tomcat.start();
+
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/special/endpoint?param1=value1&param2=value2&param3=value3",
+            new ByteChunk(), null);
+        Assert.assertEquals(400, rc);
+
+        rc = getUrl("http://localhost:" + getPort() + "/special/endpoint?param1=value1&param2=value2",
+            new ByteChunk(), null);
+        Assert.assertEquals(200, rc);
+    }
+
+
     private void doTestMaxParameterCountLimitExceeded(int maxParameterCount, int textPartCount, int filePartCount,
             int queryStringCount, boolean okExpected) throws Exception {
 
