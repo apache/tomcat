@@ -75,4 +75,29 @@ public class TestCompressionConfigSetters {
         compressionConfig.setCompression(null);
         Assert.assertEquals("off", compressionConfig.getCompression());
     }
+
+    @Test
+    public void testSetCompressibleMimeType() {
+        CompressionConfig compressionConfig = new CompressionConfig();
+
+        compressionConfig.setCompressibleMimeType("text/html, application/json");
+        Assert.assertArrayEquals(new String[] { "text/html", "application/json" },
+                compressionConfig.getCompressibleMimeTypes());
+    }
+
+    @Test
+    public void testSetCompressibleMimeTypeNull() {
+        CompressionConfig compressionConfig = new CompressionConfig();
+
+        try {
+            compressionConfig.setCompressibleMimeType(null);
+            Assert.fail("Expected an IllegalArgumentException for a null value");
+        } catch (IllegalArgumentException iae) {
+            // Expected
+        }
+
+        // The previously configured value must be unchanged
+        Assert.assertNotNull(compressionConfig.getCompressibleMimeType());
+        Assert.assertEquals("text/html", compressionConfig.getCompressibleMimeTypes()[0]);
+    }
 }
