@@ -191,10 +191,12 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
         int targetVersion = Runtime.version().feature();
 
         Map<String,VersionedJarEntry> versionedEntries = new HashMap<>();
+        Map<String,JarEntry> otherEntries = new HashMap<>();
         Iterator<Entry<String,JarEntry>> iter = archiveEntries.entrySet().iterator();
         while (iter.hasNext()) {
             Entry<String,JarEntry> entry = iter.next();
             String name = entry.getKey();
+            JarEntry jarEntry = entry.getValue();
             if (name.startsWith("META-INF/versions/")) {
                 // Remove the multi-release version
                 iter.remove();
@@ -203,7 +205,16 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
                 int i = name.indexOf('/', 18);
                 if (i > 0) {
                     String baseName = name.substring(i + 1);
-                    int version = Integer.parseInt(name.substring(18, i));
+                    int version;
+                    try {
+                        version = Integer.parseInt(name.substring(18, i));
+                    } catch (NumberFormatException e) {
+                        // The entry is not below a valid version directory, so
+                        // it is not a versioned entry and remains available
+                        // under its full name
+                        otherEntries.put(name, jarEntry);
+                        continue;
+                    }
 
                     // Ignore any entries targeting for a later version than
                     // the target for this runtime
@@ -212,20 +223,21 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
                         if (versionedJarEntry == null) {
                             // No versioned entry found for this name. Create
                             // one.
-                            versionedEntries.put(baseName, new VersionedJarEntry(version, entry.getValue()));
+                            versionedEntries.put(baseName, new VersionedJarEntry(version, jarEntry));
                         } else {
                             // Ignore any entry for which we have already found
                             // a later version
                             if (version > versionedJarEntry.getVersion()) {
                                 // Replace the entry targeted at an earlier
                                 // version
-                                versionedEntries.put(baseName, new VersionedJarEntry(version, entry.getValue()));
+                                versionedEntries.put(baseName, new VersionedJarEntry(version, jarEntry));
                             }
                         }
                     }
                 }
             }
         }
+        archiveEntries.putAll(otherEntries);
 
         for (Entry<String,VersionedJarEntry> versionedJarEntry : versionedEntries.entrySet()) {
             archiveEntries.put(versionedJarEntry.getKey(), versionedJarEntry.getValue().getJarEntry());
