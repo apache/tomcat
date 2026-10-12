@@ -22,6 +22,7 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -357,6 +358,52 @@ public class TestRewriteValve extends TomcatBaseTest {
         String expected = String.valueOf(LocalDate.now().getDayOfWeek().getValue() % 7);
         doTestRewrite("RewriteRule ^/c/x$ - [E=X-Test:%{TIME_WDAY}TUE%{TIME_WDAY}]",
                 "/c/x", "/c/x", null, expected + "TUE" + expected);
+    }
+
+    @Test
+    public void testRemoteIdentIsNotTheRemoteUser() throws Exception {
+        // REMOTE_IDENT is the RFC 931 ident protocol user name, which Tomcat
+        // does not support. It must resolve to undefined (expanding to an
+        // empty string), not to the authenticated user name that REMOTE_USER
+        // returns.
+        String config = "RewriteRule ^/c/x$ - " +
+                "[E=X-Test:user=%{REMOTE_USER}+ident=%{REMOTE_IDENT}]\n";
+
+        Tomcat tomcat = getTomcatInstance();
+        Context ctx = getProgrammaticRootContext();
+
+        // Authenticate the request before the rewrite valve runs
+        ctx.getPipeline().addValve(new ValveBase() {
+            @Override
+            public void invoke(Request request, Response response)
+                    throws IOException, ServletException {
+                request.setUserPrincipal(new Principal() {
+                    @Override
+                    public String getName() {
+                        return "testuser";
+                    }
+                });
+                getNext().invoke(request, response);
+            }
+        });
+
+        RewriteValve rewriteValve = new RewriteValve();
+        ctx.getPipeline().addValve(rewriteValve);
+        rewriteValve.setConfiguration(config);
+
+        Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
+        ctx.addServletMapping("/c/*", "snoop");
+
+        tomcat.start();
+
+        ByteChunk res = new ByteChunk();
+        int rc = methodUrl("http://localhost:" + getPort() + "/c/x", res,
+                DEFAULT_CLIENT_TIMEOUT_MS, null, null, Method.GET, true);
+        Assert.assertEquals(200, rc);
+        res.setCharset(StandardCharsets.UTF_8);
+        RequestDescriptor requestDesc = SnoopResult.parse(res.toString());
+        Assert.assertEquals("user=testuser+ident=",
+                requestDesc.getAttribute("X-Test"));
     }
 
     @Test
