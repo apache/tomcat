@@ -2910,6 +2910,8 @@ RequestHeader unset SSL_CLIENT_ESCAPED_CERT</source>
         Each entry should follow the format <code>urlPattern=limit</code>.
         The valve will apply the limit defined for a URL pattern when a request matches that pattern.
         If no pattern matches, the Connector's limit will be used.
+        If several configured patterns match a request, the limit of the first
+        matching pattern in configuration order is applied.
         For example:
           <code>
             /api/.*=100
