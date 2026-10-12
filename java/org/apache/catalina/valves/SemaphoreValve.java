@@ -65,7 +65,9 @@ public class SemaphoreValve extends ValveBase {
 
 
     /**
-     * Concurrency level of the semaphore.
+     * Concurrency level of the semaphore. The value must be at least one,
+     * since a semaphore without permits combined with blocking would make
+     * every request wait forever.
      */
     protected int concurrency = 10;
 
@@ -81,10 +83,10 @@ public class SemaphoreValve extends ValveBase {
     /**
      * Set the concurrency level of the semaphore.
      *
-     * @param concurrency the concurrency level
+     * @param concurrency the concurrency level, at least one
      */
     public void setConcurrency(int concurrency) {
-        if (concurrency < 0) {
+        if (concurrency < 1) {
             throw new IllegalArgumentException(
                     sm.getString("semaphoreValve.invalidConcurrency", Integer.valueOf(concurrency)));
         }

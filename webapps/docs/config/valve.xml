@@ -2760,7 +2760,8 @@ RequestHeader unset SSL_CLIENT_ESCAPED_CERT</source>
       </attribute>
 
       <attribute name="concurrency" required="false">
-        <p>Concurrency level of the semaphore. The default value is
+        <p>Concurrency level of the semaphore. The value must be at least
+        one. The default value is
         <strong>10</strong>.</p>
       </attribute>
 
