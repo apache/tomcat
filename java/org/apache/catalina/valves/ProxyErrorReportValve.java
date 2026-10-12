@@ -111,7 +111,13 @@ public class ProxyErrorReportValve extends ErrorReportValve {
     }
 
     private String getRedirectUrl(Response response) {
-        ResourceBundle resourceBundle = ResourceBundle.getBundle(this.getClass().getSimpleName(), response.getLocale());
+        ResourceBundle resourceBundle;
+        try {
+            resourceBundle = ResourceBundle.getBundle(this.getClass().getSimpleName(), response.getLocale());
+        } catch (MissingResourceException e) {
+            // No bundle available. Fall back to the default error report.
+            return null;
+        }
         String redirectUrl = null;
         try {
             redirectUrl = resourceBundle.getString(Integer.toString(response.getStatus()));

@@ -513,6 +513,46 @@ public class TestProxyErrorReportValve extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testMissingPropertiesBundleFallsBackToSuper() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        ((StandardHost) tomcat.getHost()).setErrorReportValveClass(PROXY_VALVE);
+
+        Context ctx = getProgrammaticRootContext();
+
+        Tomcat.addServlet(ctx, "error", new SendErrorServlet(
+                HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server broke"));
+        ctx.addServletMapping("/", "error");
+
+        tomcat.start();
+
+        ProxyErrorReportValve valve = null;
+        Valve[] valves = tomcat.getHost().getPipeline().getValves();
+        for (Valve valveCandidate : valves) {
+            if (PROXY_VALVE.equals(valveCandidate.getClass().getName())) {
+                valve = (ProxyErrorReportValve)valveCandidate;
+                break;
+            }
+        }
+        Assert.assertNotNull(valve);
+        // No ProxyErrorReportValve.properties bundle is available on the
+        // test class path. The default error report must be produced rather
+        // than an empty response.
+        valve.setUsePropertiesFile(true);
+
+        ByteChunk res = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort(), res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+
+        String body = res.toString();
+        Assert.assertNotNull("Response body should not be empty", body);
+        Assert.assertTrue("Should contain HTML error report",
+                body.contains("html") &&
+                    body.contains(String.valueOf(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)));
+    }
+
+
     private static final class SendErrorServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
