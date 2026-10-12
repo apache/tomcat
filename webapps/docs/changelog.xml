@@ -2642,6 +2642,15 @@
         configured address, while the unresolvable host was advertised to the
         other cluster members. (remm)
       </fix>
+      <fix>
+        When the Servlet asynchronous processing mechanism is used,
+        <code>SemaphoreValve</code> no longer attempts to acquire a second
+        permit when the request is dispatched back to the container. A
+        saturated semaphore previously rejected such a dispatch with a 503
+        response or an <code>IllegalStateException</code>. The permit
+        obtained when asynchronous processing starts is now released when
+        that asynchronous processing completes or fails. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
