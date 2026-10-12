@@ -290,6 +290,42 @@ public class TestRewriteValve extends TomcatBaseTest {
         doTestRewrite("RewriteCond %{REQUEST_URI} ^/b.* [NC] extra\n" + "RewriteRule /b/.* /c", "/b/a.html", "/c");
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testRewriteRuleNegativeSkip() throws Exception {
+        doTestRewrite("RewriteRule /b/.* /c [S=-1]", "/b/a.html", "/c");
+    }
+
+    @Test(timeout = 30000)
+    public void testRewriteRuleNextLoopIsBounded() throws Exception {
+        // Two next rules [N] rewriting back and forth, never reaching a
+        // state at which rewriting stops by itself
+        String config = "RewriteRule ^/c/x$ /c/y [N]\n" + "RewriteRule ^/c/y$ /c/x [N]\n";
+
+        Tomcat tomcat = getTomcatInstance();
+        Context ctx = getProgrammaticRootContext();
+
+        RewriteValve rewriteValve = new RewriteValve();
+        ctx.getPipeline().addValve(rewriteValve);
+        rewriteValve.setConfiguration(config);
+
+        Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
+        ctx.addServletMapping("/c/*", "snoop");
+
+        tomcat.start();
+
+        ByteChunk res = new ByteChunk();
+        int rc = methodUrl("http://localhost:" + getPort() + "/c/x", res, DEFAULT_CLIENT_TIMEOUT_MS, null, null,
+                Method.GET, true);
+        res.setCharset(StandardCharsets.UTF_8);
+
+        // Rewriting must stop after a bounded number of rounds and the
+        // request must complete, mapped to the servlet thanks to the last
+        // rewrite that was applied
+        Assert.assertEquals(200, rc);
+        String requestURI = SnoopResult.parse(res.toString()).getRequestInfo("REQUEST-URI");
+        Assert.assertTrue(requestURI, "/c/x".equals(requestURI) || "/c/y".equals(requestURI));
+    }
+
     @Test
     public void testRewriteEnvVarAndServerVar() throws Exception {
         System.setProperty("some_variable", "something");

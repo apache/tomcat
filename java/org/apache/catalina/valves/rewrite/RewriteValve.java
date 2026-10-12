@@ -69,6 +69,13 @@ public class RewriteValve extends ValveBase {
     private static final URLEncoder REWRITE_DEFAULT_ENCODER;
     private static final URLEncoder REWRITE_QUERY_ENCODER;
 
+    /**
+     * The maximum number of rounds of rewrite rules triggered by the next flag [N]. This bounds the processing of
+     * configurations whose next rules do not converge, which would otherwise spin in the rule loop without ever
+     * completing the request.
+     */
+    private static final int MAX_REWRITE_ROUNDS = 1000;
+
     static {
         /*
          * See the detailed explanation of encoding/decoding during URL re-writing in the invoke() method.
@@ -401,6 +408,7 @@ public class RewriteValve extends ValveBase {
             boolean qsa = false;
             boolean qsd = false;
             boolean valveSkip = false;
+            int rounds = 0;
 
             // Step 2. Process the URL using the re-write rules.
             for (int i = 0; i < rules.length; i++) {
@@ -552,6 +560,12 @@ public class RewriteValve extends ValveBase {
                 }
                 // - next (redo again)
                 if (rule.isNext() && newtest != null) {
+                    if (rounds >= MAX_REWRITE_ROUNDS) {
+                        containerLog.warn(sm.getString("rewriteValve.maxRounds",
+                                Integer.valueOf(MAX_REWRITE_ROUNDS)));
+                        break;
+                    }
+                    rounds++;
                     i = -1;
                     continue;
                 }
@@ -911,6 +925,9 @@ public class RewriteValve extends ValveBase {
                 flag = flag.substring("S=".length());
             }
             rule.setSkip(Integer.parseInt(flag));
+            if (rule.getSkip() < 0) {
+                throw new IllegalArgumentException(sm.getString("rewriteValve.invalidFlags", line, flag));
+            }
         } else if (flag.startsWith("type") || flag.startsWith("T")) {
             if (flag.startsWith("type=")) {
                 flag = flag.substring("type=".length());
