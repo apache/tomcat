@@ -407,6 +407,48 @@ public class TestRewriteValve extends TomcatBaseTest {
     }
 
     @Test
+    public void testMalformedRuleFlagsRejected() throws Exception {
+        // Typos must fail configuration parsing instead of silently enabling
+        // the flag whose name the typo extends
+        String[] malformedFlags = { "forbiddenX", "goneX", "hostX", "Hfoo", "lastX", "nocaseX", "noescapeX",
+                "nextX", "qsappendX", "qsdiscardX", "redirectX", "R2", "skipX", "typeX", "valveSkipX", "F=x", "Lx",
+                "VSx" };
+        for (String malformedFlag : malformedFlags) {
+            try {
+                RewriteValve.parseRuleFlag("RewriteRule ^/c/x$ - [" + malformedFlag + "]",
+                        new RewriteRule(), malformedFlag);
+                Assert.fail("IAE expected for flag " + malformedFlag);
+            } catch (IllegalArgumentException e) {
+                // expected, the flag is unknown
+            }
+        }
+
+        // Valid spellings, including the documented value forms, must work
+        RewriteRule rule = new RewriteRule();
+        RewriteValve.parseRuleFlag("line", rule, "redirect");
+        Assert.assertTrue(rule.isRedirect());
+        RewriteValve.parseRuleFlag("line", rule, "R");
+        Assert.assertEquals(HttpServletResponse.SC_FOUND, rule.getRedirectCode());
+        RewriteValve.parseRuleFlag("line", rule, "R=302");
+        Assert.assertEquals(302, rule.getRedirectCode());
+        RewriteValve.parseRuleFlag("line", rule, "host=example.com");
+        Assert.assertTrue(rule.isHost());
+        RewriteValve.parseRuleFlag("line", rule, "H");
+        Assert.assertTrue(rule.isHost());
+        RewriteValve.parseRuleFlag("line", rule, "skip=2");
+        Assert.assertEquals(2, rule.getSkip());
+        RewriteValve.parseRuleFlag("line", rule, "T=text/plain");
+        Assert.assertTrue(rule.isType());
+        Assert.assertEquals("text/plain", rule.getTypeValue());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testMalformedRuleFlagFailsConfiguration() throws Exception {
+        // A typo in a flag must fail parsing of the whole configuration
+        doTestRewrite("RewriteRule /b/.* /c [redirectX]", "/b/x.html", "/c");
+    }
+
+    @Test
     public void testRewriteMissingCurlyBraceOnVar() throws Exception {
         try {
             doTestRewrite("RewriteRule /b/(.*).html$ /c%_{SERVLET_PATH}", "/b/x.html", "/c");
