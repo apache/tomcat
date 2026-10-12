@@ -358,6 +358,15 @@
         proxying to absolute HTTP and HTTPS URLs and applies connect and
         read timeouts to the connection to the proxy target. (remm)
       </fix>
+      <fix>
+        Make the selection of the effective parameter limits by
+        <code>ParameterLimitValve</code> deterministic when several configured
+        URL patterns match a request. Previously, the first matching pattern
+        was encountered in hash map iteration order, which is arbitrary for
+        <code>java.util.regex.Pattern</code> keys and could change between JVM
+        restarts. The limits are now stored in configuration order and the
+        first matching pattern in configuration order is applied. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
