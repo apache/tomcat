@@ -885,6 +885,12 @@ public class RemoteIpFilter extends GenericFilter {
             // loop on remoteIpHeaderValue to find the first trusted remote ip and to build the proxies chain
             for (idx = remoteIpHeaderValue.length - 1; idx >= 0; idx--) {
                 String currentRemoteIp = remoteIpHeaderValue[idx];
+                if (currentRemoteIp.isEmpty()) {
+                    // Skip empty entries, such as those resulting from a
+                    // whitespace-only header value, rather than ending up
+                    // setting an empty remote address
+                    continue;
+                }
                 remoteIp = currentRemoteIp;
 
                 if (isInternalProxy(currentRemoteIp)) {
@@ -900,6 +906,9 @@ public class RemoteIpFilter extends GenericFilter {
             LinkedList<String> newRemoteIpHeaderValue = new LinkedList<>();
             for (; idx >= 0; idx--) {
                 String currentRemoteIp = remoteIpHeaderValue[idx];
+                if (currentRemoteIp.isEmpty()) {
+                    continue;
+                }
                 newRemoteIpHeaderValue.addFirst(currentRemoteIp);
             }
 
