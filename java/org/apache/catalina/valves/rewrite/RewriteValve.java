@@ -696,6 +696,10 @@ public class RewriteValve extends ValveBase {
                         parseCondFlag(line, condition, flagsTokenizer.nextToken());
                     }
                 }
+                if (tokenizer.hasMoreTokens()) {
+                    // Too many tokens on the line
+                    throw new IllegalArgumentException(sm.getString("rewriteValve.invalidLine", line));
+                }
                 return condition;
             } else if (token.equals("RewriteRule")) {
                 // RewriteRule Pattern Substitution [Flags]
@@ -719,6 +723,10 @@ public class RewriteValve extends ValveBase {
                     if (rule.isQsdiscard()) {
                         rule.setQsappend(false);
                     }
+                }
+                if (tokenizer.hasMoreTokens()) {
+                    // Too many tokens on the line
+                    throw new IllegalArgumentException(sm.getString("rewriteValve.invalidLine", line));
                 }
                 return rule;
             } else if (token.equals("RewriteMap")) {
