@@ -249,6 +249,10 @@
         It now resolves to undefined, expanding to an empty string, instead of
         silently turning ident-based rules into authentication checks. (remm)
       </fix>
+      <fix>
+        Refactor the default Servlet <code>Accept-Encoding</code> handling to
+        use the common HTTP header parser for processing these headers. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
