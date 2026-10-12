@@ -76,6 +76,14 @@ public final class JarContents {
 
     private void processEntry(JarEntry entry) {
         String name = entry.getName();
+
+        // A resource set lookup of the archive root is handled before the
+        // filter is consulted, so an entry with an empty name never needs to
+        // be recorded in the filter.
+        if (name.isEmpty()) {
+            return;
+        }
+
         int startPos = 0;
 
         // If the path starts with a slash, that's not useful information.
@@ -90,9 +98,15 @@ public final class JarContents {
         if (name.startsWith("META-INF/versions/", startPos)) {
             int i = name.indexOf('/', 18 + startPos);
             if (i > 0) {
-                int version = Integer.parseInt(name.substring(18 + startPos, i));
-                if (version <= Runtime.version().feature()) {
-                    startPos = i + 1;
+                try {
+                    int version = Integer.parseInt(name.substring(18 + startPos, i));
+                    if (version <= Runtime.version().feature()) {
+                        startPos = i + 1;
+                    }
+                } catch (NumberFormatException e) {
+                    // The segment is not a valid version number, so the entry
+                    // is not a versioned entry that can be resolved under its
+                    // base name and is added to the table under its full name.
                 }
             }
             if (startPos == name.length()) {
