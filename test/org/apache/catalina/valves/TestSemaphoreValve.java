@@ -535,7 +535,6 @@ public class TestSemaphoreValve extends TomcatBaseTest {
 
     private static final class StartAsyncServlet extends HttpServlet {
 
-        @Serial
         private static final long serialVersionUID = 1L;
         private final CountDownLatch asyncStarted;
         private final AtomicReference<AsyncContext> asyncContextRef;
@@ -559,7 +558,6 @@ public class TestSemaphoreValve extends TomcatBaseTest {
 
     private static final class DispatchServlet extends HttpServlet {
 
-        @Serial
         private static final long serialVersionUID = 1L;
 
         @Override
@@ -583,7 +581,7 @@ public class TestSemaphoreValve extends TomcatBaseTest {
     public static class MockRequest extends Request {
 
         public MockRequest() {
-            super(null, null);
+            super(null);
         }
     }
 
