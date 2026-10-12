@@ -134,12 +134,14 @@ public class ResolverImpl extends Resolver {
             case "REQUEST_FILENAME" -> request.getPathTranslated();
             case "HTTPS" -> request.isSecure() ? "on" : "off";
             case "TIME_YEAR" -> String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
-            case "TIME_MON" -> String.valueOf(Calendar.getInstance().get(Calendar.MONTH));
+            // Like mod_rewrite, TIME_MON is 1-12 and TIME_WDAY is 0-6 with Sunday first,
+            // unlike the zero-based Calendar.MONTH and one-based Sunday-first Calendar.DAY_OF_WEEK
+            case "TIME_MON" -> String.valueOf(Calendar.getInstance().get(Calendar.MONTH) + 1);
             case "TIME_DAY" -> String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
             case "TIME_HOUR" -> String.valueOf(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
             case "TIME_MIN" -> String.valueOf(Calendar.getInstance().get(Calendar.MINUTE));
             case "TIME_SEC" -> String.valueOf(Calendar.getInstance().get(Calendar.SECOND));
-            case "TIME_WDAY" -> String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK));
+            case "TIME_WDAY" -> String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1);
             case "TIME" -> FastHttpDateFormat.getCurrentDate();
             default -> null;
         };

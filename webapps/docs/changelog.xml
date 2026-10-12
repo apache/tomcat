@@ -1998,6 +1998,14 @@
         restarts. The limits are now stored in configuration order and the
         first matching pattern in configuration order is applied. (remm)
       </fix>
+      <fix>
+        Correct the values of the <code>TIME_MON</code> and
+        <code>TIME_WDAY</code> server variables in the rewrite valve, which
+        exposed the raw <code>java.util.Calendar</code> fields (month 0-11,
+        day of week 1-7 with Sunday first) instead of the documented
+        mod_rewrite values (month 1-12, day of week 0-6 with Sunday being 0).
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
