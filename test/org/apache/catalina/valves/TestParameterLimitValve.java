@@ -592,6 +592,60 @@ public class TestParameterLimitValve extends TomcatBaseTest {
 
 
     @Test
+    public void testOverlappingPatternsFirstConfiguredWins() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
+
+        ParameterLimitValve parameterLimitValve = new ParameterLimitValve();
+        ctx.getPipeline().addValve(parameterLimitValve);
+        // The general pattern is configured first, so its limit applies even
+        // to URIs that also match the more specific pattern configured after
+        parameterLimitValve.setUrlPatternLimits(
+                "/.*=100" + CRLF + "/special/.*=2");
+
+        Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
+        ctx.addServletMapping("/special/endpoint", "snoop");
+
+        tomcat.start();
+
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/special/endpoint?param1=value1&param2=value2&param3=value3",
+            new ByteChunk(), null);
+        Assert.assertEquals(200, rc);
+    }
+
+    @Test
+    public void testOverlappingPatternsSpecificConfiguredFirstApplies() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
+
+        ParameterLimitValve parameterLimitValve = new ParameterLimitValve();
+        ctx.getPipeline().addValve(parameterLimitValve);
+        // The specific pattern is configured first, so its limit applies to
+        // matching URIs while the general pattern applies to the others
+        parameterLimitValve.setUrlPatternLimits(
+                "/special/.*=2" + CRLF + "/.*=100");
+
+        Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
+        ctx.addServletMapping("/special/endpoint", "snoop");
+        ctx.addServletMapping("/other/endpoint", "snoop");
+
+        tomcat.start();
+
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/special/endpoint?param1=value1&param2=value2&param3=value3",
+            new ByteChunk(), null);
+        Assert.assertEquals(400, rc);
+
+        rc = getUrl("http://localhost:" + getPort() +
+                "/other/endpoint?param1=value1&param2=value2&param3=value3",
+            new ByteChunk(), null);
+        Assert.assertEquals(200, rc);
+    }
+
+    @Test
     public void testInvalidConfigLeavesLimitsUnchanged() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
