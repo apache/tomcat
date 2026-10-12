@@ -39,7 +39,7 @@ public class TestExtendedAccessLogValveElements {
         Assert.assertNull(request.getContext());
 
         CharArrayWriter buf = new CharArrayWriter();
-        element.addElement(buf, request, null, 0);
+        element.addElement(buf, null, request, null, 0);
 
         Assert.assertEquals("-", buf.toString());
     }

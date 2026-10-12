@@ -282,7 +282,7 @@ public class ParameterLimitValve extends ValveBase {
                 containerLog.error(sm.getString("parameterLimitValve.readError"), ioe);
             }
             // Do not apply the limits parsed before the error
-            return Map.of();
+            return Collections.emptyMap();
         }
         return newLimits;
     }

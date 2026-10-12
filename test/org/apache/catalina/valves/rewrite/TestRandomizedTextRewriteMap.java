@@ -17,9 +17,8 @@
 package org.apache.catalina.valves.rewrite;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,7 +30,9 @@ public class TestRandomizedTextRewriteMap {
     private String createMapFile(String content) throws IOException {
         File file = File.createTempFile("rewrite-map", ".txt");
         file.deleteOnExit();
-        Files.writeString(file.toPath(), content, StandardCharsets.UTF_8);
+        try (FileWriter writer = new FileWriter(file)) {
+            writer.write(content);
+        }
         return file.getAbsolutePath();
     }
 
