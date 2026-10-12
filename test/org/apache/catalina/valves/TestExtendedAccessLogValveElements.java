@@ -34,7 +34,8 @@ public class TestExtendedAccessLogValveElements {
     public void testServletContextElementWithoutMappedContext() {
         ExtendedAccessLogValve.ServletContextElement element = new ExtendedAccessLogValve.ServletContextElement(
                 "attributeName");
-        Request request = new Request(null, new org.apache.coyote.Request());
+        Request request = new Request(null);
+        request.setCoyoteRequest(new org.apache.coyote.Request());
         Assert.assertNull(request.getContext());
 
         CharArrayWriter buf = new CharArrayWriter();
