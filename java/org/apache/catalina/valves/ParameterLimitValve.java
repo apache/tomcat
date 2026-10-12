@@ -187,18 +187,25 @@ public class ParameterLimitValve extends ValveBase {
 
     /**
      * Set the mapping of URL patterns to their corresponding parameter limits from a string containing the
-     * configuration.
+     * configuration. The new limits replace any previously configured limits. The limits are only applied if the
+     * complete configuration is parsed successfully. If parsing fails, the exception is propagated and any previously
+     * configured limits are left unchanged.
      *
      * @param urlPatternConfig The URL pattern to parameter limit mappings
      */
     public void setUrlPatternLimits(String urlPatternConfig) {
+        Map<Pattern,Integer[]> newLimits =
+                parseUrlPatternLimits(new BufferedReader(new StringReader(urlPatternConfig)));
         urlPatternLimits.clear();
-        setUrlPatternLimits(new BufferedReader(new StringReader(urlPatternConfig)));
+        urlPatternLimits.putAll(newLimits);
     }
 
     /**
      * Set the mapping of URL patterns to their corresponding parameter limits. The input should be provided line by
-     * line, where each line contains a pattern and a limit, separated by the last '='.
+     * line, where each line contains a pattern and a limit, separated by the last '='. The parsed limits are only
+     * applied if the complete input is parsed successfully. If parsing fails, the exception is propagated and any
+     * previously configured limits are left unchanged. If a read error occurs, it is logged and the input read so far
+     * is discarded without modifying the configured limits.
      * <p>
      * Example:
      *
@@ -213,9 +220,23 @@ public class ParameterLimitValve extends ValveBase {
      *                   line.
      */
     public void setUrlPatternLimits(BufferedReader reader) {
+        urlPatternLimits.putAll(parseUrlPatternLimits(reader));
+    }
+
+    /**
+     * Parse URL pattern to parameter limit mappings without modifying the limits that are currently in effect. This
+     * avoids enforcing a partial, inconsistent limit set when parsing fails part way through.
+     *
+     * @param reader A BufferedReader containing URL pattern to parameter limit mappings, with each pair on a separate
+     *                   line.
+     *
+     * @return The parsed mappings
+     */
+    private Map<Pattern,Integer[]> parseUrlPatternLimits(BufferedReader reader) {
         if (containerLog == null && getContainer() != null) {
             containerLog = LogFactory.getLog(getContainer().getLogName() + ".parameterLimit");
         }
+        Map<Pattern,Integer[]> newLimits = new ConcurrentHashMap<>();
         try {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -237,13 +258,13 @@ public class ParameterLimitValve extends ValveBase {
                 Pattern pattern = Pattern.compile(UDecoder.URLDecode(patternString, StandardCharsets.UTF_8));
                 String[] limits = limitsString.split(",");
                 if (limits.length == 1) {
-                    urlPatternLimits.put(pattern, new Integer[] { Integer.valueOf(limits[0]), null, null });
+                    newLimits.put(pattern, new Integer[] { Integer.valueOf(limits[0]), null, null });
                 } else if (limits.length == 3) {
-                    urlPatternLimits.put(pattern, new Integer[] { Integer.valueOf(limits[0]),
+                    newLimits.put(pattern, new Integer[] { Integer.valueOf(limits[0]),
                             Integer.valueOf(limits[1]), Integer.valueOf(limits[2]) });
                 } else {
                     throw new IllegalArgumentException(
-                            sm.getString("parameterLimitValve.invalidLimitsString", limitsString));
+                            sm.getString("parameterLimitValve.invalidLimits", limitsString));
                 }
                 if (containerLog != null && containerLog.isTraceEnabled()) {
                     containerLog.trace("Add pattern " + pattern + " and limit(s) " + limitsString);
@@ -253,7 +274,10 @@ public class ParameterLimitValve extends ValveBase {
             if (containerLog != null) {
                 containerLog.error(sm.getString("parameterLimitValve.readError"), ioe);
             }
+            // Do not apply the limits parsed before the error
+            return Map.of();
         }
+        return newLimits;
     }
 
     @Override
