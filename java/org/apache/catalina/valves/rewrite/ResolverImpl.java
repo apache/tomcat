@@ -92,6 +92,7 @@ public class ResolverImpl extends Resolver {
      * <li>SERVER_ADMIN</li>
      * <li>API_VERSION</li>
      * <li>IS_SUBREQ</li>
+     * <li>REMOTE_IDENT (no RFC 931 ident protocol support)</li>
      * </ul>
      */
     @Override
@@ -121,8 +122,6 @@ public class ResolverImpl extends Resolver {
         } else if (key.equals("REMOTE_PORT")) {
             return String.valueOf(request.getRemotePort());
         } else if (key.equals("REMOTE_USER")) {
-            return request.getRemoteUser();
-        } else if (key.equals("REMOTE_IDENT")) {
             return request.getRemoteUser();
         } else if (key.equals("REQUEST_METHOD")) {
             return request.getMethod();
