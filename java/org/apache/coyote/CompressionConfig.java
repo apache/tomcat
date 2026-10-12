@@ -208,8 +208,13 @@ public class CompressionConfig {
      * Sets the comma-separated list of MIME types eligible for compression.
      *
      * @param valueS comma-separated MIME type string
+     *
+     * @throws IllegalArgumentException If the provided value is null
      */
     public void setCompressibleMimeType(String valueS) {
+        if (valueS == null) {
+            throw new IllegalArgumentException(sm.getString("compressionConfig.compressibleMimeTypeNull"));
+        }
         compressibleMimeType = valueS;
         compressibleMimeTypes = null;
     }
