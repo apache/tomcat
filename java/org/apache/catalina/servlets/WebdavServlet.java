@@ -220,6 +220,12 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
 
     /**
+     * Content type used for the XML responses.
+     */
+    private static final String XML_CONTENT_TYPE = "text/xml; charset=UTF-8";
+
+
+    /**
      * Pre generated raw XML for supported locks.
      */
     protected static final String SUPPORTED_LOCKS =
@@ -973,7 +979,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         resp.setStatus(WebdavStatus.SC_MULTI_STATUS);
 
-        resp.setContentType("text/xml; charset=UTF-8");
+        resp.setContentType(XML_CONTENT_TYPE);
 
         // Create multistatus object
         XMLWriter generatedXML = new XMLWriter(resp.getWriter());
@@ -1204,7 +1210,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         resp.setStatus(WebdavStatus.SC_MULTI_STATUS);
 
-        resp.setContentType("text/xml; charset=UTF-8");
+        resp.setContentType(XML_CONTENT_TYPE);
 
         // Create multistatus object
         XMLWriter generatedXML = new XMLWriter(resp.getWriter());
@@ -1700,6 +1706,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
                     generatedXML.writeElement("D", "multistatus", XMLWriter.CLOSING);
 
+                    resp.setContentType(XML_CONTENT_TYPE);
                     Writer writer = resp.getWriter();
                     writer.write(generatedXML.toString());
                     writer.close();
@@ -1822,7 +1829,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         generatedXML.writeElement("D", "prop", XMLWriter.CLOSING);
 
-        resp.setContentType("text/xml; charset=UTF-8");
+        resp.setContentType(XML_CONTENT_TYPE);
         Writer writer = resp.getWriter();
         writer.write(generatedXML.toString());
         writer.close();
@@ -2550,6 +2557,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         generatedXML.writeElement("D", "multistatus", XMLWriter.CLOSING);
 
+        resp.setContentType(XML_CONTENT_TYPE);
         Writer writer = resp.getWriter();
         writer.write(generatedXML.toString());
         writer.close();
@@ -2577,6 +2585,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         generatedXML.writeElement("D", "error", XMLWriter.CLOSING);
 
+        resp.setContentType(XML_CONTENT_TYPE);
         Writer writer = resp.getWriter();
         writer.write(generatedXML.toString());
         writer.close();
