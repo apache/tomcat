@@ -157,8 +157,8 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
                 }
             }
             WebResourceRoot root = getRoot();
-            if (root.getArchiveIndexStrategyEnum().getUsesBloom() ||
-                    root.getContext() != null && root.getContext().getUseBloomFilterForArchives()) {
+            if (jarContents == null && (root.getArchiveIndexStrategyEnum().getUsesBloom() ||
+                    root.getContext() != null && root.getContext().getUseBloomFilterForArchives())) {
                 jarContents = new JarContents(archiveEntries.values());
                 retainBloomFilterForArchives = root.getArchiveIndexStrategyEnum().getRetain();
             }

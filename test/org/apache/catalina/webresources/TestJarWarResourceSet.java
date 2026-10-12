@@ -17,6 +17,8 @@
 package org.apache.catalina.webresources;
 
 import java.io.File;
+import java.util.Map;
+import java.util.jar.JarEntry;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -52,5 +54,29 @@ public class TestJarWarResourceSet extends TomcatBaseTest {
         Assert.assertNotNull(results);
         Assert.assertEquals(1, results.length);
         Assert.assertNotNull(results[0].getURL());
+    }
+
+    @Test
+    public void testBloomFilterIsNotRebuiltOnEveryIndexRead() {
+        // Regression test: the bloom filter for the JAR nested in the WAR
+        // must be built once when the archive index is built and then
+        // reused. It previously was re-created on every call to
+        // getArchiveEntries(), adding work linear in the number of entries
+        // of the JAR to each resource lookup.
+        StandardRoot resourceRoot = new StandardRoot();
+        resourceRoot.setArchiveIndexStrategy("BLOOM");
+        File warFile = new File("test/webresources/war-url-connection.war");
+        JarWarResourceSet resourceSet = new JarWarResourceSet(resourceRoot, "/WEB-INF/classes",
+                warFile.getAbsolutePath(), "WEB-INF/lib/test.jar", "/");
+
+        Map<String,JarEntry> entries = resourceSet.getArchiveEntries(true);
+        Assert.assertNotNull(entries);
+        JarContents jarContents = resourceSet.jarContents;
+        Assert.assertNotNull(jarContents);
+
+        Assert.assertSame(entries, resourceSet.getArchiveEntries(true));
+        Assert.assertSame(jarContents, resourceSet.jarContents);
+
+        resourceSet.gc();
     }
 }
