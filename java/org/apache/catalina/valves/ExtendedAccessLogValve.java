@@ -32,6 +32,7 @@ import java.util.TimeZone;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.ServerInfo;
@@ -247,7 +248,11 @@ public class ExtendedAccessLogValve extends AccessLogValve {
 
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
-            wrap(request.getContext().getServletContext().getAttribute(attribute), buf);
+            // The request may not have mapped to a context, for example when a
+            // valve attached to a Host or Engine logs requests that matched no
+            // context
+            Context context = request.getContext();
+            wrap(context == null ? null : context.getServletContext().getAttribute(attribute), buf);
         }
     }
 
