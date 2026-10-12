@@ -67,9 +67,11 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
      */
     protected long archiveUseCount = 0;
     /**
-     * The JAR contents.
+     * The JAR contents. Written under {@code archiveLock} but read without
+     * locking in {@code getResource()}, so the field is volatile to ensure a
+     * fully constructed instance is published to readers.
      */
-    protected JarContents jarContents;
+    protected volatile JarContents jarContents;
     /**
      * Whether to retain the bloom filter for archives.
      */
@@ -293,7 +295,8 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
              * pre-check must use the JAR relative path. Hashing the web application path (with the mount point
              * embedded in it) would result in false negatives.
              */
-            if (jarContents != null && !jarContents.mightContainResource(pathInJar, "")) {
+            JarContents contents = jarContents;
+            if (contents != null && !contents.mightContainResource(pathInJar, "")) {
                 return new EmptyResource(root, path);
             }
 
