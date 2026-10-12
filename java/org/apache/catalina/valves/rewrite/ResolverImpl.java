@@ -163,7 +163,9 @@ public class ResolverImpl extends Resolver {
         } else if (key.equals("TIME_YEAR")) {
             return String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
         } else if (key.equals("TIME_MON")) {
-            return String.valueOf(Calendar.getInstance().get(Calendar.MONTH));
+            // Like mod_rewrite, TIME_MON is 1-12 and TIME_WDAY is 0-6 with Sunday first,
+            // unlike the zero-based Calendar.MONTH and one-based Sunday-first Calendar.DAY_OF_WEEK
+            return String.valueOf(Calendar.getInstance().get(Calendar.MONTH) + 1);
         } else if (key.equals("TIME_DAY")) {
             return String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
         } else if (key.equals("TIME_HOUR")) {
@@ -173,7 +175,7 @@ public class ResolverImpl extends Resolver {
         } else if (key.equals("TIME_SEC")) {
             return String.valueOf(Calendar.getInstance().get(Calendar.SECOND));
         } else if (key.equals("TIME_WDAY")) {
-            return String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK));
+            return String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1);
         } else if (key.equals("TIME")) {
             return FastHttpDateFormat.getCurrentDate();
         }
