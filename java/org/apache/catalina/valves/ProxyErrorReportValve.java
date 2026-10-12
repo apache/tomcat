@@ -50,6 +50,13 @@ import org.apache.tomcat.util.res.StringManager;
 public class ProxyErrorReportValve extends ErrorReportValve {
     private static final Log log = LogFactory.getLog(ProxyErrorReportValve.class);
 
+    /*
+     * Timeouts for the connection used when proxying an error report. These bound the time the request thread can be
+     * blocked by an unresponsive error report target.
+     */
+    private static final int PROXY_CONNECT_TIMEOUT_MS = 5000;
+    private static final int PROXY_READ_TIMEOUT_MS = 10000;
+
     /**
      * Default constructor.
      */
@@ -163,8 +170,11 @@ public class ProxyErrorReportValve extends ErrorReportValve {
             return;
         }
 
-        // No need to delegate anymore
-        if (!response.setErrorReported()) {
+        // If the error has already been reported, there is nothing more to do.
+        // Note: the reported flag is deliberately not consumed here. A failed
+        // proxy attempt must still be able to fall back to super.report(),
+        // which consumes the flag itself.
+        if (!response.isErrorReportRequired()) {
             return;
         }
 
@@ -225,6 +235,10 @@ public class ProxyErrorReportValve extends ErrorReportValve {
             if (log.isTraceEnabled()) {
                 log.trace("Redirecting error reporting to " + urlString);
             }
+            // No need to delegate anymore
+            if (!response.setErrorReported()) {
+                return;
+            }
             try {
                 response.sendRedirect(urlString);
             } catch (IOException ioe) {
@@ -235,24 +249,45 @@ public class ProxyErrorReportValve extends ErrorReportValve {
                 log.trace("Proxying error reporting to " + urlString);
             }
             HttpURLConnection httpURLConnection = null;
+            boolean proxied = false;
+            Exception failure = null;
             try {
                 URL url = (new URI(urlString)).toURL();
-                httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.connect();
-                response.setContentType(httpURLConnection.getContentType());
-                response.setContentLength(httpURLConnection.getContentLength());
-                OutputStream outputStream = response.getOutputStream();
-                InputStream inputStream = httpURLConnection.getInputStream();
-                IOTools.flow(inputStream, outputStream);
-            } catch (URISyntaxException | IOException | IllegalArgumentException e) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("proxyErrorReportValve.error", urlString), e);
+                String protocol = url.getProtocol();
+                if ("http".equalsIgnoreCase(protocol) || "https".equalsIgnoreCase(protocol)) {
+                    httpURLConnection = (HttpURLConnection) url.openConnection();
+                    httpURLConnection.setConnectTimeout(PROXY_CONNECT_TIMEOUT_MS);
+                    httpURLConnection.setReadTimeout(PROXY_READ_TIMEOUT_MS);
+                    httpURLConnection.connect();
+                    // Obtain the target response before modifying this response. Otherwise, a failure after the
+                    // connection was opened would leave the target's metadata on this response, corrupting the
+                    // fallback error report produced below.
+                    InputStream inputStream = httpURLConnection.getInputStream();
+                    response.setContentType(httpURLConnection.getContentType());
+                    response.setContentLength(httpURLConnection.getContentLength());
+                    OutputStream outputStream = response.getOutputStream();
+                    IOTools.flow(inputStream, outputStream);
+                    proxied = true;
                 }
-                // Ignore
+            } catch (URISyntaxException | IOException | IllegalArgumentException | IllegalStateException e) {
+                failure = e;
             } finally {
                 if (httpURLConnection != null) {
                     httpURLConnection.disconnect();
                 }
+            }
+            if (proxied) {
+                // No need to delegate anymore
+                response.setErrorReported();
+            } else {
+                if (log.isWarnEnabled()) {
+                    log.warn(sm.getString("proxyErrorReportValve.error", urlString), failure);
+                }
+                // Discard any target metadata that was applied to this response before the failure, so that a stale
+                // Content-Length cannot truncate or suppress the fallback report. Fall back to the default error
+                // report rather than returning an empty response. The reported flag is consumed by super.report().
+                response.setContentLength(-1);
+                super.report(request, response, throwable);
             }
         }
     }
