@@ -660,12 +660,13 @@ public final class Request {
     /**
      * Return the content length.
      *
-     * @return the content length
+     * @return the content length, or -1 if the length is unknown or exceeds
+     *             Integer.MAX_VALUE
      */
     public int getContentLength() {
         long length = getContentLengthLong();
 
-        if (length < Integer.MAX_VALUE) {
+        if (length <= Integer.MAX_VALUE) {
             return (int) length;
         }
         return -1;
