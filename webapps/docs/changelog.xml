@@ -552,6 +552,35 @@
         further confirmation ever followed, so a single moment of
         network reordering cost one lost cluster message. (remm)
       </fix>
+      <fix>
+        The <code>AbstractReplicatedMap</code> now holds the map
+        members lock and the state lock only briefly. The entry
+        relocation triggered by the ping expiry runs outside the map
+        members lock, the backup selection for a newly added member
+        outside the state lock, and the (de)serialization of the map
+        content for a member joining or transferring its state
+        likewise outside the state lock. Previously, a slow send to a
+        dead member or the serialization of a large map blocked every
+        session operation and the state transfer of joining members
+        for the duration of that work. (remm)
+      </fix>
+      <fix>
+        The <code>udpRxBufSize</code> and <code>udpTxBufSize</code> configured
+        on the cluster channel <code>Sender</code> now take effect for messages
+        sent using UDP. These two properties were missing from the properties
+        transferred from the configured sender to the pooled senders and on to
+        the per-member senders those create, so the datagram socket was always
+        configured with the default buffer sizes and the configured values were
+        silently ignored. (remm)
+      </fix>
+      <fix>
+        The start of the cluster receiver now fails when the configured bind
+        address cannot be resolved. Previously, the resolution failure was only
+        logged and the receiver bound to the wildcard address, silently
+        exposing the cluster listener on all interfaces instead of the
+        configured address, while the unresolvable host was advertised to the
+        other cluster members. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">

@@ -54,6 +54,13 @@ public class McastServiceImpl extends MembershipProviderBase {
     protected static final int MAX_PACKET_SIZE = 65535;
 
     /**
+     * The maximum payload size of a packet that can be sent. This is lower than the maximum
+     * packet size because the protocol limit for a UDP datagram includes the IP and UDP headers,
+     * and the IP header may be extended by options.
+     */
+    protected static final int MAX_SEND_SIZE = MAX_PACKET_SIZE - 48;
+
+    /**
      * The string manager for this class.
      */
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
@@ -342,7 +349,14 @@ public class McastServiceImpl extends MembershipProviderBase {
         if (startLevel == 0) {
             // send a stop message
             member.setCommand(Member.SHUTDOWN_PAYLOAD);
-            send(false);
+            try {
+                send(false);
+            } catch (Exception e) {
+                // Shutting down. Only log at debug.
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("mcastServiceImpl.error.stop"), e);
+                }
+            }
             // leave mcast group
             try {
                 socket.leaveGroup(new InetSocketAddress(address, 0), null);
@@ -697,9 +711,11 @@ public class McastServiceImpl extends MembershipProviderBase {
                     } else {
                         log.debug(sm.getString("mcastServiceImpl.send.failed"), e);
                     }
-                    if ((++errorCounter) >= recoveryCounter) {
-                        errorCounter = 0;
-                        RecoveryThread.recover(McastServiceImpl.this);
+                    if (doRunSender) {
+                        if ((++errorCounter) >= recoveryCounter) {
+                            errorCounter = 0;
+                            RecoveryThread.recover(McastServiceImpl.this);
+                        }
                     }
                 }
                 try {

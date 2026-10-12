@@ -43,9 +43,12 @@ public abstract class TimeBucketCounterBase {
     // Map to hold the buckets
     private final ConcurrentHashMap<String,AtomicInteger> map = new ConcurrentHashMap<>();
 
-    // The future allowing control of the background processor.
+    // The futures controlling the background tasks, plus the destroyed flag. All three are guarded by this
+    // object's monitor, which is held by destroy() on a container thread and by MaintenanceMonitor on the
+    // executor thread.
     private ScheduledFuture<?> maintenanceFuture;
     private ScheduledFuture<?> monitorFuture;
+    private boolean destroyed;
     private final ScheduledExecutorService executorService;
     private final long sleeptime;
     private final int bucketDuration;
@@ -73,7 +76,12 @@ public abstract class TimeBucketCounterBase {
 
         // Start our thread
         if (sleeptime > 0) {
-            monitorFuture = executorService.scheduleWithFixedDelay(new MaintenanceMonitor(), 0, 60, TimeUnit.SECONDS);
+            // Synchronize, since this is the one write not performed under the monitor by the maintenance or
+            // destroy() threads, and the object escapes to the executor while the constructor is still running
+            synchronized (this) {
+                monitorFuture = executorService.scheduleWithFixedDelay(new MaintenanceMonitor(), 0, 60,
+                        TimeUnit.SECONDS);
+            }
         }
     }
 
@@ -151,8 +159,8 @@ public abstract class TimeBucketCounterBase {
      *
      * @return bucket index
      */
-    public int getCurrentBucketPrefix() {
-        return (int) getBucketIndex(System.currentTimeMillis());
+    public long getCurrentBucketPrefix() {
+        return getBucketIndex(System.currentTimeMillis());
     }
 
 
@@ -167,17 +175,21 @@ public abstract class TimeBucketCounterBase {
 
 
     /**
-     * Stops threads created by this object and cleans up resources.
+     * Stops threads created by this object and cleans up resources. This method is thread safe and idempotent. On
+     * return, no maintenance or monitor task remains scheduled.
      */
     public void destroy() {
-        map.clear();
-        if (monitorFuture != null) {
-            monitorFuture.cancel(true);
-            monitorFuture = null;
-        }
-        if (maintenanceFuture != null) {
-            maintenanceFuture.cancel(true);
-            maintenanceFuture = null;
+        synchronized (this) {
+            destroyed = true;
+            map.clear();
+            if (monitorFuture != null) {
+                monitorFuture.cancel(true);
+                monitorFuture = null;
+            }
+            if (maintenanceFuture != null) {
+                maintenanceFuture.cancel(true);
+                maintenanceFuture = null;
+            }
         }
     }
 
@@ -211,17 +223,24 @@ public abstract class TimeBucketCounterBase {
     private class MaintenanceMonitor implements Runnable {
         @Override
         public void run() {
-            if (sleeptime > 0 && (maintenanceFuture == null || maintenanceFuture.isDone())) {
-                if (maintenanceFuture != null && maintenanceFuture.isDone()) {
-                    // There was an error executing the scheduled task, get it and log it
-                    try {
-                        maintenanceFuture.get();
-                    } catch (InterruptedException | ExecutionException e) {
-                        log.error(sm.getString("timebucket.maintenance.error"), e);
-                    }
+            synchronized (TimeBucketCounterBase.this) {
+                if (destroyed) {
+                    // destroy() has run. Do not schedule any replacement task, or the new future would never be
+                    // cancelled and the destroyed counter would be retained by the executor for its lifetime.
+                    return;
                 }
-                maintenanceFuture = executorService.scheduleWithFixedDelay(new Maintenance(), sleeptime, sleeptime,
-                        TimeUnit.MILLISECONDS);
+                if (sleeptime > 0 && (maintenanceFuture == null || maintenanceFuture.isDone())) {
+                    if (maintenanceFuture != null && maintenanceFuture.isDone()) {
+                        // There was an error executing the scheduled task, get it and log it
+                        try {
+                            maintenanceFuture.get();
+                        } catch (InterruptedException | ExecutionException e) {
+                            log.error(sm.getString("timebucket.maintenance.error"), e);
+                        }
+                    }
+                    maintenanceFuture = executorService.scheduleWithFixedDelay(new Maintenance(), sleeptime,
+                            sleeptime, TimeUnit.MILLISECONDS);
+                }
             }
         }
     }

@@ -65,6 +65,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 
 import org.apache.catalina.LifecycleException;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.ietf.jgss.GSSContext;
@@ -2794,30 +2795,49 @@ public class JNDIRealm extends RealmBase {
             }
         }
         LdapContext result = null;
+        StartTlsResponse tls = null;
         try {
             result = new InitialLdapContext(env, null);
-            StartTlsResponse tls = (StartTlsResponse) result.extendedOperation(new StartTlsRequest());
+            tls = (StartTlsResponse) result.extendedOperation(new StartTlsRequest());
+            if (getHostnameVerifier() != null) {
+                tls.setHostnameVerifier(getHostnameVerifier());
+            }
+            if (getCipherSuitesArray() != null) {
+                tls.setEnabledCipherSuites(getCipherSuitesArray());
+            }
+            SSLSession negotiate = tls.negotiate(getSSLSocketFactory());
+            containerLog.debug(sm.getString("jndiRealm.negotiatedTls", negotiate.getProtocol()));
+            for (Map.Entry<String,Object> savedEntry : savedEnv.entrySet()) {
+                result.addToEnvironment(savedEntry.getKey(), savedEntry.getValue());
+            }
+            connection.tls = tls;
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            NamingException ne;
+            if (t instanceof NamingException) {
+                ne = (NamingException) t;
+            } else {
+                ne = new NamingException(t.getMessage());
+                ne.initCause(t);
+            }
             try {
-                if (getHostnameVerifier() != null) {
-                    tls.setHostnameVerifier(getHostnameVerifier());
+                if (tls != null) {
+                    tls.close();
                 }
-                if (getCipherSuitesArray() != null) {
-                    tls.setEnabledCipherSuites(getCipherSuitesArray());
-                }
-                SSLSession negotiate = tls.negotiate(getSSLSocketFactory());
-                containerLog.debug(sm.getString("jndiRealm.negotiatedTls", negotiate.getProtocol()));
-                connection.tls = tls;
-            } catch (IOException ioe) {
-                NamingException ne = new NamingException(ioe.getMessage());
-                ne.initCause(ioe);
-                throw ne;
+            } catch (Throwable t1) {
+                ExceptionUtils.handleThrowable(t1);
+                ne.addSuppressed(t1);
             }
-        } finally {
-            if (result != null) {
-                for (Map.Entry<String,Object> savedEntry : savedEnv.entrySet()) {
-                    result.addToEnvironment(savedEntry.getKey(), savedEntry.getValue());
+            try {
+                if (result != null) {
+                    result.close();
                 }
+            } catch (Throwable t2) {
+                ExceptionUtils.handleThrowable(t2);
+                ne.addSuppressed(t2);
             }
+            result = null;
+            throw ne;
         }
         return result;
     }
@@ -2956,52 +2976,83 @@ public class JNDIRealm extends RealmBase {
      */
     protected String[] parseUserPatternString(String userPatternString) {
 
-        if (userPatternString != null) {
-            List<String> pathList = new ArrayList<>();
-            int startParenLoc = userPatternString.indexOf('(');
-            if (startParenLoc == -1) {
-                // no parens here; return whole thing
-                return new String[] { userPatternString };
-            }
-            while (startParenLoc > -1) {
-                // weed out escaped open parens and parens enclosing the
-                // whole statement (in the case of valid LDAP search
-                // strings: (|(something)(somethingelse))
-                while (startParenLoc > -1 && startParenLoc < userPatternString.length() - 1 &&
-                        ((userPatternString.charAt(startParenLoc + 1) == '|') ||
-                                (startParenLoc != 0 && userPatternString.charAt(startParenLoc - 1) == '\\'))) {
-                    startParenLoc = userPatternString.indexOf('(', startParenLoc + 1);
-                }
-                if (startParenLoc == -1) {
-                    break;
-                }
-                if (startParenLoc == userPatternString.length() - 1) {
-                    // an open paren at the end cannot start a pattern
-                    throw new IllegalArgumentException(sm.getString("jndiRealm.invalidUserPattern",
-                            userPatternString));
-                }
-                int endParenLoc = userPatternString.indexOf(')', startParenLoc + 1);
-                // weed out escaped end-parens
-                while (endParenLoc > 0 && userPatternString.charAt(endParenLoc - 1) == '\\') {
-                    endParenLoc = userPatternString.indexOf(')', endParenLoc + 1);
-                }
-                if (endParenLoc == -1) {
-                    // no matching close paren for this pattern
-                    throw new IllegalArgumentException(sm.getString("jndiRealm.invalidUserPattern",
-                            userPatternString));
-                }
-                String nextPathPart = userPatternString.substring(startParenLoc + 1, endParenLoc);
-                pathList.add(nextPathPart);
-                startParenLoc = userPatternString.indexOf('(', endParenLoc + 1);
-            }
-            if (pathList.isEmpty()) {
-                // every paren was escaped, nothing to separate: treat the
-                // whole string as the pattern
-                return new String[] { userPatternString };
-            }
-            return pathList.toArray(new String[0]);
+        if (userPatternString == null) {
+            return null;
         }
-        return null;
+
+        List<String> pathList = new ArrayList<>();
+        // Number of open "(|" wrappers around the patterns
+        int wrapperDepth = 0;
+        boolean unescapedOpenParen = false;
+        // A close paren without a matching open paren
+        boolean strayCloseParen = false;
+        // Text other than whitespace outside of any pattern
+        boolean strayText = false;
+        int length = userPatternString.length();
+        int i = 0;
+        while (i < length) {
+            char c = userPatternString.charAt(i);
+            if (c == '\\') {
+                // Skip the escaped character
+                strayText = true;
+                i += 2;
+            } else if (c == '(') {
+                unescapedOpenParen = true;
+                if (i + 1 < length && userPatternString.charAt(i + 1) == '|') {
+                    // Parens enclosing the whole statement. Valid LDAP search strings: (|(something)(somethingelse))
+                    wrapperDepth++;
+                    i += 2;
+                } else {
+                    int endParenLoc = findUnescapedCloseParen(userPatternString, i + 1);
+                    if (endParenLoc == -1) {
+                        // no matching close paren for this pattern
+                        throw new IllegalArgumentException(
+                                sm.getString("jndiRealm.invalidUserPattern", userPatternString));
+                    }
+                    pathList.add(userPatternString.substring(i + 1, endParenLoc));
+                    i = endParenLoc + 1;
+                }
+            } else if (c == ')') {
+                if (wrapperDepth == 0) {
+                    strayCloseParen = true;
+                } else {
+                    wrapperDepth--;
+                }
+                i++;
+            } else {
+                if (!Character.isWhitespace(c)) {
+                    strayText = true;
+                }
+                i++;
+            }
+        }
+
+        if (!unescapedOpenParen) {
+            // No open parens (or only escaped open parens) here, so this is a plain pattern. A close paren is not
+            // special in a distinguished name; return whole thing
+            return new String[] { userPatternString };
+        }
+        if (wrapperDepth != 0 || strayCloseParen || pathList.isEmpty() || strayText) {
+            // unclosed wrapper, extra close paren, nothing but wrappers or text between the patterns
+            throw new IllegalArgumentException(sm.getString("jndiRealm.invalidUserPattern", userPatternString));
+        }
+        return pathList.toArray(new String[0]);
+    }
+
+
+    private static int findUnescapedCloseParen(String value, int start) {
+        int i = start;
+        while (i < value.length()) {
+            char c = value.charAt(i);
+            if (c == '\\') {
+                i += 2;
+            } else if (c == ')') {
+                return i;
+            } else {
+                i++;
+            }
+        }
+        return -1;
     }
 
 

@@ -688,7 +688,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
         if (newPayloadLength > oldPayloadLength) {
             // It is possible that the max packet size will be exceeded
             if ((newPayloadLength - oldPayloadLength +
-                    getData(false, false).length) > McastServiceImpl.MAX_PACKET_SIZE) {
+                    getData(false, false).length) > McastServiceImpl.MAX_SEND_SIZE) {
                 throw new IllegalArgumentException(sm.getString("memberImpl.large.payload"));
             }
         }

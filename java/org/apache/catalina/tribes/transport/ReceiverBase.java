@@ -140,7 +140,10 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
         }
         executor = null;
         if (oname != null) {
-            JmxRegistry.getRegistry(channel).unregisterJmx(oname);
+            JmxRegistry jmxRegistry = JmxRegistry.getRegistry(channel);
+            if (jmxRegistry != null) {
+                jmxRegistry.unregisterJmx(oname);
+            }
             oname = null;
         }
         channel = null;
@@ -198,11 +201,11 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     }
 
     /**
-     * Returns the bind address.
+     * Returns the bind address, resolving the configured host on first use.
      *
-     * @return the bind address
+     * @return the bind address or <code>null</code> if the configured host could not be resolved
      */
-    public InetAddress getBind() {
+    public synchronized InetAddress getBind() {
         if (bind == null) {
             try {
                 if ("auto".equals(host)) {
@@ -220,9 +223,26 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     }
 
     /**
+     * Resolves the bind address, failing if the configured host cannot be resolved. This avoids silently binding to
+     * the wildcard address when {@link #getBind()} returns <code>null</code> after a failed resolution.
+     *
+     * @return the resolved bind address
+     *
+     * @throws IOException If the configured host could not be resolved
+     */
+    protected InetAddress resolveBind() throws IOException {
+        InetAddress address = getBind();
+        if (address == null) {
+            // The cause has already been logged by getBind()
+            throw new IOException(sm.getString("receiverBase.address.unresolvable", host));
+        }
+        return address;
+    }
+
+    /**
      * Attempts to bind using the provided port and if that fails attempts to bind to each of the ports from portstart
      * to (portstart + retries -1) until either there are no more ports or the bind is successful. The address to bind
-     * to is obtained via a call to {@link #getBind()}.
+     * to is obtained via a call to {@link #resolveBind()}.
      *
      * @param socket    The socket to bind
      * @param portstart Starting port for bind attempts
@@ -240,7 +260,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     /**
      * Attempts to bind using the provided port and if that fails attempts to bind to each of the ports from portstart
      * to (portstart + retries -1) until either there are no more ports or the bind is successful. The address to bind
-     * to is obtained via a call to {@link #getBind()}.
+     * to is obtained via a call to {@link #resolveBind()}.
      *
      * @param socket    The socket to bind
      * @param portstart Starting port for bind attempts
@@ -251,11 +271,12 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
      */
     protected void bind(ServerSocket socket, int portstart, int retries, boolean secure) throws IOException {
         synchronized (bindLock) {
+            InetAddress address = resolveBind();
             InetSocketAddress addr = null;
             int port = portstart;
             while (retries > 0) {
                 try {
-                    addr = new InetSocketAddress(getBind(), port);
+                    addr = new InetSocketAddress(address, port);
                     socket.bind(addr);
                     String type;
                     if (secure) {
@@ -297,11 +318,12 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
      * @throws IOException Socket bind error
      */
     protected int bindUdp(DatagramSocket socket, int portstart, int retries) throws IOException {
+        InetAddress address = resolveBind();
         InetSocketAddress addr = null;
         int port = portstart;
         while (retries > 0) {
             try {
-                addr = new InetSocketAddress(getBind(), port);
+                addr = new InetSocketAddress(address, port);
                 socket.bind(addr);
                 setUdpPort(port);
                 log.info(sm.getString("receiverBase.udp.bind", addr));

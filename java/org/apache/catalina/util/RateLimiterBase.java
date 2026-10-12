@@ -44,8 +44,9 @@ public abstract class RateLimiterBase implements RateLimiter {
     int duration;
     int actualDuration;
 
-    // Initial policy name can be rewritten by setPolicyName()
-    private String policyName = null;
+    // Initial policy name can be rewritten by setPolicyName(). Lazily initialized in getPolicyName() with the
+    // object monitor guarding the auto-generation, so the field itself is volatile for safe publication.
+    private volatile String policyName;
 
     /*
      * The self-owned utility executor, will be instantiated only when ScheduledThreadPoolExecutor is absent during
@@ -64,10 +65,17 @@ public abstract class RateLimiterBase implements RateLimiter {
 
     @Override
     public String getPolicyName() {
-        if (policyName == null) {
-            policyName = getDefaultPolicyName() + "-" + index.incrementAndGet();
+        String name = policyName;
+        if (name == null) {
+            synchronized (this) {
+                name = policyName;
+                if (name == null) {
+                    name = getDefaultPolicyName() + "-" + index.incrementAndGet();
+                    policyName = name;
+                }
+            }
         }
-        return policyName;
+        return name;
     }
 
 
@@ -110,7 +118,11 @@ public abstract class RateLimiterBase implements RateLimiter {
 
     @Override
     public void destroy() {
-        bucketCounter.destroy();
+        // bucketCounter remains null if setFilterConfig() failed before it was assigned, e.g. a counter
+        // constructor rejected the configured duration. Do not mask that failure with an NPE here.
+        if (bucketCounter != null) {
+            bucketCounter.destroy();
+        }
         if (internalExecutorService != null) {
             try {
                 internalExecutorService.shutdown();

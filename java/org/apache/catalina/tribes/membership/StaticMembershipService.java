@@ -68,6 +68,11 @@ public class StaticMembershipService extends MembershipServiceBase implements St
             provider.start(level);
             return;
         }
+        if (localMember == null) {
+            // The local member is resolved when the channel receiver starts, or is configured
+            // explicitly. Starting the membership without either leaves it unknown.
+            throw new IllegalStateException(sm.getString("staticMembershipService.localMemberNotSet"));
+        }
         localMember.setServiceStartTime(System.currentTimeMillis());
         localMember.setMemberAliveTime(100);
         // build membership provider
@@ -92,8 +97,11 @@ public class StaticMembershipService extends MembershipServiceBase implements St
         provider.setMembershipListener(this);
         provider.setMembershipService(this);
         provider.setStaticMembers(staticMembers);
-        properties.setProperty("membershipName", getMembershipName());
-        provider.init(properties);
+        // Pass the derived membership name to the provider on a copy of the configuration, so the
+        // internal key does not leak into the properties this service exposes
+        Properties providerProperties = (Properties) properties.clone();
+        providerProperties.setProperty("membershipName", getMembershipName());
+        provider.init(providerProperties);
         return provider;
     }
 
@@ -102,7 +110,10 @@ public class StaticMembershipService extends MembershipServiceBase implements St
         try {
             if (provider != null && provider.stop(level)) {
                 if (oname != null) {
-                    JmxRegistry.getRegistry(channel).unregisterJmx(oname);
+                    JmxRegistry jmxRegistry = JmxRegistry.getRegistry(channel);
+                    if (jmxRegistry != null) {
+                        jmxRegistry.unregisterJmx(oname);
+                    }
                     oname = null;
                 }
                 provider = null;
@@ -153,11 +164,12 @@ public class StaticMembershipService extends MembershipServiceBase implements St
     }
 
     /**
-     * Returns the list of static members.
-     * @return the static members list
+     * Returns a copy of the list of static members. Mutating the returned list has no effect on
+     * this service. The provider uses the configured list directly while it runs.
+     * @return a copy of the static members list
      */
     public ArrayList<StaticMember> getStaticMembers() {
-        return staticMembers;
+        return new ArrayList<>(staticMembers);
     }
 
     /**
@@ -255,8 +267,20 @@ public class StaticMembershipService extends MembershipServiceBase implements St
         properties.setProperty("pingInterval", String.valueOf(pingInterval));
     }
 
+    /**
+     * Sets the properties for this service. The values are read when the membership provider is
+     * built, as the service starts. Replacing the properties while the service runs therefore has
+     * no effect on the running provider. It keeps the values it started with until the service is
+     * fully stopped and started again, even though the attribute getters of the service report the
+     * new values.
+     *
+     * @param properties the new configuration
+     */
     @Override
     public void setProperties(Properties properties) {
+        if (provider != null) {
+            log.warn(sm.getString("staticMembershipService.propertiesWhileRunning"));
+        }
         setDefaults(properties);
         this.properties = properties;
     }

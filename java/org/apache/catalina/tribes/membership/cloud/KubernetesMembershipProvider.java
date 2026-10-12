@@ -101,7 +101,12 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                 streamProvider = new TokenStreamProvider(new String(bytes, StandardCharsets.US_ASCII), caCertFile);
                 saTokenLastModifiedTime = Files.getLastModifiedTime(saTokenPath);
             } catch (IOException ioe) {
-                log.error(sm.getString("kubernetesMembershipProvider.streamError"), ioe);
+                // Without the token, the Kubernetes API cannot be accessed and a provider without a
+                // stream provider never recovers, keeping this node out of the membership for its
+                // whole lifetime while the other nodes keep replicating to it. Fail the start
+                // instead, as the client certificate branch does for its own errors.
+                throw new IllegalStateException(sm.getString(
+                        "kubernetesMembershipProvider.serviceAccountTokenReadFailed", saTokenFile), ioe);
             }
         } else {
             String clientKeyFile = getEnv("KUBERNETES_CLIENT_KEY_FILE");

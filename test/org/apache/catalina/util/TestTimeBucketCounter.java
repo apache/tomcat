@@ -50,9 +50,37 @@ public class TestTimeBucketCounter {
     }
 
     @Test
+    public void testDurationAtMaximum() {
+        // 1073741 seconds is the largest duration whose millisecond form, rounded up to the next power of 2
+        // (2^30), still fits in an int
+        TimeBucketCounter tbc = new TimeBucketCounter(1073741,
+                new java.util.concurrent.ScheduledThreadPoolExecutor(1));
+        Assert.assertEquals(30, tbc.getNumBits());
+    }
+
+    @Test
+    public void testDurationTooLarge() {
+        // Previously this failed with the misleading "must be a positive integer, was [0]" message because the
+        // overflowed duration produced zero shift bits
+        IllegalArgumentException iae = Assert.assertThrows(IllegalArgumentException.class, () -> new TimeBucketCounter(
+                1073742, new java.util.concurrent.ScheduledThreadPoolExecutor(1)));
+        // MessageFormat applies locale grouping to the numbers, e.g. "1,073,742" in en_US
+        Assert.assertTrue("Error message should mention the rejected duration: " + iae.getMessage(),
+                iae.getMessage().replace(",", "").replace(".", "").contains("1073742"));
+    }
+
+    @Test
+    public void testDurationTooLargeAfterWrapAround() {
+        // Previously this was silently accepted: 4294968 * 1000 wraps to 704 in int arithmetic, producing a
+        // 1 second bucket with a ratio of 1.455 instead of the configured ~49.7 day window
+        Assert.assertThrows(IllegalArgumentException.class, () -> new TimeBucketCounter(4294968,
+                new java.util.concurrent.ScheduledThreadPoolExecutor(1)));
+    }
+
+    @Test
     public void testGetMillisUntilNextBucket() throws InterruptedException {
         long millis;
-        int tb1, tb2;
+        long tb1, tb2;
 
         TimeBucketCounter tbc = new TimeBucketCounter(2, new java.util.concurrent.ScheduledThreadPoolExecutor(1));
         tb1 = tbc.getCurrentBucketPrefix();
