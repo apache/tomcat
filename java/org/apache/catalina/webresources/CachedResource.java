@@ -181,6 +181,14 @@ public class CachedResource implements WebResource {
      * @return <code>true</code> if the cached resources are still valid
      */
     protected boolean validateResources(boolean useClassLoaderResources) {
+        // As per validateResource(), it is possible that some resources will
+        // only be visible for a given value of useClassLoaderResources so
+        // invalidate the entry if the lookup is made with a different value
+        // than the one used when the cache entry was created.
+        if (usesClassLoaderResources != useClassLoaderResources) {
+            return false;
+        }
+
         long now = System.currentTimeMillis();
 
         if (webResources == null) {
