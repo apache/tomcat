@@ -104,7 +104,8 @@ public final class Request {
     private final MessageBytes queryMB = MessageBytes.newInstance();
     private final MessageBytes protoMB = MessageBytes.newInstance();
 
-    private volatile String requestId = Long.toString(requestIdGenerator.getAndIncrement());
+    // The hexadecimal format here matches the identifiers generated in recycle()
+    private volatile String requestId = Long.toHexString(requestIdGenerator.getAndIncrement());
 
     // remote address/host
     private final MessageBytes remoteAddrMB = MessageBytes.newInstance();
