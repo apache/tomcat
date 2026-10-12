@@ -423,7 +423,9 @@ public class TestDefaultServlet extends TomcatBaseTest {
         client.processRequest();
         Assert.assertTrue(client.isResponse200());
         List<String> responseHeaders = client.getResponseHeaders();
-        Assert.assertFalse(responseHeaders.contains("Content-Encoding"));
+        for (String responseHeader : responseHeaders) {
+            Assert.assertFalse(responseHeader.startsWith("Content-Encoding"));
+        }
         Assert.assertTrue(responseHeaders.contains("Content-Length: " + indexSize));
         Assert.assertTrue(responseHeaders.contains("vary: accept-encoding"));
 
