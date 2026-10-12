@@ -132,7 +132,9 @@ public class ExtendedAccessLogValve extends AccessLogValve {
     @Override
     protected synchronized void open() {
         super.open();
-        if (currentLogFile.length() == 0) {
+        // The base class tolerates a failed open and leaves the writer null
+        // in which case there is nothing to write the header to
+        if (writer != null && currentLogFile.length() == 0) {
             writer.println("#Fields: " + pattern);
             writer.println("#Version: 2.0");
             writer.println("#Software: " + ServerInfo.getServerInfo());
