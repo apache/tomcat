@@ -93,6 +93,7 @@ public class ResolverImpl extends Resolver {
      * <li>SERVER_ADMIN</li>
      * <li>API_VERSION</li>
      * <li>IS_SUBREQ</li>
+     * <li>REMOTE_IDENT (no RFC 931 ident protocol support)</li>
      * </ul>
      */
     @Override
@@ -114,7 +115,10 @@ public class ResolverImpl extends Resolver {
             case "REMOTE_HOST" -> request.getRemoteHost();
             case "REMOTE_PORT" -> String.valueOf(request.getRemotePort());
             case "REMOTE_USER" -> request.getRemoteUser();
-            case "REMOTE_IDENT" -> request.getRemoteUser();
+            // REMOTE_IDENT is the RFC 931 ident protocol user name, which
+            // Tomcat does not support. It must not resolve to the remote
+            // user, as that would silently turn ident-based rules into
+            // authentication checks.
             case "REQUEST_METHOD" -> request.getMethod();
             case "SCRIPT_FILENAME" -> request.getServletContext().getRealPath(request.getServletPath());
             case "REQUEST_PATH" -> request.getRequestPathMB().toString();

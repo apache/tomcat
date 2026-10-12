@@ -2006,6 +2006,13 @@
         mod_rewrite values (month 1-12, day of week 0-6 with Sunday being 0).
         (remm)
       </fix>
+      <fix>
+        Stop resolving the <code>REMOTE_IDENT</code> server variable of the
+        rewrite valve to the authenticated user name. <code>REMOTE_IDENT</code>
+        is the RFC 931 ident protocol user name, which Tomcat does not support.
+        It now resolves to undefined, expanding to an empty string, instead of
+        silently turning ident-based rules into authentication checks. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
