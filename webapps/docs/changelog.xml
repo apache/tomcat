@@ -116,6 +116,139 @@
         <code>JNDIRealm</code>, so that groups nested more than one level deep
         are found when <code>roleBase</code> uses pattern replacements. (remm)
       </fix>
+      <fix>
+        Track the <code>StartTlsResponse</code> used by <code>JNDIRealm</code>
+        per connection rather than in a single realm-wide field, so that
+        closing one pooled connection when <code>useStartTls</code> is enabled
+        no longer terminates the TLS session of another, still active pooled
+        connection. (remm)
+      </fix>
+      <fix>
+        Select the primary or alternate directory server URL for each
+        <code>JNDIRealm</code> connection attempt individually rather than via
+        a realm-wide mutable flag that concurrent pooled connections raced on,
+        which could transiently cause a connection to use the wrong URL. Note
+        that this removes the <code>connectionAttempt</code> protected field
+        and changes the signature of the protected
+        <code>getDirectoryContextEnvironment()</code> method. (remm)
+      </fix>
+      <fix>
+        Stop pre-digesting the HTTP DIGEST client digest in
+        <code>JAASCallbackHandler</code>. The pre-digest, a leftover from the
+        pre-<code>CredentialHandler</code> design, could never match the
+        deterministic server digest and so made DIGEST authentication via
+        <code>JAASRealm</code> always fail whenever the realm's credential
+        handler algorithm matched the digest algorithm. The client digest is
+        now passed to the <code>LoginModule</code> unchanged, consistent with
+        the non-JAAS realms. (remm)
+      </fix>
+      <fix>
+        Give the SSI conditional expression operators <code>&amp;&amp;</code>
+        and <code>||</code> distinct precedences, <code>&amp;&amp;</code>
+        binding more tightly than <code>||</code>, consistent with the
+        convention used by the C-like languages and by Apache HTTP Server
+        expressions. Previously, mixed chains were evaluated strictly left to
+        right, so <code>$a || $b &amp;&amp; $c</code> was evaluated as
+        <code>($a || $b) &amp;&amp; $c</code> rather than the expected
+        <code>$a || ($b &amp;&amp; $c)</code>. Note that this changes the
+        evaluation of existing documents using unparenthesized mixed
+        <code>&amp;&amp;</code> and <code>||</code> chains. (remm)
+      </fix>
+      <fix>
+        Fix the built-in SSI variables <code>DATE_GMT</code>,
+        <code>DATE_LOCAL</code> and <code>LAST_MODIFIED</code> always
+        resolving to <code>null</code> and rendering as
+        <code>(none)</code>. The mediator stored and looked them up as
+        external variables using names starting with its own fully qualified
+        class name, which the servlet resolver rejects since those names fall
+        under the reserved <code>org.apache.catalina.</code> prefix. Hold the
+        built-in variables in the mediator itself and resolve them there, as
+        they are per-document values that do not need to be stored in the
+        external resolver. (remm)
+      </fix>
+      <fix>
+        Fix multiple data races in annotation scanning when the
+        <code>parallelAnnotationScanning</code> attribute of the
+        <code>StandardContext</code> is enabled. Classes matched for a
+        <code>ServletContainerInitializer</code> were collected into
+        non-thread-safe sets, which could silently lose matches. A scanner
+        thread could also cache an incomplete set of initializers for a class
+        when another thread had not finished adding that class' super class or
+        interfaces to the shared class cache, and the lazily computed set was
+        not safely published between threads. Matched classes could therefore
+        be missing from the set passed to
+        <code>ServletContainerInitializer.onStartup()</code>, misconfiguring
+        the application at runtime. (remm)
+      </fix>
+      <fix>
+        When automatic migration of a legacy Java EE web application from
+        the <code>legacyAppBase</code> to the <code>appBase</code> failed
+        after the previous version of the application had been moved aside,
+        the previous application was left in a temporary location from which
+        it was neither restored nor cleaned up, making it effectively lost.
+        The previous application is now restored to the deployment location
+        when the migrated application cannot be placed, and is retained with
+        a warning in the temporary location only in the rare cases where
+        restoring it is not possible. (remm)
+      </fix>
+      <fix>
+        Fix the <code>ManagerSF</code> store configuration factory always
+        treating a started <code>StandardManager</code> as non-default, since
+        the manager propagates its (possibly <code>null</code>) node identifier
+        to its session ID generator when it starts, which the default check
+        compared against an empty string. This caused a redundant
+        <code>Manager</code> element with a nested
+        <code>SessionIdGenerator</code> to be written for every context using
+        the default manager configuration when the running configuration was
+        stored. The default check was strengthened to require the exact
+        manager and session ID generator classes and to test
+        <code>throwOnFailure</code>, so the now reachable skip path cannot
+        silently drop a customised configuration. (remm)
+      </fix>
+      <fix>
+        Correctly handle error reports that cannot be proxied by
+        <code>ProxyErrorReportValve</code>. Previously, a relative location
+        or an unreachable, non-HTTP or failing proxy target resulted in an
+        empty response with only the error status set. The valve now falls
+        back to the error report of the default <code>ErrorReportValve</code>
+        in these cases, no longer applies proxy target metadata to the
+        response before the target response has been received, restricts
+        proxying to absolute HTTP and HTTPS URLs and applies connect and
+        read timeouts to the connection to the proxy target. (remm)
+      </fix>
+      <fix>
+        Make the selection of the effective parameter limits by
+        <code>ParameterLimitValve</code> deterministic when several configured
+        URL patterns match a request. Previously, the first matching pattern
+        was encountered in hash map iteration order, which is arbitrary for
+        <code>java.util.regex.Pattern</code> keys and could change between JVM
+        restarts. The limits are now stored in configuration order and the
+        first matching pattern in configuration order is applied. (remm)
+      </fix>
+      <fix>
+        When the Servlet asynchronous processing mechanism is used,
+        <code>SemaphoreValve</code> no longer attempts to acquire a second
+        permit when the request is dispatched back to the container. A
+        saturated semaphore previously rejected such a dispatch with a 503
+        response or an <code>IllegalStateException</code>. The permit
+        obtained when asynchronous processing starts is now released when
+        that asynchronous processing completes or fails. (remm)
+      </fix>
+      <fix>
+        Correct the values of the <code>TIME_MON</code> and
+        <code>TIME_WDAY</code> server variables in the rewrite valve, which
+        exposed the raw <code>java.util.Calendar</code> fields (month 0-11,
+        day of week 1-7 with Sunday first) instead of the documented
+        mod_rewrite values (month 1-12, day of week 0-6 with Sunday being 0).
+        (remm)
+      </fix>
+      <fix>
+        Stop resolving the <code>REMOTE_IDENT</code> server variable of the
+        rewrite valve to the authenticated user name. <code>REMOTE_IDENT</code>
+        is the RFC 931 ident protocol user name, which Tomcat does not support.
+        It now resolves to undefined, expanding to an empty string, instead of
+        silently turning ident-based rules into authentication checks. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
@@ -135,6 +268,92 @@
         queued. Previously, the buffer could be returned to the send buffer pool
         and reused by a concurrent send while the queued message still
         referenced it, corrupting the transmitted data. (remm)
+      </fix>
+      <fix>
+        Fix the queue size accounting of the
+        <code>MessageDispatchInterceptor</code>. The message length
+        recorded when a message is queued is now also the length used
+        to release the accounting when the send completes. Previously,
+        when a downstream interceptor like
+        <code>EncryptInterceptor</code> or
+        <code>FragmentationInterceptor</code> replaced or extended the
+        message payload while the message was sent, the recorded queue
+        size drifted towards negative values and the
+        <code>maxQueueSize</code> limit eventually stopped being
+        enforced. (remm)
+      </fix>
+      <fix>
+        The <code>NonBlockingCoordinator</code> now uses a separate,
+        configurable <code>mergeAliveTimeout</code> with a default of
+        one second for the TCP liveness checks that run while merging
+        an arriving coordination message, instead of the 15 second
+        coordination message wait timeout. Members that do not respond
+        within this timeout are excluded from the merged view and the
+        exclusion is now logged. (remm)
+      </fix>
+      <fix>
+        The <code>TcpFailureDetector</code> now performs its TCP
+        liveness checks outside the membership monitor, and only
+        applies the result after re-acquiring the monitor and
+        re-checking that the membership state has not changed in the
+        meantime. Previously, the network I/O, up to the configured
+        connection timeout for each member, was performed while
+        holding the monitor, which blocked every other membership
+        operation and update for seconds during a network outage.
+        Member events forwarded by the interceptor are also no longer
+        sent while holding the monitor, removing a potential deadlock
+        with membership listeners that call back into the
+        interceptor. (remm)
+      </fix>
+      <fix>
+        The <code>TwoPhaseCommitInterceptor</code> now forwards the
+        interceptor payload, and with it the <code>ErrorHandler</code>
+        supplied by the application, with the original message instead
+        of with its internal confirmation message. When the
+        <code>MessageDispatchInterceptor</code> performed the actual
+        send, completion and error callbacks were previously reported
+        under the confirmation message's random id, which the
+        application cannot correlate with the id returned by the send,
+        and failures of the original message were never reported at
+        all. (remm)
+      </fix>
+      <fix>
+        The <code>TwoPhaseCommitInterceptor</code> now remembers a
+        confirmation message that arrives before the original message
+        it confirms, and releases the original as soon as it arrives.
+        Previously, the confirmation was consumed as an error and the
+        original message was silently dropped when it arrived and no
+        further confirmation ever followed, so a single moment of
+        network reordering cost one lost cluster message. (remm)
+      </fix>
+      <fix>
+        The <code>AbstractReplicatedMap</code> now holds the map
+        members lock and the state lock only briefly. The entry
+        relocation triggered by the ping expiry runs outside the map
+        members lock, the backup selection for a newly added member
+        outside the state lock, and the (de)serialization of the map
+        content for a member joining or transferring its state
+        likewise outside the state lock. Previously, a slow send to a
+        dead member or the serialization of a large map blocked every
+        session operation and the state transfer of joining members
+        for the duration of that work. (remm)
+      </fix>
+      <fix>
+        The <code>udpRxBufSize</code> and <code>udpTxBufSize</code> configured
+        on the cluster channel <code>Sender</code> now take effect for messages
+        sent using UDP. These two properties were missing from the properties
+        transferred from the configured sender to the pooled senders and on to
+        the per-member senders those create, so the datagram socket was always
+        configured with the default buffer sizes and the configured values were
+        silently ignored. (remm)
+      </fix>
+      <fix>
+        The start of the cluster receiver now fails when the configured bind
+        address cannot be resolved. Previously, the resolution failure was only
+        logged and the receiver bound to the wildcard address, silently
+        exposing the cluster listener on all interfaces instead of the
+        configured address, while the unresolvable host was advertised to the
+        other cluster members. (remm)
       </fix>
     </changelog>
   </subsection>
@@ -1889,130 +2108,6 @@
         <bug>69932</bug>: Fix request end access log pattern regression,
         which would log the start time of the request instead. (remm)
       </fix>
-      <fix>
-        Track the <code>StartTlsResponse</code> used by <code>JNDIRealm</code>
-        per connection rather than in a single realm-wide field, so that
-        closing one pooled connection when <code>useStartTls</code> is enabled
-        no longer terminates the TLS session of another, still active pooled
-        connection. (remm)
-      </fix>
-      <fix>
-        Select the primary or alternate directory server URL for each
-        <code>JNDIRealm</code> connection attempt individually rather than via
-        a realm-wide mutable flag that concurrent pooled connections raced on,
-        which could transiently cause a connection to use the wrong URL. Note
-        that this removes the <code>connectionAttempt</code> protected field
-        and changes the signature of the protected
-        <code>getDirectoryContextEnvironment()</code> method. (remm)
-      </fix>
-      <fix>
-        Stop pre-digesting the HTTP DIGEST client digest in
-        <code>JAASCallbackHandler</code>. The pre-digest, a leftover from the
-        pre-<code>CredentialHandler</code> design, could never match the
-        deterministic server digest and so made DIGEST authentication via
-        <code>JAASRealm</code> always fail whenever the realm's credential
-        handler algorithm matched the digest algorithm. The client digest is
-        now passed to the <code>LoginModule</code> unchanged, consistent with
-        the non-JAAS realms. (remm)
-      </fix>
-      <fix>
-        Give the SSI conditional expression operators <code>&amp;&amp;</code>
-        and <code>||</code> distinct precedences, <code>&amp;&amp;</code>
-        binding more tightly than <code>||</code>, consistent with the
-        convention used by the C-like languages and by Apache HTTP Server
-        expressions. Previously, mixed chains were evaluated strictly left to
-        right, so <code>$a || $b &amp;&amp; $c</code> was evaluated as
-        <code>($a || $b) &amp;&amp; $c</code> rather than the expected
-        <code>$a || ($b &amp;&amp; $c)</code>. Note that this changes the
-        evaluation of existing documents using unparenthesized mixed
-        <code>&amp;&amp;</code> and <code>||</code> chains. (remm)
-      </fix>
-      <fix>
-        Fix the built-in SSI variables <code>DATE_GMT</code>,
-        <code>DATE_LOCAL</code> and <code>LAST_MODIFIED</code> always
-        resolving to <code>null</code> and rendering as
-        <code>(none)</code>. The mediator stored and looked them up as
-        external variables using names starting with its own fully qualified
-        class name, which the servlet resolver rejects since those names fall
-        under the reserved <code>org.apache.catalina.</code> prefix. Hold the
-        built-in variables in the mediator itself and resolve them there, as
-        they are per-document values that do not need to be stored in the
-        external resolver. (remm)
-      </fix>
-      <fix>
-        Fix multiple data races in annotation scanning when the
-        <code>parallelAnnotationScanning</code> attribute of the
-        <code>StandardContext</code> is enabled. Classes matched for a
-        <code>ServletContainerInitializer</code> were collected into
-        non-thread-safe sets, which could silently lose matches. A scanner
-        thread could also cache an incomplete set of initializers for a class
-        when another thread had not finished adding that class' super class or
-        interfaces to the shared class cache, and the lazily computed set was
-        not safely published between threads. Matched classes could therefore
-        be missing from the set passed to
-        <code>ServletContainerInitializer.onStartup()</code>, misconfiguring
-        the application at runtime. (remm)
-      </fix>
-      <fix>
-        When automatic migration of a legacy Java EE web application from
-        the <code>legacyAppBase</code> to the <code>appBase</code> failed
-        after the previous version of the application had been moved aside,
-        the previous application was left in a temporary location from which
-        it was neither restored nor cleaned up, making it effectively lost.
-        The previous application is now restored to the deployment location
-        when the migrated application cannot be placed, and is retained with
-        a warning in the temporary location only in the rare cases where
-        restoring it is not possible. (remm)
-      </fix>
-      <fix>
-        Fix the <code>ManagerSF</code> store configuration factory always
-        treating a started <code>StandardManager</code> as non-default, since
-        the manager propagates its (possibly <code>null</code>) node identifier
-        to its session ID generator when it starts, which the default check
-        compared against an empty string. This caused a redundant
-        <code>Manager</code> element with a nested
-        <code>SessionIdGenerator</code> to be written for every context using
-        the default manager configuration when the running configuration was
-        stored. The default check was strengthened to require the exact
-        manager and session ID generator classes and to test
-        <code>throwOnFailure</code>, so the now reachable skip path cannot
-        silently drop a customised configuration. (remm)
-      </fix>
-      <fix>
-        Correctly handle error reports that cannot be proxied by
-        <code>ProxyErrorReportValve</code>. Previously, a relative location
-        or an unreachable, non-HTTP or failing proxy target resulted in an
-        empty response with only the error status set. The valve now falls
-        back to the error report of the default <code>ErrorReportValve</code>
-        in these cases, no longer applies proxy target metadata to the
-        response before the target response has been received, restricts
-        proxying to absolute HTTP and HTTPS URLs and applies connect and
-        read timeouts to the connection to the proxy target. (remm)
-      </fix>
-      <fix>
-        Make the selection of the effective parameter limits by
-        <code>ParameterLimitValve</code> deterministic when several configured
-        URL patterns match a request. Previously, the first matching pattern
-        was encountered in hash map iteration order, which is arbitrary for
-        <code>java.util.regex.Pattern</code> keys and could change between JVM
-        restarts. The limits are now stored in configuration order and the
-        first matching pattern in configuration order is applied. (remm)
-      </fix>
-      <fix>
-        Correct the values of the <code>TIME_MON</code> and
-        <code>TIME_WDAY</code> server variables in the rewrite valve, which
-        exposed the raw <code>java.util.Calendar</code> fields (month 0-11,
-        day of week 1-7 with Sunday first) instead of the documented
-        mod_rewrite values (month 1-12, day of week 0-6 with Sunday being 0).
-        (remm)
-      </fix>
-      <fix>
-        Stop resolving the <code>REMOTE_IDENT</code> server variable of the
-        rewrite valve to the authenticated user name. <code>REMOTE_IDENT</code>
-        is the RFC 931 ident protocol user name, which Tomcat does not support.
-        It now resolves to undefined, expanding to an empty string, instead of
-        silently turning ident-based rules into authentication checks. (remm)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -2570,101 +2665,6 @@
       </fix>
       <fix>
         Avoid NPE in manager webapp displaying certificate information. (remm)
-      </fix>
-      <fix>
-        Fix the queue size accounting of the
-        <code>MessageDispatchInterceptor</code>. The message length
-        recorded when a message is queued is now also the length used
-        to release the accounting when the send completes. Previously,
-        when a downstream interceptor like
-        <code>EncryptInterceptor</code> or
-        <code>FragmentationInterceptor</code> replaced or extended the
-        message payload while the message was sent, the recorded queue
-        size drifted towards negative values and the
-        <code>maxQueueSize</code> limit eventually stopped being
-        enforced. (remm)
-      </fix>
-      <fix>
-        The <code>NonBlockingCoordinator</code> now uses a separate,
-        configurable <code>mergeAliveTimeout</code> with a default of
-        one second for the TCP liveness checks that run while merging
-        an arriving coordination message, instead of the 15 second
-        coordination message wait timeout. Members that do not respond
-        within this timeout are excluded from the merged view and the
-        exclusion is now logged. (remm)
-      </fix>
-      <fix>
-        The <code>TcpFailureDetector</code> now performs its TCP
-        liveness checks outside the membership monitor, and only
-        applies the result after re-acquiring the monitor and
-        re-checking that the membership state has not changed in the
-        meantime. Previously, the network I/O, up to the configured
-        connection timeout for each member, was performed while
-        holding the monitor, which blocked every other membership
-        operation and update for seconds during a network outage.
-        Member events forwarded by the interceptor are also no longer
-        sent while holding the monitor, removing a potential deadlock
-        with membership listeners that call back into the
-        interceptor. (remm)
-      </fix>
-      <fix>
-        The <code>TwoPhaseCommitInterceptor</code> now forwards the
-        interceptor payload, and with it the <code>ErrorHandler</code>
-        supplied by the application, with the original message instead
-        of with its internal confirmation message. When the
-        <code>MessageDispatchInterceptor</code> performed the actual
-        send, completion and error callbacks were previously reported
-        under the confirmation message's random id, which the
-        application cannot correlate with the id returned by the send,
-        and failures of the original message were never reported at
-        all. (remm)
-      </fix>
-      <fix>
-        The <code>TwoPhaseCommitInterceptor</code> now remembers a
-        confirmation message that arrives before the original message
-        it confirms, and releases the original as soon as it arrives.
-        Previously, the confirmation was consumed as an error and the
-        original message was silently dropped when it arrived and no
-        further confirmation ever followed, so a single moment of
-        network reordering cost one lost cluster message. (remm)
-      </fix>
-      <fix>
-        The <code>AbstractReplicatedMap</code> now holds the map
-        members lock and the state lock only briefly. The entry
-        relocation triggered by the ping expiry runs outside the map
-        members lock, the backup selection for a newly added member
-        outside the state lock, and the (de)serialization of the map
-        content for a member joining or transferring its state
-        likewise outside the state lock. Previously, a slow send to a
-        dead member or the serialization of a large map blocked every
-        session operation and the state transfer of joining members
-        for the duration of that work. (remm)
-      </fix>
-      <fix>
-        The <code>udpRxBufSize</code> and <code>udpTxBufSize</code> configured
-        on the cluster channel <code>Sender</code> now take effect for messages
-        sent using UDP. These two properties were missing from the properties
-        transferred from the configured sender to the pooled senders and on to
-        the per-member senders those create, so the datagram socket was always
-        configured with the default buffer sizes and the configured values were
-        silently ignored. (remm)
-      </fix>
-      <fix>
-        The start of the cluster receiver now fails when the configured bind
-        address cannot be resolved. Previously, the resolution failure was only
-        logged and the receiver bound to the wildcard address, silently
-        exposing the cluster listener on all interfaces instead of the
-        configured address, while the unresolvable host was advertised to the
-        other cluster members. (remm)
-      </fix>
-      <fix>
-        When the Servlet asynchronous processing mechanism is used,
-        <code>SemaphoreValve</code> no longer attempts to acquire a second
-        permit when the request is dispatched back to the container. A
-        saturated semaphore previously rejected such a dispatch with a 503
-        response or an <code>IllegalStateException</code>. The permit
-        obtained when asynchronous processing starts is now released when
-        that asynchronous processing completes or fails. (remm)
       </fix>
     </changelog>
   </subsection>
