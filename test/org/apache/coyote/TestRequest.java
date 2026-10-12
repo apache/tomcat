@@ -153,6 +153,20 @@ public class TestRequest {
     }
 
 
+    @Test
+    public void testGetContentLengthIntegerMaxValue() {
+        Request newRequest = new Request();
+
+        Assert.assertEquals(-1, newRequest.getContentLength());
+
+        newRequest.setContentLength(Integer.MAX_VALUE);
+        Assert.assertEquals(Integer.MAX_VALUE, newRequest.getContentLength());
+
+        newRequest.setContentLength(Integer.MAX_VALUE + 1L);
+        Assert.assertEquals(-1, newRequest.getContentLength());
+    }
+
+
     private void configureMockForOneAcknowledgementWrite(SocketWrapperBase<?> socketWrapper) throws IOException {
         EasyMock.reset(socketWrapper);
         socketWrapper.write(true, Constants.ACK_BYTES, 0, Constants.ACK_BYTES.length);
