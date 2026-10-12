@@ -24,6 +24,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.servlet.AsyncContext;
+import javax.servlet.DispatcherType;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,6 +34,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.startup.Tomcat;
@@ -174,6 +177,95 @@ public class TestSemaphoreValve extends TomcatBaseTest {
 
         canReturn.countDown();
         firstThread.join(10000);
+    }
+
+
+    @Test
+    public void testPermitHeldDuringAsyncProcessing() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        Context ctx = getProgrammaticRootContext();
+
+        CountDownLatch asyncStarted = new CountDownLatch(1);
+        AtomicReference<AsyncContext> asyncContextRef = new AtomicReference<>();
+        Wrapper asyncWrapper = Tomcat.addServlet(ctx, "async",
+                new StartAsyncServlet(asyncStarted, asyncContextRef));
+        asyncWrapper.setAsyncSupported(true);
+        ctx.addServletMapping("/async", "async");
+
+        Tomcat.addServlet(ctx, "hello", new HelloWorldServlet());
+        ctx.addServletMapping("/hello", "hello");
+
+        SemaphoreValve valve = new SemaphoreValve();
+        valve.setConcurrency(1);
+        valve.setBlock(false);
+        valve.setHighConcurrencyStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+        ctx.getPipeline().addValve(valve);
+
+        tomcat.start();
+
+        // First request starts asynchronous processing and keeps the permit
+        AtomicInteger firstRc = new AtomicInteger();
+        Thread firstThread = new Thread(() -> {
+            try {
+                firstRc.set(getUrl("http://localhost:" + getPort() + "/async", new ByteChunk(), null));
+            } catch (IOException e) {
+                // Ignore
+            }
+        });
+        firstThread.start();
+
+        Assert.assertTrue("First request should start async processing",
+                asyncStarted.await(10, TimeUnit.SECONDS));
+
+        // Give the first request time to return from the synchronous phase of
+        // the asynchronous exchange
+        Thread.sleep(500);
+
+        // The permit must still be held while async processing is in progress
+        int rc2 = getUrl("http://localhost:" + getPort() + "/hello", new ByteChunk(), null);
+
+        Assert.assertEquals(HttpServletResponse.SC_SERVICE_UNAVAILABLE, rc2);
+
+        // Complete the async processing. The permit should be released.
+        asyncContextRef.get().complete();
+        firstThread.join(10000);
+        Assert.assertFalse(firstThread.isAlive());
+        Assert.assertEquals(HttpServletResponse.SC_OK, firstRc.get());
+
+        // The permit is available again once async processing has completed
+        ByteChunk res = new ByteChunk();
+        int rc3 = getUrl("http://localhost:" + getPort() + "/hello", res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc3);
+        Assert.assertEquals(HelloWorldServlet.RESPONSE_TEXT, res.toString());
+    }
+
+
+    @Test
+    public void testAsyncDispatchCycleDoesNotAcquireSecondPermit() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        Context ctx = getProgrammaticRootContext();
+
+        Wrapper dispatchWrapper = Tomcat.addServlet(ctx, "dispatch", new DispatchServlet());
+        dispatchWrapper.setAsyncSupported(true);
+        ctx.addServletMapping("/dispatch", "dispatch");
+
+        SemaphoreValve valve = new SemaphoreValve();
+        valve.setConcurrency(1);
+        // Default block=true. If the dispatch cycle attempted to acquire a
+        // second permit, the valve would deadlock since the exchange itself
+        // holds the only permit.
+        ctx.getPipeline().addValve(valve);
+
+        tomcat.start();
+
+        ByteChunk res = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/dispatch", res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertEquals("DISPATCHED", res.toString());
     }
 
 
@@ -368,7 +460,7 @@ public class TestSemaphoreValve extends TomcatBaseTest {
         Thread blocked = new Thread(() -> {
             invokeStarted.countDown();
             try {
-                semaphoreValve.invoke(null, response);
+                semaphoreValve.invoke(new MockRequest(), response);
             } catch (Throwable t) {
                 // Ignored
             }
@@ -413,6 +505,60 @@ public class TestSemaphoreValve extends TomcatBaseTest {
             }
             resp.setContentType("text/plain");
             resp.getWriter().print("OK");
+        }
+    }
+
+    private static final class StartAsyncServlet extends HttpServlet {
+
+        @Serial
+        private static final long serialVersionUID = 1L;
+        private final CountDownLatch asyncStarted;
+        private final AtomicReference<AsyncContext> asyncContextRef;
+
+        private StartAsyncServlet(CountDownLatch asyncStarted,
+                AtomicReference<AsyncContext> asyncContextRef) {
+            this.asyncStarted = asyncStarted;
+            this.asyncContextRef = asyncContextRef;
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws IOException {
+            AsyncContext asyncContext = req.startAsync();
+            // Completion is driven by the test via the captured context
+            asyncContext.setTimeout(0);
+            asyncContextRef.set(asyncContext);
+            asyncStarted.countDown();
+        }
+    }
+
+    private static final class DispatchServlet extends HttpServlet {
+
+        @Serial
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws IOException {
+            if (req.getDispatcherType() == DispatcherType.ASYNC) {
+                // Async dispatch cycle. The pipeline is re-entered while the
+                // exchange holds the permit acquired by the initial cycle.
+                // The container completes the exchange when this cycle
+                // returns without restarting the asynchronous processing.
+                resp.getWriter().print("DISPATCHED");
+            } else {
+                AsyncContext asyncContext = req.startAsync();
+                asyncContext.setTimeout(0);
+                // Dispatch back through the pipeline
+                asyncContext.dispatch();
+            }
+        }
+    }
+
+    public static class MockRequest extends Request {
+
+        public MockRequest() {
+            super(null);
         }
     }
 
