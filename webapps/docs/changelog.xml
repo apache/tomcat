@@ -368,6 +368,15 @@
         first matching pattern in configuration order is applied. (remm)
       </fix>
       <fix>
+        When the Servlet asynchronous processing mechanism is used,
+        <code>SemaphoreValve</code> no longer attempts to acquire a second
+        permit when the request is dispatched back to the container. A
+        saturated semaphore previously rejected such a dispatch with a 503
+        response or an <code>IllegalStateException</code>. The permit
+        obtained when asynchronous processing starts is now released when
+        that asynchronous processing completes or fails. (remm)
+      </fix>
+      <fix>
         Correct the values of the <code>TIME_MON</code> and
         <code>TIME_WDAY</code> server variables in the rewrite valve, which
         exposed the raw <code>java.util.Calendar</code> fields (month 0-11,
@@ -615,15 +624,6 @@
         exposing the cluster listener on all interfaces instead of the
         configured address, while the unresolvable host was advertised to the
         other cluster members. (remm)
-      </fix>
-      <fix>
-        When the Servlet asynchronous processing mechanism is used,
-        <code>SemaphoreValve</code> no longer attempts to acquire a second
-        permit when the request is dispatched back to the container. A
-        saturated semaphore previously rejected such a dispatch with a 503
-        response or an <code>IllegalStateException</code>. The permit
-        obtained when asynchronous processing starts is now released when
-        that asynchronous processing completes or fails. (remm)
       </fix>
     </changelog>
   </subsection>
