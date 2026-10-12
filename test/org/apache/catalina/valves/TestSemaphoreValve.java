@@ -298,6 +298,31 @@ public class TestSemaphoreValve extends TomcatBaseTest {
         Assert.assertEquals(429, valve.getHighConcurrencyStatus());
     }
 
+    @Test
+    public void testInvalidConcurrency() {
+        SemaphoreValve valve = new SemaphoreValve();
+
+        // A semaphore with no permits, combined with the default blocking
+        // mode, would make every request wait forever
+        try {
+            valve.setConcurrency(0);
+            Assert.fail("Expected the concurrency of zero to be rejected");
+        } catch (IllegalArgumentException e) {
+            // Expected
+        }
+
+        try {
+            valve.setConcurrency(-1);
+            Assert.fail("Expected a negative concurrency to be rejected");
+        } catch (IllegalArgumentException e) {
+            // Expected
+        }
+
+        // The smallest accepted concurrency level remains usable
+        valve.setConcurrency(1);
+        Assert.assertEquals(1, valve.getConcurrency());
+    }
+
 
     @Test
     public void testFairSemaphore() throws Exception {
