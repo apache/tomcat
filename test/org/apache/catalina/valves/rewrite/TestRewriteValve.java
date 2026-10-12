@@ -22,6 +22,7 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -338,6 +339,24 @@ public class TestRewriteValve extends TomcatBaseTest {
         System.setProperty("some_variable", "something");
         doTestRewrite("RewriteRule /b/(.*).html$ /c%{SERVLET_PATH}/%{ENV:some_variable}", "/b/x.html",
                 "/c/b/x.html/something");
+    }
+
+    @Test
+    public void testRewriteTimeMonModRewriteNumbering() throws Exception {
+        // mod_rewrite numbering: 1-12; two tokens in one rule also cover
+        // concatenation parsing
+        String expected = String.valueOf(LocalDate.now().getMonthValue());
+        doTestRewrite("RewriteRule ^/c/x$ - [E=X-Test:%{TIME_MON}-%{TIME_MON}]",
+                "/c/x", "/c/x", null, expected + "-" + expected);
+    }
+
+    @Test
+    public void testRewriteTimeWdayModRewriteNumbering() throws Exception {
+        // mod_rewrite numbering: 0-6, Sunday being 0; the literal between the
+        // tokens also covers concatenation parsing
+        String expected = String.valueOf(LocalDate.now().getDayOfWeek().getValue() % 7);
+        doTestRewrite("RewriteRule ^/c/x$ - [E=X-Test:%{TIME_WDAY}TUE%{TIME_WDAY}]",
+                "/c/x", "/c/x", null, expected + "TUE" + expected);
     }
 
     @Test
