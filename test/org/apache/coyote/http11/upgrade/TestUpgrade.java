@@ -192,6 +192,51 @@ public class TestUpgrade extends TomcatBaseTest {
 
     @Test
     @SuppressWarnings("unchecked")
+    public void testWriteErrorReportedOnlyOnce() throws Exception {
+        SocketWrapperBase<?> socketWrapper = EasyMock.createMock(SocketWrapperBase.class);
+        WriteListener listener = EasyMock.createMock(WriteListener.class);
+
+        ContextBind contextBind = new ContextBind() {
+            @Override
+            public ClassLoader bind(ClassLoader originalClassLoader) {
+                return null;
+            }
+
+            @Override
+            public void unbind(ClassLoader originalClassLoader) {
+                // NO-OP
+            }
+        };
+        UpgradeProcessorBase processor =
+                new TesterUpgradeProcessor(new UpgradeToken(null, contextBind, null, "test"));
+
+        IOException error = new IOException("Deliberately triggered for the test");
+
+        socketWrapper.registerWriteInterest();
+        // The flush fails. That failure is seen twice, once by the caller and
+        // once by the close that reports the error. The listener must only be
+        // notified once.
+        EasyMock.expect(socketWrapper.flush(false)).andThrow(error);
+        EasyMock.expect(socketWrapper.flush(false)).andThrow(error);
+        listener.onError(error);
+        EasyMock.expectLastCall().once();
+
+        EasyMock.replay(socketWrapper, listener);
+
+        UpgradeServletOutputStream sos = new UpgradeServletOutputStream(processor, socketWrapper,
+                new UpgradeInfo());
+        sos.setWriteListener(listener);
+
+        sos.onWritePossible();
+        // The call-back for the next dispatch must not trigger any further
+        // socket processing.
+        sos.onWritePossible();
+
+        EasyMock.verify(socketWrapper, listener);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
     public void testOnAllDataReadReportedOnlyOnce() throws Exception {
         SocketWrapperBase<?> socketWrapper = EasyMock.createMock(SocketWrapperBase.class);
 
