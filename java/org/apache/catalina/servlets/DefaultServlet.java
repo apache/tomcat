@@ -79,6 +79,7 @@ import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.ResponseUtil;
+import org.apache.tomcat.util.http.parser.AcceptEncoding;
 import org.apache.tomcat.util.http.parser.ContentRange;
 import org.apache.tomcat.util.http.parser.EntityTag;
 import org.apache.tomcat.util.http.parser.Ranges;
@@ -1474,58 +1475,50 @@ public class DefaultServlet extends HttpServlet {
     private PrecompressedResource getBestPrecompressedResource(HttpServletRequest request,
             List<PrecompressedResource> precompressedResources) {
         Enumeration<String> headers = request.getHeaders("Accept-Encoding");
+        List<AcceptEncoding> acceptEncodings = new ArrayList<>();
+        while (headers.hasMoreElements()) {
+            String header = headers.nextElement();
+            try {
+                acceptEncodings.addAll(AcceptEncoding.parse(new StringReader(header)));
+            } catch (IOException e) {
+                // StringReader should not throw IOException
+                log(sm.getString("defaultServlet.acceptEncoding.ioe", header));
+            }
+        }
         PrecompressedResource bestResource = null;
         double bestResourceQuality = 0;
         int bestResourcePreference = Integer.MAX_VALUE;
-        while (headers.hasMoreElements()) {
-            String header = headers.nextElement();
-            for (String preference : header.split(",")) {
-                double quality = 1;
-                int qualityIdx = preference.indexOf(';');
-                if (qualityIdx > 0) {
-                    int equalsIdx = preference.indexOf('=', qualityIdx + 1);
-                    if (equalsIdx == -1) {
-                        continue;
-                    }
-                    try {
-                        quality = Double.parseDouble(preference.substring(equalsIdx + 1).trim());
-                    } catch (NumberFormatException nfe) {
-                        // Invalid q-value: ignore this preference
-                        continue;
-                    }
+
+        for (AcceptEncoding acceptEncoding : acceptEncodings) {
+            double quality = acceptEncoding.getQuality();
+            if (quality >= bestResourceQuality) {
+                String encoding = acceptEncoding.getEncoding();
+                if ("identity".equalsIgnoreCase(encoding)) {
+                    bestResource = null;
+                    bestResourceQuality = quality;
+                    bestResourcePreference = Integer.MAX_VALUE;
+                    continue;
                 }
-                if (quality >= bestResourceQuality) {
-                    String encoding = preference;
-                    if (qualityIdx > 0) {
-                        encoding = encoding.substring(0, qualityIdx);
-                    }
-                    encoding = encoding.trim();
-                    if ("identity".equals(encoding)) {
-                        bestResource = null;
-                        bestResourceQuality = quality;
-                        bestResourcePreference = Integer.MAX_VALUE;
-                        continue;
-                    }
-                    if ("*".equals(encoding)) {
-                        bestResource = precompressedResources.getFirst();
-                        bestResourceQuality = quality;
-                        bestResourcePreference = 0;
-                        continue;
-                    }
-                    for (int i = 0; i < precompressedResources.size(); ++i) {
-                        PrecompressedResource resource = precompressedResources.get(i);
-                        if (encoding.equals(resource.format.encoding)) {
-                            if (quality > bestResourceQuality || i < bestResourcePreference) {
-                                bestResource = resource;
-                                bestResourceQuality = quality;
-                                bestResourcePreference = i;
-                            }
-                            break;
+                if ("*".equals(encoding)) {
+                    bestResource = precompressedResources.getFirst();
+                    bestResourceQuality = quality;
+                    bestResourcePreference = 0;
+                    continue;
+                }
+                for (int i = 0; i < precompressedResources.size(); ++i) {
+                    PrecompressedResource resource = precompressedResources.get(i);
+                    if (encoding.equalsIgnoreCase(resource.format.encoding)) {
+                        if (quality > bestResourceQuality || i < bestResourcePreference) {
+                            bestResource = resource;
+                            bestResourceQuality = quality;
+                            bestResourcePreference = i;
                         }
+                        break;
                     }
                 }
             }
         }
+
         return bestResource;
     }
 
