@@ -257,6 +257,10 @@
         Connector compression will now enable gzip compression with a request
         header of the form <code>Accept-Encoding: *</code>. (markt)
       </fix>
+      <update>
+        Mark JAASRealm as a deprecated component. JAASRealm will be removed in
+        Tomcat 12. (schultz)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
