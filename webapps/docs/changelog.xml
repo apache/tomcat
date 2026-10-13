@@ -298,6 +298,22 @@
         an error has been reported. A single failure to flush the output was
         previously reported to the listener multiple times. (remm)
       </fix>
+      <fix>
+        When releasing the HTTP/2 connection back log, cap the allocation to
+        each stream at the connection window capacity that remains to be
+        distributed, decrement that capacity by every allocation made and stop
+        distributing once it is exhausted. Previously, when the capacity was
+        exhausted by incremental streams, allocations could exceed the capacity
+        the client had made available, since every incremental stream received
+        a share rounded up to at least one byte and non-incremental streams at
+        the same urgency level received a share computed using a denominator
+        that only counted incremental streams. The connection could then send
+        more data than the client's flow control window allowed, which a
+        compliant client must treat as a connection error of type
+        <code>FLOW_CONTROL_ERROR</code>. Streams that are left without an
+        allocation remain in the back log and are considered again when the
+        next window increment arrives. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
