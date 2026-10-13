@@ -395,6 +395,13 @@
         Refactor the default Servlet <code>Accept-Encoding</code> handling to
         use the common HTTP header parser for processing these headers. (markt)
       </fix>
+      <fix>
+        Connector compression will now enable gzip compression with a request
+        header of the form <code>Accept-Encoding: *</code>. (markt)
+      </fix>
+      <fix>
+        Remove JAASRealm. (schultz)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
