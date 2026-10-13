@@ -583,7 +583,15 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
 
         @Override
         public void expandPayload() {
-            payloadSize = payloadSize * 2;
+            // The encoded headers are written as the payload of a single
+            // frame so a buffer larger than the largest frame size that can
+            // be represented is never usable. Fail rather than continue
+            // doubling, which would eventually overflow the buffer size.
+            if (payloadSize >= ConnectionSettingsBase.MAX_MAX_FRAME_SIZE) {
+                throw new IllegalStateException(sm.getString("upgradeHandler.headerPayloadTooBig",
+                        Integer.toString(ConnectionSettingsBase.MAX_MAX_FRAME_SIZE)));
+            }
+            payloadSize = Integer.min(payloadSize * 2, ConnectionSettingsBase.MAX_MAX_FRAME_SIZE);
             payload = ByteBuffer.allocate(payloadSize);
         }
     }
