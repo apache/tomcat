@@ -2324,7 +2324,16 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
         @Override
         public void expandPayload() {
-            payload = ByteBuffer.allocate(payload.capacity() * 2);
+            // The encoded headers are written as the payload of a single
+            // frame so a buffer larger than the largest frame size that can
+            // be represented is never usable. Fail rather than continue
+            // doubling, which would eventually overflow the buffer size.
+            if (payload.capacity() >= ConnectionSettingsBase.MAX_MAX_FRAME_SIZE) {
+                throw new IllegalStateException(sm.getString("upgradeHandler.headerPayloadTooBig",
+                        Integer.toString(ConnectionSettingsBase.MAX_MAX_FRAME_SIZE)));
+            }
+            payload = ByteBuffer.allocate(
+                    Integer.min(payload.capacity() * 2, ConnectionSettingsBase.MAX_MAX_FRAME_SIZE));
         }
     }
 }
