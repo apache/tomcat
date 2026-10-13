@@ -199,6 +199,11 @@ public class UpgradeServletInputStream extends ServletInputStream {
     public final int read(byte[] b, int off, int len) throws IOException {
         preReadChecks();
 
+        // The input must not be touched if the caller requested zero bytes.
+        if (len <= 0) {
+            return 0;
+        }
+
         try {
             int result = socketWrapper.read(listener == null, b, off, len);
             if (result == -1) {
