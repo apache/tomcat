@@ -79,6 +79,12 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
      */
     private volatile boolean closed = false;
 
+    /**
+     * Whether an error has been reported to the listener. No further
+     * call-backs are permitted once the error has been reported.
+     */
+    private volatile boolean errorReported = false;
+
     // Start in blocking-mode
     /**
      * The async write listener.
@@ -248,6 +254,11 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
 
 
     final void onWritePossible() {
+        if (errorReported) {
+            // No further call-backs are permitted once an error has been
+            // reported.
+            return;
+        }
         try {
             if (flushing) {
                 flushInternal(false, true);
@@ -293,9 +304,10 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
 
 
     private void onError(Throwable t) {
-        if (listener == null) {
+        if (listener == null || errorReported) {
             return;
         }
+        errorReported = true;
         ClassLoader oldCL = processor.getUpgradeToken().contextBind().bind(null);
         try {
             listener.onError(t);

@@ -284,6 +284,12 @@
         reported to the listener, or once the end of the data has been
         reported. (remm)
       </fix>
+      <fix>
+        Report an error to the <code>WriteListener</code> of an upgraded
+        connection at most once and stop triggering further call-backs once
+        an error has been reported. A single failure to flush the output was
+        previously reported to the listener multiple times. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
