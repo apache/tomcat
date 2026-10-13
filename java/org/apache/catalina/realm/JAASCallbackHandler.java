@@ -39,7 +39,10 @@ import org.apache.tomcat.util.res.StringManager;
  * <code>javax.security.auth.callback.NameCallback</code>,
  * <code>javax.security.auth.callback.PasswordCallback</code> and
  * <code>javax.security.auth.callback.TextInputCallback</code>.
+ *
+ * @deprecated This class will be removed in Tomcat 12.
  */
+@Deprecated
 public class JAASCallbackHandler implements CallbackHandler {
 
     // ------------------------------------------------------------ Constructor
