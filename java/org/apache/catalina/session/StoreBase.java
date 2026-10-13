@@ -22,6 +22,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 
 import org.apache.catalina.LifecycleException;
@@ -156,6 +157,8 @@ public abstract class StoreBase extends LifecycleBase implements Store {
         long timeNow = System.currentTimeMillis();
 
         for (String key : keys) {
+            Lock writeLock = getSessionStoreLock(key).writeLock();
+            writeLock.lock();
             try {
                 Session session = load(key);
                 if (session == null) {
@@ -197,6 +200,8 @@ public abstract class StoreBase extends LifecycleBase implements Store {
                 } catch (IOException ioe) {
                     manager.getContext().getLogger().error(sm.getString("store.removeFail", key), ioe);
                 }
+            } finally {
+                writeLock.unlock();
             }
         }
     }
