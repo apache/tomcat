@@ -161,16 +161,6 @@ public class TestUpgrade extends TomcatBaseTest {
 
         ContextBind contextBind = new ContextBind() {
             @Override
-            public ClassLoader bind(ClassLoader originalClassLoader) {
-                return null;
-            }
-
-            @Override
-            public void unbind(ClassLoader originalClassLoader) {
-                // NO-OP
-            }
-
-            @Override
             public ClassLoader bind(boolean usePrivilegedAction, ClassLoader originalClassLoader) {
                 return null;
             }
@@ -210,16 +200,6 @@ public class TestUpgrade extends TomcatBaseTest {
         WriteListener listener = EasyMock.createMock(WriteListener.class);
 
         ContextBind contextBind = new ContextBind() {
-            @Override
-            public ClassLoader bind(ClassLoader originalClassLoader) {
-                return null;
-            }
-
-            @Override
-            public void unbind(ClassLoader originalClassLoader) {
-                // NO-OP
-            }
-
             @Override
             public ClassLoader bind(boolean usePrivilegedAction, ClassLoader originalClassLoader) {
                 return null;
@@ -263,16 +243,6 @@ public class TestUpgrade extends TomcatBaseTest {
         SocketWrapperBase<?> socketWrapper = EasyMock.createMock(SocketWrapperBase.class);
 
         ContextBind contextBind = new ContextBind() {
-            @Override
-            public ClassLoader bind(ClassLoader originalClassLoader) {
-                return null;
-            }
-
-            @Override
-            public void unbind(ClassLoader originalClassLoader) {
-                // NO-OP
-            }
-
             @Override
             public ClassLoader bind(boolean usePrivilegedAction, ClassLoader originalClassLoader) {
                 return null;
