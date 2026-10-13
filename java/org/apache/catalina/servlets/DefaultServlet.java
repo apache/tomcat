@@ -1434,7 +1434,7 @@ public class DefaultServlet extends HttpServlet {
                     continue;
                 }
                 if ("*".equals(encoding)) {
-                    bestResource = precompressedResources.getFirst();
+                    bestResource = precompressedResources.get(0);
                     bestResourceQuality = quality;
                     bestResourcePreference = 0;
                     continue;
