@@ -42,4 +42,45 @@ public class TestConnectionSettingsLocal {
         ConnectionSettingsLocal settings = new ConnectionSettingsLocal("0");
         settings.set(Setting.INITIAL_WINDOW_SIZE, ConnectionSettingsBase.MAX_WINDOW_SIZE + 1L);
     }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testMaxConcurrentStreamsNegative() {
+        // Use of a negative value is not permitted by the specification and
+        // can not be represented in a SETTINGS frame
+        ConnectionSettingsLocal settings = new ConnectionSettingsLocal("0");
+        settings.set(Setting.MAX_CONCURRENT_STREAMS, -1);
+    }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testMaxConcurrentStreamsTooBig() {
+        // Values larger than an unsigned 32-bit integer can not be
+        // represented in a SETTINGS frame
+        ConnectionSettingsLocal settings = new ConnectionSettingsLocal("0");
+        settings.set(Setting.MAX_CONCURRENT_STREAMS, ConnectionSettingsBase.MAX_SETTING_VALUE + 1);
+    }
+
+
+    @Test
+    public void testMaxConcurrentStreamsMaxValue() {
+        // The largest value that can be represented in a SETTINGS frame is
+        // permitted
+        ConnectionSettingsLocal settings = new ConnectionSettingsLocal("0");
+        settings.set(Setting.MAX_CONCURRENT_STREAMS, ConnectionSettingsBase.MAX_SETTING_VALUE);
+    }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testMaxHeaderListSizeNegative() {
+        ConnectionSettingsLocal settings = new ConnectionSettingsLocal("0");
+        settings.set(Setting.MAX_HEADER_LIST_SIZE, -1);
+    }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testMaxHeaderListSizeTooBig() {
+        ConnectionSettingsLocal settings = new ConnectionSettingsLocal("0");
+        settings.set(Setting.MAX_HEADER_LIST_SIZE, ConnectionSettingsBase.MAX_SETTING_VALUE + 1);
+    }
 }
