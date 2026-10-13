@@ -274,6 +274,16 @@
         an application loop that polls <code>available()</code> running.
         (remm)
       </fix>
+      <fix>
+        Report a clean end of input on an upgraded connection as end of
+        stream, with blocking and non-blocking reads returning
+        <code>-1</code> and the non-blocking <code>ReadListener</code>
+        receiving <code>onAllDataRead()</code>, rather than as an error with
+        an <code>EOFException</code>. Also ensure that no further
+        <code>ReadListener</code> call-backs occur once an error has been
+        reported to the listener, or once the end of the data has been
+        reported. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">

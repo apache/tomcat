@@ -69,6 +69,18 @@ public class UpgradeServletInputStream extends ServletInputStream {
     private volatile Boolean ready = Boolean.TRUE;
 
     /**
+     * Whether the error call-back has been triggered. No further call-backs
+     * are permitted once the error call-back has been triggered.
+     */
+    private volatile boolean errorReported = false;
+
+    /**
+     * Whether the all data read call-back has been triggered. It is only
+     * permitted to trigger the all data read call-back once.
+     */
+    private volatile boolean allDataReadReported = false;
+
+    /**
      * The async read listener.
      */
     private volatile ReadListener listener = null;
@@ -245,12 +257,20 @@ public class UpgradeServletInputStream extends ServletInputStream {
 
 
     final void onDataAvailable() {
+        if (errorReported || allDataReadReported) {
+            // No further call-backs are permitted once an error has been
+            // reported or once the end of the data has been reported.
+            return;
+        }
         try {
             if (listener == null || !socketWrapper.isReadyForRead()) {
                 return;
             }
         } catch (IOException ioe) {
             onError(ioe);
+            // Once an error has been reported to the listener, no further
+            // listener call-backs are permitted so stop processing here.
+            return;
         }
         ready = Boolean.TRUE;
         ClassLoader oldCL = processor.getUpgradeToken().getContextBind().bind(false, null);
@@ -258,7 +278,8 @@ public class UpgradeServletInputStream extends ServletInputStream {
             if (!eof) {
                 listener.onDataAvailable();
             }
-            if (eof) {
+            if (eof && !errorReported) {
+                allDataReadReported = true;
                 listener.onAllDataRead();
             }
         } catch (Throwable t) {
@@ -274,6 +295,7 @@ public class UpgradeServletInputStream extends ServletInputStream {
         if (listener == null) {
             return;
         }
+        errorReported = true;
         ClassLoader oldCL = processor.getUpgradeToken().getContextBind().bind(false, null);
         try {
             listener.onError(t);

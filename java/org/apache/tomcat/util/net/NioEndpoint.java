@@ -1561,9 +1561,13 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 return true;
             }
 
-            fillReadBuffer(false);
+            int nRead = fillReadBuffer(false);
 
-            return socketBufferHandler.getReadBuffer().position() > 0;
+            // A return of -1 signals the end of the input. Report that the
+            // socket is ready in that case since a subsequent read is able to
+            // report the end of the data to the reader immediately rather than
+            // waiting for data that will never arrive.
+            return nRead == -1 || socketBufferHandler.getReadBuffer().position() > 0;
         }
 
 
@@ -1700,7 +1704,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     synchronized (readLock) {
                         n = getSocket().read(buffer);
                         if (n == -1) {
-                            throw new EOFException();
+                            return -1;
                         } else if (n == 0) {
                             // Ensure a spurious wake-up doesn't trigger a duplicate registration
                             if (!readBlocking) {
@@ -1725,9 +1729,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 } while (n == 0); // TLS needs to loop as reading zero application bytes is possible
             } else {
                 n = getSocket().read(buffer);
-                if (n == -1) {
-                    throw new EOFException();
-                }
             }
             return n;
         }
