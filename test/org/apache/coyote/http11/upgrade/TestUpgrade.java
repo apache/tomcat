@@ -310,6 +310,20 @@ public class TestUpgrade extends TomcatBaseTest {
         uc.shutdownOutput();
     }
 
+    @Test
+    public void testZeroLengthReadReturnsZero() throws Exception {
+        UpgradeConnection uc = doUpgrade(ZeroLengthReadBlocking.class);
+
+        // Half-close the connection from the client side. The zero-length read
+        // performed by the handler must neither block waiting for the end of
+        // the input nor report the end of the input.
+        uc.shutdownOutput();
+
+        Assert.assertEquals(ZeroLengthReadBlocking.ZERO_READ_MARKER, uc.getReader().read());
+
+        uc.shutdownInput();
+    }
+
 
     @SuppressWarnings("unchecked")
     private static Set<UpgradeInfo> getUpgradeInfos(UpgradeGroupInfo groupInfo) throws Exception {
@@ -523,6 +537,41 @@ public class TestUpgrade extends TomcatBaseTest {
             try {
                 connection.getInputStream();
                 connection.getOutputStream();
+            } catch (IOException ioe) {
+                throw new IllegalStateException(ioe);
+            }
+        }
+
+        @Override
+        public void destroy() {
+            // NO-OP
+        }
+    }
+
+
+    public static class ZeroLengthReadBlocking implements HttpUpgradeHandler {
+
+        public static final char ZERO_READ_MARKER = '0';
+
+        @Override
+        public void init(WebConnection connection) {
+
+            try (ServletInputStream sis = connection.getInputStream();
+                    ServletOutputStream sos = connection.getOutputStream()) {
+
+                // A zero-length read is defined to read no bytes and return
+                // zero, independent of the state of the input.
+                int result = sis.read(new byte[8], 0, 0);
+
+                sos.write(result == 0 ? (byte) ZERO_READ_MARKER : (byte) 'E');
+                sos.flush();
+
+                // Drain the input so the connection is closed cleanly once the
+                // client has finished sending.
+                byte[] buffer = new byte[128];
+                while (sis.read(buffer) >= 0) {
+                    // Drain
+                }
             } catch (IOException ioe) {
                 throw new IllegalStateException(ioe);
             }
