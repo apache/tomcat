@@ -67,8 +67,9 @@ public abstract class UpgradeProcessorBase extends AbstractProcessorLight implem
 
 
     @Override
-    public final void recycle() {
-        // Currently a NO-OP as upgrade processors are not recycled.
+    public void recycle() {
+        // NO-OP. Sub-classes override this to release resources when the
+        // processor is released by the container.
     }
 
 
