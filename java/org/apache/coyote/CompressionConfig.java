@@ -74,9 +74,8 @@ public class CompressionConfig {
 
 
     /**
-     * Set the list of content encodings that indicate already-compressed content.
-     * When content is already encoded with one of these encodings, compression will not be applied
-     * to prevent double compression.
+     * Set the list of content encodings that indicate already-compressed content. When content is already encoded with
+     * one of these encodings, compression will not be applied to prevent double compression.
      *
      * @param encodings Comma-separated list of encoding names (e.g., "gzip,br,deflate")
      */
@@ -86,7 +85,7 @@ public class CompressionConfig {
             StringTokenizer tokens = new StringTokenizer(encodings, ",");
             while (tokens.hasMoreTokens()) {
                 String token = tokens.nextToken().trim();
-                if(!token.isEmpty()) {
+                if (!token.isEmpty()) {
                     newEncodings.add(token);
                 }
             }
@@ -164,8 +163,7 @@ public class CompressionConfig {
 
 
     /**
-     * Returns the compiled regular expression pattern for user agents that should not
-     * receive compressed responses.
+     * Returns the compiled regular expression pattern for user agents that should not receive compressed responses.
      *
      * @return the compiled pattern, or {@code null} if not configured
      */
@@ -352,11 +350,12 @@ public class CompressionConfig {
             // Therefore, set the Vary header to keep proxies happy
             ResponseUtil.addVaryFieldName(responseHeaders, "accept-encoding");
 
-            // Check if user-agent supports gzip encoding
-            // Only interested in whether gzip encoding is supported. Other
-            // encodings and weights can be ignored.
+            /*
+             * Check if user-agent supports gzip encoding. Only interested in whether gzip encoding is supported. Other
+             * encodings can be ignored.
+             */
             headerValues = request.getMimeHeaders().values("accept-encoding");
-            while (!foundGzip && headerValues.hasMoreElements()) {
+            while (headerValues.hasMoreElements()) {
                 List<AcceptEncoding> acceptEncodings;
                 try {
                     acceptEncodings = AcceptEncoding.parse(new StringReader(headerValues.nextElement()));
@@ -366,9 +365,13 @@ public class CompressionConfig {
                 }
 
                 for (AcceptEncoding acceptEncoding : acceptEncodings) {
-                    if ("gzip".equalsIgnoreCase(acceptEncoding.getEncoding())) {
+                    if (("gzip".equalsIgnoreCase(acceptEncoding.getEncoding()) ||
+                            "*".equals(acceptEncoding.getEncoding())) && acceptEncoding.getQuality() > 0) {
                         foundGzip = true;
-                        break;
+                    }
+                    if ("gzip".equalsIgnoreCase(acceptEncoding.getEncoding()) && acceptEncoding.getQuality() == 0) {
+                        // gzip is explicitly disabled
+                        return false;
                     }
                 }
             }
