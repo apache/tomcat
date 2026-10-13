@@ -909,7 +909,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             }
         }
 
-        // Should be overridden in JAASRealm - to avoid pretty inefficient conversions
         if (principal == null || role == null) {
             return false;
         }
@@ -975,7 +974,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      *             Realm; otherwise return <code>false</code>.
      */
     protected boolean hasRoleInternal(Principal principal, String role) {
-        // Should be overridden in JAASRealm - to avoid pretty inefficient conversions
         if (!(principal instanceof GenericPrincipal gp)) {
             return false;
         }

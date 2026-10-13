@@ -93,9 +93,6 @@ sources of authentication information:</p>
 <li><a href="#MemoryRealm">MemoryRealm</a> - Accesses authentication
     information stored in an in-memory object collection, which is initialized
     from an XML document (<code>conf/tomcat-users.xml</code>).</li>
-<li><a href="#JAASRealm">JAASRealm</a> - Accesses authentication information
-    through the Java Authentication &amp; Authorization Service (JAAS)
-    framework.</li>
 </ul>
 
 <p>It is also possible to write your own <code>Realm</code> implementation,
@@ -913,120 +910,6 @@ valid user, consisting of the following attributes:</p>
     provide any built-in capabilities to maintain users and roles.</li>
 </ul>
 
-
-</subsection>
-
-
-<subsection name="JAASRealm">
-
-<h5>Introduction</h5>
-
-        <p><strong>JAASRealm</strong> is an implementation of the Tomcat
-<code>Realm</code> interface that authenticates users through the Java
-Authentication &amp; Authorization Service (JAAS) framework which is now
-provided as part of the standard Java SE API.</p>
-        <p>Using JAASRealm gives the developer the ability to combine
-practically any conceivable security realm with Tomcat's CMA. </p>
-        <p>JAASRealm is prototype for Tomcat of the JAAS-based
-J2EE authentication framework for J2EE v1.4, based on the <a
- href="https://www.jcp.org/en/jsr/detail?id=196">JCP Specification
-Request 196</a> to enhance container-managed security and promote
-'pluggable' authentication mechanisms whose implementations would be
-container-independent.
-        </p>
-        <p>Based on the JAAS login module and principal (see <code>javax.security.auth.spi.LoginModule</code>
-and <code>javax.security.Principal</code>), you can develop your own
-security mechanism or wrap another third-party mechanism for
-integration with the CMA as implemented by Tomcat.
-        </p>
-
-        <h5>Quick Start</h5>
-        <p>To set up Tomcat to use JAASRealm with your own JAAS login module,
- you will need to follow these steps:</p>
-        <ol>
-          <li>Write your own LoginModule, User and Role classes based
-on JAAS (see
-<a href="http://docs.oracle.com/javase/7/docs/technotes/guides/security/jaas/tutorials/GeneralAcnOnly.html">
-the JAAS Authentication Tutorial</a> and
-<a href="http://docs.oracle.com/javase/7/docs/technotes/guides/security/jaas/JAASLMDevGuide.html">
-the JAAS Login Module Developer's Guide</a>) to be managed by the JAAS Login
-Context (<code>javax.security.auth.login.LoginContext</code>)
-When developing your LoginModule, note that JAASRealm's built-in <code>CallbackHandler</code>
-only recognizes the <code>NameCallback</code> and <code>PasswordCallback</code> at present.
-          </li>
-          <li>Although not specified in JAAS, you should create
-separate classes to distinguish between users and roles, extending <code>javax.security.Principal</code>,
-so that Tomcat can tell which Principals returned from your login
-module are users and which are roles (see <code>org.apache.catalina.realm.JAASRealm</code>).
-Regardless, the first Principal returned is <em>always</em> treated as the user Principal.
-          </li>
-          <li>Place the compiled classes on Tomcat's classpath
-          </li>
-          <li>Set up a login.config file for Java (see <a
- href="http://docs.oracle.com/javase/7/docs/technotes/guides/security/jaas/tutorials/LoginConfigFile.html">
-JAAS LoginConfig file</a>) and tell Tomcat where to find it by specifying
-its location to the JVM, for instance by setting the environment
-variable: <code>JAVA_OPTS=$JAVA_OPTS -Djava.security.auth.login.config==$CATALINA_BASE/conf/jaas.config</code></li>
-
-          <li>Configure your security-constraints in your web.xml for
-the resources you want to protect</li>
-          <li>Configure the JAASRealm module in your server.xml </li>
-          <li>Restart Tomcat if it is already running.</li>
-        </ol>
-        <h5>Realm Element Attributes</h5>
-        <p>To configure JAASRealm as for step 6 above, you create
-a <code>&lt;Realm&gt;</code> element and nest it in your
-<code>$CATALINA_BASE/conf/server.xml</code>
-file within your <code>&lt;Engine&gt;</code> node. The attributes for the
-JAASRealm are defined in the <a href="config/realm.html">Realm</a>
-configuration documentation.</p>
-
-<h5>Example</h5>
-
-<p>Here is an example of how your server.xml snippet should look.</p>
-
-<source><![CDATA[<Realm className="org.apache.catalina.realm.JAASRealm"
-                appName="MyFooRealm"
-    userClassNames="org.foobar.realm.FooUser"
-     roleClassNames="org.foobar.realm.FooRole"/>]]></source>
-
-<p>It is the responsibility of your login module to create and save User and
-Role objects representing Principals for the user
-(<code>javax.security.auth.Subject</code>). If your login module doesn't
-create a user object but also doesn't throw a login exception, then the
-Tomcat CMA will break and you will be left at the
-http://localhost:8080/myapp/j_security_check URI or at some other
-unspecified location.</p>
-
-        <p>The flexibility of the JAAS approach is two-fold: </p>
-        <ul>
-          <li>you can carry out whatever processing you require behind
-the scenes in your own login module.</li>
-          <li>you can plug in a completely different LoginModule by changing the configuration
-and restarting the server, without any code changes to your application.</li>
-        </ul>
-
-        <h5>Additional Notes</h5>
-        <ul>
-          <li>When a user attempts to access a protected resource for
-              the first time, Tomcat will call the <code>authenticate()</code>
-              method of this <code>Realm</code>.  Thus, any changes you have made in
-              the security mechanism directly (new users, changed passwords or
-              roles, etc.) will be immediately reflected.</li>
-          <li>Once a user has been authenticated, the user (and their
-              associated roles) are cached within Tomcat for the duration of
-              the user's login.  For FORM-based authentication, that means until
-              the session times out or is invalidated; for BASIC authentication,
-              that means until the user closes their browser.  Any changes to the
-              security information for an already authenticated user will <strong>not</strong>
-              be reflected until the next time that user logs on again.</li>
-          <li>As with other <code>Realm</code> implementations, digested passwords
-              are supported via the configured <code>CredentialHandler</code>.
-              JAASRealm's <code>CallbackHandler</code> passes the password or
-              client digest to the <code>LoginModule</code> unchanged; any digest
-              comparison is expected to be performed by the <code>LoginModule</code>
-              when it calls back into the <code>Realm</code></li>
-        </ul>
 
 </subsection>
 

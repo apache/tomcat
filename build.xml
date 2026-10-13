@@ -623,7 +623,6 @@
     <exclude name="org/apache/catalina/realm/DataSourceRealm.class" />
     <exclude name="org/apache/catalina/realm/JAASCallbackHandler.class" />
     <exclude name="org/apache/catalina/realm/JAASMemoryLoginModule.class" />
-    <exclude name="org/apache/catalina/realm/JAASRealm.class" />
     <exclude name="org/apache/catalina/realm/JNDIRealm$User.class" />
     <exclude name="org/apache/catalina/realm/JNDIRealm.class" />
     <exclude name="org/apache/catalina/realm/LockOutRealm*" />

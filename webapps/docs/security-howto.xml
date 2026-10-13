@@ -477,10 +477,6 @@
       <p>The UserDatabaseRealm is not intended for large-scale installations. It
       is intended for small-scale, relatively static environments.</p>
 
-      <p>The JAASRealm is not widely used and therefore the code is not as
-      mature as the other realms. Additional testing is recommended before using
-      this realm.</p>
-
       <p>By default, the realms do not implement any form of account lock-out.
       This means that brute force attacks can be successful. To prevent a brute
       force attack, the chosen realm should be wrapped in a LockOutRealm.</p>
