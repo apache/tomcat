@@ -56,7 +56,9 @@ public class TestAbstractProcessorAsyncTimeout {
 
         processor.timeoutAsync(asyncStart + 2000);
 
-        Assert.assertEquals("The timeout should have been dispatched", List.of(SocketEvent.TIMEOUT),
+        ArrayList<SocketEvent> timeoutList = new ArrayList<>();
+        timeoutList.add(SocketEvent.TIMEOUT);
+        Assert.assertEquals("The timeout should have been dispatched", timeoutList,
                 processor.getDispatchedEvents());
         Assert.assertTrue("The timeout must remain in place until it has been processed",
                 processor.getAsyncTimeout() > 0);
@@ -64,8 +66,11 @@ public class TestAbstractProcessorAsyncTimeout {
         // The event was not processed, so this run of the timeout task has to dispatch it again.
         processor.timeoutAsync(asyncStart + 4000);
 
+        ArrayList<SocketEvent> timeoutsList = new ArrayList<>();
+        timeoutsList.add(SocketEvent.TIMEOUT);
+        timeoutsList.add(SocketEvent.TIMEOUT);
         Assert.assertEquals("The timeout should have been dispatched again",
-                List.of(SocketEvent.TIMEOUT, SocketEvent.TIMEOUT), processor.getDispatchedEvents());
+                timeoutsList, processor.getDispatchedEvents());
 
         // Processing the event removes the timeout and marks the generation as handled, so any event that is already
         // queued for it is ignored.
@@ -80,7 +85,7 @@ public class TestAbstractProcessorAsyncTimeout {
         processor.timeoutAsync(asyncStart + 6000);
 
         Assert.assertEquals("The timeout must not be dispatched once it has been processed",
-                List.of(SocketEvent.TIMEOUT, SocketEvent.TIMEOUT), processor.getDispatchedEvents());
+                timeoutsList, processor.getDispatchedEvents());
     }
 
     private static class TestProcessor extends Http11Processor {

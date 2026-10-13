@@ -19,6 +19,7 @@ package org.apache.coyote;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
