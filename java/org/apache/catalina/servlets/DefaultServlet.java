@@ -41,8 +41,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Function;
 
@@ -1489,20 +1491,36 @@ public class DefaultServlet extends HttpServlet {
         double bestResourceQuality = 0;
         int bestResourcePreference = Integer.MAX_VALUE;
 
+        Set<String> excluded = new HashSet<>();
+        for (AcceptEncoding acceptEncoding : acceptEncodings) {
+            if (acceptEncoding.getQuality() == 0) {
+                excluded.add(acceptEncoding.getEncoding().toLowerCase(Locale.ENGLISH));
+            }
+        }
         for (AcceptEncoding acceptEncoding : acceptEncodings) {
             double quality = acceptEncoding.getQuality();
-            if (quality >= bestResourceQuality) {
-                String encoding = acceptEncoding.getEncoding();
-                if ("identity".equalsIgnoreCase(encoding)) {
+            if (quality > 0 && quality >= bestResourceQuality) {
+                String encoding = acceptEncoding.getEncoding().toLowerCase(Locale.ENGLISH);
+                if (excluded.contains(encoding)) {
+                    continue;
+                }
+                if ("identity".equals(encoding)) {
                     bestResource = null;
                     bestResourceQuality = quality;
                     bestResourcePreference = Integer.MAX_VALUE;
                     continue;
                 }
                 if ("*".equals(encoding)) {
-                    bestResource = precompressedResources.getFirst();
-                    bestResourceQuality = quality;
-                    bestResourcePreference = 0;
+                    for (int i = 0; i < precompressedResources.size(); ++i) {
+                        PrecompressedResource resource = precompressedResources.get(i);
+                        if (excluded.contains(resource.format.encoding.toLowerCase(Locale.ENGLISH))) {
+                            continue;
+                        }
+                        bestResource = resource;
+                        bestResourceQuality = quality;
+                        bestResourcePreference = i;
+                        break;
+                    }
                     continue;
                 }
                 for (int i = 0; i < precompressedResources.size(); ++i) {
@@ -1518,7 +1536,6 @@ public class DefaultServlet extends HttpServlet {
                 }
             }
         }
-
         return bestResource;
     }
 

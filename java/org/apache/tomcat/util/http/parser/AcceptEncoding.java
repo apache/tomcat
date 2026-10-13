@@ -60,7 +60,8 @@ public class AcceptEncoding {
 
 
     /**
-     * Parses the Accept-Encoding header value.
+     * Parses the Accept-Encoding header value. Encodings with invalid quality values are ignored. Encodings with a
+     * quality value of zero are included since they may represent an exclusion from a {@code *} entry.
      *
      * @param input The input reader
      *
@@ -91,8 +92,8 @@ public class AcceptEncoding {
             if (lookForSemiColon == SkipResult.FOUND) {
                 quality = HttpParser.readWeight(input, ',');
             }
-
-            if (quality > 0) {
+            // -1 indicates a malformed quality value - treat encoding as invalid
+            if (quality >= 0) {
                 result.add(new AcceptEncoding(encoding, quality));
             }
         } while (true);
