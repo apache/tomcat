@@ -449,6 +449,103 @@ public class TestDefaultServlet extends TomcatBaseTest {
     }
 
     /*
+     * Verify how the Accept-Encoding header is processed when selecting a precompressed resource. The server
+     * preference is br followed by gzip.
+     */
+    @Test
+    public void testPrecompressedAcceptEncodingProcessing() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+
+        long gzSize = new File(appDir, "index.html.gz").length();
+        long brSize = new File(appDir, "index.html.br").length();
+        long indexSize = new File(appDir, "index.html").length();
+
+        // app dir is relative to server home
+        Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
+        Wrapper defaultServlet = Tomcat.addServlet(ctxt, "default", DefaultServlet.class.getName());
+        defaultServlet.addInitParameter("precompressed", "br=.br,gzip=.gz");
+        defaultServlet.addInitParameter("fileEncoding", "ISO-8859-1");
+
+        ctxt.addServletMapping("/", "default");
+        ctxt.addMimeMapping("html", "text/html");
+
+        tomcat.start();
+
+        TestCompressedClient client = new TestCompressedClient(getPort());
+
+        // Content coding names are case insensitive
+        assertPrecompressedResponse(client, "GZIP", "gzip", gzSize);
+        assertPrecompressedResponse(client, "Br", "br", brSize);
+
+        // q=0 means not acceptable
+        assertPrecompressedResponse(client, "gzip;q=0", null, indexSize);
+        assertPrecompressedResponse(client, "br;q=0,gzip", "gzip", gzSize);
+
+        // Weights that do not follow the RFC grammar are ignored
+        assertPrecompressedResponse(client, "br;q=Infinity,gzip", "gzip", gzSize);
+        assertPrecompressedResponse(client, "br;q=5,gzip;q=0.5", "gzip", gzSize);
+        assertPrecompressedResponse(client, "br;q=1e0,gzip;q=0.5", "gzip", gzSize);
+        assertPrecompressedResponse(client, "br;q=NaN,gzip;q=0.5", "gzip", gzSize);
+        assertPrecompressedResponse(client, "br;q=1d,gzip;q=0.5", "gzip", gzSize);
+        assertPrecompressedResponse(client, "br;foo=bar,gzip;q=0.5", "gzip", gzSize);
+
+        // Equal weights, so the server preference decides
+        assertPrecompressedResponse(client, "gzip, br", "br", brSize);
+        assertPrecompressedResponse(client, "gzip;q=1, br;q=1.0", "br", brSize);
+
+        // Weights take precedence over server preference
+        assertPrecompressedResponse(client, "gzip, br;q=0.5", "gzip", gzSize);
+
+        // identity is case insensitive
+        assertPrecompressedResponse(client, "gzip;q=0.9, identity", null, indexSize);
+        assertPrecompressedResponse(client, "gzip;q=0.9, Identity", null, indexSize);
+
+        // Explicitly excluded encodings are not selected by "*"
+        assertPrecompressedResponse(client, "*;q=0.5, br;q=0", "gzip", gzSize);
+
+        // An explicit weight of zero is authoritative even if the same coding is also listed with a positive weight
+        assertPrecompressedResponse(client, "gzip, gzip;q=0", null, indexSize);
+        assertPrecompressedResponse(client, "gzip;q=0, gzip", null, indexSize);
+        assertPrecompressedResponse(client, "GZIP, gzip;q=0", null, indexSize);
+        assertPrecompressedResponse(client, "br, br;q=0, gzip", "gzip", gzSize);
+        assertPrecompressedResponse(client, "br;q=0, gzip, br", "gzip", gzSize);
+        assertPrecompressedResponse(client, "br, gzip, br;q=0, gzip;q=0", null, indexSize);
+        assertPrecompressedResponse(client, "*, gzip;q=0, br;q=0", null, indexSize);
+    }
+
+
+    private void assertPrecompressedResponse(TestCompressedClient client, String acceptEncoding,
+            String expectedEncoding, long expectedLength) throws Exception {
+        client.reset();
+        // @formatter:off
+        client.setRequest(new String[] {
+                "GET /index.html HTTP/1.1" + CRLF +
+                    "Host: localhost" + CRLF +
+                    "Connection: Close" + CRLF +
+                    "Accept-Encoding: " + acceptEncoding + CRLF +
+                    CRLF
+                });
+        // @formatter:on
+        client.connect();
+        client.processRequest();
+        String message = "Accept-Encoding: " + acceptEncoding;
+        Assert.assertTrue(message, client.isResponse200());
+        List<String> responseHeaders = client.getResponseHeaders();
+        if (expectedEncoding == null) {
+            for (String responseHeader : responseHeaders) {
+                Assert.assertFalse(message, responseHeader.toLowerCase(Locale.ROOT).startsWith("content-encoding"));
+            }
+        } else {
+            Assert.assertTrue(message, responseHeaders.contains("Content-Encoding: " + expectedEncoding));
+        }
+        Assert.assertTrue(message, responseHeaders.contains("Content-Length: " + expectedLength));
+        Assert.assertTrue(message, responseHeaders.contains("vary: accept-encoding"));
+    }
+
+    /*
      * Verify preferring of brotli in default configuration for actual Firefox and Chrome requests.
      */
     @Test
