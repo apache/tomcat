@@ -493,6 +493,14 @@
         allocation remain in the back log and are considered again when the
         next window increment arrives. (remm)
       </fix>
+      <fix>
+        Permit the <code>WINDOW_UPDATE</code> and <code>RST_STREAM</code>
+        frames that may legitimately be in flight when an HTTP/2 stream is
+        closed by the receipt of an end of stream frame, rather than treating
+        them as a connection error of type <code>STREAM_CLOSED</code> that
+        closes the entire connection. These frames are already permitted when
+        the stream is closed in the other direction. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
