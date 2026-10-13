@@ -439,6 +439,15 @@
         a null pointer exception instead of the expected 501 response.
         (remm)
       </fix>
+      <fix>
+        Stop reporting available bytes once a request body that was buffered
+        to allow a TLS client authentication renegotiation has been read in
+        full. Reporting the buffered length, or data belonging to a pipelined
+        next request, as available after the end of the stream was reached
+        violated the <code>ServletInputStream</code> contract and could keep
+        an application loop that polls <code>available()</code> running.
+        (remm)
+      </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
         Keep the asynchronous timeout in place until the timeout event has
