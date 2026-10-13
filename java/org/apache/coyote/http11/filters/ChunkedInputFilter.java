@@ -231,8 +231,10 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
             available = readChunk.remaining();
         }
         if (available == 1 && parseState == ParseState.CHUNK_BODY_CRLF) {
-            skipCRLF();
-            // LF to read next, or failed
+            if (skipCRLF()) {
+                parseState = ParseState.CHUNK_HEADER;
+            }
+            // CRLF complete, CR consumed with LF to read next, or failed
             available = readChunk.remaining();
         } else if (available == 2 && !crFound && parseState == ParseState.CHUNK_BODY_CRLF) {
             // Just CRLF is left in the buffer. There is no data to read.
