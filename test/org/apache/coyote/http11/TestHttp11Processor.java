@@ -1122,6 +1122,91 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Assert.assertTrue(client.isResponse400());
     }
 
+    /*
+     * A valid method token that is not one of the methods known to Tomcat must be passed through to the application
+     * unchanged rather than being reported as null.
+     */
+    @Test
+    public void testUnknownMethodIsPassedToApplication() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = getProgrammaticRootContext();
+
+        // Add servlet
+        Tomcat.addServlet(ctx, "MethodEchoServlet", new MethodEchoServlet());
+        ctx.addServletMapping("/*", "MethodEchoServlet");
+
+        tomcat.start();
+
+        // @formatter:off
+        String request =
+                "VERSION-CONTROL / HTTP/1.1" + CRLF +
+                "Host: any" + CRLF +
+                CRLF;
+        // @formatter:on
+
+        Client client = new Client(tomcat.getConnector().getLocalPort());
+        client.setRequest(new String[] { request });
+
+        client.connect();
+        client.processRequest();
+
+        Assert.assertTrue(client.getResponseLine(), client.isResponse200());
+        Assert.assertEquals("VERSION-CONTROL", client.getResponseBody());
+    }
+
+    private static class MethodEchoServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void service(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding("UTF-8");
+            PrintWriter pw = resp.getWriter();
+            pw.print(req.getMethod());
+        }
+    }
+
+
+    /*
+     * A method that is not implemented by the servlet should produce a 501 response rather than a 500 response caused
+     * by a null method name.
+     */
+    @Test
+    public void testUnknownMethodReturns501() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = getProgrammaticRootContext();
+
+        // Add servlet
+        Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
+        ctx.addServletMapping("/*", "TesterServlet");
+
+        tomcat.start();
+
+        // @formatter:off
+        String request =
+                "BADMETHOD / HTTP/1.1" + CRLF +
+                "Host: any" + CRLF +
+                CRLF;
+        // @formatter:on
+
+        Client client = new Client(tomcat.getConnector().getLocalPort());
+        client.setRequest(new String[] { request });
+
+        client.connect();
+        client.processRequest();
+
+        // Expected response is a 501 response that mentions the method.
+        Assert.assertTrue(client.getResponseLine(), client.isResponse501());
+        Assert.assertTrue(client.getResponseBody(),
+                client.getResponseBody().contains("Method [BADMETHOD]"));
+    }
+
     @Test
     public void testInconsistentHostHeader01() throws Exception {
         Tomcat tomcat = getTomcatInstance();

@@ -18,6 +18,7 @@ package org.apache.coyote;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
@@ -382,14 +383,23 @@ public final class Request {
     }
 
     /**
-     * Set the HTTP method from a byte buffer.
+     * Set the HTTP method from a byte buffer. The bytes are assumed to be an
+     * ISO-8859-1 encoded representation of an HTTP method token. If the
+     * method is not one of the methods known to Tomcat, the raw token is
+     * stored as-is.
      *
      * @param buf the byte buffer
      * @param start the start offset
      * @param len the length
      */
     public void setMethod(byte[] buf, int start, int len) {
-        this.method = Method.bytesToString(buf, start, len);
+        String method = Method.bytesToString(buf, start, len);
+        if (method == null) {
+            // Unknown method. Fall back to converting the raw method token,
+            // assumed to be ISO-8859-1 encoded, to a String.
+            method = new String(buf, start, len, StandardCharsets.ISO_8859_1);
+        }
+        this.method = method;
     }
 
     /**
