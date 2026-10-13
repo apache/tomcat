@@ -67,7 +67,10 @@ import org.apache.tomcat.util.digester.Digester;
  * <code>Realm</code> directly, so that user lookup and credential validation are performed against the XML file
  * configured for the memory realm.
  * </p>
+ *
+ * @deprecated This class will be removed in Tomcat 12.
  */
+@Deprecated
 public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
     // We need to extend MemoryRealm to avoid class cast
 
