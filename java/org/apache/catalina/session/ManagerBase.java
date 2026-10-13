@@ -822,12 +822,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
         }
 
         if (session.getIdInternal() != null) {
-            // Only remove the entry if the map still holds this exact session
-            // instance. This prevents a stale copy of a session (for example,
-            // an expired copy loaded from a store) from removing a live
-            // session with the same ID that was loaded into the map in the
-            // meantime.
-            sessions.remove(session.getIdInternal(), session);
+            sessions.remove(session.getIdInternal());
         }
     }
 
