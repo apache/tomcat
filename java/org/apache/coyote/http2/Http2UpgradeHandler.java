@@ -1300,6 +1300,11 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 // Iteration 2. Allocate.
                 // Reset for second iteration
                 remaining = increment;
+                // Tracks the allocation available for the proportional
+                // distribution used for the incremental streams at the urgency
+                // level where the allocation was exhausted. The value is
+                // initialised when the first such stream is processed.
+                int allocationBase = 0;
                 orderedStreamsIterator = orderedStreams.iterator();
                 while (orderedStreamsIterator.hasNext()) {
                     Stream s = orderedStreamsIterator.next();
@@ -1330,19 +1335,57 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                             break;
                         }
 
-                        // Cast to long during the intermediate calculation to avoid integer overflow in multiplication
-                        int share = (int) ((long) s.getConnectionAllocationRequested() * remaining /
-                                requestedAllocationForIncrementalStreams);
-                        if (share == 0) {
-                            share = 1;
+                        int grant;
+                        if (s.getIncremental()) {
+                            if (allocationBase == 0) {
+                                // First incremental stream at this level. The
+                                // proportional distribution below always
+                                // distributes the same base value, regardless of
+                                // how much of that base has already been granted
+                                // to the streams at this level.
+                                allocationBase = remaining;
+                            }
+                            // Cast to long during the intermediate calculation to avoid integer overflow in multiplication
+                            grant = (int) ((long) s.getConnectionAllocationRequested() * allocationBase /
+                                    requestedAllocationForIncrementalStreams);
+                            if (grant == 0) {
+                                grant = 1;
+                            }
+                        } else {
+                            // The proportional distribution above is only
+                            // defined for the incremental streams at this level.
+                            // The non-incremental streams at this level were
+                            // allocated in full during the first iteration (that
+                            // is how the allocation reached the incremental
+                            // streams) so allocate them in full here too.
+                            grant = s.getConnectionAllocationRequested();
                         }
-                        allocate(s, share);
+                        if (grant > remaining) {
+                            // Never allocate more than the window available. The
+                            // allocations on this path are the only record of the
+                            // use of the window the client made available.
+                            // Allocating more than that would have the connection
+                            // send more data than the client's flow control window
+                            // permits, which a compliant client must treat as a
+                            // connection error of type FLOW_CONTROL_ERROR.
+                            grant = remaining;
+                        }
+                        // Note: the rounding up above combined with the cap
+                        // here may exhaust the remaining allocation early.
+                        // Streams left without an allocation remain in the back
+                        // log and are considered again when the next window
+                        // increment arrives.
+                        int left = allocate(s, grant);
+                        remaining -= (grant - left);
                         result.add(s);
                         if (s.getConnectionAllocationRequested() == 0) {
                             // Fully allocated (unlikely but possible due to
                             // rounding if only a few bytes required).
                             orderedStreamsIterator.remove();
                             backLogStreams.remove(s);
+                        }
+                        if (remaining < 1) {
+                            break;
                         }
                     }
                 }
