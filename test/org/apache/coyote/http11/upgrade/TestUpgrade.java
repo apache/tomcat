@@ -169,6 +169,15 @@ public class TestUpgrade extends TomcatBaseTest {
             public void unbind(ClassLoader originalClassLoader) {
                 // NO-OP
             }
+
+            @Override
+            public ClassLoader bind(boolean usePrivilegedAction, ClassLoader originalClassLoader) {
+                return null;
+            }
+
+            @Override
+            public void unbind(boolean usePrivilegedAction, ClassLoader originalClassLoader) {
+            }
         };
         UpgradeProcessorBase processor =
                 new TesterUpgradeProcessor(new UpgradeToken(null, contextBind, null, "test"));
@@ -209,6 +218,15 @@ public class TestUpgrade extends TomcatBaseTest {
             @Override
             public void unbind(ClassLoader originalClassLoader) {
                 // NO-OP
+            }
+
+            @Override
+            public ClassLoader bind(boolean usePrivilegedAction, ClassLoader originalClassLoader) {
+                return null;
+            }
+
+            @Override
+            public void unbind(boolean usePrivilegedAction, ClassLoader originalClassLoader) {
             }
         };
         UpgradeProcessorBase processor =
@@ -253,6 +271,15 @@ public class TestUpgrade extends TomcatBaseTest {
             @Override
             public void unbind(ClassLoader originalClassLoader) {
                 // NO-OP
+            }
+
+            @Override
+            public ClassLoader bind(boolean usePrivilegedAction, ClassLoader originalClassLoader) {
+                return null;
+            }
+
+            @Override
+            public void unbind(boolean usePrivilegedAction, ClassLoader originalClassLoader) {
             }
         };
         UpgradeProcessorBase processor =
