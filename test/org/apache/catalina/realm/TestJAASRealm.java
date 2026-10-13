@@ -31,6 +31,10 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.HexUtils;
 
+/**
+ * @deprecated This class will be removed in Tomcat 12.
+ */
+@Deprecated
 public class TestJAASRealm extends TomcatBaseTest {
 
     private static final String ALGORITHM = "MD5";

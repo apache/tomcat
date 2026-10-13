@@ -115,7 +115,10 @@ import org.apache.tomcat.util.file.ConfigurationSource;
  * comparison is expected to be performed by the <code>LoginModule</code> when it calls back into the
  * <code>Realm</code></li>
  * </ul>
+ *
+ * @deprecated This class will be removed in Tomcat 12.
  */
+@Deprecated
 public class JAASRealm extends RealmBase {
 
     private static final Log log = LogFactory.getLog(JAASRealm.class);
