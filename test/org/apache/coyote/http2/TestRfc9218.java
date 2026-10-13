@@ -126,34 +126,24 @@ public class TestRfc9218 extends Http2TestBase {
         Assert.assertEquals(0, trace.length());
         output.clearTrace();
 
-        // 1 byte unallocated in connection window
         // 17 - 5267 body left
         // 19 - 7022 body left
         // 21 - 6144 body left
 
-        // Add 1 byte to the connection window. Due to rounding up, each stream should get 1 byte.
+        // Add 1 byte to the connection window. Rounding up means stream 17 takes the whole allocation. The other
+        // streams remain in the back log since allocating to them as well would exceed the window the client made
+        // available.
         sendWindowUpdate(0, 1);
-        parser.readFrame();
-        System.out.println(output.getTrace());
-        parser.readFrame();
-        System.out.println(output.getTrace());
         parser.readFrame();
 
         trace = output.getTrace();
         System.out.println(trace);
-        Assert.assertTrue(trace.contains("17-Body-1\n"));
-        trace = trace.replace("17-Body-1\n", "");
-        Assert.assertTrue(trace.contains("19-Body-1\n"));
-        trace = trace.replace("19-Body-1\n", "");
-        Assert.assertTrue(trace.contains("21-Body-1\n"));
-        trace = trace.replace("21-Body-1\n", "");
-        Assert.assertEquals(0, trace.length());
+        Assert.assertEquals("17-Body-1\n", trace);
         output.clearTrace();
 
-        // 1 byte over allocated in connection window
         // 17 - 5266 body left
-        // 19 - 7021 body left
-        // 21 - 6143 body left
+        // 19 - 7022 body left
+        // 21 - 6144 body left
 
         // BZ 69614 - invalid priority update frames should be ignored
         sendInvalidPriorityUpdate(17);
@@ -162,8 +152,8 @@ public class TestRfc9218 extends Http2TestBase {
         sendPriorityUpdate(17, 2, true);
 
         /*
-         * Add 8k to the connection window. Should clear the connection window over allocation and fully allocate 17
-         * with the remainder split proportionally between 19 and 21.
+         * Add 8k to the connection window. Should fully allocate 17 with the remainder split proportionally between 19
+         * and 21.
          */
         sendWindowUpdate(0, 1024 * 8);
         // Use try/catch as third read has been failing on some tests runs
@@ -189,8 +179,8 @@ public class TestRfc9218 extends Http2TestBase {
         trace = trace.replace("21-Body-1365\n", "");
         Assert.assertEquals(0, trace.length());
 
-        // 19 - 5641 body left
-        // 21 - 4778 body left
+        // 19 - 5462 body left
+        // 21 - 4779 body left
 
         // Add 16k to the connection window. Should fully allocate 19 and 21.
         sendWindowUpdate(0, 1024 * 16);
