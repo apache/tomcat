@@ -265,6 +265,15 @@
         previously left the asynchronous request running without any timeout.
         (remm)
       </fix>
+      <fix>
+        Stop reporting available bytes once a request body that was buffered
+        to allow a TLS client authentication renegotiation has been read in
+        full. Reporting the buffered length, or data belonging to a pipelined
+        next request, as available after the end of the stream was reached
+        violated the <code>ServletInputStream</code> contract and could keep
+        an application loop that polls <code>available()</code> running.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
