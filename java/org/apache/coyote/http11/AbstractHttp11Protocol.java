@@ -107,16 +107,24 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     @Override
     public void destroy() throws Exception {
-        // There may be upgrade protocols with their own MBeans. These need to
-        // be de-registered.
-        ObjectName rgOname = getGlobalRequestProcessorMBeanName();
-        if (rgOname != null) {
-            Registry registry = Registry.getRegistry(null);
-            ObjectName query = new ObjectName(rgOname.getCanonicalName() + ",Upgrade=*");
-            Set<ObjectInstance> upgrades = registry.getMBeanServer().queryMBeans(query, null);
-            for (ObjectInstance upgrade : upgrades) {
-                registry.unregisterComponent(upgrade.getObjectName());
+        // Synchronise on the group info map to prevent an upgrade that is
+        // being created and registered from racing with the de-registration
+        // below and the clearing of the map.
+        synchronized (upgradeProtocolGroupInfos) {
+            // There may be upgrade protocols with their own MBeans. These need
+            // to be de-registered.
+            ObjectName rgOname = getGlobalRequestProcessorMBeanName();
+            if (rgOname != null) {
+                Registry registry = Registry.getRegistry(null);
+                ObjectName query = new ObjectName(rgOname.getCanonicalName() + ",Upgrade=*");
+                Set<ObjectInstance> upgrades = registry.getMBeanServer().queryMBeans(query, null);
+                for (ObjectInstance upgrade : upgrades) {
+                    registry.unregisterComponent(upgrade.getObjectName());
+                }
             }
+            // Release the cached group infos so they are freed and, if the
+            // handler is re-initialised, re-created and registered with JMX.
+            upgradeProtocolGroupInfos.clear();
         }
 
         super.destroy();
@@ -909,7 +917,9 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      * Get the upgrade group info for the specified upgrade protocol.
      *
      * @param upgradeProtocol The upgrade protocol name
-     * @return The upgrade group info for the specified protocol
+     * @return The upgrade group info for the specified protocol, or
+     *             {@code null} if the protocol name is null or the statistics
+     *             MBean for the protocol could not be registered
      */
     public UpgradeGroupInfo getUpgradeGroupInfo(String upgradeProtocol) {
         if (upgradeProtocol == null) {
@@ -923,15 +933,19 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
                 result = upgradeProtocolGroupInfos.get(upgradeProtocol);
                 if (result == null) {
                     result = new UpgradeGroupInfo();
-                    upgradeProtocolGroupInfos.put(upgradeProtocol, result);
                     ObjectName oname = getONameForUpgrade(upgradeProtocol);
                     if (oname != null) {
                         try {
                             Registry.getRegistry(null).registerComponent(result, oname, null);
                         } catch (Exception e) {
                             getLog().warn(sm.getString("abstractHttp11Protocol.upgradeJmxRegistrationFail"), e);
+                            // Do not cache the result so that a later call can
+                            // retry the registration.
                             result = null;
                         }
+                    }
+                    if (result != null) {
+                        upgradeProtocolGroupInfos.put(upgradeProtocol, result);
                     }
                 }
             }
