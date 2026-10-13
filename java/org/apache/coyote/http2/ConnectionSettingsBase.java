@@ -210,6 +210,11 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
 
 
     private void validateInitialWindowSize(long initialWindowSize) throws T {
+        if (initialWindowSize < 0) {
+            String msg = sm.getString("connectionSettings.windowSizeTooSmall", connectionId,
+                    Long.toString(initialWindowSize));
+            throwException(msg, Http2Error.FLOW_CONTROL_ERROR);
+        }
         if (initialWindowSize > MAX_WINDOW_SIZE) {
             String msg = sm.getString("connectionSettings.windowSizeTooBig", connectionId,
                     Long.toString(initialWindowSize), Long.toString(MAX_WINDOW_SIZE));
