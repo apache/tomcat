@@ -84,6 +84,17 @@ public class UpgradeProcessorExternal extends UpgradeProcessorBase {
     }
 
 
+    @Override
+    public void recycle() {
+        // Ensure the connection statistics are always de-registered when the
+        // processor is released by the container. The close() method below
+        // de-registers the statistics as well but it is only triggered if the
+        // application closes the WebConnection, which an upgrade handler is
+        // not required to do.
+        upgradeInfo.setGroupInfo(null);
+    }
+
+
     // --------------------------------------------------- AutoCloseable methods
 
     @Override

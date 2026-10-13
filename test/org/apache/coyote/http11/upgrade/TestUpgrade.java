@@ -25,9 +25,12 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.lang.reflect.Field;
 import java.net.Socket;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
+import java.util.Set;
+import java.util.function.BooleanSupplier;
 
 import javax.net.SocketFactory;
 import javax.servlet.ReadListener;
@@ -49,6 +52,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.coyote.UpgradeToken;
+import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.ContextBind;
@@ -278,6 +282,50 @@ public class TestUpgrade extends TomcatBaseTest {
         Assert.assertNull(listener.error);
     }
 
+    @Test
+    public void testUpgradeInfoUnregisteredWhenConnectionClosed() throws Exception {
+        // The upgrade handler never closes the WebConnection so all clean-up
+        // has to be performed by the container when the connection is closed.
+        UpgradeConnection uc = doUpgrade(NoClose.class);
+
+        AbstractHttp11Protocol<?> protocol =
+                (AbstractHttp11Protocol<?>) getTomcatInstance().getConnector().getProtocolHandler();
+        UpgradeGroupInfo groupInfo = protocol.getUpgradeGroupInfo("test");
+
+        Set<UpgradeInfo> upgradeInfos = getUpgradeInfos(groupInfo);
+        waitForCondition(() -> upgradeInfos.size() == 1, 5000);
+        Assert.assertEquals(1, upgradeInfos.size());
+
+        // Closing the connector closes the connection. This is the only event
+        // that can trigger the clean-up of the upgrade registration.
+        getTomcatInstance().stop();
+
+        waitForCondition(upgradeInfos::isEmpty, 10000);
+
+        // The registration must not outlive the connection.
+        Assert.assertEquals("The UpgradeInfo remained registered after the connection was closed.", 0,
+                upgradeInfos.size());
+
+        uc.shutdownInput();
+        uc.shutdownOutput();
+    }
+
+
+    @SuppressWarnings("unchecked")
+    private static Set<UpgradeInfo> getUpgradeInfos(UpgradeGroupInfo groupInfo) throws Exception {
+        Field upgradeInfosField = UpgradeGroupInfo.class.getDeclaredField("upgradeInfos");
+        upgradeInfosField.setAccessible(true);
+        return (Set<UpgradeInfo>) upgradeInfosField.get(groupInfo);
+    }
+
+
+    private static void waitForCondition(BooleanSupplier condition, long timeoutMs) throws InterruptedException {
+        long deadline = System.currentTimeMillis() + timeoutMs;
+        while (!condition.getAsBoolean() && System.currentTimeMillis() < deadline) {
+            Thread.sleep(50);
+        }
+    }
+
     private void doTestCheckClosed(
             Class<? extends HttpUpgradeHandler> upgradeHandlerClass)
                     throws Exception {
@@ -455,6 +503,26 @@ public class TestUpgrade extends TomcatBaseTest {
                     sos.write(buffer, 0, read);
                     sos.flush();
                 }
+            } catch (IOException ioe) {
+                throw new IllegalStateException(ioe);
+            }
+        }
+
+        @Override
+        public void destroy() {
+            // NO-OP
+        }
+    }
+
+
+    public static class NoClose implements HttpUpgradeHandler {
+        @Override
+        public void init(WebConnection connection) {
+            // Open the streams to make the upgraded connection fully active but
+            // never close the WebConnection.
+            try {
+                connection.getInputStream();
+                connection.getOutputStream();
             } catch (IOException ioe) {
                 throw new IllegalStateException(ioe);
             }
