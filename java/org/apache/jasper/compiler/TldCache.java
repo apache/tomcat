@@ -35,8 +35,9 @@ import org.xml.sax.SAXException;
 
 /**
  * This class caches parsed instances of TLD files to remove the need for the same TLD to be parsed for each JSP that
- * references it. It does not protect against multiple threads processing the same new TLD, but it does ensure that
- * all threads will use the same TLD object after parsing.
+ * references it. All parsing is performed by a single, shared, non-thread-safe parser that is serialized on that
+ * parser's monitor. Re-parsing of a specific TLD is additionally protected by a per-entry lock so that all threads
+ * will use the same TLD object after parsing.
  */
 public class TldCache {
 
@@ -144,7 +145,13 @@ public class TldCache {
                     // Re-parse TLD
                     TaglibXml updatedTaglibXml;
                     try {
-                        updatedTaglibXml = tldParser.parse(tldResourcePath);
+                        // The parser is shared for all TLDs of this cache and
+                        // is not thread-safe. Re-parses of different TLDs run
+                        // under the per-entry locks may occur concurrently, so
+                        // the parser itself must be locked as well.
+                        synchronized (tldParser) {
+                            updatedTaglibXml = tldParser.parse(tldResourcePath);
+                        }
                     } catch (IOException | SAXException e) {
                         throw new JasperException(e);
                     }
