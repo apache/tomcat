@@ -30,6 +30,7 @@ import org.apache.tomcat.util.descriptor.DigesterFactory;
 import org.apache.tomcat.util.descriptor.XmlErrorHandler;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.RuleSet;
+import org.apache.tomcat.util.res.StringManager;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -38,6 +39,7 @@ import org.xml.sax.SAXException;
  */
 public class TagPluginParser {
     private final Log log = LogFactory.getLog(TagPluginParser.class); // must not be static
+    private static final StringManager sm = StringManager.getManager(TagPluginParser.class);
     private static final String PREFIX = "tag-plugins/tag-plugin";
     private final Digester digester;
     private final Map<String,String> plugins = new HashMap<>();
@@ -83,12 +85,20 @@ public class TagPluginParser {
     }
 
     /**
-     * Registers a plugin class for the given tag class.
+     * Registers a plugin class for the given tag class. Both parameters must
+     * be provided. Note that the parser may pass a {@code null} value for a
+     * parameter that is missing from a <code>&lt;tag-plugin&gt;</code>
+     * element. Such incomplete entries are ignored, with a warning logged.
      *
      * @param tagClass    the tag handler class name. Must not be {@code null}.
      * @param pluginClass the plugin class name. Must not be {@code null}.
      */
     public void addPlugin(String tagClass, String pluginClass) {
+        if (tagClass == null || tagClass.isEmpty() ||
+                pluginClass == null || pluginClass.isEmpty()) {
+            log.warn(sm.getString("tagPluginParser.invalidPlugin", tagClass, pluginClass));
+            return;
+        }
         plugins.put(tagClass, pluginClass);
     }
 
