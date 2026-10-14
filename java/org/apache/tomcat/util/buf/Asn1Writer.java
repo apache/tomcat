@@ -66,18 +66,22 @@ public class Asn1Writer {
         }
 
         // How many bytes required to write the value? No more than 4 for int.
+        // Note the limit is required to terminate the loop since the shift
+        // distance is evaluated modulo 32.
         int valueSize = 1;
-        while ((value >> (valueSize * 8)) > 0) {
+        while (valueSize < 4 && (value >>> (valueSize * 8)) != 0) {
             valueSize++;
         }
 
-        byte[] valueBytes = new byte[valueSize];
-        int i = 0;
-        while (valueSize > 0) {
-            valueBytes[i] = (byte) (value >> (8 * (valueSize - 1)));
-            value = value >> 8;
-            valueSize--;
-            i++;
+        /*
+         * DER INTEGER content octets are a two's complement value. A positive value whose most significant bit is set
+         * requires a leading zero byte so that it is not decoded as a negative number.
+         */
+        boolean pad = ((value >>> ((valueSize - 1) * 8)) & 0x80) != 0;
+        byte[] valueBytes = new byte[pad ? valueSize + 1 : valueSize];
+        int offset = pad ? 1 : 0;
+        for (int i = 0; i < valueSize; i++) {
+            valueBytes[offset + i] = (byte) (value >> (8 * (valueSize - 1 - i)));
         }
 
         return writeTag((byte) 0x02, valueBytes);
@@ -108,9 +112,11 @@ public class Asn1Writer {
             // 1 byte we have is now used to record how many bytes we need to
             // record a length > 127
             // Result is lengthSize = 1 + number of bytes to record length
+            // Note the limit is required to terminate the loop since the shift
+            // distance is evaluated modulo 32.
             do {
                 lengthSize++;
-            } while ((dataSize >> (lengthSize * 8)) > 0);
+            } while (lengthSize < 4 && (dataSize >>> (lengthSize * 8)) > 0);
         }
 
         byte[] result;
