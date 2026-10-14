@@ -185,4 +185,20 @@ public class TestDigester {
         Assert.assertNotNull(digester.createSAXException("message", new RuntimeException("cause")));
     }
 
+
+    /*
+     * peek(int) is documented to return null for any out of range index,
+     * including negative ones such as the values a negative CallMethodRule
+     * target offset can produce.
+     */
+    @Test
+    public void testPeekOutOfRangeIndexReturnsNull() {
+        Digester digester = new Digester();
+        digester.push(new Object());
+
+        Assert.assertNotNull(digester.peek(0));
+        Assert.assertNull(digester.peek(1));
+        Assert.assertNull(digester.peek(-1));
+    }
+
 }
