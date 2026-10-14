@@ -18,6 +18,7 @@ package org.apache.tomcat.util.digester;
 
 import java.io.FilePermission;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -65,6 +66,10 @@ import org.apache.tomcat.util.security.PermissionCheck;
  * convenience for hand-edited files/values where removing a trailing newline is difficult, and trailing whitespace
  * changes the meaning of the value.
  * </p>
+ * <p>
+ * Binding entry files are decoded as UTF-8. Bytes that are not valid UTF-8 are replaced with the Unicode replacement
+ * character (U+FFFD).
+ * </p>
  * How to configure:
  *
  * <pre>
@@ -88,10 +93,22 @@ import org.apache.tomcat.util.security.PermissionCheck;
 public class ServiceBindingPropertySource implements IntrospectionUtils.SecurePropertySource {
 
     /**
-     * Default constructor.
+     * Default constructor. The binding root is taken from the {@code SERVICE_BINDING_ROOT} environment variable when
+     * an expression is resolved.
      */
     public ServiceBindingPropertySource() {
+        this(null);
     }
+
+    /*
+     * Test seam: pins the binding root so the tests do not need to set the environment variable. A null value selects
+     * the environment variable at resolution time.
+     */
+    ServiceBindingPropertySource(String serviceBindingRoot) {
+        this.serviceBindingRoot = serviceBindingRoot;
+    }
+
+    private final String serviceBindingRoot;
 
     private static final String SERVICE_BINDING_ROOT_ENV_VAR = "SERVICE_BINDING_ROOT";
 
@@ -122,8 +139,8 @@ public class ServiceBindingPropertySource implements IntrospectionUtils.SecurePr
         }
 
         // get the root to search from
-        String serviceBindingRoot = System.getenv(SERVICE_BINDING_ROOT_ENV_VAR);
-        if (serviceBindingRoot == null) {
+        String root = serviceBindingRoot != null ? serviceBindingRoot : System.getenv(SERVICE_BINDING_ROOT_ENV_VAR);
+        if (root == null) {
             return null;
         }
 
@@ -139,7 +156,7 @@ public class ServiceBindingPropertySource implements IntrospectionUtils.SecurePr
             return null;
         }
 
-        Path path = Paths.get(serviceBindingRoot, parts[0], parts[1]);
+        Path path = Paths.get(root, parts[0], parts[1]);
 
         if (!path.toFile().exists()) {
             return null;
@@ -168,7 +185,7 @@ public class ServiceBindingPropertySource implements IntrospectionUtils.SecurePr
                 }
             }
 
-            return new String(bytes, 0, length);
+            return new String(bytes, 0, length, StandardCharsets.UTF_8);
         } catch (IOException ioe) {
             // Treat as not found
             return null;
