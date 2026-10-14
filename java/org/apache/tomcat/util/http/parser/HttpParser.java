@@ -1107,6 +1107,10 @@ public class HttpParser {
 
     static int validatePort(Reader reader, int colonPosition) throws IOException {
         // Remaining characters should be numeric ...
+        // An empty port (a ':' not followed by any digits) is permitted by the
+        // grammar (RFC 3986, section 3.2.3). It is treated as equivalent to no
+        // port being present: the colon position is returned and the caller
+        // must not overwrite the port already associated with the request.
         readInteger(reader);
         // ... followed by EOS
         if (reader.read() == -1) {
