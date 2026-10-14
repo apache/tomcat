@@ -17,9 +17,9 @@
 package org.apache.jasper.compiler;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -63,7 +63,9 @@ public class TestTldCache {
                 + "<short-name>tester</short-name>"
                 + "<uri>" + uri + "</uri>"
                 + "</taglib>";
-        Files.writeString(file.toPath(), content);
+        try (FileWriter writer = new FileWriter(file)) {
+            writer.write(content);
+        }
         file.deleteOnExit();
         return file;
     }

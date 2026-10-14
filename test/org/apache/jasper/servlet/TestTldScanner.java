@@ -17,10 +17,10 @@
 package org.apache.jasper.servlet;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
-import jakarta.servlet.ServletContext;
+import javax.servlet.ServletContext;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -153,7 +153,9 @@ public class TestTldScanner extends TomcatBaseTest {
             content.append("  ").append(extraElements).append('\n');
         }
         content.append("</taglib>\n");
-        Files.writeString(implicitTld.toPath(), content, StandardCharsets.UTF_8);
+        try (FileWriter writer = new FileWriter(implicitTld)) {
+            writer.write(content.toString());
+        }
     }
 
 
