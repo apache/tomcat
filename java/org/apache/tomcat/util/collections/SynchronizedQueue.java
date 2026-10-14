@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.util.collections;
 
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * This is intended as a (mostly) GC-free alternative to {@link java.util.concurrent.ConcurrentLinkedQueue} when the
  * requirement is to create an unbounded queue with no requirement to shrink the queue. The aim is to provide the bare
@@ -24,6 +26,8 @@ package org.apache.tomcat.util.collections;
  * @param <T> The type of object managed by this queue
  */
 public class SynchronizedQueue<T> {
+
+    private static final StringManager sm = StringManager.getManager(SynchronizedQueue.class);
 
     /**
      * The default initial capacity for a new queue.
@@ -60,9 +64,17 @@ public class SynchronizedQueue<T> {
     /**
      * Constructs a new SynchronizedQueue with the specified initial capacity.
      *
-     * @param initialSize the initial capacity
+     * @param initialSize the initial capacity, which must be positive
+     *
+     * @throws IllegalArgumentException if the specified initial capacity is
+     *         not positive
      */
     public SynchronizedQueue(int initialSize) {
+        if (initialSize <= 0) {
+            throw new IllegalArgumentException(
+                    sm.getString("synchronizedQueue.invalidInitialSize",
+                            initialSize));
+        }
         queue = new Object[initialSize];
         size = initialSize;
     }
