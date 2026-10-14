@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.util.digester;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.StringReader;
 
 import org.junit.Assert;
@@ -139,6 +141,48 @@ public class TestDigester {
         digester.parse(new InputSource(new StringReader("<root><child/></root>")));
 
         Assert.assertEquals(1, rule.getBegins());
+    }
+
+
+    /*
+     * clear() runs at the end of every successful parse. The methods that are
+     * documented to return null on an empty stack must keep working after the
+     * digester has been cleared.
+     */
+    @Test
+    public void testStackMethodsAfterSuccessfulParse() throws Exception {
+        Digester digester = new Digester();
+        digester.addObjectCreate("root", "java.lang.Object");
+
+        digester.parse(new InputSource(new StringReader("<root/>")));
+
+        Assert.assertNull(digester.peek());
+        Assert.assertNull(digester.peek(0));
+        Assert.assertNull(digester.pop());
+        Assert.assertNull(digester.peekParams());
+        Assert.assertNull(digester.popParams());
+        digester.pushParams(new Object());
+        digester.register("public-id", "system-id");
+    }
+
+
+    /*
+     * A parse failure before setDocumentLocator() leaves the locator null, so
+     * createSAXException() takes the log.error path. That path must work even
+     * though the failed parse has run clear() via the parse() failure handling.
+     */
+    @Test
+    public void testCreateSaxExceptionAfterFailedParseWithoutLocator() throws Exception {
+        Digester digester = new Digester();
+
+        try {
+            digester.parse(new File("does-not-exist.xml"));
+            Assert.fail("Expected an IOException for the missing file");
+        } catch (IOException e) {
+            // Expected
+        }
+
+        Assert.assertNotNull(digester.createSAXException("message", new RuntimeException("cause")));
     }
 
 }
