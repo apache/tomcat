@@ -334,7 +334,23 @@ public class TestMediaType {
         StringReader sr = new StringReader("type/sub-type;;a=1;;b=2;;");
         MediaType m = MediaType.parseMediaType(sr);
 
+        Assert.assertEquals(2, m.getParameterCount());
         Assert.assertEquals("1", m.getParameterValue("a"));
         Assert.assertEquals("2", m.getParameterValue("b"));
+    }
+
+    @Test
+    public void testTrailingSemicolon() throws Exception {
+        // A dangling ';' is invalid but tolerated. It must not result in a
+        // phantom parameter with an empty name.
+        StringReader sr = new StringReader("type/sub-type;charset=UTF-8;");
+        MediaType m = MediaType.parseMediaType(sr);
+
+        Assert.assertNotNull(m);
+        Assert.assertEquals(1, m.getParameterCount());
+        Assert.assertNull(m.getParameterValue(""));
+        Assert.assertEquals("UTF-8", m.getParameterValue("charset"));
+        Assert.assertEquals("type/sub-type;charset=UTF-8", m.toString());
+        Assert.assertEquals("type/sub-type", m.toStringNoCharset());
     }
 }
