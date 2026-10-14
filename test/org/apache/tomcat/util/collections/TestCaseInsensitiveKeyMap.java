@@ -198,6 +198,66 @@ public class TestCaseInsensitiveKeyMap {
 
 
     @Test
+    public void testKeySetRemoveObjectCaseInsensitive() {
+        Object o1 = new Object();
+
+        CaseInsensitiveKeyMap<Object> map = new CaseInsensitiveKeyMap<>();
+        map.put("a", o1);
+
+        // contains() is case-insensitive, so remove() must be too, even for
+        // a stored value of null
+        Set<String> keys = map.keySet();
+        Assert.assertTrue(keys.contains("A"));
+        map.put("b", null);
+        Assert.assertTrue(keys.remove("B"));
+        Assert.assertFalse(map.containsKey("b"));
+
+        Assert.assertTrue(keys.remove("A"));
+        Assert.assertFalse(map.containsKey("a"));
+        Assert.assertTrue(map.isEmpty());
+
+        // Removing an absent key must not report success
+        Assert.assertFalse(keys.remove("A"));
+    }
+
+
+    @Test
+    public void testKeySetContainsAndRemoveInvalidKeys() {
+        CaseInsensitiveKeyMap<Object> map = new CaseInsensitiveKeyMap<>();
+        map.put("a", new Object());
+
+        Set<String> keys = map.keySet();
+        Assert.assertFalse(keys.contains(null));
+        Assert.assertFalse(keys.remove(null));
+        Assert.assertFalse(keys.contains(new StringBuilder("a")));
+        Assert.assertFalse(keys.remove(new StringBuilder("a")));
+        Assert.assertEquals(1, map.size());
+    }
+
+
+    @Test
+    public void testKeySetIteratorCase() {
+        CaseInsensitiveKeyMap<Object> map = new CaseInsensitiveKeyMap<>();
+        map.put("Content-Type", new Object());
+
+        // The keys are reported with their original case
+        Assert.assertTrue(map.keySet().contains("Content-Type"));
+        Assert.assertEquals("Content-Type", map.keySet().iterator().next());
+    }
+
+
+    @Test
+    public void testKeySetClear() {
+        CaseInsensitiveKeyMap<Object> map = new CaseInsensitiveKeyMap<>();
+        map.put("a", new Object());
+        map.put("b", new Object());
+
+        map.keySet().clear();
+        Assert.assertTrue(map.isEmpty());
+    }
+
+
+    @Test
     public void testEntrySetRemove() {
         Object o1 = new Object();
 
