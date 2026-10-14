@@ -441,6 +441,17 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        <bug>68436</bug>: Reduce the log level from warning to debug for the
+        message logged when <code>driverClassName</code> is not set, as relying
+        on <code>DriverManager</code> to locate the driver is a valid
+        configuration. Pull request <pr>1084</pr> provided by Raphael Vullriede.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
