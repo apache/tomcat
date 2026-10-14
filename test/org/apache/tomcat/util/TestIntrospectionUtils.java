@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util;
 
+import java.util.Map;
 import java.util.Properties;
 
 import org.junit.Assert;
@@ -155,5 +156,49 @@ public class TestIntrospectionUtils {
         Properties properties = new Properties();
         properties.setProperty("replaceMe", "something ${replaceMe}");
         IntrospectionUtils.replaceProperties("${replaceMe}", properties, null, null);
+    }
+
+
+    // A setter with an unsupported parameter type must not be silently
+    // invoked with a null value.
+
+    @Test
+    public void testSetPropertyUnsupportedTypeNoFallback() {
+        TesterBean bean = new TesterBean();
+        Assert.assertFalse(IntrospectionUtils.setProperty(bean, "unsupported", "value", false));
+        Assert.assertNull(bean.getUnsupported());
+        Assert.assertFalse(bean.isGenericCalled());
+    }
+
+
+    @Test
+    public void testSetPropertyUnsupportedTypeWithFallback() {
+        TesterBean bean = new TesterBean();
+        Assert.assertTrue(IntrospectionUtils.setProperty(bean, "unsupported", "value", true));
+        Assert.assertNull(bean.getUnsupported());
+        Assert.assertTrue(bean.isGenericCalled());
+    }
+
+
+    public static class TesterBean {
+
+        private Map<Object, Object> unsupported;
+        private boolean genericCalled;
+
+        public void setUnsupported(Map<Object, Object> unsupported) {
+            this.unsupported = unsupported;
+        }
+
+        public Map<Object, Object> getUnsupported() {
+            return unsupported;
+        }
+
+        public void setProperty(String name, String value) {
+            genericCalled = true;
+        }
+
+        public boolean isGenericCalled() {
+            return genericCalled;
+        }
     }
 }
