@@ -16,11 +16,14 @@
  */
 package org.apache.tomcat.util.descriptor.web;
 
+import java.io.StringReader;
 import java.net.URL;
 import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import org.xml.sax.InputSource;
 
 public class TestWebXmlParser {
 
@@ -53,5 +56,46 @@ public class TestWebXmlParser {
         SecurityConstraint securityConstraint = webXml.getSecurityConstraints().iterator().next();
         SecurityCollection securityCollection = securityConstraint.findCollection("resource");
         Assert.assertArrayEquals(new String[] { "/secure%25" }, securityCollection.findPatterns());
+    }
+
+    @Test
+    public void testCookieMaxAgeInvalidFailsParse() {
+        // An invalid max-age value must fail the parse so the deployment fails,
+        // rather than breaking session cookie creation at run time
+        String webXml = "<web-app><session-config><cookie-config>" +
+                "<max-age>abc</max-age>" +
+                "</cookie-config></session-config></web-app>";
+
+        WebXml result = new WebXml();
+        WebXmlParser parser = new WebXmlParser(false, false, true);
+
+        Assert.assertFalse(parser.parseWebXml(new InputSource(new StringReader(webXml)), result, false));
+    }
+
+    @Test
+    public void testCookieMaxAgeEmptyFailsParse() {
+        // The digester passes an empty body text to the setter, so an empty
+        // element must also fail the parse
+        String webXml = "<web-app><session-config><cookie-config>" +
+                "<max-age></max-age>" +
+                "</cookie-config></session-config></web-app>";
+
+        WebXml result = new WebXml();
+        WebXmlParser parser = new WebXmlParser(false, false, true);
+
+        Assert.assertFalse(parser.parseWebXml(new InputSource(new StringReader(webXml)), result, false));
+    }
+
+    @Test
+    public void testCookieMaxAgeValidParses() {
+        String webXml = "<web-app><session-config><cookie-config>" +
+                "<max-age>60</max-age>" +
+                "</cookie-config></session-config></web-app>";
+
+        WebXml result = new WebXml();
+        WebXmlParser parser = new WebXmlParser(false, false, true);
+
+        Assert.assertTrue(parser.parseWebXml(new InputSource(new StringReader(webXml)), result, false));
+        Assert.assertEquals(Integer.valueOf(60), result.getSessionConfig().getCookieMaxAge());
     }
 }
