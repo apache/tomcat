@@ -727,6 +727,13 @@
   <subsection name="jdbc-pool">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        <bug>70269</bug>: Correct a regression in the change that reset the
+        properties of statements cached by the <code>StatementCache</code>
+        interceptor that meant no statements were cached when using JDBC
+        drivers, such as H2 and MariaDB Connector/J, that always report
+        statements as not poolable.
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

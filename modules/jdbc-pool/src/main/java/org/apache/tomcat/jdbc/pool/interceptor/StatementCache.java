@@ -63,6 +63,8 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
      */
     protected static final String STATEMENT_CACHE_ATTR = StatementCache.class.getName() + ".cache";
 
+    private static final String SET_POOLABLE = "setPoolable";
+
     /**
      * Default constructor.
      */
@@ -347,6 +349,11 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
          */
         CacheKey key;
         /**
+         * Poolable hint set by the application. Tracked here as some drivers
+         * (e.g. H2) always return false from {@code isPoolable()}.
+         */
+        private boolean poolable = true;
+        /**
          * Constructs a CachedStatement.
          * @param parent the parent prepared statement
          * @param sql the SQL text
@@ -365,7 +372,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
                 proxy.setCacheKey(getCacheKey());
                 try {
                     // Only cache if statement has been marked as poolable and not close on completion
-                    if (getDelegate().isPoolable() && !getDelegate().isCloseOnCompletion()) {
+                    if (poolable && !getDelegate().isCloseOnCompletion()) {
                         // clear Resultset
                         ResultSet result = getDelegate().getResultSet();
                         if (result != null && !result.isClosed()) {
@@ -407,6 +414,15 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
             }
             closed = true;
             delegate = null;
+        }
+
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            Object result = super.invoke(proxy, method, args);
+            if (compare(SET_POOLABLE, method)) {
+                poolable = ((Boolean) args[0]).booleanValue();
+            }
+            return result;
         }
 
         /**
