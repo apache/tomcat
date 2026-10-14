@@ -44,6 +44,7 @@ import org.apache.tomcat.Jar;
 import org.apache.tomcat.JarScanType;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.JarScannerCallback;
+import org.apache.tomcat.util.descriptor.tld.ImplicitTldRuleSet;
 import org.apache.tomcat.util.descriptor.tld.TaglibXml;
 import org.apache.tomcat.util.descriptor.tld.TldParser;
 import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
@@ -57,8 +58,11 @@ public class TldScanner {
     private static final String MSG = "org.apache.jasper.servlet.TldScanner";
     private static final String TLD_EXT = ".tld";
     private static final String WEB_INF = "/WEB-INF/";
+    private static final String WEB_INF_TAGS = "/WEB-INF/tags/";
+    private static final String IMPLICIT_TLD = "/implicit.tld";
     private final ServletContext context;
     private final TldParser tldParser;
+    private final TldParser implicitTldParser;
     private final Map<String,TldResourcePath> uriTldResourcePathMap = new HashMap<>();
     private final Map<TldResourcePath,TaglibXml> tldResourcePathTaglibXmlMap = new HashMap<>();
     private final List<String> listeners = new ArrayList<>();
@@ -76,6 +80,8 @@ public class TldScanner {
         this.context = context;
 
         this.tldParser = new TldParser(namespaceAware, validation, blockExternal);
+        this.implicitTldParser =
+                new TldParser(namespaceAware, validation, new ImplicitTldRuleSet(), blockExternal);
     }
 
     /**
@@ -133,6 +139,7 @@ public class TldScanner {
      */
     public void setClassLoader(ClassLoader classLoader) {
         tldParser.setClassLoader(classLoader);
+        implicitTldParser.setClassLoader(classLoader);
     }
 
     /**
@@ -216,11 +223,21 @@ public class TldScanner {
                     // Skip: JSP.7.3.1
                 } else if (path.endsWith("/")) {
                     scanResourcePaths(path);
-                } else if (path.startsWith("/WEB-INF/tags/")) {
+                } else if (path.startsWith(WEB_INF_TAGS)) {
                     // JSP 7.3.1: in /WEB-INF/tags only consider implicit.tld
-                    if (path.endsWith("/implicit.tld")) {
+                    if (path.endsWith(IMPLICIT_TLD)) {
                         found = true;
-                        parseTld(path);
+                        try {
+                            parseTld(path);
+                        } catch (SAXException e) {
+                            // An implicit TLD that is not specification
+                            // compliant must not prevent the web application
+                            // from starting. It is parsed again when a tag
+                            // from the tag file is used and the error will
+                            // be reported to the developer at that point.
+                            log.warn(Localizer.getMessage(
+                                    MSG + ".implicitTldInvalid", path, e.getMessage()));
+                        }
                     }
                 } else if (path.endsWith(TLD_EXT)) {
                     found = true;
@@ -271,7 +288,16 @@ public class TldScanner {
      * @throws SAXException if a parsing error occurs
      */
     protected void parseTld(TldResourcePath path) throws IOException, SAXException {
-        TaglibXml tld = tldParser.parse(path);
+        TaglibXml tld;
+        if (isImplicitTld(path.getWebappPath())) {
+            // JSP.7.3.2: an implicit TLD only allows version information and
+            // a short name. The strict rule set rejects everything else, so
+            // that such a TLD is rejected here just as it is when the tag
+            // file is translated.
+            tld = implicitTldParser.parse(path);
+        } else {
+            tld = tldParser.parse(path);
+        }
         String uri = tld.getUri();
         if (uri != null) {
             if (!uriTldResourcePathMap.containsKey(uri)) {
@@ -288,6 +314,11 @@ public class TldScanner {
         if (tld.getListeners() != null) {
             listeners.addAll(tld.getListeners());
         }
+    }
+
+    private static boolean isImplicitTld(String webappPath) {
+        return webappPath != null && webappPath.startsWith(WEB_INF_TAGS) &&
+                webappPath.endsWith(IMPLICIT_TLD);
     }
 
     class TldScannerCallback implements JarScannerCallback {
