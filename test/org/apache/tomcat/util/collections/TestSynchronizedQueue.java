@@ -21,6 +21,7 @@ import org.junit.Test;
 
 public class TestSynchronizedQueue {
 
+    @Test
     public void testPollEmpty() {
         SynchronizedQueue<Object> queue = new SynchronizedQueue<>();
         Assert.assertNull(queue.poll());
@@ -112,6 +113,31 @@ public class TestSynchronizedQueue {
         }
 
 
+        Assert.assertNull(queue.poll());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testZeroInitialSizeRejected() {
+        new SynchronizedQueue<>(0);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testNegativeInitialSizeRejected() {
+        new SynchronizedQueue<>(-1);
+    }
+
+    @Test
+    public void testInitialSizeOne() {
+        SynchronizedQueue<Object> queue = new SynchronizedQueue<>(1);
+
+        Object o1 = new Object();
+        Object o2 = new Object();
+
+        queue.offer(o1);
+        queue.offer(o2);
+
+        Assert.assertSame(queue.poll(), o1);
+        Assert.assertSame(queue.poll(), o2);
         Assert.assertNull(queue.poll());
     }
 }
