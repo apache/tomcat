@@ -210,7 +210,22 @@ public class TestMediaType {
 
         // Note: Invalid input is filtered out
         Assert.assertEquals("text/html;charset=UTF-8", m.toString());
+        Assert.assertEquals("text/html", m.toStringNoCharset());
         Assert.assertEquals("UTF-8", m.getCharset());
+    }
+
+
+    @Test
+    public void testToStringWithInvalidParameterValues() throws IOException {
+        // Parameters with an empty value or a null value (unterminated quoted
+        // string) must be omitted from the string representations.
+        String input = "type/sub-type;charset=UTF-8;a=;b=\"unterminated;c=";
+
+        StringReader sr = new StringReader(input);
+        MediaType m = MediaType.parseMediaType(sr);
+
+        Assert.assertEquals("type/sub-type;charset=UTF-8", m.toString());
+        Assert.assertEquals("type/sub-type", m.toStringNoCharset());
     }
 
 
