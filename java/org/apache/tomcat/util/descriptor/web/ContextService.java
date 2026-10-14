@@ -17,9 +17,11 @@
 package org.apache.tomcat.util.descriptor.web;
 
 import java.io.Serial;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 
@@ -42,26 +44,55 @@ public class ContextService extends ResourceBase {
 
 
     /**
-     * The WebService reference name.
+     * The WebService reference display names. Multiple display names, each with an optional language, are supported as
+     * per the deployment descriptor specification.
      */
-    private String displayname = null;
+    private final List<LocaleElement> displaynames = new ArrayList<>();
 
     /**
-     * Returns the WebService reference display name.
+     * Returns the WebService reference display names.
+     *
+     * @return the display names
+     */
+    public List<LocaleElement> getDisplaynames() {
+        return displaynames;
+    }
+
+    /**
+     * Adds a WebService reference display name.
+     *
+     * @param displayname the display name to add
+     */
+    public void addDisplayname(LocaleElement displayname) {
+        displaynames.add(displayname);
+    }
+
+    /**
+     * Returns the WebService reference display name. The default display name (the one without a language) is
+     * returned if present, otherwise the first display name is returned.
      *
      * @return the display name
      */
     public String getDisplayname() {
-        return this.displayname;
+        for (LocaleElement element : displaynames) {
+            if (element.getLang() == null) {
+                return element.getContent();
+            }
+        }
+        return displaynames.isEmpty() ? null : displaynames.get(0).getContent();
     }
 
     /**
-     * Sets the WebService reference display name.
+     * Sets the WebService reference display name. Any existing display names, including language specific ones, are
+     * replaced by a single default display name.
      *
      * @param displayname the display name
      */
     public void setDisplayname(String displayname) {
-        this.displayname = displayname;
+        displaynames.clear();
+        if (displayname != null) {
+            displaynames.add(new LocaleElement(displayname, null));
+        }
     }
 
     /**
@@ -352,9 +383,9 @@ public class ContextService extends ResourceBase {
             sb.append(", type=");
             sb.append(getType());
         }
-        if (displayname != null) {
+        if (getDisplayname() != null) {
             sb.append(", displayname=");
-            sb.append(displayname);
+            sb.append(getDisplayname());
         }
         if (largeIcon != null) {
             sb.append(", largeIcon=");
@@ -403,7 +434,7 @@ public class ContextService extends ResourceBase {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((displayname == null) ? 0 : displayname.hashCode());
+        result = prime * result + displaynames.hashCode();
         result = prime * result + handlers.hashCode();
         result = prime * result + ((jaxrpcmappingfile == null) ? 0 : jaxrpcmappingfile.hashCode());
         result = prime * result + ((largeIcon == null) ? 0 : largeIcon.hashCode());
@@ -427,11 +458,7 @@ public class ContextService extends ResourceBase {
             return false;
         }
         ContextService other = (ContextService) obj;
-        if (displayname == null) {
-            if (other.displayname != null) {
-                return false;
-            }
-        } else if (!displayname.equals(other.displayname)) {
+        if (!displaynames.equals(other.displaynames)) {
             return false;
         }
         if (!handlers.equals(other.handlers)) {

@@ -18,6 +18,8 @@ package org.apache.tomcat.util.descriptor.web;
 
 
 import java.io.Serial;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>
@@ -42,24 +44,51 @@ public class MessageDestination extends ResourceBase {
 
 
     /**
-     * The display name of this destination.
+     * The display names of this destination. Multiple display names, each with an optional language, are supported as
+     * per the deployment descriptor specification.
      */
-    private String displayName = null;
+    private final List<LocaleElement> displayNames = new ArrayList<>();
 
     /**
-     * Get the display name.
-     * @return the display name
+     * Get the display names.
+     * @return the display names
      */
-    public String getDisplayName() {
-        return this.displayName;
+    public List<LocaleElement> getDisplayNames() {
+        return displayNames;
     }
 
     /**
-     * Set the display name.
+     * Add a display name to this destination.
+     * @param displayName the display name to add
+     */
+    public void addDisplayName(LocaleElement displayName) {
+        displayNames.add(displayName);
+    }
+
+    /**
+     * Get the display name. The default display name (the one without a language) is returned if present, otherwise
+     * the first display name is returned.
+     * @return the display name
+     */
+    public String getDisplayName() {
+        for (LocaleElement element : displayNames) {
+            if (element.getLang() == null) {
+                return element.getContent();
+            }
+        }
+        return displayNames.isEmpty() ? null : displayNames.get(0).getContent();
+    }
+
+    /**
+     * Set the display name. Any existing display names, including language specific ones, are replaced by a single
+     * default display name.
      * @param displayName the display name
      */
     public void setDisplayName(String displayName) {
-        this.displayName = displayName;
+        displayNames.clear();
+        if (displayName != null) {
+            displayNames.add(new LocaleElement(displayName, null));
+        }
     }
 
 
@@ -118,9 +147,9 @@ public class MessageDestination extends ResourceBase {
         StringBuilder sb = new StringBuilder("MessageDestination[");
         sb.append("name=");
         sb.append(getName());
-        if (displayName != null) {
+        if (getDisplayName() != null) {
             sb.append(", displayName=");
-            sb.append(displayName);
+            sb.append(getDisplayName());
         }
         if (largeIcon != null) {
             sb.append(", largeIcon=");
@@ -143,7 +172,7 @@ public class MessageDestination extends ResourceBase {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((displayName == null) ? 0 : displayName.hashCode());
+        result = prime * result + displayNames.hashCode();
         result = prime * result + ((largeIcon == null) ? 0 : largeIcon.hashCode());
         result = prime * result + ((smallIcon == null) ? 0 : smallIcon.hashCode());
         return result;
@@ -162,11 +191,7 @@ public class MessageDestination extends ResourceBase {
             return false;
         }
         MessageDestination other = (MessageDestination) obj;
-        if (displayName == null) {
-            if (other.displayName != null) {
-                return false;
-            }
-        } else if (!displayName.equals(other.displayName)) {
+        if (!displayNames.equals(other.displayNames)) {
             return false;
         }
         if (largeIcon == null) {
