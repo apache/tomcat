@@ -60,7 +60,10 @@ public final class ConcurrentCache<K, V> {
             synchronized (longterm) {
                 v = this.longterm.get(k);
             }
-            if (v != null) {
+            // Only promote into eden while it still has room. Otherwise, a
+            // workload dominated by cache hits could grow eden far beyond the
+            // configured size, since only put() trims eden.
+            if (v != null && this.eden.size() < size) {
                 this.eden.put(k, v);
             }
         }
