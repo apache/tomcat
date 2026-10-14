@@ -122,6 +122,16 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        Treat a filter as not supporting asynchronous processing unless
+        async supported is explicitly set to <code>"true"</code>.
+        Previously, a filter registered via
+        <code>ServletContext.addFilter()</code> that did not call
+        <code>setAsyncSupported(true)</code> was incorrectly treated as
+        async supported, and descriptor values such as <code>"yes"</code>
+        were treated as <code>true</code> for some uses and
+        <code>false</code> for others. (remm)
+      </fix>
+      <fix>
         Lower the log level to debug when OpenSSL initialization fails in
         <code>OpenSSLLifecycleListener</code> to avoid stack traces
         when <code>libssl.so</code> is not present and to align the behavior
