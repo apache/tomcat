@@ -16,9 +16,26 @@
  */
 package org.apache.tomcat.util.buf;
 
+import java.io.IOException;
+
+import org.junit.Assert;
+import org.junit.Test;
+
 public class TestUriUtil40 extends TesterUriUtilBase {
 
     public TestUriUtil40() {
         super("@");
+    }
+
+    @Test
+    public void testBuildJarUrlPreservesSeparatorSlash() throws IOException {
+        // Use the String overload with a literal file: URL so the expected
+        // value does not depend on File.toURI() behaviour (which varies
+        // with platform)
+        String result = UriUtil.buildJarUrl("file:/patha/pathb@/pathc").toString();
+        // The custom separator must be escaped but the trailing '/' of the
+        // separator must be preserved, consistent with the default handling
+        // of "*/" being replaced with "%2a/"
+        Assert.assertEquals("jar:file:/patha/pathb%40/pathc!/", result);
     }
 }
