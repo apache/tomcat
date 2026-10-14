@@ -42,4 +42,26 @@ public class TestUEncoder {
         Assert.assertTrue(urlEncoder.encodeURL(s, 0, s.length())
                 .equals("%f0%90%90%81"));
     }
+
+
+    @Test
+    public void testEncodeURLUnpairedSurrogateDoesNotLeak() throws IOException {
+        UEncoder urlEncoder = new UEncoder(SafeCharsSet.DEFAULT);
+
+        // A string ending with an unpaired high surrogate. The surrogate
+        // cannot be encoded. It must not be retained by the encoder and
+        // combined with the start of a later, unrelated string.
+        String loneHigh = "ab" + '\uD800';
+        urlEncoder.encodeURL(loneHigh, 0, loneHigh.length());
+
+        String low = '\uDC00' + "cd";
+        String result = urlEncoder.encodeURL(low, 0, low.length()).toString();
+
+        // The result must match that of a fresh encoder, i.e. the unpaired
+        // low surrogate must be replaced, not paired with the leftover high
+        // surrogate from the previous call
+        UEncoder fresh = new UEncoder(SafeCharsSet.DEFAULT);
+        Assert.assertEquals(fresh.encodeURL(low, 0, low.length()).toString(),
+                result);
+    }
 }
