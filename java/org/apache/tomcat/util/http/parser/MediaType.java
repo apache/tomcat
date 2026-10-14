@@ -217,7 +217,7 @@ public class MediaType {
                 value = "";
             }
 
-            if (attribute != null) {
+            if (attribute != null && !attribute.isEmpty()) {
                 parameters.put(attribute.toLowerCase(Locale.ENGLISH), value);
             }
 
