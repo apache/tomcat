@@ -20,6 +20,8 @@ import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +53,77 @@ public class TestTldScanner extends TomcatBaseTest {
         scanner.scan();
         Assert.assertEquals(5, scanner.getUriTldResourcePathMap().size());
         Assert.assertEquals(1, scanner.getListeners().size());
+    }
+
+
+    @Test
+    public void testScanImplicitTldInvalid() throws Exception {
+        // JSP.7.3.2 only allows version information and a short name in an
+        // implicit.tld. Elements such as <uri>, <listener> and <tag> must be
+        // rejected, so scanning must not register anything from this file.
+        Tomcat tomcat = getTomcatInstance();
+        File appDir = new File(getTemporaryDirectory(), "implicit-tld-invalid");
+        createImplicitTld(appDir, "<uri>http://tomcat.apache.org/from-implicit-tld</uri>\n" +
+                "  <listener>\n" +
+                "    <listener-class>com.example.TesterListener</listener-class>\n" +
+                "  </listener>\n" +
+                "  <tag>\n" +
+                "    <name>Foo</name>\n" +
+                "    <tag-class>com.example.TesterTag</tag-class>\n" +
+                "    <body-content>empty</body-content>\n" +
+                "  </tag>");
+        Context context = tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+        tomcat.start();
+
+        TldScanner scanner =
+                new TldScanner(context.getServletContext(), true, true, true);
+        scanner.scan();
+
+        Assert.assertNull(scanner.getUriTldResourcePathMap().get(
+                "http://tomcat.apache.org/from-implicit-tld"));
+        Assert.assertEquals(0, scanner.getListeners().size());
+        Assert.assertEquals(0, scanner.getTldResourcePathTaglibXmlMap().size());
+    }
+
+
+    @Test
+    public void testScanImplicitTldValid() throws Exception {
+        // A specification compliant implicit.tld only contributes the short
+        // name which is used for tagdir based lookups, not for URI based ones.
+        Tomcat tomcat = getTomcatInstance();
+        File appDir = new File(getTemporaryDirectory(), "implicit-tld-valid");
+        createImplicitTld(appDir, null);
+        Context context = tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+        tomcat.start();
+
+        TldScanner scanner =
+                new TldScanner(context.getServletContext(), true, true, true);
+        scanner.scan();
+
+        // The specification compliant file is still parsed and cached but it
+        // contributes nothing to URI based lookups.
+        Assert.assertEquals(0, scanner.getUriTldResourcePathMap().size());
+        Assert.assertEquals(0, scanner.getListeners().size());
+        Assert.assertEquals(1, scanner.getTldResourcePathTaglibXmlMap().size());
+    }
+
+
+    private static void createImplicitTld(File appDir, String extraElements) throws Exception {
+        File implicitTld = new File(appDir, "WEB-INF/tags/display/implicit.tld");
+        Files.createDirectories(implicitTld.getParentFile().toPath());
+        StringBuilder content = new StringBuilder(
+                "<taglib xmlns=\"http://java.sun.com/xml/ns/javaee\"\n" +
+                "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+                "    xsi:schemaLocation=\"http://java.sun.com/xml/ns/javaee\n" +
+                "        http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd\"\n" +
+                "    version=\"2.1\">\n" +
+                "  <tlib-version>1.0</tlib-version>\n" +
+                "  <short-name>display</short-name>\n");
+        if (extraElements != null) {
+            content.append("  ").append(extraElements).append('\n');
+        }
+        content.append("</taglib>\n");
+        Files.writeString(implicitTld.toPath(), content, StandardCharsets.UTF_8);
     }
 
 
