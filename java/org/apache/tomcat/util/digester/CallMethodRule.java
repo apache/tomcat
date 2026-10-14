@@ -352,6 +352,13 @@ public class CallMethodRule extends Rule {
                 }
                 if (bodyText != null) {
                     code.append("\"").append(IntrospectionUtils.escape(bodyText)).append("\"");
+                } else if (paramValues[i] == null) {
+                    // Missing parameters are passed to the method as null
+                    // values. Emit the literal rather than trying to name a
+                    // variable for an object that does not exist. The
+                    // generated call assumes the target method resolves
+                    // unambiguously for a null argument.
+                    code.append("null");
                 } else if (paramValues[i] instanceof String) {
                     code.append("\"").append(IntrospectionUtils.escape(paramValues[i].toString())).append("\"");
                 } else {
