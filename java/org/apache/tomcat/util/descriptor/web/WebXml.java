@@ -1895,7 +1895,7 @@ public class WebXml {
                     String endpoint = endpointIter.next();
                     sb.append("    <port-component-ref>\n");
                     appendElement(sb, INDENT6, "service-endpoint-interface", endpoint);
-                    appendElement(sb, INDENT6, "port-component-link", serviceRef.getProperty(endpoint));
+                    appendElement(sb, INDENT6, "port-component-link", serviceRef.getPortlink(endpoint));
                     sb.append("    </port-component-ref>\n");
                 }
                 Iterator<String> handlerIter = serviceRef.getHandlers();

@@ -266,13 +266,18 @@ public class ContextService extends ResourceBase {
     }
 
     /**
+     * The port component mappings, keyed by service endpoint interface.
+     */
+    private final Map<String,String> portComponents = new HashMap<>();
+
+    /**
      * Declares a client dependency on the container to resolving a Service Endpoint Interface to a WSDL port. It
      * optionally associates the Service Endpoint Interface with a particular port-component.
      *
      * @return the endpoint names iterator
      */
     public Iterator<String> getServiceendpoints() {
-        return this.listProperties();
+        return this.portComponents.keySet().iterator();
     }
 
     /**
@@ -282,7 +287,7 @@ public class ContextService extends ResourceBase {
      * @return the port link
      */
     public String getPortlink(String serviceendpoint) {
-        return (String) this.getProperty(serviceendpoint);
+        return this.portComponents.get(serviceendpoint);
     }
 
     /**
@@ -295,7 +300,7 @@ public class ContextService extends ResourceBase {
         if (portlink == null) {
             portlink = "";
         }
-        this.setProperty(serviceendpoint, portlink);
+        this.portComponents.put(serviceendpoint, portlink);
     }
 
     /**
@@ -407,6 +412,7 @@ public class ContextService extends ResourceBase {
         result = prime * result + handlers.hashCode();
         result = prime * result + ((jaxrpcmappingfile == null) ? 0 : jaxrpcmappingfile.hashCode());
         result = prime * result + ((largeIcon == null) ? 0 : largeIcon.hashCode());
+        result = prime * result + portComponents.hashCode();
         result = prime * result + ((serviceInterface == null) ? 0 : serviceInterface.hashCode());
         result = prime * result + Arrays.hashCode(serviceqname);
         result = prime * result + ((smallIcon == null) ? 0 : smallIcon.hashCode());
@@ -449,6 +455,9 @@ public class ContextService extends ResourceBase {
                 return false;
             }
         } else if (!largeIcon.equals(other.largeIcon)) {
+            return false;
+        }
+        if (!portComponents.equals(other.portComponents)) {
             return false;
         }
         if (serviceInterface == null) {
