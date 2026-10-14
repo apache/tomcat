@@ -353,23 +353,29 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
             // Extract the port information first, if any
             if (colonPos != -1) {
-                int port = 0;
-                for (int i = colonPos + 1; i < valueL; i++) {
-                    char c = (char) valueB[i + valueS];
-                    if (c < '0' || c > '9') {
-                        response.setStatus(400);
-                        setErrorState(ErrorState.CLOSE_CLEAN, null);
-                        return;
+                // A ':' not followed by digits is an empty port, which the
+                // grammar allows (RFC 3986, section 3.2.3). Treat it like an
+                // absent port: keep the port already associated with the
+                // request rather than storing zero for the absent digits.
+                if (colonPos + 1 < valueL) {
+                    int port = 0;
+                    for (int i = colonPos + 1; i < valueL; i++) {
+                        char c = (char) valueB[i + valueS];
+                        if (c < '0' || c > '9') {
+                            response.setStatus(400);
+                            setErrorState(ErrorState.CLOSE_CLEAN, null);
+                            return;
+                        }
+                        int digit = c - '0';
+                        if (port > (Integer.MAX_VALUE - digit) / 10) {
+                            response.setStatus(400);
+                            setErrorState(ErrorState.CLOSE_CLEAN, null);
+                            return;
+                        }
+                        port = port * 10 + digit;
                     }
-                    int digit = c - '0';
-                    if (port > (Integer.MAX_VALUE - digit) / 10) {
-                        response.setStatus(400);
-                        setErrorState(ErrorState.CLOSE_CLEAN, null);
-                        return;
-                    }
-                    port = port * 10 + digit;
+                    request.setServerPort(port);
                 }
-                request.setServerPort(port);
 
                 // Only need to copy the host name up to the :
                 valueL = colonPos;
