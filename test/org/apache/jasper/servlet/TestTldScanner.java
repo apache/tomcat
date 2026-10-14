@@ -23,9 +23,13 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+
+import jakarta.servlet.ServletContext;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -106,6 +110,32 @@ public class TestTldScanner extends TomcatBaseTest {
         Assert.assertEquals(0, scanner.getUriTldResourcePathMap().size());
         Assert.assertEquals(0, scanner.getListeners().size());
         Assert.assertEquals(1, scanner.getTldResourcePathTaglibXmlMap().size());
+    }
+
+
+    @Test
+    public void testParseTldMissingResourceIsSkipped() throws Exception {
+        // A resource listed by getResourcePaths() may be gone by the time it
+        // is resolved with getResource() (e.g. a file removed during a
+        // development-mode scan). The scan must skip it with a warning rather
+        // than propagate a NullPointerException out of the constructor.
+        ServletContext mockContext = EasyMock.createMock(ServletContext.class);
+        EasyMock.expect(mockContext.getResourcePaths("/WEB-INF/"))
+                .andReturn(Collections.singleton("/WEB-INF/vanished.tld")).once();
+        EasyMock.expect(mockContext.getResource("/WEB-INF/vanished.tld")).andReturn(null).once();
+        EasyMock.replay(mockContext);
+
+        TldScanner scanner = new TldScanner(mockContext, true, true, true);
+        try (LogCapture logCapture = attachLogCapture(Level.WARNING, TldScanner.class.getName())) {
+            scanner.scanResourcePaths("/WEB-INF/");
+            Assert.assertTrue(logCapture.containsText(
+                    "Failed to process TLD at resource path [/WEB-INF/vanished.tld]"));
+        }
+
+        EasyMock.verify(mockContext);
+        // The vanished TLD contributed nothing.
+        Assert.assertEquals(0, scanner.getUriTldResourcePathMap().size());
+        Assert.assertEquals(0, scanner.getTldResourcePathTaglibXmlMap().size());
     }
 
 
