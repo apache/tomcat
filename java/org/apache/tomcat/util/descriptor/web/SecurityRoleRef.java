@@ -124,9 +124,10 @@ public class SecurityRoleRef implements Serializable {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof SecurityRoleRef other)) {
+        if (!(obj instanceof SecurityRoleRef)) {
             return false;
         }
+        SecurityRoleRef other = (SecurityRoleRef) obj;
         if (!Objects.equals(link, other.link)) {
             return false;
         }

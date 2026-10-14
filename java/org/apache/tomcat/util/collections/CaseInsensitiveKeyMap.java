@@ -149,7 +149,13 @@ public class CaseInsensitiveKeyMap<V> extends AbstractMap<String,V> {
     }
 
 
-    private record KeyIterator(Iterator<Key> iterator) implements Iterator<String> {
+    private static class KeyIterator implements Iterator<String> {
+
+        private final Iterator<Key> iterator;
+
+        KeyIterator(Iterator<Key> iterator) {
+            this.iterator = iterator;
+        }
 
         @Override
         public boolean hasNext() {
