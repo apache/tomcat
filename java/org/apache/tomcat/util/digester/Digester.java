@@ -1851,8 +1851,6 @@ public class Digester extends DefaultHandler2 {
         params.clear();
         publicId = null;
         stack.clear();
-        log = null;
-        saxLog = null;
         configured = false;
 
     }
