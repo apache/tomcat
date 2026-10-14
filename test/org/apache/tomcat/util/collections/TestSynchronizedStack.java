@@ -116,4 +116,79 @@ public class TestSynchronizedStack {
 
         Assert.assertNull(stack.pop());
     }
+
+
+    @Test
+    public void testSetLimitBelowCapacity() {
+        SynchronizedStack<Object> stack = new SynchronizedStack<>();
+
+        Object o1 = new Object();
+        stack.push(o1);
+
+        // The new limit is below the current capacity but above the number of
+        // elements. All elements must be retained.
+        stack.setLimit(10);
+
+        Assert.assertSame(o1, stack.pop());
+        Assert.assertNull(stack.pop());
+
+        // The limit must now be enforced on pushes
+        for (int i = 0; i < 10; i++) {
+            Assert.assertTrue(stack.push(new Object()));
+        }
+        Assert.assertFalse(stack.push(new Object()));
+    }
+
+
+    @Test
+    public void testSetLimitBelowElementCount() {
+        SynchronizedStack<Object> stack = new SynchronizedStack<>();
+
+        int count = 50;
+        Object[] objects = new Object[count];
+        for (int i = 0; i < count; i++) {
+            objects[i] = new Object();
+            stack.push(objects[i]);
+        }
+
+        // The new limit is below the number of elements. The most recently
+        // pushed elements must be retained, the remainder discarded.
+        int limit = 10;
+        stack.setLimit(limit);
+
+        Assert.assertFalse(stack.push(new Object()));
+
+        for (int i = count - 1; i >= count - limit; i--) {
+            Assert.assertSame(objects[i], stack.pop());
+        }
+        Assert.assertNull(stack.pop());
+    }
+
+
+    @Test
+    public void testSetLimitUnlimited() {
+        SynchronizedStack<Object> stack = new SynchronizedStack<>();
+
+        stack.setLimit(-1);
+
+        for (int i = 0; i < 500; i++) {
+            Assert.assertTrue(stack.push(new Object()));
+        }
+    }
+
+
+    @Test
+    public void testSetLimitZeroThenIncrease() {
+        SynchronizedStack<Object> stack = new SynchronizedStack<>();
+
+        stack.setLimit(0);
+
+        Assert.assertFalse(stack.push(new Object()));
+
+        // A stack that has been shrunk to zero must be able to grow again
+        // when the limit is raised
+        stack.setLimit(10);
+
+        Assert.assertTrue(stack.push(new Object()));
+    }
 }

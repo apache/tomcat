@@ -130,23 +130,42 @@ public class SynchronizedStack<T> {
 
     /**
      * Sets the maximum number of elements that can be pushed onto this stack.
+     * If the new limit is lower than the current capacity, the stack is
+     * shrunk. When the stack already holds more elements than the new limit,
+     * the most recently pushed elements are retained and the remaining
+     * elements are discarded.
      *
      * @param limit the maximum size, or -1 for unlimited
      */
     public synchronized void setLimit(int limit) {
         this.limit = limit;
+        if (limit > -1 && limit < size) {
+            // Keep the most recently pushed elements. They occupy
+            // stack[0..index] so the elements to keep are the last 'keep' of
+            // those.
+            int keep = Math.min(index + 1, limit);
+            Object[] newStack = new Object[limit];
+            System.arraycopy(stack, index + 1 - keep, newStack, 0, keep);
+            // The old array becomes garbage, releasing any references held by
+            // the discarded elements
+            stack = newStack;
+            size = limit;
+            index = keep - 1;
+        }
     }
 
     private void expand() {
-        int newSize = size * 2;
+        // At least one slot of growth is required to make progress. A size of
+        // zero can occur via the constructor or via setLimit(0).
+        int newSize = Math.max(1, size * 2);
         if (limit != -1 && newSize > limit) {
             newSize = limit;
         }
         Object[] newStack = new Object[newSize];
         System.arraycopy(stack, 0, newStack, 0, size);
-        // This is the only point where garbage is created by throwing away the
-        // old array. Note it is only the array, not the contents, that becomes
-        // garbage.
+        // This is one of the points where garbage is created by throwing away
+        // the old array (setLimit() being another). Note it is only the array,
+        // not the contents, that becomes garbage.
         stack = newStack;
         size = newSize;
     }
