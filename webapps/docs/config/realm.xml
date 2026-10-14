@@ -800,6 +800,9 @@
 
   <subsection name="JAAS Realm - org.apache.catalina.realm.JAASRealm">
 
+    <p><strong>NOTE: </strong>The <code>JAASRealm</code> has been deprecated
+    and will be removd in Tomcat 12.</p>
+
     <p><strong>JAASRealm</strong> is an implementation of the Tomcat
     <code>Realm</code> interface that authenticates users through the Java
     Authentication &amp; Authorization Service (JAAS) framework which is now

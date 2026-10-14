@@ -921,6 +921,9 @@ valid user, consisting of the following attributes:</p>
 
 <h5>Introduction</h5>
 
+        <p><strong>NOTE: </strong>The <code>JAASRealm</code> has been
+        deprecated and will be removd in Tomcat 12.</p>
+
         <p><strong>JAASRealm</strong> is an implementation of the Tomcat
 <code>Realm</code> interface that authenticates users through the Java
 Authentication &amp; Authorization Service (JAAS) framework which is now
