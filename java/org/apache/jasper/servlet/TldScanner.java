@@ -269,15 +269,25 @@ public class TldScanner {
     }
 
     /**
-     * Parses a TLD from the given resource path string.
+     * Parses a TLD from the given resource path string. If the resource no
+     * longer exists - it may have been removed since it was listed by
+     * {@link ServletContext#getResourcePaths(String)} - the TLD is skipped and
+     * a warning is logged.
      *
      * @param resourcePath the resource path
      * @throws IOException if an I/O error occurs
      * @throws SAXException if a parsing error occurs
      */
     protected void parseTld(String resourcePath) throws IOException, SAXException {
-        TldResourcePath tldResourcePath = new TldResourcePath(context.getResource(resourcePath), resourcePath);
-        parseTld(tldResourcePath);
+        URL url = context.getResource(resourcePath);
+        if (url == null) {
+            // The resource may have been removed after it was discovered by
+            // getResourcePaths(). Skip it rather than aborting the scan, as is
+            // done for a missing resource referenced by web.xml.
+            log.warn(Localizer.getMessage(MSG + ".resourcePathDoesNotExist", resourcePath));
+            return;
+        }
+        parseTld(new TldResourcePath(url, resourcePath));
     }
 
     /**
