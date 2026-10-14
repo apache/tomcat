@@ -255,9 +255,10 @@ public class HttpHeaderParser {
                     headerParsePos = HeaderParsePosition.HEADER_START;
                     break;
                 } else {
-                    // Copying one extra space in the buffer (since there must
-                    // be at least one space inserted between the lines)
-                    source.getHeaderByteBuffer().put(headerData.realPos, peek);
+                    // Replace the line folding with a single space as required
+                    // by RFC 9112 section 5.2. Any further whitespace at the
+                    // start of the continuation line is skipped below.
+                    source.getHeaderByteBuffer().put(headerData.realPos, SP);
                     headerData.realPos++;
                     headerParsePos = HeaderParsePosition.HEADER_VALUE_START;
                 }
