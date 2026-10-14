@@ -311,6 +311,15 @@
         closes the entire connection. These frames are already permitted when
         the stream is closed in the other direction. (remm)
       </fix>
+      <fix>
+        Correct the DER INTEGER encoding produced by
+        <code>Asn1Writer.writeInteger()</code> for multi-byte values and add
+        the leading zero byte required by DER for positive values whose most
+        significant bit is set. The length calculation loops in
+        <code>writeInteger()</code> and <code>writeTag()</code> were also
+        corrected to terminate, since the Java shift distance is evaluated
+        modulo 32. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
