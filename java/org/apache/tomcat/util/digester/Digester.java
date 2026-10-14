@@ -1604,6 +1604,12 @@ public class Digester extends DefaultHandler2 {
             InputSource input = new InputSource(fis);
             input.setSystemId("file://" + file.getAbsolutePath());
             getXMLReader().parse(input);
+        } catch (Exception e) {
+            // endDocument() is not reached when parsing fails. Restore a
+            // consistent state so the Digester can safely be reused.
+            clear();
+            root = null;
+            throw e;
         }
         return root;
     }
@@ -1622,7 +1628,15 @@ public class Digester extends DefaultHandler2 {
      */
     public Object parse(InputSource input) throws IOException, SAXException {
         configure();
-        getXMLReader().parse(input);
+        try {
+            getXMLReader().parse(input);
+        } catch (Exception e) {
+            // endDocument() is not reached when parsing fails. Restore a
+            // consistent state so the Digester can safely be reused.
+            clear();
+            root = null;
+            throw e;
+        }
         return root;
     }
 
@@ -1639,10 +1653,7 @@ public class Digester extends DefaultHandler2 {
      * @exception SAXException if a parsing exception occurs
      */
     public Object parse(InputStream input) throws IOException, SAXException {
-        configure();
-        InputSource is = new InputSource(input);
-        getXMLReader().parse(is);
-        return root;
+        return parse(new InputSource(input));
     }
 
 
@@ -1859,6 +1870,8 @@ public class Digester extends DefaultHandler2 {
     public void clear() {
 
         match = "";
+        matches.clear();
+        namespaces.clear();
         bodyTexts.clear();
         params.clear();
         publicId = null;
