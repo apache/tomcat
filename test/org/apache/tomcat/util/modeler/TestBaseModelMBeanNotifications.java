@@ -34,9 +34,11 @@ public class TestBaseModelMBeanNotifications {
 
         private final List<String> received = new ArrayList<>();
         private final List<AttributeChangeNotification> changes = new ArrayList<>();
+        private final List<Long> sequences = new ArrayList<>();
 
         @Override
         public void handleNotification(Notification notification, Object handback) {
+            sequences.add(notification.getSequenceNumber());
             String name;
             if (notification instanceof AttributeChangeNotification acn) {
                 changes.add(acn);
@@ -168,6 +170,24 @@ public class TestBaseModelMBeanNotifications {
         AttributeChangeNotification change = listener.changes.get(0);
         Assert.assertEquals("initial", change.getOldValue());
         Assert.assertEquals("updated", change.getNewValue());
+    }
+
+    @Test
+    public void testSequenceNumbersIncrease() throws Exception {
+        BaseModelMBean mbean = new BaseModelMBean();
+        TesterNotificationListener listener = new TesterNotificationListener();
+        mbean.addAttributeChangeNotificationListener(listener, "A", "hb");
+        send(mbean, "A");
+        send(mbean, "A");
+        Assert.assertEquals(2, listener.changes.size());
+        Assert.assertEquals(1L, listener.changes.get(0).getSequenceNumber());
+        Assert.assertEquals(2L, listener.changes.get(1).getSequenceNumber());
+
+        // General notifications share the same sequence counter
+        mbean.addNotificationListener(listener, null, null);
+        mbean.sendNotification("message");
+        Assert.assertEquals(3, listener.sequences.size());
+        Assert.assertEquals(3L, listener.sequences.get(2).longValue());
     }
 
     @Test
