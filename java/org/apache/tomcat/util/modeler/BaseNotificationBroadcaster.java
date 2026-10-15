@@ -18,6 +18,7 @@ package org.apache.tomcat.util.modeler;
 
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.management.ListenerNotFoundException;
 import javax.management.MBeanNotificationInfo;
@@ -119,6 +120,43 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
 
         synchronized (entries) {
             entries.removeIf(item -> item.listener == listener);
+        }
+
+    }
+
+
+    /**
+     * Remove an attribute change notification event listener for a specific attribute name from this MBean. Other
+     * registrations of the same listener are left untouched. If a coalesced filter ends up accepting no explicit
+     * names, the corresponding entry is removed entirely rather than being turned into an accept-all filter. A
+     * registration that accepts all attribute names (a filter with no explicit names, created when the listener was
+     * added with a <code>null</code> attribute name) can only be removed by passing a <code>null</code> name here.
+     *
+     * @param listener The listener to be removed
+     * @param name     The attribute name for which the registration should be removed, or <code>null</code> to remove
+     *                     a registration that accepts all attribute names
+     */
+    public void removeAttributeNotificationListener(NotificationListener listener, String name) {
+
+        synchronized (entries) {
+            Iterator<BaseNotificationBroadcasterEntry> iterator = entries.iterator();
+            while (iterator.hasNext()) {
+                BaseNotificationBroadcasterEntry item = iterator.next();
+                if (item.listener != listener || !(item.filter instanceof BaseAttributeFilter filter)) {
+                    continue;
+                }
+                String[] names = filter.getNames();
+                if (name == null) {
+                    if (names.length == 0) {
+                        // The accept-all registration
+                        iterator.remove();
+                    }
+                } else if (names.length == 1 && names[0].equals(name)) {
+                    iterator.remove();
+                } else {
+                    filter.removeAttribute(name);
+                }
+            }
         }
 
     }
