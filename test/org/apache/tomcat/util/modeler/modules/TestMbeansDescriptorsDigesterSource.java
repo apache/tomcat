@@ -21,7 +21,10 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.management.ObjectName;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -54,8 +57,11 @@ public class TestMbeansDescriptorsDigesterSource {
         AtomicBoolean closed = new AtomicBoolean();
         Registry registry = Registry.getRegistry(null);
 
-        registry.load(null, createTrackingStream(XML, closed), null);
+        List<ObjectName> result = registry.load(null, createTrackingStream(XML, closed), null);
 
+        // Descriptors are registered with the registry, no object names are
+        // returned
+        Assert.assertTrue(result.isEmpty());
         Assert.assertTrue(closed.get());
         Assert.assertNotNull(registry.findManagedBean("TestDigesterSourceBean"));
     }
