@@ -225,13 +225,21 @@ TOKEN:{
 | <NUMBER_DECIMAL:
         ("-")?
         ( (<ZERO>)+ | ( <DIGIT_NONZERO> (<DIGIT>)* ) )
-        ("."
-            (<DIGIT>)+
+        (
             (
+                "."
+                (<DIGIT>)+
+                (
+                    ["e","E"]
+                    ("+" | "-")?
+                    (<DIGIT>)+
+                )?
+            )
+          | (
                 ["e","E"]
                 ("+" | "-")?
                 (<DIGIT>)+
-            )?
+            )
         )
     >
 }
