@@ -639,6 +639,10 @@ public class Registry implements RegistryMBean, MBeanRegistration {
 
             ManagedBean managed = findManagedBean(null, bean.getClass(), type);
 
+            if (managed == null) {
+                throw new IllegalStateException(sm.getString("registry.noTypeMetadata", type));
+            }
+
             // The real mbean is created and registered
             DynamicMBean mbean = managed.createMBean(bean);
 
