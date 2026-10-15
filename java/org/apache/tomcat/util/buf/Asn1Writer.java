@@ -113,10 +113,11 @@ public class Asn1Writer {
             // record a length > 127
             // Result is lengthSize = 1 + number of bytes to record length
             // Note the limit is required to terminate the loop since the shift
-            // distance is evaluated modulo 32.
+            // distance is evaluated modulo 32. Four bytes is the most any Java
+            // array length (a non-negative int) can need.
             do {
                 lengthSize++;
-            } while (lengthSize < 4 && (dataSize >>> (lengthSize * 8)) > 0);
+            } while (lengthSize < 5 && (dataSize >>> ((lengthSize - 1) * 8)) > 0);
         }
 
         // 1 for tag + lengthSize + dataSize
