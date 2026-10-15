@@ -459,6 +459,11 @@
         buffer used by the BIO pair. Patch submitted by Lukas Hellebrandt.
         (remm)
       </fix>
+      <fix>
+        Ensure the Tomcat Native based OpenSSL <code>SSLContext</code> does not
+        drop TLS 1.3 when rebuilding the list of enabled protocols during
+        initialization. (dsoumis)
+      </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
         Keep the asynchronous timeout in place until the timeout event has
