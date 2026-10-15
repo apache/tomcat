@@ -525,6 +525,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 if ((opts & SSL.SSL_OP_NO_TLSv1_2) == 0) {
                     enabled.add(Constants.SSL_PROTO_TLSv1_2);
                 }
+                if ((opts & SSL.SSL_OP_NO_TLSv1_3) == 0) {
+                    enabled.add(Constants.SSL_PROTO_TLSv1_3);
+                }
                 if ((opts & SSL.SSL_OP_NO_SSLv3) == 0) {
                     enabled.add(Constants.SSL_PROTO_SSLv3);
                 }
