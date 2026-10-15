@@ -1017,7 +1017,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                 } else {
                     // Copying one extra space in the buffer (since there must
                     // be at least one space inserted between the lines)
-                    byteBuffer.put(headerData.realPos, peek);
+                    byteBuffer.put(headerData.realPos, Constants.SP);
                     headerData.realPos++;
                     headerParsePos = HeaderParsePosition.HEADER_VALUE_START;
                 }
