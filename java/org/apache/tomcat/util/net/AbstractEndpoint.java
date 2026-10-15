@@ -1116,9 +1116,19 @@ public abstract class AbstractEndpoint<S, U> {
 
 
     /**
-     * External Executor based thread pool for utility tasks.
+     * External Executor based thread pool for utility tasks. Lazily created
+     * when none was set. The race between concurrent creators is benign: the
+     * executor is only requested from the protocol lifecycle and the
+     * scheduled async-timeout task, both serialised per endpoint, and a
+     * duplicated pool would at worst replicate the pre-existing behaviour.
      */
-    private ScheduledExecutorService utilityExecutor = null;
+    private volatile ScheduledExecutorService utilityExecutor = null;
+
+    /**
+     * The utility executor created by this endpoint, if any. It is tracked so
+     * that it can be shut down when the endpoint is destroyed.
+     */
+    private volatile ScheduledExecutorService createdUtilityExecutor = null;
 
     /**
      * Set the utility executor.
@@ -1130,16 +1140,19 @@ public abstract class AbstractEndpoint<S, U> {
     }
 
     /**
-     * Get the utility executor.
+     * Get the utility executor, creating one if none has been set.
      *
      * @return The utility executor
      */
     public ScheduledExecutorService getUtilityExecutor() {
-        if (utilityExecutor == null) {
+        ScheduledExecutorService result = utilityExecutor;
+        if (result == null) {
             getLog().warn(sm.getString("endpoint.warn.noUtilityExecutor"));
-            utilityExecutor = new ScheduledThreadPoolExecutor(1);
+            result = new ScheduledThreadPoolExecutor(1);
+            utilityExecutor = result;
+            createdUtilityExecutor = result;
         }
-        return utilityExecutor;
+        return result;
     }
 
 
@@ -2357,6 +2370,14 @@ public abstract class AbstractEndpoint<S, U> {
      * @throws java.lang.Exception If an error occurs while destroying the endpoint
      */
     public final void destroy() throws Exception {
+        ScheduledExecutorService created = createdUtilityExecutor;
+        if (created != null) {
+            createdUtilityExecutor = null;
+            created.shutdown();
+        }
+        // Deliberately leave utilityExecutor set: later calls to
+        // getUtilityExecutor() then return the shut-down executor instead of
+        // creating a new pool that would never be destroyed
         if (bindState == BindState.BOUND_ON_INIT) {
             unbind();
             bindState = BindState.UNBOUND;
