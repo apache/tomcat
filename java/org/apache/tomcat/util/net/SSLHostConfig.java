@@ -825,11 +825,22 @@ public class SSLHostConfig implements Serializable {
 
 
     /**
-     * Set the cipher suite (TLSv1.3) configuration.
+     * Set the cipher suite (TLSv1.3) configuration. Note: Regardless of the format used to set the configuration, it is
+     * always stored in OpenSSL format.
      *
      * @param cipherSuites The cipher suites to use in a colon-separated, preference order list
      */
     public void setCipherSuites(String cipherSuites) {
+        if (cipherSuites == null) {
+            // As for setCiphers(), a null value is stored as provided.
+            this.cipherSuites = null;
+            this.cipherSuiteList = null;
+            this.jsseCipherNames = null;
+            return;
+        }
+
+        // Cipher suites are stored in OpenSSL format. Convert the provided
+        // value if necessary.
         StringBuilder sb = new StringBuilder();
         String[] values;
         if (cipherSuites.contains(":")) {
@@ -858,7 +869,7 @@ public class SSLHostConfig implements Serializable {
                 if (!sb.isEmpty()) {
                     sb.append(':');
                 }
-                sb.append(trimmed);
+                sb.append(openSSLName);
             }
         }
         this.cipherSuites = sb.toString();

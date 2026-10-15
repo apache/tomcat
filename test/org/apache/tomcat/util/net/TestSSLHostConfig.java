@@ -148,6 +148,30 @@ public class TestSSLHostConfig {
 
 
     @Test
+    public void testCiphersuite04() {
+        SSLHostConfig hc = new SSLHostConfig();
+        Cipher c1 = Cipher.TLS_AES_128_CCM_SHA256;
+        Cipher c2 = Cipher.TLS_AES_256_GCM_SHA384;
+
+        // JSSE format (comma separated) list of JSSE names. The result should be
+        // an OpenSSL format (colon separated) list of OpenSSL names.
+        hc.setCipherSuites(c1.getJsseNames().iterator().next() + "," +
+                c2.getJsseNames().iterator().next());
+        Assert.assertEquals(c1.getOpenSSLAlias() + ":" + c2.getOpenSSLAlias(), hc.getCipherSuites());
+    }
+
+
+    @Test
+    public void testCiphersuite05() {
+        SSLHostConfig hc = new SSLHostConfig();
+
+        // Null should be handled without an error, as it is for setCiphers()
+        hc.setCipherSuites(null);
+        Assert.assertNull(hc.getCipherSuites());
+    }
+
+
+    @Test
     public void testPreSharedKey() {
         SSLHostConfig sslHostConfig = new SSLHostConfig();
         SSLHostConfigPreSharedKey preSharedKey = new SSLHostConfigPreSharedKey(sslHostConfig);
