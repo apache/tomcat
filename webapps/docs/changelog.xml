@@ -331,6 +331,14 @@
         corrected to terminate, since the Java shift distance is evaluated
         modulo 32. (remm)
       </fix>
+      <fix>
+        The JSON parser now rejects input with a nesting depth greater than
+        1000 with a <code>ParseException</code>. Previously, deeply nested
+        input caused a <code>StackOverflowError</code> since the parser
+        recursed once per nesting level with no limit. RFC 8259 allows
+        implementations to set a limit on the maximum depth of nesting.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
