@@ -35,7 +35,7 @@ public class Util {
     public static boolean objectNameValueNeedsQuote(String input) {
         for (int i = 0; i < input.length(); i++) {
             char ch = input.charAt(i);
-            if (ch == ',' || ch == '=' || ch == ':' || ch == '*' || ch == '?') {
+            if (ch == ',' || ch == '=' || ch == ':' || ch == '*' || ch == '?' || ch == '"' || ch == '\n') {
                 return true;
             }
         }
