@@ -551,6 +551,18 @@ public class Registry implements RegistryMBean, MBeanRegistration {
             objValue = Long.valueOf(value);
         } else if ("java.lang.Boolean".equals(type) || "boolean".equals(type)) {
             objValue = Boolean.valueOf(value);
+        } else if ("java.lang.Double".equals(type) || "double".equals(type)) {
+            objValue = Double.valueOf(value);
+        } else if ("java.lang.Float".equals(type) || "float".equals(type)) {
+            objValue = Float.valueOf(value);
+        } else if ("java.lang.Short".equals(type) || "short".equals(type)) {
+            objValue = Short.valueOf(value);
+        } else if ("java.lang.Byte".equals(type) || "byte".equals(type)) {
+            objValue = Byte.valueOf(value);
+        } else if (("java.lang.Character".equals(type) || "char".equals(type)) &&
+                value != null && !value.isEmpty()) {
+            // A null or empty string cannot be converted to a character
+            objValue = Character.valueOf(value.charAt(0));
         }
         return objValue;
     }
