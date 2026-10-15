@@ -20,6 +20,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -163,6 +164,73 @@ public class TestPEMFile {
                 new PEMFile("toPEM", new ByteArrayInputStream(pem.getBytes(StandardCharsets.US_ASCII)), null, null);
         Assert.assertEquals(1, roundTrip.getCertificates().size());
         Assert.assertEquals(certificate, roundTrip.getCertificates().get(0));
+    }
+
+
+    @Test
+    public void testEndBoundaryWithoutStartBoundary() throws Exception {
+        assertInvalidPem("-----END CERTIFICATE-----\n");
+    }
+
+
+    @Test
+    public void testStartBoundaryWithoutEndBoundary() throws Exception {
+        assertInvalidPem("-----BEGIN CERTIFICATE-----\n" + "QUJD\n");
+    }
+
+
+    @Test
+    public void testStartBoundaryInsidePart() throws Exception {
+        assertInvalidPem("-----BEGIN CERTIFICATE-----\n" + "QUJD\n" + "-----BEGIN CERTIFICATE-----\n" + "RUZH\n");
+    }
+
+
+    @Test
+    public void testMismatchedBoundaryTypes() throws Exception {
+        assertInvalidPem("-----BEGIN CERTIFICATE-----\n" + "QUJD\n" + "-----END RSA PRIVATE KEY-----\n");
+    }
+
+
+    @Test
+    public void testBoundaryLineWithoutFinishBoundary() throws Exception {
+        assertInvalidPem("-----BEGIN CERTIFICATE\n");
+    }
+
+
+    @Test
+    public void testDekInfoWithoutAlgorithmAndIv() throws Exception {
+        assertInvalidPem("-----BEGIN RSA PRIVATE KEY-----\n" + "DEK-Info: DES-EDE3-CBC\n" + "QUJD\n"
+                + "-----END RSA PRIVATE KEY-----\n");
+    }
+
+
+    @Test
+    public void testBoundaryLinesWithTrailingWhiteSpace() throws Exception {
+        // RFC 7468 allows white space between the finish boundary and the end
+        // of the line
+        byte[] fileBytes = Files.readAllBytes(new File(getPath(CERTIFICATE)).toPath());
+        String pem = new String(fileBytes, StandardCharsets.US_ASCII);
+        String modified = pem.replace("-----BEGIN CERTIFICATE-----", "-----BEGIN CERTIFICATE-----\t")
+                .replace("-----END CERTIFICATE-----", "-----END CERTIFICATE----- ");
+        PEMFile pemFile = new PEMFile("trailing",
+                new ByteArrayInputStream(modified.getBytes(StandardCharsets.US_ASCII)), null, null);
+        Assert.assertEquals(1, pemFile.getCertificates().size());
+    }
+
+
+    /*
+     * The structure of the file is checked while it is scanned, before any of
+     * the content is decoded, so these malformed structures must be rejected
+     * even though the content is not valid PEM encoded data.
+     */
+    private void assertInvalidPem(String content) throws Exception {
+        ByteArrayInputStream stream = new ByteArrayInputStream(content.getBytes(StandardCharsets.US_ASCII));
+        try {
+            new PEMFile("invalid", stream, null, null);
+            Assert.fail("Expected the malformed PEM to be rejected");
+        } catch (IOException ioe) {
+            // Expected
+        }
     }
 
 
