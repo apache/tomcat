@@ -120,9 +120,16 @@ public class PEMFile {
      * @throws CertificateEncodingException If the certificate cannot be encoded
      */
     public static String toPEM(X509Certificate certificate) throws CertificateEncodingException {
-        return Part.BEGIN_BOUNDARY + Part.CERTIFICATE + Part.FINISH_BOUNDARY + System.lineSeparator() +
-                Base64.getMimeEncoder().encodeToString(certificate.getEncoded()) + Part.END_BOUNDARY +
-                Part.CERTIFICATE + Part.FINISH_BOUNDARY;
+        // RFC 7468 requires encoded lines of 64 characters, a line separator
+        // after each line and a line separator after the end boundary. Use the
+        // same line separator here as for the boundaries.
+        String lineSeparator = System.lineSeparator();
+        Base64.Encoder encoder =
+                Base64.getMimeEncoder(64, lineSeparator.getBytes(StandardCharsets.US_ASCII));
+
+        return Part.BEGIN_BOUNDARY + Part.CERTIFICATE + Part.FINISH_BOUNDARY + lineSeparator +
+                encoder.encodeToString(certificate.getEncoded()) + lineSeparator + Part.END_BOUNDARY +
+                Part.CERTIFICATE + Part.FINISH_BOUNDARY + lineSeparator;
     }
 
     private final List<X509Certificate> certificates = new ArrayList<>();
