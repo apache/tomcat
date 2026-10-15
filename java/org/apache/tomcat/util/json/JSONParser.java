@@ -459,9 +459,19 @@ public class JSONParser implements JSONParserConstants {
             case NUMBER_INTEGER: {
                 t = jj_consume_token(NUMBER_INTEGER);
                 if (nativeNumbers) {
-                    {
-                        if ("" != null) {
-                            return Long.valueOf(t.image);
+                    try {
+                        {
+                            if ("" != null) {
+                                return Long.valueOf(t.image);
+                            }
+                        }
+                    } catch (NumberFormatException nfe) {
+                        {
+                            // The grammar admits integers that do not fit a long. Fall back to BigInteger rather
+                            // than failing the parse, matching the behaviour of the non-native path.
+                            if ("" != null) {
+                                return new java.math.BigInteger(t.image);
+                            }
                         }
                     }
                 } else {
