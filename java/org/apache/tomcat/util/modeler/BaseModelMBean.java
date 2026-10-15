@@ -354,9 +354,15 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
                     sm.getString("baseModelMBean.nullAttributeName"));
         }
 
+        // Get the old value for the change notification below. The attribute
+        // may be write-only or the getter may fail, in which case the old
+        // value remains unknown (null).
         Object oldValue = null;
-        // if( getAttMap.get(name) != null )
-        // oldValue=getAttribute( name );
+        try {
+            oldValue = getAttribute(name);
+        } catch (Exception ignore) {
+            // Old value unknown - ignore
+        }
 
         Method m = managedBean.getSetter(name, this, resource);
 
