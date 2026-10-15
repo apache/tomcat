@@ -17,6 +17,8 @@
 package org.apache.tomcat.util.json;
 
 import java.io.StringReader;
+import java.math.BigInteger;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -53,6 +55,24 @@ public class TestJSONParser {
         }
         parser.ReInit(new StringReader("[1]"));
         Assert.assertNotNull(parser.parse());
+    }
+
+    @Test
+    public void testNativeNumbersBeyondLongRange() throws ParseException {
+        JSONParser parser = new JSONParser("[9223372036854775808, -9223372036854775809]");
+        parser.setNativeNumbers(true);
+        List<Object> values = parser.parseArray();
+        Assert.assertEquals(new BigInteger("9223372036854775808"), values.get(0));
+        Assert.assertEquals(new BigInteger("-9223372036854775809"), values.get(1));
+    }
+
+    @Test
+    public void testNativeNumbersWithinLongRange() throws ParseException {
+        JSONParser parser = new JSONParser("[9223372036854775807, -9223372036854775808]");
+        parser.setNativeNumbers(true);
+        List<Object> values = parser.parseArray();
+        Assert.assertEquals(Long.valueOf(Long.MAX_VALUE), values.get(0));
+        Assert.assertEquals(Long.valueOf(Long.MIN_VALUE), values.get(1));
     }
 
     private static String nest(int depth) {
