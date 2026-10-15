@@ -438,6 +438,20 @@ public class PEMFile {
                             log.warn(sm.getString("pemFile.encryption.insecure", filename, algorithm));
                             break;
                         }
+                        case "AES-128-CBC": {
+                            secretKeyAlgorithm = "AES";
+                            cipherTransformation = "AES/CBC/PKCS5Padding";
+                            keyLength = 16;
+                            log.warn(sm.getString("pemFile.encryption.insecure", filename, algorithm));
+                            break;
+                        }
+                        case "AES-192-CBC": {
+                            secretKeyAlgorithm = "AES";
+                            cipherTransformation = "AES/CBC/PKCS5Padding";
+                            keyLength = 24;
+                            log.warn(sm.getString("pemFile.encryption.insecure", filename, algorithm));
+                            break;
+                        }
                         case "AES-256-CBC": {
                             secretKeyAlgorithm = "AES";
                             cipherTransformation = "AES/CBC/PKCS5Padding";
@@ -446,11 +460,8 @@ public class PEMFile {
                             break;
                         }
                         default:
-                            // This will almost certainly trigger errors
-                            secretKeyAlgorithm = algorithm;
-                            cipherTransformation = algorithm;
-                            keyLength = 8;
-                            break;
+                            throw new NoSuchAlgorithmException(
+                                    sm.getString("pemFile.unknownDekInfoAlgorithm", filename, algorithm));
                     }
 
                     byte[] iv = fromHex(ivHex);
