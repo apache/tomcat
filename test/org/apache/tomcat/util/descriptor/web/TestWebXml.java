@@ -716,11 +716,11 @@ public class TestWebXml {
         // port-component-ref entries which were historically stored in the
         // same map.
         String input = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                "<web-app xmlns=\"https://jakarta.ee/xml/ns/jakartaee\"\n" +
+                "<web-app xmlns=\"http://xmlns.jcp.org/xml/ns/javaee\"\n" +
                 "         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-                "         xsi:schemaLocation=\"https://jakarta.ee/xml/ns/jakartaee" +
-                " https://jakarta.ee/xml/ns/jakartaee/web-app_6_1.xsd\"\n" +
-                "         version=\"6.1\"\n" +
+                "         xsi:schemaLocation=\"http://xmlns.jcp.org/xml/ns/javaee" +
+                " http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd\"\n" +
+                "         version=\"4.0\"\n" +
                 "         metadata-complete=\"true\">\n" +
                 "\n" +
                 "  <service-ref>\n" +
