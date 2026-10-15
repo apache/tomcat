@@ -18,6 +18,7 @@
 package org.apache.tomcat.util.net;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -74,6 +75,51 @@ public class TestKeyManagerWrappingFips {
         getKeyManagers();
         Assert.assertTrue(DummyKeyStoreSpi.wrappingOccurred);
     }
+
+
+    @Test
+    public void testFipsWithPemConfiguration() throws Exception {
+        Security.addProvider(new DummyKeyManagerFactoryProvider(FIPS_PROVIDER,
+                "Sun JSSE provider (FIPS mode, crypto provider SunPKCS11-NSSfips", DUMMY_ALGORITHM));
+
+        SSLHostConfigCertificate certificate = getCertificate();
+        certificate.setCertificateFile("server.crt");
+
+        try {
+            new JSSEUtil(certificate).getKeyManagers();
+            Assert.fail("PEM format certificates are not supported with a FIPS key manager factory");
+        } catch (IOException ioe) {
+            // Before the FIPS branch checked for a key store, the key manager
+            // factory was initialised with a null key store. That produced a key
+            // manager with no keys which failed every TLS handshake with an
+            // unrelated error rather than reporting the configuration error.
+            Assert.assertTrue(ioe.getMessage(), ioe.getMessage().contains("PEM"));
+        }
+    }
+
+
+    @Test
+    public void testFipsWithoutConfiguration() throws Exception {
+        Security.addProvider(new DummyKeyManagerFactoryProvider(FIPS_PROVIDER,
+                "Sun JSSE provider (FIPS mode, crypto provider SunPKCS11-NSSfips", DUMMY_ALGORITHM));
+
+        try {
+            new JSSEUtil(getCertificate()).getKeyManagers();
+            Assert.fail("A certificate configuration is required");
+        } catch (IOException ioe) {
+            // Ignore. This is the standard error for a missing certificate file.
+            Assert.assertFalse(ioe.getMessage(), ioe.getMessage().contains("PEM"));
+        }
+    }
+
+
+    private SSLHostConfigCertificate getCertificate() {
+        SSLHostConfig hostConfig = new SSLHostConfig();
+        hostConfig.setKeyManagerAlgorithm(DUMMY_ALGORITHM);
+        return new SSLHostConfigCertificate(hostConfig, SSLHostConfigCertificate.Type.UNDEFINED);
+    }
+
+
     private void getKeyManagers() throws Exception {
         Security.addProvider(new DummyKeyStoreProvider(KEYSTORE_PROVIDER, "", DUMMY_KEYSTORE));
         SSLHostConfig hostConfig = new SSLHostConfig();
