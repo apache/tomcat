@@ -142,7 +142,9 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource {
             registry = Registry.getRegistry(null);
         }
 
-        InputStream stream = (InputStream) source;
+        if (!(source instanceof InputStream stream)) {
+            throw new IllegalArgumentException(sm.getString("registry.invalidSource"));
+        }
 
         List<ManagedBean> loadedMbeans = new ArrayList<>();
         synchronized (dLock) {
@@ -151,7 +153,7 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource {
             }
 
             // Process the input file to configure our registry
-            try {
+            try (stream) {
                 // Push our registry object onto the stack
                 digester.push(loadedMbeans);
                 digester.parse(stream);
