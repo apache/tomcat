@@ -439,6 +439,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Bump spotbugs to 4.10.4.
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.27 (markt)" rtext="2026-10-12">
   <subsection name="Catalina">
