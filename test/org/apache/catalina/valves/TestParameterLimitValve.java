@@ -632,6 +632,8 @@ public class TestParameterLimitValve extends TomcatBaseTest {
         ctx.addServletMapping("/special/endpoint", "snoop");
         ctx.addServletMapping("/other/endpoint", "snoop");
 
+        addFailedRequestFilter(ctx);
+
         tomcat.start();
 
         int rc = getUrl("http://localhost:" + getPort() +
@@ -668,6 +670,8 @@ public class TestParameterLimitValve extends TomcatBaseTest {
 
         Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
         ctx.addServletMapping("/special/endpoint", "snoop");
+
+        addFailedRequestFilter(ctx);
 
         tomcat.start();
 

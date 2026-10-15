@@ -49,8 +49,8 @@ public class TestServiceBindingPropertySource {
         ServiceBindingPropertySource source =
                 new ServiceBindingPropertySource(temporaryFolder.getRoot().getAbsolutePath());
 
-        Assert.assertEquals(value, source.getProperty("my-binding.keyPassword"));
-        Assert.assertEquals(value, source.getProperty("chomp:my-binding.withNewline"));
+        Assert.assertEquals(value, source.getProperty("my-binding.keyPassword", null));
+        Assert.assertEquals(value, source.getProperty("chomp:my-binding.withNewline", null));
     }
 
 
@@ -66,12 +66,12 @@ public class TestServiceBindingPropertySource {
         ServiceBindingPropertySource source =
                 new ServiceBindingPropertySource(temporaryFolder.getRoot().getAbsolutePath());
 
-        Assert.assertEquals("value", source.getProperty("chomp:my-binding.lf"));
-        Assert.assertEquals("value", source.getProperty("chomp:my-binding.crlf"));
-        Assert.assertEquals("value", source.getProperty("chomp:my-binding.cr"));
-        Assert.assertEquals("value", source.getProperty("chomp:my-binding.none"));
-        Assert.assertEquals("value\n", source.getProperty("chomp:my-binding.blankline"));
-        Assert.assertEquals("value ", source.getProperty("chomp:my-binding.trailingspace"));
+        Assert.assertEquals("value", source.getProperty("chomp:my-binding.lf", null));
+        Assert.assertEquals("value", source.getProperty("chomp:my-binding.crlf", null));
+        Assert.assertEquals("value", source.getProperty("chomp:my-binding.cr", null));
+        Assert.assertEquals("value", source.getProperty("chomp:my-binding.none", null));
+        Assert.assertEquals("value\n", source.getProperty("chomp:my-binding.blankline", null));
+        Assert.assertEquals("value ", source.getProperty("chomp:my-binding.trailingspace", null));
     }
 
 
@@ -82,10 +82,10 @@ public class TestServiceBindingPropertySource {
         ServiceBindingPropertySource source =
                 new ServiceBindingPropertySource(temporaryFolder.getRoot().getAbsolutePath());
 
-        Assert.assertNull(source.getProperty("my-binding.unknown"));
-        Assert.assertNull(source.getProperty("unknown-binding.known"));
+        Assert.assertNull(source.getProperty("my-binding.unknown", null));
+        Assert.assertNull(source.getProperty("unknown-binding.known", null));
         // A key without exactly one dot is outside the <binding-name>.<key> contract
-        Assert.assertNull(source.getProperty("no-dot"));
-        Assert.assertNull(source.getProperty("too.many.dots"));
+        Assert.assertNull(source.getProperty("no-dot", null));
+        Assert.assertNull(source.getProperty("too.many.dots", null));
     }
 }

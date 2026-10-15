@@ -167,6 +167,7 @@ public class TestRemoteIpValve {
         remoteIpValve.setNext(remoteAddrAndHostTrackerValve);
 
         Request request = new MockRequest();
+        request.setCoyoteRequest(new org.apache.coyote.Request());
         request.setRemoteAddr("192.168.0.10");
         request.setRemoteHost("remote-host-original-value");
         request.getCoyoteRequest().getMimeHeaders().addValue("x-forwarded-for").setString(" ");
