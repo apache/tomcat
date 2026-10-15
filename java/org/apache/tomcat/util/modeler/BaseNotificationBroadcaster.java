@@ -144,9 +144,10 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
             Iterator<BaseNotificationBroadcasterEntry> iterator = entries.iterator();
             while (iterator.hasNext()) {
                 BaseNotificationBroadcasterEntry item = iterator.next();
-                if (item.listener != listener || !(item.filter instanceof BaseAttributeFilter filter)) {
+                if (item.listener != listener || !(item.filter instanceof BaseAttributeFilter)) {
                     continue;
                 }
+                BaseAttributeFilter filter = (BaseAttributeFilter) item.filter;
                 String[] names = filter.getNames();
                 if (name == null) {
                     if (names.length == 0) {
