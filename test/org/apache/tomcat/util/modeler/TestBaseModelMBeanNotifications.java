@@ -33,12 +33,31 @@ public class TestBaseModelMBeanNotifications {
     private static final class TesterNotificationListener implements NotificationListener {
 
         private final List<String> received = new ArrayList<>();
+        private final List<AttributeChangeNotification> changes = new ArrayList<>();
 
         @Override
         public void handleNotification(Notification notification, Object handback) {
-            String name = notification instanceof AttributeChangeNotification ?
-                    ((AttributeChangeNotification) notification).getAttributeName() : notification.getType();
+            String name;
+            if (notification instanceof AttributeChangeNotification acn) {
+                changes.add(acn);
+                name = acn.getAttributeName();
+            } else {
+                name = notification.getType();
+            }
             received.add(name + ":" + handback);
+        }
+    }
+
+    public static class TesterResource {
+
+        private String value;
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
         }
     }
 
@@ -124,6 +143,31 @@ public class TestBaseModelMBeanNotifications {
         send(mbean, "A");
         Assert.assertTrue(listener1.received.isEmpty());
         Assert.assertEquals(List.of("A:hb"), listener2.received);
+    }
+
+    @Test
+    public void testSetAttributeNotificationContainsOldValue() throws Exception {
+        ManagedBean managedBean = new ManagedBean();
+        managedBean.setName("Value");
+        managedBean.setType("Value");
+        AttributeInfo attributeInfo = new AttributeInfo();
+        attributeInfo.setName("value");
+        attributeInfo.setDescription("The value");
+        attributeInfo.setType("java.lang.String");
+        managedBean.addAttribute(attributeInfo);
+
+        TesterResource resource = new TesterResource();
+        resource.setValue("initial");
+        BaseModelMBean mbean = (BaseModelMBean) managedBean.createMBean(resource);
+
+        TesterNotificationListener listener = new TesterNotificationListener();
+        mbean.addAttributeChangeNotificationListener(listener, "value", "hb");
+        mbean.setAttribute(new Attribute("value", "updated"));
+
+        Assert.assertEquals(1, listener.changes.size());
+        AttributeChangeNotification change = listener.changes.get(0);
+        Assert.assertEquals("initial", change.getOldValue());
+        Assert.assertEquals("updated", change.getNewValue());
     }
 
     @Test
