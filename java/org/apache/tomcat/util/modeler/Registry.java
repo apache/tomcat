@@ -575,7 +575,9 @@ public class Registry implements RegistryMBean, MBeanRegistration {
      * @param source     The bean
      * @param param      A type to load
      *
-     * @return List of descriptors
+     * @return List of object names. The sources provided with Tomcat
+     *         register the descriptors with this registry instead of
+     *         returning object names, so the returned list is empty.
      *
      * @throws Exception Error loading descriptors
      */

@@ -49,7 +49,9 @@ public abstract class ModelerSource {
      * @param type     The bean registry type
      * @param source   Introspected object or some other source
      *
-     * @return a list of object names
+     * @return a list of object names. The sources provided with Tomcat
+     *         register the descriptors with the given registry instead of
+     *         returning object names, so the returned list is empty.
      *
      * @throws Exception Error loading descriptors
      */
