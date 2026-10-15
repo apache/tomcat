@@ -114,6 +114,12 @@ public class TestIPv6Utils {
         // Already ends with "::"
         Assert.assertEquals("2001:db8::", IPv6Utils.canonize("2001:db8::"));
 
+        // "::" at the start or end standing for a single zero group next to 7 explicit groups (8 colons)
+        Assert.assertEquals("1:2:3:4:5:6:7:0", IPv6Utils.canonize("1:2:3:4:5:6:7::"));
+        Assert.assertEquals("0:2:3:4:5:6:7:8", IPv6Utils.canonize("::2:3:4:5:6:7:8"));
+        Assert.assertEquals("::", IPv6Utils.canonize("0:0:0:0:0:0:0::"));
+        Assert.assertEquals("1:2:3:4:5:6:7:0%eth0", IPv6Utils.canonize("1:2:3:4:5:6:7::%eth0"));
+
         // IPv4 inside IPv6
         Assert.assertEquals("::ffff:192.0.2.1", IPv6Utils.canonize("::ffff:192.0.2.1"));
         Assert.assertEquals("::ffff:192.0.2.1", IPv6Utils.canonize("0:0:0:0:0:ffff:192.0.2.1"));
@@ -140,5 +146,30 @@ public class TestIPv6Utils {
         // Hostname safety
         Assert.assertEquals("www.apache.org", IPv6Utils.canonize("www.apache.org"));
         Assert.assertEquals("ipv6.google.com", IPv6Utils.canonize("ipv6.google.com"));
+    }
+
+    @Test
+    public void testCanonizeTooManyGroups() {
+        // Strings with more than 8 groups pass the mayBeIPv6Address() heuristic but are not valid IPv6
+        // addresses. They used to trigger an ArrayIndexOutOfBoundsException. The input is now returned
+        // unchanged.
+        Assert.assertEquals("1:2:3:4:5:6:7:8:9", IPv6Utils.canonize("1:2:3:4:5:6:7:8:9"));
+        Assert.assertEquals("1:2:3:4:5:6:7::8:9", IPv6Utils.canonize("1:2:3:4:5:6:7::8:9"));
+        Assert.assertEquals("1:2:3:4:5:6:7:8:9:10", IPv6Utils.canonize("1:2:3:4:5:6:7:8:9:10"));
+        Assert.assertEquals("ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+                IPv6Utils.canonize("ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"));
+        Assert.assertEquals("1:2:3:4:5:6:7:8:9%1", IPv6Utils.canonize("1:2:3:4:5:6:7:8:9%1"));
+        // Additional empty groups created by more than two consecutive colons
+        Assert.assertEquals("1:2:3:4:5:6:7:8:::", IPv6Utils.canonize("1:2:3:4:5:6:7:8:::"));
+        Assert.assertEquals("::::a:::::", IPv6Utils.canonize("::::a:::::"));
+    }
+
+    @Test
+    public void testCanonizeGroupTooLong() {
+        // A group with more than 4 significant hex digits passes the mayBeIPv6Address() heuristic but is
+        // not valid IPv6. It used to trigger an ArrayIndexOutOfBoundsException. The input is now returned
+        // unchanged.
+        Assert.assertEquals("12345:0:0:0:0:0:0:0", IPv6Utils.canonize("12345:0:0:0:0:0:0:0"));
+        Assert.assertEquals("12345::", IPv6Utils.canonize("12345::"));
     }
 }
