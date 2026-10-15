@@ -913,10 +913,17 @@ public class SSLHostConfig implements Serializable {
     /**
      * Obtain the current cipher suite (TLSv1.3) configuration.
      *
-     * @return An OpenSSL cipher suite string for the current configuration.
+     * @return An OpenSSL cipher suite string for the current configuration
+     *         or {@code null} if no cipher suites have been configured.
      */
     public String getCipherSuites() {
-        StringBuilder sb = new StringBuilder(cipherSuites);
+        if (cipherSuites == null && cipherSuitesFromCiphers == null) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder();
+        if (cipherSuites != null) {
+            sb.append(cipherSuites);
+        }
         if (cipherSuitesFromCiphers != null && !cipherSuitesFromCiphers.isEmpty()) {
             if (sb.length() > 0) {
                 sb.append(':');
