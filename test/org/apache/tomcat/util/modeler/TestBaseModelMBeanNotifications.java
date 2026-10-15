@@ -40,7 +40,8 @@ public class TestBaseModelMBeanNotifications {
         public void handleNotification(Notification notification, Object handback) {
             sequences.add(notification.getSequenceNumber());
             String name;
-            if (notification instanceof AttributeChangeNotification acn) {
+            if (notification instanceof AttributeChangeNotification) {
+                AttributeChangeNotification acn = (AttributeChangeNotification) notification;
                 changes.add(acn);
                 name = acn.getAttributeName();
             } else {

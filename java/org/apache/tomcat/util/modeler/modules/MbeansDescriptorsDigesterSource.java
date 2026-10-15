@@ -142,10 +142,11 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource {
             registry = Registry.getRegistry(null);
         }
 
-        if (!(source instanceof InputStream stream)) {
+        if (!(source instanceof InputStream)) {
             throw new IllegalArgumentException(sm.getString("registry.invalidSource"));
         }
 
+        InputStream stream = (InputStream) source;
         List<ManagedBean> loadedMbeans = new ArrayList<>();
         synchronized (dLock) {
             if (digester == null) {
