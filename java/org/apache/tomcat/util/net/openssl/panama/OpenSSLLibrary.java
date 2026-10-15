@@ -78,7 +78,7 @@ public class OpenSSLLibrary {
 
     static MemorySegment enginePointer = MemorySegment.NULL;
 
-    static void initLibrary() {
+    public static void initLibrary() {
         synchronized (lock) {
             if (OpenSSLStatus.isLibraryInitialized()) {
                 return;
@@ -181,7 +181,9 @@ public class OpenSSLLibrary {
                 OpenSSLStatus.setVersion(OpenSSL_version_num());
                 OpenSSLStatus.setMajorVersion(openssl_h_Compatibility.MAJOR);
                 OpenSSLStatus.setMinorVersion(openssl_h_Compatibility.MINOR);
-                if (openssl_h_Compatibility.OPENSSL3) {
+                if (openssl_h_Compatibility.OPENSSL4) {
+                    OpenSSLStatus.setName(OpenSSLStatus.Name.OPENSSL4);
+                } else if (openssl_h_Compatibility.OPENSSL3) {
                     OpenSSLStatus.setName(OpenSSLStatus.Name.OPENSSL3);
                 } else if (openssl_h_Compatibility.OPENSSL) {
                     OpenSSLStatus.setName(OpenSSLStatus.Name.OPENSSL);
