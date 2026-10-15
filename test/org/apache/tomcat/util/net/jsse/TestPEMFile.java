@@ -16,9 +16,12 @@
  */
 package org.apache.tomcat.util.net.jsse;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -43,6 +46,15 @@ public class TestPEMFile {
     private static final String KEY_ENCRYPTED_PKCS8_HMACSHA256_AES_128_CBC = "key-encrypted-pkcs8-hmacsha256-aes-128-cbc.pem";
     private static final String KEY_ENCRYPTED_PKCS8_HMACSHA256_AES_256_CBC = "key-encrypted-pkcs8-hmacsha256-aes-256-cbc.pem";
     private static final String KEY_ENCRYPTED_PKCS8_HMACSHA256_DES_EDE3_CBC = "key-encrypted-pkcs8-hmacsha256-des-ede3-cbc.pem";
+
+    /*
+     * A clean single certificate PEM. Generated with:
+     *   keytool -exportcert -rfc -keystore test/localhost-rsa.jks
+     *           -storepass changeit -alias tomcat
+     * with the line endings converted from CRLF to LF. The certificate itself
+     * expires on 2028-08-11.
+     */
+    private static final String CERTIFICATE = "certificate.pem";
 
     @Parameterized.Parameters
     public static Collection<Object[]> parameters() {
@@ -114,6 +126,43 @@ public class TestPEMFile {
     @Test
     public void testKeyEncryptedPkcs8HmacSha256DesEde3Cbc() throws Exception {
         testKeyEncrypted(KEY_ENCRYPTED_PKCS8_HMACSHA256_DES_EDE3_CBC);
+    }
+
+
+    @Test
+    public void testToPem() throws Exception {
+        PEMFile pemFile = new PEMFile(getPath(CERTIFICATE));
+        Assert.assertEquals(1, pemFile.getCertificates().size());
+        X509Certificate certificate = pemFile.getCertificates().get(0);
+
+        String pem = PEMFile.toPEM(certificate);
+
+        // RFC 7468: each boundary is on a line of its own and the encoded text
+        // ends with a line separator
+        String[] lines = pem.split(System.lineSeparator());
+        Assert.assertEquals("-----BEGIN CERTIFICATE-----", lines[0]);
+        Assert.assertEquals("-----END CERTIFICATE-----", lines[lines.length - 1]);
+        Assert.assertTrue("Missing line separator at end of: " + pem, pem.endsWith(System.lineSeparator()));
+
+        // The same line separator is used throughout the encoded text and no
+        // line is longer than the 64 characters RFC 7468 requires
+        String separatorsRemoved = pem.replace(System.lineSeparator(), "");
+        Assert.assertFalse("Unexpected line separator in: " + pem, separatorsRemoved.contains("\r"));
+        Assert.assertFalse("Unexpected line separator in: " + pem, separatorsRemoved.contains("\n"));
+        for (String line : lines) {
+            Assert.assertTrue("Long line: " + line, line.length() <= 64 || line.startsWith("-----"));
+        }
+        // RFC 7468 requires all the lines of encoded text but the last one to
+        // contain exactly 64 characters
+        for (int i = 1; i < lines.length - 2; i++) {
+            Assert.assertEquals("Short line: " + lines[i], 64, lines[i].length());
+        }
+
+        // The encoded text must be readable as PEM
+        PEMFile roundTrip =
+                new PEMFile("toPEM", new ByteArrayInputStream(pem.getBytes(StandardCharsets.US_ASCII)), null, null);
+        Assert.assertEquals(1, roundTrip.getCertificates().size());
+        Assert.assertEquals(certificate, roundTrip.getCertificates().get(0));
     }
 
 
