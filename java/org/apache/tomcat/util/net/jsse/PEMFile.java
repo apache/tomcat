@@ -82,6 +82,8 @@ public class PEMFile {
     // Default defined in RFC 8018
     private static final String DEFAULT_PRF = "HmacSHA1";
 
+    private static final String DEK_INFO = "DEK-Info: ";
+
     private static final Map<String,String> OID_TO_PRF = new HashMap<>();
     static {
         // 1.2.840.113549.2.7
@@ -249,26 +251,45 @@ public class PEMFile {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith(Part.BEGIN_BOUNDARY)) {
+                    if (part != null) {
+                        throw new IOException(sm.getString("pemFile.startWithoutEnd", filename, part.type));
+                    }
                     part = new Part();
-                    part.type =
-                            line.substring(Part.BEGIN_BOUNDARY.length(), line.length() - Part.FINISH_BOUNDARY.length())
-                                    .trim();
+                    part.type = getBoundaryType(filename, line, Part.BEGIN_BOUNDARY);
                 } else if (line.startsWith(Part.END_BOUNDARY)) {
+                    if (part == null) {
+                        throw new IOException(sm.getString("pemFile.endWithoutStart", filename, line));
+                    }
+                    String endType = getBoundaryType(filename, line, Part.END_BOUNDARY);
+                    if (!part.type.equals(endType)) {
+                        throw new IOException(sm.getString("pemFile.boundaryTypeMismatch", filename, part.type,
+                                endType));
+                    }
                     parts.add(part);
                     part = null;
                 } else if (part != null && !line.contains(":") && !line.startsWith(" ")) {
                     part.content += line;
                 } else if (part != null && line.contains(":") && !line.startsWith(" ")) {
                     /* Something like DEK-Info: DES-EDE3-CBC,B5A53CB8B7E50064 */
-                    if (line.startsWith("DEK-Info: ")) {
-                        String[] pieces = line.split(" ");
-                        pieces = pieces[1].split(",");
-                        if (pieces.length == 2) {
-                            part.algorithm = pieces[0];
-                            part.ivHex = pieces[1];
+                    if (line.startsWith(DEK_INFO)) {
+                        String[] pieces = line.substring(DEK_INFO.length()).trim().split(",");
+                        if (pieces.length != 2) {
+                            throw new IOException(sm.getString("pemFile.invalidDekInfo", filename, line));
                         }
+                        // White space between the comma and the IV is not part
+                        // of the IV
+                        String algorithm = pieces[0].trim();
+                        String ivHex = pieces[1].trim();
+                        if (algorithm.isEmpty() || ivHex.isEmpty()) {
+                            throw new IOException(sm.getString("pemFile.invalidDekInfo", filename, line));
+                        }
+                        part.algorithm = algorithm;
+                        part.ivHex = ivHex;
                     }
                 }
+            }
+            if (part != null) {
+                throw new IOException(sm.getString("pemFile.startWithoutEnd", filename, part.type));
             }
         }
 
@@ -308,6 +329,31 @@ public class PEMFile {
                     break;
             }
         }
+    }
+
+    /**
+     * Extract the type from a PEM boundary line, checking that the line has the
+     * structure of a boundary.
+     *
+     * @param filename    the filename to mention in the error message
+     * @param line        the line to extract the type from
+     * @param startPrefix the start of the line, either the begin or the end
+     *                    boundary prefix
+     *
+     * @return the type of the boundary, the text between the prefix and the
+     *         finish boundary, with surrounding white space removed. White
+     *         space at the end of the line is tolerated as RFC 7468 allows it.
+     *
+     * @throws IOException if the line does not have the structure of a boundary
+     */
+    private static String getBoundaryType(String filename, String line, String startPrefix) throws IOException {
+        String trimmedLine = line.trim();
+        if (trimmedLine.length() < startPrefix.length() + Part.FINISH_BOUNDARY.length()
+                || !trimmedLine.endsWith(Part.FINISH_BOUNDARY)) {
+            throw new IOException(sm.getString("pemFile.invalidBoundary", filename, line));
+        }
+        return trimmedLine.substring(startPrefix.length(), trimmedLine.length() - Part.FINISH_BOUNDARY.length())
+                .trim();
     }
 
     private static class Part {
