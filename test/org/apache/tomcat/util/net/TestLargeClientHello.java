@@ -17,7 +17,6 @@
 
 package org.apache.tomcat.util.net;
 
-import java.io.File;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;

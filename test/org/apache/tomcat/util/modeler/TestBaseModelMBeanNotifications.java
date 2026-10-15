@@ -80,7 +80,9 @@ public class TestBaseModelMBeanNotifications {
         mbean.removeAttributeChangeNotificationListener(listener, "A");
         send(mbean, "A");
         send(mbean, "B");
-        Assert.assertEquals(List.of("B:hb"), listener.received);
+        List<String> list = new ArrayList<>();
+        list.add("B:hb");
+        Assert.assertEquals(list, listener.received);
     }
 
     @Test
@@ -105,7 +107,9 @@ public class TestBaseModelMBeanNotifications {
         mbean.removeAttributeChangeNotificationListener(listener, "A");
         send(mbean, "A");
         send(mbean, "B");
-        Assert.assertEquals(List.of("B:hb2"), listener.received);
+        List<String> list = new ArrayList<>();
+        list.add("B:hb2");
+        Assert.assertEquals(list, listener.received);
     }
 
     @Test
@@ -117,7 +121,9 @@ public class TestBaseModelMBeanNotifications {
         // A specific name can not be removed from an accept-all registration
         mbean.removeAttributeChangeNotificationListener(listener, "A");
         send(mbean, "A");
-        Assert.assertEquals(List.of("A:hb"), listener.received);
+        List<String> list = new ArrayList<>();
+        list.add("A:hb");
+        Assert.assertEquals(list, listener.received);
         // The accept-all registration is removed by a null name
         mbean.removeAttributeChangeNotificationListener(listener, null);
         listener.received.clear();
@@ -132,7 +138,9 @@ public class TestBaseModelMBeanNotifications {
         mbean.addAttributeChangeNotificationListener(listener, "A", "hb");
         mbean.removeAttributeChangeNotificationListener(listener, "Z");
         send(mbean, "A");
-        Assert.assertEquals(List.of("A:hb"), listener.received);
+        List<String> list = new ArrayList<>();
+        list.add("A:hb");
+        Assert.assertEquals(list, listener.received);
     }
 
     @Test
@@ -145,7 +153,9 @@ public class TestBaseModelMBeanNotifications {
         mbean.removeAttributeChangeNotificationListener(listener1, "A");
         send(mbean, "A");
         Assert.assertTrue(listener1.received.isEmpty());
-        Assert.assertEquals(List.of("A:hb"), listener2.received);
+        List<String> list = new ArrayList<>();
+        list.add("A:hb");
+        Assert.assertEquals(list, listener2.received);
     }
 
     @Test
@@ -201,6 +211,8 @@ public class TestBaseModelMBeanNotifications {
         mbean.addNotificationListener(listener, acceptAll, "hb");
         mbean.removeAttributeChangeNotificationListener(listener, "A");
         send(mbean, "A");
-        Assert.assertEquals(List.of("A:hb"), listener.received);
+        List<String> list = new ArrayList<>();
+        list.add("A:hb");
+        Assert.assertEquals(list, listener.received);
     }
 }
