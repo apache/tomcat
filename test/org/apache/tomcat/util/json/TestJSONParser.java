@@ -16,15 +16,53 @@
  */
 package org.apache.tomcat.util.json;
 
+import java.io.StringReader;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 public class TestJSONParser {
+
+    private static final int MAX_TEST_DEPTH = 1000;
 
     @Test
     public void testUnicodeEscapeIsNotUnescapedTwice() throws ParseException {
         String json = "\"\\u005cn\"";
 
         Assert.assertEquals("\\n", new JSONParser(json).parse());
+    }
+
+    @Test
+    public void testNestingAtMaximumDepthAccepted() throws ParseException {
+        Assert.assertNotNull(new JSONParser(nest(MAX_TEST_DEPTH)).parse());
+    }
+
+    @Test(expected = ParseException.class)
+    public void testNestingAboveMaximumDepthIsParseException() throws ParseException {
+        new JSONParser(nest(MAX_TEST_DEPTH + 1)).parse();
+    }
+
+    @Test
+    public void testDepthResetAfterError() throws ParseException {
+        JSONParser parser = new JSONParser(nest(MAX_TEST_DEPTH + 1));
+        try {
+            parser.parse();
+            Assert.fail("A ParseException was expected");
+        } catch (ParseException e) {
+            // Expected
+        }
+        parser.ReInit(new StringReader("[1]"));
+        Assert.assertNotNull(parser.parse());
+    }
+
+    private static String nest(int depth) {
+        StringBuilder result = new StringBuilder(depth * 2);
+        for (int i = 0; i < depth; i++) {
+            result.append('[');
+        }
+        for (int i = 0; i < depth; i++) {
+            result.append(']');
+        }
+        return result.toString();
     }
 }
