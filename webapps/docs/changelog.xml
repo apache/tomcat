@@ -753,6 +753,9 @@
       <update>
         Update Checkstyle to 14.1.0. (markt)
       </update>
+      <update>
+        Add directory prefix to embedded ZIP packaging. (schultz)
+      </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
     </changelog>
   </subsection>
