@@ -16,11 +16,16 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import org.apache.tomcat.util.threads.VirtualThreadExecutor;
 
 public class TestAbstractEndpoint {
 
@@ -63,6 +68,45 @@ public class TestAbstractEndpoint {
             Assert.assertFalse(executor.isShutdown());
         } finally {
             executor.shutdown();
+        }
+    }
+
+    /*
+     * The virtual thread executor accepts tasks until it is shut down. A reference captured before the endpoint
+     * stopped must be rejected, as it is when the executor is a thread pool.
+     */
+    @Test
+    public void testCreatedVirtualThreadExecutorIsShutDownOnStop() throws Exception {
+        NioEndpoint endpoint = new NioEndpoint();
+        endpoint.setUseVirtualThreads(true);
+        endpoint.createExecutor();
+        Executor executor = endpoint.getExecutor();
+        Assert.assertTrue(executor instanceof VirtualThreadExecutor);
+
+        endpoint.shutdownExecutor();
+
+        Assert.assertTrue(((ExecutorService) executor).isShutdown());
+        try {
+            executor.execute(() -> {
+            });
+            Assert.fail("Expected RejectedExecutionException");
+        } catch (RejectedExecutionException e) {
+            // Expected.
+        }
+    }
+
+    @Test
+    public void testExternalVirtualThreadExecutorIsNotShutDownOnStop() throws Exception {
+        NioEndpoint endpoint = new NioEndpoint();
+        VirtualThreadExecutor executor = new VirtualThreadExecutor("test-external-");
+        endpoint.setExecutor(executor);
+        try {
+            endpoint.shutdownExecutor();
+
+            // Externally provided executors are owned by the caller
+            Assert.assertFalse(executor.isShutdown());
+        } finally {
+            executor.shutdownNow();
         }
     }
 }
