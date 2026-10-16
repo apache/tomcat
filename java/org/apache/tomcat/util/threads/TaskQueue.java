@@ -138,7 +138,16 @@ public class TaskQueue extends LinkedBlockingQueue<Runnable> implements Retryabl
     @Override
     public Runnable take() throws InterruptedException {
         if (parent != null && parent.currentThreadShouldBeStopped()) {
-            return poll(parent.getKeepAliveTime(TimeUnit.MILLISECONDS), TimeUnit.MILLISECONDS);
+            long timeout = parent.getKeepAliveTime(TimeUnit.MILLISECONDS);
+            if (timeout <= 0) {
+                /*
+                 * A timed wait with a zero timeout can not block. Waiting for the thread renewal delay instead keeps
+                 * the check for whether the thread should stop at a bounded interval without consuming CPU while the
+                 * queue is empty.
+                 */
+                timeout = Math.max(1, parent.getThreadRenewalDelay());
+            }
+            return poll(timeout, TimeUnit.MILLISECONDS);
             // yes, this may return null (in case of timeout) which normally
             // does not occur with take()
             // but the ThreadPoolExecutor implementation allows this
