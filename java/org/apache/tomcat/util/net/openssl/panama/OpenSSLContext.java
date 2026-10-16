@@ -189,6 +189,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
             // SSL protocol
             sslCtx = SSL_CTX_new(TLS_server_method());
+            if (MemorySegment.NULL.equals(sslCtx)) {
+                throw new SSLException(sm.getString("openssl.errMakeContext", OpenSSLLibrary.getLastError()));
+            }
 
             int protocol = SSL_PROTOCOL_NONE;
             for (String enabledProtocol : sslHostConfig.getEnabledProtocols()) {

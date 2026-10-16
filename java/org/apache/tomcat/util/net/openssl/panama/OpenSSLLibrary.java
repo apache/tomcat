@@ -445,10 +445,16 @@ public class OpenSSLLibrary {
         try (var localArena = Arena.ofConfined()) {
             initLibrary();
             var sslCtx = SSL_CTX_new(TLS_server_method());
+            if (MemorySegment.NULL.equals(sslCtx)) {
+                throw new IllegalStateException(sm.getString("openssl.errMakeContext", getLastError()));
+            }
             try {
                 openssl_h_Compatibility.SSL_CTX_set_options(sslCtx, SSL_OP_ALL());
                 SSL_CTX_set_cipher_list(sslCtx, localArena.allocateFrom(ciphers));
                 var ssl = SSL_new(sslCtx);
+                if (MemorySegment.NULL.equals(ssl)) {
+                    throw new IllegalStateException(sm.getString("engine.noSSL", getLastError()));
+                }
                 SSL_set_accept_state(ssl);
                 try {
                     for (String c : getCiphers(ssl)) {
