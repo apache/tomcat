@@ -94,6 +94,10 @@ public class SSLHostConfigCertificate implements Serializable {
      */
     private String certificateKeyAlias;
     /**
+     * Whether to prefer a certificate that is valid for TLS server authentication when resolving the alias.
+     */
+    private boolean certificateSelectByKeyUsage = false;
+    /**
      * The password used to access the keystore.
      */
     private String certificateKeystorePassword = null;
@@ -304,6 +308,29 @@ public class SSLHostConfigCertificate implements Serializable {
      */
     public String getCertificateKeyAlias() {
         return certificateKeyAlias;
+    }
+
+
+    /**
+     * Sets whether, when resolving the alias, Tomcat should prefer a certificate that is valid for TLS server
+     * authentication (Extended Key Usage serverAuth). This is useful for key stores
+     * that may expose several certificates sharing a Subject.
+     *
+     * @param certificateSelectByKeyUsage {@code true} to select the certificate by key usage
+     */
+    public void setCertificateSelectByKeyUsage(boolean certificateSelectByKeyUsage) {
+        sslHostConfig.setProperty("Certificate.certificateSelectByKeyUsage", SSLHostConfig.Type.JSSE);
+        this.certificateSelectByKeyUsage = certificateSelectByKeyUsage;
+    }
+
+
+    /**
+     * Returns whether the certificate is selected by key usage when resolving the alias.
+     *
+     * @return {@code true} if the certificate is selected by key usage
+     */
+    public boolean getCertificateSelectByKeyUsage() {
+        return certificateSelectByKeyUsage;
     }
 
 
