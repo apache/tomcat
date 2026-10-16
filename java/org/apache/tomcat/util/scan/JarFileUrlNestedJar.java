@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.scan;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.JarURLConnection;
 import java.net.URL;
@@ -43,10 +44,13 @@ public class JarFileUrlNestedJar extends AbstractInputStreamJar {
         jarConn.setUseCaches(false);
         warFile = jarConn.getJarFile();
 
-        String urlAsString = url.toString();
-        int pathStart = urlAsString.indexOf("!/") + 2;
-        String jarPath = urlAsString.substring(pathStart);
-        jarEntry = warFile.getJarEntry(jarPath);
+        // Use the connection to resolve the entry rather than parsing the URL string manually so that any
+        // percent-encoding in the entry name is handled the same way as the JDK handles it. A missing entry
+        // causes jarConn.getJarFile() above to throw.
+        jarEntry = jarConn.getJarEntry();
+        if (jarEntry == null) {
+            throw new FileNotFoundException(url.toExternalForm());
+        }
     }
 
 
