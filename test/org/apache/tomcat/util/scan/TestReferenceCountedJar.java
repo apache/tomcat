@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.jar.Attributes;
@@ -178,5 +179,35 @@ public class TestReferenceCountedJar {
         try (InputStream is = jar.getInputStream(ENTRY_NAME)) {
             Assert.assertEquals(CONTENT, readFully(is));
         }
+    }
+
+
+    /*
+     * Extra close() calls (more closes than opens) must not drive the reference count below zero. If the count were to
+     * go negative, subsequent open()/close() cycles would never return it to zero and the wrapped Jar would never be
+     * closed again, leaking it.
+     */
+    @Test
+    public void testExtraCloseDoesNotGoNegative() throws Exception {
+        File file = createJar();
+        URI jarUri = URI.create("jar:" + file.toURI().toURL().toExternalForm() + "!/");
+
+        ReferenceCountedJar jar = new ReferenceCountedJar(jarUri.toURL());
+        Field countField = ReferenceCountedJar.class.getDeclaredField("referenceCount");
+        countField.setAccessible(true);
+
+        jar.close();
+        Assert.assertEquals(0, countField.getInt(jar));
+
+        // Extra closes must be ignored rather than decrementing below zero.
+        jar.close();
+        jar.close();
+        Assert.assertEquals(0, countField.getInt(jar));
+
+        // A later open()/close() cycle must still be able to return to zero and release the wrapped Jar.
+        try (InputStream is = jar.getInputStream(ENTRY_NAME)) {
+            Assert.assertEquals(CONTENT, readFully(is));
+        }
+        Assert.assertEquals(0, countField.getInt(jar));
     }
 }
