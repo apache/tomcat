@@ -173,27 +173,28 @@ public class Asn1Parser {
      * Parses an ASN.1 length field.
      *
      * @return the parsed length value
+     *
+     * @throws IllegalArgumentException if the decoded length cannot be represented by this implementation, or if the
+     *             decoded length exceeds the number of bytes remaining in the input data
      */
     public int parseLength() {
         int len = next();
         if (len > 127) {
             int bytes = len - 128;
-            if (bytes > 4) {
-                throw new IllegalArgumentException(sm.getString("asn1Parser.lengthInvalid", Integer.valueOf(-1),
-                        Integer.valueOf(source.length - pos)));
-            }
-            len = 0;
+            byte[] lenBytes = new byte[bytes];
             for (int i = 0; i < bytes; i++) {
-                len = len << 8;
-                len = len + next();
+                lenBytes[i] = (byte) next();
             }
-            if (len < 0) {
-                throw new IllegalArgumentException(sm.getString("asn1Parser.lengthInvalid", Integer.valueOf(-1),
-                        Integer.valueOf(source.length - pos)));
+            // Length octets are always unsigned per X.690 8.1.3.5.
+            BigInteger bigLen = new BigInteger(1, lenBytes);
+            if (bigLen.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
+                throw new IllegalArgumentException(sm.getString("asn1Parser.lengthUnsupported", bigLen,
+                        Integer.valueOf(Integer.MAX_VALUE)));
             }
+            len = bigLen.intValue();
         }
         if (source.length - pos < len) {
-            throw new IllegalArgumentException(sm.getString("asn1Parser.lengthInvalid", Integer.valueOf(-1),
+            throw new IllegalArgumentException(sm.getString("asn1Parser.lengthInvalid", Integer.valueOf(len),
                     Integer.valueOf(source.length - pos)));
         }
 
