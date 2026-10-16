@@ -371,6 +371,15 @@
         of the entry order, matching the behaviour of the stream based JAR
         implementation. (remm)
       </fix>
+      <fix>
+        Correct the accounting of the count of submitted tasks that
+        <code>ThreadPoolExecutor</code> maintains for <code>TaskQueue</code>.
+        The count was not always adjusted when a submitted task could no
+        longer complete, such as when a rejected execution handler did not
+        throw, or when a queued task was removed. A drifted value caused
+        thread pools with idle threads to create unnecessary threads.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
