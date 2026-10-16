@@ -117,8 +117,15 @@ public class ConcurrentMessageDigest {
      * @param iterations the number of times to apply the digest
      * @param input the byte arrays to digest
      * @return the digest
+     *
+     * @throws IllegalArgumentException if iterations is less than one
      */
     public static byte[] digest(String algorithm, int iterations, byte[]... input) {
+
+        if (iterations < 1) {
+            throw new IllegalArgumentException(
+                    sm.getString("concurrentMessageDigest.invalidIterations", Integer.toString(iterations)));
+        }
 
         Queue<MessageDigest> queue = queues.get(algorithm);
         if (queue == null) {
