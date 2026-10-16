@@ -562,7 +562,8 @@
         Refactor the performance optimisation for
         <code>jakarta.servlet.jsp.el.ImportELResolver</code> to use the new
         marker class,
-        <code>jakarta.el.ELResolver.StandaloneIdentifierMarker</code>. (markt)
+        <code>jakarta.el.ELResolver.StandaloneIdentifierMarker</code>. Further
+        performance optimisation by AngeloRubens. (markt)
       </scode>
       <add>
         Extend the support for relational operators to include
