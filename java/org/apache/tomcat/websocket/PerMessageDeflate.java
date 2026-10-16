@@ -461,7 +461,10 @@ public class PerMessageDeflate implements Transformation {
 
     @Override
     public boolean validateRsv(int rsv, byte opCode) {
-        if (Util.isControl(opCode)) {
+        if (Util.isControl(opCode) || Util.isContinuation(opCode)) {
+            // RFC 7692 section 6.1: An endpoint MUST NOT set the "Per-Message Compressed" bit of
+            // control frames and non-first fragments of a data message. An endpoint receiving such
+            // a frame MUST Fail the WebSocket Connection.
             if ((rsv & RSV_BITMASK) != 0) {
                 return false;
             } else {
