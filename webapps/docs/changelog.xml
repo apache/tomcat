@@ -547,6 +547,17 @@
         using only the known terms. This matches OpenSSL behavior, where such
         an expression results in no cipher match. (remm)
       </fix>
+      <fix>
+        In the OpenSSL cipher name conversion, ignore the unimplemented SSLv2
+        ciphers so that names shared with a modern cipher, for example
+        <code>RC4-MD5</code>, resolve to the JSSE name of the modern cipher
+        rather than returning <code>null</code>, and so that names matching
+        only an SSLv2 cipher no longer resolve to a non-standard name.
+        Ambiguous and unknown names still resolve to <code>null</code>; the
+        OpenSSL engine implementations now filter such unmapped names rather
+        than adding <code>null</code> to the lists of cipher suites they
+        expose. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

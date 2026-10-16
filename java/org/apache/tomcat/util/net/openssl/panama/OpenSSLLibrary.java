@@ -458,7 +458,12 @@ public class OpenSSLLibrary {
                         if (c == null || c.isEmpty() || ciphersList.contains(c)) {
                             continue;
                         }
-                        ciphersList.add(OpenSSLCipherConfigurationParser.openSSLToJsse(c));
+                        String jsseName = OpenSSLCipherConfigurationParser.openSSLToJsse(c);
+                        // Ignore ciphers with no JSSE equivalent.
+                        if (jsseName == null) {
+                            continue;
+                        }
+                        ciphersList.add(jsseName);
                     }
                 } finally {
                     SSL_free(ssl);

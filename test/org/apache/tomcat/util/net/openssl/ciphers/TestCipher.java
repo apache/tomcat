@@ -117,6 +117,33 @@ public class TestCipher {
 
 
     /**
+     * Check that OpenSSL aliases that are shared with unimplemented SSLv2
+     * ciphers resolve to the JSSE name of the modern cipher, while genuinely
+     * ambiguous aliases, aliases that only match SSLv2 ciphers and unknown
+     * names resolve to null.
+     */
+    @Test
+    public void testOpenSSLToJsseAmbiguousNames() {
+        Assert.assertEquals("SSL_RSA_WITH_RC4_128_MD5",
+                OpenSSLCipherConfigurationParser.openSSLToJsse("RC4-MD5"));
+        Assert.assertEquals("SSL_RSA_EXPORT_WITH_RC4_40_MD5",
+                OpenSSLCipherConfigurationParser.openSSLToJsse("EXP-RC4-MD5"));
+        Assert.assertEquals("SSL_RSA_EXPORT_WITH_RC2_CBC_40_MD5",
+                OpenSSLCipherConfigurationParser.openSSLToJsse("EXP-RC2-CBC-MD5"));
+        // Unambiguous name
+        Assert.assertEquals("TLS_RSA_WITH_AES_128_CBC_SHA",
+                OpenSSLCipherConfigurationParser.openSSLToJsse("AES128-SHA"));
+        // Unknown name
+        Assert.assertNull(OpenSSLCipherConfigurationParser.openSSLToJsse("Nonsense"));
+        // Alias shared by more than one modern cipher
+        Assert.assertNull(OpenSSLCipherConfigurationParser.openSSLToJsse("SHA1"));
+        // Aliases that only match an unimplemented SSLv2 cipher
+        Assert.assertNull(OpenSSLCipherConfigurationParser.openSSLToJsse("RC2-CBC-MD5"));
+        Assert.assertNull(OpenSSLCipherConfigurationParser.openSSLToJsse("SSL_CK_RC4_128_WITH_MD5"));
+    }
+
+
+    /**
      * Check that the elements of the Cipher enumeration are all using standard
      * names from the TLS registry or are known exceptions.
      */
