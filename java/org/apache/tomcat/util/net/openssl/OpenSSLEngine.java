@@ -827,6 +827,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         if ((opts & SSL.SSL_OP_NO_TLSv1_2) == 0) {
             enabled.add(Constants.SSL_PROTO_TLSv1_2);
         }
+        if ((opts & SSL.SSL_OP_NO_TLSv1_3) == 0) {
+            enabled.add(Constants.SSL_PROTO_TLSv1_3);
+        }
         if ((opts & SSL.SSL_OP_NO_SSLv3) == 0) {
             enabled.add(Constants.SSL_PROTO_SSLv3);
         }
@@ -849,6 +852,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         boolean tlsv1 = false;
         boolean tlsv1_1 = false;
         boolean tlsv1_2 = false;
+        boolean tlsv1_3 = false;
         for (String p : protocols) {
             if (!IMPLEMENTED_PROTOCOLS_SET.contains(p)) {
                 throw new IllegalArgumentException(sm.getString("engine.unsupportedProtocol", p));
@@ -861,6 +865,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 tlsv1_1 = true;
             } else if (p.equals(Constants.SSL_PROTO_TLSv1_2)) {
                 tlsv1_2 = true;
+            } else if (p.equals(Constants.SSL_PROTO_TLSv1_3)) {
+                tlsv1_3 = true;
             }
         }
         // Enable all and then disable what we not want
@@ -876,6 +882,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
         if (!tlsv1_2) {
             SSL.setOptionsLong(state.ssl, SSL.SSL_OP_NO_TLSv1_2);
+        }
+        if (!tlsv1_3) {
+            SSL.setOptionsLong(state.ssl, SSL.SSL_OP_NO_TLSv1_3);
         }
     }
 
