@@ -450,6 +450,14 @@
         configuration. Pull request <pr>1084</pr> provided by Raphael Vullriede.
         (markt)
       </fix>
+      <fix>
+        <bug>70269</bug>: Correct a regression in the change that reset the
+        properties of statements cached by the <code>StatementCache</code>
+        interceptor that meant no statements were cached when using JDBC
+        drivers, such as H2 and MariaDB Connector/J, that always report
+        statements as not poolable. Pull request <pr>1083</pr> provided by
+        Raphael Vullriede. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
