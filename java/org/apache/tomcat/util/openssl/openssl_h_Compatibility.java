@@ -51,8 +51,8 @@ public class openssl_h_Compatibility {
     static {
         String versionString = OpenSSL_version(0).getString(0);
         OPENSSL = versionString.contains("OpenSSL");
-        OPENSSL1 = OPENSSL && OpenSSL_version_num() < 0x3000000fL;
-        OPENSSL3 = OPENSSL && OpenSSL_version_num() >= 0x3000000fL;
+        OPENSSL1 = OPENSSL && OpenSSL_version_num() < 0x30000000L;
+        OPENSSL3 = OPENSSL && OpenSSL_version_num() >= 0x30000000L;
         OPENSSL4 = OPENSSL && OpenSSL_version_num() >= 0x40000000L &&
                 openssl_h.SYMBOL_LOOKUP.find(QUIC_PROBE_SYMBOL).isPresent();
         BORINGSSL = versionString.contains("BoringSSL");

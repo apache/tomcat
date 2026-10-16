@@ -83,7 +83,7 @@ public class OpenSSLLibrary {
             if (OpenSSLStatus.isLibraryInitialized()) {
                 return;
             }
-            long initParam = (OpenSSL_version_num() >= 0x3000000fL) ? 0 : OPENSSL_INIT_ENGINE_ALL_BUILTIN();
+            long initParam = (OpenSSL_version_num() >= 0x30000000L) ? 0 : OPENSSL_INIT_ENGINE_ALL_BUILTIN();
             OPENSSL_init_ssl(initParam, MemorySegment.NULL);
             OpenSSLStatus.setLibraryInitialized(true);
         }
@@ -364,7 +364,7 @@ public class OpenSSLLibrary {
             OpenSSLStatus.setAvailable(false);
 
             try {
-                if (OpenSSL_version_num() < 0x3000000fL) {
+                if (OpenSSL_version_num() < 0x30000000L) {
                     // There could be unreferenced SSL_CTX still waiting for GC
                     System.gc();
                     freeDHParameters();
