@@ -790,6 +790,42 @@ public class TestPerMessageDeflate {
         Assert.assertNull(PerMessageDeflate.build(preferences, true));
     }
 
+
+    /*
+     * RFC 7692 section 6.1: "An endpoint MUST NOT set the 'Per-Message Compressed' bit of control frames and non-first
+     * fragments of a data message. An endpoint receiving such a frame MUST Fail the WebSocket Connection." The RSV1 bit
+     * is only meaningful on the first frame of a compressed data message. Continuation frames (non-first fragments) and
+     * control frames must not carry it.
+     */
+    @Test
+    public void testRsvBitMustNotBeSetOnContinuationFrames() {
+        List<List<Parameter>> preferences = new ArrayList<>();
+        preferences.add(Collections.emptyList());
+
+        // Standalone instance (no next transformation), as the terminal transformation would accept rsv==0.
+        PerMessageDeflate perMessageDeflate = PerMessageDeflate.build(preferences, true);
+
+        // First frame of a compressed data message: RSV1 set is valid.
+        Assert.assertTrue("RSV1 set on a text frame should be accepted",
+                perMessageDeflate.validateRsv(0b100, Constants.OPCODE_TEXT));
+        Assert.assertTrue("RSV1 set on a binary frame should be accepted",
+                perMessageDeflate.validateRsv(0b100, Constants.OPCODE_BINARY));
+
+        // Continuation frame (non-first fragment) with RSV1 set: must fail the connection.
+        Assert.assertFalse("RSV1 set on a continuation frame should be rejected",
+                perMessageDeflate.validateRsv(0b100, Constants.OPCODE_CONTINUATION));
+
+        // Control frame with RSV1 set: must fail the connection (already the case).
+        Assert.assertFalse("RSV1 set on a control frame should be rejected",
+                perMessageDeflate.validateRsv(0b100, Constants.OPCODE_PING));
+
+        // Continuation frame without RSV1: valid (this is the normal case for a
+        // fragmented compressed message).
+        Assert.assertTrue("RSV clear on a continuation frame should be accepted",
+                perMessageDeflate.validateRsv(0, Constants.OPCODE_CONTINUATION));
+    }
+
+
     /*
      * Minimal implementation to enable other transformations to be tested. It is NOT robust.
      */
