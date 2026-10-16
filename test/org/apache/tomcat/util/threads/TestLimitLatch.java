@@ -86,6 +86,58 @@ public class TestLimitLatch {
     }
 
     @Test
+    public void testReleaseAllKeepsCount() throws Exception {
+        LimitLatch latch = new LimitLatch(2);
+        Object lock = new Object();
+
+        // Two threads hold a share of the latch
+        latch.countUpOrAwait();
+        latch.countUpOrAwait();
+
+        // Five threads wait for a share of the latch
+        TestThread[] testThreads = new TestThread[5];
+        for (int i = 0; i < testThreads.length; i++) {
+            testThreads[i] = new TestThread(latch, lock);
+            testThreads[i].start();
+        }
+        for (int i = 0; i < testThreads.length; i++) {
+            if (!waitForThreadToStart(testThreads[i])) {
+                Assert.fail("Test thread [" + i + "] did not start");
+            }
+        }
+        checkWaitingThreadCount(latch, 5);
+
+        // Releasing all waiting threads must not change the count. The released threads acquire a share which they
+        // return below.
+        latch.releaseAll();
+
+        if (!waitForThreadsToReachStage(testThreads, 0, 5, 0)) {
+            Assert.fail("Threads were not released");
+        }
+        // Two shares held by this thread plus one acquired by each of the released threads
+        Assert.assertEquals(7, latch.getCount());
+
+        synchronized (lock) {
+            lock.notifyAll();
+        }
+
+        if (!waitForThreadsToReachStage(testThreads, 0, 0, 5)) {
+            Assert.fail("Threads did not complete");
+        }
+        Assert.assertEquals(2, latch.getCount());
+
+        // Return the shares held by this thread
+        latch.countDown();
+        latch.countDown();
+        Assert.assertEquals(0, latch.getCount());
+
+        latch.reset();
+        latch.countUpOrAwait();
+        Assert.assertEquals(1, latch.getCount());
+    }
+
+
+    @Test
     public void testTenWait() throws Exception {
         LimitLatch latch = new LimitLatch(10);
         Object lock = new Object();

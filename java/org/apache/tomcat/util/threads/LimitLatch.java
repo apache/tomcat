@@ -58,7 +58,10 @@ public class LimitLatch {
 
         @Override
         protected boolean tryReleaseShared(int arg) {
-            count.decrementAndGet();
+            // An argument of zero is used for releaseAll() which must not change the acquisition count.
+            if (arg != 0) {
+                count.decrementAndGet();
+            }
             return true;
         }
     }
@@ -133,10 +136,10 @@ public class LimitLatch {
     /**
      * Releases a shared latch, making it available for another thread to use.
      *
-     * @return the previous counter value
+     * @return the counter value after the decrement
      */
     public long countDown() {
-        sync.releaseShared(0);
+        sync.releaseShared(1);
         long result = getCount();
         if (log.isTraceEnabled()) {
             log.trace("Counting down[" + Thread.currentThread().getName() + "] latch=" + result);
@@ -145,9 +148,9 @@ public class LimitLatch {
     }
 
     /**
-     * Releases all waiting threads and causes the {@link #limit} to be ignored until {@link #reset()} is called. Note
-     * that this method also decrements the acquisition counter by one as a side effect, so {@link #reset()} should be
-     * called (or a new {@link LimitLatch} used) before the limit is enforced again.
+     * Releases all waiting threads and causes the {@link #limit} to be ignored until {@link #reset()} is called. This
+     * method does not change the acquisition counter. Threads that this method releases are counted as holding a share
+     * and each must still call {@link #countDown()} once it has finished, as with any other acquisition.
      *
      * @return <code>true</code> if release was done
      */
@@ -157,7 +160,11 @@ public class LimitLatch {
     }
 
     /**
-     * Resets the latch and initializes the shared acquisition counter to zero.
+     * Resets the latch and initializes the shared acquisition counter to zero. Any shares currently held are not
+     * accounted for. When the holders of those shares later call {@link #countDown()}, the counter goes negative which
+     * effectively allows that many additional acquisitions before the limit is reached again. Reset the latch only when
+     * no shares are held (for example, after using a dedicated latch for a period during which the limit is ignored),
+     * or accept that the limit is not reliably enforced until the counter has returned to zero.
      *
      * @see #releaseAll()
      */
