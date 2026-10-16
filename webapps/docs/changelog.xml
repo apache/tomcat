@@ -540,6 +540,13 @@
         implementations to set a limit on the maximum depth of nesting.
         (remm)
       </fix>
+      <fix>
+        In the OpenSSL cipher configuration parser, treat an AND expression
+        (<code>+</code>) that contains an unknown term as matching no ciphers
+        and log a warning, rather than silently ignoring the unknown term and
+        using only the known terms. This matches OpenSSL behavior, where such
+        an expression results in no cipher match. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
