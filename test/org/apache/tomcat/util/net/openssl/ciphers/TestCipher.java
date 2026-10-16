@@ -39,8 +39,17 @@ public class TestCipher {
         StringBuilder errors = new StringBuilder();
 
         for (String openSSLCipherSuite : openSSLCipherSuites) {
+            // The protocol suffix identifies the version OpenSSL reports as
+            // the minimum protocol for the cipher suite. SSLv3 is no longer a
+            // supported alias in cipher configuration strings (removed from
+            // OpenSSL and from this parser) so strip that suffix before
+            // parsing. The suffix is not used to determine the mapping.
+            String specification = openSSLCipherSuite;
+            if (specification.endsWith("+SSLv3")) {
+                specification = specification.substring(0, specification.length() - "+SSLv3".length());
+            }
             List<String> jsseCipherSuites =
-                    OpenSSLCipherConfigurationParser.parseExpression(openSSLCipherSuite);
+                    OpenSSLCipherConfigurationParser.parseExpression(specification);
 
             for (JsseImpl jsseImpl : JSSE_IMPLS) {
                 boolean found = false;

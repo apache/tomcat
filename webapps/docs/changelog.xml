@@ -344,6 +344,13 @@
         drop TLS 1.3 when rebuilding the list of enabled protocols during
         initialization. (dsoumis)
       </fix>
+      <fix>
+        In the OpenSSL cipher configuration parser, treat an AND expression
+        (<code>+</code>) that contains an unknown term as matching no ciphers
+        and log a warning, rather than silently ignoring the unknown term and
+        using only the known terms. This matches OpenSSL behavior, where such
+        an expression results in no cipher match. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
