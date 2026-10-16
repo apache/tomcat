@@ -409,6 +409,12 @@
         write operations so a stalled peer cannot block the write thread
         indefinitely. (remm)
       </fix>
+      <fix>
+        Correct the calculation of the digest <code>response</code> value by
+        the WebSocket client when the server uses <code>qop="auth-int"</code>.
+        The hash of the (empty) entity body was omitted, resulting in an
+        incorrect response that the server always rejected. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
