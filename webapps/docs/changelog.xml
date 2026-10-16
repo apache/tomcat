@@ -678,6 +678,12 @@
         The hash of the (empty) entity body was omitted, resulting in an
         incorrect response that the server always rejected. (remm)
       </fix>
+      <fix>
+        Encode the credentials used for basic authentication by the WebSocket
+        client with UTF-8 by default rather than ISO-8859-1, and reject
+        challenges that specify a charset other than UTF-8, the only value
+        RFC 7617 allows. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
