@@ -459,6 +459,11 @@
         buffer used by the BIO pair. Patch submitted by Lukas Hellebrandt.
         (remm)
       </fix>
+      <fix>
+        Ensure the Tomcat Native based OpenSSL <code>SSLContext</code> does not
+        drop TLS 1.3 when rebuilding the list of enabled protocols during
+        initialization. (dsoumis)
+      </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
         Keep the asynchronous timeout in place until the timeout event has
@@ -526,6 +531,14 @@
         them as a connection error of type <code>STREAM_CLOSED</code> that
         closes the entire connection. These frames are already permitted when
         the stream is closed in the other direction. (remm)
+      </fix>
+      <fix>
+        The JSON parser now rejects input with a nesting depth greater than
+        1000 with a <code>ParseException</code>. Previously, deeply nested
+        input caused a <code>StackOverflowError</code> since the parser
+        recursed once per nesting level with no limit. RFC 8259 allows
+        implementations to set a limit on the maximum depth of nesting.
+        (remm)
       </fix>
     </changelog>
   </subsection>
@@ -728,11 +741,19 @@
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
+        <bug>68436</bug>: Reduce the log level from warning to debug for the
+        message logged when <code>driverClassName</code> is not set, as relying
+        on <code>DriverManager</code> to locate the driver is a valid
+        configuration. Pull request <pr>1084</pr> provided by Raphael Vullriede.
+        (markt)
+      </fix>
+      <fix>
         <bug>70269</bug>: Correct a regression in the change that reset the
         properties of statements cached by the <code>StatementCache</code>
         interceptor that meant no statements were cached when using JDBC
         drivers, such as H2 and MariaDB Connector/J, that always report
-        statements as not poolable.
+        statements as not poolable. Pull request <pr>1083</pr> provided by
+        Raphael Vullriede. (markt)
       </fix>
     </changelog>
   </subsection>
@@ -759,6 +780,9 @@
       </add>
       <update>
         Update Checkstyle to 14.1.0. (markt)
+      </update>
+      <update>
+        Add directory prefix to embedded ZIP packaging. (schultz)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
     </changelog>

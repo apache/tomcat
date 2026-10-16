@@ -309,13 +309,15 @@ public class PooledConnection implements PooledConnectionMBean {
 
         try {
             if (driver==null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Instantiating driver using class: "+poolProperties.getDriverClassName()+" [url="+poolProperties.getUrl()+"]");
-                }
                 if (poolProperties.getDriverClassName()==null) {
                     //rely on DriverManager
-                    log.warn("Not loading a JDBC driver as driverClassName property is null.");
+                    if (log.isDebugEnabled()) {
+                        log.debug("No driverClassName is configured so the driver will be located by DriverManager.");
+                    }
                 } else {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Instantiating driver using class: "+poolProperties.getDriverClassName()+" [url="+poolProperties.getUrl()+"]");
+                    }
                     driver = (java.sql.Driver)
                         ClassLoaderUtil.loadClass(
                             poolProperties.getDriverClassName(),

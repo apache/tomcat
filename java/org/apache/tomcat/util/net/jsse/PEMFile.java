@@ -82,6 +82,8 @@ public class PEMFile {
     // Default defined in RFC 8018
     private static final String DEFAULT_PRF = "HmacSHA1";
 
+    private static final String DEK_INFO = "DEK-Info: ";
+
     private static final Map<String,String> OID_TO_PRF = new HashMap<>();
     static {
         // 1.2.840.113549.2.7
@@ -120,9 +122,16 @@ public class PEMFile {
      * @throws CertificateEncodingException If the certificate cannot be encoded
      */
     public static String toPEM(X509Certificate certificate) throws CertificateEncodingException {
-        return Part.BEGIN_BOUNDARY + Part.CERTIFICATE + Part.FINISH_BOUNDARY + System.lineSeparator() +
-                Base64.getMimeEncoder().encodeToString(certificate.getEncoded()) + Part.END_BOUNDARY +
-                Part.CERTIFICATE + Part.FINISH_BOUNDARY;
+        // RFC 7468 requires encoded lines of 64 characters, a line separator
+        // after each line and a line separator after the end boundary. Use the
+        // same line separator here as for the boundaries.
+        String lineSeparator = System.lineSeparator();
+        Base64.Encoder encoder =
+                Base64.getMimeEncoder(64, lineSeparator.getBytes(StandardCharsets.US_ASCII));
+
+        return Part.BEGIN_BOUNDARY + Part.CERTIFICATE + Part.FINISH_BOUNDARY + lineSeparator +
+                encoder.encodeToString(certificate.getEncoded()) + lineSeparator + Part.END_BOUNDARY +
+                Part.CERTIFICATE + Part.FINISH_BOUNDARY + lineSeparator;
     }
 
     private final List<X509Certificate> certificates = new ArrayList<>();
@@ -242,26 +251,45 @@ public class PEMFile {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith(Part.BEGIN_BOUNDARY)) {
+                    if (part != null) {
+                        throw new IOException(sm.getString("pemFile.startWithoutEnd", filename, part.type));
+                    }
                     part = new Part();
-                    part.type =
-                            line.substring(Part.BEGIN_BOUNDARY.length(), line.length() - Part.FINISH_BOUNDARY.length())
-                                    .trim();
+                    part.type = getBoundaryType(filename, line, Part.BEGIN_BOUNDARY);
                 } else if (line.startsWith(Part.END_BOUNDARY)) {
+                    if (part == null) {
+                        throw new IOException(sm.getString("pemFile.endWithoutStart", filename, line));
+                    }
+                    String endType = getBoundaryType(filename, line, Part.END_BOUNDARY);
+                    if (!part.type.equals(endType)) {
+                        throw new IOException(sm.getString("pemFile.boundaryTypeMismatch", filename, part.type,
+                                endType));
+                    }
                     parts.add(part);
                     part = null;
                 } else if (part != null && !line.contains(":") && !line.startsWith(" ")) {
                     part.content += line;
                 } else if (part != null && line.contains(":") && !line.startsWith(" ")) {
                     /* Something like DEK-Info: DES-EDE3-CBC,B5A53CB8B7E50064 */
-                    if (line.startsWith("DEK-Info: ")) {
-                        String[] pieces = line.split(" ");
-                        pieces = pieces[1].split(",");
-                        if (pieces.length == 2) {
-                            part.algorithm = pieces[0];
-                            part.ivHex = pieces[1];
+                    if (line.startsWith(DEK_INFO)) {
+                        String[] pieces = line.substring(DEK_INFO.length()).trim().split(",");
+                        if (pieces.length != 2) {
+                            throw new IOException(sm.getString("pemFile.invalidDekInfo", filename, line));
                         }
+                        // White space between the comma and the IV is not part
+                        // of the IV
+                        String algorithm = pieces[0].trim();
+                        String ivHex = pieces[1].trim();
+                        if (algorithm.isEmpty() || ivHex.isEmpty()) {
+                            throw new IOException(sm.getString("pemFile.invalidDekInfo", filename, line));
+                        }
+                        part.algorithm = algorithm;
+                        part.ivHex = ivHex;
                     }
                 }
+            }
+            if (part != null) {
+                throw new IOException(sm.getString("pemFile.startWithoutEnd", filename, part.type));
             }
         }
 
@@ -301,6 +329,31 @@ public class PEMFile {
                     break;
             }
         }
+    }
+
+    /**
+     * Extract the type from a PEM boundary line, checking that the line has the
+     * structure of a boundary.
+     *
+     * @param filename    the filename to mention in the error message
+     * @param line        the line to extract the type from
+     * @param startPrefix the start of the line, either the begin or the end
+     *                    boundary prefix
+     *
+     * @return the type of the boundary, the text between the prefix and the
+     *         finish boundary, with surrounding white space removed. White
+     *         space at the end of the line is tolerated as RFC 7468 allows it.
+     *
+     * @throws IOException if the line does not have the structure of a boundary
+     */
+    private static String getBoundaryType(String filename, String line, String startPrefix) throws IOException {
+        String trimmedLine = line.trim();
+        if (trimmedLine.length() < startPrefix.length() + Part.FINISH_BOUNDARY.length()
+                || !trimmedLine.endsWith(Part.FINISH_BOUNDARY)) {
+            throw new IOException(sm.getString("pemFile.invalidBoundary", filename, line));
+        }
+        return trimmedLine.substring(startPrefix.length(), trimmedLine.length() - Part.FINISH_BOUNDARY.length())
+                .trim();
     }
 
     private static class Part {
@@ -385,6 +438,20 @@ public class PEMFile {
                             log.warn(sm.getString("pemFile.encryption.insecure", filename, algorithm));
                             break;
                         }
+                        case "AES-128-CBC": {
+                            secretKeyAlgorithm = "AES";
+                            cipherTransformation = "AES/CBC/PKCS5Padding";
+                            keyLength = 16;
+                            log.warn(sm.getString("pemFile.encryption.insecure", filename, algorithm));
+                            break;
+                        }
+                        case "AES-192-CBC": {
+                            secretKeyAlgorithm = "AES";
+                            cipherTransformation = "AES/CBC/PKCS5Padding";
+                            keyLength = 24;
+                            log.warn(sm.getString("pemFile.encryption.insecure", filename, algorithm));
+                            break;
+                        }
                         case "AES-256-CBC": {
                             secretKeyAlgorithm = "AES";
                             cipherTransformation = "AES/CBC/PKCS5Padding";
@@ -393,11 +460,8 @@ public class PEMFile {
                             break;
                         }
                         default:
-                            // This will almost certainly trigger errors
-                            secretKeyAlgorithm = algorithm;
-                            cipherTransformation = algorithm;
-                            keyLength = 8;
-                            break;
+                            throw new NoSuchAlgorithmException(
+                                    sm.getString("pemFile.unknownDekInfoAlgorithm", filename, algorithm));
                     }
 
                     byte[] iv = fromHex(ivHex);

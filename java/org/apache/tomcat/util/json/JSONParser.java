@@ -30,6 +30,16 @@ public class JSONParser implements JSONParserConstants {
 
     private boolean nativeNumbers = false;
 
+    /*
+     * The maximum nesting depth accepted by the parser. Deeply nested input would otherwise make the recursive
+     * descent exhaust the stack of the thread running the parser. RFC 8259 allows implementations to set a limit
+     * on the maximum depth of nesting. A depth of 1000 is far beyond what realistic JSON documents use and
+     * matches the limit used by other mainstream JSON parsers.
+     */
+    private static final int MAX_DEPTH = 1000;
+
+    private int depth = 0;
+
     public JSONParser(String input) {
         this(new java.io.StringReader(input));
     }
@@ -38,6 +48,7 @@ public class JSONParser implements JSONParserConstants {
      * Parses a JSON object into a Java {@code Map}.
      */
     public java.util.LinkedHashMap<String,Object> parseObject() throws ParseException {
+        depth = 0;
         java.util.LinkedHashMap<String,Object> toReturn = object();
         if (!ensureEOF()) {
             throw new IllegalStateException("Expected EOF, but still had content to parse");
@@ -49,6 +60,7 @@ public class JSONParser implements JSONParserConstants {
      * Parses a JSON array into a Java {@code List}.
      */
     public java.util.ArrayList<Object> parseArray() throws ParseException {
+        depth = 0;
         java.util.ArrayList<Object> toReturn = list();
         if (!ensureEOF()) {
             throw new IllegalStateException("Expected EOF, but still had content to parse");
@@ -60,6 +72,7 @@ public class JSONParser implements JSONParserConstants {
      * Parses any JSON-parsable object, returning the value.
      */
     public Object parse() throws ParseException {
+        depth = 0;
         Object toReturn = anything();
         if (!ensureEOF()) {
             throw new IllegalStateException("Expected EOF, but still had content to parse");
@@ -149,6 +162,9 @@ public class JSONParser implements JSONParserConstants {
 
     final public Object anything() throws ParseException {
         Object x;
+        if (++depth > MAX_DEPTH) {
+            throw new ParseException("Maximum nesting depth " + MAX_DEPTH + " exceeded");
+        }
         switch (jj_nt.kind) {
             case BRACE_OPEN: {
                 x = object();
@@ -177,6 +193,7 @@ public class JSONParser implements JSONParserConstants {
         }
         {
             if ("" != null) {
+                depth--;
                 return x;
             }
         }
@@ -442,9 +459,19 @@ public class JSONParser implements JSONParserConstants {
             case NUMBER_INTEGER: {
                 t = jj_consume_token(NUMBER_INTEGER);
                 if (nativeNumbers) {
-                    {
-                        if ("" != null) {
-                            return Long.valueOf(t.image);
+                    try {
+                        {
+                            if ("" != null) {
+                                return Long.valueOf(t.image);
+                            }
+                        }
+                    } catch (NumberFormatException nfe) {
+                        {
+                            // The grammar admits integers that do not fit a long. Fall back to BigInteger rather
+                            // than failing the parse, matching the behaviour of the non-native path.
+                            if ("" != null) {
+                                return new java.math.BigInteger(t.image);
+                            }
                         }
                     }
                 } else {

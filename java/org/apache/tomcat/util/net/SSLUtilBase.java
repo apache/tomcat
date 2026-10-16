@@ -353,6 +353,16 @@ public abstract class SSLUtilBase implements SSLUtil {
             if (keyAlias != null) {
                 log.warn(sm.getString("sslUtilBase.aliasIgnored", keyAlias));
             }
+            if (ks == null) {
+                if (certificate.getCertificateFile() == null) {
+                    throw new IOException(sm.getString("sslUtilBase.noCertFile"));
+                }
+                // Importing PEM format certificates into an in memory key store
+                // requires the key manipulation that is avoided above. Passing a
+                // null key store to the factory would result in a key manager
+                // with no keys and every TLS handshake would then fail.
+                throw new IOException(sm.getString("sslUtilBase.fipsPemNotSupported"));
+            }
             kmf.init(ksUsed, keyPassArray);
             return kmf.getKeyManagers();
         }

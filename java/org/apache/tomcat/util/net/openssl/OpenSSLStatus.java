@@ -35,6 +35,8 @@ public class OpenSSLStatus {
         OPENSSL,
         /** OpenSSL 3.x. */
         OPENSSL3,
+        /** OpenSSL 4.x. */
+        OPENSSL4,
         /** LibreSSL. */
         LIBRESSL,
         /** BoringSSL. */
@@ -226,6 +228,15 @@ public class OpenSSLStatus {
      */
     public static boolean isOpenSSL3() {
         return Name.OPENSSL3.equals(name);
+    }
+
+    /**
+     * Checks if running with OpenSSL 4.0 or later that provides the QUIC API.
+     *
+     * @return true if running with OpenSSL 4.0+ that exposes a QUIC specific symbol
+     */
+    public static boolean isOpenSSL4() {
+        return Name.OPENSSL4.equals(name);
     }
 
     /**

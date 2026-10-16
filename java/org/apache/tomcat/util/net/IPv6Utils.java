@@ -90,6 +90,20 @@ public class IPv6Utils {
             ipv6AddressLength = ipv6Address.lastIndexOf('%');
         }
 
+        // A valid IPv6 address contains at most 8 colons: 7 separate 8 explicit groups, and 8 are only reached
+        // when "::" compresses a single zero group next to 7 explicit groups (RFC 4291 allows "::" to stand for
+        // one or more zero groups). Inputs with more colons than that are not valid IPv6 addresses but the
+        // mayBeIPv6Address() heuristic above does not exclude them. Return such inputs unchanged.
+        int colonCount = 0;
+        for (int i = 0; i < ipv6AddressLength; i++) {
+            if (ipv6Address.charAt(i) == ':') {
+                colonCount++;
+            }
+        }
+        if (colonCount > MAX_NUMBER_OF_GROUPS) {
+            return ipv6Address;
+        }
+
         StringBuilder result = new StringBuilder();
         char[][] groups = new char[MAX_NUMBER_OF_GROUPS][MAX_GROUP_LENGTH];
         int groupCounter = 0;
@@ -151,6 +165,12 @@ public class IPv6Utils {
                 c = (char) (c + 32);
             }
             if (c != ':') {
+                if (groupCounter >= MAX_NUMBER_OF_GROUPS || charInGroupCounter >= MAX_GROUP_LENGTH) {
+                    // A ninth group with content, or a group with more than 4 significant characters. Neither is a
+                    // valid IPv6 address but the mayBeIPv6Address() heuristic above does not exclude them. Return
+                    // the input unchanged.
+                    return ipv6Address;
+                }
                 groups[groupCounter][charInGroupCounter] = c;
                 if (!(groupStart && c == '0')) {
                     ++charInGroupCounter;

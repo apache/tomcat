@@ -82,7 +82,7 @@ public class openssl_h {
     public static final String LIBRARY_NAME = System.getProperty("org.apache.tomcat.util.openssl.LIBRARY_NAME",
             (JrePlatform.IS_MAC_OS) ? "ssl.48" : "ssl");
 
-    static final SymbolLookup SYMBOL_LOOKUP;
+    public static final SymbolLookup SYMBOL_LOOKUP;
     static {
         if (USE_SYSTEM_LOAD_LIBRARY) {
             if (CRYPTO_LIBRARY_NAME != null) {
@@ -3853,6 +3853,59 @@ public class openssl_h {
                 traceDowncall("d2i_X509_bio", bp, x509);
             }
             return (MemorySegment) mh$.invokeExact(bp, x509);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class d2i_AutoPrivateKey {
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER,
+                        openssl_h.C_LONG);
+
+        public static final MemorySegment ADDR = openssl_h.findOrThrow("d2i_AutoPrivateKey");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang = c : * EVP_PKEY *d2i_AutoPrivateKey(EVP_PKEY **a, const unsigned char **in, long len)
+     * }
+     */
+    public static FunctionDescriptor d2i_AutoPrivateKey$descriptor() {
+        return d2i_AutoPrivateKey.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang = c : * EVP_PKEY *d2i_AutoPrivateKey(EVP_PKEY **a, const unsigned char **in, long len)
+     * }
+     */
+    public static MethodHandle d2i_AutoPrivateKey$handle() {
+        return d2i_AutoPrivateKey.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang = c : * EVP_PKEY *d2i_AutoPrivateKey(EVP_PKEY **a, const unsigned char **in, long len)
+     * }
+     */
+    public static MemorySegment d2i_AutoPrivateKey$address() {
+        return d2i_AutoPrivateKey.ADDR;
+    }
+
+    /**
+     * {@snippet lang = c : * EVP_PKEY *d2i_AutoPrivateKey(EVP_PKEY **a, const unsigned char **in, long len)
+     * }
+     */
+    public static MemorySegment d2i_AutoPrivateKey(MemorySegment a, MemorySegment in, long len) {
+        var mh$ = d2i_AutoPrivateKey.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("d2i_AutoPrivateKey", a, in, len);
+            }
+            return (MemorySegment) mh$.invokeExact(a, in, len);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }

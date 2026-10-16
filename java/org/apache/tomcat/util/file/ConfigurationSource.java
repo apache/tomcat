@@ -79,6 +79,16 @@ public interface ConfigurationSource {
                 if (f.isFile()) {
                     return f.toURI();
                 }
+                try {
+                    return userDirUri.resolve(name);
+                } catch (IllegalArgumentException e) {
+                    // URI.resolve() rejects names that contain characters
+                    // which are not valid in a URI, such as a space. The
+                    // contract requires a URI to be returned even when no
+                    // resource exists, so fall back to the file based form
+                    // which encodes the name correctly.
+                    return f.toURI();
+                }
             }
             return userDirUri.resolve(name);
         }

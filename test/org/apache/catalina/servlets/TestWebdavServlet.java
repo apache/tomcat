@@ -1538,6 +1538,68 @@ public class TestWebdavServlet extends TomcatBaseTest {
         Assert.assertEquals(WebdavStatus.SC_CREATED, client.getStatusCode());
     }
 
+    /*
+     * An If header value that contains an empty list is invalid syntax (RFC 4918 requires at least one entry in a
+     * list). With strict If processing (the default) such a header must fail the precondition check. Without strict
+     * If processing the header is ignored, as for any other invalid If header syntax.
+     */
+    @Test
+    public void testIfHeaderEmptyListStrict() throws Exception {
+        Client client = doTestIfHeaderEmptyList("webdav-emptyif-strict", true);
+        client.setRequest(new String[] {
+                "PUT /file1.txt HTTP/1.1" + CRLF +
+                    "Host: localhost:" + getPort() + CRLF +
+                    "If: ()" + CRLF +
+                    "Content-Length: 6" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    CONTENT
+                });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(WebdavStatus.SC_PRECONDITION_FAILED, client.getStatusCode());
+    }
+
+
+    @Test
+    public void testIfHeaderEmptyListNonStrict() throws Exception {
+        Client client = doTestIfHeaderEmptyList("webdav-emptyif-nonstrict", false);
+        client.setRequest(new String[] {
+                "PUT /file1.txt HTTP/1.1" + CRLF +
+                    "Host: localhost:" + getPort() + CRLF +
+                    "If: ()" + CRLF +
+                    "Content-Length: 6" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    CONTENT
+                });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_CREATED, client.getStatusCode());
+    }
+
+
+    private Client doTestIfHeaderEmptyList(String webappName, boolean strictIfProcessing) throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // Create a temp webapp that can be safely written to
+        File tempWebapp = new File(getTemporaryDirectory(), webappName);
+        tempWebapp.deleteOnExit();
+        Assert.assertTrue(tempWebapp.mkdirs());
+        Context ctxt = tomcat.addContext("", tempWebapp.getAbsolutePath());
+        Wrapper webdavServlet = Tomcat.addServlet(ctxt, "webdav", new WebdavServlet());
+        webdavServlet.addInitParameter("readonly", "false");
+        webdavServlet.addInitParameter("strictIfProcessing", Boolean.toString(strictIfProcessing));
+        ctxt.addServletMapping("/*", "webdav");
+        ctxt.addMimeMapping("txt", "text/plain");
+        tomcat.start();
+
+        Client client = new Client();
+        client.setPort(getPort());
+        return client;
+    }
+
+
     @Test
     public void testPropertyStore() throws Exception {
         Tomcat tomcat = getTomcatInstance();

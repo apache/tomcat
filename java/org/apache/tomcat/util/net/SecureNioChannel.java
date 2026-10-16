@@ -293,6 +293,8 @@ public class SecureNioChannel extends NioChannel {
         String hostName = null;
         List<Cipher> clientRequestedCiphers = null;
         List<String> clientRequestedApplicationProtocols = null;
+        List<String> clientRequestedProtocols = null;
+        List<String> clientRequestedCipherNames = null;
         List<Group> clientSupportedGroups = null;
         List<SignatureScheme> clientSignatureSchemes = null;
         switch (extractor.getResult()) {
@@ -303,6 +305,8 @@ public class SecureNioChannel extends NioChannel {
                 //$FALL-THROUGH$ to set the client requested ciphers
             case NOT_PRESENT:
                 clientRequestedCiphers = extractor.getClientRequestedCiphers();
+                clientRequestedProtocols = extractor.getClientRequestedProtocols();
+                clientRequestedCipherNames = extractor.getClientRequestedCipherNames();
                 clientSupportedGroups = extractor.getClientSupportedGroups();
                 clientSignatureSchemes = extractor.getClientSignatureSchemes();
                 break;
@@ -315,6 +319,11 @@ public class SecureNioChannel extends NioChannel {
                 }
                 hostName = endpoint.getDefaultSSLHostConfigName();
                 clientRequestedCiphers = Collections.emptyList();
+                clientRequestedApplicationProtocols = Collections.emptyList();
+                clientRequestedProtocols = Collections.emptyList();
+                clientRequestedCipherNames = Collections.emptyList();
+                clientSupportedGroups = Collections.emptyList();
+                clientSignatureSchemes = Collections.emptyList();
                 break;
             case NON_SECURE:
                 netOutBuffer.clear();
@@ -329,13 +338,12 @@ public class SecureNioChannel extends NioChannel {
         }
 
         createSSLEngine(hostName, clientRequestedCiphers, clientRequestedApplicationProtocols,
-                extractor.getClientRequestedProtocols(), clientSupportedGroups, clientSignatureSchemes);
+                clientRequestedProtocols, clientSupportedGroups, clientSignatureSchemes);
 
         // Populate additional TLS attributes obtained from the handshake that
         // aren't available from the session
-        additionalTlsAttributes.put(SSLSupport.REQUESTED_PROTOCOL_VERSIONS_KEY,
-                extractor.getClientRequestedProtocols());
-        additionalTlsAttributes.put(SSLSupport.REQUESTED_CIPHERS_KEY, extractor.getClientRequestedCipherNames());
+        additionalTlsAttributes.put(SSLSupport.REQUESTED_PROTOCOL_VERSIONS_KEY, clientRequestedProtocols);
+        additionalTlsAttributes.put(SSLSupport.REQUESTED_CIPHERS_KEY, clientRequestedCipherNames);
 
         // Ensure the application buffers (which have to be created earlier) are
         // big enough.

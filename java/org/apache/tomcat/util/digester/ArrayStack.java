@@ -100,15 +100,20 @@ public class ArrayStack<E> extends ArrayList<E> {
      *
      * @return the n'th item on the stack, zero relative
      *
-     * @throws EmptyStackException if there are not enough items on the stack to satisfy this request
+     * @throws EmptyStackException if there are not enough items on the stack to satisfy this request, including when
+     *                             {@code n} is negative. Note that unlike the original Commons Collections code, a
+     *                             negative index signals EmptyStackException rather than surfacing as an
+     *                             IndexOutOfBoundsException.
      */
     public E peek(int n) throws EmptyStackException {
-        int m = (size() - n) - 1;
-        if (m < 0) {
+        // A negative index is out of range just like an index beyond the bottom
+        // of the stack. Guarding only the upper bound would let get() throw an
+        // IndexOutOfBoundsException, which callers such as Digester.peek(int)
+        // do not expect.
+        if (n < 0 || n >= size()) {
             throw new EmptyStackException();
-        } else {
-            return get(m);
         }
+        return get(size() - 1 - n);
     }
 
     /**

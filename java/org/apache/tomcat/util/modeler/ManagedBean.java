@@ -302,7 +302,13 @@ public class ManagedBean implements java.io.Serializable {
      * @param attribute The new attribute descriptor
      */
     public void addAttribute(AttributeInfo attribute) {
-        attributes.put(attribute.getName(), attribute);
+        mBeanInfoLock.writeLock().lock();
+        try {
+            attributes.put(attribute.getName(), attribute);
+            this.info = null;
+        } finally {
+            mBeanInfoLock.writeLock().unlock();
+        }
     }
 
 
@@ -331,7 +337,13 @@ public class ManagedBean implements java.io.Serializable {
      * @param operation The new operation descriptor
      */
     public void addOperation(OperationInfo operation) {
-        operations.put(createOperationKey(operation), operation);
+        mBeanInfoLock.writeLock().lock();
+        try {
+            operations.put(createOperationKey(operation), operation);
+            this.info = null;
+        } finally {
+            mBeanInfoLock.writeLock().unlock();
+        }
     }
 
 

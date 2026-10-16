@@ -1892,13 +1892,13 @@
     <zip destfile="${tomcat.embed}/${final.name}-embed.zip"
          modificationtime="${tstamp.iso.release}"
          encoding="UTF8">
-      <fileset dir="${tomcat.embed}">
+      <zipfileset dir="${tomcat.embed}" prefix="${final.name}-embed">
         <include name="**" />
         <exclude name="*.asc" />
         <exclude name="*.sha512" />
         <exclude name="*.zip" />
         <exclude name="*.tar.gz" />
-      </fileset>
+      </zipfileset>
     </zip>
     <hashAndSign file="${tomcat.embed}/${final.name}-embed.zip" />
 

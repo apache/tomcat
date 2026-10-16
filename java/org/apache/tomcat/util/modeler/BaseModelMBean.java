@@ -19,6 +19,7 @@ package org.apache.tomcat.util.modeler;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.Attribute;
 import javax.management.AttributeChangeNotification;
@@ -138,6 +139,11 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
      * The type of the managed resource.
      */
     protected String resourceType = null;
+
+    /**
+     * The sequence number for the next notification sent by this MBean.
+     */
+    private final AtomicLong sequenceNumber = new AtomicLong();
 
     // key: operation val: invoke method
     // private Hashtable invokeAttMap=new Hashtable();
@@ -354,9 +360,15 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
                     sm.getString("baseModelMBean.nullAttributeName"));
         }
 
+        // Get the old value for the change notification below. The attribute
+        // may be write-only or the getter may fail, in which case the old
+        // value remains unknown (null).
         Object oldValue = null;
-        // if( getAttMap.get(name) != null )
-        // oldValue=getAttribute( name );
+        try {
+            oldValue = getAttribute(name);
+        } catch (Exception ignore) {
+            // Old value unknown - ignore
+        }
 
         Method m = managedBean.getSetter(name, this, resource);
 
@@ -517,9 +529,12 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
             throw new IllegalArgumentException(sm.getString("baseModelMBean.nullListener"));
         }
 
-        // FIXME - currently this removes *all* notifications for this listener
+        if (log.isTraceEnabled()) {
+            log.trace("removeAttributeNotificationListener " + listener);
+        }
+
         if (attributeBroadcaster != null) {
-            attributeBroadcaster.removeNotificationListener(listener);
+            attributeBroadcaster.removeAttributeNotificationListener(listener, name);
         }
 
     }
@@ -559,8 +574,10 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
             return; // Old and new are both null == no change
         }
 
-        AttributeChangeNotification notification = new AttributeChangeNotification(this, 1, System.currentTimeMillis(),
-                "Attribute value has changed", oldValue.getName(), type, oldValue.getValue(), newValue.getValue());
+        AttributeChangeNotification notification =
+                new AttributeChangeNotification(this, sequenceNumber.incrementAndGet(), System.currentTimeMillis(),
+                        "Attribute value has changed", oldValue.getName(), type, oldValue.getValue(),
+                        newValue.getValue());
         sendAttributeChangeNotification(notification);
 
     }
@@ -590,7 +607,8 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
                     new IllegalArgumentException(sm.getString("baseModelMBean.nullMessage")),
                     sm.getString("baseModelMBean.nullMessage"));
         }
-        Notification notification = new Notification("jmx.modelmbean.generic", this, 1, message);
+        Notification notification =
+                new Notification("jmx.modelmbean.generic", this, sequenceNumber.incrementAndGet(), message);
         sendNotification(notification);
 
     }

@@ -19,6 +19,7 @@ package org.apache.tomcat.util.modeler.modules;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.management.ObjectName;
@@ -46,7 +47,6 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource {
     private static final Object dLock = new Object();
 
     private Registry registry;
-    private final List<ObjectName> mbeans = new ArrayList<>();
     private static Digester digester = null;
 
     private static Digester createDigester() {
@@ -129,7 +129,7 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource {
         setRegistry(registry);
         setSource(source);
         execute();
-        return mbeans;
+        return Collections.emptyList();
     }
 
     /**
@@ -142,7 +142,9 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource {
             registry = Registry.getRegistry(null);
         }
 
-        InputStream stream = (InputStream) source;
+        if (!(source instanceof InputStream stream)) {
+            throw new IllegalArgumentException(sm.getString("registry.invalidSource"));
+        }
 
         List<ManagedBean> loadedMbeans = new ArrayList<>();
         synchronized (dLock) {
@@ -151,7 +153,7 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource {
             }
 
             // Process the input file to configure our registry
-            try {
+            try (stream) {
                 // Push our registry object onto the stack
                 digester.push(loadedMbeans);
                 digester.parse(stream);

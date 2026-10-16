@@ -33,17 +33,28 @@ public class openssl_h_Compatibility {
     public static final boolean OPENSSL;
     public static final boolean OPENSSL1;
     public static final boolean OPENSSL3;
+    public static final boolean OPENSSL4;
     public static final boolean BORINGSSL;
     public static final boolean LIBRESSL;
 
     public static final int MAJOR;
     public static final int MINOR;
 
+    /*
+     * A simple, QUIC specific function (const SSL_METHOD *OSSL_QUIC_method(void)) that is only present in OpenSSL
+     * builds that include the QUIC implementation. Its absence, even on a 4.0+ version number, means the QUIC API is
+     * not available. Note: OSSL_QUIC_server_method and the other symbols used by QuicBindings are deliberately not
+     * referenced here so this check is independent of the HTTP/3 bindings.
+     */
+    private static final String QUIC_PROBE_SYMBOL = "OSSL_QUIC_method";
+
     static {
         String versionString = OpenSSL_version(0).getString(0);
         OPENSSL = versionString.contains("OpenSSL");
         OPENSSL1 = OPENSSL && OpenSSL_version_num() < 0x3000000fL;
         OPENSSL3 = OPENSSL && OpenSSL_version_num() >= 0x3000000fL;
+        OPENSSL4 = OPENSSL && OpenSSL_version_num() >= 0x40000000L &&
+                openssl_h.SYMBOL_LOOKUP.find(QUIC_PROBE_SYMBOL).isPresent();
         BORINGSSL = versionString.contains("BoringSSL");
         LIBRESSL = versionString.contains("LibreSSL");
         int majorVersion = 0;

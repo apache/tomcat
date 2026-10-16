@@ -21,10 +21,10 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.management.DynamicMBean;
 import javax.management.InstanceNotFoundException;
@@ -72,15 +72,15 @@ public class Registry implements RegistryMBean, MBeanRegistration {
     /**
      * The set of ManagedBean instances for the beans this registry knows about, keyed by name.
      */
-    private Map<String,ManagedBean> descriptors = new HashMap<>();
+    private final Map<String,ManagedBean> descriptors = new ConcurrentHashMap<>();
 
     /**
      * List of managed beans, keyed by class name
      */
-    private Map<String,ManagedBean> descriptorsByClass = new HashMap<>();
+    private final Map<String,ManagedBean> descriptorsByClass = new ConcurrentHashMap<>();
 
     // map to avoid duplicated searching or loading descriptors
-    private Map<String,URL> searchedPaths = new HashMap<>();
+    private final Map<String,URL> searchedPaths = new ConcurrentHashMap<>();
 
     private Object guard;
 
@@ -168,9 +168,9 @@ public class Registry implements RegistryMBean, MBeanRegistration {
      */
     @Override
     public void stop() {
-        descriptorsByClass = new HashMap<>();
-        descriptors = new HashMap<>();
-        searchedPaths = new HashMap<>();
+        descriptorsByClass.clear();
+        descriptors.clear();
+        searchedPaths.clear();
     }
 
 
@@ -297,7 +297,9 @@ public class Registry implements RegistryMBean, MBeanRegistration {
      */
     public void addManagedBean(ManagedBean bean) {
         // XXX Use group + name
-        descriptors.put(bean.getName(), bean);
+        if (bean.getName() != null) {
+            descriptors.put(bean.getName(), bean);
+        }
         if (bean.getType() != null) {
             descriptorsByClass.put(bean.getType(), bean);
         }
@@ -549,6 +551,18 @@ public class Registry implements RegistryMBean, MBeanRegistration {
             objValue = Long.valueOf(value);
         } else if ("java.lang.Boolean".equals(type) || "boolean".equals(type)) {
             objValue = Boolean.valueOf(value);
+        } else if ("java.lang.Double".equals(type) || "double".equals(type)) {
+            objValue = Double.valueOf(value);
+        } else if ("java.lang.Float".equals(type) || "float".equals(type)) {
+            objValue = Float.valueOf(value);
+        } else if ("java.lang.Short".equals(type) || "short".equals(type)) {
+            objValue = Short.valueOf(value);
+        } else if ("java.lang.Byte".equals(type) || "byte".equals(type)) {
+            objValue = Byte.valueOf(value);
+        } else if (("java.lang.Character".equals(type) || "char".equals(type)) &&
+                value != null && !value.isEmpty()) {
+            // A null or empty string cannot be converted to a character
+            objValue = Character.valueOf(value.charAt(0));
         }
         return objValue;
     }
@@ -561,7 +575,9 @@ public class Registry implements RegistryMBean, MBeanRegistration {
      * @param source     The bean
      * @param param      A type to load
      *
-     * @return List of descriptors
+     * @return List of object names. The sources provided with Tomcat
+     *         register the descriptors with this registry instead of
+     *         returning object names, so the returned list is empty.
      *
      * @throws Exception Error loading descriptors
      */
@@ -640,6 +656,10 @@ public class Registry implements RegistryMBean, MBeanRegistration {
 
             ManagedBean managed = findManagedBean(null, bean.getClass(), type);
 
+            if (managed == null) {
+                throw new IllegalStateException(sm.getString("registry.noTypeMetadata", type));
+            }
+
             // The real mbean is created and registered
             DynamicMBean mbean = managed.createMBean(bean);
 
@@ -685,7 +705,10 @@ public class Registry implements RegistryMBean, MBeanRegistration {
         if (log.isTraceEnabled()) {
             log.trace("Found " + dURL);
         }
-        searchedPaths.put(packageName, dURL);
+        if (searchedPaths.putIfAbsent(packageName, dURL) != null) {
+            // Another thread claimed this package first and is loading it
+            return;
+        }
         try {
             load("MbeansDescriptorsDigesterSource", dURL, null);
         } catch (Exception e) {
