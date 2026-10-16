@@ -259,7 +259,7 @@ public class StandardJarScanner implements JarScanner {
                             log.warn(sm.getString("jarScan.webinflibFail", path));
                         }
                     } catch (IOException ioe) {
-                        log.warn(sm.getString("jarScan.webinflibFail", url), ioe);
+                        log.warn(sm.getString("jarScan.webinflibFail", path), ioe);
                     }
                 } else {
                     if (log.isTraceEnabled()) {
