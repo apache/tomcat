@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.scan;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -68,6 +69,37 @@ public class ReferenceCountedJar implements Jar {
     }
 
 
+    /*
+     * Transfers the reference obtained by open() to the given stream obtained from the wrapped Jar. The reference is
+     * released when - and only when - the stream is closed, so the wrapped Jar remains open while the stream is in
+     * use. A null stream releases the reference immediately.
+     */
+    private InputStream retainReference(InputStream is) {
+        if (is == null) {
+            close();
+            return null;
+        }
+
+        return new FilterInputStream(is) {
+
+            private boolean released = false;
+
+            @Override
+            public synchronized void close() throws IOException {
+                if (released) {
+                    return;
+                }
+                released = true;
+                try {
+                    in.close();
+                } finally {
+                    ReferenceCountedJar.this.close();
+                }
+            }
+        };
+    }
+
+
     @Override
     public URL getJarFileURL() {
         return url;
@@ -76,8 +108,12 @@ public class ReferenceCountedJar implements Jar {
 
     @Override
     public InputStream getInputStream(String name) throws IOException {
-        try (ReferenceCountedJar jar = open()) {
-            return jar.wrappedJar.getInputStream(name);
+        ReferenceCountedJar jar = open();
+        try {
+            return jar.retainReference(jar.wrappedJar.getInputStream(name));
+        } catch (IOException | RuntimeException e) {
+            jar.close();
+            throw e;
         }
     }
 
@@ -120,8 +156,12 @@ public class ReferenceCountedJar implements Jar {
 
     @Override
     public InputStream getEntryInputStream() throws IOException {
-        try (ReferenceCountedJar jar = open()) {
-            return jar.wrappedJar.getEntryInputStream();
+        ReferenceCountedJar jar = open();
+        try {
+            return jar.retainReference(jar.wrappedJar.getEntryInputStream());
+        } catch (IOException | RuntimeException e) {
+            jar.close();
+            throw e;
         }
     }
 
