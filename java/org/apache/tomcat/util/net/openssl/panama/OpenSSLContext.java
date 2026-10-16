@@ -1019,66 +1019,43 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         }
     }
 
-    private static final int NID_kx_rsa = 1037/* NID_kx_rsa() */;
-    // private static final int NID_kx_dhe = NID_kx_dhe();
-    // private static final int NID_kx_ecdhe = NID_kx_ecdhe();
+    // Key exchange and authentication NIDs. The values are hard-coded since
+    // these OpenSSL constants are macros that are not present in the
+    // generated bindings. They are defined in OpenSSL's obj_mac.h.
+    private static final int NID_kx_rsa = 1037;
+    private static final int NID_kx_ecdhe = 1038;
+    private static final int NID_kx_dhe = 1039;
 
-    // private static final int NID_auth_rsa = NID_auth_rsa();
-    // private static final int NID_auth_dss = NID_auth_dss();
-    // private static final int NID_auth_null = NID_auth_null();
-    // private static final int NID_auth_ecdsa = NID_auth_ecdsa();
-
-    // private static final int SSL_kRSA = 1;
-    private static final int SSL_kDHr = 2;
-    private static final int SSL_kDHd = 4;
-    private static final int SSL_kEDH = 8;
-    private static final int SSL_kDHE = SSL_kEDH;
-    private static final int SSL_kKRB5 = 10;
-    private static final int SSL_kECDHr = 20;
-    private static final int SSL_kECDHe = 40;
-    private static final int SSL_kEECDH = 80;
-    private static final int SSL_kECDHE = SSL_kEECDH;
-    // private static final int SSL_kPSK = 100;
-    // private static final int SSL_kGOST = 200;
-    // private static final int SSL_kSRP = 400;
-
-    private static final int SSL_aRSA = 1;
-    private static final int SSL_aDSS = 2;
-    private static final int SSL_aNULL = 4;
-    // private static final int SSL_aDH = 8;
-    // private static final int SSL_aECDH = 10;
-    // private static final int SSL_aKRB5 = 20;
-    private static final int SSL_aECDSA = 40;
-    // private static final int SSL_aPSK = 80;
-    // private static final int SSL_aGOST94 = 100;
-    // private static final int SSL_aGOST01 = 200;
-    // private static final int SSL_aSRP = 400;
+    private static final int NID_auth_rsa = 1046;
+    private static final int NID_auth_ecdsa = 1047;
+    private static final int NID_auth_dss = 1049;
+    private static final int NID_auth_null = 1053;
 
     private static final String SSL_TXT_RSA = "RSA";
     private static final String SSL_TXT_DH = "DH";
     private static final String SSL_TXT_DSS = "DSS";
-    private static final String SSL_TXT_KRB5 = "KRB5";
     private static final String SSL_TXT_ECDH = "ECDH";
     private static final String SSL_TXT_ECDSA = "ECDSA";
 
     private static String getCipherAuthenticationMethod(int auth, int kx) {
+        // Mirrors the computation Tomcat Native performs for the JNI based
+        // implementation: a switch on the key exchange NID of the current
+        // cipher, using the authentication NID to disambiguate where
+        // required. Combinations without a JSSE authentication type,
+        // including the TLS 1.3 "any" values, result in "UNKNOWN" there and
+        // do so here.
         return switch (kx) {
             case NID_kx_rsa -> SSL_TXT_RSA;
-            case SSL_kDHr -> SSL_TXT_DH + "_" + SSL_TXT_RSA;
-            case SSL_kDHd -> SSL_TXT_DH + "_" + SSL_TXT_DSS;
-            case SSL_kDHE -> switch (auth) {
-                case SSL_aDSS -> "DHE_" + SSL_TXT_DSS;
-                case SSL_aRSA -> "DHE_" + SSL_TXT_RSA;
-                case SSL_aNULL -> SSL_TXT_DH + "_anon";
+            case NID_kx_dhe -> switch (auth) {
+                case NID_auth_dss -> "DHE_" + SSL_TXT_DSS;
+                case NID_auth_rsa -> "DHE_" + SSL_TXT_RSA;
+                case NID_auth_null -> SSL_TXT_DH + "_anon";
                 default -> "UNKNOWN";
             };
-            case SSL_kKRB5 -> SSL_TXT_KRB5;
-            case SSL_kECDHr -> SSL_TXT_ECDH + "_" + SSL_TXT_RSA;
-            case SSL_kECDHe -> SSL_TXT_ECDH + "_" + SSL_TXT_ECDSA;
-            case SSL_kECDHE -> switch (auth) {
-                case SSL_aECDSA -> "ECDHE_" + SSL_TXT_ECDSA;
-                case SSL_aRSA -> "ECDHE_" + SSL_TXT_RSA;
-                case SSL_aNULL -> SSL_TXT_ECDH + "_anon";
+            case NID_kx_ecdhe -> switch (auth) {
+                case NID_auth_ecdsa -> "ECDHE_" + SSL_TXT_ECDSA;
+                case NID_auth_rsa -> "ECDHE_" + SSL_TXT_RSA;
+                case NID_auth_null -> SSL_TXT_ECDH + "_anon";
                 default -> "UNKNOWN";
             };
             default -> "UNKNOWN";
