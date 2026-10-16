@@ -609,7 +609,8 @@
         Refactor the performance optimisation for
         <code>jakarta.servlet.jsp.el.ImportELResolver</code> to use the new
         marker class,
-        <code>jakarta.el.ELResolver.StandaloneIdentifierMarker</code>. (markt)
+        <code>jakarta.el.ELResolver.StandaloneIdentifierMarker</code>. Further
+        performance optimisation by AngeloRubens. (markt)
       </scode>
       <add>
         Extend the support for relational operators to include
@@ -787,6 +788,21 @@
   <subsection name="jdbc-pool">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        <bug>68436</bug>: Reduce the log level from warning to debug for the
+        message logged when <code>driverClassName</code> is not set, as relying
+        on <code>DriverManager</code> to locate the driver is a valid
+        configuration. Pull request <pr>1084</pr> provided by Raphael Vullriede.
+        (markt)
+      </fix>
+      <fix>
+        <bug>70269</bug>: Correct a regression in the change that reset the
+        properties of statements cached by the <code>StatementCache</code>
+        interceptor that meant no statements were cached when using JDBC
+        drivers, such as H2 and MariaDB Connector/J, that always report
+        statements as not poolable. Pull request <pr>1083</pr> provided by
+        Raphael Vullriede. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
@@ -816,6 +832,11 @@
       <update>
         Add directory prefix to embedded ZIP packaging. (schultz)
       </update>
+      <add>
+        Generate a JaCoCo XML coverage report
+        (<code>output/coverage/jacoco.xml</code>) alongside the existing HTML
+        report when the build is run with code coverage enabled. (dsoumis)
+      </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
     </changelog>
   </subsection>

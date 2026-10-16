@@ -16,9 +16,13 @@
  */
 package org.apache.el.parser;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.el.ELContext;
 import jakarta.el.ELException;
 import jakarta.el.ELProcessor;
+import jakarta.el.ELResolver;
 import jakarta.el.ExpressionFactory;
 import jakarta.el.ValueExpression;
 
@@ -29,6 +33,51 @@ import org.junit.Test;
 import org.apache.jasper.el.ELContextImpl;
 
 public class TestAstIdentifier {
+
+    @Test
+    public void testStandaloneIdentifierMarker() {
+        List<Object> markers = new ArrayList<>();
+        ELProcessor processor = new ELProcessor();
+        processor.getELManager().addELResolver(new ELResolver() {
+            @Override
+            public Object getValue(ELContext context, Object base, Object property) {
+                if (base == null && "marked".equals(property)) {
+                    markers.add(context.getContext(ELResolver.StandaloneIdentifierMarker.class));
+                    context.setPropertyResolved(null, property);
+                    return "value";
+                }
+                return null;
+            }
+
+            @Override
+            public Class<?> getType(ELContext context, Object base, Object property) {
+                return null;
+            }
+
+            @Override
+            public void setValue(ELContext context, Object base, Object property, Object value) {
+            }
+
+            @Override
+            public boolean isReadOnly(ELContext context, Object base, Object property) {
+                return true;
+            }
+
+            @Override
+            public Class<?> getCommonPropertyType(ELContext context, Object base) {
+                return null;
+            }
+        });
+
+        Assert.assertEquals("value", processor.getValue("marked", String.class));
+        Assert.assertEquals(Integer.valueOf(5), processor.getValue("marked.length()", Integer.class));
+        Assert.assertEquals("value", processor.getValue("marked", String.class));
+
+        Assert.assertEquals(List.of(Boolean.TRUE, Boolean.FALSE, Boolean.TRUE).toString(),
+                markers.stream().map(m -> Boolean.valueOf(Boolean.TRUE.equals(m))).toList().toString());
+        // Held by the evaluation, not by the ELContext of the application
+        Assert.assertNull(processor.getELManager().getELContext().getContext(ELResolver.StandaloneIdentifierMarker.class));
+    }
 
     @Test
     public void testImport01() {

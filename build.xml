@@ -2310,6 +2310,7 @@
         </sourcefiles>
       </structure>
       <html destdir="${coverage.out}"/>
+      <xml destfile="${coverage.out}/jacoco.xml"/>
     </jacoco:report>
 
   </target>

@@ -17,4 +17,3 @@
 
 Notes of things to consider for the next major Tomcat release (12.x)
 
- 1. Add QUIC support using OpenSSL and FFM.
