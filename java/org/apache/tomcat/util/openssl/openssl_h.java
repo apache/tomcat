@@ -9185,7 +9185,7 @@ public class openssl_h {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             openssl_h.C_INT,
             openssl_h.C_POINTER,
-            ValueLayout.JAVA_CHAR,
+            openssl_h.C_POINTER,
             openssl_h.C_INT
         );
 
@@ -9229,7 +9229,7 @@ public class openssl_h {
      * int OCSP_request_add1_nonce(OCSP_REQUEST *req, unsigned char *val, int len)
      * }
      */
-    public static int OCSP_request_add1_nonce(MemorySegment req, char val, int len) {
+    public static int OCSP_request_add1_nonce(MemorySegment req, MemorySegment val, int len) {
         var mh$ = OCSP_request_add1_nonce.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
