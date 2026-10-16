@@ -1741,12 +1741,12 @@ public abstract class AbstractEndpoint<S, U> {
                 }
                 TaskQueue queue = (TaskQueue) tpe.getQueue();
                 queue.setParent(null);
-            } else if (executor instanceof VirtualThreadExecutor virtualThreadExecutor) {
+            } else if (executor instanceof VirtualThreadExecutor) {
                 // The virtual thread executor accepts new tasks until it is shut
                 // down. Shut it down, so tasks submitted via a reference captured
                 // before this point are rejected, as they are with the thread
                 // pool executor.
-                virtualThreadExecutor.shutdownNow();
+                ((VirtualThreadExecutor) executor).shutdownNow();
             }
         }
     }
