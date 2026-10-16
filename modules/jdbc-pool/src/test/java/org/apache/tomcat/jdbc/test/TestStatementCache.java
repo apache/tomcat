@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
 import org.apache.tomcat.jdbc.pool.interceptor.StatementCache;
 import org.apache.tomcat.jdbc.pool.interceptor.StatementCounterInterceptor;
+import org.apache.tomcat.jdbc.test.driver.Driver;
 
 public class TestStatementCache extends DefaultTestCase {
 
@@ -109,6 +110,37 @@ public class TestStatementCache extends DefaultTestCase {
         ps3.close();
         Assert.assertTrue(ps3.isClosed());
         Assert.assertEquals(0,interceptor.getCacheSize().get());
+        con.close();
+    }
+
+    @Test
+    public void testPreparedStatementCacheDriverNotPoolable() throws Exception {
+        datasource.setDriverClassName(Driver.class.getName());
+        datasource.setUrl("jdbc:tomcat:test");
+        config(true,false,100);
+        Connection con = datasource.getConnection();
+        PreparedStatement ps1 = con.prepareStatement("select 1");
+        Assert.assertFalse(ps1.isPoolable());
+        ps1.close();
+        Assert.assertEquals(1,interceptor.getCacheSize().get());
+        con.close();
+    }
+
+    @Test
+    public void testPreparedStatementNotPoolable() throws Exception {
+        datasource.setDriverClassName(Driver.class.getName());
+        datasource.setUrl("jdbc:tomcat:test");
+        config(true,false,100);
+        Connection con = datasource.getConnection();
+        PreparedStatement ps1 = con.prepareStatement("select 1");
+        ps1.setPoolable(false);
+        ps1.close();
+        Assert.assertEquals(0,interceptor.getCacheSize().get());
+        PreparedStatement ps2 = con.prepareStatement("select 1");
+        ps2.setPoolable(false);
+        ps2.setPoolable(true);
+        ps2.close();
+        Assert.assertEquals(1,interceptor.getCacheSize().get());
         con.close();
     }
 
