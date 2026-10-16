@@ -61,6 +61,12 @@ public class ReferenceCountedJar implements Jar {
 
     @Override
     public synchronized void close() {
+        if (referenceCount <= 0) {
+            // More closes than opens have been requested. Ignore the extra
+            // close rather than letting the count go negative, which would
+            // prevent the wrapped Jar from ever being closed again.
+            return;
+        }
         referenceCount--;
         if (referenceCount == 0) {
             wrappedJar.close();
