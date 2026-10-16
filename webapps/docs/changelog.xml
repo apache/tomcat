@@ -666,6 +666,12 @@
         <code>Writer</code> and <code>OutputStream</code>. (markt)
       </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Make the WebSocket client secure channel wrapper,
+        <code>AsyncChannelWrapperSecure</code>, honor the timeout specified for
+        write operations so a stalled peer cannot block the write thread
+        indefinitely. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
