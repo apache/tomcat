@@ -23,7 +23,9 @@ import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -44,6 +46,7 @@ public class JarFileUrlJar implements Jar {
     private final boolean multiRelease;
     private Enumeration<JarEntry> entries;
     private Set<String> entryNamesSeen;
+    private Map<String,JarEntry> multiReleaseMap;
     private JarEntry entry = null;
 
     /**
@@ -157,6 +160,14 @@ public class JarFileUrlJar implements Jar {
             // - the case where an entry appears in the versions location
             // but not in the base location is handled correctly
 
+            // The look-up of the entry to use is based on the 'base' name of
+            // each entry and the highest applicable version of each class, so
+            // that the correct entry is selected independently of the order of
+            // the entries in the JAR.
+            if (multiReleaseMap == null) {
+                multiReleaseMap = populateMultiReleaseMap();
+            }
+
             // Enumerate the entries until one is reached that represents an
             // entry that has not been seen before.
             String name;
@@ -175,11 +186,25 @@ public class JarFileUrlJar implements Jar {
                     if (name.isEmpty() || entryNamesSeen.contains(name)) {
                         continue;
                     }
-
                     entryNamesSeen.add(name);
 
-                    // JarFile.getJarEntry is version aware so use it
-                    entry = jarFile.getJarEntry(entry.getName());
+                    JarEntry versionedEntry = multiReleaseMap.get(name);
+                    if (versionedEntry != null) {
+                        // Use the highest applicable version of this class
+                        entry = versionedEntry;
+                    } else {
+                        // Use the base entry. Classes with a version that
+                        // applies to this runtime were resolved from the
+                        // multi-release map above.
+                        entry = jarFile.getJarEntry(name);
+                    }
+
+                    if (entry == null) {
+                        // There is no entry that applies to this runtime, for
+                        // example the entry only exists in the versions
+                        // location with a version later than this runtime
+                        continue;
+                    }
                 } else {
                     entry = null;
                 }
@@ -222,6 +247,56 @@ public class JarFileUrlJar implements Jar {
     public void reset() throws IOException {
         entries = null;
         entryNamesSeen = null;
+        multiReleaseMap = null;
         entry = null;
+    }
+
+
+    /**
+     * Identifies, for each class that appears in the versions location of the JAR, the entry for the highest version
+     * that applies to the current runtime. Keyed by 'base' name, which is the name with the
+     * <code>META-INF/versions/&lt;version&gt;/</code> prefix removed.
+     *
+     * @return the map of 'base' name to the entry to use for that name
+     */
+    private Map<String,JarEntry> populateMultiReleaseMap() {
+        int targetVersion = Runtime.version().feature();
+
+        Map<String,Integer> mrVersions = new HashMap<>();
+        Map<String,JarEntry> result = new HashMap<>();
+
+        // Tracking the base name and the latest valid version found is
+        // sufficient to be able to create the map of entries to use
+        Enumeration<JarEntry> jarEntries = jarFile.entries();
+        while (jarEntries.hasMoreElements()) {
+            JarEntry jarEntry = jarEntries.nextElement();
+            String name = jarEntry.getName();
+            if (name.startsWith("META-INF/versions/") && name.endsWith(".class")) {
+                int i = name.indexOf('/', 18);
+                if (i > 0) {
+                    String baseName = name.substring(i + 1);
+                    int version;
+                    try {
+                        version = Integer.parseInt(name, 18, i, 10);
+                    } catch (NumberFormatException e) {
+                        continue;
+                    }
+
+                    // Ignore any entries targeting for a later version than
+                    // the target for this runtime
+                    if (version <= targetVersion) {
+                        Integer mappedVersion = mrVersions.get(baseName);
+                        // Ignore any entry for which a later version has
+                        // already been found
+                        if (mappedVersion == null || version > mappedVersion.intValue()) {
+                            mrVersions.put(baseName, Integer.valueOf(version));
+                            result.put(baseName, jarEntry);
+                        }
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 }

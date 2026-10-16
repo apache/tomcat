@@ -421,6 +421,17 @@
         corrected to terminate, since the Java shift distance is evaluated
         modulo 32. (remm)
       </fix>
+      <fix>
+        Correct the selection of multi-release JAR entries by the
+        <code>jar:file:</code> and <code>file:</code> based JAR
+        implementation used when scanning. The entry selected for a class
+        present with multiple versions depended on the order of the entries
+        in the JAR, so an older version, or a version intended for a later
+        runtime, could be scanned instead of the version the runtime would
+        use. The highest applicable version is now selected, independently
+        of the entry order, matching the behaviour of the stream based JAR
+        implementation. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
