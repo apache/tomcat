@@ -401,6 +401,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        Make the WebSocket client secure channel wrapper,
+        <code>AsyncChannelWrapperSecure</code>, honor the timeout specified for
+        write operations so a stalled peer cannot block the write thread
+        indefinitely. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
