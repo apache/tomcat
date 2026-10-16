@@ -1672,7 +1672,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
         final AtomicInteger purged = new AtomicInteger(0);
         try {
             q.removeIf(r -> {
-                if (r instanceof Future<?> future && future.isCancelled()) {
+                if (r instanceof Future<?> && ((Future<?>) r).isCancelled()) {
                     purged.incrementAndGet();
                     return true;
                 }
@@ -1685,7 +1685,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
             // before the interference occurred are already accounted for in
             // the purged count and will not appear in the copy taken below.
             for (Object r : q.toArray()) {
-                if (r instanceof Future<?> future && future.isCancelled() && q.remove(r)) {
+                if (r instanceof Future<?> && ((Future<?>) r).isCancelled() && q.remove(r)) {
                     purged.incrementAndGet();
                 }
             }
