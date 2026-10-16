@@ -41,8 +41,8 @@ public class openssl_h_Compatibility {
     static {
         String versionString = OpenSSL_version(0).getString(0);
         OPENSSL = versionString.contains("OpenSSL");
-        OPENSSL1 = OPENSSL && OpenSSL_version_num() < 0x3000000fL;
-        OPENSSL3 = OPENSSL && OpenSSL_version_num() >= 0x3000000fL;
+        OPENSSL1 = OPENSSL && OpenSSL_version_num() < 0x30000000L;
+        OPENSSL3 = OPENSSL && OpenSSL_version_num() >= 0x30000000L;
         BORINGSSL = versionString.contains("BoringSSL");
         LIBRESSL = versionString.contains("LibreSSL");
         int majorVersion = 0;
