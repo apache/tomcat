@@ -16,9 +16,9 @@
  */
 package org.apache.tomcat.websocket;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.websocket.Extension;
 
@@ -33,7 +33,11 @@ public class TransformationFactory {
 
     private static final TransformationFactory factory = new TransformationFactory();
 
-    private final Map<String,TransformationBuilder> builders = new HashMap<>();
+    /*
+     * Concurrent map since registerExtension() may be called at any time by an application while create() and the
+     * getInstalled*() methods are invoked concurrently by threads processing handshakes or by client applications.
+     */
+    private final Map<String,TransformationBuilder> builders = new ConcurrentHashMap<>();
 
 
     private TransformationFactory() {
@@ -76,7 +80,8 @@ public class TransformationFactory {
 
 
     /**
-     * Registers a transformation builder for the given extension name.
+     * Registers a transformation builder for the given extension name. This method is thread-safe and may be called
+     * at any time, including while handshakes are in progress.
      *
      * @param name the extension name
      * @param builder the transformation builder
