@@ -34,7 +34,7 @@ public class InlineExecutorService extends AbstractExecutorService {
     }
 
     private volatile boolean shutdown;
-    private volatile boolean taskRunning;
+    private volatile int runningTasks;
     private volatile boolean terminated;
 
     private final Object lock = new Object();
@@ -43,7 +43,10 @@ public class InlineExecutorService extends AbstractExecutorService {
     public void shutdown() {
         shutdown = true;
         synchronized (lock) {
-            terminated = !taskRunning;
+            terminated = runningTasks == 0;
+            if (terminated) {
+                lock.notifyAll();
+            }
         }
     }
 
@@ -86,14 +89,14 @@ public class InlineExecutorService extends AbstractExecutorService {
             if (shutdown) {
                 throw new RejectedExecutionException();
             }
-            taskRunning = true;
+            runningTasks++;
         }
         try {
             command.run();
         } finally {
             synchronized (lock) {
-                taskRunning = false;
-                if (shutdown) {
+                runningTasks--;
+                if (shutdown && runningTasks == 0) {
                     terminated = true;
                     lock.notifyAll();
                 }
