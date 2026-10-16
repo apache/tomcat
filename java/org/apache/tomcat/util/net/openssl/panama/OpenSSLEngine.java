@@ -188,13 +188,16 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             OpenSSLSessionContext sessionContext, boolean alpn, boolean initialized, int certificateVerificationDepth,
             boolean certificateVerificationOptionalNoCA, boolean noOcspCheck, boolean ocspSoftFail, int ocspTimeout,
             int ocspVerifyFlags) {
-        if (sslCtx == null) {
+        if (sslCtx == null || MemorySegment.NULL.equals(sslCtx)) {
             throw new IllegalArgumentException(sm.getString("engine.noSSLContext"));
         }
         engineArena = Arena.ofAuto();
         bufSegment = engineArena.allocate(MAX_ENCRYPTED_PACKET_LENGTH);
         session = new OpenSSLSession();
         var ssl = SSL_new(sslCtx);
+        if (MemorySegment.NULL.equals(ssl)) {
+            throw new IllegalStateException(sm.getString("engine.noSSL", OpenSSLLibrary.getLastError()));
+        }
         // Set ssl_info_callback
         SSL_set_info_callback(ssl, SSL_set_info_callback$cb.allocate(new InfoCallback(), engineArena));
         if (clientMode) {
