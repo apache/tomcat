@@ -302,7 +302,7 @@ public class StringManager {
      *
      * @return true if a bundle exists for the given locale
      */
-    private static boolean bundleExists(String bundleName, Locale locale) {
+    public static boolean bundleExists(String bundleName, Locale locale) {
         ClassLoader classLoader = StringManager.class.getClassLoader();
         if (bundleExists(bundleName, locale, classLoader)) {
             return true;
