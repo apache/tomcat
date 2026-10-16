@@ -1278,6 +1278,15 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                                     for (String urlString : urls) {
                                         try {
                                             URL url = (new URI(urlString)).toURL();
+                                            String protocol = url.getProtocol();
+                                            if (!"http".equals(protocol) && !"https".equals(protocol)) {
+                                                // OpenSSLEngine can only talk HTTP/HTTPS to OCSP responders. Other
+                                                // protocol handlers (e.g. file) trigger a ClassCastException below so
+                                                // treat them as invalid and skip to the next URL, as the JNI
+                                                // implementation does when OCSP URL parsing fails.
+                                                log.warn(sm.getString("engine.invalidOCSPURL", urlString));
+                                                continue;
+                                            }
                                             requestAttempted = true;
                                             ocspResponse =
                                                     processOCSPRequest(state, url, issuer, x509, x509ctx, localArena);
