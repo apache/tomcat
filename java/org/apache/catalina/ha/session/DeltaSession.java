@@ -874,7 +874,19 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
         boolean hasPrincipal = stream.readBoolean();
         principal = null;
         if (hasPrincipal) {
-            principal = (Principal) stream.readObject();
+            try {
+                principal = (Principal) stream.readObject();
+            } catch (WriteAbortedException wae) {
+                if (!(wae.getCause() instanceof NotSerializableException)) {
+                    throw wae;
+                }
+                String msg = sm.getString("standardSession.principalNotDeserializable", id);
+                if (manager.getContext().getLogger().isDebugEnabled()) {
+                    manager.getContext().getLogger().debug(msg, wae);
+                } else {
+                    manager.getContext().getLogger().warn(msg);
+                }
+            }
         }
 
         id = (String) stream.readObject();
@@ -975,7 +987,12 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
         stream.writeObject(Long.valueOf(version));
         stream.writeBoolean(getPrincipal() instanceof Serializable);
         if (getPrincipal() instanceof Serializable) {
-            stream.writeObject(getPrincipal());
+            // See StandardSession's notes on serializing Principal
+            try {
+                stream.writeObject(getPrincipal());
+            } catch (NotSerializableException e) {
+                manager.getContext().getLogger().warn(sm.getString("standardSession.principalNotSerializable", id), e);
+            }
         }
 
         stream.writeObject(id);
