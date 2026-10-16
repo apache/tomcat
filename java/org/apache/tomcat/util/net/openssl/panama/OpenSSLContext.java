@@ -383,7 +383,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     if (code == SSL_CONF_TYPE_FILE()) {
                         // Check file
                         File file = new File(value);
-                        if (!file.isFile() && !file.canRead()) {
+                        if (!file.isFile() || !file.canRead()) {
                             log.error(sm.getString("opensslconf.badFile", name, value));
                             ok = false;
                         }
