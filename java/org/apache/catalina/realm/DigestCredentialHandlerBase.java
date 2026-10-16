@@ -197,6 +197,12 @@ public abstract class DigestCredentialHandlerBase implements CredentialHandler {
             return false;
         }
 
+        if (iterations < 1) {
+            // Stored credentials must specify at least one iteration
+            logInvalidStoredCredentials(storedCredentials);
+            return false;
+        }
+
         String storedHexEncoded = storedCredentials.substring(sep2 + 1);
         byte[] salt;
         try {
