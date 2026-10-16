@@ -362,6 +362,15 @@
         than adding <code>null</code> to the lists of cipher suites they
         expose. (remm)
       </fix>
+      <fix>
+        Correct the computation of the authentication method passed to a custom
+        <code>X509TrustManager</code> by the FFM based OpenSSL implementation.
+        The key exchange and authentication NIDs of the negotiated cipher were
+        compared against legacy OpenSSL flag values rather than the actual NID
+        constants, so the trust manager received <code>UNKNOWN</code> as the
+        authentication type for almost every cipher suite. The computation now
+        matches the one performed by the JNI based implementation. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
