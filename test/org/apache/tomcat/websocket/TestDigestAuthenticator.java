@@ -42,6 +42,15 @@ public class TestDigestAuthenticator {
         doTestAuthorization("auth-int");
     }
 
+    @Test(expected = AuthenticationException.class)
+    public void testAuthorizationMissingRealm() throws Exception {
+        String authenticateHeader =
+                "Digest qop=\"auth\", nonce=\"0000f844a605d5c0cb0270f1e2f10ca0\", algorithm=MD5";
+
+        DigestAuthenticator authenticator = new DigestAuthenticator();
+        authenticator.getAuthorization("GET", "/ws/echo", authenticateHeader, "user", "password", null);
+    }
+
     private void doTestAuthorization(String qop) throws Exception {
         String method = "GET";
         String requestUri = "/ws/echo";

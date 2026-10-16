@@ -58,6 +58,9 @@ public class DigestAuthenticator extends Authenticator {
 
         Map<String,String> parameterMap = parseAuthenticateHeader(authenticateHeader);
         String realm = parameterMap.get("realm");
+        if (realm == null || realm.isEmpty()) {
+            throw new AuthenticationException(sm.getString("digestAuthenticator.noRealm"));
+        }
 
         validateRealm(userRealm, realm);
 
