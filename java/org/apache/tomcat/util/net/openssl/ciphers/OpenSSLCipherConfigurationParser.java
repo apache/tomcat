@@ -810,13 +810,22 @@ public class OpenSSLCipherConfigurationParser {
                 add(ciphers, element, orderedAllAddedCiphers);
             } else if (element.contains(AND)) {
                 String[] intersections = element.split("\\" + AND);
-                if (intersections.length > 0 && aliases.containsKey(intersections[0])) {
-                    List<Cipher> result = new ArrayList<>(aliases.get(intersections[0]));
-                    for (int i = 1; i < intersections.length; i++) {
-                        if (aliases.containsKey(intersections[i])) {
-                            result.retainAll(aliases.get(intersections[i]));
-                        }
+                List<Cipher> result = null;
+                for (String intersection : intersections) {
+                    // As in OpenSSL, any unknown term makes the whole AND
+                    // element match nothing
+                    if (!aliases.containsKey(intersection)) {
+                        log.warn(sm.getString("opensslCipherConfigurationParser.unknownElement", intersection));
+                        result = null;
+                        break;
                     }
+                    if (result == null) {
+                        result = new ArrayList<>(aliases.get(intersection));
+                    } else {
+                        result.retainAll(aliases.get(intersection));
+                    }
+                }
+                if (result != null) {
                     add(ciphers, result, orderedAllAddedCiphers);
                 }
             }

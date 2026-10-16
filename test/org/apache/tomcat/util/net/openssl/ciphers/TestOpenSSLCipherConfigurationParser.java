@@ -537,6 +537,16 @@ public class TestOpenSSLCipherConfigurationParser {
     }
 
 
+    @Test
+    public void testIntersectionWithUnknownTermIsEmpty() throws Exception {
+        // OpenSSL treats an AND element that contains an unknown term as
+        // matching no ciphers, regardless of the position of the unknown term
+        testSpecificationIsEmpty("SHA1+Nonsense");
+        Assert.assertEquals(0, OpenSSLCipherConfigurationParser.parse("SHA1+Nonsense").size());
+        Assert.assertEquals(0, OpenSSLCipherConfigurationParser.parse("Nonsense+SHA1").size());
+    }
+
+
     private void testSpecificationIsEmpty(String specification) throws Exception {
         String openSSLCipherList = TesterOpenSSL.getOpenSSLCiphersAsExpression(specification);
         Assert.assertEquals(TesterOpenSSL.VERSION_STRING + " with specification [" + specification + "] returned [" +
