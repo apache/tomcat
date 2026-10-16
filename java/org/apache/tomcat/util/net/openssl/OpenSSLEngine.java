@@ -87,7 +87,12 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                         if (c == null || c.isEmpty() || availableCipherSuites.contains(c)) {
                             continue;
                         }
-                        availableCipherSuites.add(OpenSSLCipherConfigurationParser.openSSLToJsse(c));
+                        String jsseName = OpenSSLCipherConfigurationParser.openSSLToJsse(c);
+                        // Ignore ciphers with no JSSE equivalent.
+                        if (jsseName == null) {
+                            continue;
+                        }
+                        availableCipherSuites.add(jsseName);
                     }
                 } finally {
                     SSL.freeSSL(ssl);
