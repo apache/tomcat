@@ -129,10 +129,15 @@ public class DigestAuthenticator extends Authenticator {
         }
 
         /*
-         * If the "qop" value is "auth-int", then A2 is: A2 = Method ":" digest-uri-value ":" H(entity-body) since we do
-         * not have an entity-body, A2 = Method ":" digest-uri-value for auth and auth_int
+         * If the "qop" value is "auth-int", then A2 is:
+         * A2 = Method ":" digest-uri-value ":" H(entity-body)
+         * There is no entity-body for a WebSocket handshake but the hash of
+         * the empty body still has to be included.
          */
         String A2 = method + ":" + requestUri;
+        if ("auth-int".equals(qop)) {
+            A2 = A2 + ":" + encode(algorithm, "");
+        }
 
         preDigest.append(encode(algorithm, A1));
         preDigest.append(':');
