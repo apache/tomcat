@@ -25,6 +25,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -56,6 +57,13 @@ public class ProxyErrorReportValve extends ErrorReportValve {
      */
     private static final int PROXY_CONNECT_TIMEOUT_MS = 5000;
     private static final int PROXY_READ_TIMEOUT_MS = 10000;
+
+    /*
+     * Control used to resolve the candidate locales of the optional properties file bundle. The default control is the
+     * one getBundle() uses, so the candidate chain matches the one getBundle() would walk.
+     */
+    private static final ResourceBundle.Control BUNDLE_CONTROL =
+            ResourceBundle.Control.getControl(ResourceBundle.Control.FORMAT_PROPERTIES);
 
     /**
      * Default constructor.
@@ -111,9 +119,22 @@ public class ProxyErrorReportValve extends ErrorReportValve {
     }
 
     private String getRedirectUrl(Response response) {
+        String bundleName = this.getClass().getSimpleName();
+        // Resolve the bundle for the first candidate locale for which a bundle exists.
+        Locale bundleLocale = null;
+        for (Locale candidate : BUNDLE_CONTROL.getCandidateLocales(bundleName, response.getLocale())) {
+            if (StringManager.bundleExists(bundleName, candidate)) {
+                bundleLocale = candidate;
+                break;
+            }
+        }
+        if (bundleLocale == null) {
+            // No bundle available. Fall back to the default error report.
+            return null;
+        }
         ResourceBundle resourceBundle;
         try {
-            resourceBundle = ResourceBundle.getBundle(this.getClass().getSimpleName(), response.getLocale());
+            resourceBundle = ResourceBundle.getBundle(bundleName, bundleLocale);
         } catch (MissingResourceException e) {
             // No bundle available. Fall back to the default error report.
             return null;
