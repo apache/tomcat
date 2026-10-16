@@ -894,7 +894,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             SSL.setOptionsLong(ssl, SSL.SSL_OP_NO_TLSv1_2);
         }
         if (!tlsv1_3) {
-            SSL.setOptionsLong(state.ssl, SSL.SSL_OP_NO_TLSv1_3);
+            SSL.setOptionsLong(ssl, SSL.SSL_OP_NO_TLSv1_3);
         }
     }
 

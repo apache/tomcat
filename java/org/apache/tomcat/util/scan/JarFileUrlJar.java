@@ -248,7 +248,7 @@ public class JarFileUrlJar implements Jar {
      * @return the map of 'base' name to the entry to use for that name
      */
     private Map<String,JarEntry> populateMultiReleaseMap() {
-        int targetVersion = Runtime.version().feature();
+        int targetVersion = JreCompat.getInstance().jarFileRuntimeMajorVersion();
 
         Map<String,Integer> mrVersions = new HashMap<>();
         Map<String,JarEntry> result = new HashMap<>();
@@ -265,7 +265,9 @@ public class JarFileUrlJar implements Jar {
                     String baseName = name.substring(i + 1);
                     int version;
                     try {
-                        version = Integer.parseInt(name, 18, i, 10);
+                        // Note: the Integer.parseInt(CharSequence,int,int,int)
+                        // overload is not available on Java 8
+                        version = Integer.parseInt(name.substring(18, i));
                     } catch (NumberFormatException e) {
                         continue;
                     }
