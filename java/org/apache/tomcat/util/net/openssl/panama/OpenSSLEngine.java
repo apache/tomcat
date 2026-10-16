@@ -251,7 +251,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         final int len = Math.min(src.remaining(), MAX_PLAINTEXT_LENGTH);
         MemorySegment srcSegment = src.isDirect() ? MemorySegment.ofBuffer(src) : bufSegment;
         if (!src.isDirect()) {
-            MemorySegment.copy(src.array(), pos, bufSegment, ValueLayout.JAVA_BYTE, 0, len);
+            MemorySegment.copy(src.array(), src.arrayOffset() + pos, bufSegment, ValueLayout.JAVA_BYTE, 0, len);
         }
         final int sslWrote = SSL_write(ssl, srcSegment, len);
         if (sslWrote > 0) {
@@ -274,7 +274,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         final int len = src.remaining();
         MemorySegment srcSegment = src.isDirect() ? MemorySegment.ofBuffer(src) : bufSegment;
         if (!src.isDirect()) {
-            MemorySegment.copy(src.array(), pos, bufSegment, ValueLayout.JAVA_BYTE, 0, len);
+            MemorySegment.copy(src.array(), src.arrayOffset() + pos, bufSegment, ValueLayout.JAVA_BYTE, 0, len);
         }
         final int netWrote = BIO_write(networkBIO, srcSegment, len);
         if (netWrote > 0) {
@@ -299,7 +299,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         final int sslRead = SSL_read(ssl, dstSegment, len);
         if (sslRead > 0) {
             if (!dst.isDirect()) {
-                MemorySegment.copy(dstSegment, ValueLayout.JAVA_BYTE, 0, dst.array(), pos, sslRead);
+                MemorySegment.copy(dstSegment, ValueLayout.JAVA_BYTE, 0, dst.array(), dst.arrayOffset() + pos,
+                        sslRead);
             }
             dst.position(pos + sslRead);
             return sslRead;
@@ -322,7 +323,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         final int bioRead = BIO_read(networkBIO, dstSegment, pending);
         if (bioRead > 0) {
             if (!dst.isDirect()) {
-                MemorySegment.copy(dstSegment, ValueLayout.JAVA_BYTE, 0, dst.array(), pos, bioRead);
+                MemorySegment.copy(dstSegment, ValueLayout.JAVA_BYTE, 0, dst.array(), dst.arrayOffset() + pos,
+                        bioRead);
             }
             dst.position(pos + bioRead);
             return bioRead;
