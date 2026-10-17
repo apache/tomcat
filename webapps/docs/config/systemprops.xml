@@ -388,6 +388,17 @@
       (100 MiB) will be used.</p>
     </property>
 
+    <property name="org.apache.catalina.util.LOAD_SERVER_INFO_OVERRIDE">
+      <p>If <code>true</code>, every <code>ServerInfo.properties</code> on the
+      class path is merged: the copy bundled in <code>catalina.jar</code>
+      provides the defaults and an override file (for example in
+      <code>$CATALINA_BASE/lib/</code>) replaces only the properties it sets.
+      This customizes the reported server version strings without modifying
+      <code>catalina.jar</code>.</p>
+      <p>If not specified, the default value of <code>false</code> is used and
+      only the first <code>ServerInfo.properties</code> found is loaded.</p>
+    </property>
+
   </properties>
 
 </section>

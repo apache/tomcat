@@ -121,6 +121,15 @@
   </subsection>
   <subsection name="Catalina">
     <changelog>
+      <add>
+        Add an opt-in system property
+        <code>org.apache.catalina.util.LOAD_SERVER_INFO_OVERRIDE</code> that, when
+        set to <code>true</code>, merges every <code>ServerInfo.properties</code>
+        on the class path so a file placed in <code>$CATALINA_BASE/lib</code> can
+        override individual server version strings while the properties it does
+        not set retain their bundled values. The default behavior is unchanged.
+        (csutherl)
+      </add>
       <fix>
         Treat a filter as not supporting asynchronous processing unless
         async supported is explicitly set to <code>"true"</code>.
