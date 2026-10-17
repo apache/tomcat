@@ -495,6 +495,9 @@ public class WsSession implements Session {
     @Override
     public void setMaxBinaryMessageBufferSize(int max) {
         checkState();
+        if (max < 1) {
+            throw new IllegalArgumentException(sm.getString("wsSession.illegalBufferSize", Integer.valueOf(max)));
+        }
         this.maxBinaryMessageBufferSize = max;
     }
 
@@ -509,6 +512,9 @@ public class WsSession implements Session {
     @Override
     public void setMaxTextMessageBufferSize(int max) {
         checkState();
+        if (max < 1) {
+            throw new IllegalArgumentException(sm.getString("wsSession.illegalBufferSize", Integer.valueOf(max)));
+        }
         this.maxTextMessageBufferSize = max;
     }
 
