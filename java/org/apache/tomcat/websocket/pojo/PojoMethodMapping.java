@@ -626,6 +626,11 @@ public class PojoMethodMapping {
                 throw new DeploymentException(sm.getString("pojoMethodMapping.partialInputStream", m.getName(),
                         m.getDeclaringClass().getName()));
             }
+            if (indexPrimitive != -1 && indexBoolean != -1) {
+                throw new DeploymentException(
+                        sm.getString("pojoMethodMapping.partialPrimitive", m.getName(),
+                                m.getDeclaringClass().getName()));
+            }
             if (decoderMatch != null && decoderMatch.hasMatches() && indexBoolean != -1) {
                 throw new DeploymentException(
                         sm.getString("pojoMethodMapping.partialObject", m.getName(), m.getDeclaringClass().getName()));
