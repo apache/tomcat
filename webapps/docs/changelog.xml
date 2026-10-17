@@ -714,6 +714,11 @@
   </subsection>
   <subsection name="Tribes">
     <changelog>
+      <update>
+        Reuse UDP sender channels between messages and apply the configured
+        <code>keepAliveCount</code> and <code>keepAliveTime</code> limits rather
+        than closing the channel after every message. (sainadh777)
+      </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
         When the <code>MessageDispatchInterceptor</code> is configured with
