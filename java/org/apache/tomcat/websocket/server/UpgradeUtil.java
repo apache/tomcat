@@ -226,7 +226,18 @@ public class UpgradeUtil {
 
         WsPerSessionServerEndpointConfig perSessionServerEndpointConfig = new WsPerSessionServerEndpointConfig(sec);
 
-        WsHandshakeRequest wsRequest = new WsHandshakeRequest(req, pathParams);
+        WsHandshakeRequest wsRequest;
+        try {
+            wsRequest = new WsHandshakeRequest(req, pathParams);
+        } catch (IllegalArgumentException iae) {
+            // The request target could not be represented as a URI, for example because the query
+            // string contains an invalid percent-escape sequence. Reject the handshake. The
+            // response is reset first so the rejection is not sent with headers that would
+            // indicate a successful handshake.
+            resp.reset();
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
         WsHandshakeResponse wsResponse = new WsHandshakeResponse();
         sec.getConfigurator().modifyHandshake(perSessionServerEndpointConfig, wsRequest, wsResponse);
         wsRequest.finished();
