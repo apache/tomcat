@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.websocket.ContainerProvider;
+import jakarta.websocket.DeploymentException;
 import jakarta.websocket.OnClose;
 import jakarta.websocket.OnMessage;
 import jakarta.websocket.OnOpen;
@@ -93,6 +94,32 @@ public class TestPojoMethodMapping extends TomcatBaseTest {
             System.err.println(error);
         }
         Assert.assertEquals("Found errors", 0, errors.size());
+    }
+
+
+    /*
+     * Only String, byte[] and ByteBuffer payloads (plus the boolean last flag) are permitted for partial messages. A
+     * primitive payload combined with a boolean last flag must be rejected at deployment time rather than resulting in
+     * a partial message handler that fails when the first fragmented message arrives.
+     */
+    @Test
+    public void testPrimitiveAndBooleanParameters() throws Exception {
+        try {
+            new PojoMethodMapping(PrimitiveAndBooleanServer.class, new ArrayList<>(), "/primitiveAndBoolean", null);
+            Assert.fail("Expected a DeploymentException");
+        } catch (DeploymentException de) {
+            Assert.assertTrue("Unexpected message: " + de.getMessage(), de.getMessage().contains("primitive type"));
+        }
+    }
+
+
+    @ServerEndpoint("/primitiveAndBoolean")
+    public static final class PrimitiveAndBooleanServer {
+
+        @OnMessage
+        public void onMessage(@SuppressWarnings("unused") int payload, @SuppressWarnings("unused") boolean last) {
+            // No-Op
+        }
     }
 
 
