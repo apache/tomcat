@@ -280,7 +280,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         long timeout = Constants.IO_TIMEOUT_MS_DEFAULT;
         String timeoutValue = (String) userProperties.get(Constants.IO_TIMEOUT_MS_PROPERTY);
         if (timeoutValue != null) {
-            timeout = Long.valueOf(timeoutValue).intValue();
+            timeout = Long.valueOf(timeoutValue).longValue();
         }
 
         AsynchronousSocketChannel socketChannel;
