@@ -50,8 +50,9 @@ public final class FastHttpDateFormat {
     private static final ConcurrentDateFormat FORMAT_RFC5322;
     private static final ConcurrentDateFormat FORMAT_OBSOLETE_RFC850;
     private static final ConcurrentDateFormat FORMAT_OBSOLETE_ASCTIME;
+    private static final TryParseDateToTimestamp FORMAT_RFC9651;
 
-    private static final ConcurrentDateFormat[] httpParseFormats;
+    private static final TryParseDateToTimestamp[] httpParseFormats;
 
     static {
         // All the formats that use a timezone use GMT
@@ -60,9 +61,20 @@ public final class FastHttpDateFormat {
         FORMAT_RFC5322 = new ConcurrentDateFormat(DATE_RFC5322, Locale.US, tz);
         FORMAT_OBSOLETE_RFC850 = new ConcurrentDateFormat(DATE_OBSOLETE_RFC850, Locale.US, tz);
         FORMAT_OBSOLETE_ASCTIME = new ConcurrentDateFormat(DATE_OBSOLETE_ASCTIME, Locale.US, tz);
+        FORMAT_RFC9651 = dateString -> {
+            if(dateString == null || !dateString.startsWith("@")) {
+                return -1;
+            }
+            try {
+                // An RFC 9651 timestamp is in seconds, not milliseconds.
+                return Long.parseLong(dateString.substring(1)) * 1_000;
+            } catch (NumberFormatException e) {
+                return -1;
+            }
+        };
 
         httpParseFormats =
-                new ConcurrentDateFormat[] { FORMAT_RFC5322, FORMAT_OBSOLETE_RFC850, FORMAT_OBSOLETE_ASCTIME };
+                new TryParseDateToTimestamp[] { FORMAT_RFC5322, FORMAT_OBSOLETE_RFC850, FORMAT_OBSOLETE_ASCTIME, FORMAT_RFC9651 };
     }
 
     /**
@@ -146,13 +158,9 @@ public final class FastHttpDateFormat {
 
         long date = -1;
         for (int i = 0; (date == -1) && (i < httpParseFormats.length); i++) {
-            try {
-                date = httpParseFormats[i].parse(value).getTime();
-                updateParseCache(value, Long.valueOf(date));
-            } catch (ParseException e) {
-                // Ignore
-            }
+            date = httpParseFormats[i].tryParseDate(value);
         }
+        updateParseCache(value, Long.valueOf(date));
 
         return date;
     }
@@ -185,5 +193,14 @@ public final class FastHttpDateFormat {
         parseCache.put(key, value);
     }
 
-
+    @FunctionalInterface
+    interface TryParseDateToTimestamp {
+        /**
+         * Tries to parse the given string as a date and returns it as a timestamp.
+         *
+         * @param dateString the string representation of the date trying to be parsed
+         * @return the number of *milli*seconds since January 1, 1970, 00:00:00 GMT or -1 if parsing failed
+         */
+        long tryParseDate(String dateString);
+    }
 }

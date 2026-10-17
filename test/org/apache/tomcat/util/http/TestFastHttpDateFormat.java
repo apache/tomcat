@@ -1,3 +1,4 @@
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -71,5 +72,26 @@ public class TestFastHttpDateFormat {
             }
             Assert.assertTrue("Saw [" + changes + "] changes in formatted date", changes > 1 && changes < 5);
         }
+    }
+
+    @Test
+    public void testRfc9651Date_valid() {
+        Assert.assertEquals(0L, FastHttpDateFormat.parseDate("@0"));
+        Assert.assertEquals(1000L, FastHttpDateFormat.parseDate("@1"));
+        Assert.assertEquals(-1000L, FastHttpDateFormat.parseDate("@-1"));
+        Assert.assertEquals(1659578233000L, FastHttpDateFormat.parseDate("@1659578233")); // Example from RFC
+        Assert.assertEquals(-62135596800000L, FastHttpDateFormat.parseDate("@-62135596800")); // Example from RFC
+        Assert.assertEquals(253402214400000L, FastHttpDateFormat.parseDate("@253402214400")); // Example from RFC
+    }
+
+    @Test
+    public void testRfc9651Date_invalid() {
+        Assert.assertEquals(-1L, FastHttpDateFormat.parseDate("@"));
+        Assert.assertEquals(-1L, FastHttpDateFormat.parseDate(" @1"));
+        Assert.assertEquals(-1L, FastHttpDateFormat.parseDate("@ 1"));
+        Assert.assertEquals(-1L, FastHttpDateFormat.parseDate("@0000-"));
+        Assert.assertEquals(-1L, FastHttpDateFormat.parseDate("@15+"));
+        Assert.assertEquals(-1L, FastHttpDateFormat.parseDate("@12p"));
+        Assert.assertEquals(-1L, FastHttpDateFormat.parseDate("@0x15"));
     }
 }
