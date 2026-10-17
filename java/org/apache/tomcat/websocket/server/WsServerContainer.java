@@ -166,8 +166,9 @@ public class WsServerContainer extends WsWebSocketContainer implements ServerCon
                     // before POJOs in WsSci#onStartup()
                     if (oldMatch.isFromAnnotatedPojo() && !newMatch.isFromAnnotatedPojo() &&
                             oldMatch.getConfig().getEndpointClass() == newMatch.getConfig().getEndpointClass()) {
-                        // The WebSocket spec says to ignore the new match in this case
-                        templateMatches.put(path, oldMatch);
+                        // The WebSocket spec says to ignore the new match in this case. The old
+                        // match has not been replaced by putIfAbsent() above so, unlike the exact
+                        // match case below, there is no need to restore the old match in the map.
                     } else {
                         // Duplicate uriTemplate;
                         throw new DeploymentException(sm.getString("serverContainer.duplicatePaths", path,
