@@ -120,7 +120,7 @@ public class WsFrameClient extends WsFrameBase {
                     }
                     return;
                 default:
-                    throw new IllegalStateException(sm.getString("wsFrameServer.illegalReadState", getReadState()));
+                    throw new IllegalStateException(sm.getString("wsFrame.illegalReadState", getReadState()));
             }
         }
     }
