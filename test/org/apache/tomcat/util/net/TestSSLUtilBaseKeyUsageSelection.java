@@ -58,17 +58,11 @@ public class TestSSLUtilBaseKeyUsageSelection {
     }
 
 
-    private static X509Certificate present(String alias, KeystoreEntry... entries) throws Exception {
-        return present(alias, true, entries);
-    }
-
-
     /*
-     * Builds a key store from the given entries, configures a JSSE certificate pointed at alias (null for none) with
-     * key-usage selection set as requested, and returns the leaf certificate the key manager actually presents.
+     * Builds a key store from the given entries, configures a JSSE certificate pointed at alias (null for none), and
+     * returns the leaf certificate the key manager actually presents.
      */
-    private static X509Certificate present(String alias, boolean selectByKeyUsage, KeystoreEntry... entries)
-            throws Exception {
+    private static X509Certificate present(String alias, KeystoreEntry... entries) throws Exception {
         File keystore = TesterKeystoreGenerator.generateKeystore(List.of(entries));
 
         SSLHostConfig hostConfig = new SSLHostConfig();
@@ -78,7 +72,6 @@ public class TestSSLUtilBaseKeyUsageSelection {
         if (alias != null) {
             certificate.setCertificateKeyAlias(alias);
         }
-        certificate.setCertificateSelectByKeyUsage(selectByKeyUsage);
 
         X509KeyManager keyManager = (X509KeyManager) new JSSEUtil(certificate).getKeyManagers()[0];
         X509Certificate[] chain = keyManager.getCertificateChain(keyManager.chooseServerAlias("RSA", null, null));
@@ -101,15 +94,6 @@ public class TestSSLUtilBaseKeyUsageSelection {
                 key(HOST, CLIENT_AUTH),
                 key("localhost-server", SERVER_AUTH));
         assertEku(presented, SSLUtilBase.SERVER_AUTH_EXTENDED_KEY_USAGE_OID);
-    }
-
-
-    @Test
-    public void testDefaultBehaviourUnchangedWhenSelectionDisabled() throws Exception {
-        X509Certificate presented = present(HOST, false,
-                key(HOST, CLIENT_AUTH),
-                key("localhost-server", SERVER_AUTH));
-        assertEku(presented, SSLUtilBase.CLIENT_AUTH_EXTENDED_KEY_USAGE_OID);
     }
 
 

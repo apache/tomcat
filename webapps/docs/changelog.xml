@@ -485,11 +485,11 @@
         initialization. (dsoumis)
       </fix>
       <update>
-        Add a <code>certificateSelectByKeyUsage</code> attribute for JSSE
-        <code>Certificate</code> configurations. When enabled, and multiple
-        certificates in the key store share a Subject, Tomcat selects a certificate that is valid
-        for TLS server authentication rather than relying on the key store to
-        return the correct certificate for the configured alias. (dsoumis)
+        When configuring a JSSE <code>Certificate</code> from a key store that
+        exposes several certificates sharing a Subject, ignore certificates
+        that are not valid for TLS server authentication so that a usable
+        certificate is selected rather than relying on the key store to
+        return the correct one for the configured alias. (dsoumis)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>

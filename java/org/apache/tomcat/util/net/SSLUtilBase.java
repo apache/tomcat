@@ -421,9 +421,7 @@ public abstract class SSLUtilBase implements SSLUtil {
                 }
             }
 
-            if (certificate.getCertificateSelectByKeyUsage()) {
-                keyAlias = selectServerAuthAlias(ks, keyAlias, certificate.getCertificateKeyAlias() != null);
-            }
+            keyAlias = selectServerAuthAlias(ks, keyAlias, certificate.getCertificateKeyAlias() != null);
 
             Key k = ks.getKey(keyAlias, keyPassArray);
             if (k != null && !"DKS".equalsIgnoreCase(certificate.getCertificateKeystoreType()) &&
@@ -465,10 +463,11 @@ public abstract class SSLUtilBase implements SSLUtil {
 
 
     /*
-     * When certificateSelectByKeyUsage is enabled, prefer a key entry whose certificate is usable for TLS server
-     * authentication. This handles key stores that can expose several certificates sharing a Subject
-     * (and therefore colliding on similar aliases). The certificate currently identified by the alias
-     * provides the Subject to match; when no alias was configured every key entry is a candidate.
+     * Prefer a key entry whose certificate is usable for TLS server authentication. This handles key stores that can
+     * expose several certificates sharing a Subject (and therefore colliding on similar aliases).
+     * The certificate currently identified by the alias provides the Subject to match.
+     * When no alias was configured every key entry is a candidate.
+     * When no usable certificate is found, the configured alias is returned unchanged.
      */
     private String selectServerAuthAlias(KeyStore ks, String currentAlias, boolean aliasConfigured)
         throws KeyStoreException, CertificateParsingException {
@@ -500,15 +499,19 @@ public abstract class SSLUtilBase implements SSLUtil {
             }
             if (isServerAuthCapable(x509Candidate)) {
                 matches.add(alias);
+            } else if (log.isDebugEnabled()) {
+                log.debug(sm.getString("sslUtilBase.skippedKeyUsage", alias));
             }
         }
 
         if (matches.isEmpty()) {
-            log.warn(sm.getString("sslUtilBase.noServerAuthCert", currentAlias));
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("sslUtilBase.noServerAuthCert", currentAlias));
+            }
             return currentAlias;
         }
-        if (matches.size() > 1) {
-            log.warn(sm.getString("sslUtilBase.multipleServerAuthCerts", currentAlias, matches));
+        if (matches.size() > 1 && log.isDebugEnabled()) {
+            log.debug(sm.getString("sslUtilBase.multipleServerAuthCerts", currentAlias, matches));
         }
         String selected = matches.get(0);
         if (!selected.equals(currentAlias) && log.isDebugEnabled()) {

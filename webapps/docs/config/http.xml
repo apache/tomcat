@@ -1667,22 +1667,12 @@
       the same order as they were added. If more than one key is present in the
       keystore it is strongly recommended that a keyAlias is configured to
       ensure that the correct key is used.</p>
-    </attribute>
-
-    <attribute name="certificateSelectByKeyUsage" required="false">
-      <p>JSSE only.</p>
-      <p>When using a key store that may contain several certificates sharing the
-        same Subject set this to <code>true</code> to
-        make Tomcat prefer a certificate that is valid for TLS server authentication
-        rather than relying on the key store to return the right certificate for the
-        configured <strong>certificateKeyAlias</strong>. A certificate is treated as
-        valid for TLS server authentication if its Extended Key Usage includes
-        <code>serverAuth</code> or <code>anyExtendedKeyUsage</code>, or if it has no
-        Extended Key Usage extension at all (its usage is then unrestricted). When
-        <strong>certificateKeyAlias</strong> is set, only certificates that share its
-        Subject are considered.</p>
-      <p>If not specified, the default value of <code>false</code> is used and the
-        certificate is selected by alias alone.</p>
+      <p>When several certificates in the key store share a Subject, Tomcat automatically ignores any that are
+      not valid for TLS server authentication - i.e. whose Extended Key Usage
+      excludes both <code>serverAuth</code> and <code>anyExtendedKeyUsage</code> -
+      so a usable certificate is selected. Certificates with no Extended Key Usage
+      extension are unrestricted and remain eligible. If none qualify, the
+      configured alias is used unchanged.</p>
     </attribute>
 
     <attribute name="certificateKeyFile" required="false">
