@@ -698,7 +698,7 @@ public class WsSession implements Session {
         long result = 0;
         Object obj = userProperties.get(Constants.SESSION_CLOSE_TIMEOUT_PROPERTY);
         if (obj instanceof Long) {
-            result = ((Long) obj).intValue();
+            result = ((Long) obj).longValue();
         }
         if (result <= 0) {
             result = Constants.DEFAULT_SESSION_CLOSE_TIMEOUT;
