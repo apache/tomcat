@@ -1022,6 +1022,10 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
     @Override
     public void setDefaultMaxBinaryMessageBufferSize(int max) {
+        if (max < 1) {
+            throw new IllegalArgumentException(
+                    sm.getString("wsWebSocketContainer.illegalBufferSize", Integer.valueOf(max)));
+        }
         maxBinaryMessageBufferSize = max;
     }
 
@@ -1034,6 +1038,10 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
     @Override
     public void setDefaultMaxTextMessageBufferSize(int max) {
+        if (max < 1) {
+            throw new IllegalArgumentException(
+                    sm.getString("wsWebSocketContainer.illegalBufferSize", Integer.valueOf(max)));
+        }
         maxTextMessageBufferSize = max;
     }
 
