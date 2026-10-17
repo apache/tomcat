@@ -587,6 +587,14 @@
         authentication type for almost every cipher suite. The computation now
         matches the one performed by the JNI based implementation. (remm)
       </fix>
+      <fix>
+        Correct <code>Asn1Parser.parseLength()</code> to report the actual decoded
+        length instead of a placeholder value when the length is valid but exceeds
+        the available input data, and to use a distinct, accurate message when a
+        length cannot be represented by this implementation due to Java's 32-bit
+        signed <code>int</code> limitation rather than misreporting it as an
+        invalid length. (michaelo)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
