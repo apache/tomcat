@@ -364,6 +364,19 @@ public class TestWsServerContainer extends WebSocketBaseTest {
         sc.addEndpoint(configA);
 
         Assert.assertNotEquals(configA, sc.findMapping("/foo/{a}").getConfig());
+
+        // The old match must remain stored under the normalized path. Ignoring the new match must
+        // not add an additional entry to the map.
+        Field configTemplateMatchMapField = WsServerContainer.class.getDeclaredField("configTemplateMatchMap");
+        configTemplateMatchMapField.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        Map<Integer, ConcurrentSkipListMap<String, Object>> configTemplateMatchMap =
+                (Map<Integer, ConcurrentSkipListMap<String, Object>>) configTemplateMatchMapField.get(sc);
+
+        ConcurrentSkipListMap<String, Object> templateMatches = configTemplateMatchMap.get(Integer.valueOf(2));
+
+        Assert.assertEquals(1, templateMatches.size());
+        Assert.assertTrue(templateMatches.containsKey("/foo/{0}"));
     }
 
 
