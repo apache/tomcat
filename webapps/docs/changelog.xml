@@ -472,6 +472,12 @@
       <update>
         Remove support for HTTP 0.9. (markt)
       </update>
+      <docs>
+        <bug>69617</bug>: Note in the documentation for
+        <code>maxHttpRequestHeaderSize</code> that the heap allocated for
+        request headers is retained by the request processors held in the
+        <code>processorCache</code> after the requests have completed.
+      </docs>
       <fix>
         <bug>70236</bug>: Fix a stalled TLS handshake with the OpenSSL based
         implementations of <code>SSLEngine</code> when the first flight of

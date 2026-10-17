@@ -626,7 +626,11 @@
       but be aware that Tomcat will allocate the full amount you specify for
       every request. For example, if you specify a maxHttpRequestHeaderSize of
       1 MB and your application handles 100 concurrent requests, you will see
-      100 MB of heap consumed by request headers.</p>
+      100 MB of heap consumed by request headers. That memory is not released
+      when those requests complete, because the request header buffers are
+      held by the request processors that Tomcat retains for reuse. Lower
+      <code>processorCache</code> to reduce the number of buffers retained,
+      or set it to <code>0</code> to disable processor reuse entirely.</p>
     </attribute>
 
     <attribute name="maxHttpResponseHeaderSize" required="false">
