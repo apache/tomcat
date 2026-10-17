@@ -39,6 +39,7 @@ import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.DeploymentException;
 import javax.websocket.Encoder;
+import javax.websocket.Endpoint;
 import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpoint;
 import javax.websocket.server.ServerEndpointConfig;
@@ -148,7 +149,12 @@ public class WsServerContainer extends WsWebSocketContainer implements ServerCon
             // Add method mapping to user properties
             PojoMethodMapping methodMapping = new PojoMethodMapping(sec.getEndpointClass(), sec.getDecoders(), path,
                     getInstanceManager(Thread.currentThread().getContextClassLoader()));
-            if (methodMapping.getOnClose() != null || methodMapping.getOnOpen() != null ||
+            // The mapping is not used for programmatic endpoints (Endpoint subclasses)
+            // so for those classes it is only stored when it has content (bug 58232).
+            // For POJO endpoints it must always be stored, even when empty, since
+            // PojoEndpointServer expects it to be present.
+            if (!Endpoint.class.isAssignableFrom(sec.getEndpointClass()) ||
+                    methodMapping.getOnClose() != null || methodMapping.getOnOpen() != null ||
                     methodMapping.getOnError() != null || methodMapping.hasMessageHandlers()) {
                 sec.getUserProperties().put(org.apache.tomcat.websocket.pojo.Constants.POJO_METHOD_MAPPING_KEY,
                         methodMapping);
