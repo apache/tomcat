@@ -135,6 +135,14 @@ public class BeanELResolver extends ELResolver {
         // Find the matching method
         Method matchingMethod = Util.findMethod(context, base.getClass(), base, methodName, paramTypes, params);
 
+        // Util.findMethod() returns null when no accessible method was found,
+        // e.g. when the method exists but is not publicly accessible because
+        // the class that defines it is not public.
+        if (matchingMethod == null) {
+            throw new MethodNotFoundException(
+                    Util.message(context, "beanELResolver.methodNotFound", methodName, base.getClass().getName()));
+        }
+
         Object[] parameters =
                 Util.buildParameters(context, matchingMethod.getParameterTypes(), matchingMethod.isVarArgs(), params);
 
