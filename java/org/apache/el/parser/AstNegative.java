@@ -24,6 +24,7 @@ import jakarta.el.ELException;
 
 import org.apache.el.lang.ELSupport;
 import org.apache.el.lang.EvaluationContext;
+import org.apache.el.util.MessageFactory;
 
 public final class AstNegative extends SimpleNode {
 
@@ -52,10 +53,18 @@ public final class AstNegative extends SimpleNode {
             return ((BigInteger) obj).negate();
         }
         if (obj instanceof String) {
-            if (ELSupport.isStringFloat((String) obj)) {
-                return Double.valueOf(-Double.parseDouble((String) obj));
+            String s = (String) obj;
+            if (s.isEmpty()) {
+                return Long.valueOf(0);
             }
-            return Long.valueOf(-Long.parseLong((String) obj));
+            try {
+                if (ELSupport.isStringFloat(s)) {
+                    return Double.valueOf(-Double.parseDouble(s));
+                }
+                return Long.valueOf(-Long.parseLong(s));
+            } catch (NumberFormatException nfe) {
+                throw new ELException(MessageFactory.get("error.convert", s, String.class, Number.class), nfe);
+            }
         }
         if (obj instanceof Long) {
             return Long.valueOf(-((Long) obj).longValue());
