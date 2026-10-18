@@ -495,9 +495,13 @@ public class TestMethodExpressionImpl extends ELBaseTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testBug60844() {
+        // Fewer parameter values than the minimum required by a varargs
+        // method (here, the fixed parameters only). A single value would be
+        // a valid number of arguments for this method, so the call below
+        // with no values is the too-few-parameters case.
         MethodExpression me2 = factory.createMethodExpression(context, "${beanC.sayHello}", null,
-                new Class[] { TesterBeanA.class, TesterBeanB.class });
-        me2.invoke(context, new Object[] { new Object() });
+                new Class[] { TesterBeanA.class });
+        me2.invoke(context, new Object[] { });
     }
 
 
@@ -721,6 +725,33 @@ public class TestMethodExpressionImpl extends ELBaseTest {
         elp.defineBean("bean1", new TesterBeanI());
         String elResult = elp.eval("bean1.echo(bean2)");
         Assert.assertEquals("No varargs: xyz", elResult);
+    }
+
+
+    @Test
+    public void testVarArgsZeroVarArgsElements() {
+        // A call that supplies only the fixed parameters of a varargs method
+        // is valid Java. The method expression mechanism must accept it, as
+        // the value expression mechanism already does.
+        context.getVariableMapper().setVariable("beanH",
+                factory.createValueExpression(new TesterBeanH(), TesterBeanH.class));
+
+        MethodExpression me = factory.createMethodExpression(context, "${beanH.doTest}", String.class,
+                new Class<?>[] { String.class });
+
+        Assert.assertEquals("String-VString", me.invoke(context, new Object[] { "apple" }));
+    }
+
+
+    @Test
+    public void testVarArgsOneVarArgsElement() {
+        context.getVariableMapper().setVariable("beanH",
+                factory.createValueExpression(new TesterBeanH(), TesterBeanH.class));
+
+        MethodExpression me = factory.createMethodExpression(context, "${beanH.doTest}", String.class,
+                new Class<?>[] { String.class, String.class });
+
+        Assert.assertEquals("String-VString", me.invoke(context, new Object[] { "apple", "apple" }));
     }
 
 
