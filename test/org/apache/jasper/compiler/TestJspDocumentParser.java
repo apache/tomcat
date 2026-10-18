@@ -86,6 +86,29 @@ public class TestJspDocumentParser extends TomcatBaseTest {
     }
 
     @Test
+    public void testNamedAttributeTrimCdata() throws Exception {
+        getTomcatInstanceTestWebapp(false, true);
+
+        ByteChunk bc = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/test/jsp/document/named-attribute-trim.jspx", bc, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+
+        String result = bc.toString();
+
+        // White-space only text nodes between the other body elements must be
+        // removed and the final text node must be trimmed
+        Assert.assertTrue(result, result.contains("<e1 a=\"x tail\"/>"));
+        Assert.assertTrue(result, result.contains("<e2 a=\"x\"/>"));
+        Assert.assertTrue(result, result.contains("<e3 a=\"xy\"/>"));
+        Assert.assertTrue(result, result.contains("<e4 a=\"x y\"/>"));
+        // With trim set to false, leading and trailing white-space only text
+        // nodes must be kept verbatim
+        Assert.assertTrue(result, result.contains("<t5 a=\"  \"/>"));
+        Assert.assertTrue(result, result.contains("<t6 a=\"x tail \"/>"));
+    }
+
+    @Test
     public void testSchemaValidation() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
