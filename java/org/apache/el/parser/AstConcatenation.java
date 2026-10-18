@@ -66,6 +66,25 @@ public class AstConcatenation extends SimpleNode {
 
     @Override
     public Class<?> getType(EvaluationContext ctx) throws ELException {
+        // Mirror the getValue type determination, but without performing any
+        // merging. The operands must be evaluated to determine the result type.
+        Object obj0 = this.children[0].getValue(ctx);
+        Object obj1 = this.children[1].getValue(ctx);
+
+        if (obj0 != null) {
+            if (obj0 instanceof Map<?, ?> && obj1 instanceof Map<?, ?>) {
+                // Maps are merged
+                return obj0.getClass();
+            } else if (obj0 instanceof Set<?> && obj1 instanceof Collection<?>) {
+                // If obj0 is a Set then merge
+                return obj0.getClass();
+            } else if (obj0 instanceof List<?> && obj1 instanceof Collection<?>) {
+                // If obj0 is a List then concatenate
+                return obj0.getClass();
+            }
+        }
+
+        // Otherwise the values are coerced to string and concatenated
         return String.class;
     }
 }

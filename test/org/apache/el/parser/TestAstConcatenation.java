@@ -219,4 +219,55 @@ public class TestAstConcatenation {
         Assert.assertEquals(String.class, ve.getType(context));
         Assert.assertEquals("a3", ve.getValue(context));
     }
+
+    @Test
+    public void testGetTypeMapMerge() {
+        // The merge branches of += produce the left operand, not a string, so
+        // getType() must not report String for them.
+        ELProcessor processor = new ELProcessor();
+        ELContext context = processor.getELManager().getELContext();
+        ExpressionFactory factory = ELManager.getExpressionFactory();
+
+        ValueExpression ve = factory.createValueExpression(
+                context, "${{'a':'1'} += {'b':'2'}}", Object.class);
+
+        Assert.assertTrue(Map.class.isAssignableFrom(ve.getType(context)));
+    }
+
+    @Test
+    public void testGetTypeSetMerge() {
+        ELProcessor processor = new ELProcessor();
+        ELContext context = processor.getELManager().getELContext();
+        ExpressionFactory factory = ELManager.getExpressionFactory();
+
+        ValueExpression ve = factory.createValueExpression(
+                context, "${{'a','b'} += ['c']}", Object.class);
+
+        Assert.assertTrue(Set.class.isAssignableFrom(ve.getType(context)));
+    }
+
+    @Test
+    public void testGetTypeListMerge() {
+        ELProcessor processor = new ELProcessor();
+        ELContext context = processor.getELManager().getELContext();
+        ExpressionFactory factory = ELManager.getExpressionFactory();
+
+        ValueExpression ve = factory.createValueExpression(
+                context, "${['a','b'] += ['c']}", Object.class);
+
+        Assert.assertTrue(List.class.isAssignableFrom(ve.getType(context)));
+    }
+
+    @Test
+    public void testGetTypeStringConcatenation() {
+        // Non-collection operands still take the string concatenation path.
+        ELProcessor processor = new ELProcessor();
+        ELContext context = processor.getELManager().getELContext();
+        ExpressionFactory factory = ELManager.getExpressionFactory();
+
+        ValueExpression ve = factory.createValueExpression(
+                context, "${1 += 2}", Object.class);
+
+        Assert.assertEquals(String.class, ve.getType(context));
+    }
 }
