@@ -16,7 +16,6 @@
  */
 package org.apache.jasper.compiler;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -49,6 +48,9 @@ public class SmapUtil {
     }
 
     private static final Charset SMAP_ENCODING = StandardCharsets.UTF_8;
+
+    // Marker that begins the SMAP data in the SourceDebugExtension attribute
+    private static final String SMAP_START_MARKER = "SMAP\n";
 
 
     /**
@@ -757,55 +759,33 @@ public class SmapUtil {
     }
 
 
-    @SuppressWarnings("null") // is cannot be null when used
     private static String getSmap(String className, ClassLoader cl) {
-        Charset encoding = StandardCharsets.ISO_8859_1;
-        boolean found = false;
-        String smap = null;
-
         InputStream is = null;
         try {
             is = cl.getResourceAsStream(className.replace(".", "/") + ".smap");
             if (is != null) {
-                encoding = SMAP_ENCODING;
-                found = true;
-            } else {
-                is = cl.getResourceAsStream(className.replace(".", "/") + ".class");
-                if (is != null) {
-                    // Alternative approach would be to read the class file as per the
-                    // JLS. That would require duplicating a lot of BCEL functionality.
-                    int b = is.read();
-                    while (b != -1) {
-                        if (b == 'S') {
-                            if ((b = is.read()) != 'M') {
-                                continue;
-                            }
-                            if ((b = is.read()) != 'A') {
-                                continue;
-                            }
-                            if ((b = is.read()) != 'P') {
-                                continue;
-                            }
-                            if ((b = is.read()) != '\n') {
-                                continue;
-                            }
-                            found = true;
-                            break;
-                        }
-                        b = is.read();
-                    }
-                }
+                return new String(is.readAllBytes(), SMAP_ENCODING);
             }
 
-            if (found) {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
-                byte[] buf = new byte[1024];
-                int numRead;
-                while ((numRead = is.read(buf)) >= 0) {
-                    baos.write(buf, 0, numRead);
+            is = cl.getResourceAsStream(className.replace(".", "/") + ".class");
+            if (is != null) {
+                // The SourceDebugExtension attribute that contains the SMAP
+                // is appended as the last attribute of the class file (see
+                // SDEInstaller) so the SMAP to extract is the one that starts
+                // at the last occurrence of the marker. The first occurrence
+                // cannot be used because the same byte sequence may appear
+                // earlier in the class file, for example in a string constant
+                // in the constant pool created from the template text of the
+                // page. Note that, unlike SmapStratum, the optional JSR-045
+                // terminator line "* END SMAP" also contains the marker. The
+                // SMAP data is installed as ISO-8859-1 (see installSmap())
+                // which preserves every byte of the class file, so the marker
+                // cannot be missed by the search below.
+                String classData = new String(is.readAllBytes(), StandardCharsets.ISO_8859_1);
+                int index = classData.lastIndexOf(SMAP_START_MARKER);
+                if (index >= 0) {
+                    return classData.substring(index + SMAP_START_MARKER.length());
                 }
-
-                smap = baos.toString(encoding);
             }
         } catch (IOException ioe) {
             Log log = LogFactory.getLog(SmapUtil.class);
@@ -820,6 +800,6 @@ public class SmapUtil {
                 }
             }
         }
-        return smap;
+        return null;
     }
 }
