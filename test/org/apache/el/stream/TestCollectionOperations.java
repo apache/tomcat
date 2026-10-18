@@ -326,6 +326,79 @@ public class TestCollectionOperations extends ELBaseTest {
 
 
     @Test
+    public void testSubstreamStart02() {
+        // A start that is less than or equal to zero skips no elements
+        ELProcessor processor = new ELProcessor();
+
+        Object result = processor.getValue(
+                "[1, 2, 3, 4, 5].stream().substream(-2).toList()",
+                Object.class);
+
+        List<Long> expected = new ArrayList<>(5);
+        expected.add(1L);
+        expected.add(2L);
+        expected.add(3L);
+        expected.add(4L);
+        expected.add(5L);
+
+        Assert.assertEquals(expected, result);
+    }
+
+
+    @Test
+    public void testSubstreamStartEnd02() {
+        // A start that is less than or equal to zero skips no elements and
+        // the number of elements included is end minus start
+        ELProcessor processor = new ELProcessor();
+
+        Object result = processor.getValue(
+                "[1, 2, 3, 4, 5].stream().substream(-2,3).toList()",
+                Object.class);
+
+        List<Long> expected = new ArrayList<>(5);
+        expected.add(1L);
+        expected.add(2L);
+        expected.add(3L);
+        expected.add(4L);
+        expected.add(5L);
+
+        Assert.assertEquals(expected, result);
+    }
+
+
+    @Test
+    public void testSubstreamStartEnd03() {
+        // The zero end position still includes end minus start elements when
+        // the start is negative
+        ELProcessor processor = new ELProcessor();
+
+        Object result = processor.getValue(
+                "[1, 2, 3, 4, 5].stream().substream(-2,0).toList()",
+                Object.class);
+
+        List<Long> expected = new ArrayList<>(2);
+        expected.add(1L);
+        expected.add(2L);
+
+        Assert.assertEquals(expected, result);
+    }
+
+
+    @Test
+    public void testSubstreamStartEnd04() {
+        // A source with fewer elements than the number to skip includes
+        // nothing
+        ELProcessor processor = new ELProcessor();
+
+        Object result = processor.getValue(
+                "[1].stream().substream(2,3).toList()",
+                Object.class);
+
+        Assert.assertEquals(new ArrayList<Long>(), result);
+    }
+
+
+    @Test
     public void testToArray01() {
         ELProcessor processor = new ELProcessor();
         processor.defineBean("beans", beans);
