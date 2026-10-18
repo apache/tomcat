@@ -258,7 +258,10 @@ public final class AstValue extends SimpleNode {
 
         int paramCount = types.length;
 
-        if (m.isVarArgs() && paramCount > 1 && (src == null || paramCount > src.length) ||
+        // For a varargs method, the final parameter may be supplied by zero or
+        // more arguments so the minimum number of arguments is one less than
+        // the number of parameters.
+        if (m.isVarArgs() && paramCount > 1 && (src == null || paramCount - 1 > src.length) ||
                 !m.isVarArgs() && (src == null || src.length != paramCount)) {
             String srcCount = null;
             if (src != null) {
@@ -267,7 +270,7 @@ public final class AstValue extends SimpleNode {
             String msg;
             if (m.isVarArgs()) {
                 msg = MessageFactory.get("error.invoke.tooFewParams", m.getName(), srcCount,
-                        Integer.toString(paramCount));
+                        Integer.toString(paramCount - 1));
             } else {
                 msg = MessageFactory.get("error.invoke.wrongParams", m.getName(), srcCount,
                         Integer.toString(paramCount));
