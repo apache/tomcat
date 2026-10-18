@@ -83,16 +83,18 @@ public class JavaCompiler extends Compiler {
                 }
             }
 
+            // Dispatch any compilation errors before deleting the generated
+            // source, so a failure to delete can not mask the real problem
+            if (!problemList.isEmpty()) {
+                JavacErrorDetail[] jeds = problemList.toArray(new JavacErrorDetail[0]);
+                errDispatcher.javacError(jeds);
+            }
+
             if (!ctxt.keepGenerated()) {
                 File javaFile = new File(ctxt.getServletJavaFileName());
                 if (!javaFile.delete()) {
                     throw new JasperException(Localizer.getMessage("jsp.warning.compiler.javafile.delete.fail", javaFile));
                 }
-            }
-
-            if (!problemList.isEmpty()) {
-                JavacErrorDetail[] jeds = problemList.toArray(new JavacErrorDetail[0]);
-                errDispatcher.javacError(jeds);
             }
 
             if (log.isDebugEnabled()) {
