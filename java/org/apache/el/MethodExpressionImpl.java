@@ -20,6 +20,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.io.Serial;
 
 import jakarta.el.ELContext;
 import jakarta.el.ELException;
@@ -66,6 +67,9 @@ import org.apache.el.util.ReflectionUtil;
  * @see jakarta.el.MethodExpression
  */
 public final class MethodExpressionImpl extends MethodExpression implements Externalizable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private Class<?> expectedType;
 

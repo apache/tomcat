@@ -20,6 +20,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.io.Serial;
 import java.lang.annotation.Annotation;
 
 import jakarta.el.ELContext;
@@ -36,6 +37,9 @@ import org.apache.el.util.ReflectionUtil;
  * Literal method expression.
  */
 public class MethodExpressionLiteral extends MethodExpression implements Externalizable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private static final Annotation[] EMPTY_ANNOTATION_ARRAY = new Annotation[0];
     private static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
