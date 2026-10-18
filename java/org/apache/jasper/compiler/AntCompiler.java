@@ -273,13 +273,8 @@ public class AntCompiler extends Compiler {
             errorReport.append(errorCapture);
         }
 
-        if (!ctxt.keepGenerated()) {
-            File javaFile = new File(javaFileName);
-            if (!javaFile.delete()) {
-                throw new JasperException(Localizer.getMessage("jsp.warning.compiler.javafile.delete.fail", javaFile));
-            }
-        }
-
+        // Dispatch any compilation errors before deleting the generated
+        // source, so a failure to delete can not mask the real problem
         if (be != null) {
             String errorReportString = errorReport.toString();
             log.error(Localizer.getMessage("jsp.error.compilation", javaFileName, errorReportString));
@@ -289,6 +284,13 @@ public class AntCompiler extends Compiler {
                 errDispatcher.javacError(javacErrors);
             } else {
                 errDispatcher.javacError(errorReportString, be);
+            }
+        }
+
+        if (!ctxt.keepGenerated()) {
+            File javaFile = new File(javaFileName);
+            if (!javaFile.delete()) {
+                throw new JasperException(Localizer.getMessage("jsp.warning.compiler.javafile.delete.fail", javaFile));
             }
         }
 
