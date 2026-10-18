@@ -16,6 +16,10 @@
  */
 package org.apache.el.parser;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import javax.el.ELContext;
 import javax.el.ELManager;
 import javax.el.ELProcessor;
