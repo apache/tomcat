@@ -69,7 +69,10 @@ public class JavacErrorDetail {
         this.errMsg = errMsg;
         this.jspFileName = jspFileName;
         // Note: this.jspBeginLineNum is set at the end of this method as it may
-        // be modified (corrected) during the execution of this method
+        // be modified (corrected) during the execution of this method. It is
+        // left at -1, which marks the error detail as unusable, if the
+        // generated Java source turns out to belong to a different compilation
+        // of the JSP page.
 
         if (jspBeginLineNum > 0 && ctxt != null) {
             InputStream is = null;
@@ -99,6 +102,9 @@ public class JavacErrorDetail {
                         // Avoid ArrayIndexOutOfBoundsException
                         // Probably bug 48498 but could be some other cause
                         jspExtract = Localizer.getMessage("jsp.error.bug48498");
+                        // Report only the Java line, since the JSP line
+                        // cannot be validated against the truncated source
+                        this.jspBeginLineNum = -1;
                         return;
                     }
 
