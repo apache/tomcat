@@ -980,7 +980,7 @@ public class TestBeanELResolver {
         Assert.assertEquals(BEAN_NAME, result);
     }
 
-    private static class Bean {
+    private static class Bean implements MyInterface {
 
         @SuppressWarnings("unused")
         public void setValueA(String valueA) {
