@@ -744,4 +744,73 @@ public class TestMethodExpressionImpl {
         Assert.assertEquals(1, mi.getParamTypes().length);
         Assert.assertEquals(String.class, mi.getParamTypes()[0]);
     }
+
+
+    @Test
+    public void testEqualsHashCodeSameExpression() {
+        MethodExpression me1 = factory.createMethodExpression(context, "${beanB.getName}", String.class,
+                new Class<?>[] {});
+        MethodExpression me2 = factory.createMethodExpression(context, "${beanB.getName}", String.class,
+                new Class<?>[] {});
+
+        Assert.assertEquals(me1, me2);
+        Assert.assertEquals(me1.hashCode(), me2.hashCode());
+    }
+
+
+    @Test
+    public void testEqualsHashCodeWhitespaceVariants() {
+        MethodExpression me1 = factory.createMethodExpression(context, "${beanB.getName}", String.class,
+                new Class<?>[] {});
+        MethodExpression me2 = factory.createMethodExpression(context, "${ beanB.getName }", String.class,
+                new Class<?>[] {});
+
+        Assert.assertEquals(me1, me2);
+        Assert.assertEquals(me1.hashCode(), me2.hashCode());
+    }
+
+
+    @Test
+    public void testNotEqualsDifferentExpression() {
+        MethodExpression me1 = factory.createMethodExpression(context, "${beanB.getName}", String.class,
+                new Class<?>[] {});
+        MethodExpression me2 = factory.createMethodExpression(context, "${beanBB.getName}", String.class,
+                new Class<?>[] {});
+
+        Assert.assertNotEquals(me1, me2);
+    }
+
+
+    @Test
+    public void testNotEqualsHashCollidingExpressions() {
+        // "Aa" and "BB" are a well known pair of strings with the same hash code
+        Assert.assertEquals("Aa".hashCode(), "BB".hashCode());
+
+        MethodExpression me1 = factory.createMethodExpression(context, "${Aa}", String.class, new Class<?>[] {});
+        MethodExpression me2 = factory.createMethodExpression(context, "${BB}", String.class, new Class<?>[] {});
+
+        Assert.assertNotEquals(me1, me2);
+    }
+
+
+    @Test
+    public void testEqualsHashCodeSameLiteral() {
+        MethodExpression me1 = factory.createMethodExpression(context, "'Aa'", String.class, new Class<?>[] {});
+        MethodExpression me2 = factory.createMethodExpression(context, "'Aa'", String.class, new Class<?>[] {});
+
+        Assert.assertEquals(me1, me2);
+        Assert.assertEquals(me1.hashCode(), me2.hashCode());
+    }
+
+
+    @Test
+    public void testNotEqualsHashCollidingLiterals() {
+        // "Aa" and "BB" are a well known pair of strings with the same hash code
+        Assert.assertEquals("'Aa'".hashCode(), "'BB'".hashCode());
+
+        MethodExpression me1 = factory.createMethodExpression(context, "'Aa'", String.class, new Class<?>[] {});
+        MethodExpression me2 = factory.createMethodExpression(context, "'BB'", String.class, new Class<?>[] {});
+
+        Assert.assertNotEquals(me1, me2);
+    }
 }
