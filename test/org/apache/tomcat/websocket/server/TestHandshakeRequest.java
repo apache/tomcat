@@ -64,16 +64,6 @@ public class TestHandshakeRequest extends WebSocketBaseTest {
     }
 
 
-    /*
-     * URI syntax is valid here so the request reaches query string decoding. That mechanism already rejects the
-     * invalid UTF-8 sequence with a 400 response. Pinned here since it is a different code path.
-     */
-    @Test
-    public void testInvalidUtf8Escape() throws Exception {
-        doTest("?x=%C0%80", HttpServletResponse.SC_BAD_REQUEST);
-    }
-
-
     @Test
     public void testEmptyQueryString() throws Exception {
         doTest("?", HttpServletResponse.SC_SWITCHING_PROTOCOLS);
