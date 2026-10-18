@@ -291,10 +291,11 @@ public class Stream {
 
 
     /**
-     * Returns a stream consisting of the elements of this stream from the
-     * specified start position to the end.
+     * Returns a stream consisting of the elements of this stream after
+     * skipping the first {@code start} elements. No elements are skipped if
+     * {@code start} is less than or equal to zero.
      *
-     * @param start the start position (inclusive)
+     * @param start the number of elements to skip
      * @return the new substream
      */
     public Stream substream(final Number start) {
@@ -302,10 +303,12 @@ public class Stream {
     }
 
     /**
-     * Returns a stream consisting of the elements of this stream from the
-     * specified start position up to, but not including, the specified end position.
+     * Returns a stream consisting of the elements of this stream, skipping
+     * the first {@code start} elements and including the next
+     * {@code end - start} elements. No elements are skipped if {@code start}
+     * is less than or equal to zero.
      *
-     * @param start the start position (inclusive)
+     * @param start the number of elements to skip
      * @param end the end position (exclusive)
      * @return the new substream
      */
@@ -313,18 +316,25 @@ public class Stream {
 
         Iterator<Object> downStream = new OpIterator() {
 
-            private final int startPos = start.intValue();
-            private final int endPos = end.intValue();
-            private int itemCount = 0;
+            // The specification counts the elements to include from the
+            // position at which the start elements were skipped, so a start
+            // that is less than or equal to zero, which skips no elements,
+            // includes end minus start elements. The count is calculated as
+            // a long because the single argument form passes an end of
+            // Integer.MAX_VALUE.
+            private final int skipCount = Math.max(start.intValue(), 0);
+            private final long includeCount = (long) end.intValue() - start.intValue();
+            private int skipped = 0;
+            private long included = 0;
 
             @Override
             protected void findNext() {
-                while (itemCount < startPos && iterator.hasNext()) {
+                while (skipped < skipCount && iterator.hasNext()) {
                     iterator.next();
-                    itemCount++;
+                    skipped++;
                 }
-                if (itemCount < endPos && iterator.hasNext()) {
-                    itemCount++;
+                if (skipped == skipCount && included < includeCount && iterator.hasNext()) {
+                    included++;
                     next = iterator.next();
                     foundNext = true;
                 }
