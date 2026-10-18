@@ -110,6 +110,48 @@ public class TestJspC {
     }
 
     @Test
+    public void argsNoFullStop() throws Exception {
+        jspc.setArgs(new String[] {"a.jsp", "b.jsp"});
+        Assert.assertEquals(List.of("a.jsp", "b.jsp"), jspc.pages);
+    }
+
+    @Test
+    public void argsFullStop() throws Exception {
+        jspc.setArgs(new String[] {"--", "a.jsp", "b.jsp", "c.jsp"});
+        Assert.assertEquals(List.of("a.jsp", "b.jsp", "c.jsp"), jspc.pages);
+    }
+
+    @Test
+    public void argsFullStopAfterOptions() throws Exception {
+        jspc.setArgs(new String[] {"-compile", "--", "a.jsp", "b.jsp"});
+        Assert.assertTrue(jspc.compile);
+        Assert.assertEquals(List.of("a.jsp", "b.jsp"), jspc.pages);
+    }
+
+    @Test
+    public void argsFullStopFileStartingWithDash() throws Exception {
+        jspc.setArgs(new String[] {"--", "-a.jsp", "b.jsp"});
+        Assert.assertEquals(List.of("-a.jsp", "b.jsp"), jspc.pages);
+    }
+
+    @Test
+    public void argsFullStopAsOptionValue() throws Exception {
+        // The full stop argument takes the place of the missing option value
+        // and must not cause the first file argument to be dropped
+        jspc.setArgs(new String[] {"-d", "--", "a.jsp", "b.jsp"});
+        Assert.assertEquals(List.of("a.jsp", "b.jsp"), jspc.pages);
+    }
+
+    @Test
+    public void argsFullStopInOptionValuePositionStopsOptionParsing()
+            throws Exception {
+        jspc.setArgs(new String[] {"-cache", "--", "-compile", "a.jsp"});
+        Assert.assertFalse(jspc.compile);
+        Assert.assertEquals(List.of("-compile", "a.jsp"), jspc.pages);
+    }
+
+    @Test
+>>>>>>> 79e8d06f4c (Fix jspc handling of the full stop (--) argument)
     public void servletContextUsesAntLog() throws Exception {
         List<String> messages = new ArrayList<>();
         Project project = new Project();
