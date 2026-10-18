@@ -24,6 +24,8 @@ import javax.el.StandardELContext;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.el.TesterFunctions;
+
 public class TestAstFunction {
 
     @Test
@@ -58,5 +60,31 @@ public class TestAstFunction {
 
         result = factory.createValueExpression(context, "${fn:format('%s','one')}", String.class).getValue(context);
         Assert.assertEquals("one", result);
+    }
+
+    @Test
+    public void testVarargMethodEmptyVarargs01() throws NoSuchMethodException {
+        // Java passes an empty array, never null, to a varargs method that is
+        // called with no arguments
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new StandardELContext(factory);
+        context.getFunctionMapper().mapFunction("fn", "count",
+                TesterFunctions.class.getMethod("varargsLength", String[].class));
+
+        Object result = factory.createValueExpression(context, "${fn:count()}", Integer.class).getValue(context);
+        Assert.assertEquals(Integer.valueOf(0), result);
+    }
+
+    @Test
+    public void testVarargMethodEmptyVarargs02() throws NoSuchMethodException {
+        // Java passes an empty array, never null, to the varargs parameter of a
+        // mixed fixed and varargs method that is called with no varargs elements
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new StandardELContext(factory);
+        context.getFunctionMapper().mapFunction("fn", "count2",
+                TesterFunctions.class.getMethod("varargsLength2", String.class, String[].class));
+
+        Object result = factory.createValueExpression(context, "${fn:count2('x')}", Integer.class).getValue(context);
+        Assert.assertEquals(Integer.valueOf(0), result);
     }
 }
