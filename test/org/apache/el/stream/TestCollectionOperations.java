@@ -215,6 +215,23 @@ public class TestCollectionOperations extends ELBaseTest {
 
 
     @Test
+    public void testSortedLambdaExpression02() {
+        // A comparator that returns null coerces to zero, treating all
+        // elements as equal. The sort is stable, so the order is unchanged.
+        ELProcessor processor = new ELProcessor();
+        Object result = processor.getValue(
+                "[3, 1, 2].stream().sorted((x,y)->null).toList()",
+                List.class);
+        List<Long> expected = new ArrayList<>(3);
+        expected.add(3L);
+        expected.add(1L);
+        expected.add(2L);
+
+        Assert.assertEquals(expected, result);
+    }
+
+
+    @Test
     public void testForEach01() {
         ELProcessor processor = new ELProcessor();
         processor.defineBean("beans", beans);
@@ -434,6 +451,34 @@ public class TestCollectionOperations extends ELBaseTest {
 
         Assert.assertEquals(bean03, ((Optional) result).get());
     }
+
+
+    @Test
+    public void testMaxLambda03() {
+        // A comparator that returns null coerces to zero, treating all
+        // elements as equal. The first element is retained.
+        ELProcessor processor = new ELProcessor();
+
+        Object result = processor.getValue(
+                "[1, 2, 3].stream().max((x,y)->null)",
+                Object.class);
+
+        Assert.assertEquals(1L, ((Optional) result).get());
+    }
+
+
+    @Test(expected=ELException.class)
+    public void testMaxLambda04() {
+        // A comparator result that cannot be coerced to a number is reported
+        // as an ELException
+        ELProcessor processor = new ELProcessor();
+
+        processor.getValue(
+                "[1, 2, 3].stream().max((x,y)->'abc')",
+                Object.class);
+    }
+
+
     @Test
     public void testMin01() {
         ELProcessor processor = new ELProcessor();
@@ -491,6 +536,20 @@ public class TestCollectionOperations extends ELBaseTest {
                 Object.class);
 
         Assert.assertEquals(bean01, ((Optional) result).get());
+    }
+
+
+    @Test
+    public void testMinLambda02() {
+        // A comparator that returns null coerces to zero, treating all
+        // elements as equal. The first element is retained.
+        ELProcessor processor = new ELProcessor();
+
+        Object result = processor.getValue(
+                "[1, 2, 3].stream().min((x,y)->null)",
+                Object.class);
+
+        Assert.assertEquals(1L, ((Optional) result).get());
     }
 
 
