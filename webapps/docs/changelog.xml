@@ -401,6 +401,18 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Correct the handling of the <code>--</code> argument by
+        <code>jspc</code>. The argument position was advanced past the full
+        stop argument on each iteration while collecting the JSP file
+        arguments, so every second file argument after <code>--</code> was
+        silently omitted from processing. Option parsing now stops at the
+        first full stop argument wherever it appears. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <fix>
