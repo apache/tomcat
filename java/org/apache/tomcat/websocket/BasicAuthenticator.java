@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.websocket;
 
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Map;
@@ -52,16 +53,23 @@ public class BasicAuthenticator extends Authenticator {
         String userPass = userName + ":" + userPassword;
 
         /*
-         * RFC 7617 section 2.1 leaves the default character encoding undefined and only allows UTF-8 as the value of
-         * the charset parameter, reserving any other value for future use. Use UTF-8 by default and reject challenges
-         * that ask for any other encoding rather than silently guessing one.
+         * RFC 7617 section 2.1 leaves the default character encoding undefined. Use ISO-8859-1, the default used by
+         * Tomcat servers of this branch, when the challenge does not specify a charset. UTF-8 is the only value the
+         * RFC allows for the charset parameter, reserving any other value for future use, so use UTF-8 when the
+         * challenge asks for it and reject challenges that ask for any other encoding rather than silently guessing
+         * one.
          */
         String charsetParam = parameterMap.get(charsetparam);
-        if (charsetParam != null && !charsetParam.equalsIgnoreCase("UTF-8")) {
-            throw new AuthenticationException(sm.getString("basicAuthenticator.invalidCharset", charsetParam));
+        Charset charset = StandardCharsets.ISO_8859_1;
+        if (charsetParam != null) {
+            if (charsetParam.equalsIgnoreCase("UTF-8")) {
+                charset = StandardCharsets.UTF_8;
+            } else {
+                throw new AuthenticationException(sm.getString("basicAuthenticator.invalidCharset", charsetParam));
+            }
         }
 
-        String base64 = Base64.getEncoder().encodeToString(userPass.getBytes(StandardCharsets.UTF_8));
+        String base64 = Base64.getEncoder().encodeToString(userPass.getBytes(charset));
 
         return " Basic " + base64;
     }

@@ -27,11 +27,12 @@ public class TestBasicAuthenticator {
 
     @Test
     public void testAuthorizationNoCharset() throws Exception {
-        // UTF-8 is used by default if no charset is specified. The pound
-        // sign is a single byte in ISO-8859-1 and two bytes in UTF-8 so the
-        // two encodings can be distinguished.
+        // ISO-8859-1 is used by default if no charset is specified, matching
+        // the default used by Tomcat servers of this branch. The pound sign
+        // is a single byte in ISO-8859-1 and two bytes in UTF-8 so the two
+        // encodings can be distinguished.
         String authorization = getAuthorization("Basic realm=\"realm\"", "user", "pass\u00A3word");
-        Assert.assertEquals(" Basic " + encode("user:pass\u00A3word", StandardCharsets.UTF_8), authorization);
+        Assert.assertEquals(" Basic " + encode("user:pass\u00A3word", StandardCharsets.ISO_8859_1), authorization);
     }
 
     @Test
