@@ -451,7 +451,7 @@ public final class AstValue extends SimpleNode {
     @Override
     public ValueReference getValueReference(EvaluationContext ctx) {
         // Check this is a reference to a base and a property
-        if (this.children.length > 2 && this.jjtGetChild(2) instanceof AstMethodParameters) {
+        if (isParametersProvided()) {
             // This is a method call
             return null;
         }
