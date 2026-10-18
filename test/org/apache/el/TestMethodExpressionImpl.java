@@ -24,6 +24,7 @@ import jakarta.el.ExpressionFactory;
 import jakarta.el.MethodExpression;
 import jakarta.el.MethodInfo;
 import jakarta.el.MethodNotFoundException;
+import jakarta.el.MethodReference;
 import jakarta.el.ValueExpression;
 
 import org.junit.Assert;
@@ -749,6 +750,40 @@ public class TestMethodExpressionImpl {
                 new Class<?>[] { String.class, String.class });
 
         Assert.assertEquals("String-VString", me.invoke(context, new Object[] { "apple", "apple" }));
+    }
+
+
+    @Test
+    public void testGetReference01() {
+        // Building a method reference must evaluate the base chain and the
+        // parameters exactly once
+        ELProcessor elp = new ELProcessor();
+        TesterBeanK bean = new TesterBeanK();
+        TesterBeanK child = new TesterBeanK();
+        bean.setChild(child);
+        elp.defineBean("beanK", bean);
+        ELContext elpContext = elp.getELManager().getELContext();
+
+        MethodExpression me = elp.getELManager().getExpressionFactory().createMethodExpression(elpContext,
+                "${beanK.child.format(beanK.next())}", String.class, null);
+
+        MethodReference ref = me.getMethodReference(elpContext);
+
+        Assert.assertEquals(1, bean.baseCalls);
+        Assert.assertEquals(1, bean.argCalls);
+        Assert.assertEquals("format", ref.getMethodInfo().getName());
+        // The base, parameters and method information must all come from the
+        // single evaluation
+        Assert.assertSame(child, ref.getBase());
+        Assert.assertArrayEquals(new Object[] { Integer.valueOf(1) }, ref.getEvaluatedParameters());
+
+        // Invoke must also evaluate each exactly once
+        bean.baseCalls = 0;
+        bean.argCalls = 0;
+
+        Assert.assertEquals("formatted-1", me.invoke(elpContext, null));
+        Assert.assertEquals(1, bean.baseCalls);
+        Assert.assertEquals(1, bean.argCalls);
     }
 
 
