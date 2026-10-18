@@ -88,7 +88,7 @@ public class TestValueExpressionImpl {
     @Test
     public void testGetValueReferenceMethodCall() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl();
+        ELContext context = new ELContextImpl(factory);
 
         TesterBeanM beanM = new TesterBeanM();
         ValueExpression var = factory.createValueExpression(beanM, TesterBeanM.class);
@@ -104,7 +104,7 @@ public class TestValueExpressionImpl {
     @Test
     public void testGetValueReferenceMethodCallResult() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl();
+        ELContext context = new ELContextImpl(factory);
 
         TesterBeanM beanM = new TesterBeanM();
         ValueExpression var = factory.createValueExpression(beanM, TesterBeanM.class);
@@ -124,7 +124,7 @@ public class TestValueExpressionImpl {
     @Test
     public void testGetValueReferencePropertyThenMethodCall() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl();
+        ELContext context = new ELContextImpl(factory);
 
         TesterBeanM beanM = new TesterBeanM();
         ValueExpression var = factory.createValueExpression(beanM, TesterBeanM.class);
