@@ -16,6 +16,10 @@
  */
 package org.apache.el.parser;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import jakarta.el.ELContext;
 import jakarta.el.ELManager;
 import jakarta.el.ELProcessor;
