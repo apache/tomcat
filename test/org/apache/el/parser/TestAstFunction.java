@@ -17,6 +17,7 @@
 package org.apache.el.parser;
 
 import jakarta.el.ELContext;
+import jakarta.el.ELException;
 import jakarta.el.ELProcessor;
 import jakarta.el.ExpressionFactory;
 import jakarta.el.StandardELContext;
@@ -41,6 +42,51 @@ public class TestAstFunction {
         processor.getELManager().getELContext().getImportHandler().importStatic("java.lang.Integer.valueOf");
         Object result = processor.getValue("valueOf(1000)", Integer.class);
         Assert.assertEquals(Integer.valueOf(1000), result);
+    }
+
+    @Test
+    public void testImportConstructorTooManyParameterSets() {
+        // resolveClass path: the result of a constructor call is not treated as
+        // a lambda so only a single set of method parameters is valid. The extra
+        // set must be rejected rather than silently ignored.
+        ELProcessor processor = new ELProcessor();
+        try {
+            processor.getValue("Integer(1000)(2000)", Object.class);
+            Assert.fail("An ELException was expected");
+        } catch (ELException e) {
+            // Expected
+        }
+    }
+
+    @Test
+    public void testImportStaticTooManyParameterSets() {
+        // resolveStatic path: the result of a static method call is not treated
+        // as a lambda so only a single set of method parameters is valid. The
+        // extra set must be rejected rather than silently ignored.
+        ELProcessor processor = new ELProcessor();
+        processor.getELManager().getELContext().getImportHandler().importStatic("java.lang.String.valueOf");
+        try {
+            processor.getValue("valueOf('a')('b')", Object.class);
+            Assert.fail("An ELException was expected");
+        } catch (ELException e) {
+            // Expected
+        }
+    }
+
+    @Test
+    public void testUnresolvedNameTooManyParameterSets() {
+        // A name that resolves to neither a class nor a static method must still
+        // report the "function not found" error, not the too-many-parameters
+        // error. This pins the placement of the parameter-set check so that it
+        // cannot be hoisted above the resolution.
+        ELProcessor processor = new ELProcessor();
+        try {
+            processor.getValue("unknown(1)(2)", Object.class);
+            Assert.fail("An ELException was expected");
+        } catch (ELException e) {
+            Assert.assertTrue("Unexpected message: " + e.getMessage(),
+                    e.getMessage().contains("not found"));
+        }
     }
 
     @Test

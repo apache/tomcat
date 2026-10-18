@@ -130,13 +130,20 @@ public final class AstFunction extends SimpleNode {
 
             // Call to a constructor or a static method
             obj = ctx.getImportHandler().resolveClass(this.localName);
-            if (obj != null) {
-                return ctx.getELResolver().invoke(ctx, new ELClass((Class<?>) obj), "<init>", null,
-                        ((AstMethodParameters) this.children[0]).getParameters(ctx));
+            String methodName = "<init>";
+            if (obj == null) {
+                obj = ctx.getImportHandler().resolveStatic(this.localName);
+                methodName = this.localName;
             }
-            obj = ctx.getImportHandler().resolveStatic(this.localName);
             if (obj != null) {
-                return ctx.getELResolver().invoke(ctx, new ELClass((Class<?>) obj), this.localName, null,
+                // The result of a constructor or static method call is not
+                // treated as a lambda expression so there must be just a single
+                // set of method parameters
+                if (this.jjtGetNumChildren() != 1) {
+                    throw new ELException(MessageFactory.get("error.function.tooManyMethodParameterSets",
+                            getOutputName()));
+                }
+                return ctx.getELResolver().invoke(ctx, new ELClass((Class<?>) obj), methodName, null,
                         ((AstMethodParameters) this.children[0]).getParameters(ctx));
             }
         }
