@@ -452,7 +452,9 @@ public class JspC extends Task implements Options {
                 xpoweredBy = true;
             } else if (tok.equals(SWITCH_TRIM_SPACES)) {
                 tok = nextArg();
-                if (TrimSpacesOption.SINGLE.toString().equalsIgnoreCase(tok)) {
+                if (tok == null) {
+                    setTrimSpaces(TrimSpacesOption.TRUE);
+                } else if (TrimSpacesOption.SINGLE.toString().equalsIgnoreCase(tok)) {
                     setTrimSpaces(TrimSpacesOption.SINGLE);
                 } else {
                     setTrimSpaces(TrimSpacesOption.TRUE);
