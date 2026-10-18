@@ -250,7 +250,11 @@ public final class AstValue extends SimpleNode {
         // Handle varArgs and any coercion required
         values = convertArgs(ctx, values, m);
 
-        return new MethodReference(t.base, getMethodInfo(ctx, types), m.getAnnotations(), values);
+        // The method information is taken from the method resolved above, so
+        // that the base chain and the parameters are evaluated only once
+        MethodInfo mi = new MethodInfo(m.getName(), m.getReturnType(), m.getParameterTypes());
+
+        return new MethodReference(t.base, mi, m.getAnnotations(), values);
     }
 
     private Object[] convertArgs(EvaluationContext ctx, Object[] src, Method m) {
