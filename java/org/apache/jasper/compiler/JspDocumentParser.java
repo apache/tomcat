@@ -548,6 +548,9 @@ class JspDocumentParser extends DefaultHandler2 implements TagConstants {
                 } else {
                     if (((Node.TemplateText) subElem).isAllSpace()) {
                         subElems.remove(subElem);
+                        // Re-examine the element that was shifted into this
+                        // position by the removal above
+                        i--;
                     }
                 }
             }
