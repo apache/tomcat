@@ -111,7 +111,11 @@ public class MethodExpressionLiteral extends MethodExpression implements Externa
 
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof MethodExpressionLiteral && this.hashCode() == obj.hashCode());
+        if (!(obj instanceof MethodExpressionLiteral)) {
+            return false;
+        }
+
+        return this.expr.equals(((MethodExpressionLiteral) obj).expr);
     }
 
     @Override

@@ -128,7 +128,14 @@ public final class MethodExpressionImpl extends MethodExpression implements Exte
      */
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof MethodExpressionImpl && obj.hashCode() == this.hashCode());
+        if (!(obj instanceof MethodExpressionImpl)) {
+            return false;
+        }
+        if (obj.hashCode() != this.hashCode()) {
+            return false;
+        }
+
+        return this.getNode().equals(((MethodExpressionImpl) obj).getNode());
     }
 
     /**
@@ -207,7 +214,7 @@ public final class MethodExpressionImpl extends MethodExpression implements Exte
      */
     @Override
     public int hashCode() {
-        return this.expr.hashCode();
+        return this.getNode().hashCode();
     }
 
     /**
