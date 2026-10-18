@@ -44,7 +44,7 @@ public class TestAstNotEmpty {
         // An array with no elements is empty. This includes primitive arrays.
         ELProcessor processor = new ELProcessor();
         processor.defineBean("arr", new int[0]);
-        Boolean result = processor.eval("not empty arr");
+        Boolean result = (Boolean) processor.eval("not empty arr");
         Assert.assertEquals(Boolean.FALSE, result);
     }
 
@@ -53,7 +53,7 @@ public class TestAstNotEmpty {
     public void test04() {
         ELProcessor processor = new ELProcessor();
         processor.defineBean("arr", new int[] { 1, 2 });
-        Boolean result = processor.eval("not empty arr");
+        Boolean result = (Boolean) processor.eval("not empty arr");
         Assert.assertEquals(Boolean.TRUE, result);
     }
 }
