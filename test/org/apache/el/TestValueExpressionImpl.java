@@ -87,6 +87,59 @@ public class TestValueExpressionImpl extends ELBaseTest {
     }
 
     @Test
+    public void testGetValueReferenceMethodCall() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new ELContextImpl();
+
+        TesterBeanM beanM = new TesterBeanM();
+        ValueExpression var = factory.createValueExpression(beanM, TesterBeanM.class);
+        context.getVariableMapper().setVariable("beanM", var);
+
+        ValueExpression ve = factory.createValueExpression(context, "${beanM.select('Tomcat')}", String.class);
+
+        // A method call is not a reference to a base and a property
+        ValueReference vr = ve.getValueReference(context);
+        Assert.assertNull(vr);
+    }
+
+    @Test
+    public void testGetValueReferenceMethodCallResult() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new ELContextImpl();
+
+        TesterBeanM beanM = new TesterBeanM();
+        ValueExpression var = factory.createValueExpression(beanM, TesterBeanM.class);
+        context.getVariableMapper().setVariable("beanM", var);
+
+        ValueExpression ve = factory.createValueExpression(context, "${beanM.select('Tomcat').name}", String.class);
+
+        // The result of the method call is the base of the property
+        // reference, so this is a reference to a base and a property
+        ValueReference vr = ve.getValueReference(context);
+        Assert.assertNotNull(vr);
+
+        Assert.assertEquals(beanM.getTarget(), vr.getBase());
+        Assert.assertEquals("name", vr.getProperty());
+    }
+
+    @Test
+    public void testGetValueReferencePropertyThenMethodCall() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new ELContextImpl();
+
+        TesterBeanM beanM = new TesterBeanM();
+        ValueExpression var = factory.createValueExpression(beanM, TesterBeanM.class);
+        context.getVariableMapper().setVariable("beanM", var);
+
+        ValueExpression ve = factory.createValueExpression(context, "${beanM.target.select('Tomcat')}", String.class);
+
+        // A method call is not a reference to a base and a property, even
+        // when the base of the method call is itself a property
+        ValueReference vr = ve.getValueReference(context);
+        Assert.assertNull(vr);
+    }
+
+    @Test
     public void testBug49345() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
         ELContext context = new ELContextImpl();
