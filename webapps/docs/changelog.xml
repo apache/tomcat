@@ -400,6 +400,16 @@
         silently omitted from processing. Option parsing now stops at the
         first full stop argument wherever it appears. (remm)
       </fix>
+      <fix>
+        When removing white-space only template text nodes from the body of a
+        <code>jsp:attribute</code> action while parsing a JSP document, the
+        node that was shifted into the vacated position is now re-examined.
+        Previously it was skipped, which, for bodies containing adjacent
+        template text nodes such as those produced by CDATA sections, could
+        leave a white-space only text node in the body or prevent the final
+        text node from being trimmed when <code>trim</code> was
+        <code>true</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
