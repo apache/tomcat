@@ -44,6 +44,16 @@ public class TesterFunctions {
         return result.toString();
     }
 
+    public static int varargsLength(String... inputs) {
+        // Distinguishes a null varargs array from an empty one
+        return inputs == null ? -1 : inputs.length;
+    }
+
+    public static int varargsLength2(String prefix, String... inputs) {
+        // Distinguishes a null varargs array from an empty one
+        return inputs == null ? -1 : inputs.length;
+    }
+
     public static String[] toArray(String a, String b) {
         return new String[] { a, b };
     }
