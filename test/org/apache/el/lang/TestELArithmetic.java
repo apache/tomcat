@@ -19,6 +19,7 @@ package org.apache.el.lang;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import javax.el.ELException;
 import javax.el.ELProcessor;
 
 import org.junit.Assert;
@@ -144,5 +145,108 @@ public class TestELArithmetic {
     @Test
     public void testBug47371doubleString2() throws Exception {
         Assert.assertEquals(Double.valueOf(2), ELArithmetic.add("1.", "1"));
+    }
+
+    @Test
+    public void testNonNumericStringCoercedThrowsELException() {
+        // A non-numeric String coerced during arithmetic must surface as ELException,
+        // not as a raw NumberFormatException (the delegate String coercions use
+        // Long.valueOf/Double.valueOf/new BigDecimal/new BigInteger).
+        Object[] badOperands = { "abc", "1E", "0x1f", "1.2.3" };
+        for (Object operand : badOperands) {
+            assertELException("add", () -> ELArithmetic.add(operand, Long.valueOf(1)));
+            assertELException("subtract", () -> ELArithmetic.subtract(Long.valueOf(1), operand));
+            assertELException("multiply", () -> ELArithmetic.multiply(operand, Long.valueOf(1)));
+        }
+    }
+
+    @Test
+    public void testIntegerModByZeroThrowsELException() {
+        // Cast to Object to select the static Object-based method
+        assertELException("mod", () -> ELArithmetic.mod((Object) Long.valueOf(1), (Object) Long.valueOf(0)));
+    }
+
+    @Test
+    public void testBigIntegerModByZeroThrowsELException() {
+        assertELException("mod",
+                () -> ELArithmetic.mod((Object) BigInteger.valueOf(1), (Object) BigInteger.valueOf(0)));
+    }
+
+    @Test
+    public void testBigDecimalDivByZeroThrowsELException() {
+        assertELException("divide", () -> ELArithmetic.divide((Object) BigDecimal.ONE, (Object) BigDecimal.ZERO));
+    }
+
+    @Test
+    public void testBigIntegerDivByZeroThrowsELException() {
+        assertELException("divide",
+                () -> ELArithmetic.divide((Object) BigInteger.ONE, (Object) BigInteger.ZERO));
+    }
+
+    @Test
+    public void testNonFiniteNumberWithBigDecimalThrowsELException() {
+        // The BigDecimal delegate Number coercion uses new BigDecimal(double) which
+        // rejects NaN and Infinity. The failure must surface as ELException.
+        assertELException("add", () -> ELArithmetic.add((Object) BigDecimal.ONE, (Object) Double.NaN));
+        assertELException("add",
+                () -> ELArithmetic.add((Object) BigDecimal.ONE, (Object) Double.POSITIVE_INFINITY));
+        assertELException("divide",
+                () -> ELArithmetic.divide((Object) BigDecimal.ONE, (Object) Double.NEGATIVE_INFINITY));
+    }
+
+    @Test
+    public void testOddNumberToStringCoercionThrowsELException() {
+        // The BigInteger delegate Number coercion uses new BigInteger(toString()). The
+        // failure must surface as ELException.
+        assertELException("add",
+                () -> ELArithmetic.add((Object) new TesterNumberOddToString(), (Object) BigInteger.ONE));
+    }
+
+    @Test
+    public void testBigDecimalOverflowThrowsELException() {
+        // BigDecimal.add()/subtract() declare ArithmeticException for overflow with
+        // extreme exponents. The failure must surface as ELException.
+        BigDecimal extreme = new BigDecimal("1e999999999");
+        assertELException("add", () -> ELArithmetic.add((Object) extreme, (Object) Long.valueOf(1)));
+        assertELException("subtract", () -> ELArithmetic.subtract((Object) extreme, (Object) Long.valueOf(1)));
+    }
+
+    private static class TesterNumberOddToString extends Number {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public int intValue() {
+            return 1;
+        }
+
+        @Override
+        public long longValue() {
+            return 1L;
+        }
+
+        @Override
+        public float floatValue() {
+            return 1.5f;
+        }
+
+        @Override
+        public double doubleValue() {
+            return 1.5;
+        }
+
+        @Override
+        public String toString() {
+            return "1.5";
+        }
+    }
+
+    private static void assertELException(String op, Runnable runnable) {
+        try {
+            runnable.run();
+            Assert.fail(op + " with an invalid operand should throw ELException");
+        } catch (ELException e) {
+            // Expected
+        }
     }
 }
