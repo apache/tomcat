@@ -383,7 +383,7 @@ public class JspConfig {
                     return true;
                 }
             } else {
-                if ((path == null || path.equals(uriPath)) &&
+                if ((path == null || (uriPath != null && uriPath.startsWith(path))) &&
                         (extension.equals("*") || extension.equals(uriExtension))) {
                     // Matches *, *.ext, /p/*, or /p/*.ext
                     return true;
