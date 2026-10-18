@@ -514,7 +514,7 @@ public class Stream {
         Boolean match = Boolean.FALSE;
 
         while (!match.booleanValue() && iterator.hasNext()) {
-            match = (Boolean) le.invoke(iterator.next());
+            match = ELSupport.coerceToBoolean(null, le.invoke(iterator.next()), true);
         }
 
         return new Optional(match);
@@ -535,7 +535,7 @@ public class Stream {
         Boolean match = Boolean.TRUE;
 
         while (match.booleanValue() && iterator.hasNext()) {
-            match = (Boolean) le.invoke(iterator.next());
+            match = ELSupport.coerceToBoolean(null, le.invoke(iterator.next()), true);
         }
 
         return new Optional(match);
@@ -556,7 +556,7 @@ public class Stream {
         Boolean match = Boolean.FALSE;
 
         while (!match.booleanValue() && iterator.hasNext()) {
-            match = (Boolean) le.invoke(iterator.next());
+            match = ELSupport.coerceToBoolean(null, le.invoke(iterator.next()), true);
         }
 
         return new Optional(Boolean.valueOf(!match.booleanValue()));

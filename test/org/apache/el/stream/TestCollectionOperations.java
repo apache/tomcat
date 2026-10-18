@@ -751,6 +751,65 @@ public class TestCollectionOperations {
     }
 
 
+    @Test(expected=ELException.class)
+    public void testAnyMatch04() {
+        // A predicate that returns a non-boolean must be coerced, producing an
+        // ELException, as for filter()
+        ELProcessor processor = new ELProcessor();
+
+        processor.getValue(
+                "[1,2,3].stream().anyMatch(x->x)",
+                Object.class);
+    }
+
+
+    @Test
+    public void testAnyMatch05() {
+        // A null predicate result is coerced to false, as for filter()
+        ELProcessor processor = new ELProcessor();
+
+        Optional result = (Optional) processor.getValue(
+                "[1,2,3].stream().anyMatch(x->null)",
+                Object.class);
+
+        Assert.assertEquals(Boolean.FALSE, result.get());
+    }
+
+
+    @Test(expected=ELException.class)
+    public void testAllMatch05() {
+        ELProcessor processor = new ELProcessor();
+
+        processor.getValue(
+                "[1,2,3].stream().allMatch(x->x)",
+                Object.class);
+    }
+
+
+    @Test
+    public void testAllMatch06() {
+        ELProcessor processor = new ELProcessor();
+
+        Optional result = (Optional) processor.getValue(
+                "[1,2,3].stream().allMatch(x->null)",
+                Object.class);
+
+        Assert.assertEquals(Boolean.FALSE, result.get());
+    }
+
+
+    @Test
+    public void testNoneMatch05() {
+        ELProcessor processor = new ELProcessor();
+
+        Optional result = (Optional) processor.getValue(
+                "[1,2,3].stream().noneMatch(x->null)",
+                Object.class);
+
+        Assert.assertEquals(Boolean.TRUE, result.get());
+    }
+
+
     @Test
     public void testFindFirst01() {
         ELProcessor processor = new ELProcessor();
