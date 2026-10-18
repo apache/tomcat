@@ -20,6 +20,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.io.Serial;
 
 import javax.el.ELContext;
 import javax.el.ELException;
@@ -33,6 +34,9 @@ import org.apache.el.util.ReflectionUtil;
  * Literal method expression.
  */
 public class MethodExpressionLiteral extends MethodExpression implements Externalizable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private Class<?> expectedType;
 

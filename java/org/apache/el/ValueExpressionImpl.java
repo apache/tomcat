@@ -20,6 +20,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.io.Serial;
 
 import javax.el.ELContext;
 import javax.el.ELException;
@@ -73,6 +74,9 @@ import org.apache.el.util.ReflectionUtil;
  * @see javax.el.ValueExpression
  */
 public final class ValueExpressionImpl extends ValueExpression implements Externalizable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private Class<?> expectedType;
 
