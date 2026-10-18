@@ -83,6 +83,12 @@ public class JavacErrorDetail {
                 } else {
                     is = ctxt.getResourceAsStream(jspFileName);
                 }
+                if (is == null) {
+                    // The JSP source is no longer available. Report only the
+                    // details of the error in the generated Java source.
+                    this.jspBeginLineNum = -1;
+                    return;
+                }
                 // Read both files in, so we can inspect them
                 String[] jspLines = readFile(is);
 
