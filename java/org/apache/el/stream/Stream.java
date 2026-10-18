@@ -621,9 +621,11 @@ public class Stream {
 
         while (iterator.hasNext()) {
             Object obj = iterator.next();
-            if (isMax && ELSupport.coerceToNumber(null, le.invoke(obj, result), Integer.class).intValue() > 0) {
+            // Coerce to the primitive type so that a null comparator result
+            // coerces to zero rather than producing a NullPointerException
+            if (isMax && ELSupport.coerceToNumber(null, le.invoke(obj, result), Integer.TYPE).intValue() > 0) {
                 result = obj;
-            } else if (!isMax && ELSupport.coerceToNumber(null, le.invoke(obj, result), Integer.class).intValue() < 0) {
+            } else if (!isMax && ELSupport.coerceToNumber(null, le.invoke(obj, result), Integer.TYPE).intValue() < 0) {
                 result = obj;
             }
         }
@@ -639,7 +641,9 @@ public class Stream {
     private record LambdaExpressionComparator(LambdaExpression le) implements Comparator<Object> {
         @Override
         public int compare(Object o1, Object o2) {
-            return ELSupport.coerceToNumber(null, le.invoke(o1, o2), Integer.class).intValue();
+            // Coerce to the primitive type so that a null comparator result
+            // coerces to zero rather than producing a NullPointerException
+            return ELSupport.coerceToNumber(null, le.invoke(o1, o2), Integer.TYPE).intValue();
         }
     }
 
