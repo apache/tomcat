@@ -638,6 +638,14 @@
         an Ant task. (sainadh777)
       </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Correct the handling of the <code>--</code> argument by
+        <code>jspc</code>. The argument position was advanced past the full
+        stop argument on each iteration while collecting the JSP file
+        arguments, so every second file argument after <code>--</code> was
+        silently omitted from processing. Option parsing now stops at the
+        first full stop argument wherever it appears. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">

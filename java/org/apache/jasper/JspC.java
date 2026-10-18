@@ -506,10 +506,14 @@ public class JspC extends Task implements Options {
                 if (tok.startsWith("-")) {
                     throw new JasperException(Localizer.getMessage("jspc.error.unknownOption", tok));
                 }
-                if (!fullstop) {
-                    argPos--;
-                }
+                // Re-process this argument as a JSP page
+                argPos--;
                 // Start treating the rest as JSP Pages
+                break;
+            }
+            if (fullstop) {
+                // A full stop argument encountered while reading an option
+                // value also stops option parsing
                 break;
             }
         }
@@ -1646,32 +1650,37 @@ public class JspC extends Task implements Options {
     // ==================== protected utility methods ====================
 
     /**
-     * Returns the next command-line argument.
+     * Returns the next command-line argument. Option parsing stops when the
+     * full stop argument {@code --} is encountered. The full stop argument is
+     * consumed and is never returned.
      *
-     * @return the next argument, or {@code null} if no more arguments
+     * @return the next argument, or {@code null} if no more arguments are
+     *             available or the full stop argument was reached
      */
     protected String nextArg() {
-        if ((argPos >= args.length) || (fullstop = SWITCH_FULL_STOP.equals(args[argPos]))) {
+        if (argPos >= args.length) {
             return null;
-        } else {
-            return args[argPos++];
         }
+        if (SWITCH_FULL_STOP.equals(args[argPos])) {
+            fullstop = true;
+            argPos++;
+            return null;
+        }
+        return args[argPos++];
     }
 
     /**
-     * Returns the next file argument from the command-line.
+     * Returns the next file argument from the command-line. All remaining
+     * arguments are treated as files once option parsing has stopped.
      *
-     * @return the next file argument, or {@code null} if no more arguments
+     * @return the next file argument, or {@code null} if no more arguments are
+     *             available
      */
     protected String nextFile() {
-        if (fullstop) {
-            argPos++;
-        }
         if (argPos >= args.length) {
             return null;
-        } else {
-            return args[argPos++];
         }
+        return args[argPos++];
     }
 
     /**
