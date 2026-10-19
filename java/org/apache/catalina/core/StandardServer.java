@@ -584,9 +584,16 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                         break;
                     }
 
-                    // Read a set of characters from the socket
+                    // Read a set of bytes from the socket
                     int expected = 1024; // Cut off to avoid DoS attack
-                    while (expected < shutdown.length()) {
+                    int shutdownLength;
+                    try {
+                        shutdownLength = shutdown.getBytes("UTF-8").length;
+                    } catch (UnsupportedEncodingException e) {
+                        // Impossible. All JREs are required to support UTF-8.
+                        shutdownLength = shutdown.length();
+                    }
+                    while (expected < shutdownLength) {
                         if (random == null) {
                             random = new Random();
                         }
