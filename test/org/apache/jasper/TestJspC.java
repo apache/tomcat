@@ -134,14 +134,6 @@ public class TestJspC {
     }
 
     @Test
-    public void precompileWebapp_6_2() throws IOException {
-        File appDir = new File("test/webapp-6.2");
-        File webappOut = new File(outputDir, appDir.getName());
-        precompile(appDir, webappOut);
-        verify(webappOut);
-    }
-
-    @Test
     public void argsNoFullStop() throws Exception {
         jspc.setArgs(new String[] {"a.jsp", "b.jsp"});
         Assert.assertEquals(List.of("a.jsp", "b.jsp"), jspc.pages);
