@@ -2509,12 +2509,9 @@ public class ContextConfig implements LifecycleListener {
 
     private void populateJavaClassCache(String className, JavaClass javaClass,
             Map<String,JavaClassCacheEntry> javaClassCache) {
-        if (javaClassCache.containsKey(className)) {
+        if (javaClassCache.putIfAbsent(className, new JavaClassCacheEntry(javaClass)) != null) {
             return;
         }
-
-        // Add this class to the cache
-        javaClassCache.put(className, new JavaClassCacheEntry(javaClass));
 
         populateJavaClassCache(javaClass.getSuperclassName(), javaClassCache);
 
