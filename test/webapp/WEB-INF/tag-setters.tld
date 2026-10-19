@@ -242,4 +242,15 @@
         <type>java.util.concurrent.TimeUnit</type>
       </attribute>
     </tag>
+    <tag>
+      <name>tagNestedTimeUnit</name>
+      <tag-class>org.apache.jasper.optimizations.TestELInterpreterTagSetters$TagNestedTimeUnit</tag-class>
+      <body-content>scriptless</body-content>
+      <attribute>
+        <name>foo</name>
+        <required>true</required>
+        <rtexprvalue>true</rtexprvalue>
+        <type>org.apache.jasper.optimizations.TestELInterpreterTagSetters$NestedTimeUnit</type>
+      </attribute>
+    </tag>
 </taglib>
