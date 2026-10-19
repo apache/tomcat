@@ -445,13 +445,14 @@ public class TestBeanNameELResolver {
     /**
      * Confirm it returns String.class for 'valid' input.
      */
+    @Test
     public void testGetCommonPropertyType01() {
         BeanNameELResolver resolver = createBeanNameELResolver();
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
         Object result = resolver.getCommonPropertyType(context, null);
 
-        Assert.assertNull(result);
+        Assert.assertEquals(String.class, result);
         Assert.assertFalse(context.isPropertyResolved());
     }
 
@@ -459,12 +460,13 @@ public class TestBeanNameELResolver {
     /**
      * Confirm it returns String.class for invalid input.
      */
+    @Test
     public void testGetCommonPropertyType02() {
         BeanNameELResolver resolver = createBeanNameELResolver();
 
         Object result = resolver.getCommonPropertyType(null, new Object());
 
-        Assert.assertNull(result);
+        Assert.assertEquals(String.class, result);
     }
 
 

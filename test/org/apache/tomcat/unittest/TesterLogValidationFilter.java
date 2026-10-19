@@ -62,9 +62,13 @@ public class TesterLogValidationFilter implements Filter {
         }
 
         if (targetThrowableString != null) {
+            Throwable thrown = record.getThrown();
+            if (thrown == null) {
+                return true;
+            }
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
-            record.getThrown().printStackTrace(pw);
+            thrown.printStackTrace(pw);
             pw.close();
             String throwableString = sw.toString();
             if (!throwableString.contains(targetThrowableString)) {
