@@ -694,6 +694,17 @@
         inline, including its surrounding whitespace, and did not escape
         the body content. (remm)
       </fix>
+      <fix>
+        The tag plugin for <code>c:set</code> now handles a deferred value
+        expression (<code>#{...}</code>) with a <code>var</code> attribute
+        like the standard tag handler does. Such a value is passed to the
+        tag as a value expression object, and it is now stored as a mapping
+        in the variable mapper of the EL context, where it evaluates
+        lazily, rather than being stored as an attribute holding the raw
+        expression object. As in the standard handler, a non-page scope is
+        rejected for a deferred value, and mappings that would shadow a
+        plain attribute are removed. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
