@@ -123,6 +123,68 @@ public class TestPageContextImpl extends TomcatBaseTest {
 
 
     @Test
+    public void testForwardRelativePathWithEmptyServletPath() throws Exception {
+        Tomcat tomcat = getTomcatInstanceTestWebapp(false, false);
+
+        Context context = (Context) tomcat.getHost().findChild("/test");
+
+        // The forwarder is mapped to the context root using the empty url
+        // pattern so the servlet path in the request handled by it is the
+        // empty string, which contains no '/' to use as the base for
+        // resolving the relative forward path.
+        Tomcat.addServlet(context, "emptyPathForwarder", new EmptyPathForwarder());
+        context.addServletMapping("", "emptyPathForwarder");
+
+        Tomcat.addServlet(context, "forwardTarget", new ForwardTarget());
+        context.addServletMapping("/forwardTarget", "forwardTarget");
+
+        tomcat.start();
+
+        // The empty pattern matches the context root exactly.
+        ByteChunk res = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/test/", res, null);
+
+        Assert.assertEquals(res.toString(), HttpServletResponse.SC_OK, rc);
+        Assert.assertTrue(res.toString(), res.toString().contains("FORWARDED"));
+    }
+
+
+    public static class EmptyPathForwarder extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            PageContext pageContext = JspFactory.getDefaultFactory().getPageContext(
+                    this, req, resp, null, false, JspWriter.DEFAULT_BUFFER, true);
+            try {
+                // Relative path resolution against the empty servlet path
+                // must not throw StringIndexOutOfBoundsException.
+                pageContext.forward("forwardTarget");
+            } finally {
+                JspFactory.getDefaultFactory().releasePageContext(pageContext);
+            }
+        }
+    }
+
+
+    public static class ForwardTarget extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            resp.setContentType("text/plain;charset=UTF-8");
+            resp.getWriter().println("FORWARDED");
+        }
+    }
+
+
+    @Test
     public void testIncludeThenForward() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
