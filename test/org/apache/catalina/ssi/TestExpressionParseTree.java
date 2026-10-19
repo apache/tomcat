@@ -153,6 +153,14 @@ public class TestExpressionParseTree {
         // The left-to-right grouping evaluates to false: ($a || $b) && $c
         ept = new ExpressionParseTree("($a || $b) && $c", mediator);
         Assert.assertFalse(ept.evaluateTree());
+        // Repeat the tests but reverse the order
+        ept = new ExpressionParseTree("$c && $b || $a", mediator);
+        Assert.assertTrue(ept.evaluateTree());
+        ept = new ExpressionParseTree("($c && $b) || $a", mediator);
+        Assert.assertTrue(ept.evaluateTree());
+        ept = new ExpressionParseTree("$c && ($b || $a)", mediator);
+        Assert.assertFalse(ept.evaluateTree());
+
     }
 
 
