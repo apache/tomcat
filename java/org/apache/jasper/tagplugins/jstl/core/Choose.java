@@ -33,9 +33,13 @@ public final class Choose implements TagPlugin {
     @Override
     public void doTag(TagPluginContext ctxt) {
 
+        // Mark this context so that the <c:when> and <c:otherwise> tags in
+        // the body know that they are directly nested in a <c:choose>.
+
         // Not much to do here, much of the work will be done in the
         // containing tags, <c:when> and <c:otherwise>.
 
+        ctxt.setPluginAttribute("inChoose", "true");
         ctxt.generateBody();
         // See comments in When.java for the reason "}" is generated here.
         ctxt.generateJavaSource("}");
