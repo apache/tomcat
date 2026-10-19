@@ -483,14 +483,15 @@ public class JspServletWrapper {
                         if (unloadHandle == null) {
                             unloadHandle = ctxt.getRuntimeContext().push(this);
                         } else if (lastUsageTime < ctxt.getRuntimeContext().getLastJspQueueUpdate()) {
+                            // Limit queue re-ordering to a single move per
+                            // background checkUnload() cycle.
                             ctxt.getRuntimeContext().makeYoungest(unloadHandle);
-                            lastUsageTime = System.currentTimeMillis();
-                        }
-                    } else {
-                        if (lastUsageTime < ctxt.getRuntimeContext().getLastJspQueueUpdate()) {
-                            lastUsageTime = System.currentTimeMillis();
                         }
                     }
+                    // Always record the usage time, so an actively used JSP is
+                    // never seen as idle by checkUnload(), independent of how
+                    // often the queue order above was updated.
+                    lastUsageTime = System.currentTimeMillis();
                 }
             }
 
