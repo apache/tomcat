@@ -446,8 +446,10 @@ public class PageContextImpl extends PageContext {
             if (uri == null) {
                 uri = ((HttpServletRequest) request).getServletPath();
             }
-            String baseURI = uri.substring(0, uri.lastIndexOf('/'));
-            path = baseURI + '/' + path;
+            if (uri.lastIndexOf('/') >= 0) {
+                uri = uri.substring(0, uri.lastIndexOf('/'));
+            }
+            path = uri + '/' + path;
         }
 
         return path;
