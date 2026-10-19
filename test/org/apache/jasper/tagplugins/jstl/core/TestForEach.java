@@ -55,4 +55,21 @@ public class TestForEach extends AbstractTestTag {
         Assert.assertTrue(body.contains("OK - 2"));
         Assert.assertTrue(body.contains("OK - 3"));
     }
+
+
+    @Test
+    public void testNumericRangeVarType() throws Exception {
+        ByteChunk res = new ByteChunk();
+
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/test/jstl/foreach-numeric-var.jsp", res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+
+        // The reference implementation exposes the loop variable as an
+        // Integer, not a String.
+        String body = res.toString();
+        Assert.assertEquals(2, body.split("java\\.lang\\.Integer", -1).length - 1);
+        Assert.assertFalse(body, body.contains("java.lang.String"));
+    }
 }
