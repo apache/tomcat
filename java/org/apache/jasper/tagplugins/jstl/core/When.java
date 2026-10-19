@@ -39,6 +39,18 @@ public final class When implements TagPlugin {
             return;
         }
 
+        /*
+         * The plugin-enabled parent is not a <c:choose>, for example a
+         * <c:forEach>, which the TLD validator does not reject. The generated
+         * if/else chain would be unbalanced and the whole page would fail to
+         * translate. Fall back to the standard tag handler, which reports the
+         * illegal nesting at runtime.
+         */
+        if (!"true".equals(parentContext.getPluginAttribute("inChoose"))) {
+            ctxt.dontUseTagPlugin();
+            return;
+        }
+
         if ("true".equals(parentContext.getPluginAttribute("hasBeenHere"))) {
             ctxt.generateJavaSource("} else if(");
             // See comment below for the reason we generate the extra "}" here.

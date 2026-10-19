@@ -33,6 +33,15 @@ public final class Otherwise implements TagPlugin {
     @Override
     public void doTag(TagPluginContext ctxt) {
 
+        // See When.java. An otherwise outside a plugin-enabled choose must
+        // not generate a stray "} else {".
+        TagPluginContext parentContext = ctxt.getParentContext();
+        if (parentContext == null ||
+                !"true".equals(parentContext.getPluginAttribute("inChoose"))) {
+            ctxt.dontUseTagPlugin();
+            return;
+        }
+
         // See When.java for the reason why "}" is needed at the beginning and
         // not at the end.
         ctxt.generateJavaSource("} else {");
