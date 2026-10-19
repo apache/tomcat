@@ -101,17 +101,24 @@ public final class ContextName {
      * Construct an instance from a path and version.
      *
      * @param path    Context path to use, which must not contain a version marker. May be <code>null</code>,
-     *                 <code>""</code>, <code>"/"</code> or <code>"/ROOT"</code> to represent the root context. Any
-     *                 other value must start with <code>"/"</code>; if it does not, a leading <code>"/"</code> is
-     *                 prepended, matching the normalisation performed by
-     *                 {@link org.apache.catalina.Context#setPath(String)}.
+     *                 <code>""</code>, <code>"/"</code>, <code>"/ROOT"</code> or <code>"ROOT"</code> to represent the
+     *                 root context. Any other value must start with <code>"/"</code>; if it does not, a leading
+     *                 <code>"/"</code> is prepended, matching the normalisation performed by
+     *                 {@link org.apache.catalina.Context#setPath(String)}. Trailing <code>"/"</code> characters are
+     *                 removed.
      * @param version Context version to use
      */
     public ContextName(String path, String version) {
-        // Path should never be null, '/' or '/ROOT'
-        if (path == null || "/".equals(path) || "/ROOT".equals(path)) {
+        if (path != null) {
+            while (path.endsWith("/")) {
+                path = path.substring(0, path.length() - 1);
+            }
+        }
+
+        // Path should never be null, '/', '/ROOT' or 'ROOT'. Neither should they end with '/'.
+        if (path == null || "/ROOT".equals(path) || "ROOT".equals(path)) {
             this.path = "";
-        } else if (path.startsWith("/") || path.isEmpty()) {
+        } else if (path.isEmpty() || path.startsWith("/")) {
             this.path = path;
         } else {
             // Normalise a malformed path the same way Context.setPath() does by adding the missing
@@ -214,12 +221,13 @@ public final class ContextName {
     public boolean isPathValid() {
         // No need to test for null since path can never be null (see constructors)
         //
+        // No need to test for empty or start with / (see constructors)
+        //
         // Therefore, just need to check:
-        // - empty or start with /
         // - normalized and no attempt to escape the root
         //
         // Note: Normalize check on empty path would fail
-        return path.isEmpty() || (path.startsWith("/") && path.equals(RequestUtil.normalize(path)));
+        return path.isEmpty() || path.equals(RequestUtil.normalize(path));
     }
 
 
