@@ -421,6 +421,14 @@
         text node from being trimmed when <code>trim</code> was
         <code>true</code>. (remm)
       </fix>
+      <fix>
+        Correct the assignability check <code>GraalBeanELResolver</code> uses
+        when selecting a setter for an EL value. The check was inverted, so a
+        setter whose parameter type was a super-type of the value type, for
+        example a setter taking <code>Object</code> or an interface, was
+        rejected and EL writes to such properties could be silently dropped
+        when running in a GraalVM native image. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
