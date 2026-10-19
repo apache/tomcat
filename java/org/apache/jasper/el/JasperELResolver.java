@@ -277,7 +277,7 @@ public class JasperELResolver extends CompositeELResolver {
             Method[] methods = beanClass.getMethods();
             for (Method method : methods) {
                 if (method.getParameterCount() == 1 && setter.equals(method.getName()) &&
-                        (valueClass == null || valueClass.isAssignableFrom(method.getParameterTypes()[0]))) {
+                        (valueClass == null || method.getParameterTypes()[0].isAssignableFrom(valueClass))) {
                     return method;
                 }
             }

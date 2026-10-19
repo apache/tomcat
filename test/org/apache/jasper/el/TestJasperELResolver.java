@@ -88,7 +88,14 @@ public class TestJasperELResolver {
         Assert.assertNull(resolver.getValue(context, new TestBean(), "foobar"));
         Assert.assertNull(resolver.getValue(context, new TestBean(), "bar"));
         Assert.assertFalse(resolver.isReadOnly(context, new TestBean(), "foo"));
-        Assert.assertTrue(resolver.isReadOnly(context, new TestBean(), "bla"));
+        Assert.assertFalse(resolver.isReadOnly(context, new TestBean(), "bla"));
+
+        // A setter whose parameter type is a supertype of the value type must
+        // be used. The inverted assignability check in getWriteMethod()
+        // previously rejected such setters, silently dropping the write.
+        TestBean bean = new TestBean();
+        resolver.setValue(context, bean, "bla", "a string value");
+        Assert.assertEquals("a string value", bean.getLastBla());
     }
 
     public static class TestBean {
@@ -108,10 +115,15 @@ public class TestJasperELResolver {
         public String isFoobar() {
             return "foobar";
         }
+        private Object bla;
         public String getBla() {
             return "bla";
         }
-        public void setBla(@SuppressWarnings("unused") Object bla) {
+        public void setBla(Object bla) {
+            this.bla = bla;
+        }
+        public Object getLastBla() {
+            return bla;
         }
     }
 }
