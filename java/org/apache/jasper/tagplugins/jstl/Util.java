@@ -139,6 +139,11 @@ public class Util {
         }
         index += 1; // positioned after the '='
         input = input.substring(index).trim();
+        if (input.isEmpty()) {
+            // Empty or whitespace-only parameter value, e.g. a malformed
+            // "Content-Type: text/html;charset=" header from a remote server.
+            return null;
+        }
 
         if (input.charAt(0) == '"') {
             // attribute value is a quoted string
