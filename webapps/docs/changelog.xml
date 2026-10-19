@@ -439,6 +439,17 @@
         illegal nesting at runtime as the reference implementation does.
         (remm)
       </fix>
+      <fix>
+        The tag plugins for <code>c:import</code> and <code>c:param</code> now
+        share the working URL of the import tag through the plugin context
+        rather than the page scope attribute <code>url_without_param</code>.
+        The import plugin set that attribute while generating the tag body and
+        removed it afterwards, clobbering an application attribute of the same
+        name, and the fixed name made the exchange prone to interference
+        between nested URL tags. This matches the reference implementation,
+        which keeps the parameters of each tag to itself and never touches
+        page scope attributes. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
