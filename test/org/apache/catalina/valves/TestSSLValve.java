@@ -390,13 +390,19 @@ public class TestSSLValve {
     }
 
 
+    @Test
     public void testSslCipherUserKeySizeHeaderBadFormat() throws Exception {
         setUp();
         mockRequest.setHeader(valve.getSslCipherUserKeySizeHeader(), "not-an-integer");
 
+        TesterLogValidationFilter f = TesterLogValidationFilter.add(Level.WARNING, null, null,
+                "org.apache.catalina.valves.SSLValve");
+
         valve.invoke(mockRequest, null);
 
+        EasyMock.verify(mockNext);
         Assert.assertNull(mockRequest.getAttribute(Globals.KEY_SIZE_ATTR));
+        Assert.assertEquals(1, f.getMessageCount());
     }
 
 
