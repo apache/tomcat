@@ -78,10 +78,15 @@ public class UniqueAttributesImpl extends AttributesImpl {
 
     @Override
     public void setAttribute(int index, String uri, String localName, String qName, String type, String value) {
-        qNames.remove(super.getQName(index));
+        String oldQName = super.getQName(index);
+        qNames.remove(oldQName);
         if (qNames.add(qName)) {
             super.setAttribute(index, uri, localName, qName, type, value);
         } else {
+            // A duplicate, whether it is tolerated by the rules below or
+            // rejected with an exception, leaves this attribute unchanged, so
+            // restore its name in the tracking set
+            qNames.add(oldQName);
             handleDuplicate(qName, value);
         }
     }
@@ -94,8 +99,17 @@ public class UniqueAttributesImpl extends AttributesImpl {
 
     @Override
     public void setQName(int index, String qName) {
-        qNames.remove(super.getQName(index));
-        super.setQName(index, qName);
+        String oldQName = super.getQName(index);
+        qNames.remove(oldQName);
+        if (qNames.add(qName)) {
+            super.setQName(index, qName);
+        } else {
+            // A duplicate, whether it is tolerated by the rules below or
+            // rejected with an exception, leaves this attribute unchanged, so
+            // restore its name in the tracking set
+            qNames.add(oldQName);
+            handleDuplicate(qName, super.getValue(index));
+        }
     }
 
     private void handleDuplicate(String qName, String value) {
