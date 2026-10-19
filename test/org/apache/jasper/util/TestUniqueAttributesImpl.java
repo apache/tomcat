@@ -19,6 +19,9 @@ package org.apache.jasper.util;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.xml.sax.Attributes;
+import org.xml.sax.helpers.AttributesImpl;
+
 
 public class TestUniqueAttributesImpl {
 
@@ -27,6 +30,15 @@ public class TestUniqueAttributesImpl {
         attrs.addAttribute("", "a", "a", "CDATA", "1");
         attrs.addAttribute("", "b", "b", "CDATA", "2");
         return attrs;
+    }
+
+    private static Attributes attributes(String... nameValuePairs) {
+        AttributesImpl atts = new AttributesImpl();
+        for (int i = 0; i < nameValuePairs.length; i += 2) {
+            atts.addAttribute("", nameValuePairs[i], nameValuePairs[i], "CDATA",
+                    nameValuePairs[i + 1]);
+        }
+        return atts;
     }
 
 
@@ -116,5 +128,125 @@ public class TestUniqueAttributesImpl {
         } catch (IllegalArgumentException e) {
             // expected
         }
+    }
+
+
+    /*
+     * Replacing the attributes must reset the duplicate tracking, so names
+     * from the replaced attributes are no longer reported as duplicates and
+     * names of the new attributes are.
+     */
+    @Test
+    public void testSetAttributesResetsTracking() throws Exception {
+        UniqueAttributesImpl attrs = createAttributes();
+
+        attrs.setAttributes(attributes("x", "3", "y", "4"));
+
+        Assert.assertEquals(2, attrs.getLength());
+        Assert.assertEquals("x", attrs.getQName(0));
+
+        // The replaced attributes' names must no longer be tracked
+        attrs.addAttribute("", "a", "a", "CDATA", "5");
+
+        // The new attributes' names must be tracked
+        try {
+            attrs.addAttribute("", "x", "x", "CDATA", "6");
+            Assert.fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+    }
+
+
+    /*
+     * The incoming set must be validated against itself, not against the
+     * attributes being replaced, so a name held by a replaced attribute may
+     * be reused with any value.
+     */
+    @Test
+    public void testSetAttributesReplacesHeldName() throws Exception {
+        UniqueAttributesImpl attrs = createAttributes();
+
+        attrs.setAttributes(attributes("a", "9"));
+
+        Assert.assertEquals(1, attrs.getLength());
+        Assert.assertEquals("9", attrs.getValue("a"));
+    }
+
+
+    /*
+     * Replacing the attributes with a set containing a rejected duplicate
+     * must leave both the attributes and the tracking untouched.
+     */
+    @Test
+    public void testSetAttributesRejectedDuplicateLeavesStateUntouched() throws Exception {
+        UniqueAttributesImpl attrs = createAttributes();
+
+        try {
+            attrs.setAttributes(attributes("m", "3", "m", "4"));
+            Assert.fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+
+        Assert.assertEquals(2, attrs.getLength());
+        Assert.assertEquals("a", attrs.getQName(0));
+
+        // The rejected set's names must not have been left behind in the
+        // tracking either
+        attrs.addAttribute("", "m", "m", "CDATA", "5");
+        Assert.assertEquals(3, attrs.getLength());
+
+        try {
+            attrs.addAttribute("", "a", "a", "CDATA", "6");
+            Assert.fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+    }
+
+
+    /*
+     * On a page directive, repeated import attributes in the incoming set
+     * must be merged into a single attribute.
+     */
+    @Test
+    public void testSetAttributesMergesImports() throws Exception {
+        UniqueAttributesImpl attrs = new UniqueAttributesImpl(true);
+
+        attrs.setAttributes(attributes("import", "a", "import", "b",
+                "contentType", "text/html"));
+
+        Assert.assertEquals(2, attrs.getLength());
+        Assert.assertEquals("a,b", attrs.getValue("import"));
+
+        // A later import still merges
+        attrs.addAttribute("", "import", "import", "CDATA", "c");
+        Assert.assertEquals("a,b,c", attrs.getValue("import"));
+    }
+
+
+    /*
+     * On a page directive, an attribute in the incoming set repeated with an
+     * identical value must be tolerated without storing the duplicate, while
+     * a repeated pageEncoding must be rejected even with an identical value.
+     */
+    @Test
+    public void testSetAttributesPageDirectiveRules() throws Exception {
+        UniqueAttributesImpl attrs = new UniqueAttributesImpl(true);
+
+        attrs.setAttributes(attributes("foo", "1", "foo", "1"));
+        Assert.assertEquals(1, attrs.getLength());
+
+        try {
+            attrs.setAttributes(attributes("pageEncoding", "UTF-8",
+                    "pageEncoding", "UTF-8"));
+            Assert.fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+        // The rejected set left the previous attributes in place
+        Assert.assertEquals(1, attrs.getLength());
+        Assert.assertEquals("1", attrs.getValue("foo"));
     }
 }
