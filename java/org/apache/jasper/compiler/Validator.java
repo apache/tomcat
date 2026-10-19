@@ -903,6 +903,17 @@ class Validator {
             TagAttributeInfo[] tldAttrs = tagInfo.getAttributes();
             Attributes attrs = n.getAttributes();
 
+            // The required version of the tag library is constant for the tag,
+            // so parse it once rather than for every attribute
+            double libraryVersion = 0;
+            try {
+                libraryVersion = Double.parseDouble(tagInfo.getTagLibrary().getRequiredVersion());
+            } catch (NumberFormatException e) {
+                // Never reached: jspError always throws
+                err.jspError(n, "jsp.error.invalid.taglib.version", tagInfo.getTagLibrary().getRequiredVersion(),
+                        n.getQName());
+            }
+
             for (int i = 0; attrs != null && i < attrs.getLength(); i++) {
                 boolean found = false;
 
@@ -910,7 +921,6 @@ class Validator {
                         (!n.getRoot().isXmlSyntax() && attrs.getValue(i).startsWith("<%=")));
                 boolean elExpression = false;
                 boolean deferred = false;
-                double libraryVersion = Double.parseDouble(tagInfo.getTagLibrary().getRequiredVersion());
                 boolean deferredSyntaxAllowedAsLiteral =
                         pageInfo.isDeferredSyntaxAllowedAsLiteral() || libraryVersion < 2.1;
 
