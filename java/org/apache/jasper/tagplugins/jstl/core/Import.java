@@ -31,7 +31,9 @@ public class Import implements TagPlugin {
      * the generated local variable that holds the URL and to which the
      * parameters are appended. Sharing the variable rather than a page scope
      * attribute with a fixed name makes the protocol re-entrant: a nested URL
-     * tag in the body cannot overwrite or remove the outer tag's URL.
+     * tag in the body cannot overwrite or remove the outer tag's URL. The
+     * Param plugin walks up the parent context chain, so a parameter nested
+     * in an intermediate tag finds the closest URL tag ancestor.
      */
     static final String URL_VARIABLE_ATTRIBUTE = "urlVariable";
 
