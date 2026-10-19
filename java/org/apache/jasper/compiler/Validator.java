@@ -1683,8 +1683,10 @@ class Validator {
                 for (ValidationMessage error : errors) {
                     if (error != null) {
                         errMsg.append("<p>");
-                        errMsg.append(error.getId());
-                        errMsg.append(": ");
+                        if (error.getId() != null) {
+                            errMsg.append(error.getId());
+                            errMsg.append(": ");
+                        }
                         errMsg.append(error.getMessage());
                         errMsg.append("</p>");
                     }

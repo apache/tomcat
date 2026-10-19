@@ -21,7 +21,10 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.tagext.PageData;
+import javax.servlet.jsp.tagext.TagLibraryValidator;
 import javax.servlet.jsp.tagext.TagSupport;
+import javax.servlet.jsp.tagext.ValidationMessage;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -57,6 +60,27 @@ public class TestValidator extends TomcatBaseTest {
         String result = res.toString();
         Assert.assertTrue(result, result.contains("Invalid JSP version [2.1.1]"));
         Assert.assertFalse(result, result.contains("NumberFormatException"));
+    }
+
+    @Test
+    public void testNullIdTlv() throws Exception {
+        getTomcatInstanceTestWebapp(false, true);
+
+        ByteChunk res = new ByteChunk();
+
+        int rc = getUrl("http://localhost:" + getPort() + "/test/jsp/parsing/taglib-null-id-tlv.jsp", res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+
+        // The validator returns a ValidationMessage with a null id. The id
+        // and the following separator must be omitted from the reported
+        // message. They were previously appended unconditionally which
+        // rendered the literal text "null: " in front of the message.
+        String result = res.toString();
+        Assert.assertTrue(result, result.contains("message without an id"));
+        Assert.assertFalse(result, result.contains("null: message"));
+        // The id of a ValidationMessage that has one is still reported
+        Assert.assertTrue(result, result.contains("123: message with an id"));
     }
 
     @Test
@@ -218,6 +242,15 @@ public class TestValidator extends TomcatBaseTest {
         Assert.assertTrue(result.indexOf("<p>04-hello world</p>") > 0);
         Assert.assertTrue(result.indexOf("<p>#{'05-hello world'}</p>") > 0);
         Assert.assertTrue(result.indexOf("<p>06-hello world</p>") > 0);
+    }
+
+    public static class NullIdValidator extends TagLibraryValidator {
+
+        @Override
+        public ValidationMessage[] validate(String prefix, String uri, PageData page) {
+            return new ValidationMessage[] { new ValidationMessage(null, "message without an id"),
+                    new ValidationMessage("123", "message with an id") };
+        }
     }
 
     public static class Echo extends TagSupport {
