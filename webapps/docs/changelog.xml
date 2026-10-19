@@ -418,6 +418,16 @@
         rejected and EL writes to such properties could be silently dropped
         when running in a GraalVM native image. (remm)
       </fix>
+      <fix>
+        The tag plugins for <code>c:when</code> and <code>c:otherwise</code>
+        now fall back to the standard tag handlers when the direct parent tag
+        is not a plugin enabled <code>c:choose</code>. Previously, they
+        generated unbalanced Java code for such misplaced tags, for example a
+        <code>c:when</code> nested directly in a <code>c:forEach</code>, which
+        failed the translation of the entire page instead of reporting the
+        illegal nesting at runtime as the reference implementation does.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
