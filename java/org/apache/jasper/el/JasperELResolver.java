@@ -225,7 +225,10 @@ public class JasperELResolver extends CompositeELResolver {
             if (base == null || property == null) {
                 return;
             }
-            Method method = getWriteMethod(base.getClass(), property.toString(), value.getClass());
+            // A null value has no class to check the setter against. Pass null
+            // and let getWriteMethod() select a reference-typed setter
+            Class<?> valueClass = value == null ? null : value.getClass();
+            Method method = getWriteMethod(base.getClass(), property.toString(), valueClass);
             if (method != null) {
                 context.setPropertyResolved(base, property);
                 try {
