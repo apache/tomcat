@@ -78,6 +78,8 @@ public class ForTokens implements TagPlugin {
             ctxt.generateJavaSource("int " + beginName + " = ");
             ctxt.generateAttribute("begin");
             ctxt.generateJavaSource(";");
+            ctxt.generateJavaSource("if (" + beginName + " < 0) {" +
+                    "throw new jakarta.servlet.jsp.JspTagException(\"'begin' < 0\");}");
             ctxt.generateJavaSource("for(int " + index + " = 0; " + index + " < " + beginName + " && " + stName +
                     ".hasMoreTokens(); " + index + "++, " + stName + ".nextToken()){}");
         } else {
@@ -88,15 +90,14 @@ public class ForTokens implements TagPlugin {
         // record the end place as the last index, otherwise, record it as "end";
         // default end place is the last index
         if (hasEnd) {
-            ctxt.generateJavaSource("int " + endName + " = 0;");
-            ctxt.generateJavaSource("if((" + tokensCountName + " - 1) < ");
+            String endSpecifiedName = ctxt.getTemporaryVariableName();
+            ctxt.generateJavaSource("int " + endSpecifiedName + " = ");
             ctxt.generateAttribute("end");
-            ctxt.generateJavaSource("){");
-            ctxt.generateJavaSource("    " + endName + " = " + tokensCountName + " - 1;");
-            ctxt.generateJavaSource("}else{");
-            ctxt.generateJavaSource("    " + endName + " = ");
-            ctxt.generateAttribute("end");
-            ctxt.generateJavaSource(";}");
+            ctxt.generateJavaSource(";");
+            ctxt.generateJavaSource("if (" + endSpecifiedName + " < 0) {" +
+                    "throw new jakarta.servlet.jsp.JspTagException(\"'end' < 0\");}");
+            ctxt.generateJavaSource("int " + endName + " = (" + tokensCountName + " - 1) < " + endSpecifiedName +
+                    " ? " + tokensCountName + " - 1 : " + endSpecifiedName + ";");
         } else {
             ctxt.generateJavaSource("int " + endName + " = " + tokensCountName + " - 1;");
         }
@@ -107,6 +108,8 @@ public class ForTokens implements TagPlugin {
             ctxt.generateJavaSource("int " + stepName + " = ");
             ctxt.generateAttribute("step");
             ctxt.generateJavaSource(";");
+            ctxt.generateJavaSource("if (" + stepName + " <= 0) {" +
+                    "throw new jakarta.servlet.jsp.JspTagException(\"'step' <= 0\");}");
         } else {
             ctxt.generateJavaSource("int " + stepName + " = 1;");
         }
