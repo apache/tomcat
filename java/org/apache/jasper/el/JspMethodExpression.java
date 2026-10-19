@@ -145,9 +145,10 @@ public final class JspMethodExpression extends MethodExpression implements Exter
         if (obj == this) {
             return true;
         }
-        if (!(obj instanceof JspMethodExpression other)) {
+        if (!(obj instanceof JspMethodExpression)) {
             return false;
         }
+        JspMethodExpression other = (JspMethodExpression) obj;
         return Objects.equals(this.mark, other.mark) && this.target.equals(other.target);
     }
 
