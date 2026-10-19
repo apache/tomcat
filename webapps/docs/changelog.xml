@@ -705,6 +705,13 @@
         rejected for a deferred value, and mappings that would shadow a
         plain attribute are removed. (remm)
       </fix>
+      <fix>
+        The tag plugin for <code>c:set</code> now falls back to the standard
+        tag handler when the tag has a value but neither a
+        <code>var</code> nor a <code>target</code> attribute, so that the
+        invalid use fails as it does with the handler instead of being
+        silently ignored. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
