@@ -804,6 +804,11 @@
         Host Manager: Host names are now always converted to lower case before
         use. (markt)
       </fix>
+      <fix>
+        Documentation: Expand the documentation of the
+        <code>maxHttpRequestHeaderSize</code> attribute for the HTTP connector.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
@@ -958,6 +963,12 @@
         report when the build is run with code coverage enabled. (dsoumis)
       </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <update>
+        <bug>69902</bug>: Change the ZIP distribution to store the same file
+        and directory permissions as the tar.gz distribution so that the
+        scripts in <code>bin</code> are executable when the archive is
+        extracted on a Unix platform.
+      </update>
     </changelog>
   </subsection>
 </section>

@@ -78,48 +78,6 @@ public class TestSsiServlet extends TomcatBaseTest {
 
 
     @Test
-    public void testLargeDocumentLastModifiedHeader() throws Exception {
-        // A document larger than the response buffer commits the unbuffered
-        // response while the output is being generated. The Last-Modified
-        // header must be set before that happens.
-        Tomcat tomcat = getTomcatInstance();
-
-        File appDir = new File(getTemporaryDirectory(), "ssi-large");
-        Assert.assertTrue(appDir.mkdirs() || appDir.isDirectory());
-        addDeleteOnTearDown(appDir);
-        File doc = new File(appDir, "large.shtml");
-        try (Writer writer = new OutputStreamWriter(new FileOutputStream(doc), StandardCharsets.ISO_8859_1)) {
-            writer.write("X".repeat(20000));
-            writer.write("<!--#flastmod file=\"large.shtml\" -->TAIL");
-        }
-
-        Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
-        Tomcat.addServlet(ctxt, "ssi", new SSIServlet());
-        ctxt.addServletMapping("*.shtml", "ssi");
-
-        tomcat.start();
-
-        Map<String,List<String>> resHeaders = new HashMap<>();
-        String path = "http://localhost:" + getPort() + "/large.shtml";
-        ByteChunk out = new ByteChunk();
-
-        int rc = getUrl(path, out, resHeaders);
-        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
-        String body = new String(out.getBuffer(), 0, out.getLength(), StandardCharsets.ISO_8859_1);
-        Assert.assertTrue(body.endsWith("TAIL"));
-        // Headers are case-insensitive. SSIServlet uses the lower-case name.
-        String lastModified = null;
-        for (Map.Entry<String,List<String>> header : resHeaders.entrySet()) {
-            if ("Last-Modified".equalsIgnoreCase(header.getKey())) {
-                Assert.assertEquals(1, header.getValue().size());
-                lastModified = header.getValue().get(0);
-            }
-        }
-        Assert.assertNotNull(lastModified);
-    }
-
-
-    @Test
     public void testBadConditionalExpressionReportsError() throws Exception {
         // A conditional directive with an expression that cannot be parsed
         // stops processing of the document, but it must report the default

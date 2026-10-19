@@ -2067,8 +2067,12 @@ public class ContextConfig implements LifecycleListener {
 
         try {
             stream = webXmlResource.getInputStream();
-            source = new InputSource(webXmlResource.getURI().toString());
             if (stream != null) {
+                // Only create the input source if the stream is available so
+                // that a source without a byte stream is never returned. The
+                // parser would otherwise try to resolve the URI itself and
+                // report the same problem a second time.
+                source = new InputSource(webXmlResource.getURI().toString());
                 source.setByteStream(stream);
             }
         } catch (Exception e) {
@@ -2504,12 +2508,9 @@ public class ContextConfig implements LifecycleListener {
 
     private void populateJavaClassCache(String className, JavaClass javaClass,
             Map<String,JavaClassCacheEntry> javaClassCache) {
-        if (javaClassCache.containsKey(className)) {
+        if (javaClassCache.putIfAbsent(className, new JavaClassCacheEntry(javaClass)) != null) {
             return;
         }
-
-        // Add this class to the cache
-        javaClassCache.put(className, new JavaClassCacheEntry(javaClass));
 
         populateJavaClassCache(javaClass.getSuperclassName(), javaClassCache);
 

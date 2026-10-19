@@ -2123,8 +2123,16 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
     @Override
     public void setPath(String path) {
+        String original = path;
         boolean invalid = false;
-        if (path == null || path.equals("/")) {
+        if (path != null) {
+            while (path.endsWith("/")) {
+                invalid = true;
+                path = path.substring(0, path.length() - 1);
+            }
+        }
+
+        if (path == null || "/ROOT".equals(path) || "ROOT".equals(path)) {
             invalid = true;
             this.path = "";
         } else if (path.isEmpty() || path.startsWith("/")) {
@@ -2133,12 +2141,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
             invalid = true;
             this.path = "/" + path;
         }
-        if (this.path.endsWith("/")) {
-            invalid = true;
-            this.path = this.path.substring(0, this.path.length() - 1);
-        }
         if (invalid) {
-            log.warn(sm.getString("standardContext.pathInvalid", path, this.path));
+            log.warn(sm.getString("standardContext.pathInvalid", original, this.path));
         }
         encodedPath = URLEncoder.DEFAULT.encode(this.path, StandardCharsets.UTF_8);
         if (getName() == null) {
