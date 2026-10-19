@@ -20,6 +20,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.Objects;
 
 import javax.el.ELContext;
 import javax.el.ELException;
@@ -115,7 +116,13 @@ public final class JspMethodExpression extends MethodExpression implements Exter
 
     @Override
     public boolean equals(Object obj) {
-        return this.target.equals(obj);
+        if (obj == this) {
+            return true;
+        }
+        if (!(obj instanceof JspMethodExpression other)) {
+            return false;
+        }
+        return Objects.equals(this.mark, other.mark) && this.target.equals(other.target);
     }
 
     @Override
