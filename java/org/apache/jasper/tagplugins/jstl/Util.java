@@ -285,11 +285,14 @@ public class Util {
             if (!context.startsWith("/") || !url.startsWith("/")) {
                 throw new JspTagException(Localizer.getMessage("jstl.urlMustStartWithSlash"));
             }
-            if (context.equals("/")) {
-                // Don't produce string starting with '//', many
-                // browsers interpret this as host name, not as
-                // path on same host.
-                return url;
+            if (context.endsWith("/")) {
+                // Strip the trailing slash of the context, as the standard
+                // handler does, so that the joined path does not carry a
+                // doubled slash. For the root context this reduces to the
+                // URL itself, which also avoids producing a string starting
+                // with '//', as many browsers interpret this as host name,
+                // not as path on same host.
+                return context.substring(0, context.length() - 1) + url;
             } else {
                 return context + url;
             }
