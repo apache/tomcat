@@ -52,9 +52,20 @@ public class Param implements TagPlugin {
             return;
         }
 
-        // get the url string before adding this param
-        ctxt.generateJavaSource(
-                "String " + urlName + " = " + "(String)_jspx_page_context.getAttribute(\"url_without_param\");");
+        // Append the parameter to the parent tag's working URL. The Import
+        // plugin shares the name of the local variable holding that URL
+        // through the plugin context, so that nested URL tags cannot
+        // interfere with it through a shared page scope attribute. The Url
+        // and Redirect plugins still use such an attribute.
+        Object urlVariable = parent.getPluginAttribute(Import.URL_VARIABLE_ATTRIBUTE);
+        String urlTargetName;
+        if (urlVariable != null) {
+            urlTargetName = (String) urlVariable;
+        } else {
+            ctxt.generateJavaSource(
+                    "String " + urlName + " = " + "(String)_jspx_page_context.getAttribute(\"url_without_param\");");
+            urlTargetName = urlName;
+        }
 
         // get the value of "name"
         ctxt.generateJavaSource("String " + nameName + " = ");
@@ -76,17 +87,19 @@ public class Param implements TagPlugin {
         ctxt.generateJavaSource(
                 "    " + valueName + " = java.net.URLEncoder.encode(" + valueName + ", " + encName + ");");
         ctxt.generateJavaSource("    int " + index + ";");
-        ctxt.generateJavaSource("    " + index + " = " + urlName + ".indexOf(\'?\');");
+        ctxt.generateJavaSource("    " + index + " = " + urlTargetName + ".indexOf(\'?\');");
         // if the current param is the first one, add a "?" ahead of it
         // else add a "&" ahead of it
         ctxt.generateJavaSource("    if(" + index + " == -1){");
-        ctxt.generateJavaSource(
-                "        " + urlName + " = " + urlName + " + \"?\" + " + nameName + " + \"=\" + " + valueName + ";");
+        ctxt.generateJavaSource("        " + urlTargetName + " = " + urlTargetName + " + \"?\" + " + nameName +
+                " + \"=\" + " + valueName + ";");
         ctxt.generateJavaSource("    }else{");
-        ctxt.generateJavaSource(
-                "        " + urlName + " = " + urlName + " + \"&\" + " + nameName + " + \"=\" + " + valueName + ";");
+        ctxt.generateJavaSource("        " + urlTargetName + " = " + urlTargetName + " + \"&\" + " + nameName +
+                " + \"=\" + " + valueName + ";");
         ctxt.generateJavaSource("    }");
-        ctxt.generateJavaSource("    _jspx_page_context.setAttribute(\"url_without_param\"," + urlName + ");");
+        if (urlVariable == null) {
+            ctxt.generateJavaSource("    _jspx_page_context.setAttribute(\"url_without_param\"," + urlName + ");");
+        }
         ctxt.generateJavaSource("}");
     }
 }
