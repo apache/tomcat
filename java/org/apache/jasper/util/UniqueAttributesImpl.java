@@ -59,12 +59,26 @@ public class UniqueAttributesImpl extends AttributesImpl {
 
     @Override
     public void setAttributes(Attributes atts) {
+        // Build the replacement store separately so that the incoming
+        // attributes are validated and merged against each other rather than
+        // against the attributes being replaced, and so that a rejected
+        // duplicate leaves this instance untouched
+        AttributesImpl merged = new AttributesImpl();
+        Set<String> names = new HashSet<>();
         for (int i = 0; i < atts.getLength(); i++) {
-            if (!qNames.add(atts.getQName(i))) {
-                handleDuplicate(atts.getQName(i), atts.getValue(i));
+            String qName = atts.getQName(i);
+            String value = atts.getValue(i);
+            if (names.add(qName)) {
+                merged.addAttribute(atts.getURI(i), atts.getLocalName(i), qName,
+                        atts.getType(i), value);
+            } else {
+                handleDuplicate(qName, value, merged);
             }
         }
-        super.setAttributes(atts);
+
+        super.setAttributes(merged);
+        qNames.clear();
+        qNames.addAll(names);
     }
 
     @Override
@@ -113,12 +127,16 @@ public class UniqueAttributesImpl extends AttributesImpl {
     }
 
     private void handleDuplicate(String qName, String value) {
+        handleDuplicate(qName, value, this);
+    }
+
+    private void handleDuplicate(String qName, String value, AttributesImpl store) {
         if (pageDirective) {
             if (IMPORT.equalsIgnoreCase(qName)) {
                 // Always merge imports
-                int i = super.getIndex(IMPORT);
-                String v = super.getValue(i);
-                super.setValue(i, v + "," + value);
+                int i = store.getIndex(IMPORT);
+                String v = store.getValue(i);
+                store.setValue(i, v + "," + value);
                 return;
             } else if (PAGE_ENCODING.equalsIgnoreCase(qName)) {
                 // Page encoding can only occur once per file so a second
@@ -126,7 +144,7 @@ public class UniqueAttributesImpl extends AttributesImpl {
             } else {
                 // Other attributes can be repeated if and only if the values
                 // are identical
-                String v = super.getValue(qName);
+                String v = store.getValue(qName);
                 if (v.equals(value)) {
                     return;
                 }
