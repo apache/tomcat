@@ -131,14 +131,17 @@ public class UniqueAttributesImpl extends AttributesImpl {
     }
 
     private void handleDuplicate(String qName, String value, AttributesImpl store) {
+        // Duplicates are tracked by exact qname, so act on the exact qnames
+        // here too; a differently cased repeat of import or pageEncoding is a
+        // different attribute and follows the ordinary rules below
         if (pageDirective) {
-            if (IMPORT.equalsIgnoreCase(qName)) {
+            if (IMPORT.equals(qName)) {
                 // Always merge imports
                 int i = store.getIndex(IMPORT);
                 String v = store.getValue(i);
                 store.setValue(i, v + "," + value);
                 return;
-            } else if (PAGE_ENCODING.equalsIgnoreCase(qName)) {
+            } else if (PAGE_ENCODING.equals(qName)) {
                 // Page encoding can only occur once per file so a second
                 // attribute - even one with a duplicate value - is an error
             } else {
