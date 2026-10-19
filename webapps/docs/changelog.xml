@@ -420,6 +420,11 @@
         Host Manager: Host names are now always converted to lower case before
         use. (markt)
       </fix>
+      <fix>
+        Documentation: Expand the documentation of the
+        <code>maxHttpRequestHeaderSize</code> attribute for the HTTP connector.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">

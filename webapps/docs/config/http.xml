@@ -628,9 +628,11 @@
       attribute.</p>
       <p>If you see "Request header is too large" errors you can increase this,
       but be aware that Tomcat will allocate the full amount you specify for
-      every request. For example, if you specify a maxHttpRequestHeaderSize of
-      1 MB and your application handles 100 concurrent requests, you will see
-      100 MB of heap consumed by request headers.</p>
+      every request and that those requests are not garbage collected after use
+      but are recycled and re-used (see <code>processorCache</code>). For
+      example, if you specify a maxHttpRequestHeaderSize of 1 MB and your
+      application handles 100 concurrent requests, you will see 100 MB of heap
+      consumed by request headers.</p>
     </attribute>
 
     <attribute name="maxHttpResponseHeaderSize" required="false">
@@ -726,7 +728,8 @@
     </attribute>
 
     <attribute name="processorCache" required="false">
-      <p>The protocol handler caches Processor objects to speed up performance.
+      <p>The protocol handler caches Processor objects (and related internal
+      objects such as the request and response) to speed up performance.
       This setting dictates how many of these objects get cached.
       <code>-1</code> means unlimited, default is <code>200</code>.
       <code>0</code> means no request processor reuse. This has a very
