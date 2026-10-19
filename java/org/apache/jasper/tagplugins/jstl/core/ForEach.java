@@ -72,7 +72,8 @@ public final class ForEach implements TagPlugin {
         if (hasVar /* && ctxt.hasEL() */) {
             ctxt.generateJavaSource("_jspx_page_context.setAttribute(");
             ctxt.generateAttribute("var");
-            ctxt.generateJavaSource(", String.valueOf(" + index + "));");
+            // The reference implementation exposes the index as an Integer.
+            ctxt.generateJavaSource(", Integer.valueOf(" + index + "));");
         }
         ctxt.generateBody();
         ctxt.generateJavaSource("}");
