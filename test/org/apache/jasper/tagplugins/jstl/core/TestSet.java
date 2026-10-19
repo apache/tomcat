@@ -89,4 +89,27 @@ public class TestSet extends AbstractTestTag {
                         + "\"page\" scope is required but was \"request\"]"));
         Assert.assertTrue(body, body.contains("ERR2=[threw]"));
     }
+
+
+    /*
+     * A c:set with a value but neither var nor target sets nothing. The
+     * standard handler treats the absent target as an invalid target and
+     * fails, which the plugin has to keep doing.
+     */
+    @Test
+    public void testNoVarNoTarget() throws Exception {
+        ByteChunk res = new ByteChunk();
+
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/test/jstl/set-no-var-target.jsp", res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+
+        String body = res.toString();
+        Assert.assertTrue(body, body.contains("ERR=[threw]"));
+        Assert.assertTrue(body,
+                body.contains("ERRMSG=[Attempt to set the property of an invalid object in &lt;set&gt;.]"));
+        // A property makes no difference without a var or a target
+        Assert.assertTrue(body, body.contains("ERR2=[threw]"));
+    }
 }

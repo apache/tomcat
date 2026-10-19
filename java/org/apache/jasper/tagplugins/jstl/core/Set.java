@@ -65,6 +65,13 @@ public class Set implements TagPlugin {
             ctxt.generateJavaSource(resultName + " = ");
             ctxt.generateAttribute("value");
             ctxt.generateJavaSource(";");
+            // Without a var or a target, nothing receives the value. The
+            // standard handler fails this use on the missing target, so let
+            // it handle the tag.
+            if (!hasVar && !hasTarget) {
+                ctxt.dontUseTagPlugin();
+                return;
+            }
         } else {
             ctxt.dontUseTagPlugin();
             return;
