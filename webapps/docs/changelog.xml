@@ -439,6 +439,15 @@
         which keeps the parameters of each tag to itself and never touches
         page scope attributes. (remm)
       </fix>
+      <fix>
+        The tag plugin for <code>c:out</code> now uses its body as the
+        fallback for a null value like the standard tag handler does: the
+        body content is captured, trimmed, then written with escaping
+        according to the <code>escapeXml</code> attribute, and the capture
+        is unwound if the body fails. The plugin previously wrote the body
+        inline, including its surrounding whitespace, and did not escape
+        the body content. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
