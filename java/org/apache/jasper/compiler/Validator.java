@@ -800,9 +800,24 @@ class Validator {
 
             Node.Nodes namedAttrs = n.getNamedAttributeNodes();
 
+            /*
+             * XML allows attributes with the same local name as long as they
+             * use different namespace prefixes so the number of 'name'
+             * attributes must be counted rather than assumed to be one.
+             */
+            int nameAttrCount = 0;
+            for (int i = 0; i < xmlAttrLen; i++) {
+                if ("name".equals(attrs.getLocalName(i))) {
+                    nameAttrCount++;
+                }
+            }
+            if (nameAttrCount > 1) {
+                err.jspError(n, "jsp.error.jspelement.duplicate.name");
+            }
+
             // XML-style 'name' attribute, which is mandatory, must not be
             // included in JspAttribute array
-            int jspAttrSize = xmlAttrLen - 1 + namedAttrs.size();
+            int jspAttrSize = xmlAttrLen - nameAttrCount + namedAttrs.size();
 
             Node.JspAttribute[] jspAttrs = new Node.JspAttribute[jspAttrSize];
             int jspAttrIndex = 0;
