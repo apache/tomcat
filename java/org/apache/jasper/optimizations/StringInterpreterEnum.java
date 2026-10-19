@@ -42,7 +42,10 @@ public class StringInterpreterEnum extends DefaultStringInterpreter {
             try {
                 @SuppressWarnings({ "unchecked", "rawtypes" })
                 Enum<?> enumValue = Enum.valueOf((Class<? extends Enum>) c, s);
-                return c.getName() + "." + enumValue.name();
+                // The canonical name (dot-separated) must be used here. The
+                // binary name returned by getName() contains '$' separators
+                // for nested types and is not valid Java source.
+                return c.getCanonicalName() + "." + enumValue.name();
             } catch (IllegalArgumentException iae) {
                 if (log.isDebugEnabled()) {
                     log.debug(Localizer.getMessage("jsp.error.typeConversion", s, "Enum[" + c.getName() + "]"), iae);
