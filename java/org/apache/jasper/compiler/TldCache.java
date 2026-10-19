@@ -175,6 +175,12 @@ public class TldCache {
                 // webappPath will be null for JARs containing TLDs that are on
                 // the class path but not part of the web application
                 URL url = servletContext.getResource(tldResourcePath.getWebappPath());
+                if (url == null) {
+                    // The resource has been removed. Return -1 values so that
+                    // the cached entry is seen as out of date and re-parsing
+                    // reports the failure rather than using stale data
+                    return result;
+                }
                 try (CloseableURLConnection conn = new CloseableURLConnection(url)) {
                     result[0] = conn.getLastModified();
                 }

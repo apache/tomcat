@@ -17,6 +17,7 @@
 package org.apache.jasper.compiler;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -29,6 +30,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.jasper.JasperException;
 import org.apache.tomcat.unittest.TesterServletContext;
 import org.apache.tomcat.util.descriptor.tld.TaglibXml;
 import org.apache.tomcat.util.descriptor.tld.TldParser;
@@ -41,6 +43,7 @@ public class TestTldCache {
 
     private static final String URI_1 = "http://tomcat.apache.org/TesterTld1";
     private static final String URI_2 = "http://tomcat.apache.org/TesterTld2";
+    private static final String URI_3 = "http://tomcat.apache.org/TesterTld3";
 
 
     private static class TesterTldCacheServletContext extends TesterServletContext {
@@ -152,6 +155,52 @@ public class TestTldCache {
         // Final state must still be consistent
         Assert.assertEquals(URI_1, cache.getTaglibXml(path1).getUri());
         Assert.assertEquals(URI_2, cache.getTaglibXml(path2).getUri());
+    }
+
+
+    /*
+     * A TLD that was present at startup is cached. If the TLD file is
+     * subsequently removed, ServletContext.getResource() returns null for it.
+     * getLastModified() previously passed that null on to
+     * CloseableURLConnection which threw a NullPointerException.
+     */
+    @Test
+    public void testRemovedTld() throws Exception {
+        File tldFile = createTld("test-tld-cache-removed", URI_3);
+        URL url = tldFile.toURI().toURL();
+
+        TesterTldCacheServletContext context = new TesterTldCacheServletContext();
+        context.resources.put("/removed.tld", url);
+
+        TldParser parser = new TldParser(true, false, true);
+        TldResourcePath path = new TldResourcePath(url, "/removed.tld");
+
+        Map<String,TldResourcePath> uriMap = new HashMap<>();
+        uriMap.put(URI_3, path);
+
+        Map<TldResourcePath,TaglibXml> xmlMap = new HashMap<>();
+        xmlMap.put(path, parser.parse(path));
+
+        TldCache cache = new TldCache(context, uriMap, xmlMap);
+
+        // The cached entry is up to date
+        Assert.assertEquals(URI_3, cache.getTaglibXml(path).getUri());
+
+        // Remove the TLD. The context, like a real web application context,
+        // no longer finds a resource at the path
+        context.resources.remove("/removed.tld");
+        Assert.assertTrue(tldFile.delete());
+
+        // The cached entry is out of date and the re-parse of the removed TLD
+        // must fail with a JasperException rather than a NullPointerException
+        try {
+            cache.getTaglibXml(path);
+            Assert.fail("Expected a JasperException for the removed TLD");
+        } catch (JasperException e) {
+            // Expected. The re-parse fails because the TLD can no longer be
+            // opened
+            Assert.assertTrue(String.valueOf(e.getCause()), e.getCause() instanceof FileNotFoundException);
+        }
     }
 
 
