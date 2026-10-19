@@ -32,7 +32,7 @@ public final class JspPropertyNotFoundException extends PropertyNotFoundExceptio
      * @param e The cause exception
      */
     public JspPropertyNotFoundException(String mark, PropertyNotFoundException e) {
-        super(mark + " " + e.getMessage(), e.getCause());
+        super(mark + " " + e.getMessage(), e);
     }
 
 }
