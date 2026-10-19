@@ -211,15 +211,9 @@ public class SSIServlet extends HttpServlet {
         }
 
         try (BufferedReader bufferedReader = new BufferedReader(isr)) {
-            // Set the header from the source before the output is generated. In the
-            // unbuffered mode a response larger than the response buffer is committed
-            // while processing, after which setting the header is silently ignored.
-            long sourceLastModified = resourceInfo.getLastModified();
-            if (sourceLastModified > 0) {
-                res.setDateHeader("last-modified", sourceLastModified);
-            }
-            long lastModified = ssiProcessor.process(bufferedReader, sourceLastModified, printWriter);
-            if (lastModified > sourceLastModified && !res.isCommitted()) {
+            long lastModified = ssiProcessor.process(bufferedReader, resourceInfo.getLastModified(), printWriter);
+            // Setting last-modified as best effort
+            if (lastModified > 0) {
                 res.setDateHeader("last-modified", lastModified);
             }
             if (stringWriter != null) {
