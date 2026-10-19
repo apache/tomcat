@@ -20,4 +20,16 @@
     <tag-class>org.apache.taglibs.standard.tag.rt.core.UrlTag</tag-class>
     <plugin-class>org.apache.jasper.tagplugins.jstl.core.Url</plugin-class>
   </tag-plugin>
+  <tag-plugin>
+    <tag-class>org.apache.taglibs.standard.tag.rt.core.ParamTag</tag-class>
+    <plugin-class>org.apache.jasper.tagplugins.jstl.core.Param</plugin-class>
+  </tag-plugin>
+  <tag-plugin>
+    <tag-class>org.apache.taglibs.standard.tag.rt.core.IfTag</tag-class>
+    <plugin-class>org.apache.jasper.tagplugins.jstl.core.If</plugin-class>
+  </tag-plugin>
+  <tag-plugin>
+    <tag-class>org.apache.taglibs.standard.tag.rt.core.ForEachTag</tag-class>
+    <plugin-class>org.apache.jasper.tagplugins.jstl.core.ForEach</plugin-class>
+  </tag-plugin>
 </tag-plugins>

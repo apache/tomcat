@@ -20,4 +20,8 @@
     <tag-class>org.apache.taglibs.standard.tag.rt.core.RedirectTag</tag-class>
     <plugin-class>org.apache.jasper.tagplugins.jstl.core.Redirect</plugin-class>
   </tag-plugin>
+  <tag-plugin>
+    <tag-class>org.apache.taglibs.standard.tag.rt.core.ParamTag</tag-class>
+    <plugin-class>org.apache.jasper.tagplugins.jstl.core.Param</plugin-class>
+  </tag-plugin>
 </tag-plugins>
