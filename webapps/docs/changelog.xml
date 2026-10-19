@@ -477,6 +477,14 @@
         invalid use fails as it does with the handler instead of being
         silently ignored. (remm)
       </fix>
+      <fix>
+        The tag plugins for <code>c:url</code> and <code>c:redirect</code>
+        now strip a trailing slash from a <code>context</code> path before
+        joining it with the URL, as the standard tag handlers do, so that a
+        context path ending in a slash no longer produces a resolved path
+        with a doubled slash. Previously only the root context was handled.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
