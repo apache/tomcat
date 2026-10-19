@@ -35,6 +35,6 @@ public class JspMethodNotFoundException extends MethodNotFoundException {
      * @param e the underlying MethodNotFoundException
      */
     public JspMethodNotFoundException(String mark, MethodNotFoundException e) {
-        super(mark + " " + e.getMessage(), e.getCause());
+        super(mark + " " + e.getMessage(), e);
     }
 }
