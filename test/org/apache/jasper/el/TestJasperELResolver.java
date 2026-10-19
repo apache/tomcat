@@ -96,6 +96,21 @@ public class TestJasperELResolver {
         TestBean bean = new TestBean();
         resolver.setValue(context, bean, "bla", "a string value");
         Assert.assertEquals("a string value", bean.getLastBla());
+
+        // A null value has no class to check the setter against. It must reach
+        // a setter whose parameter can hold null. Before the fix, deriving the
+        // value class from the null value caused a NullPointerException here.
+        context.setPropertyResolved(false);
+        resolver.setValue(context, bean, "bla", null);
+        Assert.assertNull("A null value should be written to a reference-typed setter", bean.getLastBla());
+        Assert.assertTrue("A null value should resolve the property", context.isPropertyResolved());
+
+        // A value whose type the setter parameter cannot hold must be left
+        // unresolved so that another resolver in the chain can handle it
+        context.setPropertyResolved(false);
+        resolver.setValue(context, bean, "foo", Integer.valueOf(7));
+        Assert.assertFalse("A mismatched value must leave the property unresolved",
+                context.isPropertyResolved());
     }
 
     public static class TestBean {
