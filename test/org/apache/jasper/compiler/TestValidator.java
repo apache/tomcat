@@ -42,6 +42,24 @@ public class TestValidator extends TomcatBaseTest {
     }
 
     @Test
+    public void testInvalidTldVersion() throws Exception {
+        getTomcatInstanceTestWebapp(false, true);
+
+        ByteChunk res = new ByteChunk();
+
+        int rc = getUrl("http://localhost:" + getPort() + "/test/jsp/parsing/taglib-invalid-version.jsp", res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+
+        // The invalid jsp-version in the TLD must produce a clean translation
+        // error. It previously triggered a raw NumberFormatException at
+        // translation time since the value was parsed without a catch.
+        String result = res.toString();
+        Assert.assertTrue(result, result.contains("Invalid JSP version [2.1.1]"));
+        Assert.assertFalse(result, result.contains("NumberFormatException"));
+    }
+
+    @Test
     public void testTldVersions22() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
