@@ -309,8 +309,14 @@ public class TldScanner {
             tld = tldParser.parse(path);
         }
         String uri = tld.getUri();
+        // JSP.7.3.6.1: the first mapping for a taglib URI wins. A TLD with a
+        // previously seen URI found via a different resource path (for
+        // example, an unpacked JAR in WEB-INF/classes/META-INF or the same
+        // TLD shipped in two JARs) is a duplicate.
+        boolean duplicateUri = false;
         if (uri != null) {
-            if (!uriTldResourcePathMap.containsKey(uri)) {
+            duplicateUri = uriTldResourcePathMap.containsKey(uri);
+            if (!duplicateUri) {
                 uriTldResourcePathMap.put(uri, path);
             }
         }
@@ -321,7 +327,9 @@ public class TldScanner {
         }
 
         tldResourcePathTaglibXmlMap.put(path, tld);
-        if (tld.getListeners() != null) {
+        if (tld.getListeners() != null && !duplicateUri) {
+            // The listeners of a duplicate tag library have already been
+            // registered when the tag library was first discovered.
             listeners.addAll(tld.getListeners());
         }
     }

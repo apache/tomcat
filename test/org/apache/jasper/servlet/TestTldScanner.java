@@ -40,6 +40,7 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.Jar;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
 import org.apache.tomcat.util.scan.JarFactory;
 import org.apache.tomcat.util.scan.StandardJarScanner;
 import org.easymock.EasyMock;
@@ -136,6 +137,66 @@ public class TestTldScanner extends TomcatBaseTest {
         // The vanished TLD contributed nothing.
         Assert.assertEquals(0, scanner.getUriTldResourcePathMap().size());
         Assert.assertEquals(0, scanner.getTldResourcePathTaglibXmlMap().size());
+    }
+
+
+    @Test
+    public void testListenersNotDuplicatedForDuplicateTaglibUri() throws Exception {
+        // The same tag library may be discovered more than once, for example
+        // a TLD declared in web.xml that is also found unpacked in
+        // WEB-INF/classes/META-INF or shipped in two JARs. The first mapping
+        // wins for the taglib URI and the listeners of the duplicate must not
+        // be registered again, otherwise the listener class is instantiated
+        // twice and receives each event twice.
+        ServletContext mockContext = EasyMock.createMock(ServletContext.class);
+        EasyMock.replay(mockContext);
+
+        TldScanner scanner = new TldScanner(mockContext, true, true, true);
+
+        File appDir = new File(getTemporaryDirectory(), "duplicate-listeners");
+        TldResourcePath first = createTld(appDir, "one",
+                "<uri>http://tomcat.apache.org/duplicate</uri>\n" +
+                "  <listener>\n" +
+                "    <listener-class>com.example.DuplicateListener</listener-class>\n" +
+                "  </listener>");
+        TldResourcePath second = createTld(appDir, "two",
+                "<uri>http://tomcat.apache.org/duplicate</uri>\n" +
+                "  <listener>\n" +
+                "    <listener-class>com.example.DuplicateListener</listener-class>\n" +
+                "  </listener>");
+
+        scanner.parseTld(first);
+        scanner.parseTld(second);
+
+        EasyMock.verify(mockContext);
+        Assert.assertEquals(1, scanner.getListeners().size());
+        Assert.assertEquals("com.example.DuplicateListener", scanner.getListeners().get(0));
+        // The first mapping wins for the taglib URI.
+        Assert.assertEquals(1, scanner.getUriTldResourcePathMap().size());
+        Assert.assertSame(first,
+                scanner.getUriTldResourcePathMap().get("http://tomcat.apache.org/duplicate"));
+        // Both parsed TLDs remain cached since they may also be referenced
+        // directly by resource path.
+        Assert.assertEquals(2, scanner.getTldResourcePathTaglibXmlMap().size());
+    }
+
+
+    private static TldResourcePath createTld(File appDir, String name,
+            String extraElements) throws Exception {
+        File tld = new File(appDir, name + "/example.tld");
+        Files.createDirectories(tld.getParentFile().toPath());
+        String content = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<taglib xmlns=\"http://java.sun.com/xml/ns/j2ee\"\n" +
+                "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+                "    xsi:schemaLocation=\"http://java.sun.com/xml/ns/j2ee\n" +
+                "        http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd\"\n" +
+                "    version=\"2.0\">\n" +
+                "  <tlib-version>1.0</tlib-version>\n" +
+                "  <short-name>example</short-name>\n" +
+                "  " + extraElements + "\n" +
+                "</taglib>\n";
+        Files.writeString(tld.toPath(), content, StandardCharsets.UTF_8);
+        return new TldResourcePath(tld.toURI().toURL(), "/" + name + "/example.tld");
     }
 
 
