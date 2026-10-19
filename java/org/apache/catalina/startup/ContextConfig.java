@@ -2072,8 +2072,12 @@ public class ContextConfig implements LifecycleListener {
 
         try {
             stream = webXmlResource.getInputStream();
-            source = new InputSource(webXmlResource.getURI().toString());
             if (stream != null) {
+                // Only create the input source if the stream is available so
+                // that a source without a byte stream is never returned. The
+                // parser would otherwise try to resolve the URI itself and
+                // report the same problem a second time.
+                source = new InputSource(webXmlResource.getURI().toString());
                 source.setByteStream(stream);
             }
         } catch (Exception e) {
