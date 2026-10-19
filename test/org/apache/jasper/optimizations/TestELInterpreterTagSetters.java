@@ -90,6 +90,7 @@ public class TestELInterpreterTagSetters extends TomcatBaseTest {
             parameterSets.add(new Object[] { elInterpreter, "float", "12.34", ZERO, TWO });
             parameterSets.add(new Object[] { elInterpreter, "primitive-float", "12.34", ZERO, TWO });
             parameterSets.add(new Object[] { elInterpreter, "timeunit", "SECONDS", ZERO, TWO });
+            parameterSets.add(new Object[] { elInterpreter, "nested-timeunit", "SECONDS", ZERO, TWO });
             parameterSets.add(new Object[] { elInterpreter, "string", "bar", ZERO, TWO });
         }
         return parameterSets;
@@ -463,6 +464,34 @@ public class TestELInterpreterTagSetters extends TomcatBaseTest {
         }
 
         public void setFoo(TimeUnit foo) {
+            this.foo = foo;
+        }
+
+        @Override
+        public void doTag() throws JspException, IOException {
+            getJspContext().getOut().print(foo);
+        }
+    }
+
+
+    /*
+     * Enum nested in a class to check the generated code uses the canonical
+     * name of the enum type, not the binary name.
+     */
+    public enum NestedTimeUnit {
+        SECONDS
+    }
+
+
+    public static class TagNestedTimeUnit extends SimpleTagSupport {
+
+        private NestedTimeUnit foo;
+
+        public NestedTimeUnit getFoo() {
+            return foo;
+        }
+
+        public void setFoo(NestedTimeUnit foo) {
             this.foo = foo;
         }
 

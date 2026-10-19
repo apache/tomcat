@@ -262,7 +262,10 @@ public class ELInterpreterTagSetters implements ELInterpreter {
                 try {
                     @SuppressWarnings({ "unchecked", "rawtypes" })
                     Enum<?> enumValue = Enum.valueOf((Class<? extends Enum>) expectedType, m.group(2));
-                    result = expectedType.getName() + "." + enumValue.name();
+                    // The canonical name (dot-separated) must be used here. The
+                    // binary name returned by getName() contains '$' separators
+                    // for nested types and is not valid Java source.
+                    result = expectedType.getCanonicalName() + "." + enumValue.name();
                 } catch (IllegalArgumentException iae) {
                     if (log.isDebugEnabled()) {
                         log.debug(Localizer.getMessage("jsp.error.typeConversion", m.group(2),
