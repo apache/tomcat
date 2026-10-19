@@ -30,11 +30,11 @@ public class TestSSISet {
 
     @Test
     public void testValueBeforeVar() throws Exception {
-        // The attributes may be given in any order, as Apache does
+        // As for Apache, the var attribute must precede the value attribute
         SSIMediator mediator = newMediator();
         String output = process(mediator, new String[] { "value", "var" }, new String[] { "bar", "foo" });
-        Assert.assertEquals("", output);
-        Assert.assertEquals("bar", mediator.getVariableValue("foo"));
+        Assert.assertEquals(mediator.getConfigErrMsg(), output);
+        Assert.assertNull(mediator.getVariableValue("foo"));
     }
 
 
@@ -67,19 +67,76 @@ public class TestSSISet {
 
 
     @Test
-    public void testDuplicateAttributes() throws Exception {
-        // Later occurrences of an attribute win, regardless of order
+    public void testMultiplePairs() throws Exception {
+        // Each value applies to the preceding var, as for Apache
         SSIMediator mediator = newMediator();
-        String output = process(mediator, new String[] { "value", "value", "var" },
-                new String[] { "bar1", "bar2", "foo" });
+        String output = process(mediator, new String[] { "var", "value", "var", "value" },
+                new String[] { "a", "x", "b", "y" });
         Assert.assertEquals("", output);
-        Assert.assertEquals("bar2", mediator.getVariableValue("foo"));
+        Assert.assertEquals("x", mediator.getVariableValue("a"));
+        Assert.assertEquals("y", mediator.getVariableValue("b"));
+    }
 
-        mediator = newMediator();
-        output = process(mediator, new String[] { "var", "value", "value" },
-                new String[] { "foo", "bar1", "bar2" });
+
+    @Test
+    public void testRepeatedValue() throws Exception {
+        // Each value is assigned to the current var so the last one wins
+        SSIMediator mediator = newMediator();
+        String output = process(mediator, new String[] { "var", "value", "value", "var", "value" },
+                new String[] { "a", "1", "2", "b", "3" });
         Assert.assertEquals("", output);
-        Assert.assertEquals("bar2", mediator.getVariableValue("foo"));
+        Assert.assertEquals("2", mediator.getVariableValue("a"));
+        Assert.assertEquals("3", mediator.getVariableValue("b"));
+    }
+
+
+    @Test
+    public void testRepeatedVar() throws Exception {
+        // Only the last var before a value is set
+        SSIMediator mediator = newMediator();
+        String output = process(mediator, new String[] { "var", "var", "value" },
+                new String[] { "a", "b", "y" });
+        Assert.assertEquals("", output);
+        Assert.assertNull(mediator.getVariableValue("a"));
+        Assert.assertEquals("y", mediator.getVariableValue("b"));
+    }
+
+
+    @Test
+    public void testTrailingVar() throws Exception {
+        // A trailing var without a value is ignored once something has been set, as for Apache
+        SSIMediator mediator = newMediator();
+        String output = process(mediator, new String[] { "var", "value", "var" }, new String[] { "a", "x", "b" });
+        Assert.assertEquals("", output);
+        Assert.assertEquals("x", mediator.getVariableValue("a"));
+        Assert.assertNull(mediator.getVariableValue("b"));
+    }
+
+
+    @Test
+    public void testLeadingValueStopsProcessing() throws Exception {
+        // The leading value is an error so the later var/value pair is never applied
+        SSIMediator mediator = newMediator();
+        String output = process(mediator, new String[] { "value", "var", "value" }, new String[] { "x", "a", "y" });
+        Assert.assertEquals(mediator.getConfigErrMsg(), output);
+        Assert.assertNull(mediator.getVariableValue("a"));
+    }
+
+
+    @Test
+    public void testNoAttributes() throws Exception {
+        SSIMediator mediator = newMediator();
+        String output = process(mediator, new String[0], new String[0]);
+        Assert.assertEquals(mediator.getConfigErrMsg(), output);
+    }
+
+
+    @Test
+    public void testEmptyValue() throws Exception {
+        SSIMediator mediator = newMediator();
+        String output = process(mediator, new String[] { "var", "value" }, new String[] { "foo", "" });
+        Assert.assertEquals("", output);
+        Assert.assertEquals("", mediator.getVariableValue("foo"));
     }
 
 
