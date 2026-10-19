@@ -24,6 +24,8 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -319,13 +321,18 @@ public class JspCServletContext implements ServletContext {
 
         URL url;
         try {
-            URI uri = new URI(myResourceBaseURL.toExternalForm() + path);
+            // The path is a decoded logical path. Percent-encode it before
+            // appending it to the (already encoded) base URL so that
+            // resources whose name contains characters that are not
+            // permitted in a URI, for example a space, can be resolved, as
+            // they are by the runtime container.
+            URI uri = new URI(myResourceBaseURL.toExternalForm() + encodePath(path));
             url = uri.toURL();
             try (@SuppressWarnings("unused")
             InputStream is = url.openStream()) {
             }
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
+        } catch (IOException | URISyntaxException e) {
+            // The resource does not exist or the URL could not be built.
             url = null;
         }
 
@@ -344,6 +351,30 @@ public class JspCServletContext implements ServletContext {
             }
         }
         return url;
+    }
+
+
+    /*
+     * Percent-encodes each segment of the given decoded resource path so the
+     * result can be appended to an already encoded base URL.
+     */
+    private static String encodePath(String path) {
+        StringBuilder result = new StringBuilder(path.length());
+        int start = 0;
+        for (;;) {
+            int slash = path.indexOf('/', start);
+            String segment = slash < 0 ? path.substring(start) : path.substring(start, slash);
+            // URLEncoder implements form encoding. It uses '+' for a space,
+            // which is not equivalent in a path segment. A literal '+' in the
+            // input is encoded as "%2B", so any '+' in the output is a space.
+            result.append(URLEncoder.encode(segment, StandardCharsets.UTF_8).replace("+", "%20"));
+            if (slash < 0) {
+                break;
+            }
+            result.append('/');
+            start = slash + 1;
+        }
+        return result.toString();
     }
 
 
