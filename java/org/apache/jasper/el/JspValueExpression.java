@@ -150,9 +150,10 @@ public final class JspValueExpression extends ValueExpression implements Externa
         if (obj == this) {
             return true;
         }
-        if (!(obj instanceof JspValueExpression other)) {
+        if (!(obj instanceof JspValueExpression)) {
             return false;
         }
+        JspValueExpression other = (JspValueExpression) obj;
         return Objects.equals(this.mark, other.mark) && this.target.equals(other.target);
     }
 
