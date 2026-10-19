@@ -17,10 +17,10 @@
 package org.apache.jasper.compiler;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -86,7 +86,9 @@ public class TestSmapUtil extends TomcatBaseTest {
         File file = new File(getTemporaryDirectory(), name + ".class");
 
         String classData = new String(data, StandardCharsets.ISO_8859_1) + SMAP;
-        Files.writeString(file.toPath(), classData, StandardCharsets.ISO_8859_1);
+        try (FileWriter writer = new FileWriter(file)) {
+            writer.write(classData);
+        }
 
         return new URLClassLoader(new URL[] { file.getParentFile().toURI().toURL() });
     }

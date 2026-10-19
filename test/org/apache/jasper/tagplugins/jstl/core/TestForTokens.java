@@ -16,7 +16,7 @@
  */
 package org.apache.jasper.tagplugins.jstl.core;
 
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -53,6 +53,6 @@ public class TestForTokens extends AbstractTestTag {
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
         Assert.assertTrue(res.toString(), res.toString()
-                .contains("jakarta.servlet.jsp.JspTagException: " + message));
+                .contains("javax.servlet.jsp.JspTagException: " + message));
     }
 }

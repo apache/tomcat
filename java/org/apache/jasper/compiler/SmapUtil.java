@@ -16,6 +16,7 @@
  */
 package org.apache.jasper.compiler;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -770,7 +771,7 @@ public class SmapUtil {
         try {
             is = cl.getResourceAsStream(className.replace(".", "/") + ".smap");
             if (is != null) {
-                return new String(is.readAllBytes(), SMAP_ENCODING);
+                return new String(readFully(is), SMAP_ENCODING);
             }
 
             is = cl.getResourceAsStream(className.replace(".", "/") + ".class");
@@ -787,7 +788,7 @@ public class SmapUtil {
                 // SMAP data is installed as ISO-8859-1 (see installSmap())
                 // which preserves every byte of the class file, so the marker
                 // cannot be missed by the search below.
-                String classData = new String(is.readAllBytes(), StandardCharsets.ISO_8859_1);
+                String classData = new String(readFully(is), StandardCharsets.ISO_8859_1);
                 int index = classData.lastIndexOf(SMAP_START_MARKER);
                 if (index >= 0) {
                     return classData.substring(index + SMAP_START_MARKER.length());
@@ -807,5 +808,16 @@ public class SmapUtil {
             }
         }
         return null;
+    }
+
+    private static byte[] readFully(InputStream is) throws IOException {
+        byte[] buf = new byte[1024];
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            int read;
+            while ((read = is.read(buf)) >= 0) {
+                out.write(buf, 0, read);
+            }
+            return out.toByteArray();
+        }
     }
 }

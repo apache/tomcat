@@ -79,7 +79,7 @@ public class ForTokens implements TagPlugin {
             ctxt.generateAttribute("begin");
             ctxt.generateJavaSource(";");
             ctxt.generateJavaSource("if (" + beginName + " < 0) {" +
-                    "throw new jakarta.servlet.jsp.JspTagException(\"'begin' < 0\");}");
+                    "throw new javax.servlet.jsp.JspTagException(\"'begin' < 0\");}");
             ctxt.generateJavaSource("for(int " + index + " = 0; " + index + " < " + beginName + " && " + stName +
                     ".hasMoreTokens(); " + index + "++, " + stName + ".nextToken()){}");
         } else {
@@ -95,7 +95,7 @@ public class ForTokens implements TagPlugin {
             ctxt.generateAttribute("end");
             ctxt.generateJavaSource(";");
             ctxt.generateJavaSource("if (" + endSpecifiedName + " < 0) {" +
-                    "throw new jakarta.servlet.jsp.JspTagException(\"'end' < 0\");}");
+                    "throw new javax.servlet.jsp.JspTagException(\"'end' < 0\");}");
             ctxt.generateJavaSource("int " + endName + " = (" + tokensCountName + " - 1) < " + endSpecifiedName +
                     " ? " + tokensCountName + " - 1 : " + endSpecifiedName + ";");
         } else {
@@ -109,7 +109,7 @@ public class ForTokens implements TagPlugin {
             ctxt.generateAttribute("step");
             ctxt.generateJavaSource(";");
             ctxt.generateJavaSource("if (" + stepName + " <= 0) {" +
-                    "throw new jakarta.servlet.jsp.JspTagException(\"'step' <= 0\");}");
+                    "throw new javax.servlet.jsp.JspTagException(\"'step' <= 0\");}");
         } else {
             ctxt.generateJavaSource("int " + stepName + " = 1;");
         }

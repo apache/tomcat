@@ -17,8 +17,7 @@
 package org.apache.jasper.compiler;
 
 import java.io.File;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
+import java.io.FileWriter;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -57,12 +56,14 @@ public class TestParserController extends TomcatBaseTest {
 
         // The root element may use any prefix as long as the prefix is bound
         // to the exact JSP namespace URI
-        Files.writeString(new File(appDir, "jsp.jsp").toPath(),
-                "<jsp:root xmlns:jsp=\"" + TagConstants.JSP_URI + "\" version=\"2.0\">\n" +
-                        "<jsp:body>OK</jsp:body>\n</jsp:root>\n", StandardCharsets.UTF_8);
-        Files.writeString(new File(appDir, "other.jsp").toPath(),
-                "<mypfx:root xmlns:mypfx=\"" + TagConstants.JSP_URI + "\" version=\"2.0\">\n" +
-                        "<mypfx:body>OK</mypfx:body>\n</mypfx:root>\n", StandardCharsets.UTF_8);
+        try (FileWriter writer = new FileWriter(new File(appDir, "jsp.jsp"))) {
+            writer.write("<jsp:root xmlns:jsp=\"" + TagConstants.JSP_URI + "\" version=\"2.0\">\n" +
+                    "<jsp:body>OK</jsp:body>\n</jsp:root>\n");
+        }
+        try (FileWriter writer = new FileWriter(new File(appDir, "other.jsp"))) {
+            writer.write("<mypfx:root xmlns:mypfx=\"" + TagConstants.JSP_URI + "\" version=\"2.0\">\n" +
+                    "<mypfx:body>OK</mypfx:body>\n</mypfx:root>\n");
+        }
 
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         tomcat.start();
@@ -88,9 +89,10 @@ public class TestParserController extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         File appDir = new File(getTemporaryDirectory(), "root-prefix");
         Assert.assertTrue(appDir.mkdirs() || appDir.isDirectory());
-        Files.writeString(new File(appDir, "prefix.jsp").toPath(),
-                "<foo:root xmlns:foo=\"" + TagConstants.JSP_URI + "PageExtra\">\n" +
-                        "<p>hello</p>\n</foo:root>\n", StandardCharsets.UTF_8);
+        try (FileWriter writer = new FileWriter(new File(appDir, "prefix.jsp"))) {
+            writer.write("<foo:root xmlns:foo=\"" + TagConstants.JSP_URI + "PageExtra\">\n" +
+                    "<p>hello</p>\n</foo:root>\n");
+        }
 
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         tomcat.start();

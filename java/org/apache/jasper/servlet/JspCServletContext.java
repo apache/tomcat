@@ -20,12 +20,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -367,7 +367,11 @@ public class JspCServletContext implements ServletContext {
             // URLEncoder implements form encoding. It uses '+' for a space,
             // which is not equivalent in a path segment. A literal '+' in the
             // input is encoded as "%2B", so any '+' in the output is a space.
-            result.append(URLEncoder.encode(segment, StandardCharsets.UTF_8).replace("+", "%20"));
+            try {
+                result.append(URLEncoder.encode(segment, "UTF-8").replace("+", "%20"));
+            } catch (UnsupportedEncodingException e) {
+                // Won't happen
+            }
             if (slash < 0) {
                 break;
             }

@@ -16,7 +16,10 @@
  */
 package org.apache.jasper.servlet;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -147,10 +150,12 @@ public class TestJspCServletContext {
         // silently reported as not found.
         File docBase = Files.createTempDirectory("jspc-illegal-chars").toFile();
         try {
-            Files.writeString(new File(docBase, "my file.jsp").toPath(),
-                    "<jsp/>", StandardCharsets.UTF_8);
-            Files.writeString(new File(docBase, "unicode-\u00fc.jsp").toPath(),
-                    "<jsp/>", StandardCharsets.UTF_8);
+            try (FileWriter writer = new FileWriter(new File(docBase, "my file.jsp"))) {
+                writer.write("<jsp/>");
+            }
+            try (FileWriter writer = new FileWriter(new File(docBase, "unicode-\u00fc.jsp"))) {
+                writer.write("<jsp/>");
+            }
             JspCServletContext context = new JspCServletContext(
                     null, docBase.toURI().toURL(), null, false, false);
 
@@ -158,7 +163,7 @@ public class TestJspCServletContext {
             Assert.assertNotNull(url);
             try (InputStream is = url.openStream()) {
                 Assert.assertEquals("<jsp/>",
-                        new String(is.readAllBytes(), StandardCharsets.UTF_8));
+                        new String(readFully(is), StandardCharsets.UTF_8));
             }
             Assert.assertNotNull(context.getResource("/unicode-\u00fc.jsp"));
         } finally {
@@ -166,6 +171,16 @@ public class TestJspCServletContext {
         }
     }
 
+    private static byte[] readFully(InputStream is) throws IOException {
+        byte[] buf = new byte[1024];
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            int read;
+            while ((read = is.read(buf)) >= 0) {
+                out.write(buf, 0, read);
+            }
+            return out.toByteArray();
+        }
+    }
 
     private static void deleteRecursively(File file) {
         File[] children = file.listFiles();

@@ -106,6 +106,6 @@ public class TestForEach extends AbstractTestTag {
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
         Assert.assertTrue(res.toString(), res.toString()
-                .contains("jakarta.servlet.jsp.JspTagException: " + message));
+                .contains("javax.servlet.jsp.JspTagException: " + message));
     }
 }

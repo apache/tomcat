@@ -194,7 +194,9 @@ public class TestTldScanner extends TomcatBaseTest {
                 "  <short-name>example</short-name>\n" +
                 "  " + extraElements + "\n" +
                 "</taglib>\n";
-        Files.writeString(tld.toPath(), content, StandardCharsets.UTF_8);
+        try (FileWriter writer = new FileWriter(tld)) {
+            writer.write(content);
+        }
         return new TldResourcePath(tld.toURI().toURL(), "/" + name + "/example.tld");
     }
 

@@ -98,7 +98,7 @@ public final class Out implements TagPlugin {
         // capture is unwound in a finally block, so a failing body does
         // not leave the output redirected, as the container does when a
         // buffered tag body throws.
-        ctxt.generateJavaSource("jakarta.servlet.jsp.tagext.BodyContent " +
+        ctxt.generateJavaSource("javax.servlet.jsp.tagext.BodyContent " +
                 strBodyContentName + " = _jspx_page_context.pushBody();");
         ctxt.generateJavaSource("out = " + strBodyContentName + ";");
         ctxt.generateJavaSource("String " + strBodyName + ";");

@@ -16,7 +16,7 @@
  */
 package org.apache.jasper.tagplugins.jstl.core;
 
-import jakarta.servlet.jsp.PageContext;
+import javax.servlet.jsp.PageContext;
 
 import org.apache.jasper.compiler.tagplugin.TagPlugin;
 import org.apache.jasper.compiler.tagplugin.TagPluginContext;
@@ -101,10 +101,10 @@ public class Set implements TagPlugin {
             // exported as a mapping in the variable mapper, as the standard
             // handler does; only the page scope can hold such a mapping.
             ctxt.generateJavaSource("if(" + resultName +
-                    " instanceof jakarta.el.ValueExpression) {");
+                    " instanceof javax.el.ValueExpression) {");
             if (iScope == PageContext.PAGE_SCOPE) {
                 ctxt.generateJavaSource("    " + varMapper + ".setVariable(\"" + strVar +
-                        "\", (jakarta.el.ValueExpression) " + resultName + ");");
+                        "\", (javax.el.ValueExpression) " + resultName + ");");
             } else {
                 ctxt.generateJavaSource("    throw new JspTagException(\"Invalid scope for ValueExpression in " +
                         "&lt;set&gt;. \\\"page\\\" scope is required but was \\\"" + strScope + "\\\"\");");

@@ -112,26 +112,39 @@ public class TestJspC {
     @Test
     public void argsNoFullStop() throws Exception {
         jspc.setArgs(new String[] {"a.jsp", "b.jsp"});
-        Assert.assertEquals(List.of("a.jsp", "b.jsp"), jspc.pages);
+        ArrayList<String> args = new ArrayList<>();
+        args.add("a.jsp");
+        args.add("b.jsp");
+        Assert.assertEquals(args, jspc.pages);
     }
 
     @Test
     public void argsFullStop() throws Exception {
         jspc.setArgs(new String[] {"--", "a.jsp", "b.jsp", "c.jsp"});
-        Assert.assertEquals(List.of("a.jsp", "b.jsp", "c.jsp"), jspc.pages);
+        ArrayList<String> args = new ArrayList<>();
+        args.add("a.jsp");
+        args.add("b.jsp");
+        args.add("c.jsp");
+        Assert.assertEquals(args, jspc.pages);
     }
 
     @Test
     public void argsFullStopAfterOptions() throws Exception {
         jspc.setArgs(new String[] {"-compile", "--", "a.jsp", "b.jsp"});
         Assert.assertTrue(jspc.compile);
-        Assert.assertEquals(List.of("a.jsp", "b.jsp"), jspc.pages);
+        ArrayList<String> args = new ArrayList<>();
+        args.add("a.jsp");
+        args.add("b.jsp");
+        Assert.assertEquals(args, jspc.pages);
     }
 
     @Test
     public void argsFullStopFileStartingWithDash() throws Exception {
         jspc.setArgs(new String[] {"--", "-a.jsp", "b.jsp"});
-        Assert.assertEquals(List.of("-a.jsp", "b.jsp"), jspc.pages);
+        ArrayList<String> args = new ArrayList<>();
+        args.add("-a.jsp");
+        args.add("b.jsp");
+        Assert.assertEquals(args, jspc.pages);
     }
 
     @Test
@@ -139,7 +152,10 @@ public class TestJspC {
         // The full stop argument takes the place of the missing option value
         // and must not cause the first file argument to be dropped
         jspc.setArgs(new String[] {"-d", "--", "a.jsp", "b.jsp"});
-        Assert.assertEquals(List.of("a.jsp", "b.jsp"), jspc.pages);
+        ArrayList<String> args = new ArrayList<>();
+        args.add("a.jsp");
+        args.add("b.jsp");
+        Assert.assertEquals(args, jspc.pages);
     }
 
     @Test
@@ -147,7 +163,10 @@ public class TestJspC {
             throws Exception {
         jspc.setArgs(new String[] {"-cache", "--", "-compile", "a.jsp"});
         Assert.assertFalse(jspc.compile);
-        Assert.assertEquals(List.of("-compile", "a.jsp"), jspc.pages);
+        ArrayList<String> args = new ArrayList<>();
+        args.add("-compile");
+        args.add("a.jsp");
+        Assert.assertEquals(args, jspc.pages);
     }
 
     @Test
@@ -176,7 +195,10 @@ public class TestJspC {
         // and must not be added to the list of JSP pages
         jspc.setArgs(new String[] {"-trimSpaces", "--", "a.jsp", "b.jsp"});
         Assert.assertEquals(TrimSpacesOption.TRUE, jspc.getTrimSpaces());
-        Assert.assertEquals(List.of("a.jsp", "b.jsp"), jspc.pages);
+        ArrayList<String> args = new ArrayList<>();
+        args.add("a.jsp");
+        args.add("b.jsp");
+        Assert.assertEquals(args, jspc.pages);
     }
 
     @Test
