@@ -310,7 +310,7 @@ public class TestELInJsp extends TomcatBaseTest {
         ctxt.addServletContainerInitializer(new JasperInitializer(), null);
 
         // Configure the defaults and then tweak the JSP servlet settings
-        // Note: Min value for maxLoadedJsps is 2
+        // Note: Min value for maxLoadedJsps is 1
         Tomcat.initWebappDefaults(ctxt);
         Wrapper w = (Wrapper) ctxt.findChild("jsp");
 
