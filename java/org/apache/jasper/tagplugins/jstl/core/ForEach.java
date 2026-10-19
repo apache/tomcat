@@ -30,8 +30,6 @@ public final class ForEach implements TagPlugin {
         // Default constructor
     }
 
-    private boolean hasVar, hasBegin, hasEnd, hasStep;
-
     @Override
     public void doTag(TagPluginContext ctxt) {
 
@@ -43,14 +41,17 @@ public final class ForEach implements TagPlugin {
             return;
         }
 
-        hasVar = ctxt.isAttributeSpecified("var");
-        hasBegin = ctxt.isAttributeSpecified("begin");
-        hasEnd = ctxt.isAttributeSpecified("end");
-        hasStep = ctxt.isAttributeSpecified("step");
+        // Local variables, not instance fields: a single plugin instance is
+        // shared by all translations of the web application, which may run
+        // concurrently.
+        boolean hasVar = ctxt.isAttributeSpecified("var");
+        boolean hasBegin = ctxt.isAttributeSpecified("begin");
+        boolean hasEnd = ctxt.isAttributeSpecified("end");
+        boolean hasStep = ctxt.isAttributeSpecified("step");
 
         boolean hasItems = ctxt.isAttributeSpecified("items");
         if (hasItems) {
-            doCollection(ctxt);
+            doCollection(ctxt, hasVar, hasBegin, hasEnd, hasStep);
             return;
         }
 
@@ -118,7 +119,8 @@ public final class ForEach implements TagPlugin {
     /**
      * Generate codes for Collections.
      */
-    private void doCollection(TagPluginContext ctxt) {
+    private void doCollection(TagPluginContext ctxt, boolean hasVar,
+            boolean hasBegin, boolean hasEnd, boolean hasStep) {
 
         ctxt.generateImport("java.util.*");
         generateIterators(ctxt);
