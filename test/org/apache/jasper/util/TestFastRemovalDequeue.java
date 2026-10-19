@@ -242,6 +242,21 @@ public class TestFastRemovalDequeue {
 
 
     /*
+     * The rendering of an entry must tolerate null content, as the JDK
+     * collections render null elements, rather than fail with a null pointer
+     * exception.
+     */
+    @Test
+    public void testNullContentToString() throws Exception {
+        FastRemovalDequeue<Object> q = new FastRemovalDequeue<>(2);
+
+        FastRemovalDequeue<Object>.Entry e = q.push(null);
+
+        Assert.assertEquals("Entry-null", e.toString());
+    }
+
+
+    /*
      * A maximum size below one cannot produce a usable queue and is
      * rejected, rather than silently replaced by a different size.
      */

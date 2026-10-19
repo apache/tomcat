@@ -323,7 +323,7 @@ public class FastRemovalDequeue<T> {
 
         @Override
         public String toString() {
-            return "Entry-" + content.toString();
+            return "Entry-" + String.valueOf(content);
         }
     }
 
