@@ -41,7 +41,6 @@ public class Redirect implements TagPlugin {
         String urlName = ctxt.getTemporaryVariableName();
         String contextName = ctxt.getTemporaryVariableName();
         String baseUrlName = ctxt.getTemporaryVariableName();
-        String resultName = ctxt.getTemporaryVariableName();
         String responseName = ctxt.getTemporaryVariableName();
 
         // get context
@@ -60,27 +59,29 @@ public class Redirect implements TagPlugin {
         // get the raw url according to "url" and "context"
         ctxt.generateJavaSource("String " + baseUrlName + " = " + "org.apache.jasper.tagplugins.jstl.Util.resolveUrl(" +
                 urlName + ", " + contextName + ", _jspx_page_context);");
-        ctxt.generateJavaSource("_jspx_page_context.setAttribute" + "(\"url_without_param\", " + baseUrlName + ");");
+
+        // Share the working URL with the <c:param> tags in the body by
+        // handing them the name of the local variable that holds it.
+        // Appending to the variable directly is re-entrant: a nested URL tag
+        // in the body of this tag must not be able to overwrite or remove it,
+        // which a page scope attribute with a fixed name would allow.
+        ctxt.setPluginAttribute(Import.URL_VARIABLE_ATTRIBUTE, baseUrlName);
 
         // add params
         ctxt.generateBody();
-
-        ctxt.generateJavaSource(
-                "String " + resultName + " = " + "(String)_jspx_page_context.getAttribute(\"url_without_param\");");
-        ctxt.generateJavaSource("_jspx_page_context.removeAttribute" + "(\"url_without_param\");");
 
         // get the response object
         ctxt.generateJavaSource("HttpServletResponse " + responseName + " = " +
                 "((HttpServletResponse) _jspx_page_context.getResponse());");
 
         // if the url is relative, encode it
-        ctxt.generateJavaSource("if(!org.apache.jasper.tagplugins.jstl.Util.isAbsoluteUrl(" + resultName + ")){");
-        ctxt.generateJavaSource("    " + resultName + " = " + responseName + ".encodeRedirectURL(" + resultName + ");");
+        ctxt.generateJavaSource("if(!org.apache.jasper.tagplugins.jstl.Util.isAbsoluteUrl(" + baseUrlName + ")){");
+        ctxt.generateJavaSource("    " + baseUrlName + " = " + responseName + ".encodeRedirectURL(" + baseUrlName + ");");
         ctxt.generateJavaSource("}");
 
         // do redirect
         ctxt.generateJavaSource("try{");
-        ctxt.generateJavaSource("    " + responseName + ".sendRedirect(" + resultName + ");");
+        ctxt.generateJavaSource("    " + responseName + ".sendRedirect(" + baseUrlName + ");");
         // Avoid unreachable code error in compiler
         ctxt.generateJavaSource("    if (true) {");
         ctxt.generatePageTermination();

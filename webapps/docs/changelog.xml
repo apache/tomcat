@@ -474,6 +474,18 @@
         with a doubled slash. Previously only the root context was handled.
         (remm)
       </fix>
+      <fix>
+        The tag plugins for <code>c:url</code>, <code>c:redirect</code> and
+        <code>c:param</code> now share the working URL of the URL tag through
+        the plugin context rather than the page scope attribute
+        <code>url_without_param</code>. That fixed name overwrote an
+        application attribute of the same name while the tag body was
+        processed and removed it afterwards, and it let a nested URL tag
+        destroy the outer tag's URL, which then silently rendered as
+        <code>null</code>. This matches the reference implementation, which
+        keeps the parameters of each tag to itself and never touches page
+        scope attributes. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

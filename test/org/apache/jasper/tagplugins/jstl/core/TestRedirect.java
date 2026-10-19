@@ -18,6 +18,9 @@ package org.apache.jasper.tagplugins.jstl.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -30,6 +33,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.http.Method;
 
 public class TestRedirect extends AbstractTestTag {
 
@@ -106,5 +110,28 @@ public class TestRedirect extends AbstractTestTag {
         Assert.assertEquals(HttpServletResponse.SC_FOUND, rc);
         Assert.assertTrue(pageStarted.await(1, TimeUnit.SECONDS));
         Assert.assertFalse(pageProcessingContinued.await(1, TimeUnit.SECONDS));
+    }
+
+
+    /*
+     * The <c:param> plugin must append its parameters, URL-encoded, to the
+     * working URL of the enclosing <c:redirect> tag. The plugins used to
+     * exchange that URL through the page scope attribute "url_without_param"
+     * which interfered with nested URL tags and application attributes of the
+     * same name. The URL is now shared through the plugin context instead.
+     */
+    @Test
+    public void testRedirectParams() throws Exception {
+        ByteChunk res = new ByteChunk();
+        Map<String, List<String>> resHead = new HashMap<>();
+
+        int rc = methodUrl("http://localhost:" + getPort() + "/test/jstl/redirect-params.jsp", res,
+                DEFAULT_CLIENT_TIMEOUT_MS, null, resHead, Method.GET, false);
+
+        Assert.assertEquals(HttpServletResponse.SC_FOUND, rc);
+
+        String location = getSingleHeader("Location", resHead);
+        Assert.assertNotNull(location);
+        Assert.assertTrue(location, location.endsWith("/test/jstl/redirect-target.jsp?a=b&sp=x+y&u=%26%3D"));
     }
 }
