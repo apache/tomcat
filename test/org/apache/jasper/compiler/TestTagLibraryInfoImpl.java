@@ -55,6 +55,24 @@ public class TestTagLibraryInfoImpl extends TomcatBaseTest {
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
     }
 
+    @Test
+    public void testEmptyTaglibUri() throws Exception {
+        getTomcatInstanceTestWebapp(false, true);
+
+        ByteChunk res = new ByteChunk();
+
+        int rc = getUrl("http://localhost:" + getPort() + "/test/jsp/parsing/taglib-empty-uri.jsp", res, null);
+        Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+
+        // An empty taglib URI must produce a clean translation error. It
+        // previously triggered a StringIndexOutOfBoundsException in
+        // TagLibraryInfoImpl.generateTldResourcePath() that was reported
+        // instead of the translation error.
+        String result = res.toString();
+        Assert.assertTrue(result, result.contains("is not a valid URI"));
+        Assert.assertFalse(result, result.contains("StringIndexOutOfBoundsException"));
+    }
+
     /*
      * https://bz.apache.org/bugzilla/show_bug.cgi?id=64373
      */
