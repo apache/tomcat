@@ -18,6 +18,7 @@ package org.apache.jasper.optimizations;
 
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 public class TestStringInterpreterEnum {
@@ -30,11 +31,30 @@ public class TestStringInterpreterEnum {
     }
 
 
+    /*
+     * Enum nested in a class so the binary name differs from the canonical
+     * name by a '$' separator.
+     */
+    public enum NestedEnum {
+        VALUE
+    }
+
+
     @Test
     public void testBadTerms() {
         String[] badTerms = new String[] { "", "mis format", "fudge", ";", ".", "\"", " " };
         for (String badTerm : badTerms) {
             new TestInterpreter().evaluate(TimeUnit.class, badTerm);
         }
+    }
+
+
+    @Test
+    public void testNestedEnumUsesCanonicalName() {
+        // The generated code must reference the canonical name (dot
+        // separated). The binary name contains '$' and is not valid Java
+        // source.
+        String result = new TestInterpreter().evaluate(NestedEnum.class, "VALUE");
+        Assert.assertEquals(NestedEnum.class.getCanonicalName() + ".VALUE", result);
     }
 }
