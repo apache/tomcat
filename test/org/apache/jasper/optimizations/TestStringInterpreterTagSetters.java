@@ -73,6 +73,12 @@ public class TestStringInterpreterTagSetters extends TomcatBaseTest {
         String actual = bc.toString();
 
         Assert.assertTrue(actual, actual.contains("01 The value of foo is [SECONDS]"));
+
+        bc = getUrl("http://localhost:" + getPort() + "/test/bug6nnnn/bug64872b-nested-timeunit.jsp");
+
+        actual = bc.toString();
+
+        Assert.assertTrue(actual, actual.contains("01 The value of foo is [SECONDS]"));
     }
 
 
