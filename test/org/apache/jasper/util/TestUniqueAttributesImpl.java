@@ -249,4 +249,25 @@ public class TestUniqueAttributesImpl {
         Assert.assertEquals(1, attrs.getLength());
         Assert.assertEquals("1", attrs.getValue("foo"));
     }
+
+
+    /*
+     * Names are tracked exactly, so a repeated, differently cased import is
+     * not the mergeable page directive import attribute and must be rejected
+     * like any other duplicate name rather than causing an internal error.
+     */
+    @Test
+    public void testDifferentlyCasedImportRepeatRejected() throws Exception {
+        UniqueAttributesImpl attrs = new UniqueAttributesImpl(true);
+
+        attrs.addAttribute("", "Import", "Import", "CDATA", "a");
+
+        try {
+            attrs.addAttribute("", "Import", "Import", "CDATA", "b");
+            Assert.fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+        Assert.assertEquals(1, attrs.getLength());
+    }
 }
