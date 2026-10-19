@@ -218,8 +218,7 @@ public class JasperELResolver extends CompositeELResolver {
                     method.setAccessible(true);
                     value = method.invoke(base, (Object[]) null);
                 } catch (Exception e) {
-                    Throwable thr = ExceptionUtils.unwrapInvocationTargetException(e);
-                    ExceptionUtils.handleThrowable(thr);
+                    throw toELException(e);
                 }
             }
             return value;
@@ -241,8 +240,7 @@ public class JasperELResolver extends CompositeELResolver {
                     method.setAccessible(true);
                     method.invoke(base, value);
                 } catch (Exception e) {
-                    Throwable thr = ExceptionUtils.unwrapInvocationTargetException(e);
-                    ExceptionUtils.handleThrowable(thr);
+                    throw toELException(e);
                 }
             }
         }
@@ -285,6 +283,12 @@ public class JasperELResolver extends CompositeELResolver {
                 }
             }
             return null;
+        }
+
+        private static ELException toELException(Exception e) {
+            Throwable thr = ExceptionUtils.unwrapInvocationTargetException(e);
+            ExceptionUtils.handleThrowable(thr);
+            return new ELException(thr);
         }
 
         private static String capitalize(String name) {
