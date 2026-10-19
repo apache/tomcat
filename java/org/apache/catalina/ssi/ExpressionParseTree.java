@@ -43,6 +43,10 @@ public class ExpressionParseTree {
      */
     private final LinkedList<OppNode> oppStack = new LinkedList<>();
     /**
+     * Contains the node stack size at the start of each group.
+     */
+    private final LinkedList<Integer> groupNodeCounts = new LinkedList<>();
+    /**
      * The root node after the expression has been parsed.
      */
     private Node root;
@@ -95,6 +99,7 @@ public class ExpressionParseTree {
         // If node is null then it's just a group marker
         if (node == null) {
             oppStack.addFirst(null);
+            groupNodeCounts.addFirst(Integer.valueOf(nodeStack.size()));
             return;
         }
         while (true) {
@@ -135,7 +140,8 @@ public class ExpressionParseTree {
      * @throws ParseException The operator is missing one of its operands
      */
     private void checkOperands(OppNode node, int index) throws ParseException {
-        if (nodeStack.size() < node.getOperandCount()) {
+        int groupNodeCount = nodeStack.size() - groupNodeCounts.getFirst().intValue();
+        if (groupNodeCount < node.getOperandCount()) {
             throw new ParseException(sm.getString("expressionParseTree.missingOperand"), index);
         }
     }
@@ -149,20 +155,15 @@ public class ExpressionParseTree {
      * @throws ParseException An operator was missing one of its operands
      */
     private void resolveGroup(int index) throws ParseException {
-        // The stack may be empty if the expression contained more closing
-        // parentheses than opening ones, which consumed the artificial group
-        // marker
-        while (!oppStack.isEmpty()) {
-            OppNode top = oppStack.removeFirst();
-            if (top == null) {
-                break;
-            }
+        OppNode top;
+        while ((top = oppStack.removeFirst()) != null) {
             checkOperands(top, index);
             // Let it fill its branches
             top.popValues(nodeStack);
             // Stick it on the resolved node stack
             nodeStack.addFirst(top);
         }
+        groupNodeCounts.removeFirst();
     }
 
 
@@ -214,6 +215,10 @@ public class ExpressionParseTree {
                     oppStack.addFirst(new EqualNode());
                     break;
                 case ExpressionTokenizer.TOKEN_RBRACE:
+                    if (groupNodeCounts.size() == 1) {
+                        throw new ParseException(sm.getString("expressionParseTree.unmatchedClosingParenthesis"),
+                                et.getIndex());
+                    }
                     // Closeout the current group
                     resolveGroup(et.getIndex());
                     break;

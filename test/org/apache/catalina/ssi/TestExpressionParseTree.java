@@ -164,7 +164,8 @@ public class TestExpressionParseTree {
         for (String expression : expressions) {
             SSIMediator mediator = new SSIMediator(new TesterSSIExternalResolver(), LAST_MODIFIED);
             try {
-                new ExpressionParseTree(expression, mediator);
+                @SuppressWarnings("unused")
+                ExpressionParseTree unused = new ExpressionParseTree(expression, mediator);
                 Assert.fail("Expected a parse error for [" + expression + "]");
             } catch (ParseException pe) {
                 // Expected
@@ -177,11 +178,12 @@ public class TestExpressionParseTree {
     public void testMissingOperand() throws Exception {
         // Operators missing an operand must produce a parse error rather than
         // an unchecked exception
-        String[] expressions = { "= a", "a =", "a ! =", "!", "a = = b", "!= a" };
+        String[] expressions = { "= a", "a =", "a ! =", "!", "a = = b", "!= a", "a (!)", "a (= b)" };
         for (String expression : expressions) {
             SSIMediator mediator = new SSIMediator(new TesterSSIExternalResolver(), LAST_MODIFIED);
             try {
-                new ExpressionParseTree(expression, mediator);
+                @SuppressWarnings("unused")
+                ExpressionParseTree unused = new ExpressionParseTree(expression, mediator);
                 Assert.fail("Expected a parse error for [" + expression + "]");
             } catch (ParseException pe) {
                 // Expected
@@ -191,16 +193,16 @@ public class TestExpressionParseTree {
 
 
     @Test
-    public void testExtraClosingParen() throws Exception {
-        // Unbalanced closing parentheses consumed the artificial group marker
-        // and used to result in a NoSuchElementException from the parser
+    public void testUnmatchedClosingParenthesis() throws Exception {
         String[] expressions = { ")", "a)", "a))", "(a))", "a ) b" };
         for (String expression : expressions) {
             SSIMediator mediator = new SSIMediator(new TesterSSIExternalResolver(), LAST_MODIFIED);
             try {
-                new ExpressionParseTree(expression, mediator);
+                @SuppressWarnings("unused")
+                ExpressionParseTree unused = new ExpressionParseTree(expression, mediator);
+                Assert.fail("Expected a parse error for [" + expression + "]");
             } catch (ParseException pe) {
-                // Also a valid outcome
+                // Expected
             }
         }
     }
