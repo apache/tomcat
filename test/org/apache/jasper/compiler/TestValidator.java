@@ -84,6 +84,26 @@ public class TestValidator extends TomcatBaseTest {
     }
 
     @Test
+    public void testDuplicateJspElementName() throws Exception {
+        getTomcatInstanceTestWebapp(false, true);
+
+        ByteChunk res = new ByteChunk();
+
+        int rc = getUrl("http://localhost:" + getPort() + "/test/jsp/parsing/element-duplicate-name.jspx", res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+
+        // XML allows two attributes with the local name 'name' as long as
+        // they use different namespace prefixes. jsp:element must report that
+        // as a translation error. It previously sized the JspAttribute array
+        // for a single 'name' attribute which left a null entry that later
+        // triggered a NullPointerException.
+        String result = res.toString();
+        Assert.assertTrue(result, result.contains("attribute appears more than once"));
+        Assert.assertFalse(result, result.contains("NullPointerException"));
+    }
+
+    @Test
     public void testTldVersions22() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
