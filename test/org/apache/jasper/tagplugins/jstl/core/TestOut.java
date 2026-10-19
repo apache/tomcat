@@ -56,4 +56,45 @@ public class TestOut extends AbstractTestTag {
         Assert.assertTrue(body.contains("OK - 4"));
         Assert.assertFalse(body.contains("FAIL"));
     }
+
+
+    /*
+     * When the value is null, the tag body is the fallback. Like the
+     * reference JSTL implementation, the body content is used as a string
+     * that is trimmed and then escaped according to escapeXml.
+     */
+    @Test
+    public void testBodyFallback() throws Exception {
+        ByteChunk res = new ByteChunk();
+
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/test/jstl/out-body.jsp", res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+
+        String body = res.toString();
+        // The whitespace surrounding the body content is removed
+        Assert.assertTrue(body, body.contains("TRIM=[spaced body]"));
+        // The body content is escaped, like the value attribute is
+        Assert.assertTrue(body, body.contains("ESC=[&lt;x&gt;]"));
+        // ... unless escaping is switched off
+        Assert.assertTrue(body, body.contains("RAW=[<x>]"));
+        // A body of only whitespace outputs nothing
+        Assert.assertTrue(body, body.contains("SPACE=[]"));
+        // A non-null value skips the body
+        Assert.assertTrue(body, body.contains("SKIP=[V]"));
+        // An empty body outputs nothing
+        Assert.assertTrue(body, body.contains("NONE=[]"));
+        // A nested tag body is buffered by both tags, and the outer one
+        // still trims the whole content
+        Assert.assertTrue(body, body.contains("NEST=[AB inner CD]"));
+        // A Reader is written without escaping and skips the body
+        Assert.assertTrue(body, body.contains("READER=[READOK]"));
+        Assert.assertFalse(body, body.contains("IGNORED"));
+        // The content of a failing body is not written
+        Assert.assertFalse(body, body.contains("lost"));
+        // ... and output continues after it
+        Assert.assertTrue(body, body.contains("LEAK=[]"));
+        Assert.assertTrue(body, body.contains("TAIL=[visible]"));
+    }
 }
