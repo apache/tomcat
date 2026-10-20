@@ -22,6 +22,12 @@ import org.junit.Test;
 public class TestLogUtil {
 
     @Test
+    public void testEscapeForLoggingNull() {
+        doTestEscapeForLogging(null, "");
+    }
+
+
+    @Test
     public void testEscapeForLoggingEmptyString() {
         doTestEscapeForLogging("");
     }
