@@ -29,9 +29,9 @@ import org.junit.Test;
 public class TestThreadPoolExecutor {
 
     /*
-     * The submitted task count is used by TaskQueue.offer() to decide if a task should be queued or a new thread
-     * should be created. A task that is counted when submitted but never reaches afterExecute() leaves the count
-     * permanently inflated.
+     * The submitted task count is used by TaskQueue.offer() to decide if a task should be queued or a new thread should
+     * be created. A task that is counted when submitted but never reaches afterExecute() leaves the count permanently
+     * inflated.
      */
 
     private static ThreadPoolExecutor createPool(ThreadPoolExecutor.RejectedExecutionHandler handler) {
@@ -89,9 +89,8 @@ public class TestThreadPoolExecutor {
     @Test
     public void testNonThrowingRejectionHandlerKeepsSubmittedCount() throws Exception {
         // Test both handlers that do not throw.
-        for (ThreadPoolExecutor.RejectedExecutionHandler handler :
-                new ThreadPoolExecutor.RejectedExecutionHandler[] { new ThreadPoolExecutor.DiscardPolicy(),
-                        new ThreadPoolExecutor.CallerRunsPolicy() }) {
+        for (ThreadPoolExecutor.RejectedExecutionHandler handler : new ThreadPoolExecutor.RejectedExecutionHandler[] {
+                new ThreadPoolExecutor.DiscardPolicy(), new ThreadPoolExecutor.CallerRunsPolicy() }) {
             CountDownLatch release = new CountDownLatch(1);
             boolean expectRunInCaller = handler instanceof ThreadPoolExecutor.CallerRunsPolicy;
             ThreadPoolExecutor pool = createPool(handler);
@@ -104,7 +103,8 @@ public class TestThreadPoolExecutor {
                 pool.execute(() -> ran.set(true)); // rejected: discarded or run by this thread
                 // Only the running and the queued task are still outstanding.
                 Assert.assertEquals(handler.getClass().getName(), 2, pool.getSubmittedCount());
-                Assert.assertEquals(handler.getClass().getName(), expectRunInCaller, ran.get());
+                Assert.assertEquals(handler.getClass().getName(), Boolean.valueOf(expectRunInCaller),
+                        Boolean.valueOf(ran.get()));
                 release.countDown();
                 awaitSubmittedCount(pool, 0);
             } finally {
@@ -182,8 +182,8 @@ public class TestThreadPoolExecutor {
     }
 
     /*
-     * If beforeExecute() throws, the worker dies without processing the task and without calling afterExecute(), so
-     * the submitted count must be decremented for the lost task.
+     * If beforeExecute() throws, the worker dies without processing the task and without calling afterExecute(), so the
+     * submitted count must be decremented for the lost task.
      */
     @Test
     public void testBeforeExecuteThrowKeepsSubmittedCount() throws Exception {

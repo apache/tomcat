@@ -31,13 +31,13 @@ import org.apache.catalina.tribes.io.XByteBuffer;
 public class TestMcastService {
 
     /*
-     * The shutdown message that stop() broadcasts routinely fails when the network device is down
-     * or the socket is already broken. That must not skip leaving the multicast group and closing
-     * the socket, nor prevent the service facade from releasing its implementation.
+     * The shutdown message that stop() broadcasts routinely fails when the network device is down or the socket is
+     * already broken. That must not skip leaving the multicast group and closing the socket, nor prevent the service
+     * facade from releasing its implementation.
      */
     @Test(timeout = 60000)
     public void testStopWithFailingShutdownSendCompletes() throws Exception {
-        int base = 40000 + (int) Math.floorMod(System.nanoTime(), 10000);
+        int base = 40000 + Math.floorMod(System.nanoTime(), 10000);
         StringBuilder properties = new StringBuilder();
         properties.append("mcastAddress=228.0.0.4\n");
         properties.append("mcastPort=").append(base).append("\n");
@@ -74,10 +74,9 @@ public class TestMcastService {
     }
 
     /*
-     * The soTimeout and ttl reported through MBean must reflect the configuration, whether it is
-     * supplied through the properties file or through the setters. Previously the getters read
-     * private fields that only the setters wrote, so a property-based configuration that the socket
-     * did apply was reported as the default 0.
+     * The soTimeout and ttl reported through MBean must reflect the configuration, whether it is supplied through the
+     * properties file or through the setters. Previously the getters read private fields that only the setters wrote,
+     * so a property-based configuration that the socket did apply was reported as the default 0.
      */
     @Test
     public void testSoTimeoutAndTtlReflectProperties() throws Exception {
@@ -113,8 +112,8 @@ public class TestMcastService {
     }
 
     /*
-     * When neither the properties nor a setter provides a value, the reported soTimeout and ttl
-     * default to 0, as they did before.
+     * When neither the properties nor a setter provides a value, the reported soTimeout and ttl default to 0, as they
+     * did before.
      */
     @Test
     public void testSoTimeoutAndTtlDefaultToZero() throws Exception {
@@ -124,9 +123,9 @@ public class TestMcastService {
     }
 
     /*
-     * A non-positive send frequency makes the sender spin sending pings without a pause, and a
-     * non-positive drop time expires every member on every cycle. Such configuration must be
-     * rejected when the service starts, before any socket or thread is created.
+     * A non-positive send frequency makes the sender spin sending pings without a pause, and a non-positive drop time
+     * expires every member on every cycle. Such configuration must be rejected when the service starts, before any
+     * socket or thread is created.
      */
     @Test
     public void testStartRejectsNonPositiveTimingProperties() throws Exception {
@@ -161,13 +160,13 @@ public class TestMcastService {
     }
 
     /*
-     * The 65535 byte protocol limit of an IP packet includes the IP and UDP headers, so a
-     * broadcast that fits within it can still exceed what the socket is able to send. Such a
-     * broadcast must be rejected by the size check rather than fail later in the send.
+     * The 65535 byte protocol limit of an IP packet includes the IP and UDP headers, so a broadcast that fits within it
+     * can still exceed what the socket is able to send. Such a broadcast must be rejected by the size check rather than
+     * fail later in the send.
      */
     @Test(timeout = 60000)
     public void testBroadcastRejectsPacketsTheSocketCannotCarry() throws Exception {
-        int base = 40000 + (int) Math.floorMod(System.nanoTime(), 10000);
+        int base = 40000 + Math.floorMod(System.nanoTime(), 10000);
         Properties props = new Properties();
         props.setProperty("mcastAddress", "228.0.0.4");
         props.setProperty("mcastPort", String.valueOf(base));
@@ -196,9 +195,8 @@ public class TestMcastService {
             int overhead = XByteBuffer.createDataPackage(probe).length;
             Assert.assertTrue(overhead > 0 && overhead < 128);
             byte[] messageBytes = new byte[McastServiceImpl.MAX_SEND_SIZE + 8 - overhead];
-            Assert.assertEquals(McastServiceImpl.MAX_SEND_SIZE + 8,
-                    XByteBuffer.createDataPackage(new ChannelData(probe.getUniqueId(),
-                            new XByteBuffer(messageBytes, false), 0)).length);
+            Assert.assertEquals(McastServiceImpl.MAX_SEND_SIZE + 8, XByteBuffer.createDataPackage(
+                    new ChannelData(probe.getUniqueId(), new XByteBuffer(messageBytes, false), 0)).length);
 
             ChannelData message = new ChannelData();
             message.setMessage(new XByteBuffer(messageBytes, false));

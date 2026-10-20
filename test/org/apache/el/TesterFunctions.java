@@ -49,7 +49,7 @@ public class TesterFunctions {
         return inputs == null ? -1 : inputs.length;
     }
 
-    public static int varargsLength2(String prefix, String... inputs) {
+    public static int varargsLength2(@SuppressWarnings("unused") String prefix, String... inputs) {
         // Distinguishes a null varargs array from an empty one
         return inputs == null ? -1 : inputs.length;
     }

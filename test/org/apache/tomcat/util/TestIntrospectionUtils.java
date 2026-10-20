@@ -181,6 +181,7 @@ public class TestIntrospectionUtils {
             return unsupported;
         }
 
+        @SuppressWarnings("unused")
         public void setProperty(String name, String value) {
             genericCalled = true;
         }

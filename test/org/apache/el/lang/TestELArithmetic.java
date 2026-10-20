@@ -27,13 +27,11 @@ import org.junit.Test;
 
 public class TestELArithmetic {
     private static final String a = "1.1";
-    private static final BigInteger b =
-        new BigInteger("1000000000000000000000");
+    private static final BigInteger b = new BigInteger("1000000000000000000000");
 
     @Test
     public void testAdd01() throws Exception {
-        Assert.assertEquals("1000000000000000000001.1",
-                String.valueOf(ELArithmetic.add(a, b)));
+        Assert.assertEquals("1000000000000000000001.1", String.valueOf(ELArithmetic.add(a, b)));
     }
 
     @Test
@@ -45,8 +43,7 @@ public class TestELArithmetic {
 
     @Test
     public void testSubtract01() throws Exception {
-        Assert.assertEquals("-999999999999999999998.9",
-                String.valueOf(ELArithmetic.subtract(a, b)));
+        Assert.assertEquals("-999999999999999999998.9", String.valueOf(ELArithmetic.subtract(a, b)));
     }
 
     @Test
@@ -58,8 +55,7 @@ public class TestELArithmetic {
 
     @Test
     public void testMultiply01() throws Exception {
-        Assert.assertEquals("1100000000000000000000.0",
-                String.valueOf(ELArithmetic.multiply(a, b)));
+        Assert.assertEquals("1100000000000000000000.0", String.valueOf(ELArithmetic.multiply(a, b)));
     }
 
     @Test
@@ -71,8 +67,7 @@ public class TestELArithmetic {
 
     @Test
     public void testDivide01() throws Exception {
-        Assert.assertEquals("0.0",
-                String.valueOf(ELArithmetic.divide(a, b)));
+        Assert.assertEquals("0.0", String.valueOf(ELArithmetic.divide(a, b)));
     }
 
     @Test
@@ -84,8 +79,7 @@ public class TestELArithmetic {
 
     @Test
     public void testMod01() throws Exception {
-        Assert.assertEquals("1.1",
-                String.valueOf(ELArithmetic.mod(a, b)));
+        Assert.assertEquals("1.1", String.valueOf(ELArithmetic.mod(a, b)));
     }
 
     @Test
@@ -112,8 +106,7 @@ public class TestELArithmetic {
 
     @Test
     public void testBug47371bigDecimal() throws Exception {
-        Assert.assertEquals(BigDecimal.valueOf(1),
-                ELArithmetic.add("", BigDecimal.valueOf(1)));
+        Assert.assertEquals(BigDecimal.valueOf(1), ELArithmetic.add("", BigDecimal.valueOf(1)));
     }
 
     @Test
@@ -128,8 +121,7 @@ public class TestELArithmetic {
 
     @Test
     public void testBug47371bigInteger() throws Exception {
-        Assert.assertEquals(BigInteger.valueOf(0),
-                ELArithmetic.multiply("", BigInteger.valueOf(1)));
+        Assert.assertEquals(BigInteger.valueOf(0), ELArithmetic.multiply("", BigInteger.valueOf(1)));
     }
 
     @Test
@@ -179,19 +171,18 @@ public class TestELArithmetic {
 
     @Test
     public void testBigIntegerDivByZeroThrowsELException() {
-        assertELException("divide",
-                () -> ELArithmetic.divide((Object) BigInteger.ONE, (Object) BigInteger.ZERO));
+        assertELException("divide", () -> ELArithmetic.divide((Object) BigInteger.ONE, (Object) BigInteger.ZERO));
     }
 
     @Test
     public void testNonFiniteNumberWithBigDecimalThrowsELException() {
         // The BigDecimal delegate Number coercion uses new BigDecimal(double) which
         // rejects NaN and Infinity. The failure must surface as ELException.
-        assertELException("add", () -> ELArithmetic.add((Object) BigDecimal.ONE, (Object) Double.NaN));
+        assertELException("add", () -> ELArithmetic.add((Object) BigDecimal.ONE, (Object) Double.valueOf(Double.NaN)));
         assertELException("add",
-                () -> ELArithmetic.add((Object) BigDecimal.ONE, (Object) Double.POSITIVE_INFINITY));
+                () -> ELArithmetic.add((Object) BigDecimal.ONE, (Object) Double.valueOf(Double.POSITIVE_INFINITY)));
         assertELException("divide",
-                () -> ELArithmetic.divide((Object) BigDecimal.ONE, (Object) Double.NEGATIVE_INFINITY));
+                () -> ELArithmetic.divide((Object) BigDecimal.ONE, (Object) Double.valueOf(Double.NEGATIVE_INFINITY)));
     }
 
     @Test

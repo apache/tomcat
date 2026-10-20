@@ -105,7 +105,9 @@ public class TestPojoMethodMapping extends TomcatBaseTest {
     @Test
     public void testPrimitiveAndBooleanParameters() throws Exception {
         try {
-            new PojoMethodMapping(PrimitiveAndBooleanServer.class, new ArrayList<>(), "/primitiveAndBoolean", null);
+            @SuppressWarnings("unused")
+            PojoMethodMapping mapping = new PojoMethodMapping(PrimitiveAndBooleanServer.class, new ArrayList<>(),
+                    "/primitiveAndBoolean", null);
             Assert.fail("Expected a DeploymentException");
         } catch (DeploymentException de) {
             Assert.assertTrue("Unexpected message: " + de.getMessage(), de.getMessage().contains("primitive type"));
@@ -124,22 +126,22 @@ public class TestPojoMethodMapping extends TomcatBaseTest {
 
 
     /*
-     * A sub-class method that overrides an annotated super class method using a covariant return
-     * type is still an override. Re-declaring the annotation on the override must not be treated
-     * as a duplicate annotation and the sub-class method must be the one that is mapped.
+     * A sub-class method that overrides an annotated super class method using a covariant return type is still an
+     * override. Re-declaring the annotation on the override must not be treated as a duplicate annotation and the
+     * sub-class method must be the one that is mapped.
      */
     @Test
     public void testCovariantReturnOverride() throws Exception {
-        PojoMethodMapping mapping = new PojoMethodMapping(CovariantReturnServer.class, new ArrayList<>(),
-                "/covariantReturn", null);
+        PojoMethodMapping mapping =
+                new PojoMethodMapping(CovariantReturnServer.class, new ArrayList<>(), "/covariantReturn", null);
         Assert.assertEquals(CovariantReturnServer.class.getMethod("onOpen", Session.class), mapping.getOnOpen());
     }
 
 
     /*
-     * A non-annotated sub-class method that overrides an annotated super class method using a
-     * covariant return type should result in the super class method being ignored. Note that a
-     * compiler generated bridge method previously masked this in compiled code.
+     * A non-annotated sub-class method that overrides an annotated super class method using a covariant return type
+     * should result in the super class method being ignored. Note that a compiler generated bridge method previously
+     * masked this in compiled code.
      */
     @Test
     public void testCovariantReturnOverrideWithoutAnnotation() throws Exception {
@@ -150,13 +152,15 @@ public class TestPojoMethodMapping extends TomcatBaseTest {
 
 
     /*
-     * A sub-class method that is not an override of the annotated super class method must still
-     * be rejected as a duplicate annotation if it handles the same message type.
+     * A sub-class method that is not an override of the annotated super class method must still be rejected as a
+     * duplicate annotation if it handles the same message type.
      */
     @Test
     public void testAnnotatedMethodNotAnOverride() throws Exception {
         try {
-            new PojoMethodMapping(NotAnOverrideServer.class, new ArrayList<>(), "/notAnOverride", null);
+            @SuppressWarnings("unused")
+            PojoMethodMapping mapping =
+                    new PojoMethodMapping(NotAnOverrideServer.class, new ArrayList<>(), "/notAnOverride", null);
             Assert.fail("Expected a DeploymentException");
         } catch (DeploymentException de) {
             Assert.assertTrue("Unexpected message: " + de.getMessage(),

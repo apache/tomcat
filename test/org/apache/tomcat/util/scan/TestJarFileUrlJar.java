@@ -74,7 +74,7 @@ public class TestJarFileUrlJar {
         }
     }
 
-    private static List<String> entryNames(Jar jar) throws IOException {
+    private static List<String> entryNames(Jar jar) {
         List<String> names = new ArrayList<>();
         jar.nextEntry();
         while (jar.getEntryName() != null) {

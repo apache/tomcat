@@ -221,6 +221,7 @@ public class TestCaseInsensitiveKeyMap {
     }
 
 
+    @SuppressWarnings("unlikely-arg-type")
     @Test
     public void testKeySetContainsAndRemoveInvalidKeys() {
         CaseInsensitiveKeyMap<Object> map = new CaseInsensitiveKeyMap<>();

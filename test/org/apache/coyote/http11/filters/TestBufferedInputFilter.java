@@ -69,7 +69,7 @@ public class TestBufferedInputFilter {
      * belong to the body of this request.
      */
     @Test
-    public void testAvailableWithEmptyBody() throws IOException {
+    public void testAvailableWithEmptyBody() {
         BufferedInputFilter filter = new BufferedInputFilter(-1);
         filter.setLimit(1024);
         // The body is empty but the downstream buffer has data, for example
