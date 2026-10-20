@@ -62,7 +62,7 @@ public abstract class BackportBase {
      *
      * @param args array with a single element: the target directory path
      *
-     * @throws IOException if an I/O error occurs while reading translation files
+     * @throws IOException if an I/O error occurs
      */
     protected BackportBase(String... args) throws IOException {
         if (args.length != 1) {
@@ -89,6 +89,9 @@ public abstract class BackportBase {
         targetEnglish = targetTranslations.get("");
 
         storageDir = new File(targetRoot, Constants.STORAGE_DIR);
+        if (!storageDir.exists() && !storageDir.mkdirs()) {
+            throw new IOException("Unable to create directory [" + storageDir.getAbsolutePath() + "]");
+        }
     }
 
     /**
