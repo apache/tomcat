@@ -232,9 +232,7 @@ public class FileHandler extends Handler {
 
         final String tsDate;
         if (rotatable.booleanValue()) {
-            // Construct the timestamp we will use
-            Timestamp ts = new Timestamp(System.currentTimeMillis());
-            tsDate = ts.toString().substring(0, 10);
+            tsDate = obtainCurrentDate();
         } else {
             tsDate = "";
         }
@@ -449,7 +447,8 @@ public class FileHandler extends Handler {
 
 
     /**
-     * Open the new log file for the date specified by <code>date</code>.
+     * Open the new log file. If the handler is rotatable and no date has been set yet, the log file for the current
+     * date is opened.
      */
     public void open() {
         openWriter();
@@ -473,7 +472,16 @@ public class FileHandler extends Handler {
         FileOutputStream fos = null;
         OutputStream os = null;
         try {
-            File pathname = new File(dir.getAbsoluteFile(), prefix + (rotatable.booleanValue() ? date : "") + suffix);
+            // If no date has been set, typically because the handler has been opened before any record was
+            // published, use the current date, as publish() does when it rotates the log file, so the file
+            // name always matches the pattern used for rotation and cleanup
+            String currentDate = date;
+            boolean dateComputed = rotatable.booleanValue() && currentDate == null;
+            if (dateComputed) {
+                currentDate = obtainCurrentDate();
+            }
+            File pathname = new File(dir.getAbsoluteFile(),
+                    prefix + (rotatable.booleanValue() ? currentDate : "") + suffix);
             File parent = pathname.getParentFile();
             if (!parent.mkdirs() && !parent.isDirectory()) {
                 reportError("Unable to create [" + parent + "]", null, ErrorManager.OPEN_FAILURE);
@@ -486,6 +494,9 @@ public class FileHandler extends Handler {
             writer = new PrintWriter(
                     (encoding != null) ? new OutputStreamWriter(os, encoding) : new OutputStreamWriter(os), false);
             writer.write(getFormatter().getHead(this));
+            if (dateComputed) {
+                date = currentDate;
+            }
         } catch (Exception e) {
             reportError(null, e, ErrorManager.OPEN_FAILURE);
             writer = null;
@@ -506,6 +517,17 @@ public class FileHandler extends Handler {
         } finally {
             writerLock.writeLock().unlock();
         }
+    }
+
+    /**
+     * Obtain the date string used as the date part of the names of the rotatable log files.
+     *
+     * @return The current date, formatted as <code>YYYY-MM-DD</code>
+     */
+    private static String obtainCurrentDate() {
+        // Construct the timestamp we will use
+        Timestamp ts = new Timestamp(System.currentTimeMillis());
+        return ts.toString().substring(0, 10);
     }
 
     private void clean() {
