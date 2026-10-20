@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -64,6 +65,7 @@ import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.valves.TesterAccessLogValve;
+import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.unittest.TesterContext;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.EncodedSolidusHandling;
@@ -1003,6 +1005,24 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
+        CountDownLatch initialRequestReturned = new CountDownLatch(1);
+        // Wait for the initial request to leave the host's ErrorReportValve before triggering the async error.
+        tomcat.getEngine().getPipeline().addValve(new ValveBase(true) {
+            private final AtomicBoolean firstInvocation = new AtomicBoolean(true);
+
+            @Override
+            public void invoke(Request request, Response response) throws IOException, ServletException {
+                boolean first = firstInvocation.getAndSet(false);
+                try {
+                    getNext().invoke(request, response);
+                } finally {
+                    if (first) {
+                        initialRequestReturned.countDown();
+                    }
+                }
+            }
+        });
+
         // No file system docBase required
         Context ctx = getProgrammaticRootContext();
 
@@ -1011,7 +1031,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         wrapper.setAsyncSupported(true);
         ctx.addServletMapping("/stage1", "dispatch");
 
-        ErrorServlet error = new ErrorServlet();
+        ErrorServlet error = new ErrorServlet(initialRequestReturned);
         Tomcat.addServlet(ctx, "error", error);
         ctx.addServletMapping("/stage2", "error");
 
@@ -1061,15 +1081,26 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         private static final long serialVersionUID = 1L;
 
+        private final transient CountDownLatch initialRequestReturned;
+
+        ErrorServlet(CountDownLatch initialRequestReturned) {
+            this.initialRequestReturned = initialRequestReturned;
+        }
+
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             track("ErrorServletGet-");
-            try {
-                // Give the original thread a chance to exit the
-                // ErrorReportValve before we throw this exception
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                throw new ServletException(e);
+            if (initialRequestReturned != null) {
+                try {
+                    if (!initialRequestReturned.await(10, TimeUnit.SECONDS)) {
+                        track("InitialRequestDidNotReturn-");
+                        throw new ServletException("Initial request did not return through the pipeline");
+                    }
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    track("InitialRequestWaitInterrupted-");
+                    throw new ServletException(e);
+                }
             }
             throw new ServletException("Oops.");
         }
@@ -1211,7 +1242,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         // No file system docBase required
         Context ctx = getProgrammaticRootContext();
 
-        ErrorServlet error = new ErrorServlet();
+        ErrorServlet error = new ErrorServlet(null);
         Tomcat.addServlet(ctx, "error", error);
         ctx.addServletMapping("/error", "error");
 
@@ -1228,10 +1259,6 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         int rc = getUrl(url.toString(), new ByteChunk(), null);
 
         Assert.assertEquals(500, rc);
-
-        // Without this test may complete before access log has a chance to log
-        // the request
-        Thread.sleep(REQUEST_TIME);
 
         // Check the access log
         alv.validateAccessLog(1, 500, 0, REQUEST_TIME);
@@ -1263,10 +1290,6 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         int rc = getUrl(url.toString(), new ByteChunk(), null);
 
         Assert.assertEquals(HttpServletResponse.SC_BAD_REQUEST, rc);
-
-        // Without this test may complete before access log has a chance to log
-        // the request
-        Thread.sleep(REQUEST_TIME);
 
         // Check the access log
         alv.validateAccessLog(1, HttpServletResponse.SC_BAD_REQUEST, 0, REQUEST_TIME);
@@ -1362,10 +1385,6 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         } else {
             Assert.assertTrue(responseBody, responseBody.contains(AsyncErrorServlet.ERROR_MESSAGE));
         }
-
-        // Without this test may complete before access log has a chance to log
-        // the request
-        Thread.sleep(REQUEST_TIME);
 
         // Check the access log
         alv.validateAccessLog(1, HttpServletResponse.SC_BAD_REQUEST, 0, REQUEST_TIME);
