@@ -73,9 +73,15 @@ public class ResourceLinkFactory implements ObjectFactory {
      * @param globalContext The global naming context
      * @param localName     The local name of the resource
      * @param globalName    The global name of the resource
+     *
+     * @throws IllegalArgumentException if the local or global name is not specified
      */
     public static void registerGlobalResourceAccess(Context globalContext, String localName, String globalName) {
         validateGlobalContext(globalContext);
+        if (localName == null || globalName == null) {
+            throw new IllegalArgumentException(
+                    sm.getString("resourceLinkFactory.nullName", localName, globalName));
+        }
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         globalResourceRegistrations.computeIfAbsent(cl, k -> new ConcurrentHashMap<>()).put(localName, globalName);
     }
