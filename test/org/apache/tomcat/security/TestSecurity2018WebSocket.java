@@ -36,7 +36,7 @@ import org.apache.tomcat.websocket.TesterEchoServer;
 import org.apache.tomcat.websocket.TesterMessageCountClient;
 import org.apache.tomcat.websocket.WebSocketBaseTest;
 
-public class TestSecurity2018 extends WebSocketBaseTest {
+public class TestSecurity2018WebSocket extends WebSocketBaseTest {
 
     // https://www.cve.org/CVERecord?id=CVE-2018-8034
     @Test(expected = DeploymentException.class)
