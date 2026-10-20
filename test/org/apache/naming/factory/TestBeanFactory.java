@@ -64,4 +64,31 @@ public class TestBeanFactory {
         Assert.assertNotNull(result.getServer());
         Assert.assertEquals(IP_ADDRESS, result.getServer().getHostAddress());
     }
+
+
+    /*
+     * The description of a resource is a property of the resource definition
+     * and not a property of the bean, so the factory has to ignore it.
+     */
+    @Test
+    public void testDescriptionIsNotPassedToTheBean() throws Exception {
+
+        // Create the resource definition with a description
+        ResourceRef resourceRef = new ResourceRef(TesterBean.class.getName(), "The tester bean", null, null, false);
+        resourceRef.add(new StringRefAddr("server", IP_ADDRESS));
+
+        // Create the factory
+        BeanFactory factory = new BeanFactory();
+
+        // Use the factory to create the resource from the definition
+        Object obj = factory.getObjectInstance(resourceRef, null, null, null);
+
+        // Check the correct type was created
+        Assert.assertNotNull(obj);
+        Assert.assertEquals(obj.getClass(), TesterBean.class);
+        // Check the description was ignored and only the server field was set
+        TesterBean result = (TesterBean) obj;
+        Assert.assertNotNull(result.getServer());
+        Assert.assertEquals(IP_ADDRESS, result.getServer().getHostAddress());
+    }
 }
