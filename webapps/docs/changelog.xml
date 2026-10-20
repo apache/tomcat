@@ -484,14 +484,6 @@
         drop TLS 1.3 when rebuilding the list of enabled protocols during
         initialization. (dsoumis)
       </fix>
-      <fix>
-        Align the OCSP checking performed by the OpenSSL/Panama based
-        implementation of <code>SSLEngine</code> with the behaviour of the
-        JSSE based implementation so that a certificate that is itself a
-        trust anchor (whether a self-signed root or a certificate trusted
-        directly via the configured trust store) is not subject to OCSP
-        checking. (markt)
-      </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
         Keep the asynchronous timeout in place until the timeout event has
@@ -602,6 +594,14 @@
         length cannot be represented by this implementation due to Java's 32-bit
         signed <code>int</code> limitation rather than misreporting it as an
         invalid length. (michaelo)
+      </fix>
+      <fix>
+        Align the OCSP checking performed by the OpenSSL/Panama based
+        implementation of <code>SSLEngine</code> with the behaviour of the
+        JSSE based implementation so that a certificate that is itself a
+        trust anchor (whether a self-signed root or a certificate trusted
+        directly via the configured trust store) is not subject to OCSP
+        checking. (markt)
       </fix>
     </changelog>
   </subsection>
