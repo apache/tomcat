@@ -127,11 +127,11 @@ public class RepeatableArchive extends Task {
 
                             zipOut.putNextEntry(entry);
 
-                            InputStream is = oldZipFile.getInputStream(oldEntry);
-
-                            int numRead;
-                            while ((numRead = is.read(buf)) >= 0) {
-                                zipOut.write(buf, 0, numRead);
+                            try (InputStream is = oldZipFile.getInputStream(oldEntry)) {
+                                int numRead;
+                                while ((numRead = is.read(buf)) >= 0) {
+                                    zipOut.write(buf, 0, numRead);
+                                }
                             }
                         }
                     }
