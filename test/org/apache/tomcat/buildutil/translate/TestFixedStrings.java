@@ -17,6 +17,7 @@
 package org.apache.tomcat.buildutil.translate;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Properties;
 
 import org.junit.Assert;
@@ -25,13 +26,13 @@ import org.junit.Test;
 public class TestFixedStrings {
 
     @Test
-    public void testManagerApps() {
+    public void testManagerApps() throws IOException {
         doTestStartsWith("org.apache.catalina.manager", "OK -");
         doTestStartsWith("org.apache.catalina.manager.host", "OK -");
     }
 
 
-    private void doTestStartsWith(String packageName, String text) {
+    private void doTestStartsWith(String packageName, String text) throws IOException {
         File dir = new File("java/" + packageName.replace('.',  '/'));
 
         // English
@@ -52,7 +53,7 @@ public class TestFixedStrings {
     }
 
 
-    private void doTestStartsFile(File fileTranslated, Properties propsEn, String text) {
+    private void doTestStartsFile(File fileTranslated, Properties propsEn, String text) throws IOException {
         Properties propsTranslated = Utils.load(fileTranslated);
 
         for (Object key : propsEn.keySet()) {

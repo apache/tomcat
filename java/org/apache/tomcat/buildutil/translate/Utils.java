@@ -57,14 +57,12 @@ public class Utils {
     }
 
 
-    static Properties load(File f) {
+    static Properties load(File f) throws IOException {
         Properties props = new Properties();
 
         try (FileInputStream fis = new FileInputStream(f);
                 Reader r = new InputStreamReader(fis, StandardCharsets.UTF_8)) {
             props.load(r);
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
         }
         return props;
     }
