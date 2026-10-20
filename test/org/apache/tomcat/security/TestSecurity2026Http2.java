@@ -18,6 +18,7 @@ package org.apache.tomcat.security;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
@@ -26,14 +27,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import jakarta.servlet.AsyncContext;
-import jakarta.servlet.AsyncEvent;
-import jakarta.servlet.AsyncListener;
-import jakarta.servlet.ServletInputStream;
-import jakarta.servlet.ServletOutputStream;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.AsyncContext;
+import javax.servlet.AsyncEvent;
+import javax.servlet.AsyncListener;
+import javax.servlet.ServletInputStream;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -189,7 +190,7 @@ public class TestSecurity2026Http2 extends Http2TestBase {
                 Thread.sleep(VICTIM_HANDLER_MS); // e.g. authentication back-end
             } catch (InterruptedException ignore) {
             }
-            byte[] body = req.getInputStream().readAllBytes();
+            byte[] body = readFully(req.getInputStream());
             resp.setContentType("text/plain");
             resp.getOutputStream().write(("echo:" + body.length).getBytes(StandardCharsets.ISO_8859_1));
         }
@@ -307,5 +308,17 @@ public class TestSecurity2026Http2 extends Http2TestBase {
             bytes.write(part);
         }
         return bytes.toByteArray();
+    }
+
+
+    private static byte[] readFully(InputStream is) throws IOException {
+        byte[] buf = new byte[1024];
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            int read;
+            while ((read = is.read(buf)) >= 0) {
+                out.write(buf, 0, read);
+            }
+            return out.toByteArray();
+        }
     }
 }

@@ -123,7 +123,7 @@ public class TestAbstractReplicatedMap {
         AtomicInteger disappeared = new AtomicInteger();
         AtomicBoolean lockAvailable = new AtomicBoolean();
 
-        LazyReplicatedMap<String,String> map = new LazyReplicatedMap<>((key, value) -> {
+        LazyReplicatedMap<String,String> map = new LazyReplicatedMap<String,String>((key, value) -> {
             // Not made primary here
         }, new TestChannel(), 1000, "TestAbstractReplicatedMap", null) {
 
@@ -154,7 +154,7 @@ public class TestAbstractReplicatedMap {
         AtomicBoolean lockAvailable = new AtomicBoolean();
         AtomicInteger published = new AtomicInteger();
 
-        LazyReplicatedMap<String,String> map = new LazyReplicatedMap<>((key, value) -> {
+        LazyReplicatedMap<String,String> map = new LazyReplicatedMap<String,String>((key, value) -> {
             // Not made primary here
         }, new TestChannel(), 1000, "TestAbstractReplicatedMap", null) {
 

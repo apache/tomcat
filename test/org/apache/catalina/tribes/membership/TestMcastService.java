@@ -37,7 +37,7 @@ public class TestMcastService {
      */
     @Test(timeout = 60000)
     public void testStopWithFailingShutdownSendCompletes() throws Exception {
-        int base = 40000 + Math.floorMod(System.nanoTime(), 10000);
+        int base = 40000 + (int) Math.floorMod(System.nanoTime(), 10000);
         StringBuilder properties = new StringBuilder();
         properties.append("mcastAddress=228.0.0.4\n");
         properties.append("mcastPort=").append(base).append("\n");
@@ -166,7 +166,7 @@ public class TestMcastService {
      */
     @Test(timeout = 60000)
     public void testBroadcastRejectsPacketsTheSocketCannotCarry() throws Exception {
-        int base = 40000 + Math.floorMod(System.nanoTime(), 10000);
+        int base = 40000 + (int) Math.floorMod(System.nanoTime(), 10000);
         Properties props = new Properties();
         props.setProperty("mcastAddress", "228.0.0.4");
         props.setProperty("mcastPort", String.valueOf(base));

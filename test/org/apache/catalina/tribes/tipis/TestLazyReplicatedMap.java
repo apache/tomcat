@@ -37,7 +37,7 @@ public class TestLazyReplicatedMap {
 
         // A member added between the two steps of the selection, shown directly: one member in
         // the snapshot, an index computed for a member list that has meanwhile grown
-        LazyReplicatedMap<String,String> map = new LazyReplicatedMap<>((key, value) -> {
+        LazyReplicatedMap<String,String> map = new LazyReplicatedMap<String,String>((key, value) -> {
             // Not made primary here
         }, new GroupChannel(), 1000, "TestLazyReplicatedMap", null) {
 

@@ -38,46 +38,20 @@ import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
-import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.res.StringManager;
 
-public class TestAbstractAjpProcessor extends TomcatBaseTest {
+public class TestAbstractAjpProcessor extends AjpBaseTest {
 
     @Before
     @Override
     public void setUp() throws Exception {
         super.setUp();
 
-        Connector c = getTomcatInstance().getConnector();
-        c.setProperty("secretRequired", "false");
-        c.setProperty("allowedRequestAttributesPattern", "MYATTRIBUTE.*");
+        getTomcatInstance().getConnector().setProperty("allowedRequestAttributesPattern", "MYATTRIBUTE.*");
     }
 
-
-    @Override
-    protected String getProtocol() {
-        /*
-         * The tests are all setup for HTTP so need to convert the protocol values to AJP.
-         */
-        // Has a protocol been specified
-        String protocol = System.getProperty("tomcat.test.protocol");
-
-        // Use NIO by default
-        if (protocol == null) {
-            protocol = "org.apache.coyote.ajp.AjpNioProtocol";
-        } else if (protocol.contains("Nio2")) {
-            protocol = "org.apache.coyote.ajp.AjpNio2Protocol";
-        } else if (protocol.contains("Apr")) {
-            protocol = "org.apache.coyote.ajp.AjpAprProtocol";
-        } else {
-            protocol = "org.apache.coyote.ajp.AjpNioProtocol";
-        }
-
-        return protocol;
-    }
 
     private void doSnoopTest(RequestDescriptor desc) throws Exception {
 

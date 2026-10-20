@@ -19,13 +19,13 @@ package org.apache.coyote.ajp;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-import jakarta.servlet.AsyncContext;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletOutputStream;
-import jakarta.servlet.WriteListener;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.AsyncContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -34,14 +34,13 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.HexUtils;
 
 /*
  * Tests that can't easily be added to the {@code org.apache.tomcat.security} package because they need access to
  * package private classes.
  */
-public class TestAjpSecurity extends TomcatBaseTest {
+public class TestAjpSecurity extends AjpBaseTest {
 
 
     @Test
