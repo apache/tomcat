@@ -23,6 +23,10 @@ public class TesterBean {
 
     private InetAddress server;
 
+    private int limit;
+
+    private char letter;
+
     public InetAddress getServer() {
         return server;
     }
@@ -37,5 +41,21 @@ public class TesterBean {
         } catch (UnknownHostException e) {
             throw new IllegalArgumentException(e);
         }
+    }
+
+    public int getLimit() {
+        return limit;
+    }
+
+    public void setLimit(int limit) {
+        this.limit = limit;
+    }
+
+    public char getLetter() {
+        return letter;
+    }
+
+    public void setLetter(char letter) {
+        this.letter = letter;
     }
 }
