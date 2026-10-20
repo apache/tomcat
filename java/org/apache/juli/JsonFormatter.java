@@ -16,6 +16,9 @@
  */
 package org.apache.juli;
 
+import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.Set;
 import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 
@@ -93,11 +96,20 @@ public class JsonFormatter extends OneLineFormatter {
             // Stack trace
             sb.append("\"throwable\": [");
             boolean first = true;
+            // A cause chain may legally contain cycles (Throwable.initCause() only
+            // rejects a direct self-reference) so track the visited exceptions and
+            // stop the walk at the first repeated throwable, reporting it as a
+            // circular reference in the manner of Throwable.printStackTrace().
+            Set<Throwable> seen = Collections.newSetFromMap(new IdentityHashMap<>());
             do {
                 if (!first) {
                     sb.append(',');
                 } else {
                     first = false;
+                }
+                if (!seen.add(t)) {
+                    sb.append("\"[Circular reference] ").append(JSONFilter.escape(t.toString())).append('\"');
+                    break;
                 }
                 sb.append('\"').append(JSONFilter.escape(t.toString())).append('\"');
                 for (StackTraceElement element : t.getStackTrace()) {
