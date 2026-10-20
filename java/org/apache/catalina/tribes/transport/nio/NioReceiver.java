@@ -524,6 +524,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
                 try {
                     events();
                     socketTimeouts();
+                    @SuppressWarnings("null") // Suppress IDE false positive for selector
                     int n = selector.select(getSelectorTimeout());
                     if (n == 0) {
                         // there is a good chance that we got here

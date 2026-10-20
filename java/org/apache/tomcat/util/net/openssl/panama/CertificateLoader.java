@@ -564,8 +564,7 @@ public final class CertificateLoader {
             MemorySegment keyNative = arena.allocateFrom(ValueLayout.JAVA_BYTE, keyBytes);
             MemorySegment keyPtr = arena.allocate(ValueLayout.ADDRESS);
             keyPtr.set(ValueLayout.ADDRESS, 0, keyNative);
-            key = openssl_h.d2i_AutoPrivateKey(
-                    MemorySegment.NULL, keyPtr, (long) keyBytes.length);
+            key = openssl_h.d2i_AutoPrivateKey(MemorySegment.NULL, keyPtr, keyBytes.length);
             if (key.equals(MemorySegment.NULL)) {
                 return null;
             }
