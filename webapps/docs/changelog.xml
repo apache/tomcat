@@ -653,13 +653,17 @@
   <subsection name="Other">
     <changelog>
       <update>
-        Bump spotbugs to 4.10.4.
+        Bump spotbugs to 4.10.4. (schultz)
       </update>
       <update>
         <bug>69902</bug>: Change the ZIP distribution to store the same file
         and directory permissions as the tar.gz distribution so that the
         scripts in <code>bin</code> are executable when the archive is
-        extracted on a Unix platform.
+        extracted on a Unix platform. (schultz)
+      </update>
+      <update>
+        Avoid re-evaluation of command-line arguments in tool-wrapper.sh.
+        (schultz)
       </update>
     </changelog>
   </subsection>
