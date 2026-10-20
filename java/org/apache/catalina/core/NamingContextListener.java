@@ -649,7 +649,17 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
      */
     public void addEjb(ContextEjb ejb) {
 
-        Reference ref = lookForLookupRef(ejb);
+        // The type of an EJB reference descriptor is the type of the reference
+        // itself, which is "Entity" or "Session" and never a class name, so the
+        // interface which the application expects is used as the type of a
+        // lookup reference. No type is given when the descriptor names no
+        // interface, which leaves the type of the looked up object unchecked.
+        String lookupName = ejb.getLookupName();
+        Reference ref = null;
+        if (lookupName != null && !lookupName.isEmpty()) {
+            String beanType = ejb.getRemote() != null ? ejb.getRemote() : ejb.getHome();
+            ref = new LookupRef(beanType, lookupName);
+        }
 
         if (ref == null) {
             // Create a reference to the EJB.
