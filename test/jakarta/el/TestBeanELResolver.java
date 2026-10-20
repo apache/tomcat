@@ -417,10 +417,9 @@ public class TestBeanELResolver extends ELBaseTest {
     }
 
     /**
-     * Tests that a call to a public method on a non-public class, where the
-     * method is not exposed via a public interface or super class, throws a
-     * MethodNotFoundException rather than producing a NullPointerException
-     * from the use of the null result of the method search.
+     * Tests that a call to a public method on a non-public class, where the method is not exposed via a public
+     * interface or super class, throws a MethodNotFoundException rather than producing a NullPointerException from the
+     * use of the null result of the method search.
      */
     @Test(expected = MethodNotFoundException.class)
     public void testInvokeNonPublicClass01() {
@@ -431,8 +430,8 @@ public class TestBeanELResolver extends ELBaseTest {
     }
 
     /**
-     * Tests the same behaviour as testInvokeNonPublicClass01() for a method
-     * with parameters, which is resolved via the slower, broader logic.
+     * Tests the same behaviour as testInvokeNonPublicClass01() for a method with parameters, which is resolved via the
+     * slower, broader logic.
      */
     @Test(expected = MethodNotFoundException.class)
     public void testInvokeNonPublicClass02() {
@@ -444,8 +443,7 @@ public class TestBeanELResolver extends ELBaseTest {
     }
 
     /**
-     * Tests that a public method on a non-public class is invoked normally
-     * when it is exposed via a public interface.
+     * Tests that a public method on a non-public class is invoked normally when it is exposed via a public interface.
      */
     @Test
     public void testInvokeNonPublicClass03() {
@@ -974,9 +972,10 @@ public class TestBeanELResolver extends ELBaseTest {
 
 
     /*
-     * Deliberately not public. The methods are only accessible via this class
-     * so, for the purposes of the EL, they are not accessible at all.
+     * Deliberately not public. The methods are only accessible via this class so, for the purposes of the EL, they are
+     * not accessible at all.
      */
+    @SuppressWarnings("unused")
     private static class NonPublicBean {
 
         public String getName() {

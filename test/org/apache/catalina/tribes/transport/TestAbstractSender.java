@@ -102,20 +102,27 @@ public class TestAbstractSender {
         Assert.assertEquals("txBufSize", expected.getTxBufSize(), actual.getTxBufSize());
         Assert.assertEquals("udpRxBufSize", expected.getUdpRxBufSize(), actual.getUdpRxBufSize());
         Assert.assertEquals("udpTxBufSize", expected.getUdpTxBufSize(), actual.getUdpTxBufSize());
-        Assert.assertEquals("directBuffer", expected.getDirectBuffer(), actual.getDirectBuffer());
+        Assert.assertEquals("directBuffer", Boolean.valueOf(expected.getDirectBuffer()),
+                Boolean.valueOf(actual.getDirectBuffer()));
         Assert.assertEquals("keepAliveCount", expected.getKeepAliveCount(), actual.getKeepAliveCount());
         Assert.assertEquals("keepAliveTime", expected.getKeepAliveTime(), actual.getKeepAliveTime());
         Assert.assertEquals("timeout", expected.getTimeout(), actual.getTimeout());
         Assert.assertEquals("maxRetryAttempts", expected.getMaxRetryAttempts(), actual.getMaxRetryAttempts());
-        Assert.assertEquals("tcpNoDelay", expected.getTcpNoDelay(), actual.getTcpNoDelay());
-        Assert.assertEquals("soKeepAlive", expected.getSoKeepAlive(), actual.getSoKeepAlive());
-        Assert.assertEquals("ooBInline", expected.getOoBInline(), actual.getOoBInline());
-        Assert.assertEquals("soReuseAddress", expected.getSoReuseAddress(), actual.getSoReuseAddress());
-        Assert.assertEquals("soLingerOn", expected.getSoLingerOn(), actual.getSoLingerOn());
+        Assert.assertEquals("tcpNoDelay", Boolean.valueOf(expected.getTcpNoDelay()),
+                Boolean.valueOf(actual.getTcpNoDelay()));
+        Assert.assertEquals("soKeepAlive", Boolean.valueOf(expected.getSoKeepAlive()),
+                Boolean.valueOf(actual.getSoKeepAlive()));
+        Assert.assertEquals("ooBInline", Boolean.valueOf(expected.getOoBInline()),
+                Boolean.valueOf(actual.getOoBInline()));
+        Assert.assertEquals("soReuseAddress", Boolean.valueOf(expected.getSoReuseAddress()),
+                Boolean.valueOf(actual.getSoReuseAddress()));
+        Assert.assertEquals("soLingerOn", Boolean.valueOf(expected.getSoLingerOn()),
+                Boolean.valueOf(actual.getSoLingerOn()));
         Assert.assertEquals("soLingerTime", expected.getSoLingerTime(), actual.getSoLingerTime());
         Assert.assertEquals("soTrafficClass", expected.getSoTrafficClass(), actual.getSoTrafficClass());
-        Assert.assertEquals("throwOnFailedAck", expected.getThrowOnFailedAck(), actual.getThrowOnFailedAck());
-        Assert.assertEquals("udpBased", expected.isUdpBased(), actual.isUdpBased());
+        Assert.assertEquals("throwOnFailedAck", Boolean.valueOf(expected.getThrowOnFailedAck()),
+                Boolean.valueOf(actual.getThrowOnFailedAck()));
+        Assert.assertEquals("udpBased", Boolean.valueOf(expected.isUdpBased()), Boolean.valueOf(actual.isUdpBased()));
         Assert.assertEquals("sslContext", expected.getSslContext(), actual.getSslContext());
     }
 }

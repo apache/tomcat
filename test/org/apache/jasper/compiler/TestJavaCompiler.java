@@ -89,7 +89,7 @@ public class TestJavaCompiler {
                 .andReturn(javaFile.getAbsolutePath()).anyTimes();
         EasyMock.expect(ctxt.getClassPath())
                 .andReturn(System.getProperty("java.class.path")).anyTimes();
-        EasyMock.expect(ctxt.keepGenerated()).andReturn(false).anyTimes();
+        EasyMock.expect(Boolean.valueOf(ctxt.keepGenerated())).andReturn(Boolean.FALSE).anyTimes();
         EasyMock.replay(ctxt);
 
         JavaCompiler compiler = new JavaCompiler();

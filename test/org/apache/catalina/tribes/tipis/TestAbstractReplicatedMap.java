@@ -42,8 +42,8 @@ import org.apache.catalina.tribes.tipis.AbstractReplicatedMap.MapMessage;
 public class TestAbstractReplicatedMap {
 
     /*
-     * The channel resolves any looked up member directly, so that a member can be added to the map
-     * members without starting a channel.
+     * The channel resolves any looked up member directly, so that a member can be added to the map members without
+     * starting a channel.
      */
     private static final class TestChannel extends GroupChannel {
 
@@ -62,8 +62,8 @@ public class TestAbstractReplicatedMap {
     }
 
     /*
-     * A value whose first serialization blocks until it is released, to simulate the long lasting
-     * serialization of a full map content.
+     * A value whose first serialization blocks until it is released, to simulate the long lasting serialization of a
+     * full map content.
      */
     private static final class BlockingValue implements Serializable {
 
@@ -94,8 +94,8 @@ public class TestAbstractReplicatedMap {
     }
 
     /*
-     * Whether another thread could enter the given monitor while the current thread stays inside
-     * the operation that is expected to run outside of that monitor.
+     * Whether another thread could enter the given monitor while the current thread stays inside the operation that is
+     * expected to run outside of that monitor.
      */
     private static boolean monitorAvailable(Object monitor, long timeoutMs) {
         CountDownLatch acquired = new CountDownLatch(1);
@@ -115,9 +115,9 @@ public class TestAbstractReplicatedMap {
     }
 
     /*
-     * The expiry handling of the ping aborts the entries of a timed out member, which sends to the
-     * remaining members and may block until they acknowledge. It must not run while holding the
-     * map members lock, since every session operation needs that lock.
+     * The expiry handling of the ping aborts the entries of a timed out member, which sends to the remaining members
+     * and may block until they acknowledge. It must not run while holding the map members lock, since every session
+     * operation needs that lock.
      */
     @Test
     public void testPingExpiresOutsideMapMembersLock() throws Exception {
@@ -125,10 +125,9 @@ public class TestAbstractReplicatedMap {
         AtomicInteger disappeared = new AtomicInteger();
         AtomicBoolean lockAvailable = new AtomicBoolean();
 
-        LazyReplicatedMap<String,String> map = new LazyReplicatedMap<String,String>(
-                (key, value) -> {
-                    // Not made primary here
-                }, new TestChannel(), 1000, "TestAbstractReplicatedMap", null) {
+        LazyReplicatedMap<String,String> map = new LazyReplicatedMap<>((key, value) -> {
+            // Not made primary here
+        }, new TestChannel(), 1000, "TestAbstractReplicatedMap", null) {
 
             @Override
             public void memberDisappeared(Member disappearedMember) {
@@ -147,9 +146,9 @@ public class TestAbstractReplicatedMap {
     }
 
     /*
-     * Adding a member selects backups for the primary entries that have none, which blocks until
-     * the selected backups acknowledge. That must not run while holding the state lock, since the
-     * state transfer of joining members needs that lock.
+     * Adding a member selects backups for the primary entries that have none, which blocks until the selected backups
+     * acknowledge. That must not run while holding the state lock, since the state transfer of joining members needs
+     * that lock.
      */
     @Test
     public void testMapMemberAddedPublishesOutsideStateLock() throws Exception {
@@ -157,10 +156,9 @@ public class TestAbstractReplicatedMap {
         AtomicBoolean lockAvailable = new AtomicBoolean();
         AtomicInteger published = new AtomicInteger();
 
-        LazyReplicatedMap<String,String> map = new LazyReplicatedMap<String,String>(
-                (key, value) -> {
-                    // Not made primary here
-                }, new TestChannel(), 1000, "TestAbstractReplicatedMap", null) {
+        LazyReplicatedMap<String,String> map = new LazyReplicatedMap<>((key, value) -> {
+            // Not made primary here
+        }, new TestChannel(), 1000, "TestAbstractReplicatedMap", null) {
 
             @Override
             protected Member[] publishEntryInfo(Object key, Object value) {
@@ -182,19 +180,17 @@ public class TestAbstractReplicatedMap {
     }
 
     /*
-     * Answering a state request serializes the whole map content, which must not happen while
-     * holding the state lock, since it blocks the state transfer of other joining members for the
-     * duration of that serialization.
+     * Answering a state request serializes the whole map content, which must not happen while holding the state lock,
+     * since it blocks the state transfer of other joining members for the duration of that serialization.
      */
     @Test
     public void testStateRequestSerializesOutsideStateLock() throws Exception {
         CountDownLatch release = new CountDownLatch(1);
         BlockingValue value = new BlockingValue(release);
 
-        LazyReplicatedMap<String,BlockingValue> map = new LazyReplicatedMap<String,BlockingValue>(
-                (key, val) -> {
-                    // Not made primary here
-                }, new TestChannel(), 1000, "TestAbstractReplicatedMap", null);
+        LazyReplicatedMap<String,BlockingValue> map = new LazyReplicatedMap<>((key, val) -> {
+            // Not made primary here
+        }, new TestChannel(), 1000, "TestAbstractReplicatedMap", null);
         map.put("key", value);
 
         MapMessage stateRequest = new MapMessage("TestAbstractReplicatedMap".getBytes(StandardCharsets.UTF_8),
@@ -224,18 +220,16 @@ public class TestAbstractReplicatedMap {
     }
 
     /*
-     * The put silently accepts keys that cannot be replicated, so the remove must not fail on such
-     * a key either, but just skip the notification to the other members. The removal previously
-     * threw an unchecked exception from the message construction, which also escaped a put that
-     * replaced such an entry before the new value was stored.
+     * The put silently accepts keys that cannot be replicated, so the remove must not fail on such a key either, but
+     * just skip the notification to the other members. The removal previously threw an unchecked exception from the
+     * message construction, which also escaped a put that replaced such an entry before the new value was stored.
      */
     @Test
     public void testRemoveNonSerializableKeySkipsNotification() throws Exception {
         TestChannel channel = new TestChannel();
-        LazyReplicatedMap<Object,String> map = new LazyReplicatedMap<Object,String>(
-                (key, value) -> {
-                    // Not made primary here
-                }, channel, 1000, "TestAbstractReplicatedMap", null);
+        LazyReplicatedMap<Object,String> map = new LazyReplicatedMap<>((key, value) -> {
+            // Not made primary here
+        }, channel, 1000, "TestAbstractReplicatedMap", null);
         map.memberAlive(new MemberImpl("localhost", 4016, -1));
 
         Object key = new Object();
@@ -247,16 +241,15 @@ public class TestAbstractReplicatedMap {
     }
 
     /*
-     * A put stores an entry with a null value, so the size must count it like the entry and key
-     * views do. The size previously filtered such an entry out, breaking the map contract that the
-     * size equals the size of the entry set, and the isEmpty inherited the inconsistency.
+     * A put stores an entry with a null value, so the size must count it like the entry and key views do. The size
+     * previously filtered such an entry out, breaking the map contract that the size equals the size of the entry set,
+     * and the isEmpty inherited the inconsistency.
      */
     @Test
     public void testSizeCountsActiveEntriesWithNullValue() throws Exception {
-        LazyReplicatedMap<String,String> map = new LazyReplicatedMap<String,String>(
-                (key, value) -> {
-                    // Not made primary here
-                }, new TestChannel(), 1000, "TestAbstractReplicatedMap", null);
+        LazyReplicatedMap<String,String> map = new LazyReplicatedMap<>((key, value) -> {
+            // Not made primary here
+        }, new TestChannel(), 1000, "TestAbstractReplicatedMap", null);
         map.put("key", "value");
         map.put("other", null);
 
@@ -291,24 +284,22 @@ public class TestAbstractReplicatedMap {
     }
 
     /*
-     * A received backup request carries its key only in serialized form. The reply must deserialize
-     * that key with the loaders of the map, like the other receive paths do, and must fail the
-     * request without throwing when the key cannot be deserialized, so that the requester gets a
-     * normal timeout instead of being answered by a failure of the responder.
+     * A received backup request carries its key only in serialized form. The reply must deserialize that key with the
+     * loaders of the map, like the other receive paths do, and must fail the request without throwing when the key
+     * cannot be deserialized, so that the requester gets a normal timeout instead of being answered by a failure of the
+     * responder.
      */
     @Test
     public void testBackupRequestDeserializesKeyOfReceivedMessage() throws Exception {
-        LazyReplicatedMap<Object,String> map = new LazyReplicatedMap<Object,String>(
-                (key, value) -> {
-                    // Not made primary here
-                }, new TestChannel(), 1000, "TestAbstractReplicatedMap", null);
+        LazyReplicatedMap<Object,String> map = new LazyReplicatedMap<>((key, value) -> {
+            // Not made primary here
+        }, new TestChannel(), 1000, "TestAbstractReplicatedMap", null);
         map.put(new SerialKey("key"), "value");
         Member sender = new MemberImpl("localhost", 4017, -1);
 
         // Round trip over the serialization to get a message with the key data but no live key
-        byte[] wire = XByteBuffer.serialize(new MapMessage(
-                "TestAbstractReplicatedMap".getBytes(StandardCharsets.UTF_8), MapMessage.MSG_RETRIEVE_BACKUP, false,
-                new SerialKey("key"), null, null, null, null));
+        byte[] wire = XByteBuffer.serialize(new MapMessage("TestAbstractReplicatedMap".getBytes(StandardCharsets.UTF_8),
+                MapMessage.MSG_RETRIEVE_BACKUP, false, new SerialKey("key"), null, null, null, null));
 
         MapMessage received = (MapMessage) XByteBuffer.deserialize(wire);
         Serializable reply = map.replyRequest(received, sender);

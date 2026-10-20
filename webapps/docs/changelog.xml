@@ -595,6 +595,14 @@
         signed <code>int</code> limitation rather than misreporting it as an
         invalid length. (michaelo)
       </fix>
+      <fix>
+        Align the OCSP checking performed by the OpenSSL/Panama based
+        implementation of <code>SSLEngine</code> with the behaviour of the
+        JSSE based implementation so that a certificate that is itself a
+        trust anchor (whether a self-signed root or a certificate trusted
+        directly via the configured trust store) is not subject to OCSP
+        checking. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -737,6 +745,15 @@
   <subsection name="Cluster">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        When the cluster receiver automatically binds to a port other than the
+        configured port, retain the configured <code>port</code>,
+        <code>securePort</code> and <code>udpPort</code> values and expose the
+        bound ports via the new read-only <code>boundPort</code>,
+        <code>boundSecurePort</code> and <code>boundUdpPort</code> properties
+        so that the configured values are not lost when the configuration is
+        stored. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

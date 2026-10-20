@@ -22,7 +22,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
@@ -99,7 +99,8 @@ public class TestJarFileUrlNestedJar {
         String nestedPath = "WEB-INF/lib/nested.jar";
         File war = createWar(nestedPath);
 
-        try (Jar jar = new JarFileUrlNestedJar(new URL("jar:file:" + war.getAbsolutePath() + "!/" + nestedPath))) {
+        try (Jar jar =
+                new JarFileUrlNestedJar(new URI("jar:file:" + war.getAbsolutePath() + "!/" + nestedPath).toURL())) {
             Assert.assertTrue(jar.exists(TEST_ENTRY));
             Assert.assertArrayEquals(TEST_CONTENT, readJar(jar));
         }
@@ -107,15 +108,15 @@ public class TestJarFileUrlNestedJar {
 
 
     /*
-     * A percent-encoded entry name must resolve to the same entry that the JDK resolves it to, rather than
-     * resulting in a JAR with no usable content.
+     * A percent-encoded entry name must resolve to the same entry that the JDK resolves it to, rather than resulting in
+     * a JAR with no usable content.
      */
     @Test
     public void testEncodedEntryName() throws Exception {
         File war = createWar("WEB-INF/lib/my jar.jar");
 
         try (Jar jar = new JarFileUrlNestedJar(
-                new URL("jar:file:" + war.getAbsolutePath() + "!/WEB-INF/lib/my%20jar.jar"))) {
+                new URI("jar:file:" + war.getAbsolutePath() + "!/WEB-INF/lib/my%20jar.jar").toURL())) {
             Assert.assertTrue(jar.exists(TEST_ENTRY));
             Assert.assertArrayEquals(TEST_CONTENT, readJar(jar));
         }
@@ -123,42 +124,42 @@ public class TestJarFileUrlNestedJar {
 
 
     /*
-     * A URL that does not refer to an existing entry must fail when the JAR is constructed rather than later when
-     * the content is accessed.
+     * A URL that does not refer to an existing entry must fail when the JAR is constructed rather than later when the
+     * content is accessed.
      */
     @Test
     public void testMissingEntryThrows() throws Exception {
         File war = createWar("WEB-INF/lib/nested.jar");
 
         Assert.assertThrows(IOException.class, () -> new JarFileUrlNestedJar(
-                new URL("jar:file:" + war.getAbsolutePath() + "!/WEB-INF/lib/missing.jar")));
+                new URI("jar:file:" + war.getAbsolutePath() + "!/WEB-INF/lib/missing.jar").toURL()));
     }
 
 
     /*
-     * A URL that does not name an entry (it refers to the whole archive) must fail when the JAR is constructed
-     * rather than later when the content is accessed. JarFactory routes such URLs elsewhere. This covers direct
-     * construction of JarFileUrlNestedJar with such a URL.
+     * A URL that does not name an entry (it refers to the whole archive) must fail when the JAR is constructed rather
+     * than later when the content is accessed. JarFactory routes such URLs elsewhere. This covers direct construction
+     * of JarFileUrlNestedJar with such a URL.
      */
     @Test
     public void testEmptyEntryNameThrows() throws Exception {
         File war = createWar("WEB-INF/lib/nested.jar");
 
         Assert.assertThrows(FileNotFoundException.class,
-                () -> new JarFileUrlNestedJar(new URL("jar:file:" + war.getAbsolutePath() + "!/")));
+                () -> new JarFileUrlNestedJar(new URI("jar:file:" + war.getAbsolutePath() + "!/").toURL()));
     }
 
 
     /*
-     * A URL that does not contain the JAR entry separator must fail with an IOException before the JAR can be used.
-     * In practice the JDK's jar URL handler rejects such a spec ("no !/ in spec") with a MalformedURLException when
-     * the URL is created, so a URL of this form never reaches JarFileUrlNestedJar via JarFactory.
+     * A URL that does not contain the JAR entry separator must fail with an IOException before the JAR can be used. In
+     * practice the JDK's jar URL handler rejects such a spec ("no !/ in spec") with a MalformedURLException when the
+     * URL is created, so a URL of this form never reaches JarFileUrlNestedJar via JarFactory.
      */
     @Test
     public void testMissingSeparatorThrows() throws Exception {
         File war = createWar("WEB-INF/lib/nested.jar");
 
         Assert.assertThrows(IOException.class,
-                () -> new JarFileUrlNestedJar(new URL("jar:file:" + war.getAbsolutePath() + "!x")));
+                () -> new JarFileUrlNestedJar(new URI("jar:file:" + war.getAbsolutePath() + "!x").toURL()));
     }
 }

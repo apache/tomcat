@@ -296,7 +296,7 @@ public class UpgradeServletInputStream extends ServletInputStream {
     }
 
 
-    private void onError(Throwable t) {
+    final void onError(Throwable t) {
         if (listener == null || errorReported) {
             return;
         }

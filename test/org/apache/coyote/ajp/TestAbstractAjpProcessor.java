@@ -38,44 +38,20 @@ import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
-import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.res.StringManager;
 
-public class TestAbstractAjpProcessor extends TomcatBaseTest {
+public class TestAbstractAjpProcessor extends AjpBaseTest {
 
     @Before
     @Override
     public void setUp() throws Exception {
         super.setUp();
 
-        Connector c = getTomcatInstance().getConnector();
-        c.setProperty("secretRequired", "false");
-        c.setProperty("allowedRequestAttributesPattern", "MYATTRIBUTE.*");
+        getTomcatInstance().getConnector().setProperty("allowedRequestAttributesPattern", "MYATTRIBUTE.*");
     }
 
-
-    @Override
-    protected String getProtocol() {
-        /*
-         * The tests are all setup for HTTP so need to convert the protocol values to AJP.
-         */
-        // Has a protocol been specified
-        String protocol = System.getProperty("tomcat.test.protocol");
-
-        // Use NIO by default
-        if (protocol == null) {
-            protocol = "org.apache.coyote.ajp.AjpNioProtocol";
-        } else if (protocol.contains("Nio2")) {
-            protocol = "org.apache.coyote.ajp.AjpNio2Protocol";
-        } else {
-            protocol = "org.apache.coyote.ajp.AjpNioProtocol";
-        }
-
-        return protocol;
-    }
 
     private void doSnoopTest(RequestDescriptor desc) throws Exception {
 
@@ -995,10 +971,10 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
     }
 
 
-    /**
+    /*
      * Process response header packet and checks the status. Any other data is ignored.
      */
-    private Map<String, List<String>> validateResponseHeaders(TesterAjpMessage message, int expectedStatus,
+    static Map<String, List<String>> validateResponseHeaders(TesterAjpMessage message, int expectedStatus,
             String expectedMessage) throws Exception {
         // First two bytes should always be AB
         Assert.assertEquals((byte) 'A', message.buf[0]);
@@ -1088,7 +1064,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         Assert.assertEquals(Boolean.valueOf(expectedReuse), Boolean.valueOf(reuse));
     }
 
-    private void validateCpong(TesterAjpMessage message) throws Exception {
+    static void validateCpong(TesterAjpMessage message) throws Exception {
         // First two bytes should always be AB
         Assert.assertEquals((byte) 'A', message.buf[0]);
         Assert.assertEquals((byte) 'B', message.buf[1]);

@@ -54,6 +54,11 @@ public class UpgradeProcessorExternal extends UpgradeProcessorBase {
     private final UpgradeInfo upgradeInfo;
 
     /**
+     * The socket wrapper for the upgraded connection.
+     */
+    private final SocketWrapperBase<?> wrapper;
+
+    /**
      * Constructs a new UpgradeProcessorExternal.
      *
      * @param wrapper the socket wrapper
@@ -63,6 +68,7 @@ public class UpgradeProcessorExternal extends UpgradeProcessorBase {
     public UpgradeProcessorExternal(SocketWrapperBase<?> wrapper, UpgradeToken upgradeToken,
             UpgradeGroupInfo upgradeGroupInfo) {
         super(upgradeToken);
+        this.wrapper = wrapper;
         this.upgradeInfo = new UpgradeInfo();
         if (upgradeGroupInfo != null) {
             upgradeInfo.setGroupInfo(upgradeGroupInfo);
@@ -131,6 +137,26 @@ public class UpgradeProcessorExternal extends UpgradeProcessorBase {
             if (log.isTraceEnabled()) {
                 log.trace(sm.getString("upgradeProcessor.stop"));
             }
+            try {
+                upgradeServletInputStream.close();
+            } catch (IOException ioe) {
+                log.debug(sm.getString("upgradeProcessor.isCloseFail", ioe));
+            }
+            try {
+                upgradeServletOutputStream.close();
+            } catch (IOException ioe) {
+                log.debug(sm.getString("upgradeProcessor.osCloseFail", ioe));
+            }
+            return SocketState.CLOSED;
+        } else if (status == SocketEvent.ERROR) {
+            // Give the listeners (if any) the chance to handle the error before
+            // the connection is closed.
+            Throwable error = wrapper.getError();
+            if (error == null) {
+                error = new IOException(sm.getString("upgradeProcessor.error"));
+            }
+            upgradeServletInputStream.onError(error);
+            upgradeServletOutputStream.onError(error);
             try {
                 upgradeServletInputStream.close();
             } catch (IOException ioe) {

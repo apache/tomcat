@@ -180,13 +180,13 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
                 if (localMember instanceof StaticMember staticMember) {
                     // static member
                     staticMember.setHost(getClusterReceiver().getHost());
-                    staticMember.setPort(getClusterReceiver().getPort());
-                    staticMember.setSecurePort(getClusterReceiver().getSecurePort());
+                    staticMember.setPort(getClusterReceiver().getBoundPort());
+                    staticMember.setSecurePort(getClusterReceiver().getBoundSecurePort());
                 } else {
                     // multicast member
                     membershipService.setLocalMemberProperties(getClusterReceiver().getHost(),
-                            getClusterReceiver().getPort(), getClusterReceiver().getSecurePort(),
-                            getClusterReceiver().getUdpPort());
+                            getClusterReceiver().getBoundPort(), getClusterReceiver().getBoundSecurePort(),
+                            getClusterReceiver().getBoundUdpPort());
                 }
                 valid = true;
             }
