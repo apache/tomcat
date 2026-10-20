@@ -764,7 +764,15 @@ public class TestManagerWebapp extends TomcatBaseTest {
         Assert.assertTrue("CSRF nonce not found in manager HTML response", m.find());
         String nonce = m.group(1);
 
-        Assert.assertNotNull("Session cookie not found", client.getSessionId());
+        String sessionCookie = null;
+        for (String header : client.getResponseHeaders()) {
+            if (header.startsWith("Set-Cookie:")) {
+                String cookieValue = header.substring("Set-Cookie:".length()).trim();
+                sessionCookie = cookieValue.split(";")[0];
+                break;
+            }
+        }
+        Assert.assertNotNull("Session cookie not found", sessionCookie);
 
         // Access sessions list page with the CSRF nonce
         // @formatter:off
@@ -774,7 +782,7 @@ public class TestManagerWebapp extends TomcatBaseTest {
                     " HTTP/1.1" + CRLF +
                     "Host: localhost" + CRLF +
                     "Authorization: " + basicHeader + CRLF +
-                    "Cookie: JSESSIONID=" + client.getSessionId() + CRLF +
+                    "Cookie: " + sessionCookie + CRLF +
                     "Connection: Close" + CRLF +
                     CRLF
                 });
@@ -793,6 +801,7 @@ public class TestManagerWebapp extends TomcatBaseTest {
                 "&sessionType=Primary&maxInactiveInterval=123";
 
         // Update the maximum inactive interval from the session detail page
+        // Authentication may have changed the session ID, so use the latest cookie for the POST.
         // @formatter:off
         client.setRequestPause(0);
         client.setRequest(new String[] {

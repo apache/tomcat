@@ -875,7 +875,7 @@ public class HTMLManagerServlet extends ManagerServlet {
                             smClient.getString("htmlManagerServlet.sessionTimeoutUpdated", sessionId, intervalParam));
                 } else {
                     req.setAttribute(APPLICATION_ERROR,
-                            smClient.getString("htmlManagerServlet.sessionNotFound", sessionId));
+                            smClient.getString("htmlManagerServlet.sessionTimeoutNotUpdated", sessionId));
                 }
             } catch (NumberFormatException nfe) {
                 req.setAttribute(APPLICATION_ERROR,
@@ -1121,7 +1121,16 @@ public class HTMLManagerServlet extends ManagerServlet {
     protected boolean setSessionMaxInactiveInterval(ContextName cn, String sessionId, int maxInactiveInterval,
             StringManager smClient) {
         Session session = getSessionForNameAndId(cn, sessionId, smClient);
-        if (session == null || session.getSession() == null) {
+        if (session == null) {
+            if (debug >= 1) {
+                log("Cannot update maximum inactive interval for null session " + sessionId);
+            }
+            return false;
+        }
+        if (session.getSession() == null) {
+            if (debug >= 1) {
+                log("Cannot update maximum inactive interval for session with null HTTP session " + sessionId);
+            }
             return false;
         }
         try {
