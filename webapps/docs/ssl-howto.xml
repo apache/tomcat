@@ -498,11 +498,12 @@ attributes.</p>
 
 <p>On Windows, Tomcat can read certificates directly from the Windows certificate
 store. Set <strong>certificateKeystoreType</strong> to
-<code>Windows-MY-LOCALMACHINE</code> for the local machine store (this store type
-requires Java 17.0.5, 19, or a later release; earlier releases only provide
-<code>Windows-MY</code>, the current user's store). This works well with AD CS
-autoenrollment, which issues and renews the machine's certificates
-automatically.</p>
+<code>Windows-MY-LOCALMACHINE</code> for the local machine store, or to
+<code>Windows-MY</code> for the current user's store. Reading the local machine
+store from a Tomcat service that is not running with elevated privileges requires
+Java 17.0.17, 21.0.9, 24, or a later release; on earlier releases the service must
+run with elevated privileges. This works well with AD CS autoenrollment, which
+issues and renews the machine's certificates automatically.</p>
 
 <p>The local machine store usually contains several certificates issued for the
 machine's name, such as a TLS server certificate and a Remote Desktop
