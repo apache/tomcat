@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -131,10 +133,10 @@ public class Txt2Html extends Task {
         // Open files:
         try (BufferedReader in =
                 new BufferedReader(new InputStreamReader(new FileInputStream(from), SOURCE_ENCODING))) {
-            try (PrintWriter out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(to), "UTF-8"))) {
+            try (Writer out = new OutputStreamWriter(new FileOutputStream(to), StandardCharsets.UTF_8)) {
 
                 // Output header:
-                out.print("<!DOCTYPE html><html><head><meta charset=\"UTF-8\" />" +
+                out.write("<!DOCTYPE html><html><head><meta charset=\"UTF-8\" />" +
                         "<title>Source Code</title></head><body><pre>");
 
                 // Convert, line-by-line:
@@ -155,11 +157,11 @@ public class Txt2Html extends Task {
                                 result.append(c);
                         }
                     }
-                    out.print(result.toString() + LINE_SEPARATOR);
+                    out.write(result.toString() + LINE_SEPARATOR);
                 }
 
                 // Output footer:
-                out.print("</pre></body></html>");
+                out.write("</pre></body></html>");
 
             }
         }
