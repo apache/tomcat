@@ -20,6 +20,7 @@ import java.util.function.Function;
 
 import jakarta.el.ELBaseTest;
 import jakarta.el.ELContext;
+import jakarta.el.ELManager;
 import jakarta.el.ELProcessor;
 import jakarta.el.ExpressionFactory;
 import jakarta.el.MethodExpression;
@@ -767,7 +768,7 @@ public class TestMethodExpressionImpl extends ELBaseTest {
         elp.defineBean("beanK", bean);
         ELContext elpContext = elp.getELManager().getELContext();
 
-        MethodExpression me = elp.getELManager().getExpressionFactory().createMethodExpression(elpContext,
+        MethodExpression me = ELManager.getExpressionFactory().createMethodExpression(elpContext,
                 "${beanK.child.format(beanK.next())}", String.class, null);
 
         MethodReference ref = me.getMethodReference(elpContext);

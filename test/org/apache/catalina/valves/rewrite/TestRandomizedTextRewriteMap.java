@@ -37,16 +37,14 @@ public class TestRandomizedTextRewriteMap {
 
     @Test
     public void testSingleSpaceSeparation() throws Exception {
-        RandomizedTextRewriteMap map =
-                new RandomizedTextRewriteMap(createMapFile("key value\n"), false);
+        RandomizedTextRewriteMap map = new RandomizedTextRewriteMap(createMapFile("key value\n"), false);
         Assert.assertEquals("value", map.lookup("key"));
     }
 
     @Test
     public void testTabSeparation() throws Exception {
         // mod_rewrite separates key and value by any whitespace
-        RandomizedTextRewriteMap map =
-                new RandomizedTextRewriteMap(createMapFile("key\tvalue\n"), false);
+        RandomizedTextRewriteMap map = new RandomizedTextRewriteMap(createMapFile("key\tvalue\n"), false);
         Assert.assertEquals("value", map.lookup("key"));
     }
 
@@ -54,15 +52,13 @@ public class TestRandomizedTextRewriteMap {
     public void testMultipleWhitespaceSeparation() throws Exception {
         // A single space was required before, which silently added the extra
         // whitespace to the start of the value
-        RandomizedTextRewriteMap map =
-                new RandomizedTextRewriteMap(createMapFile("key  \tvalue\n"), false);
+        RandomizedTextRewriteMap map = new RandomizedTextRewriteMap(createMapFile("key  \tvalue\n"), false);
         Assert.assertEquals("value", map.lookup("key"));
     }
 
     @Test
     public void testWhitespaceAroundEntry() throws Exception {
-        RandomizedTextRewriteMap map = new RandomizedTextRewriteMap(
-                createMapFile("  key value  \n"), false);
+        RandomizedTextRewriteMap map = new RandomizedTextRewriteMap(createMapFile("  key value  \n"), false);
         Assert.assertEquals("value", map.lookup("key"));
     }
 
@@ -70,29 +66,25 @@ public class TestRandomizedTextRewriteMap {
     public void testIndentedCommentLine() throws Exception {
         // An indentation before the comment marker used to make the line
         // look like an entry without a value and fail the map start up
-        RandomizedTextRewriteMap map = new RandomizedTextRewriteMap(
-                createMapFile("  # comment\nkey value\n"), false);
+        RandomizedTextRewriteMap map = new RandomizedTextRewriteMap(createMapFile("  # comment\nkey value\n"), false);
         Assert.assertEquals("value", map.lookup("key"));
     }
 
     @Test
     public void testCommentAfterValue() throws Exception {
-        RandomizedTextRewriteMap map = new RandomizedTextRewriteMap(
-                createMapFile("key value # comment\n"), false);
+        RandomizedTextRewriteMap map = new RandomizedTextRewriteMap(createMapFile("key value # comment\n"), false);
         Assert.assertEquals("value", map.lookup("key"));
     }
 
     @Test
     public void testValueMayContainWhitespace() throws Exception {
-        RandomizedTextRewriteMap map = new RandomizedTextRewriteMap(
-                createMapFile("key one two\n"), false);
+        RandomizedTextRewriteMap map = new RandomizedTextRewriteMap(createMapFile("key one two\n"), false);
         Assert.assertEquals("one two", map.lookup("key"));
     }
 
     @Test
     public void testRandomValues() throws Exception {
-        RandomizedTextRewriteMap map = new RandomizedTextRewriteMap(
-                createMapFile("key one|two\n"), true);
+        RandomizedTextRewriteMap map = new RandomizedTextRewriteMap(createMapFile("key one|two\n"), true);
         Set<String> possible = new HashSet<>();
         Set<String> seen = new HashSet<>();
         possible.add("one");
@@ -109,15 +101,15 @@ public class TestRandomizedTextRewriteMap {
 
     @Test
     public void testUnknownKeyResolvesToNull() throws Exception {
-        RandomizedTextRewriteMap map =
-                new RandomizedTextRewriteMap(createMapFile("key value\n"), false);
+        RandomizedTextRewriteMap map = new RandomizedTextRewriteMap(createMapFile("key value\n"), false);
         Assert.assertNull(map.lookup("other"));
     }
 
     @Test
     public void testLineWithoutValueThrows() throws Exception {
         try {
-            new RandomizedTextRewriteMap(createMapFile("key\n"), false);
+            @SuppressWarnings("unused")
+            RandomizedTextRewriteMap map = new RandomizedTextRewriteMap(createMapFile("key\n"), false);
             Assert.fail("IAE expected.");
         } catch (IllegalArgumentException e) {
             // expected, an entry without a value is invalid

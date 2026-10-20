@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.ssi;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Collection;
@@ -41,7 +40,7 @@ public class TestSSIFsize {
     }
 
 
-    private String formatSize(long size, String format) throws IOException {
+    private String formatSize(long size, String format) {
         SSIMediator mediator = new SSIMediator(new TesterSSIExternalResolver(size), 0);
         mediator.setConfigSizeFmt(format);
         StringWriter stringWriter = new StringWriter();

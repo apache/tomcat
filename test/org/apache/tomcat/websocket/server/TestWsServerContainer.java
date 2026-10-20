@@ -486,8 +486,7 @@ public class TestWsServerContainer extends WebSocketBaseTest {
 
     public static class NoMethodsEndpoint extends Endpoint {
         @Override
-        public void onOpen(@SuppressWarnings("unused") Session session,
-                @SuppressWarnings("unused") EndpointConfig config) {
+        public void onOpen(Session session, EndpointConfig config) {
             // NO-OP
         }
     }
