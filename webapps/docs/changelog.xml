@@ -509,6 +509,19 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        When the cluster receiver automatically binds to a port other than the
+        configured port, retain the configured <code>port</code>,
+        <code>securePort</code> and <code>udpPort</code> values and expose the
+        bound ports via the new read-only <code>boundPort</code>,
+        <code>boundSecurePort</code> and <code>boundUdpPort</code> properties
+        so that the configured values are not lost when the configuration is
+        stored. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <fix>

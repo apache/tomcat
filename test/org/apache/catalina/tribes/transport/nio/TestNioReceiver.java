@@ -17,18 +17,27 @@
 package org.apache.catalina.tribes.transport.nio;
 
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.lang.reflect.Field;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.ServerSocketChannel;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.tribes.group.GroupChannel;
+import org.apache.catalina.tribes.jmx.JmxRegistry;
+import org.apache.catalina.tribes.transport.RxTaskPool;
 
 public class TestNioReceiver {
 
@@ -178,6 +187,111 @@ public class TestNioReceiver {
             }
         }
         assertReleased(receiver);
+    }
+
+    @Test
+    public void testFailedStartReleasesResourcesAndCanRestart() throws Exception {
+        GroupChannel channel = new GroupChannel();
+        channel.setName("TestNioReceiver-" + System.nanoTime());
+        NioReceiver receiver = new NioReceiver();
+        receiver.setChannel(channel);
+        receiver.setAddress("127.0.0.1");
+        receiver.setPort(0);
+        receiver.setAutoBind(1);
+        receiver.setSoReuseAddress(false);
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        receiver.setExecutor(executor);
+        MBeanServer mbeanServer = ManagementFactory.getPlatformMBeanServer();
+        ObjectName objectName = new ObjectName("ClusterChannel:type=Channel,channel=" + channel.getName() +
+                ",component=Receiver");
+        try {
+            int udpPort;
+            try (DatagramSocket blocker = new DatagramSocket(0, InetAddress.getByName("127.0.0.1"))) {
+                udpPort = blocker.getLocalPort();
+                receiver.setUdpPort(udpPort);
+                Assert.assertThrows(IOException.class, receiver::start);
+                assertReleased(receiver);
+                Assert.assertEquals(-1, receiver.getBoundPort());
+                Assert.assertEquals(-1, receiver.getBoundSecurePort());
+                Assert.assertEquals(-1, receiver.getBoundUdpPort());
+                Assert.assertFalse(receiver.isListening());
+                Assert.assertNull(receiver.getExecutor());
+                Assert.assertTrue(executor.isShutdown());
+                Assert.assertNull(receiver.getChannel());
+                Assert.assertFalse(mbeanServer.isRegistered(objectName));
+            }
+
+            // As on a normal restart, the coordinator must reattach the channel before starting the receiver.
+            receiver.setChannel(channel);
+            receiver.start();
+            long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
+            while (!receiver.isListening() && System.nanoTime() < deadline) {
+                Thread.sleep(50);
+            }
+            Assert.assertTrue("the receiver did not start after the UDP port was released", receiver.isListening());
+            Assert.assertTrue(receiver.getBoundPort() > 0);
+            Assert.assertEquals(udpPort, receiver.getBoundUdpPort());
+            Assert.assertEquals(0, receiver.getPort());
+            Assert.assertEquals(udpPort, receiver.getUdpPort());
+            Assert.assertFalse(receiver.getExecutor().isShutdown());
+            Assert.assertTrue(mbeanServer.isRegistered(objectName));
+        } finally {
+            receiver.stop();
+            JmxRegistry.removeRegistry(channel, true);
+        }
+        assertReleased(receiver);
+        Assert.assertFalse(mbeanServer.isRegistered(objectName));
+    }
+
+    @Test
+    public void testStopBeforeListenClosesBoundDatagramChannel() throws Exception {
+        NioReceiver receiver = new NioReceiver();
+        receiver.setChannel(new GroupChannel());
+        receiver.setAddress("127.0.0.1");
+        receiver.setPort(0);
+        receiver.setUdpPort(45678);
+        try {
+            receiver.bind();
+            Field field = NioReceiver.class.getDeclaredField("datagramChannel");
+            field.setAccessible(true);
+            DatagramChannel datagramChannel = (DatagramChannel) field.get(receiver);
+            Assert.assertTrue(datagramChannel.isOpen());
+            receiver.stop();
+            Assert.assertFalse("stop must close UDP even before listen registers it", datagramChannel.isOpen());
+            assertReleased(receiver);
+        } finally {
+            receiver.stop();
+        }
+    }
+
+    @Test
+    public void testPoolFailurePreservesCauseAndSuppressedCleanupFailure() {
+        RuntimeException startupFailure = new IllegalStateException("pool initialization failed");
+        RuntimeException cleanupFailure = new IllegalStateException("cleanup failed");
+        NioReceiver receiver = new NioReceiver() {
+            @Override
+            public void setPool(RxTaskPool pool) {
+                throw startupFailure;
+            }
+
+            @Override
+            public void stop() {
+                super.stop();
+                throw cleanupFailure;
+            }
+        };
+        receiver.setChannel(new GroupChannel());
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        receiver.setExecutor(executor);
+        try {
+            IOException ioe = Assert.assertThrows(IOException.class, receiver::start);
+            Assert.assertSame(startupFailure, ioe.getCause());
+            Assert.assertArrayEquals(new Throwable[] { cleanupFailure }, startupFailure.getSuppressed());
+            Assert.assertTrue(executor.isShutdown());
+            Assert.assertNull(receiver.getExecutor());
+        } finally {
+            executor.shutdownNow();
+        }
     }
 
     private void assertReleased(NioReceiver receiver) throws Exception {
