@@ -134,7 +134,7 @@ public class Request implements HttpServletRequest {
      * The default value of the maximum number of locales to parse from the Accept-Language header(s). Must match the
      * default of the maxLocaleCount attribute of the Connector with which a Request is associated.
      */
-    private static final int DEFAULT_MAX_LOCALE_COUNT = 10;
+    private static final int DEFAULT_MAX_LOCALE_COUNT = -1;
 
     /*
      * Use AcceptLanguage2 parser rather than the StandardAcceptLanguageParser.

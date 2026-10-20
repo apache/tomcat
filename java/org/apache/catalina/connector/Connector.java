@@ -246,9 +246,9 @@ public class Connector extends LifecycleMBeanBase {
 
     /**
      * The maximum number of locales permitted for a request. Requests that exceed this limit will be rejected when
-     * the locales are parsed. Use a value less than zero for no limit. Defaults to 10.
+     * the locales are parsed. Use a value less than zero for no limit. Defaults to -1.
      */
-    private int maxLocaleCount = 10;
+    private int maxLocaleCount = -1;
 
     /**
      * The maximum number of parameters (GET plus POST) which will be automatically parsed by the container. 1000 by

@@ -823,7 +823,7 @@ public class TestRequest extends TomcatBaseTest {
      */
     @Test
     public void testAcceptLanguageLocaleLimitConfigurable() throws Exception {
-        // Connector default of 10 permits exactly 10 locales
+        // Connector of 10 permits exactly 10 locales
         Assert.assertEquals(10, localeCount(new Connector(), buildAcceptLanguage(10)));
 
         // Explicit limit is enforced
@@ -878,7 +878,7 @@ public class TestRequest extends TomcatBaseTest {
     public void testAcceptLanguageLocaleLimitHeaderFlood() throws Exception {
         Connector connector = new Connector();
 
-        // Default limit of 10. A header with far more tags than the
+        // Limit of 10. A header with far more tags than the
         // limit is rejected.
         try {
             localeCount(connector, buildAcceptLanguage(5000));
@@ -898,7 +898,7 @@ public class TestRequest extends TomcatBaseTest {
      */
     @Test
     public void testAcceptLanguageLocaleLimitMultipleHeaders() throws Exception {
-        // 5 + 5 = 10, within the default limit
+        // 5 + 5 = 10, within the limit
         Assert.assertEquals(10, localeCount(new Connector(), "aa-000,aa-001,aa-002,aa-003,aa-004",
                 "aa-005,aa-006,aa-007,aa-008,aa-009"));
 
