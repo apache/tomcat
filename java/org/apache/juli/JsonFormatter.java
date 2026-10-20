@@ -139,11 +139,14 @@ public class JsonFormatter extends OneLineFormatter {
         /**
          * Escape the given string.
          *
-         * @param input the string
+         * @param input the string. A null value is handled as an empty string.
          *
          * @return the escaped string
          */
         public static String escape(String input) {
+            if (input == null) {
+                return "";
+            }
             return escape(input, 0, input.length()).toString();
         }
 
