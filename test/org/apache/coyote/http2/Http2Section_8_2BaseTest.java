@@ -33,19 +33,22 @@ import org.apache.tomcat.util.http.parser.HttpParser;
 
 /**
  * Unit tests for Section 8.2 of <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>.
+ * <p>
+ * The character ranges are split across concrete test classes so they can run in parallel.
  */
 @RunWith(Parameterized.class)
-public class TestHttp2Section_8_2 extends Http2TestBase {
+public abstract class Http2Section_8_2BaseTest extends Http2TestBase {
 
-    @Parameterized.Parameters(name = "{index}: {0} {1} {2} {3} {4}")
-    public static Collection<Object[]> parameters() {
+    protected static Collection<Object[]> parameters(int startInclusive, int endExclusive) {
         Collection<Object[]> baseData = data();
 
         List<Object[]> parameterSets = new ArrayList<>();
         for (Object[] base : baseData) {
-            parameterSets.add(new Object[] { base[0], base[1], "x-test", "x-value", Boolean.TRUE });
+            if (startInclusive == 0) {
+                parameterSets.add(new Object[] { base[0], base[1], "x-test", "x-value", Boolean.TRUE });
+            }
             // Strings longer than 5 characters will be huffman encoded
-            for (char c = 0; c < 256; c++) {
+            for (char c = (char) startInclusive; c < endExclusive; c++) {
                 // HTTP/2 field names must be tokens and must be lower case
                 boolean valid = HttpParser.isToken(c) && !Character.isUpperCase(c);
                 // Non-Huffman field names
