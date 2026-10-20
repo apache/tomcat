@@ -354,9 +354,13 @@ public class SelectorContext implements Context {
             Context initialContext = ContextBindings.getContext(ICName);
             if (initialContext == null) {
                 // Allocating a new context and binding it to the appropriate
-                // name
-                initialContext = new NamingContext(env, ICName);
-                ContextBindings.bindContext(ICName, initialContext);
+                // name. Other threads may do the same for the same name at the
+                // same time, so the context which is returned is the one which
+                // ended up being bound rather than the one which was created
+                // here. Otherwise the bindings made on a context which was not
+                // bound would not be visible to the other threads using that
+                // name.
+                initialContext = ContextBindings.bindContextIfAbsent(ICName, new NamingContext(env, ICName), null);
             }
             return initialContext;
         } else {
