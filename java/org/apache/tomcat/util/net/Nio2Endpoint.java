@@ -514,6 +514,7 @@ public class Nio2Endpoint extends AbstractNetworkChannelEndpoint<Nio2Channel,Asy
         private final CompletionHandler<Integer,ByteBuffer> readCompletionHandler;
         private boolean readInterest = false; // Guarded by readCompletionHandler
         private boolean readNotify = false;
+        private boolean readEof = false; // Guarded by readCompletionHandler
 
         private final CompletionHandler<Integer,ByteBuffer> writeCompletionHandler;
         private final CompletionHandler<Long,ByteBuffer[]> gatheringWriteCompletionHandler;
@@ -616,17 +617,18 @@ public class Nio2Endpoint extends AbstractNetworkChannelEndpoint<Nio2Channel,Asy
                     synchronized (readCompletionHandler) {
                         readNotify = false;
                         if (nBytes.intValue() < 0) {
-                            failed(new EOFException(), attachment);
-                        } else {
-                            if (readInterest && !isInline()) {
-                                readNotify = true;
-                            } else {
-                                // Release here since there will be no
-                                // notify/dispatch to do the release.
-                                readPending.release();
-                            }
-                            readInterest = false;
+                            // End of input is not an error. Record it so the
+                            // next read reports it to the caller as -1.
+                            readEof = true;
                         }
+                        if (readInterest && !isInline()) {
+                            readNotify = true;
+                        } else {
+                            // Release here since there will be no
+                            // notify/dispatch to do the release.
+                            readPending.release();
+                        }
+                        readInterest = false;
                         notify = readNotify;
                     }
                     if (notify) {
@@ -788,8 +790,14 @@ public class Nio2Endpoint extends AbstractNetworkChannelEndpoint<Nio2Channel,Asy
                     readPending.release();
                     return true;
                 }
-                // Try to read some data
-                boolean isReady = fillReadBuffer(false) > 0;
+                // End of input has been reached. A read will return -1.
+                if (readEof) {
+                    readPending.release();
+                    return true;
+                }
+                // Try to read some data. A negative value is end of input and
+                // a read is possible (it will return -1).
+                boolean isReady = fillReadBuffer(false) != 0;
                 if (!isReady) {
                     readInterest = true;
                 }
@@ -860,6 +868,17 @@ public class Nio2Endpoint extends AbstractNetworkChannelEndpoint<Nio2Channel,Asy
             }
 
             int nRead = populateReadBuffer(b, off, len);
+            if (nRead <= 0) {
+                synchronized (readCompletionHandler) {
+                    if (readEof) {
+                        // Buffer is empty and the end of input has been
+                        // reached
+                        readNotify = false;
+                        readPending.release();
+                        return -1;
+                    }
+                }
+            }
             if (nRead > 0) {
                 // The code that was notified is now reading its data
                 synchronized (readCompletionHandler) {
@@ -924,6 +943,17 @@ public class Nio2Endpoint extends AbstractNetworkChannelEndpoint<Nio2Channel,Asy
             }
 
             int nRead = populateReadBuffer(to);
+            if (nRead <= 0) {
+                synchronized (readCompletionHandler) {
+                    if (readEof) {
+                        // Buffer is empty and the end of input has been
+                        // reached
+                        readNotify = false;
+                        readPending.release();
+                        return -1;
+                    }
+                }
+            }
             if (nRead > 0) {
                 // The code that was notified is now reading its data
                 synchronized (readCompletionHandler) {
@@ -1164,7 +1194,7 @@ public class Nio2Endpoint extends AbstractNetworkChannelEndpoint<Nio2Channel,Asy
                 getSocket().read(to, toTimeout(getReadTimeout()), TimeUnit.MILLISECONDS, to, readCompletionHandler);
                 endInline();
                 if (readPending.availablePermits() == 1) {
-                    nRead = to.position();
+                    nRead = readEof ? -1 : to.position();
                 }
             }
             return nRead;
@@ -1392,7 +1422,7 @@ public class Nio2Endpoint extends AbstractNetworkChannelEndpoint<Nio2Channel,Asy
                 if (readPending.tryAcquire()) {
                     // No read pending, so do a read
                     try {
-                        if (fillReadBuffer(false) > 0) {
+                        if (fillReadBuffer(false) != 0) {
                             // Special case where the read completed inline, there is no notification
                             // in that case so it has to be done here
                             if (!getEndpoint().processSocket(this, SocketEvent.OPEN_READ, true)) {
