@@ -23,6 +23,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -115,6 +117,47 @@ public class TestFileHandler {
         Assert.assertTrue(logsDir.list().length == 17);
 
         fh1.close();
+    }
+
+    /*
+     * Opening a rotatable handler before any record has been published must open the log file for the current date,
+     * rather than a file whose name contains the string representation of the unset date. The same applies when a
+     * closed handler is opened again.
+     */
+    @Test
+    public void testOpenUsesCurrentDate() throws Exception {
+        String prefix = "opendate.";
+        String suffix = ".log";
+
+        FileHandler fh = new FileHandler(logsDir.getAbsolutePath(), prefix, suffix);
+        fh.open();
+
+        String today = LocalDate.now().toString();
+        File expected = new File(logsDir, prefix + today + suffix);
+        Assert.assertTrue("Expected file [" + expected + "] was not created", expected.isFile());
+
+        // Publishing after the open must use the file that was opened, not rotate to a new one
+        fh.publish(new LogRecord(Level.INFO, "hello"));
+        Assert.assertTrue("The published record was not written to [" + expected + "]",
+                Files.readString(expected.toPath()).contains("hello"));
+        Assert.assertEquals(1, countFiles(prefix));
+
+        // Reopening a closed handler must not create a file with an unset date either
+        fh.close();
+        fh.open();
+        Assert.assertEquals(1, countFiles(prefix));
+
+        fh.close();
+    }
+
+    private int countFiles(String prefix) {
+        int count = 0;
+        for (File file : logsDir.listFiles()) {
+            if (file.getName().startsWith(prefix)) {
+                count++;
+            }
+        }
+        return count;
     }
 
     private void generateLogFiles(File dir, String prefix, String suffix, int amount)
