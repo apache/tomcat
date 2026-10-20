@@ -28,18 +28,21 @@ public class TestTldResourcePath {
 
     @Test(expected = IllegalArgumentException.class)
     public void testNullUrlRejectedTwoArg() {
-        new TldResourcePath(null, "/WEB-INF/tld/test.tld");
+        @SuppressWarnings("unused")
+        TldResourcePath path = new TldResourcePath(null, "/WEB-INF/tld/test.tld");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testNullUrlRejectedThreeArg() {
-        new TldResourcePath(null, "/WEB-INF/lib/test.jar", "META-INF/test.tld");
+        @SuppressWarnings("unused")
+        TldResourcePath path = new TldResourcePath(null, "/WEB-INF/lib/test.jar", "META-INF/test.tld");
     }
 
     @Test
     public void testNullUrlMessage() {
         try {
-            new TldResourcePath(null, "/WEB-INF/tld/test.tld");
+            @SuppressWarnings("unused")
+            TldResourcePath path = new TldResourcePath(null, "/WEB-INF/tld/test.tld");
             Assert.fail("Expected an IllegalArgumentException");
         } catch (IllegalArgumentException e) {
             String expected = StringManager.getManager(TldResourcePath.class)

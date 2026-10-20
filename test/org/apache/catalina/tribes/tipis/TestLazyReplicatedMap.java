@@ -26,10 +26,10 @@ import org.apache.catalina.tribes.membership.MemberImpl;
 public class TestLazyReplicatedMap {
 
     /*
-     * The backup node selection snapshots the members and computes an index against the current
-     * members in two steps. A member added in between lets the index point behind the end of the
-     * snapshot, which aborted the publication with an array index out of bounds exception, losing
-     * the entry that was being stored. The index must fall back to the start of the snapshot.
+     * The backup node selection snapshots the members and computes an index against the current members in two steps. A
+     * member added in between lets the index point behind the end of the snapshot, which aborted the publication with
+     * an array index out of bounds exception, losing the entry that was being stored. The index must fall back to the
+     * start of the snapshot.
      */
     @Test
     public void testBackupIndexBeyondMemberSnapshotFallsBack() throws Exception {
@@ -37,10 +37,9 @@ public class TestLazyReplicatedMap {
 
         // A member added between the two steps of the selection, shown directly: one member in
         // the snapshot, an index computed for a member list that has meanwhile grown
-        LazyReplicatedMap<String,String> map = new LazyReplicatedMap<String,String>(
-                (key, value) -> {
-                    // Not made primary here
-                }, new GroupChannel(), 1000, "TestLazyReplicatedMap", null) {
+        LazyReplicatedMap<String,String> map = new LazyReplicatedMap<>((key, value) -> {
+            // Not made primary here
+        }, new GroupChannel(), 1000, "TestLazyReplicatedMap", null) {
 
             @Override
             public Member[] getMapMembers() {

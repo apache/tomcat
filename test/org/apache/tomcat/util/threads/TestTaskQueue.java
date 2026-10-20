@@ -27,6 +27,8 @@ public class TestTaskQueue {
 
     private static class CountingTaskQueue extends TaskQueue {
 
+        private static final long serialVersionUID = 1L;
+
         private final AtomicInteger pollCount = new AtomicInteger();
 
         @Override

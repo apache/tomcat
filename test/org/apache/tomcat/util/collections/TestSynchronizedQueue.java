@@ -118,12 +118,14 @@ public class TestSynchronizedQueue {
 
     @Test(expected = IllegalArgumentException.class)
     public void testZeroInitialSizeRejected() {
-        new SynchronizedQueue<>(0);
+        @SuppressWarnings("unused")
+        SynchronizedQueue<Object> queue = new SynchronizedQueue<>(0);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testNegativeInitialSizeRejected() {
-        new SynchronizedQueue<>(-1);
+        @SuppressWarnings("unused")
+        SynchronizedQueue<Object> queue = new SynchronizedQueue<>(-1);
     }
 
     @Test

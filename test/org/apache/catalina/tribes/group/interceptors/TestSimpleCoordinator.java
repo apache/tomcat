@@ -80,8 +80,8 @@ public class TestSimpleCoordinator {
         Assert.assertNotNull("The view must be installed", view);
         Assert.assertEquals("The view holds the remote member and the local member", 2, view.length);
         Assert.assertSame(view[0], coordinator.getCoordinator());
-        Assert.assertEquals("isCoordinator must agree with the view",
-                local.equals(view[0]), coordinator.isCoordinator());
+        Assert.assertEquals("isCoordinator must agree with the view", Boolean.valueOf(local.equals(view[0])),
+                Boolean.valueOf(coordinator.isCoordinator()));
         Assert.assertEquals("A single view change must be reported", 1, coordinator.views.size());
         Assert.assertSame(view, coordinator.views.get(0));
     }
@@ -105,7 +105,6 @@ public class TestSimpleCoordinator {
         Assert.assertFalse("Second install thread did not finish", second.isAlive());
 
         Assert.assertEquals("The view must be installed", 2, coordinator.getView().length);
-        Assert.assertEquals("Installing the same view concurrently must notify once",
-                1, coordinator.views.size());
+        Assert.assertEquals("Installing the same view concurrently must notify once", 1, coordinator.views.size());
     }
 }
