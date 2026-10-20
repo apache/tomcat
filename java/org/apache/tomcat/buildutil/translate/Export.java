@@ -52,7 +52,7 @@ public class Export {
     }
 
 
-    private static void outputTranslations() {
+    private static void outputTranslations() throws IOException {
 
         File storageDir = new File(Constants.STORAGE_DIR);
         if (!storageDir.exists()) {
