@@ -27,6 +27,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -99,6 +100,10 @@ public class TestLargeClientHello extends TomcatBaseTest {
 
     @Test
     public void testClientHelloLargerThanParseLimit() throws Exception {
+        // sniParseLimit and the SNI fallback are only implemented for the JSSE based endpoints (NIO and NIO2)
+        Assume.assumeFalse(
+                "org.apache.coyote.http11.Http11AprProtocol".equals(System.getProperty("tomcat.test.protocol")));
+
         Tomcat tomcat = getTomcatInstance();
 
         Context ctx = getProgrammaticRootContext();
@@ -132,8 +137,8 @@ public class TestLargeClientHello extends TomcatBaseTest {
             out.write(record);
             out.flush();
 
-            String sniDefault = TomcatBaseTest.getKeyFromPropertiesFile("org.apache.tomcat.util.net",
-                    "channel.nio.ssl.sniDefault");
+            String sniDefault =
+                    TomcatBaseTest.getKeyFromPropertiesFile("org.apache.tomcat.util.net", "channel.nio.ssl.sniDefault");
 
             // The fallback to the default SSLHostConfig is logged once the extraction returns UNDERFLOW
             long start = System.currentTimeMillis();
