@@ -695,7 +695,6 @@ public class ClassLoaderLogManager extends LogManager {
                     // The specification strongly implies all configuration should be done
                     // during the creation of the handler object.
                     // This includes setting level, filter, formatter and encoding.
-                    this.prefix.set(null);
                     info.handlers.put(handlerName, handler);
                     if (rootHandlers == null) {
                         localRootLogger.addHandler(handler);
@@ -704,6 +703,10 @@ public class ClassLoaderLogManager extends LogManager {
                     // Report error
                     System.err.println("Handler error");
                     e.printStackTrace();
+                } finally {
+                    // Clear the prefix even when the handler could not be created, so a
+                    // stale prefix does not affect property resolution on this thread
+                    this.prefix.set(null);
                 }
             }
 

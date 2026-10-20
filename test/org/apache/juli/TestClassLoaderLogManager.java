@@ -116,6 +116,30 @@ public class TestClassLoaderLogManager {
     }
 
     /*
+     * The prefix of a handler must not remain set on the configuring thread after the instantiation of the handler
+     * fails, as subsequent property lookups on that thread would otherwise first be resolved against the prefixed
+     * properties of the failed handler.
+     */
+    @Test
+    public void testStaleHandlerPrefixAfterHandlerFailure() throws IOException {
+        final String config = "handlers = 10Foo.MissingHandler" + System.lineSeparator()
+                + "10Foo.marker = STALE_PREFIX_VALUE" + System.lineSeparator()
+                + "marker = CLEAN_VALUE" + System.lineSeparator();
+        final ClassLoader cl = new TestClassLoader(config.getBytes(StandardCharsets.UTF_8));
+        final Thread currentThread = Thread.currentThread();
+        final ClassLoader oldCL = currentThread.getContextClassLoader();
+        try {
+            currentThread.setContextClassLoader(cl);
+            final ClassLoaderLogManager logManager = new ClassLoaderLogManager();
+            logManager.readConfiguration();
+            // The failed handler must not leave its prefix behind for this thread
+            Assert.assertEquals("CLEAN_VALUE", logManager.getProperty("marker"));
+        } finally {
+            currentThread.setContextClassLoader(oldCL);
+        }
+    }
+
+    /*
      * reconfigure() must replace the configuration and apply it to the loggers that already exist (which a container
      * class holds a static reference to), unlike readConfiguration() which only configures loggers created afterwards.
      */
@@ -295,8 +319,15 @@ public class TestClassLoaderLogManager {
 
     private static class TestClassLoader extends URLClassLoader implements WebappProperties {
 
+        private final byte[] loggingProperties;
+
         TestClassLoader() {
+            this(EMPTY_BYTES);
+        }
+
+        TestClassLoader(byte[] loggingProperties) {
             super(new URL[0]);
+            this.loggingProperties = loggingProperties;
         }
 
 
@@ -332,7 +363,7 @@ public class TestClassLoaderLogManager {
         @Override
         public InputStream getResourceAsStream(final String resource) {
             if ("logging.properties".equals(resource)) {
-                return new ByteArrayInputStream(EMPTY_BYTES);
+                return new ByteArrayInputStream(loggingProperties);
             }
             return null;
         }
