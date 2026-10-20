@@ -18,6 +18,8 @@ package org.apache.juli.logging;
 
 import java.lang.reflect.Constructor;
 import java.nio.file.FileSystems;
+import java.util.Iterator;
+import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.logging.LogManager;
 
@@ -70,16 +72,23 @@ public class LogFactory {
         FileSystems.getDefault();
 
         // Look via a ServiceLoader for a Log implementation that has a
-        // constructor taking the String name.
+        // constructor taking the String name. Providers that cannot be
+        // loaded or that do not expose the required constructor are
+        // ignored, so a malformed provider does not prevent the discovery
+        // of a usable one, nor the fall back to DirectJDKLog. Note that,
+        // as the ServiceLoader requires, a provider also needs a public
+        // no-argument constructor to be considered at all.
         ServiceLoader<Log> logLoader = ServiceLoader.load(Log.class);
         Constructor<? extends Log> m = null;
-        for (Log log : logLoader) {
-            Class<? extends Log> c = log.getClass();
+        Iterator<ServiceLoader.Provider<Log>> providers = logLoader.stream().iterator();
+        while (m == null) {
             try {
-                m = c.getConstructor(String.class);
-                break;
-            } catch (NoSuchMethodException | SecurityException e) {
-                throw new Error(e);
+                if (!providers.hasNext()) {
+                    break;
+                }
+                m = providers.next().type().getConstructor(String.class);
+            } catch (ReflectiveOperationException | SecurityException | ServiceConfigurationError e) {
+                // Not a usable provider. Ignore it and look at the next one.
             }
         }
         discoveredLogConstructor = m;
@@ -145,7 +154,8 @@ public class LogFactory {
      * <p>
      * Return the singleton <code>LogFactory</code> instance. The {@link Log} implementation is discovered once, using
      * a {@link java.util.ServiceLoader} lookup for providers of the <code>Log</code> interface, falling back to
-     * {@link DirectJDKLog} if no suitable provider is found.
+     * {@link DirectJDKLog} if no suitable provider is found. Providers that cannot be loaded or that do not expose a
+     * public constructor taking the log name as its only argument are ignored.
      * </p>
      *
      * @return The singleton LogFactory instance
