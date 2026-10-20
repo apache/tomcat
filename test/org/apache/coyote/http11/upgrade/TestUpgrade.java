@@ -154,7 +154,6 @@ public class TestUpgrade extends TomcatBaseTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void testNoCallbacksAfterError() throws Exception {
         SocketWrapperBase<?> socketWrapper = EasyMock.createMock(SocketWrapperBase.class);
         ReadListener listener = EasyMock.createMock(ReadListener.class);
@@ -178,24 +177,24 @@ public class TestUpgrade extends TomcatBaseTest {
         socketWrapper.registerReadInterest();
         // The first call reports an error. No further socket state check or
         // listener call-back may occur once the error has been reported.
-        EasyMock.expect(socketWrapper.isReadyForRead()).andThrow(error);
+        EasyMock.expect(Boolean.valueOf(socketWrapper.isReadyForRead())).andThrow(error);
         listener.onError(error);
         EasyMock.expectLastCall().once();
 
         EasyMock.replay(socketWrapper, listener);
 
-        UpgradeServletInputStream sis = new UpgradeServletInputStream(processor, socketWrapper,
-                new UpgradeInfo());
-        sis.setReadListener(listener);
+        try (UpgradeServletInputStream sis = new UpgradeServletInputStream(processor, socketWrapper,
+                new UpgradeInfo())) {
+            sis.setReadListener(listener);
 
-        sis.onDataAvailable();
-        sis.onDataAvailable();
+            sis.onDataAvailable();
+            sis.onDataAvailable();
 
-        EasyMock.verify(socketWrapper, listener);
+            EasyMock.verify(socketWrapper, listener);
+        }
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void testWriteErrorReportedOnlyOnce() throws Exception {
         SocketWrapperBase<?> socketWrapper = EasyMock.createMock(SocketWrapperBase.class);
         WriteListener listener = EasyMock.createMock(WriteListener.class);
@@ -220,27 +219,27 @@ public class TestUpgrade extends TomcatBaseTest {
         // The flush fails. That failure is seen twice, once by the caller and
         // once by the close that reports the error. The listener must only be
         // notified once.
-        EasyMock.expect(socketWrapper.flush(false)).andThrow(error);
-        EasyMock.expect(socketWrapper.flush(false)).andThrow(error);
+        EasyMock.expect(Boolean.valueOf(socketWrapper.flush(false))).andThrow(error);
+        EasyMock.expect(Boolean.valueOf(socketWrapper.flush(false))).andThrow(error);
         listener.onError(error);
         EasyMock.expectLastCall().once();
 
         EasyMock.replay(socketWrapper, listener);
 
-        UpgradeServletOutputStream sos = new UpgradeServletOutputStream(processor, socketWrapper,
-                new UpgradeInfo());
-        sos.setWriteListener(listener);
+        try (UpgradeServletOutputStream sos = new UpgradeServletOutputStream(processor, socketWrapper,
+                new UpgradeInfo())) {
+            sos.setWriteListener(listener);
 
-        sos.onWritePossible();
-        // The call-back for the next dispatch must not trigger any further
-        // socket processing.
-        sos.onWritePossible();
+            sos.onWritePossible();
+            // The call-back for the next dispatch must not trigger any further
+            // socket processing.
+            sos.onWritePossible();
 
-        EasyMock.verify(socketWrapper, listener);
+            EasyMock.verify(socketWrapper, listener);
+        }
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void testOnAllDataReadReportedOnlyOnce() throws Exception {
         SocketWrapperBase<?> socketWrapper = EasyMock.createMock(SocketWrapperBase.class);
 
@@ -263,9 +262,9 @@ public class TestUpgrade extends TomcatBaseTest {
         // call-back must only be reported once, even if further dispatches
         // occur.
         socketWrapper.registerReadInterest();
-        EasyMock.expect(socketWrapper.isReadyForRead()).andReturn(Boolean.TRUE);
-        EasyMock.expect(socketWrapper.read(EasyMock.eq(false), EasyMock.anyObject(byte[].class),
-                EasyMock.anyInt(), EasyMock.anyInt())).andReturn(-1);
+        EasyMock.expect(Boolean.valueOf(socketWrapper.isReadyForRead())).andReturn(Boolean.TRUE);
+        EasyMock.expect(Integer.valueOf(socketWrapper.read(EasyMock.eq(false), EasyMock.anyObject(byte[].class),
+                EasyMock.anyInt(), EasyMock.anyInt()))).andReturn(Integer.valueOf(-1));
 
         EasyMock.replay(socketWrapper);
 

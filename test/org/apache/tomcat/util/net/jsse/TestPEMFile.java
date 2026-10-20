@@ -46,17 +46,19 @@ public class TestPEMFile {
     private static final String KEY_ENCRYPTED_PKCS1_AES128 = "key-encrypted-pkcs1-aes128.pem";
     private static final String KEY_ENCRYPTED_PKCS1_AES192 = "key-encrypted-pkcs1-aes192.pem";
     private static final String KEY_ENCRYPTED_PKCS1_AES256 = "key-encrypted-pkcs1-aes256.pem";
-    private static final String KEY_ENCRYPTED_PKCS8_HMACSHA1DEFAULT_DES_EDE3_CBC = "key-encrypted-pkcs8-hmacsha1default-des-ede3-cbc.pem";
-    private static final String KEY_ENCRYPTED_PKCS8_HMACSHA256_AES_128_CBC = "key-encrypted-pkcs8-hmacsha256-aes-128-cbc.pem";
-    private static final String KEY_ENCRYPTED_PKCS8_HMACSHA256_AES_256_CBC = "key-encrypted-pkcs8-hmacsha256-aes-256-cbc.pem";
-    private static final String KEY_ENCRYPTED_PKCS8_HMACSHA256_DES_EDE3_CBC = "key-encrypted-pkcs8-hmacsha256-des-ede3-cbc.pem";
+    private static final String KEY_ENCRYPTED_PKCS8_HMACSHA1DEFAULT_DES_EDE3_CBC =
+            "key-encrypted-pkcs8-hmacsha1default-des-ede3-cbc.pem";
+    private static final String KEY_ENCRYPTED_PKCS8_HMACSHA256_AES_128_CBC =
+            "key-encrypted-pkcs8-hmacsha256-aes-128-cbc.pem";
+    private static final String KEY_ENCRYPTED_PKCS8_HMACSHA256_AES_256_CBC =
+            "key-encrypted-pkcs8-hmacsha256-aes-256-cbc.pem";
+    private static final String KEY_ENCRYPTED_PKCS8_HMACSHA256_DES_EDE3_CBC =
+            "key-encrypted-pkcs8-hmacsha256-des-ede3-cbc.pem";
 
     /*
-     * A clean single certificate PEM. Generated with:
-     *   keytool -exportcert -rfc -keystore test/localhost-rsa.jks
-     *           -storepass changeit -alias tomcat
-     * with the line endings converted from CRLF to LF. The certificate itself
-     * expires on 2028-08-11.
+     * A clean single certificate PEM. Generated with: keytool -exportcert -rfc -keystore test/localhost-rsa.jks
+     * -storepass changeit -alias tomcat with the line endings converted from CRLF to LF. The certificate itself expires
+     * on 2028-08-11.
      */
     private static final String CERTIFICATE = "certificate.pem";
 
@@ -128,12 +130,13 @@ public class TestPEMFile {
         // the failure of an attempt to use the name as a transformation. The
         // algorithm is rejected before the content is decrypted, so the rest
         // of the content does not matter.
-        String pem = "-----BEGIN RSA PRIVATE KEY-----\n" + "Proc-Type: 4,ENCRYPTED\n"
-                + "DEK-Info: AES-128-CTR,0123456789ABCDEF0123456789ABCDEF\n" + "QUJDRA==\n"
-                + "-----END RSA PRIVATE KEY-----\n";
+        String pem = "-----BEGIN RSA PRIVATE KEY-----\n" + "Proc-Type: 4,ENCRYPTED\n" +
+                "DEK-Info: AES-128-CTR,0123456789ABCDEF0123456789ABCDEF\n" + "QUJDRA==\n" +
+                "-----END RSA PRIVATE KEY-----\n";
         try {
-            new PEMFile("unsupported", new ByteArrayInputStream(pem.getBytes(StandardCharsets.US_ASCII)), KEY_PASSWORD,
-                    null);
+            @SuppressWarnings("unused")
+            PEMFile pf = new PEMFile("unsupported", new ByteArrayInputStream(pem.getBytes(StandardCharsets.US_ASCII)),
+                    KEY_PASSWORD, null);
             Assert.fail("Expected the unsupported encryption algorithm to be rejected");
         } catch (NoSuchAlgorithmException nsae) {
             // Expected
@@ -234,8 +237,8 @@ public class TestPEMFile {
 
     @Test
     public void testDekInfoWithoutAlgorithmAndIv() throws Exception {
-        assertInvalidPem("-----BEGIN RSA PRIVATE KEY-----\n" + "DEK-Info: DES-EDE3-CBC\n" + "QUJD\n"
-                + "-----END RSA PRIVATE KEY-----\n");
+        assertInvalidPem("-----BEGIN RSA PRIVATE KEY-----\n" + "DEK-Info: DES-EDE3-CBC\n" + "QUJD\n" +
+                "-----END RSA PRIVATE KEY-----\n");
     }
 
 
@@ -254,14 +257,14 @@ public class TestPEMFile {
 
 
     /*
-     * The structure of the file is checked while it is scanned, before any of
-     * the content is decoded, so these malformed structures must be rejected
-     * even though the content is not valid PEM encoded data.
+     * The structure of the file is checked while it is scanned, before any of the content is decoded, so these
+     * malformed structures must be rejected even though the content is not valid PEM encoded data.
      */
     private void assertInvalidPem(String content) throws Exception {
         ByteArrayInputStream stream = new ByteArrayInputStream(content.getBytes(StandardCharsets.US_ASCII));
         try {
-            new PEMFile("invalid", stream, null, null);
+            @SuppressWarnings("unused")
+            PEMFile pf = new PEMFile("invalid", stream, null, null);
             Assert.fail("Expected the malformed PEM to be rejected");
         } catch (IOException ioe) {
             // Expected

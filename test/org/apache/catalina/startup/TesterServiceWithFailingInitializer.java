@@ -26,7 +26,7 @@ public class TesterServiceWithFailingInitializer implements ServletContainerInit
     static {
         // Force an ExceptionInInitializerError (a LinkageError) when this
         // class is initialized by Class.forName(name, true, loader).
-        if (Boolean.TRUE) {
+        if (true) {
             throw new IllegalStateException("Test failure in static initializer");
         }
     }

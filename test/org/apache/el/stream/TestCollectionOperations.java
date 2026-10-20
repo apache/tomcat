@@ -223,9 +223,9 @@ public class TestCollectionOperations extends ELBaseTest {
                 "[3, 1, 2].stream().sorted((x,y)->null).toList()",
                 List.class);
         List<Long> expected = new ArrayList<>(3);
-        expected.add(3L);
-        expected.add(1L);
-        expected.add(2L);
+        expected.add(Long.valueOf(3));
+        expected.add(Long.valueOf(1));
+        expected.add(Long.valueOf(2));
 
         Assert.assertEquals(expected, result);
     }
@@ -335,11 +335,11 @@ public class TestCollectionOperations extends ELBaseTest {
                 Object.class);
 
         List<Long> expected = new ArrayList<>(5);
-        expected.add(1L);
-        expected.add(2L);
-        expected.add(3L);
-        expected.add(4L);
-        expected.add(5L);
+        expected.add(Long.valueOf(1));
+        expected.add(Long.valueOf(2));
+        expected.add(Long.valueOf(3));
+        expected.add(Long.valueOf(4));
+        expected.add(Long.valueOf(5));
 
         Assert.assertEquals(expected, result);
     }
@@ -356,11 +356,11 @@ public class TestCollectionOperations extends ELBaseTest {
                 Object.class);
 
         List<Long> expected = new ArrayList<>(5);
-        expected.add(1L);
-        expected.add(2L);
-        expected.add(3L);
-        expected.add(4L);
-        expected.add(5L);
+        expected.add(Long.valueOf(1));
+        expected.add(Long.valueOf(2));
+        expected.add(Long.valueOf(3));
+        expected.add(Long.valueOf(4));
+        expected.add(Long.valueOf(5));
 
         Assert.assertEquals(expected, result);
     }
@@ -377,8 +377,8 @@ public class TestCollectionOperations extends ELBaseTest {
                 Object.class);
 
         List<Long> expected = new ArrayList<>(2);
-        expected.add(1L);
-        expected.add(2L);
+        expected.add(Long.valueOf(1));
+        expected.add(Long.valueOf(2));
 
         Assert.assertEquals(expected, result);
     }
@@ -394,7 +394,7 @@ public class TestCollectionOperations extends ELBaseTest {
                 "[1].stream().substream(2,3).toList()",
                 Object.class);
 
-        Assert.assertEquals(new ArrayList<Long>(), result);
+        Assert.assertEquals(new ArrayList<>(), result);
     }
 
 
@@ -536,7 +536,7 @@ public class TestCollectionOperations extends ELBaseTest {
                 "[1, 2, 3].stream().max((x,y)->null)",
                 Object.class);
 
-        Assert.assertEquals(1L, ((Optional) result).get());
+        Assert.assertEquals(Long.valueOf(1), ((Optional) result).get());
     }
 
 
@@ -622,7 +622,7 @@ public class TestCollectionOperations extends ELBaseTest {
                 "[1, 2, 3].stream().min((x,y)->null)",
                 Object.class);
 
-        Assert.assertEquals(1L, ((Optional) result).get());
+        Assert.assertEquals(Long.valueOf(1), ((Optional) result).get());
     }
 
 

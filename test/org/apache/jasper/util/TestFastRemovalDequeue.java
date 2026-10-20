@@ -197,9 +197,8 @@ public class TestFastRemovalDequeue {
 
 
     /*
-     * A maximum size of one must be honoured. The constructor used to
-     * silently raise it to two, so a configured maxLoadedJsps of one kept
-     * two JSPs loaded and evicted nothing until a third one was requested.
+     * A maximum size of one must be honoured. The constructor used to silently raise it to two, so a configured
+     * maxLoadedJsps of one kept two JSPs loaded and evicted nothing until a third one was requested.
      */
     @Test
     public void testSingleSizeIsHonoured() throws Exception {
@@ -242,9 +241,8 @@ public class TestFastRemovalDequeue {
 
 
     /*
-     * The rendering of an entry must tolerate null content, as the JDK
-     * collections render null elements, rather than fail with a null pointer
-     * exception.
+     * The rendering of an entry must tolerate null content, as the JDK collections render null elements, rather than
+     * fail with a null pointer exception.
      */
     @Test
     public void testNullContentToString() throws Exception {
@@ -257,20 +255,22 @@ public class TestFastRemovalDequeue {
 
 
     /*
-     * A maximum size below one cannot produce a usable queue and is
-     * rejected, rather than silently replaced by a different size.
+     * A maximum size below one cannot produce a usable queue and is rejected, rather than silently replaced by a
+     * different size.
      */
     @Test
     public void testInvalidMaxSize() throws Exception {
         try {
-            new FastRemovalDequeue<Object>(0);
+            @SuppressWarnings("unused")
+            FastRemovalDequeue<Object> dqueue = new FastRemovalDequeue<>(0);
             Assert.fail("Expected IllegalArgumentException");
         } catch (IllegalArgumentException e) {
             // The message is localized, pin the rendered value
             Assert.assertTrue(e.getMessage(), e.getMessage().contains("[0]"));
         }
         try {
-            new FastRemovalDequeue<Object>(-1);
+            @SuppressWarnings("unused")
+            FastRemovalDequeue<Object> dqueue = new FastRemovalDequeue<>(-1);
             Assert.fail("Expected IllegalArgumentException");
         } catch (IllegalArgumentException e) {
             Assert.assertTrue(e.getMessage(), e.getMessage().contains("[-1]"));

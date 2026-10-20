@@ -297,7 +297,7 @@ public class TestELSupport {
         // Coercing NaN to BigDecimal uses new BigDecimal(double) which rejects the
         // value. The failure must surface as ELException.
         try {
-            ELSupport.compare(null, BigDecimal.ONE, Double.NaN);
+            ELSupport.compare(null, BigDecimal.ONE, Double.valueOf(Double.NaN));
             Assert.fail("An ELException was expected");
         } catch (ELException e) {
             Assert.assertTrue("Unexpected cause: " + e.getCause(), e.getCause() instanceof NumberFormatException);
@@ -307,7 +307,7 @@ public class TestELSupport {
     @Test
     public void testEqualsBigDecimalWithNonFiniteThrowsELException() {
         try {
-            ELSupport.equals(null, BigDecimal.ONE, Double.NaN);
+            ELSupport.equals(null, BigDecimal.ONE, Double.valueOf(Double.NaN));
             Assert.fail("An ELException was expected");
         } catch (ELException e) {
             Assert.assertTrue("Unexpected cause: " + e.getCause(), e.getCause() instanceof NumberFormatException);
@@ -317,7 +317,7 @@ public class TestELSupport {
     @Test
     public void testCoerceToTypeNonFiniteToBigDecimalThrowsELException() {
         try {
-            ELSupport.coerceToType(null, Double.POSITIVE_INFINITY, BigDecimal.class);
+            ELSupport.coerceToType(null, Double.valueOf(Double.POSITIVE_INFINITY), BigDecimal.class);
             Assert.fail("An ELException was expected");
         } catch (ELException e) {
             Assert.assertTrue("Unexpected cause: " + e.getCause(), e.getCause() instanceof NumberFormatException);

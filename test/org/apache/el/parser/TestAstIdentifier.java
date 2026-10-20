@@ -22,6 +22,7 @@ import java.util.List;
 import jakarta.el.ELClass;
 import jakarta.el.ELContext;
 import jakarta.el.ELException;
+import jakarta.el.ELManager;
 import jakarta.el.ELProcessor;
 import jakarta.el.ELResolver;
 import jakarta.el.ExpressionFactory;
@@ -108,7 +109,7 @@ public class TestAstIdentifier {
         // getType() must resolve an imported class, just as getValue() does
         ELProcessor processor = new ELProcessor();
         ELContext context = processor.getELManager().getELContext();
-        ValueExpression ve = processor.getELManager().getExpressionFactory().createValueExpression(context,
+        ValueExpression ve = ELManager.getExpressionFactory().createValueExpression(context,
                 "${Integer}", Object.class);
         Assert.assertNotNull(ve.getValue(context));
         Assert.assertEquals(ELClass.class, ve.getType(context));
@@ -124,7 +125,7 @@ public class TestAstIdentifier {
         processor.getELManager().getELContext().getImportHandler().importStatic(
                 "java.lang.Integer.MAX_VALUE");
         ELContext context = processor.getELManager().getELContext();
-        ValueExpression ve = processor.getELManager().getExpressionFactory().createValueExpression(context,
+        ValueExpression ve = ELManager.getExpressionFactory().createValueExpression(context,
                 "${MAX_VALUE}", Object.class);
         Assert.assertEquals(Integer.valueOf(Integer.MAX_VALUE), ve.getValue(context));
         Assert.assertEquals(Integer.TYPE, ve.getType(context));
@@ -171,7 +172,7 @@ public class TestAstIdentifier {
             }
         });
         ELContext context = processor.getELManager().getELContext();
-        ValueExpression ve = processor.getELManager().getExpressionFactory().createValueExpression(context,
+        ValueExpression ve = ELManager.getExpressionFactory().createValueExpression(context,
                 "${Integer}", Object.class);
         Assert.assertEquals("resolved", ve.getValue(context));
         Assert.assertEquals(String.class, ve.getType(context));
@@ -184,7 +185,7 @@ public class TestAstIdentifier {
         // PropertyNotFoundException from getType()
         ELProcessor processor = new ELProcessor();
         ELContext context = processor.getELManager().getELContext();
-        ValueExpression ve = processor.getELManager().getExpressionFactory().createValueExpression(context,
+        ValueExpression ve = ELManager.getExpressionFactory().createValueExpression(context,
                 "${unresolvedName}", Object.class);
         try {
             ve.getType(context);
