@@ -66,14 +66,12 @@ public class SynchronizedQueue<T> {
      *
      * @param initialSize the initial capacity, which must be positive
      *
-     * @throws IllegalArgumentException if the specified initial capacity is
-     *         not positive
+     * @throws IllegalArgumentException if the specified initial capacity is not positive
      */
     public SynchronizedQueue(int initialSize) {
         if (initialSize <= 0) {
             throw new IllegalArgumentException(
-                    sm.getString("synchronizedQueue.invalidInitialSize",
-                            initialSize));
+                    sm.getString("synchronizedQueue.invalidInitialSize", Integer.valueOf(initialSize)));
         }
         queue = new Object[initialSize];
         size = initialSize;
@@ -83,6 +81,7 @@ public class SynchronizedQueue<T> {
      * Adds the specified element to the tail of this queue.
      *
      * @param t the element to add
+     *
      * @return true (as specified by {@link java.util.Queue#offer})
      */
     public synchronized boolean offer(T t) {
@@ -100,8 +99,7 @@ public class SynchronizedQueue<T> {
     }
 
     /**
-     * Retrieves and removes the head of this queue, or returns null
-     * if this queue is empty.
+     * Retrieves and removes the head of this queue, or returns null if this queue is empty.
      *
      * @return the head of this queue, or null if empty
      */
