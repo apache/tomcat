@@ -94,7 +94,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
             if (((GroupChannel) getChannel()).getSecure()) {
                 throw new IOException(sm.getString("nioReceiver.tlsUnavailable"));
             }
-            setSecurePort(-1);
+            // TLS is not available so nothing is bound to the secure port
             return;
         }
         secureServerChannel = ServerSocketChannel.open();
@@ -194,6 +194,23 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
     @Override
     public void stop() {
         this.stopListening();
+        // Startup may fail before the channels are registered with the selector or the listener thread is started.
+        if (serverChannel != null) {
+            try {
+                serverChannel.close();
+            } catch (IOException ioe) {
+                log.debug(sm.getString("nioReceiver.closeError"), ioe);
+            }
+            serverChannel = null;
+        }
+        if (datagramChannel != null) {
+            try {
+                datagramChannel.close();
+            } catch (IOException ioe) {
+                log.debug(sm.getString("nioReceiver.closeError"), ioe);
+            }
+            datagramChannel = null;
+        }
         if (secureServerChannel != null) {
             try {
                 secureServerChannel.close();
@@ -226,18 +243,9 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
 
     @Override
     public void start() throws IOException {
-        super.start();
         try {
+            super.start();
             setPool(new RxTaskPool(getMaxThreads(), getMinThreads(), this));
-        } catch (Exception e) {
-            log.fatal(sm.getString("nioReceiver.threadpool.fail"), e);
-            if (e instanceof IOException) {
-                throw (IOException) e;
-            } else {
-                throw new IOException(e.getMessage());
-            }
-        }
-        try {
             resolveBind();
             getBind();
             boolean tlsOnly = getChannel() instanceof GroupChannel && ((GroupChannel) getChannel()).getSecure();
@@ -246,8 +254,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
             }
             startSecureListener();
             if (tlsOnly) {
-                // Disable non-secure port
-                setPort(-1);
+                // Non-secure port is disabled so nothing is bound to it
                 setListen(true);
                 return;
             }
@@ -259,11 +266,16 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
             t.setDaemon(true);
             t.start();
         } catch (Exception e) {
+            try {
+                stop();
+            } catch (Exception cleanupException) {
+                e.addSuppressed(cleanupException);
+            }
             log.fatal(sm.getString("nioReceiver.start.fail"), e);
             if (e instanceof IOException) {
                 throw (IOException) e;
             } else {
-                throw new IOException(e.getMessage());
+                throw new IOException(e.getMessage(), e);
             }
         }
     }
