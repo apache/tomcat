@@ -63,7 +63,7 @@ public class TestLookupFactory extends TomcatBaseTest {
         container.bind("comp/env/ref", new LookupRef(MARKER_CLASS, "java:comp/env/target"));
 
         Object found = new javax.naming.InitialContext().lookup("java:comp/env/ref");
-        Assert.assertSame(webapp.marker(), found);
+        Assert.assertSame(webapp.getMarker(), found);
     }
 
 
@@ -79,10 +79,10 @@ public class TestLookupFactory extends TomcatBaseTest {
         ejb.setType("Session");
         ejb.setLookupName("java:comp/env/target");
         ejb.setRemote(MARKER_CLASS);
-        webapp.listener().addEjb(ejb);
+        webapp.getListener().addEjb(ejb);
 
         Object found = new javax.naming.InitialContext().lookup("java:comp/env/ejb");
-        Assert.assertSame(webapp.marker(), found);
+        Assert.assertSame(webapp.getMarker(), found);
     }
 
 
@@ -118,7 +118,7 @@ public class TestLookupFactory extends TomcatBaseTest {
         ejb.setLookupName("java:comp/env/target");
         // The object bound as the target is not an instance of this interface
         ejb.setRemote(String.class.getName());
-        webapp.listener().addEjb(ejb);
+        webapp.getListener().addEjb(ejb);
 
         try {
             Object found = new javax.naming.InitialContext().lookup("java:comp/env/ejb");
@@ -186,8 +186,8 @@ public class TestLookupFactory extends TomcatBaseTest {
         // The context of the web application is read only once it is started
         NamingContextListener listener = null;
         for (LifecycleListener lifecycleListener : ctx.findLifecycleListeners()) {
-            if (lifecycleListener instanceof NamingContextListener namingContextListener) {
-                listener = namingContextListener;
+            if (lifecycleListener instanceof NamingContextListener) {
+                listener = (NamingContextListener) lifecycleListener;
             }
         }
         Assert.assertNotNull(listener);
@@ -225,6 +225,24 @@ public class TestLookupFactory extends TomcatBaseTest {
      * The listener which binds the naming resources of the web application and
      * the instance of the class which only that web application can see.
      */
-    private record TesterWebapp(NamingContextListener listener, Object marker) {
+    private class TesterWebapp {
+        private final NamingContextListener listener;
+        private final Object marker;
+        TesterWebapp(NamingContextListener listener, Object marker) {
+            this.listener = listener;
+            this.marker = marker;
+        }
+        /**
+         * @return the listener
+         */
+        public NamingContextListener getListener() {
+            return this.listener;
+        }
+        /**
+         * @return the marker
+         */
+        public Object getMarker() {
+            return this.marker;
+        }
     }
 }
