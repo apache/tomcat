@@ -662,6 +662,15 @@
         scripts in <code>bin</code> are executable when the archive is
         extracted on a Unix platform.
       </update>
+      <fix>
+        Fix <code>service.bat</code> so <code>install &lt;name&gt; --rename</code>
+        renames the Windows service executables in <code>CATALINA_HOME\bin</code>.
+        The <code>rename</code> commands omitted that directory, so they failed
+        unless the current directory was already <code>bin</code>, and the
+        script then tried to launch the executable under its new name before
+        the rename had happened. <code>remove</code> now restores the default
+        executable names only when the service name differs from the default.
+      </fix>
     </changelog>
   </subsection>
 </section>
