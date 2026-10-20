@@ -275,6 +275,13 @@ public class FileHandler extends Handler {
                     writer.write(result);
                     if (bufferSize.intValue() < 0) {
                         writer.flush();
+                        // PrintWriter swallows the exceptions from the underlying stream instead of
+                        // propagating them, so the error flag needs to be checked explicitly after the
+                        // flush. Throwing below discards the writer and lets a later record open a new
+                        // one, as the next record will find the date unset and re-open the file.
+                        if (writer.checkError()) {
+                            throw new IOException("Unable to write to the log file");
+                        }
                     }
                 } else {
                     reportError("FileHandler is closed or not yet initialized, unable to log [" + result + "]", null,
@@ -282,6 +289,14 @@ public class FileHandler extends Handler {
                 }
             } catch (Exception e) {
                 reportError(null, e, ErrorManager.WRITE_FAILURE);
+                // Discard the writer, so the next record attempts to reopen the file rather than
+                // remaining attached to a writer that can no longer complete writes
+                writerLock.readLock().unlock();
+                try {
+                    closeWriter();
+                } finally {
+                    writerLock.readLock().lock();
+                }
             }
         } finally {
             writerLock.readLock().unlock();
@@ -310,13 +325,22 @@ public class FileHandler extends Handler {
             if (writer == null) {
                 return;
             }
-            writer.write(getFormatter().getTail(this));
-            writer.flush();
-            writer.close();
-            writer = null;
-            date = null;
-        } catch (Exception e) {
-            reportError(null, e, ErrorManager.CLOSE_FAILURE);
+            try {
+                writer.write(getFormatter().getTail(this));
+                writer.flush();
+            } catch (Exception e) {
+                reportError(null, e, ErrorManager.CLOSE_FAILURE);
+            } finally {
+                // The writer is closed and discarded even when the tail could not be written, so a
+                // failure is not repeated by every later close() for a writer that is never released
+                try {
+                    writer.close();
+                } catch (Exception e) {
+                    reportError(null, e, ErrorManager.CLOSE_FAILURE);
+                }
+                writer = null;
+                date = null;
+            }
         } finally {
             writerLock.writeLock().unlock();
         }
