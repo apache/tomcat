@@ -16,6 +16,7 @@
  */
 package org.apache.naming.factory;
 
+import javax.naming.NamingException;
 import javax.naming.StringRefAddr;
 
 import org.junit.Assert;
@@ -90,5 +91,55 @@ public class TestBeanFactory {
         TesterBean result = (TesterBean) obj;
         Assert.assertNotNull(result.getServer());
         Assert.assertEquals(IP_ADDRESS, result.getServer().getHostAddress());
+    }
+
+
+    /*
+     * A value which does not match the type of the property is a configuration
+     * error which has to be reported as a NamingException with the property as
+     * context, not as the unchecked exception of the conversion.
+     */
+    @Test
+    public void testValueNotMatchingThePropertyTypeIsReported() throws Exception {
+
+        ResourceRef resourceRef = new ResourceRef(TesterBean.class.getName(), null, null, null, false);
+        resourceRef.add(new StringRefAddr("limit", "not-a-number"));
+
+        BeanFactory factory = new BeanFactory();
+
+        try {
+            Object obj = factory.getObjectInstance(resourceRef, null, null, null);
+            Assert.fail("The invalid value was accepted: " + obj);
+        } catch (NamingException e) {
+            Assert.assertTrue("The property is not named: " + e.getMessage(), e.getMessage().contains("limit"));
+            Assert.assertTrue("The value is not named: " + e.getMessage(), e.getMessage().contains("not-a-number"));
+            Assert.assertTrue("The reason for the failure is not reported",
+                    e.getCause() instanceof NumberFormatException);
+        }
+    }
+
+
+    /*
+     * The value of a character property is read from the first character of
+     * the configured value, so an empty value has to be reported in the same
+     * way as a value which cannot be converted.
+     */
+    @Test
+    public void testEmptyValueForCharacterPropertyIsReported() throws Exception {
+
+        ResourceRef resourceRef = new ResourceRef(TesterBean.class.getName(), null, null, null, false);
+        resourceRef.add(new StringRefAddr("letter", ""));
+
+        BeanFactory factory = new BeanFactory();
+
+        try {
+            Object obj = factory.getObjectInstance(resourceRef, null, null, null);
+            Assert.fail("The invalid value was accepted: " + obj);
+        } catch (NamingException e) {
+            Assert.assertTrue("The property is not named: " + e.getMessage(), e.getMessage().contains("letter"));
+            Assert.assertTrue("The type is not named: " + e.getMessage(), e.getMessage().contains("char"));
+            Assert.assertTrue("The reason for the failure is not reported",
+                    e.getCause() instanceof StringIndexOutOfBoundsException);
+        }
     }
 }
