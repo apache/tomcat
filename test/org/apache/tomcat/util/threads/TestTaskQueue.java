@@ -30,7 +30,6 @@ public class TestTaskQueue {
         private static final long serialVersionUID = 1L;
 
         private final AtomicInteger pollCount = new AtomicInteger();
-
         @Override
         public Runnable poll(long timeout, TimeUnit unit) throws InterruptedException {
             pollCount.incrementAndGet();
@@ -61,15 +60,38 @@ public class TestTaskQueue {
             CountDownLatch executed = new CountDownLatch(4);
             executor.execute(executed::countDown);
             executor.execute(executed::countDown);
-            // Wait for both workers to be created and to enter take()
-            Thread.sleep(200);
+            // Wait for both tasks to complete and for the workers to finish with them. A worker that is still
+            // running a task when the threads are marked as due to be stopped retires itself without waiting.
+            long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
+            while ((executed.getCount() != 2 || executor.getActiveCount() != 0) && System.nanoTime() < deadline) {
+                Thread.sleep(10);
+            }
+            Assert.assertEquals(2, executed.getCount());
+            Assert.assertEquals(0, executor.getActiveCount());
+            // Threads are only due to be stopped if they were created strictly before the context stopped (compared
+            // in milliseconds) so make sure the clock has moved on from the creation of the workers
+            long created = System.currentTimeMillis();
+            while (System.currentTimeMillis() <= created) {
+                Thread.sleep(1);
+            }
 
-            // Mark the (older) worker threads as due to be stopped
+            // Mark the (older) worker threads as due to be stopped. This interrupts the idle workers which then
+            // re-enter take() which, since the threads are due to be stopped, switches to poll() with a bounded
+            // timeout.
             executor.contextStopping();
+
+            // Both workers must have entered the renewal wait. Do this before submitting more tasks. If a task is
+            // queued while the interrupt is still being delivered, the worker may return the task from take() rather
+            // than being interrupted and the renewal wait would not be entered.
+            deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
+            while (queue.pollCount.get() < 2 && System.nanoTime() < deadline) {
+                Thread.sleep(10);
+            }
+            Assert.assertTrue("Renewal wait was not exercised", queue.pollCount.get() >= 2);
+
+            // The workers complete these tasks and then re-enter take()
             executor.execute(executed::countDown);
             executor.execute(executed::countDown);
-            // The workers complete these tasks and then re-enter take() which, since the threads are due to be
-            // stopped, switches to poll() with a bounded timeout
             Assert.assertTrue(executed.await(5, TimeUnit.SECONDS));
 
             int pollsAfterTask = queue.pollCount.get();
@@ -78,9 +100,6 @@ public class TestTaskQueue {
 
             // Without the bounded timeout this is orders of magnitude larger (millions in this window)
             Assert.assertTrue("Unexpected poll count while idle: " + spinIterations, spinIterations < 100);
-
-            // Both workers must have entered the renewal wait at least once
-            Assert.assertTrue("Renewal wait was not exercised", queue.pollCount.get() >= 2);
 
             // The workers must still be able to process tasks
             CountDownLatch processed = new CountDownLatch(1);
