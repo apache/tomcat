@@ -33,12 +33,15 @@ public class LogUtil {
      * All control characters are escaped apart from horizontal tab (\\u0009), new line (\\u000a) and carriage return
      * (\\u000d).
      *
-     * @param input The string to escape
+     * @param input The string to escape. A null value is handled as an empty string.
      *
      * @return The escaped form of the input string
      */
     @SuppressWarnings("null") // sb is not null when used
     public static String escape(final String input) {
+        if (input == null) {
+            return "";
+        }
         final int len = input.length();
         int i = 0;
         int lastControl = -1;
