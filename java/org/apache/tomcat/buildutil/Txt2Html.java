@@ -101,7 +101,7 @@ public class Txt2Html extends Task {
                 File from = new File(basedir, file);
                 File to = new File(todir, file + ".html");
                 if (!to.exists() || (from.lastModified() > to.lastModified())) {
-                    log("Converting file '" + from.getAbsolutePath() + "' to '" + to.getAbsolutePath(),
+                    log("Converting file '" + from.getAbsolutePath() + "' to '" + to.getAbsolutePath() + "'",
                             Project.MSG_VERBOSE);
                     try {
                         convert(from, to);
@@ -113,9 +113,9 @@ public class Txt2Html extends Task {
                     count++;
                 }
             }
-            if (count > 0) {
-                log("Converted " + count + " file" + (count > 1 ? "s" : "") + " to " + todir.getAbsolutePath());
-            }
+        }
+        if (count > 0) {
+            log("Converted " + count + " file" + (count > 1 ? "s" : "") + " to " + todir.getAbsolutePath());
         }
     }
 
