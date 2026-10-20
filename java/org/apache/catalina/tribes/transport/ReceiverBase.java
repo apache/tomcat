@@ -65,6 +65,9 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     private String host = "auto";
     private InetAddress bind;
     private int port = 4000;
+    private volatile int boundPort = -1;
+    private volatile int boundSecurePort = -1;
+    private volatile int boundUdpPort = -1;
     private int udpPort = -1;
     private int securePort = -1;
     private int rxBufSize = Constants.DEFAULT_CLUSTER_MSG_BUFFER_SIZE;
@@ -147,6 +150,9 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
             oname = null;
         }
         channel = null;
+        boundPort = -1;
+        boundSecurePort = -1;
+        boundUdpPort = -1;
     }
 
     @Override
@@ -157,6 +163,11 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     @Override
     public int getPort() {
         return port;
+    }
+
+    @Override
+    public int getBoundPort() {
+        return boundPort;
     }
 
     /**
@@ -280,7 +291,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
                     socket.bind(addr);
                     String type;
                     if (secure) {
-                        setSecurePort(port);
+                        boundSecurePort = socket.getLocalPort();
                         if (getChannel() instanceof GroupChannel groupChannel) {
                             type = groupChannel.getSslContext().getImplementationName();
                         } else {
@@ -288,7 +299,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
                         }
                     } else {
                         type = "cleartext";
-                        setPort(port);
+                        boundPort = socket.getLocalPort();
                     }
                     log.info(sm.getString("receiverBase.socket.bind", addr, type));
                     retries = 0;
@@ -325,7 +336,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
             try {
                 addr = new InetSocketAddress(address, port);
                 socket.bind(addr);
-                setUdpPort(port);
+                boundUdpPort = socket.getLocalPort();
                 log.info(sm.getString("receiverBase.udp.bind", addr));
                 return 0;
             } catch (IOException ioe) {
@@ -573,6 +584,11 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     @Override
     public int getSecurePort() {
         return securePort;
+    }
+
+    @Override
+    public int getBoundSecurePort() {
+        return boundSecurePort;
     }
 
     /**
@@ -840,6 +856,11 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     @Override
     public int getUdpPort() {
         return udpPort;
+    }
+
+    @Override
+    public int getBoundUdpPort() {
+        return boundUdpPort;
     }
 
     /**
