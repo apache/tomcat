@@ -103,14 +103,12 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
             throws ChannelException {
         boolean async = (msg.getOptions() & Channel.SEND_OPTIONS_ASYNCHRONOUS) == Channel.SEND_OPTIONS_ASYNCHRONOUS;
         if (async && run) {
-            if ((getCurrentSize() + msg.getMessage().getLength()) > maxQueueSize) {
-                if (alwaysSend) {
-                    super.sendMessage(destination, msg, payload);
-                    return;
-                } else {
-                    throw new ChannelException(sm.getString("messageDispatchInterceptor.queue.full",
-                            Long.toString(maxQueueSize), Long.toString(getCurrentSize())));
-                }
+            ChannelMessage original = msg;
+            // Reject a message that cannot fit before paying for the clone. This check is only an optimization, the
+            // atomic reservation below enforces the limit when senders race.
+            if (getCurrentSize() + msg.getMessage().getLength() > maxQueueSize) {
+                rejectOrSend(destination, original, payload);
+                return;
             }
             // add to queue
             if (useDeepClone) {
@@ -126,7 +124,10 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
             // interceptors may replace or extend the message payload while the message
             // is being sent, so the accounting must use a single snapshot of the length.
             long queuedLength = msg.getMessage().getLength();
-            addAndGetCurrentSize(queuedLength);
+            if (!reserveQueueSize(queuedLength)) {
+                rejectOrSend(destination, original, payload);
+                return;
+            }
             if (!addToQueue(msg, destination, payload, queuedLength)) {
                 addAndGetCurrentSize(-queuedLength);
                 throw new ChannelException(sm.getString("messageDispatchInterceptor.unableAdd.queue"));
@@ -136,16 +137,46 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
         }
     }
 
+    private void rejectOrSend(Member[] destination, ChannelMessage msg, InterceptorPayload payload)
+            throws ChannelException {
+        if (alwaysSend) {
+            super.sendMessage(destination, msg, payload);
+        } else {
+            throw new ChannelException(sm.getString("messageDispatchInterceptor.queue.full",
+                    Long.toString(maxQueueSize), Long.toString(getCurrentSize())));
+        }
+    }
+
+    private boolean reserveQueueSize(long length) {
+        long current;
+        long updated;
+        do {
+            current = currentSize.get();
+            updated = current + length;
+            if (updated < current || updated > maxQueueSize) {
+                return false;
+            }
+        } while (!currentSize.compareAndSet(current, updated));
+        return true;
+    }
+
 
     /**
-     * Add a message to the queue.
+     * Add a message to the queue. The length of the message is recorded in the queue size until the message has been
+     * sent. The queue size limit is not applied.
      * @param msg the message
      * @param destination the destination
      * @param payload the payload
      * @return true if added
      */
     public boolean addToQueue(final ChannelMessage msg, final Member[] destination, final InterceptorPayload payload) {
-        return addToQueue(msg, destination, payload, msg.getMessage().getLength());
+        long queuedLength = msg.getMessage().getLength();
+        addAndGetCurrentSize(queuedLength);
+        if (addToQueue(msg, destination, payload, queuedLength)) {
+            return true;
+        }
+        addAndGetCurrentSize(-queuedLength);
+        return false;
     }
 
 
