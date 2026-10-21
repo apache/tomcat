@@ -876,6 +876,26 @@
         interceptor. (remm)
       </fix>
       <fix>
+        When a node that is configured with the
+        <code>StaticMembershipInterceptor</code> is also discovered
+        dynamically, the <code>StaticMembershipInterceptor</code> now
+        replaces the statically configured member with the dynamically
+        discovered member if the host and all of the ports (TCP, secure
+        and UDP) match. Previously, the node was a member twice because
+        the unique id of a dynamically discovered member is random and
+        can not match the statically configured unique id, and every
+        message sent to all members was sent to the node twice. If only
+        some of the ports match, the mismatch is logged as a
+        configuration error and the members are not merged. The
+        failure detector is told to forget the statically configured
+        member before the discovered member is announced, so that it is
+        not added again by the member checks. If the dynamically
+        discovered member disappears, the statically configured member
+        is restored. A second statically configured member with the
+        same host and ports as an earlier one is logged as a
+        configuration error and ignored. (markt)
+      </fix>
+      <fix>
         The <code>TwoPhaseCommitInterceptor</code> now forwards the
         interceptor payload, and with it the <code>ErrorHandler</code>
         supplied by the application, with the original message instead
