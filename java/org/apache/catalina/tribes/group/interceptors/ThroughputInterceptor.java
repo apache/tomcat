@@ -73,26 +73,25 @@ public class ThroughputInterceptor extends ChannelInterceptorBase implements Thr
         if (access.addAndGet(1) == 1) {
             txStart = System.currentTimeMillis();
         }
-        long bytes = XByteBuffer.getDataPackageLength(((ChannelData) msg).getDataPackageLength());
+        boolean completed = false;
         try {
+            long bytes = XByteBuffer.getDataPackageLength(((ChannelData) msg).getDataPackageLength());
             super.sendMessage(destination, msg, payload);
+            mbTx += (bytes * destination.length) / (1024d * 1024d);
+            mbAppTx += bytes / (1024d * 1024d);
+            completed = true;
         } catch (ChannelException x) {
             msgTxErr.addAndGet(1);
-            // Release the in-flight slot exactly once. The previous check-then-act on
-            // access could skip the decrement when another send was still in flight,
-            // permanently keeping the counter above zero and stopping the reports, or
-            // let two failing sends decrement the same slot.
-            access.addAndGet(-1);
             throw x;
-        }
-        mbTx += (bytes * destination.length) / (1024d * 1024d);
-        mbAppTx += bytes / (1024d * 1024d);
-        if (access.addAndGet(-1) == 0) {
-            long stop = System.currentTimeMillis();
-            timeTx += (stop - txStart) / 1000d;
-            if ((msgTxCnt.get() / (double) interval) >= lastCnt) {
-                lastCnt++;
-                report(timeTx);
+        } finally {
+            // Release the in-flight slot exactly once for every exit path.
+            if (access.addAndGet(-1) == 0 && completed) {
+                long stop = System.currentTimeMillis();
+                timeTx += (stop - txStart) / 1000d;
+                if ((msgTxCnt.get() / (double) interval) >= lastCnt) {
+                    lastCnt++;
+                    report(timeTx);
+                }
             }
         }
         msgTxCnt.addAndGet(1);
