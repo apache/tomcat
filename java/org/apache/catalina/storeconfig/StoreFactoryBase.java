@@ -166,6 +166,7 @@ public class StoreFactoryBase implements IStoreFactory {
      */
     protected void storeElementArray(PrintWriter aWriter, int indent, Object[] elements) throws Exception {
         if (elements != null) {
+            IOException firstException = null;
             for (Object element : elements) {
                 try {
                     storeElement(aWriter, indent, element);
@@ -173,7 +174,15 @@ public class StoreFactoryBase implements IStoreFactory {
                     // Keep storing the other elements but report the failure since some children throw without
                     // logging the error themselves (e.g. StandardContextSF.storeWithBackup())
                     log.warn(sm.getString("factory.storeElementFailed", element.getClass().getName()), ioe);
+                    if (firstException == null) {
+                        firstException = ioe;
+                    } else {
+                        firstException.addSuppressed(ioe);
+                    }
                 }
+            }
+            if (firstException != null) {
+                throw firstException;
             }
         }
     }
