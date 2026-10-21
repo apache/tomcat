@@ -17,7 +17,9 @@
 package org.apache.catalina.storeconfig;
 
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -153,12 +155,7 @@ public class TestStoreConfig extends TomcatBaseTest {
         File serverXml = new File(tomcat.getServer().getCatalinaBase(), Catalina.SERVER_XML);
         Assert.assertTrue(serverXml.canRead());
         addDeleteOnTearDown(serverXml);
-        String serverXmlDump;
-        try (FileReader reader = new FileReader(serverXml);
-                StringWriter writer = new StringWriter()) {
-            IOTools.flow(reader, writer);
-            serverXmlDump = writer.toString();
-        }
+        String serverXmlDump = fileRead(serverXml);
         Assert.assertTrue(serverXmlDump.contains("StoreConfigLifecycleListener"));
         Assert.assertTrue(serverXmlDump.contains("UserDatabaseRealm"));
         // The cluster must round-trip the channel start options the test had to restrict, as the
@@ -238,12 +235,7 @@ public class TestStoreConfig extends TomcatBaseTest {
         storeConfigListener.getStoreConfig().storeConfig();
 
         // Read written configuration
-        String serverXmlDump;
-        try (FileReader reader = new FileReader(serverXml);
-                StringWriter writer = new StringWriter()) {
-            IOTools.flow(reader, writer);
-            serverXmlDump = writer.toString();
-        }
+        String serverXmlDump = fileRead(serverXml);
         Assert.assertTrue(serverXmlDump.contains("Header comment line"));
         Assert.assertTrue(serverXmlDump.contains("Service comment"));
         Assert.assertTrue(serverXmlDump.contains("Commented out connector"));
@@ -318,12 +310,7 @@ public class TestStoreConfig extends TomcatBaseTest {
         }
 
         // Read written configuration
-        String contextXmlDump;
-        try (FileReader reader = new FileReader(contextXml);
-                StringWriter writer = new StringWriter()) {
-            IOTools.flow(reader, writer);
-            contextXmlDump = writer.toString();
-        }
+        String contextXmlDump = fileRead(contextXml);
         Assert.assertTrue(contextXmlDump, contextXmlDump.contains("Context comment"));
         Assert.assertTrue(contextXmlDump, contextXmlDump.contains("watched resources"));
         Assert.assertTrue(contextXmlDump, contextXmlDump.contains("conf/test.txt"));
@@ -708,15 +695,17 @@ public class TestStoreConfig extends TomcatBaseTest {
 
         File serverXml = new File(getTemporaryDirectory(), "server-custom.xml");
         String original = "<Server port=\"8005\"/>";
-        Files.writeString(serverXml.toPath(), original, StandardCharsets.UTF_8);
+        Files.write(serverXml.toPath(), original.getBytes(StandardCharsets.UTF_8));
         storeConfig.setServerFilename(serverXml.getAbsolutePath());
 
         Assert.assertFalse(storeConfig.store(server));
-        Assert.assertEquals(original, Files.readString(serverXml.toPath(), StandardCharsets.UTF_8));
+        String serverXmlDump = fileRead(serverXml);
+        Assert.assertEquals(original, serverXmlDump);
 
         storeConfig.setServer(server);
         Assert.assertThrows(IllegalStateException.class, storeConfig::storeConfig);
-        Assert.assertEquals(original, Files.readString(serverXml.toPath(), StandardCharsets.UTF_8));
+        serverXmlDump = fileRead(serverXml);
+        Assert.assertEquals(original, serverXmlDump);
     }
 
     private static String storeToString(StoreDescription desc, Object element) throws Exception {
@@ -781,12 +770,7 @@ public class TestStoreConfig extends TomcatBaseTest {
         // also flagged
         File generatedClass = new File(generatedCodeLocation, "catalinaembedded/ServerXml.java");
         Assert.assertTrue("Generated code was not created: " + generatedClass, generatedClass.exists());
-        String generatedCode;
-        try (FileReader reader = new FileReader(generatedClass);
-                StringWriter writer = new StringWriter()) {
-            IOTools.flow(reader, writer);
-            generatedCode = writer.toString();
-        }
+        String generatedCode = fileRead(generatedClass);
         Assert.assertTrue(generatedCode, generatedCode.contains(".setDeployedFromServerXml(true);"));
     }
 
@@ -912,12 +896,7 @@ public class TestStoreConfig extends TomcatBaseTest {
         // A new context configuration file must have been created instead
         File contextXml = new File(tomcat.getHost().getConfigBaseFile(), "standalone.xml");
         Assert.assertTrue("Context file was not created: " + contextXml, contextXml.exists());
-        String contextXmlDump;
-        try (FileReader reader = new FileReader(contextXml);
-                StringWriter writer = new StringWriter()) {
-            IOTools.flow(reader, writer);
-            contextXmlDump = writer.toString();
-        }
+        String contextXmlDump = fileRead(contextXml);
         Assert.assertTrue(contextXmlDump, contextXmlDump.contains("<Context"));
         // The stored configuration must remain well-formed
         SAXParserFactory.newInstance().newSAXParser().getXMLReader()
@@ -972,4 +951,12 @@ public class TestStoreConfig extends TomcatBaseTest {
         Assert.assertFalse(new File(tomcat.getHost().getConfigBaseFile(), "skipped.xml").exists());
     }
 
+
+    private static String fileRead(File f) throws IOException {
+        try (InputStreamReader reader = new InputStreamReader(new FileInputStream(f), StandardCharsets.UTF_8);
+                StringWriter writer = new StringWriter()) {
+            IOTools.flow(reader, writer);
+            return writer.toString();
+        }
+    }
 }
