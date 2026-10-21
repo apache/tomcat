@@ -26,6 +26,7 @@ import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.util.Date;
+import java.util.List;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
@@ -50,25 +51,84 @@ public final class TesterKeystoreGenerator {
     }
 
     /**
-     * Generate a temporary JKS keystore containing a self-signed RSA certificate.
+     * Generate a temporary JKS keystore containing a single self-signed RSA certificate.
      *
-     * @param cn       the Common Name for the certificate subject
-     * @param alias    the keystore alias for the key entry
-     * @param sanNames DNS Subject Alternative Names to include, or {@code null} for none
-     * @param customizer callback to add extensions to the certificate, or {@code null} for none.
+     * @param cn         the Common Name for the certificate subject
+     * @param alias      the keystore alias for the key entry
+     * @param sanNames   DNS Subject Alternative Names to include, or {@code null} for none
+     * @param customizer callback to add extensions to the certificate, or {@code null} for none
      *
-     *  @return a temporary keystore file with password {@link  TesterSupport#JKS_PASS}
+     * @return a temporary keystore file with password {@link TesterSupport#JKS_PASS}
      *
-     *  @throws Exception if certificate generation or keystore creation fails
+     * @throws Exception if certificate generation or keystore creation fails
      */
     public static File generateKeystore(String cn, String alias, String[] sanNames,
                                         CertificateExtensionsCustomizer customizer) throws Exception {
+        CertAndKey generated = generateSelfSignedCertificate(cn, sanNames, customizer);
+
+        KeyStore ks = KeyStore.getInstance("JKS");
+        ks.load(null, null);
+        ks.setKeyEntry(alias, generated.keyPair().getPrivate(), TesterSupport.JKS_PASS.toCharArray(),
+                new X509Certificate[] { generated.certificate() });
+
+        return storeToTempFile(ks);
+    }
+
+    /**
+     * Generate a temporary JKS keystore from an explicit list of entries. Each entry has its own Common Name and may be
+     * either a private key entry or a trusted certificate entry, which lets tests reproduce stores that mix certificates
+     * with different Subjects and certificate-only (keyless) entries.
+     *
+     * @param entries the entries to add, in order
+     *
+     * @return a temporary keystore file with password {@link TesterSupport#JKS_PASS}
+     *
+     * @throws Exception if certificate generation or keystore creation fails
+     */
+    public static File generateKeystore(List<KeystoreEntry> entries) throws Exception {
+        KeyStore ks = KeyStore.getInstance("JKS");
+        ks.load(null, null);
+
+        for (KeystoreEntry entry : entries) {
+            CertAndKey generated = generateSelfSignedCertificate(entry.cn(), null, entry.customizer());
+            if (entry.keyEntry()) {
+                ks.setKeyEntry(entry.alias(), generated.keyPair().getPrivate(), TesterSupport.JKS_PASS.toCharArray(),
+                        new X509Certificate[] { generated.certificate() });
+            } else {
+                ks.setCertificateEntry(entry.alias(), generated.certificate());
+            }
+        }
+
+        return storeToTempFile(ks);
+    }
+
+    /**
+     * A single entry for {@link #generateKeystore(List)}.
+     *
+     * @param alias      the keystore alias
+     * @param cn         the certificate Subject Common Name
+     * @param keyEntry   {@code true} for a private key entry, {@code false} for a trusted certificate entry
+     * @param customizer extensions to add to the certificate, or {@code null} for none
+     */
+    public record KeystoreEntry(String alias, String cn, boolean keyEntry, CertificateExtensionsCustomizer customizer) {
+
+        public static KeystoreEntry key(String alias, String cn, CertificateExtensionsCustomizer customizer) {
+            return new KeystoreEntry(alias, cn, true, customizer);
+        }
+
+        public static KeystoreEntry trusted(String alias, String cn, CertificateExtensionsCustomizer customizer) {
+            return new KeystoreEntry(alias, cn, false, customizer);
+        }
+    }
+
+    private static CertAndKey generateSelfSignedCertificate(String cn, String[] sanNames,
+                                                            CertificateExtensionsCustomizer customizer) throws Exception {
         KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
         kpg.initialize(4096);
         KeyPair keyPair = kpg.generateKeyPair();
 
         X500Name subject = new X500Name("CN=" + cn);
-        BigInteger serial = BigInteger.valueOf(System.currentTimeMillis());
+        BigInteger serial = BigInteger.valueOf(System.nanoTime());
         long oneDay = 86400000L;
         Date notBefore = new Date(System.currentTimeMillis() - oneDay);
         Date notAfter = new Date(System.currentTimeMillis() + 365L * oneDay);
@@ -90,17 +150,17 @@ public final class TesterKeystoreGenerator {
 
         ContentSigner signer = new JcaContentSignerBuilder("SHA256withRSA").build(keyPair.getPrivate());
         X509Certificate certificate = new JcaX509CertificateConverter().getCertificate(certBuilder.build(signer));
+        return new CertAndKey(keyPair, certificate);
+    }
 
-        KeyStore ks = KeyStore.getInstance("JKS");
-        ks.load(null, null);
-        ks.setKeyEntry(alias, keyPair.getPrivate(), TesterSupport.JKS_PASS.toCharArray(), new X509Certificate[] { certificate });
+    private record CertAndKey(KeyPair keyPair, X509Certificate certificate) {}
 
+    private static File storeToTempFile(KeyStore ks) throws Exception {
         File keystoreFile = File.createTempFile("test-cert-", ".jks");
         keystoreFile.deleteOnExit();
         try (FileOutputStream fos = new FileOutputStream(keystoreFile)) {
             ks.store(fos, TesterSupport.JKS_PASS.toCharArray());
         }
-
         return keystoreFile;
     }
 
