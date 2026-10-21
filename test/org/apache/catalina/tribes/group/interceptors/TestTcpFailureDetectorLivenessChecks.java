@@ -505,4 +505,69 @@ public class TestTcpFailureDetectorLivenessChecks {
                 detector.getMember(member));
         Assert.assertEquals("Only the forced check may have reported the member", 1, recorder.added.size());
     }
+
+    @Test
+    public void testForgetMemberIsNotAddedAgainByHeartbeat() throws Exception {
+        FakeMembershipChain chain = new FakeMembershipChain();
+        RecordingInterceptor recorder = new RecordingInterceptor();
+        CheckRecordingDetector detector = createDetector(chain, recorder);
+        StaticMember member = new StaticMember("localhost", 4000, -1);
+        detector.setAlive(true);
+        detector.memberAdded(member);
+        Assert.assertNotNull(detector.getMember(member));
+
+        detector.forgetMember(member);
+
+        Assert.assertNull("The member must be removed", detector.getMember(member));
+        Assert.assertEquals("The disappearance must be forwarded once", 1, recorder.disappeared.size());
+        Assert.assertTrue("The member must not become a suspect", detector.addSuspects.isEmpty());
+        Assert.assertTrue(detector.removeSuspects.isEmpty());
+        detector.checkMembers(false);
+        Assert.assertNull("The heartbeat must not add the member again", detector.getMember(member));
+        Assert.assertEquals(1, recorder.added.size());
+    }
+
+    @Test
+    public void testForgetMemberClearsSuspectThatWasNeverAdded() throws Exception {
+        FakeMembershipChain chain = new FakeMembershipChain();
+        RecordingInterceptor recorder = new RecordingInterceptor();
+        CheckRecordingDetector detector = createDetector(chain, recorder);
+        StaticMember member = new StaticMember("localhost", 4000, -1);
+        detector.setAlive(false);
+        detector.memberAdded(member);
+        Assert.assertTrue(detector.addSuspects.containsKey(member));
+
+        detector.forgetMember(member);
+
+        Assert.assertTrue("The suspect must be forgotten", detector.addSuspects.isEmpty());
+        Assert.assertTrue("A member the detector never accepted is not reported", recorder.disappeared.isEmpty());
+        detector.setAlive(true);
+        detector.checkMembers(false);
+        Assert.assertNull("The heartbeat must not add the member", detector.getMember(member));
+        Assert.assertTrue(recorder.added.isEmpty());
+    }
+
+    @Test
+    public void testForgetMemberSupersedesRunningAddCheck() throws Exception {
+        FakeMembershipChain chain = new FakeMembershipChain();
+        RecordingInterceptor recorder = new RecordingInterceptor();
+        GatedAddDetector detector = new GatedAddDetector();
+        detector.setChannel(new GroupChannel());
+        detector.setNext(chain);
+        detector.setPrevious(recorder);
+        chain.localMember = new StaticMember("localhost", 5000, -1);
+        StaticMember member = new StaticMember("localhost", GATED_PORT, -1);
+        Thread addThread = new Thread(() -> detector.memberAdded(member));
+        addThread.start();
+        Assert.assertTrue("Liveness check did not start",
+                detector.checkStarted.await(10, TimeUnit.SECONDS));
+
+        detector.forgetMember(member);
+        detector.releaseCheck.countDown();
+        addThread.join(10000);
+
+        Assert.assertFalse("Member add thread did not finish", addThread.isAlive());
+        Assert.assertNull("A forgotten member must not be added by a running check", detector.getMember(member));
+        Assert.assertTrue(recorder.added.isEmpty());
+    }
 }
