@@ -279,8 +279,8 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase implemen
     private TcpFailureDetector getFailureDetector() {
         ChannelInterceptor prev = getPrevious();
         while (prev != null) {
-            if (prev instanceof TcpFailureDetector failureDetector) {
-                return failureDetector;
+            if (prev instanceof TcpFailureDetector) {
+                return (TcpFailureDetector) prev;
             }
             prev = prev.getPrevious();
         }
