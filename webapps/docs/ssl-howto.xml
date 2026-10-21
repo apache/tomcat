@@ -451,6 +451,100 @@ mailing list</a>.</p>
 </subsection>
 </section>
 
+<section name="Automatic certificate selection and reloading">
+
+<p>When a key store contains more than one certificate, Tomcat must choose which
+one to present to clients, and certificates must be replaced before they expire.
+Two features help to automate this so that a single configuration can be deployed
+to many hosts without per-host customization: selection of a certificate by key
+usage, and automatic reloading of renewed certificates.</p>
+
+<subsection name="Selecting a certificate by key usage">
+
+<p>When a key store holds several certificates - for example one intended for TLS
+server authentication alongside one intended for another purpose, which may share
+the same Subject - Tomcat selects a certificate that is valid for TLS server
+authentication. A certificate qualifies if its Extended Key Usage includes
+<code>serverAuth</code> or <code>anyExtendedKeyUsage</code>, or if it has no
+Extended Key Usage extension at all. Certificates that declare a different purpose,
+such as client authentication, are ignored.</p>
+
+<p>Because of this, it is usually not necessary to set
+<strong>certificateKeyAlias</strong>: Tomcat picks a usable server certificate
+automatically. When <strong>certificateKeyAlias</strong> is set, only certificates
+that share the Subject of that alias are considered.</p>
+
+<p>If no certificate valid for server authentication is found, the configured
+alias (or, when none is configured, the first key in the store) is used unchanged,
+so existing configurations are not affected.</p>
+
+</subsection>
+
+<subsection name="Reloading certificates before they expire">
+
+<p>When certificates are renewed by an external process the
+TLS certificate reload listener can load the renewed certificate without
+restarting Tomcat. Add it to the <strong>Server</strong> element:</p>
+
+<source><![CDATA[<Server ...>
+    <Listener className="org.apache.catalina.security.TLSCertificateReloadListener" />
+    ...
+</Server>]]></source>
+
+<p>The listener periodically checks each certificate and, when one is within
+<code>daysBefore</code> days of expiry (14 by default), reloads the associated
+<code>SSLHostConfig</code> so that the renewed certificate is picked up. See the
+<a href="config/listeners.html">listener documentation</a> for the available
+attributes.</p>
+
+</subsection>
+
+<subsection name="Example: the Windows certificate store">
+
+<p>On Windows, Tomcat can read certificates directly from the Windows certificate
+store. Set <strong>certificateKeystoreType</strong> to
+<code>Windows-MY-LOCALMACHINE</code> for the local machine store, or to
+<code>Windows-MY</code> for the current user's store. Reading the local machine
+store from a Tomcat service that is not running with elevated privileges requires
+Java 17.0.17, 21.0.9, 24, or a later release; on earlier releases the service must
+run with elevated privileges. This works well with AD CS autoenrollment, which
+issues and renews the machine's certificates automatically.</p>
+
+<p>The local machine store usually contains several certificates issued for the
+machine's name, such as a TLS server certificate and a Remote Desktop
+authentication certificate. Because Tomcat selects the certificate that is valid
+for server authentication, the same configuration can be deployed to every host
+with no <strong>certificateKeyAlias</strong>:</p>
+
+<source><![CDATA[<Connector port="8443" protocol="HTTP/1.1"
+    SSLEnabled="true" scheme="https" secure="true">
+    <SSLHostConfig>
+        <Certificate certificateKeystoreType="Windows-MY-LOCALMACHINE"
+            certificateKeystoreFile=""
+            certificateKeystorePassword=""
+            protocols="TLSv1.2,TLSv1.3" />
+    </SSLHostConfig>
+</Connector>]]></source>
+
+<p>Combined with the reload listener described above this gives fully automated
+certificate handling: AD CS issues and renews the certificate, while Tomcat
+selects the correct one and reloads it before it expires.</p>
+
+<p>Two points to note:</p>
+
+<ul>
+  <li>The account running Tomcat must have read access to the certificate's private
+      key. A renewed certificate may use a new key that does not inherit this
+      access, so grant it as part of the enrollment or renewal process.</li>
+  <li>If a host holds more than one certificate valid for server authentication,
+      set a unique friendly name on the intended certificate and use it as the
+      <strong>certificateKeyAlias</strong>.</li>
+</ul>
+
+</subsection>
+
+</section>
+
 <section name="Using OCSP Certificates">
 <p>Tomcat supports the Online Certificate Status Protocol (OCSP) to verify the
 status of client provided certificates for a sub-set of connector

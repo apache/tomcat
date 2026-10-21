@@ -1702,6 +1702,12 @@
       the same order as they were added. If more than one key is present in the
       keystore it is strongly recommended that a keyAlias is configured to
       ensure that the correct key is used.</p>
+      <p>When several certificates in the key store share a Subject, Tomcat automatically ignores any that are
+      not valid for TLS server authentication - i.e. whose Extended Key Usage
+      excludes both <code>serverAuth</code> and <code>anyExtendedKeyUsage</code> -
+      so a usable certificate is selected. Certificates with no Extended Key Usage
+      extension are unrestricted and remain eligible. If none qualify, the
+      configured alias is used unchanged.</p>
     </attribute>
 
     <attribute name="certificateKeyFile" required="false">
@@ -1892,9 +1898,13 @@
   <subsection name="Key store types">
 
     <p>In addition to the standard key store types (JKS and PKCS12), most Java
-    runtimes support additional key store types such as Windows-ROOT,
-    Windows-My, DKS as well as hardware security modules. Generally, to use
-    these additional keystore types with a TLS Connector in Tomcat:</p>
+    runtimes support additional key store types such as Windows-MY, Windows-ROOT,
+    DKS as well as hardware security modules. On Windows, Windows-MY and
+    Windows-ROOT access the current user's certificate store, while
+    Windows-MY-LOCALMACHINE and Windows-ROOT-LOCALMACHINE access the local machine
+    store (reading the local machine store from a non-elevated process requires
+    Java 17.0.17, 21.0.9, 24 or later). Generally, to use these additional key
+    store types with a TLS Connector in Tomcat:</p>
 
     <ul>
       <li>Set the certificateKeystoreType and/or truststoreType Connector
