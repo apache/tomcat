@@ -1864,10 +1864,11 @@
     <p>In addition to the standard key store types (JKS and PKCS12), most Java
     runtimes support additional key store types such as Windows-MY, Windows-ROOT,
     DKS as well as hardware security modules. On Windows, Windows-MY and
-    Windows-ROOT access the current user's certificate store; Java 17.0.5, 19 and
-    later also provide Windows-MY-LOCALMACHINE and Windows-ROOT-LOCALMACHINE for
-    the local machine store. Generally, to use these additional key store types
-    with a TLS Connector in Tomcat:</p>
+    Windows-ROOT access the current user's certificate store, while
+    Windows-MY-LOCALMACHINE and Windows-ROOT-LOCALMACHINE access the local machine
+    store (reading the local machine store from a non-elevated process requires
+    Java 17.0.17, 21.0.9, 24 or later). Generally, to use these additional key
+    store types with a TLS Connector in Tomcat:</p>
 
     <ul>
       <li>Set the certificateKeystoreType and/or truststoreType Connector
