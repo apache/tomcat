@@ -16,14 +16,17 @@
  */
 package org.apache.catalina.tribes.group;
 
+import java.util.Iterator;
 import java.util.concurrent.ScheduledFuture;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
 import org.apache.catalina.tribes.Channel;
+import org.apache.catalina.tribes.ChannelInterceptor;
 import org.apache.catalina.tribes.membership.McastService;
 import org.apache.catalina.tribes.transport.ReceiverBase;
 import org.apache.catalina.tribes.transport.ReplicationTransmitter;
@@ -164,6 +167,36 @@ public class TestGroupChannelStartStop {
         Assert.assertNull(channel.heartbeatFuture);
         Assert.assertTrue(monitor.isCancelled());
         Assert.assertTrue(heartbeat.isCancelled());
+    }
+
+    @Test
+    public void testStagedStopReleasesSslContext() throws Exception {
+        channel.setPskIdentity("tribes-test");
+        channel.setPskKey("000102030405060708090a0b0c0d0e0f");
+        channel.start(Channel.DEFAULT);
+        // The TLS context is only available when the TLS implementation is
+        Assume.assumeNotNull(channel.getSslContext());
+        // Stop in stages: no single call stops all of the services
+        channel.stop(Channel.SND_RX_SEQ);
+        Assert.assertNotNull(channel.getSslContext());
+        channel.stop(Channel.SND_TX_SEQ | Channel.MBR_RX_SEQ | Channel.MBR_TX_SEQ);
+        Assert.assertNull(channel.getSslContext());
+    }
+
+    @Test
+    public void testPartialStopKeepsInterceptorChannel() throws Exception {
+        channel.start(Channel.DEFAULT);
+        channel.stop(Channel.SND_RX_SEQ);
+        // services are still running, the interceptors must still be attached to the channel
+        for (Iterator<ChannelInterceptor> it = channel.getInterceptors(); it.hasNext();) {
+            ChannelInterceptor interceptor = it.next();
+            Assert.assertSame(interceptor.getClass().getName(), channel, interceptor.getChannel());
+        }
+        channel.stop(Channel.SND_TX_SEQ | Channel.MBR_RX_SEQ | Channel.MBR_TX_SEQ);
+        for (Iterator<ChannelInterceptor> it = channel.getInterceptors(); it.hasNext();) {
+            ChannelInterceptor interceptor = it.next();
+            Assert.assertNull(interceptor.getClass().getName(), interceptor.getChannel());
+        }
     }
 
     @Test

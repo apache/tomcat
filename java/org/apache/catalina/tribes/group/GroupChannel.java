@@ -533,7 +533,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
                 heartbeatFuture.cancel(true);
                 heartbeatFuture = null;
             }
-            if ((svc & DEFAULT) == DEFAULT && sslContext != null) {
+            if (sslContext != null) {
                 sslContext.close();
                 sslContext = null;
             }

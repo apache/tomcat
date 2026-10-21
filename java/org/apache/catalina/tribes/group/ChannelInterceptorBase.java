@@ -187,14 +187,34 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
         if (getNext() != null) {
             getNext().stop(svc);
         }
-        if (oname != null) {
-            JmxRegistry jmxRegistry = JmxRegistry.getRegistry(channel);
-            if (jmxRegistry != null) {
-                jmxRegistry.unregisterJmx(oname);
+        // Only release the channel and the JMX registration once all services have been stopped. A partial stop leaves
+        // services running that still use them.
+        if (isFullyStopped()) {
+            if (oname != null) {
+                JmxRegistry jmxRegistry = JmxRegistry.getRegistry(channel);
+                if (jmxRegistry != null) {
+                    jmxRegistry.unregisterJmx(oname);
+                }
+                oname = null;
             }
-            oname = null;
+            channel = null;
         }
-        channel = null;
+    }
+
+    /**
+     * Determine if all services of the coordinator at the end of the interceptor stack have been stopped.
+     *
+     * @return {@code true} if no service is started, or if there is no coordinator after this interceptor
+     */
+    private boolean isFullyStopped() {
+        ChannelInterceptor interceptor = getNext();
+        while (interceptor != null) {
+            if (interceptor instanceof ChannelCoordinator coordinator) {
+                return coordinator.getStartLevel() == 0;
+            }
+            interceptor = interceptor.getNext();
+        }
+        return true;
     }
 
     @Override
