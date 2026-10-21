@@ -215,6 +215,34 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
         }
     }
 
+    /**
+     * Forgets a member that is represented by another member from now on, for example a statically configured
+     * member whose node has been discovered dynamically. Unlike {@link #memberDisappeared(Member)}, the member is
+     * not kept as a suspect, so it is not added again by the member checks. If the member was a member of this
+     * detector, the interceptors above are told that it disappeared.
+     *
+     * @param member the member to forget
+     */
+    public void forgetMember(Member member) {
+        if (membership == null) {
+            setupMembership();
+        }
+        boolean removed;
+        synchronized (membership) {
+            // supersedes running checks of the member
+            recordMemberEvent(member);
+            removed = membership.contains(member);
+            if (removed) {
+                membership.removeMember(member);
+            }
+            removeSuspects.remove(member);
+            addSuspects.remove(member);
+        }
+        if (removed) {
+            super.memberDisappeared(member);
+        }
+    }
+
     @Override
     public void memberDisappeared(Member member) {
         if (membership == null) {
