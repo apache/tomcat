@@ -34,7 +34,7 @@ public class TestChannelException {
         ChannelException e = new ChannelException();
         String message = e.getMessage();
         Assert.assertNotNull(message);
-        Assert.assertTrue(message, message.contains(ChannelException.class.getName()));
+        Assert.assertTrue(e.toString(), e.toString().contains(ChannelException.class.getName()));
         Assert.assertTrue(message, message.contains("No faulty members identified."));
         Assert.assertNotNull(e.toString());
 
