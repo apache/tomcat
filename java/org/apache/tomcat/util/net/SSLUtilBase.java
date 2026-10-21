@@ -85,13 +85,6 @@ public abstract class SSLUtilBase implements SSLUtil {
     public static final String DEFAULT_KEY_ALIAS = "tomcat";
 
     /**
-     * EKU OIDs.
-     */
-    public static final String SERVER_AUTH_EXTENDED_KEY_USAGE_OID = "1.3.6.1.5.5.7.3.1";
-    public static final String CLIENT_AUTH_EXTENDED_KEY_USAGE_OID = "1.3.6.1.5.5.7.3.2";
-    public static final String ANY_EXTENDED_KEY_USAGE_OID = "2.5.29.37.0";
-
-    /**
      * The SSL host configuration.
      */
     protected final SSLHostConfig sslHostConfig;
@@ -535,9 +528,9 @@ public abstract class SSLUtilBase implements SSLUtil {
      *     way TLS implementations generally interpret such certificates - so rejecting them would needlessly exclude
      *     the many server certificates issued without an EKU.</li>
      * <li>A certificate that <strong>does</strong> carry an EKU extension is usable only if that extension explicitly
-     *     lists the {@code id-kp-serverAuth} OID ({@value #SERVER_AUTH_EXTENDED_KEY_USAGE_OID}) or the
-     *     {@code anyExtendedKeyUsage} OID ({@value #ANY_EXTENDED_KEY_USAGE_OID}). Any other declared usage - for
-     *     example a certificate limited to client authentication, such as a Remote Desktop authentication
+     *     lists the {@code id-kp-serverAuth} OID ({@value Constants#SERVER_AUTH_EXTENDED_KEY_USAGE_OID}) or the
+     *     {@code anyExtendedKeyUsage} OID ({@value Constants#ANY_EXTENDED_KEY_USAGE_OID}). Any other declared usage
+     *     - for example a certificate limited to client authentication, such as a Remote Desktop authentication
      *     certificate - is rejected, which is what lets this feature skip the wrong certificate.</li>
      * </ul>
      *
@@ -555,8 +548,8 @@ public abstract class SSLUtilBase implements SSLUtil {
         }
 
         for (String objectIdentifier : objectIdentifiers) {
-            if (objectIdentifier.equals(SERVER_AUTH_EXTENDED_KEY_USAGE_OID) ||
-                    objectIdentifier.equals(ANY_EXTENDED_KEY_USAGE_OID)) {
+            if (objectIdentifier.equals(Constants.SERVER_AUTH_EXTENDED_KEY_USAGE_OID) ||
+                    objectIdentifier.equals(Constants.ANY_EXTENDED_KEY_USAGE_OID)) {
                 return true;
             }
         }

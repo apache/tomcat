@@ -93,7 +93,7 @@ public class TestSSLUtilBaseKeyUsageSelection {
         X509Certificate presented = present(HOST,
                 key(HOST, CLIENT_AUTH),
                 key("localhost-server", SERVER_AUTH));
-        assertEku(presented, SSLUtilBase.SERVER_AUTH_EXTENDED_KEY_USAGE_OID);
+        assertEku(presented, Constants.SERVER_AUTH_EXTENDED_KEY_USAGE_OID);
     }
 
 
@@ -102,7 +102,7 @@ public class TestSSLUtilBaseKeyUsageSelection {
         X509Certificate presented = present(HOST,
                 key(HOST, SERVER_AUTH),
                 key("localhost-client", CLIENT_AUTH));
-        assertEku(presented, SSLUtilBase.SERVER_AUTH_EXTENDED_KEY_USAGE_OID);
+        assertEku(presented, Constants.SERVER_AUTH_EXTENDED_KEY_USAGE_OID);
     }
 
 
@@ -111,7 +111,7 @@ public class TestSSLUtilBaseKeyUsageSelection {
         X509Certificate presented = present(HOST,
                 key(HOST, CLIENT_AUTH),
                 key("localhost-any", ANY_AUTH));
-        assertEku(presented, SSLUtilBase.ANY_EXTENDED_KEY_USAGE_OID);
+        assertEku(presented, Constants.ANY_EXTENDED_KEY_USAGE_OID);
     }
 
 
@@ -130,7 +130,7 @@ public class TestSSLUtilBaseKeyUsageSelection {
         X509Certificate presented = present(null,
                 key("first", CLIENT_AUTH),
                 key("second", SERVER_AUTH));
-        assertEku(presented, SSLUtilBase.SERVER_AUTH_EXTENDED_KEY_USAGE_OID);
+        assertEku(presented, Constants.SERVER_AUTH_EXTENDED_KEY_USAGE_OID);
     }
 
 
@@ -143,7 +143,7 @@ public class TestSSLUtilBaseKeyUsageSelection {
                 key(HOST, CLIENT_AUTH),
                 key("localhost-s1", SERVER_AUTH),
                 key("localhost-s2", SERVER_AUTH));
-        assertEku(presented, SSLUtilBase.SERVER_AUTH_EXTENDED_KEY_USAGE_OID);
+        assertEku(presented, Constants.SERVER_AUTH_EXTENDED_KEY_USAGE_OID);
     }
 
 
@@ -152,7 +152,7 @@ public class TestSSLUtilBaseKeyUsageSelection {
         X509Certificate presented = present(HOST,
                 key(HOST, CLIENT_AUTH),
                 key("localhost-2", CLIENT_AUTH));
-        assertEku(presented, SSLUtilBase.CLIENT_AUTH_EXTENDED_KEY_USAGE_OID);
+        assertEku(presented, Constants.CLIENT_AUTH_EXTENDED_KEY_USAGE_OID);
     }
 
 
@@ -161,7 +161,7 @@ public class TestSSLUtilBaseKeyUsageSelection {
         X509Certificate presented = present(HOST,
                 key(HOST, CLIENT_AUTH),
                 KeystoreEntry.key("other-server", "other.example", SERVER_AUTH));
-        assertEku(presented, SSLUtilBase.CLIENT_AUTH_EXTENDED_KEY_USAGE_OID);
+        assertEku(presented, Constants.CLIENT_AUTH_EXTENDED_KEY_USAGE_OID);
     }
 
 
@@ -173,6 +173,6 @@ public class TestSSLUtilBaseKeyUsageSelection {
         X509Certificate presented = present(HOST,
                 KeystoreEntry.trusted("ca", HOST, SERVER_AUTH),
                 key(HOST, CLIENT_AUTH));
-        assertEku(presented, SSLUtilBase.CLIENT_AUTH_EXTENDED_KEY_USAGE_OID);
+        assertEku(presented, Constants.CLIENT_AUTH_EXTENDED_KEY_USAGE_OID);
     }
 }
