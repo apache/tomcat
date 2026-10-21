@@ -24,7 +24,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.apache.catalina.tribes.Channel;
+import org.apache.catalina.tribes.membership.McastService;
 import org.apache.catalina.tribes.transport.ReceiverBase;
+import org.apache.catalina.tribes.transport.ReplicationTransmitter;
 
 public class TestGroupChannelStartStop {
     private GroupChannel channel = null;
@@ -186,6 +188,30 @@ public class TestGroupChannelStartStop {
     }
 
     @Test
+    public void testFailedStartRecordsServicesThatStarted() throws Exception {
+        CountingSender sender = new CountingSender();
+        FailingMembershipService membershipService = new FailingMembershipService();
+        channel.setChannelSender(sender);
+        channel.setMembershipService(membershipService);
+        channel.coordinator.setChannel(channel);
+
+        int services = Channel.SND_TX_SEQ | Channel.MBR_RX_SEQ;
+        try {
+            channel.coordinator.internalStart(services);
+            Assert.fail("The first membership start should fail");
+        } catch (Exception expected) {
+            // Expected
+        }
+        Assert.assertEquals(Channel.SND_TX_SEQ, channel.coordinator.getStartLevel());
+        Assert.assertEquals(1, sender.startCount);
+
+        channel.coordinator.internalStart(services);
+        Assert.assertEquals(services, channel.coordinator.getStartLevel());
+        Assert.assertEquals(1, sender.startCount);
+        channel.coordinator.internalStop(services);
+    }
+
+    @Test
     public void testFalseOption() throws Exception {
         int flag = 0xFFF0;//should get ignored by the underlying components
         int count = 0;
@@ -210,5 +236,39 @@ public class TestGroupChannelStartStop {
         channel.start(Channel.DEFAULT);
         Thread.sleep(1000);
         channel.stop(Channel.DEFAULT);
+    }
+
+    private static class CountingSender extends ReplicationTransmitter {
+
+        private volatile int startCount;
+
+        @Override
+        public synchronized void start() {
+            startCount++;
+        }
+
+        @SuppressWarnings("sync-override")
+        @Override
+        public void stop() {
+            // NO-OP
+        }
+    }
+
+    private static class FailingMembershipService extends McastService {
+
+        private boolean fail = true;
+
+        @Override
+        public void start(int level) throws Exception {
+            if (fail) {
+                fail = false;
+                throw new Exception("Test failure");
+            }
+        }
+
+        @Override
+        public void stop(int level) {
+            // NO-OP
+        }
     }
 }
