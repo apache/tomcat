@@ -19,6 +19,10 @@ package org.apache.catalina.tribes.group.interceptors;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -68,6 +72,45 @@ public class TestTcpFailureDetectorLivenessChecks {
 
         int checkCount() {
             return monitorHeld.size();
+        }
+    }
+
+    private static final int GATED_PORT = 4000;
+
+    private static class GatedAddDetector extends TcpFailureDetector {
+
+        private final CountDownLatch checkStarted = new CountDownLatch(1);
+        private final CountDownLatch releaseCheck = new CountDownLatch(1);
+        private volatile boolean gatedResult = true;
+        // Result of the gated thread's checks after the first one, which was held
+        private volatile boolean laterGatedResult = true;
+        private final AtomicInteger gatedChecks = new AtomicInteger();
+        // When set, only checks run by this thread are gated and all others return otherResult
+        private volatile Thread gatedThread;
+        private volatile boolean otherResult = true;
+
+        @Override
+        protected boolean memberAlive(Member mbr) {
+            if (gatedThread != null) {
+                if (Thread.currentThread() != gatedThread) {
+                    return otherResult;
+                }
+            } else if (mbr.getPort() != GATED_PORT) {
+                return true;
+            }
+            if (gatedChecks.incrementAndGet() > 1 && gatedThread != null) {
+                return laterGatedResult;
+            }
+            checkStarted.countDown();
+            try {
+                if (!releaseCheck.await(10, TimeUnit.SECONDS)) {
+                    throw new IllegalStateException("Timed out waiting to release liveness check");
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new IllegalStateException(e);
+            }
+            return gatedResult;
         }
     }
 
@@ -200,5 +243,266 @@ public class TestTcpFailureDetectorLivenessChecks {
         Assert.assertEquals("The disappearance must be forwarded", 1, recorder.disappeared.size());
 
         detector.assertNoCheckRanUnderMonitor();
+    }
+
+    @Test
+    public void testShutdownInvalidatesInFlightAddCheck() throws Exception {
+        FakeMembershipChain chain = new FakeMembershipChain();
+        RecordingInterceptor recorder = new RecordingInterceptor();
+        GatedAddDetector detector = new GatedAddDetector();
+        detector.setChannel(new GroupChannel());
+        detector.setNext(chain);
+        detector.setPrevious(recorder);
+        chain.localMember = new StaticMember("localhost", 5000, -1);
+        StaticMember member = new StaticMember("localhost", 4000, -1);
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+
+        Thread addThread = new Thread(() -> {
+            try {
+                detector.memberAdded(member);
+            } catch (Throwable t) {
+                failure.set(t);
+            }
+        });
+        addThread.start();
+        Assert.assertTrue("Liveness check did not start",
+                detector.checkStarted.await(10, TimeUnit.SECONDS));
+
+        member.setCommand(Member.SHUTDOWN_PAYLOAD);
+        detector.memberDisappeared(member);
+        detector.releaseCheck.countDown();
+        addThread.join(10000);
+
+        Assert.assertFalse("Member add thread did not finish", addThread.isAlive());
+        Assert.assertNull("Member add failed unexpectedly", failure.get());
+        Assert.assertNull("A stale successful check must not resurrect a member after shutdown",
+                detector.getMember(member));
+        Assert.assertTrue("A stale add must not be forwarded", recorder.added.isEmpty());
+    }
+
+    @Test
+    public void testEventOfOtherMemberDoesNotInvalidateAddCheck() throws Exception {
+        FakeMembershipChain chain = new FakeMembershipChain();
+        RecordingInterceptor recorder = new RecordingInterceptor();
+        GatedAddDetector detector = new GatedAddDetector();
+        detector.setChannel(new GroupChannel());
+        detector.setNext(chain);
+        detector.setPrevious(recorder);
+        chain.localMember = new StaticMember("localhost", 5000, -1);
+        StaticMember gated = new StaticMember("localhost", GATED_PORT, -1);
+        StaticMember other = new StaticMember("localhost", 4001, -1);
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+
+        Thread addThread = new Thread(() -> {
+            try {
+                detector.memberAdded(gated);
+            } catch (Throwable t) {
+                failure.set(t);
+            }
+        });
+        addThread.start();
+        Assert.assertTrue("Liveness check did not start",
+                detector.checkStarted.await(10, TimeUnit.SECONDS));
+
+        // Events of other members, including a disappearance, are processed meanwhile
+        detector.memberAdded(other);
+        detector.memberDisappeared(other);
+        detector.releaseCheck.countDown();
+        addThread.join(10000);
+
+        Assert.assertFalse("Member add thread did not finish", addThread.isAlive());
+        Assert.assertNull("Member add failed unexpectedly", failure.get());
+        Assert.assertNotNull("An event of another member must not drop the add", detector.getMember(gated));
+        Assert.assertTrue("The add must be forwarded", recorder.added.contains(gated));
+    }
+
+    @Test
+    public void testLaterEventOfSameMemberInvalidatesAddCheck() throws Exception {
+        FakeMembershipChain chain = new FakeMembershipChain();
+        RecordingInterceptor recorder = new RecordingInterceptor();
+        GatedAddDetector detector = new GatedAddDetector();
+        detector.setChannel(new GroupChannel());
+        detector.setNext(chain);
+        detector.setPrevious(recorder);
+        chain.localMember = new StaticMember("localhost", 5000, -1);
+        StaticMember member = new StaticMember("localhost", GATED_PORT, -1);
+
+        Thread addThread = new Thread(() -> detector.memberAdded(member));
+        addThread.start();
+        Assert.assertTrue("Liveness check did not start",
+                detector.checkStarted.await(10, TimeUnit.SECONDS));
+
+        // A non-shutdown disappearance of a member not yet in the table is ignored but still
+        // supersedes the running add check
+        detector.memberDisappeared(member);
+        detector.releaseCheck.countDown();
+        addThread.join(10000);
+
+        Assert.assertFalse("Member add thread did not finish", addThread.isAlive());
+        Assert.assertNull("A later event for the member supersedes the running check",
+                detector.getMember(member));
+        Assert.assertTrue("A superseded add must not be forwarded", recorder.added.isEmpty());
+    }
+
+    /*
+     * Runs a basic check whose probe of the member is held, while the same member is reported by the
+     * membership service, which runs its own (ungated) check with the given result. Then the held probe is
+     * released with its own result.
+     */
+    private void runBasicCheckWithConcurrentAdd(boolean probeAlive, boolean eventAlive, GatedAddDetector detector,
+            RecordingInterceptor recorder, FakeMembershipChain chain, StaticMember member) throws Exception {
+        detector.setChannel(new GroupChannel());
+        detector.setNext(chain);
+        detector.setPrevious(recorder);
+        chain.localMember = new StaticMember("localhost", 5000, -1);
+        chain.members = new Member[] { member };
+        detector.gatedResult = probeAlive;
+        // the same heartbeat re-checks add suspects after the held probe, which must agree with the event
+        detector.laterGatedResult = eventAlive;
+        detector.otherResult = eventAlive;
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+
+        Thread checkThread = new Thread(() -> {
+            try {
+                detector.checkMembers(false);
+            } catch (Throwable t) {
+                failure.set(t);
+            }
+        });
+        detector.gatedThread = checkThread;
+        checkThread.start();
+        Assert.assertTrue("Liveness check did not start",
+                detector.checkStarted.await(10, TimeUnit.SECONDS));
+
+        // The basic check is verifying the member, which must not be visible until verified
+        Assert.assertNull("An unverified member must not be in the table", detector.getMember(member));
+        detector.memberAdded(member);
+        detector.releaseCheck.countDown();
+        checkThread.join(10000);
+
+        Assert.assertFalse("Check thread did not finish", checkThread.isAlive());
+        Assert.assertNull("Check failed unexpectedly", failure.get());
+    }
+
+    @Test
+    public void testBasicCheckAddsVerifiedMemberOnlyAfterProbe() throws Exception {
+        FakeMembershipChain chain = new FakeMembershipChain();
+        RecordingInterceptor recorder = new RecordingInterceptor();
+        GatedAddDetector detector = new GatedAddDetector();
+        detector.setChannel(new GroupChannel());
+        detector.setNext(chain);
+        detector.setPrevious(recorder);
+        chain.localMember = new StaticMember("localhost", 5000, -1);
+        StaticMember member = new StaticMember("localhost", GATED_PORT, -1);
+        chain.members = new Member[] { member };
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+
+        Thread checkThread = new Thread(() -> {
+            try {
+                detector.checkMembers(false);
+            } catch (Throwable t) {
+                failure.set(t);
+            }
+        });
+        detector.gatedThread = checkThread;
+        checkThread.start();
+        Assert.assertTrue("Liveness check did not start",
+                detector.checkStarted.await(10, TimeUnit.SECONDS));
+        Assert.assertNull("An unverified member must not be in the table", detector.getMember(member));
+        Assert.assertTrue("An unverified member must not be reported", recorder.added.isEmpty());
+
+        detector.releaseCheck.countDown();
+        checkThread.join(10000);
+
+        Assert.assertFalse("Check thread did not finish", checkThread.isAlive());
+        Assert.assertNull("Check failed unexpectedly", failure.get());
+        Assert.assertNotNull("A verified member must be added", detector.getMember(member));
+        Assert.assertEquals("A verified member must be reported once", 1, recorder.added.size());
+    }
+
+    @Test
+    public void testBasicCheckDeadProbeDoesNotOverrideLaterAdd() throws Exception {
+        FakeMembershipChain chain = new FakeMembershipChain();
+        RecordingInterceptor recorder = new RecordingInterceptor();
+        GatedAddDetector detector = new GatedAddDetector();
+        StaticMember member = new StaticMember("localhost", GATED_PORT, -1);
+
+        runBasicCheckWithConcurrentAdd(false, true, detector, recorder, chain, member);
+
+        Assert.assertNotNull("The later add must win over the older dead probe", detector.getMember(member));
+        Assert.assertEquals("The member must be reported exactly once", 1, recorder.added.size());
+    }
+
+    @Test
+    public void testBasicCheckLiveProbeDoesNotOverrideLaterAdd() throws Exception {
+        FakeMembershipChain chain = new FakeMembershipChain();
+        RecordingInterceptor recorder = new RecordingInterceptor();
+        GatedAddDetector detector = new GatedAddDetector();
+        StaticMember member = new StaticMember("localhost", GATED_PORT, -1);
+
+        runBasicCheckWithConcurrentAdd(true, true, detector, recorder, chain, member);
+
+        Assert.assertNotNull("The member must stay in the table", detector.getMember(member));
+        Assert.assertEquals("The member must be reported exactly once, by the later add", 1,
+                recorder.added.size());
+    }
+
+    @Test
+    public void testBasicCheckLiveProbeDoesNotOverrideLaterFailedAdd() throws Exception {
+        FakeMembershipChain chain = new FakeMembershipChain();
+        RecordingInterceptor recorder = new RecordingInterceptor();
+        GatedAddDetector detector = new GatedAddDetector();
+        StaticMember member = new StaticMember("localhost", GATED_PORT, -1);
+
+        runBasicCheckWithConcurrentAdd(true, false, detector, recorder, chain, member);
+
+        Assert.assertNull("The later failed add must win over the older live probe", detector.getMember(member));
+        Assert.assertTrue("A superseded probe must not be reported", recorder.added.isEmpty());
+        Assert.assertTrue("The failed static member must be an add suspect",
+                detector.addSuspects.containsKey(member));
+    }
+
+    @Test
+    public void testHeartbeatChangesInvalidateInFlightAddCheck() throws Exception {
+        FakeMembershipChain chain = new FakeMembershipChain();
+        RecordingInterceptor recorder = new RecordingInterceptor();
+        GatedAddDetector detector = new GatedAddDetector();
+        detector.setChannel(new GroupChannel());
+        detector.setNext(chain);
+        detector.setPrevious(recorder);
+        chain.localMember = new StaticMember("localhost", 5000, -1);
+        StaticMember member = new StaticMember("localhost", GATED_PORT, -1);
+        chain.members = new Member[] { member };
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+
+        Thread addThread = new Thread(() -> {
+            try {
+                detector.memberAdded(member);
+            } catch (Throwable t) {
+                failure.set(t);
+            }
+        });
+        detector.gatedThread = addThread;
+        addThread.start();
+        Assert.assertTrue("Liveness check did not start",
+                detector.checkStarted.await(10, TimeUnit.SECONDS));
+
+        // Forced heartbeat checks add the member and then find it dead again, while the
+        // check started by the member event is still running
+        detector.otherResult = true;
+        detector.checkMembers(true);
+        Assert.assertNotNull("The forced check must add the member", detector.getMember(member));
+        detector.otherResult = false;
+        detector.checkMembers(true);
+        Assert.assertNull("The forced check must remove the member", detector.getMember(member));
+
+        detector.releaseCheck.countDown();
+        addThread.join(10000);
+
+        Assert.assertFalse("Member add thread did not finish", addThread.isAlive());
+        Assert.assertNull("Member add failed unexpectedly", failure.get());
+        Assert.assertNull("A stale live result must not resurrect a member the heartbeat found dead",
+                detector.getMember(member));
+        Assert.assertEquals("Only the forced check may have reported the member", 1, recorder.added.size());
     }
 }
