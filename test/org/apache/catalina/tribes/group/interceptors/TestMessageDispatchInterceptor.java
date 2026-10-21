@@ -19,7 +19,12 @@ package org.apache.catalina.tribes.group.interceptors;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -91,8 +96,7 @@ public class TestMessageDispatchInterceptor {
             Member[] destination = new Member[] { new MemberImpl("localhost", 4000, -1) };
 
             interceptor.sendMessage(destination, data, null);
-            Assert.assertTrue("Dispatch thread did not start",
-                    collector.dispatchStarted.await(10, TimeUnit.SECONDS));
+            Assert.assertTrue("Dispatch thread did not start", collector.dispatchStarted.await(10, TimeUnit.SECONDS));
             // Simulate GroupChannel.send() returning the buffer to the pool for reuse
             buffer.clear();
             buffer.append(reused, 0, reused.length);
@@ -100,10 +104,9 @@ public class TestMessageDispatchInterceptor {
             Assert.assertTrue("Dispatch thread did not collect the message",
                     collector.collected.await(10, TimeUnit.SECONDS));
 
-            Assert.assertNotSame("Queued message must not share the pooled buffer",
-                    buffer, collector.capturedBuffer);
-            Assert.assertArrayEquals("Queued message content was corrupted by buffer reuse",
-                    original, collector.capturedData);
+            Assert.assertNotSame("Queued message must not share the pooled buffer", buffer, collector.capturedBuffer);
+            Assert.assertArrayEquals("Queued message content was corrupted by buffer reuse", original,
+                    collector.capturedData);
         } finally {
             interceptor.stopQueue();
         }
@@ -160,16 +163,166 @@ public class TestMessageDispatchInterceptor {
                 size = interceptor.getCurrentSize();
             }
             Assert.assertEquals(
-                    "Queue size accounting drifted when a downstream interceptor changed the message length",
-                    0, size);
+                    "Queue size accounting drifted when a downstream interceptor changed the message length", 0, size);
         } finally {
             interceptor.stopQueue();
         }
     }
 
+    @Test
+    public void testPublicAddToQueueAccountsForQueueSize() throws Exception {
+        GroupChannel channel = new GroupChannel();
+        MessageDispatchInterceptor interceptor = new MessageDispatchInterceptor();
+        MutatingCollector collector = new MutatingCollector();
+        interceptor.setChannel(channel);
+        interceptor.setNext(collector);
+        interceptor.startQueue();
+        try {
+            Member destination = new MemberImpl("localhost", 4000, -1);
+            ChannelData data = new ChannelData(false);
+            data.setUniqueId(UUIDGenerator.randomUUID(false));
+            data.setAddress(destination);
+            data.setOptions(Channel.SEND_OPTIONS_ASYNCHRONOUS);
+            XByteBuffer buffer = new XByteBuffer(64, false);
+            byte[] payloadBytes = "PAYLOAD".getBytes(StandardCharsets.UTF_8);
+            buffer.append(payloadBytes, 0, payloadBytes.length);
+            data.setMessage(buffer);
+
+            Assert.assertTrue(interceptor.addToQueue(data, new Member[] { destination }, null));
+
+            long deadline = System.currentTimeMillis() + 10000;
+            long size = interceptor.getCurrentSize();
+            while (size != 0 && System.currentTimeMillis() < deadline) {
+                Thread.sleep(50);
+                size = interceptor.getCurrentSize();
+            }
+            Assert.assertEquals("Queue size must return to zero, not drift negative", 0, size);
+        } finally {
+            interceptor.stopQueue();
+        }
+    }
+
+    @Test
+    public void testPublicAddToQueueRollsBackWhenRejected() throws Exception {
+        GroupChannel channel = new GroupChannel();
+        MessageDispatchInterceptor interceptor = new MessageDispatchInterceptor();
+        interceptor.setChannel(channel);
+        interceptor.setNext(new MutatingCollector());
+        interceptor.startQueue();
+        // A stopped queue rejects new tasks
+        interceptor.stopQueue();
+
+        Member destination = new MemberImpl("localhost", 4000, -1);
+        ChannelData data = new ChannelData(false);
+        XByteBuffer buffer = new XByteBuffer(64, false);
+        byte[] payloadBytes = "PAYLOAD".getBytes(StandardCharsets.UTF_8);
+        buffer.append(payloadBytes, 0, payloadBytes.length);
+        data.setMessage(buffer);
+
+        Assert.assertFalse(interceptor.addToQueue(data, new Member[] { destination }, null));
+        Assert.assertEquals(0, interceptor.getCurrentSize());
+    }
+
+    @Test
+    public void testRejectedMessageIsNotCloned() throws Exception {
+        byte[] payload = "PAYLOAD".getBytes(StandardCharsets.UTF_8);
+        MessageDispatchInterceptor interceptor = new MessageDispatchInterceptor();
+        interceptor.setAlwaysSend(false);
+        interceptor.setMaxQueueSize(payload.length - 1);
+        interceptor.setChannel(new GroupChannel());
+        interceptor.setNext(new MutatingCollector());
+        interceptor.startQueue();
+        try {
+            Member destination = new MemberImpl("localhost", 4000, -1);
+            AtomicInteger clones = new AtomicInteger();
+            ChannelData data = new ChannelData(false) {
+                @Override
+                public Object deepclone() {
+                    clones.incrementAndGet();
+                    return super.deepclone();
+                }
+            };
+            data.setUniqueId(UUIDGenerator.randomUUID(false));
+            data.setAddress(destination);
+            data.setOptions(Channel.SEND_OPTIONS_ASYNCHRONOUS);
+            data.setMessage(new XByteBuffer(payload, false));
+
+            try {
+                interceptor.sendMessage(new Member[] { destination }, data, null);
+                Assert.fail("The message does not fit in the queue");
+            } catch (ChannelException expected) {
+                // Expected
+            }
+            Assert.assertEquals("A message that cannot fit must be rejected before it is cloned", 0, clones.get());
+            Assert.assertEquals(0, interceptor.getCurrentSize());
+        } finally {
+            interceptor.stopQueue();
+        }
+    }
+
+    @Test
+    public void testConcurrentSendsCannotExceedMaxQueueSize() throws Exception {
+        byte[] payload = "PAYLOAD".getBytes(StandardCharsets.UTF_8);
+        CyclicBarrier clonesReady = new CyclicBarrier(2);
+        MessageDispatchInterceptor interceptor = new MessageDispatchInterceptor();
+        interceptor.setAlwaysSend(false);
+        interceptor.setMaxQueueSize(payload.length);
+        GatedCollector collector = new GatedCollector();
+        interceptor.setChannel(new GroupChannel());
+        interceptor.setNext(collector);
+        interceptor.startQueue();
+        ExecutorService senders = Executors.newFixedThreadPool(2);
+        try {
+            Member destination = new MemberImpl("localhost", 4000, -1);
+            Member[] destinations = new Member[] { destination };
+            Future<Boolean> first = senders.submit(() -> Boolean
+                    .valueOf(send(interceptor, destinations, createMessage(payload, destination, clonesReady))));
+            Future<Boolean> second = senders.submit(() -> Boolean
+                    .valueOf(send(interceptor, destinations, createMessage(payload, destination, clonesReady))));
+
+            Boolean firstSent = first.get(10, TimeUnit.SECONDS);
+            Boolean secondSent = second.get(10, TimeUnit.SECONDS);
+            Assert.assertNotEquals("Exactly one message must fit in the queue", firstSent, secondSent);
+            Assert.assertEquals(payload.length, interceptor.getCurrentSize());
+        } finally {
+            collector.bufferReused.countDown();
+            senders.shutdownNow();
+            interceptor.stopQueue();
+        }
+    }
+
+    private static boolean send(MessageDispatchInterceptor interceptor, Member[] destinations, ChannelData message) {
+        try {
+            interceptor.sendMessage(destinations, message, null);
+            return true;
+        } catch (ChannelException e) {
+            return false;
+        }
+    }
+
+    private static ChannelData createMessage(byte[] payload, Member destination, CyclicBarrier clonesReady) {
+        ChannelData data = new ChannelData(false) {
+
+            @Override
+            public Object deepclone() {
+                try {
+                    clonesReady.await(10, TimeUnit.SECONDS);
+                } catch (Exception e) {
+                    throw new IllegalStateException(e);
+                }
+                return super.deepclone();
+            }
+        };
+        data.setUniqueId(UUIDGenerator.randomUUID(false));
+        data.setAddress(destination);
+        data.setOptions(Channel.SEND_OPTIONS_ASYNCHRONOUS);
+        data.setMessage(new XByteBuffer(payload, false));
+        return data;
+    }
+
     /*
-     * Simulates interceptors such as EncryptInterceptor or FragmentationInterceptor that replace or extend the
-     * message payload while the message is being sent downstream.
+     * Simulates interceptors such as EncryptInterceptor or FragmentationInterceptor that replace or extend the message
+     * payload while the message is being sent downstream.
      */
     private static class MutatingCollector extends ChannelInterceptorBase {
 
