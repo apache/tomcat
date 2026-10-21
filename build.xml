@@ -2321,7 +2321,6 @@
 
     <path id="spotbugs.classpath">
       <fileset file="${spotbugs.jar}" />
-      <fileset file="${findsecbugs.jar}" />
     </path>
 
     <taskdef classpathref="spotbugs.classpath" name="spotbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask"/>
@@ -3885,6 +3884,7 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
     <antcall target="downloadfile">
       <param name="sourcefile" value="${findsecbugs.loc}"/>
       <param name="destfile" value="${findsecbugs.jar}"/>
+      <param name="destdir" value="${findsecbugs.home}"/>
       <param name="checksum.enabled" value="${findsecbugs.checksum.enabled}"/>
       <param name="checksum.algorithm" value="${findsecbugs.checksum.algorithm}"/>
       <param name="checksum.value" value="${findsecbugs.checksum.value}"/>
