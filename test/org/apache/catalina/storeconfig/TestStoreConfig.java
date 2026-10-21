@@ -21,6 +21,7 @@ import java.io.FileReader;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.lang.reflect.Proxy;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
@@ -31,6 +32,7 @@ import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Host;
+import org.apache.catalina.Server;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.realm.LockOutRealm;
@@ -700,6 +702,36 @@ public class TestStoreConfig extends TomcatBaseTest {
         };
         Assert.assertNull(loader.getRegistry().findDescription(context.getClass()));
         Assert.assertFalse(storeConfig.store(context));
+    }
+
+    /**
+     * Verify that storing a Server whose class has no store description fails without replacing the existing
+     * configuration, and that the MBean operation reports the failure.
+     *
+     * @throws Exception if the test experiences an unexpected error
+     */
+    @Test
+    public void testStoreServerWithoutDescriptionFails() throws Exception {
+        StoreLoader loader = new StoreLoader();
+        loader.load(null);
+        StoreConfig storeConfig = new StoreConfig();
+        storeConfig.setRegistry(loader.getRegistry());
+
+        Server server = (Server) Proxy.newProxyInstance(Server.class.getClassLoader(), new Class<?>[] { Server.class },
+                (proxy, method, args) -> null);
+        Assert.assertNull(loader.getRegistry().findDescription(server.getClass()));
+
+        File serverXml = new File(getTemporaryDirectory(), "server-custom.xml");
+        String original = "<Server port=\"8005\"/>";
+        Files.writeString(serverXml.toPath(), original, StandardCharsets.UTF_8);
+        storeConfig.setServerFilename(serverXml.getAbsolutePath());
+
+        Assert.assertFalse(storeConfig.store(server));
+        Assert.assertEquals(original, Files.readString(serverXml.toPath(), StandardCharsets.UTF_8));
+
+        storeConfig.setServer(server);
+        Assert.assertThrows(IllegalStateException.class, storeConfig::storeConfig);
+        Assert.assertEquals(original, Files.readString(serverXml.toPath(), StandardCharsets.UTF_8));
     }
 
     private static String storeToString(StoreDescription desc, Object element) throws Exception {
