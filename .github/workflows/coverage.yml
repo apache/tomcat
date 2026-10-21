@@ -62,7 +62,11 @@ jobs:
         run: |
           includes="$(git diff --name-only --diff-filter=d "${{ steps.base.outputs.ref }}"...HEAD \
             | bash .github/scripts/select-tests.sh)"
-          echo "includes=$includes" >> "$GITHUB_OUTPUT"
+          {
+            echo "includes<<SELECT_TESTS_EOF"
+            echo "$includes"
+            echo "SELECT_TESTS_EOF"
+          } >> "$GITHUB_OUTPUT"
           if [ -z "$includes" ]; then
             echo "No targeted tests for the changed files; skipping coverage." >> "$GITHUB_STEP_SUMMARY"
           else
@@ -71,12 +75,13 @@ jobs:
 
       - name: Run targeted tests with coverage
         if: steps.select.outputs.includes != ''
+        env:
+          INCLUDES: ${{ steps.select.outputs.includes }}
+          ANT_OPTS: -Dtest.openssl.exists=false -Dtest.excludePerformance=true
         run: |
           ant -noinput deploy test-nio coverage-report \
             -Dtest.coverage=true \
-            -Dtest.name="${{ steps.select.outputs.includes }}"
-        env:
-          ANT_OPTS: -Dtest.openssl.exists=false -Dtest.excludePerformance=true
+            -Dtest.name="$INCLUDES"
 
       - name: Report diff coverage
         if: steps.select.outputs.includes != ''
@@ -89,3 +94,29 @@ jobs:
             echo '## Diff coverage (targeted tests)'
             cat diff-cover.md
           } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Full-suite coverage of changed files
+        if: always()
+        run: |
+          # Only fetch the (large) nightly report if the PR changed java/ source.
+          changed="$(git diff --name-only --diff-filter=d "${{ steps.base.outputs.ref }}"...HEAD)"
+          java_changed="$(printf '%s\n' "$changed" | grep -E '^java/.*\.java$' || true)"
+          if [ -z "$java_changed" ]; then
+            exit 0
+          fi
+          nightly_url="https://nightlies.apache.org/tomcat/tomcat-12.0.x/coverage/jacoco.xml"
+          if ! curl -fsS --connect-timeout 10 --max-time 60 --retry 2 "$nightly_url" -o nightly-jacoco.xml; then
+            echo "No nightly full-suite coverage data available."
+            echo "_No nightly full-suite coverage data available._" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          table="$(printf '%s\n' "$java_changed" | python3 .github/scripts/coverage-file-level.py nightly-jacoco.xml)"
+          if [ -n "$table" ]; then
+            # Print to the step log (visible when the step is opened) and the run Summary.
+            echo 'Full-suite coverage of changed files (overall, not your diff):'
+            printf '%s\n' "$table"
+            {
+              echo '## Full-suite coverage of changed files (overall, not your diff)'
+              echo "$table"
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
