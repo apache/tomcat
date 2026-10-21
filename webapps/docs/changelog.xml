@@ -9687,6 +9687,14 @@
         Update the packaged version of the Tomcat Native Library to 1.2.30. Also
         update the minimum recommended version to 1.2.30. (markt)
       </update>
+      <fix>
+        <bug>70262</bug>: Fix <code>service.bat</code> so <code>install
+        &lt;name&gt; --rename</code> renames the Windows service executables in
+        <code>CATALINA_HOME\bin</code>. <code>remove</code> now restores the
+        default executable names only when the service name differs from the
+        default. Based on pull request <pr>1095</pr> provided by StrongOx.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
