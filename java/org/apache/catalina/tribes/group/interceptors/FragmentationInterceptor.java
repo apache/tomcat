@@ -94,7 +94,14 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
 
     @Override
     public void messageReceived(ChannelMessage msg) {
-        boolean isFrag = XByteBuffer.toBoolean(msg.getMessage().getBytesDirect(), msg.getMessage().getLength() - 1);
+        int length = msg.getMessage().getLength();
+        if (length < 1) {
+            log.warn(sm.getString("fragmentationInterceptor.fragment.discarded"),
+                    new IllegalArgumentException(
+                            sm.getString("fragmentationInterceptor.fragment.too-short", Integer.toString(length))));
+            return;
+        }
+        boolean isFrag = XByteBuffer.toBoolean(msg.getMessage().getBytesDirect(), length - 1);
         msg.getMessage().trim(1);
         if (isFrag) {
             defrag(msg);
@@ -144,6 +151,11 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
         FragKey key = new FragKey(msg.getUniqueId());
         ChannelMessage complete = null;
         try {
+            int length = msg.getMessage().getLength();
+            if (length < 8) {
+                throw new IllegalArgumentException(
+                        sm.getString("fragmentationInterceptor.fragment.too-short", Integer.toString(length)));
+            }
             FragCollection coll = getFragCollection(key, msg);
             // The deep clone does not touch shared state, so it happens before the
             // monitor is entered. The fragment storage of a collection is shared
@@ -300,13 +312,7 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
          */
         public synchronized void addMessage(ChannelMessage msg) {
             // At least the fragment number and the fragment count must be present.
-            // Check before trimming, trimming more bytes than are available throws
-            // an ArrayIndexOutOfBoundsException.
-            int length = msg.getMessage().getLength();
-            if (length < 8) {
-                throw new IllegalArgumentException(
-                        sm.getString("fragmentationInterceptor.fragment.too-short", Integer.toString(length)));
-            }
+            // Size has already been checked so trim() is safe
             // remove the total messages
             msg.getMessage().trim(4);
             // get the msg nr
