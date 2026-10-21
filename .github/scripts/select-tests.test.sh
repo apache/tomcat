@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Hermetic tests for select-tests.sh using a temporary fixture tree.
 set -euo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -23,9 +24,16 @@ script="${script_dir}/select-tests.sh"
 fixture="$(mktemp -d)"
 trap 'rm -rf "$fixture"' EXIT
 
+# Mirror test packages for the happy-path and multi-package cases.
 mkdir -p "$fixture/test/org/apache/tomcat/util/http/parser"
 touch    "$fixture/test/org/apache/tomcat/util/http/parser/TestHttpParser.java"
 touch    "$fixture/test/org/apache/tomcat/util/http/parser/TestMediaType.java"
+mkdir -p "$fixture/test/org/apache/catalina/connector"
+touch    "$fixture/test/org/apache/catalina/connector/TestRequest.java"
+mkdir -p "$fixture/test/org/apache/tomcat/util/buf"
+touch    "$fixture/test/org/apache/tomcat/util/buf/TestByteChunk.java"
+mkdir -p "$fixture/test/org/apache/dum;my"
+touch    "$fixture/test/org/apache/dum;my/TestX.java"
 
 run() { SELECT_TESTS_ROOT="$fixture" bash "$script"; }
 
@@ -62,5 +70,17 @@ assert_eq "ignores non-java-source paths" "" "$out"
 # 5. Empty input -> empty output.
 out="$(printf '' | run)"
 assert_eq "empty input yields empty output" "" "$out"
+
+# 6. Multiple distinct packages -> sorted, comma-joined.
+out="$(printf '%s\n' \
+  'java/org/apache/catalina/connector/Request.java' \
+  'java/org/apache/tomcat/util/buf/ByteChunk.java' \
+  'java/org/apache/tomcat/util/http/parser/MediaType.java' | run)"
+assert_eq "joins multiple packages sorted and comma-separated" \
+  "org/apache/catalina/connector/Test*.java,org/apache/tomcat/util/buf/Test*.java,org/apache/tomcat/util/http/parser/Test*.java" "$out"
+
+# 7. Paths with unsafe characters are rejected even when a mirror exists
+out="$(printf '%s\n' 'java/org/apache/dum;my/X.java' | run)"
+assert_eq "rejects paths with unsafe characters" "" "$out"
 
 exit "$fail"
