@@ -329,8 +329,9 @@ public class ChannelData implements ChannelMessage {
             clone.uniqueId = this.uniqueId.clone();
         }
         if (this.message != null) {
-            clone.message = new XByteBuffer(this.message.getBytesDirect(), false);
-            clone.message.setLength(this.message.getLength());
+            int messageLength = this.message.getLength();
+            clone.message = new XByteBuffer(messageLength, false);
+            clone.message.append(this.message.getBytesDirect(), 0, messageLength);
         }
         return clone;
     }
