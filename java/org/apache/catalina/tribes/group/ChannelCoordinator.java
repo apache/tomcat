@@ -175,6 +175,7 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
                 clusterReceiver.setMessageListener(this);
                 clusterReceiver.setChannel(getChannel());
                 clusterReceiver.start();
+                startLevel = startLevel | Channel.SND_RX_SEQ;
                 // synchronize, big time FIXME
                 Member localMember = getChannel().getLocalMember(false);
                 if (localMember instanceof StaticMember) {
@@ -194,6 +195,7 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
             if (Channel.SND_TX_SEQ == (toStart & Channel.SND_TX_SEQ)) {
                 clusterSender.setChannel(getChannel());
                 clusterSender.start();
+                startLevel = startLevel | Channel.SND_TX_SEQ;
                 valid = true;
             }
 
@@ -204,18 +206,19 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
                     ((McastService) membershipService).setMessageListener(this);
                 }
                 membershipService.start(MembershipService.MBR_RX);
+                startLevel = startLevel | Channel.MBR_RX_SEQ;
                 valid = true;
             }
             if (Channel.MBR_TX_SEQ == (toStart & Channel.MBR_TX_SEQ)) {
                 membershipService.setChannel(getChannel());
                 membershipService.start(MembershipService.MBR_TX);
+                startLevel = startLevel | Channel.MBR_TX_SEQ;
                 valid = true;
             }
 
             if (!valid) {
                 throw new IllegalArgumentException(sm.getString("channelCoordinator.invalid.startLevel"));
             }
-            startLevel = (startLevel | svc);
         } catch (ChannelException cx) {
             throw cx;
         } catch (Exception e) {
