@@ -143,7 +143,7 @@ public class TestFileHandler {
         // Publishing after the open must use the file that was opened, not rotate to a new one
         fh.publish(new LogRecord(Level.INFO, "hello"));
         Assert.assertTrue("The published record was not written to [" + expected + "]",
-                Files.readString(expected.toPath()).contains("hello"));
+                new String(Files.readAllBytes(expected.toPath()), "UTF-8").contains("hello"));
         Assert.assertEquals(1, countFiles(prefix));
 
         // Reopening a closed handler must not create a file with an unset date either

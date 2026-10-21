@@ -162,7 +162,7 @@ public class FileHandler extends Handler {
     /**
      * The as-of date for the currently open log file, or a zero-length string if there is no open log file.
      */
-    private volatile String date = "";
+    private volatile String date = null;
 
 
     /**
@@ -341,7 +341,7 @@ public class FileHandler extends Handler {
                     reportError(null, e, ErrorManager.CLOSE_FAILURE);
                 }
                 writer = null;
-                date = "";
+                date = null;
             }
         } finally {
             writerLock.writeLock().unlock();
@@ -374,9 +374,6 @@ public class FileHandler extends Handler {
      * Configure from <code>LogManager</code> properties.
      */
     private void configure() {
-
-        Timestamp ts = new Timestamp(System.currentTimeMillis());
-        date = ts.toString().substring(0, 10);
 
         String className = this.getClass().getName(); // allow classes to override
 
