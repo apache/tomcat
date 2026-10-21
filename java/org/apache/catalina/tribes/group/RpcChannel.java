@@ -171,9 +171,43 @@ public class RpcChannel implements ChannelListener {
                     ((replyMessageOptions & Channel.SEND_OPTIONS_ASYNCHRONOUS) == Channel.SEND_OPTIONS_ASYNCHRONOUS);
             Serializable reply = callback.replyRequest(rmsg.message, sender);
             if (reply == null) {
-                // The callback is documented to return null when no reply
-                // should be sent
-                if (excallback != null && !asyncReply) {
+                // The callback is documented to return null when no reply should be sent. Tell the requester so that
+                // it stops waiting for this member rather than running into its timeout.
+                boolean noReplySent = false;
+                RpcMessage noReply = new RpcMessage.NoRpcChannelReply(rmsg.rpcId, rmsg.uuid);
+                ErrorHandler handler = null;
+                if (excallback != null && asyncReply) {
+                    final Serializable request = msg;
+                    final Member fsender = sender;
+                    handler = new ErrorHandler() {
+                        @Override
+                        public void handleError(ChannelException x, UniqueId id) {
+                            excallback.replyFailed(request, null, fsender, x);
+                        }
+
+                        @Override
+                        public void handleCompletion(UniqueId id) {
+                            excallback.replySucceeded(request, null, fsender);
+                        }
+                    };
+                }
+                try {
+                    if (handler != null) {
+                        channel.send(new Member[] { sender }, noReply,
+                                replyMessageOptions & ~Channel.SEND_OPTIONS_SYNCHRONIZED_ACK, handler);
+                    } else {
+                        channel.send(new Member[] { sender }, noReply,
+                                replyMessageOptions & ~Channel.SEND_OPTIONS_SYNCHRONIZED_ACK);
+                    }
+                    noReplySent = true;
+                } catch (Exception e) {
+                    if (excallback != null && !asyncReply) {
+                        excallback.replyFailed(msg, null, sender, e);
+                    } else {
+                        log.error(sm.getString("rpcChannel.replyFailed"), e);
+                    }
+                }
+                if (noReplySent && excallback != null && !asyncReply) {
                     excallback.replySucceeded(msg, null, sender);
                 }
                 return;

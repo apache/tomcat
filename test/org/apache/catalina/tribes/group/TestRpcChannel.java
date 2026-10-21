@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.tribes.group;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -47,6 +48,9 @@ public class TestRpcChannel {
         public UniqueId send(Member[] destination, Serializable msg, int options, ErrorHandler handler)
                 throws ChannelException {
             sent.add(msg);
+            if (handler != null) {
+                handler.handleCompletion(null);
+            }
             return null;
         }
     }
@@ -70,6 +74,55 @@ public class TestRpcChannel {
         }
     }
 
+    private static void assertNoReplyMessage(RecordingChannel channel, RpcMessage request) {
+        Assert.assertEquals(1, channel.sent.size());
+        Assert.assertTrue(channel.sent.get(0) instanceof RpcMessage.NoRpcChannelReply);
+        RpcMessage reply = (RpcMessage) channel.sent.get(0);
+        Assert.assertTrue(reply.reply);
+        Assert.assertNull(reply.message);
+        Assert.assertArrayEquals(request.uuid, reply.uuid);
+        Assert.assertArrayEquals(request.rpcId, reply.rpcId);
+    }
+
+    /*
+     * Routes requests from the requester directly to the responder and whatever the responder sends back to the
+     * requester.
+     */
+    private static class LoopbackChannel extends RecordingChannel {
+
+        private RpcChannel target;
+        private final Member source;
+
+        LoopbackChannel() throws IOException {
+            source = new MemberImpl("localhost", 4000, -1);
+        }
+
+        @Override
+        public UniqueId send(Member[] destination, Serializable msg, int options) throws ChannelException {
+            super.send(destination, msg, options);
+            target.messageReceived(msg, source);
+            return null;
+        }
+    }
+
+    @Test
+    public void testRequesterDoesNotWaitForTimeoutOnNullReply() throws Exception {
+        LoopbackChannel requesterChannel = new LoopbackChannel();
+        LoopbackChannel responderChannel = new LoopbackChannel();
+        RpcChannel requester = createRpcChannel(requesterChannel, new FixedCallback(null));
+        RpcChannel responder = createRpcChannel(responderChannel, new FixedCallback(null));
+        requesterChannel.target = responder;
+        responderChannel.target = requester;
+
+        Member[] destination = new Member[] { new MemberImpl("localhost", 4001, -1) };
+        long start = System.nanoTime();
+        Response[] responses = requester.send(destination, "REQUEST", RpcChannel.FIRST_REPLY, 0, 10000);
+        long elapsedMillis = (System.nanoTime() - start) / 1_000_000;
+
+        Assert.assertEquals(0, responses.length);
+        Assert.assertTrue("Requester waited " + elapsedMillis + "ms", elapsedMillis < 5000);
+    }
+
     private RpcChannel createRpcChannel(RecordingChannel channel, RpcCallback callback) {
         return new RpcChannel(new byte[] { 1 }, channel, callback);
     }
@@ -84,7 +137,8 @@ public class TestRpcChannel {
 
         rpcChannel.messageReceived(request, sender);
 
-        Assert.assertTrue("A null reply means no reply should be sent", channel.sent.isEmpty());
+        // The requester is told that no reply will follow, so that it does not wait for its timeout
+        assertNoReplyMessage(channel, request);
     }
 
     private static class RecordingExtendedCallback extends FixedCallback implements ExtendedRpcCallback {
@@ -121,14 +175,14 @@ public class TestRpcChannel {
 
         rpcChannel.messageReceived(request, sender);
 
-        Assert.assertTrue(channel.sent.isEmpty());
+        assertNoReplyMessage(channel, request);
         Assert.assertEquals(1, callback.succeededCount);
         Assert.assertSame(request, callback.succeededRequest);
         Assert.assertNull(callback.succeededResponse);
     }
 
     @Test
-    public void testNullReplyAsynchronousExtendedCallbackNotNotified() throws Exception {
+    public void testNullReplyAsynchronousExtendedCallbackNotified() throws Exception {
         RecordingChannel channel = new RecordingChannel();
         RecordingExtendedCallback callback = new RecordingExtendedCallback(null);
         RpcChannel rpcChannel = createRpcChannel(channel, callback);
@@ -139,8 +193,10 @@ public class TestRpcChannel {
 
         rpcChannel.messageReceived(request, sender);
 
-        Assert.assertTrue(channel.sent.isEmpty());
-        Assert.assertEquals(0, callback.succeededCount);
+        assertNoReplyMessage(channel, request);
+        Assert.assertEquals(1, callback.succeededCount);
+        Assert.assertSame(request, callback.succeededRequest);
+        Assert.assertNull(callback.succeededResponse);
     }
 
     @Test
