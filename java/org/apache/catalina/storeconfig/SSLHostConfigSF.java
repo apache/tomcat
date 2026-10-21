@@ -118,28 +118,33 @@ public class SSLHostConfigSF extends StoreFactoryBase {
 
     /*
      * When the SSL context is created, the OpenSSL implementation adds a runtime "groups" command derived from the
-     * SSLHostConfig "groups" attribute. Store a copy of the configuration without such a command, since it duplicates
-     * the attribute and a stored command would shadow later changes of the attribute. A command whose value differs
-     * from the derived one was written by the user and is kept.
+     * SSLHostConfig "groups" attribute if no other groups command has been specified. Store a copy of the configuration
+     * without such a command, since it duplicates the attribute and a stored command would shadow later changes of the
+     * attribute. A command whose value differs from the derived one was written by the user and is kept.
      */
     private OpenSSLConf removeRuntimeCommands(OpenSSLConf openSslConf, SSLHostConfig sslHostConfig) {
         if (openSslConf == null || sslHostConfig.getGroups() == null) {
             return openSslConf;
         }
         String derivedValue = sslHostConfig.getGroups().replace(',', ':');
-        ArrayList<OpenSSLConfCmd> retainedCommands = new ArrayList<>();
+        OpenSSLConfCmd runtimeCommand = null;
+        int groupCommandCount = 0;
         for (OpenSSLConfCmd command : openSslConf.getCommands()) {
-            if (OpenSSLConfCmd.GROUPS.equals(command.getName()) && derivedValue.equals(command.getValue())) {
-                continue;
+            if (OpenSSLConfCmd.GROUPS.equals(command.getName())) {
+                groupCommandCount++;
+                if (derivedValue.equals(command.getValue())) {
+                    runtimeCommand = command;
+                }
             }
-            retainedCommands.add(command);
         }
-        if (retainedCommands.size() == openSslConf.getCommands().size()) {
+        if (groupCommandCount != 1 || runtimeCommand == null) {
             return openSslConf;
         }
         OpenSSLConf filteredCommands = new OpenSSLConf();
-        for (OpenSSLConfCmd command : retainedCommands) {
-            filteredCommands.addCmd(command);
+        for (OpenSSLConfCmd command : openSslConf.getCommands()) {
+            if (command != runtimeCommand) {
+                filteredCommands.addCmd(command);
+            }
         }
         return filteredCommands;
     }
