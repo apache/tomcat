@@ -295,7 +295,7 @@ spotbugs.loc=${base-maven.loc}/com/github/spotbugs/spotbugs/${spotbugs.version}/
 
 findsecbugs.version=1.14.0
 findsecbugs.loc=${base-maven.loc}/com/h3xstream/findsecbugs/findsecbugs-plugin/${findsecbugs.version}/findsecbugs-plugin-${findsecbugs.version}.jar
-findsecbugs.jar=${findsecbugs.home}/findsecbugs-plugin-${findsecbugs.version}.jar
+findsecbugs.jar=findsecbugs-plugin-${findsecbugs.version}.jar
 findsecbugs.checksum.enabled=true
 findsecbugs.checksum.algorithm=SHA-512
 findsecbugs.checksum.value=9eb87ea65584d6ab9e79cfcc9a2ffe3519adab9356084c74aaead8b3c7ca1e025ae2c2ba1aa70fab701fcd2f960e044ab467da6199d3a7feb64da5db42bc7991
