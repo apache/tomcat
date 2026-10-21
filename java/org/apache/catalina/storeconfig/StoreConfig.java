@@ -97,7 +97,9 @@ public class StoreConfig implements IStoreConfig {
 
     @Override
     public void storeConfig() {
-        store(server);
+        if (!store(server)) {
+            throw new IllegalStateException(sm.getString("config.storeServerError"));
+        }
     }
 
     /**
@@ -201,6 +203,11 @@ public class StoreConfig implements IStoreConfig {
 
     @Override
     public synchronized boolean store(Server aServer) {
+        StoreDescription desc = getRegistry().findDescription(aServer.getClass());
+        if (desc == null) {
+            log.warn(sm.getString("factory.storeNoDescriptor", aServer.getClass()));
+            return false;
+        }
         StoreFileMover mover =
                 new StoreFileMover(Bootstrap.getCatalinaBase(), getServerFilename(), getRegistry().getEncoding());
         // Open an output writer for the new configuration file
