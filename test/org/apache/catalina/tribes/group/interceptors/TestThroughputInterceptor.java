@@ -149,6 +149,27 @@ public class TestThroughputInterceptor {
     }
 
     @Test
+    public void testPackageLengthFailureReleasesInFlightSlot() throws Exception {
+        ThroughputInterceptor interceptor = new ThroughputInterceptor();
+        interceptor.setChannel(new GroupChannel());
+        interceptor.setNext(new ChannelInterceptorBase() {
+            // NO-OP
+        });
+
+        ChannelData invalid = new ChannelData(false);
+        invalid.setMessage(new XByteBuffer(64, false));
+        try {
+            interceptor.sendMessage(new Member[0], invalid, null);
+            Assert.fail("A message without a unique ID cannot be packaged");
+        } catch (NullPointerException expected) {
+            // Expected
+        }
+
+        Assert.assertEquals("A package length failure must release the in-flight counter slot",
+                0, interceptor.access.get());
+    }
+
+    @Test
     public void testConcurrentSendReceiveAndReport() throws Exception {
         ThroughputInterceptor interceptor = new ThroughputInterceptor();
         interceptor.setChannel(new GroupChannel());
