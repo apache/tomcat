@@ -483,8 +483,10 @@ public abstract class SSLUtilBase implements SSLUtil {
         X500Principal subject = currentX509 == null ? null : currentX509.getSubjectX500Principal();
 
         List<String> matches = new ArrayList<>();
+        // Defense-in-depth so no misbehaving provider can ever hang a TLS-config path.
+        int remaining = ks.size();
         Enumeration<String> aliases = ks.aliases();
-        while (aliases.hasMoreElements()) {
+        while (aliases.hasMoreElements() && remaining-- > 0) {
             String alias = aliases.nextElement();
             if (!ks.isKeyEntry(alias)) {
                 continue;
