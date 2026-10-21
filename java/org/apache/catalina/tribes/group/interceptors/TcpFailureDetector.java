@@ -22,9 +22,11 @@ import java.net.InetSocketAddress;
 import java.net.NoRouteToHostException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
@@ -103,6 +105,24 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
     protected Membership membership = null;
 
     /**
+     * The sequence number of the last membership event of each member, used to detect that a member event
+     * was processed while a liveness check of the same member was running. Only populated while at least
+     * one liveness check is running. Guarded by {@link #membership}.
+     */
+    private final HashMap<Member,Long> lastMemberEvent = new HashMap<>();
+
+    /**
+     * The last membership event sequence number issued. Guarded by {@link #membership}.
+     */
+    private long memberEventSequence = 0;
+
+    /**
+     * The number of liveness checks that have started and not yet been applied. Guarded by
+     * {@link #membership}.
+     */
+    private int checksInFlight = 0;
+
+    /**
      * Map of members suspected of being dead and their detection time.
      */
     protected final HashMap<Member,Long> removeSuspects = new HashMap<>();
@@ -160,24 +180,28 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
         }
         boolean notify = false;
         boolean verify = false;
+        long stamp = 0;
         synchronized (membership) {
+            recordMemberEvent(member);
             if (removeSuspects.containsKey(member)) {
                 // previously marked suspect, system below picked up the member again
                 removeSuspects.remove(member);
             } else if (membership.getMember(member) == null) {
                 verify = true;
+                stamp = beginCheck(member);
             }
         }
         if (verify) {
             // if we add it here, then add it upwards too
             // check to see if it is alive, outside the membership monitor so
             // that slow TCP connects do not block other membership operations
-            boolean alive = memberAlive(member);
+            boolean alive = memberAliveForCheck(member, stamp);
             synchronized (membership) {
                 // the state may have changed while the member was being checked
-                if (!removeSuspects.containsKey(member) && membership.getMember(member) == null) {
+                if (endCheck(member, stamp) && membership.getMember(member) == null) {
                     if (alive) {
                         membership.memberAlive(member);
+                        recordMemberEvent(member);
                         addSuspects.remove(member);
                         notify = true;
                     } else if (member instanceof StaticMember) {
@@ -197,8 +221,10 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
             setupMembership();
         }
         boolean shutdown = Arrays.equals(member.getCommand(), Member.SHUTDOWN_PAYLOAD);
+        long stamp = 0;
         if (shutdown) {
             synchronized (membership) {
+                recordMemberEvent(member);
                 if (!membership.contains(member)) {
                     return;
                 }
@@ -212,7 +238,11 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
         } else {
             boolean verify;
             synchronized (membership) {
+                recordMemberEvent(member);
                 verify = membership.contains(member);
+                if (verify) {
+                    stamp = beginCheck(member);
+                }
             }
             if (!verify) {
                 if (log.isInfoEnabled()) {
@@ -228,17 +258,19 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
             // check to see if the member really is gone, outside the membership
             // monitor so that slow TCP connects do not block other membership
             // operations
-            boolean alive = memberAlive(member);
+            boolean alive = memberAliveForCheck(member, stamp);
             synchronized (membership) {
                 // the state may have changed while the member was being checked
-                if (membership.contains(member)) {
+                if (endCheck(member, stamp) && membership.contains(member)) {
                     applied = true;
                     if (alive) {
                         // add the member as suspect
                         removeSuspects.put(member, Long.valueOf(System.currentTimeMillis()));
+                        recordMemberEvent(member);
                     } else {
                         // not correct, we need to maintain the map
                         membership.removeMember(member);
+                        recordMemberEvent(member);
                         removeSuspects.remove(member);
                         if (member instanceof StaticMember) {
                             addSuspects.put(member, Long.valueOf(System.currentTimeMillis()));
@@ -321,18 +353,28 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
         Member[] members = super.getMembers();
         for (int i = 0; members != null && i < members.length; i++) {
             Member member = members[i];
-            boolean alive = memberAlive(member);
+            long stamp;
+            synchronized (membership) {
+                stamp = beginCheck(member);
+            }
+            boolean alive = memberAliveForCheck(member, stamp);
             boolean added = false;
             boolean disappeared = false;
             synchronized (membership) {
+                if (!endCheck(member, stamp)) {
+                    // a member event for this member was processed meanwhile and wins
+                    continue;
+                }
                 if (alive) {
                     if (membership.memberAlive(member)) {
                         added = true;
+                        recordMemberEvent(member);
                     }
                     addSuspects.remove(member);
                 } else {
                     if (membership.getMember(member) != null) {
                         membership.removeMember(member);
+                        recordMemberEvent(member);
                         removeSuspects.remove(member);
                         if (member instanceof StaticMember) {
                             addSuspects.put(member, Long.valueOf(System.currentTimeMillis()));
@@ -358,38 +400,53 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
     protected void performBasicCheck() {
         // update all alive times
         Member[] members = super.getMembers();
-        ArrayList<Member> toCheck = new ArrayList<>();
-        for (int i = 0; members != null && i < members.length; i++) {
-            synchronized (membership) {
-                if (addSuspects.containsKey(members[i]) && membership.getMember(members[i]) == null) {
-                    // avoid temporary adding member.
-                    continue;
+        // Members unknown to the tracker and the stamps of their running checks. They are only added to the
+        // tracker once the check has found them alive, so an unverified member is never visible and a stale
+        // result can simply be discarded.
+        Map<Member,Long> toCheck = new LinkedHashMap<>();
+        try {
+            for (int i = 0; members != null && i < members.length; i++) {
+                synchronized (membership) {
+                    if (membership.getMember(members[i]) != null) {
+                        // known member, just update its alive time
+                        membership.memberAlive(members[i]);
+                    } else if (!addSuspects.containsKey(members[i])) {
+                        // we don't have this one in our membership, check to see if the member is alive
+                        // (members in addSuspects are not added temporarily, see below)
+                        toCheck.put(members[i], Long.valueOf(beginCheck(members[i])));
+                    }
                 }
-                if (membership.memberAlive(members[i])) {
-                    // we don't have this one in our membership, check to see if the member is alive
-                    toCheck.add(members[i]);
-                } // end if
-            }
-        } // for
+            } // for
 
-        // The liveness checks run outside the monitor, so a concurrent memberDisappeared can
-        // remove a member from the tracker between the two passes. The apply below then skips
-        // that member and the concurrent disappearance is the one that is reported.
-        for (Member member : toCheck) {
-            boolean alive = memberAlive(member);
-            boolean notify = false;
-            synchronized (membership) {
-                if (membership.getMember(member) != null) {
-                    if (alive) {
+            // The liveness checks run outside the monitor. A member event or a change made by another check
+            // for the same member while it runs supersedes the result, which is then discarded.
+            for (Iterator<Map.Entry<Member,Long>> it = toCheck.entrySet().iterator(); it.hasNext();) {
+                Map.Entry<Member,Long> entry = it.next();
+                it.remove();
+                Member member = entry.getKey();
+                long stamp = entry.getValue().longValue();
+                boolean alive = memberAliveForCheck(member, stamp);
+                boolean notify = false;
+                synchronized (membership) {
+                    if (endCheck(member, stamp) && alive && membership.getMember(member) == null) {
+                        membership.memberAlive(member);
+                        recordMemberEvent(member);
                         notify = true;
-                    } else {
-                        membership.removeMember(member);
-                    } // end if
+                    }
+                }
+                if (notify) {
+                    log.warn(sm.getString("tcpFailureDetector.performBasicCheck.memberAdded", member));
+                    super.memberAdded(member);
                 }
             }
-            if (notify) {
-                log.warn(sm.getString("tcpFailureDetector.performBasicCheck.memberAdded", member));
-                super.memberAdded(member);
+        } finally {
+            if (!toCheck.isEmpty()) {
+                // an exception interrupted the checks, release the ones that did not run
+                synchronized (membership) {
+                    for (Map.Entry<Member,Long> entry : toCheck.entrySet()) {
+                        endCheck(entry.getKey(), entry.getValue().longValue());
+                    }
+                }
             }
         }
 
@@ -401,27 +458,29 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
         }
         for (Member m : keys) {
             boolean verify;
+            long stamp = 0;
             synchronized (membership) {
                 verify = membership.getMember(m) != null;
+                if (verify) {
+                    stamp = beginCheck(m);
+                }
             }
             boolean disappeared = false;
             if (verify) {
-                boolean alive = memberAlive(m);
-                if (!alive) {
-                    synchronized (membership) {
-                        // the state may have changed while the member was being checked
-                        if (membership.getMember(m) != null) {
-                            membership.removeMember(m);
-                            if (m instanceof StaticMember) {
-                                addSuspects.put(m, Long.valueOf(System.currentTimeMillis()));
-                            }
-                            removeSuspects.remove(m);
-                            disappeared = true;
-                        }
-                    }
-                } else {
-                    synchronized (membership) {
+                boolean alive = memberAliveForCheck(m, stamp);
+                synchronized (membership) {
+                    // the state may have changed while the member was being checked
+                    boolean current = endCheck(m, stamp);
+                    if (current && alive) {
                         expireRemoveSuspect(m);
+                    } else if (current && membership.getMember(m) != null) {
+                        membership.removeMember(m);
+                        recordMemberEvent(m);
+                        if (m instanceof StaticMember) {
+                            addSuspects.put(m, Long.valueOf(System.currentTimeMillis()));
+                        }
+                        removeSuspects.remove(m);
+                        disappeared = true;
                     }
                 }
             } else {
@@ -444,22 +503,25 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
         }
         for (Member m : keys) {
             boolean verify;
+            long stamp = 0;
             synchronized (membership) {
                 verify = membership.getMember(m) == null;
+                if (verify) {
+                    stamp = beginCheck(m);
+                }
             }
             if (!verify) {
                 continue;
             }
-            boolean alive = memberAlive(m);
+            boolean alive = memberAliveForCheck(m, stamp);
             boolean notify = false;
-            if (alive) {
-                synchronized (membership) {
-                    // the state may have changed while the member was being checked
-                    if (membership.getMember(m) == null) {
-                        membership.memberAlive(m);
-                        addSuspects.remove(m);
-                        notify = true;
-                    }
+            synchronized (membership) {
+                // the state may have changed while the member was being checked
+                if (endCheck(m, stamp) && alive && membership.getMember(m) == null) {
+                    membership.memberAlive(m);
+                    recordMemberEvent(m);
+                    addSuspects.remove(m);
+                    notify = true;
                 }
             }
             if (notify) {
@@ -468,6 +530,70 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
                     log.info(sm.getString("tcpFailureDetector.suspectMember.alive", m));
                 }
             } // end if
+        }
+    }
+
+    /**
+     * Records that a member event was processed or a change was made to the membership state of the member. A
+     * liveness check of the same member that started earlier is then stale and must not be applied, since the
+     * later event or change wins. Events of other members do not affect it. Must be called while holding the
+     * membership monitor.
+     *
+     * @param member the member the event is for
+     */
+    private void recordMemberEvent(Member member) {
+        if (checksInFlight > 0) {
+            lastMemberEvent.put(member, Long.valueOf(++memberEventSequence));
+        }
+    }
+
+    /**
+     * Registers the start of a liveness check of the member. Must be called while holding the membership
+     * monitor and followed by a call to {@link #endCheck(Member, long)} when the result is applied.
+     *
+     * @param member the member to be checked
+     * @return the stamp to pass to {@link #endCheck(Member, long)}
+     */
+    private long beginCheck(Member member) {
+        checksInFlight++;
+        Long last = lastMemberEvent.get(member);
+        return last == null ? 0 : last.longValue();
+    }
+
+    /**
+     * Registers the end of a liveness check of the member and reports if its result is still current. Must
+     * be called while holding the membership monitor.
+     *
+     * @param member the member that was checked
+     * @param stamp the stamp returned by {@link #beginCheck(Member)}
+     * @return {@code true} if no member event for the member was processed since the check started
+     */
+    private boolean endCheck(Member member, long stamp) {
+        Long last = lastMemberEvent.get(member);
+        boolean current = (last == null ? 0 : last.longValue()) == stamp;
+        if (--checksInFlight == 0) {
+            // no running check can compare against the recorded events any more
+            lastMemberEvent.clear();
+        }
+        return current;
+    }
+
+    /**
+     * Performs a registered liveness check and releases its registration if the check fails before its result can be
+     * applied.
+     *
+     * @param member the member to check
+     * @param stamp the stamp returned by {@link #beginCheck(Member)}
+     * @return {@code true} if the member is alive
+     */
+    private boolean memberAliveForCheck(Member member, long stamp) {
+        try {
+            return memberAlive(member);
+        } catch (RuntimeException | Error e) {
+            synchronized (membership) {
+                endCheck(member, stamp);
+            }
+            throw e;
         }
     }
 
