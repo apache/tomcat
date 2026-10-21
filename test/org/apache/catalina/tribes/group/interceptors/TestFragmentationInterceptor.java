@@ -314,6 +314,20 @@ public class TestFragmentationInterceptor {
     }
 
     @Test
+    public void testEmptyMessageIsDiscarded() throws Exception {
+        Member destination = new MemberImpl("localhost", 4000, -1);
+        FragmentationInterceptor receiver = new FragmentationInterceptor();
+        DeliveringCollector delivery = new DeliveringCollector();
+        receiver.setChannel(new GroupChannel());
+        receiver.setPrevious(delivery);
+
+        ChannelData message = createMessage(new byte[0], destination);
+        receiver.messageReceived(message);
+
+        Assert.assertNull("Empty message must not be delivered", delivery.delivered);
+    }
+
+    @Test
     public void testShortNonFirstFragmentIsDiscarded() throws Exception {
         Member destination = new MemberImpl("localhost", 4000, -1);
         FragmentationInterceptor receiver = new FragmentationInterceptor();
@@ -352,9 +366,9 @@ public class TestFragmentationInterceptor {
 
         byte[] uniqueId = UUIDGenerator.randomUUID(false);
 
+        // A valid count without a fragment number must be rejected before it creates reassembly state
         XByteBuffer malformed = new XByteBuffer(16, false);
-        malformed.append("data".getBytes(StandardCharsets.UTF_8), 0, 4);
-        malformed.append(Integer.MAX_VALUE);
+        malformed.append(3);
         malformed.append(true);
         ChannelData malformedFrag = createMessage(new byte[0], destination, uniqueId);
         malformedFrag.setMessage(malformed);
