@@ -605,6 +605,20 @@ public class TestStoreConfig extends TomcatBaseTest {
         Assert.assertTrue(dump, dump.contains("name=\"groups\""));
         Assert.assertTrue(dump, dump.contains("value=\"X25519\""));
 
+        // When multiple groups commands are present, all are user-written because the runtime only adds its derived
+        // command when no groups command is configured. Keep every command, including one that matches the attribute.
+        SSLHostConfig multipleCommands = new SSLHostConfig();
+        multipleCommands.setGroups("secp256r1,secp384r1");
+        multipleCommands.setOpenSslConf(new OpenSSLConf());
+        multipleCommands.getOpenSslConf().addCmd(new OpenSSLConfCmd(OpenSSLConfCmd.GROUPS, "X25519"));
+        multipleCommands.getOpenSslConf()
+                .addCmd(new OpenSSLConfCmd(OpenSSLConfCmd.GROUPS, "secp256r1:secp384r1"));
+        dump = storeToString(desc, multipleCommands);
+        int firstCommand = dump.indexOf("value=\"X25519\"");
+        int secondCommand = dump.indexOf("value=\"secp256r1:secp384r1\"");
+        Assert.assertTrue(dump, firstCommand != -1);
+        Assert.assertTrue(dump, secondCommand > firstCommand);
+
         // Without the attribute, a groups command can only be user-written and must be kept
         SSLHostConfig noAttribute = new SSLHostConfig();
         noAttribute.setGroups(null);
