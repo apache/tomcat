@@ -407,13 +407,6 @@
         directly via the configured trust store) is not subject to OCSP
         checking. (markt)
       </fix>
-      <update>
-        When configuring a JSSE <code>Certificate</code> from a key store that
-        exposes several certificates sharing a Subject, ignore certificates
-        that are not valid for TLS server authentication so that a usable
-        certificate is selected rather than relying on the key store to
-        return the correct one for the configured alias. (dsoumis)
-      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">

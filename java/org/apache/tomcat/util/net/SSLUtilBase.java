@@ -25,7 +25,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.DomainLoadStoreParameter;
 import java.security.Key;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.cert.CRL;
 import java.security.cert.CRLException;
 import java.security.cert.CertPathParameters;
@@ -37,7 +36,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.CertificateNotYetValidException;
-import java.security.cert.CertificateParsingException;
 import java.security.cert.CollectionCertStoreParameters;
 import java.security.cert.PKIXBuilderParameters;
 import java.security.cert.PKIXRevocationChecker;
@@ -61,7 +59,6 @@ import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509KeyManager;
-import javax.security.auth.x500.X500Principal;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -414,8 +411,6 @@ public abstract class SSLUtilBase implements SSLUtil {
                 }
             }
 
-            keyAlias = selectServerAuthAlias(ks, keyAlias, certificate.getCertificateKeyAlias() != null);
-
             Key k = ks.getKey(keyAlias, keyPassArray);
             if (k != null && !"DKS".equalsIgnoreCase(certificate.getCertificateKeystoreType()) &&
                     "PKCS#8".equalsIgnoreCase(k.getFormat())) {
@@ -454,108 +449,6 @@ public abstract class SSLUtilBase implements SSLUtil {
         return kms;
     }
 
-
-    /*
-     * Prefer a key entry whose certificate is usable for TLS server authentication. This handles key stores that can
-     * expose several certificates sharing a Subject (and therefore colliding on similar aliases).
-     * The certificate currently identified by the alias provides the Subject to match.
-     * When no alias was configured every key entry is a candidate.
-     * When no usable certificate is found, the configured alias is returned unchanged.
-     */
-    private String selectServerAuthAlias(KeyStore ks, String currentAlias, boolean aliasConfigured)
-        throws KeyStoreException, CertificateParsingException {
-
-        Certificate current = ks.getCertificate(currentAlias);
-        X509Certificate currentX509 = current instanceof X509Certificate x509 ? x509 : null;
-
-        // If the current selection is already usable there is nothing to do.
-        if (currentX509 != null && isServerAuthCapable(currentX509)) {
-            return currentAlias;
-        }
-
-        X500Principal subject = currentX509 == null ? null : currentX509.getSubjectX500Principal();
-
-        List<String> matches = new ArrayList<>();
-        // Defense-in-depth so no misbehaving provider can ever hang a TLS-config path.
-        int remaining = ks.size();
-        Enumeration<String> aliases = ks.aliases();
-        while (aliases.hasMoreElements() && remaining-- > 0) {
-            String alias = aliases.nextElement();
-            if (!ks.isKeyEntry(alias)) {
-                continue;
-            }
-            Certificate candidate = ks.getCertificate(alias);
-            if (!(candidate instanceof X509Certificate x509Candidate)) {
-                continue;
-            }
-            // When the user named an alias, only consider certificates that share its Subject.
-            if (aliasConfigured && subject != null && !subject.equals(x509Candidate.getSubjectX500Principal())) {
-                continue;
-            }
-            if (isServerAuthCapable(x509Candidate)) {
-                matches.add(alias);
-            } else if (log.isDebugEnabled()) {
-                log.debug(sm.getString("sslUtilBase.skippedKeyUsage", alias));
-            }
-        }
-
-        if (matches.isEmpty()) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("sslUtilBase.noServerAuthCert", currentAlias));
-            }
-            return currentAlias;
-        }
-        if (matches.size() > 1 && log.isDebugEnabled()) {
-            log.debug(sm.getString("sslUtilBase.multipleServerAuthCerts", currentAlias, matches));
-        }
-        String selected = matches.get(0);
-        if (!selected.equals(currentAlias) && log.isDebugEnabled()) {
-            log.debug(sm.getString("sslUtilBase.selectedServerAuthCert", selected, currentAlias));
-        }
-        return selected;
-    }
-
-
-    /**
-     * Determines whether the given certificate may be used for TLS server authentication, based on its Extended Key
-     * Usage (EKU) extension. Called by {@link #selectServerAuthAlias} to choose between certificates that share a
-     * Subject.
-     * <p>
-     * The policy is deliberately lenient about absent usage and strict about declared usage:
-     * <ul>
-     * <li>A certificate with <strong>no EKU extension</strong> ({@link X509Certificate#getExtendedKeyUsage()} returns
-     *     {@code null}) is treated as usable. An absent EKU places no restriction on the certificate's purpose - the
-     *     way TLS implementations generally interpret such certificates - so rejecting them would needlessly exclude
-     *     the many server certificates issued without an EKU.</li>
-     * <li>A certificate that <strong>does</strong> carry an EKU extension is usable only if that extension explicitly
-     *     lists the {@code id-kp-serverAuth} OID ({@value Constants#SERVER_AUTH_EXTENDED_KEY_USAGE_OID}) or the
-     *     {@code anyExtendedKeyUsage} OID ({@value Constants#ANY_EXTENDED_KEY_USAGE_OID}). Any other declared usage
-     *     - for example a certificate limited to client authentication, such as a Remote Desktop authentication
-     *     certificate - is rejected, which is what lets this feature skip the wrong certificate.</li>
-     * </ul>
-     *
-     * @param cert the certificate to test
-     *
-     * @return {@code true} if the certificate may be used for TLS server authentication
-     *
-     * @throws CertificateParsingException if the Extended Key Usage extension cannot be decoded
-     */
-    private static boolean isServerAuthCapable(X509Certificate cert) throws CertificateParsingException {
-        List<String> objectIdentifiers = cert.getExtendedKeyUsage();
-
-        if (objectIdentifiers == null) {
-            return true;
-        }
-
-        for (String objectIdentifier : objectIdentifiers) {
-            if (objectIdentifier.equals(Constants.SERVER_AUTH_EXTENDED_KEY_USAGE_OID) ||
-                    objectIdentifier.equals(Constants.ANY_EXTENDED_KEY_USAGE_OID)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 
     @Override
     public String[] getEnabledProtocols() {
