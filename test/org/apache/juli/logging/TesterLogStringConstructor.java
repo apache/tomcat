@@ -23,13 +23,11 @@ package org.apache.juli.logging;
  */
 public class TesterLogStringConstructor implements Log {
 
-    private static final long serialVersionUID = 1L;
-
     public TesterLogStringConstructor() {
         // Required no-argument constructor for the ServiceLoader
     }
 
-    public TesterLogStringConstructor(String name) {
+    public TesterLogStringConstructor(@SuppressWarnings("unused") String name) {
         // Used by LogFactory to create the instance for the given name
     }
 

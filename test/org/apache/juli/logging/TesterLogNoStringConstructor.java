@@ -23,8 +23,6 @@ package org.apache.juli.logging;
  */
 public class TesterLogNoStringConstructor implements Log {
 
-    private static final long serialVersionUID = 1L;
-
     @Override
     public boolean isDebugEnabled() {
         return false;
