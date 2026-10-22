@@ -20,7 +20,9 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.management.ObjectName;
 
@@ -45,7 +47,7 @@ public class StaticMembershipService extends MembershipServiceBase implements St
     /**
      * List of static members configured for this service.
      */
-    protected final ArrayList<StaticMember> staticMembers = new ArrayList<>();
+    protected final List<StaticMember> staticMembers = new CopyOnWriteArrayList<>();
     private StaticMember localMember;
     private StaticMembershipProvider provider;
 
@@ -165,7 +167,8 @@ public class StaticMembershipService extends MembershipServiceBase implements St
 
     /**
      * Returns a copy of the list of static members. Mutating the returned list has no effect on
-     * this service. The provider uses the configured list directly while it runs.
+     * this service. The configured list is safe to modify while the provider runs, so use
+     * {@link #addStaticMember(StaticMember)} and {@link #removeStaticMember(StaticMember)} to change it.
      * @return a copy of the static members list
      */
     public ArrayList<StaticMember> getStaticMembers() {
