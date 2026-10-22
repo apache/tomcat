@@ -73,7 +73,7 @@ public class StaticMembershipProvider extends MembershipProviderBase
     /**
      * List of static members for this cluster.
      */
-    protected ArrayList<StaticMember> staticMembers;
+    protected List<StaticMember> staticMembers;
     /**
      * Send options flag for channel messages.
      */
@@ -430,7 +430,7 @@ public class StaticMembershipProvider extends MembershipProviderBase
      * Sets the static members for this cluster.
      * @param staticMembers the list of static members
      */
-    public void setStaticMembers(ArrayList<StaticMember> staticMembers) {
+    public void setStaticMembers(List<StaticMember> staticMembers) {
         this.staticMembers = staticMembers;
     }
 
