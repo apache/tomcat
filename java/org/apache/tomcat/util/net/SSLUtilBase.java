@@ -36,6 +36,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.CertificateNotYetValidException;
+import java.security.cert.CertificateParsingException;
 import java.security.cert.CollectionCertStoreParameters;
 import java.security.cert.PKIXBuilderParameters;
 import java.security.cert.PKIXRevocationChecker;
@@ -401,10 +402,18 @@ public abstract class SSLUtilBase implements SSLUtil {
                     throw new IOException(sm.getString("sslUtilBase.noKeys"));
                 }
                 while (aliases.hasMoreElements() && keyAlias == null) {
-                    keyAlias = aliases.nextElement();
-                    if (!ks.isKeyEntry(keyAlias)) {
-                        keyAlias = null;
+                    String candidate = aliases.nextElement();
+                    if (!ks.isKeyEntry(candidate)) {
+                        continue;
                     }
+                    Certificate cert = ks.getCertificate(candidate);
+                    if (cert instanceof X509Certificate x509 && !isServerAuthCapable(x509)) {
+                        if (log.isDebugEnabled()) {
+                            log.debug(sm.getString("sslUtilBase.skippedKeyUsage", candidate));
+                        }
+                        continue;
+                    }
+                    keyAlias = candidate;
                 }
                 if (keyAlias == null) {
                     throw new IOException(sm.getString("sslUtilBase.alias_no_key_entry", (Object) null));
@@ -449,6 +458,50 @@ public abstract class SSLUtilBase implements SSLUtil {
         return kms;
     }
 
+
+    /**
+     * Determines whether the given certificate may be used for TLS server authentication, based on its Extended Key
+     * Usage (EKU) extension. Used by {@link #getKeyManagers()} when auto-selecting a key entry so that certificates
+     * which are not valid for server authentication are ignored.
+     * <p>
+     * The policy is deliberately lenient about absent usage, strict about declared usage and tolerant of a malformed
+     * extension:
+     * <ul>
+     * <li>A certificate with <strong>no EKU extension</strong> ({@link X509Certificate#getExtendedKeyUsage()} returns
+     *     {@code null}) is treated as usable. An absent EKU places no restriction on the certificate's purpose
+     *     so rejecting them would needlessly exclude the many server certificates issued without an EKU.</li>
+     * <li>A certificate that <strong>does</strong> carry an EKU extension is usable only if that extension explicitly
+     *     lists the {@code id-kp-serverAuth} OID ({@value Constants#SERVER_AUTH_EXTENDED_KEY_USAGE_OID}) or the
+     *     {@code anyExtendedKeyUsage} OID ({@value Constants#ANY_EXTENDED_KEY_USAGE_OID}). Any other declared usage
+     *     - for example a certificate limited to client authentication - is rejected.</li>
+     * <li>A certificate whose EKU extension <strong>cannot be decoded</strong> is ignored (treated as not usable).</li>
+     * </ul>
+     *
+     * @param cert the certificate to test
+     *
+     * @return {@code true} if the certificate may be used for TLS server authentication
+     */
+    private static boolean isServerAuthCapable(X509Certificate cert) {
+        List<String> objectIdentifiers;
+        try {
+            objectIdentifiers = cert.getExtendedKeyUsage();
+        } catch (CertificateParsingException e) {
+            return false;
+        }
+
+        if (objectIdentifiers == null) {
+            return true;
+        }
+
+        for (String objectIdentifier : objectIdentifiers) {
+            if (objectIdentifier.equals(Constants.SERVER_AUTH_EXTENDED_KEY_USAGE_OID) ||
+                    objectIdentifier.equals(Constants.ANY_EXTENDED_KEY_USAGE_OID)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     @Override
     public String[] getEnabledProtocols() {
