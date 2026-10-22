@@ -131,7 +131,7 @@ public class TestSelectorContextConcurrency {
         private static final long serialVersionUID = 1L;
 
         @Override
-        public Enumeration<String> keys() {
+        public synchronized Enumeration<String> keys() {
             try {
                 Thread.sleep(200);
             } catch (InterruptedException e) {

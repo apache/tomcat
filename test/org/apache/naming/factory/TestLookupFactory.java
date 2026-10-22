@@ -88,7 +88,7 @@ public class TestLookupFactory extends TomcatBaseTest {
 
     @Test
     public void testTypeMismatchIsStillReported() throws Exception {
-        TesterWebapp webapp = startWebapp();
+        startWebapp();
 
         Context container = ContextBindings.getClassLoader();
         container.bind("comp/env/ref", new LookupRef(String.class.getName(), "java:comp/env/target"));
@@ -174,6 +174,7 @@ public class TestLookupFactory extends TomcatBaseTest {
         Files.createDirectories(source.getParent());
         Files.write(source, ("package tester;\npublic class Marker {\n}\n".getBytes(StandardCharsets.UTF_8)));
         ByteArrayOutputStream compilerOutput = new ByteArrayOutputStream();
+        @SuppressWarnings("null")
         int result = compiler.run(null, compilerOutput, compilerOutput, "-d", classes.toString(),
                 source.toString());
         Assert.assertEquals("The class of the web application could not be compiled: " + compilerOutput, 0, result);
