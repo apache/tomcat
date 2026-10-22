@@ -47,7 +47,7 @@ public class TestKubernetesMembershipProvider {
         Assume.assumeFalse(Files.exists(
                 FileSystems.getDefault().getPath("/var/run/secrets/kubernetes.io/serviceaccount/token")));
 
-        GroupChannel channel = new GroupChannel();
+        ListenerCountingChannel channel = new ListenerCountingChannel();
         channel.setName("TestKubernetesMembershipProvider-" + System.nanoTime());
 
         CloudMembershipService service = new CloudMembershipService();
@@ -60,6 +60,8 @@ public class TestKubernetesMembershipProvider {
             // The start fails closed rather than running without access to the API
             Assert.assertTrue(expected.getCause() instanceof IOException);
         }
+        // A failed start must not leave the provider registered as a channel listener
+        Assert.assertEquals(0, channel.getListenerCount());
     }
 
     /*
@@ -105,5 +107,11 @@ public class TestKubernetesMembershipProvider {
             // A clear configuration error rather than a NumberFormatException
         }
         Assert.assertNull(service.getMembershipProvider());
+    }
+
+    private static class ListenerCountingChannel extends GroupChannel {
+        int getListenerCount() {
+            return channelListeners.size();
+        }
     }
 }
