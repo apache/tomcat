@@ -484,6 +484,15 @@
         drop TLS 1.3 when rebuilding the list of enabled protocols during
         initialization. (dsoumis)
       </fix>
+      <update>
+        When a <code>Certificate</code> is configured using a key store and no
+        <code>certificateKeyAlias</code> is set, ignore key entries whose
+        certificate has a malformed Extended Key Usage extension or one that
+        does not permit TLS server authentication when automatically selecting
+        which key in the key store to use.
+        A configured <code>certificateKeyAlias</code> is always used unchanged.
+        (dsoumis)
+      </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
         Keep the asynchronous timeout in place until the timeout event has

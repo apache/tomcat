@@ -446,6 +446,23 @@ mailing list</a>.</p>
 </subsection>
 </section>
 
+<section name="Automatic certificate selection">
+
+<p>When no <strong>certificateKeyAlias</strong> is configured, Tomcat selects the
+first eligible key entry in the key store's enumeration order. A certificate
+qualifies if its Extended Key Usage includes
+<code>serverAuth</code> or <code>anyExtendedKeyUsage</code>, or if it has no
+Extended Key Usage extension at all. Certificates whose Extended Key Usage
+excludes both purposes or cannot be parsed are ignored. If no eligible key entry
+is found, connector initialization fails.</p>
+
+<p>A configured <strong>certificateKeyAlias</strong> is used unchanged, even if
+its certificate is unsuitable for server authentication. When several certificates
+are eligible, configure an alias to ensure that the intended certificate is
+used.</p>
+
+</section>
+
 <section name="Reloading certificates before they expire">
 
 <p>When certificates are renewed by an external process the
@@ -483,7 +500,7 @@ automatically.</p>
 <p>A Windows certificate store may contain several certificates for the same
 machine. Configure <strong>certificateKeyAlias</strong> with the alias exposed
 by Java for the intended certificate. If no alias is configured, Tomcat uses the
-first key read from the store, in an implementation-dependent order. The
+first eligible key read from the store, in an implementation-dependent order. The
 following example uses the alias <code>tomcat</code>; replace it with the alias
 of the certificate to use:</p>
 
