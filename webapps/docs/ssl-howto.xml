@@ -446,6 +446,76 @@ mailing list</a>.</p>
 </subsection>
 </section>
 
+<section name="Reloading certificates before they expire">
+
+<p>When certificates are renewed by an external process the
+TLS certificate reload listener can load the renewed certificate without
+restarting Tomcat. Add it to the <strong>Server</strong> element:</p>
+
+<source><![CDATA[<Server ...>
+    <Listener className="org.apache.catalina.security.TLSCertificateReloadListener" />
+    ...
+</Server>]]></source>
+
+<p>The listener periodically checks each certificate and, when one is within
+<code>daysBefore</code> days of expiry (14 by default), reloads the associated
+<code>SSLHostConfig</code> so that the renewed certificate is picked up. The
+certificate must be renewed by another process; the listener does not renew it
+or re-read <code>server.xml</code>. See the
+<a href="config/listeners.html">listener documentation</a> for the available
+attributes.</p>
+
+</section>
+
+<section name="Using the Windows certificate store">
+
+<p>On Windows, Tomcat can read certificates directly from the Windows certificate
+store. Set <strong>certificateKeystoreType</strong> to
+<code>Windows-MY-LOCALMACHINE</code> for the local machine store, or to
+<code>Windows-MY</code> for the current user's store. Reading the local machine
+store from a Tomcat service that is not running with elevated privileges requires
+Java 17.0.17, 21.0.9, 24, or a later release; on earlier releases the service must
+run with elevated privileges. See
+<a href="https://bugs.openjdk.org/browse/JDK-8313367">JDK-8313367</a>.
+AD CS autoenrollment can issue and renew the machine's certificates
+automatically.</p>
+
+<p>A Windows certificate store may contain several certificates for the same
+machine. Configure <strong>certificateKeyAlias</strong> with the alias exposed
+by Java for the intended certificate. If no alias is configured, Tomcat uses the
+first key read from the store, in an implementation-dependent order. The
+following example uses the alias <code>tomcat</code>; replace it with the alias
+of the certificate to use:</p>
+
+<source><![CDATA[<Connector port="8443" protocol="HTTP/1.1"
+    SSLEnabled="true" scheme="https" secure="true">
+    <SSLHostConfig protocols="TLSv1.2,TLSv1.3">
+        <Certificate certificateKeystoreType="Windows-MY-LOCALMACHINE"
+            certificateKeystoreFile=""
+            certificateKeystorePassword=""
+            certificateKeyAlias="tomcat" />
+    </SSLHostConfig>
+</Connector>]]></source>
+
+<p>When using the
+<a href="#Reloading_certificates_before_they_expire">reload listener</a>
+with a configured alias, ensure that the
+renewed certificate is available under that alias. Reloading does not select a
+different alias or prefer a certificate with a later expiry date.</p>
+
+<p>Two points to note:</p>
+
+<ul>
+  <li>The account running Tomcat must have read access to the certificate's private
+      key. A renewed certificate may use a new key that does not inherit this
+      access, so grant it as part of the enrollment or renewal process.</li>
+  <li>Setting a unique friendly name on the intended certificate can help identify
+      it for use as the <strong>certificateKeyAlias</strong>. Verify the alias
+      exposed by Java, especially when several certificates share a name.</li>
+</ul>
+
+</section>
+
 <section name="Using OCSP Certificates">
 <p>Tomcat supports the Online Certificate Status Protocol (OCSP) to verify the
 status of client provided certificates for a sub-set of connector
