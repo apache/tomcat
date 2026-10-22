@@ -513,6 +513,15 @@
         <bug>70305</bug>: Move callback registrations in FFM code to the
         SSL context. (remm)
       </fix>
+      <update>
+        When a <code>Certificate</code> is configured using a key store and no
+        <code>certificateKeyAlias</code> is set, ignore key entries whose
+        certificate has a malformed Extended Key Usage extension or one that
+        does not permit TLS server authentication when automatically selecting
+        which key in the key store to use.
+        A configured <code>certificateKeyAlias</code> is always used unchanged.
+        (dsoumis)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">

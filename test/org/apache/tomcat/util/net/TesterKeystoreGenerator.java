@@ -1,0 +1,185 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.apache.tomcat.util.net;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.math.BigInteger;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.KeyStore;
+import java.security.cert.X509Certificate;
+import java.util.Date;
+import java.util.List;
+
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+
+public final class TesterKeystoreGenerator {
+
+    private TesterKeystoreGenerator() {}
+
+    @FunctionalInterface
+    public interface CertificateExtensionsCustomizer {
+        void customize(KeyPair keyPair, X509v3CertificateBuilder certBuilder)
+            throws Exception;
+    }
+
+    /**
+     * Generate a temporary JKS keystore from an explicit list of entries. Each entry has its own Common Name and may be
+     * either a private key entry or a trusted certificate entry, which lets tests reproduce stores that mix certificates
+     * with different Subjects and certificate-only (keyless) entries.
+     *
+     * @param entries the entries to add, in order
+     *
+     * @return a temporary keystore file with password {@link TesterSupport#JKS_PASS}
+     *
+     * @throws Exception if certificate generation or keystore creation fails
+     */
+    public static File generateKeystore(List<KeystoreEntry> entries) throws Exception {
+        KeyStore ks = KeyStore.getInstance("JKS");
+        ks.load(null, null);
+
+        for (KeystoreEntry entry : entries) {
+            CertAndKey generated = generateSelfSignedCertificate(entry.cn(), null, entry.customizer());
+            if (entry.keyEntry()) {
+                ks.setKeyEntry(entry.alias(), generated.keyPair().getPrivate(), TesterSupport.JKS_PASS.toCharArray(),
+                        new X509Certificate[] { generated.certificate() });
+            } else {
+                ks.setCertificateEntry(entry.alias(), generated.certificate());
+            }
+        }
+
+        return storeToTempFile(ks);
+    }
+
+    /**
+     * A single entry for {@link #generateKeystore(List)}.
+     */
+    public static final class KeystoreEntry {
+
+        private final String alias;
+        private final String cn;
+        private final boolean keyEntry;
+        private final CertificateExtensionsCustomizer customizer;
+
+        /**
+         * @param alias      the keystore alias
+         * @param cn         the certificate Subject Common Name
+         * @param keyEntry   {@code true} for a private key entry, {@code false} for a trusted certificate entry
+         * @param customizer extensions to add to the certificate, or {@code null} for none
+         */
+        public KeystoreEntry(String alias, String cn, boolean keyEntry, CertificateExtensionsCustomizer customizer) {
+            this.alias = alias;
+            this.cn = cn;
+            this.keyEntry = keyEntry;
+            this.customizer = customizer;
+        }
+
+        public String alias() {
+            return alias;
+        }
+
+        public String cn() {
+            return cn;
+        }
+
+        public boolean keyEntry() {
+            return keyEntry;
+        }
+
+        public CertificateExtensionsCustomizer customizer() {
+            return customizer;
+        }
+
+        public static KeystoreEntry key(String alias, String cn, CertificateExtensionsCustomizer customizer) {
+            return new KeystoreEntry(alias, cn, true, customizer);
+        }
+
+        public static KeystoreEntry trusted(String alias, String cn, CertificateExtensionsCustomizer customizer) {
+            return new KeystoreEntry(alias, cn, false, customizer);
+        }
+    }
+
+    private static CertAndKey generateSelfSignedCertificate(String cn, String[] sanNames,
+                                                            CertificateExtensionsCustomizer customizer) throws Exception {
+        KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+        kpg.initialize(4096);
+        KeyPair keyPair = kpg.generateKeyPair();
+
+        X500Name subject = new X500Name("CN=" + cn);
+        BigInteger serial = BigInteger.valueOf(System.nanoTime());
+        long oneDay = 86400000L;
+        Date notBefore = new Date(System.currentTimeMillis() - oneDay);
+        Date notAfter = new Date(System.currentTimeMillis() + 365L * oneDay);
+
+        X509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(subject, serial, notBefore, notAfter,
+                subject, keyPair.getPublic());
+
+        if (sanNames != null && sanNames.length > 0) {
+            GeneralName[] generalNames = new GeneralName[sanNames.length];
+            for (int i = 0; i < sanNames.length; i++) {
+                generalNames[i] = new GeneralName(GeneralName.dNSName, sanNames[i]);
+            }
+            certBuilder.addExtension(Extension.subjectAlternativeName, false, new GeneralNames(generalNames));
+        }
+
+        if (customizer != null) {
+            customizer.customize(keyPair, certBuilder);
+        }
+
+        ContentSigner signer = new JcaContentSignerBuilder("SHA256withRSA").build(keyPair.getPrivate());
+        X509Certificate certificate = new JcaX509CertificateConverter().getCertificate(certBuilder.build(signer));
+        return new CertAndKey(keyPair, certificate);
+    }
+
+    private static final class CertAndKey {
+
+        private final KeyPair keyPair;
+        private final X509Certificate certificate;
+
+        private CertAndKey(KeyPair keyPair, X509Certificate certificate) {
+            this.keyPair = keyPair;
+            this.certificate = certificate;
+        }
+
+        private KeyPair keyPair() {
+            return keyPair;
+        }
+
+        private X509Certificate certificate() {
+            return certificate;
+        }
+    }
+
+    private static File storeToTempFile(KeyStore ks) throws Exception {
+        File keystoreFile = File.createTempFile("test-cert-", ".jks");
+        keystoreFile.deleteOnExit();
+        try (FileOutputStream fos = new FileOutputStream(keystoreFile)) {
+            ks.store(fos, TesterSupport.JKS_PASS.toCharArray());
+        }
+        return keystoreFile;
+    }
+}

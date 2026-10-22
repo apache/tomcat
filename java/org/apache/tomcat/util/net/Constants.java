@@ -71,6 +71,12 @@ public class Constants {
     public static final boolean IS_SECURITY_ENABLED = (System.getSecurityManager() != null);
 
     /**
+     * EKU OIDs.
+     */
+    public static final String SERVER_AUTH_EXTENDED_KEY_USAGE_OID = "1.3.6.1.5.5.7.3.1";
+    public static final String ANY_EXTENDED_KEY_USAGE_OID = "2.5.29.37.0";
+
+    /**
      * Private constructor to prevent instantiation.
      */
     private Constants() {
