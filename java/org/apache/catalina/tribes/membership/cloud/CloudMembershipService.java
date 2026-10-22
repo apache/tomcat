@@ -227,6 +227,13 @@ public class CloudMembershipService extends MembershipServiceBase implements Clo
     }
 
     private void createOrUpdateLocalMember() throws IOException {
+        // The listen properties are provided by setLocalMemberProperties(), which is called when the channel receiver
+        // starts. Starting the membership without them leaves the local member unknown.
+        for (String name : new String[] { "tcpListenHost", "tcpListenPort", "tcpSecurePort", "udpListenPort" }) {
+            if (properties.getProperty(name) == null) {
+                throw new IllegalStateException(sm.getString("cloudMembershipService.localMemberNotSet", name));
+            }
+        }
         String host = properties.getProperty("tcpListenHost");
         int port = Integer.parseInt(properties.getProperty("tcpListenPort"));
         int securePort = Integer.parseInt(properties.getProperty("tcpSecurePort"));

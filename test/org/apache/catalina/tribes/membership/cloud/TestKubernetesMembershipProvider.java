@@ -85,4 +85,25 @@ public class TestKubernetesMembershipProvider {
             Assert.assertNull(service.getMembershipProvider());
         }
     }
+
+    /*
+     * The local member is resolved when the channel receiver starts, or is configured explicitly. Starting the
+     * membership alone, without either, must fail with a clear error rather than a NumberFormatException from a
+     * missing property, and must not leave a provider behind.
+     */
+    @Test
+    public void testStartWithoutLocalMemberPropertiesFails() throws Exception {
+        GroupChannel channel = new GroupChannel();
+        channel.setName("TestKubernetesMembershipProvider-" + System.nanoTime());
+
+        CloudMembershipService service = new CloudMembershipService();
+        service.setChannel(channel);
+        try {
+            service.start(CloudMembershipService.MBR_RX);
+            Assert.fail("start() must fail when the local member properties are not set");
+        } catch (IllegalStateException expected) {
+            // A clear configuration error rather than a NumberFormatException
+        }
+        Assert.assertNull(service.getMembershipProvider());
+    }
 }
