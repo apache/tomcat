@@ -62,6 +62,31 @@ public class TestKubernetesMembershipProvider {
         }
     }
 
+
+    /*
+     * A non-positive expiration time expires every member on every heartbeat. Such a configuration must be
+     * rejected when the provider is initialised, and must not leave an uninitialised provider behind.
+     */
+    @Test
+    public void testStartRejectsNonPositiveExpirationTime() throws Exception {
+        for (long expirationTime : new long[] { 0, -5 }) {
+            GroupChannel channel = new GroupChannel();
+            channel.setName("TestKubernetesMembershipProvider-" + System.nanoTime());
+
+            CloudMembershipService service = new CloudMembershipService();
+            service.setChannel(channel);
+            service.setLocalMemberProperties("127.0.0.1", 4007, 0, 0);
+            service.setExpirationTime(expirationTime);
+            try {
+                service.start(CloudMembershipService.MBR_RX);
+                Assert.fail("start() must reject an expiration time of " + expirationTime);
+            } catch (IllegalArgumentException expected) {
+                // The configuration must be rejected before the provider is used
+            }
+            Assert.assertNull(service.getMembershipProvider());
+        }
+    }
+
     /*
      * The local member is resolved when the channel receiver starts, or is configured explicitly. Starting the
      * membership alone, without either, must fail with a clear error rather than a NumberFormatException from a

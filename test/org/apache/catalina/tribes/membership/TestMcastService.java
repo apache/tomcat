@@ -129,7 +129,8 @@ public class TestMcastService {
      */
     @Test
     public void testStartRejectsNonPositiveTimingProperties() throws Exception {
-        String[] invalid = { "mcastFrequency=0", "mcastFrequency=-1", "memberDropTime=0", "memberDropTime=-5" };
+        String[] invalid = { "mcastFrequency=0", "mcastFrequency=-1", "memberDropTime=0", "memberDropTime=-5",
+                "recoverySleepTime=0", "recoverySleepTime=-1" };
         for (String entry : invalid) {
             String[] property = entry.split("=");
             Properties props = new Properties();
