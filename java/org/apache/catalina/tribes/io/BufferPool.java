@@ -118,7 +118,7 @@ public class BufferPool {
     }
 
     /** Maximum pool size in bytes. */
-    protected int maxSize;
+    protected volatile int maxSize;
     /** Current total size of pooled buffers in bytes. */
     protected final AtomicInteger size = new AtomicInteger(0);
     /** Queue of available buffers. */
