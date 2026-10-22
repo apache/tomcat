@@ -155,6 +155,7 @@ public class TestFileHandler {
     }
 
     private int countFiles(String prefix) {
+    	System.gc();
         int count = 0;
         for (File file : logsDir.listFiles()) {
             if (file.getName().startsWith(prefix)) {
