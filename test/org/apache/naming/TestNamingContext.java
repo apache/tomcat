@@ -101,7 +101,7 @@ public class TestNamingContext extends TomcatBaseTest {
     public void testResourceLinkWithoutGlobalName() {
         // Use a private context to keep the global context validation out of
         // the way, whatever test order is used within the JVM
-        Context context = new NamingContext(new Hashtable<String,Object>(), "test");
+        Context context = new NamingContext(new Hashtable<>(), "test");
         ResourceLinkFactory.setGlobalContext(context);
 
         // A resource link without a global name is a configuration error that
