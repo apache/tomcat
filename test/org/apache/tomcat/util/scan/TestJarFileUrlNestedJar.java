@@ -100,7 +100,7 @@ public class TestJarFileUrlNestedJar {
         File war = createWar(nestedPath);
 
         try (Jar jar =
-                new JarFileUrlNestedJar(new URI("jar:file:" + war.getAbsolutePath() + "!/" + nestedPath).toURL())) {
+                new JarFileUrlNestedJar(new URI("jar:" + war.toURI().toString() + "!/" + nestedPath).toURL())) {
             Assert.assertTrue(jar.exists(TEST_ENTRY));
             Assert.assertArrayEquals(TEST_CONTENT, readJar(jar));
         }
@@ -116,7 +116,7 @@ public class TestJarFileUrlNestedJar {
         File war = createWar("WEB-INF/lib/my jar.jar");
 
         try (Jar jar = new JarFileUrlNestedJar(
-                new URI("jar:file:" + war.getAbsolutePath() + "!/WEB-INF/lib/my%20jar.jar").toURL())) {
+                new URI("jar:" + war.toURI().toString() + "!/WEB-INF/lib/my%20jar.jar").toURL())) {
             Assert.assertTrue(jar.exists(TEST_ENTRY));
             Assert.assertArrayEquals(TEST_CONTENT, readJar(jar));
         }
@@ -132,7 +132,7 @@ public class TestJarFileUrlNestedJar {
         File war = createWar("WEB-INF/lib/nested.jar");
 
         Assert.assertThrows(IOException.class, () -> new JarFileUrlNestedJar(
-                new URI("jar:file:" + war.getAbsolutePath() + "!/WEB-INF/lib/missing.jar").toURL()));
+                new URI("jar:" + war.toURI().toString() + "!/WEB-INF/lib/missing.jar").toURL()));
     }
 
 
@@ -146,7 +146,7 @@ public class TestJarFileUrlNestedJar {
         File war = createWar("WEB-INF/lib/nested.jar");
 
         Assert.assertThrows(FileNotFoundException.class,
-                () -> new JarFileUrlNestedJar(new URI("jar:file:" + war.getAbsolutePath() + "!/").toURL()));
+                () -> new JarFileUrlNestedJar(new URI("jar:" + war.toURI().toString() + "!/").toURL()));
     }
 
 
@@ -160,6 +160,6 @@ public class TestJarFileUrlNestedJar {
         File war = createWar("WEB-INF/lib/nested.jar");
 
         Assert.assertThrows(IOException.class,
-                () -> new JarFileUrlNestedJar(new URI("jar:file:" + war.getAbsolutePath() + "!x").toURL()));
+                () -> new JarFileUrlNestedJar(new URI("jar:" + war.toURI().toString() + "!x").toURL()));
     }
 }
