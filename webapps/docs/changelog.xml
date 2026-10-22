@@ -699,6 +699,10 @@
         <code>maxHttpRequestHeaderSize</code> attribute for the HTTP connector.
         (markt)
       </fix>
+      <update>
+        Documentation: Describe how to configure the Windows certificate store
+        and reload externally renewed TLS certificates. (dsoumis)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Tribes">
