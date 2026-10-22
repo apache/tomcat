@@ -393,18 +393,22 @@ public class McastService extends MembershipServiceBase implements MessageListen
             throw new IllegalArgumentException(
                     sm.getString("membershipService.invalidTimingProperty", "memberDropTime", Long.valueOf(dropTime)));
         }
+        // The recovery sleep time only matters if recovery is enabled
+        boolean recEnabled = Boolean.parseBoolean(properties.getProperty("recoveryEnabled"));
+        long recSlpTime = Long.parseLong(properties.getProperty("recoverySleepTime"));
+        if (recEnabled && recSlpTime <= 0) {
+            throw new IllegalArgumentException(sm.getString("membershipService.invalidTimingProperty",
+                    "recoverySleepTime", Long.valueOf(recSlpTime)));
+        }
 
         impl = new McastServiceImpl(localMember, frequency, dropTime,
                 Integer.parseInt(properties.getProperty("mcastPort")), bind,
                 java.net.InetAddress.getByName(properties.getProperty("mcastAddress")), ttl, soTimeout, this, this,
                 Boolean.parseBoolean(properties.getProperty("localLoopbackDisabled")));
         impl.setMembershipService(this);
-        String value = properties.getProperty("recoveryEnabled");
-        boolean recEnabled = Boolean.parseBoolean(value);
         impl.setRecoveryEnabled(recEnabled);
         int recCnt = Integer.parseInt(properties.getProperty("recoveryCounter"));
         impl.setRecoveryCounter(recCnt);
-        long recSlpTime = Long.parseLong(properties.getProperty("recoverySleepTime"));
         impl.setRecoverySleepTime(recSlpTime);
         impl.setChannel(channel);
 

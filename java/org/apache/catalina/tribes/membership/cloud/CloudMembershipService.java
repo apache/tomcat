@@ -162,10 +162,13 @@ public class CloudMembershipService extends MembershipServiceBase implements Clo
             if (log.isTraceEnabled()) {
                 log.trace("Using membershipProvider: " + provider);
             }
-            membershipProvider = (MembershipProvider) Class.forName(provider).getConstructor().newInstance();
-            membershipProvider.setMembershipListener(this);
-            membershipProvider.setMembershipService(this);
-            membershipProvider.init(properties);
+            MembershipProvider newProvider = (MembershipProvider) Class.forName(provider).getConstructor().newInstance();
+            newProvider.setMembershipListener(this);
+            newProvider.setMembershipService(this);
+            newProvider.init(properties);
+            // Only keep the provider once it has been initialised so that a rejected configuration does not leave an
+            // uninitialised provider behind for the next start
+            membershipProvider = newProvider;
         }
         membershipProvider.start(level);
 
