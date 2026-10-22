@@ -45,4 +45,46 @@ public class TestMemberImpl {
             // The size check must reject it
         }
     }
+
+    /*
+     * Every variable length component of the ping must be bounded in the same way as the payload, and
+     * a rejected change must leave the member unmodified and usable.
+     */
+    @Test
+    public void testOtherComponentsAreBoundedAtTheSendableSize() throws Exception {
+        MemberImpl member = new MemberImpl("localhost", 4000, 100);
+        member.setUniqueId(UUIDGenerator.randomUUID(false));
+        byte[] before = member.getData(false, false);
+        int base = before.length;
+        int tooLarge = McastServiceImpl.MAX_SEND_SIZE - base + 1;
+
+        try {
+            member.setCommand(new byte[tooLarge + member.getCommand().length]);
+            Assert.fail("An oversized command must be rejected");
+        } catch (IllegalArgumentException expected) {
+            // Expected
+        }
+        try {
+            member.setDomain(new byte[tooLarge + member.getDomain().length]);
+            Assert.fail("An oversized domain must be rejected");
+        } catch (IllegalArgumentException expected) {
+            // Expected
+        }
+        try {
+            member.setUniqueId(new byte[tooLarge + member.getUniqueId().length]);
+            Assert.fail("An oversized unique ID must be rejected");
+        } catch (IllegalArgumentException expected) {
+            // Expected
+        }
+        try {
+            member.setHost(new byte[tooLarge + member.getHost().length]);
+            Assert.fail("An oversized host must be rejected");
+        } catch (IllegalArgumentException expected) {
+            // Expected
+        }
+
+        // Rejected changes leave the member unmodified and usable
+        Assert.assertEquals(base, member.getData(false, true).length);
+        member.setCommand(new byte[4]);
+    }
 }
