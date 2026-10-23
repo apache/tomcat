@@ -410,9 +410,9 @@ public class TestAbstractReplicatedMap {
             Member sender = new MemberImpl("localhost", 4017, -1);
 
             // Round trip over the serialization to get a message with the key data but no live key
-            byte[] wire = XByteBuffer.serialize(new MapMessage(
-                    "TestAbstractReplicatedMap".getBytes(StandardCharsets.UTF_8), MapMessage.MSG_RETRIEVE_BACKUP, false,
-                    key, null, null, null, null));
+            byte[] wire =
+                    XByteBuffer.serialize(new MapMessage("TestAbstractReplicatedMap".getBytes(StandardCharsets.UTF_8),
+                            MapMessage.MSG_RETRIEVE_BACKUP, false, key, null, null, null, null));
 
             MapMessage received = (MapMessage) XByteBuffer.deserialize(wire);
             Serializable reply = map.replyRequest(received, sender);
@@ -443,16 +443,15 @@ public class TestAbstractReplicatedMap {
     }
 
     /*
-     * A key may implement Serializable and still fail to serialize, which the message construction
-     * reports as an unchecked exception. That must not abort the removal either.
+     * A key may implement Serializable and still fail to serialize, which the message construction reports as an
+     * unchecked exception. That must not abort the removal either.
      */
     @Test
     public void testRemoveUnserializableKeyDoesNotThrow() throws Exception {
         TestChannel channel = new TestChannel();
-        LazyReplicatedMap<Object,String> map = new LazyReplicatedMap<Object,String>(
-                (key, value) -> {
-                    // Not made primary here
-                }, channel, 1000, "TestAbstractReplicatedMap", null);
+        LazyReplicatedMap<Object,String> map = new LazyReplicatedMap<>((key, value) -> {
+            // Not made primary here
+        }, channel, 1000, "TestAbstractReplicatedMap", null);
         map.memberAlive(new MemberImpl("localhost", 4019, -1));
 
         // The put keeps the entry on this node, as it cannot be published to a backup
@@ -468,10 +467,9 @@ public class TestAbstractReplicatedMap {
     @Test
     public void testPutUnserializableKeyReplicatedMapKeepsEntryLocal() throws Exception {
         TestChannel channel = new TestChannel();
-        ReplicatedMap<Object,String> map = new ReplicatedMap<Object,String>(
-                (key, value) -> {
-                    // Not made primary here
-                }, channel, 1000, "TestAbstractReplicatedMap", null);
+        ReplicatedMap<Object,String> map = new ReplicatedMap<>((key, value) -> {
+            // Not made primary here
+        }, channel, 1000, "TestAbstractReplicatedMap", null);
         Member first = new MemberImpl("localhost", 4020, -1);
         Member second = new MemberImpl("localhost", 4021, -1);
         map.memberAlive(first);
@@ -491,10 +489,9 @@ public class TestAbstractReplicatedMap {
     @Test
     public void testMemberDisappearedSkipsNonSerializableEntry() throws Exception {
         TestChannel channel = new TestChannel();
-        ReplicatedMap<Object,String> map = new ReplicatedMap<Object,String>(
-                (key, value) -> {
-                    // Not made primary here
-                }, channel, 1000, "TestAbstractReplicatedMap", null);
+        ReplicatedMap<Object,String> map = new ReplicatedMap<>((key, value) -> {
+            // Not made primary here
+        }, channel, 1000, "TestAbstractReplicatedMap", null);
         Member first = new MemberImpl("localhost", 4024, -1);
         Member second = new MemberImpl("localhost", 4025, -1);
         map.memberAlive(first);
@@ -512,10 +509,9 @@ public class TestAbstractReplicatedMap {
 
     @Test
     public void testStateRequestSkipsUnserializableEntry() throws Exception {
-        LazyReplicatedMap<Object,String> map = new LazyReplicatedMap<Object,String>(
-                (key, value) -> {
-                    // Not made primary here
-                }, new TestChannel(), 1000, "TestAbstractReplicatedMap", null);
+        LazyReplicatedMap<Object,String> map = new LazyReplicatedMap<>((key, value) -> {
+            // Not made primary here
+        }, new TestChannel(), 1000, "TestAbstractReplicatedMap", null);
         map.put("good", "value");
         map.put(new FailingKey(), "local");
 
@@ -533,10 +529,9 @@ public class TestAbstractReplicatedMap {
 
     @Test
     public void testBackupRequestSkipsUnserializableValue() throws Exception {
-        LazyReplicatedMap<String,Object> map = new LazyReplicatedMap<String,Object>(
-                (key, value) -> {
-                    // Not made primary here
-                }, new TestChannel(), 1000, "TestAbstractReplicatedMap", null);
+        LazyReplicatedMap<String,Object> map = new LazyReplicatedMap<>((key, value) -> {
+            // Not made primary here
+        }, new TestChannel(), 1000, "TestAbstractReplicatedMap", null);
         map.put("key", new FailingKey());
 
         MapMessage backupRequest = new MapMessage("TestAbstractReplicatedMap".getBytes(StandardCharsets.UTF_8),
@@ -551,7 +546,7 @@ public class TestAbstractReplicatedMap {
         private static final long serialVersionUID = 1L;
 
         @Serial
-        private void writeObject(ObjectOutputStream out) throws IOException {
+        private void writeObject(@SuppressWarnings("unused") ObjectOutputStream out) throws IOException {
             throw new IOException("Cannot be serialized");
         }
     }
