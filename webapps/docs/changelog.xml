@@ -121,6 +121,13 @@
   </subsection>
   <subsection name="Catalina">
     <changelog>
+      <add>
+        Add the <code>ConfigurationLoggerListener</code>, which logs the
+        configured connectors, hosts, and user valves at INFO when the server
+        has started. The basic valve of each pipeline and the automatically
+        installed <code>ErrorReportValve</code> are omitted. The listener is
+        enabled in the default <code>server.xml</code>.
+      </add>
       <fix>
         Treat a filter as not supporting asynchronous processing unless
         async supported is explicitly set to <code>"true"</code>.

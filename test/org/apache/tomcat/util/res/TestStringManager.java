@@ -136,6 +136,46 @@ public class TestStringManager {
     }
 
 
+    @Test
+    public void testConfigurationLoggerListenerAlignment() throws Exception {
+        InputStream is = TestStringManager.class.getClassLoader()
+                .getResourceAsStream("org/apache/catalina/startup/LocalStrings.properties");
+        Properties props = new Properties();
+        props.load(is);
+        Set<String> configurationLoggerListenerKeys = new HashSet<>();
+        for (Object key : props.keySet()) {
+            if (key instanceof String) {
+                if (((String) key).startsWith("configurationLoggerListener.")) {
+                    configurationLoggerListenerKeys.add((String) key);
+                }
+            }
+        }
+
+        for (Locale locale : ALL_LOCALES) {
+            testConfigurationLoggerListenerAlignment(configurationLoggerListenerKeys, locale);
+        }
+    }
+
+
+    private void testConfigurationLoggerListenerAlignment(Set<String> keys, Locale locale) {
+        System.out.println("\n" + locale.getDisplayName());
+        StringManager sm = StringManager.getManager("org.apache.catalina.startup", locale);
+        int standardLength = -1;
+        for (String key : keys) {
+            String fullLine = sm.getString(key, "XXX");
+            System.out.println(fullLine);
+            int insertIndex = fullLine.indexOf("XXX");
+            String preInsert = fullLine.substring(0, insertIndex);
+            int length = getFixedWidth(preInsert, locale);
+            if (standardLength == -1) {
+                standardLength = length;
+            } else {
+                Assert.assertEquals(locale.getDisplayName() + " - " + key, standardLength, length);
+            }
+        }
+    }
+
+
     private int getFixedWidth(String s, Locale l) {
         if (CJK_LOCALES.contains(l)) {
             // This isn't perfect but it is good enough for this test.
