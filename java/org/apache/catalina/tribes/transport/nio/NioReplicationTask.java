@@ -42,9 +42,8 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * A worker thread class which drains a channel and processes received messages.
- * Each instance services a single SelectionKey per invocation. After completion,
- * the worker returns itself to its parent pool for reuse.
+ * A worker thread class which drains a channel and processes received messages. Each instance services a single
+ * SelectionKey per invocation. After completion, the worker returns itself to its parent pool for reuse.
  */
 public class NioReplicationTask extends AbstractRxTask {
 
@@ -89,6 +88,9 @@ public class NioReplicationTask extends AbstractRxTask {
     @Override
     public synchronized void run() {
         try {
+            if (key == null) {
+                return; // just in case
+            }
             if (buffer == null) {
                 int size = getRxBufSize();
                 if (key.channel() instanceof DatagramChannel) {
@@ -101,9 +103,6 @@ public class NioReplicationTask extends AbstractRxTask {
                 }
             } else {
                 buffer.clear();
-            }
-            if (key == null) {
-                return; // just in case
             }
             if (log.isTraceEnabled()) {
                 log.trace("Servicing key:" + key);
@@ -141,11 +140,32 @@ public class NioReplicationTask extends AbstractRxTask {
                 }
                 cancelKey(key);
             }
+        } catch (Error e) {
+            // The key no longer has any interest ops so nothing would ever service it again. Cancel it so that the
+            // connection is released, then let the Error propagate.
+            if (key != null) {
+                cancelKey(key);
+            }
+            throw e;
         } finally {
             key = null;
             // done, ready for more, return to pool -- done from a finally
             // block so the worker can never leak out of the pool, not even
             // when an Error escapes the catch block above
+            getTaskPool().returnWorker(this);
+        }
+    }
+
+    /**
+     * Cancel the current selection key.
+     */
+    synchronized void cancel() {
+        try {
+            if (key != null) {
+                cancelKey(key);
+            }
+        } finally {
+            key = null;
             getTaskPool().returnWorker(this);
         }
     }
@@ -288,7 +308,7 @@ public class NioReplicationTask extends AbstractRxTask {
     /**
      * Registers a selection key for read interest.
      *
-     * @param key The selection key
+     * @param key    The selection key
      * @param reader The object reader
      */
     protected void registerForRead(final SelectionKey key, ObjectReader reader) {
