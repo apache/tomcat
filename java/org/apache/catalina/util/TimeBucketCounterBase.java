@@ -234,7 +234,11 @@ public abstract class TimeBucketCounterBase {
                         // There was an error executing the scheduled task, get it and log it
                         try {
                             maintenanceFuture.get();
-                        } catch (InterruptedException | ExecutionException e) {
+                        } catch (InterruptedException e) {
+                            // Restore the flag for the executor thread
+                            Thread.currentThread().interrupt();
+                            log.error(sm.getString("timebucket.maintenance.error"), e);
+                        } catch (ExecutionException e) {
                             log.error(sm.getString("timebucket.maintenance.error"), e);
                         }
                     }
