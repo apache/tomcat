@@ -35,6 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.catalina.tribes.ChannelMessage;
@@ -63,8 +64,11 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
      */
     protected static final StringManager sm = StringManager.getManager(NioReceiver.class);
 
-    private volatile boolean running = false;
+    // Number of listener threads in run(). A counter rather than a flag so that a stale thread of an earlier start
+    // that exits late cannot hide a live listener of a later start.
+    private final AtomicInteger runningListeners = new AtomicInteger();
 
+    private final Object channelLock = new Object();
     private final AtomicReference<Selector> selector = new AtomicReference<>();
     private ServerSocketChannel serverChannel = null;
     private volatile ServerSocketChannel secureServerChannel = null;
@@ -198,22 +202,24 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
             taskPool.stop();
         }
         this.stopListening();
-        // Startup may fail before the channels are registered with the selector or the listener thread is started.
-        if (serverChannel != null) {
-            try {
-                serverChannel.close();
-            } catch (IOException ioe) {
-                log.debug(sm.getString("nioReceiver.closeError"), ioe);
+        synchronized (channelLock) {
+            // Startup may fail before the channels are registered with the selector or the listener thread is started.
+            if (serverChannel != null) {
+                try {
+                    serverChannel.close();
+                } catch (IOException ioe) {
+                    log.debug(sm.getString("nioReceiver.closeError"), ioe);
+                }
+                serverChannel = null;
             }
-            serverChannel = null;
-        }
-        if (datagramChannel != null) {
-            try {
-                datagramChannel.close();
-            } catch (IOException ioe) {
-                log.debug(sm.getString("nioReceiver.closeError"), ioe);
+            if (datagramChannel != null) {
+                try {
+                    datagramChannel.close();
+                } catch (IOException ioe) {
+                    log.debug(sm.getString("nioReceiver.closeError"), ioe);
+                }
+                datagramChannel = null;
             }
-            datagramChannel = null;
         }
         if (secureServerChannel != null) {
             try {
@@ -301,56 +307,58 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
      * @throws IOException If binding fails
      */
     protected void bind() throws IOException {
-        try {
-            // allocate an unbound server socket channel
-            serverChannel = ServerSocketChannel.open();
-            // Get the associated ServerSocket to bind it with
-            ServerSocket serverSocket = serverChannel.socket();
-            // create a new Selector for use below
-            this.selector.set(Selector.open());
-            // set the port the server channel will listen to
-            // serverSocket.bind(new InetSocketAddress(getBind(), getTcpListenPort()));
-            bind(serverSocket, getPort(), getAutoBind(), false);
-            // set non-blocking mode for the listening socket
-            serverChannel.configureBlocking(false);
-            // register the ServerSocketChannel with the Selector
-            serverChannel.register(this.selector.get(), SelectionKey.OP_ACCEPT);
-
-            // set up the datagram channel
-            if (this.getUdpPort() >= 0) {
-                datagramChannel = DatagramChannel.open();
-                configureDatagramChannel();
-                // bind to the address to avoid security checks
-                bindUdp(datagramChannel.socket(), getUdpPort(), getAutoBind());
-            }
-        } catch (IOException | RuntimeException e) {
-            // The caller of start() only sees the exception, so release
-            // everything that was opened up to the failure point. Without
-            // this, every failed start leaks the server channel descriptor,
-            // the selector and, when the UDP bind is what failed, a bound
-            // datagram channel that nothing will ever listen on.
-            if (datagramChannel != null) {
-                try {
-                    datagramChannel.close();
-                } catch (IOException ioe) {
-                    e.addSuppressed(ioe);
-                }
-                datagramChannel = null;
-            }
-            if (serverChannel != null) {
-                try {
-                    serverChannel.close();
-                } catch (IOException ioe) {
-                    e.addSuppressed(ioe);
-                }
-                serverChannel = null;
-            }
+        synchronized (channelLock) {
             try {
-                closeSelector();
-            } catch (IOException ioe) {
-                e.addSuppressed(ioe);
+                // allocate an unbound server socket channel
+                serverChannel = ServerSocketChannel.open();
+                // Get the associated ServerSocket to bind it with
+                ServerSocket serverSocket = serverChannel.socket();
+                // create a new Selector for use below
+                this.selector.set(Selector.open());
+                // set the port the server channel will listen to
+                // serverSocket.bind(new InetSocketAddress(getBind(), getTcpListenPort()));
+                bind(serverSocket, getPort(), getAutoBind(), false);
+                // set non-blocking mode for the listening socket
+                serverChannel.configureBlocking(false);
+                // register the ServerSocketChannel with the Selector
+                serverChannel.register(this.selector.get(), SelectionKey.OP_ACCEPT);
+
+                // set up the datagram channel
+                if (this.getUdpPort() >= 0) {
+                    datagramChannel = DatagramChannel.open();
+                    configureDatagramChannel();
+                    // bind to the address to avoid security checks
+                    bindUdp(datagramChannel.socket(), getUdpPort(), getAutoBind());
+                }
+            } catch (IOException | RuntimeException e) {
+                // The caller of start() only sees the exception, so release
+                // everything that was opened up to the failure point. Without
+                // this, every failed start leaks the server channel descriptor,
+                // the selector and, when the UDP bind is what failed, a bound
+                // datagram channel that nothing will ever listen on.
+                if (datagramChannel != null) {
+                    try {
+                        datagramChannel.close();
+                    } catch (IOException ioe) {
+                        e.addSuppressed(ioe);
+                    }
+                    datagramChannel = null;
+                }
+                if (serverChannel != null) {
+                    try {
+                        serverChannel.close();
+                    } catch (IOException ioe) {
+                        e.addSuppressed(ioe);
+                    }
+                    serverChannel = null;
+                }
+                try {
+                    closeSelector();
+                } catch (IOException ioe) {
+                    e.addSuppressed(ioe);
+                }
+                throw e;
             }
-            throw e;
         }
     }
 
@@ -515,8 +523,15 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
             return;
         }
 
-        // Avoid NPEs if selector is set to null on stop.
-        Selector selector = this.selector.get();
+        Selector selector;
+        ServerSocketChannel serverChannel;
+        DatagramChannel datagramChannel;
+        synchronized (channelLock) {
+            // Capture one receiver generation so a delayed listener cannot clean up resources created by a later start.
+            selector = this.selector.get();
+            serverChannel = this.serverChannel;
+            datagramChannel = this.datagramChannel;
+        }
 
         // Set the flag only if this thread gets to select. A receiver that
         // was stopped before this thread got here must not end up marked as
@@ -527,6 +542,8 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
             setListen(true);
         }
 
+        Exception exception = null;
+        Error error = null;
         try {
             if (ownsListenFlag && datagramChannel != null) {
                 ObjectReader oreader = new ObjectReader(MAX_UDP_SIZE); // max size for a datagram packet
@@ -537,7 +554,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
             // which closes and nulls the selector while this thread is in the
             // select also ends this loop even if the thread had re-set the
             // listening flag in the meantime
-            while (ownsListenFlag && isListening() && this.selector.get() != null) {
+            while (ownsListenFlag && isListening() && this.selector.get() == selector) {
                 // this may block for a long time, upon return the
                 // selected set contains keys of the ready channels
                 try {
@@ -608,28 +625,75 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
                 }
 
             }
+        } catch (Exception e) {
+            exception = e;
+            throw e;
+        } catch (Error e) {
+            error = e;
+            throw e;
         } finally {
             if (ownsListenFlag) {
-                // This thread set the flag itself, so it clears it on every
-                // exit path, an exceptional exit included
-                setListen(false);
-            }
-        }
-
-        if (serverChannel != null) {
-            serverChannel.close();
-        }
-        if (datagramChannel != null) {
-            try {
-                datagramChannel.close();
-            } catch (Exception e) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("nioReceiver.closeError"), e);
+                synchronized (channelLock) {
+                    Selector currentSelector = this.selector.get();
+                    if (currentSelector == selector || currentSelector == null) {
+                        // Do not clear the flag of a listener for a newer selector generation.
+                        setListen(false);
+                    }
                 }
             }
-            datagramChannel = null;
+            try {
+                closeListenerResources(selector, serverChannel, datagramChannel);
+            } catch (IOException ioe) {
+                if (exception != null) {
+                    exception.addSuppressed(ioe);
+                } else if (error != null) {
+                    error.addSuppressed(ioe);
+                } else {
+                    throw ioe;
+                }
+            }
         }
-        closeSelector();
+    }
+
+    void closeListenerResources(Selector selector, ServerSocketChannel serverChannel, DatagramChannel datagramChannel)
+            throws IOException {
+        synchronized (channelLock) {
+            IOException failure = null;
+            if (serverChannel != null) {
+                try {
+                    serverChannel.close();
+                } catch (IOException ioe) {
+                    failure = ioe;
+                }
+                if (this.serverChannel == serverChannel) {
+                    this.serverChannel = null;
+                }
+            }
+            if (datagramChannel != null) {
+                try {
+                    datagramChannel.close();
+                } catch (Exception e) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("nioReceiver.closeError"), e);
+                    }
+                }
+                if (this.datagramChannel == datagramChannel) {
+                    this.datagramChannel = null;
+                }
+            }
+            try {
+                closeSelector(selector);
+            } catch (IOException ioe) {
+                if (failure == null) {
+                    failure = ioe;
+                } else {
+                    failure.addSuppressed(ioe);
+                }
+            }
+            if (failure != null) {
+                throw failure;
+            }
+        }
     }
 
 
@@ -647,25 +711,36 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
                 selector.wakeup();
                 // Wait for the receiver thread to finish
                 int count = 0;
-                while (running && count < 50) {
+                while (runningListeners.get() > 0 && count < 50) {
                     Thread.sleep(100);
                     count++;
                 }
-                if (running) {
+                if (runningListeners.get() > 0) {
                     log.warn(sm.getString("nioReceiver.stop.threadRunning"));
                 }
-                closeSelector();
+                closeSelector(selector);
             } catch (Exception e) {
                 log.error(sm.getString("nioReceiver.stop.fail"), e);
             } finally {
-                this.selector.set(null);
+                this.selector.compareAndSet(selector, null);
             }
         }
     }
 
     private void closeSelector() throws IOException {
         Selector selector = this.selector.getAndSet(null);
+        closeSelector(selector, false);
+    }
+
+    private void closeSelector(Selector selector) throws IOException {
+        closeSelector(selector, true);
+    }
+
+    private void closeSelector(Selector selector, boolean claim) throws IOException {
         if (selector == null) {
+            return;
+        }
+        if (claim && !this.selector.compareAndSet(selector, null)) {
             return;
         }
         try {
@@ -719,13 +794,13 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
      */
     @Override
     public void run() {
-        running = true;
+        runningListeners.incrementAndGet();
         try {
             listen();
         } catch (Exception e) {
             log.error(sm.getString("nioReceiver.run.fail"), e);
         } finally {
-            running = false;
+            runningListeners.decrementAndGet();
         }
     }
 
