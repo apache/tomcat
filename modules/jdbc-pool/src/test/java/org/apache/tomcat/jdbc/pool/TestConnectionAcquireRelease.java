@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.tomcat.jdbc.functional;
+package org.apache.tomcat.jdbc.pool;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -35,6 +35,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Test;
 
+import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 import org.apache.tomcat.jdbc.pool.DataSource;
 
 /**
@@ -42,7 +43,7 @@ import org.apache.tomcat.jdbc.pool.DataSource;
  * returning them, and reusing them. All assertions about physical
  * connections are made against the database, not pool statistics.
  */
-class ConnectionAcquireReleaseTest extends PoolTestSupport {
+class TestConnectionAcquireRelease extends JdbcPoolBaseTest {
 
     @Test
     void initialSizePreCreatesPhysicalConnections() throws Exception {

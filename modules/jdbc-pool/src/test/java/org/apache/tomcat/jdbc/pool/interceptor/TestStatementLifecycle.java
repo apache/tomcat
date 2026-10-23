@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.tomcat.jdbc.functional;
+package org.apache.tomcat.jdbc.pool.interceptor;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,6 +36,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.interceptor.StatementCache;
 import org.apache.tomcat.jdbc.pool.interceptor.StatementDecoratorInterceptor;
@@ -54,7 +55,7 @@ import org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer;
  * case here is decided by the database: the rows a recycled statement
  * actually inserted.</p>
  */
-class StatementLifecycleTest extends PoolTestSupport {
+class TestStatementLifecycle extends JdbcPoolBaseTest {
 
     private static final String INSERT_SQL = "INSERT INTO %s VALUES (?)";
 

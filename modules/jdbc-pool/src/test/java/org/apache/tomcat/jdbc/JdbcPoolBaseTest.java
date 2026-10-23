@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.tomcat.jdbc.functional;
+package org.apache.tomcat.jdbc;
 
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
@@ -54,7 +54,7 @@ import org.h2.tools.Server;
  * Test classes must not run in parallel (each uses static fixture
  * state); Surefire's default sequential execution applies.
  */
-public abstract class PoolTestSupport {
+public abstract class JdbcPoolBaseTest {
 
     /** Upper bound for any await-style condition; generous on slow CI. */
     protected static final long AWAIT_TIMEOUT_MS = 15000;

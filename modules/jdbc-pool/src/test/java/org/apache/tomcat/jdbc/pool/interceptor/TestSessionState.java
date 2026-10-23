@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.tomcat.jdbc.functional;
+package org.apache.tomcat.jdbc.pool.interceptor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -25,6 +25,7 @@ import java.sql.Statement;
 
 import org.junit.jupiter.api.Test;
 
+import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;
 
@@ -40,7 +41,7 @@ import org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;
  * the state really was restored: a write that stays invisible to an admin
  * connection proves the physical session is in manual commit mode.</p>
  */
-class SessionStateTest extends PoolTestSupport {
+class TestSessionState extends JdbcPoolBaseTest {
 
     private DataSource configuredPool() {
         DataSource ds = newDataSource();

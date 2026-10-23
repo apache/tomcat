@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.tomcat.jdbc.functional;
+package org.apache.tomcat.jdbc.pool;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -33,6 +33,7 @@ import javax.transaction.xa.Xid;
 
 import org.junit.jupiter.api.Test;
 
+import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.XADataSource;
 
@@ -42,7 +43,7 @@ import org.apache.tomcat.jdbc.pool.XADataSource;
  * out pooled connections that implement {@link XAConnection}, and the
  * XA resource drives real two-phase commit against the database.
  */
-class XaConnectionTest extends PoolTestSupport {
+class TestXaConnection extends JdbcPoolBaseTest {
 
     /** Simple test transaction id. */
     private static final class TestXid implements Xid {

@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.tomcat.jdbc.functional;
+package org.apache.tomcat.jdbc.pool;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 import org.apache.tomcat.jdbc.pool.Validator;
@@ -46,7 +47,7 @@ import org.apache.tomcat.jdbc.pool.Validator;
  * connection replaces the connection instead of reporting an error is
  * asserted explicitly, because it is easy to mistake for a bug.</p>
  */
-class ValidationTest extends PoolTestSupport {
+class TestValidation extends JdbcPoolBaseTest {
 
     /** Heavy pure-SQL aggregate; H2 honours statement timeouts on it. */
     private static final String SLOW_SQL =

@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.tomcat.jdbc.config;
+package org.apache.tomcat.jdbc.pool.interceptor;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,7 +38,7 @@ import org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport.QueryStatsCompara
  *
  * <p>Ported from the retired legacy {@code TestSlowQueryComparator}.</p>
  */
-class SlowQueryComparatorTest {
+class TestSlowQueryComparator {
 
     private final Comparator<QueryStats> comparator = new QueryStatsComparator();
 

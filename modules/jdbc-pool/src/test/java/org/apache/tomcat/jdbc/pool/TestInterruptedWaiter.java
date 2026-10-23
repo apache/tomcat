@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.tomcat.jdbc.functional;
+package org.apache.tomcat.jdbc.pool;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 import org.apache.tomcat.jdbc.pool.DataSource;
 
 /**
@@ -39,7 +40,7 @@ import org.apache.tomcat.jdbc.pool.DataSource;
  * <p>Asserted with pool accounting <em>and</em> the database's own
  * session count, for both queue implementations.</p>
  */
-class InterruptedWaiterTest extends PoolTestSupport {
+class TestInterruptedWaiter extends JdbcPoolBaseTest {
 
     private static final int HOLDERS = 3;
 

@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.tomcat.jdbc.functional;
+package org.apache.tomcat.jdbc.pool.interceptor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.junit.jupiter.api.Test;
 
+import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport;
 
@@ -40,7 +41,7 @@ import org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport;
  * cancellation, per-connection statement caching and the decorated
  * statement proxy contract.
  */
-class InterceptorSemanticsTest extends PoolTestSupport {
+class TestInterceptorSemantics extends JdbcPoolBaseTest {
 
     /** Heavy pure-SQL aggregate; H2 honours query timeouts on it (~2 s). */
     private static final String HEAVY_SQL_PREFIX =

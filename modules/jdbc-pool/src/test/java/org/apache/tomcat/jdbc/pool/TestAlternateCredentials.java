@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.tomcat.jdbc.functional;
+package org.apache.tomcat.jdbc.pool;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -36,6 +36,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 import org.apache.tomcat.jdbc.pool.DataSource;
 
 /**
@@ -50,7 +51,7 @@ import org.apache.tomcat.jdbc.pool.DataSource;
  * {@code AlternateUsernameTest}, which could only ask a fake driver which
  * credentials it had been handed.</p>
  */
-class AlternateCredentialsTest extends PoolTestSupport {
+class TestAlternateCredentials extends JdbcPoolBaseTest {
 
     private static final String ALT_USER = "POOL_ALT_USER";
     private static final String ALT_PASSWORD = "alt-password";

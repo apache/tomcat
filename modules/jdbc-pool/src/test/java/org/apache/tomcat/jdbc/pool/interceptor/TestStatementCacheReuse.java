@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.tomcat.jdbc.functional;
+package org.apache.tomcat.jdbc.pool.interceptor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -29,6 +29,7 @@ import java.sql.Statement;
 
 import org.junit.jupiter.api.Test;
 
+import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.interceptor.StatementCache;
 
@@ -49,7 +50,7 @@ import org.apache.tomcat.jdbc.pool.interceptor.StatementCache;
  * pool, and once that count is reached further statements are not cached
  * and are closed immediately.</p>
  */
-class StatementCacheReuseTest extends PoolTestSupport {
+class TestStatementCacheReuse extends JdbcPoolBaseTest {
 
     private DataSource cachedPool(String properties, int maxActive) {
         DataSource ds = newDataSource();

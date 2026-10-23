@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.tomcat.jdbc.config;
+package org.apache.tomcat.jdbc.pool;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -42,9 +42,9 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
  *
  * <p>Ported from the retired legacy {@code ShouldForceReconnectTest}. The
  * {@code maxAge} half of the same decision is covered against a real
- * database by {@code PoolEvictionTest#maxAgeRetiresAnOldConnectionBetweenBorrowers}.</p>
+ * database by {@code TestPoolEviction#maxAgeRetiresAnOldConnectionBetweenBorrowers}.</p>
  */
-class ShouldForceReconnectTest {
+class TestShouldForceReconnect {
 
     private static final String DEFAULT_USER = "username_def";
     private static final String DEFAULT_PASSWD = "password_def";

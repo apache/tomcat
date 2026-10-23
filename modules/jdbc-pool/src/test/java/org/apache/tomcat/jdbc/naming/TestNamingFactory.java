@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.tomcat.jdbc.functional;
+package org.apache.tomcat.jdbc.naming;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -27,6 +27,7 @@ import javax.naming.CompositeName;
 
 import org.junit.jupiter.api.Test;
 
+import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.DataSourceFactory;
 import org.apache.tomcat.jdbc.pool.XADataSource;
@@ -37,7 +38,7 @@ import org.apache.tomcat.jdbc.pool.XADataSource;
  * correctly configured, fully working pool; and the generic naming
  * factory applies documented property types to the configured object.
  */
-class NamingFactoryTest extends PoolTestSupport {
+class TestNamingFactory extends JdbcPoolBaseTest {
 
     private Reference dataSourceReference(String className) {
         Reference ref = new Reference(className, null, null);

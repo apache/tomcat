@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.tomcat.jdbc.functional;
+package org.apache.tomcat.jdbc.pool;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,13 +32,14 @@ import java.sql.Statement;
 
 import org.junit.jupiter.api.Test;
 
+import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 import org.apache.tomcat.jdbc.pool.DataSource;
 
 /**
  * Expected functionality of executing statements (DDL, DML, queries,
  * batches, calls) through pooled connections against the real database.
  */
-class StatementExecutionTest extends PoolTestSupport {
+class TestStatementExecution extends JdbcPoolBaseTest {
 
     @Test
     void ddlDmlSelectRoundTrip() throws Exception {

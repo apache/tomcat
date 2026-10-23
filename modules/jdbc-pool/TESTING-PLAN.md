@@ -34,7 +34,7 @@ regressions; scenario, not code, must survive:
 
 | Disposition | Classes |
 |---|---|
-| **Keep** (port to JUnit 5 as-is; fast, pure-unit, no fake DB) | `TestJdbcInterceptorConfigParsing`, `TestSlowQueryComparator`, `PoolPropertiesTest`, `ShouldForceReconnectTest` (`TestInterceptorShortName` moved to the harvest row below: it needs a live pool, and the real `SlowQueryReport` can play its role) |
+| **Keep** (port to JUnit 5 as-is; fast, pure-unit, no fake DB) | `JdbcInterceptorConfigParsingTest`, `SlowQueryComparatorTest`, `PoolPropertiesTest`, `ShouldForceReconnectTest` (`TestInterceptorShortName` moved to the harvest row below: it needs a live pool, and the real `SlowQueryReport` can play its role) |
 | **Harvest scenario → rewrite against real DB** | `Bug50571`, `Bug50805`, `Async0IdleTestBug50477` (regression memory), `TestConnectionState` (→ defect #3 repro), `TestGCClose` (GC-close semantics), `MultipleCloseTest`, `EqualsHashCodeTest`, `AlternateUsernameTest` (H2 supports multiple DB users → now a *real* test), `PoolPurgeTest`, `TestValidation`, `TestValidationQueryTimeout`, `TestTimeout`, `TestSuspectTimeout`, `TestGetConnection`, `TwoDataSources`, `JmxPasswordTest` (→ credential-exposure defect), `TestQueryTimeoutInterceptor`, `TestStatementCache`, `TestSlowQueryReport`, `StatementFinalizerTest` |
 | **Delete** (benchmarks, sleep-drift, DBCP/c3p0 comparisons, stub plumbing, examples) | `FairnessTest`, `CheckOutThreadTest`, `ConnectCountTest`, `StarvationTest`, `AbandonPercentageTest`, `TestConcurrency`, `TestSizePreservation`, `BorrowWaitTest`, `TestAsyncQueue`, `TestException`, `ProxiedResultSetTest`, `ProxiedStatementTest`, `PoolCleanerTest` (flaky), `CreateTestTable`, `DefaultTestCase`/`DefaultProperties` (DBCP plumbing), `SimplePOJO*Example`, `driver/*` |
 
@@ -48,43 +48,43 @@ driver what it remembered, the new test asks the database.
 
 | Legacy scenario | New home |
 |---|---|
-| `Async0IdleTestBug50477`, `Bug50805`, `TestAsyncQueue` (async borrow must not strand a waiter, accounting stays honest) | `functional/AsyncBorrowTest` (4) |
-| `Bug53367`, `FairnessTest`/`StarvationTest` *interrupt* case (an interrupted waiter must not eat a permit) | `functional/InterruptedWaiterTest` (2) |
-| `TestValidation`, `TestValidationQueryTimeout`, `TestTimeout` (validation query, timeout, `testOnBorrow`/`Return`/`WhileIdle`, `isValid()`, custom `Validator`) | `functional/ValidationTest` (9) |
-| `TestGetConnection`, `TwoDataSources`, `Bug50571`, `Bug54225`, `Bug54978` (connect-time setup: `initSQL`, blank `initSQL`, `initSQL` as connect validation, unusable configured isolation, `dbProperties`, side-door close detected) | `functional/ConnectionSetupTest` (6) |
-| `PoolPurgeTest` | `functional/PurgeTest` (2) — re-encoded to the real generational semantics: `purge()`/`purgeOnReturn()` both start a new pool generation, a pre-generation session is closed on return, `purge()` also closes the ones idle right now |
-| `MultipleCloseTest`, `EqualsHashCodeTest` (facade identity path) | `functional/ProxyContractTest` (4) |
-| `StatementFinalizerTest`, `TestStatementCache`, `ProxiedResultSetTest`/`ProxiedStatementTest` back-references | `functional/StatementLifecycleTest` (7) |
-| `TestConnectionState` (hygiene half; the leak half stays defect #3 backlog) | `functional/SessionStateTest` (3) |
-| `AlternateUsernameTest` (now a real test: H2 users, identity read back with `CURRENT_USER`) | `functional/AlternateCredentialsTest` (6) |
-| `TestInterceptorShortName`, `TestSlowQueryReport` lifecycle/statistics half | `functional/InterceptorLifecycleTest` (3) |
-| `JmxPasswordTest` (documented `getPassword()` redaction only) | `functional/JmxMonitorTest` (+1, 5 total) |
-| `PoolPropertiesTest` (config package: `toString` bracket balance **plus** password masking) | `config/PoolPropertiesTest` (2) |
-| `TestJdbcInterceptorConfigParsing` | `config/JdbcInterceptorConfigParsingTest` (4) |
-| `TestSlowQueryComparator` | `config/SlowQueryComparatorTest` (5) |
-| `ShouldForceReconnectTest` (truth table, expanded to a parameterised case per credential combination) | `config/ShouldForceReconnectTest` (17) |
+| `Async0IdleTestBug50477`, `Bug50805`, `TestAsyncQueue` (async borrow must not strand a waiter, accounting stays honest) | `pool/TestAsyncBorrow` (4) |
+| `Bug53367`, `FairnessTest`/`StarvationTest` *interrupt* case (an interrupted waiter must not eat a permit) | `pool/TestInterruptedWaiter` (2) |
+| `TestValidation`, `TestValidationQueryTimeout`, `TestTimeout` (validation query, timeout, `testOnBorrow`/`Return`/`WhileIdle`, `isValid()`, custom `Validator`) | `pool/TestValidation` (9) |
+| `TestGetConnection`, `TwoDataSources`, `Bug50571`, `Bug54225`, `Bug54978` (connect-time setup: `initSQL`, blank `initSQL`, `initSQL` as connect validation, unusable configured isolation, `dbProperties`, side-door close detected) | `pool/TestConnectionSetup` (6) |
+| `PoolPurgeTest` | `pool/TestPurge` (2) — re-encoded to the real generational semantics: `purge()`/`purgeOnReturn()` both start a new pool generation, a pre-generation session is closed on return, `purge()` also closes the ones idle right now |
+| `MultipleCloseTest`, `EqualsHashCodeTest` (facade identity path) | `pool/TestProxyContract` (4) |
+| `StatementFinalizerTest`, `TestStatementCache`, `ProxiedResultSetTest`/`ProxiedStatementTest` back-references | `pool/TestStatementLifecycle` (7) |
+| `TestConnectionState` (hygiene half; the leak half stays defect #3 backlog) | `pool/TestSessionState` (3) |
+| `AlternateUsernameTest` (now a real test: H2 users, identity read back with `CURRENT_USER`) | `pool/TestAlternateCredentials` (6) |
+| `TestInterceptorShortName`, `TestSlowQueryReport` lifecycle/statistics half | `pool/TestInterceptorLifecycle` (3) |
+| `JmxPasswordTest` (documented `getPassword()` redaction only) | `pool/TestJmxMonitor` (+1, 5 total) |
+| `PoolPropertiesTest` (pure unit: `toString` bracket balance **plus** password masking) | `pool/TestPoolProperties` (2) |
+| `TestJdbcInterceptorConfigParsing` | `pool/TestJdbcInterceptorConfigParsing` (4) |
+| `TestSlowQueryComparator` | `pool/TestSlowQueryComparator` (5) |
+| `ShouldForceReconnectTest` (truth table, expanded to a parameterised case per credential combination) | `pool/TestShouldForceReconnect` (17) |
 
 Deliberately dropped, with reasons:
 
 * `TestGCClose` — a finalizer-on-GC scenario cannot be gated (no
   deterministic trigger). The hazard it gestured at (a stale proxy
   driving somebody else's session) is a High catalog finding and is
-  pinned at the facade level by `ProxyContractTest`.
+  pinned at the facade level by `TestProxyContract`.
 * `TestQueryTimeoutInterceptor`, `TestValidation`'s "how many times did
   the driver get asked" cases — the first is already covered by
-  `InterceptorSemanticsTest`; the second counted stub-driver calls and
+  `TestInterceptorSemantics`; the second counted stub-driver calls and
   is superseded by session-count and outcome oracles.
 * `TestSlowQueryReport`'s JMX-notification counting and `bugs/Bug51582`
   (`SlowQueryReportJmx`) — High defect #7, §4 backlog.
 * `bugs/Bug54227` (a session older than `maxAge` must be replaced) was
   already covered before the harvest, by
-  `PoolEvictionTest#maxAgeRetiresAnOldConnectionBetweenBorrowers`.
+  `TestPoolEviction#maxAgeRetiresAnOldConnectionBetweenBorrowers`.
 * StatementCache hygiene cases H2 cannot observe: `maxFieldSize`
   (always reports 0), `getFetchDirection` (always `FETCH_FORWARD`),
   `isPoolable()` (always false — the interceptor tracks it itself) and
   driver-generated warnings (H2 raises none on `executeUpdate`). The
   observable half — batch, `closeOnCompletion`, `queryTimeout`,
-  `maxRows`, `fetchSize` — is in `StatementLifecycleTest`.
+  `maxRows`, `fetchSize` — is in `TestStatementLifecycle`.
 * Everything else per the disposition table above (benchmarks, DBCP
   comparisons, sleep-driven timing, stub plumbing, examples).
 
@@ -147,10 +147,12 @@ JUnit 5, three groups:
    `lockCount` property); if it is kept, it needs direct unit tests
    in the later phase — not in the functional baseline.
 
-Layout: `org.apache.tomcat.jdbc.functional` (behaviour against the real
-database, every class extending the fixture) and
-`org.apache.tomcat.jdbc.config` (the pure-unit configuration cases
-ported from the old suite — no pool, no database).
+Layout: each test class is `Test*.java` and sits in the package of
+the code it tests - `org.apache.tomcat.jdbc.pool` (pool behaviour and
+the pooled-statement surface, plus the pure-unit configuration cases
+ported from the old suite), `pool.interceptor`, `pool.jmx`, `naming`.
+The shared fixture is `org.apache.tomcat.jdbc.JdbcPoolBaseTest`, the
+one class all behavioural tests extend.
 
 Infrastructure: H2-TCP fixture (per-class server + fresh DB name);
 state-hygiene extension (every `DataSource` closed, pool statics and
@@ -159,7 +161,7 @@ the `PoolCleanerTest` flake class permanently); Awaitility instead
 of sleeps; `-Pdocker` profile for the Postgres tier.
 
 Fixture details worth knowing before writing a test against it
-(`functional/PoolTestSupport`):
+(`org.apache.tomcat.jdbc.JdbcPoolBaseTest`):
 
 * The database is bootstrapped by an admin connection with
   `SET DB_CLOSE_DELAY -1`. Without it an in-memory database is
@@ -212,31 +214,32 @@ the working list.
    helpers + Await-style polling helper. Old suite's flaky
    `PoolCleanerTest` excluded (already red in full-suite runs;
    superseded by the baseline). Suite-time target: new tests < 60 s.
-   **Done**: `org.apache.tomcat.jdbc.functional` package.
+   **Done**: the fixture as
+   `org.apache.tomcat.jdbc.JdbcPoolBaseTest`.
 2. **Spec tests** (green gate) for core pool + proxies +
    interceptors, against H2-TCP: acquire/reuse, statement
    execution, transactions, sizing/eviction/lifecycle first; then
    validation variants, fairness queues, interceptor chain
    semantics, JMX with live traffic, XA, JNDI factories.
-   **Done**: the phase 1 classes plus `InterceptorSemanticsTest`
+   **Done**: the phase 1 classes plus `TestInterceptorSemantics`
    (slow/failed query reporting, `QueryTimeoutInterceptor`
    cancellation, `StatementCache`, `StatementDecoratorInterceptor`),
-   `JmxMonitorTest` (pool + per-connection MBeans with live
-   traffic), `XaConnectionTest` (real 2-phase commit and rollback
-   against H2's XA resource), `NamingFactoryTest`
+   `TestJmxMonitor` (pool + per-connection MBeans with live
+   traffic), `TestXaConnection` (real 2-phase commit and rollback
+   against H2's XA resource), `TestNamingFactory`
    (`DataSourceFactory`, `GenericNamingResourcesFactory`) and
-   `FairBlockingQueueTest` (most-recently-used hand-off, blocking
+   `TestFairBlockingQueue` (most-recently-used hand-off, blocking
    retrieval, waiter fairness, documented-unsupported operations).
    The validation variants (`testOnBorrow`, `testOnReturn`,
    `testWhileIdle`; query vs `isValid()` vs a custom `Validator`,
    `validationQueryTimeout`) arrived with the harvest as
-   `ValidationTest`.
-   `InterceptorSemanticsTest` alone costs ~60 s: real timeout
+   `TestValidation`.
+   `TestInterceptorSemantics` alone costs ~60 s: real timeout
    cancellation needs a real multi-second query (H2 has no `SLEEP()`
    and an in-process `CREATE ALIAS` is not cancel-safe), so the
    "< 60 s" budget is understood to exclude it.
    Added afterwards, because the pool's own caching is core
-   functionality: `StatementCacheReuseTest` (6) pins the statement cache
+   functionality: `TestStatementCacheReuse` (6) pins the statement cache
    on the driver's own statement object - a closed statement is handed
    to the next borrower of the same session without a second prepare,
    each session caches its own, the `max` count is counted over the whole
@@ -246,7 +249,7 @@ the working list.
    Suite totals: 140 tests, ~80 s, 56.9 % instruction / 52.8 % branch.
 3. **Old suite removal**: **done**. The harvest (§1 "Harvest result")
    landed first: 75 tests in 12 new classes plus one added
-   `JmxMonitorTest` case. The JUnit 4 suite then went away together
+   `TestJmxMonitor` case. The JUnit 4 suite then went away together
    with its stub driver, the DBCP-comparison plumbing
    (`DefaultTestCase`, `DefaultProperties`), the `bugs/` classes, the
    test-only interceptors under `pool/interceptor/` and the two
@@ -285,7 +288,7 @@ the working list.
   * closing the `Connection` obtained from an H2 `XAConnection`
     closes the *physical* connection, so the pool discards it
     instead of pooling it; returning only the `XAConnection` keeps
-    it (what `XaConnectionTest` asserts).
+    it (what `TestXaConnection` asserts).
   * `ConnectionPool.close()` releases idle connections via
     `release()` but checked-out ones via `abandon()`, and only the
     former unregisters the per-connection
@@ -302,14 +305,14 @@ the working list.
     findings in `defects-pool/defects-...ProxyConnection.md` and
     `...DisposableConnectionFacade.md`; the baseline therefore pins
     only the identity semantics *at the facade*
-    (`ProxyContractTest`).
+    (`TestProxyContract`).
   * a borrow with alternate credentials that the database refuses
     leaves the pool having *closed the healthy idle session it
     already had*: size and server session count drop to 0 and the
     next ordinary borrow has to reconnect. The pool stays usable
-    (`AlternateCredentialsTest` pins that much), but the shrinkage is
+    (`TestAlternateCredentials` pins that much), but the shrinkage is
     not something to lock in as expected behaviour.
-* `StatementCacheReuseTest` pins the documented caching behaviour and
+* `TestStatementCacheReuse` pins the documented caching behaviour and
   deliberately stops there. The findings in
   `defects-pool/defects-...interceptor.StatementCache.md` stay unpinned:
   a cached statement keeps answering `getConnection()` with the

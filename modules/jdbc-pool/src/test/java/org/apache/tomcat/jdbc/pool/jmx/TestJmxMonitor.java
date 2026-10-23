@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.tomcat.jdbc.functional;
+package org.apache.tomcat.jdbc.pool.jmx;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -34,6 +34,7 @@ import javax.management.ObjectName;
 
 import org.junit.jupiter.api.Test;
 
+import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.jmx.ConnectionPoolMBean;
 
@@ -46,7 +47,7 @@ import org.apache.tomcat.jdbc.pool.jmx.ConnectionPoolMBean;
  * those same container callbacks and then read the published statistics
  * while real traffic flows to a real database.
  */
-class JmxMonitorTest extends PoolTestSupport {
+class TestJmxMonitor extends JdbcPoolBaseTest {
 
     private static final String POOL_DOMAIN = "tomcat.jdbc";
 

@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.tomcat.jdbc.functional;
+package org.apache.tomcat.jdbc.pool.interceptor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -31,6 +31,7 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
+import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
 import org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport;
@@ -49,7 +50,7 @@ import org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport;
  * driver: the interceptor leaves evidence in the database work it sees and
  * in the statistics it publishes.</p>
  */
-class InterceptorLifecycleTest extends PoolTestSupport {
+class TestInterceptorLifecycle extends JdbcPoolBaseTest {
 
     private static final String REPORT_SQL = "SELECT COUNT(*) FROM SYSTEM_RANGE(1,10)";
 

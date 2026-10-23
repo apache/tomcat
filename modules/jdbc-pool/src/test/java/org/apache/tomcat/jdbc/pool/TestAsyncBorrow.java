@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.tomcat.jdbc.functional;
+package org.apache.tomcat.jdbc.pool;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Test;
 
+import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 import org.apache.tomcat.jdbc.pool.DataSource;
 
 /**
@@ -44,7 +45,7 @@ import org.apache.tomcat.jdbc.pool.DataSource;
  * {@code Async0IdleTestBug50477} (async borrow from a fair pool that has
  * no idle connections yet), neither of which ran in the old build.</p>
  */
-class AsyncBorrowTest extends PoolTestSupport {
+class TestAsyncBorrow extends JdbcPoolBaseTest {
 
     @Test
     void asyncBorrowKeepsAccountingConsistentWithTheDatabase() throws Exception {

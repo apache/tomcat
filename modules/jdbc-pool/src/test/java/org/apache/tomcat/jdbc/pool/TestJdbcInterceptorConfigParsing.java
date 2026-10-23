@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.tomcat.jdbc.config;
+package org.apache.tomcat.jdbc.pool;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -39,7 +39,7 @@ import org.apache.tomcat.jdbc.pool.TrapException;
  * <p>Ported from the retired legacy
  * {@code TestJdbcInterceptorConfigParsing} (added for bug 54395).</p>
  */
-class JdbcInterceptorConfigParsingTest {
+class TestJdbcInterceptorConfigParsing {
 
     @Test
     void basicNamesAndPropertiesAreParsed() {

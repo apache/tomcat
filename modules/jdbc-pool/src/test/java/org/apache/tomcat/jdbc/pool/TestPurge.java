@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.tomcat.jdbc.functional;
+package org.apache.tomcat.jdbc.pool;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -23,6 +23,7 @@ import java.sql.Connection;
 
 import org.junit.jupiter.api.Test;
 
+import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 import org.apache.tomcat.jdbc.pool.DataSource;
 
 /**
@@ -38,7 +39,7 @@ import org.apache.tomcat.jdbc.pool.DataSource;
  * harvested from the retired legacy {@code PoolPurgeTest}, asserted here
  * with the database's session count.
  */
-class PurgeTest extends PoolTestSupport {
+class TestPurge extends JdbcPoolBaseTest {
 
     @Test
     void purgeClosesIdleSessionsAndDiscardsTheNextReturn() throws Exception {

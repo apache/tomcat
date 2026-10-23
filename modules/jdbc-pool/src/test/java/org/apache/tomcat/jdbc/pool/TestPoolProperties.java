@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.tomcat.jdbc.config;
+package org.apache.tomcat.jdbc.pool;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -36,7 +36,7 @@ import org.apache.tomcat.jdbc.pool.PoolProperties;
  *
  * <p>Ported from the retired legacy {@code PoolPropertiesTest}.</p>
  */
-class PoolPropertiesTest {
+class TestPoolProperties {
 
     private static final String DEFAULT_USER = "username_def";
     private static final String DEFAULT_PASSWD = "password_def";

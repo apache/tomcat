@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.tomcat.jdbc.functional;
+package org.apache.tomcat.jdbc.pool;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -41,7 +41,7 @@ import org.apache.tomcat.jdbc.pool.FairBlockingQueue;
  * longest waiting consumer, and the collection operations the queue
  * deliberately leaves unsupported.
  */
-class FairBlockingQueueTest {
+class TestFairBlockingQueue {
 
     @Test
     void pollTimesOutOnEmptyQueue() throws Exception {

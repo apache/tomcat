@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.tomcat.jdbc.functional;
+package org.apache.tomcat.jdbc.pool;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -31,6 +31,7 @@ import javax.sql.PooledConnection;
 
 import org.junit.jupiter.api.Test;
 
+import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 import org.apache.tomcat.jdbc.pool.DataSource;
 
 /**
@@ -46,7 +47,7 @@ import org.apache.tomcat.jdbc.pool.DataSource;
  * the facade (with {@code useDisposableConnectionFacade=false}) is not
  * covered here on purpose - see TESTING-PLAN.md.</p>
  */
-class ProxyContractTest extends PoolTestSupport {
+class TestProxyContract extends JdbcPoolBaseTest {
 
     @Test
     void aClosedFacadeStaysClosedAfterTheSessionIsReborrowed() throws Exception {
