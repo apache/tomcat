@@ -368,7 +368,10 @@ public abstract class HttpServlet extends GenericServlet {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
         } else {
             // RFC 9110, section 15.5.6: a 405 response must include an Allow header field
-            resp.setHeader("Allow", getAllowHeaderValue(req));
+            // Don't override an Allow header field the application may have set
+            if (!resp.containsHeader("Allow")) {
+                resp.setHeader("Allow", getAllowHeaderValue(req));
+            }
             resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, msg);
         }
     }
@@ -492,7 +495,9 @@ public abstract class HttpServlet extends GenericServlet {
      * OPTIONS request determines which HTTP methods the server supports and returns an appropriate header. For example,
      * if a servlet overrides <code>doGet</code>, this method returns the following header:
      * <p>
-     * <code>Allow: GET, HEAD, TRACE, OPTIONS</code>
+     * <code>Allow: GET, HEAD, OPTIONS</code>
+     * <p>
+     * The TRACE method may also be present depending on container configuration.
      * <p>
      * There's no need to override this method unless the servlet implements new HTTP methods, beyond those implemented
      * by HTTP 1.1.
