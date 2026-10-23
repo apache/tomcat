@@ -16,15 +16,14 @@
  */
 package org.apache.tomcat.jdbc.naming;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import javax.naming.CompositeName;
 import javax.naming.Name;
 import javax.naming.Reference;
 import javax.naming.StringRefAddr;
-import javax.naming.CompositeName;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;

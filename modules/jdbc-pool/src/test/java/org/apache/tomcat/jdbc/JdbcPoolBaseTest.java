@@ -101,7 +101,7 @@ public abstract class JdbcPoolBaseTest {
         return url;
     }
 
-    /**
+    /*
      * Creates a DataSource pointing at this test class' database. JMX is
      * disabled by default to keep MBean registration out of functional
      * tests (it has its own test area). Initial/min idle sizes are pinned
@@ -120,7 +120,7 @@ public abstract class JdbcPoolBaseTest {
         return manage(ds);
     }
 
-    /** Registers an externally constructed DataSource for teardown closing. */
+    /* Registers an externally constructed DataSource for teardown closing. */
     protected <D extends DataSource> D manage(D ds) {
         createdDataSources.add(ds);
         return ds;
@@ -138,12 +138,12 @@ public abstract class JdbcPoolBaseTest {
         createdDataSources.clear();
     }
 
-    /** A raw admin connection that bypasses the pool entirely. */
+    /* A raw admin connection that bypasses the pool entirely. */
     protected Connection adminConnection() throws SQLException {
         return DriverManager.getConnection(url, "sa", "");
     }
 
-    /**
+    /*
      * Finds an interceptor of the given type in the chain behind a
      * borrowed connection. The objects the pool hands out are JDK proxies
      * whose invocation handler is the first interceptor of the chain, so
@@ -162,7 +162,7 @@ public abstract class JdbcPoolBaseTest {
         return null;
     }
 
-    /**
+    /*
      * The driver's own object behind a pooled connection's statement. For
      * a prepared statement this is the honest oracle for "the session was
      * not asked to prepare this SQL again": two handles onto the same
@@ -173,7 +173,7 @@ public abstract class JdbcPoolBaseTest {
         return pooled.unwrap(Statement.class);
     }
 
-    /**
+    /*
      * Number of physical sessions on the database other than the admin
      * connection this method itself opens - i.e. the connections the
      * pool (or a test) currently holds.
@@ -188,7 +188,7 @@ public abstract class JdbcPoolBaseTest {
         }
     }
 
-    /** Polls {@link #poolSessions()} until it reaches the expected count. */
+    /* Polls {@link #poolSessions()} until it reaches the expected count. */
     protected void awaitSessions(int expected) throws SQLException {
         long deadline = System.currentTimeMillis() + AWAIT_TIMEOUT_MS;
         int observed = poolSessions();
@@ -202,7 +202,7 @@ public abstract class JdbcPoolBaseTest {
         }
     }
 
-    /**
+    /*
      * Sets an H2 session variable on the physical session behind this
      * connection. It is visible only to that same physical session,
      * which makes it a session identity probe.
@@ -213,7 +213,7 @@ public abstract class JdbcPoolBaseTest {
         }
     }
 
-    /** The marker visible on this connection's physical session, or null. */
+    /* The marker visible on this connection's physical session, or null. */
     protected Integer sessionMarker(Connection c) throws SQLException {
         try (Statement st = c.createStatement();
                 ResultSet rs = st.executeQuery("SELECT @POOL_TEST_MARKER")) {
@@ -223,7 +223,7 @@ public abstract class JdbcPoolBaseTest {
         }
     }
 
-    /** Polls a condition until it holds or the await timeout expires. */
+    /* Polls a condition until it holds or the await timeout expires. */
     protected static void awaitUntil(BooleanSupplier condition) {
         long deadline = System.currentTimeMillis() + AWAIT_TIMEOUT_MS;
         while (!condition.getAsBoolean()) {
@@ -244,12 +244,12 @@ public abstract class JdbcPoolBaseTest {
         }
     }
 
-    /** Unique table name for the duration of one test. */
+    /* Unique table name for the duration of one test. */
     protected static String uniqueTable() {
         return "T_" + System.nanoTime();
     }
 
-    /** Committed row count of a table, observed through an admin connection. */
+    /* Committed row count of a table, observed through an admin connection. */
     protected int adminRowCount(String table) throws SQLException {
         try (Connection admin = adminConnection();
                 Statement st = admin.createStatement();
