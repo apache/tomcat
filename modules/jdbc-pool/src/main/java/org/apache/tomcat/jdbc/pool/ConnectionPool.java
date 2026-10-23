@@ -314,6 +314,8 @@ public class ConnectionPool {
                 }catch(Exception x) {
                     SQLException sx = new SQLException("Unable to instantiate interceptor chain.");
                     sx.initCause(x);
+                    //nothing has been done to the connection, it can go back to the pool
+                    abandonSetup(con, sx, false);
                     throw sx;
                 }
             }
@@ -321,15 +323,18 @@ public class ConnectionPool {
             con.setHandler(handler);
         }
         //reset the chain in the order the interceptors are declared, for new and cached handlers alike
+        JdbcInterceptor next = handler;
         try {
-            JdbcInterceptor next = handler;
             while (next!=null) {
                 next.reset(this, con);
                 next = next.getNext();
             }
         }catch(Exception x) {
-            SQLException sx = new SQLException("Unable to reset interceptor chain.");
+            SQLException sx = new SQLException("Unable to reset interceptor [" +
+                    (next!=null?next.getClass().getName():"unknown") + "].");
             sx.initCause(x);
+            //the state of the connection is unknown, discard it so its partially reset chain is dropped
+            abandonSetup(con, sx, true);
             throw sx;
         }
         // setup statement proxy
@@ -351,9 +356,28 @@ public class ConnectionPool {
         }catch (Exception x) {
             SQLException s = new SQLException();
             s.initCause(x);
+            abandonSetup(con, s, false);
             throw s;
         }
 
+    }
+
+    /**
+     * Gives up a connection that was borrowed but could not be set up, so that it does not stay borrowed forever.
+     * Any failure to do so is added to the exception that is about to be thrown rather than hiding it.
+     * @param con the borrowed connection
+     * @param cause the exception that is about to be thrown to the caller
+     * @param discard {@code true} if the connection must be closed, {@code false} if it can go back to the pool
+     */
+    private void abandonSetup(PooledConnection con, SQLException cause, boolean discard) {
+        try {
+            if (discard) {
+                con.setDiscarded(true);
+            }
+            returnConnection(con);
+        }catch(Exception y) {
+            cause.addSuppressed(y);
+        }
     }
 
     /**

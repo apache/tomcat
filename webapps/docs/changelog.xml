@@ -987,6 +987,16 @@
         (markt)
       </fix>
       <fix>
+        <bug>69236</bug>: Reset the interceptors of a new connection in the
+        order they are declared, as is already done for a connection taken from
+        the pool, rather than in reverse order. A failure to reset an
+        interceptor is now reported as an <code>SQLException</code> that names
+        the interceptor and the connection is discarded rather than left
+        borrowed. A connection is also no longer left borrowed if the
+        interceptors cannot be instantiated or the connection proxy cannot be
+        created. Pull request provided by Arturo Bernal. (markt)
+      </fix>
+      <fix>
         <bug>70269</bug>: Correct a regression in the change that reset the
         properties of statements cached by the <code>StatementCache</code>
         interceptor that meant no statements were cached when using JDBC
