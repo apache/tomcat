@@ -553,10 +553,8 @@ public class TestAbstractReplicatedMap {
 
     private static final class FailingKey implements Serializable {
 
-        @Serial
         private static final long serialVersionUID = 1L;
 
-        @Serial
         private void writeObject(ObjectOutputStream out) throws IOException {
             throw new IOException("Cannot be serialized");
         }
