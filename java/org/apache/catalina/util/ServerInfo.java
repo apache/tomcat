@@ -24,6 +24,10 @@ import java.util.List;
 import java.util.Properties;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 import org.apache.tomcat.util.ExceptionUtils;
 
@@ -62,6 +66,16 @@ public class ServerInfo {
      * The server's version number String.
      */
     private static final String serverNumber;
+
+    /**
+     * Strong references to the loggers reconfigured by {@link #main(String[])}
+     * while probing the optional native/OpenSSL libraries. Retained because
+     * java.util.logging holds only weak references to {@link Logger} instances;
+     * an otherwise unreferenced Logger could be garbage collected (discarding
+     * the capturing handler and {@code useParentHandlers=false} configured on
+     * it) before the library initialization code logs.
+     */
+    private static final List<Logger> capturedLoggers = new ArrayList<>();
 
     static {
 
@@ -142,9 +156,39 @@ public class ServerInfo {
      * @param args Command line arguments (not used)
      */
     public static void main(String[] args) {
-        // Suppress INFO logging from library initialization
-        java.util.logging.Logger.getLogger("org.apache.tomcat.util.net.openssl.panama").setLevel(java.util.logging.Level.WARNING);
-        java.util.logging.Logger.getLogger("org.apache.catalina.core").setLevel(java.util.logging.Level.WARNING);
+        // Probing for the optional native/OpenSSL libraries below triggers their
+        // initialization, which emits log messages (such as the INFO reporting a
+        // successful OpenSSL init, or a SEVERE reporting an incompatible Tomcat
+        // Native version) that would pollute the version output. Rather than
+        // print them, capture them: attach a handler to the specific loggers
+        // involved and turn off delegation to the parent (console) handlers.
+        // Notable messages, such as why the native library was not loaded, are
+        // then re-emitted below in the version output's own format.
+        List<LogRecord> capturedLog = new ArrayList<>();
+        Handler capturingHandler = new Handler() {
+            @Override
+            public void publish(LogRecord record) {
+                capturedLog.add(record);
+            }
+            @Override
+            public void flush() {
+                // No-op: records are held in memory.
+            }
+            @Override
+            public void close() {
+                // No-op: nothing to release.
+            }
+        };
+        for (String name : new String[] {
+                "org.apache.catalina.core.AprLifecycleListener",
+                "org.apache.catalina.core.OpenSSLLifecycleListener",
+                "org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary" }) {
+            Logger logger = Logger.getLogger(name);
+            logger.setUseParentHandlers(false);
+            logger.setLevel(Level.ALL);
+            logger.addHandler(capturingHandler);
+            capturedLoggers.add(logger);
+        }
 
         System.out.println("Server version: " + getServerInfo());
         System.out.println("Server built:   " + getServerBuilt());
@@ -206,6 +250,16 @@ public class ServerInfo {
 
         if (!aprLoaded) {
             System.out.println("APR loaded:     false");
+            // If the native library was found but could not be used (e.g. an
+            // incompatible version was installed), surface the reason that was
+            // captured above rather than leaving "false" unexplained.
+            for (LogRecord record : capturedLog) {
+                if (record.getLevel().intValue() >= Level.WARNING.intValue() &&
+                        record.getLoggerName() != null &&
+                        record.getLoggerName().endsWith("AprLifecycleListener")) {
+                    System.out.println("                " + record.getMessage());
+                }
+            }
         }
 
         // Display FFM OpenSSL information if available
