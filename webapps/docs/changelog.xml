@@ -255,6 +255,11 @@
         when parsed instead of throwing an ISE, since a request remains
         functionally coherent. (remm)
       </fix>
+      <fix>
+        Include an <code>Allow</code> header when <code>HttpServlet</code> sends
+        a 405 response. Based on pull request <pr>1103</pr> by Arturo Bernal.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
