@@ -102,6 +102,11 @@ public abstract class PoolTestSupport {
         ds.getPoolProperties().setJmxEnabled(false);
         ds.getPoolProperties().setInitialSize(1);
         ds.getPoolProperties().setMinIdle(0);
+        return manage(ds);
+    }
+
+    /** Registers an externally constructed DataSource for teardown closing. */
+    protected <D extends DataSource> D manage(D ds) {
         createdDataSources.add(ds);
         return ds;
     }

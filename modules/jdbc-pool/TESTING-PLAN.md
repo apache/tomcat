@@ -48,11 +48,11 @@ Two tiers, H2 first:
 * **Default: H2 in TCP server mode** (`org.h2.tools.Server`
   started in-process, `jdbc:h2:tcp://...`). Real sockets, real
   server that tests can stop / SIGSTOP / restart to inject failures;
-  XA support (`org.h2.jdbcx.JdbcXADataSource`) for the
-  never-tested `XADataSource`; multiple DB users for the
-  alternate-credentials tests. No Docker, milliseconds startup.
-  **Not** `jdbc:h2:mem:` — in-process connections hide exactly the
-  failure modes under test.
+  XA support (`org.h2.jdbcx.JdbcDataSource`, which implements
+  `javax.sql.XADataSource`) for the never-tested `XADataSource`;
+  multiple DB users for the alternate-credentials tests. No Docker,
+  milliseconds startup. **Not** `jdbc:h2:mem:` — in-process
+  connections hide exactly the failure modes under test.
 * **Docker tier: PostgreSQL via Testcontainers**, `@Tag("docker")`,
   auto-skipped without Docker. Needed where H2 cannot go:
   `pg_terminate_backend()` kills *one* pooled connection while the
@@ -135,6 +135,25 @@ the working list.
    execution, transactions, sizing/eviction/lifecycle first; then
    validation variants, fairness queues, interceptor chain
    semantics, JMX with live traffic, XA, JNDI factories.
+   **Done except the validation variants**: `InterceptorSemanticsTest`
+   (slow/failed query reporting, `QueryTimeoutInterceptor`
+   cancellation, `StatementCache`, `StatementDecoratorInterceptor`),
+   `JmxMonitorTest` (pool + per-connection MBeans with live
+   traffic), `XaConnectionTest` (real 2-phase commit and rollback
+   against H2's XA resource), `NamingFactoryTest`
+   (`DataSourceFactory`, `GenericNamingResourcesFactory`) and
+   `FairBlockingQueueTest` (most-recently-used hand-off, blocking
+   retrieval, waiter fairness, documented-unsupported operations)
+   join the phase 1 classes: 59 functional tests, ~72 s, full module
+   green at 244 tests. Coverage of the module is now 64.8 %
+   instruction / 58.9 % branch.
+   Still open here: the validation variants (`testOnBorrow`,
+   `testOnReturn`, `testWhileIdle`; query vs `isValid()` vs a custom
+   `Validator`) — cheapest to write next to the defects that touch
+   them. `InterceptorSemanticsTest` alone costs ~60 s: real timeout
+   cancellation needs a real multi-second query (H2 has no `SLEEP()`
+   and an in-process `CREATE ALIAS` is not cancel-safe), so the
+   "< 60 s" budget is understood to exclude it.
 3. **Old suite removal**: benchmarks → optional JMH profile;
    harvest the remaining regression scenarios (`Bug50571`,
    `Bug50805`, `Bug50477`) as spec tests; delete `driver/`,
@@ -156,3 +175,17 @@ the working list.
 * Whether defect reproducers should also assert *log output* (many
   findings are "failed silently"): yes where a fix prescribes a
   log line; use a juli capture appender in the fixture.
+* Behaviour observed while writing the phase 2 tests, deliberately
+  **not** pinned by the baseline because it looks unintended rather
+  than specified — check against `defects-pool/` when the relevant
+  defect is processed:
+  * closing the `Connection` obtained from an H2 `XAConnection`
+    closes the *physical* connection, so the pool discards it
+    instead of pooling it; returning only the `XAConnection` keeps
+    it (what `XaConnectionTest` asserts).
+  * `ConnectionPool.close()` releases idle connections via
+    `release()` but checked-out ones via `abandon()`, and only the
+    former unregisters the per-connection
+    `...,connections=PooledConnection[n]` MBean — a pool closed
+    while connections are borrowed leaves those MBeans in the
+    platform server.
