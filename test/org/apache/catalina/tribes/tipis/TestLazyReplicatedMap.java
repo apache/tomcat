@@ -26,29 +26,28 @@ import org.apache.catalina.tribes.membership.MemberImpl;
 public class TestLazyReplicatedMap {
 
     /*
-     * The backup node selection snapshots the members and computes an index against the current members in two steps. A
-     * member added in between lets the index point behind the end of the snapshot, which aborted the publication with
-     * an array index out of bounds exception, losing the entry that was being stored. The index must fall back to the
-     * start of the snapshot.
+     * The backup node selection snapshots the members and computes an index in two steps. A member
+     * added in between must not let the index point behind the end of the snapshot, which aborted
+     * the publication with an array index out of bounds exception, losing the entry that was being
+     * stored. The index is computed for the size of the snapshot.
      */
     @Test
-    public void testBackupIndexBeyondMemberSnapshotFallsBack() throws Exception {
+    public void testBackupIndexWithinMemberSnapshot() throws Exception {
         Member member = new MemberImpl("localhost", 4007, -1);
+        Member other = new MemberImpl("localhost", 4008, -1);
 
-        // A member added between the two steps of the selection, shown directly: one member in
-        // the snapshot, an index computed for a member list that has meanwhile grown
-        LazyReplicatedMap<String,String> map = new LazyReplicatedMap<String,String>((key, value) -> {
-            // Not made primary here
-        }, new GroupChannel(), 1000, "TestLazyReplicatedMap", null) {
+        LazyReplicatedMap<String,String> map = new LazyReplicatedMap<String,String>(
+                (key, value) -> {
+                    // Not made primary here
+                }, new GroupChannel(), 1000, "TestLazyReplicatedMap", null) {
 
             @Override
             public Member[] getMapMembers() {
+                // The snapshot is smaller than the member list that was just extended
+                mapMembers.put(member, Long.valueOf(0));
+                mapMembers.put(other, Long.valueOf(0));
+                currentNode = 1;
                 return new Member[] { member };
-            }
-
-            @Override
-            public int getNextBackupIndex() {
-                return 1;
             }
         };
 
@@ -56,5 +55,21 @@ public class TestLazyReplicatedMap {
         // exception that the selection contains, while the entry survives to be stored locally
         Member[] backup = map.publishEntryInfo("key", "value");
         Assert.assertEquals(0, backup.length);
+    }
+
+    @Test
+    public void testNextBackupIndexClampsToSize() {
+        LazyReplicatedMap<String,String> map = new LazyReplicatedMap<String,String>(
+                (key, value) -> {
+                    // Not made primary here
+                }, new GroupChannel(), 1000, "TestLazyReplicatedMap", null);
+
+        Assert.assertEquals(-1, map.getNextBackupIndex(0));
+        Assert.assertEquals(0, map.getNextBackupIndex(3));
+        Assert.assertEquals(1, map.getNextBackupIndex(3));
+        Assert.assertEquals(2, map.getNextBackupIndex(3));
+        // Rotation index is now beyond a smaller list
+        Assert.assertEquals(0, map.getNextBackupIndex(2));
+        Assert.assertEquals(1, map.getNextBackupIndex(2));
     }
 }
