@@ -703,8 +703,10 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
         try (Socket socket = new Socket()) {
             InetAddress ia = InetAddress.getByAddress(mbr.getHost());
             InetSocketAddress addr = new InetSocketAddress(ia, port);
-            socket.setSoTimeout((int) readTimeout);
-            socket.connect(addr, (int) conTimeout);
+            // The timeouts are longs but the socket takes ints. Cap them rather than let a large value overflow to a
+            // negative one, which the socket rejects.
+            socket.setSoTimeout((int) Math.min(readTimeout, Integer.MAX_VALUE));
+            socket.connect(addr, (int) Math.min(conTimeout, Integer.MAX_VALUE));
             if (sendTest) {
                 ChannelData data = new ChannelData(true);
                 data.setAddress(getLocalMember(false));
