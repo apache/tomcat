@@ -24,6 +24,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.Pipe;
+import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -31,6 +32,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.management.MBeanServer;
@@ -139,6 +141,109 @@ public class TestNioReceiver {
         Assert.assertFalse("the datagram channel was not closed", datagramChannel.isOpen());
         Assert.assertNull("the datagram channel reference was not cleared", field.get(receiver));
         Assert.assertFalse(receiver.isListening());
+    }
+
+    /*
+     * A stale listener thread that exits must not make stopListening() believe that the live listener has finished.
+     */
+    @Test
+    public void testStaleThreadExitKeepsLiveListenerCounted() throws Exception {
+        NioReceiver receiver = new NioReceiver();
+        receiver.setChannel(new GroupChannel());
+        receiver.setAddress("127.0.0.1");
+        receiver.setPort(0);
+        receiver.bind();
+        Field field = NioReceiver.class.getDeclaredField("runningListeners");
+        field.setAccessible(true);
+        AtomicInteger running = (AtomicInteger) field.get(receiver);
+        Thread live = new Thread(receiver);
+        live.start();
+        try {
+            long deadline = System.currentTimeMillis() + 10000;
+            while (!receiver.isListening() && System.currentTimeMillis() < deadline) {
+                Thread.sleep(50);
+            }
+            Assert.assertTrue(receiver.isListening());
+            Assert.assertEquals(1, running.get());
+            // Hits the already started guard and returns
+            receiver.run();
+            Assert.assertEquals(1, running.get());
+            Assert.assertTrue(receiver.isListening());
+        } finally {
+            receiver.stopListening();
+            live.join(10000);
+        }
+        Assert.assertEquals(0, running.get());
+    }
+
+    @Test
+    public void testStaleListenerDoesNotCloseRestartedReceiver() throws Exception {
+        NioReceiver receiver = new NioReceiver();
+        receiver.setChannel(new GroupChannel());
+        receiver.setAddress("127.0.0.1");
+        receiver.setPort(0);
+        receiver.setUdpPort(0);
+
+        Field serverChannelField = NioReceiver.class.getDeclaredField("serverChannel");
+        serverChannelField.setAccessible(true);
+        Field datagramChannelField = NioReceiver.class.getDeclaredField("datagramChannel");
+        datagramChannelField.setAccessible(true);
+        Field selectorField = NioReceiver.class.getDeclaredField("selector");
+        selectorField.setAccessible(true);
+
+        try {
+            receiver.bind();
+            ServerSocketChannel oldServer = (ServerSocketChannel) serverChannelField.get(receiver);
+            DatagramChannel oldDatagram = (DatagramChannel) datagramChannelField.get(receiver);
+            @SuppressWarnings("unchecked")
+            AtomicReference<Selector> selectorReference =
+                    (AtomicReference<Selector>) selectorField.get(receiver);
+            Selector oldSelector = selectorReference.get();
+
+            receiver.stopListening();
+            receiver.bind();
+            ServerSocketChannel newServer = (ServerSocketChannel) serverChannelField.get(receiver);
+            DatagramChannel newDatagram = (DatagramChannel) datagramChannelField.get(receiver);
+            Selector newSelector = selectorReference.get();
+
+            receiver.closeListenerResources(oldSelector, oldServer, oldDatagram);
+
+            Assert.assertTrue(newServer.isOpen());
+            Assert.assertTrue(newDatagram.isOpen());
+            Assert.assertTrue(newSelector.isOpen());
+            Assert.assertSame(newServer, serverChannelField.get(receiver));
+            Assert.assertSame(newDatagram, datagramChannelField.get(receiver));
+            Assert.assertSame(newSelector, selectorReference.get());
+        } finally {
+            receiver.stop();
+        }
+    }
+
+    @Test
+    public void testListenerSetupFailureClosesCapturedResources() throws Exception {
+        NioReceiver receiver = new NioReceiver() {
+            @Override
+            protected void registerChannel(Selector selector, SelectableChannel channel, int ops, Object attach)
+                    throws Exception {
+                if (channel instanceof DatagramChannel) {
+                    throw new IOException("Datagram registration failed");
+                }
+                super.registerChannel(selector, channel, ops, attach);
+            }
+        };
+        receiver.setChannel(new GroupChannel());
+        receiver.setAddress("127.0.0.1");
+        receiver.setPort(0);
+        receiver.setUdpPort(0);
+
+        try {
+            receiver.bind();
+            Assert.assertThrows(IOException.class, receiver::listen);
+            assertReleased(receiver);
+            Assert.assertFalse(receiver.isListening());
+        } finally {
+            receiver.stop();
+        }
     }
 
     /*
