@@ -311,7 +311,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
             serverChannel.register(this.selector.get(), SelectionKey.OP_ACCEPT);
 
             // set up the datagram channel
-            if (this.getUdpPort() > 0) {
+            if (this.getUdpPort() >= 0) {
                 datagramChannel = DatagramChannel.open();
                 configureDatagramChannel();
                 // bind to the address to avoid security checks

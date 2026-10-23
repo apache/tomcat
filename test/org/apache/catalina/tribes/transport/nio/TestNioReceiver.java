@@ -124,7 +124,7 @@ public class TestNioReceiver {
         receiver.setChannel(new GroupChannel());
         receiver.setAddress("127.0.0.1");
         receiver.setPort(0);
-        receiver.setUdpPort(45678);
+        receiver.setUdpPort(0);
         receiver.bind();
         Field field = NioReceiver.class.getDeclaredField("datagramChannel");
         field.setAccessible(true);
@@ -249,7 +249,7 @@ public class TestNioReceiver {
         receiver.setChannel(new GroupChannel());
         receiver.setAddress("127.0.0.1");
         receiver.setPort(0);
-        receiver.setUdpPort(45678);
+        receiver.setUdpPort(0);
         try {
             receiver.bind();
             Field field = NioReceiver.class.getDeclaredField("datagramChannel");
