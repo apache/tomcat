@@ -84,7 +84,7 @@ class TestShouldForceReconnect {
             String askedUser, String askedPassword, boolean expected) throws Exception {
         PooledConnection con = pooledConnection();
         loggedInAs(con, loggedInUser, loggedInPassword);
-        assertEquals(expected, con.shouldForceReconnect(askedUser, askedPassword),
+        assertEquals(Boolean.valueOf(expected), Boolean.valueOf(con.shouldForceReconnect(askedUser, askedPassword)),
                 sessionLabel + " session asked for " + askedUser);
     }
 

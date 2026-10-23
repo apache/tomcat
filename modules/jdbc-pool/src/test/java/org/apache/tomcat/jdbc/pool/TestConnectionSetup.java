@@ -71,7 +71,7 @@ class TestConnectionSetup extends JdbcPoolBaseTest {
 
         // a second physical connection gets the init SQL as well
         Connection secondPhysical;
-        try (Connection first = ds.getConnection()) {
+        try (@SuppressWarnings("unused") Connection first = ds.getConnection()) {
             secondPhysical = ds.getConnection();
             assertEquals(2, poolSessions(), "two concurrent borrowers need two sessions");
         }

@@ -191,13 +191,13 @@ class TestStatementLifecycle extends JdbcPoolBaseTest {
         return Stream.of(
                 Arguments.of("queryTimeout",
                         (Consumer<PreparedStatement>) ps -> setQuietly(ps, 37),
-                        (Reader) Statement::getQueryTimeout, 37, 0),
+                        (Reader) Statement::getQueryTimeout, Integer.valueOf(37), Integer.valueOf(0)),
                 Arguments.of("maxRows",
                         (Consumer<PreparedStatement>) ps -> setMaxRowsQuietly(ps, 999),
-                        (Reader) Statement::getMaxRows, 999, 0),
+                        (Reader) Statement::getMaxRows, Integer.valueOf(999), Integer.valueOf(0)),
                 Arguments.of("fetchSize",
                         (Consumer<PreparedStatement>) ps -> setFetchSizeQuietly(ps, 777),
-                        (Reader) Statement::getFetchSize, 777, 100));
+                        (Reader) Statement::getFetchSize, Integer.valueOf(777), Integer.valueOf(100)));
     }
 
     /** Reads one of the statement's mutable properties. */

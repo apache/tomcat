@@ -141,7 +141,7 @@ class TestConnectionAcquireRelease extends JdbcPoolBaseTest {
         Thread waiter = new Thread(() -> {
             long start = System.currentTimeMillis();
             try (Connection c = ds.getConnection()) {
-                waitMillis.set(System.currentTimeMillis() - start);
+                waitMillis.set(Long.valueOf(System.currentTimeMillis() - start));
                 Integer marker = sessionMarker(c);
                 if (marker != null) {
                     observedMarker.set(marker.intValue());
@@ -160,7 +160,7 @@ class TestConnectionAcquireRelease extends JdbcPoolBaseTest {
         assertTrue(done.await(10, java.util.concurrent.TimeUnit.SECONDS),
                 "waiter should have obtained a connection");
         assertNull(failure.get());
-        assertTrue(waitMillis.get() >= 200,
+        assertTrue(waitMillis.get().longValue() >= 200,
                 "waiter must actually have waited for the release, waited "
                         + waitMillis.get() + " ms");
         assertEquals(42, observedMarker.get(),

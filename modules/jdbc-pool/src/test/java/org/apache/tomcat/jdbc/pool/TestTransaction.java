@@ -92,7 +92,7 @@ class TestTransaction extends JdbcPoolBaseTest {
     @Test
     void rollbackOnReturnDiscardsUncommittedWork() throws Exception {
         DataSource ds = newDataSource();
-        ds.getPoolProperties().setDefaultAutoCommit(false);
+        ds.getPoolProperties().setDefaultAutoCommit(Boolean.FALSE);
         ds.getPoolProperties().setRollbackOnReturn(true);
         String t = createTable(ds);
 
@@ -116,7 +116,7 @@ class TestTransaction extends JdbcPoolBaseTest {
     @Test
     void configuredDefaultAutoCommitIsRestoredForNextBorrower() throws Exception {
         DataSource ds = newDataSource();
-        ds.getPoolProperties().setDefaultAutoCommit(true);
+        ds.getPoolProperties().setDefaultAutoCommit(Boolean.TRUE);
         ds.getPoolProperties().setJdbcInterceptors(
                 "org.apache.tomcat.jdbc.pool.interceptor.ConnectionState");
         try (Connection c1 = ds.getConnection()) {
@@ -154,7 +154,7 @@ class TestTransaction extends JdbcPoolBaseTest {
     @Test
     void configuredDefaultReadOnlyIsRestoredAndNextBorrowerCanWrite() throws Exception {
         DataSource ds = newDataSource();
-        ds.getPoolProperties().setDefaultReadOnly(false);
+        ds.getPoolProperties().setDefaultReadOnly(Boolean.FALSE);
         ds.getPoolProperties().setJdbcInterceptors(
                 "org.apache.tomcat.jdbc.pool.interceptor.ConnectionState");
         String t = createTable(ds);

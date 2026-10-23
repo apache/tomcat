@@ -88,7 +88,7 @@ class TestInterruptedWaiter extends JdbcPoolBaseTest {
         for (int i = 0; i < HOLDERS; i++) {
             waiters[i] = new Thread(() -> {
                 stillWaiting.incrementAndGet();
-                try (Connection c = ds.getConnection()) {
+                try (@SuppressWarnings("unused") Connection c = ds.getConnection()) {
                     interruptedWithConnection.incrementAndGet();
                 } catch (Exception expected) {
                     // interrupted or timed out while waiting - as intended
