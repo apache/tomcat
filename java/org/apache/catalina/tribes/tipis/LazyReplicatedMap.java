@@ -155,18 +155,12 @@ public class LazyReplicatedMap<K, V> extends AbstractReplicatedMap<K,V> {
             return new Member[0];
         }
         Member[] members = getMapMembers();
-        int firstIdx = getNextBackupIndex();
+        int firstIdx = getNextBackupIndex(members.length);
         Member[] backup = new Member[0];
 
         // there are no backups
-        if (members.length == 0 || firstIdx == -1) {
+        if (firstIdx == -1) {
             return backup;
-        }
-        // A member may have been added between the snapshot of the members and the computation of
-        // the index, which then points beyond the end of the snapshot. Fall back to its start, as
-        // getNextBackupNode does.
-        if (firstIdx >= members.length) {
-            firstIdx = 0;
         }
         int nextIdx = firstIdx;
 
