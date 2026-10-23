@@ -70,6 +70,19 @@ public abstract class PoolTestSupport {
         server = Server.createTcpServer("-tcpPort", "0", "-ifNotExists").start();
         url = "jdbc:h2:tcp://localhost:" + server.getPort()
                 + "/mem:pooltest_" + UUID.randomUUID();
+        // Create the database and pin its lifetime to the server. Without
+        // DB_CLOSE_DELAY an in-memory database is destroyed as soon as the
+        // pool closes its last physical connection - which eviction,
+        // purge() and an alternate-credential reconnect all do - and the
+        // next connection would silently get an empty database, letting
+        // assertions about committed data pass against a database that is
+        // not the one the test wrote to. The setting is applied here rather
+        // than in the URL because it needs admin rights, and every client
+        // connection would have to reapply it.
+        try (Connection admin = DriverManager.getConnection(url, "sa", "");
+                Statement st = admin.createStatement()) {
+            st.execute("SET DB_CLOSE_DELAY -1");
+        }
     }
 
     @AfterAll

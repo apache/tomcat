@@ -24,8 +24,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.lang.management.ManagementFactory;
 import java.sql.Connection;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 
+import javax.management.JMX;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
@@ -33,6 +35,7 @@ import javax.management.ObjectName;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
+import org.apache.tomcat.jdbc.pool.jmx.ConnectionPoolMBean;
 
 /**
  * Expected JMX monitoring functionality. A container registers the
@@ -163,6 +166,41 @@ class JmxMonitorTest extends PoolTestSupport {
             assertTrue(leftovers.isEmpty(),
                     "closing the pool must unregister every MBean it published, left: "
                             + leftovers);
+        }
+    }
+
+    @Test
+    void theJmxViewNeverExposesThePassword() throws Exception {
+        final String secret = "s3cr3t-pool-password";
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setJmxEnabled(true);
+        ds.createPool();
+        // the pool is already connected; this only records what a real
+        // configuration holds
+        ds.getPoolProperties().setPassword(secret);
+
+        ObjectName dsName = uniqueDataSourceName("credentials");
+        ObjectName poolOname = registerAndFindPoolMBean(server, ds, dsName);
+        try {
+            assertNotNull(poolOname, "an enabled pool must publish its MBean");
+            ConnectionPoolMBean mbean =
+                    JMX.newMBeanProxy(server, poolOname, ConnectionPoolMBean.class);
+
+            assertEquals(secret, ds.getPoolProperties().getPassword(),
+                    "the pool itself must still hold the configured password");
+            assertFalse(String.valueOf(mbean.getPassword()).contains(secret),
+                    "the MBean must not hand out the password");
+
+            Properties dbProperties = mbean.getDbProperties();
+            assertNotNull(dbProperties);
+            for (String name : dbProperties.stringPropertyNames()) {
+                assertFalse(secret.equals(dbProperties.getProperty(name)),
+                        "the JMX view of the driver properties must not carry the"
+                                + " password, property " + name);
+            }
+        } finally {
+            ds.postDeregister();
         }
     }
 
