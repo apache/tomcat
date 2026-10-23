@@ -78,6 +78,13 @@ public class TestTimeBucketCounter {
     }
 
     @Test
+    public void testNegativeDurationAfterWrapAround() {
+        // Previously this wrapped to 1073741296 milliseconds and produced a valid 2^30 millisecond bucket
+        Assert.assertThrows(IllegalArgumentException.class, () -> new TimeBucketCounter(-3221226,
+                new java.util.concurrent.ScheduledThreadPoolExecutor(1)));
+    }
+
+    @Test
     public void testGetMillisUntilNextBucket() throws InterruptedException {
         long millis;
         long tb1, tb2;
