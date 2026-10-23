@@ -225,6 +225,18 @@ public class TestHttpServlet extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testMethodNotAllowed() throws Exception {
+        doTestMethodNotAllowed(new OptionsServlet(), "GET, HEAD, OPTIONS");
+    }
+
+
+    @Test
+    public void testMethodNotAllowedSub() throws Exception {
+        doTestMethodNotAllowed(new OptionsServletSub(), "GET, HEAD, POST, OPTIONS");
+    }
+
+
     private void doTestDoOptions(Servlet servlet, String expectedAllow) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -243,6 +255,33 @@ public class TestHttpServlet extends TomcatBaseTest {
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
         Assert.assertEquals(expectedAllow, resHeaders.get("Allow").get(0));
+    }
+
+
+    /*
+     * RFC 9110, section 15.5.6: a 405 response must contain an Allow header field that lists the methods supported by
+     * the target resource.
+     */
+    private void doTestMethodNotAllowed(Servlet servlet, String expectedAllow) throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
+
+        // Map the test Servlet
+        Tomcat.addServlet(ctx, "servlet", servlet);
+        ctx.addServletMapping("/", "servlet");
+
+        tomcat.start();
+
+        Map<String,List<String>> resHeaders = new HashMap<>();
+        int rc = methodUrl("http://localhost:" + getPort() + "/", new ByteChunk(), DEFAULT_CLIENT_TIMEOUT_MS, null,
+                resHeaders, Method.PUT);
+
+        Assert.assertEquals(HttpServletResponse.SC_METHOD_NOT_ALLOWED, rc);
+        List<String> allow = resHeaders.get("Allow");
+        Assert.assertNotNull(allow);
+        Assert.assertEquals(expectedAllow, allow.get(0));
     }
 
 
