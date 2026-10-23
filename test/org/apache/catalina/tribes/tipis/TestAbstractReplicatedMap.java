@@ -448,4 +448,116 @@ public class TestAbstractReplicatedMap {
         }
         return -1;
     }
+
+    /*
+     * A key may implement Serializable and still fail to serialize, which the message construction
+     * reports as an unchecked exception. That must not abort the removal either.
+     */
+    @Test
+    public void testRemoveUnserializableKeyDoesNotThrow() throws Exception {
+        TestChannel channel = new TestChannel();
+        LazyReplicatedMap<Object,String> map = new LazyReplicatedMap<Object,String>(
+                (key, value) -> {
+                    // Not made primary here
+                }, channel, 1000, "TestAbstractReplicatedMap", null);
+        map.memberAlive(new MemberImpl("localhost", 4019, -1));
+
+        // The put keeps the entry on this node, as it cannot be published to a backup
+        Object key = new FailingKey();
+        map.put(key, "value");
+        Assert.assertEquals(0, channel.sendCalls.get());
+
+        Assert.assertEquals("value", map.remove(key));
+        Assert.assertNull(map.getInternal(key));
+        Assert.assertEquals(0, channel.sendCalls.get());
+    }
+
+    @Test
+    public void testPutUnserializableKeyReplicatedMapKeepsEntryLocal() throws Exception {
+        TestChannel channel = new TestChannel();
+        ReplicatedMap<Object,String> map = new ReplicatedMap<Object,String>(
+                (key, value) -> {
+                    // Not made primary here
+                }, channel, 1000, "TestAbstractReplicatedMap", null);
+        Member first = new MemberImpl("localhost", 4020, -1);
+        Member second = new MemberImpl("localhost", 4021, -1);
+        map.memberAlive(first);
+        map.memberAlive(second);
+
+        Object key = new FailingKey();
+        map.put(key, "value");
+
+        Assert.assertEquals("value", map.get(key));
+        Assert.assertEquals(0, channel.sendCalls.get());
+        map.memberDisappeared(first);
+        Assert.assertEquals("value", map.get(key));
+        Assert.assertEquals(0, channel.sendCalls.get());
+        Assert.assertEquals("value", map.remove(key));
+    }
+
+    @Test
+    public void testMemberDisappearedSkipsNonSerializableEntry() throws Exception {
+        TestChannel channel = new TestChannel();
+        ReplicatedMap<Object,String> map = new ReplicatedMap<Object,String>(
+                (key, value) -> {
+                    // Not made primary here
+                }, channel, 1000, "TestAbstractReplicatedMap", null);
+        Member first = new MemberImpl("localhost", 4024, -1);
+        Member second = new MemberImpl("localhost", 4025, -1);
+        map.memberAlive(first);
+        map.memberAlive(second);
+
+        Object key = new Object();
+        map.put(key, "value");
+        map.put("good", "value");
+
+        map.memberDisappeared(first);
+
+        Assert.assertEquals("value", map.get(key));
+        Assert.assertEquals("value", map.get("good"));
+    }
+
+    @Test
+    public void testStateRequestSkipsUnserializableEntry() throws Exception {
+        LazyReplicatedMap<Object,String> map = new LazyReplicatedMap<Object,String>(
+                (key, value) -> {
+                    // Not made primary here
+                }, new TestChannel(), 1000, "TestAbstractReplicatedMap", null);
+        map.put("good", "value");
+        map.put(new FailingKey(), "local");
+
+        MapMessage stateRequest = new MapMessage("TestAbstractReplicatedMap".getBytes(StandardCharsets.UTF_8),
+                MapMessage.MSG_STATE_COPY, false, null, null, null, null, null);
+        Serializable reply = map.replyRequest(stateRequest, new MemberImpl("localhost", 4022, -1));
+
+        Assert.assertTrue(reply instanceof MapMessage);
+        Object value = ((MapMessage) reply).getValue();
+        Assert.assertTrue(value instanceof ArrayList);
+        ArrayList<?> state = (ArrayList<?>) value;
+        Assert.assertEquals(1, state.size());
+        Assert.assertEquals("good", ((MapMessage) state.get(0)).getKey());
+    }
+
+    @Test
+    public void testBackupRequestSkipsUnserializableValue() throws Exception {
+        LazyReplicatedMap<String,Object> map = new LazyReplicatedMap<String,Object>(
+                (key, value) -> {
+                    // Not made primary here
+                }, new TestChannel(), 1000, "TestAbstractReplicatedMap", null);
+        map.put("key", new FailingKey());
+
+        MapMessage backupRequest = new MapMessage("TestAbstractReplicatedMap".getBytes(StandardCharsets.UTF_8),
+                MapMessage.MSG_RETRIEVE_BACKUP, false, "key", null, null, null, null);
+
+        Assert.assertNull(map.replyRequest(backupRequest, new MemberImpl("localhost", 4023, -1)));
+    }
+
+    private static final class FailingKey implements Serializable {
+
+        private static final long serialVersionUID = 1L;
+
+        private void writeObject(ObjectOutputStream out) throws IOException {
+            throw new IOException("Cannot be serialized");
+        }
+    }
 }
