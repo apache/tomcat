@@ -176,9 +176,9 @@
     <attribute name="maxLocaleCount" required="false">
       <p>The maximum number of locales (obtained from the
       <code>Accept-Language</code> header(s)) that are permitted for a request.
-      Requests that exceed this limit will be rejected when the locales are
-      parsed. A value of less than 0 means no limit. If not specified, a
-      default of 10 is used.</p>
+      Locales above this limit will be ignored when the locales are
+      parsed and an info will be logged. A value of less than 0 means no
+      limit. If not specified, a default of 10 is used.</p>
     </attribute>
 
     <attribute name="maxParameterCount" required="false">

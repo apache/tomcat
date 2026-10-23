@@ -245,8 +245,8 @@ public class Connector extends LifecycleMBeanBase {
     private int maxCookieCount = 200;
 
     /**
-     * The maximum number of locales permitted for a request. Requests that exceed this limit will be rejected when
-     * the locales are parsed. Use a value less than zero for no limit. Defaults to 10.
+     * The maximum number of locales that will be parsed for a request.
+     * Use a value less than zero for no limit. Defaults to 10.
      */
     private int maxLocaleCount = 10;
 
