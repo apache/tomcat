@@ -312,7 +312,8 @@ public class McastServiceImpl extends MembershipProviderBase {
         try {
             Thread.sleep(memberwait);
         } catch (InterruptedException ignore) {
-            // Ignore
+            // Stop waiting but leave the interrupt for the caller to see
+            Thread.currentThread().interrupt();
         }
         if (log.isInfoEnabled()) {
             log.info(sm.getString("mcastServiceImpl.waitForMembers.done", Integer.toString(level)));
@@ -858,6 +859,9 @@ public class McastServiceImpl extends MembershipProviderBase {
                             sleep(parent.recoverySleepTime);
                         }
                     } catch (InterruptedException ignore) {
+                        // The recovery thread has been interrupted so stop trying to recover
+                        Thread.currentThread().interrupt();
+                        return;
                     }
                 }
             } finally {
