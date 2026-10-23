@@ -243,6 +243,15 @@ public class TestHttpServlet extends TomcatBaseTest {
     }
 
 
+    /*
+     * An Allow header set by the application before the default doPut() implementation is called must not be replaced.
+     */
+    @Test
+    public void testMethodNotAllowedExistingAllow() throws Exception {
+        doTestMethodNotAllowed(new AllowServlet(), "FOO");
+    }
+
+
     @Test
     public void testQueryMethod() throws Exception {
         Tomcat tomcat = getTomcatInstance();
@@ -735,6 +744,18 @@ public class TestHttpServlet extends TomcatBaseTest {
         @Override
         protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             doGet(req, resp);
+        }
+    }
+
+
+    private static class AllowServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.setHeader("Allow", "FOO");
+            super.doPut(req, resp);
         }
     }
 
