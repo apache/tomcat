@@ -1144,11 +1144,28 @@ public abstract class AbstractReplicatedMap<K, V>
      * Gets the next backup index using round-robin rotation.
      *
      * @return The next backup index, or -1 if no members exist
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12
      */
+    @Deprecated
     public int getNextBackupIndex() {
         synchronized (mapMembers) {
-            int size = mapMembers.size();
-            if (mapMembers.isEmpty()) {
+            return getNextBackupIndex(mapMembers.size());
+        }
+    }
+
+    /**
+     * Gets the next backup index using round-robin rotation, for a list of the given size. Use this variant with the
+     * size of a snapshot of the members so that the index is always within that snapshot, even if members are added
+     * or removed concurrently.
+     *
+     * @param size The number of members in the list the index is used for
+     *
+     * @return The next backup index, which is less than {@code size}, or -1 if {@code size} is not positive
+     */
+    public int getNextBackupIndex(int size) {
+        synchronized (mapMembers) {
+            if (size <= 0) {
                 return -1;
             }
             int node = currentNode++;
@@ -1167,12 +1184,9 @@ public abstract class AbstractReplicatedMap<K, V>
      */
     public Member getNextBackupNode() {
         Member[] members = getMapMembers();
-        int node = getNextBackupIndex();
-        if (members.length == 0 || node == -1) {
+        int node = getNextBackupIndex(members.length);
+        if (node == -1) {
             return null;
-        }
-        if (node >= members.length) {
-            node = 0;
         }
         return members[node];
     }
