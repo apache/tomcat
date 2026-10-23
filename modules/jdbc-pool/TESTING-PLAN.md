@@ -34,7 +34,7 @@ regressions; scenario, not code, must survive:
 
 | Disposition | Classes |
 |---|---|
-| **Keep** (port to JUnit 5 as-is; fast, pure-unit, no fake DB) | `TestJdbcInterceptorConfigParsing`, `TestInterceptorShortName`, `TestSlowQueryComparator`, `PoolPropertiesTest` |
+| **Keep** (port to JUnit 5 as-is; fast, pure-unit, no fake DB) | `TestJdbcInterceptorConfigParsing`, `TestSlowQueryComparator`, `PoolPropertiesTest`, `ShouldForceReconnectTest` (`TestInterceptorShortName` moved to the harvest row below: it needs a live pool, and the real `SlowQueryReport` can play its role) |
 | **Harvest scenario → rewrite against real DB** | `Bug50571`, `Bug50805`, `Async0IdleTestBug50477` (regression memory), `TestConnectionState` (→ defect #3 repro), `TestGCClose` (GC-close semantics), `MultipleCloseTest`, `EqualsHashCodeTest`, `AlternateUsernameTest` (H2 supports multiple DB users → now a *real* test), `PoolPurgeTest`, `TestValidation`, `TestValidationQueryTimeout`, `TestTimeout`, `TestSuspectTimeout`, `TestGetConnection`, `TwoDataSources`, `JmxPasswordTest` (→ credential-exposure defect), `TestQueryTimeoutInterceptor`, `TestStatementCache`, `TestSlowQueryReport`, `StatementFinalizerTest` |
 | **Delete** (benchmarks, sleep-drift, DBCP/c3p0 comparisons, stub plumbing, examples) | `FairnessTest`, `CheckOutThreadTest`, `ConnectCountTest`, `StarvationTest`, `AbandonPercentageTest`, `TestConcurrency`, `TestSizePreservation`, `BorrowWaitTest`, `TestAsyncQueue`, `TestException`, `ProxiedResultSetTest`, `ProxiedStatementTest`, `PoolCleanerTest` (flaky), `CreateTestTable`, `DefaultTestCase`/`DefaultProperties` (DBCP plumbing), `SimplePOJO*Example`, `driver/*` |
 
@@ -148,11 +148,9 @@ JUnit 5, three groups:
    in the later phase — not in the functional baseline.
 
 Layout: `org.apache.tomcat.jdbc.functional` (behaviour against the real
-database, every class extending the fixture),
+database, every class extending the fixture) and
 `org.apache.tomcat.jdbc.config` (the pure-unit configuration cases
-ported from the old suite — no pool, no database), and, until it is
-deleted, the legacy JUnit 4 suite in `org.apache.tomcat.jdbc.test`
-under the vintage engine.
+ported from the old suite — no pool, no database).
 
 Infrastructure: H2-TCP fixture (per-class server + fresh DB name);
 state-hygiene extension (every `DataSource` closed, pool statics and
@@ -234,14 +232,23 @@ the working list.
    cancellation needs a real multi-second query (H2 has no `SLEEP()`
    and an in-process `CREATE ALIAS` is not cancel-safe), so the
    "< 60 s" budget is understood to exclude it.
-3. **Old suite removal**: harvest first (§1 "Harvest result" —
-   **done**: 75 tests in 12 new classes plus one added
-   `JmxMonitorTest` case, module green at 319 tests, 66.1 %
-   instruction / 61.3 % branch), then delete the suite, its stub
-   driver, the DBCP-comparison plumbing and the `tomcat-dbcp`,
-   JUnit 4 and vintage-engine test dependencies along with the
-   `PoolCleanerTest` exclude. Benchmarks, if wanted later, move to a
-   JMH profile; they never gate CI.
+3. **Old suite removal**: **done**. The harvest (§1 "Harvest result")
+   landed first: 75 tests in 12 new classes plus one added
+   `JmxMonitorTest` case. The JUnit 4 suite then went away together
+   with its stub driver, the DBCP-comparison plumbing
+   (`DefaultTestCase`, `DefaultProperties`), the `bugs/` classes, the
+   test-only interceptors under `pool/interceptor/` and the two
+   `pool/` unit tests they superseded, along with the `junit`,
+   `tomcat-dbcp` and `junit-vintage-engine` test dependencies and the
+   `PoolCleanerTest` exclude.
+   The module is now 134 tests in about 80 s of test time (was ~6 min
+   for 319), at 56.6 % instruction / 52.2 % branch coverage. The
+   coverage number is *lower* than the 66.1 % measured one commit
+   earlier, and that is the honest reading: the legacy tests ran
+   through `DataSourceProxy`, the JMX and naming code and the whole
+   interceptor surface with a stub driver attached, touching code
+   without ever deciding whether it worked. Phase 5 starts its ratchet
+   from this number.
 4. **Defect processing** (later): per defect, a reproducer test per
    §4 + the fix; Postgres/kill tier added when the first defect
    needs it (single-session kill, `idle_session_timeout`,
@@ -290,6 +297,15 @@ the working list.
     next ordinary borrow has to reconnect. The pool stays usable
     (`AlternateCredentialsTest` pins that much), but the shrinkage is
     not something to lock in as expected behaviour.
+* `build.xml` (the Ant release build of this module) still has a
+  `build-test` target that compiles `src/test/java` against a JUnit 4 +
+  `tomcat-dbcp` + c3p0/derby/mysql classpath it downloads, and ships
+  the result as `tomcat-jdbc-test.jar` in `dist`. That target cannot
+  compile the current suite (JUnit 5, no DBCP) and has been stale since
+  the functional tests arrived. Needs a decision: give the Ant
+  test classpath the JUnit 5 aggregate and H2, or stop building and
+  distributing `tomcat-jdbc-test.jar` and let the tests be a Maven-only
+  concern.
 * Statement-hygiene cases that this database cannot witness at all, so
   no amount of test code would pin them: `setMaxFieldSize` (H2 always
   reports 0), `setFetchDirection` (always `FETCH_FORWARD`),
