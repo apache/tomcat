@@ -250,6 +250,11 @@
         Mark JAASRealm as a deprecated component. JAASRealm will be removed in
         Tomcat 12. (schultz)
       </update>
+      <fix>
+        Rework <code>maxLocaleCount</code> behavior to ignore extra locales
+        when parsed instead of throwing an ISE, since a request remains
+        functionally coherent. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
