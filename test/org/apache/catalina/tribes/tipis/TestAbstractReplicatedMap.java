@@ -380,6 +380,9 @@ public class TestAbstractReplicatedMap {
         Assert.assertEquals(2, map.values().size());
         Assert.assertFalse(map.isEmpty());
         Assert.assertTrue(map.values().contains(null));
+        Assert.assertTrue(map.containsValue(null));
+        Assert.assertTrue(map.containsValue("value"));
+        Assert.assertFalse(map.containsValue("missing"));
     }
 
     private static final class SerialKey implements Serializable {

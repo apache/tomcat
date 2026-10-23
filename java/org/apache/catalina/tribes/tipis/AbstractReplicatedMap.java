@@ -1541,10 +1541,9 @@ public abstract class AbstractReplicatedMap<K, V>
 
     @Override
     public boolean containsValue(Object value) {
-        Objects.requireNonNull(value);
         for (Entry<K,MapEntry<K,V>> e : innerMap.entrySet()) {
             MapEntry<K,V> entry = innerMap.get(e.getKey());
-            if (entry != null && entry.isActive() && value.equals(entry.getValue())) {
+            if (entry != null && entry.isActive() && Objects.equals(value, entry.getValue())) {
                 return true;
             }
         }
