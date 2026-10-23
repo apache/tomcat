@@ -192,6 +192,11 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
 
     @Override
     public void stop() {
+        RxTaskPool taskPool = getTaskPool();
+        if (taskPool != null) {
+            // Wake the listener if it is waiting for a receive task before waiting for it to stop
+            taskPool.stop();
+        }
         this.stopListening();
         // Startup may fail before the channels are registered with the selector or the listener thread is started.
         if (serverChannel != null) {
@@ -236,6 +241,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
                 }
             } catch (InterruptedException e) {
                 log.warn(sm.getString("nioReceiver.stop.executor.interrupted"));
+                Thread.currentThread().interrupt();
             }
         }
     }
@@ -310,7 +316,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
             serverChannel.register(this.selector.get(), SelectionKey.OP_ACCEPT);
 
             // set up the datagram channel
-            if (this.getUdpPort() > 0) {
+            if (this.getUdpPort() >= 0) {
                 datagramChannel = DatagramChannel.open();
                 configureDatagramChannel();
                 // bind to the address to avoid security checks
@@ -738,15 +744,27 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         if (task == null) {
             // No threads/tasks available, do nothing, the selection
             // loop will keep calling this method. getRxTask() blocks until a task
-            // is released, so it only returns null after the pool has been stopped.
+            // is released, so it only returns null after the pool has been stopped
+            // or the calling thread has been interrupted.
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("nioReceiver.noThread"));
             }
         } else {
             // invoking this wakes up the worker thread then returns
             // add task to thread pool
-            task.serviceChannel(key);
-            getExecutor().execute(task);
+            try {
+                task.serviceChannel(key);
+                getExecutor().execute(task);
+            } catch (RuntimeException | Error e) {
+                // The task will never run so cancel its key and hand it back, otherwise the connection and task are
+                // lost
+                try {
+                    task.cancel();
+                } catch (RuntimeException | Error cleanup) {
+                    e.addSuppressed(cleanup);
+                }
+                throw e;
+            }
         }
     }
 

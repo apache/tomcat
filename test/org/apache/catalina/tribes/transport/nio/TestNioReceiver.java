@@ -23,9 +23,13 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.nio.channels.DatagramChannel;
+import java.nio.channels.Pipe;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -124,7 +128,7 @@ public class TestNioReceiver {
         receiver.setChannel(new GroupChannel());
         receiver.setAddress("127.0.0.1");
         receiver.setPort(0);
-        receiver.setUdpPort(45678);
+        receiver.setUdpPort(0);
         receiver.bind();
         Field field = NioReceiver.class.getDeclaredField("datagramChannel");
         field.setAccessible(true);
@@ -249,7 +253,7 @@ public class TestNioReceiver {
         receiver.setChannel(new GroupChannel());
         receiver.setAddress("127.0.0.1");
         receiver.setPort(0);
-        receiver.setUdpPort(45678);
+        receiver.setUdpPort(0);
         try {
             receiver.bind();
             Field field = NioReceiver.class.getDeclaredField("datagramChannel");
@@ -291,6 +295,42 @@ public class TestNioReceiver {
             Assert.assertNull(receiver.getExecutor());
         } finally {
             executor.shutdownNow();
+        }
+    }
+
+    @Test
+    public void testRejectedTaskIsResetBeforeReturningToPool() throws Exception {
+        NioReceiver receiver = new NioReceiver();
+        receiver.setChannel(new GroupChannel());
+        RxTaskPool pool = new RxTaskPool(1, 1, receiver::createRxTask);
+        receiver.setPool(pool);
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.shutdown();
+        receiver.setExecutor(executor);
+
+        Pipe pipe = Pipe.open();
+        try (Pipe.SourceChannel source = pipe.source(); Pipe.SinkChannel sink = pipe.sink();
+                Selector selector = Selector.open()) {
+            Field selectorField = NioReceiver.class.getDeclaredField("selector");
+            selectorField.setAccessible(true);
+            @SuppressWarnings("unchecked")
+            AtomicReference<Selector> receiverSelector = (AtomicReference<Selector>) selectorField.get(receiver);
+            receiverSelector.set(selector);
+            source.configureBlocking(false);
+            SelectionKey key = source.register(selector, SelectionKey.OP_READ);
+
+            Assert.assertThrows(RejectedExecutionException.class, () -> receiver.readDataFromSocket(key));
+            Assert.assertEquals(1, pool.available());
+            receiver.events();
+            Assert.assertFalse(key.isValid());
+
+            Object task = pool.getRxTask();
+            Field keyField = NioReplicationTask.class.getDeclaredField("key");
+            keyField.setAccessible(true);
+            Assert.assertNull(keyField.get(task));
+            pool.returnWorker((NioReplicationTask) task);
+        } finally {
+            receiver.stop();
         }
     }
 

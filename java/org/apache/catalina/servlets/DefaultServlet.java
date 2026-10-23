@@ -571,8 +571,25 @@ public class DefaultServlet extends HttpServlet {
      */
     @Override
     protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
         resp.setHeader("Allow", determineMethodsAllowed(req));
+    }
+
+
+    @Override
+    protected void doPatch(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // Overridden so the correct Allow header can be returned
+        resp.setHeader("Allow", determineMethodsAllowed(req));
+        // Picks up HttpServlet's HTTP/1.0 handling
+        super.doPatch(req, resp);
+    }
+
+
+    @Override
+    protected void doQuery(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // Overridden so the correct Allow header can be returned
+        resp.setHeader("Allow", determineMethodsAllowed(req));
+        // Picks up HttpServlet's HTTP/1.0 handling
+        super.doQuery(req, resp);
     }
 
 

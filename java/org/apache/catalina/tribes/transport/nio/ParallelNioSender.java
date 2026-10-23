@@ -535,6 +535,7 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
                 }
             } catch (InterruptedException e) {
                 log.warn(sm.getString("parallelNioSender.disconnect.executor.interrupted"));
+                Thread.currentThread().interrupt();
             } finally {
                 sendSecureExecutor = null;
             }
