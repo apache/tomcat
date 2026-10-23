@@ -210,7 +210,7 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
         }
 
         public synchronized DataSender getSender(long timeout) {
-            long start = System.currentTimeMillis();
+            long start = System.nanoTime();
             while (true) {
                 if (!isOpen) {
                     throw new IllegalStateException(sm.getString("pooledSender.closed.queue"));
@@ -227,7 +227,7 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
                 }
                 try {
                     if (timeout > 0) {
-                        long delta = System.currentTimeMillis() - start;
+                        long delta = (System.nanoTime() - start) / 1_000_000;
                         if (delta >= timeout) {
                             return null;
                         }
