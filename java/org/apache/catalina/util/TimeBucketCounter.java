@@ -97,10 +97,14 @@ public class TimeBucketCounter extends TimeBucketCounterBase {
      *
      * @return bits to be shifted
      *
-     * @throws IllegalArgumentException if the duration in milliseconds, rounded up to the next power of 2, would not
-     *                                      fit in an int
+     * @throws IllegalArgumentException if the duration is not positive, or if the duration in milliseconds, rounded up
+     *                                      to the next power of 2, would not fit in an int
      */
     protected static int determineShiftBitsOfDuration(int duration) {
+        if (duration <= 0) {
+            throw new IllegalArgumentException(
+                    sm.getString("timebucket.invalidDuration", Integer.valueOf(duration)));
+        }
         if (duration > MAX_DURATION_SECONDS) {
             // duration * 1000, rounded up to the next power of 2, would overflow int. Reject it with a clear
             // message rather than computing a meaningless number of bits.
