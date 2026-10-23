@@ -87,11 +87,11 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         if (getSecurePort() < 0) {
             return;
         }
-        if (!(getChannel() instanceof GroupChannel groupChannel)) {
+        if (!(getChannel() instanceof GroupChannel)) {
             return;
         }
-        if (groupChannel.getSslContext() == null) {
-            if (groupChannel.getSecure()) {
+        if (((GroupChannel) getChannel()).getSslContext() == null) {
+            if (((GroupChannel) getChannel()).getSecure()) {
                 throw new IOException(sm.getString("nioReceiver.tlsUnavailable"));
             }
             setSecurePort(-1);
@@ -100,7 +100,8 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         secureServerChannel = ServerSocketChannel.open();
         bind(secureServerChannel.socket(), getSecurePort(), getAutoBind(), true);
         secureConnectionSlots = new Semaphore(Math.max(1, getMaxTasks()));
-        Thread thread = new Thread(() -> runSecureListener(groupChannel.getSslContext()), "NioReceiver-TLS");
+        Thread thread =
+                new Thread(() -> runSecureListener(((GroupChannel) getChannel()).getSslContext()), "NioReceiver-TLS");
         thread.setDaemon(true);
         thread.start();
     }
@@ -211,7 +212,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         secureSockets.clear();
         secureConnectionSlots = null;
         super.stop();
-        if ((getChannel() instanceof GroupChannel groupChannel) && groupChannel.getSecure()) {
+        if (getChannel() instanceof GroupChannel && ((GroupChannel) getChannel()).getSecure()) {
             try {
                 // Should stop a lot faster than this as all the sockets have been closed.
                 if (!getExecutor().awaitTermination(60, TimeUnit.SECONDS)) {
@@ -239,7 +240,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         try {
             resolveBind();
             getBind();
-            boolean tlsOnly = getChannel() instanceof GroupChannel groupChannel && groupChannel.getSecure();
+            boolean tlsOnly = getChannel() instanceof GroupChannel && ((GroupChannel) getChannel()).getSecure();
             if (!tlsOnly) {
                 bind();
             }

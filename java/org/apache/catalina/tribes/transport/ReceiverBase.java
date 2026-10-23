@@ -281,8 +281,8 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
                     String type;
                     if (secure) {
                         setSecurePort(port);
-                        if (getChannel() instanceof GroupChannel groupChannel) {
-                            type = groupChannel.getSslContext().getImplementationName();
+                        if (getChannel() instanceof GroupChannel) {
+                            type = ((GroupChannel) getChannel()).getSslContext().getImplementationName();
                         } else {
                             type = "secure";
                         }

@@ -59,13 +59,14 @@ final class TlsChannel implements ByteChannel {
         HandshakeStatus status = engine.getHandshakeStatus();
         while (status != HandshakeStatus.FINISHED && status != HandshakeStatus.NOT_HANDSHAKING) {
             switch (status) {
-                case NEED_TASK -> {
+                case NEED_TASK: {
                     Runnable task;
                     while ((task = engine.getDelegatedTask()) != null) {
                         task.run();
                     }
+                    break;
                 }
-                case NEED_WRAP -> {
+                case NEED_WRAP: {
                     networkOutput.clear();
                     SSLEngineResult result = engine.wrap(EMPTY, networkOutput);
                     if (result.getStatus() == Status.BUFFER_OVERFLOW) {
@@ -80,11 +81,12 @@ final class TlsChannel implements ByteChannel {
                     status = result.getHandshakeStatus();
                     continue;
                 }
-                case NEED_UNWRAP, NEED_UNWRAP_AGAIN -> {
+                case NEED_UNWRAP:
+                case NEED_UNWRAP_AGAIN: {
                     status = unwrapHandshake();
                     continue;
                 }
-                default -> {
+                default: {
                     // FINISHED and NOT_HANDSHAKING are handled by the loop condition.
                 }
             }

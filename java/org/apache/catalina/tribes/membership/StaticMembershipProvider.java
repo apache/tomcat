@@ -436,7 +436,7 @@ public class StaticMembershipProvider extends MembershipProviderBase
     }
 
     private Member[] getAliveMembers(Member[] members) {
-        boolean channelSecure = channel instanceof GroupChannel groupChannel && groupChannel.getSecure();
+        boolean channelSecure = channel instanceof GroupChannel && ((GroupChannel) channel).getSecure();
         List<Member> aliveMembers = new ArrayList<>();
         for (Member member : members) {
             boolean useSecurePort = channelSecure || member.getSecurePort() >= 0 && member.getPort() < 0;
