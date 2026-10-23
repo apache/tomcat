@@ -17,6 +17,7 @@
 package jakarta.servlet.http;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Serial;
@@ -99,12 +100,15 @@ public abstract class HttpServlet extends GenericServlet {
     @Deprecated(forRemoval = true, since = "Servlet 6.0")
     public static final String LEGACY_DO_HEAD = "jakarta.servlet.http.legacyDoHead";
 
-    private final transient Object cachedAllowHeaderValueLock = new Object();
+    // Non-final so it can be recreated on deserialization
+    private transient Object cachedAllowHeaderValueLock = new Object();
 
     /**
      * Cached value of the HTTP {@code Allow} header for this servlet.
+     * <p>
+     * Derived cache that is recomputed lazily.
      */
-    private volatile String cachedAllowHeaderValue = null;
+    private transient volatile String cachedAllowHeaderValue = null;
 
     /**
      * Cached value read from {@link HttpServlet#LEGACY_DO_HEAD} system property.
@@ -756,6 +760,21 @@ public abstract class HttpServlet extends GenericServlet {
             throw new ServletException(lStrings.getString("http.non_http"));
         }
         service(request, response);
+    }
+
+
+    /**
+     * Restores the transient lock object used to guard the cached Allow header after deserialization. The cached
+     * header is recomputed lazily so it isn't restored here.
+     *
+     * @param stream the object input stream
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if a serialized class cannot be found
+     */
+    @Serial
+    private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+        stream.defaultReadObject();
+        cachedAllowHeaderValueLock = new Object();
     }
 
 
