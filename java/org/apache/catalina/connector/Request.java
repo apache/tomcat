@@ -130,12 +130,6 @@ public class Request implements HttpServletRequest {
 
     private static final String HTTP_UPGRADE_HEADER_NAME = "upgrade";
 
-    /**
-     * The default value of the maximum number of locales to parse from the Accept-Language header(s). Must match the
-     * default of the maxLocaleCount attribute of the Connector with which a Request is associated.
-     */
-    private static final int DEFAULT_MAX_LOCALE_COUNT = 10;
-
     /*
      * Use AcceptLanguage2 parser rather than the StandardAcceptLanguageParser.
      */
@@ -447,10 +441,9 @@ public class Request implements HttpServletRequest {
      * The maximum number of locales permitted for a request. The Accept-Language header value is untrusted input
      * bounded only by the maximum header size so the number of locales is bounded by default to limit the
      * per-request processing and the number of distinct locales exposed to web applications and internal components.
-     * Requests that exceed this limit are rejected when the locales are parsed. A value of less than zero means no
-     * limit.
+     * A value of less than zero means no limit.
      */
-    private int maxLocaleCount = DEFAULT_MAX_LOCALE_COUNT;
+    private int maxLocaleCount = -1;
 
     // --------------------------------------------------------- Public Methods
 
@@ -507,7 +500,7 @@ public class Request implements HttpServletRequest {
             maxParameterCount = -1;
             maxPartCount = -1;
             maxPartHeaderSize = -1;
-            maxLocaleCount = DEFAULT_MAX_LOCALE_COUNT;
+            maxLocaleCount = -1;
         }
         if (parts != null) {
             for (Part part : parts) {
@@ -3126,8 +3119,9 @@ public class Request implements HttpServletRequest {
         for (ArrayList<Locale> list : locales.values()) {
             for (Locale locale : list) {
                 if (maxLocaleCount > -1 && this.locales.size() >= maxLocaleCount) {
-                    throw new IllegalArgumentException(
-                            sm.getString("coyoteRequest.tooManyLocales", Integer.valueOf(maxLocaleCount)));
+                    // Remove the last element
+                    this.locales.removeLast();
+                    log.info(sm.getString("coyoteRequest.tooManyLocales", Integer.valueOf(maxLocaleCount)));
                 }
                 addLocale(locale);
             }

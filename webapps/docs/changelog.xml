@@ -441,6 +441,11 @@
         thread pools with idle threads to create unnecessary threads.
         (remm)
       </fix>
+      <fix>
+        Rework <code>maxLocaleCount</code> behavior to ignore extra locales
+        when parsed instead of throwing an ISE, since a request remains
+        functionally coherent. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
