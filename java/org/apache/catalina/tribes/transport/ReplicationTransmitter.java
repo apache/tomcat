@@ -71,7 +71,7 @@ public class ReplicationTransmitter implements ChannelSender {
 
     @Override
     public void sendMessage(ChannelMessage message, Member[] destination) throws ChannelException {
-        if (channel instanceof GroupChannel groupChannel && groupChannel.getSecure()) {
+        if (channel instanceof GroupChannel && ((GroupChannel) channel).getSecure()) {
             message.setOptions(message.getOptions() | Channel.SEND_OPTIONS_SECURE);
         }
         MultiPointSender sender = getTransport();
@@ -152,8 +152,8 @@ public class ReplicationTransmitter implements ChannelSender {
     @Override
     public void setChannel(Channel channel) {
         this.channel = channel;
-        if (transport instanceof AbstractSender sender && channel instanceof GroupChannel groupChannel) {
-            sender.setSslContext(groupChannel.getSslContext());
+        if (transport instanceof AbstractSender && channel instanceof GroupChannel) {
+            ((AbstractSender) transport).setSslContext(((GroupChannel) channel).getSslContext());
         }
     }
 

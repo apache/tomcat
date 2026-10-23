@@ -686,7 +686,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
             return false;
         }
 
-        boolean channelSecure = getChannel() instanceof GroupChannel groupChannel && groupChannel.getSecure();
+        boolean channelSecure = getChannel() instanceof GroupChannel && ((GroupChannel) getChannel()).getSecure();
         boolean useSecurePort = channelSecure || mbr.getSecurePort() >= 0 && mbr.getPort() < 0;
         int port = useSecurePort ? mbr.getSecurePort() : mbr.getPort();
         if (port < 0) {

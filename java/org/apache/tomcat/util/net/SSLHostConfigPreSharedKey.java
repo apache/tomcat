@@ -16,7 +16,6 @@
  */
 package org.apache.tomcat.util.net;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.Locale;
 
@@ -28,7 +27,6 @@ import org.apache.tomcat.util.net.openssl.ciphers.MessageDigest;
  */
 public class SSLHostConfigPreSharedKey implements Serializable {
 
-    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
