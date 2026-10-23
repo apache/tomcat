@@ -275,6 +275,13 @@
         Ensure the DefaultServlet returns the correct Allow header for
         <code>PATCH</code> and <code>QUERY</code> requests. (markt)
       </fix>
+      <fix>
+        Correctly parse RFC 850 formatted dates with two digit years where the
+        date appears to be more than 50 years in the future as required by RFC
+        9110. Treat the year as the most recent year in the past that had the
+        same last two digits. Based on pull request <pr>1104</pr> by Arturo
+        Bernal. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
