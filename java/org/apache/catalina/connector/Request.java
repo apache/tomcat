@@ -3348,9 +3348,8 @@ public class Request implements HttpServletRequest {
         for (ArrayList<Locale> list : locales.values()) {
             for (Locale locale : list) {
                 if (maxLocaleCount > -1 && this.locales.size() >= maxLocaleCount) {
-                    // Remove the last element
-                    this.locales.remove(this.locales.size() - 1);
                     log.info(sm.getString("coyoteRequest.tooManyLocales", Integer.valueOf(maxLocaleCount)));
+                    return;
                 }
                 addLocale(locale);
             }
