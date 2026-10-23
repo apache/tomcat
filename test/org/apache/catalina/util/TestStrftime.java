@@ -62,6 +62,13 @@ public class TestStrftime {
         Assert.assertEquals("a' b", format("a' b"));
     }
 
+    @Test
+    public void testQuoteAsUnknownCommand() {
+        Assert.assertEquals("%'", format("%'"));
+        Assert.assertEquals("a%'b", format("a%'b"));
+        Assert.assertEquals("%'", format("%E'"));
+    }
+
     /*
      * A pattern of the kind SSI config timefmt values commonly use, with the literal word 'GMT' quoted.
      */
