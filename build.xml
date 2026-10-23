@@ -944,6 +944,7 @@
       <fileset dir="modules/jdbc-pool" >
         <exclude name=".*/**"/>
         <exclude name="**/MANIFEST.MF"/>
+        <exclude name="src/test/**" />
         <patternset refid="text.files" />
         <!-- Exclude developer specific local files -->
         <exclude name="build.properties" />
@@ -979,6 +980,10 @@
         <exclude name="webapp/jsp/encoding/**"/>
         <!-- Exclude OpenSSL index files -->
         <exclude name="**/index.db" />
+      </fileset>
+      <fileset dir="modules/jdbc-pool" >
+        <include name="src/test/**" />
+        <exclude name="**/MANIFEST.MF"/>
       </fileset>
     </checkstyle>
   </target>
