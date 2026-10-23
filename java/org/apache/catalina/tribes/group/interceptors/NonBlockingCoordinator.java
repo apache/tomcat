@@ -658,7 +658,12 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
      * @return Member
      */
     public Member getCoordinator() {
-        return (view != null && view.hasMembers()) ? view.getMembers()[0] : null;
+        Membership currentView = view;
+        if (currentView == null) {
+            return null;
+        }
+        Member[] members = currentView.getMembers();
+        return members.length > 0 ? members[0] : null;
     }
 
     /**
@@ -667,7 +672,8 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
      * @return The array of members in the current view
      */
     public Member[] getView() {
-        return (view != null && view.hasMembers()) ? view.getMembers() : new Member[0];
+        Membership currentView = view;
+        return currentView == null ? new Member[0] : currentView.getMembers();
     }
 
     /**
@@ -828,10 +834,11 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
      */
     public boolean isHighest() {
         Member local = getLocalMember(false);
-        if (membership.getMembers().length == 0) {
+        Member[] members = membership.getMembers();
+        if (members.length == 0) {
             return true;
         } else {
-            return AbsoluteOrder.comp.compare(local, membership.getMembers()[0]) <= 0;
+            return AbsoluteOrder.comp.compare(local, members[0]) <= 0;
         }
     }
 
