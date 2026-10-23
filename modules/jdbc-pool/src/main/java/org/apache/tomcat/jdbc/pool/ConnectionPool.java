@@ -309,8 +309,6 @@ public class ConnectionPool {
                     interceptor.setProperties(proxies[i].getProperties());
                     //setup the chain
                     interceptor.setNext(handler);
-                    //call reset
-                    interceptor.reset(this, con);
                     //configure the last one to be held by the connection
                     handler = interceptor;
                 }catch(Exception x) {
@@ -321,13 +319,18 @@ public class ConnectionPool {
             }
             //cache handler for the next iteration
             con.setHandler(handler);
-        } else {
+        }
+        //reset the chain in the order the interceptors are declared, for new and cached handlers alike
+        try {
             JdbcInterceptor next = handler;
-            //we have a cached handler, reset it
             while (next!=null) {
                 next.reset(this, con);
                 next = next.getNext();
             }
+        }catch(Exception x) {
+            SQLException sx = new SQLException("Unable to reset interceptor chain.");
+            sx.initCause(x);
+            throw sx;
         }
         // setup statement proxy
         if (getPoolProperties().getUseStatementFacade()) {
