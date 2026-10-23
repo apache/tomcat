@@ -31,7 +31,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
-import org.apache.tomcat.jdbc.pool.DataSource;
 
 /**
  * Expected functionality of the asynchronous borrow API

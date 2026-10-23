@@ -33,7 +33,6 @@ import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 import org.apache.tomcat.jdbc.pool.DataSource;
-import org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport;
 
 /**
  * Expected functionality of the interceptor chain, exercised against

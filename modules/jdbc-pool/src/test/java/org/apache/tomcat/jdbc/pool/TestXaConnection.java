@@ -34,8 +34,6 @@ import javax.transaction.xa.Xid;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
-import org.apache.tomcat.jdbc.pool.DataSource;
-import org.apache.tomcat.jdbc.pool.XADataSource;
 
 /**
  * Expected XA functionality: with a real XA-capable data source

@@ -28,7 +28,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
-import org.apache.tomcat.jdbc.pool.DataSource;
 
 /**
  * A borrower that is interrupted while waiting for a connection must

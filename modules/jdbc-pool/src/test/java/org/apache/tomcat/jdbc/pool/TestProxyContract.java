@@ -32,7 +32,6 @@ import javax.sql.PooledConnection;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
-import org.apache.tomcat.jdbc.pool.DataSource;
 
 /**
  * Expected contract of the {@link java.sql.Connection} object the pool

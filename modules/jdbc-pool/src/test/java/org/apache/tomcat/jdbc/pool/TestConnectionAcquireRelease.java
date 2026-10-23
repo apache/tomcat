@@ -36,7 +36,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
-import org.apache.tomcat.jdbc.pool.DataSource;
 
 /**
  * Expected functionality of borrowing connections from the pool,

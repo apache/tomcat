@@ -30,7 +30,6 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
-import org.apache.tomcat.jdbc.pool.DataSource;
 
 /**
  * Expected pool sizing behaviour: idle capping on return, the min-idle

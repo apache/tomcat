@@ -31,7 +31,6 @@ import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 import org.apache.tomcat.jdbc.pool.DataSource;
-import org.apache.tomcat.jdbc.pool.interceptor.StatementCache;
 
 /**
  * Expected functionality of the pool's own statement cache: a prepared

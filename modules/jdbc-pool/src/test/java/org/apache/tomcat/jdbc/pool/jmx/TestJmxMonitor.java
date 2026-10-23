@@ -36,7 +36,6 @@ import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 import org.apache.tomcat.jdbc.pool.DataSource;
-import org.apache.tomcat.jdbc.pool.jmx.ConnectionPoolMBean;
 
 /**
  * Expected JMX monitoring functionality. A container registers the

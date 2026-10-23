@@ -25,8 +25,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import org.apache.tomcat.jdbc.pool.PoolProperties;
-
 /**
  * Configuration only, no database and no pool: {@code PoolProperties}
  * renders itself for logging and diagnostics. The rendering must not leak

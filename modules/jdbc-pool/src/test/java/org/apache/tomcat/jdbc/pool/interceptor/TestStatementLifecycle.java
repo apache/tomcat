@@ -38,9 +38,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 import org.apache.tomcat.jdbc.pool.DataSource;
-import org.apache.tomcat.jdbc.pool.interceptor.StatementCache;
-import org.apache.tomcat.jdbc.pool.interceptor.StatementDecoratorInterceptor;
-import org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer;
 
 /**
  * Expected functionality of the statement decorators: statements an

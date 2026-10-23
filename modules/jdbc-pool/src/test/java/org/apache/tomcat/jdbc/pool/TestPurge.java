@@ -24,7 +24,6 @@ import java.sql.Connection;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
-import org.apache.tomcat.jdbc.pool.DataSource;
 
 /**
  * Expected functionality of {@code purge()} and {@code purgeOnReturn()}:

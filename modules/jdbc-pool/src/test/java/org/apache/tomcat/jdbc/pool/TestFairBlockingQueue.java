@@ -32,8 +32,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Test;
 
-import org.apache.tomcat.jdbc.pool.FairBlockingQueue;
-
 /**
  * Expected functionality of the idle-connection queue the pool uses when
  * the fair queue is enabled: unbounded offering, most-recently-used

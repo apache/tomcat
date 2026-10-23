@@ -30,9 +30,6 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
-import org.apache.tomcat.jdbc.pool.DataSource;
-import org.apache.tomcat.jdbc.pool.PooledConnection;
-import org.apache.tomcat.jdbc.pool.Validator;
 
 /**
  * Expected validation functionality of the pool: which checks run when,

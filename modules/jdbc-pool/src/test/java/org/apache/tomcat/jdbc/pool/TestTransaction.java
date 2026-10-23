@@ -26,7 +26,6 @@ import java.sql.Statement;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
-import org.apache.tomcat.jdbc.pool.DataSource;
 
 /**
  * Expected transaction functionality of pooled connections: commit,

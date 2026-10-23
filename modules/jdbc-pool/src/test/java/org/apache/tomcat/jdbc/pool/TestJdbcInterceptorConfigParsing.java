@@ -24,10 +24,8 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
-import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorDefinition;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
-import org.apache.tomcat.jdbc.pool.TrapException;
 
 /**
  * Configuration only, no database and no pool: how the
