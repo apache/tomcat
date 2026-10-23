@@ -88,6 +88,35 @@ public class ConcurrentDateFormat {
         }
     }
 
+    /**
+     * Parses the given string into a date using the configured format pattern. A two-digit year is resolved to the
+     * 100 year period that starts at the given date.
+     *
+     * @param source the string to parse
+     * @param twoDigitYearStart the start of the 100 year period that a two-digit year is resolved to
+     *
+     * @return the parsed date
+     *
+     * @throws ParseException if the string cannot be parsed
+     *
+     * @since 12.0.x
+     */
+    public Date parse(String source, Date twoDigitYearStart) throws ParseException {
+        SimpleDateFormat sdf = queue.poll();
+        if (sdf == null) {
+            sdf = createInstance();
+        }
+        Date previousStart = sdf.get2DigitYearStart();
+        try {
+            sdf.set2DigitYearStart(twoDigitYearStart);
+            return sdf.parse(source);
+        } finally {
+            sdf.set2DigitYearStart(previousStart);
+            sdf.setTimeZone(timezone);
+            queue.add(sdf);
+        }
+    }
+
     private SimpleDateFormat createInstance() {
         SimpleDateFormat sdf = new SimpleDateFormat(format, locale);
         sdf.setTimeZone(timezone);
