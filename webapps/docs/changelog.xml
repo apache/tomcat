@@ -520,6 +520,14 @@
         so that the configured values are not lost when the configuration is
         stored. (markt)
       </fix>
+      <fix>
+        Preserve the interrupt status of threads that are interrupted while
+        waiting in the cluster code (sender and receiver shutdown, membership
+        start-up and recovery, heartbeat checks and coordinator elections),
+        report an interrupt while waiting for a pooled sender as such rather
+        than as a time out and measure the wait for a pooled sender with a
+        monotonic clock. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

@@ -506,7 +506,10 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
                 // There was an error executing the scheduled task, get it and log it
                 try {
                     heartbeatFuture.get();
-                } catch (InterruptedException | ExecutionException e) {
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    log.error(sm.getString("groupChannel.unable.sendHeartbeat"), e);
+                } catch (ExecutionException e) {
                     log.error(sm.getString("groupChannel.unable.sendHeartbeat"), e);
                 }
             }

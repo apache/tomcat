@@ -51,10 +51,9 @@ import org.apache.juli.logging.LogFactory;
  * groups automatically when members are discovered that weren't part of the
  * </p>
  * <p>
- * This algorithm is non blocking meaning it allows for transactions while the coordination phase is going on. Note
- * that {@link #startElection(boolean)} itself blocks its caller for up to
- * {@link #getWaitForCoordMsgTimeout()} milliseconds while waiting for an election request from a higher priority
- * member.
+ * This algorithm is non blocking meaning it allows for transactions while the coordination phase is going on. Note that
+ * {@link #startElection(boolean)} itself blocks its caller for up to {@link #getWaitForCoordMsgTimeout()} milliseconds
+ * while waiting for an election request from a higher priority member.
  * </p>
  * <p>
  * This implementation is based on a home brewed algorithm that uses the AbsoluteOrder of a membership to pass a token
@@ -152,20 +151,17 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
             50, 111, 103, 65, 3, -77, 51, -35, 0, 119, 117, 9, -26, 119, 50, -75, -105, -102, 36, 79, 37, -68, -84,
             -123, 15, -22, -109, 106, -55 };
     /**
-     * Time to wait for coordination timeout. A node that is not the leader in its view
-     * waits up to this duration for a coordination message when an election is started.
-     * The wait blocks the calling thread, which for membership events is the channel
-     * utility executor thread that also runs the channel heartbeat. Lowering this value
-     * reduces the time that a single membership event can delay heartbeats and other
-     * membership processing. The liveness checks performed while merging an arriving
-     * coordination message use {@link #mergeAliveTimeout} instead.
+     * Time to wait for coordination timeout. A node that is not the leader in its view waits up to this duration for a
+     * coordination message when an election is started. The wait blocks the calling thread, which for membership events
+     * is the channel utility executor thread that also runs the channel heartbeat. Lowering this value reduces the time
+     * that a single membership event can delay heartbeats and other membership processing. The liveness checks
+     * performed while merging an arriving coordination message use {@link #mergeAliveTimeout} instead.
      */
     protected long waitForCoordMsgTimeout = 15000;
     /**
-     * Time to wait for the TCP connect of the member liveness checks performed while
-     * merging an arriving coordination message. These checks run on the channel receiver
-     * worker threads, so this timeout is kept separate from and much shorter than
-     * {@link #waitForCoordMsgTimeout}.
+     * Time to wait for the TCP connect of the member liveness checks performed while merging an arriving coordination
+     * message. These checks run on the channel receiver worker threads, so this timeout is kept separate from and much
+     * shorter than {@link #waitForCoordMsgTimeout}.
      */
     protected long mergeAliveTimeout = 1000;
     /**
@@ -218,8 +214,8 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
     }
 
     /**
-     * Returns the time in milliseconds that a non-leader node waits for a coordination
-     * message when an election is started.
+     * Returns the time in milliseconds that a non-leader node waits for a coordination message when an election is
+     * started.
      *
      * @return the coordination message wait timeout in milliseconds
      */
@@ -228,8 +224,8 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
     }
 
     /**
-     * Returns the time in milliseconds that the TCP connect of the member liveness
-     * checks waits during the merge of an arriving coordination message.
+     * Returns the time in milliseconds that the TCP connect of the member liveness checks waits during the merge of an
+     * arriving coordination message.
      *
      * @return the merge liveness check timeout in milliseconds
      */
@@ -238,14 +234,12 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
     }
 
     /**
-     * Sets the time in milliseconds that the TCP connect of the member liveness checks
-     * waits during the merge of an arriving coordination message. Since these checks run
-     * sequentially on the channel receiver worker threads, the value should stay short to
-     * avoid pinning receiver workers when a coordination message carries stale or dead
+     * Sets the time in milliseconds that the TCP connect of the member liveness checks waits during the merge of an
+     * arriving coordination message. Since these checks run sequentially on the channel receiver worker threads, the
+     * value should stay short to avoid pinning receiver workers when a coordination message carries stale or dead
      * members.
      *
-     * @param mergeAliveTimeout the merge liveness check timeout in milliseconds, at
-     *                              least one and no more than
+     * @param mergeAliveTimeout the merge liveness check timeout in milliseconds, at least one and no more than
      *                              {@link Integer#MAX_VALUE}
      */
     public void setMergeAliveTimeout(long mergeAliveTimeout) {
@@ -260,22 +254,18 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
     }
 
     /**
-     * Sets the time in milliseconds that a non-leader node waits for a coordination
-     * message when an election is started. Since the wait blocks the calling thread,
-     * which for membership events is the single threaded channel utility executor that
-     * also runs the channel heartbeat, a lower value limits the delay that a single
-     * membership event can impose on other channel maintenance work. The merge-time
-     * liveness checks are not affected by this value, they use
-     * {@link #getMergeAliveTimeout()}.
+     * Sets the time in milliseconds that a non-leader node waits for a coordination message when an election is
+     * started. Since the wait blocks the calling thread, which for membership events is the single threaded channel
+     * utility executor that also runs the channel heartbeat, a lower value limits the delay that a single membership
+     * event can impose on other channel maintenance work. The merge-time liveness checks are not affected by this
+     * value, they use {@link #getMergeAliveTimeout()}.
      *
-     * @param waitForCoordMsgTimeout the coordination message wait timeout in
-     *                                   milliseconds, at least one and no more than
-     *                                   {@link Integer#MAX_VALUE}
+     * @param waitForCoordMsgTimeout the coordination message wait timeout in milliseconds, at least one and no more
+     *                                   than {@link Integer#MAX_VALUE}
      */
     public void setWaitForCoordMsgTimeout(long waitForCoordMsgTimeout) {
         if (waitForCoordMsgTimeout < 1) {
-            throw new IllegalArgumentException(
-                    sm.getString("nonBlockingCoordinator.waitForCoordMsgTimeout.tooSmall"));
+            throw new IllegalArgumentException(sm.getString("nonBlockingCoordinator.waitForCoordMsgTimeout.tooSmall"));
         }
         if (waitForCoordMsgTimeout > Integer.MAX_VALUE) {
             throw new IllegalArgumentException(sm.getString("nonBlockingCoordinator.waitForCoordMsgTimeout.tooLarge",
@@ -292,6 +282,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
      * Starts an election to determine the coordinator.
      *
      * @param force Whether to force a new election even if one is in progress
+     *
      * @throws ChannelException if an error occurs during the election
      */
     public void startElection(boolean force) throws ChannelException {
@@ -353,10 +344,11 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
                      * happened (i.e. notify() was not called) AND b) the timeout has not expired AND c) the thread was
                      * not interrupted.
                      */
-                } while (suggestedviewId == null && !coordMsgReceived.get() && timeout > 0 && !Thread.interrupted());
+                } while (suggestedviewId == null && !coordMsgReceived.get() && timeout > 0 &&
+                        !Thread.currentThread().isInterrupted());
                 String msg;
                 if (suggestedviewId == null && !coordMsgReceived.get()) {
-                    if (Thread.interrupted()) {
+                    if (Thread.currentThread().isInterrupted()) {
                         msg = "Election abandoned, waiting interrupted.";
                     } else {
                         msg = "Election abandoned, waiting timed out.";
@@ -382,8 +374,9 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
      * Sends an election message to the next member in the ring.
      *
      * @param local The local member
-     * @param next The next member to send the message to
-     * @param msg The coordination message to send
+     * @param next  The next member to send the message to
+     * @param msg   The coordination message to send
+     *
      * @throws ChannelException if sending fails
      */
     protected void sendElectionMsg(Member local, Member next, CoordinationMessage msg) throws ChannelException {
@@ -396,7 +389,8 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
      * Sends an election message to the next member inline, retrying on failure.
      *
      * @param local The local member
-     * @param msg The coordination message to send
+     * @param msg   The coordination message to send
+     *
      * @throws ChannelException if sending fails to all members
      */
     protected void sendElectionMsgToNextInline(Member local, CoordinationMessage msg) throws ChannelException {
@@ -422,8 +416,9 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
     /**
      * Creates a ChannelData object from a coordination message.
      *
-     * @param msg The coordination message
+     * @param msg   The coordination message
      * @param local The local member
+     *
      * @return The channel data containing the message
      */
     public ChannelData createData(CoordinationMessage msg, Member local) {
@@ -437,10 +432,11 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
     }
 
     /**
-     * Checks if a member is alive using the merge liveness timeout
-     * ({@link #getMergeAliveTimeout()}) as the connection timeout.
+     * Checks if a member is alive using the merge liveness timeout ({@link #getMergeAliveTimeout()}) as the connection
+     * timeout.
      *
      * @param mbr The member to check
+     *
      * @return true if the member is alive
      */
     protected boolean alive(Member mbr) {
@@ -450,8 +446,9 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
     /**
      * Checks if a member is alive by attempting a socket connection.
      *
-     * @param mbr The member to check
+     * @param mbr        The member to check
      * @param conTimeout The connection timeout in milliseconds
+     *
      * @return true if the member is alive
      */
     protected boolean memberAlive(Member mbr, long conTimeout) {
@@ -477,6 +474,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
      * Merges the incoming coordination message members with the current membership.
      *
      * @param msg The coordination message
+     *
      * @return The merged membership
      */
     protected Membership mergeOnArrive(CoordinationMessage msg) {
@@ -504,6 +502,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
      * Processes an incoming coordination message.
      *
      * @param msg The coordination message to process
+     *
      * @throws ChannelException if processing fails
      */
     protected void processCoordMessage(CoordinationMessage msg) throws ChannelException {
@@ -524,8 +523,9 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
     /**
      * Handles a coordination token, routing to the appropriate handler based on source.
      *
-     * @param msg The coordination message
+     * @param msg    The coordination message
      * @param merged The merged membership
+     *
      * @throws ChannelException if handling fails
      */
     protected void handleToken(CoordinationMessage msg, Membership merged) throws ChannelException {
@@ -541,9 +541,10 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
     /**
      * Handles a coordination token that originated from the local member.
      *
-     * @param local The local member
-     * @param msg The coordination message
+     * @param local  The local member
+     * @param msg    The coordination message
      * @param merged The merged membership
+     *
      * @throws ChannelException if handling fails
      */
     protected void handleMyToken(Member local, CoordinationMessage msg, Membership merged) throws ChannelException {
@@ -573,9 +574,10 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
     /**
      * Handles a coordination token from another member.
      *
-     * @param local The local member
-     * @param msg The coordination message
+     * @param local  The local member
+     * @param msg    The coordination message
      * @param merged The merged membership
+     *
      * @throws ChannelException if handling fails
      */
     protected void handleOtherToken(Member local, CoordinationMessage msg, Membership merged) throws ChannelException {
@@ -591,8 +593,9 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
     /**
      * Handles a view confirmation message.
      *
-     * @param msg The coordination message
+     * @param msg    The coordination message
      * @param merged The merged membership
+     *
      * @throws ChannelException if handling fails
      */
     protected void handleViewConf(CoordinationMessage msg, Membership merged) throws ChannelException {
@@ -625,6 +628,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
      * Checks if a coordination message is a view confirmation.
      *
      * @param msg The coordination message
+     *
      * @return true if the message is a view confirmation
      */
     protected boolean isViewConf(CoordinationMessage msg) {
@@ -635,7 +639,8 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
      * Checks if the complete membership has a higher priority leader than the local membership.
      *
      * @param complete The complete membership
-     * @param local The local membership
+     * @param local    The local membership
+     *
      * @return true if the complete membership has higher priority
      */
     protected boolean hasHigherPriority(Member[] complete, Member[] local) {
@@ -789,7 +794,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
      * Handles the addition of a new member to the group.
      *
      * @param member The member that was added
-     * @param elect Whether to trigger an election
+     * @param elect  Whether to trigger an election
      */
     public void memberAdded(Member member, boolean elect) {
         if (membership == null) {
@@ -917,11 +922,11 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
      * Represents a coordination message used in the election protocol.
      */
     public static class CoordinationMessage {
-         // Message format: X{A-ldr, A-src, mbrs-A,B,C,D}
-         // X{A-ldr, A-src, mbrs-A,B,C,D}
-         /**
-          * The byte buffer for the message.
-          */
+        // Message format: X{A-ldr, A-src, mbrs-A,B,C,D}
+        // X{A-ldr, A-src, mbrs-A,B,C,D}
+        /**
+         * The byte buffer for the message.
+         */
         protected final XByteBuffer buf;
         /**
          * The leader member.
@@ -959,9 +964,9 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
          *
          * @param leader The leader member
          * @param source The source member
-         * @param view The member view
-         * @param id The message ID
-         * @param type The message type
+         * @param view   The member view
+         * @param id     The message ID
+         * @param type   The message type
          */
         public CoordinationMessage(Member leader, Member source, Member[] view, UniqueId id, byte[] type) {
             this.buf = new XByteBuffer(4096, false);
@@ -1138,8 +1143,8 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
      * Represents a coordination event in the election protocol.
      */
     public static class CoordinationEvent implements InterceptorEvent {
-         // Event type constants for coordination events.
-         /** Event for coordinator start. */
+        // Event type constants for coordination events.
+        /** Event for coordinator start. */
         public static final int EVT_START = 1;
         /** Event for member add. */
         public static final int EVT_MBR_ADD = 2;
@@ -1167,7 +1172,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
         public static final int EVT_ELECT_ABANDONED = 13;
 
         // Event fields: type, interceptor, coord, mbrs, info, view, and suggestedView.
-         /** Event type. */
+        /** Event type. */
         final int type;
         /** Channel interceptor. */
         final ChannelInterceptor interceptor;
@@ -1185,9 +1190,9 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
         /**
          * Constructs a CoordinationEvent.
          *
-         * @param type The event type
+         * @param type        The event type
          * @param interceptor The channel interceptor
-         * @param info Additional information about the event
+         * @param info        Additional information about the event
          */
         public CoordinationEvent(int type, ChannelInterceptor interceptor, String info) {
             this.type = type;
