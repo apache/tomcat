@@ -60,6 +60,7 @@ public class TestOrderInterceptor {
         for ( int i=0; i<channelCount; i++ ) {
             channels[i] = new GroupChannel();
             ((ReceiverBase) channels[i].getChannelReceiver()).setHost("localhost");
+            ((ReceiverBase) channels[i].getChannelReceiver()).setPort(0);
             orderitcs[i] = new OrderInterceptor();
             mangleitcs[i] = new MangleOrderInterceptor();
             orderitcs[i].setExpire(Long.MAX_VALUE);

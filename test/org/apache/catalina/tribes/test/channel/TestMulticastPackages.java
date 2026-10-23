@@ -53,8 +53,10 @@ public class TestMulticastPackages {
     @Before
     public void setUp() throws Exception {
         channel1 = new GroupChannel();
+        ((ReceiverBase) channel1.getChannelReceiver()).setPort(0);
         channel1.addInterceptor(new MessageDispatchInterceptor());
         channel2 = new GroupChannel();
+        ((ReceiverBase) channel2.getChannelReceiver()).setPort(0);
         channel2.addInterceptor(new MessageDispatchInterceptor());
         ThroughputInterceptor tint = new ThroughputInterceptor();
         tint.setInterval(500);
@@ -65,8 +67,8 @@ public class TestMulticastPackages {
         listener1 = new Listener();
         ReceiverBase rb1 = (ReceiverBase)channel1.getChannelReceiver();
         ReceiverBase rb2 = (ReceiverBase)channel2.getChannelReceiver();
-        rb1.setUdpPort(50000);
-        rb2.setUdpPort(50000);
+        rb1.setUdpPort(0);
+        rb2.setUdpPort(0);
         channel2.addChannelListener(listener1);
         TesterUtil.addRandomDomain(new ManagedChannel[] {channel1, channel2});
         channel1.start(Channel.DEFAULT);
