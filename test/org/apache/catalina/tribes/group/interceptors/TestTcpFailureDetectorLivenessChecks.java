@@ -16,6 +16,8 @@
  */
 package org.apache.catalina.tribes.group.interceptors;
 
+import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,6 +32,7 @@ import org.junit.Test;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 import org.apache.catalina.tribes.group.GroupChannel;
+import org.apache.catalina.tribes.membership.MemberImpl;
 import org.apache.catalina.tribes.membership.StaticMember;
 
 /**
@@ -569,5 +572,21 @@ public class TestTcpFailureDetectorLivenessChecks {
         Assert.assertFalse("Member add thread did not finish", addThread.isAlive());
         Assert.assertNull("A forgotten member must not be added by a running check", detector.getMember(member));
         Assert.assertTrue(recorder.added.isEmpty());
+    }
+
+    /*
+     * Timeouts too large for the int socket timeouts must be capped rather than overflow to a negative value that
+     * the socket rejects, which would make a live member look dead.
+     */
+    @Test
+    public void testMemberAliveWithTimeoutsAboveIntegerMax() throws Exception {
+        try (ServerSocket server = new ServerSocket(0, 1, InetAddress.getLoopbackAddress())) {
+            TcpFailureDetector detector = new TcpFailureDetector();
+            detector.setChannel(new GroupChannel());
+            MemberImpl member = new MemberImpl("127.0.0.1", server.getLocalPort(), 0);
+
+            Assert.assertTrue(detector.memberAlive(member, new byte[0], false, false,
+                    Long.MAX_VALUE, Long.MAX_VALUE, 0));
+        }
     }
 }
