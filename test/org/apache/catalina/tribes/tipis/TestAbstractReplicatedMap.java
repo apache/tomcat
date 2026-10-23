@@ -22,6 +22,8 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -133,6 +135,7 @@ public class TestAbstractReplicatedMap {
             public void memberDisappeared(Member disappearedMember) {
                 disappeared.incrementAndGet();
                 lockAvailable.set(monitorAvailable(mapMembers, 2000));
+                super.memberDisappeared(disappearedMember);
             }
         };
 
@@ -143,6 +146,28 @@ public class TestAbstractReplicatedMap {
 
         Assert.assertEquals(1, disappeared.get());
         Assert.assertTrue("The ping must expire members outside the map members lock", lockAvailable.get());
+    }
+
+    @Test
+    public void testPingDoesNotRemoveRefreshedMember() throws Exception {
+        Member member = new MemberImpl("localhost", 4014, -1);
+
+        LazyReplicatedMap<String,String> map = new LazyReplicatedMap<>((key, value) -> {
+            // Not made primary here
+        }, new TestChannel(), 1000, "TestAbstractReplicatedMap", null) {
+
+            @Override
+            public void memberDisappeared(Member disappearedMember) {
+                memberAlive(disappearedMember);
+                super.memberDisappeared(disappearedMember);
+            }
+        };
+
+        map.memberAlive(member);
+        Thread.sleep(10);
+        map.ping(0);
+
+        Assert.assertTrue(map.inSet(member, map.getMapMembers()));
     }
 
     /*
@@ -177,6 +202,60 @@ public class TestAbstractReplicatedMap {
 
         Assert.assertEquals(2, published.get());
         Assert.assertTrue("The member addition must publish backups outside the state lock", lockAvailable.get());
+    }
+
+    @Test
+    public void testConcurrentMemberAddsPublishBackupOnce() throws Exception {
+        CountDownLatch firstPublishStarted = new CountDownLatch(1);
+        CountDownLatch releaseFirstPublish = new CountDownLatch(1);
+        AtomicBoolean probeOnPublish = new AtomicBoolean();
+        AtomicInteger published = new AtomicInteger();
+        Member backup = new MemberImpl("localhost", 4015, -1);
+
+        LazyReplicatedMap<String,String> map = new LazyReplicatedMap<>((key, value) -> {
+            // Not made primary here
+        }, new TestChannel(), 1000, "TestAbstractReplicatedMap", null) {
+
+            @Override
+            protected Member[] publishEntryInfo(Object key, Object value) {
+                if (!probeOnPublish.get()) {
+                    return new Member[0];
+                }
+                if (published.incrementAndGet() == 1) {
+                    firstPublishStarted.countDown();
+                    try {
+                        releaseFirstPublish.await();
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        Assert.fail(e.getMessage());
+                    }
+                }
+                return new Member[] { backup };
+            }
+        };
+
+        map.put("key", "value");
+        probeOnPublish.set(true);
+        Member firstMember = new MemberImpl("localhost", 4016, -1);
+        Member secondMember = new MemberImpl("localhost", 4017, -1);
+        Thread first = new Thread(() -> map.mapMemberAdded(firstMember));
+        Thread second = new Thread(() -> map.mapMemberAdded(secondMember));
+        first.setDaemon(true);
+        second.setDaemon(true);
+        first.start();
+        Assert.assertTrue(firstPublishStarted.await(5, TimeUnit.SECONDS));
+        second.start();
+        try {
+            second.join(1000);
+        } finally {
+            releaseFirstPublish.countDown();
+        }
+        first.join(5000);
+        second.join(5000);
+
+        Assert.assertFalse(first.isAlive());
+        Assert.assertFalse(second.isAlive());
+        Assert.assertEquals(1, published.get());
     }
 
     /*
@@ -217,6 +296,50 @@ public class TestAbstractReplicatedMap {
         Assert.assertEquals(1, ((ArrayList<?>) list).size());
         Assert.assertTrue(((ArrayList<?>) list).get(0) instanceof MapMessage);
         Assert.assertEquals(MapMessage.MSG_COPY, ((MapMessage) ((ArrayList<?>) list).get(0)).getMsgType());
+    }
+
+    @Test
+    public void testStateRequestUsesStableEntrySnapshot() throws Exception {
+        CountDownLatch release = new CountDownLatch(1);
+        BlockingValue blockingValue = new BlockingValue(release);
+        LazyReplicatedMap<String,Serializable> map = new LazyReplicatedMap<>((key, value) -> {
+            // Not made primary here
+        }, new TestChannel(), 1000, "TestAbstractReplicatedMap", null);
+        map.put("first", "value");
+        map.put("second", "old");
+
+        Iterator<Entry<String,AbstractReplicatedMap.MapEntry<String,Serializable>>> entries =
+                map.innerMap.entrySet().iterator();
+        Entry<String,AbstractReplicatedMap.MapEntry<String,Serializable>> first = entries.next();
+        Entry<String,AbstractReplicatedMap.MapEntry<String,Serializable>> second = entries.next();
+        first.getValue().setValue(blockingValue);
+        Serializable originalSecondValue = second.getValue().getValue();
+
+        MapMessage stateRequest = new MapMessage("TestAbstractReplicatedMap".getBytes(StandardCharsets.UTF_8),
+                MapMessage.MSG_STATE_COPY, false, null, null, null, null, null);
+        AtomicReference<Serializable> reply = new AtomicReference<>();
+        Member sender = new MemberImpl("localhost", 4018, -1);
+        Thread replyThread = new Thread(() -> reply.set(map.replyRequest(stateRequest, sender)));
+        replyThread.setDaemon(true);
+        replyThread.start();
+
+        try {
+            Assert.assertTrue(blockingValue.serializationStarted.await(5, TimeUnit.SECONDS));
+            synchronized (map.stateMutex) {
+                second.getValue().setValue("new");
+            }
+        } finally {
+            release.countDown();
+        }
+        replyThread.join(5000);
+
+        Assert.assertFalse(replyThread.isAlive());
+        MapMessage replyMessage = (MapMessage) reply.get();
+        @SuppressWarnings("unchecked")
+        ArrayList<MapMessage> state = (ArrayList<MapMessage>) replyMessage.getValue();
+        MapMessage secondMessage =
+                state.stream().filter(message -> second.getKey().equals(message.getKey())).findFirst().orElseThrow();
+        Assert.assertEquals(originalSecondValue, secondMessage.getValue());
     }
 
     /*
