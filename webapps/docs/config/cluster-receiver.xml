@@ -95,7 +95,8 @@
     </attribute>
     <attribute name="udpPort" required="false">
       The UDP listen port. If this attribute is omitted no UDP port is opened up.
-      The default value is unset, meaning there is no UDP listener available.
+      The default value is unset, meaning there is no UDP listener available. A value of <code>0</code> lets the
+      operating system select a free port.
       As with <code>port</code>, auto-binding does not change the configured value; the port actually bound is
       available via the read-only <code>boundUdpPort</code> property.
     </attribute>
