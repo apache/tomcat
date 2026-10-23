@@ -26,20 +26,19 @@ import org.apache.catalina.tribes.membership.MemberImpl;
 public class TestLazyReplicatedMap {
 
     /*
-     * The backup node selection snapshots the members and computes an index in two steps. A member
-     * added in between must not let the index point behind the end of the snapshot, which aborted
-     * the publication with an array index out of bounds exception, losing the entry that was being
-     * stored. The index is computed for the size of the snapshot.
+     * The backup node selection snapshots the members and computes an index in two steps. A member added in between
+     * must not let the index point behind the end of the snapshot, which aborted the publication with an array index
+     * out of bounds exception, losing the entry that was being stored. The index is computed for the size of the
+     * snapshot.
      */
     @Test
     public void testBackupIndexWithinMemberSnapshot() throws Exception {
         Member member = new MemberImpl("localhost", 4007, -1);
         Member other = new MemberImpl("localhost", 4008, -1);
 
-        LazyReplicatedMap<String,String> map = new LazyReplicatedMap<String,String>(
-                (key, value) -> {
-                    // Not made primary here
-                }, new GroupChannel(), 1000, "TestLazyReplicatedMap", null) {
+        LazyReplicatedMap<String,String> map = new LazyReplicatedMap<>((key, value) -> {
+            // Not made primary here
+        }, new GroupChannel(), 1000, "TestLazyReplicatedMap", null) {
 
             @Override
             public Member[] getMapMembers() {
@@ -59,10 +58,9 @@ public class TestLazyReplicatedMap {
 
     @Test
     public void testNextBackupIndexClampsToSize() {
-        LazyReplicatedMap<String,String> map = new LazyReplicatedMap<String,String>(
-                (key, value) -> {
-                    // Not made primary here
-                }, new GroupChannel(), 1000, "TestLazyReplicatedMap", null);
+        LazyReplicatedMap<String,String> map = new LazyReplicatedMap<>((key, value) -> {
+            // Not made primary here
+        }, new GroupChannel(), 1000, "TestLazyReplicatedMap", null);
 
         Assert.assertEquals(-1, map.getNextBackupIndex(0));
         Assert.assertEquals(0, map.getNextBackupIndex(3));
