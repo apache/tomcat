@@ -30,6 +30,9 @@ public class Driver implements java.sql.Driver {
     public static final AtomicInteger connectCount = new AtomicInteger(0);
     public static final AtomicInteger disconnectCount = new AtomicInteger(0);
 
+    public static final AtomicInteger beginRequestCount = new AtomicInteger(0);
+    public static final AtomicInteger endRequestCount = new AtomicInteger(0);
+
     public static void reset() {
         connectCount.set(0);
         disconnectCount.set(0);
