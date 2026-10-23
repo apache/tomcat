@@ -60,32 +60,18 @@ class InterceptorLifecycleTest extends PoolTestSupport {
         return ds;
     }
 
-    /** Walks the interceptor chain of a borrowed connection. */
-    private static JdbcInterceptor findInChain(Connection pooled, Class<?> type) {
-        JdbcInterceptor interceptor =
-                (JdbcInterceptor) Proxy.getInvocationHandler(pooled);
-        while (interceptor != null) {
-            if (type.isInstance(interceptor)) {
-                return interceptor;
-            }
-            interceptor = interceptor.getNext();
-        }
-        return null;
-    }
-
     @Test
     void aShortInterceptorNameIsResolvedAndConfigured() throws Exception {
         DataSource ds = reportedPool();
         ds.createPool();
 
         try (Connection pooled = ds.getConnection()) {
-            JdbcInterceptor interceptor =
-                    findInChain(pooled, SlowQueryReport.class);
+            SlowQueryReport interceptor =
+                    interceptorOf(pooled, SlowQueryReport.class);
             assertNotNull(interceptor,
                     "the interceptor named by short name must sit in the chain of a "
                             + "borrowed connection");
-            assertInstanceOf(SlowQueryReport.class, interceptor);
-            assertEquals(7L, ((SlowQueryReport) interceptor).getThreshold(),
+            assertEquals(7L, interceptor.getThreshold(),
                     "the properties from the configuration string must be applied");
         }
     }

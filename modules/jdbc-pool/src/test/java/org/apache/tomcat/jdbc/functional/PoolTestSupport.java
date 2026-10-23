@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.jdbc.functional;
 
+import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -31,6 +32,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
+import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
 import org.h2.tools.Server;
 
 /**
@@ -139,6 +141,36 @@ public abstract class PoolTestSupport {
     /** A raw admin connection that bypasses the pool entirely. */
     protected Connection adminConnection() throws SQLException {
         return DriverManager.getConnection(url, "sa", "");
+    }
+
+    /**
+     * Finds an interceptor of the given type in the chain behind a
+     * borrowed connection. The objects the pool hands out are JDK proxies
+     * whose invocation handler is the first interceptor of the chain, so
+     * this is how a test reaches the pool's own internals without needing
+     * a test-only interceptor of its own.
+     */
+    protected static <T extends JdbcInterceptor> T interceptorOf(Connection pooled,
+            Class<T> type) {
+        JdbcInterceptor interceptor = (JdbcInterceptor) Proxy.getInvocationHandler(pooled);
+        while (interceptor != null) {
+            if (type.isInstance(interceptor)) {
+                return type.cast(interceptor);
+            }
+            interceptor = interceptor.getNext();
+        }
+        return null;
+    }
+
+    /**
+     * The driver's own object behind a pooled connection's statement. For
+     * a prepared statement this is the honest oracle for "the session was
+     * not asked to prepare this SQL again": two handles onto the same
+     * instance mean one physical prepare, and {@code isClosed()} on it
+     * says what really happened to the statement.
+     */
+    protected static Statement driverStatement(Statement pooled) throws SQLException {
+        return pooled.unwrap(Statement.class);
     }
 
     /**

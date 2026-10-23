@@ -175,10 +175,13 @@ Fixture details worth knowing before writing a test against it
   `setSessionMarker`/`sessionMarker` (an H2 session variable, to prove
   *which* physical session a borrower got) and `adminRowCount`
   (committed data, read over a separate admin connection).
-* Fault injection goes through the real objects:
+* Fault injection and white-box reach go through the real objects:
   `((javax.sql.PooledConnection) pooled).getConnection()` for the
-  physical session, `(JdbcInterceptor) Proxy.getInvocationHandler(pooled)`
-  to walk the interceptor chain.
+  physical session, `interceptorOf(pooled, type)` to find an interceptor
+  in the chain of a borrowed connection (its invocation handler is the
+  head of that chain), and `driverStatement(proxy)` — `unwrap` — for the
+  driver's own object behind a pooled statement, which is the honest
+  oracle for "this was not prepared on the session twice".
 
 ## 4. High-defect map (backlog for the later defect-processing phase — not implemented now)
 
@@ -232,6 +235,15 @@ the working list.
    cancellation needs a real multi-second query (H2 has no `SLEEP()`
    and an in-process `CREATE ALIAS` is not cancel-safe), so the
    "< 60 s" budget is understood to exclude it.
+   Added afterwards, because the pool's own caching is core
+   functionality: `StatementCacheReuseTest` (6) pins the statement cache
+   on the driver's own statement object - a closed statement is handed
+   to the next borrower of the same session without a second prepare,
+   each session caches its own, the `max` count is counted over the whole
+   pool and the statement that does not fit is closed immediately and
+   re-prepared on demand, the cache disappears with the physical session
+   it was built on, and only the configured statement types are cached.
+   Suite totals: 140 tests, ~80 s, 56.9 % instruction / 52.8 % branch.
 3. **Old suite removal**: **done**. The harvest (§1 "Harvest result")
    landed first: 75 tests in 12 new classes plus one added
    `JmxMonitorTest` case. The JUnit 4 suite then went away together
@@ -241,14 +253,14 @@ the working list.
    `pool/` unit tests they superseded, along with the `junit`,
    `tomcat-dbcp` and `junit-vintage-engine` test dependencies and the
    `PoolCleanerTest` exclude.
-   The module is now 134 tests in about 80 s of test time (was ~6 min
-   for 319), at 56.6 % instruction / 52.2 % branch coverage. The
-   coverage number is *lower* than the 66.1 % measured one commit
-   earlier, and that is the honest reading: the legacy tests ran
+   At that point the module stood at 134 tests in about 80 s of test
+   time (was ~6 min for 319) and 56.6 % instruction / 52.2 % branch
+   coverage. The coverage number is *lower* than the 66.1 % measured one
+   commit earlier, and that is the honest reading: the legacy tests ran
    through `DataSourceProxy`, the JMX and naming code and the whole
    interceptor surface with a stub driver attached, touching code
    without ever deciding whether it worked. Phase 5 starts its ratchet
-   from this number.
+   from the current number (56.9 % / 52.8 %).
 4. **Defect processing** (later): per defect, a reproducer test per
    §4 + the fix; Postgres/kill tier added when the first defect
    needs it (single-session kill, `idle_session_timeout`,
@@ -297,6 +309,15 @@ the working list.
     next ordinary borrow has to reconnect. The pool stays usable
     (`AlternateCredentialsTest` pins that much), but the shrinkage is
     not something to lock in as expected behaviour.
+* `StatementCacheReuseTest` pins the documented caching behaviour and
+  deliberately stops there. The findings in
+  `defects-pool/defects-...interceptor.StatementCache.md` stay unpinned:
+  a cached statement keeps answering `getConnection()` with the
+  *previous* borrower's facade (the pool rebuilds the JDBC handle on
+  purpose, which is why the reuse tests compare the *driver* statement
+  instead of the handle), the cache outliving a `reconnect()` whose
+  purge hook was skipped, and the pool-wide `cacheSize` counter skewing
+  when caching races `disconnected()`.
 * `build.xml` (the Ant release build of this module) still has a
   `build-test` target that compiles `src/test/java` against a JUnit 4 +
   `tomcat-dbcp` + c3p0/derby/mysql classpath it downloads, and ships

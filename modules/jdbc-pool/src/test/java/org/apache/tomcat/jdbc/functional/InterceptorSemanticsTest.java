@@ -134,7 +134,7 @@ class InterceptorSemanticsTest extends PoolTestSupport {
     void statementCacheServesRepeatedPreparesWithinOneBorrow() throws Exception {
         DataSource ds = newDataSource();
         ds.getPoolProperties().setJdbcInterceptors(
-                "org.apache.tomcat.jdbc.pool.interceptor.StatementCache(maxCacheSize=10)");
+                "org.apache.tomcat.jdbc.pool.interceptor.StatementCache(prepared=true,max=10)");
         ds.getPoolProperties().setMaxActive(1);
         String t = uniqueTable();
         try (Connection c = ds.getConnection()) {
