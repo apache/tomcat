@@ -126,6 +126,10 @@ public abstract class AbstractReplicatedMap<K, V>
      */
     protected final transient HashMap<Member,Long> mapMembers = new HashMap<>();
     /**
+     * Members removed by ping expiry before their disappearance is processed.
+     */
+    private final transient Set<Member> membersPendingDisappearance = new LinkedHashSet<>();
+    /**
      * Our default send options
      */
     protected transient int channelSendOptions = Channel.SEND_OPTIONS_DEFAULT;
@@ -380,10 +384,20 @@ public abstract class AbstractReplicatedMap<K, V>
             synchronized (mapMembers) {
                 Long access = mapMembers.get(member);
                 expired = access != null && (System.currentTimeMillis() - access.longValue()) > timeout;
+                if (expired) {
+                    mapMembers.remove(member);
+                    membersPendingDisappearance.add(member);
+                }
             }
             if (expired) {
                 log.warn(sm.getString("abstractReplicatedMap.ping.timeout", member, mapname));
-                memberDisappeared(member);
+                try {
+                    memberDisappeared(member);
+                } finally {
+                    synchronized (mapMembers) {
+                        membersPendingDisappearance.remove(member);
+                    }
+                }
             }
         }
     }
@@ -721,22 +735,22 @@ public abstract class AbstractReplicatedMap<K, V>
         // state transfer request
         if (mapmsg.getMsgType() == MapMessage.MSG_STATE || mapmsg.getMsgType() == MapMessage.MSG_STATE_COPY) {
             boolean copy = (mapmsg.getMsgType() == MapMessage.MSG_STATE_COPY);
-            List<MapEntry<K,V>> snapshot = new ArrayList<>();
+            List<MapState<K,V>> snapshot = new ArrayList<>();
             synchronized (stateMutex) { // scan under the lock, so that a concurrent state operation cannot overlap it
                 for (Entry<K,MapEntry<K,V>> e : innerMap.entrySet()) {
                     MapEntry<K,V> entry = innerMap.get(e.getKey());
                     if (entry != null && entry.isSerializable()) {
-                        snapshot.add(entry);
+                        snapshot.add(new MapState<>(entry));
                     }
                 }
             } // synchronized
             // Serialize the snapshot outside of the state lock, as serializing the whole
             // map content blocks every other state operation for a long time otherwise
             ArrayList<MapMessage> list = new ArrayList<>(snapshot.size());
-            for (MapEntry<K,V> entry : snapshot) {
+            for (MapState<K,V> entry : snapshot) {
                 MapMessage me = new MapMessage(mapContextName, copy ? MapMessage.MSG_COPY : MapMessage.MSG_PROXY,
-                        false, (Serializable) entry.getKey(), copy ? (Serializable) entry.getValue() : null, null,
-                        entry.getPrimary(), entry.getBackupNodes());
+                        false, (Serializable) entry.key, copy ? (Serializable) entry.value : null, null, entry.primary,
+                        entry.backupNodes);
                 list.add(me);
             }
             mapmsg.setValue(list);
@@ -992,19 +1006,38 @@ public abstract class AbstractReplicatedMap<K, V>
             // blocks until the backup acknowledges, while session operations and the state
             // transfer of joining members need that lock
             for (MapEntry<K,V> entry : entriesWithoutBackup) {
-                if (!entry.isPrimary() || (entry.getBackupNodes() != null && entry.getBackupNodes().length > 0)) {
-                    // The entry found its backup in the meantime
-                    continue;
+                synchronized (entry) {
+                    if (!entry.isPrimary() || (entry.getBackupNodes() != null && entry.getBackupNodes().length > 0)) {
+                        // The entry found its backup in the meantime
+                        continue;
+                    }
+                    try {
+                        Member[] backup = publishEntryInfo(entry.getKey(), entry.getValue());
+                        entry.setBackupNodes(backup);
+                        entry.setPrimary(channel.getLocalMember(false));
+                    } catch (ChannelException x) {
+                        log.error(sm.getString("abstractReplicatedMap.unableSelect.backup"), x);
+                    } // catch
                 }
-                try {
-                    Member[] backup = publishEntryInfo(entry.getKey(), entry.getValue());
-                    entry.setBackupNodes(backup);
-                    entry.setPrimary(channel.getLocalMember(false));
-                } catch (ChannelException x) {
-                    log.error(sm.getString("abstractReplicatedMap.unableSelect.backup"), x);
-                } // catch
             } // for
         } // end if
+    }
+
+    /**
+     * Removes a map member unless it was already removed by ping expiry.
+     *
+     * @param member The member to remove
+     *
+     * @return {@code true} if the disappearance needs to be processed
+     */
+    protected boolean removeMapMember(Member member) {
+        synchronized (mapMembers) {
+            if (membersPendingDisappearance.remove(member)) {
+                // A ping response may have re-added the member after the expiry removed it
+                return !mapMembers.containsKey(member);
+            }
+            return mapMembers.remove(member) != null;
+        }
     }
 
     /**
@@ -1071,14 +1104,11 @@ public abstract class AbstractReplicatedMap<K, V>
      */
     @Override
     public void memberDisappeared(Member member) {
-        synchronized (mapMembers) {
-            boolean removed = (mapMembers.remove(member) != null);
-            if (!removed) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("replicatedMap.member.disappeared.unknown", member));
-                }
-                return; // the member was not part of our map.
+        if (!removeMapMember(member)) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("replicatedMap.member.disappeared.unknown", member));
             }
+            return; // the member was not part of our map.
         }
         if (log.isInfoEnabled()) {
             log.info(sm.getString("replicatedMap.member.disappeared", member));
@@ -1600,6 +1630,25 @@ public abstract class AbstractReplicatedMap<K, V>
         return Collections.unmodifiableCollection(values);
     }
 
+
+    // ------------------------------------------------------------------------------
+    // Map state snapshot class
+    // ------------------------------------------------------------------------------
+    private static final class MapState<K, V> {
+
+        private final K key;
+        private final V value;
+        private final Member primary;
+        private final Member[] backupNodes;
+
+        private MapState(MapEntry<K,V> entry) {
+            key = entry.getKey();
+            value = entry.getValue();
+            primary = entry.getPrimary();
+            Member[] nodes = entry.getBackupNodes();
+            backupNodes = nodes == null ? null : nodes.clone();
+        }
+    }
 
     // ------------------------------------------------------------------------------
     // Map Entry class
