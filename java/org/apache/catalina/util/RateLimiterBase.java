@@ -45,8 +45,9 @@ public abstract class RateLimiterBase implements RateLimiter {
     int actualDuration;
 
     // Initial policy name can be rewritten by setPolicyName(). Lazily initialized in getPolicyName() with the
-    // object monitor guarding the auto-generation, so the field itself is volatile for safe publication.
+    // policyNameLock guarding the auto-generation, so the field itself is volatile for safe publication.
     private volatile String policyName;
+    private final Object policyNameLock = new Object();
 
     /*
      * The self-owned utility executor, will be instantiated only when ScheduledThreadPoolExecutor is absent during
@@ -67,7 +68,7 @@ public abstract class RateLimiterBase implements RateLimiter {
     public String getPolicyName() {
         String name = policyName;
         if (name == null) {
-            synchronized (this) {
+            synchronized (policyNameLock) {
                 name = policyName;
                 if (name == null) {
                     name = getDefaultPolicyName() + "-" + index.incrementAndGet();
