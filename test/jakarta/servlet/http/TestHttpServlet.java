@@ -16,7 +16,11 @@
  */
 package jakarta.servlet.http;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
@@ -216,6 +220,23 @@ public class TestHttpServlet extends TomcatBaseTest {
     @Test
     public void testDoOptions() throws Exception {
         doTestDoOptions(new OptionsServlet(), "GET, HEAD, OPTIONS");
+    }
+
+
+    @Test
+    public void testDoOptionsAfterDeserialization() throws Exception {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        // Serialize before the Allow header cache has been initialized.
+        try (ObjectOutputStream stream = new ObjectOutputStream(bytes)) {
+            stream.writeObject(new OptionsServlet());
+        }
+
+        OptionsServlet servlet;
+        try (ObjectInputStream stream = new ObjectInputStream(new ByteArrayInputStream(bytes.toByteArray()))) {
+            servlet = (OptionsServlet) stream.readObject();
+        }
+
+        doTestDoOptions(servlet, "GET, HEAD, OPTIONS");
     }
 
 
