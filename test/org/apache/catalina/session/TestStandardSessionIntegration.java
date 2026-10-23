@@ -67,6 +67,7 @@ public class TestStandardSessionIntegration extends TomcatBaseTest {
             SimpleTcpCluster cluster = new SimpleTcpCluster();
             GroupChannel channel = (GroupChannel) cluster.getChannel();
             ((ReceiverBase) channel.getChannelReceiver()).setHost("localhost");
+            ((ReceiverBase) channel.getChannelReceiver()).setPort(0);
             // Avoid discovering unrelated cluster members and waiting for their session state.
             TesterUtil.addRandomDomain(new ManagedChannel[] { channel });
             tomcat.getEngine().setCluster(cluster);

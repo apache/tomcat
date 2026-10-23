@@ -32,12 +32,12 @@ import org.apache.catalina.tribes.transport.ReplicationTransmitter;
 
 public class TestGroupChannelStartStop {
     private GroupChannel channel = null;
-    private int udpPort = 45543;
 
     @Before
     public void setUp() throws Exception {
         channel = new GroupChannel();
         ((ReceiverBase) channel.getChannelReceiver()).setHost("localhost");
+        ((ReceiverBase) channel.getChannelReceiver()).setPort(0);
     }
 
     @After
@@ -189,7 +189,7 @@ public class TestGroupChannelStartStop {
         // start one service, then start everything: the already
         // started service must not be started a second time
         ReceiverBase rb = (ReceiverBase) channel.getChannelReceiver();
-        rb.setPort(45588);
+        rb.setPort(0);
         // one bind attempt only, so a second start on the same port fails
         rb.setAutoBind(0);
         int count = 0;
@@ -197,6 +197,8 @@ public class TestGroupChannelStartStop {
             channel.start(Channel.SND_RX_SEQ);
             count++;
         } catch ( Exception x){x.printStackTrace();}
+        // Pin the port the first start was given so that a second bind attempt would fail
+        rb.setPort(rb.getBoundPort());
         try {
             channel.start(Channel.DEFAULT);
             count++;
@@ -250,7 +252,7 @@ public class TestGroupChannelStartStop {
     @Test
     public void testUdpReceiverStart() throws Exception {
         ReceiverBase rb = (ReceiverBase)channel.getChannelReceiver();
-        rb.setUdpPort(udpPort);
+        rb.setUdpPort(0);
         channel.start(Channel.DEFAULT);
         Thread.sleep(1000);
         channel.stop(Channel.DEFAULT);

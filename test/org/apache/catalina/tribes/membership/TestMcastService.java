@@ -24,6 +24,7 @@ import org.junit.Test;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
+import org.apache.catalina.tribes.TesterUtil;
 import org.apache.catalina.tribes.group.GroupChannel;
 import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.XByteBuffer;
@@ -37,12 +38,12 @@ public class TestMcastService {
      */
     @Test(timeout = 60000)
     public void testStopWithFailingShutdownSendCompletes() throws Exception {
-        int base = 40000 + (int) Math.floorMod(System.nanoTime(), 10000);
+        int mcastPort = TesterUtil.getFreeUdpPort();
         StringBuilder properties = new StringBuilder();
         properties.append("mcastAddress=228.0.0.4\n");
-        properties.append("mcastPort=").append(base).append("\n");
+        properties.append("mcastPort=").append(mcastPort).append("\n");
         properties.append("tcpListenHost=127.0.0.1\n");
-        properties.append("tcpListenPort=").append(base + 1).append("\n");
+        properties.append("tcpListenPort=").append(0).append("\n");
         properties.append("tcpSecurePort=0\n");
         properties.append("udpListenPort=0\n");
         properties.append("mcastFrequency=100\n");
@@ -167,12 +168,12 @@ public class TestMcastService {
      */
     @Test(timeout = 60000)
     public void testBroadcastRejectsPacketsTheSocketCannotCarry() throws Exception {
-        int base = 40000 + (int) Math.floorMod(System.nanoTime(), 10000);
+        int mcastPort = TesterUtil.getFreeUdpPort();
         Properties props = new Properties();
         props.setProperty("mcastAddress", "228.0.0.4");
-        props.setProperty("mcastPort", String.valueOf(base));
+        props.setProperty("mcastPort", String.valueOf(mcastPort));
         props.setProperty("tcpListenHost", "127.0.0.1");
-        props.setProperty("tcpListenPort", String.valueOf(base + 1));
+        props.setProperty("tcpListenPort", "0");
         props.setProperty("tcpSecurePort", "0");
         props.setProperty("udpListenPort", "0");
         props.setProperty("mcastFrequency", "100");
