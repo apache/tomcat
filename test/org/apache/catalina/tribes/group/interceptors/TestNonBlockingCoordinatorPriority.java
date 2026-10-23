@@ -16,11 +16,15 @@
  */
 package org.apache.catalina.tribes.group.interceptors;
 
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.membership.MemberImpl;
+import org.apache.catalina.tribes.membership.Membership;
 
 public class TestNonBlockingCoordinatorPriority {
 
@@ -44,5 +48,89 @@ public class TestNonBlockingCoordinatorPriority {
                 coordinator.hasHigherPriority(null, new Member[] { high }));
         Assert.assertFalse("A null local membership must never be outranked",
                 coordinator.hasHigherPriority(new Member[] { high }, null));
+    }
+
+    @Test
+    public void testIsHighestUsesSingleMembershipSnapshot() throws Exception {
+        Member local = new MemberImpl("10.0.0.1", 4000, -1);
+        Member other = new MemberImpl("10.0.0.2", 4000, -1);
+        AtomicInteger snapshots = new AtomicInteger();
+        Membership changingMembership = new Membership(local) {
+
+            @Override
+            public Member[] getMembers() {
+                if (snapshots.incrementAndGet() == 1) {
+                    return new Member[] { other };
+                }
+                return new Member[0];
+            }
+        };
+        NonBlockingCoordinator coordinator = new NonBlockingCoordinator() {
+
+            {
+                membership = changingMembership;
+            }
+
+            @Override
+            public Member getLocalMember(boolean incAlive) {
+                return local;
+            }
+        };
+
+        Assert.assertTrue(coordinator.isHighest());
+        Assert.assertEquals(1, snapshots.get());
+    }
+
+    @Test
+    public void testGetCoordinatorUsesSingleViewSnapshot() throws Exception {
+        Member local = new MemberImpl("10.0.0.1", 4000, -1);
+        Member other = new MemberImpl("10.0.0.2", 4000, -1);
+        AtomicInteger snapshots = new AtomicInteger();
+        Membership changingView = new Membership(local) {
+
+            @Override
+            public Member[] getMembers() {
+                if (snapshots.incrementAndGet() == 1) {
+                    return new Member[] { other };
+                }
+                return new Member[0];
+            }
+        };
+        NonBlockingCoordinator coordinator = new NonBlockingCoordinator();
+
+        Assert.assertNull(coordinator.getCoordinator());
+
+        coordinator.view = changingView;
+        Assert.assertSame(other, coordinator.getCoordinator());
+        Assert.assertEquals(1, snapshots.get());
+
+        coordinator.view = new Membership(local);
+        Assert.assertNull(coordinator.getCoordinator());
+    }
+
+    @Test
+    public void testGetViewUsesSingleViewSnapshot() throws Exception {
+        Member local = new MemberImpl("10.0.0.1", 4000, -1);
+        Member other = new MemberImpl("10.0.0.2", 4000, -1);
+        AtomicReference<NonBlockingCoordinator> coordinatorReference = new AtomicReference<>();
+        Membership changingView = new Membership(local) {
+
+            @Override
+            public boolean hasMembers() {
+                coordinatorReference.get().view = null;
+                return true;
+            }
+
+            @Override
+            public Member[] getMembers() {
+                return new Member[] { other };
+            }
+        };
+        NonBlockingCoordinator coordinator = new NonBlockingCoordinator();
+        coordinator.view = changingView;
+        coordinatorReference.set(coordinator);
+
+        Assert.assertArrayEquals(new Member[] { other }, coordinator.getView());
+        Assert.assertSame(changingView, coordinator.view);
     }
 }
