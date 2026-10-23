@@ -592,7 +592,6 @@ public class DefaultServlet extends HttpServlet {
      */
     @Override
     protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
         resp.setHeader("Allow", determineMethodsAllowed(req));
     }
 
