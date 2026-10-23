@@ -107,7 +107,7 @@
                  type="int"/>
 
     <attribute   name="maxLocaleCount"
-          description="The maximum number of locales that are permitted for a request. Requests that exceed this limit will be rejected when the locales are parsed. 10 by default. A value of less than 0 means no limit."
+          description="The maximum number of locales that are permitted for a request. Locales above this limit are ignored when the locales are parsed. 10 by default. A value of less than 0 means no limit."
                  type="int"/>
 
     <attribute   name="maxParameterCount"

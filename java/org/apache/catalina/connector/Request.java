@@ -3115,16 +3115,23 @@ public class Request implements HttpServletRequest {
         }
 
         // Process the quality values in highest->lowest order (due to
-        // negating the Double value when creating the key)
+        // negating the Double value when creating the key). Locales beyond
+        // maxLocaleCount are ignored so the higher quality locales are kept.
+        boolean localeLimitReached = false;
         for (ArrayList<Locale> list : locales.values()) {
             for (Locale locale : list) {
                 if (maxLocaleCount > -1 && this.locales.size() >= maxLocaleCount) {
-                    // Remove the last element
-                    this.locales.removeLast();
-                    log.info(sm.getString("coyoteRequest.tooManyLocales", Integer.valueOf(maxLocaleCount)));
+                    localeLimitReached = true;
+                    break;
                 }
                 addLocale(locale);
             }
+            if (localeLimitReached) {
+                break;
+            }
+        }
+        if (localeLimitReached) {
+            log.info(sm.getString("coyoteRequest.tooManyLocales", Integer.valueOf(maxLocaleCount)));
         }
     }
 
@@ -3138,10 +3145,9 @@ public class Request implements HttpServletRequest {
     protected void parseLocalesHeader(String value, TreeMap<Double,ArrayList<Locale>> locales) {
 
         // Determine how many more entries are of interest. One more than the
-        // maximum is parsed so that a header that exceeds the limit is
-        // rejected rather than silently truncated. Parsing no further entries
-        // once the limit is reached avoids creating Locale objects for entries
-        // that can never be used.
+        // maximum is parsed so that a header that exceeds the limit can be
+        // detected. Parsing no further entries once that point is reached
+        // avoids creating Locale objects for entries that can never be used.
         int maxElements = -1;
         if (maxLocaleCount > -1) {
             int current = 0;

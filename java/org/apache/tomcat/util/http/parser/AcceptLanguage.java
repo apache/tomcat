@@ -77,7 +77,7 @@ public class AcceptLanguage {
      * number of entries. Parsing stops as soon as the maximum number of
      * entries has been read. This limits the number of Locale objects created
      * when the caller has no use for entries beyond the limit (e.g. when a
-     * container level limit means the request is going to be rejected).
+     * container level limit means further entries will be ignored).
      *
      * @param input       The StringReader containing the header value
      * @param maxElements The maximum number of entries to parse or

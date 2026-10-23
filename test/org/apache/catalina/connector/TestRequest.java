@@ -805,6 +805,10 @@ public class TestRequest extends TomcatBaseTest {
         Assert.assertEquals(5, localeCount(connector, buildAcceptLanguage(5)));
 
         Assert.assertEquals(5, localeCount(connector, buildAcceptLanguage(6)));
+        // The locales within the limit are kept. The extra locale is ignored
+        // rather than replacing an accepted one.
+        Assert.assertEquals(localeList(connector, buildAcceptLanguage(5)),
+                localeList(connector, buildAcceptLanguage(6)));
 
         // No limit
         connector = new Connector();
@@ -848,25 +852,44 @@ public class TestRequest extends TomcatBaseTest {
         Assert.assertEquals(10, localeCount(new Connector(), "aa-000,aa-001,aa-002,aa-003,aa-004",
                 "aa-005,aa-006,aa-007,aa-008,aa-009"));
 
-        // 5 + 6 = 11, exceeds the default limit
-        Assert.assertEquals(10, localeCount(new Connector(), "aa-000,aa-001,aa-002,aa-003,aa-004",
+        // 5 + 6 = 11, exceeds the default limit. The extra locale from the
+        // second header is ignored; the first ten stay in order.
+        Assert.assertEquals(localeList(new Connector(), "aa-000,aa-001,aa-002,aa-003,aa-004",
+                "aa-005,aa-006,aa-007,aa-008,aa-009"),
+                localeList(new Connector(), "aa-000,aa-001,aa-002,aa-003,aa-004",
                     "aa-005,aa-006,aa-007,aa-008,aa-009,aa-010"));
     }
 
+    /*
+     * Locales are applied highest quality first, so a lower quality locale
+     * past the limit must not displace a higher quality one inside it.
+     */
+    @Test
+    public void testAcceptLanguageLocaleLimitKeepsHigherQuality() throws Exception {
+        Connector connector = new Connector();
+        connector.setMaxLocaleCount(2);
+
+        Assert.assertEquals(List.of(Locale.forLanguageTag("en"), Locale.forLanguageTag("fr")),
+                localeList(connector, "en;q=0.9,fr;q=0.8,de;q=0.1"));
+    }
+
     private static int localeCount(Connector connector, String... acceptLanguages) {
+        return localeList(connector, acceptLanguages).size();
+    }
+
+    private static List<Locale> localeList(Connector connector, String... acceptLanguages) {
         org.apache.coyote.Request coyoteRequest = new org.apache.coyote.Request();
         for (String acceptLanguage : acceptLanguages) {
             coyoteRequest.getMimeHeaders().addValue("accept-language").setString(acceptLanguage);
         }
         Request request = new Request(connector, coyoteRequest);
 
+        List<Locale> result = new ArrayList<>();
         Enumeration<Locale> locales = request.getLocales();
-        int count = 0;
         while (locales.hasMoreElements()) {
-            locales.nextElement();
-            count++;
+            result.add(locales.nextElement());
         }
-        return count;
+        return result;
     }
 
     @Test

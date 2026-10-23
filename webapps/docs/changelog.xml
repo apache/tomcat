@@ -446,6 +446,12 @@
         when parsed instead of throwing an ISE, since a request remains
         functionally coherent. (remm)
       </fix>
+      <fix>
+        Fix <code>maxLocaleCount</code> so that locales within the limit
+        are kept when extra locales are ignored. The previous
+        implementation dropped an accepted locale to make room for one
+        beyond the limit. Patch submitted by DaZuiZui.
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
