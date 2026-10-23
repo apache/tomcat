@@ -81,8 +81,7 @@ final class TlsChannel implements ByteChannel {
                     status = result.getHandshakeStatus();
                     continue;
                 }
-                case NEED_UNWRAP:
-                case NEED_UNWRAP_AGAIN: {
+                case NEED_UNWRAP: {
                     status = unwrapHandshake();
                     continue;
                 }
@@ -145,9 +144,7 @@ final class TlsChannel implements ByteChannel {
 
     private HandshakeStatus unwrapHandshake() throws IOException {
         while (true) {
-            HandshakeStatus handshakeStatus = engine.getHandshakeStatus();
-            if (networkInput.position() == 0 && handshakeStatus != HandshakeStatus.NEED_UNWRAP_AGAIN &&
-                    readEncrypted() < 0) {
+            if (networkInput.position() == 0 && readEncrypted() < 0) {
                 throw new EOFException();
             }
             networkInput.flip();

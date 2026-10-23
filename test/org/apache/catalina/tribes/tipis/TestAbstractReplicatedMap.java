@@ -23,6 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -150,7 +151,7 @@ public class TestAbstractReplicatedMap {
     public void testPingDoesNotRemoveRefreshedMember() throws Exception {
         Member member = new MemberImpl("localhost", 4014, -1);
 
-        LazyReplicatedMap<String,String> map = new LazyReplicatedMap<>((key, value) -> {
+        LazyReplicatedMap<String,String> map = new LazyReplicatedMap<String,String>((key, value) -> {
             // Not made primary here
         }, new TestChannel(), 1000, "TestAbstractReplicatedMap", null) {
 
@@ -210,7 +211,7 @@ public class TestAbstractReplicatedMap {
         AtomicInteger published = new AtomicInteger();
         Member backup = new MemberImpl("localhost", 4015, -1);
 
-        LazyReplicatedMap<String,String> map = new LazyReplicatedMap<>((key, value) -> {
+        LazyReplicatedMap<String,String> map = new LazyReplicatedMap<String,String>((key, value) -> {
             // Not made primary here
         }, new TestChannel(), 1000, "TestAbstractReplicatedMap", null) {
 
@@ -335,8 +336,8 @@ public class TestAbstractReplicatedMap {
         MapMessage replyMessage = (MapMessage) reply.get();
         @SuppressWarnings("unchecked")
         ArrayList<MapMessage> state = (ArrayList<MapMessage>) replyMessage.getValue();
-        MapMessage secondMessage =
-                state.stream().filter(message -> second.getKey().equals(message.getKey())).findFirst().orElseThrow();
+        MapMessage secondMessage = state.stream().filter(message -> second.getKey().equals(message.getKey()))
+                .findFirst().orElseThrow(NoSuchElementException::new);
         Assert.assertEquals(originalSecondValue, secondMessage.getValue());
     }
 

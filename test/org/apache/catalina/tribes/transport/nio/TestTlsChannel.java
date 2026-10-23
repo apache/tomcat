@@ -50,8 +50,7 @@ public class TestTlsChannel {
     }
 
     private static void doTestPskRoundTrip(TribesSslContext context, String protocol) throws Exception {
-        try (context;
-                ServerSocketChannel server = ServerSocketChannel.open()) {
+        try (ServerSocketChannel server = ServerSocketChannel.open()) {
             server.bind(new InetSocketAddress("localhost", 0));
             FutureTask<Void> serverTask = new FutureTask<>(() -> {
                 SSLEngine engine = context.createServerEngine();
@@ -81,6 +80,8 @@ public class TestTlsChannel {
                 }
                 throw e;
             }
+        } finally {
+            context.close();
         }
     }
 

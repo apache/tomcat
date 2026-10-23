@@ -183,7 +183,6 @@ public final class SSLContext {
     public static native String[] getCiphers(long ctx);
 
     /**
-<<<<<<< HEAD
      * Sets the "quiet shutdown" flag for <b>ctx</b> to be <b>mode</b>. SSL objects created from <b>ctx</b> inherit the
      * <b>mode</b> valid at the time and may be 0 or 1. <br>
      * Normally when an SSL connection is finished, the parties must send out "close notify" alert messages using
@@ -206,9 +205,6 @@ public final class SSLContext {
 
     /**
      * Set the TLSv1.2 and below ciphers available for negotiation in the TLS handshake.
-=======
-     * Set the TLSv1.2 and below ciphers available for negotiation the in TLS handshake.
->>>>>>> 5a9393394b (Align with Tomcat Native 1.2.x)
      * <p>
      * This complex directive uses a colon-separated cipher-spec string consisting of OpenSSL cipher specifications to
      * configure the ciphers the client is permitted to negotiate in the TLS handshake phase.

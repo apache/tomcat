@@ -22,6 +22,7 @@ import java.net.UnknownHostException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -191,7 +192,7 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
                 sendSecure(member, data, waitForAck, deadline);
                 return null;
             });
-            sends.add(Map.entry(member, send));
+            sends.add(new AbstractMap.SimpleEntry<>(member, send));
         }
         for (Map.Entry<Member,Future<Void>> entry : sends) {
             try {
