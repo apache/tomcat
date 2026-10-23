@@ -566,7 +566,7 @@ public class StaticMembershipProvider extends MembershipProviderBase
                     sleep(pingInterval);
                     ping();
                 } catch (InterruptedException ix) {
-                    // Ignore
+                    // Expected during shutdown. The running flag is already set to false, so the loop will exit.
                 } catch (Exception e) {
                     log.warn(sm.getString("staticMembershipProvider.pingThread.failed"), e);
                 }

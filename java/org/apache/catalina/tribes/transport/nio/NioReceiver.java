@@ -241,6 +241,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
                 }
             } catch (InterruptedException e) {
                 log.warn(sm.getString("nioReceiver.stop.executor.interrupted"));
+                Thread.currentThread().interrupt();
             }
         }
     }
