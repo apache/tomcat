@@ -221,7 +221,7 @@ public class Strftime {
      * @return the quoted string
      */
     protected String quote(String str, boolean insideQuotes) {
-        String retVal = str;
+        String retVal = str.replace("'", "''");
         if (!insideQuotes) {
             retVal = '\'' + retVal + '\'';
         }
