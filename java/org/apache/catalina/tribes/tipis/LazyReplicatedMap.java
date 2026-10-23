@@ -181,11 +181,14 @@ public class LazyReplicatedMap<K, V> extends AbstractReplicatedMap<K,V> {
                 continue;
             }
             MapMessage msg;
+            Member[] tmpBackup = wrap(next);
+            msg = createMapMessage(MapMessage.MSG_BACKUP, false, (Serializable) key, (Serializable) value, null,
+                    channel.getLocalMember(false), tmpBackup);
+            if (msg == null) {
+                return new Member[0];
+            }
             try {
-                Member[] tmpBackup = wrap(next);
                 // publish the backup data to one node
-                msg = new MapMessage(getMapContextName(), MapMessage.MSG_BACKUP, false, (Serializable) key,
-                        (Serializable) value, null, channel.getLocalMember(false), tmpBackup);
                 if (log.isTraceEnabled()) {
                     log.trace("Publishing backup data:" + msg + " to: " + next.getName());
                 }
@@ -204,8 +207,11 @@ public class LazyReplicatedMap<K, V> extends AbstractReplicatedMap<K,V> {
                 // publish the data out to all nodes
                 Member[] proxies = excludeFromSet(backup, getMapMembers());
                 if (proxies.length > 0) {
-                    msg = new MapMessage(getMapContextName(), MapMessage.MSG_PROXY, false, (Serializable) key, null,
-                            null, channel.getLocalMember(false), backup);
+                    msg = createMapMessage(MapMessage.MSG_PROXY, false, (Serializable) key, null, null,
+                            channel.getLocalMember(false), backup);
+                    if (msg == null) {
+                        return backup;
+                    }
                     if (log.isTraceEnabled()) {
                         log.trace("Publishing proxy data:" + msg + " to: " + Arrays.toNameString(proxies));
                     }

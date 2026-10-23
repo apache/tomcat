@@ -595,8 +595,11 @@ public abstract class AbstractReplicatedMap<K, V>
                 rentry.lock();
                 try {
                     // construct a diff message
-                    msg = new MapMessage(mapContextName, getReplicateMessageType(), true, (Serializable) entry.getKey(),
-                            null, rentry.getDiff(), entry.getPrimary(), entry.getBackupNodes());
+                    msg = createMapMessage(getReplicateMessageType(), true, (Serializable) entry.getKey(), null,
+                            rentry.getDiff(), entry.getPrimary(), entry.getBackupNodes());
+                    if (msg == null) {
+                        return;
+                    }
                     rentry.resetDiff();
                 } catch (IOException ioe) {
                     log.error(sm.getString("abstractReplicatedMap.unable.diffObject"), ioe);
@@ -606,13 +609,19 @@ public abstract class AbstractReplicatedMap<K, V>
             }
             if (msg == null && complete) {
                 // construct a complete
-                msg = new MapMessage(mapContextName, getReplicateMessageType(), false, (Serializable) entry.getKey(),
+                msg = createMapMessage(getReplicateMessageType(), false, (Serializable) entry.getKey(),
                         (Serializable) entry.getValue(), null, entry.getPrimary(), entry.getBackupNodes());
+                if (msg == null) {
+                    return;
+                }
             }
             if (msg == null) {
                 // construct an access message
-                msg = new MapMessage(mapContextName, MapMessage.MSG_ACCESS, false, (Serializable) entry.getKey(), null,
+                msg = createMapMessage(MapMessage.MSG_ACCESS, false, (Serializable) entry.getKey(), null,
                         null, entry.getPrimary(), entry.getBackupNodes());
+                if (msg == null) {
+                    return;
+                }
             }
             try {
                 if (channel != null && entry.getBackupNodes() != null && entry.getBackupNodes().length > 0) {
@@ -728,7 +737,12 @@ public abstract class AbstractReplicatedMap<K, V>
             if (entry == null || (!entry.isSerializable())) {
                 return null;
             }
-            mapmsg.setValue((Serializable) entry.getValue());
+            try {
+                mapmsg.setValue((Serializable) entry.getValue());
+            } catch (RuntimeException x) {
+                log.error(sm.getString("abstractReplicatedMap.unable.serialize", entry.getKey()), x);
+                return null;
+            }
             return mapmsg;
         }
 
@@ -748,10 +762,12 @@ public abstract class AbstractReplicatedMap<K, V>
             // map content blocks every other state operation for a long time otherwise
             ArrayList<MapMessage> list = new ArrayList<>(snapshot.size());
             for (MapState<K,V> entry : snapshot) {
-                MapMessage me = new MapMessage(mapContextName, copy ? MapMessage.MSG_COPY : MapMessage.MSG_PROXY,
-                        false, (Serializable) entry.key, copy ? (Serializable) entry.value : null, null, entry.primary,
+                MapMessage me = createMapMessage(copy ? MapMessage.MSG_COPY : MapMessage.MSG_PROXY, false,
+                        (Serializable) entry.key, copy ? (Serializable) entry.value : null, null, entry.primary,
                         entry.backupNodes);
-                list.add(me);
+                if (me != null) {
+                    list.add(me);
+                }
             }
             mapmsg.setValue(list);
             return mapmsg;
@@ -1278,8 +1294,11 @@ public abstract class AbstractReplicatedMap<K, V>
             // Skip the notification for a key that cannot be serialized, as the message
             // construction would fail on it, like the replication of put does
             if (getMapMembers().length > 0 && notify && entry != null && key instanceof Serializable) {
-                MapMessage msg = new MapMessage(getMapContextName(), MapMessage.MSG_REMOVE, false, (Serializable) key,
-                        null, null, null, null);
+                MapMessage msg =
+                        createMapMessage(MapMessage.MSG_REMOVE, false, (Serializable) key, null, null, null, null);
+                if (msg == null) {
+                    return entry.getValue();
+                }
                 getChannel().send(getMapMembers(), msg, getChannelSendOptions());
             }
         } catch (ChannelException x) {
@@ -1319,8 +1338,11 @@ public abstract class AbstractReplicatedMap<K, V>
                     backup = publishEntryInfo(key, entry.getValue());
                 } else if (entry.isProxy()) {
                     // make sure we don't retrieve from ourselves
-                    msg = new MapMessage(getMapContextName(), MapMessage.MSG_RETRIEVE_BACKUP, false, (Serializable) key,
-                            null, null, null, null);
+                    msg = createMapMessage(MapMessage.MSG_RETRIEVE_BACKUP, false, (Serializable) key, null, null, null,
+                            null);
+                    if (msg == null) {
+                        return null;
+                    }
                     Response[] resp = getRpcChannel().send(entry.getBackupNodes(), msg, RpcChannel.FIRST_REPLY,
                             getChannelSendOptions(), getRpcTimeout());
                     if (resp == null || resp.length == 0 || resp[0].getMessage() == null) {
@@ -1336,15 +1358,21 @@ public abstract class AbstractReplicatedMap<K, V>
                     }
 
                     // notify member
-                    msg = new MapMessage(getMapContextName(), MapMessage.MSG_NOTIFY_MAPMEMBER, false,
-                            (Serializable) entry.getKey(), null, null, channel.getLocalMember(false), backup);
+                    msg = createMapMessage(MapMessage.MSG_NOTIFY_MAPMEMBER, false, (Serializable) entry.getKey(), null,
+                            null, channel.getLocalMember(false), backup);
+                    if (msg == null) {
+                        return null;
+                    }
                     if (backup != null && backup.length > 0) {
                         getChannel().send(backup, msg, getChannelSendOptions());
                     }
 
                     // invalidate the previous primary
-                    msg = new MapMessage(getMapContextName(), MapMessage.MSG_PROXY, false, (Serializable) key, null,
-                            null, channel.getLocalMember(false), backup);
+                    msg = createMapMessage(MapMessage.MSG_PROXY, false, (Serializable) key, null, null,
+                            channel.getLocalMember(false), backup);
+                    if (msg == null) {
+                        return null;
+                    }
                     Member[] dest = getMapMembersExcl(backup);
                     if (dest != null && dest.length > 0) {
                         getChannel().send(dest, msg, getChannelSendOptions());
@@ -1355,8 +1383,11 @@ public abstract class AbstractReplicatedMap<K, V>
                 } else if (entry.isCopy()) {
                     backup = getMapMembers();
                     if (backup.length > 0) {
-                        msg = new MapMessage(getMapContextName(), MapMessage.MSG_NOTIFY_MAPMEMBER, false,
-                                (Serializable) key, null, null, channel.getLocalMember(false), backup);
+                        msg = createMapMessage(MapMessage.MSG_NOTIFY_MAPMEMBER, false, (Serializable) key, null, null,
+                                channel.getLocalMember(false), backup);
+                        if (msg == null) {
+                            return null;
+                        }
                         getChannel().send(backup, msg, getChannelSendOptions());
                     }
                 }
@@ -2281,6 +2312,29 @@ public abstract class AbstractReplicatedMap<K, V>
      */
     public byte[] getMapContextName() {
         return mapContextName;
+    }
+
+    /**
+     * Creates a map message, or returns {@code null} when its key or value cannot be serialized.
+     *
+     * @param msgtype   The message type
+     * @param diff      Whether this is a diff message
+     * @param key       The key
+     * @param value     The value
+     * @param diffvalue The serialized diff value
+     * @param primary   The primary member
+     * @param nodes     The backup members
+     *
+     * @return The map message, or {@code null} if serialization fails
+     */
+    protected MapMessage createMapMessage(int msgtype, boolean diff, Serializable key, Serializable value,
+            byte[] diffvalue, Member primary, Member[] nodes) {
+        try {
+            return new MapMessage(mapContextName, msgtype, diff, key, value, diffvalue, primary, nodes);
+        } catch (RuntimeException x) {
+            log.error(sm.getString("abstractReplicatedMap.unable.serialize", key), x);
+            return null;
+        }
     }
 
     /**
