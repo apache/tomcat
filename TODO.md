@@ -863,12 +863,11 @@ These are bugs, correctness issues, or missing functionality that may affect pro
 
 ## Test Code TODOs
 
-### 79. HTTP/2 Test Coverage (8 items)
+### 79. HTTP/2 Test Coverage (7 items)
 
 | # | File:Line | Description | Fix Idea | Effort | Difficulty |
 |---|-----------|-------------|----------|--------|------------|
 | 79.1 | `TestHttp2Section_4_1.java:32` | Tests for over-sized frames missing | Add tests that send frames exceeding `MAX_FRAME_SIZE` and verify GOAWAY/RST_STREAM. | 1-2 days | Medium |
-| 79.2 | `TestHttp2Section_4_1.java:46` | Tests for unexpected flags missing | Add tests for frames with invalid flag combinations. | 1-2 days | Medium |
 | 79.3 | `TestHttp2Section_3_2.java:33` | Initial request body size tests missing | Add tests with various body sizes (0, small, large, exceeding initial window). | 1-2 days | Medium |
 | 79.4 | `TestHttp2Section_6_9.java:67` | Flow control window change accounting tests missing | Add tests that verify window size updates are always accounted for, even for ignored frames. | 1-2 days | Medium |
 | 79.5 | `TestHttp2Section_6_8.java:157` | PUSH_PROMISE header/window processing tests missing | Add tests for PUSH_PROMISE frames that verify headers and window size are processed even when stream is ignored. | 1-2 days | Medium |
