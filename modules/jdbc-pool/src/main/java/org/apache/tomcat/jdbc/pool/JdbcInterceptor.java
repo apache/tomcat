@@ -38,6 +38,10 @@ public abstract class JdbcInterceptor implements InvocationHandler {
      */
     public static final String CLOSE_VAL = "close";
     /**
+     * {@link java.sql.Connection#abort(java.util.concurrent.Executor)} method name
+     */
+    public static final String ABORT_VAL = "abort";
+    /**
      * {@link Object#toString()} method name
      */
     public static final String TOSTRING_VAL = "toString";

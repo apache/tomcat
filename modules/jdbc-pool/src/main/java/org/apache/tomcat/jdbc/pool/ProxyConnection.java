@@ -137,6 +137,27 @@ public class ProxyConnection extends JdbcInterceptor {
             this.connection = null;
             pool.returnConnection(poolc);
             return null;
+        } else if (compare(ABORT_VAL,method)) {
+            if (connection==null)
+            {
+                return null; //noop for already closed.
+            }
+            PooledConnection poolc = this.connection;
+            this.connection = null;
+            try {
+                java.sql.Connection physical = poolc.getConnection();
+                //the physical connection is gone if the pool has already released it
+                if (physical!=null) {
+                    method.invoke(physical,args);
+                }
+            }catch (InvocationTargetException e) {
+                throw e.getCause() != null ? e.getCause() : e;
+            }finally {
+                //an aborted connection is closed, it must not be handed out again
+                poolc.setDiscarded(true);
+                pool.returnConnection(poolc);
+            }
+            return null;
         } else if (compare(TOSTRING_VAL,method)) {
             return this.toString();
         } else if (compare(GETCONNECTION_VAL,method) && connection!=null) {

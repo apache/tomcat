@@ -23,11 +23,15 @@ import java.sql.SQLException;
 /**
  * A DisposableConnectionFacade object is the top most interceptor that wraps an
  * object of type {@link PooledConnection}. The DisposableConnectionFacade intercepts
- * two methods:
+ * three methods:
  * <ul>
  *   <li>{@link java.sql.Connection#close()} - returns the connection to the
  *       pool then breaks the link between cutoff and the next interceptor.
  *       May be called multiple times.</li>
+ *   <li>{@link java.sql.Connection#abort(java.util.concurrent.Executor)} -
+ *       aborts the connection, discards it and then breaks the link between
+ *       cutoff and the next interceptor. Does nothing if the connection has
+ *       already been closed.</li>
  *   <li>{@link java.lang.Object#toString()} - returns a custom string for this
  *       object</li>
  * </ul>
@@ -74,7 +78,7 @@ public class DisposableConnectionFacade extends JdbcInterceptor {
             if (compare(ISCLOSED_VAL, method)) {
                 return Boolean.TRUE;
             }
-            else if (compare(CLOSE_VAL, method)) {
+            else if (compare(CLOSE_VAL, method) || compare(ABORT_VAL, method)) {
                 return null;
             }
             else if (compare(ISVALID_VAL, method)) {
@@ -95,7 +99,7 @@ public class DisposableConnectionFacade extends JdbcInterceptor {
 
             throw e;
         } finally {
-            if (compare(CLOSE_VAL, method)) {
+            if (compare(CLOSE_VAL, method) || compare(ABORT_VAL, method)) {
                 setNext(null);
             }
         }
