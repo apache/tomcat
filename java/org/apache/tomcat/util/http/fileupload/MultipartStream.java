@@ -480,6 +480,16 @@ public class MultipartStream {
     public static final byte DASH = 0x2D;
 
     /**
+     * The space ASCII character value.
+     */
+    private static final byte SPACE = 0x20;
+
+    /**
+     * The horizontal tab ASCII character value.
+     */
+    private static final byte TAB = 0x09;
+
+    /**
      * The default length of the buffer used for processing a request.
      */
     protected static final int DEFAULT_BUFSIZE = 4096;
@@ -783,6 +793,12 @@ public class MultipartStream {
         head += boundaryLength;
         try {
             marker[0] = readByte();
+            // RFC 2046, section 5.1.1: a delimiter may be followed by transport padding
+            boolean padded = false;
+            while (marker[0] == SPACE || marker[0] == TAB) {
+                padded = true;
+                marker[0] = readByte();
+            }
             if (marker[0] == LF) {
                 // Work around IE5 Mac bug with input type=image.
                 // Because the boundary delimiter, not including the trailing
@@ -794,7 +810,7 @@ public class MultipartStream {
             }
 
             marker[1] = readByte();
-            if (arrayequals(marker, STREAM_TERMINATOR, 2)) {
+            if (!padded && arrayequals(marker, STREAM_TERMINATOR, 2)) {
                 nextChunk = false;
             } else if (arrayequals(marker, FIELD_SEPARATOR, 2)) {
                 nextChunk = true;
