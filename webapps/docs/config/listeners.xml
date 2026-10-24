@@ -627,6 +627,19 @@
 
   </subsection>
 
+  <subsection name="Configuration Logging Lifecycle Listener - org.apache.catalina.startup.ConfigurationLoggerListener">
+
+    <p>The <strong>Configuration Logging Lifecycle Listener</strong> logs each
+    connector protocol and port, each virtual host, and the user-configured
+    valves on the engine and hosts when the server has started. The basic valve
+    of each pipeline and the automatically installed
+    <code>ErrorReportValve</code> are omitted.</p>
+
+    <p>This listener must only be nested within <a href="server.html">Server</a>
+    elements.</p>
+
+  </subsection>
+
   <subsection name="HTTPD mod_heartmonitor Listener - org.apache.catalina.ha.backend.HeartbeatListener">
 
     <p>The <strong>HTTPD mod_heartmonitor Listener</strong> allows tomcat to send heart beat message to
