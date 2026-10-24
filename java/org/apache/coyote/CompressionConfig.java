@@ -350,6 +350,13 @@ public class CompressionConfig {
             // Therefore, set the Vary header to keep proxies happy
             ResponseUtil.addVaryFieldName(responseHeaders, "accept-encoding");
 
+            // The ranges of a partial response refer to the bytes of the representation so it must not be content
+            // encoded. The Content-Range header is not present at the top level of a multipart/byteranges response.
+            if (response.getStatus() == 206 ||
+                    responseHeaders.getHeader("Content-Range") != null) {
+                return false;
+            }
+
             /*
              * Check if user-agent supports gzip encoding. Only interested in whether gzip encoding is supported. Other
              * encodings can be ignored.
