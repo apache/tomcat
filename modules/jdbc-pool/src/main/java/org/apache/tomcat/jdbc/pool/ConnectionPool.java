@@ -822,7 +822,7 @@ public class ConnectionPool {
                 //no need to lock a new one, its not contented
                 con.setTimestamp(now);
                 if (getPoolProperties().isLogAbandoned()) {
-                    con.setStackTrace(getThreadDump());
+                    con.setStackTraceElements(getThreadDumpElements());
                 }
                 if (!busy.offer(con)) {
                     log.debug("Connection doesn't fit into busy array, connection will not be traceable.");
@@ -890,7 +890,7 @@ public class ConnectionPool {
                     con.setTimestamp(now);
                     if (getPoolProperties().isLogAbandoned()) {
                         //set the stack trace for this pool
-                        con.setStackTrace(getThreadDump());
+                        con.setStackTraceElements(getThreadDumpElements());
                     }
                     if (!busy.offer(con)) {
                         log.debug("Connection doesn't fit into busy array, connection will not be traceable.");
@@ -914,7 +914,7 @@ public class ConnectionPool {
                     con.setTimestamp(now);
                     if (getPoolProperties().isLogAbandoned()) {
                         //set the stack trace for this pool
-                        con.setStackTrace(getThreadDump());
+                        con.setStackTraceElements(getThreadDumpElements());
                     }
                     if (!busy.offer(con)) {
                         log.debug("Connection doesn't fit into busy array, connection will not be traceable.");
@@ -1297,12 +1297,19 @@ public class ConnectionPool {
     /**
      * Creates a stack trace representing the existing thread's current state.
      * @return a string object representing the current state.
-     * TODO investigate if we simply should store {@link java.lang.Thread#getStackTrace()} elements
      */
     protected static String getThreadDump() {
         Exception x = new Exception();
         x.fillInStackTrace();
         return getStackTrace(x);
+    }
+
+    /**
+     * Creates a stack trace representing the existing thread's current state without formatting it.
+     * @return the stack trace elements representing the current state
+     */
+    protected static StackTraceElement[] getThreadDumpElements() {
+        return new Exception().getStackTrace();
     }
 
     /**
