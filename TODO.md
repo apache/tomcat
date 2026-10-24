@@ -774,16 +774,6 @@ These are bugs, correctness issues, or missing functionality that may affect pro
 
 ---
 
-### 71. Tribes UDP Keepalive (1 item)
-
-| # | File:Line | Description | Fix Idea | Effort | Difficulty |
-|---|-----------|-------------|----------|--------|------------|
-| 71.1 | `AbstractSender.java:121` | UDP connections always disconnected; keepalive not optimized | Implement UDP keepalive by tracking last activity time and only disconnecting after idle timeout. | 1-2 days | Medium |
-
-**Total estimated effort: 1-2 days, Medium difficulty**
-
----
-
 ### 72. Tribes NIO Optimization (2 items)
 
 | # | File:Line | Description | Fix Idea | Effort | Difficulty |
