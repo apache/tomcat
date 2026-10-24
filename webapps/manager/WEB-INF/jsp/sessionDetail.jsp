@@ -135,13 +135,31 @@
                <th>Attribute value</th>
            </tr>
        </thead>
-       <%--tfoot>
+       <tfoot>
            <tr>
                <td colspan="3" style="text-align: center;">
-                   TODO: set Max Inactive Interval on sessions
+                   <%
+                   if ("Primary".equals(request.getParameter("sessionType"))) {
+                   %>
+                     <form method="POST" action="<%= submitUrl %>">
+                       <div>
+                         <input type="hidden" name="action" value="setMaxInactiveInterval" />
+                         <input type="hidden" name="sessionId" value="<%= currentSessionId %>" />
+                         <input type="hidden" name="sessionType" value="Primary" />
+                         <label for="maxInactiveInterval">Maximum inactive interval (seconds):</label>
+                         <input type="text" id="maxInactiveInterval" name="maxInactiveInterval"
+                                value="<%= currentSession.getMaxInactiveInterval() %>" />
+                         <input type="submit" value="Update" />
+                       </div>
+                     </form>
+                   <%
+                   } else {
+                       out.print("Primary sessions only");
+                   }
+                   %>
                </td>
            </tr>
-       </tfoot--%>
+       </tfoot>
        <tbody>
    <% attributeNamesEnumeration = currentHttpSession.getAttributeNames();
       while (attributeNamesEnumeration.hasMoreElements()) {

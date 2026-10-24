@@ -729,6 +729,10 @@ public class TestManagerWebapp extends TomcatBaseTest {
 
         tomcat.start();
 
+        ManagerBase manager = (ManagerBase) ctx.getManager();
+        Session session = manager.createSession(null);
+        manager.add(session);
+
         SimpleHttpClient client = new SimpleHttpClient() {
             @Override
             public boolean isResponseBodyOK() {
@@ -788,6 +792,40 @@ public class TestManagerWebapp extends TomcatBaseTest {
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody().contains("Sessions Administration"));
         Assert.assertTrue(client.getResponseBody().contains("active Sessions"));
+
+        m = noncePattern.matcher(client.getResponseBody());
+        Assert.assertTrue("CSRF nonce not found in sessions response", m.find());
+        nonce = m.group(1);
+
+        String requestBody = "action=setMaxInactiveInterval&sessionId=" + session.getId() +
+                "&sessionType=Primary&maxInactiveInterval=123";
+
+        // Update the maximum inactive interval from the session detail page
+        // Authentication may have changed the session ID, so use the latest cookie for the POST.
+        // @formatter:off
+        client.setRequestPause(0);
+        client.setRequest(new String[] {
+                "POST /manager/html/sessions?path=/testapp&" +
+                    Constants.CSRF_NONCE_REQUEST_PARAM + "=" + nonce +
+                    " HTTP/1.1" + CRLF,
+                "Host: localhost" + CRLF,
+                "Authorization: " + basicHeader + CRLF,
+                "Cookie: JSESSIONID=" + client.getSessionId() + CRLF,
+                "Content-Type: application/x-www-form-urlencoded" + CRLF,
+                "Content-Length: " + requestBody.getBytes(StandardCharsets.UTF_8).length + CRLF,
+                "Connection: Close" + CRLF,
+                CRLF,
+                requestBody
+                });
+        // @formatter:on
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+        Assert.assertEquals(123, session.getMaxInactiveInterval());
+        Assert.assertTrue(client.getResponseBody().contains("name=\"maxInactiveInterval\""));
+        Assert.assertTrue(client.getResponseBody().contains("value=\"123\""));
+        Assert.assertTrue(client.getResponseBody().contains(
+                "Maximum inactive interval for session [" + session.getId() + "] set to [123] seconds"));
 
         tomcat.stop();
     }

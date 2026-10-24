@@ -986,16 +986,6 @@ These are bugs, correctness issues, or missing functionality that may affect pro
 
 ---
 
-### 93. Manager Session Detail TODO (1 item)
-
-| # | File:Line | Description | Fix Idea | Effort | Difficulty |
-|---|-----------|-------------|----------|--------|------------|
-| 93.1 | `webapps/manager/WEB-INF/jsp/sessionDetail.jsp:140` | Max Inactive Interval not settable from session detail page | Add a form field and API call to update session max inactive interval. | 1-2 days | Medium |
-
-**Total estimated effort: 1-2 days, Medium difficulty**
-
----
-
 ## Auto-Generated Stub TODOs
 
 These are IDE-generated stub methods with `// TODO Auto-generated method stub` comments. They are low-priority but should eventually be properly implemented.
