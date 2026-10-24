@@ -71,6 +71,7 @@ import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.security.ConcurrentMessageDigest;
 
 /**
  * Client-side WebSocket container implementation.
@@ -422,12 +423,21 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
             handshakeResponse = httpResponse.handshakeResponse();
 
+            // RFC 6455, section 4.1: the client must validate the response
+            validateUpgradeResponse(upgradeRequestHeaders, handshakeResponse.getHeaders());
+
             // Sub-protocol
             List<String> protocolHeaders = handshakeResponse.getHeaders().get(Constants.WS_PROTOCOL_HEADER_NAME);
             if (protocolHeaders == null || protocolHeaders.isEmpty()) {
                 subProtocol = null;
             } else if (protocolHeaders.size() == 1) {
                 subProtocol = protocolHeaders.getFirst();
+                List<String> requestedSubProtocols = upgradeRequestHeaders.get(Constants.WS_PROTOCOL_HEADER_NAME);
+                if (requestedSubProtocols == null || requestedSubProtocols.stream()
+                        .flatMap(v -> Arrays.stream(v.split(","))).noneMatch(v -> v.trim().equals(subProtocol))) {
+                    throw new DeploymentException(
+                            sm.getString("wsWebSocketContainer.unrequestedSubProtocol", subProtocol));
+                }
             } else {
                 throw new DeploymentException(sm.getString("wsWebSocketContainer.invalidSubProtocol"));
             }
@@ -449,7 +459,12 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
             // Build the transformations
             TransformationFactory factory = TransformationFactory.getInstance();
+            Set<String> requestedExtensions = getRequestedExtensionNames(upgradeRequestHeaders);
             for (Extension extension : extensionsAgreed) {
+                if (!requestedExtensions.contains(extension.getName())) {
+                    throw new DeploymentException(
+                            sm.getString("wsWebSocketContainer.unrequestedExtension", extension.getName()));
+                }
                 List<List<Extension.Parameter>> wrapper = new ArrayList<>(1);
                 wrapper.add(extension.getParameters());
                 Transformation t = factory.create(extension.getName(), wrapper, false);
@@ -918,6 +933,56 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         }
 
         return new HttpResponse(status, new WsHandshakeResponse(headers));
+    }
+
+
+    /*
+     * RFC 6455, section 4.1. The sub-protocol and the extensions are validated once they have been parsed.
+     */
+    private static void validateUpgradeResponse(Map<String,List<String>> requestHeaders,
+            Map<String,List<String>> responseHeaders) throws DeploymentException {
+
+        List<String> upgrade = responseHeaders.get(Constants.UPGRADE_HEADER_NAME);
+        if (upgrade == null || upgrade.isEmpty() ||
+                !upgrade.stream().allMatch(v -> Constants.UPGRADE_HEADER_VALUE.equalsIgnoreCase(v.trim()))) {
+            throw new DeploymentException(sm.getString("wsWebSocketContainer.invalidUpgradeHeader"));
+        }
+
+        List<String> connection = responseHeaders.get(Constants.CONNECTION_HEADER_NAME);
+        if (connection == null || connection.stream().flatMap(v -> Arrays.stream(v.split(",")))
+                .noneMatch(v -> Constants.CONNECTION_HEADER_VALUE.equalsIgnoreCase(v.trim()))) {
+            throw new DeploymentException(sm.getString("wsWebSocketContainer.invalidConnectionHeader"));
+        }
+
+        List<String> accept = responseHeaders.get(Constants.WS_ACCEPT_HEADER_NAME);
+        List<String> key = requestHeaders.get(Constants.WS_KEY_HEADER_NAME);
+        if (accept == null || accept.size() != 1 || key == null || key.isEmpty() ||
+                !generateWsAcceptValue(key.getFirst()).equals(accept.getFirst().trim())) {
+            throw new DeploymentException(sm.getString("wsWebSocketContainer.invalidAcceptHeader"));
+        }
+    }
+
+
+    private static String generateWsAcceptValue(String key) {
+        byte[] digest = ConcurrentMessageDigest.digestSHA1(key.getBytes(StandardCharsets.ISO_8859_1),
+                Constants.WS_ACCEPT_GUID.getBytes(StandardCharsets.ISO_8859_1));
+        return Base64.getEncoder().encodeToString(digest);
+    }
+
+
+    private static Set<String> getRequestedExtensionNames(Map<String,List<String>> requestHeaders) {
+        Set<String> result = new HashSet<>();
+        List<String> headers = requestHeaders.get(Constants.WS_EXTENSIONS_HEADER_NAME);
+        if (headers != null) {
+            List<Extension> extensions = new ArrayList<>();
+            for (String header : headers) {
+                Util.parseExtensionHeader(extensions, header);
+            }
+            for (Extension extension : extensions) {
+                result.add(extension.getName());
+            }
+        }
+        return result;
     }
 
 
