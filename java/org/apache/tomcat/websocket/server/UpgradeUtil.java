@@ -108,7 +108,14 @@ public class UpgradeUtil {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        if (!headerContainsToken(req, Constants.WS_VERSION_HEADER_NAME, Constants.WS_VERSION_HEADER_VALUE)) {
+        // RFC 6455, sections 11.3.1 and 11.3.5: these header fields must not appear more than once in a request
+        if (countHeaders(req, Constants.WS_VERSION_HEADER_NAME) > 1 ||
+                countHeaders(req, Constants.WS_KEY_HEADER_NAME) > 1) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+        String version = req.getHeader(Constants.WS_VERSION_HEADER_NAME);
+        if (version == null || !Constants.WS_VERSION_HEADER_VALUE.equals(version.trim())) {
             resp.setStatus(HttpServletResponse.SC_UPGRADE_REQUIRED);
             resp.setHeader(Constants.WS_VERSION_HEADER_NAME, Constants.WS_VERSION_HEADER_VALUE);
             return;
@@ -320,6 +327,11 @@ public class UpgradeUtil {
                 sb.append(p.getValue());
             }
         }
+    }
+
+
+    private static int countHeaders(HttpServletRequest req, String headerName) {
+        return Collections.list(req.getHeaders(headerName)).size();
     }
 
 
