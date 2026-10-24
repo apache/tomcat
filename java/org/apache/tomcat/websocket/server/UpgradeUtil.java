@@ -69,7 +69,9 @@ public class UpgradeUtil {
      * Checks to see if this is an HTTP request that includes a valid upgrade request to web socket.
      * <p>
      * Note: RFC 2616 does not limit HTTP upgrade to GET requests but the Java WebSocket spec 1.0, section 8.2 implies
-     * such a limitation and RFC 6455 section 4.1 requires that a WebSocket Upgrade uses GET.
+     * such a limitation and RFC 6455 section 4.1 requires that a WebSocket Upgrade uses GET. RFC 6455 section 4.2.1
+     * requires HTTP/1.1 or later and RFC 9110 section 7.8 requires an Upgrade header field in an HTTP/1.0 request to be
+     * ignored.
      *
      * @param request  The request to check if it is an HTTP upgrade request for a WebSocket connection
      * @param response The response associated with the request
@@ -82,7 +84,8 @@ public class UpgradeUtil {
         return ((request instanceof HttpServletRequest) && (response instanceof HttpServletResponse) &&
                 headerContainsToken((HttpServletRequest) request, Constants.UPGRADE_HEADER_NAME,
                         Constants.UPGRADE_HEADER_VALUE) &&
-                Method.GET.equals(((HttpServletRequest) request).getMethod()));
+                Method.GET.equals(((HttpServletRequest) request).getMethod()) &&
+                !"HTTP/1.0".equals(request.getProtocol()));
     }
 
 
