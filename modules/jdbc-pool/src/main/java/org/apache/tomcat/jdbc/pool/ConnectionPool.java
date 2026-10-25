@@ -822,6 +822,13 @@ public class ConnectionPool {
             //connect and validate the connection
             con.lock();
             con.connect();
+            if (isClosed()) {
+                // the pool was closed while this physical connection was
+                // being created; the shutdown drain has already passed over
+                // the queues, so neither hand the connection out nor register
+                // it in busy - the error path below disconnects it
+                throw new SQLException("Connection pool closed.");
+            }
             if (con.validate(PooledConnection.VALIDATE_INIT)) {
                 //no need to lock a new one, its not contented
                 con.setTimestamp(now);
