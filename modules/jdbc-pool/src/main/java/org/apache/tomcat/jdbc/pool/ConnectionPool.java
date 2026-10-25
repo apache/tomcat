@@ -1209,7 +1209,13 @@ public class ConnectionPool {
                     long time = con.getTimestamp();
                     long now = System.currentTimeMillis();
                     if (shouldAbandon() && (now - time) > con.getAbandonTimeout()) {
-                        locked.remove();
+                        // claim the connection before acting on it; without
+                        // a real lock the checks above may already be stale,
+                        // and a connection the application returned to the
+                        // pool in the meantime must not be abandoned
+                        if (!busy.remove(con)) {
+                            continue;
+                        }
                         abandon(con);
                         setToNull = true;
                     } else if (sto > 0 && (now - time) > (sto * 1000L)) {
@@ -1267,9 +1273,15 @@ public class ConnectionPool {
                     }
                     long time = con.getTimestamp();
                     if (shouldReleaseIdle(now, con, time)) {
+                        // claim the connection before acting on it; without
+                        // a real lock the checks above may already be stale,
+                        // and a connection a borrower took out of the idle
+                        // queue in the meantime must not be released here
+                        if (!idle.remove(con)) {
+                            continue;
+                        }
                         releasedIdleCount.incrementAndGet();
                         release(con);
-                        unlocked.remove();
                         setToNull = true;
                     } else {
                         //do nothing
@@ -1310,6 +1322,14 @@ public class ConnectionPool {
 
     /**
      * Forces a validation of all idle connections if {@link PoolProperties#testWhileIdle} is set.
+     * <p>
+     * Note: when this method is invoked externally while the per-connection lock is
+     * disabled (sweeper switched off and {@link PoolProperties#getUseLock()} returning
+     * {@code false}), validating and reconnecting a connection can still overlap with a
+     * borrower that just took it out of the idle queue. That overlap is transient and
+     * surfaces to one of the two threads as a connection error; it is sharpest when
+     * {@link PoolProperties#getMaxAge()} is set so that an expired connection may be
+     * reconnected under a borrower mid-use.
      */
     public void testAllIdle() {
         testAllIdle(false);
@@ -1342,8 +1362,14 @@ public class ConnectionPool {
                         release = !reconnectIfExpired(con) || !con.validate(PooledConnection.VALIDATE_IDLE);
                     }
                     if (release) {
+                        // claim the connection before acting on it; without
+                        // a real lock the check above may already be stale,
+                        // and a connection a borrower took out of the idle
+                        // queue in the meantime must not be released here
+                        if (!idle.remove(con)) {
+                            continue;
+                        }
                         releasedIdleCount.incrementAndGet();
-                        unlocked.remove();
                         release(con);
                     }
                 } finally {
