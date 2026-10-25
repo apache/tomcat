@@ -22,6 +22,7 @@ import javax.naming.Reference;
 import javax.naming.StringRefAddr;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
@@ -100,6 +101,90 @@ class TestNamingFactory extends JdbcPoolBaseTest {
         assertEquals(7, target.getCount());
         assertEquals(1234567890L, target.getRatio());
         assertTrue(target.isEnabled());
+    }
+
+    @Test
+    void unsupportedSetterTypeIsNotInvokedWithNull() throws Exception {
+        Reference ref = new Reference(UnsupportedTypeTarget.class.getName(),
+                null, null);
+        // "props" only matches setProps(Properties) whose parameter type the
+        // factory cannot convert a string to. It must not be invoked with a
+        // null argument, wiping the configured default.
+        ref.add(new StringRefAddr("props", "anything"));
+
+        Object result = new GenericNamingResourcesFactory().getObjectInstance(
+                ref, new CompositeName("test/unsupported"), null, null);
+        assertInstanceOf(UnsupportedTypeTarget.class, result);
+        UnsupportedTypeTarget target = (UnsupportedTypeTarget) result;
+        assertFalse(target.isPropsInvoked(),
+                "setter with an unsupported parameter type must not be "
+                        + "invoked with a null value");
+        assertEquals(UnsupportedTypeTarget.DEFAULT_PROPS, target.getProps(),
+                "the default value must survive an inapplicable property");
+    }
+
+    @Test
+    void overloadedSetterWithBadValueDoesNotNullOtherField()
+            throws Exception {
+        Reference ref = new Reference(OverloadedTarget.class.getName(),
+                null, null);
+        // "port" matches both setPort(int) and setPort(Properties). The
+        // numeric conversion of the value fails; the unsupported overload
+        // must not be invoked with null instead.
+        ref.add(new StringRefAddr("port", "12o"));
+
+        Object result = new GenericNamingResourcesFactory().getObjectInstance(
+                ref, new CompositeName("test/overloaded"), null, null);
+        assertInstanceOf(OverloadedTarget.class, result);
+        OverloadedTarget target = (OverloadedTarget) result;
+        assertFalse(target.isPropsInvoked(),
+                "the unsupported overload must not be invoked with null when "
+                        + "the numeric conversion fails");
+        assertEquals(-1, target.getPort(),
+                "the numeric property must keep its default on a bad value");
+    }
+
+    /** Target with a setter of a type the factory cannot convert to. */
+    public static class UnsupportedTypeTarget {
+        static final java.util.Properties DEFAULT_PROPS =
+                new java.util.Properties();
+        private java.util.Properties props = DEFAULT_PROPS;
+        private boolean propsInvoked;
+
+        public java.util.Properties getProps() {
+            return props;
+        }
+        public void setProps(java.util.Properties props) {
+            this.propsInvoked = true;
+            this.props = props;
+        }
+        public boolean isPropsInvoked() {
+            return propsInvoked;
+        }
+    }
+
+    /** Target with an overloaded setter, one supported and one not. */
+    public static class OverloadedTarget {
+        private int port = -1;
+        private java.util.Properties props;
+        private boolean propsInvoked;
+
+        public int getPort() {
+            return port;
+        }
+        public void setPort(int port) {
+            this.port = port;
+        }
+        public java.util.Properties getProps() {
+            return props;
+        }
+        public void setPort(java.util.Properties props) {
+            this.propsInvoked = true;
+            this.props = props;
+        }
+        public boolean isPropsInvoked() {
+            return propsInvoked;
+        }
     }
 
     /** Plain configuration target for the generic naming factory. */
