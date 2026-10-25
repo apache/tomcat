@@ -693,9 +693,11 @@ public class ConnectionPool {
         if (con == null) {
             return;
         }
+        boolean destroyed;
         try {
             con.lock();
-            if (con.release()) {
+            destroyed = con.release();
+            if (destroyed) {
                 //counter only decremented once
                 size.addAndGet(-1);
                 con.setHandler(null);
@@ -706,8 +708,10 @@ public class ConnectionPool {
         }
         // we've asynchronously reduced the number of connections
         // we could have threads stuck in idle.poll(timeout) that will never be
-        // notified
-        if (waitcount.get() > 0) {
+        // notified. Only a call that actually destroyed a connection opened a
+        // slot; offering a placeholder for a connection that was already
+        // released would run the pool over maxActive.
+        if (destroyed && waitcount.get() > 0) {
             if (!idle.offer(create(true))) {
                 log.warn("Failed to add a new connection to the pool after releasing a connection " +
                         "when at least one thread was waiting for a connection.");
@@ -770,6 +774,22 @@ public class ConnectionPool {
             long timetowait = Math.max(0, maxWait - (System.currentTimeMillis() - now));
             waitcount.incrementAndGet();
             try {
+                // a connection may have been destroyed between the size check
+                // above and the registration of this waiter; such a releasing
+                // thread saw no waiter and will not notify this poll, so
+                // re-check the limit now rather than wait for a notification
+                // that may never arrive. Skip the case where a connection (or
+                // a wake-up placeholder) is already queued to be taken.
+                if (idle.isEmpty() && size.get() < getPoolProperties().getMaxActive()) {
+                    //atomic duplicate check
+                    if (size.addAndGet(1) > getPoolProperties().getMaxActive()) {
+                        //if we got here, two threads passed through the first if
+                        size.decrementAndGet();
+                    } else {
+                        //create a connection, we're below the limit
+                        return createConnection(now, con, username, password);
+                    }
+                }
                 //retrieve an existing connection
                 con = idle.poll(timetowait, TimeUnit.MILLISECONDS);
             } catch (InterruptedException ex) {
