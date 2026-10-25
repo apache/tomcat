@@ -16,6 +16,13 @@
  */
 package org.apache.tomcat.jdbc.naming;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
+
 import javax.naming.CompositeName;
 import javax.naming.Name;
 import javax.naming.Reference;
@@ -223,6 +230,79 @@ class TestNamingFactory extends JdbcPoolBaseTest {
         }
         public java.util.Map<String, String> getBag() {
             return bag;
+        }
+    }
+
+    @Test
+    void propertySetFailuresAreReportedAsWarnings() throws Exception {
+        Logger logger = Logger.getLogger(
+                GenericNamingResourcesFactory.class.getName());
+        Level originalLevel = logger.getLevel();
+        final List<LogRecord> records = new ArrayList<>();
+        Handler handler = new Handler() {
+            @Override
+            public void publish(LogRecord record) {
+                records.add(record);
+            }
+            @Override
+            public void flush() {
+                // no buffering
+            }
+            @Override
+            public void close() {
+                // nothing to release
+            }
+        };
+        logger.addHandler(handler);
+        logger.setLevel(Level.FINEST);
+        try {
+            Reference ref = new Reference(WarnTarget.class.getName(),
+                    null, null);
+            // "count" matches setCount(int) but the value does not parse
+            ref.add(new StringRefAddr("count", "12o"));
+            // no setter exists at all
+            ref.add(new StringRefAddr("noSuchProperty", "x"));
+            // the matched setter throws
+            ref.add(new StringRefAddr("boom", "go"));
+
+            Object result = new GenericNamingResourcesFactory()
+                    .getObjectInstance(
+                            ref, new CompositeName("test/warn"), null, null);
+            assertInstanceOf(WarnTarget.class, result);
+            // the half-configured object is still returned, as documented
+            assertEquals(-1, ((WarnTarget) result).getCount());
+        } finally {
+            logger.removeHandler(handler);
+            logger.setLevel(originalLevel);
+        }
+        for (String property : new String[] { "count", "noSuchProperty",
+                "boom" }) {
+            boolean warned = false;
+            for (LogRecord record : records) {
+                if (record.getLevel().intValue() >= Level.WARNING.intValue()
+                        && record.getMessage() != null
+                        && record.getMessage().contains("[" + property + "]")) {
+                    warned = true;
+                    break;
+                }
+            }
+            assertTrue(warned, "failure to apply property [" + property
+                    + "] must be reported at warn level or above");
+        }
+    }
+
+    /** Target exercising the property-set failure paths. */
+    public static class WarnTarget {
+        private int count = -1;
+
+        public int getCount() {
+            return count;
+        }
+        public void setCount(int count) {
+            this.count = count;
+        }
+        public void setBoom(String value) {
+            throw new IllegalStateException("setter always fails");
         }
     }
 
