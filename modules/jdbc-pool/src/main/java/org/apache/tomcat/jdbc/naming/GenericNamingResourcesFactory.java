@@ -98,10 +98,10 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
             if (addr.getContent()!=null) {
                 value = addr.getContent().toString();
             }
-            if (setProperty(o, param, value)) {
-
-            } else {
-                log.debug("Property not configured[" + param + "]. No setter found on[" + type + "].");
+            if (!setProperty(o, param, value)) {
+                log.warn("Property [" + param + "] was not applied to ["
+                        + type + "]: no usable setter found, or the "
+                        + "configured value could not be applied.");
             }
         }
         return o;
@@ -230,18 +230,20 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
             }
 
         } catch (IllegalArgumentException ex2) {
-            log.warn("IAE " + o + " " + name + " " + value, ex2);
+            log.warn("Unable to set property [" + name + "] with value ["
+                    + value + "] on [" + o.getClass().getName() + "]", ex2);
         } catch (SecurityException ex1) {
-            if (log.isDebugEnabled()) {
-                log.debug("IntrospectionUtils: SecurityException for " +
-                        o.getClass() + " " + name + "=" + value + ")", ex1);
-            }
+            log.warn("SecurityException setting property [" + name
+                    + "] with value [" + value + "] on ["
+                    + o.getClass().getName() + "]", ex1);
         } catch (IllegalAccessException iae) {
-            if (log.isDebugEnabled()) {
-                log.debug("IntrospectionUtils: IllegalAccessException for " +
-                        o.getClass() + " " + name + "=" + value + ")", iae);
-            }
+            log.warn("IllegalAccessException setting property [" + name
+                    + "] with value [" + value + "] on ["
+                    + o.getClass().getName() + "]", iae);
         } catch (InvocationTargetException ie) {
+            // In the spirit of ExceptionUtils.handleThrowable(), which is not
+            // available to tomcat-jdbc.jar: propagate the fatal
+            // VirtualMachineError from the setter and report everything else.
             Throwable cause = ie.getCause();
             if (cause instanceof ThreadDeath) {
                 throw (ThreadDeath) cause;
@@ -249,10 +251,9 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
             if (cause instanceof VirtualMachineError) {
                 throw (VirtualMachineError) cause;
             }
-            if (log.isDebugEnabled()) {
-                log.debug("IntrospectionUtils: InvocationTargetException for " +
-                        o.getClass() + " " + name + "=" + value + ")", ie);
-            }
+            log.warn("Setter for property [" + name + "] with value ["
+                    + value + "] threw an exception on ["
+                    + o.getClass().getName() + "]", ie);
         }
         return false;
     }
