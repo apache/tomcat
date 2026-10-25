@@ -712,7 +712,12 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
     /**
-     * Performs a validation on idle connections
+     * Performs a validation on idle connections.
+     * <p>
+     * Note: when invoked while the per-connection lock is disabled (sweeper
+     * switched off and {@link PoolProperties#getUseLock()} returning
+     * {@code false}), see the residual overlap documented on
+     * {@link ConnectionPool#testAllIdle()}.
      */
     public void testIdle() {
         try {
