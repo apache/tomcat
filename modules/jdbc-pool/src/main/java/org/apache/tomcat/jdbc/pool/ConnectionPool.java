@@ -1765,8 +1765,12 @@ public class ConnectionPool {
                             || pool.getPoolProperties().getSuspectTimeout() > 0) {
                         pool.checkAbandoned();
                     }
-                    if (pool.getPoolProperties().getMinIdle() < pool.idle
-                            .size()) {
+                    // the eviction predicate in checkIdle() compares
+                    // against the total pool size, not the idle count: a
+                    // busy pool can be over the min-idle floor while idle
+                    // stays at or below it
+                    if (pool.getPoolProperties().getMinIdle()
+                            < pool.getSize()) {
                         pool.checkIdle();
                     }
                     if (pool.getPoolProperties().isTestWhileIdle()) {
