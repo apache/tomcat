@@ -108,9 +108,17 @@ public class ConnectionPool {
 
     /**
      * Since newProxyInstance performs the same operation, over and over
-     * again, it is much more optimized if we simply store the constructor ourselves.
+     * again, it is much more optimized if we simply store the constructor
+     * ourselves. One constructor is cached per proxy kind (with and without
+     * the XAConnection interface), so that a pool whose backing data source
+     * changes kind at runtime keeps proxying each connection correctly.
      */
-    private Constructor<?> proxyClassConstructor;
+    private volatile Constructor<?> proxyClassConstructor;
+
+    /**
+     * Cached constructor for proxies that also implement XAConnection.
+     */
+    private volatile Constructor<?> xaProxyClassConstructor;
 
     /**
      * Executor service used to cancel Futures
@@ -344,14 +352,14 @@ public class ConnectionPool {
             handler = new StatementFacade(handler);
         }
         try {
-            getProxyConstructor(con.getXAConnection() != null);
+            Constructor<?> proxyConstructor = getProxyConstructor(con.getXAConnection() != null);
             //create the proxy
             //TODO possible optimization, keep track if this connection was returned properly, and don't generate a new facade
             Connection connection = null;
             if (getPoolProperties().getUseDisposableConnectionFacade() ) {
-                connection = (Connection)proxyClassConstructor.newInstance(new Object[] { new DisposableConnectionFacade(handler) });
+                connection = (Connection)proxyConstructor.newInstance(new Object[] { new DisposableConnectionFacade(handler) });
             } else {
-                connection = (Connection)proxyClassConstructor.newInstance(new Object[] {handler});
+                connection = (Connection)proxyConstructor.newInstance(new Object[] {handler});
             }
             //return the connection
             return connection;
@@ -383,23 +391,31 @@ public class ConnectionPool {
     }
 
     /**
-     * Creates and caches a {@link java.lang.reflect.Constructor} used to instantiate the proxy object.
-     * We cache this, since the creation of a constructor is fairly slow.
+     * Creates and caches a {@link java.lang.reflect.Constructor} used to
+     * instantiate the proxy object of the requested kind (with or without
+     * the XAConnection interface). We cache these, since the creation of a
+     * constructor is fairly slow.
      * @param xa Use a XA connection
      * @return constructor used to instantiate the wrapper object
      * @throws NoSuchMethodException Failed to get a constructor
      */
     public Constructor<?> getProxyConstructor(boolean xa) throws NoSuchMethodException {
-        //cache the constructor
-        if (proxyClassConstructor == null ) {
+        //cache the constructor per proxy kind
+        Constructor<?> constructor = xa ? xaProxyClassConstructor : proxyClassConstructor;
+        if (constructor == null) {
             Class<?> proxyClass = xa ?
                     Proxy.getProxyClass(ConnectionPool.class.getClassLoader(),
                             new Class[] {Connection.class, javax.sql.PooledConnection.class, XAConnection.class}) :
                     Proxy.getProxyClass(ConnectionPool.class.getClassLoader(),
                             new Class[] {Connection.class, javax.sql.PooledConnection.class});
-            proxyClassConstructor = proxyClass.getConstructor(new Class[] { InvocationHandler.class });
+            constructor = proxyClass.getConstructor(new Class[] { InvocationHandler.class });
+            if (xa) {
+                xaProxyClassConstructor = constructor;
+            } else {
+                proxyClassConstructor = constructor;
+            }
         }
-        return proxyClassConstructor;
+        return constructor;
     }
 
     /**
