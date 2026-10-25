@@ -427,6 +427,7 @@ public class ConnectionPool {
 
         /* release all idle connections */
         BlockingQueue<PooledConnection> pool = (!idle.isEmpty())?idle:(force?busy:idle);
+        boolean interrupted = false;
         while (!pool.isEmpty()) {
             try {
                 //retrieve the next connection
@@ -446,13 +447,21 @@ public class ConnectionPool {
                     }
                 } //while
             } catch (InterruptedException ex) {
-                if (getPoolProperties().getPropagateInterruptState()) {
-                    Thread.currentThread().interrupt();
-                }
+                // Do not restore the interrupt status here. A poll on a queue
+                // that checks the status before inspecting its elements would
+                // then throw again immediately, removing no connection, and
+                // the loop would spin without progress. Clear the status so
+                // the polls keep working and remember that we were interrupted
+                // so the status can be propagated once the drain completes.
+                Thread.interrupted();
+                interrupted = true;
             }
             if (pool.isEmpty() && force && pool!=busy) {
                 pool = busy;
             }
+        }
+        if (interrupted && getPoolProperties().getPropagateInterruptState()) {
+            Thread.currentThread().interrupt();
         }
         if (this.getPoolProperties().isJmxEnabled()) {
             this.jmxPool = null;
