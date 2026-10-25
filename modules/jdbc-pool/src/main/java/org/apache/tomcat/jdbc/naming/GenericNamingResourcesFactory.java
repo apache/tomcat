@@ -20,8 +20,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Set;
 
 import javax.naming.Context;
 import javax.naming.Name;
@@ -57,6 +61,17 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
 
     private static final Log log = LogFactory.getLog(GenericNamingResourcesFactory.class);
 
+    /**
+     * Reference metadata that Tomcat attaches to a {@code ResourceRef}; these
+     * are not bean properties of the target object. Mirrors the list excluded
+     * by {@code org.apache.naming.factory.BeanFactory}. Inlined because
+     * tomcat-jdbc.jar does not depend on catalina.jar.
+     */
+    private static final Set<String> RESERVED_ADDR_TYPES =
+            Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+                    "factory", "singleton", "scope", "auth", "description",
+                    "forceString")));
+
     @Override
     public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable<?, ?> environment) throws Exception {
         if ((obj == null) || !(obj instanceof Reference)) {
@@ -75,6 +90,10 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
         while (refs.hasMoreElements()) {
             RefAddr addr = refs.nextElement();
             String param = addr.getType();
+            if (param == null || RESERVED_ADDR_TYPES.contains(param)) {
+                // reference metadata, not a configuration property
+                continue;
+            }
             String value = null;
             if (addr.getContent()!=null) {
                 value = addr.getContent().toString();
