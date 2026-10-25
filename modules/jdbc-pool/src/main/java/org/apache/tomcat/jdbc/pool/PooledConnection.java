@@ -507,9 +507,16 @@ public class PooledConnection implements PooledConnectionMBean {
      * {@link PoolConfiguration#setValidationInterval(long)} has been called with a positive value.
      * <p>
      * false if the validation failed. The caller should close the connection if false is returned since a session could have been left in
-     * an unknown state during initialization.
+     * an unknown state during initialization. A connection that was never connected, or has already been disconnected, is always reported
+     * as invalid.
      */
     public boolean validate(int validateAction,String sql) {
+        if (connection == null) {
+            // never connected - a wake-up placeholder that no borrower took
+            // - or already disconnected; there is nothing to validate and it
+            // cannot be handed out
+            return false;
+        }
         if (this.isDiscarded()) {
             return false;
         }
