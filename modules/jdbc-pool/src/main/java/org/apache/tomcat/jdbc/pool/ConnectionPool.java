@@ -177,7 +177,12 @@ public class ConnectionPool {
                 return new ConnectionFuture(pc);
             }
         }catch (SQLException x) {
-            if (x.getMessage().indexOf("NoWait")<0) {
+            // JDBC exceptions may carry no message at all; a missing
+            // "NoWait" marker must be assumed for those, so that the
+            // original failure reaches the caller instead of a
+            // NullPointerException from dereferencing the message
+            String msg = x.getMessage();
+            if (msg == null || msg.indexOf("NoWait")<0) {
                 throw x;
             }
         }
