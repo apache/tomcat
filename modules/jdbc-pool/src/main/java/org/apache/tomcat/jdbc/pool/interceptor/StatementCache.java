@@ -114,15 +114,15 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
         super.setProperties(properties);
         InterceptorProperty p = properties.get("prepared");
         if (p!=null) {
-          cachePrepared = p.getValueAsBoolean(cachePrepared);
+            cachePrepared = p.getValueAsBoolean(cachePrepared);
         }
         p = properties.get("callable");
         if (p!=null) {
-          cacheCallable = p.getValueAsBoolean(cacheCallable);
+            cacheCallable = p.getValueAsBoolean(cacheCallable);
         }
         p = properties.get("max");
         if (p!=null) {
-          maxCacheSize = p.getValueAsInt(maxCacheSize);
+            maxCacheSize = p.getValueAsInt(maxCacheSize);
         }
         if (cachePrepared && cacheCallable) {
             this.types = ALL_TYPES;
@@ -139,7 +139,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
 
     /*begin the cache size*/
     private static ConcurrentHashMap<ConnectionPool,AtomicInteger> cacheSizeMap =
-        new ConcurrentHashMap<>();
+            new ConcurrentHashMap<>();
 
     private AtomicInteger cacheSize;
 
@@ -186,7 +186,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
     public void disconnected(ConnectionPool parent, PooledConnection con, boolean finalizing) {
         @SuppressWarnings("unchecked")
         ConcurrentHashMap<CacheKey,CachedStatement> statements =
-            (ConcurrentHashMap<CacheKey,CachedStatement>)con.getAttributes().get(STATEMENT_CACHE_ATTR);
+                (ConcurrentHashMap<CacheKey,CachedStatement>)con.getAttributes().get(STATEMENT_CACHE_ATTR);
 
         if (statements!=null) {
             for (Map.Entry<CacheKey, CachedStatement> p : statements.entrySet()) {
@@ -205,7 +205,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
      */
     public void closeStatement(CachedStatement st) {
         if (st==null) {
-          return;
+            return;
         }
         st.forceClose();
     }
@@ -213,7 +213,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
     @Override
     protected Object createDecorator(Object proxy, Method method, Object[] args,
                                      Object statement, Constructor<?> constructor, String sql)
-    throws InstantiationException, IllegalAccessException, InvocationTargetException {
+        throws InstantiationException, IllegalAccessException, InvocationTargetException {
         boolean process = process(this.types, method, false);
         if (process) {
             Object result = null;
@@ -256,7 +256,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
     public CachedStatement isCached(Method method, Object[] args) {
         ConcurrentHashMap<CacheKey,CachedStatement> cache = getCache();
         if (cache == null) {
-          return null;
+            return null;
         }
         CacheKey key = createCacheKey(method, args);
         if (key == null) {
@@ -274,7 +274,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
     public boolean cacheStatement(CachedStatement proxy) {
         ConcurrentHashMap<CacheKey,CachedStatement> cache = getCache();
         if (cache == null) {
-          return false;
+            return false;
         }
         if (proxy.getCacheKey()==null) {
             return false;
@@ -301,7 +301,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
     public boolean removeStatement(CachedStatement proxy) {
         ConcurrentHashMap<CacheKey,CachedStatement> cache = getCache();
         if (cache == null) {
-          return false;
+            return false;
         }
         if (cache.remove(proxy.getCacheKey()) != null) {
             cacheSize.decrementAndGet();
@@ -321,7 +321,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
         PooledConnection pCon = this.pcon;
         if (pCon == null) {
             if (log.isWarnEnabled()) {
-              log.warn("Connection has already been closed or abandoned");
+                log.warn("Connection has already been closed or abandoned");
             }
             return null;
         }
@@ -335,7 +335,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
     public int getCacheSizePerConnection() {
         ConcurrentHashMap<CacheKey,CachedStatement> cache = getCache();
         if (cache == null) {
-          return 0;
+            return 0;
         }
         return cache.size();
     }
@@ -501,24 +501,24 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
         @Override
         public boolean equals(Object obj) {
             if (this == obj) {
-              return true;
+                return true;
             }
             if (obj == null) {
-              return false;
+                return false;
             }
             if (getClass() != obj.getClass()) {
-              return false;
+                return false;
             }
             CacheKey other = (CacheKey) obj;
             if (!Arrays.deepEquals(args, other.args)) {
-              return false;
+                return false;
             }
             if (stmtType == null) {
                 if (other.stmtType != null) {
-                  return false;
+                    return false;
                 }
             } else if (!stmtType.equals(other.stmtType)) {
-              return false;
+                return false;
             }
             return true;
         }
