@@ -97,7 +97,7 @@ public class ConnectionPool {
     /**
      * The thread that is responsible for checking abandoned and idle threads
      */
-    private volatile PoolCleaner poolCleaner;
+    private PoolCleaner poolCleaner;
 
     /**
      * Pool closed flag
@@ -437,9 +437,7 @@ public class ConnectionPool {
         //prevent other threads from entering
         this.closed = true;
         //stop background thread
-        if (poolCleaner!=null) {
-            poolCleaner.stopRunning();
-        }
+        terminatePoolCleaner();
 
         /* release all idle connections */
         BlockingQueue<PooledConnection> pool = (!idle.isEmpty())?idle:(force?busy:idle);
@@ -616,21 +614,29 @@ public class ConnectionPool {
 
     /**
      * Starts the pool cleaner (evicter) thread if pool sweeper is enabled.
+     * A cleaner that is still running from a previous start is terminated
+     * first, so this call never leaves a replaced task registered on the
+     * shared timer without a reference to stop it.
      *
      * @param properties the pool configuration containing sweeper settings
      */
-    public void initializePoolCleaner(PoolConfiguration properties) {
+    public synchronized void initializePoolCleaner(PoolConfiguration properties) {
         //if the evictor thread is supposed to run, start it now
         if (properties.isPoolSweeperEnabled()) {
+            // never overwrite a running cleaner: the replaced task would
+            // stay registered on the shared timer with no reference left to
+            // stop it, duplicating maintenance work for the pool's lifetime
+            terminatePoolCleaner();
             poolCleaner = new PoolCleaner(this, properties.getTimeBetweenEvictionRunsMillis());
             poolCleaner.start();
         } //end if
     }
 
     /**
-     * Stops the pool cleaner (evicter) thread if it is currently running.
+     * Stops the pool cleaner (evicter) thread if it is currently running
+     * and forgets its reference.
      */
-    public void terminatePoolCleaner() {
+    public synchronized void terminatePoolCleaner() {
         if (poolCleaner!= null) {
             poolCleaner.stopRunning();
             poolCleaner = null;
