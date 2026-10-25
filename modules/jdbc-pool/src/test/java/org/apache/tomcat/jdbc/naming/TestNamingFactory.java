@@ -25,12 +25,14 @@ import java.util.logging.Logger;
 
 import javax.naming.CompositeName;
 import javax.naming.Name;
+import javax.naming.NamingException;
 import javax.naming.Reference;
 import javax.naming.StringRefAddr;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
@@ -303,6 +305,57 @@ class TestNamingFactory extends JdbcPoolBaseTest {
         }
         public void setBoom(String value) {
             throw new IllegalStateException("setter always fails");
+        }
+    }
+
+    @Test
+    void unusableClassNamesFailWithNamingExceptions() throws Exception {
+        GenericNamingResourcesFactory factory =
+                new GenericNamingResourcesFactory();
+        Name refName = new CompositeName("jdbc/test");
+
+        // missing type attribute: a ResourceRef may carry a null class name
+        NamingException ne = assertThrows(NamingException.class,
+                () -> factory.getObjectInstance(
+                        new Reference(null, null, null), refName, null, null));
+        assertTrue(ne.getMessage().contains("type"),
+                "message must name the missing type attribute");
+
+        // unknown class: a NamingException naming the class, not a bare
+        // ClassNotFoundException with an empty name
+        ne = assertThrows(NamingException.class,
+                () -> factory.getObjectInstance(new Reference(
+                        "com.example.NoSuchClass", null, null),
+                        refName, null, null));
+        assertTrue(ne.getMessage().contains("com.example.NoSuchClass"),
+                "message must name the missing class");
+        assertInstanceOf(ClassNotFoundException.class, ne.getRootCause());
+
+        // interface: a NamingException naming the class, not a bare
+        // NoSuchMethodException
+        ne = assertThrows(NamingException.class,
+                () -> factory.getObjectInstance(new Reference(
+                        "javax.sql.DataSource", null, null),
+                        refName, null, null));
+        assertTrue(ne.getMessage().contains("javax.sql.DataSource"),
+                "message must name the unusable class");
+        assertInstanceOf(ReflectiveOperationException.class,
+                ne.getRootCause());
+        // a class whose no-argument constructor exists but throws
+        ne = assertThrows(NamingException.class,
+                () -> factory.getObjectInstance(new Reference(
+                        ThrowingCtorTarget.class.getName(), null, null),
+                        refName, null, null));
+        assertTrue(ne.getMessage().contains("constructor"),
+                "message must report the failing constructor");
+        assertInstanceOf(java.lang.reflect.InvocationTargetException.class,
+                ne.getRootCause());
+    }
+
+    /** Target whose no-argument constructor throws. */
+    public static class ThrowingCtorTarget {
+        public ThrowingCtorTarget() {
+            throw new IllegalStateException("boom");
         }
     }
 
