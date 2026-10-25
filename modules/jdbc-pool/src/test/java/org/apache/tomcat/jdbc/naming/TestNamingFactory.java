@@ -187,6 +187,45 @@ class TestNamingFactory extends JdbcPoolBaseTest {
         }
     }
 
+    @Test
+    void reservedReferenceAddressesAreNotAppliedAsProperties()
+            throws Exception {
+        Reference ref = new Reference(BagTarget.class.getName(), null, null);
+        // addresses a ResourceRef carries for a <Resource> element
+        ref.add(new StringRefAddr("singleton", "true"));
+        ref.add(new StringRefAddr("auth", "Container"));
+        ref.add(new StringRefAddr("scope", "Shareable"));
+        ref.add(new StringRefAddr("description", "my pool"));
+        ref.add(new StringRefAddr("forceString", "ignored"));
+        // the factory attribute is routed through the resource property bag
+        // by the Digester and arrives as a plain address
+        ref.add(new StringRefAddr("factory",
+                GenericNamingResourcesFactory.class.getName()));
+        // genuine configuration property
+        ref.add(new StringRefAddr("databaseName", "sample"));
+
+        Object result = new GenericNamingResourcesFactory().getObjectInstance(
+                ref, new CompositeName("test/bag"), null, null);
+        assertInstanceOf(BagTarget.class, result);
+        BagTarget target = (BagTarget) result;
+        assertEquals(java.util.Collections.singletonMap("databaseName", "sample"),
+                target.getBag(),
+                "reference metadata must not be applied as bean properties");
+    }
+
+    /** Target with a generic setProperty(name, value) fallback. */
+    public static class BagTarget {
+        private final java.util.Map<String, String> bag =
+                new java.util.LinkedHashMap<>();
+
+        public void setProperty(String name, String value) {
+            bag.put(name, value);
+        }
+        public java.util.Map<String, String> getBag() {
+            return bag;
+        }
+    }
+
     /** Plain configuration target for the generic naming factory. */
     public static class NamingTarget {
         private String name;
