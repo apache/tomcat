@@ -745,6 +745,14 @@
         connections. The shutdown drain now always completes and the
         interrupted status is propagated once it has. (remm)
       </fix>
+      <fix>
+        Correct a defect that meant a connection borrow that was in flight
+        while the pool was force-closed could be handed a newly created,
+        working connection from the closed pool, leaving that physical
+        connection open indefinitely. The borrow side now honours the closed
+        flag after the physical connect completes, like the return side
+        already did, and disconnects the new connection. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
