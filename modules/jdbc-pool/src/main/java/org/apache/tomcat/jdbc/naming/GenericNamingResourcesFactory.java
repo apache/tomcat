@@ -29,6 +29,7 @@ import java.util.Set;
 
 import javax.naming.Context;
 import javax.naming.Name;
+import javax.naming.NamingException;
 import javax.naming.RefAddr;
 import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
@@ -81,11 +82,49 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
         Enumeration<RefAddr> refs = ref.getAll();
 
         String type = ref.getClassName();
-        Object o =
-                ClassLoaderUtil.loadClass(
-                type,
-                GenericNamingResourcesFactory.class.getClassLoader(),
-                Thread.currentThread().getContextClassLoader()).getConstructor().newInstance();
+        if (type == null || type.isEmpty()) {
+            throw new NamingException(
+                    "No resource type (the \"type\" attribute) is defined for reference ["
+                            + name + "]; GenericNamingResourcesFactory needs the class of the "
+                            + "object to create.");
+        }
+        Object o;
+        try {
+            Class<?> clazz = ClassLoaderUtil.loadClass(
+                    type,
+                    GenericNamingResourcesFactory.class.getClassLoader(),
+                    Thread.currentThread().getContextClassLoader());
+            o = clazz.getConstructor().newInstance();
+        } catch (ClassNotFoundException e) {
+            NamingException ne = new NamingException(
+                    "Class [" + type + "] of reference [" + name + "] was not found");
+            ne.setRootCause(e);
+            throw ne;
+        } catch (InvocationTargetException e) {
+            // The class has a no-argument constructor, but it threw. Propagate
+            // only a fatal VirtualMachineError, in the spirit of
+            // ExceptionUtils.handleThrowable(), which tomcat-jdbc.jar cannot
+            // use directly.
+            Throwable cause = e.getCause();
+            if (cause instanceof VirtualMachineError) {
+                throw (VirtualMachineError) cause;
+            }
+            NamingException ne = new NamingException("The constructor of class ["
+                    + type + "] of reference [" + name
+                    + "] threw an exception and the object cannot be created");
+            ne.setRootCause(e);
+            throw ne;
+        } catch (ReflectiveOperationException e) {
+            // No public no-arg constructor (NoSuchMethodException), or the
+            // class cannot be instantiated (abstract, interface, illegal
+            // access).
+            NamingException ne = new NamingException("Class [" + type
+                    + "] of reference [" + name
+                    + "] has no usable public no-argument constructor and "
+                    + "cannot be created by this factory");
+            ne.setRootCause(e);
+            throw ne;
+        }
 
         while (refs.hasMoreElements()) {
             RefAddr addr = refs.nextElement();
