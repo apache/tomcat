@@ -750,6 +750,15 @@
         inflating the pool size and allowing more physical connections than
         <code>maxActive</code>. (remm)
       </fix>
+      <fix>
+        Correct a defect that meant <code>rollbackOnReturn</code> and
+        <code>commitOnReturn</code> were silently ignored unless
+        <code>defaultAutoCommit</code> was explicitly set to
+        <code>false</code>, so a connection returned while still in a
+        transaction could be handed to the next borrower inside that
+        transaction. These options now act on the actual transaction state
+        of the connection being returned. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
