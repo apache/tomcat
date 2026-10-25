@@ -753,6 +753,16 @@
         flag after the physical connect completes, like the return side
         already did, and disconnects the new connection. (remm)
       </fix>
+      <fix>
+        Correct two races in the wake-up protocol between releasing and
+        waiting threads in the connection pool. Destroying the last connection
+        while a borrower was about to register as a waiter could leave that
+        borrower blocked although a slot was free (forever when
+        <code>maxWait</code> was set to 0 or less), and releasing an already
+        released connection still injected an extra wake-up placeholder,
+        inflating the pool size and allowing more physical connections than
+        <code>maxActive</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
