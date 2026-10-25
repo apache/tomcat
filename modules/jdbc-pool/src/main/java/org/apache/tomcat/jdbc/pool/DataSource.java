@@ -70,7 +70,7 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
     @Override
     public void postDeregister() {
         if (oname!=null) {
-          unregisterJmx();
+            unregisterJmx();
         }
     }
 
@@ -103,7 +103,7 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
             if ( isJmxEnabled() ) {
                 this.oname = createObjectName(name);
                 if (oname!=null) {
-                  registerJmx();
+                    registerJmx();
                 }
             }
         }catch (MalformedObjectNameException x) {

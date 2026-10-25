@@ -51,7 +51,7 @@ public class JmxUtil {
         try {
             oname = getObjectName(base, keyprop);
             if (oname != null) {
-              ManagementFactory.getPlatformMBeanServer().registerMBean(obj, oname);
+                ManagementFactory.getPlatformMBeanServer().registerMBean(obj, oname);
             }
         } catch (Exception e) {
             log.error("Jmx registration failed.",e);
@@ -66,7 +66,7 @@ public class JmxUtil {
      */
     public static void unregisterJmx(ObjectName oname) {
         if (oname ==null) {
-          return;
+            return;
         }
         try {
             ManagementFactory.getPlatformMBeanServer().unregisterMBean(oname);
@@ -78,11 +78,11 @@ public class JmxUtil {
     private static ObjectName getObjectName(ObjectName base, String keyprop)
             throws MalformedObjectNameException {
         if (base == null) {
-          return null;
+            return null;
         }
         StringBuilder OnameStr = new StringBuilder(base.toString());
         if (keyprop != null) {
-          OnameStr.append(keyprop);
+            OnameStr.append(keyprop);
         }
         ObjectName oname = new ObjectName(OnameStr.toString());
         return oname;

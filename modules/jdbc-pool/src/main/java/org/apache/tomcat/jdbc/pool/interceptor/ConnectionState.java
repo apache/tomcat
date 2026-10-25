@@ -159,14 +159,14 @@ public class ConnectionState extends JdbcInterceptor  {
         for (int i=0; (!read) && i<readState.length; i++) {
             read = compare(name,readState[i]);
             if (read) {
-              index = i;
+                index = i;
             }
         }
         boolean write = false;
         for (int i=0; (!write) && (!read) && i<writeState.length; i++) {
             write = compare(name,writeState[i]);
             if (write) {
-              index = i;
+                index = i;
             }
         }
         Object result = null;
@@ -180,7 +180,7 @@ public class ConnectionState extends JdbcInterceptor  {
             }
             //return cached result, if we have it
             if (result!=null) {
-              return result;
+                return result;
             }
         }
 
