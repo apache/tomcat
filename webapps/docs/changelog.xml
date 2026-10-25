@@ -772,6 +772,15 @@
         transaction. These options now act on the actual transaction state
         of the connection being returned. (remm)
       </fix>
+      <fix>
+        Correct a defect in the JDBC connection pool where the cached proxy
+        constructor ignored the connection kind after the first proxy was
+        created, so swapping the data source backing a running pool could
+        proxy later connections of the wrong kind: connections backed by an
+        XA connection no longer implemented <code>XAConnection</code>, and
+        plain connections falsely did, with XA method calls on them failing
+        with a NullPointerException. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
