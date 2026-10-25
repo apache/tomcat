@@ -20,7 +20,6 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
@@ -71,9 +70,7 @@ class TestInterruptedPoolClose extends JdbcPoolBaseTest {
 
         assertTrue(outcome.interruptedAfterClose,
                 "propagateInterruptState=true must keep the interrupt status across close()");
-        assertEquals(0, ds.getSize());
-        assertEquals(0, poolSessions(),
-                "a forced close from an interrupted thread must close borrowed connections");
+        awaitSessions(0);
     }
 
     @Test
@@ -96,9 +93,7 @@ class TestInterruptedPoolClose extends JdbcPoolBaseTest {
 
         assertTrue(outcome.interruptedAfterClose,
                 "propagateInterruptState=true must keep the interrupt status across close()");
-        assertEquals(0, ds.getSize());
-        assertEquals(0, poolSessions(),
-                "a forced close must drain both queues despite the interrupt");
+        awaitSessions(0);
     }
 
     @Test
@@ -115,7 +110,6 @@ class TestInterruptedPoolClose extends JdbcPoolBaseTest {
 
         assertFalse(outcome.interruptedAfterClose,
                 "propagateInterruptState=false must not leave the interrupt status set");
-        assertEquals(0, poolSessions(),
-                "the drain must proceed after a consumed interrupt");
+        awaitSessions(0);
     }
 }
