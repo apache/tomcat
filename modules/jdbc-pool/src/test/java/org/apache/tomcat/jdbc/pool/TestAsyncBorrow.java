@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
@@ -116,6 +117,72 @@ class TestAsyncBorrow extends JdbcPoolBaseTest {
         } finally {
             holder.close();
         }
+    }
+
+    @Test
+    void asyncBorrowFailureWithoutAMessageStillSurfacesAsSqlException()
+            throws Exception {
+        // A failing connector whose exception carries no message: the pool
+        // wraps it as a message-less SQLException, and the async borrow must
+        // rethrow that failure rather than dereference its missing message
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setInitialSize(0);
+        ds.setDataSource(new javax.sql.DataSource() {
+            @Override
+            public Connection getConnection() {
+                throw new IllegalStateException();
+            }
+
+            @Override
+            public Connection getConnection(String user, String password) {
+                throw new IllegalStateException();
+            }
+
+            @Override
+            public java.io.PrintWriter getLogWriter() {
+                return null;
+            }
+
+            @Override
+            public void setLogWriter(java.io.PrintWriter out) {
+                // no logging
+            }
+
+            @Override
+            public void setLoginTimeout(int seconds) {
+                // no timeout
+            }
+
+            @Override
+            public int getLoginTimeout() {
+                return 0;
+            }
+
+            @Override
+            public java.util.logging.Logger getParentLogger()
+                    throws java.sql.SQLFeatureNotSupportedException {
+                throw new java.sql.SQLFeatureNotSupportedException();
+            }
+
+            @Override
+            public <T> T unwrap(Class<T> iface) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public boolean isWrapperFor(Class<?> iface) {
+                return false;
+            }
+        });
+
+        SQLException failure = assertThrows(SQLException.class,
+                ds::getConnectionAsync,
+                "the borrow failure must reach the caller as a SQLException "
+                        + "even when its message is null");
+        assertNull(failure.getMessage(),
+                "the rethrown failure must keep its absent message");
+        assertTrue(failure.getCause() instanceof IllegalStateException,
+                "the wrapped connector failure must be preserved as cause");
     }
 
     @Test
