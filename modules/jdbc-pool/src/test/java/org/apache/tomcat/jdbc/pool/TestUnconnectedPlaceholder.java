@@ -77,9 +77,10 @@ class TestUnconnectedPlaceholder extends JdbcPoolBaseTest {
         props.setPassword("");
         props.setJmxEnabled(false);
         props.setInitialSize(0);
-        // one above the placeholder count so the age-based eviction guard
-        // (minIdle < idle) never removes it: only the idle validation can
-        props.setMinIdle(1);
+        // age-based eviction is switched off, so the placeholder can only
+        // ever be removed by the idle validation this test is about
+        props.setMinIdle(0);
+        props.setMinEvictableIdleTimeMillis(-1);
         props.setMaxActive(1);
         props.setMaxIdle(1);
         // <= 0 means: wait forever for a notification

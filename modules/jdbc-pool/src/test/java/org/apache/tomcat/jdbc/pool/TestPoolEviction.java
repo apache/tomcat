@@ -146,6 +146,34 @@ class TestPoolEviction extends JdbcPoolBaseTest {
     }
 
     @Test
+    void agedIdleConnectionIsEvictedWhileBusyKeepsSizeAboveMinIdle()
+            throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setMinIdle(1);
+        ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(200);
+        ds.getPoolProperties().setMinEvictableIdleTimeMillis(100);
+        ds.createPool();
+
+        // one busy connection above the min-idle floor: the pool is over the
+        // floor by total size, yet idle never exceeds the floor, so the
+        // cleaner's guard must not skip the eviction sweep
+        Connection hold = ds.getConnection();
+        try {
+            Connection extra = ds.getConnection();
+            assertEquals(2, poolSessions());
+            extra.close(); // aged after 100 ms; evictable while size(2) > minIdle(1)
+
+            awaitSessions(1); // only the busy connection's session may survive
+        } finally {
+            // release the busy slot even if the eviction assertion above
+            // failed, so a red run cannot pollute the shared server; the
+            // returned connection then sits at the min-idle floor, where it
+            // must stay and where the teardown closes it
+            hold.close();
+        }
+    }
+
+    @Test
     void borrowAfterEvictionCycleYieldsFreshConnection() throws Exception {
         DataSource ds = newDataSource();
         ds.getPoolProperties().setMaxActive(1);
