@@ -1000,15 +1000,16 @@ public class ConnectionPool {
      */
     protected boolean terminateTransaction(PooledConnection con) {
         try {
-            if (Boolean.FALSE.equals(con.getPoolProperties().getDefaultAutoCommit())) {
-                if (this.getPoolProperties().getRollbackOnReturn()) {
-                    boolean autocommit = con.getConnection().getAutoCommit();
-                    if (!autocommit) {
+            // terminate the transaction of any connection that is returned
+            // while still in one; the pool-level defaultAutoCommit property
+            // must not gate this, the connection's own state is what matters
+            boolean doRollback = getPoolProperties().getRollbackOnReturn();
+            boolean doCommit = !doRollback && getPoolProperties().getCommitOnReturn();
+            if (doRollback || doCommit) {
+                if (!con.getConnection().getAutoCommit()) {
+                    if (doRollback) {
                         con.getConnection().rollback();
-                    }
-                } else if (this.getPoolProperties().getCommitOnReturn()) {
-                    boolean autocommit = con.getConnection().getAutoCommit();
-                    if (!autocommit) {
+                    } else {
                         con.getConnection().commit();
                     }
                 }

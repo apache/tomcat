@@ -818,7 +818,8 @@ public interface PoolConfiguration {
     /**
      * Set to true if you want the connection pool to commit any pending transaction when a connection is returned.
      * The default value is false, as this could result in committing data.
-     * This parameter is only looked at if the {@link #getDefaultAutoCommit()} returns false
+     * This parameter is ignored if {@link #setRollbackOnReturn(boolean)} is also set to true.
+     * The commit is only performed when the returned connection is actually in a transaction.
      * @param commitOnReturn set to true if the pool should call {@link java.sql.Connection#commit()} when a connection is returned to the pool.
      * Default is false
      */
@@ -835,7 +836,7 @@ public interface PoolConfiguration {
     /**
      * Set to true if you want the connection pool to rollback any pending transaction when a connection is returned.
      * The default value is false, as this could result in committing data.
-     * This parameter is only looked at if the {@link #getDefaultAutoCommit()} returns false
+     * The rollback is only performed when the returned connection is actually in a transaction.
      * @param rollbackOnReturn set to true if the pool should call {@link java.sql.Connection#rollback()} when a connection is returned to the pool.
      * Default is false
      */
