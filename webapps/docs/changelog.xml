@@ -735,6 +735,14 @@
         statements as not poolable. Pull request <pr>1083</pr> provided by
         Raphael Vullriede. (markt)
       </fix>
+      <fix>
+        Correct a defect that meant closing the connection pool from a thread
+        that carried an interrupt status, when
+        <code>propagateInterruptState</code> was set to
+        <code>true</code>, looped forever without closing any of the pool's
+        connections. The shutdown drain now always completes and the
+        interrupted status is propagated once it has. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
