@@ -159,6 +159,10 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
 
                         // Unknown type
                     } else {
+                        // Unsupported parameter type. Do not invoke the
+                        // method with a null value. Let the caller fall back
+                        // to setProperty(name, value) or handle the failure.
+                        ok = false;
                         if (log.isDebugEnabled()) {
                             log.debug("IntrospectionUtils: Unknown type " +
                                     paramType.getName());
