@@ -105,7 +105,9 @@
           This is achieved using the <code>suspectTimeout</code> attribute.</li>
       <li>Connections can be retrieved from a <code>java.sql.Driver</code>, <code>javax.sql.DataSource</code> or <code>javax.sql.XADataSource</code>
           This is achieved using the <code>dataSource</code> and <code>dataSourceJNDI</code> attributes.</li>
-      <li>XA connection support</li>
+      <li>XA connection support. XA connections are provided by the data source named by the
+          <code>dataSource</code> or <code>dataSourceJNDI</code> attribute, which must implement
+          <code>javax.sql.XADataSource</code>.</li>
     </ol>
 
 
@@ -166,6 +168,11 @@
       <attribute name="type" required="true">
         <p>Type should always be <code>javax.sql.DataSource</code> or <code>javax.sql.XADataSource</code></p>
         <p>Depending on the type a <code>org.apache.tomcat.jdbc.pool.DataSource</code> or a <code>org.apache.tomcat.jdbc.pool.XADataSource</code> will be created.</p>
+        <p>Note that the <code>javax.sql.XADataSource</code> type only provides XA connections if the pool is backed
+        by an XA data source: the <code>dataSource</code> or <code>dataSourceJNDI</code> attribute must name a
+        <code>javax.sql.XADataSource</code> provided by the JDBC driver. A pool configured with
+        <code>driverClassName</code> and <code>url</code> pools plain JDBC connections, and a request for an XA
+        connection from such a pool fails with an explicit error.</p>
       </attribute>
     </attributes>
   </subsection>
