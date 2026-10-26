@@ -859,8 +859,8 @@ public class WsSession implements Session {
      * endpoint.
      */
     private Object getManagedEndpointInstance() {
-        if (localEndpoint instanceof PojoEndpointBase pojoEndpoint) {
-            Object pojo = pojoEndpoint.getPojo();
+        if (localEndpoint instanceof PojoEndpointBase) {
+            Object pojo = ((PojoEndpointBase) localEndpoint).getPojo();
             if (pojo != null) {
                 return pojo;
             }
