@@ -73,6 +73,23 @@ class TestPoolProperties {
     }
 
     @Test
+    void poolNameIsAvailableBeforeThePoolIsCreatedAndAfterClose() {
+        PoolProperties properties = new PoolProperties();
+        properties.setName("test-pool");
+        DataSourceProxy proxy = new DataSourceProxy(properties);
+
+        Assertions.assertEquals("test-pool", proxy.getPoolName(),
+                "getPoolName() must not require a running pool");
+        Assertions.assertEquals(proxy.getName(), proxy.getPoolName(),
+                "getPoolName() and getName() must agree");
+
+        proxy.close();
+
+        Assertions.assertEquals("test-pool", proxy.getPoolName(),
+                "getPoolName() must still work after close()");
+    }
+
+    @Test
     void toStringMasksThePasswordButStillShowsTheConfiguration() {
         PoolProperties properties = new PoolProperties();
         properties.setUsername(DEFAULT_USER);
