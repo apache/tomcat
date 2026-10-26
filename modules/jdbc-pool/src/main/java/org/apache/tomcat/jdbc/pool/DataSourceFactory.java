@@ -622,8 +622,11 @@ public class DataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_CONNECTIONPROPERTIES);
         if (value != null) {
-            Properties p = getProperties(value);
-            poolProperties.setDbProperties(p);
+            // Use the canonical setter so that the configured string also
+            // round-trips through getConnectionProperties(); it parses the
+            // pairs into getDbProperties() with the very same parser that
+            // getProperties(value) below used to apply.
+            poolProperties.setConnectionProperties(value);
         } else {
             poolProperties.setDbProperties(new Properties());
         }
