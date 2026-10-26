@@ -66,8 +66,14 @@ public class DisposableConnectionFacade extends JdbcInterceptor {
     public Object invoke(Object proxy, Method method, Object[] args)
             throws Throwable {
         if (compare(EQUALS_VAL, method)) {
-            return Boolean.valueOf(
-                    this.equals(Proxy.getInvocationHandler(args[0])));
+            // Object.equals must answer false - never throw - for a null
+            // or foreign argument, so the handler extraction has to be
+            // guarded: Proxy.getInvocationHandler throws NPE on null and
+            // IllegalArgumentException on a non-proxy.
+            Object other = args[0];
+            return Boolean.valueOf(other != null
+                    && Proxy.isProxyClass(other.getClass())
+                    && this.equals(Proxy.getInvocationHandler(other)));
         } else if (compare(HASHCODE_VAL, method)) {
             return Integer.valueOf(this.hashCode());
         } else if (getNext()==null) {
