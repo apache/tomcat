@@ -431,9 +431,23 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                         String propsAsString = interceptorValues[i].substring(propIndex+1, endIndex);
                         String[] props = propsAsString.split(",");
                         for (int j=0; j<props.length; j++) {
-                            int pidx = props[j].indexOf('=');
-                            String propName = props[j].substring(0,pidx).trim();
-                            String propValue = props[j].substring(pidx+1).trim();
+                            String prop = props[j];
+                            if (prop.trim().isEmpty()) {
+                                // an empty segment comes from Name(), Name(   )
+                                // or a redundant separator: there is no property
+                                // to add, so tolerate it rather than fail the
+                                // whole pool start on a cosmetic spelling
+                                continue;
+                            }
+                            int pidx = prop.indexOf('=');
+                            if (pidx < 0) {
+                                throw new IllegalArgumentException(
+                                        "Invalid interceptor property '" + prop.trim()
+                                        + "', missing '=', in jdbcInterceptors value ["
+                                        + interceptorValues[i] + "]");
+                            }
+                            String propName = prop.substring(0,pidx).trim();
+                            String propValue = prop.substring(pidx+1).trim();
                             definitions[i+1].addProperty(new InterceptorProperty(propName,propValue));
                         }
                     }
