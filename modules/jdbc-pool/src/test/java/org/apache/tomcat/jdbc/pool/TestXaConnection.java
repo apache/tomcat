@@ -168,4 +168,113 @@ class TestXaConnection extends JdbcPoolBaseTest {
         assertThrows(SQLException.class, ds::getXAConnection,
                 "a non-XA pool must refuse XA connections");
     }
+
+    @Test
+    void driverUrlBackedXaPoolFailsXaRequestWithActionableMessage() {
+        // The documented "<Resource type=javax.sql.XADataSource .../>"
+        // shape with only driver/URL: the marker class cannot make the
+        // pooled connections XA-capable, so the request must fail with an
+        // explicit hint at the missing configuration instead of a generic
+        // refusal that only reads as such after the connection was already
+        // borrowed, closed and thrown away.
+        XADataSource ds = new XADataSource();
+        ds.setUrl(getUrl());
+        ds.setDriverClassName("org.h2.Driver");
+        ds.setUsername("sa");
+        ds.setPassword("");
+        ds.getPoolProperties().setJmxEnabled(false);
+        ds.getPoolProperties().setInitialSize(1);
+        ds.getPoolProperties().setMinIdle(0);
+        manage(ds);
+
+        SQLException e = assertThrows(SQLException.class, ds::getXAConnection,
+                "a driver/URL backed XA pool must refuse XA connections");
+        assertTrue(e.getMessage().contains("dataSource"),
+                "failure must name the missing dataSource/dataSourceJNDI configuration, was: "
+                        + e.getMessage());
+        SQLException e2 = assertThrows(SQLException.class, () -> ds.getXAConnection("sa", ""),
+                "the credential variant must refuse the same way");
+        assertTrue(e2.getMessage().contains("dataSource"),
+                "failure must name the missing dataSource/dataSourceJNDI configuration, was: "
+                        + e2.getMessage());
+    }
+
+    @Test
+    void nonXaBackedDataSourceFailsXaRequestWithActionableMessage() {
+        // A pool backed through the dataSource attribute by a data source
+        // that is not XA-capable must also fail with the configuration hint.
+        XADataSource ds = new XADataSource();
+        ds.getPoolProperties().setJmxEnabled(false);
+        ds.getPoolProperties().setInitialSize(1);
+        ds.getPoolProperties().setMinIdle(0);
+        ds.getPoolProperties().setDataSource(new PlainDataSource(getUrl()));
+        manage(ds);
+
+        SQLException e = assertThrows(SQLException.class, ds::getXAConnection,
+                "a pool backed by a non-XA data source must refuse XA connections");
+        assertTrue(e.getMessage().contains("PlainDataSource"),
+                "failure must name the offending data source, was: " + e.getMessage());
+        assertTrue(e.getMessage().contains("javax.sql.XADataSource"),
+                "failure must name the missing XA data source type, was: " + e.getMessage());
+    }
+
+    /**
+     * A plain, non-XA data source, as one might reference by mistake
+     * through the dataSource or dataSourceJNDI attribute.
+     */
+    private static final class PlainDataSource implements javax.sql.DataSource {
+
+        private final org.h2.jdbcx.JdbcDataSource delegate = new org.h2.jdbcx.JdbcDataSource();
+
+        PlainDataSource(String url) {
+            delegate.setUrl(url);
+            delegate.setUser("sa");
+            delegate.setPassword("");
+        }
+
+        @Override
+        public Connection getConnection() throws SQLException {
+            return delegate.getConnection();
+        }
+
+        @Override
+        public Connection getConnection(String username, String password) throws SQLException {
+            return delegate.getConnection(username, password);
+        }
+
+        @Override
+        public java.io.PrintWriter getLogWriter() throws SQLException {
+            return delegate.getLogWriter();
+        }
+
+        @Override
+        public void setLogWriter(java.io.PrintWriter out) throws SQLException {
+            delegate.setLogWriter(out);
+        }
+
+        @Override
+        public void setLoginTimeout(int seconds) throws SQLException {
+            delegate.setLoginTimeout(seconds);
+        }
+
+        @Override
+        public int getLoginTimeout() throws SQLException {
+            return delegate.getLoginTimeout();
+        }
+
+        @Override
+        public java.util.logging.Logger getParentLogger() throws java.sql.SQLFeatureNotSupportedException {
+            return delegate.getParentLogger();
+        }
+
+        @Override
+        public <T> T unwrap(Class<T> iface) throws SQLException {
+            return delegate.unwrap(iface);
+        }
+
+        @Override
+        public boolean isWrapperFor(Class<?> iface) throws SQLException {
+            return iface.isInstance(this) || delegate.isWrapperFor(iface);
+        }
+    }
 }
