@@ -1463,8 +1463,19 @@ public class ConnectionPool {
     protected void disconnectEvent(PooledConnection con, boolean finalizing) {
         JdbcInterceptor handler = con.getHandler();
         while (handler!=null) {
-            handler.disconnected(this, con, finalizing);
-            handler=handler.getNext();
+            //read the next link before the callback, as the callback
+            //is allowed to modify it
+            JdbcInterceptor next = handler.getNext();
+            try {
+                handler.disconnected(this, con, finalizing);
+            } catch (Throwable t) {
+                //one broken interceptor must not stop the rest of the
+                //chain from being notified
+                log.warn("Interceptor [" + handler.getClass().getName()
+                        + "] threw an exception from disconnected(); "
+                        + "continuing with the rest of the chain.", t);
+            }
+            handler = next;
         }
     }
 
