@@ -51,6 +51,25 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
         super(poolProperties);
     }
 
+    /**
+     * Unregisters the connection pool MBean before closing the pool, so a
+     * dead pool does not keep reporting stale statistics under a live
+     * object name (and does not pin the closed pool, its credentials and
+     * its JDBC driver class loader in the MBean server).<br>
+     * {@inheritDoc}
+     */
+    @Override
+    public synchronized void close(boolean all) {
+        // Same monitor as DataSourceProxy.close(boolean), so the
+        // check-and-clear of the registration handle is atomic against a
+        // concurrent close.
+        if (oname != null) {
+            unregisterJmx();
+            oname = null;
+        }
+        super.close(all);
+    }
+
 
 
 
@@ -71,6 +90,7 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
     public void postDeregister() {
         if (oname!=null) {
             unregisterJmx();
+            oname = null;
         }
     }
 
