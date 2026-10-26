@@ -34,9 +34,12 @@ import java.util.Locale;
  * <ul>
  *   <li>Unicode, other and private use extensions (e.g. {@code -u-ca-buddhist},
  *       {@code -x-priv}) are discarded rather than recorded on the Locale.</li>
- *   <li>Script subtags (e.g. {@code -Hant-}) cannot be represented by the
- *       deprecated constructor and are mapped to the Locale variant, in upper
- *       case, instead of to the Locale script.</li>
+ *   <li>Script subtags (e.g. {@code -Hant-}) are discarded. The deprecated
+ *       constructor has no script component and {@code zh-Hans-CN} therefore
+ *       yields the Locale for {@code zh-CN}. Mapping the script to the variant
+ *       instead kept the information but produced a Locale whose language tag
+ *       is not the one the client sent, {@code zh-CN-x-lvariant-HANS} rather
+ *       than {@code zh-Hans-CN}.</li>
  *   <li>Tags that are syntactically invalid after the language subtag retain
  *   the components parsed up to that point rather than being replaced with
  *   {@link Locale#ROOT}.</li>
@@ -113,10 +116,9 @@ public final class AcceptLanguage2 {
      * <p>
      * Component mapping: the primary subtag becomes the language, the region
      * subtag (2 alpha or 3 digits) becomes the country, the script subtag (4
-     * alpha) is upper-cased and mapped to the variant, any other variant
-     * subtags are appended to the variant unchanged (variant values are case
-     * sensitive in Locale) with '_' as separator, and extension/private use
-     * subtags are dropped.
+     * alpha) is discarded, any variant subtags are appended to the variant
+     * unchanged (variant values are case sensitive in Locale) with '_' as
+     * separator, and extension/private use subtags are dropped.
      *
      * @param tag The language tag
      *
@@ -171,10 +173,11 @@ public final class AcceptLanguage2 {
                 countrySeen = true;
             } else if (subLen == 4 && !scriptSeen && !countrySeen && allAsciiAlpha(tag, pos, end)) {
                 // Script subtag. The deprecated constructor has no script
-                // component so it is mapped to the variant instead. The
-                // subtag is upper-cased to clearly distinguish it from
-                // regular variant subtags which are kept unchanged.
-                appendVariant(variant, upper(tag, pos, end));
+                // component, and the variant cannot hold a four letter subtag
+                // without producing a language tag that differs from the one
+                // that was received, so the script is discarded. Parsing
+                // continues so that a region subtag following the script is
+                // still used.
                 scriptSeen = true;
             } else if (isVariantSubtag(tag, pos, end, subLen)) {
                 // Variant subtag. Locale variants are case sensitive and
