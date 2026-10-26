@@ -898,6 +898,31 @@ public class TestRequest extends TomcatBaseTest {
         Assert.assertEquals(expected, actual);
     }
 
+    /*
+     * A script subtag in the Accept-Language header must not end up in the
+     * Locale variant, which made the Locale report the language tag
+     * zh-CN-x-lvariant-HANS for the tag the client sent as zh-Hans-CN. The
+     * default parser cannot represent the script at all and drops it, the
+     * standard parser keeps it.
+     */
+    @Test
+    public void getLocaleScript() throws Exception {
+        TesterRequest req = new TesterRequest();
+
+        req.addHeader("accept-language", "zh-Hans-CN;q=1.0");
+
+        Locale actual = req.getLocale();
+
+        boolean standardParser = Boolean
+                .getBoolean("org.apache.tomcat.util.http.parser.StandardAcceptLanguageParser");
+        Locale expected = Locale.forLanguageTag(standardParser ? "zh-Hans-CN" : "zh-CN");
+
+        Assert.assertEquals(expected, actual);
+        Assert.assertEquals("CN", actual.getCountry());
+        Assert.assertEquals("", actual.getVariant());
+        Assert.assertEquals(expected.toLanguageTag(), actual.toLanguageTag());
+    }
+
 
     @Test
     public void testGetReaderValidEncoding() throws Exception {
