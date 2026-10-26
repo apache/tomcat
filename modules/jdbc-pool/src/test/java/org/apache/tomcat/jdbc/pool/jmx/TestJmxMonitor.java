@@ -241,6 +241,39 @@ class TestJmxMonitor extends JdbcPoolBaseTest {
     }
 
     @Test
+    void theDataSourceBeanSurfaceNeverExposesThePassword() throws Exception {
+        final String secret = "s3cr3t-pool-password";
+        DataSource ds = newDataSource();
+        ds.createPool(); // connect with the fixture credentials first
+        // the pool is already connected; this only records what a real
+        // configuration holds
+        ds.setPassword(secret);
+        ds.setConnectionProperties("appconfigured=yes");
+
+        // The DataSource object doubles as its own MBean/bean surface:
+        // the modeler and reflective exporters read these public getters.
+        // The deliberately masked getPassword() must not be bypassed by a
+        // sibling getter that still hands out the live db-properties.
+        Properties dbProperties = ds.getDbProperties();
+        Assertions.assertNotNull(dbProperties);
+        for (String name : dbProperties.stringPropertyNames()) {
+            Assertions.assertFalse(secret.equals(dbProperties.getProperty(name)),
+                    "the bean view of the driver properties must not carry the"
+                            + " password, property " + name);
+        }
+        Assertions.assertEquals("yes", dbProperties.getProperty("appconfigured"),
+                "the sanitization must still show every other driver property");
+        // The returned view is a copy: writing through it cannot smuggle
+        // values back into the pool configuration.
+        dbProperties.setProperty("injected", "through-the-view");
+        Assertions.assertNull(ds.getPoolProperties().getDbProperties().getProperty("injected"),
+                "the exposed db-properties must be a view, not the live object");
+        // and the pool must still authenticate - the copy is display-side
+        // only, the connect path keeps its own credentials
+        Assertions.assertDoesNotThrow(() -> ds.getConnection().close());
+    }
+
+    @Test
     void closingThePoolUnregistersItsMBean() throws Exception {
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
         DataSource ds = newDataSource();
