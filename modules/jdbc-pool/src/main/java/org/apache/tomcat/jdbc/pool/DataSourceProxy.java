@@ -863,9 +863,20 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
 
+    /**
+     * Returns a copy of the database properties with the password removed.
+     * This object doubles as its own JMX/bean surface and
+     * {@link #setPassword(String)} stores the password into the database
+     * properties, so returning them as they are would expose the plaintext
+     * password through a getter while {@link #getPassword()} is explicitly
+     * masked - the same protection the pool's own MBean
+     * ({@link org.apache.tomcat.jdbc.pool.jmx.ConnectionPool#getDbProperties()})
+     * already applies.
+     * {@inheritDoc}
+     */
     @Override
     public Properties getDbProperties() {
-        return getPoolProperties().getDbProperties();
+        return PoolUtilities.cloneWithoutPassword(getPoolProperties().getDbProperties());
     }
 
 
