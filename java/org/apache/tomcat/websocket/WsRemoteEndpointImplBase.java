@@ -825,22 +825,30 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
      */
     protected void setEncoders(EndpointConfig endpointConfig) throws DeploymentException {
         encoderEntries.clear();
-        for (Class<? extends Encoder> encoderClazz : endpointConfig.getEncoders()) {
-            Encoder instance;
-            InstanceManager instanceManager = wsSession.getInstanceManager();
-            try {
-                if (instanceManager == null) {
-                    instance = encoderClazz.getConstructor().newInstance();
-                } else {
-                    instance = (Encoder) instanceManager.newInstance(encoderClazz);
+        try {
+            for (Class<? extends Encoder> encoderClazz : endpointConfig.getEncoders()) {
+                Encoder instance;
+                InstanceManager instanceManager = wsSession.getInstanceManager();
+                try {
+                    if (instanceManager == null) {
+                        instance = encoderClazz.getConstructor().newInstance();
+                    } else {
+                        instance = (Encoder) instanceManager.newInstance(encoderClazz);
+                    }
+                    // Add the entry before initialising the encoder below so that the encoder is released by the
+                    // clean-up below if the initialisation fails.
+                    encoderEntries.add(new EncoderEntry(Util.getEncoderType(encoderClazz), instance));
+                    instance.init(endpointConfig);
+                } catch (ReflectiveOperationException | NamingException e) {
+                    throw new DeploymentException(
+                            sm.getString("wsRemoteEndpoint.invalidEncoder", encoderClazz.getName()), e);
                 }
-                instance.init(endpointConfig);
-            } catch (ReflectiveOperationException | NamingException e) {
-                throw new DeploymentException(sm.getString("wsRemoteEndpoint.invalidEncoder", encoderClazz.getName()),
-                        e);
             }
-            EncoderEntry entry = new EncoderEntry(Util.getEncoderType(encoderClazz), instance);
-            encoderEntries.add(entry);
+        } catch (RuntimeException e) {
+            // This endpoint is not going to be used, so close() below will never be called for it. Release the encoders
+            // created so far, since nothing else will.
+            destroyEncoders();
+            throw e;
         }
     }
 
@@ -856,9 +864,11 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
 
     /**
-     * Closes all encoders associated with this endpoint.
+     * Destroys the encoders associated with this endpoint, including any clean-up the instance manager performs when an
+     * instance it created is destroyed. The encoders are only destroyed once, no matter how many times this method is
+     * called.
      */
-    public final void close() {
+    void destroyEncoders() {
         InstanceManager instanceManager = wsSession.getInstanceManager();
         for (EncoderEntry entry : encoderEntries) {
             entry.getEncoder().destroy();
@@ -870,9 +880,23 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                 }
             }
         }
+        // The entries are removed, so that a repeated call does not destroy the encoders a second time.
+        encoderEntries.clear();
+    }
+
+
+    /**
+     * Closes all encoders associated with this endpoint.
+     */
+    public final void close() {
+        destroyEncoders();
         // The transformation handles both input and output. It only needs to be
         // closed once so it is closed here on the output side.
-        transformation.close();
+        if (transformation != null) {
+            // The transformation is set once the connection is fully established. It is not set if the connection
+            // could not be established, in which case there is nothing to close here.
+            transformation.close();
+        }
         doClose();
     }
 
