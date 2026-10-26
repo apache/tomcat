@@ -25,11 +25,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
@@ -88,9 +84,9 @@ class TestSlowQueryEviction extends JdbcPoolBaseTest {
             stats.put("sql-" + i, entry);
         }
 
-        assertDoesNotThrow(() -> report.removeOldest(stats),
+        Assertions.assertDoesNotThrow(() -> report.removeOldest(stats),
                 "an eviction that cannot catch up must not fail the caller");
-        assertTrue(stats.size() <= 15,
+        Assertions.assertTrue(stats.size() <= 15,
                 "the map must stay bounded, was " + stats.size());
     }
 
@@ -110,11 +106,11 @@ class TestSlowQueryEviction extends JdbcPoolBaseTest {
 
         report.removeOldest(stats);
 
-        assertEquals(2, stats.size(), "down to the configured maximum");
-        assertTrue(stats.containsKey("never-used"),
+        Assertions.assertEquals(2, stats.size(), "down to the configured maximum");
+        Assertions.assertTrue(stats.containsKey("never-used"),
                 "a query that was never invoked counts as the newest of all");
-        assertTrue(stats.containsKey("recent"), "the more recent one survives");
-        assertFalse(stats.containsKey("old"), "the least recent one is evicted");
+        Assertions.assertTrue(stats.containsKey("recent"), "the more recent one survives");
+        Assertions.assertFalse(stats.containsKey("old"), "the least recent one is evicted");
     }
 
     /*
@@ -144,7 +140,7 @@ class TestSlowQueryEviction extends JdbcPoolBaseTest {
         SlowQueryReport report;
         try (Connection c = ds.getConnection()) {
             report = interceptorOf(c, SlowQueryReport.class);
-            assertNotNull(report, "the interceptor must be in the chain");
+            Assertions.assertNotNull(report, "the interceptor must be in the chain");
             for (int t = 0; t < threads; t++) {
                 int id = t;
                 pool.execute(() -> {
@@ -163,7 +159,7 @@ class TestSlowQueryEviction extends JdbcPoolBaseTest {
             ready.await();
             start.countDown();
             pool.shutdown();
-            assertTrue(pool.awaitTermination(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
+            Assertions.assertTrue(pool.awaitTermination(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
                     "the borrowers must not wedge each other");
         } finally {
             pool.shutdownNow();
@@ -181,8 +177,8 @@ class TestSlowQueryEviction extends JdbcPoolBaseTest {
         // evictions that both see one entry too many may take it below. What
         // has to hold is that the map neither runs away nor is drained; the
         // margins below are comfortably wide rather than derived limits.
-        assertTrue(size <= 16 + threads,
+        Assertions.assertTrue(size <= 16 + threads,
                 "the map must stay near its configured capacity, was " + size);
-        assertTrue(size > 0, "the map must still hold statistics, was " + size);
+        Assertions.assertTrue(size > 0, "the map must still hold statistics, was " + size);
     }
 }

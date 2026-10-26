@@ -21,8 +21,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -74,11 +73,11 @@ class TestInterruptedWaiter extends JdbcPoolBaseTest {
             holder.setDaemon(true);
             holder.start();
         }
-        assertTrue(holdersBorrowed.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
+        Assertions.assertTrue(holdersBorrowed.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
                 "the holders must reach maxActive");
-        assertEquals(0, ds.getIdle());
-        assertEquals(HOLDERS, ds.getActive());
-        assertEquals(HOLDERS, ds.getSize());
+        Assertions.assertEquals(0, ds.getIdle());
+        Assertions.assertEquals(HOLDERS, ds.getActive());
+        Assertions.assertEquals(HOLDERS, ds.getSize());
         awaitSessions(HOLDERS);
 
         // Now the pool is exhausted: every further borrower is a waiter.
@@ -105,23 +104,23 @@ class TestInterruptedWaiter extends JdbcPoolBaseTest {
             waiter.join(AWAIT_TIMEOUT_MS);
         }
 
-        assertEquals(0, interruptedWithConnection.get(),
+        Assertions.assertEquals(0, interruptedWithConnection.get(),
                 "no connection was available, so no waiter may hold one");
-        assertEquals(HOLDERS, stillWaiting.get());
-        assertEquals(0, ds.getIdle(),
+        Assertions.assertEquals(HOLDERS, stillWaiting.get());
+        Assertions.assertEquals(0, ds.getIdle(),
                 "interrupted waiters must not leave connections checked out");
-        assertEquals(HOLDERS, ds.getActive(),
+        Assertions.assertEquals(HOLDERS, ds.getActive(),
                 "interrupted waiters must not change the active count");
-        assertEquals(HOLDERS, ds.getSize());
-        assertEquals(HOLDERS, poolSessions(),
+        Assertions.assertEquals(HOLDERS, ds.getSize());
+        Assertions.assertEquals(HOLDERS, poolSessions(),
                 "interrupted waiters must not leave physical connections behind");
 
         releaseHolders.countDown();
-        assertTrue(holdersReturned.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
+        Assertions.assertTrue(holdersReturned.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
                 "the holders must return their connections");
-        assertEquals(HOLDERS, ds.getIdle(),
+        Assertions.assertEquals(HOLDERS, ds.getIdle(),
                 "the returned connections must be reusable again");
-        assertEquals(0, ds.getActive());
+        Assertions.assertEquals(0, ds.getActive());
 
         // and the pool must serve a fresh wave of borrowers
         AtomicInteger served = new AtomicInteger();
@@ -142,9 +141,9 @@ class TestInterruptedWaiter extends JdbcPoolBaseTest {
         for (Thread borrower : borrowers) {
             borrower.join(AWAIT_TIMEOUT_MS);
         }
-        assertEquals(0, failed.get(),
+        Assertions.assertEquals(0, failed.get(),
                 "a pool that only ever had interrupted waiters must still serve them");
-        assertEquals(HOLDERS, served.get());
+        Assertions.assertEquals(HOLDERS, served.get());
         awaitSessions(HOLDERS);
     }
 }

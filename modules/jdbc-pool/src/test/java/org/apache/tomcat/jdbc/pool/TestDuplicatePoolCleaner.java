@@ -16,7 +16,7 @@
  */
 package org.apache.tomcat.jdbc.pool;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
@@ -46,7 +46,7 @@ class TestDuplicatePoolCleaner extends JdbcPoolBaseTest {
 
         ds.close();
 
-        assertEquals(baseline, ConnectionPool.getPoolCleaners().size(),
+        Assertions.assertEquals(baseline, ConnectionPool.getPoolCleaners().size(),
                 "closing the pool must unregister every cleaner it started; "
                         + "a replaced cleaner must not stay scheduled");
     }

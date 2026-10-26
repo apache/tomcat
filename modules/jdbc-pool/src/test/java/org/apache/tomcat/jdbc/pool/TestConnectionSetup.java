@@ -20,9 +20,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -64,7 +62,7 @@ class TestConnectionSetup extends JdbcPoolBaseTest {
         ds.createPool();
 
         try (Connection initial = ds.getConnection()) {
-            assertEquals("applied", initMarker(initial),
+            Assertions.assertEquals("applied", initMarker(initial),
                     "the init SQL must have run on the initial connection");
         }
         awaitSessions(1);
@@ -73,9 +71,10 @@ class TestConnectionSetup extends JdbcPoolBaseTest {
         Connection secondPhysical;
         try (@SuppressWarnings("unused") Connection first = ds.getConnection()) {
             secondPhysical = ds.getConnection();
-            assertEquals(2, poolSessions(), "two concurrent borrowers need two sessions");
+            Assertions.assertEquals(2, poolSessions(),
+                    "two concurrent borrowers need two sessions");
         }
-        assertEquals("applied", initMarker(secondPhysical),
+        Assertions.assertEquals("applied", initMarker(secondPhysical),
                 "the init SQL must run on every session the pool establishes");
         secondPhysical.close();
     }
@@ -86,12 +85,12 @@ class TestConnectionSetup extends JdbcPoolBaseTest {
     void aBlankInitSqlIsNotConfiguredAtAll(String initSql) throws Exception {
         DataSource ds = newDataSource();
         ds.getPoolProperties().setInitSQL(initSql);
-        assertNull(ds.getPoolProperties().getInitSQL(),
+        Assertions.assertNull(ds.getPoolProperties().getInitSQL(),
                 "a blank init SQL must be normalised to 'not configured'");
         ds.createPool();
 
         try (Connection c = ds.getConnection()) {
-            assertNull(initMarker(c), "nothing may have been executed on the session");
+            Assertions.assertNull(initMarker(c), "nothing may have been executed on the session");
             c.createStatement().execute("SELECT 1");
         }
     }
@@ -112,10 +111,10 @@ class TestConnectionSetup extends JdbcPoolBaseTest {
         ds.createPool();
 
         try (Connection c = ds.getConnection()) {
-            assertEquals("applied", initMarker(c),
+            Assertions.assertEquals("applied", initMarker(c),
                     "the configured init SQL must have validated the session");
         }
-        assertEquals(1, ds.getIdle());
+        Assertions.assertEquals(1, ds.getIdle());
     }
 
     @Test
@@ -128,13 +127,13 @@ class TestConnectionSetup extends JdbcPoolBaseTest {
 
         for (int i = 0; i < 2; i++) {
             try (Connection c = ds.getConnection()) {
-                assertEquals(Connection.TRANSACTION_READ_COMMITTED,
+                Assertions.assertEquals(Connection.TRANSACTION_READ_COMMITTED,
                         c.getTransactionIsolation(),
                         "the session keeps the driver's isolation level");
-                assertTrue(c.createStatement().execute("SELECT 1"),
+                Assertions.assertTrue(c.createStatement().execute("SELECT 1"),
                         "the connection must be usable despite the unusable setting");
             }
         }
-        assertEquals(1, ds.getIdle(), "the pool must still pool the connection");
+        Assertions.assertEquals(1, ds.getIdle(), "the pool must still pool the connection");
     }
 }

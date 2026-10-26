@@ -20,7 +20,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
@@ -66,12 +66,12 @@ class TestTerminateTransactionOnReturn extends JdbcPoolBaseTest {
         }
         c1.close(); // returned mid-transaction -> must be rolled back
 
-        assertEquals(0, adminRowCount(t),
+        Assertions.assertEquals(0, adminRowCount(t),
                 "uncommitted work must not survive the return");
         // The pool reuses the same idle session; a still-open transaction
         // would make the previous borrower's work visible right here.
         try (Connection c2 = ds.getConnection()) {
-            assertEquals(0, rowCount(c2, t),
+            Assertions.assertEquals(0, rowCount(c2, t),
                     "the next borrower must not observe the previous "
                             + "borrower's uncommitted work");
         }
@@ -91,7 +91,7 @@ class TestTerminateTransactionOnReturn extends JdbcPoolBaseTest {
         }
         c1.close(); // returned mid-transaction -> must be committed
 
-        assertEquals(1, adminRowCount(t),
+        Assertions.assertEquals(1, adminRowCount(t),
                 "commitOnReturn must persist the work on return, even "
                         + "without defaultAutoCommit=false");
     }
@@ -110,7 +110,7 @@ class TestTerminateTransactionOnReturn extends JdbcPoolBaseTest {
         c1.close(); // returned mid-transaction -> pool must not touch it
 
         try (Connection c2 = ds.getConnection()) {
-            assertEquals(1, rowCount(c2, t),
+            Assertions.assertEquals(1, rowCount(c2, t),
                     "without either flag the pool must leave the "
                             + "transaction untouched");
         }
@@ -130,7 +130,7 @@ class TestTerminateTransactionOnReturn extends JdbcPoolBaseTest {
         }
         c1.close(); // rollback takes precedence over commit
 
-        assertEquals(0, adminRowCount(t),
+        Assertions.assertEquals(0, adminRowCount(t),
                 "when both flags are set, rollbackOnReturn takes "
                         + "precedence");
     }

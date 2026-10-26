@@ -20,7 +20,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
@@ -83,13 +83,13 @@ class TestPendingTransactionAcrossBorrowers extends JdbcPoolBaseTest {
         first.close(); // returned mid-transaction, pool must not touch it
 
         try (Connection second = ds.getConnection()) {
-            assertEquals(Integer.valueOf(33), sessionMarker(second),
+            Assertions.assertEquals(Integer.valueOf(33), sessionMarker(second),
                     "the same physical session must have been reused");
             // the borrow alone ran the restore; nothing else was done here
         }
         // Same session, so the only way the row can be visible from outside
         // is that the restore committed it.
-        assertEquals(0, adminRowCount(t),
+        Assertions.assertEquals(0, adminRowCount(t),
                 "restoring the configured auto-commit must not commit the "
                         + "work the previous borrower abandoned");
     }
@@ -105,9 +105,9 @@ class TestPendingTransactionAcrossBorrowers extends JdbcPoolBaseTest {
         first.close();
 
         try (Connection second = ds.getConnection()) {
-            assertEquals(Integer.valueOf(31), sessionMarker(second),
+            Assertions.assertEquals(Integer.valueOf(31), sessionMarker(second),
                     "the same physical session must have been reused");
-            assertEquals(0, rowCount(second, t),
+            Assertions.assertEquals(0, rowCount(second, t),
                     "the next borrower must not find itself inside the "
                             + "previous borrower's transaction");
         }
@@ -128,9 +128,9 @@ class TestPendingTransactionAcrossBorrowers extends JdbcPoolBaseTest {
         first.close();
 
         try (Connection second = ds.getConnection()) {
-            assertEquals(Integer.valueOf(32), sessionMarker(second),
+            Assertions.assertEquals(Integer.valueOf(32), sessionMarker(second),
                     "the same physical session must have been reused");
-            assertEquals(1, rowCount(second, t),
+            Assertions.assertEquals(1, rowCount(second, t),
                     "a caching-only configuration must keep the pool's "
                             + "documented transaction handling untouched");
         }
@@ -158,16 +158,16 @@ class TestPendingTransactionAcrossBorrowers extends JdbcPoolBaseTest {
         first.close(); // still in a transaction (auto-commit default false)
 
         try (Connection second = ds.getConnection()) {
-            assertEquals(Integer.valueOf(34), sessionMarker(second),
+            Assertions.assertEquals(Integer.valueOf(34), sessionMarker(second),
                     "the same physical session must have been reused");
-            assertEquals(Connection.TRANSACTION_READ_COMMITTED,
+            Assertions.assertEquals(Connection.TRANSACTION_READ_COMMITTED,
                     second.getTransactionIsolation(),
                     "the isolation level must be back at the pool default");
-            assertEquals(0, rowCount(second, t),
+            Assertions.assertEquals(0, rowCount(second, t),
                     "the isolation-only restore must still terminate the "
                             + "transaction the previous borrower left open");
         }
-        assertEquals(0, adminRowCount(t),
+        Assertions.assertEquals(0, adminRowCount(t),
                 "the abandoned work must not have survived");
     }
 }
