@@ -93,6 +93,17 @@ class TestJmxMonitor extends JdbcPoolBaseTest {
         return count;
     }
 
+    /* The pool-MBean registration handle is a private field; tests reach
+     * it reflectively to pin that a finished lifecycle step drops it. */
+    private static void assertNoRegistrationHandle(DataSource ds)
+            throws Exception {
+        Field handle = DataSource.class.getDeclaredField("oname");
+        handle.setAccessible(true);
+        Assertions.assertNull(handle.get(ds),
+                "the DataSource must not keep an ObjectName as a pool-MBean "
+                        + "registration handle at this point");
+    }
+
     @Test
     void poolMBeanTracksLiveTraffic() throws Exception {
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
@@ -130,6 +141,7 @@ class TestJmxMonitor extends JdbcPoolBaseTest {
             ds.postDeregister();
             Assertions.assertFalse(server.isRegistered(poolOname),
                     "postDeregister must unregister the pool MBean");
+            assertNoRegistrationHandle(ds);
         }
     }
 
@@ -229,6 +241,27 @@ class TestJmxMonitor extends JdbcPoolBaseTest {
     }
 
     @Test
+    void closingThePoolUnregistersItsMBean() throws Exception {
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setJmxEnabled(true);
+        ds.createPool();
+
+        ObjectName dsName = uniqueDataSourceName("closed");
+        ObjectName poolOname = registerAndFindPoolMBean(server, ds, dsName);
+        Assertions.assertNotNull(poolOname, "an enabled pool must publish its MBean");
+
+        ds.close();
+        Assertions.assertFalse(server.isRegistered(poolOname),
+                "closing the pool must unregister its MBean instead of "
+                        + "letting it report a dead pool");
+        assertNoRegistrationHandle(ds);
+        // the container still deregisters the DataSource itself afterwards;
+        // that must stay a clean no-op
+        Assertions.assertDoesNotThrow(ds::postDeregister);
+    }
+
+    @Test
     void registrationBeforeThePoolExistsKeepsTheContainerCallback()
             throws Exception {
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
@@ -250,11 +283,7 @@ class TestJmxMonitor extends JdbcPoolBaseTest {
         // The registration then completes, so the container will also
         // deregister later. The pool-side handle postDeregister()
         // unregisters must not claim a name that was never registered.
-        Field handle = DataSource.class.getDeclaredField("oname");
-        handle.setAccessible(true);
-        Assertions.assertNull(handle.get(ds),
-                "a skipped pool MBean registration must not leave its "
-                        + "ObjectName behind as a registration handle");
+        assertNoRegistrationHandle(ds);
         Assertions.assertDoesNotThrow(ds::postDeregister,
                 "deregistering a DataSource whose pool MBean was never "
                         + "published must be a clean no-op");
