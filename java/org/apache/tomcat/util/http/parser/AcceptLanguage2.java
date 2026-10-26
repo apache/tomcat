@@ -99,7 +99,7 @@ public final class AcceptLanguage2 {
             }
 
             if (quality > 0) {
-                result.add(new AcceptLanguage(toLegacyLocale(languageTag), quality));
+                result.add(new AcceptLanguage(languageTag, quality, AcceptLanguage2::toLegacyLocale));
             }
         } while (true);
 

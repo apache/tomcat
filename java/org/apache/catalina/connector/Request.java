@@ -29,6 +29,7 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -3136,29 +3137,12 @@ public class Request implements HttpServletRequest {
      */
     protected void parseLocalesHeader(String value, TreeMap<Double,ArrayList<Locale>> locales) {
 
-        // Determine how many more entries are of interest. One more than the
-        // maximum is parsed so that a header that exceeds the limit is
-        // rejected rather than silently truncated. Parsing no further entries
-        // once the limit is reached avoids creating Locale objects for entries
-        // that can never be used.
-        int maxElements = -1;
-        if (maxLocaleCount > -1) {
-            int current = 0;
-            for (ArrayList<Locale> list : locales.values()) {
-                current += list.size();
-            }
-            maxElements = maxLocaleCount + 1 - current;
-            if (maxElements < 1) {
-                return;
-            }
-        }
-
         List<AcceptLanguage> acceptLanguages;
         try {
             if (USE_STANDARD_ACCEPT_LANGUAGE_PARSER) {
-                acceptLanguages = AcceptLanguage.parse(new StringReader(value), maxElements);
+                acceptLanguages = AcceptLanguage.parse(new StringReader(value), -1);
             } else {
-                acceptLanguages = AcceptLanguage2.parse(new StringReader(value), maxElements);
+                acceptLanguages = AcceptLanguage2.parse(new StringReader(value), -1);
             }
         } catch (IOException ioe) {
             // Mal-formed headers are ignore. Do the same in the unlikely event
@@ -3166,10 +3150,54 @@ public class Request implements HttpServletRequest {
             return;
         }
 
+        if (maxLocaleCount < 0) {
+            for (AcceptLanguage acceptLanguage : acceptLanguages) {
+                // Add a new Locale to the list of Locales for this quality level
+                Double key = Double.valueOf(-acceptLanguage.getQuality()); // Reverse the order
+                locales.computeIfAbsent(key, k -> new ArrayList<>()).add(acceptLanguage.getLocale());
+            }
+            return;
+        }
+
+        // Retain the entries with the highest quality values. The order of the
+        // entries in the header(s) cannot be relied upon to indicate priority
+        // (RFC 9110, section 12.5.4) so the whole header is parsed. One more
+        // than the maximum is retained so that a header that exceeds the limit
+        // can be detected. The Locale is only created for the entries that are
+        // retained.
+        int maxElements = maxLocaleCount == Integer.MAX_VALUE ? maxLocaleCount : maxLocaleCount + 1;
+        if (acceptLanguages.size() > maxElements) {
+            // The sort is stable so entries with the same quality value remain
+            // in header order
+            acceptLanguages.sort(Comparator.comparingDouble(AcceptLanguage::getQuality).reversed());
+            acceptLanguages = acceptLanguages.subList(0, maxElements);
+        }
+
+        int current = 0;
+        for (ArrayList<Locale> list : locales.values()) {
+            current += list.size();
+        }
+
         for (AcceptLanguage acceptLanguage : acceptLanguages) {
-            // Add a new Locale to the list of Locales for this quality level
             Double key = Double.valueOf(-acceptLanguage.getQuality()); // Reverse the order
+            if (current >= maxElements) {
+                // Replace the entry with the lowest quality value, and the last
+                // one with that quality value, if this entry has a higher
+                // quality value. Otherwise, this entry is not retained.
+                Double lowestKey = locales.lastKey();
+                if (key.compareTo(lowestKey) >= 0) {
+                    continue;
+                }
+                ArrayList<Locale> lowest = locales.get(lowestKey);
+                lowest.remove(lowest.size() - 1);
+                if (lowest.isEmpty()) {
+                    locales.remove(lowestKey);
+                }
+                current--;
+            }
+            // Add a new Locale to the list of Locales for this quality level
             locales.computeIfAbsent(key, k -> new ArrayList<>()).add(acceptLanguage.getLocale());
+            current++;
         }
     }
 

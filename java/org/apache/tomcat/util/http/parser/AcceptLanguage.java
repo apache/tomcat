@@ -21,14 +21,17 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Function;
 
 /**
  * Represents a single language entry from an Accept-Language header.
  */
 public class AcceptLanguage {
 
-    private final Locale locale;
+    private final String languageTag;
+    private final Function<String,Locale> localeFactory;
     private final double quality;
+    private Locale locale;
 
     /**
      * Constructs a new AcceptLanguage.
@@ -37,7 +40,26 @@ public class AcceptLanguage {
      * @param quality The quality value for this language entry
      */
     protected AcceptLanguage(Locale locale, double quality) {
+        this.languageTag = null;
+        this.localeFactory = null;
+        this.quality = quality;
         this.locale = locale;
+    }
+
+    /**
+     * Constructs a new AcceptLanguage for which the Locale is only created
+     * when it is first requested. This allows callers to select entries based
+     * on the quality value without creating Locale objects for the entries
+     * that are not used.
+     *
+     * @param languageTag   The language tag of this language entry
+     * @param quality       The quality value for this language entry
+     * @param localeFactory The function used to create the Locale from the
+     *                          language tag
+     */
+    AcceptLanguage(String languageTag, double quality, Function<String,Locale> localeFactory) {
+        this.languageTag = languageTag;
+        this.localeFactory = localeFactory;
         this.quality = quality;
     }
 
@@ -47,7 +69,12 @@ public class AcceptLanguage {
      * @return The locale of this language entry
      */
     public Locale getLocale() {
-        return locale;
+        Locale result = locale;
+        if (result == null && localeFactory != null) {
+            result = localeFactory.apply(languageTag);
+            locale = result;
+        }
+        return result;
     }
 
     /**
@@ -124,7 +151,7 @@ public class AcceptLanguage {
             }
 
             if (quality > 0) {
-                result.add(new AcceptLanguage(Locale.forLanguageTag(languageTag), quality));
+                result.add(new AcceptLanguage(languageTag, quality, Locale::forLanguageTag));
             }
         } while (true);
 

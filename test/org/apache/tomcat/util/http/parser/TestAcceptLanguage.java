@@ -19,6 +19,7 @@ package org.apache.tomcat.util.http.parser;
 import java.io.StringReader;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -415,5 +416,27 @@ public class TestAcceptLanguage {
         Assert.assertEquals(L_EN, actual.get(0).getLocale());
         Assert.assertEquals(L_FR, actual.get(1).getLocale());
         Assert.assertEquals(Locale.forLanguageTag("de"), actual.get(2).getLocale());
+    }
+
+
+    /*
+     * The Locale is only created when it is first requested so that
+     * entries can be selected by quality without creating Locale
+     * objects for entries that are not used.
+     */
+    @Test
+    public void testLazyLocale() {
+        AtomicInteger count = new AtomicInteger();
+        AcceptLanguage acceptLanguage = new AcceptLanguage("en", Q0_500, tag -> {
+            count.incrementAndGet();
+            return Locale.forLanguageTag(tag);
+        });
+
+        Assert.assertEquals(0, count.get());
+        Assert.assertEquals(Q0_500, acceptLanguage.getQuality(), 0.0001);
+        Assert.assertEquals(0, count.get());
+        Assert.assertEquals(L_EN, acceptLanguage.getLocale());
+        Assert.assertEquals(L_EN, acceptLanguage.getLocale());
+        Assert.assertEquals(1, count.get());
     }
 }

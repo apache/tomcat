@@ -30,6 +30,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -839,8 +840,7 @@ public class TestRequest extends TomcatBaseTest {
 
     /*
      * When multiple Accept-Language headers are present the limit
-     * applies to the combined set of locales and parsing stops
-     * early on the header in which the limit is exceeded.
+     * applies to the combined set of locales.
      */
     @Test
     public void testAcceptLanguageLocaleLimitMultipleHeaders() throws Exception {
@@ -867,6 +867,84 @@ public class TestRequest extends TomcatBaseTest {
             count++;
         }
         return count;
+    }
+
+    /*
+     * When the limit is exceeded, the locales with the highest quality
+     * values are retained regardless of the order in which they appear
+     * in the header.
+     */
+    @Test
+    public void testAcceptLanguageLocaleLimitQuality() throws Exception {
+        Connector connector = new Connector();
+        connector.setMaxLocaleCount(2);
+
+        Assert.assertEquals(locales("ja", "it"), getLocales(connector, "de;q=0.1,fr;q=0.2,it;q=0.3,ja"));
+    }
+
+    /*
+     * Locales with the same quality value are retained in header order.
+     */
+    @Test
+    public void testAcceptLanguageLocaleLimitSameQuality() throws Exception {
+        Connector connector = new Connector();
+        connector.setMaxLocaleCount(2);
+
+        Assert.assertEquals(locales("aa", "cc"), getLocales(connector, "aa,bb;q=0.5,cc,dd"));
+    }
+
+    /*
+     * The highest quality locales are selected across multiple
+     * Accept-Language headers and locales with the same quality value
+     * are retained in the order of the headers.
+     */
+    @Test
+    public void testAcceptLanguageLocaleLimitQualityMultipleHeaders() throws Exception {
+        Connector connector = new Connector();
+        connector.setMaxLocaleCount(2);
+
+        Assert.assertEquals(locales("ja", "en"), getLocales(connector, "de;q=0.1,fr;q=0.2", "ja,en;q=0.9"));
+        Assert.assertEquals(locales("cc", "aa"), getLocales(connector, "aa;q=0.5", "bb;q=0.5,cc"));
+    }
+
+    /*
+     * The highest quality locales are retained when the header contains
+     * far more entries than the limit.
+     */
+    @Test
+    public void testAcceptLanguageLocaleLimitQualityHeaderFlood() throws Exception {
+        StringBuilder acceptLanguage = new StringBuilder();
+        for (int i = 1; i < 1000; i++) {
+            if (i > 1) {
+                acceptLanguage.append(',');
+            }
+            acceptLanguage.append(String.format("aa-%03d;q=0.%03d", Integer.valueOf(i), Integer.valueOf(i)));
+        }
+
+        List<Locale> expected = new ArrayList<>();
+        for (int i = 999; i > 989; i--) {
+            expected.add(Locale.forLanguageTag(String.format("aa-%03d", Integer.valueOf(i))));
+        }
+
+        Assert.assertEquals(expected, getLocales(new Connector(), acceptLanguage.toString()));
+    }
+
+    private static List<Locale> locales(String... languageTags) {
+        List<Locale> result = new ArrayList<>();
+        for (String languageTag : languageTags) {
+            result.add(Locale.forLanguageTag(languageTag));
+        }
+        return result;
+    }
+
+    private static List<Locale> getLocales(Connector connector, String... acceptLanguages) {
+        org.apache.coyote.Request coyoteRequest = new org.apache.coyote.Request();
+        for (String acceptLanguage : acceptLanguages) {
+            coyoteRequest.getMimeHeaders().addValue("accept-language").setString(acceptLanguage);
+        }
+        Request request = new Request(connector, coyoteRequest);
+
+        return Collections.list(request.getLocales());
     }
 
     @Test
