@@ -16,9 +16,9 @@
  */
 package org.apache.tomcat.jdbc.pool;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.StringReader;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Locale;
@@ -1136,7 +1136,12 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         }
         if (propText != null) {
             try {
-                props.load(new ByteArrayInputStream(propText.replace(';', '\n').getBytes()));
+                // Load through a Reader: Properties.load(InputStream) decodes as
+                // ISO-8859-1 while encoding the string to bytes uses the platform
+                // charset, silently corrupting any non-ASCII value on a
+                // UTF-8-default JVM. A Reader carries the exact characters, so no
+                // charset conversion takes place at all.
+                props.load(new StringReader(propText.replace(';', '\n')));
             }catch (IOException ioe) {
                 throw new RuntimeException(ioe);
             }
