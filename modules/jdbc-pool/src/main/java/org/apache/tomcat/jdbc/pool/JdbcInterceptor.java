@@ -167,6 +167,9 @@ public abstract class JdbcInterceptor implements InvocationHandler {
      * Called when {@link java.sql.Connection#close()} is called on the underlying connection.
      * This is to notify the interceptors, that the physical connection has been released.
      * Implementation of this method should be thought through with care, as no actions should trigger an exception.
+     * An interceptor that nevertheless throws is isolated: the exception is logged and
+     * ignored, the remaining interceptors in the chain are still notified, and the
+     * physical connection is closed as it would have been.
      * @param parent - the connection pool that this connection belongs to
      * @param con    - the pooled connection that holds this connection
      * @param finalizing - if this connection is finalizing. True means that the pooled connection will not reconnect the underlying connection
