@@ -328,6 +328,12 @@
         Use RequestDispatcher target rather than source when looking up
         <code>security-role-ref</code>s for the current Servlet. (markt)
       </fix>
+      <fix>
+        As per the Jakarta Authentication specification, an
+        <code>AuthException</code> during
+        <code>serverAuthContext.secureResponse()</code> should result in an
+        internal server error (500) response. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
