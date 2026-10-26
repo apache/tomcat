@@ -138,6 +138,28 @@ class TestPoolProperties {
     }
 
     @Test
+    void nonAsciiValuesInConnectionPropertiesSurviveParsing() {
+        // The escaped e-acute and a-ring below are multi-byte under the UTF-8
+        // default charset every supported JVM ships with, while
+        // Properties.load(InputStream) decodes as ISO-8859-1; parsing must
+        // hand the driver exactly the characters the configuration named,
+        // whatever the platform default charset is. Unicode escapes keep
+        // this source file 7-bit for the ISO-8859-1 Ant build.
+        PoolProperties properties = new PoolProperties();
+        properties.setConnectionProperties("clientInfo=caf\u00e9;clientLocale=de_DE");
+
+        Assertions.assertEquals("caf\u00e9", properties.getDbProperties().getProperty("clientInfo"),
+                "a non-ASCII value must reach the driver properties uncorrupted");
+        Assertions.assertEquals("de_DE", properties.getDbProperties().getProperty("clientLocale"),
+                "the pairs around it must still parse");
+
+        // the static helper the JNDI factory routes through
+        Properties parsed = PoolProperties.getProperties("foo=b\u00e5r", null);
+        Assertions.assertEquals("b\u00e5r", parsed.getProperty("foo"),
+                "a non-ASCII value must survive the factory path as well");
+    }
+
+    @Test
     void toStringMasksThePasswordButStillShowsTheConfiguration() {
         PoolProperties properties = new PoolProperties();
         properties.setUsername(DEFAULT_USER);
