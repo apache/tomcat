@@ -41,19 +41,20 @@ import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
  */
 class TestCloseDuringBorrow extends JdbcPoolBaseTest {
 
-    /* A driver whose connect() is slow enough for a close() to complete
-       while a connection attempt is in flight. It signals when it enters
-       connect() so the test can close the pool mid-attempt deterministically. */
+    /* A driver whose connect() parks until the test releases it, so the
+       close() is guaranteed to complete while a connection attempt is in
+       flight. It signals when it enters connect() so the test can close the
+       pool mid-attempt deterministically. */
     public static class SlowConnectDriver implements Driver {
 
         static final CountDownLatch CONNECT_STARTED = new CountDownLatch(1);
-        static final long CONNECT_DELAY_MS = 1500;
+        static final CountDownLatch CONNECT_RELEASE = new CountDownLatch(1);
 
         @Override
         public Connection connect(String url, Properties info) throws SQLException {
             CONNECT_STARTED.countDown();
             try {
-                Thread.sleep(CONNECT_DELAY_MS);
+                CONNECT_RELEASE.await();
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new SQLException(e);
@@ -110,22 +111,32 @@ class TestCloseDuringBorrow extends JdbcPoolBaseTest {
         }, "borrower-in-flight-during-close");
         borrower.setDaemon(true);
         borrower.start();
+        try {
+            // close while the physical connect() is in flight: the driver
+            // parks inside connect() until the close has completed, so the
+            // race is decided deterministically in the test's favour
+            Assertions.assertTrue(SlowConnectDriver.CONNECT_STARTED.await(AWAIT_TIMEOUT_MS,
+                            TimeUnit.MILLISECONDS),
+                    "the borrower must be inside the driver's connect()");
+            ds.close(true);
+            SlowConnectDriver.CONNECT_RELEASE.countDown();
 
-        // close while the physical connect() is in flight: the driver signals
-        // when it enters connect() and sleeps there for CONNECT_DELAY_MS
-        Assertions.assertTrue(SlowConnectDriver.CONNECT_STARTED.await(AWAIT_TIMEOUT_MS,
-                        TimeUnit.MILLISECONDS),
-                "the borrower must be inside the driver's connect()");
-        ds.close(true);
+            borrower.join(AWAIT_TIMEOUT_MS);
+            Assertions.assertFalse(borrower.isAlive(),
+                    "the borrower must not outlive the close");
 
-        borrower.join(AWAIT_TIMEOUT_MS);
-        Assertions.assertFalse(borrower.isAlive(), "the borrower must not outlive the close");
-
-        Assertions.assertNotNull(failure.get(),
-                "the borrower must not be handed a connection from the closed pool");
-        Assertions.assertTrue(failure.get() instanceof SQLException,
-                "the borrower must be rejected with a SQLException, not " + failure.get());
-        Assertions.assertNull(borrowed.get());
-        awaitSessions(0);
+            Assertions.assertNotNull(failure.get(),
+                    "the borrower must not be handed a connection from the closed pool");
+            Assertions.assertTrue(failure.get() instanceof SQLException,
+                    "the borrower must be rejected with a SQLException, not " + failure.get());
+            Assertions.assertNull(borrowed.get());
+            awaitSessions(0);
+        } finally {
+            // Never leave the borrower parked inside connect() if one of the
+            // assertions above failed: release it and reap it so a red run
+            // cannot linger on the class' database until the server stop.
+            SlowConnectDriver.CONNECT_RELEASE.countDown();
+            borrower.join(AWAIT_TIMEOUT_MS);
+        }
     }
 }

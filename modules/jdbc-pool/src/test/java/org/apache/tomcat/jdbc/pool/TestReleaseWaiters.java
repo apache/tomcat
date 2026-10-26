@@ -180,6 +180,21 @@ class TestReleaseWaiters extends JdbcPoolBaseTest {
         Assertions.assertEquals(1, ds.getWaitCount(),
                 "the duplicate release must not wake the remaining waiter");
 
+        // Only the destruction of the connection opened a slot: exactly one
+        // borrower was served while the other stayed parked.
+        awaitUntil(() -> served[0] != null || served[1] != null);
+        Assertions.assertTrue(served[0] == null || served[1] == null,
+                "the duplicate release must not serve a second borrower, "
+                        + "both waiters hold a connection");
+
+        // Hand the remaining waiter a real connection instead of making it
+        // sit out the full maxWait timeout before it can be joined. A
+        // genuine release must reach a parked waiter; the duplicate release
+        // above was the one that must not.
+        Connection servedFirst = served[0] != null ? served[0] : served[1];
+        servedFirst.close();
+        awaitUntil(() -> served[0] != null && served[1] != null);
+
         for (Thread waiter : waiters) {
             waiter.join(AWAIT_TIMEOUT_MS);
             if (waiter.isAlive()) {
@@ -187,9 +202,6 @@ class TestReleaseWaiters extends JdbcPoolBaseTest {
                 Assertions.fail("waiter is stuck");
             }
         }
-        int servedCount = (served[0] == null ? 0 : 1) + (served[1] == null ? 0 : 1);
-        Assertions.assertEquals(1, servedCount,
-                "only the destruction of the connection should have opened a slot");
         awaitSessions(1);
         for (Connection c : served) {
             if (c != null) {

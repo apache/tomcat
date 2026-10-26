@@ -96,7 +96,7 @@ class TestInterruptedWaiter extends JdbcPoolBaseTest {
             waiters[i].setDaemon(true);
             waiters[i].start();
         }
-        sleep(500); // give the waiters time to register with the queue
+        awaitUntil(() -> ds.getWaitCount() == HOLDERS); // the waiters are registered with the queue
         for (Thread waiter : waiters) {
             waiter.interrupt();
         }
