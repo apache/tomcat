@@ -54,7 +54,9 @@ public class SlowQueryReport extends AbstractQueryReport  {
      */
     protected volatile ConcurrentHashMap<String,QueryStats> queries = null;
     /**
-     * Maximum number of queries we will be storing
+     * Maximum number of queries we will be storing statistics for. Eviction
+     * keeps the number of stored queries near this amount; while queries are
+     * being executed concurrently it can briefly be exceeded.
      */
     protected int  maxQueries= 1000; //don't store more than this amount of queries
 
@@ -76,7 +78,9 @@ public class SlowQueryReport extends AbstractQueryReport  {
     /**
      * Returns the query stats for a given pool
      * @param poolname - the name of the pool we want to retrieve stats for
-     * @return a hash map containing statistics for 0 to maxQueries
+     * @return a hash map containing the statistics of the monitored queries,
+     *         kept near {@code maxQueries} entries by eviction, or
+     *         {@code null} if the pool is not being monitored
      */
     public static ConcurrentHashMap<String,QueryStats> getPoolStats(String poolname) {
         return perPoolStats.get(poolname);
@@ -250,20 +254,40 @@ public class SlowQueryReport extends AbstractQueryReport  {
     }
 
     /**
-     * Sort QueryStats by last invocation time
+     * Evicts the least recently invoked query statistics until the map is
+     * back within {@code maxQueries} entries. The map is shared by all the
+     * connections of the pool, so the eviction runs concurrently with the
+     * inserts and removals of the other borrower threads and can only do as
+     * much work as its own snapshot allows; it then leaves the map above
+     * capacity for the next new query to evict further.
+     *
      * @param queries The queries map
      */
     protected void removeOldest(ConcurrentHashMap<String,QueryStats> queries) {
-        ArrayList<QueryStats> list = new ArrayList<>(queries.values());
-        Collections.sort(list, queryStatsComparator);
+        // Sort a snapshot of the statistics rather than the live entries:
+        // the invocation times are updated concurrently, and a comparator
+        // that reads mutable state may violate its own contract while the
+        // sort is in progress.
+        ArrayList<QueryStats> snapshot = new ArrayList<>(queries.size());
+        for (QueryStats qs : queries.values()) {
+            snapshot.add(qs.snapshotForEviction());
+        }
+        Collections.sort(snapshot, queryStatsComparator);
+        // The map is shared by all connections of the pool, so it may have
+        // grown or shrunk since the snapshot was taken. Entries that another
+        // thread removed already make our removal a no-op, so the snapshot
+        // can run out while the map is still over capacity. Eviction then
+        // gives up rather than running past the end of the list, leaving the
+        // map over capacity by about as many queries as were being inserted
+        // concurrently; the next new query evicts further.
         int removeIndex = 0;
-        while (queries.size() > maxQueries) {
-            String sql = list.get(removeIndex).getQuery();
+        while (queries.size() > maxQueries && removeIndex < snapshot.size()) {
+            String sql = snapshot.get(removeIndex).getQuery();
+            removeIndex++;
             queries.remove(sql);
             if (log.isDebugEnabled()) {
                 log.debug("Removing slow query, capacity reached:"+sql);
             }
-            removeIndex++;
         }
     }
 
@@ -500,6 +524,20 @@ public class SlowQueryReport extends AbstractQueryReport  {
          */
         public QueryStats(String query) {
             this.query = query;
+        }
+
+        /**
+         * Returns a snapshot of the data that orders this query for eviction.
+         * Only the query and the time of its last invocation are carried
+         * over: the snapshot exists to be sorted, and unlike the live
+         * statistics its ordering does not change while a sort is running.
+         *
+         * @return a snapshot of this query and its last invocation time
+         */
+        private QueryStats snapshotForEviction() {
+            QueryStats result = new QueryStats(query);
+            result.lastInvocation = lastInvocation;
+            return result;
         }
 
         /**
