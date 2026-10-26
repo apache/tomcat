@@ -68,11 +68,15 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      * @param name the name of the method used to execute {@link AbstractCreateStatementInterceptor#isExecute(Method, boolean)}
      * @param start the time the query execution started
      * @param t the exception that happened
-     * @return - the SQL that was executed or the string &quot;batch&quot; if it was a batch execution
+     * @return - the SQL that was executed or the string &quot;batch&quot; if it was a batch execution,
+     *         or {@code null} if the invocation carries no SQL string
      */
     protected String reportFailedQuery(String query, Object[] args, final String name, long start, Throwable t) {
         //extract the query string
-        String sql = (query==null && args!=null &&  args.length>0)?(String)args[0]:query;
+        String sql = query;
+        if (sql == null && args != null && args.length > 0 && args[0] instanceof String) {
+            sql = (String) args[0];
+        }
         //if we do batch execution, then we name the query 'batch'
         if (sql==null && compare(EXECUTE_BATCH,name)) {
             sql = "batch";
@@ -87,11 +91,15 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      * @param name the name of the method used to execute {@link AbstractCreateStatementInterceptor#isExecute(Method, boolean)}
      * @param start the time the query execution started
      * @param delta the time the execution took
-     * @return - the SQL that was executed or the string &quot;batch&quot; if it was a batch execution
+     * @return - the SQL that was executed or the string &quot;batch&quot; if it was a batch execution,
+     *         or {@code null} if the invocation carries no SQL string
      */
     protected String reportQuery(String query, Object[] args, final String name, long start, long delta) {
         //extract the query string
-        String sql = (query==null && args!=null &&  args.length>0)?(String)args[0]:query;
+        String sql = query;
+        if (sql == null && args != null && args.length > 0 && args[0] instanceof String) {
+            sql = (String) args[0];
+        }
         //if we do batch execution, then we name the query 'batch'
         if (sql==null && compare(EXECUTE_BATCH,name)) {
             sql = "batch";
@@ -106,11 +114,15 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      * @param name the name of the method used to execute {@link AbstractCreateStatementInterceptor#isExecute(Method, boolean)}
      * @param start the time the query execution started
      * @param delta the time the execution took
-     * @return - the SQL that was executed or the string &quot;batch&quot; if it was a batch execution
+     * @return - the SQL that was executed or the string &quot;batch&quot; if it was a batch execution,
+     *         or {@code null} if the invocation carries no SQL string
      */
     protected String reportSlowQuery(String query, Object[] args, final String name, long start, long delta) {
         //extract the query string
-        String sql = (query==null && args!=null &&  args.length>0)?(String)args[0]:query;
+        String sql = query;
+        if (sql == null && args != null && args.length > 0 && args[0] instanceof String) {
+            sql = (String) args[0];
+        }
         //if we do batch execution, then we name the query 'batch'
         if (sql==null && compare(EXECUTE_BATCH,name)) {
             sql = "batch";
@@ -231,7 +243,13 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
                 //execute the query
                 result =  method.invoke(delegate,args);
             }catch (Throwable t) {
-                reportFailedQuery(query,args,name,start,t);
+                //only report the failure if we were executing a query.
+                //For any other method there is no query to report, and
+                //reporting it would replace the exception that the
+                //application is expecting with a reporting failure
+                if (process) {
+                    reportFailedQuery(query,args,name,start,t);
+                }
                 if (t instanceof InvocationTargetException
                         && t.getCause() != null) {
                     throw t.getCause();
