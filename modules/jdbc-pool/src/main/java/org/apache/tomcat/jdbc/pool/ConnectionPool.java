@@ -451,10 +451,16 @@ public class ConnectionPool {
                 //close it and retrieve the next one, if one is available
                 while (con != null) {
                     //close the connection
-                    if (pool==idle) {
-                        release(con);
-                    } else {
-                        abandon(con);
+                    try {
+                        if (pool==idle) {
+                            release(con);
+                        } else {
+                            abandon(con);
+                        }
+                    } catch (Throwable x) {
+                        //one failing connection must not leave the
+                        //remaining idle and busy connections undisconnected
+                        log.warn("Unable to close pooled connection.", x);
                     }
                     if (!pool.isEmpty()) {
                         con = pool.poll(1000, TimeUnit.MILLISECONDS);
@@ -1450,8 +1456,19 @@ public class ConnectionPool {
     protected void finalize(PooledConnection con) {
         JdbcInterceptor handler = con.getHandler();
         while (handler!=null) {
-            handler.reset(null, null);
-            handler=handler.getNext();
+            //read the next link before the callback, as the callback
+            //is allowed to modify it
+            JdbcInterceptor next = handler.getNext();
+            try {
+                handler.reset(null, null);
+            } catch (Throwable t) {
+                //one broken interceptor must not stop the rest of the
+                //chain from being reset
+                log.warn("Interceptor [" + handler.getClass().getName()
+                        + "] threw an exception from reset(); "
+                        + "continuing with the rest of the chain.", t);
+            }
+            handler = next;
         }
     }
 
