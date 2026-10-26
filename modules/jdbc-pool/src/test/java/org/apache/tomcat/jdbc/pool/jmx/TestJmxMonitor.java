@@ -17,6 +17,7 @@
 package org.apache.tomcat.jdbc.pool.jmx;
 
 import java.lang.management.ManagementFactory;
+import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.util.HashSet;
 import java.util.Properties;
@@ -225,6 +226,38 @@ class TestJmxMonitor extends JdbcPoolBaseTest {
         } finally {
             ds.postDeregister();
         }
+    }
+
+    @Test
+    void registrationBeforeThePoolExistsKeepsTheContainerCallback()
+            throws Exception {
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setJmxEnabled(true);
+        // Deliberately no createPool(): a container may register the
+        // DataSource before the embedder has started the pool. That must
+        // not break the MBeanRegistration callback - preRegister throwing
+        // makes the MBean server abort the whole registration.
+        ObjectName dsName = uniqueDataSourceName("nopool");
+        Set<ObjectName> before = poolMBeans(server);
+        Assertions.assertDoesNotThrow(() -> ds.preRegister(server, dsName),
+                "preRegister must not fail over a pool that does not exist yet");
+        Set<ObjectName> added = new HashSet<>(poolMBeans(server));
+        added.removeAll(before);
+        Assertions.assertTrue(added.isEmpty(),
+                "a pool that does not exist yet must not publish MBeans, added: "
+                        + added);
+        // The registration then completes, so the container will also
+        // deregister later. The pool-side handle postDeregister()
+        // unregisters must not claim a name that was never registered.
+        Field handle = DataSource.class.getDeclaredField("oname");
+        handle.setAccessible(true);
+        Assertions.assertNull(handle.get(ds),
+                "a skipped pool MBean registration must not leave its "
+                        + "ObjectName behind as a registration handle");
+        Assertions.assertDoesNotThrow(ds::postDeregister,
+                "deregistering a DataSource whose pool MBean was never "
+                        + "published must be a clean no-op");
     }
 
     @Test
