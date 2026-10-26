@@ -83,12 +83,40 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     protected static final ConcurrentHashMap<String,SlowQueryReportJmxMBean> mbeans =
             new ConcurrentHashMap<>();
 
+    /**
+     * Notification broadcasters for each connection pool. Interceptor
+     * instances are created per pooled connection, but JMX clients
+     * attach their listeners to the single MBean registered per pool, so
+     * notifications raised by any instance of a pool must reach the
+     * broadcaster of the pool rather than a broadcaster private to the
+     * instance.
+     */
+    protected static final ConcurrentHashMap<String,NotificationBroadcasterSupport> notifiers =
+            new ConcurrentHashMap<>();
+
 
     //==============================JMX STUFF========================
     /**
-     * Notification broadcaster support for JMX notifications.
+     * Notification broadcaster used before the pool name is known;
+     * once the pool name is known, {@link #getNotifier()} returns the
+     * broadcaster shared by all interceptor instances of that pool.
      */
     protected volatile NotificationBroadcasterSupport notifier = new NotificationBroadcasterSupport();
+
+    /**
+     * Returns the notification broadcaster that all interceptor
+     * instances of the current pool share, so that notifications raised
+     * on any connection reach the listeners registered with the pool's
+     * MBean.
+     * @return the shared broadcaster for this interceptor's pool
+     */
+    protected NotificationBroadcasterSupport getNotifier() {
+        String name = poolName;
+        if (name == null) {
+            return notifier;
+        }
+        return notifiers.computeIfAbsent(name, key -> new NotificationBroadcasterSupport());
+    }
 
     /**
      * Adds a notification listener.
@@ -99,7 +127,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
      */
     @Override
     public void addNotificationListener(NotificationListener listener, NotificationFilter filter, Object handback) throws IllegalArgumentException {
-        notifier.addNotificationListener(listener, filter, handback);
+        getNotifier().addNotificationListener(listener, filter, handback);
     }
 
 
@@ -109,7 +137,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
      */
     @Override
     public MBeanNotificationInfo[] getNotificationInfo() {
-        return notifier.getNotificationInfo();
+        return getNotifier().getNotificationInfo();
     }
 
     /**
@@ -119,7 +147,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
      */
     @Override
     public void removeNotificationListener(NotificationListener listener) throws ListenerNotFoundException {
-        notifier.removeNotificationListener(listener);
+        getNotifier().removeNotificationListener(listener);
 
     }
 
@@ -132,7 +160,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
      */
     @Override
     public void removeNotificationListener(NotificationListener listener, NotificationFilter filter, Object handback) throws ListenerNotFoundException {
-        notifier.removeNotificationListener(listener, filter, handback);
+        getNotifier().removeNotificationListener(listener, filter, handback);
 
     }
 
@@ -249,7 +277,8 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
                     this.pool.getJmxPool().notify(type, query);
                 }
             } else {
-                if (notifier!=null) {
+                NotificationBroadcasterSupport target = getNotifier();
+                if (target!=null) {
                     Notification notification =
                             new Notification(type,
                                          this,
@@ -257,7 +286,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
                                          System.currentTimeMillis(),
                                          query);
 
-                    notifier.sendNotification(notification);
+                    target.sendNotification(notification);
                 }
             }
         } catch (RuntimeOperationsException e) {
@@ -364,6 +393,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
             if (mbeans.remove(poolName)!=null) {
                 ObjectName oname = getObjectName(getClass(),poolName);
                 JmxUtil.unregisterJmx(oname);
+                notifiers.remove(poolName);
             }
         } catch (MalformedObjectNameException | RuntimeOperationsException e) {
             log.warn("Jmx deregistration failed.",e);
