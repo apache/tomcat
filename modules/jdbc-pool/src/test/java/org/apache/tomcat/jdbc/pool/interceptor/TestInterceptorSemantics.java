@@ -87,6 +87,72 @@ class TestInterceptorSemantics extends JdbcPoolBaseTest {
                         + ", recorded keys: " + statsKeySet(stats));
     }
 
+    /*
+     * A failing statement method that is not an execution has no query to
+     * report. Reporting it anyway made the reporting code itself fail - the
+     * query extraction cast the int argument of setFetchSize to String -
+     * and the ClassCastException escaped in place of the SQLException the
+     * driver raised, which no application catching SQLException expects.
+     */
+    @Test
+    void failedNonExecuteMethodPropagatesTheDriverException() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setJdbcInterceptors(
+                "org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport");
+        ds.createPool();
+
+        try (Connection c = ds.getConnection(); Statement st = c.createStatement()) {
+            assertThrows(SQLException.class, () -> st.setFetchSize(-1),
+                    "the driver's SQLException must reach the application");
+        }
+    }
+
+    /*
+     * Same for a prepared statement, where the extraction succeeds: the
+     * failure used to be booked against the statement's SQL with a start
+     * time of 0, so the recorded "execution time" was the epoch.
+     */
+    @Test
+    void failedNonExecuteMethodIsNotBookedAsAFailedQuery() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setJdbcInterceptors(
+                "org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport");
+        ds.createPool();
+        String poolName = ds.getPoolProperties().getPoolName();
+
+        String nonce = "nontime_" + System.nanoTime();
+        String sql = "SELECT 1 /* " + nonce + " */";
+        Connection c = ds.getConnection();
+        PreparedStatement ps = c.prepareStatement(sql);
+        // a negative fetch size is a SQLException per the JDBC contract
+        assertThrows(SQLException.class, () -> ps.setFetchSize(-1));
+
+        // preparing the statement legitimately creates the stats entry,
+        // but a method that is not an execution must not be booked in it
+        ConcurrentHashMap<String, ?> stats = SlowQueryReport.getPoolStats(poolName);
+        assertNotNull(stats, "the prepare must have created the stats map");
+        String key = statsKeySet(stats).stream().filter(k -> k.contains(nonce))
+                .findFirst().orElse(null);
+        assertNotNull(key, "the prepared statement must have a stats entry, "
+                + "recorded keys: " + statsKeySet(stats));
+        SlowQueryReport.QueryStats qs = (SlowQueryReport.QueryStats) stats.get(key);
+        assertEquals(0, qs.getNrOfInvocations(),
+                "a method that is not an execution must not be booked as an "
+                        + "invocation of " + key);
+        assertEquals(Long.MIN_VALUE, qs.getMaxInvocationTime(),
+                "no invocation time may be recorded for a method that is not "
+                        + "an execution");
+
+        // positive control: the report must still be live for this statement,
+        // so the assertions above cannot pass because the proxy is absent
+        ps.execute();
+        assertEquals(1, qs.getNrOfInvocations(),
+                "the execution must be booked in the same entry");
+
+        ps.close();
+        c.close();
+    }
+
     private static java.util.Set<String> statsKeySet(ConcurrentHashMap<String, ?> stats) {
         return stats.keySet();
     }
