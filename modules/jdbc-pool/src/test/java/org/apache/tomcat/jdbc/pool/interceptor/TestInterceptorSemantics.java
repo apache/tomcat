@@ -37,29 +37,89 @@ import org.apache.tomcat.jdbc.pool.DataSource;
  */
 class TestInterceptorSemantics extends JdbcPoolBaseTest {
 
-    /** Heavy pure-SQL aggregate; H2 honours query timeouts on it (~2 s). */
-    private static final String HEAVY_SQL_PREFIX =
+    /**
+     * Heavy pure-SQL aggregate that keeps running for well over a second.
+     * It must stay heavy: it has to still be executing when the query
+     * timeout interceptor's cancellation arrives.
+     */
+    private static final String HEAVY_SQL =
             "SELECT COUNT(*) FROM SYSTEM_RANGE(1,400000000) r1, SYSTEM_RANGE(1,3)";
 
+    /*
+     * A slow query that is slow for a wall-clock reason, not a CPU reason.
+     * Burning cycles until the clock crosses the threshold scales with the
+     * hardware - a billion-row COUNT cost a minute on a slow core and gives
+     * no margin on a fast one. Instead the instrumented UPDATE is made to
+     * wait on the row lock a second session holds open, and that session
+     * commits a fixed window later: the execution time is the lock wait,
+     * so it exceeds the threshold on any machine while the test itself
+     * stays sub-second.
+     */
     @Test
     void slowQueryIsRecordedInPoolStats() throws Exception {
+        final long thresholdMillis = 100;
+        final long lockHoldMillis = 5 * thresholdMillis;
+
         DataSource ds = newDataSource();
         ds.getPoolProperties().setJdbcInterceptors(
-                "org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport(threshold=100)");
+                "org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport(threshold="
+                        + thresholdMillis + ")");
         ds.createPool();
         String poolName = ds.getPoolProperties().getPoolName();
+        String table = uniqueTable();
+
+        try (Connection c = ds.getConnection(); Statement st = c.createStatement()) {
+            st.execute("CREATE TABLE " + table + " (ID INT PRIMARY KEY, V INT)");
+            st.execute("INSERT INTO " + table + " VALUES (1, 1)");
+        }
+
+        // hold the row lock open...
+        Connection blocker = ds.getConnection();
+        blocker.setAutoCommit(false);
+        try (PreparedStatement ps = blocker.prepareStatement(
+                "UPDATE " + table + " SET V = V + 10 WHERE ID = 1")) {
+            Assertions.assertEquals(1, ps.executeUpdate());
+        }
+        // ...and release it while the instrumented statement is blocked on it
+        Thread releaseLock = new Thread(() -> {
+            sleep(lockHoldMillis);
+            try {
+                blocker.commit();
+            } catch (SQLException ignore) {
+                // the assertions below report the broken state
+            }
+        }, "release-row-lock");
 
         String nonce = "nonce_" + System.nanoTime();
-        String sql = HEAVY_SQL_PREFIX + " /* " + nonce + " */";
+        String sql = "UPDATE " + table + " SET V = V + 1 WHERE ID = 1 /* " + nonce + " */";
+        long start;
+        long elapsed;
+        releaseLock.start();
         try (Connection c = ds.getConnection(); Statement st = c.createStatement()) {
-            Assertions.assertTrue(st.execute(sql));
+            // the lock wait must not be cut short by the driver's own limit
+            st.execute("SET LOCK_TIMEOUT 60000");
+            start = System.currentTimeMillis();
+            Assertions.assertFalse(st.execute(sql), "an UPDATE yields no result set");
+            elapsed = System.currentTimeMillis() - start;
         }
+        releaseLock.join(AWAIT_TIMEOUT_MS);
+        blocker.close();
+        Assertions.assertTrue(elapsed >= thresholdMillis,
+                "the instrumented statement must have been slowed by the lock wait, took "
+                        + elapsed + " ms");
 
         ConcurrentHashMap<String, ?> stats = SlowQueryReport.getPoolStats(poolName);
         Assertions.assertNotNull(stats, "stats must exist once a slow query was run");
-        Assertions.assertTrue(statsKeySet(stats).stream().anyMatch(k -> k.contains(nonce)),
-                "slow query must be reported under pool " + poolName
-                        + ", recorded keys: " + statsKeySet(stats));
+        String key = statsKeySet(stats).stream().filter(k -> k.contains(nonce))
+                .findFirst().orElse(null);
+        Assertions.assertNotNull(key, "slow query must be reported under pool " + poolName
+                + ", recorded keys: " + statsKeySet(stats));
+        // the entry must carry the slowness the interceptor measured
+        SlowQueryReport.QueryStats qs = (SlowQueryReport.QueryStats) stats.get(key);
+        Assertions.assertEquals(1, qs.getNrOfInvocations());
+        Assertions.assertTrue(qs.getMaxInvocationTime() >= thresholdMillis,
+                "the recorded execution time must exceed the threshold, was "
+                        + qs.getMaxInvocationTime() + " ms");
     }
 
     @Test
@@ -234,7 +294,7 @@ class TestInterceptorSemantics extends JdbcPoolBaseTest {
 
         long start = System.currentTimeMillis();
         try (Connection c = ds.getConnection(); Statement st = c.createStatement()) {
-            Assertions.assertThrows(SQLException.class, () -> st.execute(HEAVY_SQL_PREFIX));
+            Assertions.assertThrows(SQLException.class, () -> st.execute(HEAVY_SQL));
         }
         long elapsed = System.currentTimeMillis() - start;
         Assertions.assertTrue(elapsed >= 900 && elapsed < 8000,

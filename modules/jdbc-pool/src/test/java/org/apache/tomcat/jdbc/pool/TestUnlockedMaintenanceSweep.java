@@ -40,7 +40,15 @@ import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
  */
 public class TestUnlockedMaintenanceSweep extends JdbcPoolBaseTest {
 
+    /*
+     * The window under test is hit once per borrow/sweep collision, and a
+     * hot borrow loop produces hundreds of thousands of them per second.
+     * The run therefore stops at an iteration budget that even a slow CI
+     * covers inside the wall-clock cap, and an error ends it at once,
+     * instead of always burning the full cap.
+     */
     private static final long RUN_MILLIS = 6000;
+    private static final long ITERATIONS = 250_000;
     private static final int BORROWERS = 4;
 
     @Test
@@ -99,7 +107,12 @@ public class TestUnlockedMaintenanceSweep extends JdbcPoolBaseTest {
             for (Thread b : borrowers) {
                 b.start();
             }
-            sleep(RUN_MILLIS);
+            long deadline = System.currentTimeMillis() + RUN_MILLIS;
+            while (System.currentTimeMillis() < deadline
+                    && uses.get() + errors.get() < ITERATIONS
+                    && firstError.get() == null) {
+                sleep(25);
+            }
             stop.set(true);
             sweeper.join();
             for (Thread b : borrowers) {

@@ -136,7 +136,7 @@ class TestCloseVsPoolCreation extends JdbcPoolBaseTest {
             closer.setDaemon(true);
             closer.start();
 
-            closer.join(1000);
+            closer.join(500);
             Assertions.assertTrue(closer.isAlive(),
                     "close() must wait for the in-flight pool creation instead of"
                             + " returning while the pool is still unpublished");
