@@ -1094,6 +1094,22 @@
         always empty. Fair queueing remains available through
         <code>FairBlockingQueue</code>. (remm)
       </fix>
+      <fix>
+        Make the JDBC pool fail fast and explicitly when a resource of
+        type <code>javax.sql.XADataSource</code> is not actually backed
+        by an XA data source. XA connections are created by the data
+        source named by the <code>dataSource</code> or
+        <code>dataSourceJNDI</code> attribute, but the documentation
+        presented the resource type alone as enabling XA, so the common
+        <code>driverClassName</code> and <code>url</code> configuration
+        silently produced a pool of plain JDBC connections that looked
+        and behaved exactly like a non-XA pool; the missing XA support
+        only surfaced later, as an opaque generic failure inside the
+        transaction manager when it requested an XA connection. Such a
+        request now fails immediately with a message that names the
+        missing configuration, and the documentation now states the
+        requirement. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
