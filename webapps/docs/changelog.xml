@@ -553,6 +553,10 @@
         suffixed certificate is used instead.
         (dsoumis)
       </update>
+      <fix>
+        When validating HTTP/2 frames, make sure more serious errors take
+        priority over less serious errors. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
