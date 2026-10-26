@@ -865,14 +865,30 @@ public class PooledConnection implements PooledConnectionMBean {
      * @param handler the first interceptor in the chain
      */
     public void setHandler(JdbcInterceptor handler) {
-        if (this.handler!=null && this.handler!=handler) {
-            JdbcInterceptor interceptor = this.handler;
-            while (interceptor!=null) {
-                interceptor.reset(null, null);
-                interceptor = interceptor.getNext();
-            }//while
-        }//end if
-        this.handler = handler;
+        try {
+            if (this.handler!=null && this.handler!=handler) {
+                JdbcInterceptor interceptor = this.handler;
+                while (interceptor!=null) {
+                    //read the next link before the callback, as the callback
+                    //is allowed to modify it
+                    JdbcInterceptor next = interceptor.getNext();
+                    try {
+                        interceptor.reset(null, null);
+                    } catch (Throwable t) {
+                        //one broken interceptor must not stop the rest of the
+                        //chain from being reset
+                        log.warn("Interceptor [" + interceptor.getClass().getName()
+                                + "] threw an exception from reset(); "
+                                + "continuing with the rest of the chain.", t);
+                    }
+                    interceptor = next;
+                }//while
+            }//end if
+        } finally {
+            //a released connection must never keep a stale chain,
+            //even if resetting the old one failed
+            this.handler = handler;
+        }
     }
 
     @Override
