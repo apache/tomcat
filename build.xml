@@ -1556,6 +1556,8 @@
     </copy>
     <!-- Copy doesn't retain permissions -->
     <chmod dir="${tomcat.build}/bin" includes="*.sh" perm="+x"/>
+    <!-- Copy with an encoding rewrites newlines as the platform default -->
+    <fixcrlf srcdir="${tomcat.build}" includes="**/*.sh" eol="lf" encoding="ISO-8859-1" fixlast="false" />
 
     <!-- Copy static resource files -->
     <copy todir="${tomcat.build}/conf" encoding="ISO-8859-1">

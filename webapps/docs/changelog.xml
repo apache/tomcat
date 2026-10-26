@@ -1053,6 +1053,13 @@
         default. Based on pull request <pr>1095</pr> provided by StrongOx.
         (markt)
       </fix>
+      <fix>
+        <bug>70285</bug>: Fix the <code>deploy</code> build target so
+        <code>*.sh</code> files in the build directory use LF line endings when
+        Tomcat is built on Windows. A Windows build otherwise writes scripts
+        such as <code>catalina.sh</code> with CRLF line endings, and those
+        scripts fail when the build output is run on Linux. (strongox)
+      </fix>
     </changelog>
   </subsection>
 </section>
