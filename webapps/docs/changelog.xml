@@ -1133,6 +1133,17 @@
         already in-flight connection when the cancellation comes too
         late. (remm)
       </fix>
+      <fix>
+        Include the JDBC 4.2 execution methods
+        <code>executeLargeUpdate()</code> and
+        <code>executeLargeBatch()</code> in the methods that the query
+        reporting interceptors recognise as query executions. Slow or
+        failed large updates and large batches – a common bulk
+        processing pattern – were never timed, never reported as slow
+        and never counted in the query statistics, so the monitoring the
+        interceptors exist to provide silently missed exactly the work
+        most likely to be slow. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

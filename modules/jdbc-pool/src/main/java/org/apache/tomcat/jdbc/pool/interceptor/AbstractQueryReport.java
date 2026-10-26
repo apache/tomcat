@@ -62,7 +62,33 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
     protected abstract void prepareCall(String query, long time);
 
     /**
-     * Invoked when a query execution, a call to execute/executeQuery or executeBatch failed.
+     * Extracts the SQL that a statement execution is reported under: the SQL
+     * the statement was prepared with, else a {@code String} first argument,
+     * else {@code "batch"} for batch executions, which carry no SQL of their
+     * own, else {@code null}.
+     *
+     * @param query the SQL the statement was prepared with, or {@code null}
+     * @param args  the arguments of the invoked method
+     * @param name  the name of the invoked method
+     *
+     * @return the SQL, {@code "batch"} or {@code null}
+     */
+    private String extractQuery(String query, Object[] args, final String name) {
+        //extract the query string
+        String sql = query;
+        if (sql == null && args != null && args.length > 0 && args[0] instanceof String) {
+            sql = (String) args[0];
+        }
+        //if we do batch execution, then we name the query 'batch'
+        if (sql == null && (compare(EXECUTE_BATCH, name) || compare(EXECUTE_LARGE_BATCH, name))) {
+            sql = "batch";
+        }
+        return sql;
+    }
+
+    /**
+     * Invoked when a query execution, a call to an execute method as
+     * recognised by {@link AbstractCreateStatementInterceptor#isExecute(Method, boolean)}, failed.
      * @param query the query that was executed and failed
      * @param args the arguments to the execution
      * @param name the name of the method used to execute {@link AbstractCreateStatementInterceptor#isExecute(Method, boolean)}
@@ -72,20 +98,12 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      *         or {@code null} if the invocation carries no SQL string
      */
     protected String reportFailedQuery(String query, Object[] args, final String name, long start, Throwable t) {
-        //extract the query string
-        String sql = query;
-        if (sql == null && args != null && args.length > 0 && args[0] instanceof String) {
-            sql = (String) args[0];
-        }
-        //if we do batch execution, then we name the query 'batch'
-        if (sql==null && compare(EXECUTE_BATCH,name)) {
-            sql = "batch";
-        }
-        return sql;
+        return extractQuery(query, args, name);
     }
 
     /**
-     * Invoked when a query execution, a call to execute/executeQuery or executeBatch succeeded and was within the timing threshold
+     * Invoked when a query execution, a call to an execute method as
+     * recognised by {@link AbstractCreateStatementInterceptor#isExecute(Method, boolean)}, succeeded and was within the timing threshold
      * @param query the query that was executed and failed
      * @param args the arguments to the execution
      * @param name the name of the method used to execute {@link AbstractCreateStatementInterceptor#isExecute(Method, boolean)}
@@ -95,20 +113,12 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      *         or {@code null} if the invocation carries no SQL string
      */
     protected String reportQuery(String query, Object[] args, final String name, long start, long delta) {
-        //extract the query string
-        String sql = query;
-        if (sql == null && args != null && args.length > 0 && args[0] instanceof String) {
-            sql = (String) args[0];
-        }
-        //if we do batch execution, then we name the query 'batch'
-        if (sql==null && compare(EXECUTE_BATCH,name)) {
-            sql = "batch";
-        }
-        return sql;
+        return extractQuery(query, args, name);
     }
 
     /**
-     * Invoked when a query execution, a call to execute/executeQuery or executeBatch succeeded and was exceeded the timing threshold
+     * Invoked when a query execution, a call to an execute method as
+     * recognised by {@link AbstractCreateStatementInterceptor#isExecute(Method, boolean)}, succeeded and was exceeded the timing threshold
      * @param query the query that was executed and failed
      * @param args the arguments to the execution
      * @param name the name of the method used to execute {@link AbstractCreateStatementInterceptor#isExecute(Method, boolean)}
@@ -118,16 +128,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      *         or {@code null} if the invocation carries no SQL string
      */
     protected String reportSlowQuery(String query, Object[] args, final String name, long start, long delta) {
-        //extract the query string
-        String sql = query;
-        if (sql == null && args != null && args.length > 0 && args[0] instanceof String) {
-            sql = (String) args[0];
-        }
-        //if we do batch execution, then we name the query 'batch'
-        if (sql==null && compare(EXECUTE_BATCH,name)) {
-            sql = "batch";
-        }
-        return sql;
+        return extractQuery(query, args, name);
     }
 
     /**
