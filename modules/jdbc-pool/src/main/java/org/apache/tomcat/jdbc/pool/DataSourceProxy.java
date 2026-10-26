@@ -57,6 +57,15 @@ public class DataSourceProxy implements PoolConfiguration {
     protected volatile PoolConfiguration poolProperties = null;
 
     /**
+     * Terminal lifecycle flag. Set by {@link #close(boolean)} while holding
+     * this proxy's monitor, the same monitor that serializes pool creation in
+     * {@link #pCreatePool()}. Once set, no new {@link ConnectionPool} is
+     * created: {@link #createPool()} fails with a {@link SQLException} instead
+     * of resurrecting a pool that its owner has already stopped tracking.
+     */
+    private volatile boolean closed = false;
+
+    /**
      * Construct a DataSourceProxy with default pool properties.
      */
     public DataSourceProxy() {
@@ -144,7 +153,8 @@ public class DataSourceProxy implements PoolConfiguration {
     /**
      * Sets up the connection pool, by creating a pooling driver.
      * @return the connection pool
-     * @throws SQLException Error creating pool
+     * @throws SQLException Error creating pool, or if this data source has
+     *                      been closed
      */
     public ConnectionPool createPool() throws SQLException {
         if (pool != null) {
@@ -158,6 +168,9 @@ public class DataSourceProxy implements PoolConfiguration {
      * Sets up the connection pool, by creating a pooling driver.
      */
     private synchronized ConnectionPool pCreatePool() throws SQLException {
+        if (closed) {
+            throw new SQLException("DataSource has been closed.");
+        }
         if (pool != null) {
             return pool;
         } else {
@@ -260,12 +273,18 @@ public class DataSourceProxy implements PoolConfiguration {
     /**
      * Return the underlying connection pool, creating it if necessary.
      *
-     * @return the connection pool or null if creation failed
+     * @return the connection pool, or null if creation failed or this data
+     *         source has been closed
      */
     public ConnectionPool getPool() {
         try {
             return createPool();
         }catch (SQLException x) {
+            if (closed) {
+                // A closed data source legitimately has no pool; this is
+                // a normal lifecycle state, not a creation failure.
+                return null;
+            }
             log.error("Error during connection pool creation.", x);
             return null;
         }
@@ -274,26 +293,37 @@ public class DataSourceProxy implements PoolConfiguration {
 
     /**
      * Close the connection pool, returning connections to the database.
+     * The closure is terminal: later borrow or pool creation attempts on
+     * this data source fail with an <code>SQLException</code> instead of
+     * recreating the pool.
      */
     public void close() {
         close(false);
     }
     /**
-     * Close the connection pool.
+     * Close the connection pool. If the pool is being created concurrently,
+     * this method waits for the creation to complete and then closes the
+     * resulting pool rather than racing it.
      *
      * @param all if true close all connections, otherwise only idle ones
      */
-    public void close(boolean all) {
-        try {
-            if (pool != null) {
-                final ConnectionPool p = pool;
-                pool = null;
-                if (p!=null) {
-                    p.close(all);
-                }
+    public synchronized void close(boolean all) {
+        // Synchronized on the same monitor as pCreatePool() so a pool being
+        // created concurrently with this close cannot be published after the
+        // field has been nulled and thus leak, untracked, with its database
+        // sessions and scheduled cleaner still alive. The closed flag makes
+        // the closure terminal for the pool creation paths as well: a closed
+        // data source no longer resurrects its pool on the next borrow or
+        // statistics access.
+        closed = true;
+        final ConnectionPool p = pool;
+        pool = null;
+        if (p != null) {
+            try {
+                p.close(all);
+            } catch (Exception x) {
+                log.warn("Error during connection pool closure.", x);
             }
-        }catch (Exception x) {
-            log.warn("Error during connection pool closure.", x);
         }
     }
 
