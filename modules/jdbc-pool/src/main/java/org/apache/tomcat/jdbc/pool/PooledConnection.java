@@ -428,6 +428,16 @@ public class PooledConnection implements PooledConnectionMBean {
         if (connection != null) {
             try {
                 parent.disconnectEvent(this, finalize);
+            } catch (Throwable x) {
+                // the event itself isolates each link of the chain, so this
+                // catch only guards against a failure of the walk itself;
+                // an interceptor must not be able to keep the physical
+                // connection from being closed
+                log.warn("Interceptor threw an exception from the "
+                        + "disconnected() event; ignoring it so that the "
+                        + "physical connection can be closed.", x);
+            }
+            try {
                 if (xaConnection == null) {
                     connection.close();
                 } else {
