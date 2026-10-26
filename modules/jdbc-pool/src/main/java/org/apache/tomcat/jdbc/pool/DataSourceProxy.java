@@ -355,7 +355,7 @@ public class DataSourceProxy implements PoolConfiguration {
 
     @Override
     public String getPoolName() {
-        return pool.getName();
+        return getPoolProperties().getPoolName();
     }
 
 
