@@ -27,12 +27,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
@@ -120,7 +115,8 @@ class TestCloseVsPoolCreation extends JdbcPoolBaseTest {
         creator.setDaemon(true);
         creator.start();
         try {
-            assertTrue(ParkingConnectDriver.CONNECT_STARTED.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
+            Assertions.assertTrue(ParkingConnectDriver.CONNECT_STARTED
+                    .await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
                     "pool creation must be parked inside the driver's connect()");
 
             // close() while the pool is still being created: it must not
@@ -141,15 +137,16 @@ class TestCloseVsPoolCreation extends JdbcPoolBaseTest {
             closer.start();
 
             closer.join(1000);
-            assertTrue(closer.isAlive(),
+            Assertions.assertTrue(closer.isAlive(),
                     "close() must wait for the in-flight pool creation instead of"
                             + " returning while the pool is still unpublished");
 
             ParkingConnectDriver.CONNECT_RELEASE.countDown();
             closer.join(AWAIT_TIMEOUT_MS);
             creator.join(AWAIT_TIMEOUT_MS);
-            assertFalse(creator.isAlive(), "the creating thread must not outlive the test");
-            assertNull(closeFailure.get(), "close() must not fail");
+            Assertions.assertFalse(creator.isAlive(),
+                    "the creating thread must not outlive the test");
+            Assertions.assertNull(closeFailure.get(), "close() must not fail");
 
             if (borrowed.get() != null) {
                 // The borrow won the race against the closure by a hair; the
@@ -164,12 +161,14 @@ class TestCloseVsPoolCreation extends JdbcPoolBaseTest {
             awaitSessions(0);
 
             // The closure is terminal: no later access may resurrect a pool
-            SQLException x = assertThrows(SQLException.class, ds::getConnection,
+            SQLException x = Assertions.assertThrows(SQLException.class, ds::getConnection,
                     "a closed data source must reject borrows instead of recreating the pool");
-            assertTrue(x.getMessage() != null && x.getMessage().contains("closed"),
+            Assertions.assertTrue(x.getMessage() != null && x.getMessage().contains("closed"),
                     "the rejection must say the data source is closed, was: " + x.getMessage());
-            assertNull(ds.getPool(), "getPool() must not create a pool on a closed data source");
-            assertEquals(0, poolSessions(), "no database session may exist after the close");
+            Assertions.assertNull(ds.getPool(),
+                    "getPool() must not create a pool on a closed data source");
+            Assertions.assertEquals(0, poolSessions(),
+                    "no database session may exist after the close");
         } finally {
             // Never leave the creator parked inside connect(): it holds
             // the data source monitor there, so the base class teardown
@@ -183,19 +182,20 @@ class TestCloseVsPoolCreation extends JdbcPoolBaseTest {
     void closedDataSourceDoesNotResurrectItsPool() throws Exception {
         DataSource ds = newDataSource();
         ds.getConnection().close();
-        assertEquals(1, poolSessions(), "the pool must own its connection before the close");
+        Assertions.assertEquals(1, poolSessions(),
+                "the pool must own its connection before the close");
         ds.close();
         awaitSessions(0);
 
-        SQLException x = assertThrows(SQLException.class, ds::getConnection,
+        SQLException x = Assertions.assertThrows(SQLException.class, ds::getConnection,
                 "a closed data source must reject borrows instead of recreating the pool");
-        assertTrue(x.getMessage() != null && x.getMessage().contains("closed"),
+        Assertions.assertTrue(x.getMessage() != null && x.getMessage().contains("closed"),
                 "the rejection must say the data source is closed, was: " + x.getMessage());
-        assertEquals(0, poolSessions(), "no new pool may be created after close()");
+        Assertions.assertEquals(0, poolSessions(), "no new pool may be created after close()");
 
         // A failing pool creation surfaces through getPool() as null...
-        assertNull(ds.getPool());
+        Assertions.assertNull(ds.getPool());
         // ...while the explicit creation attempt reports the reason
-        assertNotNull(assertThrows(SQLException.class, ds::createPool));
+        Assertions.assertNotNull(Assertions.assertThrows(SQLException.class, ds::createPool));
     }
 }

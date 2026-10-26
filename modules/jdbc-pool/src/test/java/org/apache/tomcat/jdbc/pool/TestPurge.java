@@ -18,8 +18,7 @@ package org.apache.tomcat.jdbc.pool;
 
 import java.sql.Connection;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
@@ -51,21 +50,23 @@ class TestPurge extends JdbcPoolBaseTest {
         for (int i = 0; i < 2; i++) {
             ds.getConnection().close();
         }
-        assertEquals(3, ds.getSize());
-        assertEquals(2, ds.getIdle());
+        Assertions.assertEquals(3, ds.getSize());
+        Assertions.assertEquals(2, ds.getIdle());
 
         ds.purge();
 
-        assertEquals(0, ds.getIdle(), "purge must drop every idle connection");
-        assertEquals(1, ds.getSize(), "only the borrowed connection may survive a purge");
+        Assertions.assertEquals(0, ds.getIdle(), "purge must drop every idle connection");
+        Assertions.assertEquals(1, ds.getSize(),
+                "only the borrowed connection may survive a purge");
         awaitSessions(1);
 
         // the borrower is untouched by the purge...
         inUse.createStatement().execute("SELECT 1");
         // ...but its session is stale, so returning it closes it
         inUse.close();
-        assertEquals(0, ds.getIdle(), "a session older than the purge must not be repooled");
-        assertEquals(0, ds.getSize());
+        Assertions.assertEquals(0, ds.getIdle(),
+                "a session older than the purge must not be repooled");
+        Assertions.assertEquals(0, ds.getSize());
         awaitSessions(0);
     }
 
@@ -78,36 +79,37 @@ class TestPurge extends JdbcPoolBaseTest {
         awaitSessions(2);
 
         Connection held = ds.getConnection();
-        assertEquals(1, ds.getIdle());
+        Assertions.assertEquals(1, ds.getIdle());
 
         ds.purgeOnReturn();
 
-        assertEquals(1, ds.getIdle(),
+        Assertions.assertEquals(1, ds.getIdle(),
                 "purgeOnReturn must not touch idle connections, unlike purge()");
-        assertEquals(2, ds.getSize());
-        assertEquals(2, poolSessions());
+        Assertions.assertEquals(2, ds.getSize());
+        Assertions.assertEquals(2, poolSessions());
 
         // both pooled sessions predate the purge, so the return of the one
         // in use closes it instead of repooling it
         held.close();
-        assertEquals(1, ds.getIdle(), "the untouched idle session stays available");
-        assertEquals(1, ds.getSize());
+        Assertions.assertEquals(1, ds.getIdle(), "the untouched idle session stays available");
+        Assertions.assertEquals(1, ds.getSize());
         awaitSessions(1);
 
         // the other pre-purge session is discarded on its own return as well
         Connection stale = ds.getConnection();
         stale.close();
-        assertEquals(0, ds.getSize(),
+        Assertions.assertEquals(0, ds.getSize(),
                 "every session established before the purge must end up closed");
         awaitSessions(0);
 
         // a session established after the purge belongs to the new
         // generation and is pooled as usual
         try (Connection fresh = ds.getConnection()) {
-            assertTrue(fresh.createStatement().execute("SELECT 1"));
+            Assertions.assertTrue(fresh.createStatement().execute("SELECT 1"));
         }
-        assertEquals(1, ds.getSize(), "a session established after the purge must be pooled");
-        assertEquals(1, ds.getIdle());
+        Assertions.assertEquals(1, ds.getSize(),
+                "a session established after the purge must be pooled");
+        Assertions.assertEquals(1, ds.getIdle());
         awaitSessions(1);
     }
 }

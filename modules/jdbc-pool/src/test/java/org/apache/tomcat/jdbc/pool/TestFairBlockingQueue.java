@@ -23,12 +23,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -44,26 +39,26 @@ class TestFairBlockingQueue {
     void pollTimesOutOnEmptyQueue() throws Exception {
         FairBlockingQueue<String> queue = new FairBlockingQueue<>();
         long start = System.currentTimeMillis();
-        assertNull(queue.poll(200, TimeUnit.MILLISECONDS));
-        assertTrue(System.currentTimeMillis() - start >= 150,
+        Assertions.assertNull(queue.poll(200, TimeUnit.MILLISECONDS));
+        Assertions.assertTrue(System.currentTimeMillis() - start >= 150,
                 "poll must honour its timeout");
-        assertEquals(0, queue.size());
+        Assertions.assertEquals(0, queue.size());
     }
 
     @Test
     void mostRecentlyOfferedElementIsPolledFirst() {
         FairBlockingQueue<String> queue = new FairBlockingQueue<>();
-        assertTrue(queue.offer("first"));
-        assertTrue(queue.offer("second"));
-        assertTrue(queue.offer("third"));
-        assertEquals(3, queue.size());
+        Assertions.assertTrue(queue.offer("first"));
+        Assertions.assertTrue(queue.offer("second"));
+        Assertions.assertTrue(queue.offer("third"));
+        Assertions.assertEquals(3, queue.size());
         // the pool queue is a stack: the connection that was returned most
         // recently is the one handed out next
-        assertEquals("third", queue.poll());
-        assertEquals("second", queue.poll());
-        assertEquals("first", queue.poll());
-        assertEquals(0, queue.size());
-        assertNull(queue.poll());
+        Assertions.assertEquals("third", queue.poll());
+        Assertions.assertEquals("second", queue.poll());
+        Assertions.assertEquals("first", queue.poll());
+        Assertions.assertEquals(0, queue.size());
+        Assertions.assertNull(queue.poll());
     }
 
     @Test
@@ -71,22 +66,23 @@ class TestFairBlockingQueue {
         FairBlockingQueue<String> queue = new FairBlockingQueue<>();
         queue.offer("keep");
         queue.offer("drop");
-        assertTrue(queue.contains("keep"));
-        assertTrue(queue.contains("drop"));
-        assertFalse(queue.isEmpty());
+        Assertions.assertTrue(queue.contains("keep"));
+        Assertions.assertTrue(queue.contains("drop"));
+        Assertions.assertFalse(queue.isEmpty());
 
-        assertTrue(queue.remove("drop"), "an idle element must be removable");
-        assertFalse(queue.remove("drop"), "a second removal must report nothing removed");
-        assertEquals(1, queue.size());
-        assertFalse(queue.contains("drop"));
+        Assertions.assertTrue(queue.remove("drop"), "an idle element must be removable");
+        Assertions.assertFalse(queue.remove("drop"),
+                "a second removal must report nothing removed");
+        Assertions.assertEquals(1, queue.size());
+        Assertions.assertFalse(queue.contains("drop"));
 
         queue.add("added");
         List<String> seen = new ArrayList<>();
         for (String element : queue) {
             seen.add(element);
         }
-        assertEquals(2, seen.size(), "the iterator must see both queued elements");
-        assertTrue(seen.contains("added"));
+        Assertions.assertEquals(2, seen.size(), "the iterator must see both queued elements");
+        Assertions.assertTrue(seen.contains("added"));
     }
 
     @Test
@@ -106,8 +102,8 @@ class TestFairBlockingQueue {
         taker.start();
         Thread.sleep(100);
         queue.offer("late");
-        assertTrue(done.await(5, TimeUnit.SECONDS), "taker must be handed the element");
-        assertEquals("late", taken.get());
+        Assertions.assertTrue(done.await(5, TimeUnit.SECONDS), "taker must be handed the element");
+        Assertions.assertEquals("late", taken.get());
         taker.join(1000);
     }
 
@@ -151,12 +147,13 @@ class TestFairBlockingQueue {
         queue.offer("one");
         queue.offer("two");
 
-        assertTrue(firstDone.await(5, TimeUnit.SECONDS), "first waiter must be served");
-        assertTrue(secondDone.await(5, TimeUnit.SECONDS), "second waiter must be served");
-        assertSame("one", firstIn.get(),
+        Assertions.assertTrue(firstDone.await(5, TimeUnit.SECONDS), "first waiter must be served");
+        Assertions.assertTrue(secondDone.await(5, TimeUnit.SECONDS),
+                "second waiter must be served");
+        Assertions.assertSame("one", firstIn.get(),
                 "the longest waiting consumer must receive the first element, got "
                         + firstIn.get());
-        assertSame("two", secondIn.get());
+        Assertions.assertSame("two", secondIn.get());
     }
 
     @Test
@@ -166,33 +163,33 @@ class TestFairBlockingQueue {
         for (int i = 0; i < count; i++) {
             queue.put("e" + i);
         }
-        assertEquals(count, queue.size());
-        assertEquals(Integer.MAX_VALUE - count, queue.remainingCapacity());
+        Assertions.assertEquals(count, queue.size());
+        Assertions.assertEquals(Integer.MAX_VALUE - count, queue.remainingCapacity());
 
         List<String> drained = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             drained.add(queue.take());
         }
-        assertEquals("e" + (count - 1), drained.get(0),
+        Assertions.assertEquals("e" + (count - 1), drained.get(0),
                 "blocking take must follow the same most-recently-used order");
-        assertEquals(0, queue.size());
-        assertTrue(queue.isEmpty());
+        Assertions.assertEquals(0, queue.size());
+        Assertions.assertTrue(queue.isEmpty());
     }
 
     @Test
     void bulkCollectionOperationsAreUnsupportedByContract() {
         FairBlockingQueue<String> queue = new FairBlockingQueue<>();
         queue.offer("item");
-        assertThrows(UnsupportedOperationException.class, queue::clear);
-        assertThrows(UnsupportedOperationException.class,
+        Assertions.assertThrows(UnsupportedOperationException.class, queue::clear);
+        Assertions.assertThrows(UnsupportedOperationException.class,
                 () -> queue.containsAll(Collections.singletonList("item")));
-        assertThrows(UnsupportedOperationException.class,
+        Assertions.assertThrows(UnsupportedOperationException.class,
                 () -> queue.removeAll(Collections.emptyList()));
-        assertThrows(UnsupportedOperationException.class,
+        Assertions.assertThrows(UnsupportedOperationException.class,
                 () -> queue.retainAll(Collections.emptyList()));
-        assertThrows(UnsupportedOperationException.class,
+        Assertions.assertThrows(UnsupportedOperationException.class,
                 () -> queue.drainTo(new ArrayList<>()));
-        assertEquals(1, queue.size(),
+        Assertions.assertEquals(1, queue.size(),
                 "the unsupported operations must not mutate the queue");
     }
 }

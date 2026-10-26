@@ -25,10 +25,7 @@ import java.util.logging.Logger;
 
 import javax.sql.XAConnection;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
@@ -117,11 +114,11 @@ class TestProxyKindAfterDataSourceSwap extends JdbcPoolBaseTest {
 
         ds.setDataSource(newH2XaDataSource());
         try (Connection c2 = ds.getConnection()) {
-            assertTrue(c2 instanceof XAConnection,
+            Assertions.assertTrue(c2 instanceof XAConnection,
                     "a connection created through an XA data source must be "
                             + "proxied as an XAConnection even though the "
                             + "pool started out non-XA");
-            assertNotNull(((XAConnection) c2).getXAResource(),
+            Assertions.assertNotNull(((XAConnection) c2).getXAResource(),
                     "the XA dispatch must reach the real XA connection");
         }
         held.close();
@@ -141,12 +138,12 @@ class TestProxyKindAfterDataSourceSwap extends JdbcPoolBaseTest {
 
         ds.setDataSource(new PlainDataSource(getUrl()));
         try (Connection c2 = ds.getConnection()) {
-            assertFalse(c2 instanceof XAConnection,
+            Assertions.assertFalse(c2 instanceof XAConnection,
                     "a connection created through a plain data source must "
                             + "not be proxied as an XAConnection just "
                             + "because the pool started out XA");
         }
-        assertThrows(SQLException.class, ds::getXAConnection,
+        Assertions.assertThrows(SQLException.class, ds::getXAConnection,
                 "the XA data source facade must refuse to hand out a "
                         + "connection that no longer has an XA connection "
                         + "behind it");

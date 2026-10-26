@@ -23,10 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -70,7 +67,7 @@ class TestInterceptorResetOrder extends JdbcPoolBaseTest {
 
         ds.getConnection().close();
 
-        assertEquals(Arrays.asList("first", "second"), RESETS);
+        Assertions.assertEquals(Arrays.asList("first", "second"), RESETS);
     }
 
     @Test
@@ -82,9 +79,9 @@ class TestInterceptorResetOrder extends JdbcPoolBaseTest {
         RESETS.clear();
 
         try (Connection reused = ds.getConnection()) {
-            assertEquals(Integer.valueOf(1), sessionMarker(reused),
+            Assertions.assertEquals(Integer.valueOf(1), sessionMarker(reused),
                     "the cached interceptor chain must be exercised on the same physical session");
-            assertEquals(Arrays.asList("first", "second"), RESETS);
+            Assertions.assertEquals(Arrays.asList("first", "second"), RESETS);
         }
     }
 
@@ -92,16 +89,16 @@ class TestInterceptorResetOrder extends JdbcPoolBaseTest {
     void resetFailureIsReportedAndTheConnectionDiscarded() throws Exception {
         DataSource ds = pool(First.class, Failing.class, Second.class);
 
-        SQLException e = assertThrows(SQLException.class, () -> ds.getConnection());
+        SQLException e = Assertions.assertThrows(SQLException.class, () -> ds.getConnection());
 
-        assertInstanceOf(IllegalStateException.class, e.getCause());
-        assertTrue(e.getMessage().contains(Failing.class.getName()), e.getMessage());
+        Assertions.assertInstanceOf(IllegalStateException.class, e.getCause());
+        Assertions.assertTrue(e.getMessage().contains(Failing.class.getName()), e.getMessage());
         // The interceptors after the one that failed are not reset
-        assertEquals(Arrays.asList("first"), RESETS);
+        Assertions.assertEquals(Arrays.asList("first"), RESETS);
         // The connection that could not be set up must not stay borrowed ...
-        assertEquals(0, ds.getPool().getActive());
+        Assertions.assertEquals(0, ds.getPool().getActive());
         // ... and must have been closed rather than returned to the pool
-        assertEquals(0, ds.getPool().getIdle());
+        Assertions.assertEquals(0, ds.getPool().getIdle());
         awaitSessions(0);
     }
 
@@ -115,12 +112,12 @@ class TestInterceptorResetOrder extends JdbcPoolBaseTest {
         Unconstructable.fail = true;
 
         for (int i = 0; i < 2; i++) {
-            SQLException e = assertThrows(SQLException.class, () -> ds.getConnection());
+            SQLException e = Assertions.assertThrows(SQLException.class, () -> ds.getConnection());
 
-            assertTrue(e.getMessage().contains("instantiate"), e.getMessage());
+            Assertions.assertTrue(e.getMessage().contains("instantiate"), e.getMessage());
             // Nothing was done to the connection so it goes back to the pool rather than being closed
-            assertEquals(0, ds.getPool().getActive());
-            assertEquals(1, ds.getPool().getIdle());
+            Assertions.assertEquals(0, ds.getPool().getActive());
+            Assertions.assertEquals(1, ds.getPool().getIdle());
         }
         awaitSessions(1);
     }

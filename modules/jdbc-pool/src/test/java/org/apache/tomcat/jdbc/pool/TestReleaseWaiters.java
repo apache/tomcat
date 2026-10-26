@@ -22,10 +22,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
@@ -107,7 +104,7 @@ class TestReleaseWaiters extends JdbcPoolBaseTest {
         }, "probe-borrower");
         props.arm();
         borrower.start();
-        assertTrue(props.awaitInWindow(),
+        Assertions.assertTrue(props.awaitInWindow(),
                 "borrower should have reached the window between the maxActive "
                         + "check and the waiter registration");
 
@@ -121,16 +118,16 @@ class TestReleaseWaiters extends JdbcPoolBaseTest {
         borrower.join(AWAIT_TIMEOUT_MS);
         if (borrower.isAlive()) {
             borrower.interrupt(); // unstick it before failing
-            fail("a borrower whose notification was lost waits forever even "
+            Assertions.fail("a borrower whose notification was lost waits forever even "
                     + "though a slot is free");
         }
-        assertNull(failure[0], "the borrower should have been served");
+        Assertions.assertNull(failure[0], "the borrower should have been served");
         try (ResultSet rs = served[0].createStatement().executeQuery("SELECT 1")) {
-            assertTrue(rs.next());
+            Assertions.assertTrue(rs.next());
         }
         awaitSessions(1); // the old one destroyed, the borrower's created
         served[0].close();
-        assertEquals(1, ds.getIdle());
+        Assertions.assertEquals(1, ds.getIdle());
     }
 
     @Test
@@ -180,18 +177,18 @@ class TestReleaseWaiters extends JdbcPoolBaseTest {
         // a good fraction of maxWait, it is handed the placeholder directly
         // and would wake within milliseconds if it were woken at all.
         sleep(500);
-        assertEquals(1, ds.getWaitCount(),
+        Assertions.assertEquals(1, ds.getWaitCount(),
                 "the duplicate release must not wake the remaining waiter");
 
         for (Thread waiter : waiters) {
             waiter.join(AWAIT_TIMEOUT_MS);
             if (waiter.isAlive()) {
                 waiter.interrupt();
-                fail("waiter is stuck");
+                Assertions.fail("waiter is stuck");
             }
         }
         int servedCount = (served[0] == null ? 0 : 1) + (served[1] == null ? 0 : 1);
-        assertEquals(1, servedCount,
+        Assertions.assertEquals(1, servedCount,
                 "only the destruction of the connection should have opened a slot");
         awaitSessions(1);
         for (Connection c : served) {

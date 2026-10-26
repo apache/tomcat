@@ -21,8 +21,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
@@ -109,7 +108,7 @@ class TestUnconnectedPlaceholder extends JdbcPoolBaseTest {
 
         props.arm();
         waiter.interrupt();
-        assertTrue(props.awaitInWindow(),
+        Assertions.assertTrue(props.awaitInWindow(),
                 "waiter should have reached the window between removing its "
                         + "queue latch and decrementing the pool wait count");
 
@@ -120,7 +119,7 @@ class TestUnconnectedPlaceholder extends JdbcPoolBaseTest {
         // proxy and muddy what this test observes.
         pool.release(pc);
         waiter.join(AWAIT_TIMEOUT_MS);
-        assertNotNull(waiterFailure[0],
+        Assertions.assertNotNull(waiterFailure[0],
                 "the interrupted waiter must have failed its borrow");
 
         // The sweeper runs every 200 ms. Validating the never-connected
