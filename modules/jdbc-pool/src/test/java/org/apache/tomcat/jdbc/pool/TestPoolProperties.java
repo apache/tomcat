@@ -90,6 +90,28 @@ class TestPoolProperties {
     }
 
     @Test
+    void setConnectionPropertiesRoundTripsThroughTheProxy() {
+        PoolProperties properties = new PoolProperties();
+        DataSourceProxy proxy = new DataSourceProxy(properties);
+
+        proxy.setConnectionProperties("first=one;second=two");
+
+        Assertions.assertEquals("first=one;second=two", proxy.getConnectionProperties(),
+                "the proxy setter must store the raw string like every other "
+                        + "implementation of the interface does");
+        // the same call must keep parsing the pairs into the driver
+        // properties the pool connects with
+        Assertions.assertEquals("one", properties.getDbProperties().getProperty("first"),
+                "the parsed pairs must still reach the database properties");
+        Assertions.assertEquals("two", properties.getDbProperties().getProperty("second"),
+                "the parsed pairs must still reach the database properties");
+
+        proxy.setConnectionProperties(null);
+        Assertions.assertNull(proxy.getConnectionProperties(),
+                "clearing the configuration must round-trip as well");
+    }
+
+    @Test
     void toStringMasksThePasswordButStillShowsTheConfiguration() {
         PoolProperties properties = new PoolProperties();
         properties.setUsername(DEFAULT_USER);

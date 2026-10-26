@@ -20,7 +20,6 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
-import java.util.Iterator;
 import java.util.Properties;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -560,17 +559,15 @@ public class DataSourceProxy implements PoolConfiguration {
     @Override
     public void setConnectionProperties(String properties) {
         try {
-            Properties prop = DataSourceFactory.getProperties(properties);
-            Iterator<?> i = prop.keySet().iterator();
-            while (i.hasNext()) {
-                String key = (String) i.next();
-                String value = prop.getProperty(key);
-                getPoolProperties().getDbProperties().setProperty(key, value);
-            }
-
-        } catch (Exception x) {
+            // Delegate so the raw string is stored as well as parsed: a
+            // hand-rolled merge into the database properties left
+            // getConnectionProperties() reporting null for a value that
+            // was just set, unlike every other implementation of the
+            // interface (PoolProperties itself and the pool's JMX wrapper).
+            getPoolProperties().setConnectionProperties(properties);
+        } catch (RuntimeException x) {
             log.error("Unable to parse connection properties.", x);
-            throw new RuntimeException(x);
+            throw x;
         }
     }
 
