@@ -118,4 +118,33 @@ public class TestHttp2Section_6_5 extends Http2TestBase {
     }
 
     // delayed ACKs. Requires an API (TBD) for applications to send settings.
+
+
+    @Test
+    public void testSettingsLargeHeaderTableSize() throws Exception {
+        // RFC 9113, section 6.5.2: SETTINGS_HEADER_TABLE_SIZE has no protocol-defined upper
+        // bound. The encoder selects any size equal to or less than the advertised value.
+        // A value above the implementation limit must be accepted, not rejected.
+        http2Connect();
+
+        sendSettings(0, false, new SettingValue(0x1, 65537));
+
+        parser.readFrame();
+
+        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith("0-Settings-Ack"));
+    }
+
+
+    @Test
+    public void testSettingsMaxUnsignedHeaderTableSize() throws Exception {
+        // RFC 9113, section 6.5.2: any value up to 2^32-1 is valid for
+        // SETTINGS_HEADER_TABLE_SIZE. The maximum unsigned 32-bit value must be accepted.
+        http2Connect();
+
+        sendSettings(0, false, new SettingValue(0x1, 0xFFFFFFFFL));
+
+        parser.readFrame();
+
+        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith("0-Settings-Ack"));
+    }
 }
