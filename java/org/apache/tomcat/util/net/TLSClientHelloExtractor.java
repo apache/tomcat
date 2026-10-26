@@ -477,7 +477,11 @@ public class TLSClientHelloExtractor {
         char serverNameSize = bb.getChar();
         byte[] serverNameBytes = new byte[serverNameSize];
         bb.get(serverNameBytes);
-        return new String(serverNameBytes, StandardCharsets.UTF_8).toLowerCase(Locale.ENGLISH);
+        String result = new String(serverNameBytes, StandardCharsets.UTF_8).toLowerCase(Locale.ENGLISH);
+        if (result.endsWith(".")) {
+            throw new IllegalArgumentException(sm.getString("sniExtractor.host.invalid.trailingPeriod", result));
+        }
+        return result;
     }
 
 
