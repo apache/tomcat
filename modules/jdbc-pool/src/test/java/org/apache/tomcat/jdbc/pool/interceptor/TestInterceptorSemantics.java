@@ -309,4 +309,80 @@ class TestInterceptorSemantics extends JdbcPoolBaseTest {
         Assertions.assertEquals(0, adminRowCount(t),
                 "execution attempted after close must not reach the database");
     }
+
+    /*
+     * Reporting must never disturb the application: the report hooks are
+     * extension points, and a subclass whose reportQuery throws used to
+     * turn a successful execution into a thrown exception at the
+     * application (reportFailedQuery threw from inside the catch block,
+     * replacing the driver's SQLException).
+     */
+    @Test
+    void throwingSuccessReporterDoesNotAffectExecution() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setName("throw_" + System.nanoTime());
+        ds.getPoolProperties().setJdbcInterceptors(
+                ThrowingReportInterceptor.class.getName() + "(threshold=60000)");
+        ds.createPool();
+        String poolName = ds.getPoolProperties().getPoolName();
+        String t = uniqueTable();
+        String sql = "CREATE TABLE " + t + " (v INT)";
+        try (Connection c = ds.getConnection(); Statement st = c.createStatement()) {
+            Assertions.assertDoesNotThrow(() -> st.execute(sql),
+                    "a throwing reporter must not disturb the application");
+        }
+        // positive control: the hook ran and booked the execution before
+        // throwing, so the assertion above cannot pass because the proxy
+        // is absent
+        ConcurrentHashMap<String, ?> stats = SlowQueryReport.getPoolStats(poolName);
+        Assertions.assertEquals(1, statsFor(stats, sql).getNrOfInvocations(),
+                "the reporting hook must have run before it threw");
+    }
+
+    /*
+     * Same for the failure path: the driver's SQLException, not the
+     * reporting failure, is what the application catches.
+     */
+    @Test
+    void throwingFailedReporterDoesNotMaskDriverException() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setName("throwfail_" + System.nanoTime());
+        ds.getPoolProperties().setJdbcInterceptors(
+                ThrowingReportInterceptor.class.getName() + "(threshold=60000)");
+        ds.createPool();
+        String poolName = ds.getPoolProperties().getPoolName();
+        String nonce = "throwfail_" + System.nanoTime();
+        String sql = "SELECT * FROM no_such_table_" + nonce;
+        try (Connection c = ds.getConnection(); Statement st = c.createStatement()) {
+            Assertions.assertThrows(SQLException.class, () -> st.execute(sql),
+                    "the driver's SQLException must reach the application "
+                            + "even if the reporter throws");
+        }
+        // positive control as above: the failed-query hook ran and booked
+        // the failure before throwing
+        ConcurrentHashMap<String, ?> stats = SlowQueryReport.getPoolStats(poolName);
+        Assertions.assertEquals(1, statsFor(stats, sql).getNrOfInvocations(),
+                "the failed-query reporting hook must have run before it threw");
+    }
+
+    /**
+     * Interceptor that always throws from its report hooks, after having
+     * performed the regular booking, simulating a subclass that fails
+     * unexpectedly.
+     */
+    public static class ThrowingReportInterceptor extends SlowQueryReport {
+        @Override
+        protected String reportQuery(String query, Object[] args,
+                String name, long start, long delta) {
+            super.reportQuery(query, args, name, start, delta);
+            throw new IllegalStateException("reporter intentionally fails");
+        }
+
+        @Override
+        protected String reportFailedQuery(String query, Object[] args,
+                String name, long start, Throwable t) {
+            super.reportFailedQuery(query, args, name, start, t);
+            throw new IllegalStateException("reporter intentionally fails");
+        }
+    }
 }
