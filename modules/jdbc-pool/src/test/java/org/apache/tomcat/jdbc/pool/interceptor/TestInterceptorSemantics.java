@@ -153,6 +153,78 @@ class TestInterceptorSemantics extends JdbcPoolBaseTest {
         return stats.keySet();
     }
 
+    private static SlowQueryReport.QueryStats statsFor(ConcurrentHashMap<String, ?> stats,
+            String key) {
+        SlowQueryReport.QueryStats qs = (SlowQueryReport.QueryStats) stats.get(key);
+        Assertions.assertNotNull(qs, "no stats entry for " + key
+                + ", recorded keys: " + statsKeySet(stats));
+        return qs;
+    }
+
+    /*
+     * The JDBC 4.2 execution methods executeLargeUpdate and executeLargeBatch
+     * were not recognised as executions, so they were neither timed nor booked
+     * in the query statistics - a pool under monitoring silently ignored
+     * exactly the long-running batch work the statistics exist to surface.
+     */
+    @Test
+    void jdbc42ExecutionsAreBookedInQueryStats() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setName("large_" + System.nanoTime());
+        ds.getPoolProperties().setJdbcInterceptors(
+                "org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport");
+        ds.createPool();
+        String poolName = ds.getPoolProperties().getPoolName();
+        String t = uniqueTable();
+
+        String largeUpdateSql = "INSERT INTO " + t + " VALUES (1)";
+        String batchedSql = "INSERT INTO " + t + " VALUES (2)";
+        try (Connection c = ds.getConnection(); Statement st = c.createStatement()) {
+            c.createStatement().execute("CREATE TABLE " + t + " (v INT)");
+            Assertions.assertEquals(1, st.executeLargeUpdate(largeUpdateSql));
+
+            st.addBatch(batchedSql);
+            Assertions.assertArrayEquals(new long[] { 1 }, st.executeLargeBatch());
+        }
+
+        ConcurrentHashMap<String, ?> stats = SlowQueryReport.getPoolStats(poolName);
+        Assertions.assertNotNull(stats, "stats must exist once the executions ran");
+        Assertions.assertEquals(1,
+                statsFor(stats, largeUpdateSql).getNrOfInvocations(),
+                "executeLargeUpdate must be booked under its SQL");
+        Assertions.assertEquals(1, statsFor(stats, "batch").getNrOfInvocations(),
+                "executeLargeBatch must be booked as a batch execution");
+        Assertions.assertEquals(2, adminRowCount(t), "both rows must be inserted");
+    }
+
+    /*
+     * A failure of a JDBC 4.2 execution method must be booked against the
+     * executed SQL as a failed query, just like the JDBC 3 executions are.
+     */
+    @Test
+    void failedJdbc42ExecutionIsBookedInQueryStats() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setName("largefail_" + System.nanoTime());
+        ds.getPoolProperties().setJdbcInterceptors(
+                "org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport");
+        ds.createPool();
+        String poolName = ds.getPoolProperties().getPoolName();
+
+        String nonce = "largefail_" + System.nanoTime();
+        String sql = "INSERT INTO no_such_table_" + nonce + " VALUES (1)";
+        try (Connection c = ds.getConnection(); Statement st = c.createStatement()) {
+            Assertions.assertThrows(SQLException.class, () -> st.executeLargeUpdate(sql));
+        }
+
+        ConcurrentHashMap<String, ?> stats = SlowQueryReport.getPoolStats(poolName);
+        Assertions.assertNotNull(stats, "stats must exist once a query failed");
+        // QueryStats.failure() books the execution through add() before
+        // counting the failure, so one booked invocation proves the failure
+        // went through the failed-query reporting path
+        Assertions.assertEquals(1, statsFor(stats, sql).getNrOfInvocations(),
+                "a failed executeLargeUpdate must be booked as an execution of " + sql);
+    }
+
     @Test
     void queryTimeoutInterceptorCancelsAndPoolStaysUsable() throws Exception {
         DataSource ds = newDataSource();
