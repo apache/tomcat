@@ -56,6 +56,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.websocket.pojo.PojoEndpointBase;
 import org.apache.tomcat.websocket.pojo.PojoEndpointServer;
 import org.apache.tomcat.websocket.server.DefaultServerEndpointConfigurator;
 
@@ -171,7 +172,12 @@ public class WsSession implements Session {
         this.userProperties.putAll(endpointConfig.getUserProperties());
         this.id = Long.toHexString(ids.getAndIncrement());
 
-        this.localEndpoint = clientEndpointHolder.getInstance(getInstanceManager());
+        try {
+            this.localEndpoint = clientEndpointHolder.getInstance(getInstanceManager());
+        } catch (RuntimeException e) {
+            destroyEncodersOnFailure();
+            throw e;
+        }
 
         if (log.isTraceEnabled()) {
             log.trace(sm.getString("wsSession.created", id));
@@ -263,7 +269,11 @@ public class WsSession implements Session {
                 endpointInstance = instanceManager.newInstance(clazz);
             }
         } catch (ReflectiveOperationException | NamingException e) {
+            destroyEncodersOnFailure();
             throw new DeploymentException(sm.getString("wsSession.instanceCreateFailed"), e);
+        } catch (RuntimeException e) {
+            destroyEncodersOnFailure();
+            throw e;
         }
 
         if (endpointInstance instanceof Endpoint) {
@@ -283,6 +293,23 @@ public class WsSession implements Session {
             return true;
         }
         return SEC_CONFIGURATOR_USES_IMPL_DEFAULT && configurator.getClass().equals(Configurator.class);
+    }
+
+
+    /*
+     * Releases the encoders the remote endpoint created for this session when the session could not be created. Since
+     * the session does not exist, close() is never called for the remote endpoint and nothing else releases those
+     * encoders - including any clean-up the instance manager performs when it destroys an instance it registered.
+     * Failures during the clean-up are logged rather than propagated since they must not replace the exception that
+     * caused the session creation to fail.
+     */
+    private void destroyEncodersOnFailure() {
+        try {
+            wsRemoteEndpoint.destroyEncoders();
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            log.warn(sm.getString("wsSession.destroyEncodersFailed"), t);
+        }
     }
 
 
@@ -723,6 +750,55 @@ public class WsSession implements Session {
 
 
     /**
+     * Closes the session without waiting for the remote endpoint to complete the closing handshake. This is used when
+     * the connection could not be established, for example because the end point's onOpen method threw an exception.
+     * Such a session is not registered with the container so, unlike other sessions that are waiting for the closing
+     * handshake to complete, the session close timeout processing will never see this session. The close process has to
+     * be completed here instead, otherwise the resources associated with the session are never released - notably the
+     * end point instance and the encoders held by the instance manager.
+     * <p>
+     * If the close process has already been started, for example because the end point closed the session from its
+     * onOpen method, the close reason provided here is ignored and the close process that was started is completed.
+     *
+     * @param closeReason The close reason to use if the close process has not yet been started
+     */
+    public void closeImmediately(CloseReason closeReason) {
+        try {
+            // Start the close process if it has not already been started. Note: the socket is closed rather than
+            // waiting for the remote endpoint to respond to the close message that is sent.
+            doClose(closeReason, closeReason, true);
+        } catch (RuntimeException e) {
+            /*
+             * The close message could not be sent. This happens if the connection was never fully established, for
+             * example if the frame used to process the WebSocket protocol could not be created. Complete the close
+             * here without sending the close message. The resources associated with the session still need to be
+             * released - notably the end point instance and the encoders held by the instance manager.
+             */
+            if (log.isWarnEnabled()) {
+                log.warn(sm.getString("wsSession.sendCloseFail", id), e);
+            }
+            if (state.compareAndSet(State.OPEN, State.CLOSED) ||
+                    state.compareAndSet(State.OUTPUT_CLOSING, State.CLOSED)) {
+                fireEndpointOnClose(closeReason);
+                closeConnection();
+            }
+        }
+
+        // If the close process was started elsewhere, the call above is ignored since the close process only runs once.
+        // Complete that process here. Note: the CLOSING state is not handled below since that state is only reached
+        // once a close message has been received from the remote endpoint which, for a session that was never fully
+        // established, can not have happened.
+        if (state.compareAndSet(State.OUTPUT_CLOSING, State.CLOSED) ||
+                state.compareAndSet(State.OUTPUT_CLOSED, State.CLOSED)) {
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("wsSession.closeImmediately", id));
+            }
+            closeConnection();
+        }
+    }
+
+
+    /**
      * Called when a close message is received. Should only ever happen once. Also called after a protocol error when
      * the ProtocolHandler needs to force the closing of the connection.
      *
@@ -850,7 +926,7 @@ public class WsSession implements Session {
         } finally {
             if (instanceManager != null) {
                 try {
-                    instanceManager.destroyInstance(localEndpoint);
+                    instanceManager.destroyInstance(getManagedEndpointInstance());
                 } catch (Throwable t2) {
                     ExceptionUtils.handleThrowable(t2);
                     if (throwable == null) {
@@ -864,6 +940,26 @@ public class WsSession implements Session {
         if (throwable != null) {
             fireEndpointOnError(throwable);
         }
+    }
+
+
+    /*
+     * The instance the instance manager registered is the one it created or, for an endpoint instance the application
+     * provides itself (via a configurator on the server or when connecting a client), the one passed to
+     * InstanceManager.newInstance(Object). Annotated POJO endpoints are wrapped by a PojoEndpointBase implementation
+     * before use, so the wrapper is not an instance the instance manager knows about and passing it to
+     * destroyInstance(Object) would by-pass the clean-up the instance manager performs when it destroys an instance it
+     * registered. Return the registered instance, which is the wrapper for a standard Endpoint and the POJO for a POJO
+     * endpoint.
+     */
+    private Object getManagedEndpointInstance() {
+        if (localEndpoint instanceof PojoEndpointBase pojoEndpoint) {
+            Object pojo = pojoEndpoint.getPojo();
+            if (pojo != null) {
+                return pojo;
+            }
+        }
+        return localEndpoint;
     }
 
 

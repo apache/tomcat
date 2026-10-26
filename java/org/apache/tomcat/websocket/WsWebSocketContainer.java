@@ -505,7 +505,20 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         WsSession wsSession = new WsSession(clientEndpointHolder, wsRemoteEndpointClient, this, extensionsAgreed,
                 subProtocol, Collections.emptyMap(), secure, clientEndpointConfiguration);
 
-        WsFrameClient wsFrameClient = new WsFrameClient(response, channel, wsSession, transformation);
+        WsFrameClient wsFrameClient;
+        try {
+            wsFrameClient = new WsFrameClient(response, channel, wsSession, transformation);
+        } catch (RuntimeException e) {
+            /*
+             * The session has been created, including the end point instance obtained from the instance manager, but
+             * the connection can not be used. The session is not registered with the container, so the session close
+             * timeout processing will never see it. Close the session here, so that the instance manager releases the
+             * end point instance and the encoders.
+             */
+            closeSessionAfterError(wsSession,
+                    new CloseReason(CloseCodes.CLOSED_ABNORMALLY, sm.getString("wsWebSocketContainer.connectAborted")));
+            throw e;
+        }
         // WsFrame adds the necessary final transformations. Copy the
         // completed transformation chain to the remote end point.
         wsRemoteEndpointClient.setTransformation(wsFrameClient.getTransformation());
@@ -538,6 +551,20 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         wsFrameClient.startInputProcessing();
 
         return wsSession;
+    }
+
+
+    /*
+     * Closes the session when the connection could not be established. Failures during the close are logged rather than
+     * propagated since they must not replace the exception that is being propagated.
+     */
+    private void closeSessionAfterError(WsSession wsSession, CloseReason closeReason) {
+        try {
+            wsSession.closeImmediately(closeReason);
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            log.warn(sm.getString("wsWebSocketContainer.closeSessionFail"), t);
+        }
     }
 
 

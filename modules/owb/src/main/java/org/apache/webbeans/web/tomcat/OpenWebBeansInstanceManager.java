@@ -61,7 +61,7 @@ public class OpenWebBeansInstanceManager implements InstanceManager {
     @Override
     public void destroyInstance(Object object)
             throws IllegalAccessException, InvocationTargetException {
-        Instance injectorInstance = instances.get(object);
+        Instance injectorInstance = instances.remove(object);
         if (injectorInstance != null) {
             try {
                 ClassLoader oldLoader = Thread.currentThread().getContextClassLoader();

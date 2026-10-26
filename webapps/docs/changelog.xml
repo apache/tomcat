@@ -693,6 +693,9 @@
         contracts. This map backs the WebSocket handshake request and response
         header maps. Pull request <pr>1075</pr> provided by breken-ai. (markt)
       </fix>
+      <fix>
+        Improve resource clean-up during WebSocket error handling. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
