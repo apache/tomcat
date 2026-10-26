@@ -1595,13 +1595,24 @@ public class ConnectionPool {
          */
         @Override
         public boolean cancel(boolean mayInterruptIfRunning) {
-            if (pc!=null) {
+            //On the async path the pc field is never assigned; once a
+            //connection has been produced it is held in the result field,
+            //so a non-null result means the future is complete and it is
+            //too late to cancel
+            if (pc!=null || result!=null) {
                 return false;
-            } else if ((!cancelled.get()) && cancelled.compareAndSet(false, true)) {
-                //cancel by retrieving the connection and returning it to the pool
-                ConnectionPool.this.cancellator.execute(this);
+            } else if (cancelled.compareAndSet(false, true)) {
+                if (!pcFuture.cancel(mayInterruptIfRunning)) {
+                    //The pooled connection was already handed over to the
+                    //queue future (or is being handed over right now), so
+                    //cancel by retrieving the connection and returning it
+                    //to the pool
+                    ConnectionPool.this.cancellator.execute(this);
+                }
+                return true;
             }
-            return true;
+            //already cancelled
+            return false;
         }
 
         /**
