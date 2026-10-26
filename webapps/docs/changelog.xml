@@ -746,6 +746,10 @@
         <bug>70305</bug>: Move callback registrations in FFM code to the
         SSL context. (remm)
       </fix>
+      <fix>
+        When validating HTTP/2 frames, make sure more serious errors take
+        priority over less serious errors. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
