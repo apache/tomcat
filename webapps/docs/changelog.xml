@@ -1062,6 +1062,23 @@
         need no restore, keep the previous behaviour of leaving the
         transaction untouched. (remm)
       </fix>
+      <fix>
+        Correct two defects in the <code>StatementFinalizer</code>
+        interceptor. Tracked statements were only removed in bulk when the
+        connection was returned, so a borrow that closed every statement it
+        created still accumulated one tracking entry per statement created
+        for the whole borrow cycle; and the tracking relied on weak
+        references without a queue, so exactly the statements the
+        interceptor exists for - those an application forgot about - could
+        be garbage collected before being closed, leaking their
+        database-side state to the next borrower. Statements are now
+        tracked with a strong reference in a list guarded against the
+        pool's cleaner thread, and the statement proxy handed to the
+        application removes its tracking entry as soon as the application
+        closes the statement, while a leaked statement is reliably closed
+        when the connection is returned regardless of the garbage
+        collector. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
