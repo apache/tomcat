@@ -29,11 +29,7 @@ import javax.naming.NamingException;
 import javax.naming.Reference;
 import javax.naming.StringRefAddr;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
@@ -67,18 +63,18 @@ class TestNamingFactory extends JdbcPoolBaseTest {
         Object result = new DataSourceFactory().getObjectInstance(
                 dataSourceReference("javax.sql.DataSource"), name, null, null);
 
-        assertInstanceOf(DataSource.class, result,
+        Assertions.assertInstanceOf(DataSource.class, result,
                 "factory must produce a pool DataSource");
         DataSource ds = manage((DataSource) result);
-        assertEquals(4, ds.getPoolProperties().getMaxActive(),
+        Assertions.assertEquals(4, ds.getPoolProperties().getMaxActive(),
                 "maxActive from the reference must be applied");
-        assertEquals("sa", ds.getPoolProperties().getUsername());
+        Assertions.assertEquals("sa", ds.getPoolProperties().getUsername());
 
         try (java.sql.Connection c = ds.getConnection();
                 java.sql.ResultSet rs = c.createStatement().executeQuery("SELECT 1")) {
-            assertTrue(rs.next());
+            Assertions.assertTrue(rs.next());
         }
-        assertEquals(1, poolSessions(),
+        Assertions.assertEquals(1, poolSessions(),
                 "the JNDI-configured pool must reach the real database");
     }
 
@@ -87,7 +83,7 @@ class TestNamingFactory extends JdbcPoolBaseTest {
         Name name = new CompositeName("jdbc/FunctionalXaDS");
         Object result = new DataSourceFactory().getObjectInstance(
                 dataSourceReference("javax.sql.XADataSource"), name, null, null);
-        assertInstanceOf(XADataSource.class, result,
+        Assertions.assertInstanceOf(XADataSource.class, result,
                 "a javax.sql.XADataSource reference must yield the pool's XA type");
         if (result instanceof DataSource) {
             manage((DataSource) result);
@@ -104,12 +100,12 @@ class TestNamingFactory extends JdbcPoolBaseTest {
 
         Object result = new org.apache.tomcat.jdbc.naming.GenericNamingResourcesFactory()
                 .getObjectInstance(ref, new CompositeName("test/target"), null, null);
-        assertInstanceOf(NamingTarget.class, result);
+        Assertions.assertInstanceOf(NamingTarget.class, result);
         NamingTarget target = (NamingTarget) result;
-        assertEquals("configured", target.getName());
-        assertEquals(7, target.getCount());
-        assertEquals(1234567890L, target.getRatio());
-        assertTrue(target.isEnabled());
+        Assertions.assertEquals("configured", target.getName());
+        Assertions.assertEquals(7, target.getCount());
+        Assertions.assertEquals(1234567890L, target.getRatio());
+        Assertions.assertTrue(target.isEnabled());
     }
 
     @Test
@@ -123,12 +119,12 @@ class TestNamingFactory extends JdbcPoolBaseTest {
 
         Object result = new GenericNamingResourcesFactory().getObjectInstance(
                 ref, new CompositeName("test/unsupported"), null, null);
-        assertInstanceOf(UnsupportedTypeTarget.class, result);
+        Assertions.assertInstanceOf(UnsupportedTypeTarget.class, result);
         UnsupportedTypeTarget target = (UnsupportedTypeTarget) result;
-        assertFalse(target.isPropsInvoked(),
+        Assertions.assertFalse(target.isPropsInvoked(),
                 "setter with an unsupported parameter type must not be "
                         + "invoked with a null value");
-        assertEquals(UnsupportedTypeTarget.DEFAULT_PROPS, target.getProps(),
+        Assertions.assertEquals(UnsupportedTypeTarget.DEFAULT_PROPS, target.getProps(),
                 "the default value must survive an inapplicable property");
     }
 
@@ -144,12 +140,12 @@ class TestNamingFactory extends JdbcPoolBaseTest {
 
         Object result = new GenericNamingResourcesFactory().getObjectInstance(
                 ref, new CompositeName("test/overloaded"), null, null);
-        assertInstanceOf(OverloadedTarget.class, result);
+        Assertions.assertInstanceOf(OverloadedTarget.class, result);
         OverloadedTarget target = (OverloadedTarget) result;
-        assertFalse(target.isPropsInvoked(),
+        Assertions.assertFalse(target.isPropsInvoked(),
                 "the unsupported overload must not be invoked with null when "
                         + "the numeric conversion fails");
-        assertEquals(-1, target.getPort(),
+        Assertions.assertEquals(-1, target.getPort(),
                 "the numeric property must keep its default on a bad value");
     }
 
@@ -215,9 +211,9 @@ class TestNamingFactory extends JdbcPoolBaseTest {
 
         Object result = new GenericNamingResourcesFactory().getObjectInstance(
                 ref, new CompositeName("test/bag"), null, null);
-        assertInstanceOf(BagTarget.class, result);
+        Assertions.assertInstanceOf(BagTarget.class, result);
         BagTarget target = (BagTarget) result;
-        assertEquals(java.util.Collections.singletonMap("databaseName", "sample"),
+        Assertions.assertEquals(java.util.Collections.singletonMap("databaseName", "sample"),
                 target.getBag(),
                 "reference metadata must not be applied as bean properties");
     }
@@ -270,9 +266,9 @@ class TestNamingFactory extends JdbcPoolBaseTest {
             Object result = new GenericNamingResourcesFactory()
                     .getObjectInstance(
                             ref, new CompositeName("test/warn"), null, null);
-            assertInstanceOf(WarnTarget.class, result);
+            Assertions.assertInstanceOf(WarnTarget.class, result);
             // the half-configured object is still returned, as documented
-            assertEquals(-1, ((WarnTarget) result).getCount());
+            Assertions.assertEquals(-1, ((WarnTarget) result).getCount());
         } finally {
             logger.removeHandler(handler);
             logger.setLevel(originalLevel);
@@ -288,7 +284,7 @@ class TestNamingFactory extends JdbcPoolBaseTest {
                     break;
                 }
             }
-            assertTrue(warned, "failure to apply property [" + property
+            Assertions.assertTrue(warned, "failure to apply property [" + property
                     + "] must be reported at warn level or above");
         }
     }
@@ -315,40 +311,40 @@ class TestNamingFactory extends JdbcPoolBaseTest {
         Name refName = new CompositeName("jdbc/test");
 
         // missing type attribute: a ResourceRef may carry a null class name
-        NamingException ne = assertThrows(NamingException.class,
+        NamingException ne = Assertions.assertThrows(NamingException.class,
                 () -> factory.getObjectInstance(
                         new Reference(null, null, null), refName, null, null));
-        assertTrue(ne.getMessage().contains("type"),
+        Assertions.assertTrue(ne.getMessage().contains("type"),
                 "message must name the missing type attribute");
 
         // unknown class: a NamingException naming the class, not a bare
         // ClassNotFoundException with an empty name
-        ne = assertThrows(NamingException.class,
+        ne = Assertions.assertThrows(NamingException.class,
                 () -> factory.getObjectInstance(new Reference(
                         "com.example.NoSuchClass", null, null),
                         refName, null, null));
-        assertTrue(ne.getMessage().contains("com.example.NoSuchClass"),
+        Assertions.assertTrue(ne.getMessage().contains("com.example.NoSuchClass"),
                 "message must name the missing class");
-        assertInstanceOf(ClassNotFoundException.class, ne.getRootCause());
+        Assertions.assertInstanceOf(ClassNotFoundException.class, ne.getRootCause());
 
         // interface: a NamingException naming the class, not a bare
         // NoSuchMethodException
-        ne = assertThrows(NamingException.class,
+        ne = Assertions.assertThrows(NamingException.class,
                 () -> factory.getObjectInstance(new Reference(
                         "javax.sql.DataSource", null, null),
                         refName, null, null));
-        assertTrue(ne.getMessage().contains("javax.sql.DataSource"),
+        Assertions.assertTrue(ne.getMessage().contains("javax.sql.DataSource"),
                 "message must name the unusable class");
-        assertInstanceOf(ReflectiveOperationException.class,
+        Assertions.assertInstanceOf(ReflectiveOperationException.class,
                 ne.getRootCause());
         // a class whose no-argument constructor exists but throws
-        ne = assertThrows(NamingException.class,
+        ne = Assertions.assertThrows(NamingException.class,
                 () -> factory.getObjectInstance(new Reference(
                         ThrowingCtorTarget.class.getName(), null, null),
                         refName, null, null));
-        assertTrue(ne.getMessage().contains("constructor"),
+        Assertions.assertTrue(ne.getMessage().contains("constructor"),
                 "message must report the failing constructor");
-        assertInstanceOf(java.lang.reflect.InvocationTargetException.class,
+        Assertions.assertInstanceOf(java.lang.reflect.InvocationTargetException.class,
                 ne.getRootCause());
     }
 

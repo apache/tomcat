@@ -27,10 +27,7 @@ import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
@@ -105,32 +102,32 @@ class TestJmxMonitor extends JdbcPoolBaseTest {
         ObjectName dsName = uniqueDataSourceName("live");
         ObjectName poolOname = registerAndFindPoolMBean(server, ds, dsName);
         try {
-            assertNotNull(poolOname, "an enabled pool must publish its MBean");
-            assertEquals(POOL_DOMAIN, poolOname.getDomain(),
+            Assertions.assertNotNull(poolOname, "an enabled pool must publish its MBean");
+            Assertions.assertEquals(POOL_DOMAIN, poolOname.getDomain(),
                     "the pool MBean must be published under the tomcat.jdbc domain");
-            assertEquals("ConnectionPool", poolOname.getKeyProperty("type"));
-            assertEquals(DataSource.class.getName(), poolOname.getKeyProperty("class"));
+            Assertions.assertEquals("ConnectionPool", poolOname.getKeyProperty("type"));
+            Assertions.assertEquals(DataSource.class.getName(), poolOname.getKeyProperty("class"));
 
             // the fixture pre-creates one physical connection
-            assertEquals(0, attr(server, poolOname, "NumActive"));
-            assertEquals(1, attr(server, poolOname, "NumIdle"));
+            Assertions.assertEquals(0, attr(server, poolOname, "NumActive"));
+            Assertions.assertEquals(1, attr(server, poolOname, "NumIdle"));
 
             Connection borrowed = ds.getConnection();
-            assertEquals(1, attr(server, poolOname, "NumActive"),
+            Assertions.assertEquals(1, attr(server, poolOname, "NumActive"),
                     "NumActive must reflect the borrowed connection");
-            assertEquals(0, attr(server, poolOname, "NumIdle"));
+            Assertions.assertEquals(0, attr(server, poolOname, "NumIdle"));
             borrowed.close();
-            assertEquals(0, attr(server, poolOname, "NumActive"));
-            assertEquals(1, attr(server, poolOname, "NumIdle"),
+            Assertions.assertEquals(0, attr(server, poolOname, "NumActive"));
+            Assertions.assertEquals(1, attr(server, poolOname, "NumIdle"),
                     "NumIdle must reflect the returned connection");
 
-            assertTrue(attr(server, poolOname, "BorrowedCount") >= 1,
+            Assertions.assertTrue(attr(server, poolOname, "BorrowedCount") >= 1,
                     "BorrowedCount must count borrows");
-            assertTrue(attr(server, poolOname, "ReturnedCount") >= 1,
+            Assertions.assertTrue(attr(server, poolOname, "ReturnedCount") >= 1,
                     "ReturnedCount must count returns");
         } finally {
             ds.postDeregister();
-            assertFalse(server.isRegistered(poolOname),
+            Assertions.assertFalse(server.isRegistered(poolOname),
                     "postDeregister must unregister the pool MBean");
         }
     }
@@ -147,22 +144,22 @@ class TestJmxMonitor extends JdbcPoolBaseTest {
         Set<ObjectName> before = poolMBeans(server);
         ObjectName poolOname = registerAndFindPoolMBean(server, ds, dsName);
         try {
-            assertNotNull(poolOname);
+            Assertions.assertNotNull(poolOname);
             Connection first = ds.getConnection();
             Connection second = ds.getConnection();
-            assertEquals(2, connectionMBeanCount(server, poolOname),
+            Assertions.assertEquals(2, connectionMBeanCount(server, poolOname),
                     "every physical connection in use must be published below the pool");
 
             first.close();
             second.close();
-            assertEquals(2, connectionMBeanCount(server, poolOname),
+            Assertions.assertEquals(2, connectionMBeanCount(server, poolOname),
                     "returned connections stay published, they are still pooled");
         } finally {
             ds.close(); // releases the physical connections
             ds.postDeregister();
             Set<ObjectName> leftovers = new HashSet<>(poolMBeans(server));
             leftovers.removeAll(before);
-            assertTrue(leftovers.isEmpty(),
+            Assertions.assertTrue(leftovers.isEmpty(),
                     "closing the pool must unregister every MBean it published, left: "
                             + leftovers);
         }
@@ -182,19 +179,19 @@ class TestJmxMonitor extends JdbcPoolBaseTest {
         ObjectName dsName = uniqueDataSourceName("credentials");
         ObjectName poolOname = registerAndFindPoolMBean(server, ds, dsName);
         try {
-            assertNotNull(poolOname, "an enabled pool must publish its MBean");
+            Assertions.assertNotNull(poolOname, "an enabled pool must publish its MBean");
             ConnectionPoolMBean mbean =
                     JMX.newMBeanProxy(server, poolOname, ConnectionPoolMBean.class);
 
-            assertEquals(secret, ds.getPoolProperties().getPassword(),
+            Assertions.assertEquals(secret, ds.getPoolProperties().getPassword(),
                     "the pool itself must still hold the configured password");
-            assertFalse(String.valueOf(mbean.getPassword()).contains(secret),
+            Assertions.assertFalse(String.valueOf(mbean.getPassword()).contains(secret),
                     "the MBean must not hand out the password");
 
             Properties dbProperties = mbean.getDbProperties();
-            assertNotNull(dbProperties);
+            Assertions.assertNotNull(dbProperties);
             for (String name : dbProperties.stringPropertyNames()) {
-                assertFalse(secret.equals(dbProperties.getProperty(name)),
+                Assertions.assertFalse(secret.equals(dbProperties.getProperty(name)),
                         "the JMX view of the driver properties must not carry the"
                                 + " password, property " + name);
             }
@@ -214,16 +211,16 @@ class TestJmxMonitor extends JdbcPoolBaseTest {
         ObjectName poolOname = registerAndFindPoolMBean(server, ds, dsName);
         String table = uniqueTable();
         try {
-            assertNotNull(poolOname, "an enabled pool must publish its MBean");
+            Assertions.assertNotNull(poolOname, "an enabled pool must publish its MBean");
             try (Connection c = ds.getConnection()) {
-                assertEquals("H2", c.getMetaData().getDatabaseProductName(),
+                Assertions.assertEquals("H2", c.getMetaData().getDatabaseProductName(),
                         "monitoring must not interfere with the connection");
                 c.createStatement().execute("CREATE TABLE " + table + " (v INT)");
-                assertEquals(1, c.createStatement().executeUpdate("INSERT INTO " + table
+                Assertions.assertEquals(1, c.createStatement().executeUpdate("INSERT INTO " + table
                         + " VALUES (1)"));
             }
-            assertEquals(0, attr(server, poolOname, "NumActive"));
-            assertEquals(1, adminRowCount(table),
+            Assertions.assertEquals(0, attr(server, poolOname, "NumActive"));
+            Assertions.assertEquals(1, adminRowCount(table),
                     "work done on a monitored connection must reach the database");
         } finally {
             ds.postDeregister();
@@ -242,7 +239,7 @@ class TestJmxMonitor extends JdbcPoolBaseTest {
         try {
             Set<ObjectName> added = new HashSet<>(poolMBeans(server));
             added.removeAll(before);
-            assertTrue(added.isEmpty(),
+            Assertions.assertTrue(added.isEmpty(),
                     "a JMX-disabled pool must not publish MBeans, added: " + added);
         } finally {
             ds.postDeregister();

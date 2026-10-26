@@ -28,8 +28,7 @@ import javax.management.Notification;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
@@ -63,14 +62,14 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
         NotificationListener listener = (notification, handback) -> received.add(notification);
 
         try (Connection first = ds.getConnection()) {
-            assertTrue(server.isRegistered(oname),
+            Assertions.assertTrue(server.isRegistered(oname),
                     "the interceptor MBean must be registered once the pool is in use");
             server.addNotificationListener(oname, listener, null, null);
             try (Connection second = ds.getConnection()) {
                 // two concurrent borrows with no pre-created connections
                 // means two physical connections, hence two interceptor
                 // instances - only one of which can own the MBean
-                assertEquals(2, ds.getNumActive());
+                Assertions.assertEquals(2, ds.getNumActive());
                 try (Statement st1 = first.createStatement();
                         Statement st2 = second.createStatement()) {
                     st1.execute("SELECT 1");
@@ -82,11 +81,11 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
 
         List<String> messages = received.stream().map(Notification::getMessage)
                 .collect(Collectors.toList());
-        assertEquals(2, messages.size(),
+        Assertions.assertEquals(2, messages.size(),
                 "every slow query of every connection must notify, received: " + messages);
-        assertTrue(messages.stream().anyMatch(m -> m.contains("SELECT 1")),
+        Assertions.assertTrue(messages.stream().anyMatch(m -> m.contains("SELECT 1")),
                 "the query run on the first connection must be reported, received: " + messages);
-        assertTrue(messages.stream().anyMatch(m -> m.contains("SELECT 2")),
+        Assertions.assertTrue(messages.stream().anyMatch(m -> m.contains("SELECT 2")),
                 "the query run on the second physical connection must also reach the listener, received: "
                         + messages);
     }

@@ -26,12 +26,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
@@ -48,7 +43,7 @@ class TestConnectionAcquireRelease extends JdbcPoolBaseTest {
         DataSource ds = newDataSource();
         ds.getPoolProperties().setInitialSize(2);
         ds.createPool();
-        assertEquals(2, poolSessions(),
+        Assertions.assertEquals(2, poolSessions(),
                 "initialSize connections must exist before any borrow");
     }
 
@@ -56,14 +51,14 @@ class TestConnectionAcquireRelease extends JdbcPoolBaseTest {
     void getConnectionReturnsUsableConnection() throws Exception {
         DataSource ds = newDataSource();
         try (Connection c = ds.getConnection()) {
-            assertNotNull(c);
-            assertFalse(c.isClosed());
-            assertTrue(c.isValid(2));
-            assertEquals("H2", c.getMetaData().getDatabaseProductName());
+            Assertions.assertNotNull(c);
+            Assertions.assertFalse(c.isClosed());
+            Assertions.assertTrue(c.isValid(2));
+            Assertions.assertEquals("H2", c.getMetaData().getDatabaseProductName());
             try (Statement st = c.createStatement();
                     ResultSet rs = st.executeQuery("SELECT 1")) {
-                assertTrue(rs.next());
-                assertEquals(1, rs.getInt(1));
+                Assertions.assertTrue(rs.next());
+                Assertions.assertEquals(1, rs.getInt(1));
             }
         }
     }
@@ -76,15 +71,15 @@ class TestConnectionAcquireRelease extends JdbcPoolBaseTest {
         Connection c1 = ds.getConnection();
         setSessionMarker(c1, 777);
         c1.close();
-        assertTrue(c1.isClosed(), "closed proxy must report isClosed()");
-        assertEquals(1, poolSessions(),
+        Assertions.assertTrue(c1.isClosed(), "closed proxy must report isClosed()");
+        Assertions.assertEquals(1, poolSessions(),
                 "close() must not physically close the pooled connection");
 
         try (Connection c2 = ds.getConnection()) {
             Integer marker = sessionMarker(c2);
-            assertNotNull(marker, "same physical session must have been reused");
-            assertEquals(777, marker.intValue());
-            assertEquals(1, poolSessions(), "reuse must not open a new session");
+            Assertions.assertNotNull(marker, "same physical session must have been reused");
+            Assertions.assertEquals(777, marker.intValue());
+            Assertions.assertEquals(1, poolSessions(), "reuse must not open a new session");
         }
     }
 
@@ -98,8 +93,8 @@ class TestConnectionAcquireRelease extends JdbcPoolBaseTest {
         c.close(); // documented to be a no-op
         try (Connection again = ds.getConnection()) {
             Integer marker = sessionMarker(again);
-            assertNotNull(marker);
-            assertEquals(11, marker.intValue());
+            Assertions.assertNotNull(marker);
+            Assertions.assertEquals(11, marker.intValue());
         }
     }
 
@@ -114,9 +109,9 @@ class TestConnectionAcquireRelease extends JdbcPoolBaseTest {
             for (int i = 0; i < 5; i++) {
                 held.add(ds.getConnection());
             }
-            assertEquals(5, poolSessions(),
+            Assertions.assertEquals(5, poolSessions(),
                     "each outstanding borrow must be its own physical session");
-            assertThrows(SQLException.class, ds::getConnection,
+            Assertions.assertThrows(SQLException.class, ds::getConnection,
                     "exhausted pool must throw after maxWait");
         } finally {
             for (Connection c : held) {
@@ -157,13 +152,13 @@ class TestConnectionAcquireRelease extends JdbcPoolBaseTest {
         sleep(300); // let the waiter block on the exhausted pool
         held.close();
 
-        assertTrue(done.await(10, java.util.concurrent.TimeUnit.SECONDS),
+        Assertions.assertTrue(done.await(10, java.util.concurrent.TimeUnit.SECONDS),
                 "waiter should have obtained a connection");
-        assertNull(failure.get());
-        assertTrue(waitMillis.get().longValue() >= 200,
+        Assertions.assertNull(failure.get());
+        Assertions.assertTrue(waitMillis.get().longValue() >= 200,
                 "waiter must actually have waited for the release, waited "
                         + waitMillis.get() + " ms");
-        assertEquals(42, observedMarker.get(),
+        Assertions.assertEquals(42, observedMarker.get(),
                 "waiter must have received the released physical session");
     }
 
@@ -175,16 +170,16 @@ class TestConnectionAcquireRelease extends JdbcPoolBaseTest {
 
         Connection held = ds.getConnection();
         long start = System.currentTimeMillis();
-        assertThrows(SQLException.class, ds::getConnection);
+        Assertions.assertThrows(SQLException.class, ds::getConnection);
         long elapsed = System.currentTimeMillis() - start;
-        assertTrue(elapsed >= 250 && elapsed < 5000,
+        Assertions.assertTrue(elapsed >= 250 && elapsed < 5000,
                 "timeout should be honoured approximately, was " + elapsed + " ms");
 
         held.close();
         try (Connection recovered = ds.getConnection()) {
             try (Statement st = recovered.createStatement();
                     ResultSet rs = st.executeQuery("SELECT 1")) {
-                assertTrue(rs.next());
+                Assertions.assertTrue(rs.next());
             }
         }
     }
@@ -195,7 +190,7 @@ class TestConnectionAcquireRelease extends JdbcPoolBaseTest {
         ds.getPoolProperties().setMaxActive(2);
         ds.getConnection().close();
         ds.getConnection().close();
-        assertEquals(1, poolSessions()); // one pooled connection, reused
+        Assertions.assertEquals(1, poolSessions()); // one pooled connection, reused
         ds.close();
         awaitSessions(0);
     }
@@ -210,14 +205,14 @@ class TestConnectionAcquireRelease extends JdbcPoolBaseTest {
         ds1.getConnection();
         Connection c2 = ds2.getConnection();
         setSessionMarker(c2, 22);
-        assertEquals(2, poolSessions());
+        Assertions.assertEquals(2, poolSessions());
 
         ds1.close();
         awaitSessions(1);
         // the surviving pool is untouched by the other's shutdown
         Integer marker = sessionMarker(c2);
-        assertNotNull(marker);
-        assertEquals(22, marker.intValue());
+        Assertions.assertNotNull(marker);
+        Assertions.assertEquals(22, marker.intValue());
         c2.close();
     }
 
@@ -229,11 +224,11 @@ class TestConnectionAcquireRelease extends JdbcPoolBaseTest {
         try (Connection c = ds.getConnection()) {
             try (Statement st = c.createStatement();
                     ResultSet rs = st.executeQuery("SELECT 2")) {
-                assertTrue(rs.next());
-                assertEquals(2, rs.getInt(1));
+                Assertions.assertTrue(rs.next());
+                Assertions.assertEquals(2, rs.getInt(1));
             }
         }
-        assertEquals(1, poolSessions(), "validation must not consume sessions");
+        Assertions.assertEquals(1, poolSessions(), "validation must not consume sessions");
     }
 
     @Test
@@ -242,9 +237,9 @@ class TestConnectionAcquireRelease extends JdbcPoolBaseTest {
         ds.getPoolProperties().setTestOnBorrow(true);
         ds.getPoolProperties().setValidationQuery("");
         try (Connection c = ds.getConnection()) {
-            assertTrue(c.isValid(2));
+            Assertions.assertTrue(c.isValid(2));
         }
-        assertEquals(1, poolSessions());
+        Assertions.assertEquals(1, poolSessions());
     }
 
     @Test
@@ -258,8 +253,8 @@ class TestConnectionAcquireRelease extends JdbcPoolBaseTest {
         c1.close();
         try (Connection c2 = ds.getConnection()) {
             Integer marker = sessionMarker(c2);
-            assertNotNull(marker, "validated connection must be reused, not replaced");
-            assertEquals(5, marker.intValue());
+            Assertions.assertNotNull(marker, "validated connection must be reused, not replaced");
+            Assertions.assertEquals(5, marker.intValue());
         }
     }
 
@@ -277,14 +272,14 @@ class TestConnectionAcquireRelease extends JdbcPoolBaseTest {
         long start = System.currentTimeMillis();
         try (Connection reclaimed = ds.getConnection()) {
             long elapsed = System.currentTimeMillis() - start;
-            assertTrue(elapsed >= 800,
+            Assertions.assertTrue(elapsed >= 800,
                     "reclaim must wait out the abandoned timeout, was " + elapsed + " ms");
             try (Statement st = reclaimed.createStatement();
                     ResultSet rs = st.executeQuery("SELECT 1")) {
-                assertTrue(rs.next());
+                Assertions.assertTrue(rs.next());
             }
         }
-        assertTrue(poolSessions() <= 1,
+        Assertions.assertTrue(poolSessions() <= 1,
                 "the abandoned physical connection must not be left dangling");
     }
 

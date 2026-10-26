@@ -25,11 +25,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
@@ -83,7 +79,8 @@ class TestStatementFinalizer extends JdbcPoolBaseTest {
 
         try (Connection pooled = ds.getConnection()) {
             StatementFinalizer finalizer = interceptorOf(pooled, StatementFinalizer.class);
-            assertNotNull(finalizer, "the interceptor must sit in the chain of the borrowed connection");
+            Assertions.assertNotNull(finalizer,
+                    "the interceptor must sit in the chain of the borrowed connection");
 
             for (int i = 0; i < 250; i++) {
                 try (Statement st = pooled.createStatement();
@@ -98,7 +95,7 @@ class TestStatementFinalizer extends JdbcPoolBaseTest {
                 }
             }
 
-            assertEquals(0, tracked(finalizer),
+            Assertions.assertEquals(0, tracked(finalizer),
                     "a borrow that closed every statement must not be charged for them at connection return");
 
             Statement openOne = pooled.createStatement();
@@ -109,13 +106,15 @@ class TestStatementFinalizer extends JdbcPoolBaseTest {
             try (ResultSet rs = openTwo.executeQuery()) {
                 rs.next();
             }
-            assertEquals(2, tracked(finalizer),
+            Assertions.assertEquals(2, tracked(finalizer),
                     "exactly the statements that are still open must be tracked");
 
             openOne.close();
-            assertEquals(1, tracked(finalizer), "closing must remove the entry, not wait for the return");
+            Assertions.assertEquals(1, tracked(finalizer),
+                    "closing must remove the entry, not wait for the return");
             openTwo.close();
-            assertEquals(0, tracked(finalizer), "closing must remove the entry, not wait for the return");
+            Assertions.assertEquals(0, tracked(finalizer),
+                    "closing must remove the entry, not wait for the return");
         }
     }
 
@@ -126,7 +125,7 @@ class TestStatementFinalizer extends JdbcPoolBaseTest {
 
         Connection pooled = ds.getConnection();
         StatementFinalizer finalizer = interceptorOf(pooled, StatementFinalizer.class);
-        assertNotNull(finalizer);
+        Assertions.assertNotNull(finalizer);
 
         Statement leaked = pooled.createStatement();
         try (ResultSet rs = leaked.executeQuery("SELECT 1")) {
@@ -143,16 +142,17 @@ class TestStatementFinalizer extends JdbcPoolBaseTest {
         }
 
         List<Object> entries = trackedEntries(finalizer);
-        assertEquals(1, entries.size(), "the leaked statement must still be tracked at the return");
+        Assertions.assertEquals(1, entries.size(),
+                "the leaked statement must still be tracked at the return");
         // A handle taken only after the collection: before the fix the
         // referent could be gone by then, and the interceptor would have
         // nothing left to close when the connection returns.
         Statement stillTracked = trackedStatement(entries.get(0));
-        assertNotNull(stillTracked,
+        Assertions.assertNotNull(stillTracked,
                 "finalisation must not depend on the leaked statement still being reachable");
 
         pooled.close();
-        assertTrue(stillTracked.isClosed(),
+        Assertions.assertTrue(stillTracked.isClosed(),
                 "the leaked statement must be closed when its connection goes back");
     }
 
@@ -167,32 +167,33 @@ class TestStatementFinalizer extends JdbcPoolBaseTest {
 
         try (Connection pooled = ds.getConnection()) {
             StatementFinalizer finalizer = interceptorOf(pooled, StatementFinalizer.class);
-            assertNotNull(finalizer);
+            Assertions.assertNotNull(finalizer);
 
             PreparedStatement ps = pooled.prepareStatement("SELECT 1");
-            assertTrue(ps.equals(ps), "the handle must be equal to itself");
-            assertFalse(ps.equals(pooled), "an unrelated object must not compare equal");
+            Assertions.assertTrue(ps.equals(ps), "the handle must be equal to itself");
+            Assertions.assertFalse(ps.equals(pooled), "an unrelated object must not compare equal");
             java.util.Set<Statement> seen = new java.util.HashSet<>();
             seen.add(ps);
-            assertTrue(seen.contains(ps), "hashCode must agree with equals");
+            Assertions.assertTrue(seen.contains(ps), "hashCode must agree with equals");
             try (ResultSet rs = ps.executeQuery()) {
-                assertTrue(rs.next());
+                Assertions.assertTrue(rs.next());
             }
 
             CallableStatement call = pooled.prepareCall("CALL NOW()");
             try (ResultSet rs = call.executeQuery()) {
-                assertTrue(rs.next());
+                Assertions.assertTrue(rs.next());
             }
-            assertEquals(2, tracked(finalizer), "the callable statement must be tracked as well");
+            Assertions.assertEquals(2, tracked(finalizer),
+                    "the callable statement must be tracked as well");
 
             ps.close();
             ps.close(); // JDBC demands that a repeated close is a no-op
-            assertEquals(1, tracked(finalizer), "the close must have been counted once");
+            Assertions.assertEquals(1, tracked(finalizer), "the close must have been counted once");
 
-            assertThrows(SQLException.class, ps::getMoreResults,
+            Assertions.assertThrows(SQLException.class, ps::getMoreResults,
                     "use after close must still be reported, not swallowed");
             call.close();
-            assertEquals(0, tracked(finalizer));
+            Assertions.assertEquals(0, tracked(finalizer));
         }
     }
 }

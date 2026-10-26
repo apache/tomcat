@@ -22,10 +22,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
@@ -71,13 +68,14 @@ class TestValidation extends JdbcPoolBaseTest {
         ds.getPoolProperties().setMaxActive(1);
         ds.getPoolProperties().setMaxWait(2000);
         ds.createPool();
-        assertEquals(1, poolSessions(), "the initial connection exists before the borrow");
+        Assertions.assertEquals(1, poolSessions(),
+                "the initial connection exists before the borrow");
 
-        assertThrows(SQLException.class, ds::getConnection,
+        Assertions.assertThrows(SQLException.class, ds::getConnection,
                 "an idle connection that fails validation must not be handed out");
-        assertEquals(0, poolSessions(),
+        Assertions.assertEquals(0, poolSessions(),
                 "the rejected connection must be closed on the database");
-        assertEquals(0, ds.getSize(), "the pool must not keep a connection it rejected");
+        Assertions.assertEquals(0, ds.getSize(), "the pool must not keep a connection it rejected");
     }
 
     @Test
@@ -94,9 +92,9 @@ class TestValidation extends JdbcPoolBaseTest {
 
         try (Connection c = ds.getConnection()) {
             c.createStatement().execute("SELECT 1");
-            assertEquals(1, poolSessions());
+            Assertions.assertEquals(1, poolSessions());
         }
-        assertEquals(1, ds.getIdle(),
+        Assertions.assertEquals(1, ds.getIdle(),
                 "the newly created connection is pooled without borrow validation");
     }
 
@@ -106,9 +104,9 @@ class TestValidation extends JdbcPoolBaseTest {
         ds.getPoolProperties().setTestOnConnect(true);
         ds.getPoolProperties().setInitialSize(1);
 
-        assertThrows(SQLException.class, ds::createPool,
+        Assertions.assertThrows(SQLException.class, ds::createPool,
                 "testOnConnect must fail fast when the initial connection does not validate");
-        assertEquals(0, poolSessions(), "no session may survive the failed startup");
+        Assertions.assertEquals(0, poolSessions(), "no session may survive the failed startup");
     }
 
     @Test
@@ -125,13 +123,13 @@ class TestValidation extends JdbcPoolBaseTest {
         awaitSessions(0);
 
         try (Connection second = ds.getConnection()) {
-            assertNull(sessionMarker(second),
+            Assertions.assertNull(sessionMarker(second),
                     "the borrow must not get the dead session back, but a fresh one");
             try (java.sql.ResultSet rs = second.createStatement().executeQuery("SELECT 1")) {
-                assertTrue(rs.next(), "the replacement connection must work");
+                Assertions.assertTrue(rs.next(), "the replacement connection must work");
             }
         }
-        assertEquals(1, ds.getSize(), "the dead connection must be replaced, not lost");
+        Assertions.assertEquals(1, ds.getSize(), "the dead connection must be replaced, not lost");
         awaitSessions(1);
     }
 
@@ -145,15 +143,15 @@ class TestValidation extends JdbcPoolBaseTest {
         physical(pooled).close(); // dies while the application holds it
         pooled.close(); // the return validation must notice
 
-        assertEquals(0, ds.getSize(),
+        Assertions.assertEquals(0, ds.getSize(),
                 "a connection that failed the return validation must leave the pool");
-        assertEquals(0, ds.getIdle());
+        Assertions.assertEquals(0, ds.getIdle());
         awaitSessions(0);
 
         try (Connection fresh = ds.getConnection()) {
             fresh.createStatement().execute("SELECT 1");
         }
-        assertEquals(1, ds.getSize(), "the pool must recover with a new connection");
+        Assertions.assertEquals(1, ds.getSize(), "the pool must recover with a new connection");
     }
 
     @Test
@@ -166,10 +164,10 @@ class TestValidation extends JdbcPoolBaseTest {
         ds.createPool();
 
         long start = System.currentTimeMillis();
-        assertThrows(SQLException.class, ds::getConnection,
+        Assertions.assertThrows(SQLException.class, ds::getConnection,
                 "a validation query that outlives its timeout must fail the borrow");
         long elapsed = System.currentTimeMillis() - start;
-        assertTrue(elapsed >= 900 && elapsed < 10000,
+        Assertions.assertTrue(elapsed >= 900 && elapsed < 10000,
                 "the validation must be cancelled at the configured timeout, took "
                         + elapsed + " ms");
         awaitSessions(0);
@@ -188,15 +186,15 @@ class TestValidation extends JdbcPoolBaseTest {
                 c.createStatement().execute("SELECT 1");
             }
         }
-        assertEquals(2, validator.actions.size(),
+        Assertions.assertEquals(2, validator.actions.size(),
                 "the validator must be consulted once per borrow");
         for (Integer action : validator.actions) {
-            assertEquals(Integer.valueOf(PooledConnection.VALIDATE_BORROW), action,
+            Assertions.assertEquals(Integer.valueOf(PooledConnection.VALIDATE_BORROW), action,
                     "a borrow validation must report the borrow action to the validator");
         }
 
         validator.accept = false;
-        assertThrows(SQLException.class, ds::getConnection,
+        Assertions.assertThrows(SQLException.class, ds::getConnection,
                 "a rejecting validator must keep the connection out of the application");
         awaitSessions(0);
 
@@ -204,7 +202,8 @@ class TestValidation extends JdbcPoolBaseTest {
         try (Connection c = ds.getConnection()) {
             c.createStatement().execute("SELECT 1");
         }
-        assertEquals(1, ds.getSize(), "the pool must serve again once validation passes");
+        Assertions.assertEquals(1, ds.getSize(),
+                "the pool must serve again once validation passes");
     }
 
     @Test
@@ -223,14 +222,14 @@ class TestValidation extends JdbcPoolBaseTest {
         }
         // The interval is measured from the last successful validation,
         // which for a fresh physical connection is its creation.
-        assertEquals(0, validator.actions.size(),
+        Assertions.assertEquals(0, validator.actions.size(),
                 "within the validation interval no borrow may validate");
 
         ds.getPoolProperties().setValidationInterval(0);
         try (Connection c = ds.getConnection()) {
             c.createStatement().execute("SELECT 1");
         }
-        assertEquals(1, validator.actions.size(),
+        Assertions.assertEquals(1, validator.actions.size(),
                 "with the interval switched off the borrow must validate");
     }
 
@@ -250,7 +249,7 @@ class TestValidation extends JdbcPoolBaseTest {
             st.executeUpdate("INSERT INTO " + table + " VALUES (1)");
         } // returned without an explicit commit, autoCommit is off
 
-        assertEquals(1, adminRowCount(table),
+        Assertions.assertEquals(1, adminRowCount(table),
                 "the validation on return must leave no open transaction behind");
     }
 

@@ -18,9 +18,7 @@ package org.apache.tomcat.jdbc.pool;
 
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorDefinition;
@@ -44,24 +42,24 @@ class TestJdbcInterceptorConfigParsing {
         PoolProperties props = new PoolProperties();
         props.setJdbcInterceptors(interceptorConfig);
         InterceptorDefinition[] interceptorDefs = props.getJdbcInterceptorsAsArray();
-        assertNotNull(interceptorDefs);
+        Assertions.assertNotNull(interceptorDefs);
 
         // 3 items because parser automatically inserts TrapException interceptor to front of list
-        assertEquals(3, interceptorDefs.length);
-        assertEquals(TrapException.class.getName(), interceptorDefs[0].getClassName());
+        Assertions.assertEquals(3, interceptorDefs.length);
+        Assertions.assertEquals(TrapException.class.getName(), interceptorDefs[0].getClassName());
 
-        assertNotNull(interceptorDefs[1]);
-        assertEquals("FirstInterceptor", interceptorDefs[1].getClassName());
-        assertNotNull(interceptorDefs[2]);
-        assertEquals("SecondInterceptor", interceptorDefs[2].getClassName());
+        Assertions.assertNotNull(interceptorDefs[1]);
+        Assertions.assertEquals("FirstInterceptor", interceptorDefs[1].getClassName());
+        Assertions.assertNotNull(interceptorDefs[2]);
+        Assertions.assertEquals("SecondInterceptor", interceptorDefs[2].getClassName());
 
         Map<String, InterceptorProperty> secondProps = interceptorDefs[2].getProperties();
-        assertNotNull(secondProps);
-        assertEquals(2, secondProps.size());
-        assertNotNull(secondProps.get("parm1"));
-        assertEquals("value1", secondProps.get("parm1").getValue());
-        assertNotNull(secondProps.get("parm2"));
-        assertEquals("value2", secondProps.get("parm2").getValue());
+        Assertions.assertNotNull(secondProps);
+        Assertions.assertEquals(2, secondProps.size());
+        Assertions.assertNotNull(secondProps.get("parm1"));
+        Assertions.assertEquals("value1", secondProps.get("parm1").getValue());
+        Assertions.assertNotNull(secondProps.get("parm2"));
+        Assertions.assertEquals("value2", secondProps.get("parm2").getValue());
     }
 
     @Test
@@ -73,39 +71,39 @@ class TestJdbcInterceptorConfigParsing {
         PoolProperties props = new PoolProperties();
         props.setJdbcInterceptors(interceptorConfig);
         InterceptorDefinition[] interceptorDefs = props.getJdbcInterceptorsAsArray();
-        assertNotNull(interceptorDefs);
+        Assertions.assertNotNull(interceptorDefs);
 
         // 5 items because parser automatically inserts TrapException interceptor to front of list
-        assertEquals(5, interceptorDefs.length);
-        assertEquals(TrapException.class.getName(), interceptorDefs[0].getClassName());
+        Assertions.assertEquals(5, interceptorDefs.length);
+        Assertions.assertEquals(TrapException.class.getName(), interceptorDefs[0].getClassName());
 
-        assertNotNull(interceptorDefs[1]);
-        assertEquals("FirstInterceptor", interceptorDefs[1].getClassName());
-        assertNotNull(interceptorDefs[2]);
-        assertEquals("SecondInterceptor", interceptorDefs[2].getClassName());
-        assertNotNull(interceptorDefs[3]);
-        assertEquals("org.cyb.ThirdInterceptor", interceptorDefs[3].getClassName());
+        Assertions.assertNotNull(interceptorDefs[1]);
+        Assertions.assertEquals("FirstInterceptor", interceptorDefs[1].getClassName());
+        Assertions.assertNotNull(interceptorDefs[2]);
+        Assertions.assertEquals("SecondInterceptor", interceptorDefs[2].getClassName());
+        Assertions.assertNotNull(interceptorDefs[3]);
+        Assertions.assertEquals("org.cyb.ThirdInterceptor", interceptorDefs[3].getClassName());
 
         Map<String, InterceptorProperty> secondProps = interceptorDefs[2].getProperties();
-        assertNotNull(secondProps);
-        assertEquals(2, secondProps.size());
-        assertNotNull(secondProps.get("parm1"));
-        assertEquals("value1", secondProps.get("parm1").getValue());
-        assertNotNull(secondProps.get("parm2"));
+        Assertions.assertNotNull(secondProps);
+        Assertions.assertEquals(2, secondProps.size());
+        Assertions.assertNotNull(secondProps.get("parm1"));
+        Assertions.assertEquals("value1", secondProps.get("parm1").getValue());
+        Assertions.assertNotNull(secondProps.get("parm2"));
         // Bug 54395: the value kept its leading space
-        assertEquals("value2", secondProps.get("parm2").getValue());
+        Assertions.assertEquals("value2", secondProps.get("parm2").getValue());
 
         Map<String, InterceptorProperty> thirdProps = interceptorDefs[3].getProperties();
-        assertNotNull(thirdProps);
-        assertEquals(1, thirdProps.size());
-        assertNotNull(thirdProps.get("parm1"));
-        assertEquals("value1", thirdProps.get("parm1").getValue());
+        Assertions.assertNotNull(thirdProps);
+        Assertions.assertEquals(1, thirdProps.size());
+        Assertions.assertNotNull(thirdProps.get("parm1"));
+        Assertions.assertEquals("value1", thirdProps.get("parm1").getValue());
 
         Map<String, InterceptorProperty> emptyParmValProps = interceptorDefs[4].getProperties();
-        assertNotNull(emptyParmValProps);
-        assertEquals(1, emptyParmValProps.size());
-        assertNotNull(emptyParmValProps.get("parm1"));
-        assertEquals("", emptyParmValProps.get("parm1").getValue());
+        Assertions.assertNotNull(emptyParmValProps);
+        Assertions.assertEquals(1, emptyParmValProps.size());
+        Assertions.assertNotNull(emptyParmValProps.get("parm1"));
+        Assertions.assertEquals("", emptyParmValProps.get("parm1").getValue());
     }
 
     /*
@@ -123,7 +121,7 @@ class TestJdbcInterceptorConfigParsing {
         for (String badConfig : exceptionInducingConfigs) {
             PoolProperties props = new PoolProperties();
             props.setJdbcInterceptors(badConfig);
-            assertThrows(Exception.class, props::getJdbcInterceptorsAsArray,
+            Assertions.assertThrows(Exception.class, props::getJdbcInterceptorsAsArray,
                     "expected a failure for " + badConfig);
         }
 
@@ -149,21 +147,21 @@ class TestJdbcInterceptorConfigParsing {
         PoolProperties props = new PoolProperties();
         props.setJdbcInterceptors(";EmptyLeadingSemiInterceptor");
         InterceptorDefinition[] jiDefs = props.getJdbcInterceptorsAsArray();
-        assertNotNull(jiDefs);
-        assertEquals(3, jiDefs.length);
+        Assertions.assertNotNull(jiDefs);
+        Assertions.assertEquals(3, jiDefs.length);
 
         // This one does NOT get an extra/empty definition (no trailing whitespace)
         props = new PoolProperties();
         props.setJdbcInterceptors("EmptyTrailingSemiInterceptor;");
         jiDefs = props.getJdbcInterceptorsAsArray();
-        assertNotNull(jiDefs);
-        assertEquals(2, jiDefs.length);
+        Assertions.assertNotNull(jiDefs);
+        Assertions.assertEquals(2, jiDefs.length);
 
         // This one DOES get an extra/empty definition (with trailing whitespace)
         props = new PoolProperties();
         props.setJdbcInterceptors("EmptyTrailingSemiInterceptor; ");
         jiDefs = props.getJdbcInterceptorsAsArray();
-        assertNotNull(jiDefs);
-        assertEquals(3, jiDefs.length);
+        Assertions.assertNotNull(jiDefs);
+        Assertions.assertEquals(3, jiDefs.length);
     }
 }

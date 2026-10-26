@@ -19,9 +19,7 @@ package org.apache.tomcat.jdbc.pool;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -59,19 +57,19 @@ class TestPoolProperties {
                     stack.add(Character.valueOf(c));
                     break;
                 case '}':
-                    assertEquals('{', stack.remove(stack.size() - 1).charValue());
+                    Assertions.assertEquals('{', stack.remove(stack.size() - 1).charValue());
                     break;
                 case ')':
-                    assertEquals('(', stack.remove(stack.size() - 1).charValue());
+                    Assertions.assertEquals('(', stack.remove(stack.size() - 1).charValue());
                     break;
                 case ']':
-                    assertEquals('[', stack.remove(stack.size() - 1).charValue());
+                    Assertions.assertEquals('[', stack.remove(stack.size() - 1).charValue());
                     break;
                 default:
                     break;
             }
         }
-        assertEquals(0, stack.size(), "All brackets should have been closed");
+        Assertions.assertEquals(0, stack.size(), "All brackets should have been closed");
     }
 
     @Test
@@ -83,13 +81,13 @@ class TestPoolProperties {
 
         String asString = properties.toString();
 
-        assertTrue(asString.contains("password=********"),
+        Assertions.assertTrue(asString.contains("password=********"),
                 "the password must be masked in the dump, was: " + asString);
-        assertFalse(asString.contains(DEFAULT_PASSWD),
+        Assertions.assertFalse(asString.contains(DEFAULT_PASSWD),
                 "the cleartext password must not appear anywhere in the dump");
-        assertTrue(asString.contains(DEFAULT_USER),
+        Assertions.assertTrue(asString.contains(DEFAULT_USER),
                 "the non-secret configuration must still be readable, was: " + asString);
-        assertTrue(asString.contains("jdbc:h2:mem:shown"),
+        Assertions.assertTrue(asString.contains("jdbc:h2:mem:shown"),
                 "the JDBC URL must stay readable, was: " + asString);
     }
 }

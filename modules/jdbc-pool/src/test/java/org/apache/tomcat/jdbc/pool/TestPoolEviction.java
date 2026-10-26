@@ -22,10 +22,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
@@ -52,7 +49,7 @@ class TestPoolEviction extends JdbcPoolBaseTest {
         for (int i = 0; i < 5; i++) {
             opened.add(ds.getConnection());
         }
-        assertEquals(5, poolSessions());
+        Assertions.assertEquals(5, poolSessions());
         for (Connection c : opened) {
             c.close();
         }
@@ -61,7 +58,7 @@ class TestPoolEviction extends JdbcPoolBaseTest {
         try (Connection c = ds.getConnection()) {
             try (Statement st = c.createStatement();
                     ResultSet rs = st.executeQuery("SELECT 1")) {
-                assertTrue(rs.next());
+                Assertions.assertTrue(rs.next());
             }
         }
     }
@@ -75,15 +72,15 @@ class TestPoolEviction extends JdbcPoolBaseTest {
         ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(200);
         ds.getPoolProperties().setMinEvictableIdleTimeMillis(100);
         ds.createPool();
-        assertEquals(3, poolSessions());
+        Assertions.assertEquals(3, poolSessions());
 
         // several eviction rounds over well past the idle threshold
         sleep(1500);
-        assertEquals(3, poolSessions(),
+        Assertions.assertEquals(3, poolSessions(),
                 "connections at the min-idle floor must not be evicted");
 
         try (Connection c = ds.getConnection()) {
-            assertTrue(c.isValid(2));
+            Assertions.assertTrue(c.isValid(2));
         }
     }
 
@@ -100,8 +97,8 @@ class TestPoolEviction extends JdbcPoolBaseTest {
         // within maxAge the very same physical session is reused
         try (Connection same = ds.getConnection()) {
             Integer marker = sessionMarker(same);
-            assertNotNull(marker, "young connection must be reused");
-            assertEquals(99, marker.intValue());
+            Assertions.assertNotNull(marker, "young connection must be reused");
+            Assertions.assertEquals(99, marker.intValue());
             same.close();
         }
 
@@ -110,14 +107,14 @@ class TestPoolEviction extends JdbcPoolBaseTest {
         sleep(3500); // ~2x maxAge plus sweeper interval
         awaitSessions(1);
         try (Connection replacement = ds.getConnection()) {
-            assertNull(sessionMarker(replacement),
+            Assertions.assertNull(sessionMarker(replacement),
                     "after maxAge the pool must not hand out the old session");
             try (Statement st = replacement.createStatement();
                     ResultSet rs = st.executeQuery("SELECT 1")) {
-                assertTrue(rs.next());
+                Assertions.assertTrue(rs.next());
             }
         }
-        assertEquals(1, poolSessions());
+        Assertions.assertEquals(1, poolSessions());
     }
 
     @Test
@@ -132,15 +129,15 @@ class TestPoolEviction extends JdbcPoolBaseTest {
         ds.createPool();
 
         sleep(1500); // many validation rounds
-        assertEquals(2, poolSessions(),
+        Assertions.assertEquals(2, poolSessions(),
                 "validated idle connections must be kept, not replaced");
 
         try (Connection a = ds.getConnection(); Connection b = ds.getConnection()) {
             try (Statement st = a.createStatement(); ResultSet rs = st.executeQuery("SELECT 1")) {
-                assertTrue(rs.next());
+                Assertions.assertTrue(rs.next());
             }
             try (Statement st = b.createStatement(); ResultSet rs = st.executeQuery("SELECT 1")) {
-                assertTrue(rs.next());
+                Assertions.assertTrue(rs.next());
             }
         }
     }
@@ -160,7 +157,7 @@ class TestPoolEviction extends JdbcPoolBaseTest {
         Connection hold = ds.getConnection();
         try {
             Connection extra = ds.getConnection();
-            assertEquals(2, poolSessions());
+            Assertions.assertEquals(2, poolSessions());
             extra.close(); // aged after 100 ms; evictable while size(2) > minIdle(1)
 
             awaitSessions(1); // only the busy connection's session may survive
@@ -189,18 +186,18 @@ class TestPoolEviction extends JdbcPoolBaseTest {
         try (Connection probe = ds.getConnection()) {
             markerBeforeEviction = sessionMarker(probe);
         }
-        assertNotNull(markerBeforeEviction,
+        Assertions.assertNotNull(markerBeforeEviction,
                 "quick re-borrow must reuse the idle connection");
 
         awaitSessions(0); // idle eviction retires it (age > 300ms, minIdle 0)
 
         try (Connection c2 = ds.getConnection()) {
-            assertNull(sessionMarker(c2),
+            Assertions.assertNull(sessionMarker(c2),
                     "after eviction the pool must hand out a fresh connection");
             Integer marker = sessionMarker(c2);
-            assertNull(marker);
+            Assertions.assertNull(marker);
             setSessionMarker(c2, 8);
-            assertEquals(8, sessionMarker(c2).intValue());
+            Assertions.assertEquals(8, sessionMarker(c2).intValue());
         }
     }
 }

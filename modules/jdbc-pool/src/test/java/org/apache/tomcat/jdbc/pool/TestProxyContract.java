@@ -21,13 +21,7 @@ import java.sql.SQLException;
 
 import javax.sql.PooledConnection;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
@@ -54,21 +48,21 @@ class TestProxyContract extends JdbcPoolBaseTest {
 
         Connection first = ds.getConnection();
         setSessionMarker(first, 31);
-        assertFalse(first.isClosed());
+        Assertions.assertFalse(first.isClosed());
 
         first.close();
-        assertTrue(first.isClosed(), "a returned facade must report itself closed");
+        Assertions.assertTrue(first.isClosed(), "a returned facade must report itself closed");
 
         try (Connection second = ds.getConnection()) {
-            assertEquals(Integer.valueOf(31), sessionMarker(second),
+            Assertions.assertEquals(Integer.valueOf(31), sessionMarker(second),
                     "the next borrower must get the very same physical session back");
-            assertFalse(second.isClosed(), "the new facade must be usable");
+            Assertions.assertFalse(second.isClosed(), "the new facade must be usable");
 
-            assertTrue(first.isClosed(),
+            Assertions.assertTrue(first.isClosed(),
                     "a closed facade must stay closed while its session works for somebody else");
-            assertFalse(first.isValid(1),
+            Assertions.assertFalse(first.isValid(1),
                     "a closed facade must report itself invalid, not its session's state");
-            assertThrows(SQLException.class, first::createStatement,
+            Assertions.assertThrows(SQLException.class, first::createStatement,
                     "a disposed facade must refuse to hand out work for the session");
         }
     }
@@ -81,11 +75,11 @@ class TestProxyContract extends JdbcPoolBaseTest {
         Connection pooled = ds.getConnection();
         pooled.close();
         pooled.close();
-        assertTrue(pooled.isClosed());
+        Assertions.assertTrue(pooled.isClosed());
 
         // exactly one return took place, so the session is idle once
-        assertEquals(1, ds.getIdle());
-        assertEquals(1, poolSessions());
+        Assertions.assertEquals(1, ds.getIdle());
+        Assertions.assertEquals(1, poolSessions());
     }
 
     @Test
@@ -94,23 +88,23 @@ class TestProxyContract extends JdbcPoolBaseTest {
         ds.createPool();
 
         Connection first = ds.getConnection();
-        assertTrue(first.equals(first), "a facade must be equal to itself");
+        Assertions.assertTrue(first.equals(first), "a facade must be equal to itself");
         int firstHash = first.hashCode();
-        assertEquals(firstHash, first.hashCode(), "hashCode must be stable");
+        Assertions.assertEquals(firstHash, first.hashCode(), "hashCode must be stable");
 
         first.close();
-        assertTrue(first.equals(first),
+        Assertions.assertTrue(first.equals(first),
                 "closing must not change the identity of a facade");
-        assertEquals(firstHash, first.hashCode(),
+        Assertions.assertEquals(firstHash, first.hashCode(),
                 "closing must not change the hash code of a facade");
 
         try (Connection second = ds.getConnection()) {
-            assertFalse(first.equals(second),
+            Assertions.assertFalse(first.equals(second),
                     "two borrows are two facades even over one physical session");
-            assertFalse(second.equals(first));
-            assertNotEquals(firstHash, second.hashCode(),
+            Assertions.assertFalse(second.equals(first));
+            Assertions.assertNotEquals(firstHash, second.hashCode(),
                     "two facades must not share an identity hash");
-            assertEquals(second.hashCode(), second.hashCode());
+            Assertions.assertEquals(second.hashCode(), second.hashCode());
         }
     }
 
@@ -121,18 +115,18 @@ class TestProxyContract extends JdbcPoolBaseTest {
         ds.createPool();
 
         try (Connection pooled = ds.getConnection()) {
-            assertInstanceOf(PooledConnection.class, pooled,
+            Assertions.assertInstanceOf(PooledConnection.class, pooled,
                     "the facade must also expose the pooled connection interface");
             Connection physical = ((PooledConnection) pooled).getConnection();
-            assertNotNull(physical, "the underlying session must be reachable");
-            assertTrue(physical.getClass().getName().startsWith("org.h2."),
+            Assertions.assertNotNull(physical, "the underlying session must be reachable");
+            Assertions.assertTrue(physical.getClass().getName().startsWith("org.h2."),
                     "the underlying session must be the driver's own object, was "
                             + physical.getClass().getName());
-            assertEquals(getUrl(), physical.getMetaData().getURL(),
+            Assertions.assertEquals(getUrl(), physical.getMetaData().getURL(),
                     "the reachable session must be the one the pool opened");
 
-            assertTrue(pooled.isWrapperFor(Connection.class));
-            assertFalse(pooled.isWrapperFor(javax.sql.XAConnection.class),
+            Assertions.assertTrue(pooled.isWrapperFor(Connection.class));
+            Assertions.assertFalse(pooled.isWrapperFor(javax.sql.XAConnection.class),
                     "a plain pool must not claim to be an XA wrapper");
         }
     }

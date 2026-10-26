@@ -19,9 +19,7 @@ package org.apache.tomcat.jdbc.pool;
 import java.sql.Connection;
 import java.sql.Statement;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
@@ -53,10 +51,10 @@ class TestTransaction extends JdbcPoolBaseTest {
         DataSource ds = newDataSource();
         String t = createTable(ds);
         try (Connection c = ds.getConnection()) {
-            assertTrue(c.getAutoCommit(), "auto-commit is the pool default");
+            Assertions.assertTrue(c.getAutoCommit(), "auto-commit is the pool default");
             insert(c, t, 1);
             // visible to others without close/commit
-            assertEquals(1, adminRowCount(t));
+            Assertions.assertEquals(1, adminRowCount(t));
         }
     }
 
@@ -67,11 +65,11 @@ class TestTransaction extends JdbcPoolBaseTest {
         try (Connection c = ds.getConnection()) {
             c.setAutoCommit(false);
             insert(c, t, 1);
-            assertEquals(0, adminRowCount(t), "uncommitted work is invisible");
+            Assertions.assertEquals(0, adminRowCount(t), "uncommitted work is invisible");
             c.rollback();
-            assertEquals(0, adminRowCount(t));
+            Assertions.assertEquals(0, adminRowCount(t));
         }
-        assertEquals(0, adminRowCount(t));
+        Assertions.assertEquals(0, adminRowCount(t));
     }
 
     @Test
@@ -82,10 +80,10 @@ class TestTransaction extends JdbcPoolBaseTest {
             c.setAutoCommit(false);
             insert(c, t, 1);
             c.commit();
-            assertEquals(1, adminRowCount(t));
+            Assertions.assertEquals(1, adminRowCount(t));
             insert(c, t, 2);
             c.commit();
-            assertEquals(2, adminRowCount(t));
+            Assertions.assertEquals(2, adminRowCount(t));
         }
     }
 
@@ -100,13 +98,13 @@ class TestTransaction extends JdbcPoolBaseTest {
         insert(c1, t, 1);
         c1.close(); // returned without commit -> must be rolled back
 
-        assertEquals(0, adminRowCount(t), "uncommitted work must not survive");
+        Assertions.assertEquals(0, adminRowCount(t), "uncommitted work must not survive");
         try (Connection c2 = ds.getConnection()) {
             try (Statement st = c2.createStatement()) {
                 try (java.sql.ResultSet rs = st.executeQuery(
                         "SELECT COUNT(*) FROM " + t)) {
-                    assertTrue(rs.next());
-                    assertEquals(0, rs.getInt(1),
+                    Assertions.assertTrue(rs.next());
+                    Assertions.assertEquals(0, rs.getInt(1),
                             "the next borrower must not observe the previous work");
                 }
             }
@@ -120,12 +118,12 @@ class TestTransaction extends JdbcPoolBaseTest {
         ds.getPoolProperties().setJdbcInterceptors(
                 "org.apache.tomcat.jdbc.pool.interceptor.ConnectionState");
         try (Connection c1 = ds.getConnection()) {
-            assertTrue(c1.getAutoCommit(), "configured default");
+            Assertions.assertTrue(c1.getAutoCommit(), "configured default");
             c1.setAutoCommit(false);
-            assertFalse(c1.getAutoCommit());
+            Assertions.assertFalse(c1.getAutoCommit());
         }
         try (Connection c2 = ds.getConnection()) {
-            assertTrue(c2.getAutoCommit(),
+            Assertions.assertTrue(c2.getAutoCommit(),
                     "configured default must be restored before the next borrow");
         }
     }
@@ -138,14 +136,14 @@ class TestTransaction extends JdbcPoolBaseTest {
         ds.getPoolProperties().setJdbcInterceptors(
                 "org.apache.tomcat.jdbc.pool.interceptor.ConnectionState");
         try (Connection c1 = ds.getConnection()) {
-            assertEquals(Connection.TRANSACTION_READ_COMMITTED,
+            Assertions.assertEquals(Connection.TRANSACTION_READ_COMMITTED,
                     c1.getTransactionIsolation(), "configured default");
             c1.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
-            assertEquals(Connection.TRANSACTION_SERIALIZABLE,
+            Assertions.assertEquals(Connection.TRANSACTION_SERIALIZABLE,
                     c1.getTransactionIsolation());
         }
         try (Connection c2 = ds.getConnection()) {
-            assertEquals(Connection.TRANSACTION_READ_COMMITTED,
+            Assertions.assertEquals(Connection.TRANSACTION_READ_COMMITTED,
                     c2.getTransactionIsolation(),
                     "configured default must not leak to the next borrower");
         }
@@ -160,14 +158,14 @@ class TestTransaction extends JdbcPoolBaseTest {
         String t = createTable(ds);
         try (Connection c1 = ds.getConnection()) {
             c1.setReadOnly(true);
-            assertTrue(c1.isReadOnly());
+            Assertions.assertTrue(c1.isReadOnly());
         }
         try (Connection c2 = ds.getConnection()) {
-            assertFalse(c2.isReadOnly(),
+            Assertions.assertFalse(c2.isReadOnly(),
                     "configured default must be restored before the next borrow");
             insert(c2, t, 1);
         }
-        assertEquals(1, adminRowCount(t));
+        Assertions.assertEquals(1, adminRowCount(t));
     }
 
     @Test
@@ -182,7 +180,7 @@ class TestTransaction extends JdbcPoolBaseTest {
             insert(b, t, 2);
             b.rollback();
             a.commit();
-            assertEquals(1, adminRowCount(t),
+            Assertions.assertEquals(1, adminRowCount(t),
                     "one connection's rollback must not undo the other's commit");
         }
     }

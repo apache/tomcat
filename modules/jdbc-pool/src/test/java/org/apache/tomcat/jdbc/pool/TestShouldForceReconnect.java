@@ -18,9 +18,7 @@ package org.apache.tomcat.jdbc.pool;
 
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -84,7 +82,8 @@ class TestShouldForceReconnect {
             String askedUser, String askedPassword, boolean expected) throws Exception {
         PooledConnection con = pooledConnection();
         loggedInAs(con, loggedInUser, loggedInPassword);
-        assertEquals(Boolean.valueOf(expected), Boolean.valueOf(con.shouldForceReconnect(askedUser, askedPassword)),
+        Assertions.assertEquals(Boolean.valueOf(expected),
+                Boolean.valueOf(con.shouldForceReconnect(askedUser, askedPassword)),
                 sessionLabel + " session asked for " + askedUser);
     }
 
@@ -127,7 +126,7 @@ class TestShouldForceReconnect {
         PooledConnection con = pooledConnection();
         // no PROP_USER/PROP_PASSWORD at all: the pool cannot know who this
         // session belongs to, so it re-establishes it rather than trusting it
-        assertTrue(con.shouldForceReconnect(null, null));
+        Assertions.assertTrue(con.shouldForceReconnect(null, null));
     }
 
     @Test
@@ -135,17 +134,17 @@ class TestShouldForceReconnect {
         PooledConnection con = pooledConnection();
         loggedInAs(con, DEFAULT_USER, DEFAULT_PASSWD);
 
-        assertTrue(con.shouldForceReconnect(ALT_USER, ALT_PASSWD),
+        Assertions.assertTrue(con.shouldForceReconnect(ALT_USER, ALT_PASSWD),
                 "another identity must be refused the pooled session");
-        assertFalse(con.shouldForceReconnect(ALT_USER, ALT_PASSWD),
+        Assertions.assertFalse(con.shouldForceReconnect(ALT_USER, ALT_PASSWD),
                 "the decision records the new identity, so the next borrower asking "
                         + "for the same user gets the session once it is re-established");
 
         loggedInAs(con, DEFAULT_USER, DEFAULT_PASSWD);
-        assertFalse(con.shouldForceReconnect(null, null));
-        assertTrue(con.shouldForceReconnect(ALT_USER, ALT_PASSWD));
-        assertFalse(con.shouldForceReconnect(ALT_USER, ALT_PASSWD));
-        assertTrue(con.shouldForceReconnect(null, null),
+        Assertions.assertFalse(con.shouldForceReconnect(null, null));
+        Assertions.assertTrue(con.shouldForceReconnect(ALT_USER, ALT_PASSWD));
+        Assertions.assertFalse(con.shouldForceReconnect(ALT_USER, ALT_PASSWD));
+        Assertions.assertTrue(con.shouldForceReconnect(null, null),
                 "and the same holds in the other direction");
     }
 
@@ -156,9 +155,9 @@ class TestShouldForceReconnect {
         PooledConnection con = pooledConnection();
         loggedInAs(con, ALT_USER, ALT_PASSWD);
 
-        assertFalse(con.shouldForceReconnect(DEFAULT_USER, DEFAULT_PASSWD),
+        Assertions.assertFalse(con.shouldForceReconnect(DEFAULT_USER, DEFAULT_PASSWD),
                 "with alternates disallowed the credentials of the borrower are ignored, "
                         + "so the session can never mismatch");
-        assertFalse(con.shouldForceReconnect(ALT_USER, ALT_PASSWD));
+        Assertions.assertFalse(con.shouldForceReconnect(ALT_USER, ALT_PASSWD));
     }
 }

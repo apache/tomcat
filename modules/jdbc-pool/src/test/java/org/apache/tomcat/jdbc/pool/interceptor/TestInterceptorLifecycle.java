@@ -21,11 +21,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
@@ -64,10 +60,10 @@ class TestInterceptorLifecycle extends JdbcPoolBaseTest {
         try (Connection pooled = ds.getConnection()) {
             SlowQueryReport interceptor =
                     interceptorOf(pooled, SlowQueryReport.class);
-            assertNotNull(interceptor,
+            Assertions.assertNotNull(interceptor,
                     "the interceptor named by short name must sit in the chain of a "
                             + "borrowed connection");
-            assertEquals(7L, interceptor.getThreshold(),
+            Assertions.assertEquals(7L, interceptor.getThreshold(),
                     "the properties from the configuration string must be applied");
         }
     }
@@ -81,16 +77,16 @@ class TestInterceptorLifecycle extends JdbcPoolBaseTest {
         for (int i = 0; i < 2; i++) {
             try (Connection pooled = ds.getConnection(); Statement st = pooled.createStatement();
                     ResultSet rs = st.executeQuery(REPORT_SQL)) {
-                assertTrue(rs.next());
+                Assertions.assertTrue(rs.next());
             }
         }
 
         Map<String, SlowQueryReport.QueryStats> stats =
                 SlowQueryReport.getPoolStats(poolName);
-        assertNotNull(stats, "a running pool must have its report registered");
+        Assertions.assertNotNull(stats, "a running pool must have its report registered");
         SlowQueryReport.QueryStats query = stats.get(REPORT_SQL);
-        assertNotNull(query, "both executions must be reported, saw " + stats.keySet());
-        assertEquals(2, query.getNrOfInvocations(),
+        Assertions.assertNotNull(query, "both executions must be reported, saw " + stats.keySet());
+        Assertions.assertEquals(2, query.getNrOfInvocations(),
                 "the report must see the work of every borrower");
     }
 
@@ -98,21 +94,21 @@ class TestInterceptorLifecycle extends JdbcPoolBaseTest {
     void thePoolLifecycleIsReportedToTheInterceptor() throws Exception {
         DataSource ds = reportedPool();
         String poolName = ds.getPoolProperties().getPoolName();
-        assertNull(SlowQueryReport.getPoolStats(poolName),
+        Assertions.assertNull(SlowQueryReport.getPoolStats(poolName),
                 "nothing may be published before the pool starts");
 
         ds.createPool();
-        assertNotNull(SlowQueryReport.getPoolStats(poolName),
+        Assertions.assertNotNull(SlowQueryReport.getPoolStats(poolName),
                 "poolStarted must have reached the interceptor");
 
         try (Connection pooled = ds.getConnection()) {
             pooled.createStatement().execute(REPORT_SQL);
         }
-        assertFalse(SlowQueryReport.getPoolStats(poolName).isEmpty(),
+        Assertions.assertFalse(SlowQueryReport.getPoolStats(poolName).isEmpty(),
                 "the report must hold data while the pool runs");
 
         ds.close();
-        assertNull(SlowQueryReport.getPoolStats(poolName),
+        Assertions.assertNull(SlowQueryReport.getPoolStats(poolName),
                 "poolClosed must have made the interceptor give its statistics up");
     }
 }
