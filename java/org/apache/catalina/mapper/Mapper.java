@@ -735,30 +735,43 @@ public final class Mapper {
         }
 
         // Virtual host mapping
-        MappedHost[] hosts = this.hosts;
-        MappedHost mappedHost = exactFindIgnoreCase(hosts, host);
-        if (mappedHost == null) {
-            // Note: Internally, the Mapper does not use the leading * on a
-            // wildcard host. This is to allow this shortcut.
-            int firstDot = host.indexOf('.');
-            if (firstDot > -1) {
-                int start = host.getStart();
-                try {
-                    host.setStart(firstDot + start);
-                    mappedHost = exactFindIgnoreCase(hosts, host);
-                } finally {
-                    // Make absolutely sure this gets reset
-                    host.setStart(start);
+        boolean trailingPeriodRemoved = false;
+        MappedHost mappedHost = null;
+        try {
+            if (host.charAt(host.length() - 1)  == '.') {
+                host.setEnd(host.getEnd() - 1);
+                trailingPeriodRemoved = true;
+            }
+            MappedHost[] hosts = this.hosts;
+            mappedHost = exactFindIgnoreCase(hosts, host);
+            if (mappedHost == null) {
+                // Note: Internally, the Mapper does not use the leading * on a
+                // wildcard host. This is to allow this shortcut.
+                int firstDot = host.indexOf('.');
+                if (firstDot > -1) {
+                    int start = host.getStart();
+                    try {
+                        host.setStart(firstDot + start);
+                        mappedHost = exactFindIgnoreCase(hosts, host);
+                    } finally {
+                        // Make absolutely sure this gets reset
+                        host.setStart(start);
+                    }
+                }
+                if (mappedHost == null) {
+                    mappedHost = defaultHost;
+                    if (mappedHost == null) {
+                        return;
+                    }
                 }
             }
-            if (mappedHost == null) {
-                mappedHost = defaultHost;
-                if (mappedHost == null) {
-                    return;
-                }
+            mappingData.host = mappedHost.object;
+        } finally {
+            // Make absolutely sure this gets reset if required
+            if (trailingPeriodRemoved) {
+                host.setEnd(host.getEnd() + 1);
             }
         }
-        mappingData.host = mappedHost.object;
 
         if (uri.isNull()) {
             // Can't map context or wrapper without a uri
