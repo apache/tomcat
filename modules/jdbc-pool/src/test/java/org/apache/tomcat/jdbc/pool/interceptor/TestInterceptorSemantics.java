@@ -23,11 +23,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
@@ -56,12 +52,12 @@ class TestInterceptorSemantics extends JdbcPoolBaseTest {
         String nonce = "nonce_" + System.nanoTime();
         String sql = HEAVY_SQL_PREFIX + " /* " + nonce + " */";
         try (Connection c = ds.getConnection(); Statement st = c.createStatement()) {
-            assertTrue(st.execute(sql));
+            Assertions.assertTrue(st.execute(sql));
         }
 
         ConcurrentHashMap<String, ?> stats = SlowQueryReport.getPoolStats(poolName);
-        assertNotNull(stats, "stats must exist once a slow query was run");
-        assertTrue(statsKeySet(stats).stream().anyMatch(k -> k.contains(nonce)),
+        Assertions.assertNotNull(stats, "stats must exist once a slow query was run");
+        Assertions.assertTrue(statsKeySet(stats).stream().anyMatch(k -> k.contains(nonce)),
                 "slow query must be reported under pool " + poolName
                         + ", recorded keys: " + statsKeySet(stats));
     }
@@ -77,12 +73,12 @@ class TestInterceptorSemantics extends JdbcPoolBaseTest {
         String nonce = "fail_" + System.nanoTime();
         String sql = "SELECT * FROM no_such_table_" + nonce;
         try (Connection c = ds.getConnection(); Statement st = c.createStatement()) {
-            assertThrows(SQLException.class, () -> st.executeQuery(sql));
+            Assertions.assertThrows(SQLException.class, () -> st.executeQuery(sql));
         }
 
         ConcurrentHashMap<String, ?> stats = SlowQueryReport.getPoolStats(poolName);
-        assertNotNull(stats, "stats must exist once a query failed");
-        assertTrue(statsKeySet(stats).stream().anyMatch(k -> k.contains(nonce)),
+        Assertions.assertNotNull(stats, "stats must exist once a query failed");
+        Assertions.assertTrue(statsKeySet(stats).stream().anyMatch(k -> k.contains(nonce)),
                 "failed query must be reported under pool " + poolName
                         + ", recorded keys: " + statsKeySet(stats));
     }
@@ -102,7 +98,7 @@ class TestInterceptorSemantics extends JdbcPoolBaseTest {
         ds.createPool();
 
         try (Connection c = ds.getConnection(); Statement st = c.createStatement()) {
-            assertThrows(SQLException.class, () -> st.setFetchSize(-1),
+            Assertions.assertThrows(SQLException.class, () -> st.setFetchSize(-1),
                     "the driver's SQLException must reach the application");
         }
     }
@@ -125,28 +121,28 @@ class TestInterceptorSemantics extends JdbcPoolBaseTest {
         Connection c = ds.getConnection();
         PreparedStatement ps = c.prepareStatement(sql);
         // a negative fetch size is a SQLException per the JDBC contract
-        assertThrows(SQLException.class, () -> ps.setFetchSize(-1));
+        Assertions.assertThrows(SQLException.class, () -> ps.setFetchSize(-1));
 
         // preparing the statement legitimately creates the stats entry,
         // but a method that is not an execution must not be booked in it
         ConcurrentHashMap<String, ?> stats = SlowQueryReport.getPoolStats(poolName);
-        assertNotNull(stats, "the prepare must have created the stats map");
+        Assertions.assertNotNull(stats, "the prepare must have created the stats map");
         String key = statsKeySet(stats).stream().filter(k -> k.contains(nonce))
                 .findFirst().orElse(null);
-        assertNotNull(key, "the prepared statement must have a stats entry, "
+        Assertions.assertNotNull(key, "the prepared statement must have a stats entry, "
                 + "recorded keys: " + statsKeySet(stats));
         SlowQueryReport.QueryStats qs = (SlowQueryReport.QueryStats) stats.get(key);
-        assertEquals(0, qs.getNrOfInvocations(),
+        Assertions.assertEquals(0, qs.getNrOfInvocations(),
                 "a method that is not an execution must not be booked as an "
                         + "invocation of " + key);
-        assertEquals(Long.MIN_VALUE, qs.getMaxInvocationTime(),
+        Assertions.assertEquals(Long.MIN_VALUE, qs.getMaxInvocationTime(),
                 "no invocation time may be recorded for a method that is not "
                         + "an execution");
 
         // positive control: the report must still be live for this statement,
         // so the assertions above cannot pass because the proxy is absent
         ps.execute();
-        assertEquals(1, qs.getNrOfInvocations(),
+        Assertions.assertEquals(1, qs.getNrOfInvocations(),
                 "the execution must be booked in the same entry");
 
         ps.close();
@@ -166,18 +162,18 @@ class TestInterceptorSemantics extends JdbcPoolBaseTest {
 
         long start = System.currentTimeMillis();
         try (Connection c = ds.getConnection(); Statement st = c.createStatement()) {
-            assertThrows(SQLException.class, () -> st.execute(HEAVY_SQL_PREFIX));
+            Assertions.assertThrows(SQLException.class, () -> st.execute(HEAVY_SQL_PREFIX));
         }
         long elapsed = System.currentTimeMillis() - start;
-        assertTrue(elapsed >= 900 && elapsed < 8000,
+        Assertions.assertTrue(elapsed >= 900 && elapsed < 8000,
                 "query must be cancelled around the configured timeout, took "
                         + elapsed + " ms");
 
         // the pool and its physical connection must survive the cancellation
-        assertEquals(1, poolSessions());
+        Assertions.assertEquals(1, poolSessions());
         try (Connection c = ds.getConnection();
                 ResultSet rs = c.createStatement().executeQuery("SELECT 1")) {
-            assertTrue(rs.next());
+            Assertions.assertTrue(rs.next());
         }
     }
 
@@ -188,9 +184,9 @@ class TestInterceptorSemantics extends JdbcPoolBaseTest {
         try (Connection c = ds.getConnection()) {
             c.createStatement().execute("CREATE TABLE " + t + " (v INT)");
             PreparedStatement ps = c.prepareStatement("INSERT INTO " + t + " VALUES (1)");
-            assertEquals(1, ps.executeUpdate());
+            Assertions.assertEquals(1, ps.executeUpdate());
             ps.close();
-            assertThrows(SQLException.class, ps::executeUpdate,
+            Assertions.assertThrows(SQLException.class, ps::executeUpdate,
                     "a physically closed statement must fail");
         }
     }
@@ -207,15 +203,15 @@ class TestInterceptorSemantics extends JdbcPoolBaseTest {
             String sql = "INSERT INTO " + t + " VALUES (1)";
 
             PreparedStatement first = c.prepareStatement(sql);
-            assertEquals(1, first.executeUpdate());
+            Assertions.assertEquals(1, first.executeUpdate());
             first.close(); // returned to the cache, not physically closed
 
             PreparedStatement second = c.prepareStatement(sql);
-            assertEquals(1, second.executeUpdate(),
+            Assertions.assertEquals(1, second.executeUpdate(),
                     "the cached statement must be usable again after close");
             second.close();
         }
-        assertEquals(2, adminRowCount(t));
+        Assertions.assertEquals(2, adminRowCount(t));
     }
 
     @Test
@@ -228,17 +224,17 @@ class TestInterceptorSemantics extends JdbcPoolBaseTest {
             c.createStatement().execute("CREATE TABLE " + t + " (v INT)");
 
             Statement st = c.createStatement();
-            assertFalse(st.isClosed());
+            Assertions.assertFalse(st.isClosed());
             try (ResultSet rs = st.executeQuery("SELECT v FROM " + t)) {
-                assertFalse(rs.next(), "empty table");
+                Assertions.assertFalse(rs.next(), "empty table");
             }
             st.close();
-            assertTrue(st.isClosed());
-            assertThrows(SQLException.class,
+            Assertions.assertTrue(st.isClosed());
+            Assertions.assertThrows(SQLException.class,
                     () -> st.execute("INSERT INTO " + t + " VALUES (1)"),
                     "closed decorated statement must reject execution");
         }
-        assertEquals(0, adminRowCount(t),
+        Assertions.assertEquals(0, adminRowCount(t),
                 "execution attempted after close must not reach the database");
     }
 }

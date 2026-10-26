@@ -27,10 +27,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
@@ -116,19 +113,19 @@ class TestCloseDuringBorrow extends JdbcPoolBaseTest {
 
         // close while the physical connect() is in flight: the driver signals
         // when it enters connect() and sleeps there for CONNECT_DELAY_MS
-        assertTrue(SlowConnectDriver.CONNECT_STARTED.await(AWAIT_TIMEOUT_MS,
+        Assertions.assertTrue(SlowConnectDriver.CONNECT_STARTED.await(AWAIT_TIMEOUT_MS,
                         TimeUnit.MILLISECONDS),
                 "the borrower must be inside the driver's connect()");
         ds.close(true);
 
         borrower.join(AWAIT_TIMEOUT_MS);
-        assertFalse(borrower.isAlive(), "the borrower must not outlive the close");
+        Assertions.assertFalse(borrower.isAlive(), "the borrower must not outlive the close");
 
-        assertNotNull(failure.get(),
+        Assertions.assertNotNull(failure.get(),
                 "the borrower must not be handed a connection from the closed pool");
-        assertTrue(failure.get() instanceof SQLException,
+        Assertions.assertTrue(failure.get() instanceof SQLException,
                 "the borrower must be rejected with a SQLException, not " + failure.get());
-        assertNull(borrowed.get());
+        Assertions.assertNull(borrowed.get());
         awaitSessions(0);
     }
 }

@@ -20,8 +20,7 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
@@ -51,7 +50,7 @@ class TestInterruptedPoolClose extends JdbcPoolBaseTest {
         closer.setDaemon(true);
         closer.start();
         closer.join(AWAIT_TIMEOUT_MS);
-        assertFalse(closer.isAlive(), "close() must complete on an interrupted thread");
+        Assertions.assertFalse(closer.isAlive(), "close() must complete on an interrupted thread");
         return outcome;
     }
 
@@ -68,7 +67,7 @@ class TestInterruptedPoolClose extends JdbcPoolBaseTest {
 
         CloseOutcome outcome = closeFromInterruptedThread(ds);
 
-        assertTrue(outcome.interruptedAfterClose,
+        Assertions.assertTrue(outcome.interruptedAfterClose,
                 "propagateInterruptState=true must keep the interrupt status across close()");
         awaitSessions(0);
     }
@@ -91,7 +90,7 @@ class TestInterruptedPoolClose extends JdbcPoolBaseTest {
         // the drain starts on the idle queue and must then switch to busy
         CloseOutcome outcome = closeFromInterruptedThread(ds);
 
-        assertTrue(outcome.interruptedAfterClose,
+        Assertions.assertTrue(outcome.interruptedAfterClose,
                 "propagateInterruptState=true must keep the interrupt status across close()");
         awaitSessions(0);
     }
@@ -108,7 +107,7 @@ class TestInterruptedPoolClose extends JdbcPoolBaseTest {
 
         CloseOutcome outcome = closeFromInterruptedThread(ds);
 
-        assertFalse(outcome.interruptedAfterClose,
+        Assertions.assertFalse(outcome.interruptedAfterClose,
                 "propagateInterruptState=false must not leave the interrupt status set");
         awaitSessions(0);
     }

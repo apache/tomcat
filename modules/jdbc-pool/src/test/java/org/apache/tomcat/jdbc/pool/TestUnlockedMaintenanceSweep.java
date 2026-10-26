@@ -22,8 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
@@ -108,13 +107,13 @@ public class TestUnlockedMaintenanceSweep extends JdbcPoolBaseTest {
             }
             awaitUntil(() -> ds.getActive() == 0);
 
-            assertTrue(ds.getReleasedIdleCount() > 0,
+            Assertions.assertTrue(ds.getReleasedIdleCount() > 0,
                     "the sweep must actually have released aged connections, "
                             + "otherwise this test exercises nothing");
-            assertEquals(0, errors.get(), () -> "the unlocked idle sweep broke "
+            Assertions.assertEquals(0, errors.get(), () -> "the unlocked idle sweep broke "
                     + errors.get() + " of " + uses.get()
                     + " successful borrows, first failure: " + firstError.get());
-            assertEquals(ds.getSize(), ds.getIdle(),
+            Assertions.assertEquals(ds.getSize(), ds.getIdle(),
                     "the idle sweep must not strand connections outside both queues");
         } finally {
             stop.set(true);

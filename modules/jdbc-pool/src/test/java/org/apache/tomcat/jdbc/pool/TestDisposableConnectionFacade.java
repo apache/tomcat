@@ -30,11 +30,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -120,34 +116,34 @@ class TestDisposableConnectionFacade {
         closer.setDaemon(true);
         closer.start();
         try {
-            assertTrue(chain.closeEntered.await(AWAIT_MS, TimeUnit.MILLISECONDS),
+            Assertions.assertTrue(chain.closeEntered.await(AWAIT_MS, TimeUnit.MILLISECONDS),
                     "the chain close must be entered");
-            assertTrue(chain.returnedToPool,
+            Assertions.assertTrue(chain.returnedToPool,
                     "precondition: the connection has already been handed back");
 
             // From this point on nothing may pass through the facade: the
             // physical connection is the pool's to hand out again.
-            assertEquals(Boolean.TRUE, proxy.isClosed(),
+            Assertions.assertEquals(Boolean.TRUE, proxy.isClosed(),
                     "the facade must report closed while the close is still in flight");
-            assertEquals(Boolean.FALSE, proxy.isValid(0),
+            Assertions.assertEquals(Boolean.FALSE, proxy.isValid(0),
                     "the facade must report invalid while the close is still in flight");
-            assertThrows(SQLException.class, proxy::getAutoCommit,
+            Assertions.assertThrows(SQLException.class, proxy::getAutoCommit,
                     "post-return calls must be rejected instead of reaching the chain");
-            assertEquals(0, chain.callsAfterReturn.size(),
+            Assertions.assertEquals(0, chain.callsAfterReturn.size(),
                     "no call may reach the chain after the connection was returned, saw "
                             + chain.callsAfterReturn);
         } finally {
             chain.closeRelease.countDown();
             closer.join(AWAIT_MS);
-            assertFalse(closer.isAlive(), "the closing thread must have finished");
+            Assertions.assertFalse(closer.isAlive(), "the closing thread must have finished");
         }
 
-        assertNull(closeFailure.get(),
+        Assertions.assertNull(closeFailure.get(),
                 () -> "close() must not fail: " + closeFailure.get());
-        assertEquals(1, chain.closeCount.get(), "the chain must see exactly one close");
+        Assertions.assertEquals(1, chain.closeCount.get(), "the chain must see exactly one close");
         // A later close stays a no-op and never re-enters the chain
         proxy.close();
-        assertEquals(1, chain.closeCount.get());
+        Assertions.assertEquals(1, chain.closeCount.get());
     }
 
     @Test
@@ -165,7 +161,7 @@ class TestDisposableConnectionFacade {
         }, "first close");
         first.setDaemon(true);
         first.start();
-        assertTrue(chain.closeEntered.await(AWAIT_MS, TimeUnit.MILLISECONDS),
+        Assertions.assertTrue(chain.closeEntered.await(AWAIT_MS, TimeUnit.MILLISECONDS),
                 "the first close must be inside the chain");
 
         AtomicReference<Throwable> second = new AtomicReference<>();
@@ -180,12 +176,12 @@ class TestDisposableConnectionFacade {
         secondClose.start();
         try {
             secondClose.join(AWAIT_MS);
-            assertFalse(secondClose.isAlive(),
+            Assertions.assertFalse(secondClose.isAlive(),
                     "the second closing thread must not park in the chain");
 
-            assertNull(second.get(),
+            Assertions.assertNull(second.get(),
                     () -> "the concurrent close must not fail: " + second.get());
-            assertEquals(1, chain.closeCount.get(),
+            Assertions.assertEquals(1, chain.closeCount.get(),
                     "the concurrent close must observe the disposed facade instead of "
                             + "driving the return a second time");
         } finally {
@@ -193,10 +189,10 @@ class TestDisposableConnectionFacade {
         }
 
         first.join(AWAIT_MS);
-        assertFalse(first.isAlive(), "the first closing thread must have finished");
-        assertNull(firstFailure.get(),
+        Assertions.assertFalse(first.isAlive(), "the first closing thread must have finished");
+        Assertions.assertNull(firstFailure.get(),
                 () -> "the first close must not fail: " + firstFailure.get());
-        assertEquals(1, chain.closeCount.get());
+        Assertions.assertEquals(1, chain.closeCount.get());
     }
 
     /* The serialized second close above cannot cover the interleaving that
@@ -239,9 +235,9 @@ class TestDisposableConnectionFacade {
                 intoClose.await(AWAIT_MS, TimeUnit.MILLISECONDS);
                 roundDone.await(AWAIT_MS, TimeUnit.MILLISECONDS);
                 final int r = round;
-                assertNull(closerFailure.get(),
+                Assertions.assertNull(closerFailure.get(),
                         () -> "round " + r + ": a closer failed: " + closerFailure.get());
-                assertEquals(1, chain.closeCount.get(),
+                Assertions.assertEquals(1, chain.closeCount.get(),
                         () -> "round " + r
                                 + ": both concurrent closes reached the chain; capture and seal"
                                 + " must be atomic");

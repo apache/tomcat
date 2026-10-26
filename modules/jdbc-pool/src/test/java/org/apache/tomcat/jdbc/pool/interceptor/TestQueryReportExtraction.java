@@ -16,8 +16,7 @@
  */
 package org.apache.tomcat.jdbc.pool.interceptor;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -49,29 +48,29 @@ class TestQueryReportExtraction {
     @Test
     void aNonStringArgumentIsNotAQuery() {
         // the argument of setFetchSize(int) and friends is not SQL
-        assertNull(REPORT.reportFailedQuery(null, new Object[] { Integer.valueOf(5) },
+        Assertions.assertNull(REPORT.reportFailedQuery(null, new Object[] { Integer.valueOf(5) },
                 "setFetchSize", 0, null));
         // but the SQL of the prepared statement still is
-        assertEquals("SELECT 1", REPORT.reportFailedQuery("SELECT 1",
+        Assertions.assertEquals("SELECT 1", REPORT.reportFailedQuery("SELECT 1",
                 new Object[] { Integer.valueOf(5) }, "setFetchSize", 0, null));
     }
 
     @Test
     void aBatchOnAPlainStatementIsNamedBatch() {
         // a batch execution carries no SQL and no arguments at all
-        assertEquals("batch",
+        Assertions.assertEquals("batch",
                 REPORT.reportFailedQuery(null, null, "executeBatch", 0, null));
-        assertEquals("batch",
+        Assertions.assertEquals("batch",
                 REPORT.reportQuery(null, new Object[0], "executeBatch", 0, 1));
-        assertEquals("batch",
+        Assertions.assertEquals("batch",
                 REPORT.reportSlowQuery(null, null, "executeBatch", 0, 1));
     }
 
     @Test
     void theSQLOfTheStatementWinsOverTheMethodArgument() {
-        assertEquals("CALL p()", REPORT.reportQuery("CALL p()",
+        Assertions.assertEquals("CALL p()", REPORT.reportQuery("CALL p()",
                 new Object[] { "SELECT 1" }, "execute", 0, 1));
-        assertEquals("SELECT 1", REPORT.reportSlowQuery(null,
+        Assertions.assertEquals("SELECT 1", REPORT.reportSlowQuery(null,
                 new Object[] { "SELECT 1" }, "executeQuery", 0, 1));
     }
 }
