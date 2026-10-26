@@ -18,6 +18,7 @@ package org.apache.tomcat.jdbc.pool;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -109,6 +110,31 @@ class TestPoolProperties {
         proxy.setConnectionProperties(null);
         Assertions.assertNull(proxy.getConnectionProperties(),
                 "clearing the configuration must round-trip as well");
+    }
+
+    @Test
+    void setConnectionPropertiesRoundTripsThroughTheFactory() {
+        Properties attrs = new Properties();
+        attrs.setProperty("connectionProperties", "first=one;second=two");
+
+        PoolConfiguration configured =
+                DataSourceFactory.parsePoolProperties(attrs);
+
+        Assertions.assertEquals("first=one;second=two", configured.getConnectionProperties(),
+                "the factory/JNDI path must store the raw string like every "
+                        + "other implementation of the interface does");
+        // the pairs must still reach the driver properties the pool connects with
+        Assertions.assertEquals("one", configured.getDbProperties().getProperty("first"),
+                "the parsed pairs must still reach the database properties");
+        Assertions.assertEquals("two", configured.getDbProperties().getProperty("second"),
+                "the parsed pairs must still reach the database properties");
+
+        PoolConfiguration without =
+                DataSourceFactory.parsePoolProperties(new Properties());
+        Assertions.assertNull(without.getConnectionProperties(),
+                "an unconfigured attribute must read back null");
+        Assertions.assertTrue(without.getDbProperties().isEmpty(),
+                "an unconfigured attribute must leave the driver properties empty");
     }
 
     @Test
