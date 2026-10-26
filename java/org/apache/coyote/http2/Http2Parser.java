@@ -738,10 +738,11 @@ class Http2Parser {
                     Integer.toString(flags), Integer.toString(payloadSize)));
         }
 
-        if (expected != null && frameType != expected) {
-            throw new StreamException(sm.getString("http2Parser.processFrame.unexpectedType", expected, frameType),
-                    Http2Error.PROTOCOL_ERROR, streamId);
-        }
+        /*
+         * Frames with multiple errors may trigger multiple failures. Check the things that can trigger the more serious
+         * ConnectionException first so such errors are not masked by a less serious error that triggers a
+         * StreamException.
+         */
 
         int maxFrameSize = input.getMaxFrameSize();
         if (payloadSize > maxFrameSize) {
@@ -764,7 +765,13 @@ class Http2Parser {
             }
         }
 
+        // May throw StreamException or ConnectionException
         frameType.check(streamId, payloadSize);
+
+        if (expected != null && frameType != expected) {
+            throw new StreamException(sm.getString("http2Parser.processFrame.unexpectedType", expected, frameType),
+                    Http2Error.PROTOCOL_ERROR, streamId);
+        }
     }
 
 
