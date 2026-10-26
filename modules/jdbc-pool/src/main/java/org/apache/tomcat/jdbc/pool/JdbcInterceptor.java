@@ -158,6 +158,8 @@ public abstract class JdbcInterceptor implements InvocationHandler {
      * the interceptor can be reused for another connection.
      * <br>
      * This method may be called with null as both arguments when we are closing down the connection.
+     * When called for a shutdown reset, an interceptor that throws is isolated: the exception
+     * is logged and ignored, and the remaining interceptors in the chain are reset as well.
      * @param parent - the connection pool owning the connection
      * @param con - the pooled connection
      */
