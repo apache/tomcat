@@ -32,7 +32,7 @@ jobs:
       with:
         java-version: 21
         distribution: temurin
-    - uses: vapier/coverity-scan-action@1b6fd4eaba6651aa354c9ea7f48caa1710b4e12e
+    - uses: vapier/coverity-scan-action@8fe7b0af23cbbd4eced5f63dcd2384640eaa5d49
       with:
         project: 'Apache Tomcat'
         version: 12.0.x - ${{ github.sha }}
