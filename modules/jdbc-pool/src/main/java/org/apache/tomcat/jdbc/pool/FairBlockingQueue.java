@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -192,7 +193,12 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
     }
 
     /**
-     * Request an item from the queue asynchronously
+     * Request an item from the queue asynchronously.
+     * If no item is available, the returned future registers a waiter on the
+     * queue. Cancelling the future deregisters that waiter again, provided the
+     * item has not already been handed over to the future. A future that is no
+     * longer needed must therefore be cancelled, so that a subsequent offer
+     * does not hand an item over to a future nobody is waiting on.
      * @return - a future pending the result from the queue poll request
      */
     public Future<E> pollAsync() {
@@ -411,10 +417,12 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
 
 
     //------------------------------------------------------------------
-    // Non cancellable Future used to check and see if a connection has been made available
+    // Future used to check and see if a connection has been made available
     //------------------------------------------------------------------
     /**
-     * A non-cancellable future used to check if a connection has been made available.
+     * A future used to check if a connection has been made available.
+     * Cancelling the future deregisters its waiter from the queue, as long
+     * as the item has not already been handed over to the future.
      *
      * @param <T> the type of the item
      */
@@ -446,7 +454,33 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
 
         @Override
         public boolean cancel(boolean mayInterruptIfRunning) {
-            return false; //don't allow cancel for now
+            if (item!=null) {
+                //the item is already available, too late to cancel
+                return false;
+            }
+            ExchangeCountDownLatch<T> l = latch;
+            if (l==null) {
+                return false;
+            }
+            final ReentrantLock lock = FairBlockingQueue.this.lock;
+            lock.lock();
+            try {
+                //the item is handed over under the queue lock, so a non-null
+                //item means an offer() has already committed to this future
+                if (l.getItem()!=null || canceled) {
+                    return false;
+                }
+                canceled = true;
+                //deregister the waiter, so that a subsequent offer() does not
+                //hand an item over to a future nobody is waiting on anymore
+                waiters.remove(l);
+            } finally {
+                lock.unlock();
+            }
+            //wake up any thread blocked in one of the get() methods, so that
+            //it can observe the cancellation instead of waiting forever
+            l.countDown();
+            return true;
         }
 
         @Override
@@ -454,7 +488,13 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
             if (item!=null) {
                 return item;
             } else if (latch!=null) {
+                if (canceled) {
+                    throw new CancellationException();
+                }
                 latch.await();
+                if (canceled) {
+                    throw new CancellationException();
+                }
                 return latch.getItem();
             } else {
                 throw new ExecutionException("ItemFuture incorrectly instantiated. Bug in the code?", new Exception());
@@ -466,8 +506,30 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
             if (item!=null) {
                 return item;
             } else if (latch!=null) {
+                if (canceled) {
+                    throw new CancellationException();
+                }
                 boolean timedout = !latch.await(timeout, unit);
+                if (canceled) {
+                    throw new CancellationException();
+                }
                 if (timedout) {
+                    //an abandoned timed-out waiter would otherwise keep
+                    //consuming offered items, so deregister it as well -
+                    //this mirrors what the timed poll() method does
+                    final ReentrantLock lock = FairBlockingQueue.this.lock;
+                    lock.lock();
+                    try {
+                        waiters.remove(latch);
+                    } finally {
+                        lock.unlock();
+                    }
+                    //an item may have been handed over concurrently with the
+                    //timeout; in that case it is delivered rather than lost
+                    T delivered = latch.getItem();
+                    if (delivered!=null) {
+                        return delivered;
+                    }
                     throw new TimeoutException();
                 } else {
                     return latch.getItem();
@@ -479,12 +541,12 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
 
         @Override
         public boolean isCancelled() {
-            return false;
+            return canceled;
         }
 
         @Override
         public boolean isDone() {
-            return (item!=null || latch.getItem()!=null);
+            return (item!=null || canceled || (latch!=null && latch.getItem()!=null));
         }
 
     }

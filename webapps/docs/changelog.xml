@@ -1117,6 +1117,22 @@
         missing configuration, and the documentation now states the
         requirement. (remm)
       </fix>
+      <fix>
+        Make the asynchronous poll of the JDBC pool's fair queue
+        cancellable. Cancelling the future returned by
+        <code>pollAsync()</code> was a no-op, so the waiter it had
+        registered stayed on the queue indefinitely and a later
+        <code>offer()</code> handed an item – in the pool, a returned
+        connection – to a future nobody was reading, losing it from the
+        pool. Cancellation now deregisters the waiter as long as the
+        item has not already been handed over, a cancelled future fails
+        its <code>get()</code> methods with
+        <code>CancellationException</code> instead of blocking forever,
+        and the pool's own connection future uses this to release its
+        queue waiter, only falling back to retrieving and closing an
+        already in-flight connection when the cancellation comes too
+        late. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

@@ -19,8 +19,11 @@ package org.apache.tomcat.jdbc.pool;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Assertions;
@@ -30,8 +33,9 @@ import org.junit.jupiter.api.Test;
  * Expected functionality of the idle-connection queue the pool uses when
  * the fair queue is enabled: unbounded offering, most-recently-used
  * hand-off, blocking retrieval with timeout, fairness towards the
- * longest waiting consumer, and the collection operations the queue
- * deliberately leaves unsupported.
+ * longest waiting consumer, deregistration of cancelled asynchronous
+ * polls, and the collection operations the queue deliberately leaves
+ * unsupported.
  */
 class TestFairBlockingQueue {
 
@@ -191,5 +195,105 @@ class TestFairBlockingQueue {
                 () -> queue.drainTo(new ArrayList<>()));
         Assertions.assertEquals(1, queue.size(),
                 "the unsupported operations must not mutate the queue");
+    }
+
+    @Test
+    void cancelledAsyncPollIsDeregistered() throws Exception {
+        FairBlockingQueue<String> queue = new FairBlockingQueue<>();
+        Future<String> future = queue.pollAsync();
+        Assertions.assertTrue(future.cancel(true),
+                "an async poll that has not received its element must be cancellable");
+        Assertions.assertFalse(future.cancel(true),
+                "a second cancel must report nothing cancelled");
+        Assertions.assertTrue(future.isCancelled());
+        Assertions.assertTrue(future.isDone());
+        Assertions.assertThrows(CancellationException.class, future::get);
+        // the cancelled waiter must not consume a subsequently offered element
+        Assertions.assertTrue(queue.offer("keep"));
+        Assertions.assertEquals(1, queue.size(),
+                "an element offered after the cancellation must stay in the queue");
+        Assertions.assertEquals("keep", queue.poll());
+    }
+
+    @Test
+    void cancelAfterDeliveryReturnsFalse() throws Exception {
+        FairBlockingQueue<String> queue = new FairBlockingQueue<>();
+        Future<String> future = queue.pollAsync();
+        Assertions.assertTrue(queue.offer("handed"),
+                "the element must be handed to the registered waiter");
+        Assertions.assertFalse(future.cancel(true),
+                "a future that already received its element must not be cancellable");
+        Assertions.assertFalse(future.isCancelled());
+        Assertions.assertTrue(future.isDone());
+        Assertions.assertEquals("handed", future.get(5, TimeUnit.SECONDS));
+        // the element belongs to the future, not to the queue
+        Assertions.assertEquals(0, queue.size());
+    }
+
+    @Test
+    void getIsReleasedWithCancellationWhenCancelledWhileBlocked() throws Exception {
+        final FairBlockingQueue<String> queue = new FairBlockingQueue<>();
+        final Future<String> future = queue.pollAsync();
+        final AtomicReference<Throwable> error = new AtomicReference<>();
+        final CountDownLatch started = new CountDownLatch(1);
+        final CountDownLatch done = new CountDownLatch(1);
+        Thread caller = new Thread(() -> {
+            started.countDown();
+            try {
+                future.get();
+            } catch (Throwable t) {
+                error.set(t);
+            } finally {
+                done.countDown();
+            }
+        });
+        caller.start();
+        Assertions.assertTrue(started.await(5, TimeUnit.SECONDS));
+        Thread.sleep(100); // let the caller block inside get()
+        Assertions.assertTrue(future.cancel(true));
+        Assertions.assertTrue(done.await(5, TimeUnit.SECONDS),
+                "cancellation must release a caller blocked in get()");
+        Assertions.assertTrue(error.get() instanceof CancellationException,
+                "a cancelled future must fail get() with CancellationException, got "
+                        + error.get());
+        caller.join(1000);
+    }
+
+    @Test
+    void cancelledWaiterDoesNotStealTheHandoffFromTheNextWaiter() throws Exception {
+        FairBlockingQueue<String> queue = new FairBlockingQueue<>();
+        Future<String> cancelled = queue.pollAsync(); // first in line
+        Future<String> active = queue.pollAsync();    // second in line
+        Assertions.assertTrue(cancelled.cancel(true));
+        Assertions.assertTrue(queue.offer("next"));
+        Assertions.assertEquals("next", active.get(5, TimeUnit.SECONDS),
+                "the element must go to the next waiter in line");
+        Assertions.assertEquals(0, queue.size());
+    }
+
+    @Test
+    void cancelOfImmediatelyCompletedAsyncPollReturnsFalse() throws Exception {
+        FairBlockingQueue<String> queue = new FairBlockingQueue<>();
+        queue.offer("item");
+        Future<String> future = queue.pollAsync(); // completes right away
+        Assertions.assertFalse(future.cancel(true),
+                "an already completed future must not be cancellable");
+        Assertions.assertTrue(future.isDone());
+        Assertions.assertFalse(future.isCancelled());
+        Assertions.assertEquals("item", future.get());
+        Assertions.assertEquals(0, queue.size());
+    }
+
+    @Test
+    void timedOutAsyncPollIsDeregistered() throws Exception {
+        FairBlockingQueue<String> queue = new FairBlockingQueue<>();
+        Future<String> future = queue.pollAsync();
+        Assertions.assertThrows(TimeoutException.class,
+                () -> future.get(200, TimeUnit.MILLISECONDS));
+        // the timed-out waiter must not consume a subsequently offered element
+        Assertions.assertTrue(queue.offer("keep"));
+        Assertions.assertEquals(1, queue.size(),
+                "an element offered after the timeout must stay in the queue");
+        Assertions.assertEquals("keep", queue.poll());
     }
 }
