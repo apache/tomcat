@@ -23,11 +23,15 @@ import java.sql.SQLException;
 import javax.sql.XAConnection;
 /**
  * A ProxyConnection object is the bottom most interceptor that wraps an object of type
- * {@link PooledConnection}. The ProxyConnection intercepts three methods:
+ * {@link PooledConnection}. The ProxyConnection intercepts, among the calls it forwards,
+ * the following methods:
  * <ul>
  *   <li>{@link java.sql.Connection#close()} - returns the connection to the pool. May be called multiple times.</li>
  *   <li>{@link java.lang.Object#toString()} - returns a custom string for this object</li>
  *   <li>{@link javax.sql.PooledConnection#getConnection()} - returns the underlying connection</li>
+ *   <li>{@link java.lang.Object#equals(Object)} and {@link java.lang.Object#hashCode()} -
+ *       answered with the identity of the connection handle, so that the {@code Object}
+ *       contract holds even when no facade sits in front of this interceptor</li>
  * </ul>
  * By default method comparisons is done on a String reference level, unless the {@link PoolConfiguration#setUseEquals(boolean)} has been called
  * with a <code>true</code> argument.
@@ -127,6 +131,21 @@ public class ProxyConnection extends JdbcInterceptor {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (compare(ISCLOSED_VAL,method)) {
             return Boolean.valueOf(isClosed());
+        }
+        if (compare(EQUALS_VAL,method)) {
+            // With the DisposableConnectionFacade switched off, Object methods
+            // reach this interceptor, and the XA branch below would dispatch
+            // them at a null XA connection (or at the XA connection of another
+            // borrower) instead of answering them. Object.equals must answer
+            // false rather than throw for a null or foreign argument, and it
+            // must stay answerable on a released handle, so the identity of
+            // the handle itself is what compares - mirroring the semantics of
+            // the facade when it is enabled.
+            Object other = (args == null || args.length == 0) ? null : args[0];
+            return Boolean.valueOf(proxy == other);
+        }
+        if (compare(HASHCODE_VAL,method)) {
+            return Integer.valueOf(System.identityHashCode(proxy));
         }
         if (compare(CLOSE_VAL,method)) {
             if (connection==null)
