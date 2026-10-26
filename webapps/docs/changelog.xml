@@ -781,6 +781,20 @@
         plain connections falsely did, with XA method calls on them failing
         with a NullPointerException. (remm)
       </fix>
+      <fix>
+        Correct a defect in the <code>ConnectionState</code> interceptor where
+        the configured connection defaults were restored while the previous
+        borrower's transaction was still open: the isolation level and the
+        read only state are transaction scoped on many drivers, so the
+        restore was refused or deferred and the previous borrower's state
+        reached the next borrower, and restoring auto-commit committed
+        whatever the previous borrower had left pending. The interceptor now
+        terminates the pending transaction before restoring the configured
+        state, and fails the borrow rather than handing out a connection it
+        cannot verify. Pools that configure no defaults, and borrows that
+        need no restore, keep the previous behaviour of leaving the
+        transaction untouched. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
