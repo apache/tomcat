@@ -1348,12 +1348,6 @@
     <Bug code="ES" />
   </Match>
   <Match>
-    <!-- Lock is released -->
-    <Class name="org.apache.tomcat.jdbc.pool.MultiLockFairBlockingQueue" />
-    <Method name="poll" />
-    <Bug code="UL" />
-  </Match>
-  <Match>
     <!-- SQL is from config so is considered safe -->
     <Class name="org.apache.tomcat.jdbc.pool.PooledConnection" />
     <Method name="validate" />

@@ -142,10 +142,9 @@ JUnit 5, three groups:
    because the baseline contains no defect tests; once defect
    processing starts, reproducers land alongside (or slightly
    before) their fix, so the suite stays green throughout.
-3. **Dead-code coverage.** `MultiLockFairBlockingQueue` is
-   unreachable through the pool (instantiation commented out, no
-   `lockCount` property); if it is kept, it needs direct unit tests
-   in the later phase — not in the functional baseline.
+3. **Dead-code coverage.** `MultiLockFairBlockingQueue` was removed
+   during defect processing (it was unreachable through the pool and
+   its design was unfinished), so it needs no direct unit tests.
 
 Layout: each test class is `Test*.java` and sits in the package of
 the code it tests - `org.apache.tomcat.jdbc.pool` (pool behaviour and
@@ -198,7 +197,7 @@ Fixture details worth knowing before writing a test against it
 | 7. `SlowQueryReportJmx notifyPool=false` drops notifications | 2 concurrent borrowers slow-querying, count JMX notifications == expected |
 | 8. `XADataSource` marker silently non-XA | `<Resource type=javax.sql.XADataSource>` with plain driver → expect fail-fast `SQLException`, not silent non-XA; real 2-phase commit/rollback with H2's XA resource |
 | 9. `GenericNamingResourcesFactory` silent null-set | JNDI-configured pool with unsupported setter type; assert property unchanged and warning logged |
-| 10. `MultiLockFairBlockingQueue` ×3 | direct unit tests: cross-stripe starvation, interrupt-ghost-waiter, empty `FairIterator` |
+| 10. `MultiLockFairBlockingQueue` ×3 | resolved by removing the class (dead, unfinished design) — no tests needed |
 
 Medium themes (interceptor `disconnected()` leak chain, async ghost
 waiters, `getDbProperties()` password exposure, MBean
