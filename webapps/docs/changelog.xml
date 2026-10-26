@@ -436,6 +436,13 @@
         Add TLS pre-shared key support to the OpenSSL FFM implementation.
         (markt)
       </add>
+      <fix>
+        <bug>70286</bug>: Strip the scipt tag in the
+        <code>AcceptLanguage2</code> parser, If the script subtag needs to be
+        preserved, use the standard parser by setting the system property
+        <code>org.apache.tomcat.util.http.parser.StandardAcceptLanguageParser</code>
+        to <code>true</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
