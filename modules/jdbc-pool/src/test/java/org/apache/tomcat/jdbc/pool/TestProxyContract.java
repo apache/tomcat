@@ -109,6 +109,34 @@ class TestProxyContract extends JdbcPoolBaseTest {
     }
 
     @Test
+    void equalsAgainstNullOrForeignObjectsIsFalseNotAnException()
+            throws Exception {
+        DataSource ds = newDataSource();
+        ds.createPool();
+
+        Connection pooled = ds.getConnection();
+        Assertions.assertFalse(pooled.equals(null),
+                "Object.equals(null) must answer false, not throw");
+        Assertions.assertFalse(pooled.equals("a foreign object"),
+                "equals against a non-proxy must answer false, not throw");
+        // a proxy that is not the pool's own passes the proxy guard but
+        // must still compare unequal - its handler is not this facade
+        Object foreignProxy = java.lang.reflect.Proxy.newProxyInstance(
+                getClass().getClassLoader(),
+                new Class<?>[] { Runnable.class },
+                (p, m, a) -> null);
+        Assertions.assertFalse(pooled.equals(foreignProxy),
+                "equals against a foreign dynamic proxy must answer false");
+        pooled.close();
+        // the equals branch runs ahead of the disposal guard, so the same
+        // contract must hold on a disposed facade too
+        Assertions.assertFalse(pooled.equals(null),
+                "a disposed facade must keep the equals(null) contract");
+        Assertions.assertFalse(pooled.equals("a foreign object"),
+                "a disposed facade must keep the equals(non-proxy) contract");
+    }
+
+    @Test
     void thePhysicalSessionStaysReachableThroughThePooledConnectionInterface()
             throws Exception {
         DataSource ds = newDataSource();
