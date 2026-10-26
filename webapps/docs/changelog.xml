@@ -810,6 +810,21 @@
         when the connection is returned regardless of the garbage
         collector. (remm)
       </fix>
+      <fix>
+        Remove the unfinished, experimental
+        <code>MultiLockFairBlockingQueue</code> class together with the
+        unreachable code that referenced it. The class was never
+        selectable - its instantiation in the pool was commented out and
+        no configuration property existed to enable it - while its
+        striped design kept items and waiting threads on unrelated
+        stripes, so enabling it as it stood could hang borrowers while
+        idle connections sat in another stripe, report the pool as
+        exhausted although it was not, lose a connection permanently
+        whenever a waiting thread was interrupted, and silently disable
+        the idle connection sweep because the queue's iterator was
+        always empty. Fair queueing remains available through
+        <code>FairBlockingQueue</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
