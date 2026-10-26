@@ -107,24 +107,54 @@ class TestJdbcInterceptorConfigParsing {
     }
 
     /*
-     * Some of these should probably be handled more cleanly by the parser, but a few known
-     * exception scenarios are presented here just to document current behavior.  In many cases
-     * failure in parsing will just be propagated to a definition that will fail later
-     * when instantiated.  Should we be failing faster (and with more detail)?
+     * Empty parenthesis lists are tolerated (they spell "no properties");
+     * a property segment without a '=' fails the parse with a named,
+     * locating exception instead of the raw StringIndexOutOfBoundsException
+     * the parser used to let substring(0,-1) produce. Other malformed
+     * shapes still pass the parser and fail later when instantiated.
      */
     @Test
-    void someMalformedConfigsFailAtParsingAndSomeOnlyLater() {
-        String[] exceptionInducingConfigs = {
-            "EmptyParmsInterceptor()",
-            "WhitespaceParmsInterceptor(   )"
+    void emptyParameterListIsTolerated() {
+        String[][] tolerated = {
+            { "EmptyParmsInterceptor()", "EmptyParmsInterceptor", "0" },
+            { "WhitespaceParmsInterceptor(   )", "WhitespaceParmsInterceptor", "0" },
+            { "RedundantCommaInterceptor(a=1,)", "RedundantCommaInterceptor", "1" },
+            { "LeadingCommaInterceptor(,a=1)", "LeadingCommaInterceptor", "1" },
+            { "MiddleCommaInterceptor(a=1,,b=2)", "MiddleCommaInterceptor", "2" },
+            { "WhitespaceSegmentInterceptor(a=1, ,b=2)", "WhitespaceSegmentInterceptor", "2" },
         };
-        for (String badConfig : exceptionInducingConfigs) {
+        for (String[] entry : tolerated) {
+            PoolProperties props = new PoolProperties();
+            props.setJdbcInterceptors(entry[0]);
+            InterceptorDefinition[] defs = props.getJdbcInterceptorsAsArray();
+            Assertions.assertEquals(entry[1], defs[1].getClassName(),
+                    entry[0] + " must parse as a named interceptor");
+            Assertions.assertEquals(Integer.parseInt(entry[2]),
+                    defs[1].getProperties().size(),
+                    entry[0] + " must keep only its real properties");
+        }
+    }
+
+    @Test
+    void propertySegmentWithoutEqualsFailsWithANamedException() {
+        String[] badConfigs = {
+            "MalformedParmsInterceptor(a=1,b)",
+            "MalformedParmsInterceptor(just-a-name)",
+        };
+        for (String badConfig : badConfigs) {
             PoolProperties props = new PoolProperties();
             props.setJdbcInterceptors(badConfig);
-            Assertions.assertThrows(Exception.class, props::getJdbcInterceptorsAsArray,
-                    "expected a failure for " + badConfig);
+            IllegalArgumentException thrown = Assertions.assertThrows(
+                    IllegalArgumentException.class, props::getJdbcInterceptorsAsArray,
+                    "expected a named failure for " + badConfig);
+            Assertions.assertTrue(thrown.getMessage().contains(badConfig),
+                    "the failure must name the configuration it came from, was: "
+                            + thrown.getMessage());
         }
+    }
 
+    @Test
+    void otherMalformedConfigsOnlyFailLater() {
         String[] noExceptionButInvalidConfigs = {
             "MalformedParmsInterceptor(=   )",
             "MalformedParmsInterceptor(  =)",
