@@ -103,8 +103,10 @@ class TestPoolEviction extends JdbcPoolBaseTest {
         }
 
         // past maxAge the connection is retired and a fresh one takes its
-        // place (sweeper and/or borrow-time check), keeping the pool size
-        sleep(3500); // ~2x maxAge plus sweeper interval
+        // place (sweeper and/or borrow-time check), keeping the pool size.
+        // The borrow itself runs the expiry check, so the wait only has to
+        // cross maxAge itself, not an extra sweeper cycle on top of it.
+        sleep(1800); // maxAge plus a margin for the elapsed-time check
         awaitSessions(1);
         try (Connection replacement = ds.getConnection()) {
             Assertions.assertNull(sessionMarker(replacement),

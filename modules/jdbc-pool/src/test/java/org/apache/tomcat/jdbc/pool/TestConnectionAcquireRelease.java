@@ -132,11 +132,8 @@ class TestConnectionAcquireRelease extends JdbcPoolBaseTest {
         final CountDownLatch done = new CountDownLatch(1);
         final AtomicReference<Throwable> failure = new AtomicReference<>();
         final AtomicInteger observedMarker = new AtomicInteger(-1);
-        final AtomicReference<Long> waitMillis = new AtomicReference<>();
         Thread waiter = new Thread(() -> {
-            long start = System.currentTimeMillis();
             try (Connection c = ds.getConnection()) {
-                waitMillis.set(Long.valueOf(System.currentTimeMillis() - start));
                 Integer marker = sessionMarker(c);
                 if (marker != null) {
                     observedMarker.set(marker.intValue());
@@ -149,15 +146,12 @@ class TestConnectionAcquireRelease extends JdbcPoolBaseTest {
         });
         waiter.start();
 
-        sleep(300); // let the waiter block on the exhausted pool
+        awaitUntil(() -> ds.getWaitCount() == 1); // the waiter is parked on the exhausted pool
         held.close();
 
         Assertions.assertTrue(done.await(10, java.util.concurrent.TimeUnit.SECONDS),
                 "waiter should have obtained a connection");
         Assertions.assertNull(failure.get());
-        Assertions.assertTrue(waitMillis.get().longValue() >= 200,
-                "waiter must actually have waited for the release, waited "
-                        + waitMillis.get() + " ms");
         Assertions.assertEquals(42, observedMarker.get(),
                 "waiter must have received the released physical session");
     }
