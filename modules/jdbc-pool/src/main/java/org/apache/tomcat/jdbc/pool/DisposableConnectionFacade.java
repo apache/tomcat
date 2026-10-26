@@ -25,8 +25,8 @@ import java.sql.SQLException;
  * object of type {@link PooledConnection}. The DisposableConnectionFacade intercepts
  * two methods:
  * <ul>
- *   <li>{@link java.sql.Connection#close()} - returns the connection to the
- *       pool then breaks the link between cutoff and the next interceptor.
+ *   <li>{@link java.sql.Connection#close()} - breaks the link between cutoff
+ *       and the next interceptor, then returns the connection to the pool.
  *       May be called multiple times.</li>
  *   <li>{@link java.lang.Object#toString()} - returns a custom string for this
  *       object</li>
@@ -82,6 +82,30 @@ public class DisposableConnectionFacade extends JdbcInterceptor {
             }
         }
 
+        if (compare(CLOSE_VAL, method)) {
+            // Dispose the facade before delegating close: the chain hands
+            // the physical connection back to the pool, where it can be
+            // re-borrowed and the shared interceptor chain re-armed before
+            // this call returns. Sealing only afterwards would leave a
+            // window in which new calls pass the disposed guard above and
+            // execute against the next borrower's connection, and a
+            // concurrent second close could drive the return a second time.
+            // Capture and seal are one atomic step under this facade's
+            // monitor so that of two concurrent closes exactly one observes
+            // a live link and delegates; the delegation itself runs outside
+            // the lock.
+            JdbcInterceptor next;
+            synchronized (this) {
+                next = getNext();
+                setNext(null);
+            }
+            if (next == null) {
+                // Already disposed by a concurrent close.
+                return null;
+            }
+            return next.invoke(proxy, method, args);
+        }
+
         try {
             return super.invoke(proxy, method, args);
         } catch (NullPointerException e) {
@@ -94,10 +118,6 @@ public class DisposableConnectionFacade extends JdbcInterceptor {
             }
 
             throw e;
-        } finally {
-            if (compare(CLOSE_VAL, method)) {
-                setNext(null);
-            }
         }
     }
 }
