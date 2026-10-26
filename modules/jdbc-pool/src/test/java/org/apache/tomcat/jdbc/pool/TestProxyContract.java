@@ -34,10 +34,10 @@ import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
  * for the callers that need it.
  *
  * <p>Scenario harvested from the retired legacy classes
- * {@code MultipleCloseTest} and {@code EqualsHashCodeTest}. Note that
- * the pool's own {@code equals}/{@code hashCode} handling <em>below</em>
- * the facade (with {@code useDisposableConnectionFacade=false}) is not
- * covered here on purpose - see TESTING-PLAN.md.</p>
+ * {@code MultipleCloseTest} and {@code EqualsHashCodeTest}. The pool's own
+ * {@code equals}/{@code hashCode} handling <em>below</em> the facade (with
+ * {@code useDisposableConnectionFacade=false}) is pinned separately in
+ * {@link TestFacadelessProxyIdentity}.</p>
  */
 class TestProxyContract extends JdbcPoolBaseTest {
 
