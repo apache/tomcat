@@ -249,7 +249,16 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
                 //reporting it would replace the exception that the
                 //application is expecting with a reporting failure
                 if (process) {
-                    reportFailedQuery(query,args,name,start,t);
+                    try {
+                        reportFailedQuery(query,args,name,start,t);
+                    }catch (Throwable reporting) {
+                        //reporting must never disturb the application -
+                        //the driver's exception is the one being thrown
+                        if (log.isWarnEnabled()) {
+                            log.warn("Unable to process failed query for "
+                                    + AbstractQueryReport.this.getClass().getName(),reporting);
+                        }
+                    }
                 }
                 if (t instanceof InvocationTargetException
                         && t.getCause() != null) {
@@ -265,13 +274,22 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
                 try {
                     //report the slow query
                     reportSlowQuery(query, args, name, start, delta);
-                }catch (Exception t) {
+                }catch (Throwable t) {
                     if (log.isWarnEnabled()) {
-                        log.warn("Unable to process slow query",t);
+                        log.warn("Unable to process slow query for "
+                                + AbstractQueryReport.this.getClass().getName(),t);
                     }
                 }
             } else if (process) {
-                reportQuery(query, args, name, start, delta);
+                try {
+                    reportQuery(query, args, name, start, delta);
+                }catch (Throwable t) {
+                    //reporting must never disturb the application
+                    if (log.isWarnEnabled()) {
+                        log.warn("Unable to process query report for "
+                                + AbstractQueryReport.this.getClass().getName(),t);
+                    }
+                }
             }
             //perform close cleanup
             if (close) {
