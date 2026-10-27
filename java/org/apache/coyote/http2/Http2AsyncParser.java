@@ -127,7 +127,7 @@ class Http2AsyncParser extends Http2Parser {
                  * Use the error code of the HTTP/2 error, if there is one, so that the client is told why the
                  * connection is being closed.
                  */
-                upgradeHandler.closeConnection(error instanceof Http2Exception http2Exception ? http2Exception :
+                upgradeHandler.closeConnection(error instanceof Http2Exception ? (Http2Exception) error :
                         new ConnectionException(error.getMessage(), Http2Error.PROTOCOL_ERROR, error));
             }
             // Continue reading frames
