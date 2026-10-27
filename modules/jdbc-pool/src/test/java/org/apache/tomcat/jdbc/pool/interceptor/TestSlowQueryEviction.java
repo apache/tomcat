@@ -17,6 +17,8 @@
 package org.apache.tomcat.jdbc.pool.interceptor;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
@@ -24,6 +26,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.management.openmbean.CompositeData;
+import javax.management.openmbean.CompositeType;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -179,5 +184,97 @@ class TestSlowQueryEviction extends JdbcPoolBaseTest {
         Assertions.assertTrue(size <= 16 + threads,
                 "the map must stay near its configured capacity, was " + size);
         Assertions.assertTrue(size > 0, "the map must still hold statistics, was " + size);
+    }
+
+    /*
+     * Prepared-but-never-executed statements are ordinary users of a
+     * statistics slot: the statement cache throws them out un-executed and
+     * applications prepare literals and discard them. They must therefore
+     * age like any other entry. Because preparation used to leave
+     * lastInvocation at zero - which the comparator treats as the newest
+     * possible invocation - it was picked for eviction last, so a churn of
+     * distinct prepared SQL pushed the real, executed queries out of the
+     * report instead of itself.
+     */
+    @Test
+    void prepareOnlyChurnDoesNotEvictTheExecutedQueries() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setJdbcInterceptors(
+                "org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport"
+                        + "(maxQueries=5)");
+        ds.createPool();
+        String poolName = ds.getPoolProperties().getPoolName();
+
+        int prepared = 20;
+        int executed = 5;
+        try (Connection c = ds.getConnection()) {
+            for (int i = 0; i < prepared; i++) {
+                try (PreparedStatement ps = c.prepareStatement(
+                        "SELECT 1 /* prepare-only " + i + " */")) {
+                    // never executed, the statement is simply discarded
+                }
+            }
+            ConcurrentHashMap<String,QueryStats> stats =
+                    SlowQueryReport.getPoolStats(poolName);
+            Assertions.assertTrue(stats.keySet().stream()
+                            .anyMatch(sql -> sql.contains("prepare-only")),
+                    "the prepared statements must have been registered");
+
+            // The two phases are ordered by real time, and the timestamps
+            // are millisecond-resolution, so the executed queries must start
+            // measurably after the last preparation for the eviction order
+            // below to be strict rather than decided by a comparator tie.
+            // Wait for the clock to pass the deadline rather than trusting a
+            // fixed sleep: every preparation timestamp was taken before it.
+            long prepareDeadline = System.currentTimeMillis();
+            while (System.currentTimeMillis() <= prepareDeadline) {
+                Thread.sleep(1);
+            }
+
+            for (int i = 0; i < executed; i++) {
+                try (Statement st = c.createStatement()) {
+                    st.execute("SELECT 1 /* executed " + i + " */");
+                }
+            }
+        }
+
+        ConcurrentHashMap<String,QueryStats> stats =
+                SlowQueryReport.getPoolStats(poolName);
+        for (int i = 0; i < executed; i++) {
+            Assertions.assertTrue(
+                    stats.containsKey("SELECT 1 /* executed " + i + " */"),
+                    "an executed query must outlive a churn of prepared-only "
+                            + "statements, but SELECT 1 /* executed " + i
+                            + " */ was evicted; the map held " + stats.keySet());
+        }
+        Assertions.assertTrue(
+                stats.keySet().stream().noneMatch(sql -> sql.contains("prepare-only")),
+                "prepared-only entries are the oldest activity in the map and "
+                        + "must be evicted first, but the map held "
+                        + stats.keySet());
+    }
+
+    /*
+     * Preparation is activity on the entry, so it must be what the entry is
+     * aged by: the last invocation time the eviction orders on has to
+     * reflect it, and the statistics the reporting MBean publishes have to
+     * show it.
+     */
+    @Test
+    void preparingAQueryUpdatesItsLastInvocationTime() throws Exception {
+        QueryStats stats = new QueryStats("SELECT 1 /* prepared only */");
+        long before = System.currentTimeMillis();
+        stats.prepare(3);
+        long after = System.currentTimeMillis();
+
+        CompositeType type = new CompositeType("QueryStats", "QueryStats",
+                QueryStats.getFieldNames(), QueryStats.getFieldDescriptions(),
+                QueryStats.getFieldTypes());
+        CompositeData data = stats.getCompositeData(type);
+        long lastInvocation = ((Number) data.get("lastInvocation")).longValue();
+
+        Assertions.assertTrue(lastInvocation >= before && lastInvocation <= after,
+                "preparing a query must record when it happened, was "
+                        + lastInvocation);
     }
 }
