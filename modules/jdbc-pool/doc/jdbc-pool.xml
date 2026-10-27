@@ -671,6 +671,13 @@
        the same pool. Once the count reaches <code>max</code>, subsequent
        statements are not returned to the cache and are closed immediately.
     </p>
+    <p><strong>Note:</strong> a cache hit is answered by this interceptor without
+       invoking the rest of the interceptor chain, and recycled statements are reset to
+       driver defaults. Interceptors listed <em>after</em> the cache in
+       <code>jdbcInterceptors</code> do not see reused statements &#8211; for example,
+       <code>QueryTimeoutInterceptor</code> must be listed <em>before</em> the cache to keep
+       its timeout on cached statements.
+    </p>
     <attributes>
       <attribute name="prepared" required="false">
         <p>(boolean as String) Enable caching of <code>PreparedStatement</code>
@@ -702,6 +709,13 @@
   <subsection name="org.apache.tomcat.jdbc.pool.interceptor.QueryTimeoutInterceptor">
     <p>Automatically calls <code>java.sql.Statement.setQueryTimeout(seconds)</code> when a new statement is created.
        The pool itself doesn't timeout the query, it is still up to the JDBC driver to enforce query timeouts.
+    </p>
+    <p><strong>Note:</strong> when combined with
+       <code>org.apache.tomcat.jdbc.pool.interceptor.StatementCache</code>, this interceptor must be listed
+       <em>before</em> the statement cache in the <code>jdbcInterceptors</code> attribute. The cache serves a hit
+       without invoking the rest of the interceptor chain and recycles statements with their query timeout reset
+       to zero, so an interceptor listed after the cache does not see cached statements on reuse and those
+       statements execute with no timeout.
     </p>
     <attributes>
       <attribute name="queryTimeout" required="true">

@@ -344,6 +344,15 @@ the working list.
   instead of the handle), the cache outliving a `reconnect()` whose
   purge hook was skipped, and the pool-wide `cacheSize` counter skewing
   when caching races `disconnected()`.
+* `TestQueryTimeoutWithStatementCache` (2) pins the ordering dependency
+  between the two: with `StatementCache` listed first, a cache hit skips
+  the rest of the chain and the next borrower of the same SQL gets the
+  timeout the *first* borrower configured or `0` after a recycle reset,
+  not the one it configured - that case is pinned as the documented
+  limitation, with the reset itself pinned first because H2 reports the
+  session-wide value; the supported order (`StatementCache` last) is
+  pinned to keep the configured timeout across a cache hit. Both are
+  javadoc/wording fixes in the shipped code, not behaviour changes.
 * `build.xml` (the Ant release build of this module) still has a
   `build-test` target that compiles `src/test/java` against a JUnit 4 +
   `tomcat-dbcp` + c3p0/derby/mysql classpath it downloads, and ships
