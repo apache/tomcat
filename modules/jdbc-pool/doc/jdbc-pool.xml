@@ -577,7 +577,8 @@
          called on the closed statements if any statement proxy is set.
          A wrapped statement also reports the pooled connection it was created
          from when <code>Statement.getConnection()</code> is called, rather than
-         the driver's own connection.
+         the driver's own connection, and stops working, along with the result
+         sets read from it, once that connection has been returned to the pool.
          Default value is <code>true</code>.
       </p>
     </attribute>
