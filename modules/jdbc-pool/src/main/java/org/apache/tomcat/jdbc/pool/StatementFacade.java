@@ -39,6 +39,14 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
     private static final Log logger = LogFactory.getLog(StatementFacade.class);
 
     /**
+     * Whether the borrow this facade was created for has ended. The pool
+     * creates one facade per borrow, so this says when every handle this
+     * instance handed out stopped belonging to a connection the application
+     * still holds.
+     */
+    private volatile boolean borrowEnded = false;
+
+    /**
      * Constructs a StatementFacade.
      * @param interceptor the next interceptor in the chain
      */
@@ -47,9 +55,17 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
         setNext(interceptor);
     }
 
+    /**
+     * Marks the borrow as ended, which closes every statement and result set
+     * handle this facade handed out. Called before the connection is handed
+     * back, so a handle cannot outlive the borrow and end up driving the
+     * session of the next borrower. A borrow that is abandoned instead never
+     * runs this method, but the pool destroys an abandoned session rather
+     * than lending it again, so those handles only fail at the driver.
+     */
     @Override
     public void closeInvoked() {
-        // nothing to do
+        borrowEnded = true;
     }
 
     /**
@@ -135,18 +151,27 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
             if (compare(HASHCODE_VAL, method)) {
                 return Integer.valueOf(this.hashCode());
             }
+            // Read the state once: whether the borrow has ended must not
+            // change while the call is being answered.
+            boolean ended = borrowEnded;
             if (compare(CLOSE_VAL, method)) {
-                if (delegate == null) {
+                if (delegate == null || ended) {
                     return null;
                 }
             }
             if (compare(ISCLOSED_VAL, method)) {
-                if (delegate == null) {
+                if (delegate == null || ended) {
                     return Boolean.TRUE;
                 }
             }
             if (delegate == null) {
                 throw new SQLException("Statement closed.");
+            }
+            if (ended) {
+                // The delegate is still open, but it is open on a session
+                // that belongs to the next borrower now.
+                throw new SQLException("Statement closed. The pooled connection this "
+                        + "statement was created from has been returned to the pool.");
             }
             // The connection a statement reports is the pooled handle the
             // application created it from, not the driver's own connection.
@@ -248,18 +273,27 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
             if (compare(HASHCODE_VAL, method)) {
                 return Integer.valueOf(this.hashCode());
             }
+            // Read the state once: whether the borrow has ended must not
+            // change while the call is being answered.
+            boolean ended = borrowEnded;
             if (compare(CLOSE_VAL, method)) {
-                if (delegate == null) {
+                if (delegate == null || ended) {
                     return null;
                 }
             }
             if (compare(ISCLOSED_VAL, method)) {
-                if (delegate == null) {
+                if (delegate == null || ended) {
                     return Boolean.TRUE;
                 }
             }
             if (delegate == null) {
                 throw new SQLException("ResultSet closed.");
+            }
+            if (ended) {
+                // The cursor is still open, but it is open on a session that
+                // belongs to the next borrower now.
+                throw new SQLException("ResultSet closed. The pooled connection this "
+                        + "result set was read from has been returned to the pool.");
             }
 
             if (compare(GET_STATEMENT, method)) {
