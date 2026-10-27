@@ -207,6 +207,16 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
          */
         protected T delegate;
         private Object actualProxy;
+        /**
+         * The connection handle of the borrow during which this proxy was
+         * created, bound through {@link #setConnection(Object)}. It is a
+         * creation-time snapshot, not a live view: once that borrow is
+         * returned the handle answers nothing. A component that lets a
+         * statement proxy outlive its borrow - {@link StatementCache}
+         * recycling a parked statement, for instance - must therefore
+         * re-bind the handle to the new borrower before handing the proxy
+         * out; see {@link StatementCache#invoke(Object, Method, Object[])}.
+         */
         private Object connection;
         private String sql;
         private Constructor<?> constructor;
@@ -237,14 +247,31 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
         }
 
         /**
-         * Sets the connection proxy.
+         * Binds the connection handle that {@link #getConnection()} will
+         * report for this statement. {@code createDecorator} binds the
+         * handle of the borrow that creates the statement, and
+         * {@link StatementCache} seeds the closing borrow's handle when it
+         * parks a statement; the binding is kept as a snapshot and is
+         * never refreshed on its own. A handle kept past its borrow is
+         * inert by design, so anything reusing a statement proxy across
+         * borrows must call this method with the new borrower's handle
+         * before the proxy is handed out, as {@link StatementCache} does
+         * on a cache hit.
+         *
          * @param proxy the connection proxy
          */
         public void setConnection(Object proxy) {
             this.connection = proxy;
         }
         /**
-         * Returns the connection proxy.
+         * Returns the connection proxy most recently bound through
+         * {@link #setConnection(Object)}. While that binding's borrow is
+         * current it is a live handle; a statement kept past its borrow
+         * answers with the disposed facade it came from. Once the
+         * statement is closed the handler refuses the call before it
+         * reaches the snapshot, so a stale binding is only visible
+         * through diagnostics such as {@link #toString()}.
+         *
          * @return the connection proxy
          */
         public Object getConnection() {
@@ -328,6 +355,10 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
                 throw new SQLException("Statement closed.");
             }
             if (compare(GETCONNECTION_VAL,method)){
+                // the handle of the current borrow, as bound by
+                // setConnection; a proxy kept past its borrow gets the
+                // inert handle it came from, and a closed one has already
+                // thrown above
                 return connection;
             }
             boolean process = false;
