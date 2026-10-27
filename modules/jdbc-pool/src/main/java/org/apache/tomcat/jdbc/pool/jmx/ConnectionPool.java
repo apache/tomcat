@@ -168,38 +168,8 @@ public class ConnectionPool extends NotificationBroadcasterSupport
     //=================================================================
     //       NOTIFICATION INFO
     //=================================================================
-    /**
-     * Notification type sent when pool initialization fails.
-     */
-    public static final String NOTIFY_INIT = "INIT FAILED";
-    /**
-     * Notification type sent when a connection cannot be established.
-     */
-    public static final String NOTIFY_CONNECT = "CONNECTION FAILED";
-    /**
-     * Notification type sent when a connection is abandoned.
-     */
-    public static final String NOTIFY_ABANDON = "CONNECTION ABANDONED";
-    /**
-     * Notification type sent when a slow query is detected.
-     */
-    public static final String SLOW_QUERY_NOTIFICATION = "SLOW QUERY";
-    /**
-     * Notification type sent when a query fails.
-     */
-    public static final String FAILED_QUERY_NOTIFICATION = "FAILED QUERY";
-    /**
-     * Notification type sent when a connection is suspected of being abandoned.
-     */
-    public static final String SUSPECT_ABANDONED_NOTIFICATION = "SUSPECT CONNECTION ABANDONED";
-    /**
-     * Notification type sent when the pool is empty and no connections are available.
-     */
-    public static final String POOL_EMPTY = "POOL EMPTY";
-    /**
-     * Notification type sent when a previously suspect connection is returned to the pool.
-     */
-    public static final String SUSPECT_RETURNED_NOTIFICATION = "SUSPECT CONNECTION RETURNED";
+    // The notification types this MBean sends are declared as constants on
+    // the ConnectionPoolMBean interface, under POOL NOTIFICATIONS.
 
     @Override
     public MBeanNotificationInfo[] getNotificationInfo() {

@@ -955,6 +955,18 @@
         only, and no longer depends on whether a locally registered
         listener threw. (remm)
       </fix>
+      <fix>
+        The notification types that the connection pool MBean sends are now
+        declared as constants on the <code>ConnectionPoolMBean</code>
+        interface, the client-facing type for pool management. The types
+        were already discoverable as runtime metadata of the registered
+        MBean, but the interface that a JMX client compiles its listener
+        and notification filter against declared none of them, so client
+        code had to hardcode the type strings or compile against the
+        implementation class. The implementation now inherits the
+        constants from the interface; the notification types and the
+        strings they carry on the wire are unchanged. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
