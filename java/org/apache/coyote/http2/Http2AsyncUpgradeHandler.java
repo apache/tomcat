@@ -312,6 +312,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
             if (!localSettings.ack()) {
                 // Ack was unexpected
                 log.warn(sm.getString("upgradeHandler.unexpectedAck", connectionId, getIdAsString()));
+                increaseOverheadCount(FrameType.SETTINGS);
             }
         } else {
             socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(), TimeUnit.MILLISECONDS, null,

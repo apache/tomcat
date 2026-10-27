@@ -1933,6 +1933,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             if (!localSettings.ack()) {
                 // Ack was unexpected
                 log.warn(sm.getString("upgradeHandler.unexpectedAck", connectionId, getIdAsString()));
+                increaseOverheadCount(FrameType.SETTINGS);
             }
         } else {
             socketWrapper.getLock().lock();
