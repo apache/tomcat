@@ -624,8 +624,8 @@ public interface PoolConfiguration {
      * These interceptors will be inserted as an interceptor into the chain of operations on a java.sql.Connection object.
      * Example interceptors are {@link org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer StatementFinalizer} to close all
      * used statements during the session.
-     * {@link org.apache.tomcat.jdbc.pool.interceptor.ResetAbandonedTimer ResetAbandonedTimer} resets the timer upon every operation
-     * on the connection or a statement.
+     * {@link org.apache.tomcat.jdbc.pool.interceptor.ResetAbandonedTimer ResetAbandonedTimer} resets the timer upon any activity
+     * on the connection, upon any statement execution and upon any read of a result set, whether the operation succeeded or failed.
      * {@link org.apache.tomcat.jdbc.pool.interceptor.ConnectionState ConnectionState} caches the auto commit, read only and catalog settings to avoid round trips to the DB.
      * The default value is null.
      * @return the interceptors that are used for connections.
@@ -638,8 +638,8 @@ public interface PoolConfiguration {
      * These interceptors will be inserted as an interceptor into the chain of operations on a java.sql.Connection object.
      * Example interceptors are {@link org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer StatementFinalizer} to close all
      * used statements during the session.
-     * {@link org.apache.tomcat.jdbc.pool.interceptor.ResetAbandonedTimer ResetAbandonedTimer} resets the timer upon every operation
-     * on the connection or a statement.
+     * {@link org.apache.tomcat.jdbc.pool.interceptor.ResetAbandonedTimer ResetAbandonedTimer} resets the timer upon any activity
+     * on the connection, upon any statement execution and upon any read of a result set, whether the operation succeeded or failed.
      * {@link org.apache.tomcat.jdbc.pool.interceptor.ConnectionState ConnectionState} caches the auto commit, read only and catalog settings to avoid round trips to the DB.
      * The default value is null.
      * @param jdbcInterceptors the interceptors that are used for connections.

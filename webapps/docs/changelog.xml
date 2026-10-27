@@ -895,6 +895,21 @@
         calls drove – the connection a later borrower was still using.
         (remm)
       </fix>
+      <fix>
+        Keep the abandoned timer alive while a pooled connection is
+        streaming a result set. The <code>ResetAbandonedTimer</code>
+        interceptor only reset the timer while a statement was executing,
+        so a borrower that left a cursor open across a long pause - the
+        usual reason for configuring a fetch size - appeared idle, and a
+        connection that was actively streaming could be reported as
+        abandoned and reclaimed from underneath its borrower. Statement
+        creation and result-set access through a pooled connection now
+        also reset the timer, so the abandoned check only reports a
+        connection that is genuinely making no progress. The
+        <code>jdbcInterceptors</code> documentation, which listed only
+        three of the interceptors bundled with the pool, has been
+        corrected. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
