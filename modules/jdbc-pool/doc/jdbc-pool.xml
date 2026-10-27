@@ -575,6 +575,9 @@
       <p>(boolean) Set this to true if you wish to wrap statements in order to
          enable <code>equals()</code> and <code>hashCode()</code> methods to be
          called on the closed statements if any statement proxy is set.
+         A wrapped statement also reports the pooled connection it was created
+         from when <code>Statement.getConnection()</code> is called, rather than
+         the driver's own connection.
          Default value is <code>true</code>.
       </p>
     </attribute>

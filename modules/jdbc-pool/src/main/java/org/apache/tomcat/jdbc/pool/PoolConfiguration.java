@@ -924,7 +924,9 @@ public interface PoolConfiguration {
 
     /**
      * Set this to true if you wish to wrap statements in order to enable equals() and hashCode()
-     * methods to be called on the closed statements if any statement proxy is set.
+     * methods to be called on the closed statements if any statement proxy is set. A wrapped
+     * statement also reports the pooled connection it was created from rather than the driver's
+     * own connection.
      * @param useStatementFacade set to <code>true</code> to wrap statements
      */
     void setUseStatementFacade(boolean useStatementFacade);
@@ -932,7 +934,8 @@ public interface PoolConfiguration {
     /**
      * Returns <code>true</code> if this connection pool is configured to wrap statements in order
      * to enable equals() and hashCode() methods to be called on the closed statements if any
-     * statement proxy is set.
+     * statement proxy is set. A wrapped statement also reports the pooled connection it was
+     * created from rather than the driver's own connection.
      * @return <code>true</code> if the statements are wrapped
      */
     boolean getUseStatementFacade();
