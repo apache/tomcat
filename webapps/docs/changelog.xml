@@ -282,6 +282,16 @@
         same last two digits. Based on pull request <pr>1104</pr> by Arturo
         Bernal. (markt)
       </fix>
+      <fix>
+        Validate that applications calling
+        <code>HttpServletRequest.upgrade</code> are also setting the
+        <code>upgrade</code> header on the response. Attempted upgrades without
+        this header will now fail. (markt)
+      </fix>
+      <fix>
+        Ensure that requests cannot try to start asynchronous processing and the
+        HTTP upgrade process on the same request. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -428,6 +428,11 @@ public class Request implements HttpServletRequest {
      */
     protected Boolean asyncSupported = null;
 
+    /**
+     * Has HttpServletRequest.upgrade() been called for this request?
+     */
+    private boolean upgradeRequested = false;
+
     private HttpServletRequest applicationRequest = null;
 
     /**
@@ -562,6 +567,7 @@ public class Request implements HttpServletRequest {
         }
 
         asyncSupported = null;
+        upgradeRequested = false;
         if (asyncContext != null) {
             asyncContext.recycle();
             asyncContext = null;
@@ -1591,6 +1597,10 @@ public class Request implements HttpServletRequest {
             throw ise;
         }
 
+        if (upgradeRequested) {
+            throw new IllegalStateException(sm.getString("coyoteRequest.asyncAfterUpgrade"));
+        }
+
         if (asyncContext == null) {
             asyncContext = new AsyncContextImpl(this);
         }
@@ -1916,6 +1926,13 @@ public class Request implements HttpServletRequest {
     @Override
     public <T extends HttpUpgradeHandler> T upgrade(Class<T> httpUpgradeHandlerClass)
             throws IOException, ServletException {
+        if (isAsyncStarted()) {
+            throw new IllegalStateException(sm.getString("coyoteRequest.upgradeAfterAsync"));
+        }
+        if (response.isCommitted()) {
+            throw new IllegalStateException(sm.getString("coyoteRequest.upgradeAfterCommit"));
+        }
+
         T handler;
         InstanceManager instanceManager = null;
         try {
@@ -1934,6 +1951,7 @@ public class Request implements HttpServletRequest {
                 getUpgradeProtocolName(httpUpgradeHandlerClass));
 
         coyoteRequest.action(ActionCode.UPGRADE, upgradeToken);
+        upgradeRequested = true;
 
         // Output required by RFC2616. Protocol specific headers should have
         // already been set.
@@ -1958,9 +1976,15 @@ public class Request implements HttpServletRequest {
         }
 
         if (result == null) {
-            // Ugly but use the class name - it is better than nothing
+            /*
+             * Use the class name temporarily. It will be replaced at the end of Servlet.service() by the upgrade header
+             * field value.
+             */
             result = httpUpgradeHandlerClass.getName();
+        } else {
+            result = result.trim();
         }
+
         return result;
     }
 
