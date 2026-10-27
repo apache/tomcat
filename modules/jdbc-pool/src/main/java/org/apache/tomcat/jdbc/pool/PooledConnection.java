@@ -850,7 +850,7 @@ public class PooledConnection implements PooledConnectionMBean {
 
     /**
      * Locks the connection only if either {@link PoolConfiguration#isPoolSweeperEnabled()} or
-     * {@link PoolConfiguration#getUseLock()} return true. The per connection lock ensures thread safety is
+     * {@link PoolConfiguration#getUseLock()} return true. The per connection lock ensures thread safety if
      * multiple threads are performing operations on the connection.
      * Otherwise this is a noop for performance
      */
@@ -862,12 +862,18 @@ public class PooledConnection implements PooledConnectionMBean {
     }
 
     /**
-     * Unlocks the connection only if the sweeper is enabled
-     * Otherwise this is a noop for performance
+     * Unlocks the connection if, and only if, this thread currently holds
+     * the lock. The release decision is based on the lock state rather than
+     * on the configuration that {@link #lock()} consulted, because that
+     * configuration is mutable (it can be changed at runtime through JMX)
+     * and may differ between the two calls: deciding by configuration would
+     * either leave the lock write-locked forever (enabled at lock() time,
+     * disabled at unlock() time) or throw IllegalMonitorStateException
+     * (disabled at lock() time, enabled at unlock() time).
      */
     public void unlock() {
-        if (poolProperties.getUseLock() || this.poolProperties.isPoolSweeperEnabled()) {
-          //optimized, only use a lock when there is concurrency
+        if (lock.isWriteLockedByCurrentThread()) {
+            //release only what this thread actually acquired
             lock.writeLock().unlock();
         }
     }
