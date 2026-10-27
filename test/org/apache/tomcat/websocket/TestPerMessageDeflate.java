@@ -781,6 +781,44 @@ public class TestPerMessageDeflate {
     }
 
 
+    /*
+     * RFC 7692 section 7.1: the no_context_takeover parameters have no value and the max_window_bits parameters have a
+     * decimal integer value without leading zeroes (1*DIGIT). Section 7.1 requires an offer that contains a parameter
+     * with an invalid value to be declined. The values used for the window bits are all 15, which is accepted when it
+     * is written as specified, so the offer is only declined because of how the value is written.
+     */
+    @Test
+    public void testInvalidParameterValueDeclinesOffer() {
+        assertDeclined("server_no_context_takeover", "1");
+        assertDeclined("client_no_context_takeover", "1");
+        assertDeclined("server_max_window_bits", "015");
+        assertDeclined("server_max_window_bits", "+15");
+        assertDeclined("client_max_window_bits", "015");
+        assertDeclined("client_max_window_bits", "+15");
+        assertDeclined("client_max_window_bits", "");
+    }
+
+
+    @Test
+    public void testValidParameterValueAcceptsOffer() {
+        assertAccepted("server_no_context_takeover", null);
+        assertAccepted("client_no_context_takeover", null);
+        assertAccepted("server_max_window_bits", "15");
+        assertAccepted("client_max_window_bits", "15");
+        assertAccepted("client_max_window_bits", null);
+    }
+
+
+    private static void assertAccepted(String name, String value) {
+        List<Parameter> parameters = new ArrayList<>();
+        parameters.add(new WsExtensionParameter(name, value));
+        List<List<Parameter>> preferences = new ArrayList<>();
+        preferences.add(parameters);
+
+        Assert.assertNotNull(name + "=" + value, PerMessageDeflate.build(preferences, true));
+    }
+
+
     private static void assertDeclined(String name, String value) {
         List<Parameter> parameters = new ArrayList<>();
         parameters.add(new WsExtensionParameter(name, value));
