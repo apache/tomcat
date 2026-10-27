@@ -76,7 +76,7 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
                 // do nothing
                 return statement;
             }
-            return constructor.newInstance(new Object[] { new StatementProxy(statement, sql) });
+            return constructor.newInstance(new Object[] { new StatementProxy(statement, sql, proxy) });
         } catch (Exception x) {
             logger.warn("Unable to create statement proxy.", x);
         }
@@ -99,15 +99,26 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
          * The SQL query text.
          */
         protected final String query;
+        /**
+         * The pooled connection the statement was created from, as reported
+         * by {@link java.sql.Statement#getConnection()}. It is the handle the
+         * application borrowed, so it stops working once that borrow has been
+         * returned, while the driver's own connection would have gone on
+         * serving whoever borrowed the connection next.
+         */
+        protected final Object connection;
 
         /**
          * Constructs a StatementProxy.
          * @param parent the parent statement
          * @param query the SQL query text
+         * @param connection the pooled connection the statement was created
+         *                   from
          */
-        public StatementProxy(Object parent, String query) {
+        public StatementProxy(Object parent, String query, Object connection) {
             this.delegate = parent;
             this.query = query;
+            this.connection = connection;
         }
 
         @Override
@@ -136,6 +147,15 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
             }
             if (delegate == null) {
                 throw new SQLException("Statement closed.");
+            }
+            // The connection a statement reports is the pooled handle the
+            // application created it from, not the driver's own connection.
+            // Forwarding the call instead hands the application a handle on
+            // the physical session: it survives the borrow it came from and
+            // bypasses every interceptor, so statements made through it
+            // escape the close-on-return tracking and any statement cache.
+            if (compare(GETCONNECTION_VAL, method)) {
+                return connection;
             }
 
             Object result;
