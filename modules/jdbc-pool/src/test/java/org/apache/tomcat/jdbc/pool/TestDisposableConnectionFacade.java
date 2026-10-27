@@ -123,9 +123,9 @@ class TestDisposableConnectionFacade {
 
             // From this point on nothing may pass through the facade: the
             // physical connection is the pool's to hand out again.
-            Assertions.assertEquals(Boolean.TRUE, proxy.isClosed(),
+            Assertions.assertEquals(Boolean.TRUE, Boolean.valueOf(proxy.isClosed()),
                     "the facade must report closed while the close is still in flight");
-            Assertions.assertEquals(Boolean.FALSE, proxy.isValid(0),
+            Assertions.assertEquals(Boolean.FALSE, Boolean.valueOf(proxy.isValid(0)),
                     "the facade must report invalid while the close is still in flight");
             Assertions.assertThrows(SQLException.class, proxy::getAutoCommit,
                     "post-return calls must be rejected instead of reaching the chain");

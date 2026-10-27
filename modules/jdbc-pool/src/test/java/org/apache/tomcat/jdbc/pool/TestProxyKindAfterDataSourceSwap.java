@@ -42,8 +42,6 @@ class TestProxyKindAfterDataSourceSwap extends JdbcPoolBaseTest {
     /* A plain, non-XA javax.sql.DataSource for H2. */
     private static final class PlainDataSource implements javax.sql.DataSource {
 
-        private static final long serialVersionUID = 1L;
-
         private final String url;
 
         PlainDataSource(String url) {
