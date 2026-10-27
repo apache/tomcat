@@ -851,17 +851,31 @@ public interface PoolConfiguration {
     boolean getRollbackOnReturn();
 
     /**
-     * If set to <code>true</code>, the connection will be wrapped with facade that will disallow the connection to be used after
-     * {@link java.sql.Connection#close()} is called. If set to <code>true</code>, after {@link java.sql.Connection#close()} all calls except
-     * {@link java.sql.Connection#close()} and {@link java.sql.Connection#isClosed()} will throw an exception.
-     * @param useDisposableConnectionFacade <code>true</code> to use a facade
+     * Stores the value of the deprecated {@code useDisposableConnectionFacade}
+     * property. The pool always wraps the connection handle in a facade that
+     * disallows use of the connection after {@link java.sql.Connection#close()}
+     * has been called, whatever value is stored here.
+     * @param useDisposableConnectionFacade the configured value, retained but
+     *                                      without effect
+     * @deprecated The disposable connection facade is always used, so this
+     *             property no longer has any effect. Setting it to
+     *             <code>false</code> used to hand out connection handles that
+     *             stayed usable, or worse, able to return and drive the
+     *             connection of a later borrower.
      */
+    @Deprecated
     void setUseDisposableConnectionFacade(boolean useDisposableConnectionFacade);
     /**
-     * Returns <code>true</code> if this connection pool is configured to use a connection facade to prevent re-use of connection after
-     * {@link java.sql.Connection#close()} has been invoked
-     * @return <code>true</code> if {@link java.sql.Connection#close()} has been invoked.
+     * Returns the value stored for the deprecated
+     * {@code useDisposableConnectionFacade} property. The pool always wraps the
+     * connection handle in a facade that disallows use of the connection after
+     * {@link java.sql.Connection#close()} has been called, whatever value is
+     * returned here.
+     * @return the configured value, retained but without effect
+     * @deprecated The disposable connection facade is always used, so this
+     *             property no longer has any effect.
      */
+    @Deprecated
     boolean getUseDisposableConnectionFacade();
 
     /**
