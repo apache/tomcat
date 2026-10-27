@@ -16,8 +16,6 @@
  */
 package org.apache.tomcat.jdbc.pool.interceptor;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 /**
  * MBean interface for monitoring the statement cache.
  */
@@ -38,10 +36,16 @@ public interface StatementCacheMBean {
      */
     int getMaxCacheSize();
     /**
-     * Returns the current global cache size across all connections.
-     * @return current cache size counter
+     * Returns the number of statements currently held in the statement
+     * cache, counted across all connections that belong to the same
+     * connection pool - the value the {@code max} limit is compared
+     * against. The number is a snapshot of the pool's accounting at the
+     * moment of the read; it is not a handle that can be used to change
+     * that accounting.
+     * @return the number of cached statements, or {@code -1} if this
+     *         interceptor instance is not bound to a pooled connection
      */
-    AtomicInteger getCacheSize();
+    int getCacheSize();
     /**
      * Returns the cache size for the current connection.
      * @return number of cached statements for this connection

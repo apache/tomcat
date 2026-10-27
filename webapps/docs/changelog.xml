@@ -922,6 +922,22 @@
         <code>IllegalStateException</code> whenever statistics were
         present. (remm)
       </fix>
+      <fix>
+        The <code>CacheSize</code> attribute of the
+        <code>StatementCache</code> interceptor MBean is now a plain
+        <code>int</code>. It used to be a
+        <code>java.util.concurrent.atomic.AtomicInteger</code>, which
+        meant that a client reading the attribute from inside the JVM
+        received the very object the pool uses to enforce its
+        <code>max</code> cache size, and could change the accounting it
+        had only come to observe: inflating it stopped the pool from
+        caching any further statement, deflating it let the cache grow
+        beyond <code>max</code>. A remote client, on the other hand,
+        received a snapshot that its writes could not affect. The value
+        reported by an interceptor instance that is not bound to a pooled
+        connection is now <code>-1</code> instead of no value at all.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
