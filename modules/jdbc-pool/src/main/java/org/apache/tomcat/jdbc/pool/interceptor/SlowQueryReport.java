@@ -247,9 +247,45 @@ public class SlowQueryReport extends AbstractQueryReport  {
      */
     @Override
     public void poolClosed(ConnectionPool pool) {
-        perPoolStats.computeIfPresent(pool.getName(),
-                (name, existing) -> existing.removeLivePool(pool) ? null : existing);
+        lastPoolOfNameClosed = releaseStatistics(pool);
         super.poolClosed(pool);
+    }
+
+    /**
+     * Whether the {@link #poolClosed(ConnectionPool)} delivered to this
+     * instance deregistered the closing pool as the last live pool under
+     * its name, meaning everything else registered for that name - the
+     * interceptor's MBean and broadcaster, for instance - can and must
+     * now be released with it. The deciding {@link
+     * #releaseStatistics(ConnectionPool)} call is atomic, so across
+     * concurrent closes of same-named pools and across the interceptor
+     * definitions of one close exactly one caller ever sees {@code true}.
+     */
+    protected boolean lastPoolOfNameClosed = false;
+
+    /**
+     * Deregisters a closed pool from the live pools that the
+     * per-name statistics are held for, and releases the statistics
+     * once no live pool is registered under the name any more.
+     * <p>
+     * The decision is taken inside a {@code compute} on the name, which
+     * atomises it against the concurrent removals of other same-named
+     * pools: exactly one of any number of concurrent {@code poolClosed}
+     * deliveries sees {@code true} returned, so the per-name entries are
+     * never released twice and never left behind.</p>
+     *
+     * @param pool the connection pool that has been closed
+     * @return {@code true} if this call removed the last live pool
+     *         registered under the name
+     */
+    protected static boolean releaseStatistics(ConnectionPool pool) {
+        boolean[] last = new boolean[1];
+        perPoolStats.computeIfPresent(pool.getName(),
+                (name, existing) -> {
+                    last[0] = existing.removeLivePool(pool);
+                    return last[0] ? null : existing;
+                });
+        return last[0];
     }
 
     /**

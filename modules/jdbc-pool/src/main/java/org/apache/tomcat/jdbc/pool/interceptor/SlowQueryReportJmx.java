@@ -47,7 +47,21 @@ import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
  * JMX-enabled slow query report interceptor.
  * Publishes slow and failed query statistics to JMX and provides
  * notifications when slow or failed queries are detected.
- *
+ * <p>
+ * The MBean and the notification broadcaster are published for the pool
+ * <em>name</em>: the first interceptor instance to borrow a connection
+ * registers them, and every other instance sharing the name - the other
+ * connections of that pool, the second interceptor of the recommended
+ * two-thresholds configuration, or a second pool configured with the
+ * same name - reports through them. They stay published until the last
+ * live pool registered under the name closes; closing one of several
+ * same-named pools leaves the registration with the survivors.</p>
+ * <p>
+ * A JMX client's listener subscription belongs to the registration it
+ * was added through. JMX cannot carry a subscription across an
+ * unregistration, so after the last pool of a name has closed, a client
+ * must attach its listeners again to receive notifications from a pool
+ * started under that name anew.</p>
  */
 public class SlowQueryReportJmx extends SlowQueryReport implements NotificationEmitter, SlowQueryReportJmxMBean{
     /**
@@ -224,14 +238,32 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
 
 
     /**
-     * Called when the connection pool is closed; deregisters JMX.
+     * Called when the connection pool is closed; releases the JMX
+     * registration of the pool's name - the MBean and the broadcaster its
+     * clients' listeners are attached to - only once that pool was the
+     * last live pool registered under the name. Both belong to the name
+     * and are shared by every live pool of that name, so taking them down
+     * while a survivor is still running would orphan the survivor's
+     * monitoring; releasing them on every close but a decided last one
+     * would unregister a shared registration that other closing or live
+     * pools still rely on. Whether this close is the last one is decided
+     * atomically by {@link SlowQueryReport#releaseStatistics(ConnectionPool)}
+     * on the way through {@code super.poolClosed}, so concurrent closes
+     * of same-named pools cannot all see a survivor and leave the name
+     * registered for ever.
      * @param pool the connection pool being closed
      */
     @Override
     public void poolClosed(ConnectionPool pool) {
         this.poolName = pool.getName();
-        deregisterJmx();
         super.poolClosed(pool);
+        if (lastPoolOfNameClosed) {
+            // the statistics of the name were freed by this very close,
+            // so no live pool is registered under it any more - and the
+            // registered MBean, whose delegate may be an interceptor
+            // instance of an already closed pool, goes with them
+            deregisterJmx();
+        }
     }
 
     /**
@@ -386,7 +418,12 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     }
 
     /**
-     * Deregisters this interceptor from JMX.
+     * Releases the MBean registration and the shared broadcaster held
+     * for the current pool name unconditionally - even when the pool
+     * name is still owned by live pools. Normal pool shutdown releases
+     * through {@code super.poolClosed} plus {@link #lastPoolOfNameClosed}
+     * in {@link #poolClosed(ConnectionPool)}, which keeps the
+     * registration for any surviving same-named pool.
      */
     protected void deregisterJmx() {
         try {
