@@ -44,14 +44,23 @@ public class JmxUtil {
      * @param base the base object name
      * @param keyprop the key property
      * @param obj the object to register
-     * @return the registered object name, or {@code null} on failure
+     * @return the registered object name, or {@code null} on failure. A
+     *         registration the MBean server refused - because the name is
+     *         already in use by another MBean, for instance - is such a
+     *         failure, so a non-{@code null} name always means this call is
+     *         the one that published the object under that name
      */
     public static ObjectName registerJmx(ObjectName base, String keyprop, Object obj) {
         ObjectName oname = null;
         try {
-            oname = getObjectName(base, keyprop);
-            if (oname != null) {
-                ManagementFactory.getPlatformMBeanServer().registerMBean(obj, oname);
+            ObjectName name = getObjectName(base, keyprop);
+            if (name != null) {
+                ManagementFactory.getPlatformMBeanServer().registerMBean(obj, name);
+                // only a publish the MBean server accepted is a registration:
+                // handing back the name of a refused one would have the caller
+                // treat it as its own, and its later unregistration would then
+                // take the name away from the MBean that really owns it
+                oname = name;
             }
         } catch (Exception e) {
             log.error("Jmx registration failed.",e);
