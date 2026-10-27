@@ -512,4 +512,49 @@ public class TestAuthorizationDigest {
         Map<String,String> result = Authorization.parseAuthorizationDigest(input);
         Assert.assertNull(result);
     }
+
+    @Test
+    public void testSchemeCaseInsensitive() throws Exception {
+        // RFC 9110, section 11.1: the authentication scheme is case-insensitive
+        for (String scheme : new String[] { "digest", "DIGEST", "dIgEsT" }) {
+            Map<String,String> result =
+                    Authorization.parseAuthorizationDigest(new StringReader(scheme + " username=\"a\""));
+            Assert.assertNotNull(scheme, result);
+            Assert.assertEquals(scheme, "a", result.get("username"));
+        }
+    }
+
+    @Test
+    public void testSchemeMustBeFollowedBySpace() throws Exception {
+        Map<String,String> result = Authorization.parseAuthorizationDigest(new StringReader("Digestusername=\"a\""));
+        Assert.assertNull(result);
+    }
+
+    @Test
+    public void testParameterNamesCaseInsensitive() throws Exception {
+        // RFC 9110, section 11.2: parameter names are matched case-insensitively
+        String header = "Digest Username=\"a\", REALM=\"r\", Nc=00000001, QoP=auth";
+
+        Map<String,String> result = Authorization.parseAuthorizationDigest(new StringReader(header));
+
+        Assert.assertEquals("a", result.get("username"));
+        Assert.assertEquals("r", result.get("realm"));
+        Assert.assertEquals("00000001", result.get("nc"));
+        Assert.assertEquals("auth", result.get("qop"));
+    }
+
+    @Test
+    public void testEmptyListElements() throws Exception {
+        // RFC 9110, section 5.6.1.2: empty list elements must be ignored
+        String[] headers = new String[] { "Digest username=\"a\",, realm=\"r\"",
+                "Digest username=\"a\", , realm=\"r\"", "Digest ,username=\"a\", realm=\"r\"",
+                "Digest username=\"a\", realm=\"r\",,", "Digest , username=\"a\" ,, , realm=\"r\" , " };
+        for (String header : headers) {
+            Map<String,String> result = Authorization.parseAuthorizationDigest(new StringReader(header));
+            Assert.assertNotNull(header, result);
+            Assert.assertEquals(header, 2, result.size());
+            Assert.assertEquals(header, "a", result.get("username"));
+            Assert.assertEquals(header, "r", result.get("realm"));
+        }
+    }
 }

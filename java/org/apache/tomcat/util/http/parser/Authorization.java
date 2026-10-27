@@ -74,8 +74,13 @@ public class Authorization {
 
         Map<String,String> result = new HashMap<>();
 
-        if (HttpParser.skipConstant(input, "Digest") != SkipResult.FOUND) {
+        // The authentication scheme is case-insensitive (RFC 9110, section 11.1)
+        if (!"Digest".equalsIgnoreCase(HttpParser.readToken(input))) {
             return null;
+        }
+        // Empty list elements must be ignored (RFC 9110, section 5.6.1.2)
+        while (HttpParser.skipConstant(input, ",") == SkipResult.FOUND) {
+            // Skip
         }
         // All field names are valid tokens
         String field = HttpParser.readToken(input);
@@ -101,10 +106,16 @@ public class Authorization {
             if (value == null) {
                 return null;
             }
-            result.put(field, value);
+            // The parameter names are case-insensitive (RFC 9110, section 11.2)
+            result.put(field.toLowerCase(Locale.ENGLISH), value);
 
-            if (HttpParser.skipConstant(input, ",") == SkipResult.NOT_FOUND) {
+            SkipResult skipResult = HttpParser.skipConstant(input, ",");
+            if (skipResult == SkipResult.NOT_FOUND) {
                 return null;
+            }
+            // Empty list elements must be ignored (RFC 9110, section 5.6.1.2)
+            while (skipResult == SkipResult.FOUND) {
+                skipResult = HttpParser.skipConstant(input, ",");
             }
             field = HttpParser.readToken(input);
             if (field == null) {
