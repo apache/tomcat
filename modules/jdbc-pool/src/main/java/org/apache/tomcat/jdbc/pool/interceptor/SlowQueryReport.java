@@ -406,7 +406,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
             "The number of failures for this query",
             "The number of times this query was prepared (prepareStatement/prepareCall)",
             "The total number of milliseconds spent preparing this query",
-            "The date and time of the last invocation"
+            "The date and time of the last invocation or preparation"
         };
 
         static final OpenType<?>[] FIELD_TYPES = new OpenType[] {
@@ -541,14 +541,18 @@ public class SlowQueryReport extends AbstractQueryReport  {
         }
 
         /**
-         * Records the time taken to prepare this query.
+         * Records the time taken to prepare this query. Preparation counts as
+         * activity on the entry, so the last invocation time that orders the
+         * statistics for eviction is updated as well: a statement that is
+         * prepared but never executed must age like any other query instead
+         * of occupying a statistics slot for ever.
          *
          * @param invocationTime the time in milliseconds to prepare the query
          */
         public synchronized void prepare(long invocationTime) {
             prepareCount++;
             prepareTime+=invocationTime;
-
+            lastInvocation = System.currentTimeMillis();
         }
 
         /**
