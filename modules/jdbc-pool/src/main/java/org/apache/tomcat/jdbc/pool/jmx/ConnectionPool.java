@@ -17,6 +17,10 @@ package org.apache.tomcat.jdbc.pool.jmx;
 
 import java.util.Properties;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.management.MBeanNotificationInfo;
@@ -63,6 +67,42 @@ public class ConnectionPool extends NotificationBroadcasterSupport
             new ConcurrentLinkedQueue<>();
 
     /**
+     * How many delivery tasks the notifier thread accepts into its queue
+     * before further notifications are dropped and logged rather than
+     * queued. The queue bounds the memory a flooded event source - the pool
+     * notifying once per failed borrow while it is exhausted - can make the
+     * pool allocate; it is not a promise that every notification is
+     * delivered.
+     */
+    private static final int NOTIFY_QUEUE_CAPACITY = 2000;
+
+    /**
+     * The single thread that pool notifications are delivered on. Delivery
+     * goes through here rather than running on the thread that reports the
+     * condition, because several of the pool's notifications are raised from
+     * the connection lifecycle - some of them while holding the lock of the
+     * connection concerned - and a monitoring listener that is slow or
+     * blocked must not stall those paths. One worker keeps the notifications
+     * in the order the pool raised them; the bounded queue and the drop on
+     * overflow keep a listener that stops draining from growing the queue
+     * without limit. The thread is a daemon, is started on the first
+     * notification and dies when it has been idle, so a pool that never
+     * notifies costs nothing, and it never holds up the JVM on shutdown.
+     * Shared by every pool MBean in the JVM: notifications of one pool can
+     * queue behind those of another, but a blocked listener then only
+     * starves delivery - the drop above is what a pool's operations feel,
+     * not the block.
+     */
+    private static final ThreadPoolExecutor NOTIFIER = new ThreadPoolExecutor(
+            0, 1, 60L, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<Runnable>(NOTIFY_QUEUE_CAPACITY),
+            r -> {
+                Thread t = new Thread(r, "JDBC-Pool-JMX-Notifier");
+                t.setDaemon(true);
+                return t;
+            });
+
+    /**
      * the ObjectName of this pool.
      */
     private ObjectName oname = null;
@@ -73,7 +113,9 @@ public class ConnectionPool extends NotificationBroadcasterSupport
      * @param pool the connection pool to wrap
      */
     public ConnectionPool(org.apache.tomcat.jdbc.pool.ConnectionPool pool) {
-        super();
+        // hand the JMX listener delivery to the notifier thread as well;
+        // see notify(String,String)
+        super(NOTIFIER);
         this.pool = pool;
     }
 
@@ -189,15 +231,29 @@ public class ConnectionPool extends NotificationBroadcasterSupport
     }
 
     /**
-     * Return true if the notification was sent successfully, false otherwise.
+     * Reports a condition to the pool's notification listeners.
      * <p>
-     * The notification is sent with the pool's {@link ObjectName} as its source
-     * - see {@link #getNotificationSource()} - so that a client which receives
-     * the notification over Java serialization can receive it at all.
+     * The delivery is asynchronous: both the listeners reached through JMX -
+     * delivered by {@link #sendNotification(Notification)} - and the ones
+     * registered locally with {@link #addListener(NotificationListener)}
+     * receive the notification on the pool's notification thread, not on the
+     * thread that calls this method. The pool raises several of its
+     * notifications from the connection lifecycle, some of them while holding
+     * the lock of the connection concerned, and a monitoring listener that is
+     * slow or blocked must not reach those paths. The notification itself is
+     * still built on the calling thread, so it carries the time, sequence
+     * number and serializable source of the condition it reports - see
+     * {@link #getNotificationSource()} - and, since the notifier is a single
+     * thread, listeners observe notifications in the order the pool reported
+     * them.
      *
      * @param type The notification type
      * @param message The message
-     * @return true if the notification succeeded
+     * @return true if the notification was accepted for delivery, false if it
+     *         was dropped - which happens when the delivery queue is full or
+     *         the notification could not be built. The result reports the
+     *         handoff only: it says nothing about whether any listener was
+     *         reached or what a listener did with the notification.
      */
     public boolean notify(final String type, String message) {
         try {
@@ -207,11 +263,21 @@ public class ConnectionPool extends NotificationBroadcasterSupport
                     sequence.incrementAndGet(),
                     System.currentTimeMillis(),
                     "["+type+"] "+message);
+            // queues the notification for the JMX listeners on the notifier
             sendNotification(n);
-            for (NotificationListener listener : listeners) {
-                listener.handleNotification(n,this);
-            }
+            // and the same for the local listeners, behind the JMX handoff so
+            // that per notification the listener order stays as it was when
+            // delivery was synchronous
+            NOTIFIER.execute(() -> deliverLocally(n, type));
             return true;
+        }catch (RejectedExecutionException x) {
+            // the delivery queue is full; dropping the notification is the
+            // point of the bound, and must not fail the pool operation that
+            // reported the condition
+            log.warn("Dropping notification of type ["+type+"] for pool ["
+                    +getNotificationSource()+"]: the notification delivery queue ("
+                    +NOTIFY_QUEUE_CAPACITY+" deliveries) is full");
+            return false;
         }catch (Exception x) {
             if (log.isDebugEnabled()) {
                 log.debug("Notify failed. Type="+type+"; Message="+message,x);
@@ -219,6 +285,27 @@ public class ConnectionPool extends NotificationBroadcasterSupport
             return false;
         }
 
+    }
+
+    /**
+     * Hands a notification to the listeners registered with this MBean
+     * outside JMX. Runs on the notifier thread. A listener that throws is
+     * contained here: its exception may not kill the notifier thread that
+     * every pool in the JVM delivers its notifications on.
+     *
+     * @param n         the notification to deliver
+     * @param type      the notification type, for the failure log
+     */
+    private void deliverLocally(Notification n, String type) {
+        try {
+            for (NotificationListener listener : listeners) {
+                listener.handleNotification(n, this);
+            }
+        } catch (Exception x) {
+            if (log.isDebugEnabled()) {
+                log.debug("Local notification listener failed. Type="+type,x);
+            }
+        }
     }
 
     /**
