@@ -50,7 +50,7 @@ import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.http.Method;
 
-public class TestSecurity2023 extends TomcatBaseTest {
+public class TestSecurity2023Tomcat extends TomcatBaseTest {
     /*
      * https://www.cve.org/CVERecord?id=CVE-2023-24998
      *

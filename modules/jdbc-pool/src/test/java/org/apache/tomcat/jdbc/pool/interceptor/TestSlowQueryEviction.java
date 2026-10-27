@@ -132,7 +132,6 @@ class TestSlowQueryEviction extends JdbcPoolBaseTest {
 
         int threads = 48;
         int perThread = 1000;
-        ConcurrentHashMap<String, QueryStats> stats;
         ExecutorService pool = Executors.newFixedThreadPool(threads);
         CopyOnWriteArrayList<Throwable> failures = new CopyOnWriteArrayList<>();
         CountDownLatch ready = new CountDownLatch(threads);
