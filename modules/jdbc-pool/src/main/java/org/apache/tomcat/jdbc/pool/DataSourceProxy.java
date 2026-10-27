@@ -1226,12 +1226,24 @@ public class DataSourceProxy implements PoolConfiguration {
         return getPoolProperties().getRollbackOnReturn();
     }
 
+    /**
+     * {@inheritDoc}
+     * @deprecated The disposable connection facade is always used, so this
+     *             property no longer has any effect.
+     */
     @Override
+    @Deprecated
     public void setUseDisposableConnectionFacade(boolean useDisposableConnectionFacade) {
         getPoolProperties().setUseDisposableConnectionFacade(useDisposableConnectionFacade);
     }
 
+    /**
+     * {@inheritDoc}
+     * @deprecated The disposable connection facade is always used, so this
+     *             property no longer has any effect.
+     */
     @Override
+    @Deprecated
     public boolean getUseDisposableConnectionFacade() {
         return getPoolProperties().getUseDisposableConnectionFacade();
     }

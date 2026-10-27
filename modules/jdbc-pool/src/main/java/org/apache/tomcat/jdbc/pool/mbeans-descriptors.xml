@@ -300,7 +300,7 @@
              writeable="false"/>
 
     <attribute    name="useDisposableConnectionFacade"
-           description="If true, connection pool is configured to use a connection facade to prevent re-use of connection after close() has been invoked"
+           description="Deprecated, no longer has any effect: the pool always uses a connection facade to prevent re-use of connection after close() has been invoked"
                   type="java.lang.Boolean"
                     is="false"
              writeable="false"/>
