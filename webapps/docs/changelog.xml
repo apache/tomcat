@@ -1144,6 +1144,17 @@
         interceptors exist to provide silently missed exactly the work
         most likely to be slow. (remm)
       </fix>
+      <fix>
+        Always wrap connection handles in the disposable connection
+        facade. The <code>useDisposableConnectionFacade</code> property
+        that could switch the facade off is deprecated and no longer has
+        any effect; it is still accepted so existing configurations keep
+        loading. Switching the facade off exposed the pool's cached
+        interceptor chain directly to the application: a handle kept from
+        an earlier borrow stayed usable and its close returned – or its
+        calls drove – the connection a later borrower was still using.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

@@ -93,8 +93,10 @@ pinned (they look unintended; see §6): a failed alternate-credential
 borrow discards a healthy idle session (the pool shrinks to 0 sessions
 instead of keeping the one it had). (The third observation — that
 `ProxyConnection`'s own `equals`/`hashCode` below the disposable facade
-threw — has since been fixed and is now pinned by
-`pool/TestFacadelessProxyIdentity`.)
+threw — has since been fixed; the facadeless configuration that reached
+it has since been deprecated away — the facade is now always used, and
+the handle contract for such configurations is pinned by
+`pool/TestFacadeAlwaysUsed`.)
 
 ## 2. Database choice (unchanged conclusion)
 
@@ -298,14 +300,16 @@ the working list.
     platform server.
 * Found while harvesting, same status (unintended-looking, so not
   pinned):
-  * `ProxyConnection`'s own `equals`/`hashCode`, reachable with
-    `useDisposableConnectionFacade=false`, used to throw
+  * `ProxyConnection`'s own `equals`/`hashCode`, reachable with the
+    now-deprecated `useDisposableConnectionFacade=false`, used to throw
     `NullPointerException` (and now answer with the identity of the
     connection handle, as the facade-on configuration does). Fixed
-    (the calls are answered before the XA dispatch branch); the
-    semantics are pinned by `pool/TestFacadelessProxyIdentity`, which
-    complements the facade-level identity assertions in
-    `TestProxyContract`.
+    (the calls are answered before the XA dispatch branch); that
+    configuration has since been deprecated away — the disposable
+    facade is always used now, so the handling is defensive only —
+    and the handle contract for such configurations is pinned by
+    `pool/TestFacadeAlwaysUsed`, on top of the facade-level identity
+    assertions in `TestProxyContract`.
   * a borrow with alternate credentials that the database refuses
     leaves the pool having *closed the healthy idle session it
     already had*: size and server session count drop to 0 and the

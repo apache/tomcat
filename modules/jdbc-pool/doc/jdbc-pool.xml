@@ -544,8 +544,16 @@
       </p>
     </attribute>
     <attribute name="useDisposableConnectionFacade" required="false">
-      <p>(boolean) Set this to true if you wish to put a facade on your connection so that it cannot be reused after it has been closed. This prevents a thread holding on to a
-                   reference of a connection it has already called closed on, to execute queries on it. Default value is <code>true</code>.
+      <p>(boolean) Deprecated. This property no longer has any effect. The pool
+                   always puts a facade on the connections it hands out, so that a
+                   connection cannot be reused after it has been closed: after
+                   <code>close()</code> has been called, all calls on the handle
+                   except <code>close()</code> and <code>isClosed()</code> throw an
+                   exception. Switching the facade off used to leave a handle usable
+                   after close, which allowed it to return or drive the connection of
+                   a later borrower; setting this property to
+                   <code>false</code> is therefore not supported. The property is
+                   still accepted so that existing configurations keep loading.
       </p>
     </attribute>
     <attribute name="logValidationErrors" required="false">
