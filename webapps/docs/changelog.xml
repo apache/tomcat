@@ -925,6 +925,23 @@
         connection is now <code>-1</code> instead of no value at all.
         (remm)
       </fix>
+      <fix>
+        Pool JMX notifications are now delivered on a dedicated
+        notification thread instead of on the thread that reported the
+        condition. Several of the pool's notifications are raised from
+        the connection lifecycle, some of them while the pool holds the
+        lock of the connection concerned, so a monitoring listener that
+        was slow or blocked stalled the borrow, return and abandon
+        processing of that connection for as long as it held on, and a
+        failed borrow from an exhausted pool repeated that cost on every
+        miss. Listeners observe the notifications in the same order the
+        pool reported them; a listener that stops draining the bounded
+        delivery queue now causes later notifications to be dropped and
+        logged rather than delaying the pool. The result of reporting a
+        notification through the pool MBean now describes that handoff
+        only, and no longer depends on whether a locally registered
+        listener threw. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
