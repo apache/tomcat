@@ -364,8 +364,11 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
 
     /**
      * JMX operation - return the names of all the pools
-     * @return - all the names of pools that we have stored data for
+     * @return - all the names of pools that we have stored data for,
+     *         which is a view of the JVM-wide statistics registry rather
+     *         than of this pool alone
      */
+    @Override
     public String[] getPoolNames() {
         Set<String> keys = perPoolStats.keySet();
         return keys.toArray(new String[0]);
@@ -373,8 +376,10 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
 
     /**
      * JMX operation - return the name of the pool
-     * @return the name of the pool, unique within the JVM
+     * @return the name of the pool, unique within the JVM, or
+     *         {@code null} before this instance is bound to a pool
      */
+    @Override
     public String getPoolName() {
         return poolName;
     }
@@ -389,7 +394,13 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     }
 
     /**
-     * Sets whether notifications are sent to the pool.
+     * Sets whether notifications are sent to the pool. Configuration
+     * entry point only, applied to every interceptor instance of a pool by
+     * {@code setProperties} while its connection chain is built: it is not
+     * part of the JMX management interface, because writing it through the
+     * registered MBean would reach only the one instance that owns the
+     * registration and leave the pool's other connections routing as
+     * before. See {@link SlowQueryReportJmxMBean}.
      * @param notifyPool true if notifications should be sent to the pool
      */
     public void setNotifyPool(boolean notifyPool) {
@@ -397,15 +408,21 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     }
 
     /**
-     * JMX operation - remove all stats for this connection pool
+     * JMX operation - remove all stats for this connection pool. The
+     * statistics are keyed by pool name and shared by every live pool
+     * configured with that name, so clearing them through one pool's MBean
+     * clears them for all of those pools. Only the recorded content goes:
+     * the statistics map stays registered with the name - every live
+     * instance holds that very map and keeps accumulating into it.
      */
+    @Override
     public void resetStats() {
         ConcurrentHashMap<String,QueryStats> queries = getPoolStats(poolName);
         if (queries!=null) {
-            Iterator<String> it = queries.keySet().iterator();
-            while (it.hasNext()) {
-                it.remove();
-            }
+            // clear the map itself rather than emptying it through an
+            // iterator: the map is shared with every interceptor instance
+            // of the name, which all hold this same instance
+            queries.clear();
         }
     }
 
