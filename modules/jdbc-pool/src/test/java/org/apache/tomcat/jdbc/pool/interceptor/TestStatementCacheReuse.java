@@ -231,7 +231,7 @@ class TestStatementCacheReuse extends JdbcPoolBaseTest {
                     "the first session caches its own statement");
             Assertions.assertEquals(1, cacheOf(second).getCacheSizePerConnection(),
                     "the second session caches its own statement");
-            Assertions.assertEquals(2, cacheOf(first).getCacheSize().get(),
+            Assertions.assertEquals(2, cacheOf(first).getCacheSize(),
                     "the pool-wide count must see both");
             Assertions.assertNotSame(physicalOnFirst, physicalOnSecond,
                     "a cached statement belongs to the session it was prepared on and "
@@ -253,7 +253,7 @@ class TestStatementCacheReuse extends JdbcPoolBaseTest {
         Statement physicalOnFirst = driverStatement(onFirst);
         onFirst.close();
         Assertions.assertEquals(1, cacheOf(first).getCacheSizePerConnection());
-        Assertions.assertEquals(1, cacheOf(first).getCacheSize().get());
+        Assertions.assertEquals(1, cacheOf(first).getCacheSize());
 
         // The limit is reached, so the second session's statement cannot be
         // cached: the documentation says it is closed immediately.
@@ -265,7 +265,7 @@ class TestStatementCacheReuse extends JdbcPoolBaseTest {
                 "once the pool-wide count is at max, a further statement must not be "
                         + "cached but closed immediately");
         Assertions.assertEquals(0, cacheOf(second).getCacheSizePerConnection());
-        Assertions.assertEquals(1, cacheOf(first).getCacheSize().get(),
+        Assertions.assertEquals(1, cacheOf(first).getCacheSize(),
                 "the count must not grow past max");
 
         // Taking the cached statement out of the cache frees the slot for
@@ -275,7 +275,7 @@ class TestStatementCacheReuse extends JdbcPoolBaseTest {
                 "the first session's statement must still come from the cache");
         reused.close();
         Assertions.assertEquals(1, cacheOf(first).getCacheSizePerConnection());
-        Assertions.assertEquals(1, cacheOf(first).getCacheSize().get(),
+        Assertions.assertEquals(1, cacheOf(first).getCacheSize(),
                 "putting it back must not exceed the limit either");
 
         first.close();

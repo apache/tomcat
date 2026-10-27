@@ -118,8 +118,9 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
     }
 
     @Override
-    public AtomicInteger getCacheSize() {
-        return cacheSize;
+    public int getCacheSize() {
+        AtomicInteger size = this.cacheSize;
+        return size == null ? -1 : size.get();
     }
 
     @Override
