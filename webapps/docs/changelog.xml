@@ -428,6 +428,10 @@
         <code>org.apache.tomcat.util.http.parser.StandardAcceptLanguageParser</code>
         to <code>true</code>. (remm)
       </fix>
+      <fix>
+        Detect and disconnect a mis-behaving HTTP/2 client that sends large
+        numbers of unexpected settings acknowledgement frames. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
