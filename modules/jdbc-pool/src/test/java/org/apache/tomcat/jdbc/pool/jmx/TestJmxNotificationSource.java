@@ -57,6 +57,12 @@ import org.apache.tomcat.jdbc.pool.DataSource;
  * rewriting is also what a client behind a connector effectively sees, which is
  * why the last test pins that the name the remote side reads does not change
  * with this fix.</p>
+ * <p>
+ * Delivery is asynchronous (on the pool's notification thread), so the tests
+ * wait for the expected notifications to arrive with the bounded
+ * {@link JdbcPoolBaseTest#awaitUntil(java.util.function.BooleanSupplier)}
+ * before asserting; once they have all arrived, every pin below is asserted
+ * exactly as if delivery had been immediate.</p>
  */
 class TestJmxNotificationSource extends JdbcPoolBaseTest {
 
@@ -127,6 +133,7 @@ class TestJmxNotificationSource extends JdbcPoolBaseTest {
                         "the notification of type [" + type + "] must be reported as sent");
             }
 
+            awaitUntil(() -> received.size() >= ALL_TYPES.length);
             Assertions.assertEquals(ALL_TYPES.length, received.size(),
                     "every type must have reached the listener");
             long previousSequence = -1;
@@ -185,6 +192,7 @@ class TestJmxNotificationSource extends JdbcPoolBaseTest {
                     "the notification of type [" + type + "] must be reported as sent");
         }
 
+        awaitUntil(() -> received.size() >= ALL_TYPES.length);
         Assertions.assertEquals(ALL_TYPES.length, received.size(),
                 "every type must have reached the listener");
         for (int i = 0; i < ALL_TYPES.length; i++) {
@@ -232,6 +240,7 @@ class TestJmxNotificationSource extends JdbcPoolBaseTest {
                 Assertions.assertTrue(jmxPool.notify(ConnectionPool.POOL_EMPTY, "pool is empty"),
                         "the notification must be reported as sent");
 
+                awaitUntil(() -> !received.isEmpty());
                 Assertions.assertEquals(1, received.size(),
                         "a client subscribed through the MBean server must be reached");
                 Notification notification = received.get(0);
