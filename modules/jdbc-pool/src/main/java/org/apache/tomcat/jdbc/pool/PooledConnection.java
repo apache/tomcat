@@ -595,7 +595,24 @@ public class PooledConnection implements PooledConnectionMBean {
         }
 
         if (poolProperties.getValidator() != null) {
-            if (poolProperties.getValidator().validate(connection, validateAction)) {
+            boolean valid;
+            try {
+                valid = poolProperties.getValidator().validate(connection, validateAction);
+            } catch (RuntimeException x) {
+                // the SPI declares no checked exception, so throwing is the
+                // only way an implementation can report its own failure; the
+                // pool must treat that as a failed validation, because a
+                // throw escaping from here unwinds the borrow or return path
+                // between the idle and busy queues and strands the pooled
+                // connection - permanently shrinking the pool
+                if (getPoolProperties().getLogValidationErrors()) {
+                    log.error("Custom validation through "+poolProperties.getValidator()+" threw an exception.", x);
+                } else if (log.isDebugEnabled()) {
+                    log.debug("Custom validation threw an exception.", x);
+                }
+                return false;
+            }
+            if (valid) {
                 this.lastValidated = now;
                 return true;
             } else {
