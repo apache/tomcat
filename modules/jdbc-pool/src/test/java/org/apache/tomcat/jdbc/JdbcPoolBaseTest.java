@@ -31,8 +31,10 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 
+import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
+import org.apache.tomcat.jdbc.pool.PooledConnection;
 import org.h2.tools.Server;
 
 /**
@@ -160,6 +162,25 @@ public abstract class JdbcPoolBaseTest {
             interceptor = interceptor.getNext();
         }
         return null;
+    }
+
+    /*
+     * An interceptor that always throws from disconnected(), shared by the
+     * tests that pin how the disconnect path isolates a misbehaving link of
+     * the chain. It is configured through the jdbcInterceptors class-name
+     * list, so it must stay a public static class with a no-arg constructor.
+     */
+    public static class BoomInterceptor extends JdbcInterceptor {
+        @Override
+        public void reset(ConnectionPool parent, PooledConnection con) {
+            // empty
+        }
+
+        @Override
+        public void disconnected(ConnectionPool parent, PooledConnection con,
+                boolean finalizing) {
+            throw new IllegalStateException("boom from disconnected()");
+        }
     }
 
     /*
