@@ -42,7 +42,9 @@ import org.apache.tomcat.jdbc.pool.DataSource;
  * <p>The rules asserted below are the documented ones: statements are
  * cached per connection, the {@code max} count is counted over the whole
  * pool, and once that count is reached further statements are not cached
- * and are closed immediately.</p>
+ * and are closed immediately. A reused statement must also report the
+ * connection of the borrow it is handed to, not the one its previous
+ * borrower closed it with.</p>
  */
 class TestStatementCacheReuse extends JdbcPoolBaseTest {
 
@@ -104,6 +106,100 @@ class TestStatementCacheReuse extends JdbcPoolBaseTest {
         }
         Assertions.assertEquals(2, adminRowCount(table),
                 "both executes must have reached the database");
+    }
+
+    /**
+     * The connection a recycled statement reports is the one it is handed
+     * out on, not the one its previous borrower closed it with: that handle
+     * stops working the moment its borrow ends, and a framework unwrapping
+     * through {@code Statement.getConnection()} would receive a connection
+     * that answers every call as closed.
+     */
+    @Test
+    void aRecycledStatementReportsTheBorrowerItIsHandedTo() throws Exception {
+        DataSource ds = cachedPool("prepared=true,max=5", 1);
+        // Without the statement facade the cache's own proxy is what the
+        // application holds; the facade answers getConnection() itself and
+        // so masks what the proxy behind it carries.
+        ds.getPoolProperties().setUseStatementFacade(false);
+        String table = uniqueTable();
+        ds.createPool();
+        try (Connection admin = adminConnection(); Statement st = admin.createStatement()) {
+            st.execute("CREATE TABLE " + table + " (v INT)");
+        }
+        String insert = "INSERT INTO " + table + " VALUES (?)";
+
+        Connection first = ds.getConnection();
+        setSessionMarker(first, 31);
+        PreparedStatement prepared = first.prepareStatement(insert);
+        Assertions.assertSame(first, prepared.getConnection(),
+                "a freshly prepared statement reports the handle that prepared it");
+        prepared.setInt(1, 1);
+        Assertions.assertEquals(1, prepared.executeUpdate());
+        prepared.close();
+        Assertions.assertEquals(1, cacheOf(first).getCacheSizePerConnection(),
+                "the statement must be waiting in the cache");
+        first.close();
+
+        Connection second = ds.getConnection();
+        try {
+            Assertions.assertEquals(Integer.valueOf(31), sessionMarker(second),
+                    "the same physical session must have been reused");
+            PreparedStatement reused = second.prepareStatement(insert);
+            Assertions.assertEquals(0, cacheOf(second).getCacheSizePerConnection(),
+                    "the statement must have come out of the cache");
+
+            Connection reported = reused.getConnection();
+            Assertions.assertSame(second, reported,
+                    "the recycled statement must report the borrower it is handed to, "
+                            + "not the borrower that closed it");
+            Assertions.assertFalse(reported.isClosed(),
+                    "the reported connection must be the live handle of the current borrow");
+            try (Statement probe = reported.createStatement()) {
+                Assertions.assertTrue(probe.execute("SELECT 1"),
+                        "the reported connection must serve the current borrower");
+            }
+
+            reused.setInt(1, 2);
+            Assertions.assertEquals(1, reused.executeUpdate());
+            reused.close();
+        } finally {
+            second.close();
+        }
+        Assertions.assertEquals(2, adminRowCount(table),
+                "both executes must have reached the database");
+    }
+
+    /**
+     * The same contract with the default statement facade on: the facade
+     * answers {@code getConnection()} from the current borrow, so the answer
+     * must not depend on which borrower originally prepared the statement.
+     */
+    @Test
+    void aRecycledStatementBehindTheDefaultFacadeReportsTheCurrentBorrower() throws Exception {
+        DataSource ds = cachedPool("prepared=true,max=5", 1);
+        ds.createPool();
+
+        Connection first = ds.getConnection();
+        setSessionMarker(first, 32);
+        PreparedStatement prepared = first.prepareStatement("SELECT 1");
+        prepared.close();
+        Assertions.assertEquals(1, cacheOf(first).getCacheSizePerConnection());
+        first.close();
+
+        Connection second = ds.getConnection();
+        try {
+            Assertions.assertEquals(Integer.valueOf(32), sessionMarker(second),
+                    "the same physical session must have been reused");
+            try (PreparedStatement reused = second.prepareStatement("SELECT 1")) {
+                Assertions.assertEquals(0, cacheOf(second).getCacheSizePerConnection(),
+                        "the statement must have come out of the cache");
+                Assertions.assertSame(second, reused.getConnection(),
+                        "the recycled statement must report the current handle");
+            }
+        } finally {
+            second.close();
+        }
     }
 
     @Test

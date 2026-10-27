@@ -249,6 +249,12 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
             if (statement!=null) {
                 //remove it from the cache since it is used
                 removeStatement(statement);
+                // The cached proxy carries the connection handle of the
+                // borrower that closed the statement, which by now is a
+                // disposed facade. Re-bind it to the borrower the proxy is
+                // handed to, so that getConnection() on the reused statement
+                // reports a live handle instead of the previous borrower's.
+                statement.setConnection(proxy);
                 return statement.getActualProxy();
             } else {
                 return super.invoke(proxy, method, args);
