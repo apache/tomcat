@@ -319,6 +319,16 @@ the working list.
     `SQLException` naming the method; `pool/TestXaBranchDispatch`
     pins that, with an XA-pool control showing the live dispatch
     still works.
+  * a custom `Validator` that reports its failure by throwing — the
+    only option, since the SPI declares no checked exception — escaped
+    the unguarded call in `PooledConnection.validate()` and stranded the
+    pooled connection between the idle and busy queues on borrow and on
+    `close()` (a permanently lost slot), while aborting each idle sweep.
+    A throw now counts as a failed validation, exactly like the `false`
+    the built-in query/`isValid()` paths already return for any
+    exception; `pool/TestThrowingValidator` pins the borrow, return and
+    idle paths, with the already-safe create path and a plain-`false`
+    validator as controls.
   * a borrow with alternate credentials that the database refuses
     leaves the pool having *closed the healthy idle session it
     already had*: size and server session count drop to 0 and the
