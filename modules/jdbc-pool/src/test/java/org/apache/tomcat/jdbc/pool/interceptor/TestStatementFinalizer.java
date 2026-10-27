@@ -156,6 +156,7 @@ class TestStatementFinalizer extends JdbcPoolBaseTest {
                 "the leaked statement must be closed when its connection goes back");
     }
 
+    @SuppressWarnings("unlikely-arg-type") // Use of unlikely arg-type is deliberate
     @Test
     void theTrackingWrapperStaysHonestAboutTheStatementItWraps() throws Exception {
         DataSource ds = finalizerPool();
