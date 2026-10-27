@@ -33,19 +33,6 @@ import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
  */
 class TestThrowingDisconnectedInterceptor extends JdbcPoolBaseTest {
 
-    public static class BoomInterceptor extends JdbcInterceptor {
-        @Override
-        public void reset(ConnectionPool parent, PooledConnection con) {
-            // empty
-        }
-
-        @Override
-        public void disconnected(ConnectionPool parent, PooledConnection con,
-                boolean finalizing) {
-            throw new IllegalStateException("boom from disconnected()");
-        }
-    }
-
     public static class RecordingInterceptor extends JdbcInterceptor {
         static final AtomicInteger DISCONNECTED_CALLS = new AtomicInteger();
 
