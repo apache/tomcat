@@ -60,6 +60,12 @@ import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
  * and with it the broadcaster its clients' listeners are attached to -
  * away from the pool that is still running, while concurrent closes of
  * such pools must still release the name exactly once.</p>
+ * <p>
+ * The registry also holds the pool's claim to a registration, so a
+ * publish the MBeanServer refused must not keep the claim: every later
+ * borrow retries, and closing a pool that never got published must
+ * release the name's broadcaster and failure-report bookkeeping along
+ * with the slot.</p>
  */
 class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
 
@@ -369,6 +375,173 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
         ds.close();
         Assertions.assertFalse(server.isRegistered(oname),
                 "closing the only pool of the name must release the MBean");
+    }
+
+    /*
+     * A foreign MBean interface and resource. Registered under the very
+     * ObjectName the interceptor computes, it makes the interceptor's
+     * publish attempt fail with InstanceAlreadyExistsException even
+     * though the per-name registry let it through - the least invasive
+     * deterministic way to make registerMBean refuse the MBean.
+     */
+    public interface ObstacleMBean {
+        String getHeldBy();
+    }
+
+    /* The resource behind {@link ObstacleMBean}. */
+    public static class Obstacle implements ObstacleMBean {
+        @Override
+        public String getHeldBy() {
+            return "registration-obstacle";
+        }
+    }
+
+    @Test
+    void failedRegistrationFreesTheSlotSoALaterBorrowCanStillPublish() throws Exception {
+        String poolName = "JmxRegFail-" + System.nanoTime();
+        DataSource ds = newDataSource();
+        ds.setName(poolName);
+        ds.setJdbcInterceptors("org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx"
+                + "(notifyPool=false,threshold=-1)");
+        ds.getPoolProperties().setInitialSize(0);
+
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        ObjectName oname = new ObjectName("tomcat.jdbc:type="
+                + SlowQueryReportJmx.class.getName() + ",name=" + poolName);
+
+        Obstacle obstacle = new Obstacle();
+        server.registerMBean(obstacle, oname);
+        try {
+            try (Connection first = ds.getConnection()) {
+                // The borrow tried to publish and the MBeanServer refused
+                // it: the name was taken outside the per-name registry, so
+                // registry and MBeanServer now disagree.
+                Assertions.assertEquals("registration-obstacle",
+                        server.getAttribute(oname, "HeldBy"),
+                        "the interceptor's publish must have collided with the foreign MBean");
+                Assertions.assertNull(SlowQueryReportJmx.mbeans.get(poolName),
+                        "a registration that the MBeanServer refused must not leave the per-name "
+                                + "registry claiming an MBean that was never published - the slot is "
+                                + "the only registration gate, and every later borrow would skip "
+                                + "re-registration behind it for the life of the pool");
+
+                // With the obstacle gone, a later borrow must still get the
+                // MBean published: the refused attempt must not have latched
+                // the registration for the life of the pool.
+                server.unregisterMBean(oname);
+                try (Connection next = ds.getConnection()) {
+                    Assertions.assertTrue(server.isRegistered(oname),
+                            "the borrow after the obstacle was removed must publish the MBean");
+                    // the attribute of the interceptor's MBean interface,
+                    // answered by the registered resource: not the obstacle,
+                    // which exposes no such attribute
+                    Assertions.assertDoesNotThrow(() -> server.getAttribute(oname, "SlowQueriesCD"),
+                            "the published MBean must be the interceptor's, answering its statistics query");
+                    Assertions.assertSame(SlowQueryReportJmx.mbeans.get(poolName),
+                            interceptorOf(next, SlowQueryReportJmx.class),
+                            "the retrying borrow's interceptor instance must own the slot");
+                }
+            }
+            ds.close();
+            Assertions.assertFalse(server.isRegistered(oname),
+                    "closing the pool must release the registration that the retry published");
+            Assertions.assertNull(SlowQueryReportJmx.mbeans.get(poolName),
+                    "closing the pool must release the per-name registry slot");
+        } finally {
+            // remove the obstacle if the test never got as far as removing
+            // it itself; on the green path nothing is registered any more
+            try {
+                server.unregisterMBean(oname);
+            } catch (InstanceNotFoundException ignore) {
+                // nothing left to clean up under this name
+            }
+        }
+    }
+
+    @Test
+    void persistentRegistrationRefusalKeepsRetryingAndCleansUpOnClose() throws Exception {
+        String poolName = "JmxRegRefuse-" + System.nanoTime();
+        DataSource refusingPool = reportingPoolNamed(poolName);
+
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        ObjectName oname = new ObjectName("tomcat.jdbc:type="
+                + SlowQueryReportJmx.class.getName() + ",name=" + poolName);
+
+        Obstacle obstacle = new Obstacle();
+        server.registerMBean(obstacle, oname);
+        try {
+            // the first refused borrow: the slot must be freed again, and
+            // the failure marked as reported - the loud report of this name
+            // (warn/error) has gone out, its repeats ride at debug without
+            // a stack trace (not asserted: the module's test infrastructure
+            // captures no log, so the throttle is pinned through its
+            // bookkeeping only)
+            Connection first = refusingPool.getConnection();
+            Assertions.assertNull(SlowQueryReportJmx.mbeans.get(poolName),
+                    "a refused registration must not latch the per-name slot");
+            Assertions.assertEquals(oname, SlowQueryReportJmx.registrationFailuresLogged.get(poolName),
+                    "the first refusal of the name must be marked as reported for the throttle");
+
+            // later borrows keep retrying behind the freed slot: still
+            // refused (the obstacle holds the name), still no latch, and the
+            // identical marker keeps their logging throttled
+            try (Connection second = refusingPool.getConnection();
+                    Connection third = refusingPool.getConnection()) {
+                Assertions.assertNull(SlowQueryReportJmx.mbeans.get(poolName),
+                        "retried refusals must keep leaving the slot free for the next borrow");
+                Assertions.assertEquals(oname, SlowQueryReportJmx.registrationFailuresLogged.get(poolName),
+                        "repeated failures for the same name must not re-mark it loudly");
+                Assertions.assertEquals("registration-obstacle",
+                        server.getAttribute(oname, "HeldBy"),
+                        "the retried publishes must still be colliding with the obstacle");
+                // a slow query on the refused pool still reaches the name's
+                // broadcaster through getNotifier() - state a closing pool
+                // must release together with the name even though no MBean
+                // registration of this pool ever succeeded
+                try (Statement st = first.createStatement()) {
+                    st.execute("SELECT 1");
+                }
+                Assertions.assertNotNull(SlowQueryReportJmx.notifiers.get(poolName),
+                        "reporting a query must have created the name's broadcaster");
+            }
+            first.close();
+
+            // close a pool that never got published: releasing the name must
+            // free the broadcaster it reported through and the throttle
+            // marker even though the registry slot was empty all along, so
+            // neither outlives the name - a new failure cycle under the name
+            // has to start marked loudly again
+            refusingPool.close();
+            Assertions.assertNull(SlowQueryReportJmx.mbeans.get(poolName),
+                    "closing the pool must release the per-name registry slot");
+            Assertions.assertNull(SlowQueryReportJmx.notifiers.get(poolName),
+                    "closing the pool must release the name's broadcaster the refused"
+                            + " registration had still made it report through");
+            Assertions.assertNull(SlowQueryReportJmx.registrationFailuresLogged.get(poolName),
+                    "releasing the name must release its throttle marker");
+
+            // the name stayed retryable through every refusal: once the
+            // obstacle is gone, a fresh pool under the name publishes at once
+            // and publishes cleanly - success marks nothing in the throttle
+            server.unregisterMBean(oname);
+            DataSource revivedPool = reportingPoolNamed(poolName);
+            try (Connection borrowed = revivedPool.getConnection()) {
+                Assertions.assertTrue(server.isRegistered(oname),
+                        "the first borrow of a pool started after the obstacle is gone"
+                                + " must publish the MBean");
+                Assertions.assertNull(SlowQueryReportJmx.registrationFailuresLogged.get(poolName),
+                        "a succeeding registration must not leave a throttle marker behind");
+            }
+            revivedPool.close();
+            Assertions.assertFalse(server.isRegistered(oname),
+                    "closing the revived pool must release the registration again");
+        } finally {
+            try {
+                server.unregisterMBean(oname);
+            } catch (InstanceNotFoundException ignore) {
+                // nothing registered left to clean up under this name
+            }
+        }
     }
 
     @Test
