@@ -352,7 +352,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
      * JMX operation - remove all stats for this connection pool
      */
     public void resetStats() {
-        ConcurrentHashMap<String,QueryStats> queries = perPoolStats.get(poolName);
+        ConcurrentHashMap<String,QueryStats> queries = getPoolStats(poolName);
         if (queries!=null) {
             Iterator<String> it = queries.keySet().iterator();
             while (it.hasNext()) {
@@ -368,7 +368,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     @Override
     public CompositeData[] getSlowQueriesCD() throws OpenDataException {
         CompositeDataSupport[] result = null;
-        ConcurrentHashMap<String,QueryStats> queries = perPoolStats.get(poolName);
+        ConcurrentHashMap<String,QueryStats> queries = getPoolStats(poolName);
         if (queries!=null) {
             Set<Map.Entry<String,QueryStats>> stats = queries.entrySet();
             if (stats!=null) {
