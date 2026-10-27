@@ -190,6 +190,11 @@ public class ConnectionPool extends NotificationBroadcasterSupport
 
     /**
      * Return true if the notification was sent successfully, false otherwise.
+     * <p>
+     * The notification is sent with the pool's {@link ObjectName} as its source
+     * - see {@link #getNotificationSource()} - so that a client which receives
+     * the notification over Java serialization can receive it at all.
+     *
      * @param type The notification type
      * @param message The message
      * @return true if the notification succeeded
@@ -198,7 +203,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport
         try {
             Notification n = new Notification(
                     type,
-                    this,
+                    getNotificationSource(),
                     sequence.incrementAndGet(),
                     System.currentTimeMillis(),
                     "["+type+"] "+message);
@@ -214,6 +219,33 @@ public class ConnectionPool extends NotificationBroadcasterSupport
             return false;
         }
 
+    }
+
+    /**
+     * Returns the source the pool's notifications are sent with.
+     * <p>
+     * {@link Notification} marshals its source, so a listener outside this
+     * JVM - one reached through a JMX connector, or one that hands the
+     * notification on to another process - only receives the notification at
+     * all if the source is serializable. This MBean is not, and neither is the
+     * pool it wraps, so the source is the {@link ObjectName} the MBean is
+     * registered under, which names the pool and is serializable. A pool MBean
+     * that has never been registered has no such name: the source is then a
+     * string of the shape the name would have had.
+     *
+     * @return the registered ObjectName, or a string naming the pool if the
+     *         MBean is not registered
+     */
+    protected Object getNotificationSource() {
+        // the registration handle is written by whichever thread registered the
+        // MBean; read it once so a single notification is sent with one source
+        // whatever happens to the field while the notification is on its way
+        ObjectName name = oname;
+        if (name != null) {
+            return name;
+        }
+        return org.apache.tomcat.jdbc.pool.ConnectionPool.POOL_JMX_TYPE_PREFIX
+                + "ConnectionPool,name=" + getPoolName();
     }
 
     /**
