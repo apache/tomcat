@@ -102,6 +102,7 @@ public class ConnectionState extends JdbcInterceptor  {
      * @param con    the pooled connection being set up for its next
      *               borrower
      */
+    @SuppressWarnings("null") // Suppress false positive warnings
     @Override
     public void reset(ConnectionPool parent, PooledConnection con) {
         if (parent==null || con==null) {
