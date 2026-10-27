@@ -160,9 +160,35 @@ public class ProxyConnection extends JdbcInterceptor {
             return this.toString();
         } else if (compare(GETCONNECTION_VAL,method) && connection!=null) {
             return connection.getConnection();
-        } else if (method.getDeclaringClass().isAssignableFrom(XAConnection.class) && connection != null) {
+        } else if (method.getDeclaringClass() != Object.class
+                && method.getDeclaringClass().isAssignableFrom(XAConnection.class)
+                && connection != null) {
+            // The Object.class exclusion is defensive: the only Object
+            // methods java.lang.reflect.Proxy routes to an invocation
+            // handler are equals, hashCode and toString, and all three are
+            // answered above. Any other method the branch condition matches
+            // can only be answered by the XA connection wrapper - and that
+            // wrapper exists only when the pool is backed by an XA data
+            // source (and only while the physical connection is still
+            // connected). The condition also matches methods declared by
+            // the interfaces XAConnection extends, javax.sql.PooledConnection
+            // among them, so on a plain pool calls such as
+            // addConnectionEventListener reach this branch without a target;
+            // dispatching them at null would surface a raw
+            // NullPointerException to the application.
+            javax.sql.XAConnection xaConnection = connection.getXAConnection();
+            if (xaConnection == null) {
+                if (isClosed()) {
+                    // The handle was disconnected while borrowed; report it
+                    // the way every other method on this class does, rather
+                    // than blaming the XA configuration.
+                    throw new SQLException("Connection has already been closed.");
+                }
+                throw new SQLException("The pooled connection is not an XA connection; "
+                        + "method [" + method.getName() + "] cannot be dispatched.");
+            }
             try {
-                return method.invoke(connection.getXAConnection(),args);
+                return method.invoke(xaConnection, args);
             }catch (Throwable t) {
                 if (t instanceof InvocationTargetException) {
                     throw t.getCause() != null ? t.getCause() : t;
