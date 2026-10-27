@@ -95,8 +95,7 @@ class TestThrowingResetInterceptor extends JdbcPoolBaseTest {
                 ThrowResetInterceptor.class.getName() + ";" + RecordingInterceptor.class.getName());
         Connection con = ds.getConnection();
         // keep the physical connection strongly reachable (see above)
-        java.sql.Connection physical =
-                ((PooledConnection) con.unwrap(PooledConnection.class)).getConnection();
+        java.sql.Connection physical = con.unwrap(PooledConnection.class).getConnection();
         con.close();
         ds.close();
         // a shutdown reset walks the chain twice by existing design

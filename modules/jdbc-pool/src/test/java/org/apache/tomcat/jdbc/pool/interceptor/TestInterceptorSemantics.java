@@ -388,7 +388,7 @@ class TestInterceptorSemantics extends JdbcPoolBaseTest {
         String t = uniqueTable();
         String sql = "CREATE TABLE " + t + " (v INT)";
         try (Connection c = ds.getConnection(); Statement st = c.createStatement()) {
-            Assertions.assertDoesNotThrow(() -> st.execute(sql),
+            Assertions.assertDoesNotThrow(() -> Boolean.valueOf(st.execute(sql)),
                     "a throwing reporter must not disturb the application");
         }
         // positive control: the hook ran and booked the execution before

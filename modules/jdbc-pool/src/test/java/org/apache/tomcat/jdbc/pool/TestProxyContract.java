@@ -108,6 +108,7 @@ class TestProxyContract extends JdbcPoolBaseTest {
         }
     }
 
+    @SuppressWarnings("unlikely-arg-type") // Use of unlikely arg-type is deliberate
     @Test
     void equalsAgainstNullOrForeignObjectsIsFalseNotAnException()
             throws Exception {
