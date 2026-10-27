@@ -883,7 +883,9 @@ public class ConnectionPool extends NotificationBroadcasterSupport
 
     @Override
     public void setSuspectTimeout(int seconds) {
+        boolean wasEnabled = getPoolProperties().isPoolSweeperEnabled();
         getPoolProperties().setSuspectTimeout(seconds);
+        poolCleanerAttributeUpdated(wasEnabled);
     }
 
     @Override
