@@ -1170,6 +1170,18 @@
         three of the interceptors bundled with the pool, has been
         corrected. (remm)
       </fix>
+      <fix>
+        The <code>SlowQueryReportJmx</code> interceptor MBean now exposes
+        the management surface its metadata declares: the
+        <code>PoolName</code> and <code>PoolNames</code> attributes and
+        the <code>resetStats()</code> operation are reachable through
+        JMX. Previously the MBean interface declared only
+        <code>SlowQueriesCD</code>, so the attributes and the operation
+        did not exist on the registered MBean, and once declared,
+        <code>resetStats()</code> would have thrown an
+        <code>IllegalStateException</code> whenever statistics were
+        present. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
