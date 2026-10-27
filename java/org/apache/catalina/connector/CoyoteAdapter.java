@@ -382,10 +382,11 @@ public class CoyoteAdapter implements Adapter {
             AtomicBoolean error = new AtomicBoolean(false);
             res.action(ActionCode.IS_ERROR, error);
 
-            if (request.isAsyncCompleting() && error.get()) {
+            if ((request.isAsyncCompleting() || request.isAsyncDispatching()) && error.get()) {
                 // Connection will be forcibly closed which will prevent
-                // completion happening at the usual point. Need to trigger
-                // call to onComplete() here.
+                // completion or the dispatch requested during error handling
+                // from happening at the usual point. Need to trigger the call
+                // to onComplete() here.
                 res.action(ActionCode.ASYNC_POST_PROCESS, null);
                 async = false;
             }

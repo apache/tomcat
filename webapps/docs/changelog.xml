@@ -122,6 +122,16 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>70290</bug>: Fix a leak of the in-progress async request count
+        that could prevent a clean shutdown. If a client dropped the connection
+        during the initial async service call and an
+        <code>AsyncListener.onError()</code> handler then called
+        <code>AsyncContext.dispatch()</code>, the request could be recycled
+        while still in the <code>MUST_DISPATCH</code> state so that
+        <code>onComplete()</code> was not called and the in-progress async
+        count was not decremented. (TODO)
+      </fix>
+      <fix>
         Treat a filter as not supporting asynchronous processing unless
         async supported is explicitly set to <code>"true"</code>.
         Previously, a filter registered via
