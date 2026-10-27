@@ -310,6 +310,15 @@ the working list.
     and the handle contract for such configurations is pinned by
     `pool/TestFacadeAlwaysUsed`, on top of the facade-level identity
     assertions in `TestProxyContract`.
+  * the rest of `ProxyConnection`'s XA dispatch branch was over-
+    matching the same way: methods declared by interfaces the handle
+    implements but the pool cannot honour – such as
+    `javax.sql.PooledConnection`'s `add`/`removeConnectionEventListener`
+    on a plain pool – were dispatched at a `null` `XAConnection` and
+    escaped as a raw `NullPointerException`. They now fail as an
+    `SQLException` naming the method; `pool/TestXaBranchDispatch`
+    pins that, with an XA-pool control showing the live dispatch
+    still works.
   * a borrow with alternate credentials that the database refuses
     leaves the pool having *closed the healthy idle session it
     already had*: size and server session count drop to 0 and the
