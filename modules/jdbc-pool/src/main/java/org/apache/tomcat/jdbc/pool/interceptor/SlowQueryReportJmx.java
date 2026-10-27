@@ -16,12 +16,14 @@
  */
 package org.apache.tomcat.jdbc.pool.interceptor;
 
+import java.lang.management.ManagementFactory;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.management.InstanceAlreadyExistsException;
 import javax.management.ListenerNotFoundException;
 import javax.management.MBeanNotificationInfo;
 import javax.management.MalformedObjectNameException;
@@ -106,6 +108,20 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
      * instance.
      */
     protected static final ConcurrentHashMap<String,NotificationBroadcasterSupport> notifiers =
+            new ConcurrentHashMap<>();
+
+    /**
+     * Registry of the first registration failure seen for each pool name,
+     * holding the ObjectName that failed. Registration is retried by every
+     * borrow of such a pool, but only the first failure of a name is
+     * logged with its exception, so a persistent refusal - a foreign MBean
+     * holding the name, a security restriction - is not reported with a
+     * stack trace once per borrow. The marker is dropped when a
+     * registration under the name succeeds and when the name's release
+     * runs through {@link #deregisterJmx()}, so a later failure cycle is
+     * reported loudly once again.
+     */
+    protected static final ConcurrentHashMap<String,ObjectName> registrationFailuresLogged =
             new ConcurrentHashMap<>();
 
 
@@ -424,14 +440,22 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
      * through {@code super.poolClosed} plus {@link #lastPoolOfNameClosed}
      * in {@link #poolClosed(ConnectionPool)}, which keeps the
      * registration for any surviving same-named pool.
+     * <p>
+     * The broadcaster and the registration-failure marker belong to the
+     * name as much as the MBean does, so the release drops them even
+     * when this pool never held the registry slot: a pool whose every
+     * registration attempt was refused still reported through the
+     * broadcaster, and its throttle marker must not outlive the name and
+     * hush the first failure of a later failure cycle under the name.</p>
      */
     protected void deregisterJmx() {
         try {
             if (mbeans.remove(poolName)!=null) {
                 ObjectName oname = getObjectName(getClass(),poolName);
                 JmxUtil.unregisterJmx(oname);
-                notifiers.remove(poolName);
             }
+            notifiers.remove(poolName);
+            registrationFailuresLogged.remove(poolName);
         } catch (MalformedObjectNameException | RuntimeOperationsException e) {
             log.warn("Jmx deregistration failed.",e);
         }
@@ -459,6 +483,21 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
 
     /**
      * Registers this interceptor with JMX.
+     * <p>
+     * The registration is attempted under the protection of the per-name
+     * registry slot: the slot is taken with {@code putIfAbsent} so only
+     * one instance per pool name registers, and it is released again when
+     * the MBeanServer refuses the MBean. A failed publish must not keep
+     * the slot, because the slot is the only registration gate: every
+     * later borrow would find it occupied and skip the registration, so
+     * the pool would claim an MBean for its whole life that was never
+     * published - and would not re-register even after whatever made the
+     * MBeanServer refuse it is gone. Releasing the slot lets a later
+     * borrow retry; {@code JmxUtil.registerJmx} cannot be used for the
+     * attempt because it swallows every exception and returns a name
+     * whatever happened, so the failure of its own call is unobservable
+     * to the caller. Only the first refusal of a name is logged with its
+     * exception, so a persistent refusal is not reported once per borrow.
      */
     protected void registerJmx() {
         try {
@@ -468,7 +507,44 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
             } else if (getCompositeType()!=null) {
                 ObjectName oname = getObjectName(getClass(),poolName);
                 if (mbeans.putIfAbsent(poolName, this)==null) {
-                    JmxUtil.registerJmx(oname, null, this);
+                    try {
+                        ManagementFactory.getPlatformMBeanServer().registerMBean(this, oname);
+                        // a registration under the name works again - drop
+                        // the marker so a later failure cycle reports loudly
+                        registrationFailuresLogged.remove(poolName);
+                    } catch (Exception x) {
+                        mbeans.remove(poolName, this);
+                        if (oname.equals(registrationFailuresLogged.putIfAbsent(poolName, oname))) {
+                            // the loud report went out with the first
+                            // refusal of this name; repeats ride along at
+                            // debug, without a stack trace, so a persistent
+                            // refusal stays quiet under borrow load
+                            if (log.isDebugEnabled()) {
+                                log.debug("Jmx registration of [" + oname
+                                        + "] failed again: " + x);
+                            }
+                        } else {
+                            // first refusal for the name, or the name now
+                            // fails under a different ObjectName: report it
+                            // loudly and remember to throttle the repeats
+                            registrationFailuresLogged.put(poolName, oname);
+                            if (x instanceof InstanceAlreadyExistsException) {
+                                // retryable: the name may be held by a stale
+                                // or foreign MBean that a later borrow finds
+                                // gone
+                                log.warn("Jmx registration of [" + oname
+                                        + "] failed: the name is already in use by another MBean."
+                                        + " The registration is retried by later borrows;"
+                                        + " repeated failures are logged at debug level.", x);
+                            } else {
+                                log.error("Jmx registration of [" + oname
+                                        + "] failed, no JMX data will be exposed for the query stats"
+                                        + " until a registration succeeds. The registration is"
+                                        + " retried by later borrows; repeated failures are"
+                                        + " logged at debug level.", x);
+                            }
+                        }
+                    }
                 }
             } else {
                 log.warn(SlowQueryReport.class.getName()+ "- No JMX support, composite type was not found.");
