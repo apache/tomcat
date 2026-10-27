@@ -659,7 +659,7 @@ public class RewriteValve extends ValveBase {
                     request.setAsyncSupported(pipeline.isAsyncSupported());
                     pipeline.getFirst().invoke(request, response);
                 }
-            } else {
+            } else if (!done) {
                 Valve next = getNext();
                 if (valveSkip) {
                     next = next.getNext();
