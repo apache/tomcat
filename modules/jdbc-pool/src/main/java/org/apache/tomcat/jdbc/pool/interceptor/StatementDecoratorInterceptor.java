@@ -297,6 +297,19 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
             if (compare(TOSTRING_VAL,method)) {
                 return toString();
             }
+            // Handle identity on this proxy, like the statement facade
+            // does, rather than forwarding it to the delegate: the delegate
+            // does not recognise the handle the application holds, and after
+            // close there is no delegate left to answer at all.
+            if (compare(EQUALS_VAL, method)) {
+                if (args[0] == null || !Proxy.isProxyClass(args[0].getClass())) {
+                    return Boolean.FALSE;
+                }
+                return Boolean.valueOf(this.equals(Proxy.getInvocationHandler(args[0])));
+            }
+            if (compare(HASHCODE_VAL, method)) {
+                return Integer.valueOf(this.hashCode());
+            }
             // was close invoked?
             boolean close = compare(CLOSE_VAL, method);
             // allow close to be called multiple times
@@ -343,6 +356,16 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
         }
 
         @Override
+        public int hashCode() {
+            return System.identityHashCode(this);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return this == obj;
+        }
+
+        @Override
         public String toString() {
             StringBuffer buf = new StringBuffer(StatementProxy.class.getName());
             buf.append("[Proxy=");
@@ -378,7 +401,24 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            if (method.getName().equals("getStatement")) {
+            String name = method.getName();
+            // Handle the Object methods on this proxy, like the statement
+            // facade does, rather than forwarding them to the delegate: the
+            // delegate does not recognise the handle the application holds,
+            // and answers that leak driver details through a proxy.
+            if (TOSTRING_VAL.equals(name)) {
+                return toString();
+            }
+            if (EQUALS_VAL.equals(name)) {
+                if (args[0] == null || !Proxy.isProxyClass(args[0].getClass())) {
+                    return Boolean.FALSE;
+                }
+                return Boolean.valueOf(this.equals(Proxy.getInvocationHandler(args[0])));
+            }
+            if (HASHCODE_VAL.equals(name)) {
+                return Integer.valueOf(this.hashCode());
+            }
+            if (GET_STATEMENT.equals(name)) {
                 return this.st;
             } else {
                 try {
@@ -392,6 +432,21 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
                     }
                 }
             }
+        }
+
+        @Override
+        public int hashCode() {
+            return System.identityHashCode(this);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return this == obj;
+        }
+
+        @Override
+        public String toString() {
+            return ResultSetProxy.class.getName() + "[Proxy=" + hashCode() + "; Delegate=" + delegate + ']';
         }
     }
 }
