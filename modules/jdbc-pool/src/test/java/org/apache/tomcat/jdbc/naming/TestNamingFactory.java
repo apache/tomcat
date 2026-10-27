@@ -299,7 +299,7 @@ class TestNamingFactory extends JdbcPoolBaseTest {
         public void setCount(int count) {
             this.count = count;
         }
-        public void setBoom(String value) {
+        public void setBoom(@SuppressWarnings("unused") String value) {
             throw new IllegalStateException("setter always fails");
         }
     }
