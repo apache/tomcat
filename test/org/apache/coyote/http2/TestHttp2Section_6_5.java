@@ -16,6 +16,8 @@
  */
 package org.apache.coyote.http2;
 
+import java.net.SocketTimeoutException;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -34,6 +36,42 @@ public class TestHttp2Section_6_5 extends Http2TestBase {
         sendSettings(0, true, new SettingValue(1, 1));
 
         handleGoAwayResponse(1, Http2Error.FRAME_SIZE_ERROR);
+    }
+
+
+    @Test
+    public void testSettingsFrameEmptyAckFlood() throws Exception {
+        // HTTP2 upgrade
+        http2Connect();
+
+        sendSimpleGetRequest(3);
+        readSimpleGetResponse();
+        output.clearTrace();
+
+        // Unsolicited, empty SETTINGS ACK frames
+        for (int i = 0; i < 100; i++) {
+            sendSettings(0, true);
+        }
+
+        sendSimpleGetRequest(5);
+
+        /*
+         * Expect the server to close the connection with ENHANCE_YOUR_CALM. The response to the second GET request may
+         * or may not be written first so read frames until the GOAWAY arrives.
+         */
+        s.setSoTimeout(5000);
+        String expected = "0-Goaway-[";
+        try {
+            while (!output.getTrace().contains(expected)) {
+                parser.readFrame();
+            }
+        } catch (SocketTimeoutException ste) {
+            Assert.fail("No GOAWAY received after 100 empty SETTINGS ACK frames. Frames seen: [" + output.getTrace() +
+                    "]");
+        }
+
+        String trace = output.getTrace();
+        Assert.assertTrue(trace, trace.contains("]-[" + Http2Error.ENHANCE_YOUR_CALM.getCode() + "]-["));
     }
 
 
