@@ -54,6 +54,7 @@ import jakarta.servlet.http.HttpSession;
 import org.apache.catalina.Globals;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
+import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.util.IOTools;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -534,6 +535,7 @@ public final class CGIServlet extends HttpServlet {
             super.service(req, res);
         } else {
             // Unsupported method
+            res.setHeader("allow", getAllowHeaderValue(req));
             res.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
         }
     }
@@ -581,9 +583,19 @@ public final class CGIServlet extends HttpServlet {
     protected void doOptions(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         // Note: This method will never be called if cgiMethods is "*" so that
         // case does not need to be handled here.
+        res.setHeader("allow", getAllowHeaderValue(req));
+    }
+
+
+    private String getAllowHeaderValue(HttpServletRequest req) {
         Set<String> allowedMethods = new HashSet<>();
         allowedMethods.addAll(cgiMethods);
         allowedMethods.addAll(DEFAULT_SUPER_METHODS);
+
+        // Trace - assume disabled unless we can prove otherwise
+        if (!(req instanceof RequestFacade && ((RequestFacade) req).getAllowTrace())) {
+            allowedMethods.remove(Method.TRACE);
+        }
 
         StringBuilder headerValue = new StringBuilder();
 
@@ -595,7 +607,7 @@ public final class CGIServlet extends HttpServlet {
         // Remove trailing comma
         headerValue.deleteCharAt(headerValue.length() - 1);
 
-        res.setHeader("allow", headerValue.toString());
+        return headerValue.toString();
     }
 
 
