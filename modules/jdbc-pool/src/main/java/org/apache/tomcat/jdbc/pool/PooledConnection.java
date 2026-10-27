@@ -986,47 +986,83 @@ public class PooledConnection implements PooledConnectionMBean {
         return oname;
     }
 
+    /**
+     * Returns the physical connection behind this pooled connection. The
+     * connection field is transiently null while a reconnect is in flight
+     * (and after a failed one), during which the per-connection MBean stays
+     * registered, so the JMX-exposed delegation methods must report that
+     * state rather than fail with a {@link NullPointerException}.
+     * @return the live physical connection
+     * @throws SQLException if this pooled connection currently has no
+     *                      physical connection
+     */
+    private java.sql.Connection requireConnection() throws SQLException {
+        java.sql.Connection c = connection;
+        if (c == null) {
+            throw new SQLException("Connection has been disconnected.");
+        }
+        return c;
+    }
+
+    /**
+     * Clears the warnings on the physical connection. A no-op while this
+     * pooled connection has no physical connection, as there is nothing to
+     * clear warnings on. A driver failure to clear the warnings is logged
+     * and swallowed rather than propagated; the operation is JMX-exposed and
+     * therefore declares no exception.
+     */
     @Override
     public void clearWarnings() {
+        java.sql.Connection c = connection;
+        if (c == null) {
+            return;
+        }
         try {
-            connection.clearWarnings();
+            c.clearWarnings();
         } catch (SQLException e) {
-            log.warn("Unable to clear Warnings, connection will be closed.", e);
+            log.warn("Unable to clear warnings on the connection.", e);
         }
     }
 
+    /**
+     * Returns true if this pooled connection is closed: either it currently
+     * has no physical connection or that connection is closed.
+     * @return true if disconnected or the physical connection is closed
+     * @throws SQLException if the physical connection reports a failure
+     */
     @Override
     public boolean isClosed() throws SQLException {
-        return connection.isClosed();
+        java.sql.Connection c = connection;
+        return c == null || c.isClosed();
     }
 
     @Override
     public boolean getAutoCommit() throws SQLException {
-        return connection.getAutoCommit();
+        return requireConnection().getAutoCommit();
     }
 
     @Override
     public String getCatalog() throws SQLException {
-        return connection.getCatalog();
+        return requireConnection().getCatalog();
     }
 
     @Override
     public int getHoldability() throws SQLException {
-        return connection.getHoldability();
+        return requireConnection().getHoldability();
     }
 
     @Override
     public boolean isReadOnly() throws SQLException {
-        return connection.isReadOnly();
+        return requireConnection().isReadOnly();
     }
 
     @Override
     public String getSchema() throws SQLException {
-        return connection.getSchema();
+        return requireConnection().getSchema();
     }
 
     @Override
     public int getTransactionIsolation() throws SQLException {
-        return connection.getTransactionIsolation();
+        return requireConnection().getTransactionIsolation();
     }
 }
