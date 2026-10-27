@@ -38,6 +38,18 @@ import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
 /**
  * Interceptor that caches {@code PreparedStatement} and/or
  * {@code CallableStatement} instances on a connection.
+ * <p>
+ * A cache hit is answered by this interceptor alone: the rest of the
+ * interceptor chain is not invoked for it, and a statement recycled into
+ * the cache is reset to driver defaults (its query timeout goes back to
+ * zero). Interceptors listed <em>after</em> this one in
+ * {@link org.apache.tomcat.jdbc.pool.PoolConfiguration#setJdbcInterceptors(String)
+ * jdbcInterceptors} therefore do not see reused statements - relevant to
+ * any interceptor whose {@code createStatement} hook performs an action
+ * rather than only wrapping the statement: {@link QueryTimeoutInterceptor}
+ * must be listed before this one to keep its timeout on cached statements,
+ * while wrapping-only interceptors are unaffected because their wrapper is
+ * carried inside the cached proxy.
  */
 public class StatementCache extends StatementDecoratorInterceptor implements StatementCacheMBean {
     private static final Log log = LogFactory.getLog(StatementCache.class);

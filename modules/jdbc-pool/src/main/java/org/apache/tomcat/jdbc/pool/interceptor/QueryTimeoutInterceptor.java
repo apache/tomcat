@@ -27,6 +27,19 @@ import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
 
 /**
  * Interceptor that sets a query timeout on every created {@link Statement}.
+ * <p>
+ * The timeout is applied by the {@code createStatement} hook, which only runs
+ * for statement-creation calls that pass through this interceptor. When
+ * combined with {@link StatementCache}, this interceptor must therefore be
+ * listed <em>before</em> {@code StatementCache} in the
+ * {@link org.apache.tomcat.jdbc.pool.PoolConfiguration#setJdbcInterceptors(String)
+ * jdbcInterceptors} configuration. A statement cache hit is served by the
+ * cache without invoking the rest of the chain, and a statement recycled into
+ * the cache has its query timeout reset to zero, so an interceptor listed
+ * after the cache never sees the reuse and the cached statement executes with
+ * no timeout. Listed before the cache, the hook runs for every creation
+ * request, including the ones the cache serves, and the timeout is re-applied
+ * to the reused statement.
  */
 public class QueryTimeoutInterceptor extends AbstractCreateStatementInterceptor {
     private static final Log log = LogFactory.getLog(QueryTimeoutInterceptor.class);
