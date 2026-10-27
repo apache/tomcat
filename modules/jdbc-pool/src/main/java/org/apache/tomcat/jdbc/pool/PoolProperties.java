@@ -148,7 +148,12 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     private volatile boolean commitOnReturn = false;
     /** Whether to rollback on connection return. */
     private volatile boolean rollbackOnReturn = false;
-    /** Whether to use a disposable connection facade. */
+    /**
+     * Whether to use a disposable connection facade.
+     * @deprecated The disposable connection facade is always used, so this
+     *             property no longer has any effect.
+     */
+    @Deprecated
     private volatile boolean useDisposableConnectionFacade = true;
     /** Whether to log validation errors. */
     private volatile boolean logValidationErrors = false;
@@ -1180,12 +1185,24 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         return this.rollbackOnReturn;
     }
 
+    /**
+     * {@inheritDoc}
+     * @deprecated The disposable connection facade is always used, so this
+     *             property no longer has any effect.
+     */
     @Override
+    @Deprecated
     public void setUseDisposableConnectionFacade(boolean useDisposableConnectionFacade) {
         this.useDisposableConnectionFacade = useDisposableConnectionFacade;
     }
 
+    /**
+     * {@inheritDoc}
+     * @deprecated The disposable connection facade is always used, so this
+     *             property no longer has any effect.
+     */
     @Override
+    @Deprecated
     public boolean getUseDisposableConnectionFacade() {
         return useDisposableConnectionFacade;
     }

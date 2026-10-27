@@ -354,15 +354,15 @@ public class ConnectionPool {
         try {
             Constructor<?> proxyConstructor = getProxyConstructor(con.getXAConnection() != null);
             //create the proxy
-            //TODO possible optimization, keep track if this connection was returned properly, and don't generate a new facade
-            Connection connection = null;
-            if (getPoolProperties().getUseDisposableConnectionFacade() ) {
-                connection = (Connection)proxyConstructor.newInstance(new Object[] { new DisposableConnectionFacade(handler) });
-            } else {
-                connection = (Connection)proxyConstructor.newInstance(new Object[] {handler});
-            }
-            //return the connection
-            return connection;
+            //TODO possible optimization, keep track if this connection was returned properly, and don't generate a new handle and facade
+            // The disposable connection facade is always used; a handle that
+            // its borrower has closed must stay inert, as the interceptor
+            // chain below is cached on the pooled connection and re-armed
+            // for the next borrower. (The useDisposableConnectionFacade
+            // property that used to switch this off is deprecated and no
+            // longer has any effect.)
+            return (Connection)proxyConstructor.newInstance(
+                    new Object[] { new DisposableConnectionFacade(handler) });
         }catch (Exception x) {
             SQLException s = new SQLException();
             s.initCause(x);
