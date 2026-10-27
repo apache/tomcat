@@ -83,6 +83,14 @@ public class PooledConnection implements PooledConnectionMBean {
      */
     protected volatile javax.sql.XAConnection xaConnection;
     /**
+     * If using a ConnectionPoolDataSource underneath, this is the
+     * javax.sql.PooledConnection handle obtained from it. Per the JDBC
+     * specification, closing the logical connection obtained from that
+     * handle does not close the physical connection, so the handle itself
+     * must be kept in order to close the physical connection.
+     */
+    private volatile javax.sql.PooledConnection cpdsConnection;
+    /**
      * When we track abandon traces, this string holds the thread dump
      */
     private String abandonTrace = null;
@@ -292,10 +300,44 @@ public class PooledConnection implements PooledConnectionMBean {
             }
         } else if (poolProperties.getDataSource() instanceof javax.sql.ConnectionPoolDataSource){
             javax.sql.ConnectionPoolDataSource ds = (javax.sql.ConnectionPoolDataSource)poolProperties.getDataSource();
-            if (usr!=null && pwd!=null) {
-                connection = ds.getPooledConnection(usr, pwd).getConnection();
-            } else {
-                connection = ds.getPooledConnection().getConnection();
+            javax.sql.PooledConnection pooled = (usr!=null && pwd!=null) ?
+                    ds.getPooledConnection(usr, pwd) : ds.getPooledConnection();
+            // Keep the handle before obtaining the logical connection: the
+            // physical connection is only closed when the handle is closed,
+            // so losing the handle here would leak the physical connection.
+            cpdsConnection = pooled;
+            SQLException failure = null;
+            RuntimeException failureRuntime = null;
+            try {
+                connection = pooled.getConnection();
+            } catch (SQLException e) {
+                failure = e;
+            } catch (RuntimeException e) {
+                failureRuntime = e;
+            }
+            if (connection == null && failure == null && failureRuntime == null) {
+                // Contract-violating provider: a handle without a logical
+                // connection is of no use either.
+                failure = new SQLException("ConnectionPoolDataSource "+ds+
+                        " returned a null connection for the pooled connection handle");
+            }
+            if (failure != null || failureRuntime != null) {
+                // Do not strand the handle if the logical connection
+                // could not be obtained.
+                Exception origin = failure != null ? failure : failureRuntime;
+                try {
+                    pooled.close();
+                } catch (SQLException | RuntimeException closeX) {
+                    if (closeX != origin) {
+                        origin.addSuppressed(closeX);
+                    }
+                }
+                cpdsConnection = null;
+                connection = null;
+                if (failureRuntime != null) {
+                    throw failureRuntime;
+                }
+                throw failure;
             }
         } else {
             throw new SQLException("DataSource is of unknown class:"+(poolProperties.getDataSource()!=null?poolProperties.getDataSource().getClass():"null"));
@@ -438,7 +480,12 @@ public class PooledConnection implements PooledConnectionMBean {
                         + "physical connection can be closed.", x);
             }
             try {
-                if (xaConnection == null) {
+                if (cpdsConnection != null) {
+                    // Closing the handle closes the physical connection
+                    // and invalidates the logical connection; closing the
+                    // logical connection alone would not.
+                    cpdsConnection.close();
+                } else if (xaConnection == null) {
                     connection.close();
                 } else {
                     xaConnection.close();
@@ -451,6 +498,7 @@ public class PooledConnection implements PooledConnectionMBean {
         }
         connection = null;
         xaConnection = null;
+        cpdsConnection = null;
         lastConnected = -1;
         if (finalize) {
             parent.finalize(this);
