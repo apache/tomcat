@@ -38,7 +38,7 @@ import org.apache.tomcat.util.compat.JrePlatform;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 
-public class TestSecurity2019 extends TomcatBaseTest {
+public class TestSecurity2019Tomcat extends TomcatBaseTest {
 
     // https://www.cve.org/CVERecord?id=CVE-2019-0221
     @Test
