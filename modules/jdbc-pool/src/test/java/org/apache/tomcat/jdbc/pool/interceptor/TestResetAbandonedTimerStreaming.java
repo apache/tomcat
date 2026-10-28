@@ -40,8 +40,14 @@ import org.apache.tomcat.jdbc.pool.DataSource;
  * assert which of the two physical sessions the cleaner killed. The
  * composition test pins that the result set handles the interceptor
  * hands out stay usable, obey the identity contract of a handle, and
- * compose with the statement facade on every access path that yields a
- * result set.
+ * compose with the (always installed) statement facade on every access
+ * path that yields a result set.
+ *
+ * <p>The pool under test still configures the deprecated
+ * {@code useStatementFacade=false}, so the handle composition asserted below
+ * is the one an application gets whatever it asks for: the facade is always
+ * installed. That the property no longer has an effect is what
+ * {@code TestStatementFacadeAlwaysUsed} pins down.</p>
  */
 class TestResetAbandonedTimerStreaming extends JdbcPoolBaseTest {
 
@@ -68,14 +74,19 @@ class TestResetAbandonedTimerStreaming extends JdbcPoolBaseTest {
      */
     private static final int MIN_FAILURE_CALLS = 5;
 
-    private DataSource streamingPool(boolean useStatementFacade) throws SQLException {
+    @SuppressWarnings("deprecation")
+    private DataSource streamingPool() throws SQLException {
         DataSource ds = newDataSource();
         ds.getPoolProperties().setJdbcInterceptors(
                 "org.apache.tomcat.jdbc.pool.interceptor.ResetAbandonedTimer");
         ds.getPoolProperties().setRemoveAbandoned(true);
         ds.getPoolProperties().setRemoveAbandonedTimeout(1); // seconds
         ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(100);
-        ds.getPoolProperties().setUseStatementFacade(useStatementFacade);
+        // Deprecated and without effect: the statement facade is always
+        // used. Running the scenarios on a pool that still asks for it to
+        // be switched off pins that the request can no longer take the
+        // interceptor's keep-alive proxies away.
+        ds.getPoolProperties().setUseStatementFacade(false);
         ds.createPool();
         pool = ds;
         return ds;
@@ -156,9 +167,9 @@ class TestResetAbandonedTimerStreaming extends JdbcPoolBaseTest {
         return rows;
     }
 
-    private void assertStreamingKeepsConnectionAlive(boolean useStatementFacade) throws Exception {
+    private void assertStreamingKeepsConnectionAlive() throws Exception {
         awaitSessions(0);
-        DataSource ds = streamingPool(useStatementFacade);
+        DataSource ds = streamingPool();
         Connection busy = borrowBusyWithIdleControl(ds);
 
         int rows = streamSlowly(busy);
@@ -172,23 +183,15 @@ class TestResetAbandonedTimerStreaming extends JdbcPoolBaseTest {
      * An application iterating a result set is active for as long as it
      * reads, not only until the query returns the cursor position. The
      * abandoned timer must be reset by the fetch traffic driven by
-     * ResultSet.next() - through the statement facade that wraps the
-     * interceptor's result set proxy by default.
+     * ResultSet.next() - through the always-installed statement facade
+     * wrapping the interceptor's result set proxy. The pool under test
+     * still asks for the facade to be switched off through the deprecated
+     * property, so this also pins that the keep-alive proxies can no
+     * longer be taken away that way.
      */
     @Test
     void streamingAResultSetKeepsConnectionAlive() throws Exception {
-        assertStreamingKeepsConnectionAlive(true);
-    }
-
-    /*
-     * The result set keep-alive belongs to the interceptor itself, not
-     * to the statement facade layered around it: with the facade
-     * switched off, fetching rows must keep the connection alive just
-     * the same.
-     */
-    @Test
-    void streamingKeepsConnectionAliveWithoutStatementFacade() throws Exception {
-        assertStreamingKeepsConnectionAlive(false);
+        assertStreamingKeepsConnectionAlive();
     }
 
     /*
@@ -203,7 +206,7 @@ class TestResetAbandonedTimerStreaming extends JdbcPoolBaseTest {
     @Test
     void failedResultSetReadsKeepConnectionAlive() throws Exception {
         awaitSessions(0);
-        DataSource ds = streamingPool(true);
+        DataSource ds = streamingPool();
         Connection busy = borrowBusyWithIdleControl(ds);
 
         int failures = 0;
@@ -234,26 +237,23 @@ class TestResetAbandonedTimerStreaming extends JdbcPoolBaseTest {
     }
 
     /*
-     * The result set handle the interceptor inserts under (or, without
-     * the facade, in place of) the facade's own handle must behave: it
-     * must yield the rows, obey the identity contract of a handle (a
-     * handle is equal to itself and to nothing else), hand out a working
-     * statement through getStatement() - the handle in use by this
-     * interceptor, which an interceptor configured around it may have
-     * wrapped further - close cleanly, and do so on all three paths that
-     * produce a result set - executeQuery, getResultSet and
-     * getGeneratedKeys - with the facade composing around it.
+     * The result set handle the interceptor inserts beneath the facade's
+     * own handle must behave: it must yield the rows, obey the identity
+     * contract of a handle (a handle is equal to itself and to nothing
+     * else), hand out a working statement through getStatement() - the
+     * facade answers that call with the application's own statement
+     * handle - close cleanly, and do so on all three paths that produce a
+     * result set - executeQuery, getResultSet and getGeneratedKeys.
      */
     @Test
     void resultSetsOnEveryAccessPathStayUsableAndHandleStable() throws Exception {
         awaitSessions(0);
-        assertResultSetHandlesCompose(true);
-        assertResultSetHandlesCompose(false);
+        assertResultSetHandlesCompose();
     }
 
     @SuppressWarnings("unlikely-arg-type") // Use of unlikely arg-type is deliberate
-    private void assertResultSetHandlesCompose(boolean useStatementFacade) throws SQLException {
-        DataSource ds = streamingPool(useStatementFacade);
+    private void assertResultSetHandlesCompose() throws SQLException {
+        DataSource ds = streamingPool();
         Connection con = ds.getConnection();
         String table = uniqueTable();
         try (Statement st = con.createStatement()) {

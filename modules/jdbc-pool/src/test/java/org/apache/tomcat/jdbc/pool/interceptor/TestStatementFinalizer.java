@@ -160,10 +160,6 @@ class TestStatementFinalizer extends JdbcPoolBaseTest {
     @Test
     void theTrackingWrapperStaysHonestAboutTheStatementItWraps() throws Exception {
         DataSource ds = finalizerPool();
-        // Without the statement facade the tracker's wrapper is the first
-        // proxy in front of the driver's own statement object, so it is the
-        // handle the application compares, closes and reuses.
-        ds.getPoolProperties().setUseStatementFacade(false);
         ds.createPool();
 
         try (Connection pooled = ds.getConnection()) {
@@ -171,12 +167,25 @@ class TestStatementFinalizer extends JdbcPoolBaseTest {
             Assertions.assertNotNull(finalizer);
 
             PreparedStatement ps = pooled.prepareStatement("SELECT 1");
-            Assertions.assertTrue(ps.equals(ps), "the handle must be equal to itself");
-            Assertions.assertFalse(ps.equals(pooled), "an unrelated object must not compare equal");
+            // The application handle is the statement facade's proxy, which
+            // is always installed. The tracking wrapper this interceptor
+            // puts in front of the driver's statement sits right beneath it,
+            // and that wrapper is what forgets the tracked entry at close -
+            // so its own contract is what the battery below pins down.
+            PreparedStatement wrapper =
+                    (PreparedStatement) proxiedObject(ps);
+            Assertions.assertNotSame(ps, wrapper,
+                    "the tracking wrapper must still sit between the facade and the driver");
+
+            Assertions.assertTrue(wrapper.equals(wrapper), "the handle must be equal to itself");
+            Assertions.assertFalse(wrapper.equals(pooled), "an unrelated object must not compare equal");
+            Statement driver = driverStatement(ps);
+            Assertions.assertTrue(wrapper.equals(driver),
+                    "the wrapper must be equal to the statement it wraps");
             java.util.Set<Statement> seen = new java.util.HashSet<>();
-            seen.add(ps);
-            Assertions.assertTrue(seen.contains(ps), "hashCode must agree with equals");
-            try (ResultSet rs = ps.executeQuery()) {
+            seen.add(wrapper);
+            Assertions.assertTrue(seen.contains(wrapper), "hashCode must agree with equals");
+            try (ResultSet rs = wrapper.executeQuery()) {
                 Assertions.assertTrue(rs.next());
             }
 
@@ -187,11 +196,11 @@ class TestStatementFinalizer extends JdbcPoolBaseTest {
             Assertions.assertEquals(2, tracked(finalizer),
                     "the callable statement must be tracked as well");
 
-            ps.close();
-            ps.close(); // JDBC demands that a repeated close is a no-op
+            wrapper.close();
+            wrapper.close(); // JDBC demands that a repeated close is a no-op
             Assertions.assertEquals(1, tracked(finalizer), "the close must have been counted once");
 
-            Assertions.assertThrows(SQLException.class, ps::getMoreResults,
+            Assertions.assertThrows(SQLException.class, wrapper::getMoreResults,
                     "use after close must still be reported, not swallowed");
             call.close();
             Assertions.assertEquals(0, tracked(finalizer));

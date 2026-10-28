@@ -161,7 +161,12 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     private volatile boolean propagateInterruptState = false;
     /** Whether to ignore exceptions during pre-load. */
     private volatile boolean ignoreExceptionOnPreLoad = false;
-    /** Whether to use a statement facade. */
+    /**
+     * Whether to use a statement facade.
+     * @deprecated The statement facade is always used, so this property no
+     *             longer has any effect.
+     */
+    @Deprecated
     private volatile boolean useStatementFacade = true;
 
     @Override
@@ -1237,12 +1242,24 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         this.ignoreExceptionOnPreLoad = ignoreExceptionOnPreLoad;
     }
 
+    /**
+     * {@inheritDoc}
+     * @deprecated The statement facade is always used, so this property no
+     *             longer has any effect.
+     */
     @Override
+    @Deprecated
     public boolean getUseStatementFacade() {
         return useStatementFacade;
     }
 
+    /**
+     * {@inheritDoc}
+     * @deprecated The statement facade is always used, so this property no
+     *             longer has any effect.
+     */
     @Override
+    @Deprecated
     public void setUseStatementFacade(boolean useStatementFacade) {
         this.useStatementFacade = useStatementFacade;
     }

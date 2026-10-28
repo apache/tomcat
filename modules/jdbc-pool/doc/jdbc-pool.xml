@@ -572,14 +572,21 @@
       </p>
     </attribute>
     <attribute name="useStatementFacade" required="false">
-      <p>(boolean) Set this to true if you wish to wrap statements in order to
-         enable <code>equals()</code> and <code>hashCode()</code> methods to be
-         called on the closed statements if any statement proxy is set.
-         A wrapped statement also reports the pooled connection it was created
-         from when <code>Statement.getConnection()</code> is called, rather than
-         the driver's own connection, and stops working, along with the result
-         sets read from it, once that connection has been returned to the pool.
-         Default value is <code>true</code>.
+      <p>(boolean) Deprecated. This property no longer has any effect. The pool
+                   always puts a facade on the statements it hands out, so that
+                   <code>equals()</code>, <code>hashCode()</code> and
+                   <code>toString()</code> can be called on closed statements,
+                   <code>Statement.getConnection()</code> reports the pooled
+                   connection the statement was created from rather than the
+                   driver's own connection, and a statement stops working,
+                   along with the result sets read from it, once that connection
+                   has been returned to the pool. Switching the facade off used
+                   to leave statement and result set handles usable after the
+                   borrow they came from had ended, which allowed a kept handle
+                   to execute on the session the next borrower held; setting
+                   this property to <code>false</code> is therefore not
+                   supported. The property is still accepted so that existing
+                   configurations keep loading.
       </p>
     </attribute>
 

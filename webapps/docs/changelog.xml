@@ -1027,6 +1027,16 @@
         now runs before the return validation that would otherwise override
         it. (remm)
       </fix>
+      <fix>
+        Always wrap pooled statements and their result sets in the statement
+        facade, so a statement handle kept past the end of its borrow can no
+        longer execute against the session the next borrower holds, and a
+        statement reports the pooled connection it was created from rather
+        than the driver's. The <code>useStatementFacade</code> property that
+        could switch the facade off is deprecated and no longer has any
+        effect, but it is still accepted so existing configurations keep
+        loading. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

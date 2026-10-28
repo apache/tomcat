@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.jdbc;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -192,6 +193,22 @@ public abstract class JdbcPoolBaseTest {
      */
     protected static Statement driverStatement(Statement pooled) throws SQLException {
         return pooled.unwrap(Statement.class);
+    }
+
+    /*
+     * The object a pooled handle wraps. The statement facade's statement and
+     * result set handles keep what they wrap in a field named "delegate" on
+     * their invocation handler, which lets a test assert on the layer below
+     * the facade - the interceptor's own handle, or the statement the
+     * interceptors pass on. The handler classes live in the pool package and
+     * are not nameable from a test elsewhere, so the field is read here.
+     */
+    protected static Object proxiedObject(Object handle)
+            throws ReflectiveOperationException {
+        Object handler = Proxy.getInvocationHandler(handle);
+        Field field = handler.getClass().getDeclaredField("delegate");
+        field.setAccessible(true);
+        return field.get(handler);
     }
 
     /*
