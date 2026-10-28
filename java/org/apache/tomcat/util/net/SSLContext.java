@@ -90,12 +90,48 @@ public interface SSLContext {
     SSLParameters getSupportedSSLParameters();
 
     /**
-     * Returns the certificate chain for the given alias.
+     * Returns the certificate chain for the given key store alias. This is a low-level lookup by exact alias; callers
+     * that want the certificate actually served for a configured {@link SSLHostConfigCertificate} should use
+     * {@link #getCertificateChain(SSLHostConfigCertificate)}, which resolves the served alias (it can differ from the
+     * configured alias, for example after SunMSCAPI Windows-MY numbered-duplicate resolution).
      *
      * @param alias The alias
+     *
      * @return The certificate chain
      */
     X509Certificate[] getCertificateChain(String alias);
+
+
+    /**
+     * Returns the alias the key manager would select to serve for the given certificate configuration during a
+     * handshake. This can differ from {@link SSLHostConfigCertificate#getCertificateKeyAlias()}, for example after
+     * SunMSCAPI Windows-MY numbered-duplicate resolution. The default returns the configured alias (or
+     * {@link SSLUtilBase#DEFAULT_KEY_ALIAS} when none is configured); implementations backed by a key manager override
+     * it to resolve the alias actually served.
+     *
+     * @param certificate The certificate configuration
+     *
+     * @return The served alias, never {@code null}
+     */
+    default String getServedAlias(SSLHostConfigCertificate certificate) {
+        String alias = certificate.getCertificateKeyAlias();
+        return alias == null ? SSLUtilBase.DEFAULT_KEY_ALIAS : alias;
+    }
+
+
+    /**
+     * Returns the certificate chain actually served for the given certificate configuration. Unlike
+     * {@link #getCertificateChain(String)}, which looks up a fixed alias, this uses {@link #getServedAlias}, so callers
+     * such as the certificate reload check observe the certificate that is really in use. This can differ from the
+     * configured alias, for example after SunMSCAPI Windows-MY duplicate resolution.
+     *
+     * @param certificate The certificate configuration
+     *
+     * @return The served certificate chain, or {@code null} if none can be determined
+     */
+    default X509Certificate[] getCertificateChain(SSLHostConfigCertificate certificate) {
+        return getCertificateChain(getServedAlias(certificate));
+    }
 
     /**
      * Returns the accepted issuers.
