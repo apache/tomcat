@@ -20,6 +20,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -220,6 +221,22 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             //get the name of the method for comparison
             final String name = method.getName();
+            //Handle identity on this proxy, like the statement facade
+            //does, rather than forwarding it to the delegate: the delegate
+            //does not recognise the handle the application holds, and after
+            //close there is no delegate left to answer at all.
+            if (compare(TOSTRING_VAL, name)) {
+                return toString();
+            }
+            if (compare(EQUALS_VAL, name)) {
+                if (args[0] == null || !Proxy.isProxyClass(args[0].getClass())) {
+                    return Boolean.FALSE;
+                }
+                return Boolean.valueOf(this.equals(Proxy.getInvocationHandler(args[0])));
+            }
+            if (compare(HASHCODE_VAL, name)) {
+                return Integer.valueOf(this.hashCode());
+            }
             //was close invoked?
             boolean close = compare(CLOSE_VAL, name);
             //allow close to be called multiple times
@@ -297,6 +314,22 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
                 delegate = null;
             }
             return result;
+        }
+
+        @Override
+        public int hashCode() {
+            return System.identityHashCode(this);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return this == obj;
+        }
+
+        @Override
+        public String toString() {
+            return AbstractQueryReport.this.getClass().getName()
+                    + "[Proxy=" + hashCode() + "; Query=" + query + "; Delegate=" + delegate + ']';
         }
     }
 
