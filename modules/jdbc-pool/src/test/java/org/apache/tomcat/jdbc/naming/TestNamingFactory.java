@@ -43,7 +43,10 @@ import org.apache.tomcat.jdbc.pool.XADataSource;
  * correctly configured, fully working pool; and the generic naming
  * factory applies documented property types to the configured object.
  */
-class TestNamingFactory extends JdbcPoolBaseTest {
+/* Public because the public nested targets instantiated through reflection
+   must declare public constructors, which Checkstyle's RedundantModifier
+   check only accepts within a public enclosing class. */
+public class TestNamingFactory extends JdbcPoolBaseTest {
 
     private Reference dataSourceReference(String className) {
         Reference ref = new Reference(className, null, null);
@@ -348,9 +351,15 @@ class TestNamingFactory extends JdbcPoolBaseTest {
                 ne.getRootCause());
     }
 
-    /** Target whose no-argument constructor throws. */
+    /**
+     * Target whose no-argument constructor throws. The constructor must
+     * keep its explicit public modifier: the factory locates it with
+     * reflection (Class.getConstructor() only finds declared public
+     * constructors), and the enclosing class is public so Checkstyle's
+     * RedundantModifier check does not treat the modifier as redundant.
+     */
     public static class ThrowingCtorTarget {
-        ThrowingCtorTarget() {
+        public ThrowingCtorTarget() {
             throw new IllegalStateException("boom");
         }
     }
