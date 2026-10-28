@@ -17,7 +17,7 @@
 package org.apache.tomcat.jdbc.pool.interceptor;
 
 import java.lang.management.ManagementFactory;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -435,16 +435,17 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
         CompositeDataSupport[] result = null;
         ConcurrentHashMap<String,QueryStats> queries = getPoolStats(poolName);
         if (queries!=null) {
-            Set<Map.Entry<String,QueryStats>> stats = queries.entrySet();
-            if (stats!=null) {
-                result = new CompositeDataSupport[stats.size()];
-                Iterator<Map.Entry<String,QueryStats>> it = stats.iterator();
-                int pos = 0;
-                while (it.hasNext()) {
-                    Map.Entry<String,QueryStats> entry = it.next();
-                    QueryStats qs = entry.getValue();
-                    result[pos++] = qs.getCompositeData(getCompositeType());
-                }
+            // Materialise a point-in-time snapshot before sizing the array:
+            // the map is shared with every interceptor instance of the pool
+            // name, which keep adding entries on every query and removing
+            // them on capacity eviction, so sizing from the live map and
+            // then filling from its weakly consistent entry set could run
+            // past the end of the array or leave nulls in it
+            Map<String,QueryStats> snapshot = new HashMap<>(queries);
+            result = new CompositeDataSupport[snapshot.size()];
+            int pos = 0;
+            for (QueryStats qs : snapshot.values()) {
+                result[pos++] = qs.getCompositeData(getCompositeType());
             }
         }
         return result;
