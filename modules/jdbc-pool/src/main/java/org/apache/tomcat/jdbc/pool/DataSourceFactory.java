@@ -309,7 +309,8 @@ public class DataSourceFactory implements ObjectFactory {
     protected static final String PROP_IGNOREEXCEPTIONONPRELOAD = "ignoreExceptionOnPreLoad";
 
     /**
-     * Property name for useStatementFacade.
+     * Property name for useStatementFacade. The property is deprecated and
+     * has no effect; the statement facade is always used.
      */
     protected static final String PROP_USESTATEMENTFACADE = "useStatementFacade";
 
@@ -801,7 +802,8 @@ public class DataSourceFactory implements ObjectFactory {
         if (value != null) {
             Boolean b = parseBoolean(PROP_USESTATEMENTFACADE, value);
             if (b != null) {
-                poolProperties.setUseStatementFacade(b.booleanValue());
+                storeDeprecatedUseStatementFacade(poolProperties,
+                        b.booleanValue());
             }
         }
         return poolProperties;
@@ -946,6 +948,21 @@ public class DataSourceFactory implements ObjectFactory {
     private static void storeDeprecatedUseDisposableConnectionFacade(
             PoolConfiguration poolProperties, boolean value) {
         poolProperties.setUseDisposableConnectionFacade(value);
+    }
+
+    /**
+     * Stores the configured value of the deprecated useStatementFacade
+     * property. The property has no effect any more, the statement facade is
+     * always used; the value is stored as configured so that the property
+     * keeps showing up the way it was set, the same as through any other
+     * configuration path.
+     * @param poolProperties the properties to store the value on
+     * @param value the configured value
+     */
+    @SuppressWarnings("deprecation")
+    private static void storeDeprecatedUseStatementFacade(
+            PoolConfiguration poolProperties, boolean value) {
+        poolProperties.setUseStatementFacade(value);
     }
 
 }

@@ -363,9 +363,13 @@ public class ConnectionPool {
             throw sx;
         }
         // setup statement proxy
-        if (getPoolProperties().getUseStatementFacade()) {
-            handler = new StatementFacade(handler);
-        }
+        // The statement facade is always used; statement and result set
+        // handles a borrower keeps after returning the connection must stay
+        // inert, as the interceptor chain below is cached on the pooled
+        // connection and re-armed for the next borrower. (The
+        // useStatementFacade property that used to switch this off is
+        // deprecated and no longer has any effect.)
+        handler = new StatementFacade(handler);
         try {
             Constructor<?> proxyConstructor = getProxyConstructor(con.getXAConnection() != null);
             //create the proxy

@@ -47,56 +47,75 @@ import org.apache.tomcat.jdbc.pool.DataSource;
  * to answer, so every one of these methods surfaced as an
  * {@link UndeclaredThrowableException} wrapping "Statement closed.".
  *
- * <p>With the (default) statement facade enabled it sits outermost and
- * answers these methods itself, which masks the gap; these tests pin the
- * unfacaded configuration - {@code useStatementFacade=false} is a documented
- * configuration - and that both configurations answer identically.</p>
+ * <p>The pool always installs its statement facade outermost (the
+ * {@code useStatementFacade} property that used to switch it off is
+ * deprecated and has no effect), and the facade answers these methods on the
+ * handle the application holds. The interceptor's own proxies stay live
+ * inner layers under the facade's handles, so the tests reach them through
+ * the facade's delegate and pin the contract at both layers.</p>
  */
 class TestQueryReportIdentity extends JdbcPoolBaseTest {
 
-    private DataSource queryReportPool(String interceptors, boolean useStatementFacade)
-            throws SQLException {
+    private DataSource queryReportPool(String interceptors) throws SQLException {
         DataSource ds = newDataSource();
-        ds.getPoolProperties().setUseStatementFacade(useStatementFacade);
         ds.getPoolProperties().setJdbcInterceptors(interceptors);
         ds.createPool();
         return ds;
     }
 
-    private DataSource slowQueryPool(boolean useStatementFacade) throws SQLException {
-        return queryReportPool(SlowQueryReport.class.getSimpleName(), useStatementFacade);
+    private DataSource slowQueryPool() throws SQLException {
+        return queryReportPool(SlowQueryReport.class.getSimpleName());
+    }
+
+    /* The interceptor's own statement handle behind the facade's. */
+    private static Statement statementBehindFacade(Statement facadeHandle)
+            throws ReflectiveOperationException {
+        return (Statement) proxiedObject(facadeHandle);
+    }
+
+    /* The contract of an open statement handle, for one layer. */
+    private static void assertOpenStatementHandle(Statement handle,
+            Connection pooled, String layer) throws SQLException {
+        Assertions.assertTrue(handle.equals(handle),
+                layer + ": a statement handle must be equal to itself");
+        Assertions.assertFalse(handle.equals(null),
+                layer + ": a statement handle is not equal to null");
+        Assertions.assertFalse(handle.equals(pooled),
+                layer + ": a statement handle is not equal to its connection");
+        Assertions.assertFalse(handle.equals(new Object()),
+                layer + ": a statement handle is not equal to a foreign object");
+        // the driver object underneath is not the handle: an equality the
+        // driver answers is the driver's own identity, not the identity of
+        // the handle above it
+        Assertions.assertFalse(handle.equals(driverStatement(handle)),
+                layer + ": a statement handle is not equal to the driver object below it");
+        int hash = handle.hashCode();
+        Assertions.assertEquals(hash, handle.hashCode(),
+                layer + ": hashCode must be a stable value of the handle itself");
+        Set<Statement> seen = new HashSet<>();
+        seen.add(handle);
+        Assertions.assertTrue(seen.contains(handle),
+                layer + ": hashCode must agree with equals");
     }
 
     @Test
     void aQueryReportStatementHandleIsEqualOnlyToItselfWhileOpen() throws Exception {
-        DataSource ds = slowQueryPool(false);
+        DataSource ds = slowQueryPool();
         try (Connection pooled = ds.getConnection()) {
             try (Statement st = pooled.createStatement()) {
-                Assertions.assertTrue(st.equals(st),
-                        "a statement handle must be equal to itself");
-                Assertions.assertFalse(st.equals(null),
-                        "a statement handle is not equal to null");
-                Assertions.assertFalse(st.equals(pooled),
-                        "a statement handle is not equal to its connection");
-                Assertions.assertFalse(st.equals(new Object()),
-                        "a statement handle is not equal to a foreign object");
-                // the driver object underneath is not the handle: an equality
-                // the driver answers is the driver's own identity, not the
-                // identity of the handle the application holds
-                Assertions.assertFalse(st.equals(driverStatement(st)),
-                        "a statement handle is not equal to the driver object below it");
+                assertOpenStatementHandle(st, pooled, "the statement facade");
+                assertOpenStatementHandle(statementBehindFacade(st), pooled,
+                        "the query report proxy");
                 try (Statement other = pooled.createStatement()) {
                     Assertions.assertFalse(st.equals(other),
-                            "two statements are two handles");
+                            "two statements are two handles at the facade layer");
                     Assertions.assertFalse(other.equals(st));
+                    Assertions.assertFalse(statementBehindFacade(st).equals(other),
+                            "and the proxy of one statement is not the handle of another");
+                    Assertions.assertFalse(statementBehindFacade(st)
+                            .equals(statementBehindFacade(other)),
+                            "two statements are two handles at the interceptor layer");
                 }
-                int hash = st.hashCode();
-                Assertions.assertEquals(hash, st.hashCode(),
-                        "hashCode must be a stable value of the handle itself");
-                Set<Statement> seen = new HashSet<>();
-                seen.add(st);
-                Assertions.assertTrue(seen.contains(st),
-                        "hashCode must agree with equals");
             }
             try (PreparedStatement pst = pooled.prepareStatement("SELECT 1")) {
                 Assertions.assertTrue(pst.equals(pst),
@@ -105,66 +124,90 @@ class TestQueryReportIdentity extends JdbcPoolBaseTest {
                         "two prepared statements are two handles");
                 Assertions.assertEquals(pst.hashCode(), pst.hashCode(),
                         "hashCode must be a stable value of the handle itself");
+                Statement inner = statementBehindFacade(pst);
+                Assertions.assertTrue(inner.equals(inner),
+                        "the interceptor's prepared statement proxy is equal to itself");
             }
         }
     }
 
     @Test
     void aClosedQueryReportHandleKeepsAnsweringWithItsOwnIdentity() throws Exception {
-        DataSource ds = slowQueryPool(false);
-        Connection pooled = ds.getConnection();
-        try {
+        DataSource ds = slowQueryPool();
+        try (Connection pooled = ds.getConnection()) {
             Statement st = pooled.createStatement();
-            int hash = st.hashCode();
-            Map<Statement, String> byHandle = new HashMap<>();
-            byHandle.put(st, "the handle");
+            Statement reportHandle = statementBehindFacade(st);
+            int facadeHash = st.hashCode();
+            int reportHash = reportHandle.hashCode();
+            Map<Statement, String> byFacadeHandle = new HashMap<>();
+            byFacadeHandle.put(st, "the handle");
+            Map<Statement, String> byReportHandle = new HashMap<>();
+            byReportHandle.put(reportHandle, "the handle");
             st.close();
 
-            // None of these three methods declares a checked exception, so a
-            // throwing handler cannot reach the application as a SQLException
-            // - the proxy machinery wraps it. All three answers must simply
-            // be values.
-            Assertions.assertDoesNotThrow(st::hashCode,
-                    "hashCode on a closed handle must return, not throw");
-            Assertions.assertEquals(hash, st.hashCode(),
-                    "closing must not change the identity of a handle");
-            Assertions.assertTrue(st.equals(st),
-                    "closing must not break reflexivity of a handle");
-            Assertions.assertFalse(st.equals(pooled),
-                    "a closed handle is still equal to nothing but itself");
-            Assertions.assertDoesNotThrow(() -> String.valueOf(st),
-                    "toString on a closed handle must return, not throw");
-            // the shapes that actually reach the defect in practice: hashing a
-            // stale handle for a collection, and stringifying one for a log
-            // line or an assertion message
-            try {
-                Assertions.assertEquals("the handle", byHandle.get(st),
-                        "a closed handle must still find its entry in a map");
-                Assertions.assertEquals(hash, st.hashCode());
-                Assertions.assertTrue(String.valueOf(st).contains("Query="));
-            } catch (UndeclaredThrowableException e) {
-                Assertions.fail("a closed statement handle must not surface "
-                        + "UndeclaredThrowableException: " + e.getCause());
+            for (int layer = 0; layer < 2; layer++) {
+                String name = layer == 0 ? "the statement facade"
+                        : "the query report proxy";
+                Statement handle = layer == 0 ? st : reportHandle;
+                int hash = layer == 0 ? facadeHash : reportHash;
+                Map<Statement, String> byHandle = layer == 0 ? byFacadeHandle : byReportHandle;
+
+                // None of these three methods declares a checked exception,
+                // so a throwing handler cannot reach the application as a
+                // SQLException - the proxy machinery wraps it. All three
+                // answers must simply be values.
+                Assertions.assertDoesNotThrow(handle::hashCode,
+                        name + ": hashCode on a closed handle must return, not throw");
+                Assertions.assertEquals(hash, handle.hashCode(),
+                        name + ": closing must not change the identity of a handle");
+                Assertions.assertTrue(handle.equals(handle),
+                        name + ": closing must not break reflexivity of a handle");
+                Assertions.assertFalse(handle.equals(pooled),
+                        name + ": a closed handle is still equal to nothing but itself");
+                Assertions.assertDoesNotThrow(() -> String.valueOf(handle),
+                        name + ": toString on a closed handle must return, not throw");
+                // the shapes that actually reach the defect in practice:
+                // hashing a stale handle for a collection, and stringifying
+                // one for a log line or an assertion message
+                try {
+                    Assertions.assertEquals("the handle", byHandle.get(handle),
+                            name + ": a closed handle must still find its entry in a map");
+                    Assertions.assertEquals(hash, handle.hashCode());
+                    Assertions.assertTrue(String.valueOf(handle).contains("Query="));
+                } catch (UndeclaredThrowableException e) {
+                    Assertions.fail(name + ": a closed statement handle must not surface "
+                            + "UndeclaredThrowableException: " + e.getCause());
+                }
             }
-        } finally {
-            pooled.close();
         }
     }
 
     @Test
     void aQueryReportHandleDescribesItselfRatherThanTheDriverBelowIt() throws Exception {
-        DataSource ds = slowQueryPool(false);
+        DataSource ds = slowQueryPool();
         try (Connection pooled = ds.getConnection()) {
             PreparedStatement pst = pooled.prepareStatement("SELECT 1");
-            String open = Assertions.assertDoesNotThrow(pst::toString,
+            // The shape with the interceptor's name belongs to the query
+            // report proxy below the facade; the facade's own handle
+            // describes the facade instead. Neither may leak the driver.
+            Statement reportHandle = statementBehindFacade(pst);
+
+            String open = Assertions.assertDoesNotThrow(reportHandle::toString,
                     "toString on an open handle must return, not throw");
             Assertions.assertTrue(open.contains(SlowQueryReport.class.getName()),
                     "the handle must say which interceptor produced it, was: " + open);
             Assertions.assertTrue(open.contains("SELECT 1"),
                     "the handle must name its query, was: " + open);
 
+            String facadeSide = Assertions.assertDoesNotThrow(pst::toString,
+                    "toString on the application's handle must return, not throw");
+            Assertions.assertTrue(facadeSide.contains("StatementFacade"),
+                    "the facade handle must say what it is, was: " + facadeSide);
+            Assertions.assertTrue(facadeSide.contains("SELECT 1"),
+                    "and name its query, was: " + facadeSide);
+
             pst.close();
-            String closed = Assertions.assertDoesNotThrow(pst::toString,
+            String closed = Assertions.assertDoesNotThrow(reportHandle::toString,
                     "toString on a closed handle must return, not throw");
             Assertions.assertTrue(closed.contains("SELECT 1"),
                     "a closed handle must still name its query, was: " + closed);
@@ -180,74 +223,99 @@ class TestQueryReportIdentity extends JdbcPoolBaseTest {
      */
     @Test
     void aClosedQueryReportHandleStillRefusesTheWorkItWasCreatedFor() throws Exception {
-        DataSource ds = slowQueryPool(false);
-        Connection pooled = ds.getConnection();
-        try {
+        DataSource ds = slowQueryPool();
+        try (Connection pooled = ds.getConnection()) {
             Statement st = pooled.createStatement();
+            Statement reportHandle = statementBehindFacade(st);
             st.close();
 
-            SQLException onExecute = Assertions.assertThrows(SQLException.class,
-                    () -> st.execute("SELECT 1"));
-            Assertions.assertTrue(onExecute.getMessage().contains("closed"),
-                    "the closed contract still reports a closed statement: "
-                            + onExecute.getMessage());
-            Assertions.assertTrue(st.isClosed(),
-                    "isClosed must report the closed handle");
-            Assertions.assertThrows(SQLException.class, st::getConnection,
-                    "a closed handle still reports its connection as gone");
-            Assertions.assertThrows(SQLException.class, () -> st.unwrap(Statement.class),
-                    "unwrap on a closed handle still fails");
-            Assertions.assertThrows(SQLException.class, () -> st.isWrapperFor(Statement.class),
-                    "isWrapperFor on a closed handle still fails");
-            Assertions.assertThrows(SQLException.class, () -> st.setFetchSize(1),
-                    "a business method on a closed handle still fails");
-        } finally {
-            pooled.close();
+            for (int layer = 0; layer < 2; layer++) {
+                String name = layer == 0 ? "the statement facade"
+                        : "the query report proxy";
+                Statement handle = layer == 0 ? st : reportHandle;
+
+                SQLException onExecute = Assertions.assertThrows(SQLException.class,
+                        () -> handle.execute("SELECT 1"),
+                        name + ": a closed handle must refuse work");
+                Assertions.assertTrue(onExecute.getMessage().contains("closed"),
+                        name + ": the closed contract still reports a closed statement: "
+                                + onExecute.getMessage());
+                Assertions.assertTrue(handle.isClosed(),
+                        name + ": isClosed must report the closed handle");
+                Assertions.assertThrows(SQLException.class, handle::getConnection,
+                        name + ": a closed handle still reports its connection as gone");
+                Assertions.assertThrows(SQLException.class, () -> handle.unwrap(Statement.class),
+                        name + ": unwrap on a closed handle still fails");
+                Assertions.assertThrows(SQLException.class,
+                        () -> handle.isWrapperFor(Statement.class),
+                        name + ": isWrapperFor on a closed handle still fails");
+                Assertions.assertThrows(SQLException.class, () -> handle.setFetchSize(1),
+                        name + ": a business method on a closed handle still fails");
+            }
         }
     }
 
     /*
-     * The facade absorbs the Object methods from outside the interceptor, and
-     * so does the abandoned timer's own proxy; neither configuration and
-     * neither interceptor may change an answer the application gets.
+     * The facade always absorbs the Object methods from outside the
+     * interceptor, and the abandoned timer wraps once more on top of the
+     * query report proxy; neither interceptor and neither layer may change
+     * an answer the contract requires.
      */
+    private static String layerName(int layer) {
+        return layer == 0 ? "facade handle" : "interceptor handle";
+    }
+
     @Test
-    void everyConfigurationAnswersTheSameWay() throws Exception {
+    void everyQueryReportInterceptorAnswersTheSameWayAtBothLayers() throws Exception {
         String[] interceptors = { SlowQueryReport.class.getSimpleName(),
                 ResetAbandonedTimer.class.getSimpleName() };
         for (String interceptor : interceptors) {
-            for (boolean facade : new boolean[] { false, true }) {
-                String config = interceptor + " " + (facade ? "with" : "without");
-                DataSource ds = queryReportPool(interceptor, facade);
-                try (Connection pooled = ds.getConnection()) {
-                    Statement st = pooled.createStatement();
-                    try (PreparedStatement pst = pooled.prepareStatement("SELECT 1")) {
-                        Assertions.assertTrue(pst.equals(pst),
-                                config + " the facade a prepared handle is equal to itself");
-                        Assertions.assertFalse(pst.equals(st),
-                                config + " the facade two statements are two handles");
-                    }
+            DataSource ds = queryReportPool(interceptor);
+            try (Connection pooled = ds.getConnection()) {
+                Statement st = pooled.createStatement();
+                Statement inner = statementBehindFacade(st);
+                try (PreparedStatement pst = pooled.prepareStatement("SELECT 1")) {
+                    Assertions.assertTrue(pst.equals(pst),
+                            interceptor + ": a prepared handle is equal to itself");
+                    Assertions.assertFalse(pst.equals(st),
+                            interceptor + ": two statements are two handles");
+                    Statement innerPst = statementBehindFacade(pst);
+                    Assertions.assertTrue(innerPst.equals(innerPst),
+                            interceptor + ": the interceptor's own prepared proxy is equal to itself");
+                    Assertions.assertFalse(innerPst.equals(inner),
+                            interceptor + ": two proxies are two handles below the facade");
+                }
 
-                    Assertions.assertTrue(st.equals(st),
-                            config + " the facade a statement handle is equal to itself");
-                    Assertions.assertFalse(st.equals(null),
-                            config + " the facade equals(null) is false");
-                    int hash = st.hashCode();
-                    Map<Statement, String> byHandle = new HashMap<>();
-                    byHandle.put(st, "the handle");
+                Statement[] handles = { st, inner };
+                int[] hashes = new int[2];
+                @SuppressWarnings("unchecked")
+                Map<Statement, String>[] byHandle = new Map[] {
+                        new HashMap<Statement, String>(), new HashMap<Statement, String>() };
+                for (int layer = 0; layer < 2; layer++) {
+                    Assertions.assertTrue(handles[layer].equals(handles[layer]),
+                            interceptor + " " + layerName(layer) + ": a statement handle is equal to itself");
+                    Assertions.assertFalse(handles[layer].equals(null),
+                            interceptor + " " + layerName(layer) + ": equals(null) is false");
+                    hashes[layer] = handles[layer].hashCode();
+                    byHandle[layer].put(handles[layer], "the handle");
+                }
 
-                    st.close();
+                st.close(); // both layers then face the same closed state
 
-                    Assertions.assertTrue(st.equals(st),
-                            config + " the facade a closed handle stays equal to itself");
-                    Assertions.assertFalse(st.equals(pooled),
-                            config + " the facade a closed handle is equal to nothing else");
-                    Assertions.assertEquals(hash, st.hashCode(),
-                            config + " the facade the hash survives the close");
-                    Assertions.assertEquals("the handle", byHandle.get(st),
-                            config + " the facade a closed handle still hashes into its map");
-                    Assertions.assertNotNull(String.valueOf(st),
-                            config + " the facade the closed handle still describes itself");
+                for (int layer = 0; layer < 2; layer++) {
+                    String name = interceptor + " " + layerName(layer);
+                    Statement handle = handles[layer];
+
+                    Assertions.assertTrue(handle.equals(handle),
+                            name + ": a closed handle stays equal to itself");
+                    Assertions.assertFalse(handle.equals(pooled),
+                            name + ": a closed handle is equal to nothing else");
+                    Assertions.assertEquals(hashes[layer], handle.hashCode(),
+                            name + ": the hash survives the close");
+                    Assertions.assertEquals("the handle", byHandle[layer].get(handle),
+                            name + ": a closed handle still hashes into its map");
+                    Assertions.assertNotNull(String.valueOf(handle),
+                            name + ": the closed handle still describes itself");
                 }
             }
         }

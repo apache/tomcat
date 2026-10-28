@@ -41,8 +41,8 @@ import org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer;
  * ({@link StatementFinalizer}'s close-on-return, a statement cache).</p>
  *
  * <p>{@link StatementDecoratorInterceptor} has always answered this call
- * with the pooled handle; {@link StatementFacade}, which is on by default,
- * did not.</p>
+ * with the pooled handle, and so does the statement facade that is now
+ * always installed.</p>
  */
 class TestStatementConnectionHandle extends JdbcPoolBaseTest {
 
@@ -188,6 +188,7 @@ class TestStatementConnectionHandle extends JdbcPoolBaseTest {
      * answer does not depend on an unrelated interceptor being configured.
      */
     @Test
+    @SuppressWarnings("deprecation")
     void theDecoratorAndTheFacadeAnswerTheSameWay() throws Exception {
         DataSource ds = newDataSource();
         ds.getPoolProperties().setJdbcInterceptors(
@@ -200,6 +201,10 @@ class TestStatementConnectionHandle extends JdbcPoolBaseTest {
                     "with the decorator configured the reported connection must stay the pooled handle");
         }
 
+        // The deprecated value asks for the facade not to be installed; it
+        // no longer removes it, so this handle is the facade's proxy and the
+        // decorator's own proxy sits right underneath it. Both layers must
+        // give the same answer.
         DataSource unfacaded = newDataSource();
         unfacaded.getPoolProperties().setUseStatementFacade(false);
         unfacaded.getPoolProperties().setJdbcInterceptors(
@@ -208,7 +213,12 @@ class TestStatementConnectionHandle extends JdbcPoolBaseTest {
         try (Connection pooled = unfacaded.getConnection();
                 Statement st = pooled.createStatement()) {
             Assertions.assertSame(pooled, st.getConnection(),
-                    "the decorator alone must keep answering with the pooled handle");
+                    "the application handle must report the pooled handle even with the "
+                            + "deprecated value set");
+            try (Statement inner = (Statement) proxiedObject(st)) {
+                Assertions.assertSame(pooled, inner.getConnection(),
+                        "the decorator handle beneath the facade must answer the same way");
+            }
         }
     }
 }

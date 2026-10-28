@@ -43,12 +43,10 @@ import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
  * Each reset happens when an individual call completes, so a single call
  * that itself blocks on the database for longer than
  * {@link org.apache.tomcat.jdbc.pool.PoolConfiguration#setRemoveAbandonedTimeout(int)}
- * still gets the connection abandoned. When the
- * {@link org.apache.tomcat.jdbc.pool.PoolConfiguration#setUseStatementFacade(boolean)
- * statement facade} is switched off, a result set handle that outlives
- * its borrow keeps refreshing the abandoned timer of whoever holds that
- * physical connection next; with the facade enabled, as by default, a
- * returned borrow is sealed off before that can happen.
+ * still gets the connection abandoned. The statement facade is always used,
+ * so a result set handle that outlives its borrow is sealed off before it
+ * can go on refreshing the abandoned timer of whoever holds that physical
+ * connection next.
  * This interceptor is useful for when you have a {@link org.apache.tomcat.jdbc.pool.PoolConfiguration#setRemoveAbandonedTimeout(int)}
  * that is fairly low, and you want to reset the abandoned time each time any operation on the connection is performed
  * This is useful for batch processing programs that use connections for extensive amount of times.

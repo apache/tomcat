@@ -334,7 +334,7 @@
              writeable="false"/>
 
     <attribute    name="useStatementFacade"
-           description="If true, connection pool is configured to wrap statements."
+           description="Deprecated, no longer has any effect: the pool always uses a statement facade, so statements and result sets cannot be used after the connection they came from is returned"
                   type="java.lang.Boolean"
                     is="false"
              writeable="false"/>
