@@ -453,12 +453,18 @@ public class DataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_DEFAULTAUTOCOMMIT);
         if (value != null) {
-            poolProperties.setDefaultAutoCommit(Boolean.valueOf(value));
+            Boolean b = parseBoolean(PROP_DEFAULTAUTOCOMMIT, value);
+            if (b != null) {
+                poolProperties.setDefaultAutoCommit(b);
+            }
         }
 
         value = properties.getProperty(PROP_DEFAULTREADONLY);
         if (value != null) {
-            poolProperties.setDefaultReadOnly(Boolean.valueOf(value));
+            Boolean b = parseBoolean(PROP_DEFAULTREADONLY, value);
+            if (b != null) {
+                poolProperties.setDefaultReadOnly(b);
+            }
         }
 
         value = properties.getProperty(PROP_DEFAULTTRANSACTIONISOLATION);
@@ -524,17 +530,26 @@ public class DataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_TESTONBORROW);
         if (value != null) {
-            poolProperties.setTestOnBorrow(Boolean.parseBoolean(value));
+            Boolean b = parseBoolean(PROP_TESTONBORROW, value);
+            if (b != null) {
+                poolProperties.setTestOnBorrow(b.booleanValue());
+            }
         }
 
         value = properties.getProperty(PROP_TESTONRETURN);
         if (value != null) {
-            poolProperties.setTestOnReturn(Boolean.parseBoolean(value));
+            Boolean b = parseBoolean(PROP_TESTONRETURN, value);
+            if (b != null) {
+                poolProperties.setTestOnReturn(b.booleanValue());
+            }
         }
 
         value = properties.getProperty(PROP_TESTONCONNECT);
         if (value != null) {
-            poolProperties.setTestOnConnect(Boolean.parseBoolean(value));
+            Boolean b = parseBoolean(PROP_TESTONCONNECT, value);
+            if (b != null) {
+                poolProperties.setTestOnConnect(b.booleanValue());
+            }
         }
 
         value = properties.getProperty(PROP_TIMEBETWEENEVICTIONRUNSMILLIS);
@@ -554,7 +569,10 @@ public class DataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_TESTWHILEIDLE);
         if (value != null) {
-            poolProperties.setTestWhileIdle(Boolean.parseBoolean(value));
+            Boolean b = parseBoolean(PROP_TESTWHILEIDLE, value);
+            if (b != null) {
+                poolProperties.setTestWhileIdle(b.booleanValue());
+            }
         }
 
         value = properties.getProperty(PROP_PASSWORD);
@@ -594,12 +612,18 @@ public class DataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED);
         if (value != null) {
-            poolProperties.setAccessToUnderlyingConnectionAllowed(Boolean.parseBoolean(value));
+            Boolean b = parseBoolean(PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED, value);
+            if (b != null) {
+                poolProperties.setAccessToUnderlyingConnectionAllowed(b.booleanValue());
+            }
         }
 
         value = properties.getProperty(PROP_REMOVEABANDONED);
         if (value != null) {
-            poolProperties.setRemoveAbandoned(Boolean.parseBoolean(value));
+            Boolean b = parseBoolean(PROP_REMOVEABANDONED, value);
+            if (b != null) {
+                poolProperties.setRemoveAbandoned(b.booleanValue());
+            }
         }
 
         value = properties.getProperty(PROP_REMOVEABANDONEDTIMEOUT);
@@ -609,7 +633,10 @@ public class DataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_LOGABANDONED);
         if (value != null) {
-            poolProperties.setLogAbandoned(Boolean.parseBoolean(value));
+            Boolean b = parseBoolean(PROP_LOGABANDONED, value);
+            if (b != null) {
+                poolProperties.setLogAbandoned(b.booleanValue());
+            }
         }
 
         value = properties.getProperty(PROP_POOLPREPAREDSTATEMENTS);
@@ -652,17 +679,26 @@ public class DataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_JMX_ENABLED);
         if (value != null) {
-            poolProperties.setJmxEnabled(Boolean.parseBoolean(value));
+            Boolean b = parseBoolean(PROP_JMX_ENABLED, value);
+            if (b != null) {
+                poolProperties.setJmxEnabled(b.booleanValue());
+            }
         }
 
         value = properties.getProperty(PROP_FAIR_QUEUE);
         if (value != null) {
-            poolProperties.setFairQueue(Boolean.parseBoolean(value));
+            Boolean b = parseBoolean(PROP_FAIR_QUEUE, value);
+            if (b != null) {
+                poolProperties.setFairQueue(b.booleanValue());
+            }
         }
 
         value = properties.getProperty(PROP_USE_EQUALS);
         if (value != null) {
-            poolProperties.setUseEquals(Boolean.parseBoolean(value));
+            Boolean b = parseBoolean(PROP_USE_EQUALS, value);
+            if (b != null) {
+                poolProperties.setUseEquals(b.booleanValue());
+            }
         }
 
         value = properties.getProperty(OBJECT_NAME);
@@ -682,7 +718,10 @@ public class DataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_USE_CON_LOCK);
         if (value != null) {
-            poolProperties.setUseLock(Boolean.parseBoolean(value));
+            Boolean b = parseBoolean(PROP_USE_CON_LOCK, value);
+            if (b != null) {
+                poolProperties.setUseLock(b.booleanValue());
+            }
         }
 
         value = properties.getProperty(PROP_DATASOURCE);
@@ -704,44 +743,99 @@ public class DataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_ALTERNATE_USERNAME_ALLOWED);
         if (value != null) {
-            poolProperties.setAlternateUsernameAllowed(Boolean.parseBoolean(value));
+            Boolean b = parseBoolean(PROP_ALTERNATE_USERNAME_ALLOWED, value);
+            if (b != null) {
+                poolProperties.setAlternateUsernameAllowed(b.booleanValue());
+            }
         }
 
         value = properties.getProperty(PROP_COMMITONRETURN);
         if (value != null) {
-            poolProperties.setCommitOnReturn(Boolean.parseBoolean(value));
+            Boolean b = parseBoolean(PROP_COMMITONRETURN, value);
+            if (b != null) {
+                poolProperties.setCommitOnReturn(b.booleanValue());
+            }
         }
 
         value = properties.getProperty(PROP_ROLLBACKONRETURN);
         if (value != null) {
-            poolProperties.setRollbackOnReturn(Boolean.parseBoolean(value));
+            Boolean b = parseBoolean(PROP_ROLLBACKONRETURN, value);
+            if (b != null) {
+                poolProperties.setRollbackOnReturn(b.booleanValue());
+            }
         }
 
         value = properties.getProperty(PROP_USEDISPOSABLECONNECTIONFACADE);
         if (value != null) {
-            storeDeprecatedUseDisposableConnectionFacade(poolProperties,
-                    Boolean.parseBoolean(value));
+            Boolean b = parseBoolean(PROP_USEDISPOSABLECONNECTIONFACADE, value);
+            if (b != null) {
+                storeDeprecatedUseDisposableConnectionFacade(poolProperties,
+                        b.booleanValue());
+            }
         }
 
         value = properties.getProperty(PROP_LOGVALIDATIONERRORS);
         if (value != null) {
-            poolProperties.setLogValidationErrors(Boolean.parseBoolean(value));
+            Boolean b = parseBoolean(PROP_LOGVALIDATIONERRORS, value);
+            if (b != null) {
+                poolProperties.setLogValidationErrors(b.booleanValue());
+            }
         }
 
         value = properties.getProperty(PROP_PROPAGATEINTERRUPTSTATE);
         if (value != null) {
-            poolProperties.setPropagateInterruptState(Boolean.parseBoolean(value));
+            Boolean b = parseBoolean(PROP_PROPAGATEINTERRUPTSTATE, value);
+            if (b != null) {
+                poolProperties.setPropagateInterruptState(b.booleanValue());
+            }
         }
 
         value = properties.getProperty(PROP_IGNOREEXCEPTIONONPRELOAD);
         if (value != null) {
-            poolProperties.setIgnoreExceptionOnPreLoad(Boolean.parseBoolean(value));
+            Boolean b = parseBoolean(PROP_IGNOREEXCEPTIONONPRELOAD, value);
+            if (b != null) {
+                poolProperties.setIgnoreExceptionOnPreLoad(b.booleanValue());
+            }
         }
         value = properties.getProperty(PROP_USESTATEMENTFACADE);
         if (value != null) {
-            poolProperties.setUseStatementFacade(Boolean.parseBoolean(value));
+            Boolean b = parseBoolean(PROP_USESTATEMENTFACADE, value);
+            if (b != null) {
+                poolProperties.setUseStatementFacade(b.booleanValue());
+            }
         }
         return poolProperties;
+    }
+
+    /**
+     * Parses the value configured for a boolean property. Unlike
+     * {@link Boolean#parseBoolean(String)}, which silently yields
+     * {@code false} for any input, an unrecognized value is reported
+     * instead of being applied as {@code false}.
+     * @param name  the property name, for the error message
+     * @param value the configured value, never {@code null}
+     * @return {@link Boolean#TRUE} or {@link Boolean#FALSE}, or {@code null}
+     *         when the value is empty and the property is therefore to be
+     *         left unset: at its {@link PoolProperties} default for a plain
+     *         boolean, at its "use the driver default" state for a tri-state
+     *         property
+     * @throws IllegalArgumentException if the value is neither
+     *         {@code true} nor {@code false}, ignoring case and surrounding
+     *         whitespace
+     */
+    private static Boolean parseBoolean(String name, String value) {
+        String trimmed = value.trim();
+        if (trimmed.isEmpty()) {
+            return null;
+        }
+        if ("true".equalsIgnoreCase(trimmed)) {
+            return Boolean.TRUE;
+        }
+        if ("false".equalsIgnoreCase(trimmed)) {
+            return Boolean.FALSE;
+        }
+        throw new IllegalArgumentException("Invalid boolean value '" + value
+                + "' for property " + name);
     }
 
     /**
