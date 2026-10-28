@@ -672,13 +672,28 @@ public interface PoolConfiguration {
 
     /**
      * Returns true if the pool sweeper is enabled for the connection pool.
-     * The pool sweeper is enabled if any settings that require async intervention in the pool are turned on
+     * The pool sweeper is enabled if any settings that require async intervention in the pool are turned on.
+     * Implementations are expected to run the background maintenance whenever
      * <code>
-     * boolean result = getTimeBetweenEvictionRunsMillis()&gt;0;
-     * result = result &amp;&amp; (isRemoveAbandoned() &amp;&amp; getRemoveAbandonedTimeout()&gt;0);
-     * result = result || (isTestWhileIdle() &amp;&amp; getValidationQuery()!=null);
+     * boolean timer = getTimeBetweenEvictionRunsMillis()&gt;0;
+     * boolean result = timer &amp;&amp; (isRemoveAbandoned() &amp;&amp; getRemoveAbandonedTimeout()&gt;0);
+     * result = result || (timer &amp;&amp; getSuspectTimeout()&gt;0);
+     * result = result || (timer &amp;&amp; isTestWhileIdle());
+     * result = result || (timer &amp;&amp; getMinEvictableIdleTimeMillis()&gt;0);
+     * result = result || (timer &amp;&amp; getMaxAge()&gt;0);
      * return result;
      * </code>
+     * so enabling the maintenance when any one of these triggers is turned on satisfies the contract.
+     * With the defaults shipped by {@link PoolProperties} the sweeper is enabled.
+     * When it runs, the background cleaner thread checks for abandoned connections when
+     * {@link #isRemoveAbandoned()} is set, marks and reports connections that exceeded
+     * {@link #getSuspectTimeout()}, evicts idle connections towards
+     * {@link #getMinIdle()}, validates idle connections when {@link #isTestWhileIdle()} is set and
+     * reconnects idle connections that exceeded {@link #getMaxAge()}.
+     * While the sweeper is enabled, the pool also takes the per-connection lock when borrowing and
+     * returning connections (the same lock {@link #getUseLock()} forces on) and returned connections
+     * are kept beyond {@link #getMaxIdle()}, letting the idle pool grow towards
+     * {@link #getMaxActive()} as the cleaner trims it.
      *
      * @return true if a background thread is or will be enabled for this pool
      */
