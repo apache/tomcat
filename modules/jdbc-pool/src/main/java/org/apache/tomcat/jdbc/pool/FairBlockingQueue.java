@@ -209,6 +209,10 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
      * item has not already been handed over to the future. A future that is no
      * longer needed must therefore be cancelled, so that a subsequent offer
      * does not hand an item over to a future nobody is waiting on.
+     * A {@link java.util.concurrent.Future#get(long, TimeUnit)} call on the
+     * future that times out deregisters the waiter in the same way and fails
+     * the future terminally, so that every later retrieval from it fails right
+     * away instead of waiting for an item that can no longer be handed over.
      * Once {@link #cancelWaiters()} has been called, no waiter is registered
      * anymore: the returned future is cancelled right away, as the caller
      * that cancelled the waiters offers no further item that could serve it.
@@ -488,6 +492,15 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
      * A future used to check if a connection has been made available.
      * Cancelling the future deregisters its waiter from the queue, as long
      * as the item has not already been handed over to the future.
+     * <br>
+     * A {@link #get(long, TimeUnit)} call that times out deregisters the
+     * waiter in the same way, and additionally fails the future terminally:
+     * no offer can reach the deregistered latch anymore, so the future
+     * reports {@link #isDone()} true without ever being cancelled, keeps
+     * failing every later {@link #get(long, TimeUnit)} with a
+     * {@link TimeoutException} and every later {@link #get()} with an
+     * {@link ExecutionException} caused by one, and can no longer be
+     * cancelled.
      *
      * @param <T> the type of the item
      */
@@ -498,6 +511,14 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
         protected volatile ExchangeCountDownLatch<T> latch = null;
         /** Whether this future has been cancelled. */
         protected volatile boolean canceled = false;
+        /**
+         * Whether a {@link #get(long, TimeUnit)} call on this future timed
+         * out. Its waiter was then deregistered from the queue, so no item
+         * can ever be handed over to this future anymore; the future is
+         * terminally failed and its get() methods fail fast instead of
+         * parking on a latch that nothing can count down again.
+         */
+        protected volatile boolean abandoned = false;
 
         /**
          * Creates an ItemFuture with the given item already available.
@@ -532,7 +553,10 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
             try {
                 //the item is handed over under the queue lock, so a non-null
                 //item means an offer() has already committed to this future
-                if (l.getItem()!=null || canceled) {
+                if (l.getItem()!=null || canceled || abandoned) {
+                    //the future is complete: it received its item, it was
+                    //cancelled earlier, or a timed out get() call abandoned
+                    //its waiter, so there is nothing left to cancel
                     return false;
                 }
                 canceled = true;
@@ -556,9 +580,18 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
                 if (canceled) {
                     throw new CancellationException();
                 }
+                if (abandoned) {
+                    throw abandonedFailure();
+                }
                 latch.await();
+                //the latch is counted down by the offer() that hands over
+                //the item, by cancel(), or by a timed get() call that
+                //abandoned this future - check for each of them
                 if (canceled) {
                     throw new CancellationException();
+                }
+                if (abandoned) {
+                    throw abandonedFailure();
                 }
                 return latch.getItem();
             } else {
@@ -574,27 +607,59 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
                 if (canceled) {
                     throw new CancellationException();
                 }
+                if (abandoned) {
+                    throw abandonedTimeout();
+                }
                 boolean timedout = !latch.await(timeout, unit);
                 if (canceled) {
                     throw new CancellationException();
                 }
+                if (abandoned) {
+                    //another timed get() call abandoned this future while
+                    //this one was waiting, so this wait can no longer be
+                    //served either
+                    throw abandonedTimeout();
+                }
                 if (timedout) {
-                    //an abandoned timed-out waiter would otherwise keep
-                    //consuming offered items, so deregister it as well -
-                    //this mirrors what the timed poll() method does
                     final ReentrantLock lock = FairBlockingQueue.this.lock;
+                    T delivered;
+                    boolean lostToCancel;
                     lock.lock();
                     try {
-                        waiters.remove(latch);
+                        //the item is handed over under the queue lock, so an
+                        //offer() that committed to this latch concurrently
+                        //with the timeout is visible here
+                        delivered = latch.getItem();
+                        lostToCancel = canceled;
+                        if (delivered==null && !lostToCancel) {
+                            //an abandoned timed-out waiter would otherwise keep
+                            //consuming offered items, so deregister it as well -
+                            //this mirrors what the timed poll() method does
+                            waiters.remove(latch);
+                            //no offer() can reach the deregistered latch
+                            //anymore and nothing else can complete the future,
+                            //so fail it terminally: a later get() must not
+                            //park on a latch that will never be counted down
+                            abandoned = true;
+                        }
                     } finally {
                         lock.unlock();
                     }
-                    //an item may have been handed over concurrently with the
-                    //timeout; in that case it is delivered rather than lost
-                    T delivered = latch.getItem();
                     if (delivered!=null) {
+                        //an item may have been handed over concurrently with
+                        //the timeout; in that case it is delivered rather than
+                        //lost
                         return delivered;
                     }
+                    if (lostToCancel) {
+                        //a cancel() won the race against this timeout; its
+                        //callers are told about the cancellation
+                        throw new CancellationException();
+                    }
+                    //wake up any other caller already blocked in a get()
+                    //method, so it observes the abandonment instead of
+                    //waiting on a latch nothing will count down again
+                    latch.countDown();
                     throw new TimeoutException();
                 } else {
                     return latch.getItem();
@@ -611,7 +676,35 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
 
         @Override
         public boolean isDone() {
-            return (item!=null || canceled || (latch!=null && latch.getItem()!=null));
+            return (item!=null || canceled || abandoned
+                    || (latch!=null && latch.getItem()!=null));
+        }
+
+        /**
+         * The failure for a caller of {@link #get(long, TimeUnit)} of a
+         * future whose waiter was abandoned by an earlier timeout. The wait
+         * cannot ever succeed anymore, so the timeout of this call is what
+         * the caller gets to hear about, right away.
+         *
+         * @return the timeout failure to throw
+         */
+        private TimeoutException abandonedTimeout() {
+            return new TimeoutException("The waiter of this future timed out on an earlier"
+                    + " get() call and was deregistered from the queue; the future can no"
+                    + " longer receive an item");
+        }
+
+        /**
+         * The failure for a caller of the untimed {@link #get()} of a future
+         * whose waiter was abandoned by an earlier timeout. The get() method
+         * cannot declare a {@link TimeoutException}, so, the same way
+         * {@link ConnectionPool.ConnectionFuture#get()} does, it reports the
+         * timeout as the cause of an ExecutionException.
+         *
+         * @return the execution failure to throw
+         */
+        private ExecutionException abandonedFailure() {
+            return new ExecutionException(abandonedTimeout());
         }
 
     }
