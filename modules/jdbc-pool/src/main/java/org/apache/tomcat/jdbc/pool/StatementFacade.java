@@ -33,6 +33,20 @@ import org.apache.tomcat.jdbc.pool.interceptor.AbstractCreateStatementIntercepto
 
 /**
  * Facade that creates statement and result set proxies.
+ * <p>
+ * The handles this facade hands out implement only the standard JDBC
+ * interfaces, as do the proxies of the interceptors that wrap statements
+ * beneath it, so the driver's own statement and result set classes are never
+ * visible to the application through a cast. The <code>Wrapper</code> methods
+ * are delegated to the driver, and <code>unwrap</code> is the supported way
+ * to reach driver-specific methods through every layer. An unwrapped driver
+ * object, however, is a driver object rather than a pooled handle: retiring
+ * these handles at the end of the borrow does not retire what was already
+ * unwrapped, and only tracking the statements with
+ * {@link org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer} (or the
+ * application closing them) keeps the statements underneath from outliving
+ * the borrow - unless an interceptor recycles them for the next borrow, as a
+ * statement cache does.
  */
 public class StatementFacade extends AbstractCreateStatementInterceptor {
 
