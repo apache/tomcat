@@ -118,10 +118,6 @@ class TestStatementCacheReuse extends JdbcPoolBaseTest {
     @Test
     void aRecycledStatementReportsTheBorrowerItIsHandedTo() throws Exception {
         DataSource ds = cachedPool("prepared=true,max=5", 1);
-        // Without the statement facade the cache's own proxy is what the
-        // application holds; the facade answers getConnection() itself and
-        // so masks what the proxy behind it carries.
-        ds.getPoolProperties().setUseStatementFacade(false);
         String table = uniqueTable();
         ds.createPool();
         try (Connection admin = adminConnection(); Statement st = admin.createStatement()) {
@@ -149,15 +145,24 @@ class TestStatementCacheReuse extends JdbcPoolBaseTest {
             Assertions.assertEquals(0, cacheOf(second).getCacheSizePerConnection(),
                     "the statement must have come out of the cache");
 
+            // The application handle is the facade's proxy, which answers
+            // from the current borrow (pinned separately by
+            // aRecycledStatementBehindTheDefaultFacadeReportsTheCurrentBorrower).
+            // Beneath it sits the cache's own proxy, and that is the object
+            // the cache must have rebound to the new borrower.
             Connection reported = reused.getConnection();
             Assertions.assertSame(second, reported,
                     "the recycled statement must report the borrower it is handed to, "
                             + "not the borrower that closed it");
-            Assertions.assertFalse(reported.isClosed(),
-                    "the reported connection must be the live handle of the current borrow");
-            try (Statement probe = reported.createStatement()) {
+            Statement inner = (Statement) proxiedObject(reused);
+            Assertions.assertSame(second, inner.getConnection(),
+                    "the cache's own proxy must have been rebound to the new borrower");
+            Connection bound = inner.getConnection();
+            Assertions.assertFalse(bound.isClosed(),
+                    "the bound connection must be the live handle of the current borrow");
+            try (Statement probe = bound.createStatement()) {
                 Assertions.assertTrue(probe.execute("SELECT 1"),
-                        "the reported connection must serve the current borrower");
+                        "the bound connection must serve the current borrower");
             }
 
             reused.setInt(1, 2);

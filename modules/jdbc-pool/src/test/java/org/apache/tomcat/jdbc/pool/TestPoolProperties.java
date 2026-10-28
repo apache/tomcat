@@ -129,6 +129,22 @@ class TestPoolProperties {
     }
 
     @Test
+    @SuppressWarnings("deprecation")
+    void theDeprecatedStatementFacadePropertyIsStillStoredWhenConfigured() {
+        Properties attrs = new Properties();
+        attrs.setProperty("useStatementFacade", "false");
+
+        PoolConfiguration configured =
+                DataSourceFactory.parsePoolProperties(attrs);
+
+        // The property has no effect any more, but existing configuration
+        // must keep loading and keep reading back as it was written.
+        Assertions.assertFalse(configured.getUseStatementFacade(),
+                "the deprecated value must still round-trip through the "
+                        + "factory path");
+    }
+
+    @Test
     void setConnectionPropertiesRoundTripsThroughTheFactory() {
         Properties attrs = new Properties();
         attrs.setProperty("connectionProperties", "first=one;second=two");

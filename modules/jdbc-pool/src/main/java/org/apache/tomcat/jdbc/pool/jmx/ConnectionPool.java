@@ -1055,12 +1055,24 @@ public class ConnectionPool extends NotificationBroadcasterSupport
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * {@inheritDoc}
+     * @deprecated The statement facade is always used, so this property no
+     *             longer has any effect.
+     */
     @Override
+    @Deprecated
     public boolean getUseStatementFacade() {
         return getPoolProperties().getUseStatementFacade();
     }
 
+    /**
+     * {@inheritDoc}
+     * @deprecated The statement facade is always used, so this property no
+     *             longer has any effect.
+     */
     @Override
+    @Deprecated
     public void setUseStatementFacade(boolean useStatementFacade) {
         getPoolProperties().setUseStatementFacade(useStatementFacade);
     }
