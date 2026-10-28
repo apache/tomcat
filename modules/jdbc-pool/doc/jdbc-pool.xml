@@ -580,9 +580,14 @@
                    connection the statement was created from rather than the
                    driver's own connection, and a statement stops working,
                    along with the result sets read from it, once that connection
-                   has been returned to the pool. Switching the facade off used
-                   to leave statement and result set handles usable after the
-                   borrow they came from had ended, which allowed a kept handle
+                   has been returned to the pool. The handles of that facade,
+                   and those of the interceptors that wrap statements beneath
+                   it, implement only the standard <code>java.sql</code>
+                   interfaces, so the driver's own classes are reached with
+                   <code>isWrapperFor()</code> and <code>unwrap()</code>.
+                   Switching the facade off used to leave statement and result
+                   set handles usable after the borrow they came from had
+                   ended, which allowed a kept handle
                    to execute on the session the next borrower held; setting
                    this property to <code>false</code> is therefore not
                    supported. The property is still accepted so that existing
@@ -658,6 +663,19 @@
   <subsection name="org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer">
     <p>Keeps track of all statements created using <code>createStatement</code>, <code>prepareStatement</code> or <code>prepareCall</code>
        and closes these statements when the connection is returned to the pool.
+    </p>
+    <p>The tracked statements are handed to the application as proxies
+       implementing the standard <code>java.sql</code> statement interfaces, as
+       is the statement facade the pool always installs in front of this
+       interceptor; the driver's own statement class is therefore not
+       reachable by casting. <code>isWrapperFor</code> and <code>unwrap</code>
+       answer through every layer, and <code>unwrap</code> is the supported way
+       to reach driver-specific statement methods. A statement the application
+       unwraps during a borrow is still tracked by this interceptor and is
+       closed, like the others, when the connection is returned to the pool -
+       unless an interceptor listed after this one recycles the statement
+       instead of closing it, as a <code>StatementCache</code> beneath this
+       interceptor does.
     </p>
     <attributes>
       <attribute name="trace" required="false">

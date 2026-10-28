@@ -47,6 +47,18 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
  * this one may swallow the statement's <code>close()</code>, e.g. a statement
  * cache recycling instead of closing; such entries are simply reclaimed at
  * the connection return, as they were before.)
+ * <p>
+ * Tracked statements are handed to the application as proxies implementing
+ * the standard JDBC statement interfaces, as is the statement facade the
+ * pool always installs in front of this interceptor and as are the proxies
+ * of the other statement-wrapping interceptors; the driver's own statement
+ * class is therefore not reachable by casting. The <code>Wrapper</code>
+ * methods are delegated to the driver, and <code>unwrap</code> is the
+ * supported way to reach driver-specific statement methods. A statement the
+ * application reaches that way is still tracked here and is closed, like any
+ * other tracked statement, when the connection is returned - unless an
+ * interceptor listed after this one recycles the statement instead of
+ * closing it, as a statement cache beneath this interceptor does.
  *
  */
 public class StatementFinalizer extends AbstractCreateStatementInterceptor {
