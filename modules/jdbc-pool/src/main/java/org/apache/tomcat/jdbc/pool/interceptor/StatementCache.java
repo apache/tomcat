@@ -329,7 +329,11 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
     }
 
     /**
-     * Removes the given statement from the cache.
+     * Removes the given statement from the cache. The removal is
+     * identity-aware: it only takes effect while the entry under the
+     * statement's key still holds this very proxy, so a proxy that was
+     * never parked - or is no longer the cached statement - cannot evict
+     * a different statement parked under an equal key.
      *
      * @param proxy the statement proxy to remove
      * @return true if the statement was removed, false otherwise
@@ -339,7 +343,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
         if (cache == null) {
             return false;
         }
-        if (cache.remove(proxy.getCacheKey()) != null) {
+        if (cache.remove(proxy.getCacheKey(), proxy)) {
             cacheSize.decrementAndGet();
             return true;
         } else {
@@ -487,7 +491,14 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
                         }
                     }
                 } catch (RuntimeException | ReflectiveOperationException | SQLException x) {
+                    // The throw always precedes the park attempt in the try
+                    // above, so this proxy is not in the cache; the
+                    // identity-aware removal is a no-op for it and leaves any
+                    // other statement parked under the same key alone.
                     removeStatement(proxy);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Unable to recycle statement: " + getSql(), x);
+                    }
                 }
             }
             if (shouldClose) {
