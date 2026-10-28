@@ -147,7 +147,7 @@ class TestInterceptorResetOrder extends JdbcPoolBaseTest {
 
         static volatile boolean fail;
 
-        public Unconstructable() {
+        Unconstructable() {
             if (fail) {
                 throw new IllegalStateException();
             }
