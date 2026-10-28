@@ -21,9 +21,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Assertions;
@@ -34,9 +36,10 @@ import org.junit.jupiter.api.Test;
  * the fair queue is enabled: unbounded offering, most-recently-used
  * hand-off, blocking retrieval with timeout, fairness towards the
  * longest waiting consumer, deregistration of cancelled asynchronous
- * polls, the termination of every outstanding poll once the waiters are
- * cancelled, and the collection operations the queue deliberately leaves
- * unsupported.
+ * polls, the terminal failure of an asynchronous poll whose timed get
+ * times out, the termination of every outstanding poll once the waiters
+ * are cancelled, and the collection operations the queue deliberately
+ * leaves unsupported.
  */
 class TestFairBlockingQueue {
 
@@ -356,5 +359,146 @@ class TestFairBlockingQueue {
         Assertions.assertEquals(1, queue.size(),
                 "an element offered after the timeout must stay in the queue");
         Assertions.assertEquals("keep", queue.poll());
+    }
+
+    @Test
+    void timedOutAsyncPollTerminallyFailsItsFuture() throws Exception {
+        final FairBlockingQueue<String> queue = new FairBlockingQueue<>();
+        final Future<String> future = queue.pollAsync();
+        Assertions.assertThrows(TimeoutException.class,
+                () -> future.get(200, TimeUnit.MILLISECONDS));
+        // the timed-out waiter must not consume a subsequently offered element
+        Assertions.assertTrue(queue.offer("keep"));
+        Assertions.assertEquals(1, queue.size(),
+                "an element offered after the timeout must stay in the queue");
+        Assertions.assertEquals("keep", queue.poll());
+
+        // a Future may be retrieved any number of times until it succeeds, so
+        // the untimed get() after the timeout must terminate - the waiter is
+        // deregistered and nothing can ever complete the future, which must
+        // therefore fail fast instead of parking on the dead latch
+        final AtomicReference<Throwable> error = new AtomicReference<>();
+        final CountDownLatch done = new CountDownLatch(1);
+        Thread caller = new Thread(() -> {
+            try {
+                future.get();
+            } catch (Throwable t) {
+                error.set(t);
+            } finally {
+                done.countDown();
+            }
+        });
+        caller.setDaemon(true);
+        caller.start();
+        Assertions.assertTrue(done.await(5, TimeUnit.SECONDS),
+                "an untimed get() after the timeout must terminate, not block forever");
+        Assertions.assertTrue(error.get() instanceof ExecutionException
+                        && error.get().getCause() instanceof TimeoutException,
+                "the untimed get() must report the earlier timeout as its cause, got "
+                        + error.get());
+        caller.join(1000);
+
+        // the state of the terminally failed future is truthful
+        Assertions.assertTrue(future.isDone(),
+                "a future whose waiter was abandoned can never receive an element");
+        Assertions.assertFalse(future.isCancelled(),
+                "a timeout must not report a cancellation nobody asked for");
+
+        // a repeated timed get reports the failure right away
+        long start = System.currentTimeMillis();
+        Assertions.assertThrows(TimeoutException.class,
+                () -> future.get(10, TimeUnit.SECONDS),
+                "a get() after the timeout must keep reporting the timeout");
+        Assertions.assertTrue(System.currentTimeMillis() - start < 5000,
+                "the abandoned future must fail fast instead of serving a fresh timeout");
+
+        // a future that already failed terminally cannot be cancelled, and a
+        // refused cancel must not make its cancellation state untrue
+        Assertions.assertFalse(future.cancel(true),
+                "a terminally failed future must not report a cancellation");
+        Assertions.assertFalse(future.isCancelled());
+        Assertions.assertTrue(future.isDone());
+    }
+
+    @Test
+    void timedOutAsyncPollReleasesAConcurrentlyBlockedGetter() throws Exception {
+        // one caller is already waiting untimed on the poll when a timed get
+        // times out and abandons the waiter: the blocked caller must observe
+        // the abandonment instead of parking on a latch nothing counts down
+        final FairBlockingQueue<String> queue = new FairBlockingQueue<>();
+        final Future<String> future = queue.pollAsync();
+        final AtomicReference<Throwable> error = new AtomicReference<>();
+        final CountDownLatch started = new CountDownLatch(1);
+        final CountDownLatch done = new CountDownLatch(1);
+        Thread blocked = new Thread(() -> {
+            started.countDown();
+            try {
+                future.get();
+            } catch (Throwable t) {
+                error.set(t);
+            } finally {
+                done.countDown();
+            }
+        });
+        blocked.setDaemon(true);
+        blocked.start();
+        Assertions.assertTrue(started.await(5, TimeUnit.SECONDS));
+        Thread.sleep(100); // let the caller block inside get()
+
+        Assertions.assertThrows(TimeoutException.class,
+                () -> future.get(200, TimeUnit.MILLISECONDS));
+
+        Assertions.assertTrue(done.await(5, TimeUnit.SECONDS),
+                "the abandonment must release a caller blocked in get()");
+        Assertions.assertTrue(error.get() instanceof ExecutionException
+                        && error.get().getCause() instanceof TimeoutException,
+                "the blocked caller must observe the abandonment, got " + error.get());
+        blocked.join(1000);
+    }
+
+    @Test
+    void timedOutAsyncPollRacingAnOfferDoesNotStrandElements() throws Exception {
+        // an offer() that commits its element to a latch concurrently with a
+        // timeout is delivered rather than lost, and every timed-out waiter
+        // really leaves the waiters list: across this race, every element
+        // must end up either delivered to a future or still in the queue
+        final FairBlockingQueue<String> queue = new FairBlockingQueue<>();
+        final int rounds = 200;
+        final AtomicInteger delivered = new AtomicInteger();
+        Thread offerer = new Thread(() -> {
+            for (int i = 0; i < rounds; i++) {
+                queue.offer("e" + i);
+            }
+        });
+        offerer.setDaemon(true);
+        offerer.start();
+        for (int i = 0; i < rounds; i++) {
+            Future<String> future = queue.pollAsync();
+            try {
+                String element = future.get(1, TimeUnit.MILLISECONDS);
+                Assertions.assertNotNull(element,
+                        "a get() that returns must deliver the element it waited for");
+                delivered.incrementAndGet();
+            } catch (TimeoutException e) {
+                // the waiter was abandoned; the element stays in the queue
+            }
+        }
+        offerer.join(5000);
+        Assertions.assertFalse(offerer.isAlive(), "the offerer must have finished");
+
+        Assertions.assertEquals(rounds, delivered.get() + queue.size(),
+                "no element may be lost between a timing out get() and a racing offer()");
+
+        // and no timed-out future stayed registered: further elements are
+        // stored rather than handed to a phantom waiter
+        queue.offer("extra");
+        Assertions.assertEquals(rounds - delivered.get() + 1, queue.size(),
+                "a timed-out waiter must not consume a further element");
+        while (queue.poll() != null) {
+            // drain the queue
+        }
+        Assertions.assertTrue(queue.offer("last"));
+        Assertions.assertEquals(1, queue.size());
+        Assertions.assertEquals("last", queue.poll());
     }
 }

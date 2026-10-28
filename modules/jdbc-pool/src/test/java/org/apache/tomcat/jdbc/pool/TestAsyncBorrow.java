@@ -21,8 +21,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -36,8 +38,9 @@ import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
  * ({@code getConnectionAsync()}): the same accounting, the same
  * database-side truth and the same delivery guarantees as the blocking
  * API, a clear failure when the pool is configured with a queue that
- * cannot hand out futures, and the termination of an outstanding poll
- * once the pool is closed.
+ * cannot hand out futures, the termination of an outstanding poll once
+ * the pool is closed, and the immediate failure of a further retrieval
+ * from a poll whose timed get already timed out.
  *
  * <p>Scenario harvested from the retired legacy classes
  * {@code Bug50805} (async borrow accounting) and
@@ -283,6 +286,65 @@ class TestAsyncBorrow extends JdbcPoolBaseTest {
         Assertions.assertThrows(SQLException.class, pool::getConnectionAsync,
                 "an async borrow on a closed pool must be rejected");
         awaitSessions(0);
+    }
+
+    @Test
+    void aTimedOutAsyncBorrowFailsFurtherGettersInsteadOfBlockingThem()
+            throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setFairQueue(true);
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setMinIdle(0);
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setMaxIdle(1);
+        ds.createPool();
+
+        Connection holder = ds.getConnection(); // takes the only slot
+        Future<Connection> future = ds.getConnectionAsync(); // queued poll
+
+        Assertions.assertThrows(TimeoutException.class,
+                () -> future.get(100, TimeUnit.MILLISECONDS),
+                "the borrow cannot be served while the pool holds its only slot");
+
+        // the timed-out poll left the idle queue, so the connection that
+        // comes back is not stranded on it but goes to the next borrower
+        holder.close();
+        try (Connection served = ds.getConnection()) {
+            Assertions.assertNotNull(served,
+                    "a returned connection must not be consumed by the abandoned poll");
+        }
+
+        // the poll can never receive a connection anymore - it must say so,
+        // instead of leaving a later getter parked on the abandoned waiter
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+        CountDownLatch finished = new CountDownLatch(1);
+        Thread caller = new Thread(() -> {
+            try {
+                future.get(); // the documented, untimed usage
+            } catch (Throwable e) {
+                failure.set(e);
+            } finally {
+                finished.countDown();
+            }
+        }, "timed-out-async-borrower");
+        caller.setDaemon(true);
+        caller.start();
+        Assertions.assertTrue(finished.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
+                "an untimed get() after the timeout must not block forever");
+        Assertions.assertTrue(failure.get() instanceof ExecutionException
+                        && failure.get().getCause() instanceof TimeoutException,
+                "the untimed get() must report the earlier timeout as its cause, got "
+                        + failure.get());
+
+        Assertions.assertTrue(future.isDone(),
+                "a poll whose timed get() timed out is complete");
+        Assertions.assertFalse(future.isCancelled(),
+                "nobody cancelled the poll, a timeout must not report a cancellation");
+        Assertions.assertThrows(TimeoutException.class,
+                () -> future.get(100, TimeUnit.MILLISECONDS),
+                "a repeated timed get() must keep reporting the timeout");
+
+        ds.close();
     }
 
     @Test
