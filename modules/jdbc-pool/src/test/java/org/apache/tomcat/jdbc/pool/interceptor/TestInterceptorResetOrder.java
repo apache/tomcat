@@ -37,7 +37,11 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
  * The interceptors of a connection must be reset in the order in which they are declared, whether the connection is
  * new or is taken from the pool, and a failure to reset them must not leave the connection borrowed.
  */
-class TestInterceptorResetOrder extends JdbcPoolBaseTest {
+/* Public because the public nested interceptors are instantiated through
+   reflection and must declare public constructors (Class.getConstructor()
+   only finds declared public constructors), which Checkstyle's
+   RedundantModifier check only accepts within a public enclosing class. */
+public class TestInterceptorResetOrder extends JdbcPoolBaseTest {
 
     private static final List<String> RESETS = Collections.synchronizedList(new ArrayList<>());
 
@@ -147,7 +151,7 @@ class TestInterceptorResetOrder extends JdbcPoolBaseTest {
 
         static volatile boolean fail;
 
-        Unconstructable() {
+        public Unconstructable() {
             if (fail) {
                 throw new IllegalStateException();
             }
