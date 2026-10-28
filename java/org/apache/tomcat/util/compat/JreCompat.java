@@ -102,6 +102,7 @@ public class JreCompat {
             jre19Available = true;
             jre16Available = true;
             jre12Available = true;
+            jre11Available = true;
             jre9Available = true;
         } else if (Jre21Compat.isSupported()) {
             instance = new Jre21Compat();
@@ -111,6 +112,7 @@ public class JreCompat {
             jre19Available = true;
             jre16Available = true;
             jre12Available = true;
+            jre11Available = true;
             jre9Available = true;
         } else if (Jre20Compat.isSupported()) {
             instance = new Jre20Compat();
@@ -120,6 +122,7 @@ public class JreCompat {
             jre19Available = true;
             jre16Available = true;
             jre12Available = true;
+            jre11Available = true;
             jre9Available = true;
         } else if (Jre19Compat.isSupported()) {
             instance = new Jre19Compat();
@@ -129,6 +132,7 @@ public class JreCompat {
             jre19Available = true;
             jre16Available = true;
             jre12Available = true;
+            jre11Available = true;
             jre9Available = true;
         } else if (Jre16Compat.isSupported()) {
             instance = new Jre16Compat();
@@ -138,6 +142,7 @@ public class JreCompat {
             jre19Available = false;
             jre16Available = true;
             jre12Available = true;
+            jre11Available = true;
             jre9Available = true;
         } else if (Jre12Compat.isSupported()) {
             instance = new Jre12Compat();
@@ -147,6 +152,17 @@ public class JreCompat {
             jre19Available = false;
             jre16Available = false;
             jre12Available = true;
+            jre11Available = true;
+            jre9Available = true;
+        } else if (Jre11Compat.isSupported()) {
+            instance = new Jre11Compat();
+            jre22Available = false;
+            jre21Available = false;
+            jre20Available = false;
+            jre19Available = false;
+            jre16Available = false;
+            jre12Available = false;
+            jre11Available = true;
             jre9Available = true;
         } else if (Jre9Compat.isSupported()) {
             instance = new Jre9Compat();
@@ -156,6 +172,7 @@ public class JreCompat {
             jre19Available = false;
             jre16Available = false;
             jre12Available = false;
+            jre11Available = false;
             jre9Available = true;
         } else {
             instance = new JreCompat();
@@ -165,9 +182,9 @@ public class JreCompat {
             jre19Available = false;
             jre16Available = false;
             jre12Available = false;
+            jre11Available = false;
             jre9Available = false;
         }
-        jre11Available = instance.jarFileRuntimeMajorVersion() >= 11;
 
         Method m1 = null;
         Method m2 = null;
@@ -676,4 +693,35 @@ public class JreCompat {
         throw new UnsupportedOperationException(sm.getString("jreCompat.noNamedGroups"));
     }
 
+
+    public String strip(String input) {
+        return strip(input, true, true);
+    }
+
+
+    public String stripLeading(String input) {
+        return strip(input, true, false);
+    }
+
+
+    public String stripTrailing(String input) {
+        return strip(input, false, true);
+    }
+
+
+    private String strip(String input, boolean leading, boolean trailing) {
+        int start = 0;
+        int end = input.length();
+        if (leading) {
+            while (start < end && Character.isWhitespace(input.charAt(start))) {
+                start++;
+            }
+        }
+        if (trailing) {
+            while (end > start && Character.isWhitespace(input.charAt(end - 1))) {
+                end--;
+            }
+        }
+        return input.substring(start, end);
+    }
 }

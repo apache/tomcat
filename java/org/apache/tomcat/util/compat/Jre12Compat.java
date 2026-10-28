@@ -30,7 +30,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
-public class Jre12Compat extends Jre9Compat {
+public class Jre12Compat extends Jre11Compat {
 
     private static final Log log = LogFactory.getLog(Jre12Compat.class);
     private static final StringManager sm = StringManager.getManager(Jre12Compat.class);
