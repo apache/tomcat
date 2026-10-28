@@ -329,7 +329,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
                 if (target!=null) {
                     Notification notification =
                             new Notification(type,
-                                         this,
+                                         getNotificationSource(),
                                          sequence,
                                          System.currentTimeMillis(),
                                          query);
@@ -341,6 +341,42 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
             if (log.isDebugEnabled()) {
                 log.debug("Unable to send failed query notification.",e);
             }
+        }
+    }
+
+    /**
+     * Returns the source this MBean's notifications are sent with.
+     * <p>
+     * {@link Notification} marshals its source, so a listener outside this
+     * JVM - one reached through a JMX connector, or one that hands the
+     * notification on to another process - only receives the notification at
+     * all if the source is serializable. This MBean is not, and neither is
+     * the pool it reports on, so the source is the {@link ObjectName} the
+     * MBean is registered under, which names the pool and is serializable.
+     * Interceptor instances are created per pooled connection and only one
+     * of them is the registered MBean's resource, so an instance cannot
+     * name itself: every instance of a pool name sends the very name its
+     * registration was published under. An instance whose name cannot be
+     * formed - a malformed {@code objectName} property or a pool name that
+     * cannot be quoted into an ObjectName - was never registered at all, so
+     * no listener reached through a connector can exist for it; the source
+     * is then a string of the default name's shape, which still names the
+     * pool for the local listeners the broadcaster serves.
+     *
+     * @return the ObjectName the registration of this interceptor's pool
+     *         name is published under, or, when that name cannot be
+     *         formed, a string of the default name's shape
+     */
+    protected Object getNotificationSource() {
+        try {
+            return getObjectName(getClass(), poolName);
+        } catch (MalformedObjectNameException x) {
+            // the name construction getObjectName uses when no override is
+            // configured - with a malformed name this MBean was never
+            // registered, so this fallback is only read by local listeners,
+            // for which it must still name the pool
+            return ConnectionPool.POOL_JMX_TYPE_PREFIX + getClass().getName()
+                    + ",name=" + poolName;
         }
     }
 
