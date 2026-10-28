@@ -307,7 +307,7 @@ public class StatusApiServlet extends HttpServlet implements ContainerServlet, N
         String value = getServletConfig().getInitParameter(name);
         if (value != null && !value.isEmpty()) {
             try {
-                long parsed = Long.parseLong(value.trim());
+                long parsed = Long.parseLong(value.strip());
                 if (parsed >= minimum) {
                     return parsed;
                 }

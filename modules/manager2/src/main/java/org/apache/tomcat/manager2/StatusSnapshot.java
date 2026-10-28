@@ -290,7 +290,7 @@ public final class StatusSnapshot {
             for (String line : Files.readAllLines(MEMINFO_PATH, StandardCharsets.UTF_8)) {
                 if (line.startsWith(MEM_AVAILABLE_PREFIX)) {
                     // The kernel writes the value in kB: "MemAvailable:   <n> kB".
-                    return Long.valueOf(Long.parseLong(line.substring(MEM_AVAILABLE_PREFIX.length()).trim()
+                    return Long.valueOf(Long.parseLong(line.substring(MEM_AVAILABLE_PREFIX.length()).strip()
                             .split("\\s+")[0]) * 1024L);
                 }
             }

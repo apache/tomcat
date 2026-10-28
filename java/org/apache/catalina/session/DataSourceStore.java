@@ -298,7 +298,7 @@ public class DataSourceStore extends StoreBase {
      * @param dataSourceName The JNDI name of the DataSource-factory
      */
     public void setDataSourceName(String dataSourceName) {
-        if (dataSourceName == null || dataSourceName.trim().isEmpty()) {
+        if (dataSourceName == null || dataSourceName.strip().isEmpty()) {
             manager.getContext().getLogger().warn(sm.getString(getStoreName() + ".missingDataSourceName"));
             return;
         }

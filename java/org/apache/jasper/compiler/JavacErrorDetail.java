@@ -113,7 +113,7 @@ public class JavacErrorDetail {
                     // faulty. Scan forward to match the java line...
                     if (jspLines[jspBeginLineNum - 1].lastIndexOf("<%") > jspLines[jspBeginLineNum - 1]
                             .lastIndexOf("%>")) {
-                        String javaLine = javaLines[javaLineNum - 1].trim();
+                        String javaLine = javaLines[javaLineNum - 1].strip();
 
                         for (int i = jspBeginLineNum - 1; i < jspLines.length; i++) {
                             if (jspLines[i].contains(javaLine)) {

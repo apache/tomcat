@@ -173,7 +173,7 @@ public class MemoryRealm extends RealmBase {
                 if (comma < 0) {
                     break;
                 }
-                String role = roles.substring(0, comma).trim();
+                String role = roles.substring(0, comma).strip();
                 if (!role.isEmpty()) {
                     list.add(role);
                 }

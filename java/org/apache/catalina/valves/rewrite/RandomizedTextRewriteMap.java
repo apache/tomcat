@@ -52,13 +52,13 @@ public class RandomizedTextRewriteMap implements RewriteMap {
         try (Resource txtResource = ConfigFileLoader.getSource().getResource(txtFilePath);
                 BufferedReader reader = new BufferedReader(new InputStreamReader(txtResource.getInputStream()))) {
             while ((line = reader.readLine()) != null) {
-                line = line.trim();
+                line = line.strip();
                 if (line.startsWith("#") || line.isEmpty()) {
                     // Ignore comment line or empty lines
                     continue;
                 } else if (line.indexOf('#') > 0) {
                     // Ignore comment characters after '#'
-                    line = line.substring(0, line.indexOf('#')).trim();
+                    line = line.substring(0, line.indexOf('#')).strip();
                 }
                 // Like mod_rewrite, any whitespace separates the key from the
                 // value. The value may itself contain whitespace.

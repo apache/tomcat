@@ -630,7 +630,7 @@ public class SmapUtil {
             // beginning of the text.
             while ((next = text.indexOf('\n', index)) > -1) {
                 if (beginning) {
-                    String line = text.substring(index, next).trim();
+                    String line = text.substring(index, next).strip();
                     if (!slashStarSeen && line.startsWith("/*")) {
                         slashStarSeen = true;
                     }

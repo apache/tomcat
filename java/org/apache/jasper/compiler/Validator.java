@@ -996,10 +996,10 @@ class Validator {
                                     // for the attribute
                                     String m = tldAttr.getMethodSignature();
                                     if (m != null) {
-                                        m = m.trim();
+                                        m = m.strip();
                                         int rti = m.indexOf(' ');
                                         if (rti > 0) {
-                                            expectedType = m.substring(0, rti).trim();
+                                            expectedType = m.substring(0, rti).strip();
                                         }
                                     } else {
                                         expectedType = "java.lang.Object";
@@ -1444,7 +1444,7 @@ class Validator {
                     }
                     lastArg = true;
                 }
-                String arg = signature.substring(start, p).trim();
+                String arg = signature.substring(start, p).strip();
                 if (!arg.isEmpty()) {
                     params.add(arg);
                 }

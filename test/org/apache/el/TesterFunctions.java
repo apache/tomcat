@@ -22,7 +22,7 @@ import jakarta.el.FunctionMapper;
 
 public class TesterFunctions {
     public static String trim(String input) {
-        return input.trim();
+        return input.strip();
     }
 
     public static String concat(String... inputs) {

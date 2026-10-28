@@ -76,7 +76,7 @@ public class TestApplicationDispatcher extends TomcatBaseTest {
                 response, null);
 
         Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
-        Assert.assertEquals("OK", response.toString().trim());
+        Assert.assertEquals("OK", response.toString().strip());
     }
 
 
@@ -100,7 +100,7 @@ public class TestApplicationDispatcher extends TomcatBaseTest {
                 response, null);
 
         Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
-        Assert.assertEquals("OK", response.toString().trim());
+        Assert.assertEquals("OK", response.toString().strip());
     }
 
 
