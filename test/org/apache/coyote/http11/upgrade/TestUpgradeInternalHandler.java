@@ -137,6 +137,8 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
 
+            // No request Upgrade header is sent in these tests so set a fixed value on the response
+            resp.setHeader("upgrade", "test");
             req.upgrade(upgradeHandlerClass);
         }
     }

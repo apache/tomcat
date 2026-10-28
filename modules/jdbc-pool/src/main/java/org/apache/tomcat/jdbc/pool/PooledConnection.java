@@ -267,6 +267,7 @@ public class PooledConnection implements PooledConnectionMBean {
      * Connects using the configured DataSource.
      * @throws SQLException if unable to obtain a connection from the DataSource
      */
+    @SuppressWarnings("null") // Suppress false positive warnings
     protected void connectUsingDataSource() throws SQLException {
         String usr = null;
         String pwd = null;
