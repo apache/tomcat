@@ -39,17 +39,19 @@ import org.apache.tomcat.jdbc.pool.interceptor.AbstractCreateStatementIntercepto
  * interfaces, as do the proxies of the interceptors that wrap statements
  * beneath it, so the driver's own statement and result set classes are never
  * visible to the application through a cast. Every result set a pooled
- * statement call hands back reaches the application as one of these
- * handles, whatever the method that returned it was called: a cursor that
- * arrives as a plain object - a REF cursor OUT-parameter read through
- * {@link java.sql.CallableStatement#getObject(int)}, for instance - is
+ * statement hands back, and every result set that one of those handles
+ * hands back in turn, reaches the application as one of these handles,
+ * whatever the method that returned it was called: a cursor that arrives
+ * as a plain object - a REF cursor OUT-parameter read through
+ * {@link java.sql.CallableStatement#getObject(int)}, or the nested cursor
+ * a {@link java.sql.ResultSet#getObject(int)} column value hands out - is
  * sealed to the borrow like the ones the standard result set methods
  * return. The <code>Wrapper</code> methods are delegated to the driver, and
  * <code>unwrap</code> is the supported way to reach driver-specific methods
  * through every layer. An unwrapped driver object, however, is a driver
- * object rather than a pooled handle: retiring
- * these handles at the end of the borrow does not retire what was already
- * unwrapped, and only tracking the statements with
+ * object rather than a pooled handle: retiring these handles at the end of
+ * the borrow does not retire what was already unwrapped, and only tracking
+ * the statements with
  * {@link org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer} (or the
  * application closing them) keeps the statements underneath from outliving
  * the borrow - unless an interceptor recycles them for the next borrow, as a
@@ -220,7 +222,8 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
                 // methods are kept out of this: unwrap() is the documented
                 // way to reach the driver's own object, so what it hands back
                 // stays the driver's object even when that object implements
-                // ResultSet.
+                // ResultSet. ResultSetProxy mirrors this rule for the result
+                // sets a result set itself hands out.
                 if (result instanceof ResultSet
                         && method.getDeclaringClass() != Wrapper.class) {
                     return getConstructor(RESULTSET_IDX, ResultSet.class)
@@ -275,7 +278,10 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
         /**
          * Constructs a ResultSetProxy.
          * @param delegate the ResultSet to delegate to
-         * @param parent the parent statement proxy
+         * @param parent the statement handle the result set was read from,
+         *               which {@link java.sql.ResultSet#getStatement()}
+         *               answers; a result set a handle hands out as a column
+         *               value is parented to the same statement
          */
         public ResultSetProxy(Object delegate, Object parent) {
             this.delegate = delegate;
@@ -327,6 +333,21 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
             try {
                 // invoke next
                 result = method.invoke(delegate, args);
+
+                // The statement proxy's rule, mirrored one layer down: a
+                // cursor-valued column - a nested cursor, or a REF cursor
+                // selected as a column - arrives through a getObject(...)
+                // overload, which comes back as an Object, and would
+                // otherwise reach the application with nothing tying it to
+                // this borrow. The new handle is parented to the statement,
+                // as the statement proxy parents its result sets, so that
+                // getStatement() keeps answering a Statement; the Wrapper
+                // carve-out is the statement proxy's, for its reason there.
+                if (result instanceof ResultSet
+                        && method.getDeclaringClass() != Wrapper.class) {
+                    return getConstructor(RESULTSET_IDX, ResultSet.class)
+                            .newInstance(new ResultSetProxy(result, parent));
+                }
             } catch (Throwable t) {
                 if (t instanceof InvocationTargetException && t.getCause() != null) {
                     throw t.getCause();
