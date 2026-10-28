@@ -296,6 +296,13 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
 
     /**
      * Caches the given statement proxy if there is room in the cache.
+     * <p>
+     * The insertion is atomic: of two statements closed concurrently
+     * under one key exactly one is parked, and the other is refused as a
+     * duplicate - a park can never overwrite, and so can never orphan, a
+     * statement another close has already parked. A proxy that is
+     * refused was never in the map, and the caller that receives
+     * {@code false} must close the statement it offered.
      *
      * @param proxy the statement proxy to cache
      * @return true if the statement was cached, false otherwise
@@ -314,18 +321,37 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
             // had already run). The statement belongs to a dead connection
             // and must not be parked in the cache of the new one.
             return false;
-        } else if (cache.containsKey(proxy.getCacheKey())) {
-            return false;
         } else if (cacheSize.get()>=maxCacheSize) {
             return false;
         } else if (cacheSize.incrementAndGet()>maxCacheSize) {
             cacheSize.decrementAndGet();
             return false;
-        } else {
-            //cache the statement
-            cache.put(proxy.getCacheKey(), proxy);
-            return true;
         }
+        // Reserve the slot first and let the map itself arbitrate the
+        // duplicate check: putIfAbsent makes the statement visible
+        // atomically, so a second close racing in under the same key
+        // either sees the parked statement and is refused, or parks its
+        // own - it can no longer overwrite it. (The separate
+        // containsKey/put pair this replaces let both racers pass the
+        // check, counted both, and let the second put orphan the
+        // statement the first one had parked.) Reserving before the
+        // insert keeps the pool-wide count ahead of the map's visibility,
+        // as increment-then-put already did, so retracting a reservation
+        // never has to withdraw an entry that another thread can already
+        // see, hand out, or close underneath.
+        boolean parked = false;
+        try {
+            parked = cache.putIfAbsent(proxy.getCacheKey(), proxy) == null;
+        } finally {
+            if (!parked) {
+                // The key was already taken, or the insert threw: this
+                // statement is not in the map and never was. Undo exactly
+                // the one increment this call made and let the caller
+                // close it - nothing here can leak a slot or a statement.
+                cacheSize.decrementAndGet();
+            }
+        }
+        return parked;
     }
 
     /**
