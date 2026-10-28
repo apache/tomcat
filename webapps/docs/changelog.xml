@@ -1286,6 +1286,17 @@
         terminally instead of leaving its future in a state nobody can
         complete. (remm)
       </fix>
+      <fix>
+        A JDBC pool validation that runs its built-in check against the
+        database now terminates a pending transaction with a rollback rather
+        than by committing it, so a health check no longer commits work the
+        application left uncommitted, and a validation whose rollback fails
+        is reported as failed so the connection is taken out of service; the
+        configured <code>commitOnReturn</code> or
+        <code>rollbackOnReturn</code> termination of a returned connection
+        now runs before the return validation that would otherwise override
+        it. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
