@@ -122,14 +122,16 @@ public class DataSourceProxy implements PoolConfiguration {
      * @param username The user name
      * @param password The password
      * @return the connection
-     * @throws SQLException Connection error
+     * @throws SQLException Connection error, or this data source has been
+     *                      closed
      */
     public Connection getConnection(String username, String password) throws SQLException {
         if (this.getPoolProperties().isAlternateUsernameAllowed()) {
-            if (pool == null) {
-                return createPool().getConnection(username,password);
-            }
-            return pool.getConnection(username,password);
+            // Go through createPool() rather than testing the field and then
+            // calling it: that reads the volatile field only once, so a
+            // close() running concurrently cannot turn this borrow into a
+            // NullPointerException.
+            return createPool().getConnection(username,password);
         } else {
             if (connectionWithoutCredentialsWarningIssued.compareAndSet(false, true)) {
                 log.warn(String.format(
@@ -151,13 +153,23 @@ public class DataSourceProxy implements PoolConfiguration {
 
     /**
      * Sets up the connection pool, by creating a pooling driver.
+     * The reference is taken from the volatile field with a single read, so
+     * that the borrow paths which use this method as their single point of
+     * access cannot observe a {@code null} that a concurrent
+     * {@link #close(boolean)} published after they saw the field set. The
+     * result is never {@code null}: it is either the pool that is in use or
+     * this method fails with an {@link SQLException}.
      * @return the connection pool
      * @throws SQLException Error creating pool, or if this data source has
      *                      been closed
      */
     public ConnectionPool createPool() throws SQLException {
-        if (pool != null) {
-            return pool;
+        // Read the volatile field once. Guarding on it and then returning it
+        // would read it twice, and a close() landing between the reads makes
+        // the second one null and hands a null pool out to the caller.
+        final ConnectionPool p = pool;
+        if (p != null) {
+            return p;
         } else {
             return pCreatePool();
         }
@@ -167,6 +179,11 @@ public class DataSourceProxy implements PoolConfiguration {
      * Sets up the connection pool, by creating a pooling driver.
      */
     private synchronized ConnectionPool pCreatePool() throws SQLException {
+        // Runs under the monitor that close(boolean) also takes, and that is
+        // the only writer that nulls the field, so the pool cannot disappear
+        // between the reads below the way it can on the unsynchronized read
+        // paths. Returning null is therefore not possible here: either the
+        // closed flag rejects the caller or a pool is published and returned.
         if (closed) {
             throw new SQLException("DataSource has been closed.");
         }
@@ -182,25 +199,26 @@ public class DataSourceProxy implements PoolConfiguration {
      * Get a database connection.
      * {@link javax.sql.DataSource#getConnection()}
      * @return the connection
-     * @throws SQLException Connection error
+     * @throws SQLException Connection error, or this data source has been
+     *                      closed
      */
     public Connection getConnection() throws SQLException {
-        if (pool == null) {
-            return createPool().getConnection();
-        }
-        return pool.getConnection();
+        // One read of the volatile field, through createPool(): a guard on
+        // the field followed by a call on it reads it twice, and a close()
+        // landing between the two reads makes the second one null and a
+        // NullPointerException escapes this SQLException contract.
+        return createPool().getConnection();
     }
 
     /**
      * Invokes an sync operation to retrieve the connection.
      * @return a Future containing a reference to the connection when it becomes available
-     * @throws SQLException Connection error
+     * @throws SQLException Connection error, or this data source has been
+     *                      closed
      */
     public Future<Connection> getConnectionAsync() throws SQLException {
-        if (pool == null) {
-            return createPool().getConnectionAsync();
-        }
-        return pool.getConnectionAsync();
+        // see getConnection() on why the pool is reached through createPool()
+        return createPool().getConnectionAsync();
     }
 
     /**
