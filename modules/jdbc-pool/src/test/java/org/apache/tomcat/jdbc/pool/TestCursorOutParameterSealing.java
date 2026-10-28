@@ -24,8 +24,11 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.junit.jupiter.api.Assertions;
@@ -54,6 +57,16 @@ import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
  * {@code Wrapper} methods hand back does not (see also
  * {@link TestStatementConnectionHandle#unwrapStillReachesTheDriverStatement()}
  * and {@link TestStatementWrapperContract}).</p>
+ *
+ * <p>One parameter goes one layer deeper, because that is where the same
+ * decision had still not been made: the cursor that parameter hands back
+ * answers a designated column with a second real H2 result set on the same
+ * session, which is how a nested cursor - a REF cursor selected as a column
+ * value - reaches the application through the result set handle's own
+ * {@code ResultSet.getObject(...)}. The pins for that cursor column are the
+ * same four properties as for the OUT-parameter cursor: it arrives as a
+ * handle, it works during the borrow, it retires with the borrow, and the
+ * driver's own object is still what {@code unwrap()} hands back.</p>
  */
 class TestCursorOutParameterSealing extends JdbcPoolBaseTest {
 
@@ -61,12 +74,30 @@ class TestCursorOutParameterSealing extends JdbcPoolBaseTest {
      * The parameter this provider's callable statements answer with a
      * cursor, and the one they answer with a plain value, mirroring what a
      * driver with a REF cursor OUT-parameter and an ordinary OUT-parameter
-     * does for CallableStatement.getObject(...).
+     * does for CallableStatement.getObject(...). The third parameter is the
+     * one-layer-deeper case: its cursor answers a designated column with a
+     * cursor of its own.
      */
     private static final int CURSOR_PARAMETER = 1;
     private static final int VALUE_PARAMETER = 2;
+    private static final int CURSOR_COLUMN_PARAMETER = 3;
     private static final Integer OUT_VALUE = Integer.valueOf(1234);
     private static final String CURSOR_SQL = "SELECT X FROM SYSTEM_RANGE(1,3)";
+
+    /*
+     * The column of that second cursor's owner which holds a cursor rather
+     * than a value, and the nested cursor it hands out. The plain column of
+     * the same result set stays a plain column, so the pins can tell the two
+     * apart.
+     */
+    private static final int CURSOR_COLUMN = 2;
+    private static final int PLAIN_COLUMN = 1;
+    private static final String CURSOR_COLUMN_NAME = "CURSOR_VALUE";
+    private static final String PLAIN_COLUMN_VALUE = "not a cursor";
+    private static final String CURSOR_COLUMN_SQL = "SELECT X, '" + PLAIN_COLUMN_VALUE
+            + "' " + CURSOR_COLUMN_NAME + " FROM SYSTEM_RANGE(1,3)";
+    private static final String NESTED_CURSOR_SQL = "SELECT X FROM SYSTEM_RANGE(101,103)";
+    private static final int NESTED_CURSOR_FIRST_ROW = 101;
 
     /*
      * Stands for the driver's own cursor interface. A real driver's cursor
@@ -188,8 +219,10 @@ class TestCursorOutParameterSealing extends JdbcPoolBaseTest {
      * The fictional cursor behaviour, and nothing else: getObject(...) for
      * the cursor parameter returns the session's H2 result set - the same
      * object every request and an unwrap(DriverCursor.class) hand back -
-     * and getObject(...) for the value parameter returns the OUT-parameter
-     * value. Every other call is forwarded to the H2 callable statement.
+     * getObject(...) for the cursor-column parameter returns the session's
+     * H2 result set that has a cursor-valued column, and getObject(...) for
+     * the value parameter returns the OUT-parameter value. Every other call
+     * is forwarded to the H2 callable statement.
      */
     private static final class CallableStatementHandler implements InvocationHandler {
 
@@ -198,6 +231,9 @@ class TestCursorOutParameterSealing extends JdbcPoolBaseTest {
         /* Kept open with the cursor: closing the owner would close it. */
         private Statement cursorOwner;
         private ResultSet cursor;
+        /* Likewise for the cursor that has a cursor-valued column. */
+        private Statement cursorColumnOwner;
+        private ResultSet cursorColumnCursor;
 
         CallableStatementHandler(Connection physical, CallableStatement delegate) {
             this.physical = physical;
@@ -211,6 +247,24 @@ class TestCursorOutParameterSealing extends JdbcPoolBaseTest {
                 cursor = cursorOwner.executeQuery(CURSOR_SQL);
             }
             return cursor;
+        }
+
+        /*
+         * The session's cursor whose column holds a cursor, opened on the
+         * physical session once. Its rows are H2's own; only the cursor
+         * column is this provider's fiction, so that behaviour lives in the
+         * handler below and nowhere else.
+         */
+        private ResultSet cursorWithCursorColumn() throws SQLException {
+            if (cursorColumnCursor == null) {
+                cursorColumnOwner = physical.createStatement();
+                cursorColumnCursor = (ResultSet) Proxy.newProxyInstance(
+                        CursorProvider.class.getClassLoader(),
+                        new Class<?>[] { ResultSet.class },
+                        new CursorColumnResultSetHandler(physical,
+                                cursorColumnOwner.executeQuery(CURSOR_COLUMN_SQL)));
+            }
+            return cursorColumnCursor;
         }
 
         @Override
@@ -229,6 +283,15 @@ class TestCursorOutParameterSealing extends JdbcPoolBaseTest {
                                 && ((Class<?>) args[1]).isInstance(cursor())) {
                             return cursor();
                         }
+                    } else if (parameter == CURSOR_COLUMN_PARAMETER) {
+                        if (args.length == 1) {
+                            return cursorWithCursorColumn();
+                        }
+                        if (args[1] instanceof Class
+                                && ((Class<?>) args[1]).isInstance(
+                                        cursorWithCursorColumn())) {
+                            return cursorWithCursorColumn();
+                        }
                     } else if (parameter == VALUE_PARAMETER) {
                         if (args.length == 1
                                 || ((Class<?>) args[1]).isInstance(OUT_VALUE)) {
@@ -244,6 +307,82 @@ class TestCursorOutParameterSealing extends JdbcPoolBaseTest {
                         // the pool must not put a proxy of its own in front
                         // of it.
                         return cursor();
+                    }
+                    return delegate.unwrap(iface);
+                } else if ("isWrapperFor".equals(name)) {
+                    Class<?> iface = (Class<?>) args[0];
+                    return Boolean.valueOf(DriverCursor.class.equals(iface)
+                            || delegate.isWrapperFor(iface));
+                }
+                return method.invoke(delegate, args);
+            } catch (InvocationTargetException e) {
+                throw e.getCause();
+            }
+        }
+    }
+
+    /*
+     * The one-layer-deeper fiction, and nothing else: the result set the
+     * callable statement hands out has one column that is itself a cursor -
+     * the nested cursor a driver reports for a cursor-valued column - and
+     * reading that column through any of the ResultSet.getObject(...)
+     * overloads hands out a second real H2 result set, opened on the very
+     * same physical session. The plain column, the conversions the driver
+     * cannot make here, the metadata and every other call go to the H2
+     * result set beneath, and unwrap(DriverCursor.class) hands out that same
+     * nested cursor object, the way the driver's own cursor method would.
+     */
+    private static final class CursorColumnResultSetHandler implements InvocationHandler {
+
+        private final Connection physical;
+        private final ResultSet delegate;
+        /* Kept open with the nested cursor: closing it closes the cursor. */
+        private Statement nestedOwner;
+        private ResultSet nested;
+
+        CursorColumnResultSetHandler(Connection physical, ResultSet delegate) {
+            this.physical = physical;
+            this.delegate = delegate;
+        }
+
+        /* The session's nested cursor, opened on the physical session once. */
+        private ResultSet nestedCursor() throws SQLException {
+            if (nested == null) {
+                nestedOwner = physical.createStatement();
+                nested = nestedOwner.executeQuery(NESTED_CURSOR_SQL);
+            }
+            return nested;
+        }
+
+        private static boolean isCursorColumn(Object column) {
+            return (column instanceof Integer
+                    && ((Integer) column).intValue() == CURSOR_COLUMN)
+                    || CURSOR_COLUMN_NAME.equals(column);
+        }
+
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args)
+                throws Throwable {
+            String name = method.getName();
+            try {
+                if ("getObject".equals(name) && args != null && args.length >= 1
+                        && isCursorColumn(args[0])) {
+                    // The column is a cursor, so every one of the six
+                    // overloads the standard API declares to come back as an
+                    // Object hands it out - the typed one only where the
+                    // requested type is one the cursor satisfies, the way a
+                    // driver's conversion would.
+                    if (args.length == 1 || args[1] instanceof Map) {
+                        return nestedCursor();
+                    }
+                    if (args[1] instanceof Class
+                            && ((Class<?>) args[1]).isInstance(nestedCursor())) {
+                        return nestedCursor();
+                    }
+                } else if ("unwrap".equals(name)) {
+                    Class<?> iface = (Class<?>) args[0];
+                    if (DriverCursor.class.equals(iface)) {
+                        return nestedCursor();
                     }
                     return delegate.unwrap(iface);
                 } else if ("isWrapperFor".equals(name)) {
@@ -510,6 +649,260 @@ class TestCursorOutParameterSealing extends JdbcPoolBaseTest {
                 Assertions.assertEquals(7, rs.getInt(1),
                         "an ordinary column read through a handle must be untouched");
             }
+        }
+    }
+
+    /**
+     * One layer deeper, and the layer the sealing rule had not reached: the
+     * cursor that a result set handle's own {@code getObject(...)} hands out
+     * as a column value must arrive as a handle of this borrow over the
+     * driver's nested cursor, not as the driver's result set itself. All six
+     * {@code getObject} overloads a result set declares come back as an
+     * Object, so the rule has to see every one of them, and the handle must
+     * behave like every other sealed result set during the borrow: rows
+     * readable, and closing it closes the nested cursor and nothing else -
+     * above all not the result set that handed it out.
+     */
+    @Test
+    void aCursorColumnValueArrivesAsAFacadeHandle() throws Exception {
+        DataSource ds = cursorPool();
+        try (Connection pooled = ds.getConnection();
+                CallableStatement cs = pooled.prepareCall("CALL 1")) {
+            cs.execute();
+            ResultSet outer = (ResultSet) cs.getObject(CURSOR_COLUMN_PARAMETER);
+            Assertions.assertTrue(outer.next(), "the cursor that owns the column is live");
+            Object driverNested = outer.unwrap(DriverCursor.class);
+            Assertions.assertTrue(driverNested instanceof ResultSet,
+                    "precondition: the driver's nested cursor implements ResultSet");
+
+            ResultSet nested = (ResultSet) outer.getObject(CURSOR_COLUMN);
+
+            // What the application holds must not be the driver's object: a
+            // handle of this borrow, sealing exactly the driver's cursor, and
+            // exactly one facade layer of it.
+            assertDriverObjectBeneathTheFacadeHandle(nested, "getObject(cursor column)");
+            Assertions.assertNotSame(driverNested, nested,
+                    "the cursor column must reach the application as a handle, not as the "
+                            + "driver's result set");
+            Assertions.assertSame(driverNested, proxiedObject(nested),
+                    "the handle must wrap exactly this session's nested cursor");
+
+            // During the borrow it works like any other result set handle.
+            Assertions.assertTrue(nested.next(), "the nested cursor is live during the borrow");
+            Assertions.assertEquals(NESTED_CURSOR_FIRST_ROW, nested.getInt(1),
+                    "the nested cursor's own rows must come through the handle");
+            Assertions.assertEquals(1, outer.getInt(PLAIN_COLUMN),
+                    "the plain column of the same row must be untouched");
+
+            // All six getObject(...) overloads a result set declares can
+            // carry the column, so the return-type rule has to see each of
+            // them; each arrives as a handle over the same driver cursor.
+            Map<String, Class<?>> map = new HashMap<>();
+            ResultSet[] fromEveryOverload = {
+                    nested,
+                    (ResultSet) outer.getObject(CURSOR_COLUMN_NAME),
+                    (ResultSet) outer.getObject(CURSOR_COLUMN, Object.class),
+                    (ResultSet) outer.getObject(CURSOR_COLUMN_NAME, Object.class),
+                    (ResultSet) outer.getObject(CURSOR_COLUMN, map),
+                    (ResultSet) outer.getObject(CURSOR_COLUMN_NAME, map),
+            };
+            for (ResultSet handle : fromEveryOverload) {
+                Assertions.assertTrue(Proxy.isProxyClass(handle.getClass()),
+                        "a cursor column read through getObject(...) must arrive as a handle, "
+                                + "was " + handle.getClass().getName());
+                Assertions.assertNotSame(driverNested, handle,
+                        "a cursor column read through getObject(...) must not arrive as the "
+                                + "driver's result set");
+                Assertions.assertSame(driverNested, proxiedObject(handle),
+                        "a cursor column read through getObject(...) must wrap exactly the "
+                                + "driver's nested cursor");
+            }
+
+            // Closing the nested handle closes that cursor, and only that
+            // cursor: the handle that handed it out is untouched, and so is
+            // the row the application was reading.
+            nested.close();
+            Assertions.assertTrue(nested.isClosed(),
+                    "the handle reports itself closed after close()");
+            Assertions.assertThrows(SQLException.class, nested::next,
+                    "the handle of a closed result set must refuse reads");
+            nested.close(); // the no-op a closed result set's close() is
+            Assertions.assertTrue(((ResultSet) driverNested).isClosed(),
+                    "the close must reach the driver's own nested cursor");
+            Assertions.assertFalse(outer.isClosed(),
+                    "closing a cursor column must not close the cursor that handed it out");
+            Assertions.assertTrue(outer.next(), "the owning handle still reads its rows");
+            Assertions.assertEquals(2, outer.getInt(PLAIN_COLUMN));
+        }
+    }
+
+    /**
+     * getStatement() answers the application's own statement for every result
+     * set the facade hands out, which is the Bugzilla-60764-era contract the
+     * result set handler already guarantees for the standard paths. A handle
+     * sealed from a cursor column is therefore parented to the same
+     * statement, not to the result set that handed it out: the method is
+     * declared to return a Statement, so answering the handle of a result set
+     * would break the call site rather than the assertion, and the borrow it
+     * reports retirement with is the statement's.
+     */
+    @Test
+    void aNestedCursorHandleReportsTheStatementItWasReadFrom() throws Exception {
+        DataSource ds = cursorPool();
+        try (Connection pooled = ds.getConnection();
+                CallableStatement cs = pooled.prepareCall("CALL 1")) {
+            cs.execute();
+            ResultSet outer = (ResultSet) cs.getObject(CURSOR_COLUMN_PARAMETER);
+            ResultSet nested = outer.getObject(CURSOR_COLUMN, ResultSet.class);
+
+            Assertions.assertSame(cs, nested.getStatement(),
+                    "the nested handle must report the application's own statement");
+            Assertions.assertSame(outer.getStatement(), nested.getStatement(),
+                    "both handles were read from one statement, so both must report it");
+            Assertions.assertTrue(nested.next(), "the nested cursor is live during the borrow");
+            // Answerable after the reads began, as it is for any other handle.
+            Assertions.assertSame(cs, nested.getStatement(),
+                    "getStatement() stays answerable as a Statement through the borrow");
+            nested.close();
+            Assertions.assertThrows(SQLException.class, nested::getStatement,
+                    "a closed handle answers getStatement() as a closed result set does");
+        }
+    }
+
+    /**
+     * The consequence that makes the deeper wrap worth having: a handle over
+     * a cursor column kept past its borrow must be retired with it. The
+     * driver's own nested cursor is the control here - it is still open on
+     * the session the pool re-lent, and still reads rows off it, so the
+     * refusal below cannot be the cursor having been closed for some
+     * unrelated reason.
+     */
+    @Test
+    void aNestedCursorHandleRetiresWithTheBorrowThatOpenedIt() throws Exception {
+        DataSource ds = cursorPool();
+
+        Connection first = ds.getConnection();
+        setSessionMarker(first, 5250);
+        CallableStatement cs = first.prepareCall("CALL 1");
+        cs.execute();
+        ResultSet outer = (ResultSet) cs.getObject(CURSOR_COLUMN_PARAMETER);
+        ResultSet nested = (ResultSet) outer.getObject(CURSOR_COLUMN);
+        ResultSet driverNested = (ResultSet) outer.unwrap(DriverCursor.class);
+        Assertions.assertTrue(nested.next(), "the nested cursor is live during the borrow");
+        first.close(); // returned to the pool
+
+        Connection second = ds.getConnection();
+        Assertions.assertEquals(Integer.valueOf(5250), sessionMarker(second),
+                "precondition: the pool re-armed the same physical session");
+        Assertions.assertFalse(driverNested.isClosed(),
+                "precondition: the driver's own nested cursor is still open on that session");
+        Assertions.assertTrue(driverNested.next(),
+                "precondition: the driver's own nested cursor still reads rows off the session, "
+                        + "which is exactly what the handle must not do");
+
+        Assertions.assertTrue(nested.isClosed(),
+                "a nested cursor whose borrow ended must report itself closed");
+        SQLException thrown = Assertions.assertThrows(SQLException.class, nested::next,
+                "a nested cursor whose borrow ended must not keep streaming on the next "
+                        + "borrower's session");
+        Assertions.assertTrue(thrown.getMessage().contains(
+                "result set was read from has been returned to the pool"),
+                "the failure must be the facade's retirement wording, but said: "
+                        + thrown.getMessage());
+        Assertions.assertEquals(Integer.valueOf(5250), sessionMarker(second),
+                "the next borrower's session must be untouched");
+
+        // The current borrower keeps full use of its session.
+        try (Statement st = second.createStatement();
+                ResultSet rs = st.executeQuery("SELECT 1")) {
+            Assertions.assertTrue(rs.next(), "the current borrower must get working handles");
+        }
+        nested.close(); // the no-op a retired handle's close() is
+        nested.close();
+        driverNested.close();
+        second.close();
+    }
+
+    /**
+     * The documented escape hatch one layer down, pinned at the point where
+     * the deeper rule could break it: this driver's cursor type implements
+     * ResultSet, so a blanket rule at the result set layer would silently
+     * wrap what unwrap() hands back. Reaching the driver's nested cursor
+     * through unwrap() on a result set handle must still arrive at the
+     * driver's very own object - never a proxy, the same object on repeated
+     * calls, still usable - and so must unwrap() through the nested handle
+     * itself.
+     */
+    @Test
+    void unwrapAtTheResultSetLayerStillHandsBackTheDriversOwnCursor() throws Exception {
+        DataSource ds = cursorPool();
+        try (Connection pooled = ds.getConnection();
+                CallableStatement cs = pooled.prepareCall("CALL 1")) {
+            cs.execute();
+            ResultSet outer = (ResultSet) cs.getObject(CURSOR_COLUMN_PARAMETER);
+            Assertions.assertTrue(outer.isWrapperFor(DriverCursor.class),
+                    "the provider must answer its own cursor interface honestly, as a driver "
+                            + "does");
+
+            Object nested = outer.unwrap(DriverCursor.class);
+
+            Assertions.assertTrue(nested instanceof ResultSet,
+                    "precondition: the object reached by unwrapping implements ResultSet");
+            Assertions.assertFalse(Proxy.isProxyClass(nested.getClass()),
+                    "unwrap() on a result set handle must hand back the driver's object, not a "
+                            + "pool handle: " + nested.getClass().getName());
+            Assertions.assertTrue(nested.getClass().getName().startsWith("org.h2."),
+                    "unwrap() must arrive at the driver object through every layer: "
+                            + nested.getClass().getName());
+            Assertions.assertSame(nested, outer.unwrap(DriverCursor.class),
+                    "a repeated unwrap() must return the same object, not a new wrapper");
+
+            // The same carve-out holds one layer further in: what the nested
+            // handle's unwrap() reaches is the driver's nested cursor, the
+            // object the sealed handle happens to be made of.
+            ResultSet handle = (ResultSet) outer.getObject(CURSOR_COLUMN);
+            Assertions.assertSame(nested, handle.unwrap(ResultSet.class),
+                    "unwrap() through the nested handle must still arrive at the driver object");
+            Assertions.assertTrue(((ResultSet) nested).next(),
+                    "what the escape hatch hands back must still work");
+            handle.close();
+        }
+    }
+
+    /**
+     * The deeper rule fires on the return type, so it must leave everything
+     * else the same getObject(...) family hands back alone: an ordinary
+     * column value, in the plain and in the typed overload, a conversion of
+     * the cursor column that the driver answers with its plain value, and
+     * the result set metadata, which is no result set at all.
+     */
+    @Test
+    void aPlainColumnValuePassesThroughTheCursorColumnUnchanged() throws Exception {
+        DataSource ds = cursorPool();
+        try (Connection pooled = ds.getConnection();
+                CallableStatement cs = pooled.prepareCall("CALL 1")) {
+            cs.execute();
+            ResultSet outer = (ResultSet) cs.getObject(CURSOR_COLUMN_PARAMETER);
+            Assertions.assertTrue(outer.next(), "the cursor that owns the column is live");
+
+            Object plain = outer.getObject(PLAIN_COLUMN);
+            Assertions.assertFalse(Proxy.isProxyClass(plain.getClass()),
+                    "an ordinary column value must reach the application untouched, was "
+                            + plain.getClass().getName());
+            Assertions.assertEquals(1, ((Number) plain).intValue());
+            Assertions.assertEquals(Integer.valueOf(1),
+                    outer.getObject(PLAIN_COLUMN, Integer.class),
+                    "the typed overload must pass the plain value through unchanged too");
+            Assertions.assertEquals(PLAIN_COLUMN_VALUE,
+                    outer.getObject(CURSOR_COLUMN, String.class),
+                    "a conversion the driver answers with a value must not become a cursor");
+
+            ResultSetMetaData meta = outer.getMetaData();
+            Assertions.assertFalse(Proxy.isProxyClass(meta.getClass()),
+                    "metadata is not a result set and must not be sealed: "
+                            + meta.getClass().getName());
+            Assertions.assertEquals(2, meta.getColumnCount(),
+                    "the metadata must still answer through the handle");
         }
     }
 }
