@@ -26,6 +26,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Wrapper;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -37,10 +38,16 @@ import org.apache.tomcat.jdbc.pool.interceptor.AbstractCreateStatementIntercepto
  * The handles this facade hands out implement only the standard JDBC
  * interfaces, as do the proxies of the interceptors that wrap statements
  * beneath it, so the driver's own statement and result set classes are never
- * visible to the application through a cast. The <code>Wrapper</code> methods
- * are delegated to the driver, and <code>unwrap</code> is the supported way
- * to reach driver-specific methods through every layer. An unwrapped driver
- * object, however, is a driver object rather than a pooled handle: retiring
+ * visible to the application through a cast. Every result set a pooled
+ * statement call hands back reaches the application as one of these
+ * handles, whatever the method that returned it was called: a cursor that
+ * arrives as a plain object - a REF cursor OUT-parameter read through
+ * {@link java.sql.CallableStatement#getObject(int)}, for instance - is
+ * sealed to the borrow like the ones the standard result set methods
+ * return. The <code>Wrapper</code> methods are delegated to the driver, and
+ * <code>unwrap</code> is the supported way to reach driver-specific methods
+ * through every layer. An unwrapped driver object, however, is a driver
+ * object rather than a pooled handle: retiring
  * these handles at the end of the borrow does not retire what was already
  * unwrapped, and only tracking the statements with
  * {@link org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer} (or the
@@ -202,20 +209,22 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
                 // invoke next
                 result = method.invoke(delegate, args);
 
-                // Don't create a ResultSet proxy for null
-                if (result != null) {
-                    if (compare(GET_RESULTSET, method)) {
-                        return getConstructor(RESULTSET_IDX, ResultSet.class)
-                                .newInstance(new ResultSetProxy(result, proxy));
-                    }
-                    if (compare(GET_GENERATED_KEYS, method)) {
-                        return getConstructor(RESULTSET_IDX, ResultSet.class)
-                                .newInstance(new ResultSetProxy(result, proxy));
-                    }
-                    if (compare(EXECUTE_QUERY, method)) {
-                        return getConstructor(RESULTSET_IDX, ResultSet.class)
-                                .newInstance(new ResultSetProxy(result, proxy));
-                    }
+                // Seal every result set the call hands back, whatever the
+                // method that returned it was called. Matching the three
+                // names the standard API gives them (executeQuery,
+                // getResultSet, getGeneratedKeys) misses the result sets
+                // declared to come back as an Object: a cursor OUT-parameter
+                // reaches the application through
+                // CallableStatement.getObject(...). The return type sees them
+                // all, and a null result simply is no result set. The Wrapper
+                // methods are kept out of this: unwrap() is the documented
+                // way to reach the driver's own object, so what it hands back
+                // stays the driver's object even when that object implements
+                // ResultSet.
+                if (result instanceof ResultSet
+                        && method.getDeclaringClass() != Wrapper.class) {
+                    return getConstructor(RESULTSET_IDX, ResultSet.class)
+                            .newInstance(new ResultSetProxy(result, proxy));
                 }
             } catch (Throwable t) {
                 if (t instanceof InvocationTargetException && t.getCause() != null) {
