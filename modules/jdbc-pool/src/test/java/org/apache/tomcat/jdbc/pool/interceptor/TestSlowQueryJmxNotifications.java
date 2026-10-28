@@ -412,7 +412,7 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
         Obstacle obstacle = new Obstacle();
         server.registerMBean(obstacle, oname);
         try {
-            try (Connection first = ds.getConnection()) {
+            try (@SuppressWarnings("unused") Connection first = ds.getConnection()) {
                 // The borrow tried to publish and the MBeanServer refused
                 // it: the name was taken outside the per-name registry, so
                 // registry and MBeanServer now disagree.
@@ -485,8 +485,8 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
             // later borrows keep retrying behind the freed slot: still
             // refused (the obstacle holds the name), still no latch, and the
             // identical marker keeps their logging throttled
-            try (Connection second = refusingPool.getConnection();
-                    Connection third = refusingPool.getConnection()) {
+            try (@SuppressWarnings("unused") Connection second = refusingPool.getConnection();
+                    @SuppressWarnings("unused") Connection third = refusingPool.getConnection()) {
                 Assertions.assertNull(SlowQueryReportJmx.mbeans.get(poolName),
                         "retried refusals must keep leaving the slot free for the next borrow");
                 Assertions.assertEquals(oname, SlowQueryReportJmx.registrationFailuresLogged.get(poolName),
@@ -525,7 +525,7 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
             // and publishes cleanly - success marks nothing in the throttle
             server.unregisterMBean(oname);
             DataSource revivedPool = reportingPoolNamed(poolName);
-            try (Connection borrowed = revivedPool.getConnection()) {
+            try (@SuppressWarnings("unused") Connection borrowed = revivedPool.getConnection()) {
                 Assertions.assertTrue(server.isRegistered(oname),
                         "the first borrow of a pool started after the obstacle is gone"
                                 + " must publish the MBean");
@@ -614,7 +614,7 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
         // merely flagged: a pool restarted under the freed name must be able
         // to re-register, and must release the name again when it closes
         DataSource restarted = reportingPoolNamed(poolName);
-        try (Connection borrowed = restarted.getConnection()) {
+        try (@SuppressWarnings("unused") Connection borrowed = restarted.getConnection()) {
             Assertions.assertTrue(server.isRegistered(oname),
                     "a pool started under the concurrently freed name must re-register the MBean");
         }

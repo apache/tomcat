@@ -221,7 +221,7 @@ class TestJmxNotificationTypeContract extends JdbcPoolBaseTest {
 
             // Raise POOL EMPTY the way the pool raises it: a failed borrow
             // on an exhausted pool, not a test hand-fed notify().
-            try (Connection held = ds.getConnection()) {
+            try (@SuppressWarnings("unused") Connection held = ds.getConnection()) {
                 Assertions.assertThrows(PoolExhaustedException.class, ds::getConnection,
                         "a borrow that times out on an exhausted pool must fail");
             }

@@ -52,7 +52,7 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
 class TestStatementCacheStaleEntryResurrection extends JdbcPoolBaseTest {
 
     @Test
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     void anInjectedStaleEntryOfAReplacedSessionIsNotHandedToTheNextBorrower() throws Exception {
         DataSource ds = newDataSource();
         ds.getPoolProperties().setJdbcInterceptors(
@@ -67,8 +67,7 @@ class TestStatementCacheStaleEntryResurrection extends JdbcPoolBaseTest {
         String insert = "INSERT INTO " + table + " VALUES (?)";
 
         Connection first = ds.getConnection();
-        java.sql.Connection oldPhysical =
-                ((PooledConnection) first.unwrap(PooledConnection.class)).getConnection();
+        java.sql.Connection oldPhysical = first.unwrap(PooledConnection.class).getConnection();
         setSessionMarker(first, 21);
         PreparedStatement prepared = first.prepareStatement(insert);
         Statement oldDriverStatement = driverStatement(prepared);
@@ -85,7 +84,7 @@ class TestStatementCacheStaleEntryResurrection extends JdbcPoolBaseTest {
 
         // Replace the physical session underneath the pooled connection, as
         // any reconnect path does: the purge runs and clears the map.
-        ((PooledConnection) first.unwrap(PooledConnection.class)).reconnect();
+        first.unwrap(PooledConnection.class).reconnect();
         Assertions.assertTrue(oldPhysical.isClosed(),
                 "the replaced session must be closed by the reconnect");
         Assertions.assertEquals(0, cacheMap.size(),
