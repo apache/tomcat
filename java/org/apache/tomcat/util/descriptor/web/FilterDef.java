@@ -238,7 +238,9 @@ public class FilterDef implements Serializable {
     private String asyncSupported = null;
 
     /**
-     * Returns the async-supported setting for this filter.
+     * Returns the async-supported setting for this filter as it was supplied. The original string is retained for
+     * descriptor merging and serialization. Use {@link #getAsyncSupportedBoolean()} for the normalized value used at
+     * runtime.
      *
      * @return The async-supported value
      */

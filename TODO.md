@@ -941,16 +941,6 @@ These are bugs, correctness issues, or missing functionality that may affect pro
 
 ---
 
-### 88. Annotation Test Type Inconsistency (1 item)
-
-| # | File:Line | Description | Fix Idea | Effort | Difficulty |
-|---|-----------|-------------|----------|--------|------------|
-| 88.1 | `TestContextConfigAnnotation.java:243` | `servletDef` is Boolean, `FilterDef` is String - inconsistent | Investigate why the types differ. If it's a bug, fix the annotation processing. If intentional, document. | 0.5-1 day | Low |
-
-**Total estimated effort: 0.5-1 day, Low difficulty**
-
----
-
 ### 89. Example WebSocket Drawboard (5 items)
 
 | # | File:Line | Description | Fix Idea | Effort | Difficulty |
