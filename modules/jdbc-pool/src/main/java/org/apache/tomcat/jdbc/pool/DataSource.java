@@ -167,7 +167,9 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
      * (or was already closed) has no MBean to publish; the registration is
      * then skipped rather than failing, since the caller of
      * {@link #preRegister(MBeanServer, ObjectName)} must not see an
-     * exception over pool-side lifecycle state.
+     * exception over pool-side lifecycle state. A publish the MBean server
+     * refused - because the name is already in use by another MBean, for
+     * instance - is likewise not this pool's registration.
      */
     protected void registerJmx() {
         final ConnectionPool p = pool;
@@ -179,7 +181,11 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
             this.oname = null;
             return;
         }
-        JmxUtil.registerJmx(oname, null, p.getJmxPool());
+        // oname is only kept for an actually published MBean: the helper
+        // hands back the name of its own publish, or null when the server
+        // refused it, so a name a foreign MBean owns is never released as
+        // if it were this pool's registration
+        this.oname = JmxUtil.registerJmx(oname, null, p.getJmxPool());
     }
 
     /**
