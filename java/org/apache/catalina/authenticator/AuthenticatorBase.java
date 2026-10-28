@@ -262,7 +262,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
      */
     public void setSsoReauthenticationMode(String ssoReauthenticationMode) {
         this.ssoReauthenticationMode =
-                SsoReauthenticationMode.valueOf(ssoReauthenticationMode.trim().toUpperCase(Locale.ENGLISH));
+                SsoReauthenticationMode.valueOf(ssoReauthenticationMode.strip().toUpperCase(Locale.ENGLISH));
     }
 
     /**
@@ -280,7 +280,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
      * @param allowCorsPreflight the CORS preflight handling mode
      */
     public void setAllowCorsPreflight(String allowCorsPreflight) {
-        this.allowCorsPreflight = AllowCorsPreflight.valueOf(allowCorsPreflight.trim().toUpperCase(Locale.ENGLISH));
+        this.allowCorsPreflight = AllowCorsPreflight.valueOf(allowCorsPreflight.strip().toUpperCase(Locale.ENGLISH));
     }
 
     /**

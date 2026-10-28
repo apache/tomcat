@@ -295,7 +295,7 @@ public class StandardJarScanFilter implements JarScanFilter {
         if (attribute != null) {
             StringTokenizer tokenizer = new StringTokenizer(attribute, ",");
             while (tokenizer.hasMoreElements()) {
-                String token = tokenizer.nextToken().trim();
+                String token = tokenizer.nextToken().strip();
                 if (!token.isEmpty()) {
                     set.add(token);
                 }

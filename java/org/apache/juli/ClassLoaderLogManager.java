@@ -154,7 +154,7 @@ public class ClassLoaderLogManager extends LogManager {
         if (levelString != null) {
             try {
                 AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
-                    logger.setLevel(Level.parse(levelString.trim()));
+                    logger.setLevel(Level.parse(levelString.strip()));
                     return null;
                 });
             } catch (IllegalArgumentException e) {
@@ -190,7 +190,7 @@ public class ClassLoaderLogManager extends LogManager {
             logger.setUseParentHandlers(false);
             StringTokenizer tok = new StringTokenizer(handlers, ",");
             while (tok.hasMoreTokens()) {
-                String handlerName = (tok.nextToken().trim());
+                String handlerName = (tok.nextToken().strip());
                 Handler handler = null;
                 ClassLoader current = classLoader;
                 while (current != null) {
@@ -545,7 +545,7 @@ public class ClassLoaderLogManager extends LogManager {
         if (handlers != null) {
             StringTokenizer tok = new StringTokenizer(handlers, ",");
             while (tok.hasMoreTokens()) {
-                String handlerName = (tok.nextToken().trim());
+                String handlerName = (tok.nextToken().strip());
                 String handlerClassName = handlerName;
                 String prefix = "";
                 if (handlerClassName.isEmpty()) {

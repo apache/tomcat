@@ -83,7 +83,7 @@ public class TestEncodingDetector extends TomcatBaseTest {
 
         if (expectedResponseCode == 200) {
             // trim() to remove whitespace like new lines
-            String bodyText = responseBody.toString().trim();
+            String bodyText = responseBody.toString().strip();
             if (responseBodyOK.booleanValue()) {
                 Assert.assertEquals("OK", bodyText);
             } else {

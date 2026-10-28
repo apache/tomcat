@@ -106,7 +106,7 @@ public class TestEnvEntry extends TomcatBaseTest {
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
 
         // JSP has leading and trailing white-space
-        String result = out.toString().trim();
+        String result = out.toString().strip();
         Assert.assertEquals(expected, result);
     }
 
@@ -130,7 +130,7 @@ public class TestEnvEntry extends TomcatBaseTest {
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
 
         // JSP has leading and trailing white-space
-        String result = out.toString().trim();
+        String result = out.toString().strip();
         Assert.assertEquals(expected, result);
     }
 }

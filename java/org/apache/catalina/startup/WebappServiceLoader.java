@@ -213,7 +213,7 @@ public class WebappServiceLoader<T> {
                 if (i >= 0) {
                     line = line.substring(0, i);
                 }
-                line = line.trim();
+                line = line.strip();
                 if (line.isEmpty()) {
                     continue;
                 }
