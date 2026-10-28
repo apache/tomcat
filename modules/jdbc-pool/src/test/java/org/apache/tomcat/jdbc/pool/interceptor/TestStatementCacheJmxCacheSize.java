@@ -122,7 +122,7 @@ class TestStatementCacheJmxCacheSize extends JdbcPoolBaseTest {
             Assertions.assertInstanceOf(Integer.class, read,
                     "a monitoring read must yield the number of cached statements rather than "
                             + "an object the client can change");
-            Assertions.assertEquals(1, read,
+            Assertions.assertEquals(Integer.valueOf(1), read,
                     "the statement that has just been closed is cached and must be counted");
         } finally {
             ds.close();
@@ -191,7 +191,7 @@ class TestStatementCacheJmxCacheSize extends JdbcPoolBaseTest {
             // This instance has never been given a pooled connection, so
             // there is no pool whose accounting it could report; 0 would be
             // indistinguishable from an empty cache.
-            Assertions.assertEquals(-1, server.getAttribute(oname, "CacheSize"),
+            Assertions.assertEquals(Integer.valueOf(-1), server.getAttribute(oname, "CacheSize"),
                     "an interceptor that is not bound to a pooled connection must report the "
                             + "documented sentinel instead of a value that looks like a count");
         } finally {

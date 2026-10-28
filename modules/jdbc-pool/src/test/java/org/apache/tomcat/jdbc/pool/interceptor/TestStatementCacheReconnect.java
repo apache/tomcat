@@ -100,7 +100,7 @@ class TestStatementCacheReconnect extends JdbcPoolBaseTest {
      * regardless of which path did the replacing, so the helper pins the
      * invariant, not one call site.
      */
-    private void assertCacheDoesNotCrossSessions(DataSource ds, Connection second,
+    private void assertCacheDoesNotCrossSessions(Connection second,
             java.sql.Connection oldPhysical, Statement oldStatement, String insert,
             int expectedInserts) throws Exception {
         Assertions.assertNull(sessionMarker(second),
@@ -136,8 +136,7 @@ class TestStatementCacheReconnect extends JdbcPoolBaseTest {
         String insert = "INSERT INTO " + table + " VALUES (?)";
 
         Connection first = ds.getConnection();
-        java.sql.Connection oldPhysical =
-                ((PooledConnection) first.unwrap(PooledConnection.class)).getConnection();
+        java.sql.Connection oldPhysical = first.unwrap(PooledConnection.class).getConnection();
         setSessionMarker(first, 11);
         PreparedStatement prepared = first.prepareStatement(insert);
         Statement oldStatement = driverStatement(prepared);
@@ -156,7 +155,7 @@ class TestStatementCacheReconnect extends JdbcPoolBaseTest {
                         + "reach the cache with the purge already done");
         Connection second = ds.getConnection();
         try {
-            assertCacheDoesNotCrossSessions(ds, second, oldPhysical, oldStatement, insert, 2);
+            assertCacheDoesNotCrossSessions(second, oldPhysical, oldStatement, insert, 2);
         } finally {
             second.close();
         }
@@ -178,8 +177,7 @@ class TestStatementCacheReconnect extends JdbcPoolBaseTest {
         String insert = "INSERT INTO " + table + " VALUES (?)";
 
         Connection first = ds.getConnection();
-        java.sql.Connection oldPhysical =
-                ((PooledConnection) first.unwrap(PooledConnection.class)).getConnection();
+        java.sql.Connection oldPhysical = first.unwrap(PooledConnection.class).getConnection();
         setSessionMarker(first, 12);
         PreparedStatement prepared = first.prepareStatement(insert);
         Statement oldStatement = driverStatement(prepared);
@@ -202,7 +200,7 @@ class TestStatementCacheReconnect extends JdbcPoolBaseTest {
                     CacheAtDisconnectInterceptor.cacheSizeAtDisconnect,
                     "the disconnect walk of the borrow-time reconnect must "
                             + "reach the cache with the purge already done");
-            assertCacheDoesNotCrossSessions(ds, second, oldPhysical, oldStatement, insert, 2);
+            assertCacheDoesNotCrossSessions(second, oldPhysical, oldStatement, insert, 2);
         } finally {
             second.close();
         }
@@ -224,8 +222,7 @@ class TestStatementCacheReconnect extends JdbcPoolBaseTest {
         String insert = "INSERT INTO " + table + " VALUES (?)";
 
         Connection first = ds.getConnection();
-        java.sql.Connection oldPhysical =
-                ((PooledConnection) first.unwrap(PooledConnection.class)).getConnection();
+        java.sql.Connection oldPhysical = first.unwrap(PooledConnection.class).getConnection();
         setSessionMarker(first, 13);
         PreparedStatement prepared = first.prepareStatement(insert);
         Statement oldStatement = driverStatement(prepared);
@@ -250,7 +247,7 @@ class TestStatementCacheReconnect extends JdbcPoolBaseTest {
                         + "cache with the purge already done");
         Connection second = ds.getConnection();
         try {
-            assertCacheDoesNotCrossSessions(ds, second, oldPhysical, oldStatement, insert, 2);
+            assertCacheDoesNotCrossSessions(second, oldPhysical, oldStatement, insert, 2);
         } finally {
             second.close();
         }
