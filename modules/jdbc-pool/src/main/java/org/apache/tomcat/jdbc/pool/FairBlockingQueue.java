@@ -16,9 +16,11 @@
  */
 package org.apache.tomcat.jdbc.pool;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CancellationException;
@@ -72,6 +74,14 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
      * All threads waiting for an object are stored in a linked list
      */
     final LinkedList<ExchangeCountDownLatch<E>> waiters;
+
+    /**
+     * Set once {@link #cancelWaiters()} has failed the waiters of this queue.
+     * The caller that cancels the waiters (a closing pool) stops offering
+     * items to this queue afterwards, so an asynchronous poll that registers
+     * a waiter on a cancelled queue could never be served.
+     */
+    private boolean waitersCancelled = false;
 
     /**
      * Creates a new fair blocking queue.
@@ -199,6 +209,9 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
      * item has not already been handed over to the future. A future that is no
      * longer needed must therefore be cancelled, so that a subsequent offer
      * does not hand an item over to a future nobody is waiting on.
+     * Once {@link #cancelWaiters()} has been called, no waiter is registered
+     * anymore: the returned future is cancelled right away, as the caller
+     * that cancelled the waiters offers no further item that could serve it.
      * @return - a future pending the result from the queue poll request
      */
     public Future<E> pollAsync() {
@@ -212,9 +225,21 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
             if (item==null) {
                 //queue is empty, add ourselves as waiters
                 ExchangeCountDownLatch<E> c = new ExchangeCountDownLatch<>(1);
-                waiters.addLast(c);
                 //return a future that will wait for the object
-                result = new ItemFuture<>(c);
+                ItemFuture<E> future = new ItemFuture<>(c);
+                //tell the latch which future its item is meant for, before the
+                //waiter becomes visible to cancelWaiters()
+                c.setFuture(future);
+                if (waitersCancelled) {
+                    //the caller that cancelled the waiters offers no further
+                    //item, so registering a waiter here would park its caller
+                    //forever - hand out a future that is cancelled from the
+                    //start instead
+                    future.cancel(false);
+                } else {
+                    waiters.addLast(c);
+                }
+                result = future;
             } else {
                 //return a future with the item
                 result = new ItemFuture<>(item);
@@ -223,6 +248,46 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
             lock.unlock();
         }
         return result;
+    }
+
+    /**
+     * Cancel the futures of all the asynchronous polls that are waiting for an
+     * item on this queue. A thread that is blocked in one of the
+     * {@link Future#get()} methods of such a future observes a
+     * {@link CancellationException} instead of waiting for an item that will
+     * never be offered, and later calls to {@link #pollAsync()} do not register
+     * a waiter at all. A future an item has already been handed over to is not
+     * cancelled, it completes with that item as usual.
+     * <br>
+     * This makes a queue that is never fed again terminate the callers that
+     * wait on it, instead of leaving them parked forever.
+     */
+    public void cancelWaiters() {
+        final ReentrantLock lock = this.lock;
+        List<ItemFuture<E>> futures;
+        lock.lock();
+        try {
+            //the caller that cancels the waiters offers no further item from
+            //this point on, so a waiter that registers after it can never be
+            //served either
+            waitersCancelled = true;
+            futures = new ArrayList<>(waiters.size());
+            for (ExchangeCountDownLatch<E> c : waiters) {
+                ItemFuture<E> future = c.getFuture();
+                if (future != null) {
+                    //only the asynchronous polls have a future to cancel, the
+                    //waiters of poll(long,TimeUnit) time out on their own
+                    futures.add(future);
+                }
+            }
+        } finally {
+            lock.unlock();
+        }
+        //cancel outside of the lock, as the cancellation wakes up the callers
+        //and deregisters their waiter itself
+        for (ItemFuture<E> future : futures) {
+            future.cancel(false);
+        }
     }
 
     @Override
@@ -563,6 +628,12 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
         /** The item to exchange. */
         protected volatile T item;
         /**
+         * The future the item is exchanged with, set by
+         * {@link FairBlockingQueue#pollAsync()} and null for the waiters of
+         * {@link FairBlockingQueue#poll(long, TimeUnit)}.
+         */
+        protected volatile ItemFuture<T> future;
+        /**
          * Creates a new ExchangeCountDownLatch with the given count.
          *
          * @param i the count
@@ -585,6 +656,22 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
          */
         public void setItem(T item) {
             this.item = item;
+        }
+        /**
+         * Returns the future the exchanged item is meant for.
+         *
+         * @return the future of an asynchronous poll, or null
+         */
+        public ItemFuture<T> getFuture() {
+            return future;
+        }
+        /**
+         * Sets the future the exchanged item is meant for.
+         *
+         * @param future the future of an asynchronous poll
+         */
+        public void setFuture(ItemFuture<T> future) {
+            this.future = future;
         }
     }
 

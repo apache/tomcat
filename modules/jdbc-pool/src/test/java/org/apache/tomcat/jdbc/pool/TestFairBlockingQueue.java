@@ -34,7 +34,8 @@ import org.junit.jupiter.api.Test;
  * the fair queue is enabled: unbounded offering, most-recently-used
  * hand-off, blocking retrieval with timeout, fairness towards the
  * longest waiting consumer, deregistration of cancelled asynchronous
- * polls, and the collection operations the queue deliberately leaves
+ * polls, the termination of every outstanding poll once the waiters are
+ * cancelled, and the collection operations the queue deliberately leaves
  * unsupported.
  */
 class TestFairBlockingQueue {
@@ -281,6 +282,66 @@ class TestFairBlockingQueue {
         Assertions.assertTrue(future.isDone());
         Assertions.assertFalse(future.isCancelled());
         Assertions.assertEquals("item", future.get());
+        Assertions.assertEquals(0, queue.size());
+    }
+
+    @Test
+    void cancellingTheWaitersReleasesBlockedPollersAndRefusesNewOnes() throws Exception {
+        final FairBlockingQueue<String> queue = new FairBlockingQueue<>();
+        final Future<String> pending = queue.pollAsync();
+        final AtomicReference<Throwable> error = new AtomicReference<>();
+        final CountDownLatch started = new CountDownLatch(1);
+        final CountDownLatch done = new CountDownLatch(1);
+        Thread caller = new Thread(() -> {
+            started.countDown();
+            try {
+                pending.get();
+            } catch (Throwable t) {
+                error.set(t);
+            } finally {
+                done.countDown();
+            }
+        });
+        caller.start();
+        Assertions.assertTrue(started.await(5, TimeUnit.SECONDS));
+        Thread.sleep(100); // let the caller block inside get()
+
+        queue.cancelWaiters();
+
+        Assertions.assertTrue(done.await(5, TimeUnit.SECONDS),
+                "cancelling the waiters must release a caller blocked in get()");
+        Assertions.assertTrue(error.get() instanceof CancellationException,
+                "a cancelled waiter must fail get() with CancellationException, got "
+                        + error.get());
+        Assertions.assertTrue(pending.isCancelled());
+        Assertions.assertTrue(pending.isDone());
+        caller.join(1000);
+
+        // a poll that registers on a cancelled queue can never be served, so it
+        // must not stay registered
+        Future<String> late = queue.pollAsync();
+        Assertions.assertTrue(late.isCancelled(),
+                "a poll registered after the cancellation must be cancelled");
+        Assertions.assertThrows(CancellationException.class, late::get);
+        Assertions.assertTrue(queue.offer("keep"));
+        Assertions.assertEquals(1, queue.size(),
+                "a cancelled poll must not consume an offered element");
+        // the queue still hands out what it holds
+        Assertions.assertEquals("keep", queue.poll(200, TimeUnit.MILLISECONDS));
+    }
+
+    @Test
+    void cancellingTheWaitersLeavesADeliveredItemWithItsFuture() throws Exception {
+        FairBlockingQueue<String> queue = new FairBlockingQueue<>();
+        Future<String> future = queue.pollAsync();
+        Assertions.assertTrue(queue.offer("handed"),
+                "the element must be handed to the registered waiter");
+        queue.cancelWaiters();
+        Assertions.assertFalse(future.isCancelled(),
+                "a future that already received its element must not be cancelled");
+        Assertions.assertTrue(future.isDone());
+        Assertions.assertEquals("handed", future.get(5, TimeUnit.SECONDS),
+                "the element belongs to the future, the cancellation must not take it back");
         Assertions.assertEquals(0, queue.size());
     }
 
