@@ -23,7 +23,7 @@ import java.lang.reflect.AccessibleObject;
  * only the methods required by the EL implementation.
  *
  * This class is duplicated in org.apache.el.util
- * When making changes keep the two in sync if required.
+ * When making changes keep the two in sync.
  */
 class JreCompat {
 

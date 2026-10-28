@@ -23,14 +23,16 @@ import java.lang.reflect.AccessibleObject;
  * only the methods required by the EL implementation.
  *
  * This class is duplicated in javax.el
- * When making changes keep the two in sync if required.
+ * When making changes keep the two in sync.
  */
 public class JreCompat {
 
     private static final JreCompat instance;
 
     static {
-        if (Jre9Compat.isSupported()) {
+        if (Jre11Compat.isSupported()) {
+            instance = new Jre11Compat();
+        } else if (Jre9Compat.isSupported()) {
             instance = new Jre9Compat();
         } else {
             instance = new JreCompat();
@@ -54,5 +56,18 @@ public class JreCompat {
     public boolean canAccess(Object base, AccessibleObject accessibleObject) {
         // Java 8 doesn't support modules so default to true
         return true;
+    }
+
+
+    public String strip(String input) {
+        int start = 0;
+        int end = input.length();
+        while (start < end && Character.isWhitespace(input.charAt(start))) {
+            start++;
+        }
+        while (end > start && Character.isWhitespace(input.charAt(end - 1))) {
+            end--;
+        }
+        return input.substring(start, end);
     }
 }
