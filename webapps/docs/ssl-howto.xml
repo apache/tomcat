@@ -456,10 +456,26 @@ Extended Key Usage extension at all. Certificates whose Extended Key Usage
 excludes both purposes or cannot be parsed are ignored. If no eligible key entry
 is found, connector initialization fails.</p>
 
-<p>A configured <strong>certificateKeyAlias</strong> is used unchanged, even if
-its certificate is unsuitable for server authentication. When several certificates
-are eligible, configure an alias to ensure that the intended certificate is
-used.</p>
+<p>A configured <strong>certificateKeyAlias</strong> is normally used even if its
+certificate is unsuitable for server authentication. The one exception is the
+Windows-MY store accessed through the SunMSCAPI provider: if the certificate at the
+configured alias is unsuitable there, but the store also holds a suitable
+certificate under that same name with <code>" (1)"</code>, <code>" (2)"</code>,
+etc. appended - the way that store gives unique aliases to several certificates
+that share a name, since the key store API requires aliases to be unique - the
+suffixed certificate is used instead. This lets one configured alias keep working
+on a store that holds more than one certificate under that name. Every
+other key store type uses the configured alias as given. When several
+differently-named certificates are eligible, configure an alias to ensure that the
+intended certificate is used.</p>
+
+<p>Selection is made solely on the appended <code>" (N)"</code> suffix. The
+SunMSCAPI provider does not expose a certificate's original Windows friendly name
+through the key store API (see
+<a href="https://bugs.openjdk.org/browse/JDK-8395755">JDK-8395755</a>), so a suffix
+that is genuinely part of a certificate's own name cannot be told apart from one
+added to disambiguate a shared name. The result is therefore a best-effort
+heuristic that selects the first numbered alias whose certificate is suitable.</p>
 
 </section>
 

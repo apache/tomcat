@@ -27,6 +27,7 @@ import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
@@ -41,6 +42,8 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 public final class TesterKeystoreGenerator {
+
+    private static final AtomicLong SERIAL_COUNTER = new AtomicLong(1);
 
     private TesterKeystoreGenerator() {}
 
@@ -128,7 +131,7 @@ public final class TesterKeystoreGenerator {
         KeyPair keyPair = kpg.generateKeyPair();
 
         X500Name subject = new X500Name("CN=" + cn);
-        BigInteger serial = BigInteger.valueOf(System.nanoTime());
+        BigInteger serial = BigInteger.valueOf(SERIAL_COUNTER.getAndIncrement());
         long oneDay = 86400000L;
         Date notBefore = new Date(System.currentTimeMillis() - oneDay);
         Date notAfter = new Date(System.currentTimeMillis() + 365L * oneDay);

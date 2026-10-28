@@ -489,8 +489,14 @@
         <code>certificateKeyAlias</code> is set, ignore key entries whose
         certificate has a malformed Extended Key Usage extension or one that
         does not permit TLS server authentication when automatically selecting
-        which key in the key store to use.
-        A configured <code>certificateKeyAlias</code> is always used unchanged.
+        which key in the key store to use. A configured
+        <code>certificateKeyAlias</code> is used even if its certificate is not
+        valid for TLS server authentication, except in the Windows-MY key store
+        accessed through the SunMSCAPI provider: there, if the configured
+        certificate is not valid but the store holds a valid certificate under
+        that alias with a numeric suffix appended - the format that provider uses
+        to give unique aliases to several certificates that share a name - the
+        suffixed certificate is used instead.
         (dsoumis)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
