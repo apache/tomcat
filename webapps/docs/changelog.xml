@@ -514,6 +514,10 @@
         Do not depend on the content length being defined when processing
         request bodies with the CGI Servlet. (csutherl)
       </fix>
+      <fix>
+        Align LockoutRealm with some Realm implementations and ignore leading
+        and trailing space in user names by default. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
