@@ -1626,6 +1626,16 @@ public class ConnectionPool {
      */
     protected class ConnectionFuture implements Future<Connection>, Runnable {
         Future<PooledConnection> pcFuture = null;
+        /**
+         * The claim on the pooled connection this future produces. The queue
+         * hands its connection to every caller of the queue future, so this
+         * single compare-and-set is what decides who may act on it: a
+         * {@link #get(long, TimeUnit)} caller, who then owns the connection
+         * that comes out of it, or {@link #cancel(boolean)}, whose cleanup
+         * task returns that connection to the pool. Whichever path loses the
+         * claim must neither use the connection nor report a cancellation of
+         * it, so one physical connection never ends up with two owners.
+         */
         AtomicBoolean configured = new AtomicBoolean(false);
         CountDownLatch latch = new CountDownLatch(1);
         volatile Connection result = null;
@@ -1663,20 +1673,31 @@ public class ConnectionPool {
             //deregister and no connection to clean up, so report nothing
             //cancelled without arming the deferred cleanup task, which a
             //java.util.concurrent.Future must not run for a completed task.
-            if (pc!=null || result!=null || pcFuture.isCancelled()) {
+            if (pc!=null || result!=null || cancelled.get() || pcFuture.isCancelled()) {
                 return false;
-            } else if (cancelled.compareAndSet(false, true)) {
-                if (!pcFuture.cancel(mayInterruptIfRunning)) {
-                    //The pooled connection was already handed over to the
-                    //queue future (or is being handed over right now), so
-                    //cancel by retrieving the connection and returning it
-                    //to the pool
-                    ConnectionPool.this.cancellator.execute(this);
-                }
-                return true;
             }
-            //already cancelled
-            return false;
+            //The queue may have produced its connection already, and a get()
+            //caller that received it is using it, so cancel only when this
+            //thread wins the claim on that connection. Losing the claim means
+            //the connection belongs to that caller, which is the completed
+            //case a java.util.concurrent.Future reports as not cancelled.
+            if (!configured.compareAndSet(false, true)) {
+                return false;
+            }
+            cancelled.set(true);
+            if (pcFuture.cancel(mayInterruptIfRunning)) {
+                //The waiter was still queued, so it is deregistered and no
+                //connection will be produced for this future. Release the
+                //callers that are waiting on the claim above, as nobody is
+                //left to publish a result for them.
+                latch.countDown();
+            } else {
+                //The pooled connection was already handed over to the queue
+                //future (or is being handed over right now), so cancel by
+                //retrieving the connection and returning it to the pool
+                ConnectionPool.this.cancellator.execute(this);
+            }
+            return true;
         }
 
         /**
@@ -1702,26 +1723,61 @@ public class ConnectionPool {
                     return result;
                 }
                 if (configured.compareAndSet(false, true)) {
-                    try {
-                        pc = borrowConnection(System.currentTimeMillis(),pc, null, null);
-                        if (pc != null) {
-                            result = ConnectionPool.this.setupConnection(pc);
-                        }
-                    } catch (SQLException x) {
-                        cause = x;
-                    } finally {
-                        latch.countDown();
-                    }
+                    configure(pc);
                 } else {
-                    //if we reach here, another thread is configuring the actual connection
-                    latch.await(timeout,unit); //this shouldn't block for long
+                    //if we reach here, another thread claimed the connection:
+                    //a get() caller that is setting it up, or the cancellation
+                    //cleanup that returns it to the pool
+                    if (!latch.await(timeout,unit)) { //this shouldn't block for long
+                        if (cancelled.get()) {
+                            //a cancellation won the claim, so its cleanup is
+                            //what this wait was for: as for a cancelled
+                            //java.util.concurrent.Future, its callers are told
+                            //about the cancellation rather than about their
+                            //own deadline expiring. A timeout observed before
+                            //the cancellation wins the claim stays a timeout;
+                            //that window is inherent and bounded, the next
+                            //get() here observes the cancellation
+                            throw new CancellationException();
+                        }
+                        throw new TimeoutException();
+                    }
                 }
                 if (result==null) {
+                    if (cancelled.get()) {
+                        //The cancellation cleanup won the claim on this
+                        //connection and returned it to the pool, so it is not
+                        //ours to hand out; the callers of a cancelled future
+                        //are told about the cancellation instead of being
+                        //handed a connection that is already back in the pool
+                        throw new CancellationException();
+                    }
                     throw new ExecutionException(cause);
                 }
                 return result;
             } else {
                 return null;
+            }
+        }
+
+        /**
+         * Sets up the pooled connection that the claim on {@link #configured}
+         * gave to this caller and publishes what came out of it for the
+         * callers waiting on {@link #latch}. Only the winner of that claim may
+         * call this, which is what keeps the connection from being handed to
+         * one caller while the cancellation cleanup returns it to the pool.
+         * @param pooled the pooled connection the queue handed out
+         */
+        private void configure(PooledConnection pooled) {
+            try {
+                PooledConnection pc = borrowConnection(System.currentTimeMillis(),pooled, null, null);
+                if (pc != null) {
+                    result = ConnectionPool.this.setupConnection(pc);
+                }
+            } catch (SQLException x) {
+                cause = x;
+            } finally {
+                latch.countDown();
             }
         }
 
@@ -1746,20 +1802,49 @@ public class ConnectionPool {
          */
         @Override
         public void run() {
+            //cancel() armed this task because it won the claim on the
+            //connection this future produces, so this is the path that hands
+            //that connection back to the pool when no get() caller claimed it.
+            //It sets the connection up the way a borrow does, so that the
+            //return runs through the interceptors, but it never publishes a
+            //result: a get() caller waiting on the claim has to observe the
+            //cancellation rather than a connection that is already closed.
             try {
-                Connection con = get(); //complete this future
-                if (con != null) {
-                    con.close(); //return to the pool
+                PooledConnection pooled = null;
+                try {
+                    pooled = pcFuture.get(); //the connection this future produced
+                } catch (InterruptedException x) {
+                    Thread.currentThread().interrupt();
+                } catch (ExecutionException x) {
+                    //the queue future produced no connection to return
+                } catch (CancellationException x) {
+                    //the pool closure cancelled the queued wait between the
+                    //registration of this cleanup task and its execution; this
+                    //future never produced a connection, so there is nothing
+                    //to close
                 }
-            }catch (ExecutionException ex) {
-                //we can ignore this
-            }catch (CancellationException ex) {
-                //the pool closure cancelled the queued wait between the
-                //registration of this cleanup task and its execution; this
-                //future never produced a connection, so there is nothing
-                //to close
+                if (pooled != null) {
+                    try {
+                        PooledConnection pc =
+                                borrowConnection(System.currentTimeMillis(), pooled, null, null);
+                        if (pc != null) {
+                            Connection con = ConnectionPool.this.setupConnection(pc);
+                            if (con != null) {
+                                con.close(); //return to the pool
+                            }
+                        }
+                    } catch (SQLException x) {
+                        //the connection was released or could not be set up,
+                        //so there is nothing left to return to the pool
+                        cause = x;
+                    }
+                }
             }catch (Exception x) {
                 log.error("Unable to cancel ConnectionFuture.",x);
+            } finally {
+                //whatever came out of it, the callers waiting on the claim are
+                //done waiting
+                latch.countDown();
             }
         }
 
