@@ -989,6 +989,28 @@
         a borrow that had registered its waiter just before the closure ran
         gets a future that reports that cancellation instead. (remm)
       </fix>
+      <fix>
+        Correct a defect in the asynchronous borrow of the JDBC connection pool
+        that handed one physical connection to two users at once, silently
+        sharing a session between them. The queue delivers the connection it
+        produced to every caller of its <code>get()</code>, and the cancellation
+        of the future that <code>getConnectionAsync()</code> had returned used
+        that same delivery to retrieve the connection and close it, without
+        establishing whether a borrower had taken delivery of it. A
+        <code>cancel()</code> that landed while a borrower was receiving the
+        connection, or was still setting it up, therefore reported a successful
+        cancellation while the borrower was using that connection: it went back
+        to the pool and to the next borrower underneath its owner, or the owner
+        was handed a connection that had already been closed. The connection the
+        queue produces is now claimed once, by whichever of the borrower and the
+        cancellation gets there first. A borrower that won the claim keeps its
+        connection and <code>cancel()</code> reports that nothing was cancelled,
+        the way <code>java.util.concurrent.Future</code> reports nothing
+        cancelled once the work is done; a cancellation that won it returns the
+        connection to the pool exactly once and the future reports a
+        <code>CancellationException</code> to its callers instead of a closed
+        connection. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
