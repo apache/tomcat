@@ -318,7 +318,7 @@ public class ResolverImpl extends Resolver {
                 break;
             }
 
-            String key = unescape(fullDN.substring(start, eqPos)).trim();
+            String key = unescape(fullDN.substring(start, eqPos)).strip();
             int valStart = eqPos + 1;
 
             // Find the unescaped ',' that ends this RDN, or end of string
@@ -333,7 +333,7 @@ public class ResolverImpl extends Resolver {
                 }
             }
 
-            String value = unescape(fullDN.substring(valStart, commaPos)).trim();
+            String value = unescape(fullDN.substring(valStart, commaPos)).strip();
             if (!key.isEmpty()) {
                 components.put(key, value);
             }

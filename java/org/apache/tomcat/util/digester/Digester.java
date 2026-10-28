@@ -99,7 +99,7 @@ public class Digester extends DefaultHandler2 {
         if (classNames != null) {
             StringTokenizer classNamesTokenizer = new StringTokenizer(classNames, ",");
             while (classNamesTokenizer.hasMoreTokens()) {
-                String className = classNamesTokenizer.nextToken().trim();
+                String className = classNamesTokenizer.nextToken().strip();
                 ClassLoader[] cls = new ClassLoader[] { Digester.class.getClassLoader(),
                         Thread.currentThread().getContextClassLoader() };
                 for (ClassLoader cl : cls) {

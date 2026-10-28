@@ -357,7 +357,7 @@ public class AppsApiServlet extends HTMLManagerServlet {
             try (PrintWriter pw = new PrintWriter(validation)) {
                 if (!validateContextName(cn, pw, smClient)) {
                     Api.error(response, HttpServletResponse.SC_BAD_REQUEST, "INVALID_PATH",
-                            validation.toString().trim());
+                            validation.toString().strip());
                     return;
                 }
             }
@@ -441,7 +441,7 @@ public class AppsApiServlet extends HTMLManagerServlet {
 
             String sortBy = request.getParameter("sort");
             String orderBy = null;
-            if (sortBy != null && !sortBy.trim().isEmpty()) {
+            if (sortBy != null && !sortBy.strip().isEmpty()) {
                 Comparator<Session> comparator = getComparator(sortBy);
                 if (comparator != null) {
                     boolean asc = !"DESC".equalsIgnoreCase(request.getParameter("order"));
@@ -709,7 +709,7 @@ public class AppsApiServlet extends HTMLManagerServlet {
         try (PrintWriter writer = new PrintWriter(stringWriter)) {
             operation.run(writer);
         }
-        return stringWriter.toString().trim();
+        return stringWriter.toString().strip();
     }
 
 

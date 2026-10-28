@@ -248,7 +248,7 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
      */
     public void setPathsAcceptingParams(String pathsList) {
         if (Objects.nonNull(pathsList)) {
-            Arrays.asList(pathsList.split(pathsDelimiter)).forEach(e -> pathsAcceptingParams.add(e.trim()));
+            Arrays.asList(pathsList.split(pathsDelimiter)).forEach(e -> pathsAcceptingParams.add(e.strip()));
         }
     }
 

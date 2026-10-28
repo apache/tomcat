@@ -157,7 +157,7 @@ public class CallParamRule extends Rule {
             if (bodyTextStack == null) {
                 bodyTextStack = new ArrayStack<>();
             }
-            bodyTextStack.push(bodyText.trim());
+            bodyTextStack.push(bodyText.strip());
         }
 
     }

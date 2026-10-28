@@ -108,7 +108,7 @@ public enum CookiesWithoutEquals {
      * @return The corresponding enum value
      */
     public static CookiesWithoutEquals fromString(String from) {
-        String trimmedLower = from.trim().toLowerCase(Locale.ENGLISH);
+        String trimmedLower = from.strip().toLowerCase(Locale.ENGLISH);
 
         for (CookiesWithoutEquals value : values()) {
             if (value.getValue().equals(trimmedLower)) {

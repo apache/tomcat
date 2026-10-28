@@ -269,7 +269,7 @@ public class ELParser {
         int end = len;
 
         // Look to see if the value is quoted
-        String trimmed = input.trim();
+        String trimmed = input.strip();
         int trimmedLen = trimmed.length();
         if (trimmedLen > 1) {
             // Might be quoted

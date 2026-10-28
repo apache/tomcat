@@ -464,7 +464,7 @@ public class FileHandler extends Handler {
         if (value == null) {
             value = defaultValue;
         } else {
-            value = value.trim();
+            value = value.strip();
         }
         return value;
     }

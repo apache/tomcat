@@ -288,13 +288,13 @@ public class CoordinationDemo {
     public static String fill(String value, int length, String ch, boolean left) {
         StringBuilder buf = new StringBuilder();
         if (!left) {
-            buf.append(value.trim());
+            buf.append(value.strip());
         }
-        for (int i = value.trim().length(); i < length; i++) {
+        for (int i = value.strip().length(); i < length; i++) {
             buf.append(ch);
         }
         if (left) {
-            buf.append(value.trim());
+            buf.append(value.strip());
         }
         return buf.toString();
     }
