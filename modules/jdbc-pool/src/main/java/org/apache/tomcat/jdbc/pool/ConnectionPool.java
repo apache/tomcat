@@ -733,7 +733,17 @@ public class ConnectionPool {
         // notified. Only a call that actually destroyed a connection opened a
         // slot; offering a placeholder for a connection that was already
         // released would run the pool over maxActive.
-        if (destroyed && waitcount.get() > 0) {
+        // A counted thread is not necessarily able to consume the placeholder:
+        // after an interrupted or timed out wait its queue latch is already
+        // deregistered while the wait count is still held, and a thread that
+        // creates its connection does not wait on the queue at all. With no
+        // counted thread able to consume it, a placeholder can only be taken
+        // by the shutdown drain, which drains this very queue: it would poll
+        // the placeholder, destroy it, and the release of that destruction
+        // would queue the next one, spinning for as long as any thread holds
+        // a wait count. A closed pool serves no more borrowers, so only
+        // queue the placeholder while it is open.
+        if (destroyed && !isClosed() && waitcount.get() > 0) {
             if (!idle.offer(create(true))) {
                 log.warn("Failed to add a new connection to the pool after releasing a connection " +
                         "when at least one thread was waiting for a connection.");
