@@ -1089,7 +1089,7 @@ public class JNDIRealm extends RealmBase {
         if (cipherSuites == null || cipherSuitesArray != null) {
             return cipherSuitesArray;
         }
-        this.cipherSuites = this.cipherSuites.trim();
+        this.cipherSuites = this.cipherSuites.strip();
         if (this.cipherSuites.isEmpty()) {
             containerLog.warn(sm.getString("jndiRealm.emptyCipherSuites"));
             this.cipherSuitesArray = null;
@@ -1156,7 +1156,7 @@ public class JNDIRealm extends RealmBase {
      */
     public void setHostnameVerifierClassName(String verifierClassName) {
         if (verifierClassName != null) {
-            this.hostNameVerifierClassName = verifierClassName.trim();
+            this.hostNameVerifierClassName = verifierClassName.strip();
         } else {
             this.hostNameVerifierClassName = null;
         }
@@ -2732,7 +2732,7 @@ public class JNDIRealm extends RealmBase {
             return sslSocketFactory;
         }
         final SSLSocketFactory result;
-        if (this.sslSocketFactoryClassName != null && !sslSocketFactoryClassName.trim().isEmpty()) {
+        if (this.sslSocketFactoryClassName != null && !sslSocketFactoryClassName.strip().isEmpty()) {
             result = createSSLSocketFactoryFromClassName(this.sslSocketFactoryClassName);
         } else {
             result = createSSLContextFactoryFromProtocol(sslProtocol);

@@ -147,7 +147,7 @@ public class ClassLoaderLogManager extends LogManager {
         // Apply initial level for new logger
         final String levelString = getProperty(loggerName + ".level");
         if (levelString != null) {
-            logger.setLevel(Level.parse(levelString.trim()));
+            logger.setLevel(Level.parse(levelString.strip()));
         }
 
         // Always instantiate parent loggers so that
@@ -178,7 +178,7 @@ public class ClassLoaderLogManager extends LogManager {
             logger.setUseParentHandlers(false);
             StringTokenizer tok = new StringTokenizer(handlers, ",");
             while (tok.hasMoreTokens()) {
-                String handlerName = (tok.nextToken().trim());
+                String handlerName = (tok.nextToken().strip());
                 Handler handler = null;
                 ClassLoader current = classLoader;
                 while (current != null) {
@@ -502,7 +502,7 @@ public class ClassLoaderLogManager extends LogManager {
         if (handlers != null) {
             StringTokenizer tok = new StringTokenizer(handlers, ",");
             while (tok.hasMoreTokens()) {
-                String handlerName = (tok.nextToken().trim());
+                String handlerName = (tok.nextToken().strip());
                 String handlerClassName = handlerName;
                 String prefix = "";
                 if (handlerClassName.isEmpty()) {

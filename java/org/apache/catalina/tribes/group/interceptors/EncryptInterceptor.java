@@ -248,7 +248,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
         if (null == keyBytes) {
             setEncryptionKey((byte[]) null);
         } else {
-            setEncryptionKey(fromHexString(keyBytes.trim()));
+            setEncryptionKey(fromHexString(keyBytes.strip()));
         }
     }
 

@@ -3068,7 +3068,7 @@ public class DefaultServlet extends HttpServlet {
          * @return An Order specifying the column and ascending/descending to be applied to resources.
          */
         public Order getOrder(String order) {
-            if (null == order || order.trim().isEmpty()) {
+            if (null == order || order.strip().isEmpty()) {
                 return Order.DEFAULT;
             }
 
@@ -3082,7 +3082,7 @@ public class DefaultServlet extends HttpServlet {
             boolean ascending = false;
 
             for (String option : options) {
-                option = option.trim();
+                option = option.strip();
 
                 if (2 < option.length()) {
                     char opt = option.charAt(0);

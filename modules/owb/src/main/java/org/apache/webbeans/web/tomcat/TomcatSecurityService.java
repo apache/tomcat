@@ -50,7 +50,7 @@ public class TomcatSecurityService extends SimpleSecurityService {
                         .filter(it -> !it.isEmpty())
                         .map(it -> {
                             try { // if MP JWT-Auth is available
-                                return loader.loadClass(it.trim());
+                                return loader.loadClass(it.strip());
                             } catch (final NoClassDefFoundError | ClassNotFoundException e) {
                                 return null;
                             }

@@ -248,7 +248,7 @@ public class ParameterLimitValve extends ValveBase {
             String line;
             while ((line = reader.readLine()) != null) {
                 // Trim whitespace from the line
-                line = line.trim();
+                line = line.strip();
                 if (line.isEmpty() || line.startsWith("#")) {
                     // Skip empty lines or comments
                     continue;
@@ -259,8 +259,8 @@ public class ParameterLimitValve extends ValveBase {
                     throw new IllegalArgumentException(sm.getString("parameterLimitValve.invalidLine", line));
                 }
 
-                String patternString = line.substring(0, lastEqualsIndex).trim();
-                String limitsString = line.substring(lastEqualsIndex + 1).trim();
+                String patternString = line.substring(0, lastEqualsIndex).strip();
+                String limitsString = line.substring(lastEqualsIndex + 1).strip();
 
                 Pattern pattern = Pattern.compile(UDecoder.URLDecode(patternString, StandardCharsets.UTF_8));
                 String[] limits = limitsString.split(",");

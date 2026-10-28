@@ -139,7 +139,7 @@ public class Util {
             return null;
         }
         index += 1; // positioned after the '='
-        input = input.substring(index).trim();
+        input = input.substring(index).strip();
         if (input.isEmpty()) {
             // Empty or whitespace-only parameter value, e.g. a malformed
             // "Content-Type: text/html;charset=" header from a remote server.
@@ -163,7 +163,7 @@ public class Util {
                 end = input.length();
             }
         }
-        return input.substring(begin, end).trim();
+        return input.substring(begin, end).strip();
     }
 
     /**

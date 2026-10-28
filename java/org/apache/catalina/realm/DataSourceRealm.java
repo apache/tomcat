@@ -447,7 +447,7 @@ public class DataSourceRealm extends RealmBase {
                     dbCredentials = rs.getString(1);
                 }
 
-                return (dbCredentials != null) ? dbCredentials.trim() : null;
+                return (dbCredentials != null) ? dbCredentials.strip() : null;
             }
         } catch (SQLException e) {
             containerLog.error(sm.getString("dataSourceRealm.getPassword.exception", username), e);
@@ -551,7 +551,7 @@ public class DataSourceRealm extends RealmBase {
                 while (rs.next()) {
                     String role = rs.getString(1);
                     if (role != null) {
-                        list.add(role.trim());
+                        list.add(role.strip());
                     }
                 }
                 return list;

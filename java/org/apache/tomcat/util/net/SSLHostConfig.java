@@ -742,7 +742,7 @@ public class SSLHostConfig implements Serializable {
                 String[] components = ciphersList.split(":");
                 // Remove any TLS 1.3 cipher suites
                 for (String component : components) {
-                    String trimmed = component.trim();
+                    String trimmed = component.strip();
                     if (OpenSSLCipherConfigurationParser.isTls13Cipher(trimmed)) {
                         log.warn(sm.getString("sslHostConfig.handleTls13CiphersuiteInCiphers", trimmed));
                         if (!sbCipherSuitesFromCiphers.isEmpty()) {
@@ -765,7 +765,7 @@ public class SSLHostConfig implements Serializable {
                 StringBuilder sbCipherSuitesFromCiphers = new StringBuilder();
                 String[] ciphers = ciphersList.split(",");
                 for (String cipher : ciphers) {
-                    String trimmed = cipher.trim();
+                    String trimmed = cipher.strip();
                     if (!trimmed.isEmpty()) {
                         if (OpenSSLCipherConfigurationParser.isTls13Cipher(trimmed)) {
                             log.warn(sm.getString("sslHostConfig.handleTls13CiphersuiteInCiphers", trimmed));
@@ -866,7 +866,7 @@ public class SSLHostConfig implements Serializable {
             values = cipherSuites.split(",");
         }
         for (String value : values) {
-            String trimmed = value.trim();
+            String trimmed = value.strip();
             if (!trimmed.isEmpty()) {
                 if (!OpenSSLCipherConfigurationParser.isTls13Cipher(trimmed)) {
                     log.warn(sm.getString("sslHostConfig.ignoreNonTls13Ciphersuite", trimmed));
@@ -1066,11 +1066,11 @@ public class SSLHostConfig implements Serializable {
         // Split using a positive lookahead to keep the separator in
         // the capture so we can check which case it is.
         for (String value : input.split("(?=[-+,])")) {
-            String trimmed = value.trim();
+            String trimmed = value.strip();
             // Ignore token which only consists of prefix character
             if (trimmed.length() > 1) {
                 if (trimmed.charAt(0) == '+') {
-                    trimmed = trimmed.substring(1).trim();
+                    trimmed = trimmed.substring(1).strip();
                     if (trimmed.equalsIgnoreCase(Constants.SSL_PROTO_ALL)) {
                         protocols.addAll(SSL_PROTO_ALL_SET);
                     } else {
@@ -1078,7 +1078,7 @@ public class SSLHostConfig implements Serializable {
                         explicitlyRequestedProtocols.add(trimmed);
                     }
                 } else if (trimmed.charAt(0) == '-') {
-                    trimmed = trimmed.substring(1).trim();
+                    trimmed = trimmed.substring(1).strip();
                     if (trimmed.equalsIgnoreCase(Constants.SSL_PROTO_ALL)) {
                         protocols.removeAll(SSL_PROTO_ALL_SET);
                     } else {
@@ -1087,7 +1087,7 @@ public class SSLHostConfig implements Serializable {
                     }
                 } else {
                     if (trimmed.charAt(0) == ',') {
-                        trimmed = trimmed.substring(1).trim();
+                        trimmed = trimmed.substring(1).strip();
                     }
                     if (!protocols.isEmpty()) {
                         log.warn(sm.getString("sslHostConfig.prefix_missing", trimmed, getHostName()));
@@ -1193,7 +1193,7 @@ public class SSLHostConfig implements Serializable {
                 String[] groupNames = groups.split(",");
                 for (String groupName : groupNames) {
                     try {
-                        Group group = Group.valueOf(groupName.trim());
+                        Group group = Group.valueOf(groupName.strip());
                         groupList.add(group);
                     } catch (IllegalArgumentException e) {
                         log.warn(sm.getString("sslHostConfig.unknownGroup", groupName));
