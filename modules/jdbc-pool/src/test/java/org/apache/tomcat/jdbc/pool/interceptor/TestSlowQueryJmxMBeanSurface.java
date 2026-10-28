@@ -89,7 +89,7 @@ class TestSlowQueryJmxMBeanSurface extends JdbcPoolBaseTest {
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
         ObjectName oname = objectNameFor(poolName);
 
-        try (Connection con = ds.getConnection()) {
+        try (@SuppressWarnings("unused") Connection con = ds.getConnection()) {
             Assertions.assertTrue(server.isRegistered(oname),
                     "the interceptor MBean must be registered once the pool is in use");
             MBeanInfo info = server.getMBeanInfo(oname);
@@ -132,7 +132,7 @@ class TestSlowQueryJmxMBeanSurface extends JdbcPoolBaseTest {
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
         ObjectName oname = objectNameFor(poolName);
 
-        try (Connection con = reporting.getConnection();
+        try (@SuppressWarnings("unused") Connection con = reporting.getConnection();
                 Connection other = statsOnly.getConnection();
                 Statement st = other.createStatement()) {
             st.execute("SELECT 1");
@@ -200,7 +200,7 @@ class TestSlowQueryJmxMBeanSurface extends JdbcPoolBaseTest {
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
         ObjectName oname = objectNameFor(poolName);
 
-        try (Connection ownerCon = owner.getConnection();
+        try (@SuppressWarnings("unused") Connection ownerCon = owner.getConnection();
                 Connection sharerCon = sharer.getConnection();
                 Statement st = sharerCon.createStatement()) {
             st.execute("SELECT 1");
