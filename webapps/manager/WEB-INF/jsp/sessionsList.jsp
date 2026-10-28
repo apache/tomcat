@@ -21,11 +21,6 @@
 <%@page import="org.apache.catalina.manager.Constants" %>
 <%@page import="org.apache.catalina.manager.JspHelper" %>
 <%@page import="org.apache.catalina.util.ContextName" %>
-<!DOCTYPE html
-     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-
 <%@page import="java.lang.reflect.Method"%>
 <%@page import="org.apache.catalina.manager.DummyProxySession"%>
 <%!
@@ -46,7 +41,8 @@ static {
     isPrimaryMethod = method;
 }
 %>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <% String path = (String) request.getAttribute("path");
    String version = (String) request.getAttribute("version");
    ContextName cn = new ContextName(path, version);
@@ -56,15 +52,17 @@ static {
    Collection<Session> activeSessions = (Collection<Session>) request.getAttribute("activeSessions");
 %>
 <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="pragma" content="no-cache"/><!-- HTTP 1.0 -->
     <meta http-equiv="cache-control" content="no-cache,must-revalidate"/><!-- HTTP 1.1 -->
     <meta http-equiv="expires" content="0"/><!-- 0 is an invalid value and should be treated as 'now' -->
     <meta http-equiv="content-language" content="en"/>
-    <meta name="copyright" content="<%= Constants.COPYRIGHT_NOTICE %>" />
+    <meta name="copyright" content="<%= Constants.COPYRIGHT_NOTICE %>"/>
     <meta name="robots" content="noindex,nofollow,noarchive"/>
     <title>Sessions Administration for <%= JspHelper.escapeXml(cn.getDisplayName()) %></title>
     <link href="<%=request.getContextPath()%>/images/favicon.ico" rel="icon" type="image/x-icon" />
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/css/manager.css">
 </head>
 <body>
 <h1>Sessions Administration for <%= JspHelper.escapeXml(cn.getDisplayName()) %></h1>
@@ -81,41 +79,40 @@ static {
 <form action="<%= submitUrl %>" method="POST" id="sessionsForm">
     <fieldset><legend>Active HttpSessions information</legend>
         <input type="hidden" name="action" id="sessionsFormAction" value="injectSessions"/>
-        <input type="hidden" name="sort" id="sessionsFormSort" value="<%= JspHelper.escapeXml(request.getAttribute("sort")) %>"/>
         <% String order = (String) request.getAttribute("order");
            if (order == null || "".equals(order)) {
                order = "ASC";
            }
         %>
         <input type="hidden" name="order" id="sessionsFormSortOrder" value="<%= JspHelper.escapeXml(order) %>"/>
-        <input type="submit" name="refresh" id="refreshButton" value="Refresh Sessions list" onclick="document.getElementById('sessionsFormAction').value='refreshSessions'; return true;"/>
+        <input type="submit" name="refresh" value="Refresh Sessions list"/>
         <%= JspHelper.formatNumber(activeSessions.size()) %> active Sessions<br/>
-        <table border="1" cellpadding="2" cellspacing="2" width="100%">
+        <table class="sessions">
             <thead>
                 <tr>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='id'; document.getElementById('refreshButton').click(); return true;">Session Id</a></th>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='id'; document.getElementById('refreshButton').click(); return true;">Type</a></th>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='locale'; document.getElementById('refreshButton').click(); return true;">Guessed Locale</a></th>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='user'; document.getElementById('refreshButton').click(); return true;">Guessed User name</a></th>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='CreationTime'; document.getElementById('refreshButton').click(); return true;">Creation Time</a></th>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='LastAccessedTime'; document.getElementById('refreshButton').click(); return true;">Last Accessed Time</a></th>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='UsedTime'; document.getElementById('refreshButton').click(); return true;">Used Time</a></th>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='InactiveTime'; document.getElementById('refreshButton').click(); return true;">Inactive Time</a></th>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='TTL'; document.getElementById('refreshButton').click(); return true;"><span title="Time To Live">TTL</span></a></th>
+                    <th scope="col"<% if ("id".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="id">Session Id</button></th>
+                    <th scope="col"<% if ("id".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="id">Type</button></th>
+                    <th scope="col"<% if ("locale".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="locale">Guessed Locale</button></th>
+                    <th scope="col"<% if ("user".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="user">Guessed User name</button></th>
+                    <th scope="col"<% if ("CreationTime".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="CreationTime">Creation Time</button></th>
+                    <th scope="col"<% if ("LastAccessedTime".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="LastAccessedTime">Last Accessed Time</button></th>
+                    <th scope="col"<% if ("UsedTime".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="UsedTime">Used Time</button></th>
+                    <th scope="col"<% if ("InactiveTime".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="InactiveTime">Inactive Time</button></th>
+                    <th scope="col"<% if ("TTL".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="TTL"><span title="Time To Live">TTL</span></button></th>
                 </tr>
             </thead>
             <% if (activeSessions.size() > 10) { %>
             <tfoot><%-- <tfoot> is the same as <thead> --%>
                 <tr>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='id'; document.getElementById('refreshButton').click(); return true;">Session Id</a></th>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='id'; document.getElementById('refreshButton').click(); return true;">Type</a></th>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='locale'; document.getElementById('refreshButton').click(); return true;">Guessed Locale</a></th>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='user'; document.getElementById('refreshButton').click(); return true;">Guessed User name</a></th>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='CreationTime'; document.getElementById('refreshButton').click(); return true;">Creation Time</a></th>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='LastAccessedTime'; document.getElementById('refreshButton').click(); return true;">Last Accessed Time</a></th>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='UsedTime'; document.getElementById('refreshButton').click(); return true;">Used Time</a></th>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='InactiveTime'; document.getElementById('refreshButton').click(); return true;">Inactive Time</a></th>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='TTL'; document.getElementById('refreshButton').click(); return true;"><span title="Time To Live">TTL</span></a></th>
+                    <th scope="col"<% if ("id".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="id">Session Id</button></th>
+                    <th scope="col"<% if ("id".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="id">Type</button></th>
+                    <th scope="col"<% if ("locale".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="locale">Guessed Locale</button></th>
+                    <th scope="col"<% if ("user".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="user">Guessed User name</button></th>
+                    <th scope="col"<% if ("CreationTime".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="CreationTime">Creation Time</button></th>
+                    <th scope="col"<% if ("LastAccessedTime".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="LastAccessedTime">Last Accessed Time</button></th>
+                    <th scope="col"<% if ("UsedTime".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="UsedTime">Used Time</button></th>
+                    <th scope="col"<% if ("InactiveTime".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="InactiveTime">Inactive Time</button></th>
+                    <th scope="col"<% if ("TTL".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="TTL"><span title="Time To Live">TTL</span></button></th>
                 </tr>
             </tfoot>
             <% } // end if %>
@@ -152,26 +149,26 @@ static {
                         }
                       %>
                     </td>
-                    <td style="text-align: center;"><%= type %></td>
-                    <td style="text-align: center;"><%= JspHelper.guessDisplayLocaleFromSession(currentSession) %></td>
-                    <td style="text-align: center;"><%= JspHelper.guessDisplayUserFromSession(currentSession) %></td>
-                    <td style="text-align: center;"><%= JspHelper.getDisplayCreationTimeForSession(currentSession) %></td>
-                    <td style="text-align: center;"><%= JspHelper.getDisplayLastAccessedTimeForSession(currentSession) %></td>
-                    <td style="text-align: center;"><%= JspHelper.getDisplayUsedTimeForSession(currentSession) %></td>
-                    <td style="text-align: center;"><%= JspHelper.getDisplayInactiveTimeForSession(currentSession) %></td>
-                    <td style="text-align: center;"><%= JspHelper.getDisplayTTLForSession(currentSession) %></td>
+                    <td><%= type %></td>
+                    <td><%= JspHelper.guessDisplayLocaleFromSession(currentSession) %></td>
+                    <td><%= JspHelper.guessDisplayUserFromSession(currentSession) %></td>
+                    <td><%= JspHelper.getDisplayCreationTimeForSession(currentSession) %></td>
+                    <td><%= JspHelper.getDisplayLastAccessedTimeForSession(currentSession) %></td>
+                    <td><%= JspHelper.getDisplayUsedTimeForSession(currentSession) %></td>
+                    <td><%= JspHelper.getDisplayInactiveTimeForSession(currentSession) %></td>
+                    <td><%= JspHelper.getDisplayTTLForSession(currentSession) %></td>
                 </tr>
 <% } // end while %>
             </tbody>
         </table>
-        <p style="text-align: center;">
-            <input type="submit" name="invalidate" value="Invalidate selected Sessions" onclick="document.getElementById('sessionsFormAction').value='invalidateSessions'; return true;"/>
+        <p class="center-text">
+            <button type="submit" name="action" value="invalidateSessions">Invalidate selected Sessions</button>
         </p>
     </fieldset>
 </form>
 
 <form method="GET" action="<%=request.getContextPath()%>/html">
-  <p style="text-align: center;">
+  <p class="center-text">
     <input type="submit" value="Return to main page" />
   </p>
 </form>

@@ -127,6 +127,16 @@ public class TestStatusTransformer extends TomcatBaseTest {
         } else {
             // Verify that a request is being processed
             Assert.assertTrue(body.contains("<strong>S</strong>"));
+            // Modernized, valid HTML5 markup
+            Assert.assertTrue(body.contains("<!DOCTYPE html>"));
+            Assert.assertTrue(body.contains("<html lang="));
+            Assert.assertFalse(body.contains("<font"));
+            Assert.assertFalse(body.contains("bgcolor="));
+            Assert.assertFalse(body.contains(" border="));
+            Assert.assertFalse(body.contains(" align="));
+            Assert.assertFalse(body.contains(" nowrap>"));
+            Assert.assertFalse(body.contains(" width="));
+            Assert.assertFalse(body.contains("style=\""));
         }
     }
 

@@ -105,7 +105,19 @@ public class TestHostManagerWebapp extends TomcatBaseTest {
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
-        Assert.assertTrue(client.getResponseBody().contains("/host-manager/css/manager.css"));
+
+        String html = client.getResponseBody();
+        Assert.assertTrue(html.contains("/host-manager/css/manager.css"));
+        Assert.assertTrue(html.contains("<!DOCTYPE html>"));
+        Assert.assertTrue(html.contains("<html lang="));
+        Assert.assertFalse(html.contains("<font"));
+        Assert.assertFalse(html.contains("bgcolor="));
+        Assert.assertFalse(html.contains("NOWRAP"));
+        Assert.assertFalse(html.contains(" border="));
+        Assert.assertFalse(html.contains(" align="));
+        Assert.assertFalse(html.contains(" nowrap>"));
+        Assert.assertFalse(html.contains(" width="));
+        Assert.assertFalse(html.contains("style=\""));
 
         // @formatter:off
         client.setRequest(new String[] {

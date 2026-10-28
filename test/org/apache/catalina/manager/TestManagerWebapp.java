@@ -122,6 +122,19 @@ public class TestManagerWebapp extends TomcatBaseTest {
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody().contains("/manager/css/manager.css"));
 
+        // Modernized, valid HTML5 markup (no quirks mode, no obsolete tags)
+        String html = client.getResponseBody();
+        Assert.assertTrue("missing doctype", html.contains("<!DOCTYPE html>"));
+        Assert.assertTrue("missing lang attribute", html.contains("<html lang="));
+        Assert.assertFalse("obsolete <font>", html.contains("<font"));
+        Assert.assertFalse("obsolete bgcolor", html.contains("bgcolor="));
+        Assert.assertFalse("obsolete <center>", html.contains("<center"));
+        Assert.assertFalse("obsolete border", html.contains(" border="));
+        Assert.assertFalse("obsolete align", html.contains(" align="));
+        Assert.assertFalse("obsolete nowrap", html.contains(" nowrap>"));
+        Assert.assertFalse("obsolete width", html.contains(" width="));
+        Assert.assertFalse("inline style", html.contains("style=\""));
+
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/status HTTP/1.1" + CRLF +
@@ -788,6 +801,23 @@ public class TestManagerWebapp extends TomcatBaseTest {
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody().contains("Sessions Administration"));
         Assert.assertTrue(client.getResponseBody().contains("active Sessions"));
+
+        String sessionsPage = client.getResponseBody();
+        Assert.assertFalse("inline JS present", sessionsPage.contains("onclick="));
+        Assert.assertTrue("sort control not a button",
+                sessionsPage.contains("<button type=\"submit\" class=\"sort\" name=\"sort\""));
+        Assert.assertTrue("missing column scope", sessionsPage.contains("scope=\"col\""));
+        Assert.assertFalse("obsolete border", sessionsPage.contains(" border="));
+        Assert.assertFalse("obsolete align", sessionsPage.contains(" align="));
+        Assert.assertFalse("obsolete nowrap", sessionsPage.contains(" nowrap>"));
+        Assert.assertFalse("obsolete width", sessionsPage.contains(" width="));
+        Assert.assertFalse("inline style", sessionsPage.contains("style=\""));
+        Assert.assertTrue("missing stylesheet link", sessionsPage.contains("/manager/css/manager.css"));
+        Assert.assertTrue("missing doctype", sessionsPage.contains("<!DOCTYPE html>"));
+        // Regression guard: the stale hidden "sort" field (which used to shadow the
+        // sort buttons and break column sorting) must be gone.
+        Assert.assertFalse("stale hidden sort field present",
+                sessionsPage.contains("id=\"sessionsFormSort\""));
 
         tomcat.stop();
     }

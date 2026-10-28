@@ -1046,6 +1046,11 @@
         Documentation: Describe how to configure the Windows certificate store
         and reload externally renewed TLS certificates. (dsoumis)
       </update>
+      <update>
+        Modernize the manager, host-manager, and server status pages for valid
+        HTML5 markup, accessibility, and inline-free content. Remove obsolete
+        presentational HTML attributes and inline styles/scripts. (dsoumis)
+      </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
         Host Manager: Host names are now always converted to lower case before

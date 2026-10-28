@@ -20,15 +20,13 @@
 <%@page import="java.util.Map.Entry" %>
 <%@page import="java.util.List" %>
 <%@page import="org.apache.catalina.manager.Constants" %>
-<!DOCTYPE html
-     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <% Map<String,List<String>> cipherList = (Map<String,List<String>>) request.getAttribute("cipherList");
 %>
 <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="pragma" content="no-cache"/><!-- HTTP 1.0 -->
     <meta http-equiv="cache-control" content="no-cache,must-revalidate"/><!-- HTTP 1.1 -->
     <meta http-equiv="expires" content="0"/><!-- 0 is an invalid value and should be treated as 'now' -->
@@ -37,11 +35,12 @@
     <meta name="robots" content="noindex,nofollow,noarchive"/>
     <title>Configured ciphers per Connector</title>
     <link href="<%=request.getContextPath()%>/images/favicon.ico" rel="icon" type="image/x-icon" />
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/css/manager.css">
 </head>
 <body>
 <h1>Configured ciphers per Connector</h1>
 
-<table border="1" cellpadding="2" cellspacing="2" width="100%">
+<table class="data-table">
     <thead>
         <tr>
             <th>Connector / TLS Virtual Host</th>
@@ -71,7 +70,7 @@
 </table>
 
 <form method="GET" action="<%=request.getContextPath()%>/html">
-  <p style="text-align: center;">
+  <p class="center-text">
     <input type="submit" value="Return to main page" />
   </p>
 </form>

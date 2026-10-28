@@ -15,8 +15,11 @@
  * limitations under the License.
  */
 
+/* === Base Styles === */
 body {
     font-family: Tahoma, Arial, sans-serif;
+    color: black;
+    background-color: white;
 }
 
 h1,
@@ -47,29 +50,59 @@ a {
     color: black;
 }
 
+pre,
+tt {
+    border: 1px dotted #525D76;
+}
+
+/* === Layout Helpers === */
 .line {
     height          : 1px;
     background-color: #525D76;
     border          : none;
 }
 
+form.inline {
+    display: inline;
+}
+
+/* === Tables === */
 table {
     width: 100%;
 }
 
+/* Default table cell styles */
+th,
+td {
+    font-family: sans-serif, Tahoma, Arial;
+}
+
+th {
+    text-align    : center;
+    vertical-align: top;
+    font-weight   : bold;
+    background    : #FFDC75;
+}
+
+td {
+    text-align    : center;
+    vertical-align: middle;
+    color         : black;
+}
+
+/* Specialized table cells */
 td.page-title {
     text-align    : center;
     vertical-align: top;
-    font-family   : sans-serif, Tahoma, Arial;
     font-weight   : bold;
     background    : white;
     color         : black;
+    font-size     : 1.5em;
 }
 
 td.title {
     text-align    : left;
     vertical-align: top;
-    font-family   : sans-serif, Tahoma, Arial;
     font-style    : italic;
     font-weight   : bold;
     background    : #D2A41C;
@@ -78,7 +111,6 @@ td.title {
 td.header-left {
     text-align    : left;
     vertical-align: top;
-    font-family   : sans-serif, Tahoma, Arial;
     font-weight   : bold;
     background    : #FFDC75;
 }
@@ -86,7 +118,6 @@ td.header-left {
 td.header-center {
     text-align    : center;
     vertical-align: top;
-    font-family   : sans-serif, Tahoma, Arial;
     font-weight   : bold;
     background    : #FFDC75;
 }
@@ -94,48 +125,96 @@ td.header-center {
 td.row-left {
     text-align    : left;
     vertical-align: middle;
-    font-family   : sans-serif, Tahoma, Arial;
     color         : black;
 }
 
 td.row-center {
     text-align    : center;
     vertical-align: middle;
-    font-family   : sans-serif, Tahoma, Arial;
     color         : black;
 }
 
 td.row-right {
     text-align    : right;
     vertical-align: middle;
-    font-family   : sans-serif, Tahoma, Arial;
     color         : black;
 }
 
-TH {
-    text-align    : center;
-    vertical-align: top;
-    font-family   : sans-serif, Tahoma, Arial;
-    font-weight   : bold;
-    background    : #FFDC75;
+td.highlighted {
+    background-color: #C3F3C3;
 }
 
-TD {
-    text-align    : center;
-    vertical-align: middle;
-    font-family   : sans-serif, Tahoma, Arial;
-    color         : black;
+/* Specialized table styles */
+table.sessions {
+    border: 1px solid black;
+    border-collapse: collapse;
+    width: 100%;
 }
 
-form {
-    margin: 1;
+table.sessions th,
+table.sessions td {
+    padding: 2px;
 }
 
-form.inline {
-    display: inline;
+table.sessions td:not(:first-child) {
+    text-align: center;
 }
 
+table.data-table {
+    width: 100%;
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+table.data-table th,
+table.data-table td {
+    padding: 2px;
+}
+
+/* === Images === */
 img.tomcat-logo {
     height: 92px;
     float : left;
+}
+
+img.asf-logo {
+    width: 266px;
+    height: 83px;
+}
+
+/* === Utility Classes === */
+.nowrap {
+    white-space: nowrap;
+}
+
+.subtitle {
+    font-size: 1.2em;
+}
+
+footer.copyright {
+    text-align: center;
+    font-size: 0.8em;
+    color: #525D76;
+}
+
+button.sort {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    color: black;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.center-text {
+    text-align: center;
+}
+
+.table-left {
+    text-align: left;
+}
+
+.caption-small-caps {
+    font-variant: small-caps;
 }

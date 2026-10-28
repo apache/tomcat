@@ -43,9 +43,9 @@ public class Constants {
      * The HTML message section template for host manager pages.
      */
     public static final String MESSAGE_SECTION =
-            "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
+            "<table>\n" +
             " <tr>\n" +
-            "  <td class=\"row-left\" width=\"10%\">" +
+            "  <td class=\"row-left\">" +
             "<small><strong>{0}</strong></small>&nbsp;</td>\n" +
             "  <td class=\"row-left\"><pre>{1}</pre></td>\n" +
             " </tr>\n" +
@@ -57,7 +57,7 @@ public class Constants {
      * The HTML manager section template for host manager pages.
      */
     public static final String MANAGER_SECTION =
-            "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
+            "<table>\n" +
             "<tr>\n" +
             " <td colspan=\"4\" class=\"title\">{0}</td>\n" +
             "</tr>\n" +
@@ -75,7 +75,7 @@ public class Constants {
      * The HTML server header section template for host manager pages.
      */
     public static final String SERVER_HEADER_SECTION =
-            "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
+            "<table>\n" +
             "<tr>\n" +
             " <td colspan=\"6\" class=\"title\">{0}</td>\n" +
             "</tr>\n" +
@@ -108,10 +108,10 @@ public class Constants {
      * The HTML tail section template for host manager pages.
      */
     public static final String HTML_TAIL_SECTION =
-            "<hr size=\"1\" noshade=\"noshade\">\n" +
-            "<center><font size=\"-1\" color=\"#525D76\">\n" +
-            " <em>" + org.apache.catalina.manager.Constants.HTML_COPYRIGHT_NOTICE + "</em>" +
-            "</font></center>\n" +
+            "<hr class=\"line\">\n" +
+            "<footer class=\"copyright\">\n" +
+            " <em>" + org.apache.catalina.manager.Constants.HTML_COPYRIGHT_NOTICE + "</em>\n" +
+            "</footer>\n" +
             "\n" +
             "</body>\n" +
             "</html>";

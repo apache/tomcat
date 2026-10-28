@@ -197,7 +197,7 @@ public class StatusTransformer {
             writer.print(formatSize(Long.valueOf(Runtime.getRuntime().maxMemory()), true));
             writer.print("</p>");
 
-            writer.write("<table border=\"0\"><thead><tr><th>" + args[3] + "</th><th>" + args[4] + "</th><th>" +
+            writer.write("<table><thead><tr><th>" + args[3] + "</th><th>" + args[4] + "</th><th>" +
                     args[5] + "</th><th>" + args[6] + "</th><th>" + args[7] + "</th><th>" + args[8] +
                     "</th></tr></thead><tbody>");
             for (MemoryPoolMXBean memoryPoolMBean : memoryPoolMBeans.values()) {
@@ -415,7 +415,7 @@ public class StatusTransformer {
             writer.print(formatSize(mBeanServer.getAttribute(grpName, "bytesSent"), true));
             writer.print("</p>");
 
-            writer.print("<table border=\"0\"><tr><th>" + args[10] + "</th><th>" + args[11] + "</th><th>" + args[12] +
+            writer.print("<table><tr><th>" + args[10] + "</th><th>" + args[11] + "</th><th>" + args[12] +
                     "</th><th>" + args[13] + "</th><th>" + args[14] + "</th><th>" + args[15] + "</th><th>" + args[16] +
                     "</th><th>" + args[17] + "</th></tr>");
 
@@ -616,10 +616,10 @@ public class StatusTransformer {
                 writer.write("<td>");
                 writer.print(Escape.htmlElementContent(mBeanServer.getAttribute(pName, "remoteAddr")));
                 writer.write("</td>");
-                writer.write("<td nowrap>");
+                writer.write("<td class=\"nowrap\">");
                 writer.write(Escape.htmlElementContent(mBeanServer.getAttribute(pName, "virtualHost")));
                 writer.write("</td>");
-                writer.write("<td nowrap class=\"row-left\">");
+                writer.write("<td class=\"row-left nowrap\">");
                 if (showRequest) {
                     writer.write(Escape.htmlElementContent(mBeanServer.getAttribute(pName, "method")));
                     writer.write(' ');
