@@ -245,6 +245,31 @@ public class SSLHostConfigCertificate implements Serializable {
 
 
     /**
+     * Returns the alias the given key manager would choose to serve for this certificate, or {@code null} if it has no
+     * suitable entry. When {@link #getType()} is {@link Type#UNDEFINED} every key type is tried. This reflects the
+     * alias actually used in a handshake, which can differ from {@link #getCertificateKeyAlias()} - for example after
+     * the SunMSCAPI Windows-MY numbered-duplicate resolution performed by SSLUtilBase#getKeyManagers().
+     *
+     * @param keyManager the key manager that will serve this certificate
+     *
+     * @return the served alias, or {@code null} if the key manager has no suitable entry
+     */
+    public String chooseServerAlias(X509KeyManager keyManager) {
+        Type[] candidateTypes = Type.UNDEFINED.equals(type) ? Type.values() : new Type[] { type };
+        for (Type candidateType : candidateTypes) {
+            if (candidateType == Type.UNDEFINED) {
+                continue;
+            }
+            String alias = keyManager.chooseServerAlias(candidateType.getKeyType(), null, null);
+            if (alias != null) {
+                return alias;
+            }
+        }
+        return null;
+    }
+
+
+    /**
      * Returns the password for the certificate's private key.
      *
      * @return the certificate key password

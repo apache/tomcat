@@ -613,6 +613,7 @@ public abstract class AbstractEndpoint<S, U> {
      */
     protected void logCertificate(SSLHostConfigCertificate certificate) {
         SSLHostConfig sslHostConfig = certificate.getSSLHostConfig();
+        SSLContext sslContext = certificate.getSslContext();
 
         String certificateInfo;
 
@@ -647,13 +648,19 @@ public abstract class AbstractEndpoint<S, U> {
         getLogCertificate().info(sm.getString("endpoint.tls.info", getName(), sslHostConfig.getHostName(),
                 certificate.getType(), certificateInfo, trustStoreSource));
 
-        SSLContext sslContext = certificate.getSslContext();
-        if (getLogCertificate().isDebugEnabled() && sslContext != null) {
-            String alias = certificate.getCertificateKeyAlias();
-            if (alias == null) {
-                alias = SSLUtilBase.DEFAULT_KEY_ALIAS;
+        // When a configured alias was resolved to a different alias that is actually served (e.g. a SunMSCAPI
+        // Windows-MY numbered duplicate), report it so the alias logged above is not mistaken for the one in use.
+        String configuredAlias = certificate.getCertificateKeyAlias();
+        if (sslContext != null && configuredAlias != null) {
+            String servedAlias = sslContext.getServedAlias(certificate);
+            if (servedAlias != null && !servedAlias.equals(configuredAlias)) {
+                getLogCertificate()
+                        .info(sm.getString("endpoint.tls.info.cert.aliasResolved", configuredAlias, servedAlias));
             }
-            X509Certificate[] x509Certificates = sslContext.getCertificateChain(alias);
+        }
+
+        if (getLogCertificate().isDebugEnabled() && sslContext != null) {
+            X509Certificate[] x509Certificates = sslContext.getCertificateChain(certificate);
             if (x509Certificates != null && x509Certificates.length > 0) {
                 getLogCertificate().debug(generateCertificateDebug(x509Certificates[0]));
             } else {

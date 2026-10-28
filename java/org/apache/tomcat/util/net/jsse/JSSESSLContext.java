@@ -34,6 +34,7 @@ import javax.net.ssl.X509KeyManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.apache.tomcat.util.net.SSLContext;
+import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 
 class JSSESSLContext implements SSLContext {
 
@@ -87,6 +88,22 @@ class JSSESSLContext implements SSLContext {
             }
         }
         return result;
+    }
+
+
+    @Override
+    public String getServedAlias(SSLHostConfigCertificate certificate) {
+        if (kms != null) {
+            for (KeyManager km : kms) {
+                if (km instanceof X509KeyManager x509KeyManager) {
+                    String alias = certificate.chooseServerAlias(x509KeyManager);
+                    if (alias != null) {
+                        return alias;
+                    }
+                }
+            }
+        }
+        return SSLContext.super.getServedAlias(certificate);
     }
 
     @Override
