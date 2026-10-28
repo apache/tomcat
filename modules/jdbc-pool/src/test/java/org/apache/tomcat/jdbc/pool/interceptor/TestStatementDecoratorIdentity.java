@@ -59,6 +59,7 @@ class TestStatementDecoratorIdentity extends JdbcPoolBaseTest {
         return ds;
     }
 
+    @SuppressWarnings("unlikely-arg-type") // Use of unlikely arg-type is deliberate
     @Test
     void aStatementHandleIsEqualOnlyToItselfWhileOpen() throws Exception {
         DataSource ds = decoratorPool(false);
@@ -86,6 +87,7 @@ class TestStatementDecoratorIdentity extends JdbcPoolBaseTest {
         }
     }
 
+    @SuppressWarnings("unlikely-arg-type") // Use of unlikely arg-type is deliberate
     @Test
     void aClosedStatementHandleKeepsAnsweringWithItsOwnIdentity() throws Exception {
         DataSource ds = decoratorPool(false);
@@ -117,6 +119,7 @@ class TestStatementDecoratorIdentity extends JdbcPoolBaseTest {
         }
     }
 
+    @SuppressWarnings("unlikely-arg-type") // Use of unlikely arg-type is deliberate
     @Test
     void aResultSetHandleIsAnHonestHandleOpenAndClosed() throws Exception {
         DataSource ds = decoratorPool(false);
@@ -153,7 +156,7 @@ class TestStatementDecoratorIdentity extends JdbcPoolBaseTest {
                         "a closed result set handle must still be equal to itself");
                 Assertions.assertEquals(hash, rs.hashCode(),
                         "closing must not change the identity of a handle");
-                Assertions.assertDoesNotThrow(() -> rs.equals(rs),
+                Assertions.assertDoesNotThrow(() -> Boolean.valueOf(rs.equals(rs)),
                         "equals on a closed handle must return, not throw");
             }
         }
@@ -201,6 +204,7 @@ class TestStatementDecoratorIdentity extends JdbcPoolBaseTest {
      * the configuration switch must not change any answer the application
      * gets.
      */
+    @SuppressWarnings("unlikely-arg-type") // Use of unlikely arg-type is deliberate
     @Test
     void bothConfigurationsAnswerTheSameWay() throws Exception {
         for (boolean facade : new boolean[] { false, true }) {

@@ -209,7 +209,7 @@ class TestSlowQueryEviction extends JdbcPoolBaseTest {
         int executed = 5;
         try (Connection c = ds.getConnection()) {
             for (int i = 0; i < prepared; i++) {
-                try (PreparedStatement ps = c.prepareStatement(
+                try (@SuppressWarnings("unused") PreparedStatement ps = c.prepareStatement(
                         "SELECT 1 /* prepare-only " + i + " */")) {
                     // never executed, the statement is simply discarded
                 }
