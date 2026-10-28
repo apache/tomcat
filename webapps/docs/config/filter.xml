@@ -1005,6 +1005,27 @@ FINE: Request "/docs/config/manager.html" with response status "200"
           will be used.</p>
       </attribute>
 
+      <attribute name="cspEnabled" required="false">
+        <p>Should a <code>Content-Security-Policy</code> header be set on every
+          response? Any existing header with the same name will be replaced. If
+          not specified, the default value of <code>false</code> will be used.</p>
+      </attribute>
+
+      <attribute name="cspReportOnly" required="false">
+        <p>When CSP is enabled, should <code>Content-Security-Policy-Report-Only</code>
+          be used instead of <code>Content-Security-Policy</code>? Report-only mode
+          logs violations without blocking them, useful for testing policies. If not
+          specified, the default value of <code>false</code> will be used.</p>
+      </attribute>
+
+      <attribute name="cspPolicy" required="false">
+        <p>The Content Security Policy value to use. Required when
+          <strong>cspEnabled</strong> is <code>true</code>. Must be a valid CSP
+          directive string. Example: <code>default-src 'none'; style-src 'self';
+          img-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri
+          'none'</code></p>
+      </attribute>
+
     </attributes>
 
   </subsection>

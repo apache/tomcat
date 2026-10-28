@@ -117,6 +117,14 @@
       <param-name>hstsEnabled</param-name>
       <param-value>false</param-value>
     </init-param>
+    <init-param>
+      <param-name>cspEnabled</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <init-param>
+      <param-name>cspPolicy</param-name>
+      <param-value>default-src 'none'; style-src 'self'; img-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'</param-value>
+    </init-param>
   </filter>
 
   <filter-mapping>

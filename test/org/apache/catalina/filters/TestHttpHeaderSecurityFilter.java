@@ -182,6 +182,45 @@ public class TestHttpHeaderSecurityFilter {
         filter.init(TesterFilterConfigs.generateFilterConfig(filterDef));
     }
 
+    @Test
+    public void testCspDefaultDisabled() throws IOException, ServletException {
+        HttpServletResponse response = doFilter(new FilterDef(), false);
+        Assert.assertNull(response.getHeader("Content-Security-Policy"));
+        Assert.assertNull(response.getHeader("Content-Security-Policy-Report-Only"));
+    }
+
+    @Test
+    public void testCspEnabled() throws IOException, ServletException {
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("cspEnabled", "true");
+        filterDef.addInitParameter("cspPolicy", "default-src 'none'");
+        HttpServletResponse response = doFilter(filterDef, false);
+        Assert.assertEquals("default-src 'none'", response.getHeader("Content-Security-Policy"));
+        Assert.assertNull(response.getHeader("Content-Security-Policy-Report-Only"));
+    }
+
+    @Test
+    public void testCspReportOnly() throws IOException, ServletException {
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("cspEnabled", "true");
+        filterDef.addInitParameter("cspReportOnly", "true");
+        filterDef.addInitParameter("cspPolicy", "default-src 'none'");
+        HttpServletResponse response = doFilter(filterDef, false);
+        Assert.assertEquals("default-src 'none'",
+                response.getHeader("Content-Security-Policy-Report-Only"));
+        Assert.assertNull(response.getHeader("Content-Security-Policy"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCspEnabledBlankPolicy() throws ServletException {
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("cspEnabled", "true");
+        HttpHeaderSecurityFilter filter = new HttpHeaderSecurityFilter();
+        filterDef.setFilterName(HttpHeaderSecurityFilter.class.getName());
+        filterDef.setFilterClass(HttpHeaderSecurityFilter.class.getName());
+        filter.init(TesterFilterConfigs.generateFilterConfig(filterDef));
+    }
+
     private HttpServletResponse doFilter(FilterDef filterDef, boolean secure)
         throws ServletException, IOException {
         TesterHttpServletRequest request = new TesterHttpServletRequest();

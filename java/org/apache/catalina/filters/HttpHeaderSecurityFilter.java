@@ -68,6 +68,13 @@ public class HttpHeaderSecurityFilter extends FilterBase {
     private static final String BLOCK_CONTENT_TYPE_SNIFFING_HEADER_VALUE = "nosniff";
     private boolean blockContentTypeSniffingEnabled = true;
 
+    // Content Security Policy
+    private static final String CSP_HEADER_NAME = "Content-Security-Policy";
+    private static final String CSP_REPORT_ONLY_HEADER_NAME = "Content-Security-Policy-Report-Only";
+    private boolean cspEnabled = false;
+    private boolean cspReportOnly = false;
+    private String cspPolicy = "";
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         super.init(filterConfig);
@@ -93,6 +100,11 @@ public class HttpHeaderSecurityFilter extends FilterBase {
             cjValue.append(antiClickJackingUri);
         }
         antiClickJackingHeaderValue = cjValue.toString();
+
+        // Content Security Policy
+        if (cspEnabled && (cspPolicy == null || cspPolicy.isBlank())) {
+            throw new IllegalArgumentException(sm.getString("httpHeaderSecurityFilter.csp.invalid"));
+        }
     }
 
 
@@ -119,6 +131,12 @@ public class HttpHeaderSecurityFilter extends FilterBase {
             if (blockContentTypeSniffingEnabled) {
                 httpResponse.setHeader(BLOCK_CONTENT_TYPE_SNIFFING_HEADER_NAME,
                         BLOCK_CONTENT_TYPE_SNIFFING_HEADER_VALUE);
+            }
+
+            // Content Security Policy
+            if (cspEnabled) {
+                httpResponse.setHeader(cspReportOnly ? CSP_REPORT_ONLY_HEADER_NAME : CSP_HEADER_NAME,
+                        cspPolicy);
             }
         }
 
@@ -294,6 +312,66 @@ public class HttpHeaderSecurityFilter extends FilterBase {
      */
     public void setBlockContentTypeSniffingEnabled(boolean blockContentTypeSniffingEnabled) {
         this.blockContentTypeSniffingEnabled = blockContentTypeSniffingEnabled;
+    }
+
+
+    /**
+     * Returns whether Content-Security-Policy is enabled.
+     *
+     * @return {@code true} if CSP is enabled
+     */
+    public boolean isCspEnabled() {
+        return cspEnabled;
+    }
+
+
+    /**
+     * Enables or disables Content-Security-Policy.
+     *
+     * @param cspEnabled {@code true} to enable CSP
+     */
+    public void setCspEnabled(boolean cspEnabled) {
+        this.cspEnabled = cspEnabled;
+    }
+
+
+    /**
+     * Returns whether the policy is sent in report-only mode.
+     *
+     * @return {@code true} if report-only
+     */
+    public boolean isCspReportOnly() {
+        return cspReportOnly;
+    }
+
+
+    /**
+     * Sets whether the policy is sent as Content-Security-Policy-Report-Only.
+     *
+     * @param cspReportOnly {@code true} for report-only
+     */
+    public void setCspReportOnly(boolean cspReportOnly) {
+        this.cspReportOnly = cspReportOnly;
+    }
+
+
+    /**
+     * Returns the configured Content-Security-Policy value.
+     *
+     * @return the policy string
+     */
+    public String getCspPolicy() {
+        return cspPolicy;
+    }
+
+
+    /**
+     * Sets the Content-Security-Policy value. Required when CSP is enabled.
+     *
+     * @param cspPolicy the policy string
+     */
+    public void setCspPolicy(String cspPolicy) {
+        this.cspPolicy = cspPolicy;
     }
 
 

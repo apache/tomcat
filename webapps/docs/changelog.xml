@@ -1051,6 +1051,12 @@
         HTML5 markup, accessibility, and inline-free content. Remove obsolete
         presentational HTML attributes and inline styles/scripts. (dsoumis)
       </update>
+      <add>
+        Add Content-Security-Policy support to <code>HttpHeaderSecurityFilter</code>
+        via <code>cspEnabled</code>, <code>cspReportOnly</code>, and
+        <code>cspPolicy</code> init-params. Enforce a strict CSP on the manager
+        and host-manager webapps. (dsoumis)
+      </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
         Host Manager: Host names are now always converted to lower case before

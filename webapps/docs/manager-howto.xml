@@ -1055,6 +1055,13 @@ http://localhost:8080/manager/status/all</source>
 <p>Displays server status information in XML format. The XML format does
 not include the detailed per web application statistics.</p>
 
+<p><strong>Note:</strong> The in-browser XSLT rendering of the XML output is
+not available under the manager's strict Content-Security-Policy. Browsers are
+also deprecating XSLT support. For human-readable status information, use the
+HTML format (<code>/manager/status</code>). The <code>?XML=true</code> and
+<code>?JSON=true</code> formats remain available for automated monitoring and
+data extraction tools.</p>
+
 <source>http://localhost:8080/manager/status?JSON=true
 http://localhost:8080/manager/status/all?JSON=true</source>
 

@@ -119,6 +119,17 @@ public class TestHostManagerWebapp extends TomcatBaseTest {
         Assert.assertFalse(html.contains(" width="));
         Assert.assertFalse(html.contains("style=\""));
 
+        // Strict Content-Security-Policy header present
+        boolean cspFound = false;
+        for (String header : client.getResponseHeaders()) {
+            if (header.equals("Content-Security-Policy: " +
+                    "default-src 'none'; style-src 'self'; img-src 'self'; " +
+                    "form-action 'self'; frame-ancestors 'none'; base-uri 'none'")) {
+                cspFound = true;
+            }
+        }
+        Assert.assertTrue("strict CSP header not present on /host-manager/html", cspFound);
+
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /host-manager/text/list HTTP/1.1" + CRLF +

@@ -122,6 +122,17 @@ public class TestManagerWebapp extends TomcatBaseTest {
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody().contains("/manager/css/manager.css"));
 
+        // Strict Content-Security-Policy header present
+        boolean cspFound = false;
+        for (String header : client.getResponseHeaders()) {
+            if (header.equals("Content-Security-Policy: " +
+                    "default-src 'none'; style-src 'self'; img-src 'self'; " +
+                    "form-action 'self'; frame-ancestors 'none'; base-uri 'none'")) {
+                cspFound = true;
+            }
+        }
+        Assert.assertTrue("strict CSP header not present on /manager/html", cspFound);
+
         // Modernized, valid HTML5 markup (no quirks mode, no obsolete tags)
         String html = client.getResponseBody();
         Assert.assertTrue("missing doctype", html.contains("<!DOCTYPE html>"));
