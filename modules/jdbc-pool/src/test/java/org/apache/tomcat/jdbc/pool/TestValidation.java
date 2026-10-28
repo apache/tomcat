@@ -207,6 +207,50 @@ class TestValidation extends JdbcPoolBaseTest {
     }
 
     @Test
+    void validationTerminatesTheTransactionOpenOnTheSession() throws Exception {
+        // Corrected contract (legacy TestValidation pinned "no transaction
+        // must be running" after a validation - that property still holds):
+        // a validation that reaches the database ends whatever transaction
+        // is open on the session - the one its own read-only check may have
+        // started, or one its borrower left behind - but it ends it with a
+        // rollback. A health check must never commit application work the
+        // application itself never committed, so what used to be committed
+        // here is now discarded. The termination happens in place, on the
+        // reused session.
+        DataSource ds = validatingDataSource("SELECT 1");
+        ds.getPoolProperties().setDefaultAutoCommit(Boolean.FALSE);
+        ds.getPoolProperties().setTestOnReturn(true);
+        String table = uniqueTable();
+        try (Connection admin = adminConnection();
+                Statement st = admin.createStatement()) {
+            st.execute("CREATE TABLE " + table + " (v INT)");
+        }
+
+        Connection first = ds.getConnection();
+        setSessionMarker(first, 13);
+        try (Statement st = first.createStatement()) {
+            st.executeUpdate("INSERT INTO " + table + " VALUES (1)");
+        }
+        first.close(); // returned without an explicit commit, autoCommit is off
+
+        Assertions.assertEquals(0, adminRowCount(table),
+                "the validation on return must leave no open transaction "
+                        + "behind, and it must not commit the pending work");
+        try (Connection second = ds.getConnection()) {
+            Assertions.assertEquals(Integer.valueOf(13), sessionMarker(second),
+                    "the session must have been reused - the transaction was "
+                            + "terminated in place, not by a reconnect");
+            try (java.sql.ResultSet rs = second.createStatement()
+                    .executeQuery("SELECT COUNT(*) FROM " + table)) {
+                rs.next();
+                Assertions.assertEquals(0, rs.getInt(1),
+                        "the next borrower must not inherit the open "
+                                + "transaction");
+            }
+        }
+    }
+
+    @Test
     void theValidationIntervalSuppressesRepeatedChecks() throws Exception {
         CountingValidator validator = new CountingValidator();
         DataSource ds = validatingDataSource("SELECT 1");
@@ -231,26 +275,6 @@ class TestValidation extends JdbcPoolBaseTest {
         }
         Assertions.assertEquals(1, validator.actions.size(),
                 "with the interval switched off the borrow must validate");
-    }
-
-    @Test
-    void validationCommitsTheTransactionOpenOnTheSession() throws Exception {
-        // Documented behaviour: PooledConnection.validate() finishes with a
-        // silent commit, so that a validated connection never carries an
-        // open transaction into the next borrow. Legacy TestValidation
-        // pinned the same contract ("no transaction must be running").
-        DataSource ds = validatingDataSource("SELECT 1");
-        ds.getPoolProperties().setDefaultAutoCommit(Boolean.FALSE);
-        ds.getPoolProperties().setTestOnReturn(true);
-        String table = uniqueTable();
-
-        try (Connection c = ds.getConnection(); Statement st = c.createStatement()) {
-            st.execute("CREATE TABLE " + table + " (v INT)");
-            st.executeUpdate("INSERT INTO " + table + " VALUES (1)");
-        } // returned without an explicit commit, autoCommit is off
-
-        Assertions.assertEquals(1, adminRowCount(table),
-                "the validation on return must leave no open transaction behind");
     }
 
     /** Records every validation the pool asks it to perform. */

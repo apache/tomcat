@@ -25,6 +25,8 @@ import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 import org.apache.tomcat.jdbc.pool.DataSource;
+import org.apache.tomcat.jdbc.pool.ProxyConnection;
+import org.apache.tomcat.jdbc.pool.PooledConnection;
 
 /**
  * A borrower that returns a connection while still in a transaction hands
@@ -38,6 +40,11 @@ import org.apache.tomcat.jdbc.pool.DataSource;
  * defaults - but only when there are defaults to restore, since a pool that
  * uses the interceptor purely to cache the state must leave the pool's own
  * documented transaction handling untouched.
+ * Validation of the connection (testOnBorrow, testOnReturn, testWhileIdle)
+ * runs before any of this and is part of that handling: a validation that
+ * actually reaches the database must terminate a pending transaction the
+ * same way - by rollback, never by commit - and the tests below pin that
+ * for each validation mode as well.
  */
 class TestPendingTransactionAcrossBorrowers extends JdbcPoolBaseTest {
 
@@ -169,5 +176,131 @@ class TestPendingTransactionAcrossBorrowers extends JdbcPoolBaseTest {
         }
         Assertions.assertEquals(0, adminRowCount(t),
                 "the abandoned work must not have survived");
+    }
+
+    /*
+     * Validation runs before the state restore on borrow and before the
+     * evictor ever lets reset() see the connection, so it must terminate a
+     * pending transaction the same way the restore does - by rollback. A
+     * health check is read-only and must never commit the work the
+     * application itself never committed.
+     */
+    private DataSource enforcingPoolValidatingOn(String action) {
+        DataSource ds = enforcingPool();
+        ds.getPoolProperties().setValidationQuery("SELECT 1");
+        ds.getPoolProperties().setValidationInterval(0);
+        if ("borrow".equals(action)) {
+            ds.getPoolProperties().setTestOnBorrow(true);
+        } else if ("return".equals(action)) {
+            ds.getPoolProperties().setTestOnReturn(true);
+        } else if ("idle".equals(action)) {
+            ds.getPoolProperties().setTestWhileIdle(true);
+        }
+        return ds;
+    }
+
+    private void assertReusableAndWorking(Connection second, String table,
+            int marker) throws Exception {
+        Assertions.assertEquals(Integer.valueOf(marker), sessionMarker(second),
+                "the same physical session must have been reused - the "
+                        + "transaction is terminated in place, the "
+                        + "connection is not discarded");
+        Assertions.assertEquals(0, rowCount(second, table),
+                "the next borrower must not find itself inside the previous "
+                        + "borrower's transaction");
+        try (Statement st = second.createStatement();
+                ResultSet rs = st.executeQuery("SELECT 1")) {
+            Assertions.assertTrue(rs.next(),
+                    "the validated connection must still work");
+        }
+    }
+
+    @Test
+    void borrowValidationDoesNotCommitThePreviousBorrowersWork() throws Exception {
+        DataSource ds = enforcingPoolValidatingOn("borrow");
+        String t = createTable(ds);
+
+        Connection first = ds.getConnection();
+        setSessionMarker(first, 41);
+        insertInTransaction(first, t);
+        first.close();
+
+        try (Connection second = ds.getConnection()) {
+            assertReusableAndWorking(second, t, 41);
+        }
+        Assertions.assertEquals(0, adminRowCount(t),
+                "the validation on borrow must not commit the work the "
+                        + "previous borrower abandoned");
+    }
+
+    @Test
+    void returnValidationDoesNotCommitThePreviousBorrowersWork() throws Exception {
+        DataSource ds = enforcingPoolValidatingOn("return");
+        String t = createTable(ds);
+
+        Connection first = ds.getConnection();
+        setSessionMarker(first, 42);
+        insertInTransaction(first, t);
+        first.close(); // the return validation runs here
+
+        try (Connection second = ds.getConnection()) {
+            assertReusableAndWorking(second, t, 42);
+        }
+        Assertions.assertEquals(0, adminRowCount(t),
+                "the validation on return must not commit the work the "
+                        + "previous borrower abandoned");
+    }
+
+    @Test
+    void idleValidationDoesNotCommitThePreviousBorrowersWork() throws Exception {
+        DataSource ds = enforcingPoolValidatingOn("idle");
+        String t = createTable(ds);
+
+        Connection first = ds.getConnection();
+        PooledConnection pooled =
+                interceptorOf(first, ProxyConnection.class).getConnection();
+        setSessionMarker(first, 43);
+        insertInTransaction(first, t);
+        first.close();
+
+        // The evictor's own check, invoked directly to keep the test
+        // deterministic; a live session must pass it.
+        Assertions.assertTrue(pooled.validate(PooledConnection.VALIDATE_IDLE),
+                "the idle validation must succeed on a live session");
+        try (Connection second = ds.getConnection()) {
+            assertReusableAndWorking(second, t, 43);
+        }
+        Assertions.assertEquals(0, adminRowCount(t),
+                "the validation while idle must not commit the work the "
+                        + "previous borrower abandoned");
+    }
+
+    @Test
+    void withoutConfiguredDefaultsValidationStillTerminatesTheTransaction()
+            throws Exception {
+        // Caching-only configuration: reset() leaves a pending transaction
+        // alone (pinned above), but a validation that actually reaches the
+        // database still ends it - by rollback. So with validation enabled
+        // the abandoned work does not survive to the next borrower either;
+        // the "transaction untouched" behavior only holds for pools whose
+        // validations do not run.
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setJdbcInterceptors(ConnectionState.class.getSimpleName());
+        ds.getPoolProperties().setValidationQuery("SELECT 1");
+        ds.getPoolProperties().setValidationInterval(0);
+        ds.getPoolProperties().setTestOnBorrow(true);
+        String t = createTable(ds);
+
+        Connection first = ds.getConnection();
+        setSessionMarker(first, 44);
+        insertInTransaction(first, t);
+        first.close();
+
+        try (Connection second = ds.getConnection()) {
+            assertReusableAndWorking(second, t, 44);
+        }
+        Assertions.assertEquals(0, adminRowCount(t),
+                "the validation must discard - not commit - the pending "
+                        + "work even when no defaults are configured");
     }
 }
