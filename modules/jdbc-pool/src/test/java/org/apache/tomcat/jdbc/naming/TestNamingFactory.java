@@ -350,7 +350,7 @@ class TestNamingFactory extends JdbcPoolBaseTest {
 
     /** Target whose no-argument constructor throws. */
     public static class ThrowingCtorTarget {
-        public ThrowingCtorTarget() {
+        ThrowingCtorTarget() {
             throw new IllegalStateException("boom");
         }
     }

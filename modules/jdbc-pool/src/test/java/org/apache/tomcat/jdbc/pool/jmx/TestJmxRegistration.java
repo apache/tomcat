@@ -73,7 +73,7 @@ class TestJmxRegistration extends JdbcPoolBaseTest {
     public static class Probe implements ProbeMBean {
         private final String marker;
 
-        public Probe(String marker) {
+        Probe(String marker) {
             this.marker = marker;
         }
 
