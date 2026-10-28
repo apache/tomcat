@@ -35,6 +35,7 @@ import org.junit.jupiter.api.Test;
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.DataSourceFactory;
+import org.apache.tomcat.jdbc.pool.PoolConfiguration;
 import org.apache.tomcat.jdbc.pool.XADataSource;
 
 /**
@@ -91,6 +92,137 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
         if (result instanceof DataSource) {
             manage((DataSource) result);
         }
+    }
+
+    /*
+     * Boolean attributes are applied strictly: only "true" and "false",
+     * ignoring case and surrounding whitespace, configure the property;
+     * an empty attribute means "unset" - the PoolProperties default, and
+     * for the tri-state defaultAutoCommit/defaultReadOnly the "leave the
+     * driver default alone" state - and anything else fails the factory
+     * instead of being silently applied as false, the way the numeric
+     * attributes already fail on a bad value.
+     */
+
+    @Test
+    void misspelledBooleanAttributeFailsTheFactory()
+            throws Exception {
+        Reference ref = dataSourceReference("javax.sql.DataSource");
+        // pre-fix this was silently applied as testOnBorrow=false
+        ref.add(new StringRefAddr("testOnBorrow", "ture"));
+
+        IllegalArgumentException e = Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> new DataSourceFactory().getObjectInstance(
+                        ref, new CompositeName("jdbc/BadBooleanDS"),
+                        null, null),
+                "a misspelled boolean value must fail the factory call");
+        Assertions.assertTrue(e.getMessage().contains("testOnBorrow"),
+                "the failure must name the misconfigured attribute, was: "
+                        + e.getMessage());
+        Assertions.assertTrue(e.getMessage().contains("ture"),
+                "the failure must show the offending value, was: "
+                        + e.getMessage());
+    }
+
+    @Test
+    void misspelledTriStateAttributeFailsTheFactory()
+            throws Exception {
+        Reference ref = dataSourceReference("javax.sql.DataSource");
+        // pre-fix this was silently applied as defaultAutoCommit=FALSE,
+        // forcing auto-commit off on every connection of the pool
+        ref.add(new StringRefAddr("defaultAutoCommit", "Yes"));
+
+        IllegalArgumentException e = Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> new DataSourceFactory().getObjectInstance(
+                        ref, new CompositeName("jdbc/BadTriStateDS"),
+                        null, null),
+                "a misspelled tri-state boolean must fail the factory call "
+                        + "instead of forcing an explicit value");
+        Assertions.assertTrue(e.getMessage().contains("defaultAutoCommit"),
+                "the failure must name the misconfigured attribute, was: "
+                        + e.getMessage());
+        Assertions.assertTrue(e.getMessage().contains("Yes"),
+                "the failure must show the offending value, was: "
+                        + e.getMessage());
+    }
+
+    @Test
+    void emptyBooleanAttributeLeavesThePropertyUnset() {
+        java.util.Properties attrs = new java.util.Properties();
+        attrs.setProperty("defaultAutoCommit", "");
+        attrs.setProperty("defaultReadOnly", "");
+        // fairQueue defaults to true: pre-fix, the empty attribute forced
+        // false and silently changed the pool's behavior
+        attrs.setProperty("fairQueue", "");
+
+        PoolConfiguration configured =
+                DataSourceFactory.parsePoolProperties(attrs);
+
+        Assertions.assertNull(configured.getDefaultAutoCommit(),
+                "an empty tri-state attribute must keep the "
+                        + "\"use the driver default\" state");
+        Assertions.assertNull(configured.getDefaultReadOnly(),
+                "an empty tri-state attribute must keep the "
+                        + "\"use the driver default\" state");
+        Assertions.assertTrue(configured.isFairQueue(),
+                "an empty plain boolean attribute must leave the "
+                        + "PoolProperties default in place");
+    }
+
+    @Test
+    void emptyDefaultAutoCommitLeavesConnectionsAtTheDriverDefault()
+            throws Exception {
+        DataSource pool = factoryPoolWithAutoCommit("");
+        try (java.sql.Connection c = pool.getConnection()) {
+            Assertions.assertTrue(c.getAutoCommit(),
+                    "an empty defaultAutoCommit must leave the connections "
+                            + "at the driver's own auto-commit default");
+        }
+    }
+
+    @Test
+    void configuredDefaultAutoCommitStillForcesTheStateOnConnections()
+            throws Exception {
+        DataSource pool = factoryPoolWithAutoCommit("false");
+        try (java.sql.Connection c = pool.getConnection()) {
+            Assertions.assertFalse(c.getAutoCommit(),
+                    "an explicitly configured defaultAutoCommit must still "
+                            + "be applied to the connections");
+        }
+    }
+
+    @Test
+    void booleanValuesApplyIgnoringCaseAndSurroundingWhitespace() {
+        java.util.Properties attrs = new java.util.Properties();
+        attrs.setProperty("testOnBorrow", "TRUE");
+        // pre-fix, the trailing space made this false
+        attrs.setProperty("testOnReturn", "True ");
+        attrs.setProperty("testWhileIdle", " False ");
+        attrs.setProperty("removeAbandoned", "false");
+
+        PoolConfiguration configured =
+                DataSourceFactory.parsePoolProperties(attrs);
+
+        Assertions.assertTrue(configured.isTestOnBorrow(),
+                "\"TRUE\" must be accepted as true");
+        Assertions.assertTrue(configured.isTestOnReturn(),
+                "\"True \" must be accepted as true, whitespace included");
+        Assertions.assertFalse(configured.isTestWhileIdle(),
+                "\" False \" must be accepted as false, whitespace included");
+        Assertions.assertFalse(configured.isRemoveAbandoned(),
+                "the exact lowercase spelling must keep working");
+    }
+
+    /* A factory-built pool, H2-backed, with one extra attribute. */
+    private DataSource factoryPoolWithAutoCommit(String value)
+            throws Exception {
+        Reference ref = dataSourceReference("javax.sql.DataSource");
+        ref.add(new StringRefAddr("jmxEnabled", "false"));
+        ref.add(new StringRefAddr("defaultAutoCommit", value));
+        return manage((DataSource) new DataSourceFactory().getObjectInstance(
+                ref, new CompositeName("jdbc/AutoCommitDS"), null, null));
     }
 
     @Test
