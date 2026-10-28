@@ -285,12 +285,44 @@ public class PooledConnection implements PooledConnectionMBean {
         }
         if (poolProperties.getDataSource() instanceof javax.sql.XADataSource) {
             javax.sql.XADataSource xds = (javax.sql.XADataSource)poolProperties.getDataSource();
-            if (usr!=null && pwd!=null) {
-                xaConnection = xds.getXAConnection(usr, pwd);
-                connection = xaConnection.getConnection();
-            } else {
-                xaConnection = xds.getXAConnection();
-                connection = xaConnection.getConnection();
+            javax.sql.XAConnection pooled = (usr!=null && pwd!=null) ?
+                    xds.getXAConnection(usr, pwd) : xds.getXAConnection();
+            // Keep the handle before obtaining the logical connection: the
+            // physical connection is only closed when the handle is closed,
+            // so losing the handle here would leak the physical connection.
+            xaConnection = pooled;
+            SQLException failure = null;
+            RuntimeException failureRuntime = null;
+            try {
+                connection = pooled.getConnection();
+            } catch (SQLException e) {
+                failure = e;
+            } catch (RuntimeException e) {
+                failureRuntime = e;
+            }
+            if (connection == null && failure == null && failureRuntime == null) {
+                // Contract-violating provider: a handle without a logical
+                // connection is of no use either.
+                failure = new SQLException("XADataSource "+xds+
+                        " returned a null connection for the XA connection handle");
+            }
+            if (failure != null || failureRuntime != null) {
+                // Do not strand the handle if the logical connection
+                // could not be obtained.
+                Exception origin = failure != null ? failure : failureRuntime;
+                try {
+                    pooled.close();
+                } catch (SQLException | RuntimeException closeX) {
+                    if (closeX != origin) {
+                        origin.addSuppressed(closeX);
+                    }
+                }
+                xaConnection = null;
+                connection = null;
+                if (failureRuntime != null) {
+                    throw failureRuntime;
+                }
+                throw failure;
             }
         } else if (poolProperties.getDataSource() instanceof javax.sql.DataSource){
             javax.sql.DataSource ds = (javax.sql.DataSource)poolProperties.getDataSource();
