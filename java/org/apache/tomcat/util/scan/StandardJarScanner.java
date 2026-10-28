@@ -522,7 +522,7 @@ public class StandardJarScanner implements JarScanner {
             }
             String[] classPathEntries = classPathAttribute.split(" ");
             for (String classPathEntry : classPathEntries) {
-                classPathEntry = classPathEntry.trim();
+                classPathEntry = JreCompat.getInstance().strip(classPathEntry);
                 if (classPathEntry.isEmpty()) {
                     continue;
                 }

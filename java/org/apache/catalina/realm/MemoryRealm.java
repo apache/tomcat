@@ -27,6 +27,7 @@ import java.util.Map;
 import org.apache.catalina.LifecycleException;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.file.ConfigFileLoader;
 
@@ -156,14 +157,14 @@ public class MemoryRealm extends RealmBase {
 
         // Accumulate the list of roles for this user
         List<String> list = new ArrayList<>();
-        if (roles != null && roles.trim().length() > 0) {
+        if (roles != null && JreCompat.getInstance().strip(roles).length() > 0) {
             roles += ",";
             while (true) {
                 int comma = roles.indexOf(',');
                 if (comma < 0) {
                     break;
                 }
-                String role = roles.substring(0, comma).trim();
+                String role = JreCompat.getInstance().strip(roles.substring(0, comma));
                 if (!role.isEmpty()) {
                     list.add(role);
                 }

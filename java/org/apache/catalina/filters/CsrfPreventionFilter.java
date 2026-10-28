@@ -46,6 +46,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.http.Method;
 
 /**
@@ -117,7 +118,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
     public void setEntryPoints(String entryPoints) {
         String[] values = entryPoints.split(",");
         for (String value : values) {
-            this.entryPoints.add(value.trim());
+            this.entryPoints.add(JreCompat.getInstance().strip(value));
         }
     }
 
@@ -188,7 +189,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
      * @return A collection of predicates representing the URL patterns.
      */
     protected static Collection<Predicate<String>> createNoNoncePredicates(ServletContext context, String patterns) {
-        if (null == patterns || patterns.trim().isEmpty()) {
+        if (null == patterns || JreCompat.getInstance().strip(patterns).isEmpty()) {
             return null;
         }
 
@@ -200,7 +201,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
         ArrayList<Predicate<String>> matchers = new ArrayList<>(values.length);
         for (String value : values) {
-            Predicate<String> p = createNoNoncePredicate(context, value.trim());
+            Predicate<String> p = createNoNoncePredicate(context, JreCompat.getInstance().strip(value));
 
             if (null != p) {
                 matchers.add(p);
@@ -221,7 +222,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
      * @return A Predicate which can match the specified pattern, or <code>null</code> if the pattern is null or blank.
      */
     protected static Predicate<String> createNoNoncePredicate(ServletContext context, String pattern) {
-        if (null == pattern || pattern.trim().isEmpty()) {
+        if (null == pattern || JreCompat.getInstance().strip(pattern).isEmpty()) {
             return null;
         }
         if (pattern.startsWith("mime:")) {

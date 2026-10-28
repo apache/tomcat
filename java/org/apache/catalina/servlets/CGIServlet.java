@@ -55,6 +55,7 @@ import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.util.IOTools;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.compat.JrePlatform;
 import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.res.StringManager;
@@ -356,13 +357,13 @@ public final class CGIServlet extends HttpServlet {
 
         if (getServletConfig().getInitParameter("cgiMethods") != null) {
             String paramValue = getServletConfig().getInitParameter("cgiMethods");
-            paramValue = paramValue.trim();
+            paramValue = JreCompat.getInstance().strip(paramValue);
             if ("*".equals(paramValue)) {
                 cgiMethodsAll = true;
             } else {
                 String[] methods = paramValue.split(",");
                 for (String method : methods) {
-                    String trimmedMethod = method.trim();
+                    String trimmedMethod = JreCompat.getInstance().strip(method);
                     cgiMethods.add(trimmedMethod);
                 }
             }

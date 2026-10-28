@@ -40,6 +40,7 @@ import javax.servlet.jsp.tagext.TagInfo;
 import javax.servlet.jsp.tagext.TagLibraryInfo;
 import javax.servlet.jsp.tagext.ValidationMessage;
 
+import org.apache.el.util.JreCompat;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.compiler.ELNode.Text;
 import org.apache.jasper.el.ELContextImpl;
@@ -1043,10 +1044,10 @@ class Validator {
                                     // for the attribute
                                     String m = tldAttr.getMethodSignature();
                                     if (m != null) {
-                                        m = m.trim();
+                                        m = JreCompat.getInstance().strip(m);
                                         int rti = m.indexOf(' ');
                                         if (rti > 0) {
-                                            expectedType = m.substring(0, rti).trim();
+                                            expectedType = JreCompat.getInstance().strip(m.substring(0, rti));
                                         }
                                     } else {
                                         expectedType = "java.lang.Object";
@@ -1491,7 +1492,7 @@ class Validator {
                     }
                     lastArg = true;
                 }
-                String arg = signature.substring(start, p).trim();
+                String arg = JreCompat.getInstance().strip(signature.substring(start, p));
                 if (!arg.isEmpty()) {
                     params.add(arg);
                 }

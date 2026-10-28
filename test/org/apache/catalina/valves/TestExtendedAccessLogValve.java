@@ -41,6 +41,7 @@ import org.apache.catalina.Host;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.http.Method;
 
 @RunWith(Parameterized.class)
@@ -165,7 +166,7 @@ public class TestExtendedAccessLogValve extends TomcatBaseTest {
         int result = 0;
         String[] lines = content.split("\\r?\\n");
         for (String line : lines) {
-            if (!line.startsWith("#") && !line.trim().isEmpty()) {
+            if (!line.startsWith("#") && !JreCompat.getInstance().strip(line).isEmpty()) {
                 result++;
             }
         }
@@ -179,7 +180,7 @@ public class TestExtendedAccessLogValve extends TomcatBaseTest {
         List<String> dataLines = new ArrayList<>();
         for (String line : lines) {
             if (!line.startsWith("#")) { // Skip directives
-                dataLines.add(line.trim());
+                dataLines.add(JreCompat.getInstance().strip(line));
             } else {
                 if (line.startsWith("#Fields: ")) {
                     Assert.assertEquals(line.substring("#Fields: ".length()), logPattern);

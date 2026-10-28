@@ -354,8 +354,8 @@ public abstract class ExpressionFactory {
                 Properties props = new Properties();
                 props.load(is);
                 String value = props.getProperty(PROPERTY_NAME);
-                if (value != null && value.trim().length() > 0) {
-                    return value.trim();
+                if (value != null && JreCompat.getInstance().strip(value).length() > 0) {
+                    return JreCompat.getInstance().strip(value);
                 }
             } catch (FileNotFoundException e) {
                 // Should not happen - ignore it if it does
@@ -368,8 +368,8 @@ public abstract class ExpressionFactory {
 
     private static String getClassNameSysProp() {
         String value = System.getProperty(PROPERTY_NAME);
-        if (value != null && value.trim().length() > 0) {
-            return value.trim();
+        if (value != null && JreCompat.getInstance().strip(value).length() > 0) {
+            return JreCompat.getInstance().strip(value);
         }
         return null;
     }

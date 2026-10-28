@@ -33,6 +33,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.tomcat.util.compat.JreCompat;
+
 /**
  * Provides basic CSRF protection for REST APIs. The filter assumes that the clients have adapted the transfer of the
  * nonce through the 'X-CSRF-Token' header.
@@ -248,7 +250,8 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
      */
     public void setPathsAcceptingParams(String pathsList) {
         if (Objects.nonNull(pathsList)) {
-            Arrays.asList(pathsList.split(pathsDelimiter)).forEach(e -> pathsAcceptingParams.add(e.trim()));
+            Arrays.asList(pathsList.split(pathsDelimiter))
+                    .forEach(e -> pathsAcceptingParams.add(JreCompat.getInstance().strip(e)));
         }
     }
 

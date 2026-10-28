@@ -45,6 +45,7 @@ import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.IntrospectionUtils.PropertySource;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ToStringUtil;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.res.StringManager;
 import org.xml.sax.Attributes;
 import org.xml.sax.EntityResolver;
@@ -102,7 +103,7 @@ public class Digester extends DefaultHandler2 {
         if (classNames != null) {
             StringTokenizer classNamesTokenizer = new StringTokenizer(classNames, ",");
             while (classNamesTokenizer.hasMoreTokens()) {
-                String className = classNamesTokenizer.nextToken().trim();
+                String className = JreCompat.getInstance().strip(classNamesTokenizer.nextToken());
                 ClassLoader[] cls = new ClassLoader[] { Digester.class.getClassLoader(),
                         Thread.currentThread().getContextClassLoader() };
                 for (ClassLoader cl : cls) {

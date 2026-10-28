@@ -28,6 +28,7 @@ import java.util.StringTokenizer;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -108,7 +109,7 @@ public class TcpSender implements Sender {
         proxies = new Proxy[tok.countTokens()];
         int i = 0;
         while (tok.hasMoreTokens()) {
-            String token = tok.nextToken().trim();
+            String token = JreCompat.getInstance().strip(tok.nextToken());
             int pos = token.indexOf(':');
             if (pos <= 0) {
                 throw new Exception(sm.getString("tcpSender.invalidProxyList"));

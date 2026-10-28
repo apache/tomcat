@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Locale;
 
 import org.apache.catalina.util.IOTools;
+import org.apache.tomcat.util.compat.JreCompat;
 
 /**
  * The entry point to SSI processing. This class does the actual parsing, delegating to the SSIMediator, SSICommand, and
@@ -252,7 +253,7 @@ public class SSIProcessor {
                     collectingName = false;
                 }
             } else if (endQuote == 0 && c == '=') {
-                retString[idx++] = nameBuf.toString().trim();
+                retString[idx++] = JreCompat.getInstance().strip(nameBuf.toString());
                 nameBuf.setLength(0);
                 collectingName = false;
             } else if (endQuote == 0) {

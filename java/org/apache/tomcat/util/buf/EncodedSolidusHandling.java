@@ -18,6 +18,7 @@ package org.apache.tomcat.util.buf;
 
 import java.util.Locale;
 
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -67,7 +68,7 @@ public enum EncodedSolidusHandling {
      * @throws IllegalStateException if the string does not match any known strategy
      */
     public static EncodedSolidusHandling fromString(String from) {
-        String trimmedLower = from.trim().toLowerCase(Locale.ENGLISH);
+        String trimmedLower = JreCompat.getInstance().strip(from).toLowerCase(Locale.ENGLISH);
 
         for (EncodedSolidusHandling value : values()) {
             if (value.getValue().equals(trimmedLower)) {

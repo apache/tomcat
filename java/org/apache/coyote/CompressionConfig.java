@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.ResponseUtil;
 import org.apache.tomcat.util.http.parser.AcceptEncoding;
@@ -85,7 +86,7 @@ public class CompressionConfig {
         if (encodings != null && !encodings.isEmpty()) {
             StringTokenizer tokens = new StringTokenizer(encodings, ",");
             while (tokens.hasMoreTokens()) {
-                String token = tokens.nextToken().trim();
+                String token = JreCompat.getInstance().strip(tokens.nextToken());
                 if (!token.isEmpty()) {
                     newEncodings.add(token);
                 }
@@ -105,7 +106,7 @@ public class CompressionConfig {
     public void setCompression(String compression) {
         // Trim the value so that surrounding whitespace in the configuration
         // does not silently disable compression
-        String value = compression == null ? "" : compression.trim();
+        String value = compression == null ? "" : JreCompat.getInstance().strip(compression);
         if (value.equals("on")) {
             this.compressionLevel = 1;
         } else if (value.equals("force")) {
@@ -232,7 +233,7 @@ public class CompressionConfig {
         List<String> values = new ArrayList<>();
         StringTokenizer tokens = new StringTokenizer(compressibleMimeType, ",");
         while (tokens.hasMoreTokens()) {
-            String token = tokens.nextToken().trim();
+            String token = JreCompat.getInstance().strip(tokens.nextToken());
             if (!token.isEmpty()) {
                 values.add(token);
             }

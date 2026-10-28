@@ -27,6 +27,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.compat.JreCompat;
 
 public class TestEnvEntry extends TomcatBaseTest {
 
@@ -106,7 +107,7 @@ public class TestEnvEntry extends TomcatBaseTest {
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
 
         // JSP has leading and trailing white-space
-        String result = out.toString().trim();
+        String result = JreCompat.getInstance().strip(out.toString());
         Assert.assertEquals(expected, result);
     }
 
@@ -130,7 +131,7 @@ public class TestEnvEntry extends TomcatBaseTest {
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
 
         // JSP has leading and trailing white-space
-        String result = out.toString().trim();
+        String result = JreCompat.getInstance().strip(out.toString());
         Assert.assertEquals(expected, result);
     }
 }

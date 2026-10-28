@@ -34,6 +34,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.Escape;
 import org.xml.sax.Attributes;
@@ -285,8 +286,9 @@ public final class XMLFormatPreserver {
         }
         String freshText = fresh.getText();
         String candidateText = candidate.getText();
-        if (freshText != null && !freshText.trim().isEmpty()
-                && Objects.equals(freshText.trim(), candidateText == null ? null : candidateText.trim())) {
+        if (freshText != null && !JreCompat.getInstance().strip(freshText).isEmpty()
+                && Objects.equals(JreCompat.getInstance().strip(freshText),
+                        candidateText == null ? null : JreCompat.getInstance().strip(candidateText))) {
             score += 50;
         }
         return score;
@@ -346,7 +348,7 @@ public final class XMLFormatPreserver {
         }
         boolean hasChildren = !fresh.children.isEmpty();
         String text = fresh.getText();
-        boolean hasText = text != null && !text.trim().isEmpty();
+        boolean hasText = text != null && !JreCompat.getInstance().strip(text).isEmpty();
         // Reproduce the attribute line wrapping of StoreAppender: the position starts at the indentation level and
         // the attributes are wrapped on a new line once the position exceeds 60 characters
         int position = indent;
@@ -483,8 +485,10 @@ public final class XMLFormatPreserver {
         // Only the significant text is compared: whitespace between child elements is layout, not content
         String aText = a.getText();
         String bText = b.getText();
-        String aTrimmed = (aText == null || aText.trim().isEmpty()) ? null : aText.trim();
-        String bTrimmed = (bText == null || bText.trim().isEmpty()) ? null : bText.trim();
+        String aTrimmed = (aText == null || JreCompat.getInstance().strip(aText).isEmpty()) ? null :
+                JreCompat.getInstance().strip(aText);
+        String bTrimmed = (bText == null || JreCompat.getInstance().strip(bText).isEmpty()) ? null :
+                JreCompat.getInstance().strip(bText);
         if (!Objects.equals(aTrimmed, bTrimmed)) {
             return false;
         }

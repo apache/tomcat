@@ -32,6 +32,7 @@ import org.apache.catalina.util.ServerInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.StringUtils;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -101,7 +102,7 @@ public class SecurityListener implements LifecycleListener {
         } else {
             String[] userNames = userNameList.split(",");
             for (String userName : userNames) {
-                userName = userName.trim();
+                userName = JreCompat.getInstance().strip(userName);
                 if (!userName.isEmpty()) {
                     checkedOsUsers.add(userName.toLowerCase(Locale.getDefault()));
                 }

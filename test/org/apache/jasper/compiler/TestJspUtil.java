@@ -23,6 +23,7 @@ import org.junit.Test;
 
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.compat.JreCompat;
 
 public class TestJspUtil extends TomcatBaseTest {
 
@@ -37,7 +38,7 @@ public class TestJspUtil extends TomcatBaseTest {
         String[] lines = body.split("\n");
 
         for (String line : lines) {
-            line = line.trim();
+            line = JreCompat.getInstance().strip(line);
             if (line.startsWith("<p>")) {
                 line = line.substring(3, line.length() - 4);
                 String[] parts = line.split(":");

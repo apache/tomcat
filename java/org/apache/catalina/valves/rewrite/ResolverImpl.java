@@ -34,6 +34,7 @@ import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.connector.Request;
 import org.apache.juli.logging.Log;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.RequestUtil;
 import org.apache.tomcat.util.net.SSLSupport;
@@ -363,7 +364,7 @@ public class ResolverImpl extends Resolver {
                 break;
             }
 
-            String key = unescape(fullDN.substring(start, eqPos)).trim();
+            String key = JreCompat.getInstance().strip(unescape(fullDN.substring(start, eqPos)));
             int valStart = eqPos + 1;
 
             // Find the unescaped ',' that ends this RDN, or end of string
@@ -378,7 +379,7 @@ public class ResolverImpl extends Resolver {
                 }
             }
 
-            String value = unescape(fullDN.substring(valStart, commaPos)).trim();
+            String value = JreCompat.getInstance().strip(unescape(fullDN.substring(valStart, commaPos)));
             if (!key.isEmpty()) {
                 components.put(key, value);
             }

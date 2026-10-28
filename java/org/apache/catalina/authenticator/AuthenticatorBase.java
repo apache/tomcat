@@ -65,6 +65,7 @@ import org.apache.catalina.valves.ValveBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
@@ -261,7 +262,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
      */
     public void setSsoReauthenticationMode(String ssoReauthenticationMode) {
         this.ssoReauthenticationMode =
-                SsoReauthenticationMode.valueOf(ssoReauthenticationMode.trim().toUpperCase(Locale.ENGLISH));
+                SsoReauthenticationMode
+                        .valueOf(JreCompat.getInstance().strip(ssoReauthenticationMode).toUpperCase(Locale.ENGLISH));
     }
 
     /**
@@ -279,7 +281,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
      * @param allowCorsPreflight the CORS preflight handling mode
      */
     public void setAllowCorsPreflight(String allowCorsPreflight) {
-        this.allowCorsPreflight = AllowCorsPreflight.valueOf(allowCorsPreflight.trim().toUpperCase(Locale.ENGLISH));
+        this.allowCorsPreflight = AllowCorsPreflight
+                .valueOf(JreCompat.getInstance().strip(allowCorsPreflight).toUpperCase(Locale.ENGLISH));
     }
 
     /**

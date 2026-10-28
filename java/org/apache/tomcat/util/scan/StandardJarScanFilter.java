@@ -25,6 +25,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.tomcat.JarScanFilter;
 import org.apache.tomcat.JarScanType;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.file.Matcher;
 
 /**
@@ -295,7 +296,7 @@ public class StandardJarScanFilter implements JarScanFilter {
         if (attribute != null) {
             StringTokenizer tokenizer = new StringTokenizer(attribute, ",");
             while (tokenizer.hasMoreElements()) {
-                String token = tokenizer.nextToken().trim();
+                String token = JreCompat.getInstance().strip(tokenizer.nextToken());
                 if (!token.isEmpty()) {
                     set.add(token);
                 }

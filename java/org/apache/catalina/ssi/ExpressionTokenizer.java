@@ -16,6 +16,8 @@
  */
 package org.apache.catalina.ssi;
 
+import org.apache.tomcat.util.compat.JreCompat;
+
 
 /**
  * Parses an expression string to return the individual tokens. This is patterned similar to the StreamTokenizer in the
@@ -62,7 +64,7 @@ public class ExpressionTokenizer {
      * @param expr The expression
      */
     public ExpressionTokenizer(String expr) {
-        this.expr = expr.trim().toCharArray();
+        this.expr = JreCompat.getInstance().strip(expr).toCharArray();
         this.length = this.expr.length;
     }
 

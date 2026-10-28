@@ -19,6 +19,7 @@ package org.apache.tomcat.util.digester;
 import java.util.Arrays;
 
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.xml.sax.Attributes;
 
 /**
@@ -227,7 +228,7 @@ public class CallMethodRule extends Rule {
     public void body(String namespace, String name, String bodyText) throws Exception {
 
         if (paramCount == 0) {
-            this.bodyText = bodyText.trim();
+            this.bodyText = JreCompat.getInstance().strip(bodyText);
         }
 
     }

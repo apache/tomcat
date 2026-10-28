@@ -36,6 +36,7 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.UDecoder;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.file.ConfigFileLoader;
 import org.apache.tomcat.util.file.ConfigurationSource;
 
@@ -248,7 +249,7 @@ public class ParameterLimitValve extends ValveBase {
             String line;
             while ((line = reader.readLine()) != null) {
                 // Trim whitespace from the line
-                line = line.trim();
+                line = JreCompat.getInstance().strip(line);
                 if (line.isEmpty() || line.startsWith("#")) {
                     // Skip empty lines or comments
                     continue;
@@ -259,8 +260,8 @@ public class ParameterLimitValve extends ValveBase {
                     throw new IllegalArgumentException(sm.getString("parameterLimitValve.invalidLine", line));
                 }
 
-                String patternString = line.substring(0, lastEqualsIndex).trim();
-                String limitsString = line.substring(lastEqualsIndex + 1).trim();
+                String patternString = JreCompat.getInstance().strip(line.substring(0, lastEqualsIndex));
+                String limitsString = JreCompat.getInstance().strip(line.substring(lastEqualsIndex + 1));
 
                 Pattern pattern = Pattern.compile(UDecoder.URLDecode(patternString, StandardCharsets.UTF_8));
                 String[] limits = limitsString.split(",");

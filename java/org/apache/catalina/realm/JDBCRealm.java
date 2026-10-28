@@ -29,6 +29,7 @@ import java.util.Properties;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.compat.JreCompat;
 
 
 /**
@@ -525,7 +526,7 @@ public class JDBCRealm extends RealmBase {
                     dbConnection.commit();
 
                     if (dbCredentials != null) {
-                        dbCredentials = dbCredentials.trim();
+                        dbCredentials = JreCompat.getInstance().strip(dbCredentials);
                     }
 
                     return dbCredentials;
@@ -639,7 +640,7 @@ public class JDBCRealm extends RealmBase {
                     while (rs.next()) {
                         String role = rs.getString(1);
                         if (null != role) {
-                            roleList.add(role.trim());
+                            roleList.add(JreCompat.getInstance().strip(role));
                         }
                     }
 

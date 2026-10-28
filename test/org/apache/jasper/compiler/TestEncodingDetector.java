@@ -29,6 +29,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.compat.JreCompat;
 
 @RunWith(Parameterized.class)
 public class TestEncodingDetector extends TomcatBaseTest {
@@ -83,7 +84,7 @@ public class TestEncodingDetector extends TomcatBaseTest {
 
         if (expectedResponseCode == 200) {
             // trim() to remove whitespace like new lines
-            String bodyText = responseBody.toString().trim();
+            String bodyText = JreCompat.getInstance().strip(responseBody.toString());
             if (responseBodyOK.booleanValue()) {
                 Assert.assertEquals("OK", bodyText);
             } else {

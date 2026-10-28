@@ -715,7 +715,7 @@ public class TestGenerator extends TomcatBaseTest {
                 throw new IllegalSelectorException();
             } else {
                 try {
-                    if (!state.trim().isEmpty()) {
+                    if (!JreCompat.getInstance().strip(state).isEmpty()) {
                         pageContext.getOut().print(state);
                         pageContext.getOut().print("-");
                     }
@@ -736,7 +736,7 @@ public class TestGenerator extends TomcatBaseTest {
                 throw new IllegalSelectorException();
             } else {
                 try {
-                    if (!state.trim().isEmpty()) {
+                    if (!JreCompat.getInstance().strip(state).isEmpty()) {
                         pageContext.getOut().print(state);
                         pageContext.getOut().print("-");
                     }

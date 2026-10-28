@@ -35,6 +35,7 @@ import org.apache.catalina.User;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -943,7 +944,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                     return null;
                 }
 
-                dbCredentials = (dbCredentials != null) ? dbCredentials.trim() : null;
+                dbCredentials = (dbCredentials != null) ? JreCompat.getInstance().strip(dbCredentials) : null;
             }
         } catch (SQLException e) {
             log.error(sm.getString("dataSourceUserDatabase.exception"), e);

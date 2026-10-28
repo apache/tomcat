@@ -31,6 +31,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.el.util.JreCompat;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.apache.jasper.compiler.SmapStratum.LineInfo;
@@ -637,7 +638,7 @@ public class SmapUtil {
             // beginning of the text.
             while ((next = text.indexOf('\n', index)) > -1) {
                 if (beginning) {
-                    String line = text.substring(index, next).trim();
+                    String line = JreCompat.getInstance().strip(text.substring(index, next));
                     if (!slashStarSeen && line.startsWith("/*")) {
                         slashStarSeen = true;
                     }

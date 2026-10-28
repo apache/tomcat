@@ -32,6 +32,7 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspTagException;
 import javax.servlet.jsp.PageContext;
 
+import org.apache.el.util.JreCompat;
 import org.apache.jasper.Constants;
 import org.apache.jasper.compiler.Localizer;
 
@@ -138,7 +139,7 @@ public class Util {
             return null;
         }
         index += 1; // positioned after the '='
-        input = input.substring(index).trim();
+        input = JreCompat.getInstance().strip(input.substring(index));
         if (input.isEmpty()) {
             // Empty or whitespace-only parameter value, e.g. a malformed
             // "Content-Type: text/html;charset=" header from a remote server.
@@ -162,7 +163,7 @@ public class Util {
                 end = input.length();
             }
         }
-        return input.substring(begin, end).trim();
+        return JreCompat.getInstance().strip(input.substring(begin, end));
     }
 
     /**

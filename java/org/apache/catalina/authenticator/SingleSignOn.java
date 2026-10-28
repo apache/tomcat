@@ -37,6 +37,7 @@ import org.apache.catalina.SessionListener;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -141,7 +142,7 @@ public class SingleSignOn extends ValveBase {
      * @param cookieDomain cookie domain name
      */
     public void setCookieDomain(String cookieDomain) {
-        if (cookieDomain != null && cookieDomain.trim().isEmpty()) {
+        if (cookieDomain != null && JreCompat.getInstance().strip(cookieDomain).isEmpty()) {
             this.cookieDomain = null;
         } else {
             this.cookieDomain = cookieDomain;

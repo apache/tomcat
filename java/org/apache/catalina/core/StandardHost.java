@@ -46,6 +46,7 @@ import org.apache.catalina.valves.ErrorReportValve;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.compat.JreCompat;
 
 /**
  * Standard implementation of the <b>Host</b> interface. Each child container must be a Context implementation to
@@ -235,7 +236,7 @@ public class StandardHost extends ContainerBase implements Host {
 
     @Override
     public void setAppBase(String appBase) {
-        if (appBase.trim().isEmpty()) {
+        if (JreCompat.getInstance().strip(appBase).isEmpty()) {
             log.warn(sm.getString("standardHost.problematicAppBase", getName()));
         }
         String oldAppBase = this.appBase;

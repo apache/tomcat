@@ -35,6 +35,7 @@ import javax.servlet.jsp.tagext.TagVariableInfo;
 import javax.servlet.jsp.tagext.TryCatchFinally;
 import javax.servlet.jsp.tagext.VariableInfo;
 
+import org.apache.el.util.JreCompat;
 import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.compiler.tagplugin.TagPluginContext;
@@ -743,7 +744,7 @@ public abstract class Node implements TagConstants {
             if (importEntry.indexOf(';') > -1) {
                 throw new IllegalArgumentException(Localizer.getMessage("jsp.error.page.invalid.import"));
             }
-            return importEntry.trim();
+            return JreCompat.getInstance().strip(importEntry);
         }
     }
 
@@ -813,14 +814,14 @@ public abstract class Node implements TagConstants {
             int start = 0;
             int index;
             while ((index = value.indexOf(',', start)) != -1) {
-                imports.add(value.substring(start, index).trim());
+                imports.add(JreCompat.getInstance().strip(value.substring(start, index)));
                 start = index + 1;
             }
             if (start == 0) {
                 // No comma found
-                imports.add(value.trim());
+                imports.add(JreCompat.getInstance().strip(value));
             } else {
-                imports.add(value.substring(start).trim());
+                imports.add(JreCompat.getInstance().strip(value.substring(start)));
             }
         }
 
@@ -2715,9 +2716,9 @@ public abstract class Node implements TagConstants {
                 } else if (this.isDeferredMethodInput()) {
                     String m = this.tai.getMethodSignature();
                     if (m != null) {
-                        int rti = m.trim().indexOf(' ');
+                        int rti = JreCompat.getInstance().strip(m).indexOf(' ');
                         if (rti > 0) {
-                            return m.substring(0, rti).trim();
+                            return JreCompat.getInstance().strip(m.substring(0, rti));
                         }
                     }
                 }
@@ -2735,13 +2736,13 @@ public abstract class Node implements TagConstants {
                 if (this.isDeferredMethodInput()) {
                     String m = this.tai.getMethodSignature();
                     if (m != null) {
-                        m = m.trim();
+                        m = JreCompat.getInstance().strip(m);
                         m = m.substring(m.indexOf('(') + 1);
                         m = m.substring(0, m.length() - 1);
-                        if (!m.trim().isEmpty()) {
+                        if (!JreCompat.getInstance().strip(m).isEmpty()) {
                             String[] p = m.split(",");
                             for (int i = 0; i < p.length; i++) {
-                                p[i] = p[i].trim();
+                                p[i] = JreCompat.getInstance().strip(p[i]);
                             }
                             return p;
                         }

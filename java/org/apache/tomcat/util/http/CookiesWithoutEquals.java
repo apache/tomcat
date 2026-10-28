@@ -18,6 +18,7 @@ package org.apache.tomcat.util.http;
 
 import java.util.Locale;
 
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -105,7 +106,7 @@ public enum CookiesWithoutEquals {
      * @return The corresponding enum value
      */
     public static CookiesWithoutEquals fromString(String from) {
-        String trimmedLower = from.trim().toLowerCase(Locale.ENGLISH);
+        String trimmedLower = JreCompat.getInstance().strip(from).toLowerCase(Locale.ENGLISH);
 
         for (CookiesWithoutEquals value : values()) {
             if (value.getValue().equals(trimmedLower)) {

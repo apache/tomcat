@@ -37,6 +37,7 @@ import java.util.regex.Pattern;
 import javax.servlet.ServletContext;
 
 import org.apache.catalina.Context;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.scan.JarFactory;
 
 /**
@@ -213,7 +214,7 @@ public class WebappServiceLoader<T> {
                 if (i >= 0) {
                     line = line.substring(0, i);
                 }
-                line = line.trim();
+                line = JreCompat.getInstance().strip(line);
                 if (line.isEmpty()) {
                     continue;
                 }

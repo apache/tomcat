@@ -38,6 +38,7 @@ import org.apache.catalina.UserDatabase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.CloseableURLConnection;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.digester.AbstractObjectCreationFactory;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.file.ConfigFileLoader;
@@ -713,10 +714,10 @@ class MemoryGroupCreationFactory extends AbstractObjectCreationFactory {
                 String rolename;
                 int comma = roles.indexOf(',');
                 if (comma >= 0) {
-                    rolename = roles.substring(0, comma).trim();
+                    rolename = JreCompat.getInstance().strip(roles.substring(0, comma));
                     roles = roles.substring(comma + 1);
                 } else {
-                    rolename = roles.trim();
+                    rolename = JreCompat.getInstance().strip(roles);
                     roles = "";
                 }
                 if (!rolename.isEmpty()) {
@@ -802,10 +803,10 @@ class MemoryUserCreationFactory extends AbstractObjectCreationFactory {
                 String groupname;
                 int comma = groups.indexOf(',');
                 if (comma >= 0) {
-                    groupname = groups.substring(0, comma).trim();
+                    groupname = JreCompat.getInstance().strip(groups.substring(0, comma));
                     groups = groups.substring(comma + 1);
                 } else {
-                    groupname = groups.trim();
+                    groupname = JreCompat.getInstance().strip(groups);
                     groups = "";
                 }
                 if (!groupname.isEmpty()) {
@@ -822,10 +823,10 @@ class MemoryUserCreationFactory extends AbstractObjectCreationFactory {
                 String rolename;
                 int comma = roles.indexOf(',');
                 if (comma >= 0) {
-                    rolename = roles.substring(0, comma).trim();
+                    rolename = JreCompat.getInstance().strip(roles.substring(0, comma));
                     roles = roles.substring(comma + 1);
                 } else {
-                    rolename = roles.trim();
+                    rolename = JreCompat.getInstance().strip(roles);
                     roles = "";
                 }
                 if (!rolename.isEmpty()) {

@@ -1174,7 +1174,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
             return;
         }
         for (String servletName : resourceOnlyServlets.split(",")) {
-            servletName = servletName.trim();
+            servletName = JreCompat.getInstance().strip(servletName);
             if (!servletName.isEmpty()) {
                 this.resourceOnlyServlets.add(servletName);
             }

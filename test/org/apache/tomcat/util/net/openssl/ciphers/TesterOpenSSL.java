@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.catalina.util.IOTools;
+import org.apache.tomcat.util.compat.JreCompat;
 
 public class TesterOpenSSL {
 
@@ -250,7 +251,7 @@ public class TesterOpenSSL {
 
 
     public static Set<String> getOpenSSLCiphersAsSet(String specification) throws Exception {
-        String[] ciphers = getOpenSSLCiphersAsExpression(specification, true).trim().split(":");
+        String[] ciphers = JreCompat.getInstance().strip(getOpenSSLCiphersAsExpression(specification, true)).split(":");
         Set<String> result = new HashSet<>(Arrays.asList(ciphers));
         return result;
     }
@@ -390,7 +391,7 @@ public class TesterOpenSSL {
             System.err.println(errorText);
         }
 
-        return stdout.getText().trim();
+        return JreCompat.getInstance().strip(stdout.getText());
     }
 
     private static class InputStreamToText implements Runnable {

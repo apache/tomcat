@@ -209,10 +209,10 @@ public class ELProcessor {
             int paramIndex = methodName.indexOf('(');
 
             if (paramIndex == -1) {
-                name = methodName.trim();
+                name = JreCompat.getInstance().strip(methodName);
                 parameterTypeNames = null;
             } else {
-                String returnTypeAndName = methodName.substring(0, paramIndex).trim();
+                String returnTypeAndName = JreCompat.getInstance().strip(methodName.substring(0, paramIndex));
                 // Assume that the return type and the name are separated by
                 // whitespace. Given the use of trim() above, there should only
                 // be one sequence of whitespace characters.
@@ -226,27 +226,28 @@ public class ELProcessor {
                 if (wsPos == -1) {
                     throw new NoSuchMethodException();
                 }
-                name = returnTypeAndName.substring(wsPos).trim();
+                name = JreCompat.getInstance().strip(returnTypeAndName.substring(wsPos));
 
-                String paramString = methodName.substring(paramIndex).trim();
+                String paramString = JreCompat.getInstance().strip(methodName.substring(paramIndex));
                 // We know the params start with '(', check they end with ')'
                 if (!paramString.endsWith(")")) {
                     throw new NoSuchMethodException(Util.message(context,
                             "elProcessor.defineFunctionInvalidParameterList", paramString, methodName, className));
                 }
                 // Trim '(' and ')'
-                paramString = paramString.substring(1, paramString.length() - 1).trim();
+                paramString = JreCompat.getInstance().strip(paramString.substring(1, paramString.length() - 1));
                 if (paramString.length() == 0) {
                     parameterTypeNames = EMPTY_STRING_ARRAY;
                 } else {
                     parameterTypeNames = paramString.split(",");
                     ImportHandler importHandler = context.getImportHandler();
                     for (int i = 0; i < parameterTypeNames.length; i++) {
-                        String parameterTypeName = parameterTypeNames[i].trim();
+                        String parameterTypeName = JreCompat.getInstance().strip(parameterTypeNames[i]);
                         int dimension = 0;
                         int bracketPos = parameterTypeName.indexOf('[');
                         if (bracketPos > -1) {
-                            String parameterTypeNameOnly = parameterTypeName.substring(0, bracketPos).trim();
+                            String parameterTypeNameOnly = JreCompat.getInstance().strip(
+                                    parameterTypeName.substring(0, bracketPos));
                             while (bracketPos > -1) {
                                 dimension++;
                                 bracketPos = parameterTypeName.indexOf('[', bracketPos + 1);
@@ -257,7 +258,8 @@ public class ELProcessor {
                         if (parameterTypeName.endsWith("...")) {
                             varArgs = true;
                             dimension = 1;
-                            parameterTypeName = parameterTypeName.substring(0, parameterTypeName.length() - 3).trim();
+                            parameterTypeName = JreCompat.getInstance()
+                                    .strip(parameterTypeName.substring(0, parameterTypeName.length() - 3));
                         }
                         boolean isPrimitive = PRIMITIVES.contains(parameterTypeName);
                         if (isPrimitive && dimension > 0) {

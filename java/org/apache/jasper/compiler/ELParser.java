@@ -16,6 +16,7 @@
  */
 package org.apache.jasper.compiler;
 
+import org.apache.el.util.JreCompat;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.compiler.ELNode.ELText;
 import org.apache.jasper.compiler.ELNode.Function;
@@ -269,7 +270,7 @@ public class ELParser {
         int end = len;
 
         // Look to see if the value is quoted
-        String trimmed = input.trim();
+        String trimmed = JreCompat.getInstance().strip(input);
         int trimmedLen = trimmed.length();
         if (trimmedLen > 1) {
             // Might be quoted

@@ -43,6 +43,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.compat.JreCompat;
 
 public class TestPerWebappJuliIntegration extends TomcatBaseTest {
     @Before
@@ -60,8 +61,8 @@ public class TestPerWebappJuliIntegration extends TomcatBaseTest {
         tomcat.start();
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/juli" + APP_ID_A + "/log_level");
         ByteChunk res2 = getUrl("http://localhost:" + getPort() + "/juli" + APP_ID_B + "/log_level");
-        Assert.assertEquals(Level.FINE.toString(), res.toString().trim());
-        Assert.assertEquals(Level.INFO.toString(), res2.toString().trim());
+        Assert.assertEquals(Level.FINE.toString(), JreCompat.getInstance().strip(res.toString()));
+        Assert.assertEquals(Level.INFO.toString(), JreCompat.getInstance().strip(res2.toString()));
         tomcat.stop();
     }
     @Test

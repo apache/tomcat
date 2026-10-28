@@ -29,6 +29,7 @@ import org.apache.catalina.tribes.group.interceptors.NonBlockingCoordinator;
 import org.apache.catalina.tribes.group.interceptors.TcpFailureDetector;
 import org.apache.catalina.tribes.transport.ReceiverBase;
 import org.apache.catalina.tribes.util.Arrays;
+import org.apache.tomcat.util.compat.JreCompat;
 
 
 public class CoordinationDemo {
@@ -288,13 +289,13 @@ public class CoordinationDemo {
     public static String fill(String value, int length, String ch, boolean left) {
         StringBuilder buf = new StringBuilder();
         if (!left) {
-            buf.append(value.trim());
+            buf.append(JreCompat.getInstance().strip(value));
         }
-        for (int i = value.trim().length(); i < length; i++) {
+        for (int i = JreCompat.getInstance().strip(value).length(); i < length; i++) {
             buf.append(ch);
         }
         if (left) {
-            buf.append(value.trim());
+            buf.append(JreCompat.getInstance().strip(value));
         }
         return buf.toString();
     }

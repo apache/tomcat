@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.catalina.util.RateLimiter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -264,7 +265,7 @@ public class RateLimitFilter extends FilterBase {
         rateLimiter.setFilterConfig(filterConfig);
 
         if (policyName != null) {
-            String trimmedName = policyName.trim();
+            String trimmedName = JreCompat.getInstance().strip(policyName);
             if (!trimmedName.isEmpty()) {
                 rateLimiter.setPolicyName(trimmedName);
             }

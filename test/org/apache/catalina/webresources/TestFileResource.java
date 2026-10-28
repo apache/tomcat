@@ -25,6 +25,7 @@ import org.junit.Test;
 
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.compat.JreCompat;
 
 public class TestFileResource extends TomcatBaseTest {
 
@@ -40,6 +41,7 @@ public class TestFileResource extends TomcatBaseTest {
 
         // Build the expected location the same way the webapp base dir is built
         File f = new File("test/webapp/WEB-INF/classes");
-        Assert.assertEquals(f.getCanonicalFile().toURI().toURL().toString(), out.toString().trim());
+        Assert.assertEquals(f.getCanonicalFile().toURI().toURL().toString(),
+                JreCompat.getInstance().strip(out.toString()));
     }
 }

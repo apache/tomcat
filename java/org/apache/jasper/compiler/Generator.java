@@ -589,7 +589,7 @@ class Generator {
         Set<String> packages = new LinkedHashSet<>();
         Set<String> classes = new LinkedHashSet<>();
         for (String importName : imports) {
-            String trimmed = importName.trim();
+            String trimmed = JreCompat.getInstance().strip(importName);
             if (trimmed.endsWith(".*")) {
                 packages.add(trimmed.substring(0, trimmed.length() - 2));
             } else {
@@ -2047,7 +2047,7 @@ class Generator {
                     String revisedText = matcher.replaceAll("\n");
                     // Leading and trailing whitespace can be trimmed so remove
                     // it here as the regex won't remove it.
-                    text = revisedText.trim();
+                    text = JreCompat.getInstance().strip(revisedText);
                 }
             }
 

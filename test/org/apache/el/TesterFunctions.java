@@ -20,9 +20,11 @@ import java.lang.reflect.Method;
 
 import javax.el.FunctionMapper;
 
+import org.apache.tomcat.util.compat.JreCompat;
+
 public class TesterFunctions {
     public static String trim(String input) {
-        return input.trim();
+        return JreCompat.getInstance().strip(input);
     }
 
     public static String concat(String... inputs) {

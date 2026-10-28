@@ -24,6 +24,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.el.util.JreCompat;
 import org.apache.jasper.JspCompilationContext;
 import org.apache.tomcat.Jar;
 
@@ -113,7 +114,7 @@ public class JavacErrorDetail {
                     // faulty. Scan forward to match the java line...
                     if (jspLines[jspBeginLineNum - 1].lastIndexOf("<%") > jspLines[jspBeginLineNum - 1]
                             .lastIndexOf("%>")) {
-                        String javaLine = javaLines[javaLineNum - 1].trim();
+                        String javaLine = JreCompat.getInstance().strip(javaLines[javaLineNum - 1]);
 
                         for (int i = jspBeginLineNum - 1; i < jspLines.length; i++) {
                             if (jspLines[i].contains(javaLine)) {

@@ -45,6 +45,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.collections.SynchronizedStack;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
@@ -423,7 +424,7 @@ public class Http2Protocol implements UpgradeProtocol {
         if (commaSeparatedHeaders != null) {
             String[] headers = commaSeparatedHeaders.split(",");
             for (String header : headers) {
-                String trimmedHeader = header.trim().toLowerCase(Locale.ENGLISH);
+                String trimmedHeader = JreCompat.getInstance().strip(header).toLowerCase(Locale.ENGLISH);
                 if (toRemove.contains(trimmedHeader)) {
                     toRemove.remove(trimmedHeader);
                 } else {

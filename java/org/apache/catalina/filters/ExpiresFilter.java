@@ -44,6 +44,7 @@ import javax.servlet.http.MappingMatch;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.StringUtils;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.http.Method;
 
 /**
@@ -1495,7 +1496,8 @@ public class ExpiresFilter extends FilterBase {
             try {
                 if (name.startsWith(PARAMETER_EXPIRES_BY_TYPE)) {
                     String contentType =
-                            name.substring(PARAMETER_EXPIRES_BY_TYPE.length()).trim().toLowerCase(Locale.ENGLISH);
+                            JreCompat.getInstance().strip(name.substring(PARAMETER_EXPIRES_BY_TYPE.length()))
+                                    .toLowerCase(Locale.ENGLISH);
                     ExpiresConfiguration expiresConfiguration = parseExpiresConfiguration(value);
                     this.expiresConfigurationByContentType.put(contentType, expiresConfiguration);
                 } else if (name.equalsIgnoreCase(PARAMETER_EXPIRES_DEFAULT)) {
@@ -1627,7 +1629,7 @@ public class ExpiresFilter extends FilterBase {
      * @return the parsed expires
      */
     protected ExpiresConfiguration parseExpiresConfiguration(String inputLine) {
-        String line = inputLine.trim();
+        String line = JreCompat.getInstance().strip(inputLine);
 
         StringTokenizer tokenizer = new StringTokenizer(line, " ");
 

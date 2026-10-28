@@ -34,6 +34,7 @@ import javax.servlet.annotation.ServletSecurity;
 import javax.servlet.annotation.ServletSecurity.EmptyRoleSemantic;
 
 import org.apache.juli.logging.Log;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -699,7 +700,8 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
                     msg.append(' ');
                 }
                 if (denyUncoveredHttpMethods) {
-                    log.info(sm.getString("securityConstraint.uncoveredHttpMethodFix", pattern, msg.toString().trim()));
+                    log.info(sm.getString("securityConstraint.uncoveredHttpMethodFix", pattern,
+                            JreCompat.getInstance().strip(msg.toString())));
                     SecurityCollection collection = new SecurityCollection();
                     for (String method : methods) {
                         collection.addOmittedMethod(method);
@@ -711,7 +713,8 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
                     constraint.addCollection(collection);
                     newConstraints.add(constraint);
                 } else {
-                    log.error(sm.getString("securityConstraint.uncoveredHttpMethod", pattern, msg.toString().trim()));
+                    log.error(sm.getString("securityConstraint.uncoveredHttpMethod", pattern,
+                            JreCompat.getInstance().strip(msg.toString())));
                 }
                 continue;
             }
@@ -746,7 +749,7 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
             }
             if (denyUncoveredHttpMethods) {
                 log.info(sm.getString("securityConstraint.uncoveredHttpOmittedMethodFix", pattern,
-                        msg.toString().trim()));
+                        JreCompat.getInstance().strip(msg.toString())));
                 SecurityCollection collection = new SecurityCollection();
                 for (String method : omittedMethods) {
                     collection.addMethod(method);
@@ -759,7 +762,8 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
                 newConstraints.add(constraint);
             } else {
                 log.error(
-                        sm.getString("securityConstraint.uncoveredHttpOmittedMethod", pattern, msg.toString().trim()));
+                        sm.getString("securityConstraint.uncoveredHttpOmittedMethod", pattern,
+                                JreCompat.getInstance().strip(msg.toString())));
             }
         }
     }

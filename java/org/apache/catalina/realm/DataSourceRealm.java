@@ -31,6 +31,7 @@ import javax.sql.DataSource;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Server;
 import org.apache.naming.ContextBindings;
+import org.apache.tomcat.util.compat.JreCompat;
 
 /**
  * Implementation of <b>Realm</b> that works with any JDBC JNDI DataSource. See the Realm How-To for more details on how
@@ -447,7 +448,7 @@ public class DataSourceRealm extends RealmBase {
                     dbCredentials = rs.getString(1);
                 }
 
-                return (dbCredentials != null) ? dbCredentials.trim() : null;
+                return (dbCredentials != null) ? JreCompat.getInstance().strip(dbCredentials) : null;
             }
         } catch (SQLException e) {
             containerLog.error(sm.getString("dataSourceRealm.getPassword.exception", username), e);
@@ -551,7 +552,7 @@ public class DataSourceRealm extends RealmBase {
                 while (rs.next()) {
                     String role = rs.getString(1);
                     if (role != null) {
-                        list.add(role.trim());
+                        list.add(JreCompat.getInstance().strip(role));
                     }
                 }
                 return list;

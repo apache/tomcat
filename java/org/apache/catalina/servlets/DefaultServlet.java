@@ -83,6 +83,7 @@ import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.catalina.webresources.CachedResource;
 import org.apache.tomcat.util.buf.B2CConverter;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.ResponseUtil;
@@ -3255,7 +3256,7 @@ public class DefaultServlet extends HttpServlet {
          * @return An Order specifying the column and ascending/descending to be applied to resources.
          */
         public Order getOrder(String order) {
-            if (null == order || order.trim().isEmpty()) {
+            if (null == order || JreCompat.getInstance().strip(order).isEmpty()) {
                 return Order.DEFAULT;
             }
 
@@ -3269,7 +3270,7 @@ public class DefaultServlet extends HttpServlet {
             boolean ascending = false;
 
             for (String option : options) {
-                option = option.trim();
+                option = JreCompat.getInstance().strip(option);
 
                 if (2 < option.length()) {
                     char opt = option.charAt(0);

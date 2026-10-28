@@ -66,6 +66,7 @@ import org.apache.catalina.LifecycleException;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.collections.SynchronizedStack;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSName;
@@ -1087,7 +1088,7 @@ public class JNDIRealm extends RealmBase {
         if (cipherSuites == null || cipherSuitesArray != null) {
             return cipherSuitesArray;
         }
-        this.cipherSuites = this.cipherSuites.trim();
+        this.cipherSuites = JreCompat.getInstance().strip(this.cipherSuites);
         if (this.cipherSuites.isEmpty()) {
             containerLog.warn(sm.getString("jndiRealm.emptyCipherSuites"));
             this.cipherSuitesArray = null;
@@ -1154,7 +1155,7 @@ public class JNDIRealm extends RealmBase {
      */
     public void setHostnameVerifierClassName(String verifierClassName) {
         if (verifierClassName != null) {
-            this.hostNameVerifierClassName = verifierClassName.trim();
+            this.hostNameVerifierClassName = JreCompat.getInstance().strip(verifierClassName);
         } else {
             this.hostNameVerifierClassName = null;
         }
@@ -2751,7 +2752,8 @@ public class JNDIRealm extends RealmBase {
             return sslSocketFactory;
         }
         final SSLSocketFactory result;
-        if (this.sslSocketFactoryClassName != null && !sslSocketFactoryClassName.trim().isEmpty()) {
+        if (this.sslSocketFactoryClassName != null &&
+                !JreCompat.getInstance().strip(sslSocketFactoryClassName).isEmpty()) {
             result = createSSLSocketFactoryFromClassName(this.sslSocketFactoryClassName);
         } else {
             result = createSSLContextFactoryFromProtocol(sslProtocol);

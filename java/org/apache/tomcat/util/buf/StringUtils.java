@@ -20,6 +20,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Function;
 
+import org.apache.tomcat.util.compat.JreCompat;
+
 /**
  * Utility methods to build a separated list from a given set (not java.util.Set) of inputs and return that list as a
  * string or append it to an existing StringBuilder. If the given set is null or empty, an empty string will be
@@ -177,7 +179,7 @@ public final class StringUtils {
 
         String[] splits = s.split(",");
         for (int i = 0; i < splits.length; ++i) {
-            splits[i] = splits[i].trim();
+            splits[i] = JreCompat.getInstance().strip(splits[i]);
         }
 
         return splits;

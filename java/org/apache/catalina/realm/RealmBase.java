@@ -57,6 +57,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.HexUtils;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.res.StringManager;
@@ -955,7 +956,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         }
         List<String> attrs = new ArrayList<>();
         for (String name : userAttributes.split(USER_ATTRIBUTES_DELIMITER)) {
-            name = name.trim();
+            name = JreCompat.getInstance().strip(name);
             if (name.isEmpty()) {
                 continue;
             }
@@ -1661,7 +1662,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     }
 
     private static X509UsernameRetriever createUsernameRetriever(String className) throws LifecycleException {
-        if (null == className || className.trim().isEmpty()) {
+        if (null == className || JreCompat.getInstance().strip(className).isEmpty()) {
             return new X509SubjectDnRetriever();
         }
 

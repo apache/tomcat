@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.digester;
 
+import org.apache.tomcat.util.compat.JreCompat;
 import org.xml.sax.Attributes;
 
 /**
@@ -160,7 +161,7 @@ public class CallParamRule extends Rule {
             if (bodyTextStack == null) {
                 bodyTextStack = new ArrayStack<>();
             }
-            bodyTextStack.push(bodyText.trim());
+            bodyTextStack.push(JreCompat.getInstance().strip(bodyText));
         }
 
     }

@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
+import org.apache.tomcat.util.compat.JreCompat;
+
 /**
  * Representation of a Manifest file and its available extensions and required extensions.
  */
@@ -168,7 +170,7 @@ public class ManifestResource {
             if (space < 0) {
                 break;
             }
-            String name = names.substring(0, space).trim();
+            String name = JreCompat.getInstance().strip(names.substring(0, space));
             names = names.substring(space + 1);
 
             String value = attributes.getValue(name + "-Extension-Name");

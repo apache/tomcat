@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.catalina.Globals;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.RequestUtil;
 import org.apache.tomcat.util.http.ResponseUtil;
@@ -621,7 +622,7 @@ public class CorsFilter extends GenericFilter {
             final String allowedHttpHeaders, final String exposedHeaders, final String supportsCredentials,
             final String preflightMaxAge, final String decorateRequest) throws ServletException {
 
-        if (allowedOrigins.trim().equals("*")) {
+        if (JreCompat.getInstance().strip(allowedOrigins).equals("*")) {
             this.anyOriginAllowed = true;
         } else {
             this.anyOriginAllowed = false;
@@ -686,7 +687,7 @@ public class CorsFilter extends GenericFilter {
 
         Set<String> set = new HashSet<>();
         for (String split : splits) {
-            set.add(split.trim());
+            set.add(JreCompat.getInstance().strip(split));
         }
 
         return set;

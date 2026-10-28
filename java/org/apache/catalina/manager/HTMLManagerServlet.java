@@ -49,6 +49,7 @@ import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.SessionComparators;
 import org.apache.catalina.util.URLEncoder;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.Escape;
 
@@ -951,7 +952,7 @@ public class HTMLManagerServlet extends ManagerServlet {
         List<Session> sessions = getSessionsForName(cn, smClient);
         String sortBy = req.getParameter("sort");
         String orderBy = null;
-        if (null != sortBy && !sortBy.trim().isEmpty()) {
+        if (null != sortBy && !JreCompat.getInstance().strip(sortBy).isEmpty()) {
             Comparator<Session> comparator = getComparator(sortBy);
             if (comparator != null) {
                 orderBy = req.getParameter("order");

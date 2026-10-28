@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.file.ConfigFileLoader;
 import org.apache.tomcat.util.file.ConfigurationSource.Resource;
 import org.apache.tomcat.util.res.StringManager;
@@ -52,13 +53,13 @@ public class RandomizedTextRewriteMap implements RewriteMap {
         try (Resource txtResource = ConfigFileLoader.getSource().getResource(txtFilePath);
                 BufferedReader reader = new BufferedReader(new InputStreamReader(txtResource.getInputStream()))) {
             while ((line = reader.readLine()) != null) {
-                line = line.trim();
+                line = JreCompat.getInstance().strip(line);
                 if (line.startsWith("#") || line.isEmpty()) {
                     // Ignore comment line or empty lines
                     continue;
                 } else if (line.indexOf('#') > 0) {
                     // Ignore comment characters after '#'
-                    line = line.substring(0, line.indexOf('#')).trim();
+                    line = JreCompat.getInstance().strip(line.substring(0, line.indexOf('#')));
                 }
                 // Like mod_rewrite, any whitespace separates the key from the
                 // value. The value may itself contain whitespace.

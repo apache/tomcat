@@ -22,6 +22,7 @@ import javax.servlet.jsp.tagext.TagAttributeInfo;
 import javax.servlet.jsp.tagext.TagVariableInfo;
 import javax.servlet.jsp.tagext.VariableInfo;
 
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.Rule;
 import org.apache.tomcat.util.digester.RuleSet;
@@ -484,7 +485,7 @@ public class TldRuleSet implements RuleSet {
         @Override
         public void body(String namespace, String name, String text) throws Exception {
             if (null != text) {
-                text = text.trim();
+                text = JreCompat.getInstance().strip(text);
             }
             boolean value = "true".equalsIgnoreCase(text) || "yes".equalsIgnoreCase(text);
             setter.invoke(digester.peek(), Boolean.valueOf(value));

@@ -44,6 +44,7 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Session;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.compat.JreCompat;
 
 /**
  * Implementation of the {@link org.apache.catalina.Store Store} interface that stores serialized session objects in a
@@ -425,7 +426,7 @@ public class JDBCStore extends StoreBase {
      * @param dataSourceName The JNDI name of the DataSource-factory
      */
     public void setDataSourceName(String dataSourceName) {
-        if (dataSourceName == null || dataSourceName.trim().isEmpty()) {
+        if (dataSourceName == null || JreCompat.getInstance().strip(dataSourceName).isEmpty()) {
             manager.getContext().getLogger().warn(sm.getString(getStoreName() + ".missingDataSourceName"));
             return;
         }
