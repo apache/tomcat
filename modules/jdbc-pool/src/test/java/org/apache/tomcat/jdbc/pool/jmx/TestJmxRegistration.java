@@ -52,10 +52,13 @@ import org.apache.tomcat.jdbc.pool.interceptor.StatementCache;
  * perfectly well.</p>
  * <p>
  * The contract the first tests pin is that the returned name is this call's own
- * publish, or nothing at all. The last two drive that through a real pool: a
+ * publish, or nothing at all. The last three drive that through a real pool: a
  * {@code StatementCache} whose name is taken must leave the MBean that owns the
  * name registered when its connection is discarded, and it must publish itself
- * at the next borrow once the obstacle is gone.</p>
+ * at the next borrow once the obstacle is gone; the {@code DataSource} one
+ * level up must keep the same books for the pool MBean it publishes, whose
+ * handle it releases at {@code close()} and at the container's
+ * {@code postDeregister()}.</p>
  */
 class TestJmxRegistration extends JdbcPoolBaseTest {
 
@@ -126,6 +129,16 @@ class TestJmxRegistration extends JdbcPoolBaseTest {
         Field handle = StatementCache.class.getDeclaredField("oname");
         handle.setAccessible(true);
         return (ObjectName) handle.get(cache);
+    }
+
+    /*
+     * The pool-MBean handle a DataSource keeps for itself: the same state,
+     * read the same way, one level up.
+     */
+    private static ObjectName handleOf(DataSource ds) throws Exception {
+        Field handle = DataSource.class.getDeclaredField("oname");
+        handle.setAccessible(true);
+        return (ObjectName) handle.get(ds);
     }
 
     /*
@@ -360,6 +373,53 @@ class TestJmxRegistration extends JdbcPoolBaseTest {
         } finally {
             if (server.isRegistered(name)) {
                 server.unregisterMBean(name);
+            }
+            ds.close();
+            ds.postDeregister();
+        }
+    }
+
+    @Test
+    void aDataSourceThatWasRefusedItsPoolNameDoesNotUnregisterTheMBeanThatOwnsIt()
+            throws Exception {
+        MBeanServer server = server();
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setJmxEnabled(true);
+        ds.createPool();
+        ObjectName dsName = uniqueName("datasource");
+        // the exact name the DataSource will ask the server for: createObjectName
+        // is a deterministic mapping of the DataSource's own name, so two data
+        // sources - or a data source and the leftover of one that died without
+        // deregistering - derive the same name from the same keys
+        ObjectName foreign = ds.createObjectName(dsName);
+        server.registerMBean(new Probe("foreign"), foreign);
+        try {
+            // the container registers the DataSource, and the pool MBean the
+            // DataSource publishes from preRegister() is refused its name
+            ds.preRegister(server, dsName);
+            Assertions.assertEquals("foreign", server.getAttribute(foreign, "Marker"),
+                    "a refused publish must not have touched the MBean holding the name");
+            // read the handle before close(): close() clears whatever handle is
+            // held, so after it the read no longer says what the refusal left
+            ObjectName kept = handleOf(ds);
+
+            // the harm, on the DataSource's own lifecycle: close() and the
+            // container's postDeregister() each unregister the handle they hold
+            ds.close();
+            ds.postDeregister();
+            Assertions.assertTrue(server.isRegistered(foreign),
+                    "closing a DataSource whose pool publish was refused must leave the MBean"
+                            + " that owns that name registered: unregistering it takes the"
+                            + " management surface of a component that has done nothing wrong,"
+                            + " and does so silently");
+            Assertions.assertNull(kept,
+                    "a DataSource whose pool publish was refused must not keep the refused"
+                            + " name as its registration handle: that handle is exactly what"
+                            + " close() and postDeregister() unregister, and this data source"
+                            + " never published under it");
+        } finally {
+            if (server.isRegistered(foreign)) {
+                server.unregisterMBean(foreign);
             }
             ds.close();
             ds.postDeregister();
