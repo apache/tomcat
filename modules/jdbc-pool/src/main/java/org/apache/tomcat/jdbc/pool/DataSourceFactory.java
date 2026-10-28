@@ -784,8 +784,15 @@ public class DataSourceFactory implements ObjectFactory {
      *
      * @param context        The JNDI context
      * @param poolProperties The pool configuration
+     *
+     * @throws NamingException if the name configured through the
+     *         dataSourceJNDI property cannot be resolved. The name was
+     *         configured specifically to supply the connections for the
+     *         pool, so a pool without that data source is not a usable
+     *         fallback and the failure is reported instead of being
+     *         deferred to the first connection request.
      */
-    public void performJNDILookup(Context context, PoolConfiguration poolProperties) {
+    public void performJNDILookup(Context context, PoolConfiguration poolProperties) throws NamingException {
         Object jndiDS = null;
         try {
             if (context!=null) {
@@ -798,17 +805,29 @@ public class DataSourceFactory implements ObjectFactory {
                 log.debug("The name \""+poolProperties.getDataSourceJNDI()+"\" cannot be found in the local context.", e);
             }
         }
+        NamingException initialContextFailure = null;
         if (jndiDS==null) {
             try {
                 context = new InitialContext();
                 jndiDS = context.lookup(poolProperties.getDataSourceJNDI());
             } catch (NamingException e) {
+                initialContextFailure = e;
                 log.warn("The name \""+poolProperties.getDataSourceJNDI()+"\" cannot be found in the InitialContext.", e);
             }
         }
         if (jndiDS!=null) {
             poolProperties.setDataSource(jndiDS);
+            return;
         }
+        NamingException failure = new NamingException("Unable to create the connection pool: the name ["
+                + poolProperties.getDataSourceJNDI() + "] configured through the 'dataSourceJNDI' attribute was"
+                + " not found in the local JNDI context nor in the InitialContext. The pool is built around the"
+                + " data source that name refers to; check that the name is correct and that the data source is"
+                + " bound and visible to the application before the pool is created.");
+        if (initialContextFailure != null) {
+            failure.setRootCause(initialContextFailure);
+        }
+        throw failure;
     }
 
     /**
