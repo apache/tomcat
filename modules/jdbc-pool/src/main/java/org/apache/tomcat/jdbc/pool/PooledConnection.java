@@ -568,6 +568,18 @@ public class PooledConnection implements PooledConnectionMBean {
      * false if the validation failed. The caller should close the connection if false is returned since a session could have been left in
      * an unknown state during initialization. A connection that was never connected, or has already been disconnected, is always reported
      * as invalid.
+     * <p>
+     * A validation that runs its built-in check against the database also
+     * ends any transaction that is open on the session when the check
+     * completes - a pool configured with a custom {@link Validator} is not,
+     * as the validator replaces the check and owns the session state it
+     * observes. The transaction ended is the one the check itself may have
+     * started, or one a previous borrower left open. It is ended with a
+     * rollback, never with a commit: the check is read-only and a pool
+     * health check must not commit application work the application itself
+     * never committed. When that rollback fails the session state is
+     * unknown, so the validation is reported as failed and the pool takes
+     * the connection out of service.
      */
     public boolean validate(int validateAction,String sql) {
         if (connection == null) {
@@ -634,7 +646,7 @@ public class PooledConnection implements PooledConnectionMBean {
         }
 
         if (query == null) {
-            boolean transactionCommitted = false;
+            boolean transactionTerminated = false;
             int validationQueryTimeout = poolProperties.getValidationQueryTimeout();
             if (validationQueryTimeout < 0) {
                 validationQueryTimeout = 0;
@@ -642,8 +654,15 @@ public class PooledConnection implements PooledConnectionMBean {
             try {
                 if (connection.isValid(validationQueryTimeout)) {
                     this.lastValidated = now;
-                    transactionCommitted = silentlyCommitTransactionIfNeeded();
-                    return true;
+                    // Terminate - by rollback, never by commit - any
+                    // transaction the isValid() call opened, or that a
+                    // previous borrower left open: a read-only health check
+                    // must not commit application work. A session whose
+                    // transaction cannot be terminated is in an unknown
+                    // state, so it fails the validation and the pool takes
+                    // the connection out of service.
+                    transactionTerminated = silentlyRollbackTransactionIfNeeded();
+                    return transactionTerminated;
                 } else {
                     if (getPoolProperties().getLogValidationErrors()) {
                         log.error("isValid() returned false.");
@@ -658,13 +677,13 @@ public class PooledConnection implements PooledConnectionMBean {
                 }
                 return false;
             } finally {
-                if (!transactionCommitted) {
+                if (!transactionTerminated) {
                     silentlyRollbackTransactionIfNeeded();
                 }
             }
         }
 
-        boolean transactionCommitted = false;
+        boolean transactionTerminated = false;
         Statement stmt = null;
         try {
             stmt = connection.createStatement();
@@ -677,8 +696,14 @@ public class PooledConnection implements PooledConnectionMBean {
             stmt.execute(query);
             stmt.close();
             this.lastValidated = now;
-            transactionCommitted = silentlyCommitTransactionIfNeeded();
-            return true;
+            // Terminate - by rollback, never by commit - any transaction
+            // the validation query opened, or that a previous borrower left
+            // open: a read-only health check must not commit application
+            // work. A session whose transaction cannot be terminated is in
+            // an unknown state, so it fails the validation and the pool
+            // takes the connection out of service.
+            transactionTerminated = silentlyRollbackTransactionIfNeeded();
+            return transactionTerminated;
         } catch (Exception ex) {
             if (getPoolProperties().getLogValidationErrors()) {
                 log.error("SQL Validation error", ex);
@@ -690,25 +715,12 @@ public class PooledConnection implements PooledConnectionMBean {
             }
 
         } finally {
-            if (!transactionCommitted) {
+            if (!transactionTerminated) {
                 silentlyRollbackTransactionIfNeeded();
             }
         }
         return false;
     } //validate
-
-
-    private boolean silentlyCommitTransactionIfNeeded() {
-        try {
-            if (!connection.getAutoCommit()) {
-                connection.commit();
-            }
-            return true;
-        } catch (SQLException e) {
-            log.debug("Failed to commit transaction", e);
-        }
-        return false;
-    }
 
 
     private boolean silentlyRollbackTransactionIfNeeded() {

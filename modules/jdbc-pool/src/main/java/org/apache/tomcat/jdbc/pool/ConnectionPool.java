@@ -1067,11 +1067,19 @@ public class ConnectionPool {
             boolean doRollback = getPoolProperties().getRollbackOnReturn();
             boolean doCommit = !doRollback && getPoolProperties().getCommitOnReturn();
             if (doRollback || doCommit) {
-                if (!con.getConnection().getAutoCommit()) {
+                Connection raw = con.getConnection();
+                if (raw == null) {
+                    // defensive: the pool's call path reaches here only on
+                    // a session that is not closed; with nothing to
+                    // terminate there is nothing to fail, and the caller's
+                    // own closed checks take the connection out of service
+                    return true;
+                }
+                if (!raw.getAutoCommit()) {
                     if (doRollback) {
-                        con.getConnection().rollback();
+                        raw.rollback();
                     } else {
-                        con.getConnection().commit();
+                        raw.commit();
                     }
                 }
             }
@@ -1107,10 +1115,17 @@ public class ConnectionPool {
         if (isClosed()) {
             return true;
         }
-        if (!con.validate(action)) {
+        // Terminate the transaction before validating. When the pool is
+        // configured to commit or roll back on return, that is the explicit
+        // choice for the pending work, and a validation that runs first
+        // would end the transaction with its own rollback and silently
+        // override a configured commitOnReturn. With the termination first,
+        // a validation below only ever sees a transaction the return path
+        // deliberately left open.
+        if (!terminateTransaction(con)) {
             return true;
         }
-        if (!terminateTransaction(con)) {
+        if (!con.validate(action)) {
             return true;
         }
         return false;

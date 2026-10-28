@@ -134,4 +134,56 @@ class TestTerminateTransactionOnReturn extends JdbcPoolBaseTest {
                 "when both flags are set, rollbackOnReturn takes "
                         + "precedence");
     }
+
+    /*
+     * With testOnReturn enabled, shouldClose() runs the validation and the
+     * transaction termination on the same return. The validation ends any
+     * open transaction with a rollback, so the configured termination has
+     * to run first: otherwise the validation would silently override both
+     * flags - committing when rollbackOnReturn is set, and discarding work
+     * when commitOnReturn is set.
+     */
+    private DataSource validatingOnReturn() {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setTestOnReturn(true);
+        ds.getPoolProperties().setValidationQuery("SELECT 1");
+        ds.getPoolProperties().setValidationInterval(0);
+        return ds;
+    }
+
+    @Test
+    void returnValidationDoesNotOverrideRollbackOnReturn() throws Exception {
+        DataSource ds = validatingOnReturn();
+        ds.getPoolProperties().setRollbackOnReturn(true);
+        String t = createTable(ds);
+
+        Connection c1 = ds.getConnection();
+        c1.setAutoCommit(false);
+        try (Statement st = c1.createStatement()) {
+            st.executeUpdate("INSERT INTO " + t + " VALUES (1)");
+        }
+        c1.close(); // terminate first, then validate
+
+        Assertions.assertEquals(0, adminRowCount(t),
+                "the return validation must not turn a configured rollback "
+                        + "into a commit");
+    }
+
+    @Test
+    void returnValidationDoesNotOverrideCommitOnReturn() throws Exception {
+        DataSource ds = validatingOnReturn();
+        ds.getPoolProperties().setCommitOnReturn(true);
+        String t = createTable(ds);
+
+        Connection c1 = ds.getConnection();
+        c1.setAutoCommit(false);
+        try (Statement st = c1.createStatement()) {
+            st.executeUpdate("INSERT INTO " + t + " VALUES (1)");
+        }
+        c1.close(); // terminate first, then validate
+
+        Assertions.assertEquals(1, adminRowCount(t),
+                "the return validation must not discard the work a "
+                        + "configured commitOnReturn promised to commit");
+    }
 }
