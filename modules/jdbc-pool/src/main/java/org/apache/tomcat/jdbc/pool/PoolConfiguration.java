@@ -938,22 +938,39 @@ public interface PoolConfiguration {
     boolean isIgnoreExceptionOnPreLoad();
 
     /**
-     * Set this to true if you wish to wrap statements in order to enable equals() and hashCode()
-     * methods to be called on the closed statements if any statement proxy is set. A wrapped
-     * statement also reports the pooled connection it was created from rather than the driver's
-     * own connection, and stops working, along with the result sets read from it, once that
-     * connection has been returned to the pool.
-     * @param useStatementFacade set to <code>true</code> to wrap statements
+     * Stores the value of the deprecated {@code useStatementFacade}
+     * property. The pool always wraps the statements it hands out - and the
+     * result sets read from them - in a facade, whatever value is stored
+     * here. That facade answers {@code equals()}, {@code hashCode()} and
+     * {@code toString()} on closed statements, answers
+     * {@link java.sql.Statement#getConnection()} with the pooled connection
+     * the statement was created from, and stops the statement
+     * and its result sets from working once that connection has been
+     * returned to the pool.
+     * @param useStatementFacade the configured value, retained but without
+     *                           effect
+     * @deprecated The statement facade is always used, so this property no
+     *             longer has any effect. Setting it to <code>false</code>
+     *             used to leave statement and result set handles usable
+     *             after the borrow they came from had ended, so a handle
+     *             kept by the application could go on executing on the
+     *             session the next borrower held, and
+     *             {@link java.sql.Statement#getConnection()} returned the
+     *             driver's own connection, which survives the borrow and
+     *             bypasses every configured interceptor.
      */
+    @Deprecated
     void setUseStatementFacade(boolean useStatementFacade);
 
     /**
-     * Returns <code>true</code> if this connection pool is configured to wrap statements in order
-     * to enable equals() and hashCode() methods to be called on the closed statements if any
-     * statement proxy is set. A wrapped statement also reports the pooled connection it was
-     * created from rather than the driver's own connection, and stops working, along with the
-     * result sets read from it, once that connection has been returned to the pool.
-     * @return <code>true</code> if the statements are wrapped
+     * Returns the value stored for the deprecated {@code useStatementFacade}
+     * property. The pool always wraps the statements it hands out - and the
+     * result sets read from them - in a facade, whatever value is returned
+     * here.
+     * @return the configured value, retained but without effect
+     * @deprecated The statement facade is always used, so this property no
+     *             longer has any effect.
      */
+    @Deprecated
     boolean getUseStatementFacade();
 }
