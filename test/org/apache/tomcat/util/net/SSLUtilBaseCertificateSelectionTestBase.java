@@ -19,14 +19,18 @@ package org.apache.tomcat.util.net;
 
 import java.io.File;
 import java.io.Serial;
+import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreSpi;
+import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.net.ssl.X509KeyManager;
@@ -140,11 +144,68 @@ public abstract class SSLUtilBaseCertificateSelectionTestBase extends TomcatBase
     }
 
 
+    /*
+     * Builds and registers an SSLContext for the given configured alias and key store, then returns the certificates
+     * that SSLHostConfig.certificatesExpiringBefore() - the input to the TLS certificate reload listener - would flag.
+     * The cut-off date is far enough in the future that every certificate qualifies, so the result is exactly the set
+     * of certificates the listener monitors for reload.
+     */
+    protected Set<X509Certificate> certificatesMonitoredForReload(String alias, KeyStore keystore) throws Exception {
+        SSLHostConfigCertificate certificate = registeredCertificate(alias, keystore);
+        SSLContext context = sslUtil(certificate).createSSLContext(List.of());
+        try {
+            certificate.setSslContext(context);
+            Date farFuture = new Date(System.currentTimeMillis() + 3650L * 24 * 60 * 60 * 1000);
+            return certificate.getSSLHostConfig().certificatesExpiringBefore(farFuture);
+        } finally {
+            context.destroy();
+        }
+    }
+
+
+    /*
+     * Builds and registers an SSLContext for the given configured alias and key store, then returns the alias the
+     * context reports as actually served - which is what the certificate logging and reload paths resolve.
+     */
+    protected String servedAlias(String alias, KeyStore keystore) throws Exception {
+        SSLHostConfigCertificate certificate = registeredCertificate(alias, keystore);
+        SSLContext context = sslUtil(certificate).createSSLContext(List.of());
+        try {
+            certificate.setSslContext(context);
+            return context.getServedAlias(certificate);
+        } finally {
+            context.destroy();
+        }
+    }
+
+
+    private static SSLHostConfigCertificate registeredCertificate(String alias, KeyStore keystore) {
+        SSLHostConfig hostConfig = new SSLHostConfig();
+        SSLHostConfigCertificate certificate = new SSLHostConfigCertificate(hostConfig, Type.UNDEFINED);
+        certificate.setCertificateKeystore(keystore);
+        certificate.setCertificateKeystoreType("JKS");
+        certificate.setCertificateKeystorePassword(TesterSupport.JKS_PASS);
+        if (alias != null) {
+            certificate.setCertificateKeyAlias(alias);
+        }
+        hostConfig.addCertificate(certificate);
+        return certificate;
+    }
+
+
     protected static KeyStore orderedKeystore(String malformedAlias, KeystoreEntry... entries) throws Exception {
-        return orderedKeystore(new Provider("SunMSCAPI", "1.0", "test") {
-            @Serial
-            private static final long serialVersionUID = -4141665633237722962L;
-        }, "Windows-MY", malformedAlias, entries);
+        return orderedKeystore(sunMSCAPIProvider(), "Windows-MY", true, malformedAlias, entries);
+    }
+
+
+    /*
+     * As orderedKeystore(String, KeystoreEntry...) but the private keys report a null format, like a non-exportable
+     * SunMSCAPI key. This routes SSLUtilBase.getKeyManagers() through its production path that keeps the original key
+     * store (ksUsed == ks) and wraps each key manager, rather than the in-memory-copy branch the exportable JKS-backed
+     * mock otherwise takes.
+     */
+    protected static KeyStore nonExportableKeystore(KeystoreEntry... entries) throws Exception {
+        return orderedKeystore(sunMSCAPIProvider(), "Windows-MY", false, null, entries);
     }
 
 
@@ -152,12 +213,20 @@ public abstract class SSLUtilBaseCertificateSelectionTestBase extends TomcatBase
         return orderedKeystore(new Provider("SUN", "1.0", "test") {
             @Serial
             private static final long serialVersionUID = 4434321038151233913L;
-        }, "JKS", null, entries);
+        }, "JKS", true, null, entries);
     }
 
 
-    protected static KeyStore orderedKeystore(Provider provider, String type, String malformedAlias,
-            KeystoreEntry... entries) throws Exception {
+    private static Provider sunMSCAPIProvider() {
+        return new Provider("SunMSCAPI", "1.0", "test") {
+            @Serial
+            private static final long serialVersionUID = -4141665633237722962L;
+        };
+    }
+
+
+    protected static KeyStore orderedKeystore(Provider provider, String type, boolean exportableKeys,
+            String malformedAlias, KeystoreEntry... entries) throws Exception {
         File file = TesterKeystoreGenerator.generateKeystore(List.of(entries));
         KeyStore delegate = KeyStore.getInstance(file, TesterSupport.JKS_PASS.toCharArray());
         List<String> aliases = Stream.of(entries).map(KeystoreEntry::alias).toList();
@@ -180,15 +249,49 @@ public abstract class SSLUtilBaseCertificateSelectionTestBase extends TomcatBase
         });
         EasyMock.expect(spi.engineGetCertificateChain(EasyMock.anyString()))
                 .andStubAnswer(() -> delegate.getCertificateChain(EasyMock.getCurrentArgument(0)));
-        EasyMock.expect(spi.engineGetKey(EasyMock.anyString(), EasyMock.anyObject(char[].class)))
-                .andStubAnswer(() -> delegate.getKey(EasyMock.getCurrentArgument(0), EasyMock.getCurrentArgument(1)));
+        EasyMock.expect(spi.engineGetKey(EasyMock.anyString(), EasyMock.anyObject(char[].class))).andStubAnswer(() -> {
+            Key key = delegate.getKey(EasyMock.getCurrentArgument(0), EasyMock.getCurrentArgument(1));
+            return exportableKeys ? key : nonExportableView(key);
+        });
         EasyMock.replay(spi);
-        // A real JKS backs the mock, so keys report PKCS#8 and getKeyManagers() takes its in-memory-copy branch
-        // rather than SunMSCAPI's non-exportable-key path; the provider name and store type are overridden only so
+        // A real JKS backs the mock. With exportableKeys the keys report PKCS#8, so getKeyManagers() takes its
+        // in-memory-copy branch; with exportableKeys == false they report a null format (see nonExportableView), so it
+        // takes SunMSCAPI's non-exportable-key path instead. The provider name and store type are overridden only so
         // isSunMSCAPIWindowsMY() can be exercised off Windows.
         KeyStore result = new KeyStore(spi, provider, type) { };
         result.load(null, null);
         return result;
+    }
+
+
+    /*
+     * A view of a private key that reports a null format, as a non-exportable SunMSCAPI key does, while staying usable
+     * by the key manager. getEncoded() returns null for the same reason; these selection tests never sign, so the key
+     * material itself is never needed.
+     */
+    private static Key nonExportableView(Key key) {
+        if (!(key instanceof PrivateKey privateKey)) {
+            return key;
+        }
+        return new PrivateKey() {
+            @Serial
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public String getAlgorithm() {
+                return privateKey.getAlgorithm();
+            }
+
+            @Override
+            public String getFormat() {
+                return null;
+            }
+
+            @Override
+            public byte[] getEncoded() {
+                return null;
+            }
+        };
     }
 
 
