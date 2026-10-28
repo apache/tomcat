@@ -95,7 +95,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport
      */
     private static final ThreadPoolExecutor NOTIFIER = new ThreadPoolExecutor(
             0, 1, 60L, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<Runnable>(NOTIFY_QUEUE_CAPACITY),
+            new LinkedBlockingQueue<>(NOTIFY_QUEUE_CAPACITY),
             r -> {
                 Thread t = new Thread(r, "JDBC-Pool-JMX-Notifier");
                 t.setDaemon(true);

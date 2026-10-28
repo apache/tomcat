@@ -251,6 +251,7 @@ class TestResetAbandonedTimerStreaming extends JdbcPoolBaseTest {
         assertResultSetHandlesCompose();
     }
 
+    @SuppressWarnings("unlikely-arg-type") // Use of unlikely arg-type is deliberate
     private void assertResultSetHandlesCompose() throws SQLException {
         DataSource ds = streamingPool();
         Connection con = ds.getConnection();

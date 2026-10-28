@@ -117,6 +117,7 @@ class TestStatementDecoratorIdentity extends JdbcPoolBaseTest {
         }
     }
 
+    @SuppressWarnings("unlikely-arg-type") // Use of unlikely arg-type is deliberate
     @Test
     void aStatementHandleIsEqualOnlyToItselfWhileOpen() throws Exception {
         DataSource ds = decoratorPool();
@@ -131,6 +132,7 @@ class TestStatementDecoratorIdentity extends JdbcPoolBaseTest {
         }
     }
 
+    @SuppressWarnings("unlikely-arg-type") // Use of unlikely arg-type is deliberate
     @Test
     void aClosedStatementHandleKeepsAnsweringWithItsOwnIdentity() throws Exception {
         DataSource ds = decoratorPool();
@@ -149,6 +151,7 @@ class TestStatementDecoratorIdentity extends JdbcPoolBaseTest {
         }
     }
 
+    @SuppressWarnings("unlikely-arg-type") // Use of unlikely arg-type is deliberate
     @Test
     void aResultSetHandleIsAnHonestHandleOpenAndClosed() throws Exception {
         DataSource ds = decoratorPool();
@@ -206,7 +209,7 @@ class TestStatementDecoratorIdentity extends JdbcPoolBaseTest {
                         name + ": a closed result set handle must still be equal to itself");
                 Assertions.assertEquals(hash, rsHandle.hashCode(),
                         name + ": closing must not change the identity of a handle");
-                Assertions.assertDoesNotThrow(() -> rsHandle.equals(rsHandle),
+                Assertions.assertDoesNotThrow(() -> Boolean.valueOf(rsHandle.equals(rsHandle)),
                         name + ": equals on a closed handle must return, not throw");
             }
         }
@@ -268,6 +271,7 @@ class TestStatementDecoratorIdentity extends JdbcPoolBaseTest {
      * it - but the decorator's proxies stay live underneath, and the answers
      * both layers give must obey the same contract.
      */
+    @SuppressWarnings("unlikely-arg-type") // Use of unlikely arg-type is deliberate
     @Test
     void facadeHandleAndDecoratorHandleObeyTheSameContract() throws Exception {
         DataSource ds = decoratorPool();
