@@ -1032,6 +1032,20 @@
        will also not reset the lock out time.</p>
       </attribute>
 
+      <attribute name="stripLeadingSpace" required="false">
+        <p>Will leading space (<code>Character.isWhitespace()</code> or
+        <code>Character.isSpaceChar()</code> returns <code>true</code>) be
+        removed from user names when making locking decisions. Defaults to
+        <code>true</code>, meaning leading space will be removed.</p>
+      </attribute>
+
+      <attribute name="stripTrailingSpace" required="false">
+        <p>Will trailing space (<code>Character.isWhitespace()</code> or
+        <code>Character.isSpaceChar()</code> returns <code>true</code>) be
+        removed from user names when making locking decisions. Defaults to
+        <code>true</code>, meaning leading space will be removed.</p>
+      </attribute>
+
       <attribute name="transportGuaranteeRedirectStatus" required="false">
         <p>The HTTP status code to use when the container needs to issue an HTTP
            redirect to meet the requirements of a configured transport
