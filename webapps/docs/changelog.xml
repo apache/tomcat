@@ -1009,6 +1009,11 @@
         <code>CancellationException</code> to its callers instead of a closed
         connection. (remm)
       </fix>
+      <fix>
+        Make a timed-out retrieval from the JDBC pool's fair queue fail
+        terminally instead of leaving its future in a state nobody can
+        complete. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
