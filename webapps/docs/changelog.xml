@@ -334,6 +334,10 @@
         <code>serverAuthContext.secureResponse()</code> should result in an
         internal server error (500) response. (markt)
       </fix>
+      <fix>
+        Do not depend on the content length being defined when processing
+        request bodies with the CGI Servlet. (csutherl)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
