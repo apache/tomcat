@@ -540,7 +540,7 @@
       </p>
     </attribute>
     <attribute name="dataSourceJNDI" required="false">
-      <p>(String) The JNDI name for a data source to be looked up in JNDI and then used to establish connections to the database. See the <code>dataSource</code> attribute. Default value is <code>null</code>
+      <p>(String) The JNDI name for a data source to be looked up in JNDI and then used to establish connections to the database. See the <code>dataSource</code> attribute. Default value is <code>null</code>. If the name cannot be resolved when the pool is created, the creation fails with an error naming the unresolved name rather than producing a pool that cannot provide connections.
       </p>
     </attribute>
     <attribute name="useDisposableConnectionFacade" required="false">
