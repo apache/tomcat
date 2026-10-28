@@ -32,6 +32,7 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -169,6 +170,9 @@ public class ConnectionPool {
      * until a connection has become available.
      * If a connection is not retrieved, the Future must be cancelled in order for the connection to be returned
      * to the pool.
+     * Closing the pool cancels a future that has not received a connection yet, so a thread blocked in
+     * {@link Future#get()} observes a {@link java.util.concurrent.CancellationException} instead of waiting for
+     * a connection that can no longer be handed out.
      * @return a Future containing a reference to the connection or the future connection
      * @throws SQLException Cannot use asynchronous connect
      */
@@ -191,6 +195,15 @@ public class ConnectionPool {
         //we can only retrieve a future if the underlying queue supports it.
         if (idle instanceof FairBlockingQueue<?>) {
             Future<PooledConnection> pcf = ((FairBlockingQueue<PooledConnection>)idle).pollAsync();
+            if (isClosed() && pcf.isCancelled()) {
+                //The pool was closed between the borrow attempt above and the
+                //registration of the waiter: close() fails every waiter the
+                //queue holds and a later poll cannot register one, so this
+                //future will never hand out a connection. Reject the borrow the
+                //same way a synchronous borrow on a closed pool does, rather than
+                //handing out a future that only ever fails with a cancellation.
+                throw new SQLException("Connection pool closed.");
+            }
             return new ConnectionFuture(pcf);
         } else {
             throw new SQLException("Connection pool is misconfigured, doesn't support async retrieval. Set the 'fair' property to 'true'");
@@ -442,6 +455,15 @@ public class ConnectionPool {
         this.closed = true;
         //stop background thread
         terminatePoolCleaner();
+
+        //An asynchronous borrow waits on the idle queue, where a thread cannot
+        //observe the closed flag: this pool never offers a connection to that
+        //queue once it is closed, so a caller parked in the Future.get() of
+        //getConnectionAsync() would stay parked forever. Fail the waiters that
+        //are registered on the queue, so that the futures handed out terminate.
+        if (idle instanceof FairBlockingQueue<?>) {
+            ((FairBlockingQueue<PooledConnection>)idle).cancelWaiters();
+        }
 
         /* release all idle connections */
         BlockingQueue<PooledConnection> pool = (!idle.isEmpty())?idle:(force?busy:idle);
@@ -1638,8 +1660,12 @@ public class ConnectionPool {
             //On the async path the pc field is never assigned; once a
             //connection has been produced it is held in the result field,
             //so a non-null result means the future is complete and it is
-            //too late to cancel
-            if (pc!=null || result!=null) {
+            //too late to cancel. A queue future the pool closure already
+            //cancelled is complete in the same way and leaves nothing to
+            //deregister and no connection to clean up, so report nothing
+            //cancelled without arming the deferred cleanup task, which a
+            //java.util.concurrent.Future must not run for a completed task.
+            if (pc!=null || result!=null || pcFuture.isCancelled()) {
                 return false;
             } else if (cancelled.compareAndSet(false, true)) {
                 if (!pcFuture.cancel(mayInterruptIfRunning)) {
@@ -1729,6 +1755,11 @@ public class ConnectionPool {
                 }
             }catch (ExecutionException ex) {
                 //we can ignore this
+            }catch (CancellationException ex) {
+                //the pool closure cancelled the queued wait between the
+                //registration of this cleanup task and its execution; this
+                //future never produced a connection, so there is nothing
+                //to close
             }catch (Exception x) {
                 log.error("Unable to cancel ConnectionFuture.",x);
             }

@@ -973,6 +973,20 @@
         constants from the interface; the notification types and the
         strings they carry on the wire are unchanged. (remm)
       </fix>
+      <fix>
+        Closing the connection pool now also terminates the asynchronous
+        borrows that were still waiting for a connection. A caller blocked in
+        the <code>get()</code> of the future that
+        <code>getConnectionAsync()</code> had returned waited forever on the
+        closed pool: a closed pool never hands another connection to the queue
+        that future waits on, and the waiter itself cannot observe the closed
+        state. The pool now cancels those outstanding polls, so their
+        <code>get()</code> reports a <code>CancellationException</code>. An
+        asynchronous borrow that races the closure is rejected with an
+        <code>SQLException</code>, like a synchronous borrow on a closed pool;
+        a borrow that had registered its waiter just before the closure ran
+        gets a future that reports that cancellation instead. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

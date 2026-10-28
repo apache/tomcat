@@ -19,9 +19,12 @@ package org.apache.tomcat.jdbc.pool;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -32,8 +35,9 @@ import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
  * Expected functionality of the asynchronous borrow API
  * ({@code getConnectionAsync()}): the same accounting, the same
  * database-side truth and the same delivery guarantees as the blocking
- * API, and a clear failure when the pool is configured with a queue that
- * cannot hand out futures.
+ * API, a clear failure when the pool is configured with a queue that
+ * cannot hand out futures, and the termination of an outstanding poll
+ * once the pool is closed.
  *
  * <p>Scenario harvested from the retired legacy classes
  * {@code Bug50805} (async borrow accounting) and
@@ -219,5 +223,105 @@ class TestAsyncBorrow extends JdbcPoolBaseTest {
         Assertions.assertEquals(2, ds.getIdle(),
                 "the pool must keep at most maxActive connections");
         awaitSessions(2);
+    }
+
+    @Test
+    void closingThePoolTerminatesAnAsyncPollThatIsBlockedInGet() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setFairQueue(true);
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setMinIdle(0);
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setMaxIdle(1);
+        ds.createPool();
+        ConnectionPool pool = ds.getPool();
+
+        ds.getConnection(); // takes the only slot, and the pool is at maxActive
+
+        // the borrow below cannot be served by a new connection, so it has to
+        // register a waiter on the idle queue and wait for a returned one
+        Future<Connection> future = ds.getConnectionAsync();
+        Assertions.assertFalse(future.isDone(),
+                "the poll must still be waiting for a connection");
+
+        CountDownLatch parked = new CountDownLatch(1);
+        CountDownLatch finished = new CountDownLatch(1);
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+        Thread caller = new Thread(() -> {
+            parked.countDown();
+            try {
+                future.get(); // the documented, untimed usage
+            } catch (Throwable e) {
+                failure.set(e);
+            } finally {
+                finished.countDown();
+            }
+        }, "blocked-async-borrower");
+        caller.setDaemon(true);
+        caller.start();
+        Assertions.assertTrue(parked.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS));
+        sleep(200); // let the caller reach the wait on the idle queue
+
+        ds.close(true);
+
+        // The caller cannot observe the closed pool itself - it is inside the
+        // queue wait, and a closed pool never offers a connection to that queue
+        // again. Closing the pool has to terminate the future instead.
+        Assertions.assertTrue(finished.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
+                "closing the pool must release a caller blocked in get()");
+        Assertions.assertTrue(failure.get() instanceof CancellationException,
+                "a pool closure must fail an outstanding poll with a "
+                        + "cancellation, got " + failure.get());
+        Assertions.assertTrue(future.isDone());
+        Assertions.assertTrue(future.isCancelled(),
+                "an outstanding poll must be cancelled by the pool closure");
+        Assertions.assertThrows(CancellationException.class, future::get,
+                "a completed poll must keep reporting its cancellation");
+
+        // and the borrow path itself reports the closure the same way a
+        // synchronous borrow does
+        Assertions.assertThrows(SQLException.class, pool::getConnectionAsync,
+                "an async borrow on a closed pool must be rejected");
+        awaitSessions(0);
+    }
+
+    @Test
+    void cancellingAnAsyncPollAfterThePoolClosedReportsNothingCancelled() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setFairQueue(true);
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setMinIdle(0);
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setMaxIdle(1);
+        ds.createPool();
+        ConnectionPool pool = ds.getPool();
+
+        ds.getConnection(); // takes the only slot, so the poll stays queued
+        Future<Connection> future = ds.getConnectionAsync();
+
+        ds.close(true);
+
+        // the closure has already cancelled the queued poll
+        Assertions.assertTrue(future.isCancelled());
+        Assertions.assertTrue(future.isDone());
+
+        // a cancel() after the fact must report nothing cancelled, as the
+        // future is already complete, and must not arm the deferred cleanup
+        // task, which would only run to observe that same cancellation
+        Assertions.assertFalse(future.cancel(true),
+                "a poll the pool closure already cancelled must not report "
+                        + "a further cancellation");
+        Assertions.assertTrue(future.isCancelled());
+        Assertions.assertTrue(future.isDone());
+        Assertions.assertThrows(CancellationException.class, future::get,
+                "the completed cancellation must keep being reported");
+
+        // the refused cancel must not act on any connection: beyond what the
+        // closure itself already released, the pool released nothing
+        long releasedAfterClose = pool.getReleasedCount();
+        sleep(200); // a cleanup task scheduled by cancel() would have run
+        Assertions.assertEquals(releasedAfterClose, pool.getReleasedCount(),
+                "a refused cancel must not retrieve or release any connection");
+        awaitSessions(0);
     }
 }
