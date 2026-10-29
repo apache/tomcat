@@ -16,7 +16,6 @@
  */
 package org.apache.coyote.http2;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -67,9 +66,6 @@ public class TestHttp2Section_6_4 extends Http2TestBase {
         os.write(resetFrame);
         os.flush();
 
-        // Read reset frame
-        parser.readFrame();
-
-        Assert.assertEquals("3-RST-[" + Http2Error.FRAME_SIZE_ERROR.getCode() + "]\n", output.getTrace());
+        handleGoAwayResponse(1, Http2Error.FRAME_SIZE_ERROR);
     }
 }
