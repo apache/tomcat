@@ -367,6 +367,162 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
     }
 
     @Test
+    void incompatibleSetPropertyOverloadIsNotInvokedAsFallback()
+            throws Exception {
+        Logger logger = Logger.getLogger(
+                GenericNamingResourcesFactory.class.getName());
+        Level originalLevel = logger.getLevel();
+        final List<LogRecord> records = new ArrayList<>();
+        Handler handler = new Handler() {
+            @Override
+            public void publish(LogRecord record) {
+                records.add(record);
+            }
+            @Override
+            public void flush() {
+                // no buffering
+            }
+            @Override
+            public void close() {
+                // nothing to release
+            }
+        };
+        logger.addHandler(handler);
+        logger.setLevel(Level.FINEST);
+        try {
+            Reference ref = new Reference(
+                    DecoySetPropertyTarget.class.getName(), null, null);
+            // "whatever" matches no setter; only the setProperty overloads
+            // could be consulted as the (name, value) fallback, and neither
+            // one can accept those arguments
+            ref.add(new StringRefAddr("whatever", "v"));
+
+            Object result = new GenericNamingResourcesFactory()
+                    .getObjectInstance(
+                            ref, new CompositeName("test/decoy"), null, null);
+            Assertions.assertInstanceOf(DecoySetPropertyTarget.class, result);
+            Assertions.assertFalse(
+                    ((DecoySetPropertyTarget) result).isInvoked(),
+                    "a setProperty overload the factory cannot call with the "
+                            + "configured name and value must not run");
+        } finally {
+            logger.removeHandler(handler);
+            logger.setLevel(originalLevel);
+        }
+        boolean warned = false;
+        for (LogRecord record : records) {
+            Assertions.assertFalse(
+                    record.getThrown() instanceof IllegalArgumentException,
+                    "the fallback must not be recorded by method name only: "
+                            + "invoking an unreachable setProperty overload "
+                            + "reflectively produced " + record.getMessage()
+                            + " with " + record.getThrown());
+            if (record.getLevel().intValue() >= Level.WARNING.intValue()
+                    && record.getMessage() != null
+                    && record.getMessage().contains("[whatever]")) {
+                warned = true;
+            }
+        }
+        Assertions.assertTrue(warned,
+                "the unapplied property must be reported once, at warn level");
+    }
+
+    /**
+     * Target whose setProperty overloads cannot accept the (name, value)
+     * arguments of the generic fallback. The two overloads cover both
+     * recording buckets, boolean and default return type; either one,
+     * invoked with two arguments, fails reflectively.
+     */
+    public static class DecoySetPropertyTarget {
+        private boolean invoked;
+
+        public boolean isInvoked() {
+            return invoked;
+        }
+        public boolean setProperty(String name) {
+            invoked = true;
+            return true;
+        }
+        public void setProperty(int index) {
+            invoked = true;
+        }
+    }
+
+    @Test
+    void propertyBagFallbackSurvivesIncompatibleOverload()
+            throws Exception {
+        Reference ref = new Reference(MixedBagTarget.class.getName(),
+                null, null);
+        ref.add(new StringRefAddr("databaseName", "sample"));
+
+        Object result = new GenericNamingResourcesFactory().getObjectInstance(
+                ref, new CompositeName("test/mixedbag"), null, null);
+        Assertions.assertInstanceOf(MixedBagTarget.class, result);
+        MixedBagTarget target = (MixedBagTarget) result;
+        Assertions.assertEquals(java.util.Collections.singletonMap(
+                        "databaseName", "sample"),
+                target.getBag(),
+                "the (name, value) overload must be used as the fallback "
+                        + "even when an unreachable overload exists");
+        Assertions.assertFalse(target.isIndexInvoked(),
+                "the unreachable overload must not be invoked");
+    }
+
+    /**
+     * Target carrying a usable setProperty(name, value) property bag next
+     * to an unrelated setProperty overload. Recording used to match on the
+     * method name only, so which of the two overloads the fallback ended
+     * up calling depended on the reflection method order.
+     */
+    public static class MixedBagTarget {
+        private final java.util.Map<String, String> bag =
+                new java.util.LinkedHashMap<>();
+        private boolean indexInvoked;
+
+        public void setProperty(String name, String value) {
+            bag.put(name, value);
+        }
+        public java.util.Map<String, String> getBag() {
+            return bag;
+        }
+        public void setProperty(int index) {
+            indexInvoked = true;
+        }
+        public boolean isIndexInvoked() {
+            return indexInvoked;
+        }
+    }
+
+    @Test
+    void hashtableStyleSetPropertyBagIsApplied() throws Exception {
+        Reference ref = new Reference(ObjectBagTarget.class.getName(),
+                null, null);
+        ref.add(new StringRefAddr("databaseName", "sample"));
+
+        Object result = new GenericNamingResourcesFactory().getObjectInstance(
+                ref, new CompositeName("test/objectbag"), null, null);
+        Assertions.assertInstanceOf(ObjectBagTarget.class, result);
+        Assertions.assertEquals(java.util.Collections.singletonMap(
+                        "databaseName", "sample"),
+                ((ObjectBagTarget) result).getBag(),
+                "a setProperty(Object, Object) bag can accept the string "
+                        + "name and value and must stay usable");
+    }
+
+    /** Target with a Hashtable-style setProperty(Object, Object) bag. */
+    public static class ObjectBagTarget {
+        private final java.util.Map<Object, Object> bag =
+                new java.util.LinkedHashMap<>();
+
+        public void setProperty(Object key, Object value) {
+            bag.put(key, value);
+        }
+        public java.util.Map<Object, Object> getBag() {
+            return bag;
+        }
+    }
+
+    @Test
     void propertySetFailuresAreReportedAsWarnings() throws Exception {
         Logger logger = Logger.getLogger(
                 GenericNamingResourcesFactory.class.getName());

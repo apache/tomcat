@@ -217,14 +217,22 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
                     }
                 }
 
-                // Save "setProperty" for later
+                // Save "setProperty" for later, but only one that the two
+                // string arguments below can actually be passed to: a
+                // setProperty of any other signature is not a (name, value)
+                // property bag, and invoking it reflectively with those
+                // arguments would only fail with an IllegalArgumentException
+                // that masks the "property was not applied" report.
                 if ("setProperty".equals(methods[i].getName())) {
-                    if (methods[i].getReturnType() == Boolean.TYPE) {
-                        setPropertyMethodBool = methods[i];
-                    } else {
-                        setPropertyMethodVoid = methods[i];
+                    Class<?>[] paramT = methods[i].getParameterTypes();
+                    if (paramT.length == 2 && paramT[0].isAssignableFrom(String.class)
+                            && paramT[1].isAssignableFrom(String.class)) {
+                        if (methods[i].getReturnType() == Boolean.TYPE) {
+                            setPropertyMethodBool = methods[i];
+                        } else {
+                            setPropertyMethodVoid = methods[i];
+                        }
                     }
-
                 }
             }
 
@@ -237,8 +245,10 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
                     try {
                         return ((Boolean) setPropertyMethodBool.invoke(o, params)).booleanValue();
                     } catch (IllegalArgumentException biae) {
-                        // The boolean method had the wrong
-                        // parameter types. lets try the other
+                        // Defensive: the recorded method's parameter types
+                        // were checked above, so invoking it with the name
+                        // and value should not fail on the arguments; if it
+                        // somehow does, fall back to the other method.
                         if (setPropertyMethodVoid != null) {
                             setPropertyMethodVoid.invoke(o, params);
                             return true;
