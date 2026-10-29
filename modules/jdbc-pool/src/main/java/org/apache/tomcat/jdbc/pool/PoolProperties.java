@@ -20,10 +20,13 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -69,6 +72,8 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     private volatile String defaultCatalog = null;
     /** Additional connection properties. */
     private volatile String connectionProperties;
+    /** Keys the last parse of {@link #connectionProperties} contributed to {@link #dbProperties}. */
+    private volatile Set<String> connectionPropertyKeys = Collections.emptySet();
     /** The initial number of connections in the pool. */
     private volatile int initialSize = 10;
     /** The maximum number of active connections. */
@@ -472,16 +477,65 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     }
 
 
+    /**
+     * Stores the connection properties string and parses the pairs into the
+     * database properties the pool connects with. The pairs contributed by the
+     * previous value of the string are removed first, so reconfiguring a running
+     * pool with a reduced or cleared string really stops sending the dropped
+     * properties to the driver instead of leaving them merged in. Entries the
+     * string never contributed, such as the {@code user} and {@code password}
+     * injected by {@link DataSourceFactory#parsePoolProperties(Properties)} or
+     * mirrored in by {@link DataSourceProxy}, are kept. A configuration whose
+     * database properties are {@code null} only stores the raw string, as there
+     * is no property collection to parse into. The remove and re-add run inside
+     * this one synchronized method; an unsynchronised reader of the database
+     * properties, which {@link #getDbProperties()} has always handed out live,
+     * can therefore observe the contributed keys briefly missing.
+     *
+     * @param connectionProperties the property string with semicolon-separated
+     *                             key=value pairs, or {@code null} to clear it
+     */
     @Override
-    public void setConnectionProperties(String connectionProperties) {
+    public synchronized void setConnectionProperties(String connectionProperties) {
         this.connectionProperties = connectionProperties;
-        getProperties(connectionProperties, getDbProperties());
+        Properties dbProps = getDbProperties();
+        if (dbProps == null) {
+            // The pairs have no collection to land in; nothing was contributed,
+            // so there is nothing to track for a later removal either.
+            connectionPropertyKeys = Collections.emptySet();
+            return;
+        }
+        // A configuration serialized before this field existed deserializes
+        // with it null, as field initializers do not run on deserialization.
+        if (connectionPropertyKeys != null) {
+            for (String key : connectionPropertyKeys) {
+                dbProps.remove(key);
+            }
+        }
+        // Parse into a fresh collection first: that is what tells apart the keys
+        // this string contributes from the ones dbProperties holds from elsewhere.
+        Properties parsed = getProperties(connectionProperties, new Properties());
+        Set<String> keys = new HashSet<>(parsed.size());
+        for (String key : parsed.stringPropertyNames()) {
+            dbProps.setProperty(key, parsed.getProperty(key));
+            keys.add(key);
+        }
+        connectionPropertyKeys = keys;
     }
 
 
+    /**
+     * Replaces the database properties the pool connects with. The keys tracked
+     * from the last connection properties parse contributed to the previous
+     * collection, not to the replacement, so the tracking is reset: the caller
+     * owns whatever the new collection holds.
+     *
+     * @param dbProperties the new database properties, may be {@code null}
+     */
     @Override
-    public void setDbProperties(Properties dbProperties) {
+    public synchronized void setDbProperties(Properties dbProperties) {
         this.dbProperties = dbProperties;
+        connectionPropertyKeys = Collections.emptySet();
     }
 
 

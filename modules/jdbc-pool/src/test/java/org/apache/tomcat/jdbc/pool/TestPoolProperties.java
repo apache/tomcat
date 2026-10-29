@@ -192,6 +192,46 @@ class TestPoolProperties {
     }
 
     @Test
+    void reconfiguredConnectionPropertiesDropTheKeysTheStringDropped() {
+        PoolProperties properties = new PoolProperties();
+        // the credential injection DataSourceFactory.parsePoolProperties does
+        // around the connectionProperties setter: these entries must survive
+        properties.getDbProperties().setProperty("user", DEFAULT_USER);
+        properties.getDbProperties().setProperty("password", DEFAULT_PASSWD);
+
+        properties.setConnectionProperties("keep=yes;stale=leftover");
+        properties.setConnectionProperties("keep=yes");
+
+        Assertions.assertEquals("yes", properties.getDbProperties().getProperty("keep"),
+                "a pair the new value still names must carry the new value");
+        Assertions.assertNull(properties.getDbProperties().getProperty("stale"),
+                "a pair dropped by the new value must not keep being sent to"
+                        + " the driver for the life of the pool");
+        Assertions.assertEquals(DEFAULT_USER, properties.getDbProperties().getProperty("user"),
+                "a credential injected outside the string must survive reconfiguration");
+        Assertions.assertEquals(DEFAULT_PASSWD, properties.getDbProperties().getProperty("password"),
+                "a credential injected outside the string must survive reconfiguration");
+    }
+
+    @Test
+    void clearedConnectionPropertiesRemoveEveryParsedPair() {
+        PoolProperties properties = new PoolProperties();
+        properties.setConnectionProperties("stale=leftover");
+
+        properties.setConnectionProperties(null);
+
+        Assertions.assertNull(properties.getConnectionProperties(),
+                "clearing the configuration must still round-trip as null");
+        Assertions.assertTrue(properties.getDbProperties().isEmpty(),
+                "clearing the string must remove the pairs it contributed");
+
+        properties.setConnectionProperties("first=one;second=two");
+        properties.setConnectionProperties("");
+        Assertions.assertTrue(properties.getDbProperties().isEmpty(),
+                "an empty string must clear the pairs just like a null one does");
+    }
+
+    @Test
     void toStringMasksThePasswordButStillShowsTheConfiguration() {
         PoolProperties properties = new PoolProperties();
         properties.setUsername(DEFAULT_USER);
