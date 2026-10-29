@@ -91,9 +91,17 @@ public class PooledConnection implements PooledConnectionMBean {
      */
     private volatile javax.sql.PooledConnection cpdsConnection;
     /**
-     * When we track abandon traces, this string holds the thread dump
+     * When we track abandon traces, this string holds the formatted thread dump
      */
     private String abandonTrace = null;
+    /**
+     * When we track abandon traces, the frames of the borrow site as they
+     * were captured, until an abandoned-connection report reads the trace
+     * and they are formatted into {@link #abandonTrace}. A pool with
+     * logAbandoned borrows constantly and reports rarely, so the
+     * formatting cost is only paid when the trace is actually read.
+     */
+    private StackTraceElement[] abandonTraceElements = null;
     /**
      * Timestamp the connection was last 'touched' by the pool
      */
@@ -809,6 +817,19 @@ public class PooledConnection implements PooledConnectionMBean {
 
     public void setStackTrace(String trace) {
         abandonTrace = trace;
+        abandonTraceElements = null;
+    }
+
+    /**
+     * The pool will set the borrow-site frames when it hands the
+     * connection out; they are formatted into a trace only if an
+     * abandoned-connection report reads it back. The pool writes and
+     * reads the trace under the lock of this connection.
+     * @param trace the borrow-site frames for this connection
+     */
+    void setStackTraceElements(StackTraceElement[] trace) {
+        abandonTraceElements = trace;
+        abandonTrace = null;
     }
 
     /**
@@ -816,7 +837,21 @@ public class PooledConnection implements PooledConnectionMBean {
      * @return the stack trace or null of no trace was set
      */
     public String getStackTrace() {
-        return abandonTrace;
+        String trace = abandonTrace;
+        if (trace == null) {
+            //format the deferred borrow site, if one is pending, and cache
+            //the result: the abandon path logs the trace and notifies of it,
+            //and both readings should pay for a single formatting
+            StackTraceElement[] elements = abandonTraceElements;
+            if (elements != null) {
+                Exception x = new Exception();
+                x.setStackTrace(elements);
+                trace = ConnectionPool.getStackTrace(x);
+                abandonTrace = trace;
+                abandonTraceElements = null;
+            }
+        }
+        return trace;
     }
 
     /**
