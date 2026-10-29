@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
@@ -87,9 +88,17 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
     // The queue methods below are used by the connection pool implementation.
     /**
      * Will always return true, queue is unbounded. {@inheritDoc}
+     *
+     * @throws NullPointerException - if the specified element is null
      */
     @Override
     public boolean offer(E e) {
+        // The queue uses null as its absence-of-item sentinel when polling the
+        // items, so a null element would make a stored item indistinguishable
+        // from an empty queue and a null hand-off would silently deliver no
+        // item to the waiter it is given to. Like the JDK queue
+        // implementations, reject null elements.
+        Objects.requireNonNull(e);
         // During the offer, we will grab the main lock
         final ReentrantLock lock = this.lock;
         lock.lock();
