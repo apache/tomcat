@@ -648,23 +648,24 @@ public abstract class AbstractEndpoint<S, U> {
         getLogCertificate().info(sm.getString("endpoint.tls.info", getName(), sslHostConfig.getHostName(),
                 certificate.getType(), certificateInfo, trustStoreSource));
 
-        // When a configured alias was resolved to a different alias than is actually served (e.g. a SunMSCAPI
-        // Windows-MY numbered duplicate), report it so the alias logged above is not mistaken for the one in use.
-        String configuredAlias = certificate.getCertificateKeyAlias();
-        if (sslContext != null && configuredAlias != null) {
+        if (sslContext != null) {
             String servedAlias = sslContext.getServedAlias(certificate);
-            if (servedAlias != null && !servedAlias.equalsIgnoreCase(configuredAlias)) {
+
+            // When a configured alias was resolved to a different alias than is actually served (e.g. a SunMSCAPI
+            // Windows-MY numbered duplicate), report it so the alias logged above is not mistaken for the one in use.
+            String configuredAlias = certificate.getCertificateKeyAlias();
+            if (configuredAlias != null && servedAlias != null && !servedAlias.equalsIgnoreCase(configuredAlias)) {
                 getLogCertificate()
                         .info(sm.getString("endpoint.tls.info.cert.aliasResolved", configuredAlias, servedAlias));
             }
-        }
 
-        if (getLogCertificate().isDebugEnabled() && sslContext != null) {
-            X509Certificate[] x509Certificates = sslContext.getCertificateChain(sslContext.getServedAlias(certificate));
-            if (x509Certificates != null && x509Certificates.length > 0) {
-                getLogCertificate().debug(generateCertificateDebug(x509Certificates[0]));
-            } else {
-                getLogCertificate().debug(sm.getString("endpoint.tls.cert.noCerts"));
+            if (getLogCertificate().isDebugEnabled()) {
+                X509Certificate[] x509Certificates = sslContext.getCertificateChain(servedAlias);
+                if (x509Certificates != null && x509Certificates.length > 0) {
+                    getLogCertificate().debug(generateCertificateDebug(x509Certificates[0]));
+                } else {
+                    getLogCertificate().debug(sm.getString("endpoint.tls.cert.noCerts"));
+                }
             }
         }
     }
