@@ -755,12 +755,18 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
     }
 
     /**
-     * Iterator safe from concurrent modification exceptions.
+     * Iterator safe from concurrent modification exceptions. The iterator walks a snapshot of the queue contents taken
+     * when it was created, but {@link #remove()} removes the last returned element - or, for element types with value
+     * semantics, an element equal to it - from the live queue.
+     * An element that was taken out of the queue and offered back as the same object between the snapshot and the
+     * removal is therefore also removed from the live queue - like the weakly consistent iterators of the JDK, this
+     * iterator makes no promise about seeing the current state of the queue.
      */
     protected class FairIterator implements Iterator<E> {
         E[] elements = null;
         int index;
         E element = null;
+        boolean canRemove = false;
 
         /**
          * Creates a new FairIterator with a snapshot of the current queue contents.
@@ -789,20 +795,27 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
                 throw new NoSuchElementException();
             }
             element = elements[index++];
+            canRemove = true;
             return element;
         }
 
         @Override
         public void remove() {
+            if (!canRemove) {
+                // Either next() has not been called yet, or the element it
+                // returned has already been removed - the Iterator contract
+                // demands an IllegalStateException, not a silent no-op
+                throw new IllegalStateException();
+            }
             final ReentrantLock lock = FairBlockingQueue.this.lock;
             lock.lock();
             try {
-                if (element != null) {
-                    FairBlockingQueue.this.items.remove(element);
-                }
+                FairBlockingQueue.this.items.remove(element);
             } finally {
                 lock.unlock();
             }
+            element = null;
+            canRemove = false;
         }
 
     }
