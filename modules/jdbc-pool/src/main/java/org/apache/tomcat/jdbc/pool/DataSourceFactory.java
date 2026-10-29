@@ -538,6 +538,7 @@ public class DataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_NUMTESTSPEREVICTIONRUN);
         if (value != null) {
+            log.warn(PROP_NUMTESTSPEREVICTIONRUN + " is not a valid setting, it will have no effect.");
             poolProperties.setNumTestsPerEvictionRun(Integer.parseInt(value));
         }
 
@@ -591,6 +592,7 @@ public class DataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED);
         if (value != null) {
+            log.warn(PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED + " is not a valid setting, it will have no effect.");
             Boolean b = parseBoolean(PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED, value);
             if (b != null) {
                 poolProperties.setAccessToUnderlyingConnectionAllowed(b.booleanValue());
