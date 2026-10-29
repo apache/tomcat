@@ -26,6 +26,7 @@ import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509KeyManager;
 
 /**
  * This interface is needed to override the default SSLContext class to allow SSL implementation pluggability without
@@ -103,19 +104,41 @@ public interface SSLContext {
 
 
     /**
+     * Returns the key managers that may serve the given certificate configuration, in preference order. Used by
+     * {@link #getServedAlias} to resolve the alias actually served. The default returns an empty array (no key manager
+     * known); implementations backed by one or more key managers override it to expose them.
+     *
+     * @param certificate The certificate configuration
+     *
+     * @return The key managers that may serve the certificate, possibly empty, never {@code null}
+     */
+    default X509KeyManager[] getServerKeyManagers(SSLHostConfigCertificate certificate) {
+        return new X509KeyManager[0];
+    }
+
+
+    /**
      * Returns the alias the key manager would select to serve for the given certificate configuration during a
      * handshake. This can differ from {@link SSLHostConfigCertificate#getCertificateKeyAlias()}, for example after
-     * SunMSCAPI Windows-MY numbered-duplicate resolution. The default returns the configured alias (or
-     * {@link SSLUtilBase#DEFAULT_KEY_ALIAS} when none is configured); implementations backed by a key manager override
-     * it to resolve the alias actually served.
+     * SunMSCAPI Windows-MY numbered-duplicate resolution. Each key manager from {@link #getServerKeyManagers} is asked
+     * in turn; if none selects an alias the configured alias is used (or {@link SSLUtilBase#DEFAULT_KEY_ALIAS} when
+     * none is configured).
      *
      * @param certificate The certificate configuration
      *
      * @return The served alias, never {@code null}
      */
     default String getServedAlias(SSLHostConfigCertificate certificate) {
-        String alias = certificate.getCertificateKeyAlias();
-        return alias == null ? SSLUtilBase.DEFAULT_KEY_ALIAS : alias;
+        for (X509KeyManager keyManager : getServerKeyManagers(certificate)) {
+            if (keyManager != null) {
+                String alias = certificate.chooseServerAlias(keyManager);
+                if (alias != null) {
+                    return alias;
+                }
+            }
+        }
+        String configured = certificate.getCertificateKeyAlias();
+        return configured == null ? SSLUtilBase.DEFAULT_KEY_ALIAS : configured;
     }
 
 
