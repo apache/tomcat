@@ -57,7 +57,6 @@ import org.apache.tomcat.util.net.SSLHostConfig.CertificateVerification;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
 import org.apache.tomcat.util.net.SSLHostConfigPreSharedKey;
-import org.apache.tomcat.util.net.SSLUtilBase;
 import org.apache.tomcat.util.net.openssl.OpenSSLConf;
 import org.apache.tomcat.util.net.openssl.OpenSSLConfCmd;
 import org.apache.tomcat.util.net.openssl.OpenSSLPreSharedKeySelector;
@@ -1194,16 +1193,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 }
             }
         } else {
-            String alias = certificate.getCertificateKeyAlias();
             X509KeyManager x509KeyManager = certificate.getCertificateKeyManager();
-            if (alias == null) {
-                alias = SSLUtilBase.DEFAULT_KEY_ALIAS;
-            }
+            String alias = getServedAlias(certificate);
             X509Certificate[] chain = x509KeyManager.getCertificateChain(alias);
-            if (chain == null) {
-                alias = certificate.chooseServerAlias(x509KeyManager);
-                chain = x509KeyManager.getCertificateChain(alias);
-            }
             // Convert the in-memory key manager entry to native objects with
             // the shared loader (PKCS#8 key via d2i_AutoPrivateKey,
             // certificates via d2i_X509)
@@ -1375,25 +1367,20 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
     @Override
     public X509Certificate[] getCertificateChain(String alias) {
-        X509Certificate[] chain = null;
         X509KeyManager x509KeyManager = certificate.getCertificateKeyManager();
         if (x509KeyManager != null) {
-            if (alias == null) {
-                alias = SSLUtilBase.DEFAULT_KEY_ALIAS;
-            }
-            chain = x509KeyManager.getCertificateChain(alias);
-            if (chain == null) {
-                alias = certificate.chooseServerAlias(x509KeyManager);
-                chain = x509KeyManager.getCertificateChain(alias);
-            }
-        } else {
-            // No key manager (e.g. a PEM or PKCS#12 file configuration): read
-            // the chain from the configured source with the shared loader so
-            // the certificate data is available via JMX and for expiry checks
-            chain = CertificateLoader.getCertificateChain(certificate);
+            return x509KeyManager.getCertificateChain(alias);
         }
+        // No key manager (e.g. a PEM or PKCS#12 file configuration): read the chain from the configured source with
+        // the shared loader so the certificate data is available via JMX and for expiry checks
+        return CertificateLoader.getCertificateChain(certificate);
+    }
 
-        return chain;
+
+    @Override
+    public X509KeyManager[] getServerKeyManagers(SSLHostConfigCertificate certificate) {
+        X509KeyManager x509KeyManager = certificate.getCertificateKeyManager();
+        return x509KeyManager == null ? new X509KeyManager[0] : new X509KeyManager[] { x509KeyManager };
     }
 
     @Override
