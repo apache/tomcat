@@ -303,7 +303,18 @@ class AsyncStateMachine {
             asyncCtxt.decrementInProgressAsyncCount();
             return SocketState.ASYNC_END;
         } else if (state == AsyncState.MUST_DISPATCH) {
-            updateState(AsyncState.DISPATCHING);
+            if (processor.getErrorState().isIoAllowed()) {
+                updateState(AsyncState.DISPATCHING);
+                return SocketState.ASYNC_END;
+            }
+            // The connection is in an error state so the dispatch requested
+            // (e.g. by a call to dispatch() from AsyncListener.onError()) can no
+            // longer be performed. Complete the async processing here so that
+            // onComplete() is called and the in-progress async count is
+            // balanced, rather than leaving the request in MUST_DISPATCH.
+            asyncCtxt.fireOnComplete();
+            updateState(AsyncState.DISPATCHED);
+            asyncCtxt.decrementInProgressAsyncCount();
             return SocketState.ASYNC_END;
         } else if (state == AsyncState.DISPATCHING) {
             if (processor.getErrorState().isIoAllowed() && processor.flushBufferedWrite()) {
