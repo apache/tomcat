@@ -30,7 +30,7 @@ import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
 
-import org.apache.catalina.tribes.group.TribesSslContext;
+import org.apache.catalina.tribes.transport.TribesSslContext;
 
 public class TestTlsChannel {
 
