@@ -21,8 +21,8 @@ import java.sql.Connection;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Properties;
 import java.util.Set;
 
