@@ -1049,6 +1049,21 @@
         dump; the text reported for a connection that really is abandoned is
         unchanged. Pull request <pr>1048</pr> provided by sainadh777. (remm)
       </fix>
+      <fix>
+        <bug>59569</bug>: Unwrap a pooled connection through a driver whose
+        own connection is itself a wrapper around another driver's
+        connection: when the physical connection does not directly implement
+        the requested interface, <code>isWrapperFor()</code> and
+        <code>unwrap()</code> now delegate to it, so the vendor object behind
+        a wrapping driver - like the AWS JDBC wrapper over the PostgreSQL
+        driver - is reachable through the pooled connection. The pool's
+        <code>DataSource</code>, whose implementations of the two methods
+        always answered false and returned null, now recognises itself and
+        the configured <code>dataSource</code>, and reports a failed unwrap
+        as the <code>SQLException</code> that the <code>Wrapper</code>
+        contract requires. Pull request <pr>1077</pr> provided by Shayan
+        Davarzani. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
