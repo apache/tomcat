@@ -194,7 +194,7 @@ public abstract class SSLUtilBaseCertificateSelectionTestBase extends TomcatBase
 
 
     protected static KeyStore orderedKeystore(String malformedAlias, KeystoreEntry... entries) throws Exception {
-        return orderedKeystore(sunMSCAPIProvider(), "Windows-MY", true, malformedAlias, entries);
+        return orderedKeystore(sunMSCAPIProvider(), "Windows-MY", KeyMode.EXPORTABLE, malformedAlias, entries);
     }
 
 
@@ -205,7 +205,18 @@ public abstract class SSLUtilBaseCertificateSelectionTestBase extends TomcatBase
      * mock otherwise takes.
      */
     protected static KeyStore nonExportableKeystore(KeystoreEntry... entries) throws Exception {
-        return orderedKeystore(sunMSCAPIProvider(), "Windows-MY", false, null, entries);
+        return orderedKeystore(sunMSCAPIProvider(), "Windows-MY", KeyMode.NON_EXPORTABLE, null, entries);
+    }
+
+
+    /*
+     * As nonExportableKeystore(KeystoreEntry...) - the keys report a null format so the original key store is kept and
+     * each key manager is wrapped - but getEncoded() still returns the real key material, so OpenSSL can load it. This
+     * reaches the wrapped path (ksUsed == ks) for the OpenSSL implementations, where a lookup of the configured alias
+     * would otherwise resolve the wrong certificate.
+     */
+    protected static KeyStore wrappedExportableKeystore(KeystoreEntry... entries) throws Exception {
+        return orderedKeystore(sunMSCAPIProvider(), "Windows-MY", KeyMode.WRAPPED_EXPORTABLE, null, entries);
     }
 
 
@@ -213,7 +224,7 @@ public abstract class SSLUtilBaseCertificateSelectionTestBase extends TomcatBase
         return orderedKeystore(new Provider("SUN", "1.0", "test") {
             @Serial
             private static final long serialVersionUID = 4434321038151233913L;
-        }, "JKS", true, null, entries);
+        }, "JKS", KeyMode.EXPORTABLE, null, entries);
     }
 
 
@@ -225,7 +236,20 @@ public abstract class SSLUtilBaseCertificateSelectionTestBase extends TomcatBase
     }
 
 
-    protected static KeyStore orderedKeystore(Provider provider, String type, boolean exportableKeys,
+    /*
+     * How the mocked SunMSCAPI private keys present themselves, which selects the branch of
+     * SSLUtilBase.getKeyManagers() under test. EXPORTABLE keys report PKCS#8 (in-memory copy); NON_EXPORTABLE and
+     * WRAPPED_EXPORTABLE report a null format (original key store kept, key managers wrapped). WRAPPED_EXPORTABLE
+     * additionally exposes the key encoding so the OpenSSL implementations can load it.
+     */
+    protected enum KeyMode {
+        EXPORTABLE,
+        NON_EXPORTABLE,
+        WRAPPED_EXPORTABLE
+    }
+
+
+    protected static KeyStore orderedKeystore(Provider provider, String type, KeyMode keyMode,
             String malformedAlias, KeystoreEntry... entries) throws Exception {
         File file = TesterKeystoreGenerator.generateKeystore(List.of(entries));
         KeyStore delegate = KeyStore.getInstance(file, TesterSupport.JKS_PASS.toCharArray());
@@ -251,13 +275,18 @@ public abstract class SSLUtilBaseCertificateSelectionTestBase extends TomcatBase
                 .andStubAnswer(() -> delegate.getCertificateChain(EasyMock.getCurrentArgument(0)));
         EasyMock.expect(spi.engineGetKey(EasyMock.anyString(), EasyMock.anyObject(char[].class))).andStubAnswer(() -> {
             Key key = delegate.getKey(EasyMock.getCurrentArgument(0), EasyMock.getCurrentArgument(1));
-            return exportableKeys ? key : nonExportableView(key);
+            return switch (keyMode) {
+                case EXPORTABLE -> key;
+                case NON_EXPORTABLE -> nonExportableView(key);
+                case WRAPPED_EXPORTABLE -> wrappedExportableView(key);
+            };
         });
         EasyMock.replay(spi);
-        // A real JKS backs the mock. With exportableKeys the keys report PKCS#8, so getKeyManagers() takes its
-        // in-memory-copy branch; with exportableKeys == false they report a null format (see nonExportableView), so it
-        // takes SunMSCAPI's non-exportable-key path instead. The provider name and store type are overridden only so
-        // isSunMSCAPIWindowsMY() can be exercised off Windows.
+        // A real JKS backs the mock. EXPORTABLE keys report PKCS#8, so getKeyManagers() takes its in-memory-copy
+        // branch; NON_EXPORTABLE and WRAPPED_EXPORTABLE keys report a null format (see nonExportableView /
+        // wrappedExportableView), so it keeps the original key store and wraps each key manager - WRAPPED_EXPORTABLE
+        // still exposes the key encoding so OpenSSL can load it. The provider name and store type are overridden only
+        // so isSunMSCAPIWindowsMY() can be exercised off Windows.
         KeyStore result = new KeyStore(spi, provider, type) { };
         result.load(null, null);
         return result;
@@ -290,6 +319,36 @@ public abstract class SSLUtilBaseCertificateSelectionTestBase extends TomcatBase
             @Override
             public byte[] getEncoded() {
                 return null;
+            }
+        };
+    }
+
+
+    /*
+     * As nonExportableView(Key) but getEncoded() returns the real key material, modeling a SunMSCAPI key that keeps
+     * the original key store in use (null format) yet can still be exported into OpenSSL.
+     */
+    private static Key wrappedExportableView(Key key) {
+        if (!(key instanceof PrivateKey privateKey)) {
+            return key;
+        }
+        return new PrivateKey() {
+            @Serial
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public String getAlgorithm() {
+                return privateKey.getAlgorithm();
+            }
+
+            @Override
+            public String getFormat() {
+                return null;
+            }
+
+            @Override
+            public byte[] getEncoded() {
+                return privateKey.getEncoded();
             }
         };
     }

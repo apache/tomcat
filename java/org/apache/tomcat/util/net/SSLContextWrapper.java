@@ -80,6 +80,12 @@ class SSLContextWrapper implements SSLContext {
         return keyManager.getCertificateChain(alias);
     }
 
+
+    @Override
+    public X509KeyManager[] getServerKeyManagers(SSLHostConfigCertificate certificate) {
+        return new X509KeyManager[] { keyManager };
+    }
+
     @Override
     public X509Certificate[] getAcceptedIssuers() {
         return trustManager.getAcceptedIssuers();
