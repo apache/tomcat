@@ -243,6 +243,185 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
         Assertions.assertTrue(target.isEnabled());
     }
 
+    /*
+     * An address that carries no content is a value the factory cannot
+     * convert, not a value to fabricate: Boolean.valueOf(null or "") is
+     * false and InetAddress.getByName(null or "") is the loopback address,
+     * so both conversions silently produce something the configuration
+     * never asked for. Like the numeric conversions, which throw on null
+     * and empty content, these must leave the setter uninvoked and report
+     * the property as not applied.
+     */
+
+    @Test
+    void missingContentIsNotAppliedAsBooleanOrLoopback() throws Exception {
+        Logger logger = Logger.getLogger(
+                GenericNamingResourcesFactory.class.getName());
+        Level originalLevel = logger.getLevel();
+        final List<LogRecord> records = new ArrayList<>();
+        Handler handler = new Handler() {
+            @Override
+            public void publish(LogRecord record) {
+                records.add(record);
+            }
+            @Override
+            public void flush() {
+                // no buffering
+            }
+            @Override
+            public void close() {
+                // nothing to release
+            }
+        };
+        logger.addHandler(handler);
+        logger.setLevel(Level.FINEST);
+        try {
+            Reference ref = new Reference(ConvertedTarget.class.getName(),
+                    null, null);
+            // pre-fix these set enabled, checked, flag and marker to false
+            // and addr and host to the loopback address, reported as a
+            // successful set
+            ref.add(new StringRefAddr("enabled", null));
+            ref.add(new StringRefAddr("checked", ""));
+            // the boxed java.lang.Boolean conversion takes the same branch
+            ref.add(new StringRefAddr("flag", null));
+            ref.add(new StringRefAddr("marker", ""));
+            ref.add(new StringRefAddr("addr", null));
+            ref.add(new StringRefAddr("host", ""));
+
+            Object result = new GenericNamingResourcesFactory()
+                    .getObjectInstance(
+                            ref, new CompositeName("test/converted"),
+                            null, null);
+            Assertions.assertInstanceOf(ConvertedTarget.class, result);
+            ConvertedTarget target = (ConvertedTarget) result;
+            for (String property : new String[] { "enabled", "checked",
+                    "flag", "marker", "addr", "host" }) {
+                Assertions.assertFalse(target.isInvoked(property),
+                        "the setter for [" + property + "] must not be "
+                                + "invoked with a value fabricated from "
+                                + "missing content");
+            }
+            Assertions.assertFalse(target.isEnabled());
+            Assertions.assertFalse(target.isChecked());
+            Assertions.assertNull(target.getFlag(),
+                    "the default must survive an address with no content");
+            Assertions.assertNull(target.getMarker(),
+                    "the default must survive an address with no content");
+            Assertions.assertNull(target.getAddr(),
+                    "the default must survive an address with no content");
+            Assertions.assertNull(target.getHost(),
+                    "the default must survive an address with no content");
+        } finally {
+            logger.removeHandler(handler);
+            logger.setLevel(originalLevel);
+        }
+        for (String property : new String[] { "enabled", "checked",
+                "flag", "marker", "addr", "host" }) {
+            boolean warned = false;
+            for (LogRecord record : records) {
+                if (record.getLevel().intValue() >= Level.WARNING.intValue()
+                        && record.getMessage() != null
+                        && record.getMessage().contains("[" + property + "]")) {
+                    warned = true;
+                    break;
+                }
+            }
+            Assertions.assertTrue(warned, "failure to apply property ["
+                    + property
+                    + "] must be reported at warn level or above");
+        }
+    }
+
+    @Test
+    void booleanAndInetAddressContentStillApplies() throws Exception {
+        Reference ref = new Reference(ConvertedTarget.class.getName(),
+                null, null);
+        ref.add(new StringRefAddr("enabled", "true"));
+        // an explicit "false" is content and must still be applied
+        ref.add(new StringRefAddr("checked", "false"));
+        // the boxed java.lang.Boolean conversion takes the same branch
+        ref.add(new StringRefAddr("flag", "true"));
+        ref.add(new StringRefAddr("marker", "false"));
+        ref.add(new StringRefAddr("addr", "127.0.0.1"));
+        ref.add(new StringRefAddr("host", "192.0.2.1"));
+
+        Object result = new GenericNamingResourcesFactory().getObjectInstance(
+                ref, new CompositeName("test/convertedok"), null, null);
+        Assertions.assertInstanceOf(ConvertedTarget.class, result);
+        ConvertedTarget target = (ConvertedTarget) result;
+        Assertions.assertTrue(target.isEnabled());
+        Assertions.assertTrue(target.isInvoked("checked"),
+                "\"false\" is configured content, not missing content");
+        Assertions.assertFalse(target.isChecked());
+        Assertions.assertEquals(Boolean.TRUE, target.getFlag(),
+                "explicit content must be applied through the boxed setter");
+        Assertions.assertEquals(Boolean.FALSE, target.getMarker(),
+                "explicit content must be applied through the boxed setter");
+        Assertions.assertEquals(java.net.InetAddress.getByName("127.0.0.1"),
+                target.getAddr());
+        Assertions.assertEquals(java.net.InetAddress.getByName("192.0.2.1"),
+                target.getHost());
+    }
+
+    /** Target with primitive and boxed boolean and InetAddress setters. */
+    public static class ConvertedTarget {
+        private final java.util.Set<String> invoked =
+                new java.util.HashSet<>();
+        private boolean enabled;
+        private boolean checked;
+        private Boolean flag;
+        private Boolean marker;
+        private java.net.InetAddress addr;
+        private java.net.InetAddress host;
+
+        public boolean isInvoked(String name) {
+            return invoked.contains(name);
+        }
+        public boolean isEnabled() {
+            return enabled;
+        }
+        public void setEnabled(boolean enabled) {
+            invoked.add("enabled");
+            this.enabled = enabled;
+        }
+        public boolean isChecked() {
+            return checked;
+        }
+        public void setChecked(boolean checked) {
+            invoked.add("checked");
+            this.checked = checked;
+        }
+        public Boolean getFlag() {
+            return flag;
+        }
+        public void setFlag(Boolean flag) {
+            invoked.add("flag");
+            this.flag = flag;
+        }
+        public Boolean getMarker() {
+            return marker;
+        }
+        public void setMarker(Boolean marker) {
+            invoked.add("marker");
+            this.marker = marker;
+        }
+        public java.net.InetAddress getAddr() {
+            return addr;
+        }
+        public void setAddr(java.net.InetAddress addr) {
+            invoked.add("addr");
+            this.addr = addr;
+        }
+        public java.net.InetAddress getHost() {
+            return host;
+        }
+        public void setHost(java.net.InetAddress host) {
+            invoked.add("host");
+            this.host = host;
+        }
+    }
+
     @Test
     void unsupportedSetterTypeIsNotInvokedWithNull() throws Exception {
         Reference ref = new Reference(UnsupportedTypeTarget.class.getName(),

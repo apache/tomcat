@@ -187,17 +187,33 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
                         // Try a setFoo ( boolean )
                     } else if ("java.lang.Boolean".equals(paramType.getName()) ||
                             "boolean".equals(paramType.getName())) {
-                        params[0] = Boolean.valueOf(value);
+                        // Boolean.valueOf() reports everything it does not
+                        // recognise, missing content included, as false.
+                        // Missing content is not a configured value: let the
+                        // caller report the property as not applied.
+                        if (value == null || value.isEmpty()) {
+                            ok = false;
+                        } else {
+                            params[0] = Boolean.valueOf(value);
+                        }
 
                         // Try a setFoo ( InetAddress )
                     } else if ("java.net.InetAddress".equals(paramType.getName())) {
-                        try {
-                            params[0] = InetAddress.getByName(value);
-                        } catch (UnknownHostException exc) {
-                            if (log.isDebugEnabled()) {
-                                log.debug("IntrospectionUtils: Unable to resolve host name:" + value);
-                            }
+                        // getByName() documents null and empty content as the
+                        // loopback address instead of failing, and a missing
+                        // host is not a request for loopback: do not invoke
+                        // the setter with a fabricated address.
+                        if (value == null || value.isEmpty()) {
                             ok = false;
+                        } else {
+                            try {
+                                params[0] = InetAddress.getByName(value);
+                            } catch (UnknownHostException exc) {
+                                if (log.isDebugEnabled()) {
+                                    log.debug("IntrospectionUtils: Unable to resolve host name:" + value);
+                                }
+                                ok = false;
+                            }
                         }
 
                         // Unknown type
