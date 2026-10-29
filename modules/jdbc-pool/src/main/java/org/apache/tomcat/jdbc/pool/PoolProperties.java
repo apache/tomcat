@@ -424,13 +424,32 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     }
 
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The string is parsed on first use and the result cached. The check,
+     * the parse and the publish run inside this one synchronized method, under
+     * the same lock {@link #setJdbcInterceptors(String)} takes to clear the
+     * cache: a parse that read the previous value of the string can therefore
+     * never store its result back after a reconfiguration cleared it, which is
+     * what would leave every later caller on the discarded interceptor chain
+     * for good. The string is read once into a local so the parse works on a
+     * single snapshot. A malformed value throws before the cache is written, so
+     * a later call parses the then-current value again. The lock is never held
+     * over interceptor class loading: an {@link InterceptorDefinition} parsed
+     * from the string only keeps the class name, and those classes are loaded
+     * later by the pool, outside this lock.</p>
+     */
     @Override
-    public InterceptorDefinition[] getJdbcInterceptorsAsArray() {
+    public synchronized InterceptorDefinition[] getJdbcInterceptorsAsArray() {
         if (interceptors == null) {
-            if (jdbcInterceptors == null) {
+            // One read of the reconfigurable string: the parse below must see
+            // a single value, not a fresh read per use.
+            String interceptorList = jdbcInterceptors;
+            if (interceptorList == null) {
                 interceptors = new InterceptorDefinition[0];
             } else {
-                String[] interceptorValues = jdbcInterceptors.split(";");
+                String[] interceptorValues = interceptorList.split(";");
                 InterceptorDefinition[] definitions = new InterceptorDefinition[interceptorValues.length + 1];
                 // Always add the trap interceptor to the mix
                 definitions[0] = new InterceptorDefinition(TrapException.class);
@@ -729,8 +748,18 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     }
 
 
+    /**
+     * Stores the interceptor configuration string and drops the parsed cache
+     * so the next {@link #getJdbcInterceptorsAsArray()} re-parses the new
+     * value. The clear runs under the same lock the parse publishes under, so
+     * a parse that started from the previous value of the string can never
+     * store its result back after this clear.
+     *
+     * @param jdbcInterceptors the semicolon separated interceptor configuration,
+     *                         may be {@code null} to use none
+     */
     @Override
-    public void setJdbcInterceptors(String jdbcInterceptors) {
+    public synchronized void setJdbcInterceptors(String jdbcInterceptors) {
         this.jdbcInterceptors = jdbcInterceptors;
         this.interceptors = null;
     }
