@@ -19,6 +19,8 @@ package org.apache.tomcat.jdbc.pool;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -70,6 +72,20 @@ public class ConnectionPool {
      * Logger
      */
     private static final Log log = LogFactory.getLog(ConnectionPool.class);
+
+    /**
+     * The JDBC 4.3 <code>beginRequest()</code> hint, looked up by reflection
+     * because this module compiles against Java 8, whose
+     * {@link java.sql.Connection} does not declare it; on a runtime that
+     * predates JDBC 4.3 the lookup yields null and the hint is not sent.
+     */
+    private static final Method BEGIN_REQUEST = getRequestHintMethod("beginRequest");
+
+    /**
+     * The counterpart of {@link #BEGIN_REQUEST}, sent when the application
+     * returns the connection to the pool.
+     */
+    private static final Method END_REQUEST = getRequestHintMethod("endRequest");
 
     //===============================================================================
     //         INSTANCE/QUICK ACCESS VARIABLE
@@ -380,8 +396,16 @@ public class ConnectionPool {
             // for the next borrower. (The useDisposableConnectionFacade
             // property that used to switch this off is deprecated and no
             // longer has any effect.)
-            return (Connection)proxyConstructor.newInstance(
+            Connection connection = (Connection)proxyConstructor.newInstance(
                     new Object[] { new DisposableConnectionFacade(handler) });
+            //The handle exists and the borrow is about to start: send the
+            //JDBC 4.3 hint that opens the request, so a driver that
+            //optimises per-request session handling knows the unit of work
+            //begins here. The matching endRequest() is sent at the return,
+            //in returnConnection().
+            invokeRequestHint(BEGIN_REQUEST, con.getConnection());
+            //return the connection
+            return connection;
         }catch (Exception x) {
             SQLException s = new SQLException();
             s.initCause(x);
@@ -406,6 +430,48 @@ public class ConnectionPool {
             returnConnection(con);
         }catch(Exception y) {
             cause.addSuppressed(y);
+        }
+    }
+
+    /**
+     * Looks up one of the JDBC 4.3 request boundary hint methods on
+     * {@link java.sql.Connection} by name, as they are absent from the
+     * Java 8 API this module compiles against.
+     * @param methodName the name of the hint method
+     * @return the method, or <code>null</code> on a runtime that predates
+     *         JDBC 4.3
+     */
+    private static Method getRequestHintMethod(String methodName) {
+        try {
+            return Connection.class.getMethod(methodName);
+        } catch (NoSuchMethodException x) {
+            //Java 8 and earlier: there are no request boundary hints to send
+            return null;
+        }
+    }
+
+    /**
+     * Sends one of the JDBC 4.3 request boundary hints to a physical
+     * connection. The hint is advisory - the specification lets the driver
+     * treat it as a no-op - so a driver that refuses one does not fail the
+     * borrow or the return around it; the refusal is logged with the
+     * driver's own cause.
+     * @param hint one of the hint methods, or <code>null</code> when
+     *            running where they do not exist
+     * @param connection the physical connection to hint
+     */
+    private static void invokeRequestHint(Method hint, Connection connection) {
+        if (hint == null) {
+            return;
+        }
+        try {
+            hint.invoke(connection);
+        } catch (InvocationTargetException x) {
+            log.warn("The request boundary hint [" + hint.getName() +
+                    "] was refused by the driver", x.getTargetException());
+        } catch (ReflectiveOperationException | IllegalArgumentException x) {
+            log.warn("Unable to send the request boundary hint [" +
+                    hint.getName() + "]", x);
         }
     }
 
@@ -1197,6 +1263,12 @@ public class ConnectionPool {
                         con.clearWarnings();
                         con.setStackTrace(null);
                         con.setTimestamp(System.currentTimeMillis());
+                        //The application is done with the connection: close
+                        //the JDBC 4.3 request that beginRequest() opened in
+                        //setupConnection(). A connection discarded instead
+                        //of going back to the pool is not hinted; it is
+                        //about to be closed, which subsumes the hint.
+                        invokeRequestHint(END_REQUEST, con.getConnection());
                         if (((idle.size()>=poolProperties.getMaxIdle()) && !poolProperties.isPoolSweeperEnabled()) || (!idle.offer(con))) {
                             if (log.isDebugEnabled()) {
                                 log.debug("Connection ["+con+"] will be closed and not returned to the pool, idle["+idle.size()+"]>=maxIdle["+poolProperties.getMaxIdle()+"] idle.offer failed.");
