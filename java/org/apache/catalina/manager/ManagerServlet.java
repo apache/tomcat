@@ -1692,7 +1692,8 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                         if (sslContext == null) {
                             certList.add(smClient.getString("managerServlet.certsNotLoaded"));
                         } else {
-                            X509Certificate[] certs = sslContext.getCertificateChain(sslHostConfigCert);
+                            X509Certificate[] certs = sslContext.getCertificateChain(
+                                    sslContext.getServedAlias(sslHostConfigCert));
                             if (certs == null) {
                                 certList.add(smClient.getString("managerServlet.certsNotAvailable"));
                             } else {
