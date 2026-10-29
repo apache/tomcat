@@ -1092,6 +1092,9 @@
         Avoid re-evaluation of command-line arguments in tool-wrapper.sh.
         (schultz)
       </update>
+      <update>
+        Update Tomcat Native to 2.0.17. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
