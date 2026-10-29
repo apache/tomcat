@@ -33,14 +33,17 @@ import org.junit.jupiter.api.Test;
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 
 /**
- * Closing a data source must be serialized against pool creation and must
- * be terminal. Unsynchronized, a {@code close()} racing the first
- * {@code getConnection()} observed {@code pool == null}, returned without
- * closing anything, and the concurrently created pool was published
+ * Closing a data source must be serialized against the publication of its
+ * pool and must be terminal. Unsynchronized, a {@code close()} racing the
+ * first {@code getConnection()} observed {@code pool == null}, returned
+ * without closing anything, and the concurrently created pool was published
  * afterwards - live, unclosed, with its database sessions and scheduled
- * cleaner no longer reachable through the closed data source. Likewise,
- * any later borrow or statistics access silently resurrected a fresh pool
- * on a data source its owner had already stopped tracking.
+ * cleaner no longer reachable through the closed data source. Likewise, any
+ * later borrow or statistics access silently resurrected a fresh pool on a
+ * data source its owner had already stopped tracking. The construction
+ * itself runs outside the monitor the close takes, so the close is never
+ * parked behind a driver connect: a creation already in flight observes the
+ * closure at its publication step and tears its result down itself.
  */
 class TestCloseVsPoolCreation extends JdbcPoolBaseTest {
 
@@ -104,12 +107,12 @@ class TestCloseVsPoolCreation extends JdbcPoolBaseTest {
         ds.getPoolProperties().setInitialSize(1);
 
         AtomicReference<Connection> borrowed = new AtomicReference<>();
+        AtomicReference<SQLException> borrowFailure = new AtomicReference<>();
         Thread creator = new Thread(() -> {
             try {
                 borrowed.set(ds.getConnection());
             } catch (SQLException e) {
-                // Rejected by the pool-level closed guard - expected when
-                // the close wins the race; see TestCloseDuringBorrow
+                borrowFailure.set(e);
             }
         }, "creator racing close");
         creator.setDaemon(true);
@@ -119,12 +122,13 @@ class TestCloseVsPoolCreation extends JdbcPoolBaseTest {
                     .await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
                     "pool creation must be parked inside the driver's connect()");
 
-            // close() while the pool is still being created: it must not
-            // observe the not-yet-published pool as "nothing to close" and
-            // return - it has to wait for the creation and then tear it
-            // down. (Whether the close also wins against a merely
-            // unscheduled creator is not what this asserts; the session
-            // and resurrection assertions below carry the regression.)
+            // close() while the pool is still being created: the close must
+            // not be parked behind the driver's connect() the creation is
+            // blocked in - the construction runs outside the monitor the
+            // close takes - and the still-unpublished pool must not be lost
+            // either: whichever of the two reaches the monitor first owns
+            // the teardown, so the pool the parked creation later finishes
+            // is closed by that creation itself when it finds the closure.
             AtomicReference<Throwable> closeFailure = new AtomicReference<>();
             Thread closer = new Thread(() -> {
                 try {
@@ -136,22 +140,32 @@ class TestCloseVsPoolCreation extends JdbcPoolBaseTest {
             closer.setDaemon(true);
             closer.start();
 
-            closer.join(500);
-            Assertions.assertTrue(closer.isAlive(),
-                    "close() must wait for the in-flight pool creation instead of"
-                            + " returning while the pool is still unpublished");
+            closer.join(AWAIT_TIMEOUT_MS);
+            Assertions.assertFalse(closer.isAlive(),
+                    "close() must not block behind the in-flight pool creation:"
+                            + " parking it on the driver's connect() against a hung"
+                            + " database would park the shutdown forever");
+            Assertions.assertNull(closeFailure.get(), "close() must not fail");
 
             ParkingConnectDriver.CONNECT_RELEASE.countDown();
-            closer.join(AWAIT_TIMEOUT_MS);
             creator.join(AWAIT_TIMEOUT_MS);
             Assertions.assertFalse(creator.isAlive(),
                     "the creating thread must not outlive the test");
-            Assertions.assertNull(closeFailure.get(), "close() must not fail");
 
             if (borrowed.get() != null) {
-                // The borrow won the race against the closure by a hair; the
-                // connection must be releasable so the closed pool drains it.
+                // The borrow published before the closure and won the race
+                // by a hair; the connection must be releasable so the closed
+                // pool drains it.
                 borrowed.get().close();
+            } else {
+                // The closure won: the creation must have been rejected, and
+                // told so as a closed data source, not left to hang.
+                Assertions.assertNotNull(borrowFailure.get(),
+                        "the losing creation must have been rejected");
+                Assertions.assertTrue(borrowFailure.get().getMessage() != null
+                                && borrowFailure.get().getMessage().contains("closed"),
+                        "the rejection must say the data source is closed, was: "
+                                + borrowFailure.get().getMessage());
             }
             // With the leak, this pool would still own its session: the close
             // ran against a null field and the published pool was never closed.
@@ -170,9 +184,11 @@ class TestCloseVsPoolCreation extends JdbcPoolBaseTest {
             Assertions.assertEquals(0, poolSessions(),
                     "no database session may exist after the close");
         } finally {
-            // Never leave the creator parked inside connect(): it holds
-            // the data source monitor there, so the base class teardown
-            // (ds.close()) would block forever and hang the suite.
+            // Release and reap the parked creation even on a red run. It no
+            // longer holds the data source monitor inside connect(), so the
+            // base class teardown (ds.close()) cannot be blocked by it, but
+            // it must not linger past the test still owning a half-built
+            // pool whose connect() then completes and publishes nothing.
             ParkingConnectDriver.CONNECT_RELEASE.countDown();
             creator.join(AWAIT_TIMEOUT_MS);
         }
