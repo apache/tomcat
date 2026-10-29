@@ -458,8 +458,12 @@ public class PooledConnection implements PooledConnectionMBean {
             if (log.isDebugEnabled()) {
                 log.debug("Unable to connect to database.", x);
             }
-            if (parent.jmxPool != null) {
-                parent.jmxPool.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.NOTIFY_CONNECT,
+            // Read the pool's JMX object only once: close() gives it up
+            // concurrently, and a second read can observe the null the first
+            // one did not
+            org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = parent.getJmxPool();
+            if (jmx != null) {
+                jmx.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.NOTIFY_CONNECT,
                         ConnectionPool.getStackTrace(x));
             }
             if (x instanceof SQLException) {
@@ -1090,14 +1094,20 @@ public class PooledConnection implements PooledConnectionMBean {
     }
 
     /**
-     * Creates and registers an MBean for this pooled connection with JMX.
+     * Creates and registers an MBean for this pooled connection with JMX. The pool's own MBean is the registration
+     * base; once close() has given it up - which a borrow can race - there is no base to register under, and the
+     * registration is skipped.
      */
     public void createMBean() {
         if (oname != null) {
             return;
         }
+        org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = parent.getJmxPool();
+        if (jmx == null) {
+            return;
+        }
         String keyprop = ",connections=PooledConnection[" + connectionIndex.getAndIncrement() + "]";
-        oname = JmxUtil.registerJmx(parent.getJmxPool().getObjectName(), keyprop, this);
+        oname = JmxUtil.registerJmx(jmx.getObjectName(), keyprop, this);
     }
 
     /**

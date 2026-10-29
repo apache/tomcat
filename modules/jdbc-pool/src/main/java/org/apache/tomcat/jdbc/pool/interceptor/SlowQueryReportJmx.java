@@ -311,8 +311,13 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
             long sequence = notifySequence.incrementAndGet();
 
             if (isNotifyPool()) {
-                if (this.pool != null && this.pool.getJmxPool() != null) {
-                    this.pool.getJmxPool().notify(type, query);
+                // Read the pool and its JMX object each only once: close()
+                // gives the JMX object up concurrently, and a second read can
+                // observe the null the first one did not
+                ConnectionPool p = this.pool;
+                org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = p == null ? null : p.getJmxPool();
+                if (jmx != null) {
+                    jmx.notify(type, query);
                 }
             } else {
                 NotificationBroadcasterSupport target = getNotifier();
