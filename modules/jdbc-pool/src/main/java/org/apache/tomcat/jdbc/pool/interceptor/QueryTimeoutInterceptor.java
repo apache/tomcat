@@ -28,18 +28,14 @@ import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
 /**
  * Interceptor that sets a query timeout on every created {@link Statement}.
  * <p>
- * The timeout is applied by the {@code createStatement} hook, which only runs
- * for statement-creation calls that pass through this interceptor. When
- * combined with {@link StatementCache}, this interceptor must therefore be
- * listed <em>before</em> {@code StatementCache} in the
- * {@link org.apache.tomcat.jdbc.pool.PoolConfiguration#setJdbcInterceptors(String)
- * jdbcInterceptors} configuration. A statement cache hit is served by the
- * cache without invoking the rest of the chain, and a statement recycled into
- * the cache has its query timeout reset to zero, so an interceptor listed
- * after the cache never sees the reuse and the cached statement executes with
- * no timeout. Listed before the cache, the hook runs for every creation
- * request, including the ones the cache serves, and the timeout is re-applied
- * to the reused statement.
+ * The timeout is applied by the {@code createStatement} hook, which only runs for statement-creation calls that pass
+ * through this interceptor. When combined with {@link StatementCache}, this interceptor must therefore be listed
+ * <em>before</em> {@code StatementCache} in the
+ * {@link org.apache.tomcat.jdbc.pool.PoolConfiguration#setJdbcInterceptors(String) jdbcInterceptors} configuration. A
+ * statement cache hit is served by the cache without invoking the rest of the chain, and a statement recycled into the
+ * cache has its query timeout reset to zero, so an interceptor listed after the cache never sees the reuse and the
+ * cached statement executes with no timeout. Listed before the cache, the hook runs for every creation request,
+ * including the ones the cache serves, and the timeout is re-applied to the reused statement.
  */
 public class QueryTimeoutInterceptor extends AbstractCreateStatementInterceptor {
     private static final Log log = LogFactory.getLog(QueryTimeoutInterceptor.class);
@@ -62,10 +58,10 @@ public class QueryTimeoutInterceptor extends AbstractCreateStatementInterceptor 
      * @param properties map of interceptor properties
      */
     @Override
-    public void setProperties(Map<String,InterceptorProperty> properties) {
+    public void setProperties(Map<String, InterceptorProperty> properties) {
         super.setProperties(properties);
         InterceptorProperty p = properties.get("queryTimeout");
-        if (p!=null) {
+        if (p != null) {
             timeout = p.getValueAsInt(timeout);
         }
     }
@@ -78,16 +74,17 @@ public class QueryTimeoutInterceptor extends AbstractCreateStatementInterceptor 
      * @param args      the arguments to the method
      * @param statement the statement that the underlying connection created
      * @param time      elapsed time in milliseconds
+     *
      * @return the (possibly wrapped) statement object
      */
     @Override
     public Object createStatement(Object proxy, Method method, Object[] args, Object statement, long time) {
         if (statement instanceof Statement && timeout > 0) {
-            Statement s = (Statement)statement;
+            Statement s = (Statement) statement;
             try {
                 s.setQueryTimeout(timeout);
-            }catch (SQLException x) {
-                log.warn("[QueryTimeoutInterceptor] Unable to set query timeout:"+x.getMessage(),x);
+            } catch (SQLException x) {
+                log.warn("[QueryTimeoutInterceptor] Unable to set query timeout:" + x.getMessage(), x);
             }
         }
         return statement;

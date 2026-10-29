@@ -40,7 +40,7 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
     /**
      * Method name for executeQuery.
      */
-    protected static final String EXECUTE_QUERY  = "executeQuery";
+    protected static final String EXECUTE_QUERY = "executeQuery";
     /**
      * Method name for getGeneratedKeys.
      */
@@ -48,12 +48,12 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
     /**
      * Method name for getResultSet.
      */
-    protected static final String GET_RESULTSET  = "getResultSet";
+    protected static final String GET_RESULTSET = "getResultSet";
 
     /**
      * Method names that return a ResultSet.
      */
-    protected static final String[] RESULTSET_TYPES = {EXECUTE_QUERY, GET_GENERATED_KEYS, GET_RESULTSET};
+    protected static final String[] RESULTSET_TYPES = { EXECUTE_QUERY, GET_GENERATED_KEYS, GET_RESULTSET };
 
     /**
      * Default constructor.
@@ -68,18 +68,19 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
 
     @Override
     public void closeInvoked() {
-        // nothing to do
+        // Nothing to do
     }
 
     /*
-     * Neither the class nor the constructor are exposed outside of jdbc-pool.
-     * Given the comments in the jdbc-pool code regarding caching for
-     * performance, continue to use Proxy.getProxyClass(). This will need to be
-     * revisited if that method is marked for removal.
+     * Neither the class nor the constructor are exposed outside of jdbc-pool. Given the comments in the jdbc-pool code
+     * regarding caching for performance, continue to use Proxy.getProxyClass(). This will need to be revisited if that
+     * method is marked for removal.
      */
     /**
      * Gets the constructor for creating ResultSet proxies.
+     *
      * @return the ResultSet proxy constructor
+     *
      * @throws NoSuchMethodException if the constructor is not found
      */
     @SuppressWarnings("deprecation")
@@ -107,13 +108,13 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
             } else if (compare(PREPARE_STATEMENT, name)) {
                 // prepareStatement
                 constructor = getConstructor(PREPARE_STATEMENT_IDX, PreparedStatement.class);
-                sql = (String)args[0];
+                sql = (String) args[0];
             } else if (compare(PREPARE_CALL, name)) {
                 // prepareCall
                 constructor = getConstructor(PREPARE_CALL_IDX, CallableStatement.class);
-                sql = (String)args[0];
+                sql = (String) args[0];
             } else {
-                // do nothing, might be a future unsupported method
+                // Do nothing, might be a future unsupported method
                 // so we better bail out and let the system continue
                 return statement;
             }
@@ -133,26 +134,24 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
     /**
      * Creates a proxy for a Statement.
      *
-     * @param proxy         The proxy object on which the method that triggered
-     *                          the creation of the statement was called.
-     * @param method        The method that was called on the proxy
-     * @param args          The arguments passed as part of the method call to
-     *                          the proxy
-     * @param statement     The statement object that is to be proxied
-     * @param constructor   The constructor for the desired proxy
-     * @param sql           The sql of of the statement
+     * @param proxy       The proxy object on which the method that triggered the creation of the statement was called.
+     * @param method      The method that was called on the proxy
+     * @param args        The arguments passed as part of the method call to the proxy
+     * @param statement   The statement object that is to be proxied
+     * @param constructor The constructor for the desired proxy
+     * @param sql         The sql of of the statement
      *
-     * @return  A new proxy for the Statement
-     * @throws InstantiationException Couldn't instantiate object
-     * @throws IllegalAccessException Inaccessible constructor
+     * @return A new proxy for the Statement
+     *
+     * @throws InstantiationException    Couldn't instantiate object
+     * @throws IllegalAccessException    Inaccessible constructor
      * @throws InvocationTargetException Exception thrown from constructor
      */
-    protected Object createDecorator(Object proxy, Method method, Object[] args,
-                                     Object statement, Constructor<?> constructor, String sql)
-        throws InstantiationException, IllegalAccessException, InvocationTargetException {
+    protected Object createDecorator(Object proxy, Method method, Object[] args, Object statement,
+            Constructor<?> constructor, String sql)
+            throws InstantiationException, IllegalAccessException, InvocationTargetException {
         Object result = null;
-        StatementProxy<Statement> statementProxy =
-                new StatementProxy<>((Statement)statement,sql);
+        StatementProxy<Statement> statementProxy = new StatementProxy<>((Statement) statement, sql);
         result = constructor.newInstance(new Object[] { statementProxy });
         statementProxy.setActualProxy(result);
         statementProxy.setConnection(proxy);
@@ -162,7 +161,9 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
 
     /**
      * Checks if the given method name is executeQuery.
+     *
      * @param methodName the method name to check
+     *
      * @return true if the method is executeQuery
      */
     protected boolean isExecuteQuery(String methodName) {
@@ -171,7 +172,9 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
 
     /**
      * Checks if the given method is executeQuery.
+     *
      * @param method the method to check
+     *
      * @return true if the method is executeQuery
      */
     protected boolean isExecuteQuery(Method method) {
@@ -180,8 +183,10 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
 
     /**
      * Checks if the given method returns a ResultSet.
-     * @param method the method to check
+     *
+     * @param method  the method to check
      * @param process whether processing is already enabled
+     *
      * @return true if the method returns a ResultSet
      */
     protected boolean isResultSet(Method method, boolean process) {
@@ -205,14 +210,11 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
         protected T delegate;
         private Object actualProxy;
         /**
-         * The connection handle of the borrow during which this proxy was
-         * created, bound through {@link #setConnection(Object)}. It is a
-         * creation-time snapshot, not a live view: once that borrow is
-         * returned the handle answers nothing. A component that lets a
-         * statement proxy outlive its borrow - {@link StatementCache}
-         * recycling a parked statement, for instance - must therefore
-         * re-bind the handle to the new borrower before handing the proxy
-         * out; see {@link StatementCache#invoke(Object, Method, Object[])}.
+         * The connection handle of the borrow during which this proxy was created, bound through
+         * {@link #setConnection(Object)}. It is a creation-time snapshot, not a live view: once that borrow is returned
+         * the handle answers nothing. A component that lets a statement proxy outlive its borrow -
+         * {@link StatementCache} recycling a parked statement, for instance - must therefore re-bind the handle to the
+         * new borrower before handing the proxy out; see {@link StatementCache#invoke(Object, Method, Object[])}.
          */
         private Object connection;
         private String sql;
@@ -220,15 +222,18 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
 
         /**
          * Constructs a StatementProxy.
+         *
          * @param delegate the statement to delegate to
-         * @param sql the SQL text
+         * @param sql      the SQL text
          */
         public StatementProxy(T delegate, String sql) {
             this.delegate = delegate;
             this.sql = sql;
         }
+
         /**
          * Returns the delegated statement.
+         *
          * @return the delegated statement
          */
         public T getDelegate() {
@@ -237,6 +242,7 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
 
         /**
          * Returns the SQL text.
+         *
          * @return the SQL text
          */
         public String getSql() {
@@ -244,30 +250,24 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
         }
 
         /**
-         * Binds the connection handle that {@link #getConnection()} will
-         * report for this statement. {@code createDecorator} binds the
-         * handle of the borrow that creates the statement, and
-         * {@link StatementCache} seeds the closing borrow's handle when it
-         * parks a statement; the binding is kept as a snapshot and is
-         * never refreshed on its own. A handle kept past its borrow is
-         * inert by design, so anything reusing a statement proxy across
-         * borrows must call this method with the new borrower's handle
-         * before the proxy is handed out, as {@link StatementCache} does
-         * on a cache hit.
+         * Binds the connection handle that {@link #getConnection()} will report for this statement.
+         * {@code createDecorator} binds the handle of the borrow that creates the statement, and {@link StatementCache}
+         * seeds the closing borrow's handle when it parks a statement; the binding is kept as a snapshot and is never
+         * refreshed on its own. A handle kept past its borrow is inert by design, so anything reusing a statement proxy
+         * across borrows must call this method with the new borrower's handle before the proxy is handed out, as
+         * {@link StatementCache} does on a cache hit.
          *
          * @param proxy the connection proxy
          */
         public void setConnection(Object proxy) {
             this.connection = proxy;
         }
+
         /**
-         * Returns the connection proxy most recently bound through
-         * {@link #setConnection(Object)}. While that binding's borrow is
-         * current it is a live handle; a statement kept past its borrow
-         * answers with the disposed facade it came from. Once the
-         * statement is closed the handler refuses the call before it
-         * reaches the snapshot, so a stale binding is only visible
-         * through diagnostics such as {@link #toString()}.
+         * Returns the connection proxy most recently bound through {@link #setConnection(Object)}. While that binding's
+         * borrow is current it is a live handle; a statement kept past its borrow answers with the disposed facade it
+         * came from. Once the statement is closed the handler refuses the call before it reaches the snapshot, so a
+         * stale binding is only visible through diagnostics such as {@link #toString()}.
          *
          * @return the connection proxy
          */
@@ -277,13 +277,16 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
 
         /**
          * Sets the actual proxy object.
+         *
          * @param proxy the actual proxy
          */
-        public void setActualProxy(Object proxy){
+        public void setActualProxy(Object proxy) {
             this.actualProxy = proxy;
         }
+
         /**
          * Returns the actual proxy object.
+         *
          * @return the actual proxy
          */
         public Object getActualProxy() {
@@ -293,26 +296,30 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
 
         /**
          * Returns the constructor used to create this proxy.
+         *
          * @return the constructor
          */
         public Constructor<?> getConstructor() {
             return constructor;
         }
+
         /**
          * Sets the constructor for creating proxies.
+         *
          * @param constructor the constructor
          */
         public void setConstructor(Constructor<?> constructor) {
             this.constructor = constructor;
         }
+
         /**
          * Called when the close method is invoked on the statement.
          */
         public void closeInvoked() {
-            if (getDelegate()!=null) {
+            if (getDelegate() != null) {
                 try {
                     getDelegate().close();
-                }catch (SQLException ignore) {
+                } catch (SQLException ignore) {
                 }
             }
             closed = true;
@@ -321,7 +328,7 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            if (compare(TOSTRING_VAL,method)) {
+            if (compare(TOSTRING_VAL, method)) {
                 return toString();
             }
             // Handle identity on this proxy, like the statement facade
@@ -337,22 +344,22 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
             if (compare(HASHCODE_VAL, method)) {
                 return Integer.valueOf(this.hashCode());
             }
-            // was close invoked?
+            // Was close invoked?
             boolean close = compare(CLOSE_VAL, method);
-            // allow close to be called multiple times
+            // Allow close to be called multiple times
             if (close && closed) {
                 return null;
             }
-            // are we calling isClosed?
+            // Are we calling isClosed?
             if (compare(ISCLOSED_VAL, method)) {
                 return Boolean.valueOf(closed);
             }
-            // if we are calling anything else, bail out
+            // If we are calling anything else, bail out
             if (closed) {
                 throw new SQLException("Statement closed.");
             }
-            if (compare(GETCONNECTION_VAL,method)){
-                // the handle of the current borrow, as bound by
+            if (compare(GETCONNECTION_VAL, method)) {
+                // The handle of the current borrow, as bound by
                 // setConnection; a proxy kept past its borrow gets the
                 // inert handle it came from, and a closed one has already
                 // thrown above
@@ -360,20 +367,19 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
             }
             boolean process = false;
             process = isResultSet(method, process);
-            // check to see if we are about to execute a query
+            // Check to see if we are about to execute a query
             // if we are executing, get the current time
             Object result = null;
             try {
-                // perform close cleanup
+                // Perform close cleanup
                 if (close) {
                     closeInvoked();
                 } else {
-                    // execute the query
+                    // Execute the query
                     result = method.invoke(delegate, args);
                 }
             } catch (Throwable t) {
-                if (t instanceof InvocationTargetException
-                        && t.getCause() != null) {
+                if (t instanceof InvocationTargetException && t.getCause() != null) {
                     throw t.getCause();
                 } else {
                     throw t;
@@ -381,7 +387,7 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
             }
             if (process && result != null) {
                 Constructor<?> cons = getResultSetConstructor();
-                result = cons.newInstance(new Object[]{new ResultSetProxy(actualProxy, result)});
+                result = cons.newInstance(new Object[] { new ResultSetProxy(actualProxy, result) });
             }
             return result;
         }
@@ -422,7 +428,8 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
 
         /**
          * Constructs a ResultSetProxy.
-         * @param st the statement proxy
+         *
+         * @param st       the statement proxy
          * @param delegate the ResultSet to delegate to
          */
         public ResultSetProxy(Object st, Object delegate) {
@@ -455,8 +462,7 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
                 try {
                     return method.invoke(this.delegate, args);
                 } catch (Throwable t) {
-                    if (t instanceof InvocationTargetException
-                            && t.getCause() != null) {
+                    if (t instanceof InvocationTargetException && t.getCause() != null) {
                         throw t.getCause();
                     } else {
                         throw t;

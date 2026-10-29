@@ -19,8 +19,7 @@ package org.apache.tomcat.jdbc.pool;
 import java.sql.SQLException;
 
 /**
- * Exception thrown when the connection pool is exhausted
- * and no connections are available.
+ * Exception thrown when the connection pool is exhausted and no connections are available.
  */
 public class PoolExhaustedException extends SQLException {
 
@@ -34,6 +33,7 @@ public class PoolExhaustedException extends SQLException {
 
     /**
      * Constructs a PoolExhaustedException with the specified detail message.
+     *
      * @param reason the detail message
      */
     public PoolExhaustedException(String reason) {
@@ -42,6 +42,7 @@ public class PoolExhaustedException extends SQLException {
 
     /**
      * Constructs a PoolExhaustedException with the specified cause.
+     *
      * @param cause the cause of this exception
      */
     public PoolExhaustedException(Throwable cause) {
@@ -50,7 +51,8 @@ public class PoolExhaustedException extends SQLException {
 
     /**
      * Constructs a PoolExhaustedException with the specified detail message and SQL state.
-     * @param reason the detail message
+     *
+     * @param reason   the detail message
      * @param SQLState the SQL state code
      */
     public PoolExhaustedException(String reason, String SQLState) {
@@ -59,8 +61,9 @@ public class PoolExhaustedException extends SQLException {
 
     /**
      * Constructs a PoolExhaustedException with the specified detail message and cause.
+     *
      * @param reason the detail message
-     * @param cause the cause of this exception
+     * @param cause  the cause of this exception
      */
     public PoolExhaustedException(String reason, Throwable cause) {
         super(reason, cause);
@@ -68,8 +71,9 @@ public class PoolExhaustedException extends SQLException {
 
     /**
      * Constructs a PoolExhaustedException with the specified detail message, SQL state, and vendor code.
-     * @param reason the detail message
-     * @param SQLState the SQL state code
+     *
+     * @param reason     the detail message
+     * @param SQLState   the SQL state code
      * @param vendorCode the vendor-specific error code
      */
     public PoolExhaustedException(String reason, String SQLState, int vendorCode) {
@@ -78,21 +82,22 @@ public class PoolExhaustedException extends SQLException {
 
     /**
      * Constructs a PoolExhaustedException with the specified detail message, SQL state, and cause.
-     * @param reason the detail message
+     *
+     * @param reason   the detail message
      * @param sqlState the SQL state code
-     * @param cause the cause of this exception
+     * @param cause    the cause of this exception
      */
     public PoolExhaustedException(String reason, String sqlState, Throwable cause) {
         super(reason, sqlState, cause);
     }
 
     /**
-     * Constructs a PoolExhaustedException with the specified detail message, SQL state,
-     * vendor code, and cause.
-     * @param reason the detail message
-     * @param sqlState the SQL state code
+     * Constructs a PoolExhaustedException with the specified detail message, SQL state, vendor code, and cause.
+     *
+     * @param reason     the detail message
+     * @param sqlState   the SQL state code
      * @param vendorCode the vendor-specific error code
-     * @param cause the cause of this exception
+     * @param cause      the cause of this exception
      */
     public PoolExhaustedException(String reason, String sqlState, int vendorCode, Throwable cause) {
         super(reason, sqlState, vendorCode, cause);
