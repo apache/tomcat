@@ -137,9 +137,10 @@ public class ConnectionPool {
             new LinkedBlockingQueue<>());
 
     /**
-     * reference to the JMX mbean
+     * reference to the JMX mbean. close() gives it up without holding any pool lock while other threads still notify
+     * through it, so the field is volatile and every user reads it at most once, into a local.
      */
-    protected org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmxPool = null;
+    protected volatile org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmxPool = null;
 
     /**
      * counter to track how many threads are waiting for a connection
@@ -348,8 +349,21 @@ public class ConnectionPool {
         // Fetch previously cached interceptor proxy - one per connection
         JdbcInterceptor handler = con.getHandler();
         if (handler == null) {
-            if (jmxPool != null) {
+            // The registration reads the pool's own JMX object itself and does
+            // nothing once close() has given it up; it is not gated on jmxPool
+            // here because checking the field and then calling into the
+            // connection would let close() take it away between the two, and
+            // the resulting failure must not strand the connection - it is
+            // already in busy, so a throw that skips abandonSetup() costs a
+            // physical connection and a maxActive slot until the pool restarts.
+            try {
                 con.createMBean();
+            } catch (Exception x) {
+                SQLException sx = new SQLException("Unable to register the pooled connection MBean.");
+                sx.initCause(x);
+                // Nothing has been done to the connection, it can go back to the pool
+                abandonSetup(con, sx, false);
+                throw sx;
             }
             // Build the proxy handler
             handler = new ProxyConnection(this, con, getPoolProperties().isUseEquals());
@@ -651,8 +665,9 @@ public class ConnectionPool {
                 interceptor.poolStarted(this);
             } catch (Exception x) {
                 log.error("Unable to inform interceptor of pool start.", x);
-                if (jmxPool != null) {
-                    jmxPool.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.NOTIFY_INIT, getStackTrace(x));
+                org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = jmxPool;
+                if (jmx != null) {
+                    jmx.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.NOTIFY_INIT, getStackTrace(x));
                 }
                 close(true);
                 SQLException ex = new SQLException();
@@ -671,8 +686,9 @@ public class ConnectionPool {
         } catch (SQLException x) {
             log.error("Unable to create initial connections of pool.", x);
             if (!poolProperties.isIgnoreExceptionOnPreLoad()) {
-                if (jmxPool != null) {
-                    jmxPool.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.NOTIFY_INIT, getStackTrace(x));
+                org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = jmxPool;
+                if (jmx != null) {
+                    jmx.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.NOTIFY_INIT, getStackTrace(x));
                 }
                 close(true);
                 throw x;
@@ -774,8 +790,9 @@ public class ConnectionPool {
             if (getPoolProperties().isLogAbandoned()) {
                 log.warn("Connection has been abandoned " + con + ":" + trace);
             }
-            if (jmxPool != null) {
-                jmxPool.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.NOTIFY_ABANDON, trace);
+            org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = jmxPool;
+            if (jmx != null) {
+                jmx.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.NOTIFY_ABANDON, trace);
             }
             // Release the connection
             removeAbandonedCount.incrementAndGet();
@@ -806,8 +823,9 @@ public class ConnectionPool {
                 log.warn("Connection has been marked suspect, possibly abandoned " + con + "[" +
                         (System.currentTimeMillis() - con.getTimestamp()) + " ms.]:" + trace);
             }
-            if (jmxPool != null) {
-                jmxPool.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.SUSPECT_ABANDONED_NOTIFICATION, trace);
+            org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = jmxPool;
+            if (jmx != null) {
+                jmx.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.SUSPECT_ABANDONED_NOTIFICATION, trace);
             }
             con.setSuspect(true);
         } finally {
@@ -950,8 +968,9 @@ public class ConnectionPool {
                 waitcount.decrementAndGet();
             }
             if (maxWait == 0 && con == null) { // No wait, return one if we have one
-                if (jmxPool != null) {
-                    jmxPool.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.POOL_EMPTY, "Pool empty - no wait.");
+                org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = jmxPool;
+                if (jmx != null) {
+                    jmx.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.POOL_EMPTY, "Pool empty - no wait.");
                 }
                 throw new PoolExhaustedException("[" + Thread.currentThread().getName() + "] " +
                         "NoWait: Pool empty. Unable to fetch a connection, none available[" + busy.size() +
@@ -960,8 +979,9 @@ public class ConnectionPool {
             // We didn't get a connection, lets see if we timed out
             if (con == null) {
                 if ((System.currentTimeMillis() - now) >= maxWait) {
-                    if (jmxPool != null) {
-                        jmxPool.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.POOL_EMPTY,
+                    org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = jmxPool;
+                    if (jmx != null) {
+                        jmx.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.POOL_EMPTY,
                                 "Pool empty - timeout.");
                     }
                     throw new PoolExhaustedException("[" + Thread.currentThread().getName() + "] " +
@@ -1286,8 +1306,9 @@ public class ConnectionPool {
                                 " The processing time is " + (System.currentTimeMillis() - con.getTimestamp()) +
                                 " ms.");
                     }
-                    if (jmxPool != null) {
-                        jmxPool.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.SUSPECT_RETURNED_NOTIFICATION,
+                    org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = jmxPool;
+                    if (jmx != null) {
+                        jmx.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.SUSPECT_RETURNED_NOTIFICATION,
                                 "Connection(" + con + ") that has been marked suspect was returned.");
                     }
                 }
