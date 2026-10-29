@@ -489,25 +489,26 @@ public abstract class SSLUtilBase implements SSLUtil {
      * @param baseAlias the configured alias. Not itself re-checked: the caller has already determined that its
      *                      certificate is not valid for TLS server authentication.
      *
-     * @return the alias of the first duplicate (in increasing numeric order starting at 1) whose certificate is
-     *             valid for TLS server authentication, or {@code null} if there is no such duplicate
+     * @return the alias of the first duplicate in the contiguous run (in increasing numeric order starting at 1) whose
+     *             certificate is valid for TLS server authentication, or {@code null} if there is no such duplicate
      *
      * @throws KeyStoreException if the key store has not been initialized
      */
     private static String findServerAuthAliasInWindowsMYFamily(KeyStore ks, String baseAlias) throws KeyStoreException {
-        int limit = Collections.list(ks.aliases()).size();
-        for (int suffix = 1; suffix <= limit; suffix++) {
+        int suffix = 1;
+        while (true) {
             String candidateAlias = baseAlias + " (" + suffix + ")";
             Certificate candidateCert = ks.getCertificate(candidateAlias);
             if (candidateCert == null) {
-                continue;
+                // The first missing number ends the contiguous run of numbered duplicates.
+                return null;
             }
             if (candidateCert instanceof X509Certificate x509 && ks.isKeyEntry(candidateAlias) &&
                     isServerAuthCapable(x509)) {
                 return candidateAlias;
             }
+            suffix++;
         }
-        return null;
     }
 
 
