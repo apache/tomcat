@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BooleanSupplier;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -41,7 +42,9 @@ import org.junit.jupiter.api.Test;
  * times out, the termination of every outstanding poll once the waiters
  * are cancelled, the collection operations the queue deliberately
  * leaves unsupported, the rejection of null elements by every
- * insertion path, and the removal contract of the queue iterator.
+ * insertion path, the removal contract of the queue iterator, and the
+ * preservation of the interrupt status of a poller that an element is
+ * handed over to despite its interrupt.
  */
 class TestFairBlockingQueue {
 
@@ -525,6 +528,57 @@ class TestFairBlockingQueue {
     }
 
     @Test
+    void deliveredElementDoesNotSwallowTheInterruptOfItsWaiter() throws Exception {
+        // A waiter interrupted inside poll(timeout) that an element is handed
+        // over to all the same must receive the element AND keep its interrupt
+        // status: a normal return after having noticed an interrupt must
+        // re-assert the status, the way the JDK blocking queues do, or the
+        // interrupt - often meant for a later phase - is silently lost
+        final FairBlockingQueue<String> queue = new FairBlockingQueue<>();
+        final AtomicReference<String> received = new AtomicReference<>();
+        final AtomicReference<Throwable> thrown = new AtomicReference<>();
+        final AtomicReference<Boolean> flagAfterPoll = new AtomicReference<>();
+        final CountDownLatch done = new CountDownLatch(1);
+        final Thread waiter = new Thread(() -> {
+            try {
+                received.set(queue.poll(30, TimeUnit.SECONDS));
+            } catch (InterruptedException e) {
+                thrown.set(e);
+            } finally {
+                flagAfterPoll.set(Thread.currentThread().isInterrupted());
+                done.countDown();
+            }
+        });
+        waiter.setDaemon(true);
+        waiter.start();
+        awaitUntil(() -> queue.waiters.size() == 1, "the waiter must register on the queue");
+
+        // Hold the queue lock across the hand-off: after its wait ends with
+        // the InterruptedException, the waiter blocks in the re-acquisition of
+        // that lock, so it is pinned between noticing the interrupt and
+        // deregistering. Throwing the InterruptedException clears the flag, so
+        // the flag going false again proves the wait has ended with it.
+        queue.lock.lock();
+        try {
+            waiter.interrupt();
+            awaitUntil(() -> !waiter.isInterrupted(), "the waiter must observe its interrupt in the wait");
+            Assertions.assertTrue(queue.offer("handed"),
+                    "the element must be handed to the pinned waiter");
+        } finally {
+            queue.lock.unlock();
+        }
+
+        Assertions.assertTrue(done.await(5, TimeUnit.SECONDS),
+                "the waiter must finish once the lock is released");
+        Assertions.assertNull(thrown.get(),
+                "the handed element must not be reported as an interruption, got " + thrown.get());
+        Assertions.assertEquals("handed", received.get(),
+                "the element committed to the waiter's latch must be delivered");
+        Assertions.assertEquals(Boolean.TRUE, flagAfterPoll.get(),
+                "delivering the element must not swallow the waiter's interrupt");
+    }
+
+    @Test
     void timedOutAsyncPollRacingAnOfferDoesNotStrandElements() throws Exception {
         // an offer() that commits its element to a latch concurrently with a
         // timeout is delivered rather than lost, and every timed-out waiter
@@ -568,5 +622,18 @@ class TestFairBlockingQueue {
         Assertions.assertTrue(queue.offer("last"));
         Assertions.assertEquals(1, queue.size());
         Assertions.assertEquals("last", queue.poll());
+    }
+
+    /* Spins until the condition holds, or fails after a generous deadline.
+       No sleep decides any outcome: the conditions awaited are the waiter's
+       own queue registration and the interrupt flag transitions driven by
+       the wait ending. */
+    private static void awaitUntil(BooleanSupplier condition, String message) {
+        long deadline = System.currentTimeMillis() + 5000;
+        while (!condition.getAsBoolean()) {
+            if (System.currentTimeMillis() > deadline) {
+                Assertions.fail(message);
+            }
+        }
     }
 }
