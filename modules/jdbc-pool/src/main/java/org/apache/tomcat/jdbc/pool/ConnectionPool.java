@@ -331,6 +331,20 @@ public class ConnectionPool {
      * @throws SQLException if an interceptor can't be configured, if the proxy can't be instantiated
      */
     protected Connection setupConnection(PooledConnection con) throws SQLException {
+        // The connection is being handed to a borrower: a borrow is counted
+        // here rather than where it was claimed, as that is the one point all
+        // hand-offs pass - the synchronous borrows, the async borrow that
+        // takes an idle connection, the configuration of a connection a queue
+        // handed to an async poll, and the cleanup that retrieves a cancelled
+        // poll's connection to return it - each exactly once, while a claim
+        // that ends in a throw never reaches a borrower at all. A setup that
+        // fails gives the connection back through abandonSetup(), which counts
+        // the return, so the borrow is counted on the way in to match. The
+        // pool's own initialization is the only path that takes connections
+        // out of the creation route without a borrower: it returns its
+        // preloaded connections directly and never sets one up here, so it
+        // stays out of the count.
+        borrowedCount.incrementAndGet();
         // Fetch previously cached interceptor proxy - one per connection
         JdbcInterceptor handler = con.getHandler();
         if (handler == null) {
@@ -878,10 +892,13 @@ public class ConnectionPool {
             if (con != null) {
                 // Configure the connection and return it
                 PooledConnection result = borrowConnection(now, con, username, password);
-                borrowedCount.incrementAndGet();
                 if (result != null) {
                     return result;
                 }
+                // The connection was released while it sat idle, so this
+                // poll got nothing to hand out; keep polling. Nothing is
+                // counted here: a borrow is counted on the hand-off that
+                // succeeds, in setupConnection().
             }
 
             // If we get here, see if we need to create one
