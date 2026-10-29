@@ -20,8 +20,10 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.net.ssl.KeyManager;
@@ -92,18 +94,17 @@ class JSSESSLContext implements SSLContext {
 
 
     @Override
-    public String getServedAlias(SSLHostConfigCertificate certificate) {
-        if (kms != null) {
-            for (KeyManager km : kms) {
-                if (km instanceof X509KeyManager x509KeyManager) {
-                    String alias = certificate.chooseServerAlias(x509KeyManager);
-                    if (alias != null) {
-                        return alias;
-                    }
-                }
+    public X509KeyManager[] getServerKeyManagers(SSLHostConfigCertificate certificate) {
+        if (kms == null) {
+            return new X509KeyManager[0];
+        }
+        List<X509KeyManager> x509KeyManagers = new ArrayList<>();
+        for (KeyManager km : kms) {
+            if (km instanceof X509KeyManager x509KeyManager) {
+                x509KeyManagers.add(x509KeyManager);
             }
         }
-        return SSLContext.super.getServedAlias(certificate);
+        return x509KeyManagers.toArray(new X509KeyManager[0]);
     }
 
     @Override

@@ -232,13 +232,26 @@ public class TestSSLUtilBaseConfiguredAliasSelection extends SSLUtilBaseCertific
     /*
      * After the SunMSCAPI numbered-duplicate swap the served alias is the numbered duplicate, not the configured alias.
      * This is the alias that logCertificate reports and the reload check resolves. Non-exportable keys route
-     * getKeyManagers() through the production ksUsed == ks path. Scoped to JSSE: for OpenSSL the served alias is
-     * resolved from the native layer by a separate path.
+     * getKeyManagers() through the production ksUsed == ks path.
      */
     @Test
     public void testServedAliasIsTheNumberedDuplicate() throws Exception {
         Assume.assumeTrue("JSSE".equals(connectorName));
         KeyStore keystore = nonExportableKeystore(key(HOST, CLIENT_AUTH), key(HOST + " (1)", SERVER_AUTH));
+        Assert.assertEquals(HOST + " (1)", servedAlias(HOST, keystore));
+    }
+
+
+    /*
+     * A SunMSCAPI key that reports a null format but is still exportable keeps the original key store in use
+     * (ksUsed == ks) and wraps each key manager, like a real non-exportable key, while remaining loadable by OpenSSL.
+     * In that wrapped path a lookup of the configured alias still resolves its own (clientAuth) chain, so the served
+     * alias - not that lookup - must drive what OpenSSL installs.
+     */
+    @Test
+    public void testServedAliasResolvesForOpenSSLWithOriginalKeystore() throws Exception {
+        Assume.assumeTrue(useOpenSSL);
+        KeyStore keystore = wrappedExportableKeystore(key(HOST, CLIENT_AUTH), key(HOST + " (1)", SERVER_AUTH));
         Assert.assertEquals(HOST + " (1)", servedAlias(HOST, keystore));
     }
 }
