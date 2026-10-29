@@ -55,12 +55,27 @@ public class DataSourceProxy implements PoolConfiguration {
     protected volatile PoolConfiguration poolProperties = null;
 
     /**
-     * Terminal lifecycle flag. Set by {@link #close(boolean)} while holding this proxy's monitor, the same monitor that
-     * serializes pool creation in {@link #pCreatePool()}. Once set, no new {@link ConnectionPool} is created:
-     * {@link #createPool()} fails with a {@link SQLException} instead of resurrecting a pool that its owner has already
-     * stopped tracking.
+     * Terminal lifecycle flag. Set by {@link #close(boolean)} while holding this proxy's monitor, the same monitor
+     * under which {@link #pCreatePool()} checks the flag and publishes its result. Once set, no {@link ConnectionPool}
+     * is published any more: {@link #createPool()} fails with a {@link SQLException} instead of resurrecting a pool
+     * that its owner has already stopped tracking, and a creation that was already in flight - whose constructor the
+     * close did not wait for - closes the pool it built instead of publishing it.
      */
     private volatile boolean closed = false;
+
+    /**
+     * Serializes pool construction away from this proxy's monitor. The pool constructor pre-connects
+     * {@link PoolConfiguration#getInitialSize() initialSize} connections, so against a hung database it blocks in the
+     * driver for as long as the JDBC login timeout; running that under the monitor {@link #close(boolean)} takes made
+     * the close wait on the driver for an unbounded, uninterruptible time. The gate keeps the construction serialized
+     * anyway - it is the only point at which two pools are ever built from the same {@code poolProperties}, whose
+     * contract is that no two pools are ever constructed from one instance at a time - while leaving the close free,
+     * as it only has to serialize against the short publication step, not the driver. This lock is taken before the
+     * proxy monitor and never while holding it, so it cannot invert against the monitor's other users:
+     * {@link #close(boolean)} and, in the {@link DataSource} subclass, the JMX registration callbacks; none of them
+     * reaches pool creation.
+     */
+    private final Object poolCreationLock = new Object();
 
     /**
      * Construct a DataSourceProxy with default pool properties.
@@ -205,20 +220,60 @@ public class DataSourceProxy implements PoolConfiguration {
     /**
      * Sets up the connection pool, by creating a pooling driver.
      */
-    private synchronized ConnectionPool pCreatePool() throws SQLException {
-        // Runs under the monitor that close(boolean) also takes, and that is
-        // the only writer that nulls the field, so the pool cannot disappear
-        // between the reads below the way it can on the unsynchronized read
-        // paths. Returning null is therefore not possible here: either the
-        // closed flag rejects the caller or a pool is published and returned.
+    private ConnectionPool pCreatePool() throws SQLException {
+        // Runs under the construction gate, not under the monitor that
+        // close(boolean) takes: the constructor pre-connects the initial
+        // size of the pool, so against a hung database it blocks inside the
+        // driver's connect for as long as the JDBC login timeout, and a
+        // close parked behind that would be unbounded and uninterruptible.
+        // Returning null is not possible here: either the closed flag
+        // rejects the caller or a pool is published and returned.
         if (closed) {
             throw new SQLException("DataSource has been closed.");
         }
-        if (pool != null) {
-            return pool;
-        } else {
-            pool = new ConnectionPool(poolProperties);
-            return pool;
+        synchronized (poolCreationLock) {
+            // Re-check under the gate: a close completed while this thread
+            // queued must not be resurrected, and a creator that won the
+            // gate has already published its pool. The gate also keeps this
+            // the only construction the shared poolProperties ever faces.
+            if (closed) {
+                throw new SQLException("DataSource has been closed.");
+            }
+            final ConnectionPool existing = pool;
+            if (existing != null) {
+                return existing;
+            }
+            // The constructor - and with it the driver connects of the
+            // initial pre-load - runs with the close monitor free. A failure
+            // here propagates directly: an init that fails after starting
+            // anything tears its pool down itself before throwing.
+            final ConnectionPool fresh = new ConnectionPool(poolProperties);
+            final boolean rejected;
+            synchronized (this) {
+                // Check-and-publish against the closure, which sets the flag
+                // and takes the field in one step under this same monitor:
+                // whichever of the two runs first wins, so the close either
+                // finds this pool published and closes it, or it found the
+                // field empty and this thread takes the pool down below. It
+                // is never neither - that was the leak - and never both.
+                rejected = closed;
+                if (!rejected) {
+                    pool = fresh;
+                }
+            }
+            if (rejected) {
+                // close(boolean) completed while this pool was being built
+                // and had nothing published to close, so the sessions the
+                // pre-load established and the cleaner the constructor
+                // started are this thread's to release.
+                try {
+                    fresh.close(true);
+                } catch (Exception x) {
+                    log.warn("Error during connection pool closure.", x);
+                }
+                throw new SQLException("DataSource has been closed.");
+            }
+            return fresh;
         }
     }
 
@@ -349,19 +404,25 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
     /**
-     * Close the connection pool. If the pool is being created concurrently, this method waits for the creation to
-     * complete and then closes the resulting pool rather than racing it.
+     * Close the connection pool. If a pool creation is in flight, this method does not wait for it - the driver
+     * connects of the creation's initial pre-load can block for an unbounded, uninterruptible time against a hung
+     * database - it marks this data source closed and returns: the creation observes the closure at its publication
+     * step and closes the pool it built instead of publishing it.
      *
      * @param all if true close all connections, otherwise only idle ones
      */
     public synchronized void close(boolean all) {
-        // Synchronized on the same monitor as pCreatePool() so a pool being
-        // created concurrently with this close cannot be published after the
-        // field has been nulled and thus leak, untracked, with its database
-        // sessions and scheduled cleaner still alive. The closed flag makes
-        // the closure terminal for the pool creation paths as well: a closed
-        // data source no longer resurrects its pool on the next borrow or
-        // statistics access.
+        // Sets the terminal closed flag and takes the published pool in one
+        // step under this monitor, which the publication step of
+        // pCreatePool() also takes as one step: a creation whose pool is not
+        // yet published cannot be missed by this close and then published
+        // after it - it either wins the monitor and this close closes its
+        // pool, or this close wins and that creation tears its pool down as
+        // rejected. The closed flag makes the closure terminal for the pool
+        // creation paths as well: a closed data source no longer resurrects
+        // its pool on the next borrow or statistics access. The monitor is
+        // never held across a pool construction, so this method never waits
+        // on a driver connect.
         closed = true;
         final ConnectionPool p = pool;
         pool = null;
