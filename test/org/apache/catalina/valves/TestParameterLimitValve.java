@@ -22,6 +22,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
@@ -645,6 +646,29 @@ public class TestParameterLimitValve extends TomcatBaseTest {
                 "/other/endpoint?param1=value1&param2=value2&param3=value3",
             new ByteChunk(), null);
         Assert.assertEquals(200, rc);
+    }
+
+    @Test
+    public void testRepeatedPatternReplacesLimitAtOriginalPosition() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
+
+        ParameterLimitValve parameterLimitValve = new ParameterLimitValve();
+        ctx.getPipeline().addValve(parameterLimitValve);
+        parameterLimitValve.setUrlPatternLimits("/special/.*=100" + CRLF + "/.*=100");
+        // Appending the same pattern must replace its limit, not add a shadowed entry
+        parameterLimitValve.setUrlPatternLimits(new BufferedReader(new StringReader("/special/.*=2")));
+
+        Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
+        ctx.addServletMapping("/special/endpoint", "snoop");
+
+        tomcat.start();
+
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/special/endpoint?param1=value1&param2=value2&param3=value3",
+            new ByteChunk(), null);
+        Assert.assertEquals(400, rc);
     }
 
     @Test
