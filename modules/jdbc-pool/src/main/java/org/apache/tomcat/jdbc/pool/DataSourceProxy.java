@@ -407,6 +407,14 @@ public class DataSourceProxy implements PoolConfiguration {
      * @param poolProperties The new pool configuration
      */
     public void setPoolProperties(PoolConfiguration poolProperties) {
+        // Same fail-fast check as the constructor: a null configuration would
+        // leave the ~60 delegating accessors and the borrow paths to throw
+        // bare NullPointerExceptions at opaque points, while the login timeout
+        // accessors would silently degrade. The class invariant is that this
+        // field is never null, so reject the misuse at its site.
+        if (poolProperties == null) {
+            throw new NullPointerException("PoolConfiguration cannot be null.");
+        }
         this.poolProperties = poolProperties;
     }
 
