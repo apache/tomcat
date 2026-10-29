@@ -318,8 +318,8 @@ public class ParameterLimitValve extends ValveBase {
         // matching pattern. The map is in configuration order, so when several
         // patterns match, the first configured matching pattern wins.
         for (UrlPatternLimit urlPatternLimit : urlPatternLimitsSnapshot.values()) {
-            if (urlPatternLimit.pattern().matcher(requestURI).matches()) {
-                Integer[] limits = urlPatternLimit.limits();
+            if (urlPatternLimit.pattern.matcher(requestURI).matches()) {
+                Integer[] limits = urlPatternLimit.limits;
                 // maxParameterCount should always be present
                 request.setMaxParameterCount(limits[0].intValue());
                 if (limits[1] != null) {
@@ -337,11 +337,13 @@ public class ParameterLimitValve extends ValveBase {
 
     /**
      * The compiled URL pattern and the limits to apply to the requests that match it.
-     *
-     * @param pattern The compiled URL pattern
-     * @param limits  The maxParameterCount, maxPartCount and maxPartHeaderSize limits, the latter two being
-     *                    {@code null} if not configured
      */
-    private record UrlPatternLimit(Pattern pattern, Integer[] limits) {
+    private static class UrlPatternLimit {
+        final Pattern pattern;
+        final Integer[] limits;
+        UrlPatternLimit(Pattern pattern, Integer[] limits) {
+            this.pattern = pattern;
+            this.limits = limits;
+        }
     }
 }
