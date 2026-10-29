@@ -18,6 +18,7 @@ package org.apache.tomcat.jdbc.pool;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.sql.Connection;
 import java.sql.SQLException;
 
 import javax.sql.XAConnection;
@@ -108,8 +109,31 @@ public class ProxyConnection extends JdbcInterceptor {
     public boolean isWrapperFor(Class<?> iface) {
         if (iface == XAConnection.class && connection.getXAConnection()!=null) {
             return true;
-        } else {
-            return iface.isInstance(connection.getConnection());
+        }
+        Connection physical = connection.getConnection();
+        if (physical == null) {
+            //released handle: there is nothing left below to be a wrapper
+            return false;
+        }
+        if (iface.isInstance(physical)) {
+            return true;
+        }
+        if (iface == XAConnection.class) {
+            //javax.sql.XAConnection is only ever handed out from the pooled
+            //connection's own XA handle - unwrap() says so - so the driver
+            //below is not asked about it
+            return false;
+        }
+        //The driver's own connection may itself wrap a further connection -
+        //a driver built around another driver's, like the AWS wrapper over
+        //the PostgreSQL one - and it, not the class of the object it
+        //presents, is what knows which interfaces it can unwrap to.
+        try {
+            return physical.isWrapperFor(iface);
+        } catch (SQLException x) {
+            //a driver that cannot answer the question is not a wrapper
+            //for the interface
+            return false;
         }
     }
 
@@ -132,8 +156,12 @@ public class ProxyConnection extends JdbcInterceptor {
                 throw new SQLException("Not a wrapper of " + iface.getName());
             }
             return xa;
-        } else if (isWrapperFor(iface)) {
+        } else if (iface.isInstance(connection.getConnection())) {
             return connection.getConnection();
+        } else if (isWrapperFor(iface)) {
+            //the driver's connection is a wrapper further down, and
+            //unwrapping that far is its answer to give, not ours
+            return connection.getConnection().unwrap(iface);
         } else {
             throw new SQLException("Not a wrapper of "+iface.getName());
         }

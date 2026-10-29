@@ -85,35 +85,64 @@ public class DataSourceProxy implements PoolConfiguration {
 
 
     /**
-     * Check if this proxy wraps an instance of the given interface.
-     * This implementation always returns {@code false}.
+     * Check if this proxy implements, or wraps an instance of, the given
+     * interface. The configured {@link PoolConfiguration#getDataSource()
+     * DataSource}, if any, is checked as the wrapped object.
      * <p>
      * Has to match signature in DataSource.
      *
-     * @param iface The interface to check - ignored
-     * @return false
-     * @throws SQLException never thrown
+     * @param iface The interface to check
+     * @return {@code true} if this proxy implements the interface or wraps an
+     *         object that does
+     * @throws SQLException if the wrapped data source throws one
      */
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        // we are not a wrapper of anything
+        if (iface.isInstance(this)) {
+            return true;
+        }
+        Object dataSource = poolProperties.getDataSource();
+        if (iface.isInstance(dataSource)) {
+            return true;
+        }
+        if (dataSource instanceof java.sql.Wrapper) {
+            //like the pooled connections, the configured data source may
+            //itself be a wrapper - of the driver's data source, of a
+            //pooling data source the configuration replaced - and it is
+            //what answers for its own layers
+            return ((java.sql.Wrapper) dataSource).isWrapperFor(iface);
+        }
         return false;
     }
 
 
     /**
-     * Unwrap the proxy to the given interface.
-     * This implementation always returns {@code null}.
+     * Unwrap the proxy to the given interface. The configured
+     * {@link PoolConfiguration#getDataSource() DataSource}, if any, is
+     * checked as the wrapped object.
      * <p>
      * Has to match signature in DataSource
      *
      * @param <T> The interface type
-     * @param iface The interface to unwrap to - ignored
-     * @return null
-     * @throws SQLException never thrown
+     * @param iface The interface to unwrap to
+     * @return an object that implements the interface
+     * @throws SQLException if no object implementing the interface is found
      */
     public <T> T unwrap(Class<T> iface) throws SQLException {
-        //we can't unwrap anything
-        return null;
+        if (iface.isInstance(this)) {
+            return iface.cast(this);
+        }
+        Object dataSource = poolProperties.getDataSource();
+        if (iface.isInstance(dataSource)) {
+            return iface.cast(dataSource);
+        }
+        if (dataSource instanceof java.sql.Wrapper
+                && ((java.sql.Wrapper) dataSource).isWrapperFor(iface)) {
+            return ((java.sql.Wrapper) dataSource).unwrap(iface);
+        }
+        // The Wrapper contract asks for a failure, not for a silent null
+        // that turns into an unrelated NullPointerException at the caller's
+        // first use of the "unwrapped" value.
+        throw new SQLException("Not a wrapper of " + iface.getName());
     }
 
     /**
