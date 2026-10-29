@@ -471,10 +471,26 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
 
+    /**
+     * Sets the password used to establish connections with, and mirrors it into the {@code password} database
+     * property. A {@code null} password clears the credential: the entry is removed from the database properties
+     * instead of the properties being set to null, which {@link java.util.Properties} rejects and which previously
+     * threw after the field had already been cleared, leaving the previous password behind for the driver to keep
+     * using. A configuration whose database properties are {@code null} only stores the field, as there is no
+     * property collection to mirror into. {@inheritDoc}
+     */
     @Override
     public void setPassword(String password) {
         this.poolProperties.setPassword(password);
-        this.poolProperties.getDbProperties().setProperty("password", this.poolProperties.getPassword());
+        Properties dbProperties = this.poolProperties.getDbProperties();
+        if (dbProperties != null) {
+            String storedPassword = this.poolProperties.getPassword();
+            if (storedPassword == null) {
+                dbProperties.remove(PoolUtilities.PROP_PASSWORD);
+            } else {
+                dbProperties.setProperty(PoolUtilities.PROP_PASSWORD, storedPassword);
+            }
+        }
     }
 
 
@@ -526,10 +542,26 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
 
+    /**
+     * Sets the user name used to establish connections with, and mirrors it into the {@code user} database property.
+     * A {@code null} user name clears the credential: the entry is removed from the database properties instead of the
+     * properties being set to null, which {@link java.util.Properties} rejects and which previously threw after the
+     * field had already been cleared, leaving the previous user name behind for the driver to keep using. A
+     * configuration whose database properties are {@code null} only stores the field, as there is no property
+     * collection to mirror into. {@inheritDoc}
+     */
     @Override
     public void setUsername(String username) {
         this.poolProperties.setUsername(username);
-        this.poolProperties.getDbProperties().setProperty("user", getPoolProperties().getUsername());
+        Properties dbProperties = this.poolProperties.getDbProperties();
+        if (dbProperties != null) {
+            String storedUsername = this.poolProperties.getUsername();
+            if (storedUsername == null) {
+                dbProperties.remove(PoolUtilities.PROP_USER);
+            } else {
+                dbProperties.setProperty(PoolUtilities.PROP_USER, storedUsername);
+            }
+        }
     }
 
 
