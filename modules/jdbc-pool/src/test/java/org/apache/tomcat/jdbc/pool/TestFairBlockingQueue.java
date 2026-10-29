@@ -38,8 +38,9 @@ import org.junit.jupiter.api.Test;
  * longest waiting consumer, deregistration of cancelled asynchronous
  * polls, the terminal failure of an asynchronous poll whose timed get
  * times out, the termination of every outstanding poll once the waiters
- * are cancelled, and the collection operations the queue deliberately
- * leaves unsupported.
+ * are cancelled, the collection operations the queue deliberately
+ * leaves unsupported, and the rejection of null elements by every
+ * insertion path.
  */
 class TestFairBlockingQueue {
 
@@ -91,6 +92,36 @@ class TestFairBlockingQueue {
         }
         Assertions.assertEquals(2, seen.size(), "the iterator must see both queued elements");
         Assertions.assertTrue(seen.contains("added"));
+    }
+
+    @Test
+    void nullElementsAreRejectedByEveryInsertionPath() throws Exception {
+        FairBlockingQueue<String> queue = new FairBlockingQueue<>();
+        Assertions.assertThrows(NullPointerException.class, () -> queue.offer(null));
+        Assertions.assertThrows(NullPointerException.class, () -> queue.add(null));
+        Assertions.assertThrows(NullPointerException.class, () -> queue.put(null));
+        Assertions.assertThrows(NullPointerException.class,
+                () -> queue.offer(null, 10, TimeUnit.MILLISECONDS));
+        Assertions.assertThrows(NullPointerException.class,
+                () -> queue.addAll(Collections.singletonList(null)));
+        Assertions.assertEquals(0, queue.size(), "a rejected element must not enter the queue");
+        // the lookups that take an Object must keep working on a queue that
+        // can hold no null element
+        Assertions.assertFalse(queue.contains(null));
+        Assertions.assertFalse(queue.remove(null));
+    }
+
+    @Test
+    void rejectedNullOfferDoesNotConsumeTheWaiterSlot() throws Exception {
+        FairBlockingQueue<String> queue = new FairBlockingQueue<>();
+        Future<String> future = queue.pollAsync(); // registers a waiter
+        Assertions.assertThrows(NullPointerException.class, () -> queue.offer(null),
+                "a null hand-off would deliver no item to the registered waiter");
+        Assertions.assertFalse(future.isDone(),
+                "a rejected offer must not hand a phantom element to the waiter");
+        Assertions.assertTrue(queue.offer("real"));
+        Assertions.assertEquals("real", future.get(5, TimeUnit.SECONDS),
+                "the waiter must still be registered and receive the next element");
     }
 
     @Test
