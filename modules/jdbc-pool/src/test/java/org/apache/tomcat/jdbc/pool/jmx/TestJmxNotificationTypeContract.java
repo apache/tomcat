@@ -117,7 +117,10 @@ class TestJmxNotificationTypeContract extends JdbcPoolBaseTest {
 
     /*
      * Publishes an already created pool the way a container does and returns
-     * the single pool MBean that appeared.
+     * the pool's own MBean that appeared. A container's registration also
+     * publishes the connections the pool was holding, below the pool's own
+     * name with a "connections=PooledConnection[n]" key of their own, so the
+     * pool's MBean is picked as the added one that carries no such key.
      */
     private ObjectName registerPoolMBean(MBeanServer server, DataSource ds, String role)
             throws Exception {
@@ -127,7 +130,12 @@ class TestJmxNotificationTypeContract extends JdbcPoolBaseTest {
         Set<ObjectName> added =
                 new HashSet<>(server.queryNames(new ObjectName(POOL_DOMAIN + ":*"), null));
         added.removeAll(before);
-        return added.isEmpty() ? null : added.iterator().next();
+        for (ObjectName name : added) {
+            if (name.getKeyProperty("connections") == null) {
+                return name;
+            }
+        }
+        return null;
     }
 
     @Test
