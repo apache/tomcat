@@ -26,8 +26,8 @@ import org.apache.juli.logging.LogFactory;
 public class ClassLoaderUtil {
     private static final Log log = LogFactory.getLog(ClassLoaderUtil.class);
 
-    private static final boolean onlyAttemptFirstLoader =
-            Boolean.getBoolean("org.apache.tomcat.jdbc.pool.onlyAttemptCurrentClassLoader");
+    private static final boolean onlyAttemptFirstLoader = Boolean
+            .getBoolean("org.apache.tomcat.jdbc.pool.onlyAttemptCurrentClassLoader");
 
     /**
      * Private constructor to prevent instantiation.
@@ -38,7 +38,7 @@ public class ClassLoaderUtil {
     /**
      * Attempts to load the specified class using the given class loaders in order.
      *
-     * @param className the fully qualified class name
+     * @param className    the fully qualified class name
      * @param classLoaders the class loaders to attempt, in order
      *
      * @return the loaded class
@@ -50,9 +50,9 @@ public class ClassLoaderUtil {
         StringBuilder errorMsg = null;
         for (ClassLoader cl : classLoaders) {
             try {
-                if (cl!=null) {
+                if (cl != null) {
                     if (log.isDebugEnabled()) {
-                        log.debug("Attempting to load class["+className+"] from "+cl);
+                        log.debug("Attempting to load class[" + className + "] from " + cl);
                     }
                     return Class.forName(className, true, cl);
                 } else {
@@ -60,7 +60,7 @@ public class ClassLoaderUtil {
                 }
             } catch (ClassNotFoundException x) {
                 last = x;
-                if (errorMsg==null) {
+                if (errorMsg == null) {
                     errorMsg = new StringBuilder();
                 } else {
                     errorMsg.append(';');
@@ -72,9 +72,8 @@ public class ClassLoaderUtil {
                 break;
             }
         }
-        throw new ClassNotFoundException("Unable to load class: "+className+" from "+errorMsg, last);
+        throw new ClassNotFoundException("Unable to load class: " + className + " from " + errorMsg, last);
     }
-
 
 
 }

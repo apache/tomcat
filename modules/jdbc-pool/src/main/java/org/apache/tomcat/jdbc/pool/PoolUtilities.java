@@ -43,6 +43,7 @@ public class PoolUtilities {
      * Creates a shallow copy of the given properties.
      *
      * @param p the properties to clone
+     *
      * @return a new Properties instance containing all entries from the source
      */
     public static Properties clone(Properties p) {
@@ -55,6 +56,7 @@ public class PoolUtilities {
      * Creates a copy of the given properties with the password entry removed.
      *
      * @param p the properties to clone
+     *
      * @return a new Properties instance with all entries except the password
      */
     public static Properties cloneWithoutPassword(Properties p) {

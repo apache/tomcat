@@ -34,23 +34,17 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
 import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
 
 /**
- * Class that resets the abandoned timer on any activity on the
- * Connection, on any query execution and on any read of a
- * {@link java.sql.ResultSet} returned by a statement obtained from the
- * pooled connection, whether the operation completed successfully or
- * failed. Iterating a large result set therefore keeps the connection
- * alive through the fetch phase, not only until the query returns.
- * Each reset happens when an individual call completes, so a single call
- * that itself blocks on the database for longer than
- * {@link org.apache.tomcat.jdbc.pool.PoolConfiguration#setRemoveAbandonedTimeout(int)}
- * still gets the connection abandoned. The statement facade is always used,
- * so a result set handle that outlives its borrow is sealed off before it
- * can go on refreshing the abandoned timer of whoever holds that physical
- * connection next.
- * This interceptor is useful for when you have a {@link org.apache.tomcat.jdbc.pool.PoolConfiguration#setRemoveAbandonedTimeout(int)}
- * that is fairly low, and you want to reset the abandoned time each time any operation on the connection is performed
- * This is useful for batch processing programs that use connections for extensive amount of times.
- *
+ * Class that resets the abandoned timer on any activity on the Connection, on any query execution and on any read of a
+ * {@link java.sql.ResultSet} returned by a statement obtained from the pooled connection, whether the operation
+ * completed successfully or failed. Iterating a large result set therefore keeps the connection alive through the fetch
+ * phase, not only until the query returns. Each reset happens when an individual call completes, so a single call that
+ * itself blocks on the database for longer than
+ * {@link org.apache.tomcat.jdbc.pool.PoolConfiguration#setRemoveAbandonedTimeout(int)} still gets the connection
+ * abandoned. The statement facade is always used, so a result set handle that outlives its borrow is sealed off before
+ * it can go on refreshing the abandoned timer of whoever holds that physical connection next. This interceptor is
+ * useful for when you have a {@link org.apache.tomcat.jdbc.pool.PoolConfiguration#setRemoveAbandonedTimeout(int)} that
+ * is fairly low, and you want to reset the abandoned time each time any operation on the connection is performed This
+ * is useful for batch processing programs that use connections for extensive amount of times.
  */
 public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAbandonedTimerMBean {
 
@@ -99,24 +93,22 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
         try {
             return super.invoke(proxy, method, args);
         } finally {
-            //the operation was attempted on the connection, which counts
-            //as activity even when it failed
+            // The operation was attempted on the connection, which counts
+            // as activity even when it failed
             resetTimer();
         }
     }
 
     /**
-     * Wraps the query reporting statement proxy so that the result sets
-     * handed to the application reset the abandoned timer while they are
-     * read. Statements that this interceptor does not proxy are passed
-     * through unchanged.
+     * Wraps the query reporting statement proxy so that the result sets handed to the application reset the abandoned
+     * timer while they are read. Statements that this interceptor does not proxy are passed through unchanged.
      */
     @Override
     public Object createStatement(Object proxy, Method method, Object[] args, Object statement, long time) {
         Object result = super.createStatement(proxy, method, args, statement, time);
         if (result == statement) {
-            //not one of the statement types we proxy, or the proxy
-            //creation above failed - nothing to wrap
+            // Not one of the statement types we proxy, or the proxy
+            // creation above failed - nothing to wrap
             return result;
         }
         try {
@@ -130,11 +122,9 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
                 type = CallableStatement.class;
                 index = PREPARE_CALL_IDX;
             }
-            return getConstructor(index, type).newInstance(
-                    new Object[] { new TimerStatementProxy(result) });
+            return getConstructor(index, type).newInstance(new Object[] { new TimerStatementProxy(result) });
         } catch (Exception x) {
-            log.warn("Unable to create timer statement proxy for "
-                    + getClass().getName() + ".", x);
+            log.warn("Unable to create timer statement proxy for " + getClass().getName() + ".", x);
         }
         return result;
     }
@@ -156,27 +146,26 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
     }
 
     @Override
-    protected String reportFailedQuery(String query, Object[] args, String name,long start, Throwable t) {
+    protected String reportFailedQuery(String query, Object[] args, String name, long start, Throwable t) {
         resetTimer();
         return super.reportFailedQuery(query, args, name, start, t);
     }
 
     @Override
-    protected String reportQuery(String query, Object[] args, String name,long start, long delta) {
+    protected String reportQuery(String query, Object[] args, String name, long start, long delta) {
         resetTimer();
         return super.reportQuery(query, args, name, start, delta);
     }
 
     @Override
-    protected String reportSlowQuery(String query, Object[] args, String name,long start, long delta) {
+    protected String reportSlowQuery(String query, Object[] args, String name, long start, long delta) {
         resetTimer();
         return super.reportSlowQuery(query, args, name, start, delta);
     }
 
     /**
-     * Proxy for a statement that turns the result sets the statement hands
-     * out into {@link TimerResultSetProxy} instances. Every other call is
-     * passed straight through to the wrapped statement.
+     * Proxy for a statement that turns the result sets the statement hands out into {@link TimerResultSetProxy}
+     * instances. Every other call is passed straight through to the wrapped statement.
      */
     private final class TimerStatementProxy implements InvocationHandler {
         /**
@@ -190,9 +179,9 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            //Handle identity on this proxy, like the statement facade
-            //does, rather than on the object below it: the application
-            //must be able to rely on its own handles
+            // Handle identity on this proxy, like the statement facade
+            // does, rather than on the object below it: the application
+            // must be able to rely on its own handles
             if (compare(TOSTRING_VAL, method)) {
                 return toString();
             }
@@ -215,21 +204,20 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
                 }
                 throw cause;
             }
-            //Wrap the same three result set producing calls that the
-            //statement facade wraps: executeQuery, getResultSet and
-            //getGeneratedKeys
+            // Wrap the same three result set producing calls that the
+            // statement facade wraps: executeQuery, getResultSet and
+            // getGeneratedKeys
             if (result instanceof ResultSet) {
                 String name = method.getName();
-                if (compare(EXECUTE_QUERY, name) || compare(GET_RESULTSET, name)
-                        || compare(GET_GENERATED_KEYS, name)) {
+                if (compare(EXECUTE_QUERY, name) || compare(GET_RESULTSET, name) || compare(GET_GENERATED_KEYS, name)) {
                     try {
-                        return getConstructor(RESULTSET_IDX, ResultSet.class).newInstance(
-                                new Object[] { new TimerResultSetProxy(result, proxy) });
+                        return getConstructor(RESULTSET_IDX, ResultSet.class)
+                                .newInstance(new Object[] { new TimerResultSetProxy(result, proxy) });
                     } catch (Exception x) {
-                        //the application just does not get the timer reset
-                        //while reading this result set
-                        log.warn("Unable to create timer result set proxy for "
-                                + ResetAbandonedTimer.this.getClass().getName() + ".", x);
+                        // The application just does not get the timer reset
+                        // while reading this result set
+                        log.warn("Unable to create timer result set proxy for " +
+                                ResetAbandonedTimer.this.getClass().getName() + ".", x);
                     }
                 }
             }
@@ -248,16 +236,14 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
 
         @Override
         public String toString() {
-            return ResetAbandonedTimer.this.getClass().getName()
-                    + "[Proxy=" + hashCode() + "; Delegate=" + delegate + ']';
+            return ResetAbandonedTimer.this.getClass().getName() + "[Proxy=" + hashCode() + "; Delegate=" + delegate +
+                    ']';
         }
     }
 
     /**
-     * Proxy for a result set that resets the abandoned timer on every read,
-     * so that an application iterating a result set - or doing its per-row
-     * work between the reads - counts as active and is not abandoned
-     * mid-iteration.
+     * Proxy for a result set that resets the abandoned timer on every read, so that an application iterating a result
+     * set - or doing its per-row work between the reads - counts as active and is not abandoned mid-iteration.
      */
     private final class TimerResultSetProxy implements InvocationHandler {
         /**
@@ -265,12 +251,10 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
          */
         private final Object delegate;
         /**
-         * The statement handle in use by this interceptor, returned by
-         * {@link java.sql.ResultSet#getStatement()}. It keeps the timer
-         * reset like the handle the application holds, but it is not
-         * necessarily that same outermost handle: the statement facade
-         * substitutes its own handle from outside this interceptor, and
-         * any interceptor configured around this one may too.
+         * The statement handle in use by this interceptor, returned by {@link java.sql.ResultSet#getStatement()}. It
+         * keeps the timer reset like the handle the application holds, but it is not necessarily that same outermost
+         * handle: the statement facade substitutes its own handle from outside this interceptor, and any interceptor
+         * configured around this one may too.
          */
         private final Object statement;
 
@@ -281,9 +265,9 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            //Handle identity on this proxy, like the statement facade
-            //does, rather than on the object below it: the application
-            //must be able to rely on its own handles
+            // Handle identity on this proxy, like the statement facade
+            // does, rather than on the object below it: the application
+            // must be able to rely on its own handles
             if (compare(TOSTRING_VAL, method)) {
                 return toString();
             }
@@ -308,8 +292,8 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
                 }
                 throw cause;
             } finally {
-                //reading the result set is activity on the connection,
-                //even when the read failed
+                // Reading the result set is activity on the connection,
+                // even when the read failed
                 resetTimer();
             }
         }
@@ -326,8 +310,8 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
 
         @Override
         public String toString() {
-            return ResetAbandonedTimer.this.getClass().getName()
-                    + "[Proxy=" + hashCode() + "; Delegate=" + delegate + ']';
+            return ResetAbandonedTimer.this.getClass().getName() + "[Proxy=" + hashCode() + "; Delegate=" + delegate +
+                    ']';
         }
     }
 }

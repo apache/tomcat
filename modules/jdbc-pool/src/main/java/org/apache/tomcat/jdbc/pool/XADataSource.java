@@ -23,15 +23,11 @@ import javax.sql.XAConnection;
 /**
  * XA-enabled data source for distributed transaction support.
  * <p>
- * Note that XA support is not provided by this class itself: XA
- * connections are obtained from the data source configured through the
- * {@code dataSource} or {@code dataSourceJNDI} attribute, which must
- * implement {@link javax.sql.XADataSource} (see
- * {@link PoolConfiguration#setDataSource(Object)}). A pool configured
- * with only {@code driverClassName} and {@code url} pools plain JDBC
- * connections; a request for an XA connection from such a pool fails
- * with an explicit message naming the missing configuration rather
- * than later, inside the transaction manager.
+ * Note that XA support is not provided by this class itself: XA connections are obtained from the data source
+ * configured through the {@code dataSource} or {@code dataSourceJNDI} attribute, which must implement
+ * {@link javax.sql.XADataSource} (see {@link PoolConfiguration#setDataSource(Object)}). A pool configured with only
+ * {@code driverClassName} and {@code url} pools plain JDBC connections; a request for an XA connection from such a pool
+ * fails with an explicit message naming the missing configuration rather than later, inside the transaction manager.
  */
 public class XADataSource extends DataSource implements javax.sql.XADataSource {
 
@@ -44,6 +40,7 @@ public class XADataSource extends DataSource implements javax.sql.XADataSource {
 
     /**
      * Constructs a DataSource object wrapping a connection
+     *
      * @param poolProperties The pool configuration
      */
     public XADataSource(PoolConfiguration poolProperties) {
@@ -53,9 +50,8 @@ public class XADataSource extends DataSource implements javax.sql.XADataSource {
     /**
      * {@inheritDoc}
      * <p>
-     * This implementation first checks that the pool can provide XA
-     * connections at all, and fails with an explicit configuration hint
-     * when it cannot.
+     * This implementation first checks that the pool can provide XA connections at all, and fails with an explicit
+     * configuration hint when it cannot.
      */
     @Override
     public XAConnection getXAConnection() throws SQLException {
@@ -66,9 +62,9 @@ public class XADataSource extends DataSource implements javax.sql.XADataSource {
     /**
      * {@inheritDoc}
      * <p>
-     * This implementation first checks that the pool can provide XA
-     * connections at all, and fails with an explicit configuration hint
-     * when it cannot.
+     * This implementation first checks that the pool can provide XA connections at all, and fails with an explicit
+     * configuration hint when it cannot.
+     *
      * @param username The user name
      * @param password The password
      */
@@ -79,11 +75,11 @@ public class XADataSource extends DataSource implements javax.sql.XADataSource {
     }
 
     /**
-     * Verifies that the pool is backed by an XA data source, matching
-     * the condition under which {@link PooledConnection} creates XA
-     * connections.
-     * @throws SQLException if the pool cannot hold XA connections, with
-     *         a message naming the configuration that is missing
+     * Verifies that the pool is backed by an XA data source, matching the condition under which
+     * {@link PooledConnection} creates XA connections.
+     *
+     * @throws SQLException if the pool cannot hold XA connections, with a message naming the configuration that is
+     *                          missing
      */
     private void requireXABacking() throws SQLException {
         Object ds = getPoolProperties().getDataSource();
@@ -91,13 +87,13 @@ public class XADataSource extends DataSource implements javax.sql.XADataSource {
             return;
         }
         if (ds == null) {
-            throw new SQLException("The connection pool [" + getName() + "] cannot provide XA connections: it is"
-                    + " configured with a JDBC driver and URL (or the 'dataSourceJNDI' lookup did not resolve to a"
-                    + " data source), so the pool holds plain JDBC connections. Set the 'dataSource' or"
-                    + " 'dataSourceJNDI' attribute to a javax.sql.XADataSource provided by the JDBC driver.");
+            throw new SQLException("The connection pool [" + getName() + "] cannot provide XA connections: it is" +
+                    " configured with a JDBC driver and URL (or the 'dataSourceJNDI' lookup did not resolve to a" +
+                    " data source), so the pool holds plain JDBC connections. Set the 'dataSource' or" +
+                    " 'dataSourceJNDI' attribute to a javax.sql.XADataSource provided by the JDBC driver.");
         }
-        throw new SQLException("The connection pool [" + getName() + "] cannot provide XA connections: the data"
-                + " source configured through the 'dataSource' or 'dataSourceJNDI' attribute ("
-                + ds.getClass().getName() + ") does not implement javax.sql.XADataSource.");
+        throw new SQLException("The connection pool [" + getName() + "] cannot provide XA connections: the data" +
+                " source configured through the 'dataSource' or 'dataSourceJNDI' attribute (" +
+                ds.getClass().getName() + ") does not implement javax.sql.XADataSource.");
     }
 }

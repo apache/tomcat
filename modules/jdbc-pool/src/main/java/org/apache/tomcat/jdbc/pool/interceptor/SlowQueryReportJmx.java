@@ -45,27 +45,24 @@ import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
+
 /**
- * JMX-enabled slow query report interceptor.
- * Publishes slow and failed query statistics to JMX and provides
+ * JMX-enabled slow query report interceptor. Publishes slow and failed query statistics to JMX and provides
  * notifications when slow or failed queries are detected.
  * <p>
- * The MBean and the notification broadcaster are published for the pool
- * <em>name</em>: the first interceptor instance to borrow a connection
- * registers them, and every other instance sharing the name - the other
- * connections of that pool, the second interceptor of the recommended
- * two-thresholds configuration, or a second pool configured with the
- * same name - reports through them. They stay published until the last
- * live pool registered under the name closes; closing one of several
- * same-named pools leaves the registration with the survivors.</p>
+ * The MBean and the notification broadcaster are published for the pool <em>name</em>: the first interceptor instance
+ * to borrow a connection registers them, and every other instance sharing the name - the other connections of that
+ * pool, the second interceptor of the recommended two-thresholds configuration, or a second pool configured with the
+ * same name - reports through them. They stay published until the last live pool registered under the name closes;
+ * closing one of several same-named pools leaves the registration with the survivors.
+ * </p>
  * <p>
- * A JMX client's listener subscription belongs to the registration it
- * was added through. JMX cannot carry a subscription across an
- * unregistration, so after the last pool of a name has closed, a client
- * must attach its listeners again to receive notifications from a pool
- * started under that name anew.</p>
+ * A JMX client's listener subscription belongs to the registration it was added through. JMX cannot carry a
+ * subscription across an unregistration, so after the last pool of a name has closed, a client must attach its
+ * listeners again to receive notifications from a pool started under that name anew.
+ * </p>
  */
-public class SlowQueryReportJmx extends SlowQueryReport implements NotificationEmitter, SlowQueryReportJmxMBean{
+public class SlowQueryReportJmx extends SlowQueryReport implements NotificationEmitter, SlowQueryReportJmxMBean {
     /**
      * Notification type for slow query events.
      */
@@ -96,48 +93,35 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     /**
      * Registry of JMX MBeans for each connection pool.
      */
-    protected static final ConcurrentHashMap<String,SlowQueryReportJmxMBean> mbeans =
-            new ConcurrentHashMap<>();
+    protected static final ConcurrentHashMap<String, SlowQueryReportJmxMBean> mbeans = new ConcurrentHashMap<>();
 
     /**
-     * Notification broadcasters for each connection pool. Interceptor
-     * instances are created per pooled connection, but JMX clients
-     * attach their listeners to the single MBean registered per pool, so
-     * notifications raised by any instance of a pool must reach the
-     * broadcaster of the pool rather than a broadcaster private to the
-     * instance.
+     * Notification broadcasters for each connection pool. Interceptor instances are created per pooled connection, but
+     * JMX clients attach their listeners to the single MBean registered per pool, so notifications raised by any
+     * instance of a pool must reach the broadcaster of the pool rather than a broadcaster private to the instance.
      */
-    protected static final ConcurrentHashMap<String,NotificationBroadcasterSupport> notifiers =
-            new ConcurrentHashMap<>();
+    protected static final ConcurrentHashMap<String, NotificationBroadcasterSupport> notifiers = new ConcurrentHashMap<>();
 
     /**
-     * Registry of the first registration failure seen for each pool name,
-     * holding the ObjectName that failed. Registration is retried by every
-     * borrow of such a pool, but only the first failure of a name is
-     * logged with its exception, so a persistent refusal - a foreign MBean
-     * holding the name, a security restriction - is not reported with a
-     * stack trace once per borrow. The marker is dropped when a
-     * registration under the name succeeds and when the name's release
-     * runs through {@link #deregisterJmx()}, so a later failure cycle is
-     * reported loudly once again.
+     * Registry of the first registration failure seen for each pool name, holding the ObjectName that failed.
+     * Registration is retried by every borrow of such a pool, but only the first failure of a name is logged with its
+     * exception, so a persistent refusal - a foreign MBean holding the name, a security restriction - is not reported
+     * with a stack trace once per borrow. The marker is dropped when a registration under the name succeeds and when
+     * the name's release runs through {@link #deregisterJmx()}, so a later failure cycle is reported loudly once again.
      */
-    protected static final ConcurrentHashMap<String,ObjectName> registrationFailuresLogged =
-            new ConcurrentHashMap<>();
+    protected static final ConcurrentHashMap<String, ObjectName> registrationFailuresLogged = new ConcurrentHashMap<>();
 
 
-    //==============================JMX STUFF========================
     /**
-     * Notification broadcaster used before the pool name is known;
-     * once the pool name is known, {@link #getNotifier()} returns the
-     * broadcaster shared by all interceptor instances of that pool.
+     * Notification broadcaster used before the pool name is known; once the pool name is known, {@link #getNotifier()}
+     * returns the broadcaster shared by all interceptor instances of that pool.
      */
     protected volatile NotificationBroadcasterSupport notifier = new NotificationBroadcasterSupport();
 
     /**
-     * Returns the notification broadcaster that all interceptor
-     * instances of the current pool share, so that notifications raised
-     * on any connection reach the listeners registered with the pool's
-     * MBean.
+     * Returns the notification broadcaster that all interceptor instances of the current pool share, so that
+     * notifications raised on any connection reach the listeners registered with the pool's MBean.
+     *
      * @return the shared broadcaster for this interceptor's pool
      */
     protected NotificationBroadcasterSupport getNotifier() {
@@ -150,19 +134,23 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
 
     /**
      * Adds a notification listener.
+     *
      * @param listener the listener to add
-     * @param filter the notification filter
+     * @param filter   the notification filter
      * @param handback the handback object
+     *
      * @throws IllegalArgumentException if the listener is null
      */
     @Override
-    public void addNotificationListener(NotificationListener listener, NotificationFilter filter, Object handback) throws IllegalArgumentException {
+    public void addNotificationListener(NotificationListener listener, NotificationFilter filter, Object handback)
+            throws IllegalArgumentException {
         getNotifier().addNotificationListener(listener, filter, handback);
     }
 
 
     /**
      * Returns information about the notifications this MBean can send.
+     *
      * @return an array of MBeanNotificationInfo objects
      */
     @Override
@@ -172,7 +160,9 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
 
     /**
      * Removes a notification listener.
+     *
      * @param listener the listener to remove
+     *
      * @throws ListenerNotFoundException if the listener was not previously added
      */
     @Override
@@ -183,19 +173,20 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
 
     /**
      * Removes a notification listener with the given filter and handback.
+     *
      * @param listener the listener to remove
-     * @param filter the notification filter
+     * @param filter   the notification filter
      * @param handback the handback object
+     *
      * @throws ListenerNotFoundException if the listener was not previously added
      */
     @Override
-    public void removeNotificationListener(NotificationListener listener, NotificationFilter filter, Object handback) throws ListenerNotFoundException {
+    public void removeNotificationListener(NotificationListener listener, NotificationFilter filter, Object handback)
+            throws ListenerNotFoundException {
         getNotifier().removeNotificationListener(listener, filter, handback);
 
     }
 
-
-    //==============================JMX STUFF========================
 
     /**
      * The name of the connection pool.
@@ -219,19 +210,17 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
 
     /**
      * Returns the composite type used for JMX query statistics.
+     *
      * @return the composite type, or {@code null} if initialization failed
      */
     protected static CompositeType getCompositeType() {
-        if (SLOW_QUERY_TYPE==null) {
+        if (SLOW_QUERY_TYPE == null) {
             try {
-                SLOW_QUERY_TYPE = new CompositeType(
-                        SlowQueryReportJmx.class.getName(),
-                        "Composite data type for query statistics",
-                        QueryStats.getFieldNames(),
-                        QueryStats.getFieldDescriptions(),
-                        QueryStats.getFieldTypes());
-            }catch (OpenDataException x) {
-                log.warn("Unable to initialize composite data type for JMX stats and notifications.",x);
+                SLOW_QUERY_TYPE = new CompositeType(SlowQueryReportJmx.class.getName(),
+                        "Composite data type for query statistics", QueryStats.getFieldNames(),
+                        QueryStats.getFieldDescriptions(), QueryStats.getFieldTypes());
+            } catch (OpenDataException x) {
+                log.warn("Unable to initialize composite data type for JMX stats and notifications.", x);
             }
         }
         return SLOW_QUERY_TYPE;
@@ -239,13 +228,14 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
 
     /**
      * Resets this interceptor for a new connection, registering JMX if applicable.
+     *
      * @param parent the connection pool
-     * @param con the pooled connection
+     * @param con    the pooled connection
      */
     @Override
     public void reset(ConnectionPool parent, PooledConnection con) {
         super.reset(parent, con);
-        if (parent!=null) {
+        if (parent != null) {
             poolName = parent.getName();
             pool = parent;
             registerJmx();
@@ -254,19 +244,15 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
 
 
     /**
-     * Called when the connection pool is closed; releases the JMX
-     * registration of the pool's name - the MBean and the broadcaster its
-     * clients' listeners are attached to - only once that pool was the
-     * last live pool registered under the name. Both belong to the name
-     * and are shared by every live pool of that name, so taking them down
-     * while a survivor is still running would orphan the survivor's
-     * monitoring; releasing them on every close but a decided last one
-     * would unregister a shared registration that other closing or live
-     * pools still rely on. Whether this close is the last one is decided
-     * atomically by {@link SlowQueryReport#releaseStatistics(ConnectionPool)}
-     * on the way through {@code super.poolClosed}, so concurrent closes
-     * of same-named pools cannot all see a survivor and leave the name
-     * registered for ever.
+     * Called when the connection pool is closed; releases the JMX registration of the pool's name - the MBean and the
+     * broadcaster its clients' listeners are attached to - only once that pool was the last live pool registered under
+     * the name. Both belong to the name and are shared by every live pool of that name, so taking them down while a
+     * survivor is still running would orphan the survivor's monitoring; releasing them on every close but a decided
+     * last one would unregister a shared registration that other closing or live pools still rely on. Whether this
+     * close is the last one is decided atomically by {@link SlowQueryReport#releaseStatistics(ConnectionPool)} on the
+     * way through {@code super.poolClosed}, so concurrent closes of same-named pools cannot all see a survivor and
+     * leave the name registered for ever.
+     *
      * @param pool the connection pool being closed
      */
     @Override
@@ -274,7 +260,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
         this.poolName = pool.getName();
         super.poolClosed(pool);
         if (lastPoolOfNameClosed) {
-            // the statistics of the name were freed by this very close,
+            // The statistics of the name were freed by this very close,
             // so no live pool is registered under it any more - and the
             // registered MBean, whose delegate may be an interceptor
             // instance of an already closed pool, goes with them
@@ -284,6 +270,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
 
     /**
      * Called when the connection pool is started.
+     *
      * @param pool the connection pool being started
      */
     @Override
@@ -295,51 +282,50 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
 
     /**
      * Reports a failed query and sends a JMX notification if logging is enabled.
+     *
      * @param query the SQL query
-     * @param args the query arguments
-     * @param name the connection pool name
+     * @param args  the query arguments
+     * @param name  the connection pool name
      * @param start the start time in milliseconds
-     * @param t the throwable that caused the failure
+     * @param t     the throwable that caused the failure
+     *
      * @return the formatted query string
      */
     @Override
     protected String reportFailedQuery(String query, Object[] args, String name, long start, Throwable t) {
         query = super.reportFailedQuery(query, args, name, start, t);
         if (isLogFailed()) {
-            notifyJmx(query,FAILED_QUERY_NOTIFICATION);
+            notifyJmx(query, FAILED_QUERY_NOTIFICATION);
         }
         return query;
     }
 
     /**
      * Sends a JMX notification for the given query and notification type.
+     *
      * @param query the SQL query string
-     * @param type the notification type (slow or failed query)
+     * @param type  the notification type (slow or failed query)
      */
     protected void notifyJmx(String query, String type) {
         try {
             long sequence = notifySequence.incrementAndGet();
 
             if (isNotifyPool()) {
-                if (this.pool!=null && this.pool.getJmxPool()!=null) {
+                if (this.pool != null && this.pool.getJmxPool() != null) {
                     this.pool.getJmxPool().notify(type, query);
                 }
             } else {
                 NotificationBroadcasterSupport target = getNotifier();
-                if (target!=null) {
-                    Notification notification =
-                            new Notification(type,
-                                         getNotificationSource(),
-                                         sequence,
-                                         System.currentTimeMillis(),
-                                         query);
+                if (target != null) {
+                    Notification notification = new Notification(type, getNotificationSource(), sequence,
+                            System.currentTimeMillis(), query);
 
                     target.sendNotification(notification);
                 }
             }
         } catch (RuntimeOperationsException e) {
             if (log.isDebugEnabled()) {
-                log.debug("Unable to send failed query notification.",e);
+                log.debug("Unable to send failed query notification.", e);
             }
         }
     }
@@ -347,62 +333,57 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     /**
      * Returns the source this MBean's notifications are sent with.
      * <p>
-     * {@link Notification} marshals its source, so a listener outside this
-     * JVM - one reached through a JMX connector, or one that hands the
-     * notification on to another process - only receives the notification at
-     * all if the source is serializable. This MBean is not, and neither is
-     * the pool it reports on, so the source is the {@link ObjectName} the
-     * MBean is registered under, which names the pool and is serializable.
-     * Interceptor instances are created per pooled connection and only one
-     * of them is the registered MBean's resource, so an instance cannot
-     * name itself: every instance of a pool name sends the very name its
-     * registration was published under. An instance whose name cannot be
-     * formed - a malformed {@code objectName} property or a pool name that
-     * cannot be quoted into an ObjectName - was never registered at all, so
-     * no listener reached through a connector can exist for it; the source
-     * is then a string of the default name's shape, which still names the
-     * pool for the local listeners the broadcaster serves.
+     * {@link Notification} marshals its source, so a listener outside this JVM - one reached through a JMX connector,
+     * or one that hands the notification on to another process - only receives the notification at all if the source is
+     * serializable. This MBean is not, and neither is the pool it reports on, so the source is the {@link ObjectName}
+     * the MBean is registered under, which names the pool and is serializable. Interceptor instances are created per
+     * pooled connection and only one of them is the registered MBean's resource, so an instance cannot name itself:
+     * every instance of a pool name sends the very name its registration was published under. An instance whose name
+     * cannot be formed - a malformed {@code objectName} property or a pool name that cannot be quoted into an
+     * ObjectName - was never registered at all, so no listener reached through a connector can exist for it; the source
+     * is then a string of the default name's shape, which still names the pool for the local listeners the broadcaster
+     * serves.
      *
-     * @return the ObjectName the registration of this interceptor's pool
-     *         name is published under, or, when that name cannot be
-     *         formed, a string of the default name's shape
+     * @return the ObjectName the registration of this interceptor's pool name is published under, or, when that name
+     *             cannot be formed, a string of the default name's shape
      */
     protected Object getNotificationSource() {
         try {
             return getObjectName(getClass(), poolName);
         } catch (MalformedObjectNameException x) {
-            // the name construction getObjectName uses when no override is
+            // The name construction getObjectName uses when no override is
             // configured - with a malformed name this MBean was never
             // registered, so this fallback is only read by local listeners,
             // for which it must still name the pool
-            return ConnectionPool.POOL_JMX_TYPE_PREFIX + getClass().getName()
-                    + ",name=" + poolName;
+            return ConnectionPool.POOL_JMX_TYPE_PREFIX + getClass().getName() + ",name=" + poolName;
         }
     }
 
     /**
      * Reports a slow query and sends a JMX notification if logging is enabled.
+     *
      * @param query the SQL query
-     * @param args the query arguments
-     * @param name the connection pool name
+     * @param args  the query arguments
+     * @param name  the connection pool name
      * @param start the start time in milliseconds
      * @param delta the elapsed time in milliseconds
+     *
      * @return the formatted query string
      */
     @Override
     protected String reportSlowQuery(String query, Object[] args, String name, long start, long delta) {
         query = super.reportSlowQuery(query, args, name, start, delta);
         if (isLogSlow()) {
-            notifyJmx(query,SLOW_QUERY_NOTIFICATION);
+            notifyJmx(query, SLOW_QUERY_NOTIFICATION);
         }
         return query;
     }
 
     /**
      * JMX operation - return the names of all the pools
-     * @return - all the names of pools that we have stored data for,
-     *         which is a view of the JVM-wide statistics registry rather
-     *         than of this pool alone
+     *
+     * @return - all the names of pools that we have stored data for, which is a view of the JVM-wide statistics
+     *             registry rather than of this pool alone
      */
     @Override
     public String[] getPoolNames() {
@@ -412,8 +393,8 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
 
     /**
      * JMX operation - return the name of the pool
-     * @return the name of the pool, unique within the JVM, or
-     *         {@code null} before this instance is bound to a pool
+     *
+     * @return the name of the pool, unique within the JVM, or {@code null} before this instance is bound to a pool
      */
     @Override
     public String getPoolName() {
@@ -423,6 +404,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
 
     /**
      * Returns whether notifications are sent to the pool.
+     *
      * @return true if notifications are sent to the pool
      */
     public boolean isNotifyPool() {
@@ -430,13 +412,11 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     }
 
     /**
-     * Sets whether notifications are sent to the pool. Configuration
-     * entry point only, applied to every interceptor instance of a pool by
-     * {@code setProperties} while its connection chain is built: it is not
-     * part of the JMX management interface, because writing it through the
-     * registered MBean would reach only the one instance that owns the
-     * registration and leave the pool's other connections routing as
-     * before. See {@link SlowQueryReportJmxMBean}.
+     * Sets whether notifications are sent to the pool. Configuration entry point only, applied to every interceptor
+     * instance of a pool by {@code setProperties} while its connection chain is built: it is not part of the JMX
+     * management interface, because writing it through the registered MBean would reach only the one instance that owns
+     * the registration and leave the pool's other connections routing as before. See {@link SlowQueryReportJmxMBean}.
+     *
      * @param notifyPool true if notifications should be sent to the pool
      */
     public void setNotifyPool(boolean notifyPool) {
@@ -444,18 +424,16 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     }
 
     /**
-     * JMX operation - remove all stats for this connection pool. The
-     * statistics are keyed by pool name and shared by every live pool
-     * configured with that name, so clearing them through one pool's MBean
-     * clears them for all of those pools. Only the recorded content goes:
-     * the statistics map stays registered with the name - every live
-     * instance holds that very map and keeps accumulating into it.
+     * JMX operation - remove all stats for this connection pool. The statistics are keyed by pool name and shared by
+     * every live pool configured with that name, so clearing them through one pool's MBean clears them for all of those
+     * pools. Only the recorded content goes: the statistics map stays registered with the name - every live instance
+     * holds that very map and keeps accumulating into it.
      */
     @Override
     public void resetStats() {
-        ConcurrentHashMap<String,QueryStats> queries = getPoolStats(poolName);
-        if (queries!=null) {
-            // clear the map itself rather than emptying it through an
+        ConcurrentHashMap<String, QueryStats> queries = getPoolStats(poolName);
+        if (queries != null) {
+            // Clear the map itself rather than emptying it through an
             // iterator: the map is shared with every interceptor instance
             // of the name, which all hold this same instance
             queries.clear();
@@ -464,20 +442,21 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
 
     /**
      * JMX operation - returns all the queries we have collected.
+     *
      * @return - the slow query report as composite data.
      */
     @Override
     public CompositeData[] getSlowQueriesCD() throws OpenDataException {
         CompositeDataSupport[] result = null;
-        ConcurrentHashMap<String,QueryStats> queries = getPoolStats(poolName);
-        if (queries!=null) {
+        ConcurrentHashMap<String, QueryStats> queries = getPoolStats(poolName);
+        if (queries != null) {
             // Materialise a point-in-time snapshot before sizing the array:
             // the map is shared with every interceptor instance of the pool
             // name, which keep adding entries on every query and removing
             // them on capacity eviction, so sizing from the live map and
             // then filling from its weakly consistent entry set could run
             // past the end of the array or leave nulls in it
-            Map<String,QueryStats> snapshot = new HashMap<>(queries);
+            Map<String, QueryStats> snapshot = new HashMap<>(queries);
             result = new CompositeDataSupport[snapshot.size()];
             int pos = 0;
             for (QueryStats qs : snapshot.values()) {
@@ -488,30 +467,27 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     }
 
     /**
-     * Releases the MBean registration and the shared broadcaster held
-     * for the current pool name unconditionally - even when the pool
-     * name is still owned by live pools. Normal pool shutdown releases
-     * through {@code super.poolClosed} plus {@link #lastPoolOfNameClosed}
-     * in {@link #poolClosed(ConnectionPool)}, which keeps the
-     * registration for any surviving same-named pool.
+     * Releases the MBean registration and the shared broadcaster held for the current pool name unconditionally - even
+     * when the pool name is still owned by live pools. Normal pool shutdown releases through {@code super.poolClosed}
+     * plus {@link #lastPoolOfNameClosed} in {@link #poolClosed(ConnectionPool)}, which keeps the registration for any
+     * surviving same-named pool.
      * <p>
-     * The broadcaster and the registration-failure marker belong to the
-     * name as much as the MBean does, so the release drops them even
-     * when this pool never held the registry slot: a pool whose every
-     * registration attempt was refused still reported through the
-     * broadcaster, and its throttle marker must not outlive the name and
-     * hush the first failure of a later failure cycle under the name.</p>
+     * The broadcaster and the registration-failure marker belong to the name as much as the MBean does, so the release
+     * drops them even when this pool never held the registry slot: a pool whose every registration attempt was refused
+     * still reported through the broadcaster, and its throttle marker must not outlive the name and hush the first
+     * failure of a later failure cycle under the name.
+     * </p>
      */
     protected void deregisterJmx() {
         try {
-            if (mbeans.remove(poolName)!=null) {
-                ObjectName oname = getObjectName(getClass(),poolName);
+            if (mbeans.remove(poolName) != null) {
+                ObjectName oname = getObjectName(getClass(), poolName);
                 JmxUtil.unregisterJmx(oname);
             }
             notifiers.remove(poolName);
             registrationFailuresLogged.remove(poolName);
         } catch (MalformedObjectNameException | RuntimeOperationsException e) {
-            log.warn("Jmx deregistration failed.",e);
+            log.warn("Jmx deregistration failed.", e);
         }
 
     }
@@ -519,18 +495,21 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
 
     /**
      * Returns the JMX ObjectName for the given class and pool name.
-     * @param clazz the interceptor class
+     *
+     * @param clazz    the interceptor class
      * @param poolName the name of the connection pool
+     *
      * @return the JMX ObjectName
+     *
      * @throws MalformedObjectNameException if the object name is malformed
      */
     public ObjectName getObjectName(Class<?> clazz, String poolName) throws MalformedObjectNameException {
         ObjectName oname;
-        Map<String,InterceptorProperty> properties = getProperties();
+        Map<String, InterceptorProperty> properties = getProperties();
         if (properties != null && properties.containsKey(objectNameAttribute)) {
             oname = new ObjectName(properties.get(objectNameAttribute).getValue());
         } else {
-            oname = new ObjectName(ConnectionPool.POOL_JMX_TYPE_PREFIX+clazz.getName()+",name=" + poolName);
+            oname = new ObjectName(ConnectionPool.POOL_JMX_TYPE_PREFIX + clazz.getName() + ",name=" + poolName);
         }
         return oname;
     }
@@ -538,78 +517,73 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     /**
      * Registers this interceptor with JMX.
      * <p>
-     * The registration is attempted under the protection of the per-name
-     * registry slot: the slot is taken with {@code putIfAbsent} so only
-     * one instance per pool name registers, and it is released again when
-     * the MBeanServer refuses the MBean. A failed publish must not keep
-     * the slot, because the slot is the only registration gate: every
-     * later borrow would find it occupied and skip the registration, so
-     * the pool would claim an MBean for its whole life that was never
-     * published - and would not re-register even after whatever made the
-     * MBeanServer refuse it is gone. Releasing the slot lets a later
-     * borrow retry; {@code JmxUtil.registerJmx} cannot be used for the
-     * attempt because it swallows every exception and returns a name
-     * whatever happened, so the failure of its own call is unobservable
-     * to the caller. Only the first refusal of a name is logged with its
-     * exception, so a persistent refusal is not reported once per borrow.
+     * The registration is attempted under the protection of the per-name registry slot: the slot is taken with
+     * {@code putIfAbsent} so only one instance per pool name registers, and it is released again when the MBeanServer
+     * refuses the MBean. A failed publish must not keep the slot, because the slot is the only registration gate: every
+     * later borrow would find it occupied and skip the registration, so the pool would claim an MBean for its whole
+     * life that was never published - and would not re-register even after whatever made the MBeanServer refuse it is
+     * gone. Releasing the slot lets a later borrow retry; {@code JmxUtil.registerJmx} cannot be used for the attempt
+     * because it swallows every exception and returns a name whatever happened, so the failure of its own call is
+     * unobservable to the caller. Only the first refusal of a name is logged with its exception, so a persistent
+     * refusal is not reported once per borrow.
      */
     protected void registerJmx() {
         try {
-            //only if we notify the pool itself
+            // Only if we notify the pool itself
             if (isNotifyPool()) {
 
-            } else if (getCompositeType()!=null) {
-                ObjectName oname = getObjectName(getClass(),poolName);
-                if (mbeans.putIfAbsent(poolName, this)==null) {
+            } else if (getCompositeType() != null) {
+                ObjectName oname = getObjectName(getClass(), poolName);
+                if (mbeans.putIfAbsent(poolName, this) == null) {
                     try {
                         ManagementFactory.getPlatformMBeanServer().registerMBean(this, oname);
-                        // a registration under the name works again - drop
+                        // A registration under the name works again - drop
                         // the marker so a later failure cycle reports loudly
                         registrationFailuresLogged.remove(poolName);
                     } catch (Exception x) {
                         mbeans.remove(poolName, this);
                         if (oname.equals(registrationFailuresLogged.putIfAbsent(poolName, oname))) {
-                            // the loud report went out with the first
+                            // The loud report went out with the first
                             // refusal of this name; repeats ride along at
                             // debug, without a stack trace, so a persistent
                             // refusal stays quiet under borrow load
                             if (log.isDebugEnabled()) {
-                                log.debug("Jmx registration of [" + oname
-                                        + "] failed again: " + x);
+                                log.debug("Jmx registration of [" + oname + "] failed again: " + x);
                             }
                         } else {
-                            // first refusal for the name, or the name now
+                            // First refusal for the name, or the name now
                             // fails under a different ObjectName: report it
                             // loudly and remember to throttle the repeats
                             registrationFailuresLogged.put(poolName, oname);
                             if (x instanceof InstanceAlreadyExistsException) {
-                                // retryable: the name may be held by a stale
+                                // Retryable: the name may be held by a stale
                                 // or foreign MBean that a later borrow finds
                                 // gone
-                                log.warn("Jmx registration of [" + oname
-                                        + "] failed: the name is already in use by another MBean."
-                                        + " The registration is retried by later borrows;"
-                                        + " repeated failures are logged at debug level.", x);
+                                log.warn("Jmx registration of [" + oname +
+                                        "] failed: the name is already in use by another MBean." +
+                                        " The registration is retried by later borrows;" +
+                                        " repeated failures are logged at debug level.", x);
                             } else {
-                                log.error("Jmx registration of [" + oname
-                                        + "] failed, no JMX data will be exposed for the query stats"
-                                        + " until a registration succeeds. The registration is"
-                                        + " retried by later borrows; repeated failures are"
-                                        + " logged at debug level.", x);
+                                log.error("Jmx registration of [" + oname +
+                                        "] failed, no JMX data will be exposed for the query stats" +
+                                        " until a registration succeeds. The registration is" +
+                                        " retried by later borrows; repeated failures are" + " logged at debug level.",
+                                        x);
                             }
                         }
                     }
                 }
             } else {
-                log.warn(SlowQueryReport.class.getName()+ "- No JMX support, composite type was not found.");
+                log.warn(SlowQueryReport.class.getName() + "- No JMX support, composite type was not found.");
             }
         } catch (MalformedObjectNameException | RuntimeOperationsException e) {
-            log.error("Jmx registration failed, no JMX data will be exposed for the query stats.",e);
+            log.error("Jmx registration failed, no JMX data will be exposed for the query stats.", e);
         }
     }
 
     /**
      * Sets the interceptor properties, including the notifyPool flag.
+     *
      * @param properties the interceptor properties
      */
     @Override
@@ -617,7 +591,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
         super.setProperties(properties);
         final String threshold = "notifyPool";
         InterceptorProperty p1 = properties.get(threshold);
-        if (p1!=null) {
+        if (p1 != null) {
             this.setNotifyPool(Boolean.parseBoolean(p1.getValue()));
         }
     }
