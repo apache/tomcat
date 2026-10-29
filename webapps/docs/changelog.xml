@@ -1376,6 +1376,20 @@
         value for that attribute is still rejected, with a message that now
         points at the supported ways of providing a data source. (remm)
       </fix>
+      <fix>
+        Do not wait on pool creation when closing a JDBC pool data source.
+        The pool constructor pre-establishes the <code>initialSize</code>
+        connections, and it previously ran under the data source monitor that
+        <code>close()</code> takes, so closing a data source whose initial
+        connections were still being attempted against an unresponsive
+        database parked the shutdown on the driver for an unbounded,
+        uninterruptible time. The construction now runs under a gate that
+        serializes it on its own, outside that monitor, so a close does not
+        wait for an in-flight creation; that creation observes the closure at its
+        publication step and tears down the pool it built rather than
+        publishing it. As before, no database session and no pool cleaner
+        outlives the close, and the closure stays terminal. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
