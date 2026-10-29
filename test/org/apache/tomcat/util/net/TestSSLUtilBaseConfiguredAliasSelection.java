@@ -28,8 +28,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import org.apache.tomcat.util.net.TesterKeystoreGenerator.KeystoreEntry;
-
 /**
  * Tests {@link SSLUtilBase#getKeyManagers()} when a {@code certificateKeyAlias} is configured. The configured alias is
  * used even if its certificate is not valid for TLS server authentication, except in a SunMSCAPI Windows-MY key store:
@@ -42,8 +40,8 @@ public class TestSSLUtilBaseConfiguredAliasSelection extends SSLUtilBaseCertific
     @Test
     public void testConfiguredAliasIsUsedUnchangedWhenNotServerAuth() throws Exception {
         X509Certificate presented = present(HOST,
-                key(HOST, CLIENT_AUTH),
-                key("localhost-server", SERVER_AUTH));
+                key(HOST, CertType.CLIENT_AUTH),
+                key("localhost-server", CertType.SERVER_AUTH));
         assertEku(presented, CLIENT_AUTH_EXTENDED_KEY_USAGE_OID);
     }
 
@@ -51,8 +49,8 @@ public class TestSSLUtilBaseConfiguredAliasSelection extends SSLUtilBaseCertific
     @Test
     public void testConfiguredAliasIsUsedWhenServerAuth() throws Exception {
         X509Certificate presented = present(HOST,
-                key(HOST, SERVER_AUTH),
-                key("localhost-client", CLIENT_AUTH));
+                key(HOST, CertType.SERVER_AUTH),
+                key("localhost-client", CertType.CLIENT_AUTH));
         assertEku(presented, Constants.SERVER_AUTH_EXTENDED_KEY_USAGE_OID);
     }
 
@@ -60,8 +58,8 @@ public class TestSSLUtilBaseConfiguredAliasSelection extends SSLUtilBaseCertific
     @Test
     public void testConfiguredAliasUsesNumberedDuplicateWhenBaseNotServerAuth() throws Exception {
         X509Certificate presented = present(HOST,
-                key(HOST, CLIENT_AUTH),
-                key(HOST + " (1)", SERVER_AUTH));
+                key(HOST, CertType.CLIENT_AUTH),
+                key(HOST + " (1)", CertType.SERVER_AUTH));
         assertEku(presented, Constants.SERVER_AUTH_EXTENDED_KEY_USAGE_OID);
     }
 
@@ -69,8 +67,8 @@ public class TestSSLUtilBaseConfiguredAliasSelection extends SSLUtilBaseCertific
     @Test
     public void testConfiguredAliasUnchangedForNonSunMSCAPIStore() throws Exception {
         KeyStore keystore = nonSunMSCAPIKeystore(
-                key(HOST, CLIENT_AUTH),
-                key(HOST + " (1)", SERVER_AUTH));
+                key(HOST, CertType.CLIENT_AUTH),
+                key(HOST + " (1)", CertType.SERVER_AUTH));
         X509Certificate presented = present(HOST, keystore);
         Assert.assertEquals(keystore.getCertificate(HOST), presented);
     }
@@ -79,8 +77,8 @@ public class TestSSLUtilBaseConfiguredAliasSelection extends SSLUtilBaseCertific
     @Test
     public void testConfiguredAliasKeepsBaseWhenAlreadyServerAuth() throws Exception {
         X509Certificate presented = present(HOST,
-                key(HOST, SERVER_AUTH),
-                key(HOST + " (1)", CLIENT_AUTH));
+                key(HOST, CertType.SERVER_AUTH),
+                key(HOST + " (1)", CertType.CLIENT_AUTH));
         assertEku(presented, Constants.SERVER_AUTH_EXTENDED_KEY_USAGE_OID);
     }
 
@@ -88,9 +86,9 @@ public class TestSSLUtilBaseConfiguredAliasSelection extends SSLUtilBaseCertific
     @Test
     public void testConfiguredAliasUsesSecondDuplicateWhenFirstIsNotServerAuth() throws Exception {
         X509Certificate presented = present(HOST,
-                key(HOST, CLIENT_AUTH),
-                key(HOST + " (1)", CLIENT_AUTH),
-                key(HOST + " (2)", SERVER_AUTH));
+                key(HOST, CertType.CLIENT_AUTH),
+                key(HOST + " (1)", CertType.CLIENT_AUTH),
+                key(HOST + " (2)", CertType.SERVER_AUTH));
         assertEku(presented, Constants.SERVER_AUTH_EXTENDED_KEY_USAGE_OID);
     }
 
@@ -98,9 +96,9 @@ public class TestSSLUtilBaseConfiguredAliasSelection extends SSLUtilBaseCertific
     @Test
     public void testConfiguredAliasSelectsFirstOfSeveralServerAuthDuplicates() throws Exception {
         KeyStore keystore = orderedKeystore(null,
-                key("tomcat", CLIENT_AUTH),
-                key("tomcat (1)", SERVER_AUTH),
-                key("tomcat (2)", SERVER_AUTH));
+                key("tomcat", CertType.CLIENT_AUTH),
+                key("tomcat (1)", CertType.SERVER_AUTH),
+                key("tomcat (2)", CertType.SERVER_AUTH));
         X509Certificate presented = present("tomcat", keystore);
         Assert.assertEquals(keystore.getCertificate("tomcat (1)"), presented);
     }
@@ -109,9 +107,9 @@ public class TestSSLUtilBaseConfiguredAliasSelection extends SSLUtilBaseCertific
     @Test
     public void testConfiguredAliasSkipsTrustedDuplicateAndUsesNextKeyEntry() throws Exception {
         X509Certificate presented = present(HOST,
-                key(HOST, CLIENT_AUTH),
-                KeystoreEntry.trusted(HOST + " (1)", HOST, SERVER_AUTH),
-                key(HOST + " (2)", SERVER_AUTH));
+                key(HOST, CertType.CLIENT_AUTH),
+                KeystoreEntry.trusted(HOST + " (1)"),
+                key(HOST + " (2)", CertType.SERVER_AUTH));
         assertEku(presented, Constants.SERVER_AUTH_EXTENDED_KEY_USAGE_OID);
     }
 
@@ -119,8 +117,8 @@ public class TestSSLUtilBaseConfiguredAliasSelection extends SSLUtilBaseCertific
     @Test
     public void testConfiguredAliasFallsBackToBaseWhenNoDuplicateIsServerAuth() throws Exception {
         X509Certificate presented = present(HOST,
-                key(HOST, CLIENT_AUTH),
-                key(HOST + " (1)", CLIENT_AUTH));
+                key(HOST, CertType.CLIENT_AUTH),
+                key(HOST + " (1)", CertType.CLIENT_AUTH));
         assertEku(presented, CLIENT_AUTH_EXTENDED_KEY_USAGE_OID);
     }
 
@@ -128,15 +126,15 @@ public class TestSSLUtilBaseConfiguredAliasSelection extends SSLUtilBaseCertific
     @Test
     public void testConfiguredAliasIgnoresAliasNotMatchingDuplicateFormat() throws Exception {
         X509Certificate presented = present(HOST,
-                key(HOST, CLIENT_AUTH),
-                key(HOST + "(1)", SERVER_AUTH));
+                key(HOST, CertType.CLIENT_AUTH),
+                key(HOST + "(1)", CertType.SERVER_AUTH));
         assertEku(presented, CLIENT_AUTH_EXTENDED_KEY_USAGE_OID);
     }
 
 
     @Test
     public void testConfiguredAliasWithMalformedExtendedKeyUsageIsUsed() throws Exception {
-        KeyStore keystore = orderedKeystore("malformed", key("malformed", CLIENT_AUTH), key("server", SERVER_AUTH));
+        KeyStore keystore = orderedKeystore("malformed", key("malformed", CertType.CLIENT_AUTH), key("server", CertType.SERVER_AUTH));
         Assert.assertEquals(keystore.getCertificateChain("malformed")[0], present("malformed", keystore));
     }
 
@@ -144,21 +142,21 @@ public class TestSSLUtilBaseConfiguredAliasSelection extends SSLUtilBaseCertific
     @Test
     public void testConfiguredAliasUsesNumberedDuplicateWhenBaseIsMalformed() throws Exception {
         KeyStore keystore =
-                orderedKeystore("malformed", key("malformed", CLIENT_AUTH), key("malformed (1)", SERVER_AUTH));
+                orderedKeystore("malformed", key("malformed", CertType.CLIENT_AUTH), key("malformed (1)", CertType.SERVER_AUTH));
         assertEku(present("malformed", keystore), Constants.SERVER_AUTH_EXTENDED_KEY_USAGE_OID);
     }
 
 
     @Test
     public void testConfiguredMissingAliasFails() {
-        Assert.assertThrows(IOException.class, () -> present("missing", key("server", SERVER_AUTH)));
+        Assert.assertThrows(IOException.class, () -> present("missing", key("server", CertType.SERVER_AUTH)));
     }
 
 
     @Test
     public void testConfiguredTrustedAliasFails() {
-        Assert.assertThrows(IOException.class, () -> present("trusted", KeystoreEntry.trusted("trusted", HOST, SERVER_AUTH),
-                key("server", SERVER_AUTH)));
+        Assert.assertThrows(IOException.class, () -> present("trusted", KeystoreEntry.trusted("trusted"),
+                key("server", CertType.SERVER_AUTH)));
     }
 
 
@@ -172,9 +170,9 @@ public class TestSSLUtilBaseConfiguredAliasSelection extends SSLUtilBaseCertific
     @Test
     public void testReloadListenerMonitorsTheServedCertificate() throws Exception {
         Assume.assumeTrue("JSSE".equals(connectorName));
-        KeyStore keystore = nonExportableKeystore(key(HOST, CLIENT_AUTH), key(HOST + " (1)", SERVER_AUTH));
+        KeyStore keystore = nonExportableKeystore(key(HOST, CertType.CLIENT_AUTH), key(HOST + " (1)", CertType.SERVER_AUTH));
 
-        Set<X509Certificate> monitored = certificatesMonitoredForReload(HOST, keystore);
+        Set<X509Certificate> monitored = certificatesMonitoredForReload(keystore);
 
         X509Certificate served = (X509Certificate) keystore.getCertificateChain(HOST + " (1)")[0];
         X509Certificate notServed = (X509Certificate) keystore.getCertificateChain(HOST)[0];
@@ -192,8 +190,8 @@ public class TestSSLUtilBaseConfiguredAliasSelection extends SSLUtilBaseCertific
     @Test
     public void testConfiguredTrustedBaseAliasUsesServerAuthDuplicate() throws Exception {
         X509Certificate presented = present(HOST,
-                KeystoreEntry.trusted(HOST, HOST, SERVER_AUTH),
-                key(HOST + " (1)", SERVER_AUTH));
+                KeystoreEntry.trusted(HOST),
+                key(HOST + " (1)", CertType.SERVER_AUTH));
         assertEku(presented, Constants.SERVER_AUTH_EXTENDED_KEY_USAGE_OID);
     }
 
@@ -201,8 +199,8 @@ public class TestSSLUtilBaseConfiguredAliasSelection extends SSLUtilBaseCertific
     @Test
     public void testConfiguredAliasStopsAtGapAndKeepsBase() throws Exception {
         X509Certificate presented = present("tomcat",
-                key("tomcat", CLIENT_AUTH),
-                key("tomcat (2)", SERVER_AUTH));
+                key("tomcat", CertType.CLIENT_AUTH),
+                key("tomcat (2)", CertType.SERVER_AUTH));
         assertEku(presented, CLIENT_AUTH_EXTENDED_KEY_USAGE_OID);
     }
 
@@ -217,9 +215,9 @@ public class TestSSLUtilBaseConfiguredAliasSelection extends SSLUtilBaseCertific
     @Test
     public void testReloadResolvesServedCertificateWithOpenSSL() throws Exception {
         Assume.assumeTrue(useOpenSSL);
-        KeyStore keystore = orderedKeystore(null, key(HOST, CLIENT_AUTH), key(HOST + " (1)", SERVER_AUTH));
+        KeyStore keystore = orderedKeystore(null, key(HOST, CertType.CLIENT_AUTH), key(HOST + " (1)", CertType.SERVER_AUTH));
 
-        Set<X509Certificate> monitored = certificatesMonitoredForReload(HOST, keystore);
+        Set<X509Certificate> monitored = certificatesMonitoredForReload(keystore);
 
         X509Certificate served = (X509Certificate) keystore.getCertificateChain(HOST + " (1)")[0];
         X509Certificate notServed = (X509Certificate) keystore.getCertificateChain(HOST)[0];
@@ -237,8 +235,8 @@ public class TestSSLUtilBaseConfiguredAliasSelection extends SSLUtilBaseCertific
     @Test
     public void testServedAliasIsTheNumberedDuplicate() throws Exception {
         Assume.assumeTrue("JSSE".equals(connectorName));
-        KeyStore keystore = nonExportableKeystore(key(HOST, CLIENT_AUTH), key(HOST + " (1)", SERVER_AUTH));
-        Assert.assertEquals(HOST + " (1)", servedAlias(HOST, keystore));
+        KeyStore keystore = nonExportableKeystore(key(HOST, CertType.CLIENT_AUTH), key(HOST + " (1)", CertType.SERVER_AUTH));
+        Assert.assertEquals(HOST + " (1)", servedAlias(keystore));
     }
 
 
@@ -251,7 +249,7 @@ public class TestSSLUtilBaseConfiguredAliasSelection extends SSLUtilBaseCertific
     @Test
     public void testServedAliasResolvesForOpenSSLWithOriginalKeystore() throws Exception {
         Assume.assumeTrue(useOpenSSL);
-        KeyStore keystore = wrappedExportableKeystore(key(HOST, CLIENT_AUTH), key(HOST + " (1)", SERVER_AUTH));
-        Assert.assertEquals(HOST + " (1)", servedAlias(HOST, keystore));
+        KeyStore keystore = wrappedExportableKeystore(key(HOST, CertType.CLIENT_AUTH), key(HOST + " (1)", CertType.SERVER_AUTH));
+        Assert.assertEquals(HOST + " (1)", servedAlias(keystore));
     }
 }

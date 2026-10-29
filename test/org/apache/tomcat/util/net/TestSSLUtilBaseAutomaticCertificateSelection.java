@@ -30,7 +30,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
-import org.apache.tomcat.util.net.TesterKeystoreGenerator.KeystoreEntry;
 
 /**
  * Tests that, when no {@code certificateKeyAlias} is configured, {@link SSLUtilBase#getKeyManagers()} auto-selects the
@@ -43,8 +42,8 @@ public class TestSSLUtilBaseAutomaticCertificateSelection extends SSLUtilBaseCer
     @Test
     public void testAutoSelectPrefersServerAuthOverClientAuth() throws Exception {
         X509Certificate presented = present(null,
-                key("first", CLIENT_AUTH),
-                key("second", SERVER_AUTH));
+                key("first", CertType.CLIENT_AUTH),
+                key("second", CertType.SERVER_AUTH));
         assertEku(presented, Constants.SERVER_AUTH_EXTENDED_KEY_USAGE_OID);
     }
 
@@ -52,8 +51,8 @@ public class TestSSLUtilBaseAutomaticCertificateSelection extends SSLUtilBaseCer
     @Test
     public void testAutoSelectAcceptsAnyExtendedKeyUsage() throws Exception {
         X509Certificate presented = present(null,
-                key("first", CLIENT_AUTH),
-                key("any", ANY_AUTH));
+                key("first", CertType.CLIENT_AUTH),
+                key("any", CertType.ANY_AUTH));
         assertEku(presented, Constants.ANY_EXTENDED_KEY_USAGE_OID);
     }
 
@@ -61,8 +60,8 @@ public class TestSSLUtilBaseAutomaticCertificateSelection extends SSLUtilBaseCer
     @Test
     public void testAutoSelectAcceptsCertificateWithoutExtendedKeyUsage() throws Exception {
         X509Certificate presented = present(null,
-                key("first", CLIENT_AUTH),
-                key("none", null));
+                key("first", CertType.CLIENT_AUTH),
+                key("none", CertType.NO_EKU));
         Assert.assertNull("A certificate with no Extended Key Usage is unrestricted and must be selectable",
                 presented.getExtendedKeyUsage());
     }
@@ -71,44 +70,44 @@ public class TestSSLUtilBaseAutomaticCertificateSelection extends SSLUtilBaseCer
     @Test
     public void testAutoSelectSkipsTrustedEntries() {
         Assert.assertThrows(IOException.class, () -> present(null,
-                KeystoreEntry.trusted("ca", HOST, SERVER_AUTH),
-                key("key", CLIENT_AUTH)));
+                KeystoreEntry.trusted("ca"),
+                key("key", CertType.CLIENT_AUTH)));
     }
 
 
     @Test
     public void testAutoSelectFailsWhenNoneServerAuth() {
         Assert.assertThrows(IOException.class, () -> present(null,
-                key("first", CLIENT_AUTH),
-                key("second", CLIENT_AUTH)));
+                key("first", CertType.CLIENT_AUTH),
+                key("second", CertType.CLIENT_AUTH)));
     }
 
 
     @Test
     public void testAutoSelectSkipsMalformedExtendedKeyUsage() throws Exception {
-        KeyStore keystore = orderedKeystore("malformed", key("malformed", CLIENT_AUTH), key("server", SERVER_AUTH));
+        KeyStore keystore = orderedKeystore("malformed", key("malformed", CertType.CLIENT_AUTH), key("server", CertType.SERVER_AUTH));
         assertEku(present(null, keystore), Constants.SERVER_AUTH_EXTENDED_KEY_USAGE_OID);
     }
 
 
     @Test
     public void testAutoSelectFailsWhenOnlyMalformedExtendedKeyUsage() throws Exception {
-        KeyStore keystore = orderedKeystore("malformed", key("malformed", CLIENT_AUTH));
+        KeyStore keystore = orderedKeystore("malformed", key("malformed", CertType.CLIENT_AUTH));
         Assert.assertThrows(IOException.class, () -> present(null, keystore));
     }
 
 
     @Test
     public void testAutoSelectUsesFirstEligibleKey() throws Exception {
-        KeyStore keystore = orderedKeystore(null, key("client", CLIENT_AUTH), key("first", ANY_AUTH),
-                key("second", SERVER_AUTH));
+        KeyStore keystore = orderedKeystore(null, key("client", CertType.CLIENT_AUTH), key("first", CertType.ANY_AUTH),
+                key("second", CertType.SERVER_AUTH));
         Assert.assertEquals(keystore.getCertificate("first"), present(null, keystore));
     }
 
 
     @Test
     public void testAutoSelectDoesNotSkipKeyReadFailure() throws Exception {
-        KeyStore keystore = orderedKeystore(null, key("first", SERVER_AUTH), key("second", SERVER_AUTH));
+        KeyStore keystore = orderedKeystore(null, key("first", CertType.SERVER_AUTH), key("second", CertType.SERVER_AUTH));
         SSLHostConfig hostConfig = new SSLHostConfig();
         SSLHostConfigCertificate certificate = new SSLHostConfigCertificate(hostConfig, Type.UNDEFINED);
         certificate.setCertificateKeystore(keystore);
@@ -121,7 +120,7 @@ public class TestSSLUtilBaseAutomaticCertificateSelection extends SSLUtilBaseCer
 
     @Test
     public void testSSLContextUsesSelectedCertificate() throws Exception {
-        KeyStore keystore = orderedKeystore(null, key("client", CLIENT_AUTH), key("server", SERVER_AUTH));
+        KeyStore keystore = orderedKeystore(null, key("client", CertType.CLIENT_AUTH), key("server", CertType.SERVER_AUTH));
         SSLContext context = sslUtil(null, keystore).createSSLContext(List.of());
         try {
             Assert.assertEquals(keystore.getCertificate("server"), context.getCertificateChain("server")[0]);
@@ -133,8 +132,7 @@ public class TestSSLUtilBaseAutomaticCertificateSelection extends SSLUtilBaseCer
 
     @Test
     public void testSSLContextLoadsSelectedCertificateFromKeystoreFile() throws Exception {
-        File file = TesterKeystoreGenerator.generateKeystore(
-                List.of(key(SSLUtilBase.DEFAULT_KEY_ALIAS, CLIENT_AUTH), key("server", SERVER_AUTH)));
+        File file = keystoreFile(key(SSLUtilBase.DEFAULT_KEY_ALIAS, CertType.CLIENT_AUTH), key("server", CertType.SERVER_AUTH));
         KeyStore keystore = KeyStore.getInstance(file, TesterSupport.JKS_PASS.toCharArray());
         SSLHostConfig hostConfig = new SSLHostConfig();
         SSLHostConfigCertificate certificate = new SSLHostConfigCertificate(hostConfig, Type.UNDEFINED);

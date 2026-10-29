@@ -18,6 +18,8 @@
 package org.apache.tomcat.util.net;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.io.Serial;
 import java.security.Key;
 import java.security.KeyStore;
@@ -29,7 +31,9 @@ import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -42,11 +46,6 @@ import org.junit.runners.Parameterized.Parameter;
 
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
-import org.apache.tomcat.util.net.TesterKeystoreGenerator.CertificateExtensionsCustomizer;
-import org.apache.tomcat.util.net.TesterKeystoreGenerator.KeystoreEntry;
-import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.easymock.EasyMock;
 
 /**
@@ -91,19 +90,37 @@ public abstract class SSLUtilBaseCertificateSelectionTestBase extends TomcatBase
 
     protected static final String CLIENT_AUTH_EXTENDED_KEY_USAGE_OID = "1.3.6.1.5.5.7.3.2";
 
-    @SuppressWarnings("unused")
-    protected static final CertificateExtensionsCustomizer SERVER_AUTH = (keyPair, builder) -> builder
-            .addExtension(Extension.extendedKeyUsage, true, new ExtendedKeyUsage(KeyPurposeId.id_kp_serverAuth));
-    @SuppressWarnings("unused")
-    protected static final CertificateExtensionsCustomizer CLIENT_AUTH = (keyPair, builder) -> builder
-            .addExtension(Extension.extendedKeyUsage, true, new ExtendedKeyUsage(KeyPurposeId.id_kp_clientAuth));
-    @SuppressWarnings("unused")
-    protected static final CertificateExtensionsCustomizer ANY_AUTH = (keyPair, builder) -> builder
-            .addExtension(Extension.extendedKeyUsage, true, new ExtendedKeyUsage(KeyPurposeId.anyExtendedKeyUsage));
+    private static final String SERVER_AUTH_KEYSTORE = TesterSupport.SSL_DIR + "localhost-rsa-serverauth.jks";
+    private static final String SERVER_AUTH_KEYSTORE_2 = TesterSupport.SSL_DIR + "localhost-rsa-serverauth2.jks";
+    private static final String CLIENT_AUTH_KEYSTORE = TesterSupport.SSL_DIR + "localhost-rsa-clientauth.jks";
+    private static final String ANY_AUTH_KEYSTORE = TesterSupport.SSL_DIR + "localhost-rsa-anyauth.jks";
+    private static final String NO_EKU_KEYSTORE = TesterSupport.SSL_DIR + "localhost-rsa-noeku.jks";
 
+    protected enum CertType {
+        SERVER_AUTH,
+        CLIENT_AUTH,
+        ANY_AUTH,
+        NO_EKU
+    }
 
-    protected static KeystoreEntry key(String alias, CertificateExtensionsCustomizer eku) {
-        return KeystoreEntry.key(alias, HOST, eku);
+    private static Map<CertType,List<CertAndKey>> certificatePool;
+
+    private record CertAndKey(PrivateKey key, X509Certificate certificate) {
+    }
+
+    /**
+     * An entry to place into a test key store: the alias, which pre-generated certificate to use, and whether it is a
+     * private key entry or a trusted (certificate-only) entry.
+     */
+    protected record KeystoreEntry(String alias, CertType certType, boolean keyEntry) {
+
+        protected static KeystoreEntry trusted(String alias) {
+            return new KeystoreEntry(alias, CertType.SERVER_AUTH, false);
+        }
+    }
+
+    protected static KeystoreEntry key(String alias, CertType certType) {
+        return new KeystoreEntry(alias, certType, true);
     }
 
 
@@ -150,8 +167,8 @@ public abstract class SSLUtilBaseCertificateSelectionTestBase extends TomcatBase
      * The cut-off date is far enough in the future that every certificate qualifies, so the result is exactly the set
      * of certificates the listener monitors for reload.
      */
-    protected Set<X509Certificate> certificatesMonitoredForReload(String alias, KeyStore keystore) throws Exception {
-        SSLHostConfigCertificate certificate = registeredCertificate(alias, keystore);
+    protected Set<X509Certificate> certificatesMonitoredForReload(KeyStore keystore) throws Exception {
+        SSLHostConfigCertificate certificate = registeredCertificate(keystore);
         SSLContext context = sslUtil(certificate).createSSLContext(List.of());
         try {
             certificate.setSslContext(context);
@@ -167,8 +184,8 @@ public abstract class SSLUtilBaseCertificateSelectionTestBase extends TomcatBase
      * Builds and registers an SSLContext for the given configured alias and key store, then returns the alias the
      * context reports as actually served - which is what the certificate logging and reload paths resolve.
      */
-    protected String servedAlias(String alias, KeyStore keystore) throws Exception {
-        SSLHostConfigCertificate certificate = registeredCertificate(alias, keystore);
+    protected String servedAlias(KeyStore keystore) throws Exception {
+        SSLHostConfigCertificate certificate = registeredCertificate(keystore);
         SSLContext context = sslUtil(certificate).createSSLContext(List.of());
         try {
             certificate.setSslContext(context);
@@ -179,17 +196,73 @@ public abstract class SSLUtilBaseCertificateSelectionTestBase extends TomcatBase
     }
 
 
-    private static SSLHostConfigCertificate registeredCertificate(String alias, KeyStore keystore) {
+    private static SSLHostConfigCertificate registeredCertificate(KeyStore keystore) {
         SSLHostConfig hostConfig = new SSLHostConfig();
         SSLHostConfigCertificate certificate = new SSLHostConfigCertificate(hostConfig, Type.UNDEFINED);
         certificate.setCertificateKeystore(keystore);
         certificate.setCertificateKeystoreType("JKS");
         certificate.setCertificateKeystorePassword(TesterSupport.JKS_PASS);
-        if (alias != null) {
-            certificate.setCertificateKeyAlias(alias);
-        }
+        certificate.setCertificateKeyAlias(SSLUtilBaseCertificateSelectionTestBase.HOST);
         hostConfig.addCertificate(certificate);
         return certificate;
+    }
+
+
+    private static synchronized Map<CertType,List<CertAndKey>> certificatePool() throws Exception {
+        if (certificatePool == null) {
+            Map<CertType,List<CertAndKey>> pool = new EnumMap<>(CertType.class);
+            pool.put(CertType.SERVER_AUTH, List.of(load(SERVER_AUTH_KEYSTORE), load(SERVER_AUTH_KEYSTORE_2)));
+            pool.put(CertType.CLIENT_AUTH, List.of(load(CLIENT_AUTH_KEYSTORE)));
+            pool.put(CertType.ANY_AUTH, List.of(load(ANY_AUTH_KEYSTORE)));
+            pool.put(CertType.NO_EKU, List.of(load(NO_EKU_KEYSTORE)));
+            certificatePool = pool;
+        }
+        return certificatePool;
+    }
+
+
+    private static CertAndKey load(String keystoreFile) throws Exception {
+        KeyStore keystore = KeyStore.getInstance(new File(keystoreFile), TesterSupport.JKS_PASS.toCharArray());
+        String alias = keystore.aliases().nextElement();
+        return new CertAndKey((PrivateKey) keystore.getKey(alias, TesterSupport.JKS_PASS.toCharArray()),
+                (X509Certificate) keystore.getCertificate(alias));
+    }
+
+
+    /*
+     * Populates the key store from the pre-generated pool, one certificate per entry. Repeated entries of the same
+     * category are given distinct certificates where the pool holds more than one (so two server-auth entries in one
+     * store differ, as the duplicate-selection test requires).
+     */
+    private static void populate(KeyStore keystore, KeystoreEntry... entries) throws Exception {
+        Map<CertType,Integer> used = new EnumMap<>(CertType.class);
+        for (KeystoreEntry entry : entries) {
+            List<CertAndKey> options = certificatePool().get(entry.certType());
+            CertAndKey chosen = options.get((used.merge(entry.certType(), 1, Integer::sum) - 1) % options.size());
+            if (entry.keyEntry()) {
+                keystore.setKeyEntry(entry.alias(), chosen.key(), TesterSupport.JKS_PASS.toCharArray(),
+                        new X509Certificate[] { chosen.certificate() });
+            } else {
+                keystore.setCertificateEntry(entry.alias(), chosen.certificate());
+            }
+        }
+    }
+
+
+    /*
+     * Writes a temporary JKS file populated from the pool, for the tests that configure a certificateKeystoreFile
+     * rather than an in-memory key store.
+     */
+    protected static File keystoreFile(KeystoreEntry... entries) throws Exception {
+        KeyStore keystore = KeyStore.getInstance("JKS");
+        keystore.load(null, null);
+        populate(keystore, entries);
+        File file = File.createTempFile("cert-selection-", ".jks");
+        file.deleteOnExit();
+        try (OutputStream os = new FileOutputStream(file)) {
+            keystore.store(os, TesterSupport.JKS_PASS.toCharArray());
+        }
+        return file;
     }
 
 
@@ -251,8 +324,9 @@ public abstract class SSLUtilBaseCertificateSelectionTestBase extends TomcatBase
 
     protected static KeyStore orderedKeystore(Provider provider, String type, KeyMode keyMode,
             String malformedAlias, KeystoreEntry... entries) throws Exception {
-        File file = TesterKeystoreGenerator.generateKeystore(List.of(entries));
-        KeyStore delegate = KeyStore.getInstance(file, TesterSupport.JKS_PASS.toCharArray());
+        KeyStore delegate = KeyStore.getInstance("JKS");
+        delegate.load(null, null);
+        populate(delegate, entries);
         List<String> aliases = Stream.of(entries).map(KeystoreEntry::alias).toList();
 
         // JKS type of keystore enumeration order is unspecified.
