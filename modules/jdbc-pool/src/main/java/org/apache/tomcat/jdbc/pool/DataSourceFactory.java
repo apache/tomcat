@@ -18,8 +18,13 @@ package org.apache.tomcat.jdbc.pool;
 
 
 import java.sql.Connection;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.management.ObjectName;
 import javax.naming.Context;
@@ -342,6 +347,39 @@ public class DataSourceFactory implements ObjectFactory {
             PROP_USEDISPOSABLECONNECTIONFACADE, PROP_LOGVALIDATIONERRORS, PROP_PROPAGATEINTERRUPTSTATE,
             PROP_IGNOREEXCEPTIONONPRELOAD, PROP_USESTATEMENTFACADE };
 
+    /**
+     * Names of the reference addresses that the JNDI container itself places
+     * into a resource reference alongside the pool properties. They configure
+     * the naming layer, not the pool, and are therefore not reported as
+     * unrecognized:
+     * <ul>
+     * <li>{@code factory}: the object factory to delegate to; the container
+     * reads it as a reference address through
+     * {@code ref.get(org.apache.naming.factory.Constants.FACTORY)} in
+     * {@code org.apache.naming.factory.FactoryBase}.</li>
+     * <li>{@code singleton}, {@code scope}, {@code auth} and
+     * {@code description}: the resource metadata that
+     * {@code org.apache.naming.ResourceRef} adds to every resource
+     * reference.</li>
+     * <li>{@code forceString}: the removed legacy attribute that the
+     * container's {@code org.apache.naming.factory.BeanFactory} still
+     * recognizes and reports on its own. With this factory it is inert,
+     * but it is reserved to stay silent exactly as BeanFactory does, so a
+     * resource switched between the two factories does not start to warn
+     * about it.</li>
+     * </ul>
+     */
+    private static final Set<String> RESERVED_JNDI_ADDRESS_NAMES = Collections.unmodifiableSet(
+            new HashSet<>(Arrays.asList("factory", "singleton", "scope", "auth", "description", "forceString")));
+
+    /*
+     * The recognized property names as a set, for the sweep over the
+     * reference's addresses that reports everything the lookup loop above
+     * never read.
+     */
+    private static final Set<String> ALL_PROPERTY_NAMES = Collections.unmodifiableSet(
+            new HashSet<>(Arrays.asList(ALL_PROPERTIES)));
+
     // -------------------------------------------------- ObjectFactory Methods
 
     /**
@@ -407,6 +445,19 @@ public class DataSourceFactory implements ObjectFactory {
                     continue;
                 }
                 properties.setProperty(propertyName, content.toString());
+            }
+        }
+
+        // Whatever the lookup above did not recognize is never read, so the
+        // operator hears about it here instead of watching the pool come up
+        // with defaults. Names the JNDI container itself uses to build the
+        // reference are not pool properties and stay unmentioned.
+        Enumeration<RefAddr> addresses = ref.getAll();
+        while (addresses.hasMoreElements()) {
+            String addressName = addresses.nextElement().getType();
+            if (!ALL_PROPERTY_NAMES.contains(addressName)
+                    && !RESERVED_JNDI_ADDRESS_NAMES.contains(addressName)) {
+                log.warn(addressName + " is not a valid property, it will be ignored.");
             }
         }
 
