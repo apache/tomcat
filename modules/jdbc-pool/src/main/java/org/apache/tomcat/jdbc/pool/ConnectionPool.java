@@ -567,13 +567,23 @@ public class ConnectionPool {
                 PooledConnection con = pool.poll(1000, TimeUnit.MILLISECONDS);
                 // Close it and retrieve the next one, if one is available
                 while (con != null) {
-                    // Close the connection
+                    // Close the connection. A forced shutdown tears a busy
+                    // connection away from a borrower that is legitimately
+                    // using it, so the drain releases it the way it releases
+                    // an idle one: disconnecting the session and running the
+                    // interceptors' disconnect events. It does not abandon it.
+                    // The abandonment counter, the WARN log and the JMX
+                    // abandon notification record an application that leaked
+                    // a connection - checkAbandoned()'s bookkeeping - and a
+                    // shutdown the operator ordered is no such leak, so
+                    // recording it there inflates the monitoring counter and
+                    // fires one bogus leak notification per connection in
+                    // use. The borrower's handle is left equally unusable
+                    // either way: an abandon disconnected it through this
+                    // same release, and a later close on the handle finds the
+                    // pool closed and the connection already released.
                     try {
-                        if (pool == idle) {
-                            release(con);
-                        } else {
-                            abandon(con);
-                        }
+                        release(con);
                     } catch (Throwable x) {
                         // One failing connection must not leave the
                         // remaining idle and busy connections undisconnected
