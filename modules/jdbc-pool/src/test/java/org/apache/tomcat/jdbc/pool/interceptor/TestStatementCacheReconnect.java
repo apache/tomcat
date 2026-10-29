@@ -83,8 +83,12 @@ class TestStatementCacheReconnect extends JdbcPoolBaseTest {
         ds.getPoolProperties().setMaxAge(maxAgeMillis);
         // keep the background sweeper out of the way: these tests trigger
         // the reconnect paths themselves (return, borrow, explicit
-        // testAllIdle) and pin the reconnect count exactly
-        ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(60000);
+        // testAllIdle) and pin the reconnect count exactly. A positive
+        // interval does not achieve that - the sweeper would fire on its
+        // own during the sleeps and race the counted reconnect (any value
+        // larger than maxAge is also clamped down to maxAge by
+        // checkPoolConfiguration) - only switching it off does
+        ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(0);
         return ds;
     }
 

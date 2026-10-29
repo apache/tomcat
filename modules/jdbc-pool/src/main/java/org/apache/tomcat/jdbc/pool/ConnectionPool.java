@@ -1544,10 +1544,13 @@ public class ConnectionPool {
      * Forces a validation of all idle connections if {@link PoolProperties#testWhileIdle} is set.
      * <p>
      * Note: when this method is invoked externally while the per-connection lock is disabled (sweeper switched off and
-     * {@link PoolProperties#getUseLock()} returning {@code false}), validating and reconnecting a connection can still
-     * overlap with a borrower that just took it out of the idle queue. That overlap is transient and surfaces to one of
-     * the two threads as a connection error; it is sharpest when {@link PoolProperties#getMaxAge()} is set so that an
-     * expired connection may be reconnected under a borrower mid-use.
+     * {@link PoolProperties#getUseLock()} returning {@code false}), it still serialises with borrowers through the
+     * queues: every connection is claimed out of the idle queue before it is validated or reconnected, and is put back
+     * or released afterwards, so a borrower is never handed a connection this method is working on. That claim is what
+     * makes an invocation concurrent with traffic safe, as {@link PooledConnection#lock()} alone protects nothing in
+     * this configuration. A pool closed while a connection is claimed does not get it offered back into its idle
+     * queue - the shutdown drain has passed it by, so the released connection is disconnected directly; the small
+     * window that accepts between that check and the queue hand-over is the same one the return path accepts.
      */
     public void testAllIdle() {
         testAllIdle(false);
@@ -1573,21 +1576,60 @@ public class ConnectionPool {
                     if (busy.contains(con)) {
                         continue;
                     }
-
-                    boolean release;
-                    if (checkMaxAgeOnly) {
-                        release = !reconnectIfExpired(con);
-                    } else {
-                        release = !reconnectIfExpired(con) || !con.validate(PooledConnection.VALIDATE_IDLE);
+                    // Claim the connection before acting on it; without a
+                    // real lock the check above may already be stale, and a
+                    // connection a borrower took out of the idle queue in
+                    // the meantime must not be validated or reconnected
+                    // here. Reconnecting one under a borrower is the worst
+                    // of it: both threads run disconnect-then-connect on the
+                    // same PooledConnection, the loser's physical handle is
+                    // overwritten by the winner's field write, and a session
+                    // nothing references any more can never be closed.
+                    if (!idle.remove(con)) {
+                        continue;
                     }
-                    if (release) {
-                        // Claim the connection before acting on it; without
-                        // a real lock the check above may already be stale,
-                        // and a connection a borrower took out of the idle
-                        // queue in the meantime must not be released here
-                        if (!idle.remove(con)) {
-                            continue;
+                    boolean keep;
+                    try {
+                        if (checkMaxAgeOnly) {
+                            keep = reconnectIfExpired(con);
+                        } else {
+                            keep = reconnectIfExpired(con) && con.validate(PooledConnection.VALIDATE_IDLE);
                         }
+                    } catch (RuntimeException x) {
+                        // The checks above swallow every checked driver
+                        // failure, but an unchecked throw from behind one of
+                        // them - a validation ending a transaction is one
+                        // such call - must not escape now that the
+                        // connection is claimed: unwinding here would leave
+                        // it in neither queue, invisible to the next sweep
+                        // and to the close() drain alike. Take it out of
+                        // service instead, as a failed check already does.
+                        con.setDiscarded(true);
+                        release(con);
+                        log.warn("Unable to test idle connection [" + con + "], closing it.", x);
+                        continue;
+                    }
+                    if (keep) {
+                        if (isClosed()) {
+                            // The pool was closed while this connection was
+                            // claimed: the shutdown drain has already passed
+                            // over the queues and a closing pool offers no
+                            // further item to the idle queue, so return it
+                            // through the drain's own exit, as the return
+                            // path does - an offer would land it in a dead
+                            // queue that nothing drains any more, stranding
+                            // the session out of every counter
+                            release(con);
+                        } else if (((idle.size() >= poolProperties.getMaxIdle()) &&
+                                !poolProperties.isPoolSweeperEnabled()) || (!idle.offer(con))) {
+                            if (log.isDebugEnabled()) {
+                                log.debug("Connection [" + con + "] passed the idle test but will be closed and " +
+                                        "not returned to the pool, idle[" + idle.size() + "]>=maxIdle[" +
+                                        poolProperties.getMaxIdle() + "] idle.offer failed.");
+                            }
+                            release(con);
+                        }
+                    } else {
                         releasedIdleCount.incrementAndGet();
                         release(con);
                     }
