@@ -292,12 +292,17 @@ the working list.
     closes the *physical* connection, so the pool discards it
     instead of pooling it; returning only the `XAConnection` keeps
     it (what `TestXaConnection` asserts).
-  * `ConnectionPool.close()` releases idle connections via
-    `release()` but checked-out ones via `abandon()`, and only the
-    former unregisters the per-connection
-    `...,connections=PooledConnection[n]` MBean — a pool closed
-    while connections are borrowed leaves those MBeans in the
-    platform server.
+  * `ConnectionPool.close(true)` used to tear down connections that were
+    still borrowed via `abandon()`, booking a forced shutdown as one
+    application leak per connection in use (inflated
+    `removeAbandonedCount`, a WARN with the borrow trace under
+    `logAbandoned`, one `CONNECTION ABANDONED` notification each). The
+    drain now releases busy connections the way it releases idle ones —
+    disconnecting them and unregistering their
+    `...,connections=PooledConnection[n]` MBeans, as a release always
+    did through `abandon()` — and the abandonment bookkeeping stays
+    `checkAbandoned()`'s alone; `TestForcedShutdownDoesNotAbandon`
+    pins it.
 * Found while harvesting, same status (unintended-looking, so not
   pinned):
   * `ProxyConnection`'s own `equals`/`hashCode`, reachable with the
