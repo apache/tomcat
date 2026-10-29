@@ -29,9 +29,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Base64;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
@@ -585,7 +583,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
             X509Certificate[] chain = x509KeyManager.getCertificateChain(alias);
             if (chain == null) {
-                alias = findAlias(x509KeyManager, certificate);
+                alias = certificate.chooseServerAlias(x509KeyManager);
                 chain = x509KeyManager.getCertificateChain(alias);
             }
             PrivateKey key = x509KeyManager.getPrivateKey(alias);
@@ -620,32 +618,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         return result;
     }
 
-
-    /*
-     * Find a valid alias when none was specified in the config.
-     */
-    private static String findAlias(X509KeyManager keyManager, SSLHostConfigCertificate certificate) {
-
-        Type type = certificate.getType();
-        String result = null;
-
-        List<Type> candidateTypes = new ArrayList<>();
-        if (Type.UNDEFINED.equals(type)) {
-            // Try all types to find a suitable alias
-            candidateTypes.addAll(Arrays.asList(Type.values()));
-            candidateTypes.remove(Type.UNDEFINED);
-        } else {
-            // Look for the specific type to find a suitable alias
-            candidateTypes.add(type);
-        }
-
-        Iterator<Type> iter = candidateTypes.iterator();
-        while (result == null && iter.hasNext()) {
-            result = keyManager.chooseServerAlias(iter.next().getKeyType(), null, null);
-        }
-
-        return result;
-    }
 
     private static X509TrustManager chooseTrustManager(TrustManager[] managers) {
         for (TrustManager m : managers) {
@@ -703,7 +675,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
             chain = x509KeyManager.getCertificateChain(alias);
             if (chain == null) {
-                alias = findAlias(x509KeyManager, certificate);
+                alias = certificate.chooseServerAlias(x509KeyManager);
                 chain = x509KeyManager.getCertificateChain(alias);
             }
         }
