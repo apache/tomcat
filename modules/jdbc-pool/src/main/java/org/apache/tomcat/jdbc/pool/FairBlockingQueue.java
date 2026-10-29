@@ -138,7 +138,9 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
     }
 
     /**
-     * Fair retrieval of an object in the queue. Objects are returned in the order the threads requested them.
+     * Fair retrieval of an object in the queue. Objects are returned in the order the threads requested them. If the
+     * wait is interrupted but an object was handed over to this waiter all the same, the object is returned and the
+     * interrupt status of the calling thread is restored instead of being cleared.
      * {@inheritDoc}
      */
     @Override
@@ -180,9 +182,13 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
                 if (null != interruptedException) {
                     // We got interrupted
                     if (null != result) {
-                        // We got a result - clear the interrupt status
-                        // don't propagate cause we have removed a connection from pool
-                        Thread.interrupted();
+                        // We got a result - deliver it, the connection is not
+                        // lost, but re-assert the interrupt status rather than
+                        // swallow it: a method that returns normally after
+                        // having noticed an interrupt must leave the status
+                        // set, the way the JDK hand-off queues do, so that an
+                        // interrupt meant for a later phase is not lost
+                        Thread.currentThread().interrupt();
                     } else {
                         throw interruptedException;
                     }
