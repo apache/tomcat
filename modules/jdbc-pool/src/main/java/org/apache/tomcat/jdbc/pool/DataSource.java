@@ -188,6 +188,14 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
         // refused it, so a name a foreign MBean owns is never released as
         // if it were this pool's registration
         this.oname = JmxUtil.registerJmx(oname, null, jmx);
+        if (this.oname != null) {
+            // A connection publishes itself below this name when its physical
+            // connection is established; the connections the pool was already
+            // holding could not do that while this name did not exist yet, so
+            // they are published now. A publish the server refused registers
+            // nothing of its own and has no connections to publish either.
+            p.registerConnectionMBeans();
+        }
     }
 
     /**

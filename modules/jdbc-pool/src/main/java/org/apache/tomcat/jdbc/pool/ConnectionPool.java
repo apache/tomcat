@@ -354,6 +354,12 @@ public class ConnectionPool {
             // the resulting failure must not strand the connection - it is
             // already in busy, so a throw that skips abandonSetup() costs a
             // physical connection and a maxActive slot until the pool restarts.
+            // A connection that connected while the pool's MBean was already
+            // published registered itself as part of connect() and is a no-op
+            // here; this call is the retry for one that could not - because the
+            // pool's MBean was published only after it connected, or because the
+            // server refused the name, and a refused publish must be retried
+            // once the obstacle is gone rather than count as a registration.
             try {
                 con.createMBean();
             } catch (Exception x) {
@@ -1790,6 +1796,53 @@ public class ConnectionPool {
         } catch (Exception x) {
             log.warn("Unable to start JMX integration for connection pool. Instance[" + getName() +
                     "] can't be monitored.", x);
+        }
+    }
+
+    /**
+     * Publishes the MBeans of all connections this pool currently holds, below the pool's own MBean. A connection
+     * registers itself when its physical connection is established, but that is only possible once the pool's own
+     * MBean has been published - and a container publishes it only after the pool, already connected to its initial
+     * size, has been created. Without this sweep the connections made before that publication, and in particular the
+     * ones the pool pre-created for its initial size, would be counted in the pool's size while staying invisible to
+     * JMX for as long as they are never borrowed.
+     */
+    public void registerConnectionMBeans() {
+        // The connections publish themselves below the pool's own name, so
+        // until that name is registered there is no base to publish them under.
+        org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = jmxPool;
+        if (jmx == null || jmx.getObjectName() == null) {
+            return;
+        }
+        registerConnectionMBeans(idle);
+        registerConnectionMBeans(busy);
+    }
+
+    private void registerConnectionMBeans(BlockingQueue<PooledConnection> pool) {
+        // The fair queue iterates a snapshot taken under its lock, the default
+        // queue a view that tolerates concurrent modification: either way, a
+        // connection that is concurrently taken out of or added to the queue
+        // may or may not be seen, and both answers are correct - the one this
+        // pass misses registers itself on the borrow that hands it out.
+        for (PooledConnection con : pool) {
+            try {
+                // Under the connection's own lock, as every operation acting
+                // on a pooled connection is: the registration must not slip in
+                // beside the release of the same connection, whose
+                // unregistration would then find no name to take back and this
+                // one would leave a MBean of a dead connection behind forever.
+                con.lock();
+                // A connection that is still without a physical connection is a
+                // placeholder for a slot, not a session to monitor, and it
+                // registers through the connect path once it gets its
+                // connection - publishing one now would name a session that
+                // does not exist.
+                if (con.isInitialized()) {
+                    con.createMBean();
+                }
+            } finally {
+                con.unlock();
+            }
         }
     }
 

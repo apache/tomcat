@@ -1085,6 +1085,22 @@
         contract requires. Pull request <pr>1077</pr> provided by Shayan
         Davarzani. (remm)
       </fix>
+      <fix>
+        <bug>63705</bug>: Publish a JMX MBean for every physical connection
+        held by the JDBC pool, not only for the ones the application has
+        borrowed at least once. The connection MBeans that appear below the
+        pool's MBean as <code>connections=PooledConnection[n]</code> were
+        registered when a connection was borrowed for the first time, so the
+        connections the pool pre-created for its <code>initialSize</code>, and
+        any idle connection that was never borrowed, were counted in the pool's
+        <code>Size</code> and <code>NumIdle</code> attributes while remaining
+        invisible to management. A connection's MBean is now registered as soon
+        as its physical connection is established, and the connections a
+        running pool already holds are published when the pool's own MBean is
+        registered. A connection keeps its registration across a reconnect and
+        releases it, as before, when it leaves the pool.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
