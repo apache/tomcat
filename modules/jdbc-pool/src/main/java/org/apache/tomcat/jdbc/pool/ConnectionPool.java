@@ -1987,6 +1987,18 @@ public class ConnectionPool {
                 PooledConnection pc = borrowConnection(System.currentTimeMillis(), pooled, null, null);
                 if (pc != null) {
                     result = ConnectionPool.this.setupConnection(pc);
+                } else {
+                    // The connection was released while it sat idle, so this
+                    // hand-off got nothing to set up. The synchronous borrow
+                    // treats that as a poll to retry; an async poll is served
+                    // by exactly the one connection its wait produced, so it
+                    // fails the caller instead. Every caller released on the
+                    // latch below reports what this publishes, and an
+                    // ExecutionException with no cause tells them nothing.
+                    cause = new SQLException("The pooled connection served to" +
+                            " this asynchronous borrow was released before it" +
+                            " could be set up; no connection was borrowed," +
+                            " borrow the pool again.");
                 }
             } catch (SQLException x) {
                 cause = x;
