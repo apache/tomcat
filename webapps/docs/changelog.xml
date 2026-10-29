@@ -1042,6 +1042,17 @@
         effect, but it is still accepted so existing configurations keep
         loading. (remm)
       </fix>
+      <add>
+        Send the JDBC 4.3 request boundary hints on the pooled connections:
+        <code>beginRequest()</code> is now called on the physical connection
+        when the pool hands it to the application and
+        <code>endRequest()</code> when the application returns it, so that a
+        driver which optimises session handling around a unit of work can do
+        so. The hints are looked up reflectively and skipped on a Java runtime
+        that predates JDBC 4.3, and a driver that refuses a hint has the
+        refusal logged rather than the borrow or the return around it failed.
+        Pull request <pr>677</pr> provided by Fernanda Meheust. (remm)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
