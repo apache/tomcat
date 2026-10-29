@@ -63,13 +63,13 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
     public synchronized void close(boolean all) {
         // This monitor serializes the whole registration lifecycle against the
         // closure: preRegister(), postRegister() and postDeregister() take it
-        // too, and DataSourceProxy.close(boolean) and pCreatePool() below run
-        // under the same lock. A close therefore cannot slip in beside an
-        // in-flight publication - between its read of the registration name
-        // and the publish itself - where its own unregister would find nothing
-        // to take back and the pool MBean would then be published onto the
-        // dead pool under a live name that no later close() or
-        // postDeregister() could ever take back.
+        // too, and DataSourceProxy.close(boolean) and the publication step of
+        // pCreatePool() below run under the same lock. A close therefore
+        // cannot slip in beside an in-flight publication - between its read of
+        // the registration name and the publish itself - where its own
+        // unregister would find nothing to take back and the pool MBean would
+        // then be published onto the dead pool under a live name that no later
+        // close() or postDeregister() could ever take back.
         releasePoolMBean();
         super.close(all);
     }
