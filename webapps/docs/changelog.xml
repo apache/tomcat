@@ -1053,6 +1053,15 @@
         refusal logged rather than the borrow or the return around it failed.
         Pull request <pr>677</pr> provided by Fernanda Meheust. (remm)
       </add>
+      <fix>
+        Record the borrow site of a connection borrowed from the JDBC pool
+        with <code>logAbandoned</code> enabled as stack trace elements
+        instead of a formatted thread-dump string, and format the trace only
+        when an abandoned-connection report actually reads it. Every borrow
+        previously formatted - and almost always threw away - a full thread
+        dump; the text reported for a connection that really is abandoned is
+        unchanged. Pull request <pr>1048</pr> provided by sainadh777. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
