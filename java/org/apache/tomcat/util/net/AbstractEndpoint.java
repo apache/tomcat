@@ -653,14 +653,14 @@ public abstract class AbstractEndpoint<S, U> {
         String configuredAlias = certificate.getCertificateKeyAlias();
         if (sslContext != null && configuredAlias != null) {
             String servedAlias = sslContext.getServedAlias(certificate);
-            if (servedAlias != null && !servedAlias.equals(configuredAlias)) {
+            if (servedAlias != null && !servedAlias.equalsIgnoreCase(configuredAlias)) {
                 getLogCertificate()
                         .info(sm.getString("endpoint.tls.info.cert.aliasResolved", configuredAlias, servedAlias));
             }
         }
 
         if (getLogCertificate().isDebugEnabled() && sslContext != null) {
-            X509Certificate[] x509Certificates = sslContext.getCertificateChain(certificate);
+            X509Certificate[] x509Certificates = sslContext.getCertificateChain(sslContext.getServedAlias(certificate));
             if (x509Certificates != null && x509Certificates.length > 0) {
                 getLogCertificate().debug(generateCertificateDebug(x509Certificates[0]));
             } else {
