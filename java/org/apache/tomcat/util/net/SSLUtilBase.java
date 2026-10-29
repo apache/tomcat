@@ -406,15 +406,17 @@ public abstract class SSLUtilBase implements SSLUtil {
                     if (!ks.isKeyEntry(candidate)) {
                         continue;
                     }
+                    // Select only a key entry with an X.509 certificate valid for server authentication. A non-X.509
+                    // or absent certificate cannot be validated or serve TLS, so skip it rather than prefer it.
                     Certificate cert = ks.getCertificate(candidate);
-                    if (cert instanceof X509Certificate x509 && !isServerAuthCapable(x509)) {
+                    if (cert instanceof X509Certificate x509 && isServerAuthCapable(x509)) {
+                        keyAlias = candidate;
+                    } else {
                         if (log.isDebugEnabled()) {
                             log.debug(sm.getString("sslUtilBase.skippedKeyUsage", candidate));
                         }
                         skippedForServerAuth = true;
-                        continue;
                     }
-                    keyAlias = candidate;
                 }
                 if (keyAlias == null) {
                     if (skippedForServerAuth) {
