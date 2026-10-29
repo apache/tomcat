@@ -539,7 +539,7 @@ public abstract class SSLUtilBase implements SSLUtil {
         List<String> objectIdentifiers;
         try {
             objectIdentifiers = cert.getExtendedKeyUsage();
-        } catch (CertificateParsingException e) {
+        } catch (CertificateParsingException | RuntimeException e) {
             return false;
         }
 
