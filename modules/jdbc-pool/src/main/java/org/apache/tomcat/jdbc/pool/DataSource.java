@@ -170,7 +170,12 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
      */
     protected void registerJmx() {
         final ConnectionPool p = pool;
-        if (p == null || p.getJmxPool() == null) {
+        // Read the pool's JMX object only once: close() gives it up
+        // concurrently, and a second read can observe the null the first one
+        // did not - a registration attempt against that null would only fail
+        // inside the helper, with a spurious error log
+        final org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = p == null ? null : p.getJmxPool();
+        if (jmx == null) {
             log.warn("JDBC pool MBean [" + oname + "] not registered: the pool " +
                     "has not been created yet or has already been closed.");
             // oname is the handle postDeregister() unregisters; do not keep
@@ -182,7 +187,7 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
         // hands back the name of its own publish, or null when the server
         // refused it, so a name a foreign MBean owns is never released as
         // if it were this pool's registration
-        this.oname = JmxUtil.registerJmx(oname, null, p.getJmxPool());
+        this.oname = JmxUtil.registerJmx(oname, null, jmx);
     }
 
     /**
