@@ -91,10 +91,7 @@ public interface SSLContext {
     SSLParameters getSupportedSSLParameters();
 
     /**
-     * Returns the certificate chain for the given key store alias. This is a low-level lookup by exact alias; callers
-     * that want the certificate actually served for a configured {@link SSLHostConfigCertificate} should use
-     * {@link #getCertificateChain(SSLHostConfigCertificate)}, which resolves the served alias (it can differ from the
-     * configured alias, for example after SunMSCAPI Windows-MY numbered-duplicate resolution).
+     * Returns the certificate chain for the given alias.
      *
      * @param alias The alias
      *
@@ -137,24 +134,10 @@ public interface SSLContext {
                 }
             }
         }
-        String configured = certificate.getCertificateKeyAlias();
-        return configured == null ? SSLUtilBase.DEFAULT_KEY_ALIAS : configured;
+        String configuredAlias = certificate.getCertificateKeyAlias();
+        return configuredAlias == null ? SSLUtilBase.DEFAULT_KEY_ALIAS : configuredAlias;
     }
 
-
-    /**
-     * Returns the certificate chain actually served for the given certificate configuration. Unlike
-     * {@link #getCertificateChain(String)}, which looks up a fixed alias, this uses {@link #getServedAlias}, so callers
-     * such as the certificate reload check observe the certificate that is really in use. This can differ from the
-     * configured alias, for example after SunMSCAPI Windows-MY duplicate resolution.
-     *
-     * @param certificate The certificate configuration
-     *
-     * @return The served certificate chain, or {@code null} if none can be determined
-     */
-    default X509Certificate[] getCertificateChain(SSLHostConfigCertificate certificate) {
-        return getCertificateChain(getServedAlias(certificate));
-    }
 
     /**
      * Returns the accepted issuers.
