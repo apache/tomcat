@@ -275,6 +275,21 @@ public class PooledConnection implements PooledConnectionMBean {
         }
         this.discarded = false;
         this.lastConnected = System.currentTimeMillis();
+
+        // The physical session is up: this is the point at which the
+        // connection can publish itself below the pool's MBean. Tying that to
+        // the first borrow instead left a connection the pool pre-created for
+        // its initial size, or one that is simply never borrowed, counted in
+        // the pool's size yet invisible to JMX for its whole life. This also
+        // covers every reconnect; a connection that is already registered
+        // keeps its registration across a reconnect, and createMBean() leaves
+        // such a call alone by its own guards. With JMX disabled the pool has
+        // no JMX object to register under, and the borrow path still calls the
+        // registration unconditionally, so it is skipped here rather than
+        // called only to do nothing.
+        if (parent.getJmxPool() != null) {
+            createMBean();
+        }
     }
 
     /**
@@ -1096,10 +1111,14 @@ public class PooledConnection implements PooledConnectionMBean {
     /**
      * Creates and registers an MBean for this pooled connection with JMX. The pool's own MBean is the registration
      * base; once close() has given it up - which a borrow can race - there is no base to register under, and the
-     * registration is skipped.
+     * registration is skipped. It is skipped as well for a connection that is already registered - the pool reaches a
+     * live connection from the connect path, from the first-borrow path and from the sweep it runs when its own MBean
+     * is published - and for a released one, which would leave a registration of a dead connection behind with nothing
+     * left to unregister it. The check and the publish are one synchronized step because those paths can meet on the
+     * same connection and must never publish it twice: only one of the registrations would ever be unregistered.
      */
-    public void createMBean() {
-        if (oname != null) {
+    public synchronized void createMBean() {
+        if (oname != null || released.get()) {
             return;
         }
         org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = parent.getJmxPool();
