@@ -18,6 +18,7 @@ package org.apache.tomcat.jdbc.pool;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
@@ -39,8 +40,8 @@ import org.junit.jupiter.api.Test;
  * polls, the terminal failure of an asynchronous poll whose timed get
  * times out, the termination of every outstanding poll once the waiters
  * are cancelled, the collection operations the queue deliberately
- * leaves unsupported, and the rejection of null elements by every
- * insertion path.
+ * leaves unsupported, the rejection of null elements by every
+ * insertion path, and the removal contract of the queue iterator.
  */
 class TestFairBlockingQueue {
 
@@ -92,6 +93,42 @@ class TestFairBlockingQueue {
         }
         Assertions.assertEquals(2, seen.size(), "the iterator must see both queued elements");
         Assertions.assertTrue(seen.contains("added"));
+    }
+
+    @Test
+    void iteratorRemoveRequiresAnInterveningNext() {
+        FairBlockingQueue<String> queue = new FairBlockingQueue<>();
+        queue.offer("drop");
+        queue.offer("keep");
+        Iterator<String> iterator = queue.iterator();
+        Assertions.assertThrows(IllegalStateException.class, iterator::remove,
+                "remove() before the first next() must fail per the Iterator contract");
+        iterator.next();
+        iterator.remove(); // the legal call
+        Assertions.assertThrows(IllegalStateException.class, iterator::remove,
+                "a second remove() without an intervening next() must fail per the Iterator contract");
+        Assertions.assertEquals(1, queue.size(),
+                "the failed second remove() must not remove a further element");
+    }
+
+    @Test
+    void iteratorRemoveTakesTheElementOutOfTheLiveQueue() {
+        FairBlockingQueue<String> queue = new FairBlockingQueue<>();
+        queue.offer("drop");
+        queue.offer("keep");
+        for (Iterator<String> iterator = queue.iterator(); iterator.hasNext();) {
+            if ("drop".equals(iterator.next())) {
+                iterator.remove();
+            }
+        }
+        Assertions.assertEquals(1, queue.size(), "the removed element must leave the live queue");
+        Assertions.assertFalse(queue.contains("drop"));
+        Assertions.assertTrue(queue.contains("keep"), "the other elements must stay in the queue");
+        // Collection.removeIf is a default method that routes through
+        // Iterator.remove(), so it must honour the same contract
+        Assertions.assertTrue(queue.removeIf("keep"::equals));
+        Assertions.assertEquals(0, queue.size());
+        Assertions.assertFalse(queue.removeIf("keep"::equals));
     }
 
     @Test
