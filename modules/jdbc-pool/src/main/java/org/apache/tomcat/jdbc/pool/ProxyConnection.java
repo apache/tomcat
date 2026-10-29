@@ -22,20 +22,20 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import javax.sql.XAConnection;
+
 /**
- * A ProxyConnection object is the bottom most interceptor that wraps an object of type
- * {@link PooledConnection}. The ProxyConnection intercepts, among the calls it forwards,
- * the following methods:
+ * A ProxyConnection object is the bottom most interceptor that wraps an object of type {@link PooledConnection}. The
+ * ProxyConnection intercepts, among the calls it forwards, the following methods:
  * <ul>
- *   <li>{@link java.sql.Connection#close()} - returns the connection to the pool. May be called multiple times.</li>
- *   <li>{@link java.lang.Object#toString()} - returns a custom string for this object</li>
- *   <li>{@link javax.sql.PooledConnection#getConnection()} - returns the underlying connection</li>
- *   <li>{@link java.lang.Object#equals(Object)} and {@link java.lang.Object#hashCode()} -
- *       answered with the identity of the connection handle, so that the {@code Object}
- *       contract holds even when no facade sits in front of this interceptor</li>
+ * <li>{@link java.sql.Connection#close()} - returns the connection to the pool. May be called multiple times.</li>
+ * <li>{@link java.lang.Object#toString()} - returns a custom string for this object</li>
+ * <li>{@link javax.sql.PooledConnection#getConnection()} - returns the underlying connection</li>
+ * <li>{@link java.lang.Object#equals(Object)} and {@link java.lang.Object#hashCode()} - answered with the identity of
+ * the connection handle, so that the {@code Object} contract holds even when no facade sits in front of this
+ * interceptor</li>
  * </ul>
- * By default method comparisons is done on a String reference level, unless the {@link PoolConfiguration#setUseEquals(boolean)} has been called
- * with a <code>true</code> argument.
+ * By default method comparisons is done on a String reference level, unless the
+ * {@link PoolConfiguration#setUseEquals(boolean)} has been called with a <code>true</code> argument.
  */
 public class ProxyConnection extends JdbcInterceptor {
 
@@ -47,6 +47,7 @@ public class ProxyConnection extends JdbcInterceptor {
 
     /**
      * Returns the underlying pooled connection.
+     *
      * @return the pooled connection
      */
     public PooledConnection getConnection() {
@@ -55,6 +56,7 @@ public class ProxyConnection extends JdbcInterceptor {
 
     /**
      * Sets the underlying pooled connection.
+     *
      * @param connection the pooled connection
      */
     public void setConnection(PooledConnection connection) {
@@ -63,6 +65,7 @@ public class ProxyConnection extends JdbcInterceptor {
 
     /**
      * Returns the parent connection pool.
+     *
      * @return the connection pool
      */
     public ConnectionPool getPool() {
@@ -71,6 +74,7 @@ public class ProxyConnection extends JdbcInterceptor {
 
     /**
      * Sets the parent connection pool.
+     *
      * @param pool the connection pool
      */
     public void setPool(ConnectionPool pool) {
@@ -79,12 +83,12 @@ public class ProxyConnection extends JdbcInterceptor {
 
     /**
      * Creates a new ProxyConnection wrapping the given pooled connection.
-     * @param parent the parent connection pool
-     * @param con the pooled connection
+     *
+     * @param parent    the parent connection pool
+     * @param con       the pooled connection
      * @param useEquals whether to use equals for method comparison
      */
-    protected ProxyConnection(ConnectionPool parent, PooledConnection con,
-            boolean useEquals) {
+    protected ProxyConnection(ConnectionPool parent, PooledConnection con, boolean useEquals) {
         pool = parent;
         connection = con;
         setUseEquals(useEquals);
@@ -97,42 +101,42 @@ public class ProxyConnection extends JdbcInterceptor {
     }
 
     /**
-     * Checks whether this interceptor wraps the given interface. This is the
-     * view from the interceptor itself; the contract of the connection handle
-     * the pool hands out - which also implements {@link java.sql.Connection}
-     * and {@link javax.sql.PooledConnection} (and {@link javax.sql.XAConnection}
-     * on XA pools) - is answered by the dispatch in
-     * {@link #invoke(Object, Method, Object[])}.
+     * Checks whether this interceptor wraps the given interface. This is the view from the interceptor itself; the
+     * contract of the connection handle the pool hands out - which also implements {@link java.sql.Connection} and
+     * {@link javax.sql.PooledConnection} (and {@link javax.sql.XAConnection} on XA pools) - is answered by the dispatch
+     * in {@link #invoke(Object, Method, Object[])}.
+     *
      * @param iface the interface to check
+     *
      * @return true if this interceptor wraps the given interface
      */
     public boolean isWrapperFor(Class<?> iface) {
-        if (iface == XAConnection.class && connection.getXAConnection()!=null) {
+        if (iface == XAConnection.class && connection.getXAConnection() != null) {
             return true;
         }
         Connection physical = connection.getConnection();
         if (physical == null) {
-            //released handle: there is nothing left below to be a wrapper
+            // Released handle: there is nothing left below to be a wrapper
             return false;
         }
         if (iface.isInstance(physical)) {
             return true;
         }
         if (iface == XAConnection.class) {
-            //javax.sql.XAConnection is only ever handed out from the pooled
-            //connection's own XA handle - unwrap() says so - so the driver
-            //below is not asked about it
+            // javax.sql.XAConnection is only ever handed out from the pooled
+            // connection's own XA handle - unwrap() says so - so the driver
+            // below is not asked about it
             return false;
         }
-        //The driver's own connection may itself wrap a further connection -
-        //a driver built around another driver's, like the AWS wrapper over
-        //the PostgreSQL one - and it, not the class of the object it
-        //presents, is what knows which interfaces it can unwrap to.
+        // The driver's own connection may itself wrap a further connection -
+        // a driver built around another driver's, like the AWS wrapper over
+        // the PostgreSQL one - and it, not the class of the object it
+        // presents, is what knows which interfaces it can unwrap to.
         try {
             return physical.isWrapperFor(iface);
         } catch (SQLException x) {
-            //a driver that cannot answer the question is not a wrapper
-            //for the interface
+            // A driver that cannot answer the question is not a wrapper
+            // for the interface
             return false;
         }
     }
@@ -140,14 +144,17 @@ public class ProxyConnection extends JdbcInterceptor {
 
     /**
      * Unwraps the connection to the given interface.
+     *
      * @param iface the interface to unwrap to
+     *
      * @return the unwrapped connection
+     *
      * @throws SQLException if the connection does not wrap the given interface
      */
     public Object unwrap(Class<?> iface) throws SQLException {
         if (iface == PooledConnection.class) {
             return connection;
-        }else if (iface == XAConnection.class) {
+        } else if (iface == XAConnection.class) {
             javax.sql.XAConnection xa = connection.getXAConnection();
             if (xa == null) {
                 // The Wrapper contract asks for a failure, not for a silent
@@ -159,20 +166,20 @@ public class ProxyConnection extends JdbcInterceptor {
         } else if (iface.isInstance(connection.getConnection())) {
             return connection.getConnection();
         } else if (isWrapperFor(iface)) {
-            //the driver's connection is a wrapper further down, and
-            //unwrapping that far is its answer to give, not ours
+            // The driver's connection is a wrapper further down, and
+            // unwrapping that far is its answer to give, not ours
             return connection.getConnection().unwrap(iface);
         } else {
-            throw new SQLException("Not a wrapper of "+iface.getName());
+            throw new SQLException("Not a wrapper of " + iface.getName());
         }
     }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        if (compare(ISCLOSED_VAL,method)) {
+        if (compare(ISCLOSED_VAL, method)) {
             return Boolean.valueOf(isClosed());
         }
-        if (compare(EQUALS_VAL,method)) {
+        if (compare(EQUALS_VAL, method)) {
             // With the DisposableConnectionFacade switched off, Object methods
             // reach this interceptor, and the XA branch below would dispatch
             // them at a null XA connection (or at the XA connection of another
@@ -184,25 +191,23 @@ public class ProxyConnection extends JdbcInterceptor {
             Object other = (args == null || args.length == 0) ? null : args[0];
             return Boolean.valueOf(proxy == other);
         }
-        if (compare(HASHCODE_VAL,method)) {
+        if (compare(HASHCODE_VAL, method)) {
             return Integer.valueOf(System.identityHashCode(proxy));
         }
-        if (compare(CLOSE_VAL,method)) {
-            if (connection==null)
-            {
-                return null; //noop for already closed.
+        if (compare(CLOSE_VAL, method)) {
+            if (connection == null) {
+                return null; // No-op for already closed.
             }
             PooledConnection poolc = this.connection;
             this.connection = null;
             pool.returnConnection(poolc);
             return null;
-        } else if (compare(TOSTRING_VAL,method)) {
+        } else if (compare(TOSTRING_VAL, method)) {
             return this.toString();
-        } else if (compare(GETCONNECTION_VAL,method) && connection!=null) {
+        } else if (compare(GETCONNECTION_VAL, method) && connection != null) {
             return connection.getConnection();
-        } else if (method.getDeclaringClass() != Object.class
-                && method.getDeclaringClass().isAssignableFrom(XAConnection.class)
-                && connection != null) {
+        } else if (method.getDeclaringClass() != Object.class &&
+                method.getDeclaringClass().isAssignableFrom(XAConnection.class) && connection != null) {
             // The Object.class exclusion is defensive: the only Object
             // methods java.lang.reflect.Proxy routes to an invocation
             // handler are equals, hashCode and toString, and all three are
@@ -224,12 +229,12 @@ public class ProxyConnection extends JdbcInterceptor {
                     // than blaming the XA configuration.
                     throw new SQLException("Connection has already been closed.");
                 }
-                throw new SQLException("The pooled connection is not an XA connection; "
-                        + "method [" + method.getName() + "] cannot be dispatched.");
+                throw new SQLException("The pooled connection is not an XA connection; " + "method [" +
+                        method.getName() + "] cannot be dispatched.");
             }
             try {
                 return method.invoke(xaConnection, args);
-            }catch (Throwable t) {
+            } catch (Throwable t) {
                 if (t instanceof InvocationTargetException) {
                     throw t.getCause() != null ? t.getCause() : t;
                 } else {
@@ -240,10 +245,10 @@ public class ProxyConnection extends JdbcInterceptor {
         if (isClosed()) {
             throw new SQLException("Connection has already been closed.");
         }
-        if (compare(UNWRAP_VAL,method)) {
-            Class<?> iface = (Class<?>)args[0];
-            if (iface != XAConnection.class && iface.isInstance(proxy)
-                    && !iface.isInstance(connection.getConnection())) {
+        if (compare(UNWRAP_VAL, method)) {
+            Class<?> iface = (Class<?>) args[0];
+            if (iface != XAConnection.class && iface.isInstance(proxy) &&
+                    !iface.isInstance(connection.getConnection())) {
                 // The Wrapper contract: the handle is a wrapper of every
                 // interface it implements itself. Interfaces the physical
                 // connection behind it also provides - java.sql.Connection
@@ -255,20 +260,19 @@ public class ProxyConnection extends JdbcInterceptor {
                 return proxy;
             }
             return unwrap(iface);
-        } else if (compare(ISWRAPPERFOR_VAL,method)) {
-            Class<?> iface = (Class<?>)args[0];
+        } else if (compare(ISWRAPPERFOR_VAL, method)) {
+            Class<?> iface = (Class<?>) args[0];
             // An object is always a wrapper of the interfaces it implements.
-            return Boolean.valueOf(iface.isInstance(proxy)
-                    || this.isWrapperFor(iface));
+            return Boolean.valueOf(iface.isInstance(proxy) || this.isWrapperFor(iface));
         }
         try {
             PooledConnection poolc = connection;
-            if (poolc!=null) {
-                return method.invoke(poolc.getConnection(),args);
+            if (poolc != null) {
+                return method.invoke(poolc.getConnection(), args);
             } else {
                 throw new SQLException("Connection has already been closed.");
             }
-        }catch (Throwable t) {
+        } catch (Throwable t) {
             if (t instanceof InvocationTargetException) {
                 throw t.getCause() != null ? t.getCause() : t;
             } else {
@@ -279,14 +283,16 @@ public class ProxyConnection extends JdbcInterceptor {
 
     /**
      * Returns true if the underlying connection has been closed or discarded.
+     *
      * @return true if closed or discarded
      */
     public boolean isClosed() {
-        return connection==null || connection.isDiscarded();
+        return connection == null || connection.isDiscarded();
     }
 
     /**
      * Returns the delegate pooled connection.
+     *
      * @return the delegate pooled connection
      */
     public PooledConnection getDelegateConnection() {
@@ -295,6 +301,7 @@ public class ProxyConnection extends JdbcInterceptor {
 
     /**
      * Returns the parent connection pool.
+     *
      * @return the parent connection pool
      */
     public ConnectionPool getParentPool() {
@@ -303,7 +310,7 @@ public class ProxyConnection extends JdbcInterceptor {
 
     @Override
     public String toString() {
-        return "ProxyConnection["+(connection!=null?connection.toString():"null")+"]";
+        return "ProxyConnection[" + (connection != null ? connection.toString() : "null") + "]";
     }
 
 }

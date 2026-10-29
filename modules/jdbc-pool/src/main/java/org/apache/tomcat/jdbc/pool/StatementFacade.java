@@ -35,42 +35,33 @@ import org.apache.tomcat.jdbc.pool.interceptor.AbstractCreateStatementIntercepto
 /**
  * Facade that creates statement and result set proxies.
  * <p>
- * The handles this facade hands out implement only the standard JDBC
- * interfaces, as do the proxies of the interceptors that wrap statements
- * beneath it, so the driver's own statement and result set classes are never
- * visible to the application through a cast. Every result set a pooled
- * statement hands back, and every result set that one of those handles
- * hands back in turn, reaches the application as one of these handles,
- * whatever the method that returned it was called: a cursor that arrives
- * as a plain object - a REF cursor OUT-parameter read through
- * {@link java.sql.CallableStatement#getObject(int)}, or the nested cursor
- * a {@link java.sql.ResultSet#getObject(int)} column value hands out - is
- * sealed to the borrow like the ones the standard result set methods
- * return. The <code>Wrapper</code> methods are delegated to the driver, and
- * <code>unwrap</code> is the supported way to reach driver-specific methods
- * through every layer. An unwrapped driver object, however, is a driver
- * object rather than a pooled handle: retiring these handles at the end of
- * the borrow does not retire what was already unwrapped, and only tracking
- * the statements with
- * {@link org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer} (or the
- * application closing them) keeps the statements underneath from outliving
- * the borrow - unless an interceptor recycles them for the next borrow, as a
- * statement cache does.
+ * The handles this facade hands out implement only the standard JDBC interfaces, as do the proxies of the interceptors
+ * that wrap statements beneath it, so the driver's own statement and result set classes are never visible to the
+ * application through a cast. Every result set a pooled statement hands back, and every result set that one of those
+ * handles hands back in turn, reaches the application as one of these handles, whatever the method that returned it was
+ * called: a cursor that arrives as a plain object - a REF cursor OUT-parameter read through
+ * {@link java.sql.CallableStatement#getObject(int)}, or the nested cursor a {@link java.sql.ResultSet#getObject(int)}
+ * column value hands out - is sealed to the borrow like the ones the standard result set methods return. The
+ * <code>Wrapper</code> methods are delegated to the driver, and <code>unwrap</code> is the supported way to reach
+ * driver-specific methods through every layer. An unwrapped driver object, however, is a driver object rather than a
+ * pooled handle: retiring these handles at the end of the borrow does not retire what was already unwrapped, and only
+ * tracking the statements with {@link org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer} (or the application
+ * closing them) keeps the statements underneath from outliving the borrow - unless an interceptor recycles them for the
+ * next borrow, as a statement cache does.
  */
 public class StatementFacade extends AbstractCreateStatementInterceptor {
 
     private static final Log logger = LogFactory.getLog(StatementFacade.class);
 
     /**
-     * Whether the borrow this facade was created for has ended. The pool
-     * creates one facade per borrow, so this says when every handle this
-     * instance handed out stopped belonging to a connection the application
-     * still holds.
+     * Whether the borrow this facade was created for has ended. The pool creates one facade per borrow, so this says
+     * when every handle this instance handed out stopped belonging to a connection the application still holds.
      */
     private volatile boolean borrowEnded = false;
 
     /**
      * Constructs a StatementFacade.
+     *
      * @param interceptor the next interceptor in the chain
      */
     protected StatementFacade(JdbcInterceptor interceptor) {
@@ -79,12 +70,10 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
     }
 
     /**
-     * Marks the borrow as ended, which closes every statement and result set
-     * handle this facade handed out. Called before the connection is handed
-     * back, so a handle cannot outlive the borrow and end up driving the
-     * session of the next borrower. A borrow that is abandoned instead never
-     * runs this method, but the pool destroys an abandoned session rather
-     * than lending it again, so those handles only fail at the driver.
+     * Marks the borrow as ended, which closes every statement and result set handle this facade handed out. Called
+     * before the connection is handed back, so a handle cannot outlive the borrow and end up driving the session of the
+     * next borrower. A borrow that is abandoned instead never runs this method, but the pool destroys an abandoned
+     * session rather than lending it again, so those handles only fail at the driver.
      */
     @Override
     public void closeInvoked() {
@@ -112,7 +101,7 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
                 constructor = getConstructor(PREPARE_CALL_IDX, CallableStatement.class);
                 sql = (String) args[0];
             } else {
-                // do nothing
+                // Do nothing
                 return statement;
             }
             return constructor.newInstance(new Object[] { new StatementProxy(statement, sql, proxy) });
@@ -139,20 +128,19 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
          */
         protected final String query;
         /**
-         * The pooled connection the statement was created from, as reported
-         * by {@link java.sql.Statement#getConnection()}. It is the handle the
-         * application borrowed, so it stops working once that borrow has been
-         * returned, while the driver's own connection would have gone on
-         * serving whoever borrowed the connection next.
+         * The pooled connection the statement was created from, as reported by
+         * {@link java.sql.Statement#getConnection()}. It is the handle the application borrowed, so it stops working
+         * once that borrow has been returned, while the driver's own connection would have gone on serving whoever
+         * borrowed the connection next.
          */
         protected final Object connection;
 
         /**
          * Constructs a StatementProxy.
-         * @param parent the parent statement
-         * @param query the SQL query text
-         * @param connection the pooled connection the statement was created
-         *                   from
+         *
+         * @param parent     the parent statement
+         * @param query      the SQL query text
+         * @param connection the pooled connection the statement was created from
          */
         public StatementProxy(Object parent, String query, Object connection) {
             this.delegate = parent;
@@ -193,8 +181,8 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
             if (ended) {
                 // The delegate is still open, but it is open on a session
                 // that belongs to the next borrower now.
-                throw new SQLException("Statement closed. The pooled connection this "
-                        + "statement was created from has been returned to the pool.");
+                throw new SQLException("Statement closed. The pooled connection this " +
+                        "statement was created from has been returned to the pool.");
             }
             // The connection a statement reports is the pooled handle the
             // application created it from, not the driver's own connection.
@@ -208,7 +196,7 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
 
             Object result;
             try {
-                // invoke next
+                // Invoke next
                 result = method.invoke(delegate, args);
 
                 // Seal every result set the call hands back, whatever the
@@ -224,8 +212,7 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
                 // stays the driver's object even when that object implements
                 // ResultSet. ResultSetProxy mirrors this rule for the result
                 // sets a result set itself hands out.
-                if (result instanceof ResultSet
-                        && method.getDeclaringClass() != Wrapper.class) {
+                if (result instanceof ResultSet && method.getDeclaringClass() != Wrapper.class) {
                     return getConstructor(RESULTSET_IDX, ResultSet.class)
                             .newInstance(new ResultSetProxy(result, proxy));
                 }
@@ -236,7 +223,7 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
                     throw t;
                 }
             }
-            // perform close cleanup
+            // Perform close cleanup
             if (compare(CLOSE_VAL, method)) {
                 delegate = null;
             }
@@ -277,11 +264,11 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
 
         /**
          * Constructs a ResultSetProxy.
+         *
          * @param delegate the ResultSet to delegate to
-         * @param parent the statement handle the result set was read from,
-         *               which {@link java.sql.ResultSet#getStatement()}
-         *               answers; a result set a handle hands out as a column
-         *               value is parented to the same statement
+         * @param parent   the statement handle the result set was read from, which
+         *                     {@link java.sql.ResultSet#getStatement()} answers; a result set a handle hands out as a
+         *                     column value is parented to the same statement
          */
         public ResultSetProxy(Object delegate, Object parent) {
             this.delegate = delegate;
@@ -321,8 +308,8 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
             if (ended) {
                 // The cursor is still open, but it is open on a session that
                 // belongs to the next borrower now.
-                throw new SQLException("ResultSet closed. The pooled connection this "
-                        + "result set was read from has been returned to the pool.");
+                throw new SQLException("ResultSet closed. The pooled connection this " +
+                        "result set was read from has been returned to the pool.");
             }
 
             if (compare(GET_STATEMENT, method)) {
@@ -331,7 +318,7 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
 
             Object result;
             try {
-                // invoke next
+                // Invoke next
                 result = method.invoke(delegate, args);
 
                 // The statement proxy's rule, mirrored one layer down: a
@@ -343,8 +330,7 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
                 // as the statement proxy parents its result sets, so that
                 // getStatement() keeps answering a Statement; the Wrapper
                 // carve-out is the statement proxy's, for its reason there.
-                if (result instanceof ResultSet
-                        && method.getDeclaringClass() != Wrapper.class) {
+                if (result instanceof ResultSet && method.getDeclaringClass() != Wrapper.class) {
                     return getConstructor(RESULTSET_IDX, ResultSet.class)
                             .newInstance(new ResultSetProxy(result, parent));
                 }
@@ -355,7 +341,7 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
                     throw t;
                 }
             }
-            // perform close cleanup
+            // Perform close cleanup
             if (compare(CLOSE_VAL, method)) {
                 delegate = null;
             }

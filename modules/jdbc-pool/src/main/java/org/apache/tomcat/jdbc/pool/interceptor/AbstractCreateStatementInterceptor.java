@@ -223,10 +223,8 @@ public abstract class AbstractCreateStatementInterceptor extends JdbcInterceptor
     /**
      * Returns true if the method that is being invoked matches one of the method names passed in
      *
-     * @param names list of method names that we want to intercept
-     *
-     * @param method the method being invoked on the proxy
-     *
+     * @param names   list of method names that we want to intercept
+     * @param method  the method being invoked on the proxy
      * @param process boolean result used for recursion
      *
      * @return returns true if the method name matched

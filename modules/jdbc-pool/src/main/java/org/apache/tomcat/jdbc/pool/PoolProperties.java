@@ -31,8 +31,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * Implementation of {@link PoolConfiguration} that holds the configuration
- * properties for a connection pool.
+ * Implementation of {@link PoolConfiguration} that holds the configuration properties for a connection pool.
  */
 public class PoolProperties implements PoolConfiguration, Cloneable, Serializable {
 
@@ -109,7 +108,8 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     /** Whether to log abandoned connections. */
     private volatile boolean logAbandoned = false;
     /** The pool name. */
-    private volatile String name = "Tomcat Connection Pool["+(poolCounter.addAndGet(1))+"-"+System.identityHashCode(PoolProperties.class)+"]";
+    private volatile String name = "Tomcat Connection Pool[" + (poolCounter.addAndGet(1)) + "-" +
+            System.identityHashCode(PoolProperties.class) + "]";
     /** The database password. */
     private volatile String password;
     /** The database username. */
@@ -121,9 +121,9 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     /** The SQL to execute on connection creation. */
     private volatile String initSQL;
     /** Whether to validate connections on creation. */
-    private volatile boolean testOnConnect =false;
+    private volatile boolean testOnConnect = false;
     /** The JDBC interceptors configuration. */
-    private volatile String jdbcInterceptors=null;
+    private volatile String jdbcInterceptors = null;
     /** Whether to use a fair queue for connection requests. */
     private volatile boolean fairQueue = true;
     /** Whether to use equals for object comparison. */
@@ -150,8 +150,8 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     private volatile boolean rollbackOnReturn = false;
     /**
      * Whether to use a disposable connection facade.
-     * @deprecated The disposable connection facade is always used, so this
-     *             property no longer has any effect.
+     *
+     * @deprecated The disposable connection facade is always used, so this property no longer has any effect.
      */
     @Deprecated
     private volatile boolean useDisposableConnectionFacade = true;
@@ -163,17 +163,17 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     private volatile boolean ignoreExceptionOnPreLoad = false;
     /**
      * Whether to use a statement facade.
-     * @deprecated The statement facade is always used, so this property no
-     *             longer has any effect.
+     *
+     * @deprecated The statement facade is always used, so this property no longer has any effect.
      */
     @Deprecated
     private volatile boolean useStatementFacade = true;
 
     @Override
     public void setAbandonWhenPercentageFull(int percentage) {
-        if (percentage<0) {
+        if (percentage < 0) {
             abandonWhenPercentageFull = 0;
-        } else if (percentage>100) {
+        } else if (percentage > 100) {
             abandonWhenPercentageFull = 100;
         } else {
             abandonWhenPercentageFull = percentage;
@@ -387,13 +387,12 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     @Override
     public void setValidator(Validator validator) {
         this.validator = validator;
-        if (validator!=null) {
+        if (validator != null) {
             this.validatorClassName = validator.getClass().getName();
         } else {
             this.validatorClassName = null;
         }
     }
-
 
 
     @Override
@@ -423,27 +422,27 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     @Override
     public InterceptorDefinition[] getJdbcInterceptorsAsArray() {
         if (interceptors == null) {
-            if (jdbcInterceptors==null) {
+            if (jdbcInterceptors == null) {
                 interceptors = new InterceptorDefinition[0];
             } else {
                 String[] interceptorValues = jdbcInterceptors.split(";");
-                InterceptorDefinition[] definitions = new InterceptorDefinition[interceptorValues.length+1];
-                //always add the trap interceptor to the mix
+                InterceptorDefinition[] definitions = new InterceptorDefinition[interceptorValues.length + 1];
+                // Always add the trap interceptor to the mix
                 definitions[0] = new InterceptorDefinition(TrapException.class);
-                for (int i=0; i<interceptorValues.length; i++) {
+                for (int i = 0; i < interceptorValues.length; i++) {
                     int propIndex = interceptorValues[i].indexOf('(');
                     int endIndex = interceptorValues[i].indexOf(')');
-                    if (propIndex<0 || endIndex<0 || endIndex <= propIndex) {
-                        definitions[i+1] = new InterceptorDefinition(interceptorValues[i].trim());
+                    if (propIndex < 0 || endIndex < 0 || endIndex <= propIndex) {
+                        definitions[i + 1] = new InterceptorDefinition(interceptorValues[i].trim());
                     } else {
-                        String name = interceptorValues[i].substring(0,propIndex).trim();
-                        definitions[i+1] = new InterceptorDefinition(name);
-                        String propsAsString = interceptorValues[i].substring(propIndex+1, endIndex);
+                        String name = interceptorValues[i].substring(0, propIndex).trim();
+                        definitions[i + 1] = new InterceptorDefinition(name);
+                        String propsAsString = interceptorValues[i].substring(propIndex + 1, endIndex);
                         String[] props = propsAsString.split(",");
-                        for (int j=0; j<props.length; j++) {
+                        for (int j = 0; j < props.length; j++) {
                             String prop = props[j];
                             if (prop.trim().isEmpty()) {
-                                // an empty segment comes from Name(), Name(   )
+                                // An empty segment comes from Name(), Name( )
                                 // or a redundant separator: there is no property
                                 // to add, so tolerate it rather than fail the
                                 // whole pool start on a cosmetic spelling
@@ -451,14 +450,12 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                             }
                             int pidx = prop.indexOf('=');
                             if (pidx < 0) {
-                                throw new IllegalArgumentException(
-                                        "Invalid interceptor property '" + prop.trim()
-                                        + "', missing '=', in jdbcInterceptors value ["
-                                        + interceptorValues[i] + "]");
+                                throw new IllegalArgumentException("Invalid interceptor property '" + prop.trim() +
+                                        "', missing '=', in jdbcInterceptors value [" + interceptorValues[i] + "]");
                             }
-                            String propName = prop.substring(0,pidx).trim();
-                            String propValue = prop.substring(pidx+1).trim();
-                            definitions[i+1].addProperty(new InterceptorProperty(propName,propValue));
+                            String propName = prop.substring(0, pidx).trim();
+                            String propValue = prop.substring(pidx + 1).trim();
+                            definitions[i + 1].addProperty(new InterceptorProperty(propName, propValue));
                         }
                     }
                 }
@@ -609,8 +606,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
 
     @Override
-    public void setTimeBetweenEvictionRunsMillis(int
-                                                 timeBetweenEvictionRunsMillis) {
+    public void setTimeBetweenEvictionRunsMillis(int timeBetweenEvictionRunsMillis) {
         this.timeBetweenEvictionRunsMillis = timeBetweenEvictionRunsMillis;
     }
 
@@ -651,28 +647,25 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
         try {
             @SuppressWarnings("unchecked")
-            Class<Validator> validatorClass = (Class<Validator>)ClassLoaderUtil.loadClass(
-                    className,
-                    PoolProperties.class.getClassLoader(),
-                    Thread.currentThread().getContextClassLoader()
-            );
+            Class<Validator> validatorClass = (Class<Validator>) ClassLoaderUtil.loadClass(className,
+                    PoolProperties.class.getClassLoader(), Thread.currentThread().getContextClassLoader());
             validator = validatorClass.getConstructor().newInstance();
         } catch (ClassNotFoundException e) {
-            log.warn("The class "+className+" cannot be found.", e);
+            log.warn("The class " + className + " cannot be found.", e);
         } catch (ClassCastException e) {
-            log.warn("The class "+className+" does not implement the Validator interface.", e);
+            log.warn("The class " + className + " does not implement the Validator interface.", e);
         } catch (IllegalAccessException e) {
-            log.warn("The class "+className+" or its no-arg constructor are inaccessible.", e);
+            log.warn("The class " + className + " or its no-arg constructor are inaccessible.", e);
         } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException e) {
-            log.warn("An object of class "+className+" cannot be instantiated. Make sure that "+
-                     "it includes an implicit or explicit no-arg constructor.", e);
+            log.warn("An object of class " + className + " cannot be instantiated. Make sure that " +
+                    "it includes an implicit or explicit no-arg constructor.", e);
         }
     }
 
 
     @Override
     public void setInitSQL(String initSQL) {
-        this.initSQL = initSQL!=null && initSQL.trim().length()>0 ? initSQL : null;
+        this.initSQL = initSQL != null && initSQL.trim().length() > 0 ? initSQL : null;
     }
 
 
@@ -694,17 +687,15 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         StringBuilder buf = new StringBuilder("ConnectionPool[");
         try {
             String[] fields = DataSourceFactory.ALL_PROPERTIES;
-            for (String field: fields) {
-                final String[] prefix = new String[] {"get","is"};
-                for (int j=0; j<prefix.length; j++) {
+            for (String field : fields) {
+                final String[] prefix = new String[] { "get", "is" };
+                for (int j = 0; j < prefix.length; j++) {
 
-                    String name = prefix[j]
-                            + field.substring(0, 1).toUpperCase(Locale.ENGLISH)
-                            + field.substring(1);
+                    String name = prefix[j] + field.substring(0, 1).toUpperCase(Locale.ENGLISH) + field.substring(1);
                     Method m = null;
                     try {
                         m = getClass().getMethod(name);
-                    }catch (NoSuchMethodException nm) {
+                    } catch (NoSuchMethodException nm) {
                         continue;
                     }
                     buf.append(field);
@@ -720,7 +711,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             }
             buf.append(']');
         } catch (Exception x) {
-            //shouldn't happen
+            // Shouldn't happen
             if (log.isDebugEnabled()) {
                 log.debug("toString() call failed", x);
             }
@@ -730,6 +721,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
     /**
      * Returns the current pool counter value.
+     *
      * @return the pool counter value
      */
     public static int getPoolCounter() {
@@ -761,7 +753,6 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     }
 
 
-
     @Override
     public int getSuspectTimeout() {
         return this.suspectTimeout;
@@ -776,12 +767,12 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
     @Override
     public boolean isPoolSweeperEnabled() {
-        boolean timer = getTimeBetweenEvictionRunsMillis()>0;
-        boolean result = timer && (isRemoveAbandoned() && getRemoveAbandonedTimeout()>0);
-        result = result || (timer && getSuspectTimeout()>0);
+        boolean timer = getTimeBetweenEvictionRunsMillis() > 0;
+        boolean result = timer && (isRemoveAbandoned() && getRemoveAbandonedTimeout() > 0);
+        result = result || (timer && getSuspectTimeout() > 0);
         result = result || (timer && isTestWhileIdle());
-        result = result || (timer && getMinEvictableIdleTimeMillis()>0);
-        result = result || (timer && getMaxAge()>0);
+        result = result || (timer && getMinEvictableIdleTimeMillis() > 0);
+        result = result || (timer && getMaxAge() > 0);
         return result;
     }
 
@@ -798,13 +789,15 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         /**
          * Map of interceptor properties.
          */
-        protected Map<String,InterceptorProperty> properties = new HashMap<>();
+        protected Map<String, InterceptorProperty> properties = new HashMap<>();
         /**
          * Cached interceptor class.
          */
         protected volatile Class<?> clazz = null;
+
         /**
          * Constructs an InterceptorDefinition with the given class name.
+         *
          * @param className the interceptor class name
          */
         public InterceptorDefinition(String className) {
@@ -813,6 +806,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
         /**
          * Constructs an InterceptorDefinition with the given class.
+         *
          * @param cl the interceptor class
          */
         public InterceptorDefinition(Class<?> cl) {
@@ -822,23 +816,27 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
         /**
          * Returns the interceptor class name.
+         *
          * @return the class name
          */
         public String getClassName() {
             return className;
         }
+
         /**
          * Adds a property with the given name and value.
-         * @param name the property name
+         *
+         * @param name  the property name
          * @param value the property value
          */
         public void addProperty(String name, String value) {
-            InterceptorProperty p = new InterceptorProperty(name,value);
+            InterceptorProperty p = new InterceptorProperty(name, value);
             addProperty(p);
         }
 
         /**
          * Adds the given interceptor property.
+         *
          * @param p the property to add
          */
         public void addProperty(InterceptorProperty p) {
@@ -847,41 +845,38 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
         /**
          * Returns the map of interceptor properties.
+         *
          * @return the properties map
          */
-        public Map<String,InterceptorProperty> getProperties() {
+        public Map<String, InterceptorProperty> getProperties() {
             return properties;
         }
 
         /**
          * Returns the interceptor class, loading it if necessary.
+         *
          * @return the interceptor class
+         *
          * @throws ClassNotFoundException if the class cannot be found
          */
         @SuppressWarnings("unchecked")
         public Class<? extends JdbcInterceptor> getInterceptorClass() throws ClassNotFoundException {
-            if (clazz==null) {
-                if (getClassName().indexOf('.')<0) {
+            if (clazz == null) {
+                if (getClassName().indexOf('.') < 0) {
                     if (log.isDebugEnabled()) {
-                        log.debug("Loading interceptor class:" +  PKG_PREFIX + getClassName());
+                        log.debug("Loading interceptor class:" + PKG_PREFIX + getClassName());
                     }
-                    clazz = ClassLoaderUtil.loadClass(
-                        PKG_PREFIX + getClassName(),
-                        PoolProperties.class.getClassLoader(),
-                        Thread.currentThread().getContextClassLoader()
-                    );
+                    clazz = ClassLoaderUtil.loadClass(PKG_PREFIX + getClassName(),
+                            PoolProperties.class.getClassLoader(), Thread.currentThread().getContextClassLoader());
                 } else {
                     if (log.isDebugEnabled()) {
-                        log.debug("Loading interceptor class:"+getClassName());
+                        log.debug("Loading interceptor class:" + getClassName());
                     }
-                    clazz = ClassLoaderUtil.loadClass(
-                        getClassName(),
-                        PoolProperties.class.getClassLoader(),
-                        Thread.currentThread().getContextClassLoader()
-                    );
+                    clazz = ClassLoaderUtil.loadClass(getClassName(), PoolProperties.class.getClassLoader(),
+                            Thread.currentThread().getContextClassLoader());
                 }
             }
-            return (Class<? extends JdbcInterceptor>)clazz;
+            return (Class<? extends JdbcInterceptor>) clazz;
         }
     }
 
@@ -898,25 +893,31 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
          * Property value.
          */
         String value;
+
         /**
          * Constructs an InterceptorProperty with the given name and value.
-         * @param name the property name
+         *
+         * @param name  the property name
          * @param value the property value
          */
         public InterceptorProperty(String name, String value) {
-            assert(name!=null);
+            assert (name != null);
             this.name = name;
             this.value = value;
         }
+
         /**
          * Returns the property name.
+         *
          * @return the property name
          */
         public String getName() {
             return name;
         }
+
         /**
          * Returns the property value.
+         *
          * @return the property value
          */
         public String getValue() {
@@ -925,11 +926,13 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
         /**
          * Returns the property value as a boolean.
+         *
          * @param def the default value if the property is null or invalid
+         *
          * @return the boolean value
          */
         public boolean getValueAsBoolean(boolean def) {
-            if (value==null) {
+            if (value == null) {
                 return def;
             }
             if ("true".equals(value)) {
@@ -943,113 +946,127 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
         /**
          * Returns the property value as an int.
+         *
          * @param def the default value if the property is null or invalid
+         *
          * @return the int value
          */
         public int getValueAsInt(int def) {
-            if (value==null) {
+            if (value == null) {
                 return def;
             }
             try {
                 int v = Integer.parseInt(value);
                 return v;
-            }catch (NumberFormatException nfe) {
+            } catch (NumberFormatException nfe) {
                 return def;
             }
         }
 
         /**
          * Returns the property value as a long.
+         *
          * @param def the default value if the property is null or invalid
+         *
          * @return the long value
          */
         public long getValueAsLong(long def) {
-            if (value==null) {
+            if (value == null) {
                 return def;
             }
             try {
                 return Long.parseLong(value);
-            }catch (NumberFormatException nfe) {
+            } catch (NumberFormatException nfe) {
                 return def;
             }
         }
 
         /**
          * Returns the property value as a byte.
+         *
          * @param def the default value if the property is null or invalid
+         *
          * @return the byte value
          */
         public byte getValueAsByte(byte def) {
-            if (value==null) {
+            if (value == null) {
                 return def;
             }
             try {
                 return Byte.parseByte(value);
-            }catch (NumberFormatException nfe) {
+            } catch (NumberFormatException nfe) {
                 return def;
             }
         }
 
         /**
          * Returns the property value as a short.
+         *
          * @param def the default value if the property is null or invalid
+         *
          * @return the short value
          */
         public short getValueAsShort(short def) {
-            if (value==null) {
+            if (value == null) {
                 return def;
             }
             try {
                 return Short.parseShort(value);
-            }catch (NumberFormatException nfe) {
+            } catch (NumberFormatException nfe) {
                 return def;
             }
         }
 
         /**
          * Returns the property value as a float.
+         *
          * @param def the default value if the property is null or invalid
+         *
          * @return the float value
          */
         public float getValueAsFloat(float def) {
-            if (value==null) {
+            if (value == null) {
                 return def;
             }
             try {
                 return Float.parseFloat(value);
-            }catch (NumberFormatException nfe) {
+            } catch (NumberFormatException nfe) {
                 return def;
             }
         }
 
         /**
          * Returns the property value as a double.
+         *
          * @param def the default value if the property is null or invalid
+         *
          * @return the double value
          */
         public double getValueAsDouble(double def) {
-            if (value==null) {
+            if (value == null) {
                 return def;
             }
             try {
                 return Double.parseDouble(value);
-            }catch (NumberFormatException nfe) {
+            } catch (NumberFormatException nfe) {
                 return def;
             }
         }
 
         /**
          * Returns the property value as a char.
+         *
          * @param def the default value if the property is null or invalid
+         *
          * @return the char value
          */
         public char getValueAschar(char def) {
-            if (value==null) {
+            if (value == null) {
                 return def;
             }
             try {
                 return value.charAt(0);
-            }catch (StringIndexOutOfBoundsException nfe) {
+            } catch (StringIndexOutOfBoundsException nfe) {
                 return def;
             }
         }
@@ -1061,11 +1078,11 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
         @Override
         public boolean equals(Object o) {
-            if (o==this) {
+            if (o == this) {
                 return true;
             }
             if (o instanceof InterceptorProperty) {
-                InterceptorProperty other = (InterceptorProperty)o;
+                InterceptorProperty other = (InterceptorProperty) o;
                 return other.name.equals(this.name);
             }
             return false;
@@ -1136,12 +1153,14 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
     /**
      * Parses a property string into a Properties object.
+     *
      * @param propText the property string with semicolon-separated key=value pairs
-     * @param props the Properties object to populate, or null to create a new one
+     * @param props    the Properties object to populate, or null to create a new one
+     *
      * @return the populated Properties object
      */
     public static Properties getProperties(String propText, Properties props) {
-        if (props==null) {
+        if (props == null) {
             props = new Properties();
         }
         if (propText != null) {
@@ -1152,7 +1171,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                 // UTF-8-default JVM. A Reader carries the exact characters, so no
                 // charset conversion takes place at all.
                 props.load(new StringReader(propText.replace(';', '\n')));
-            }catch (IOException ioe) {
+            } catch (IOException ioe) {
                 throw new RuntimeException(ioe);
             }
         }
@@ -1192,8 +1211,8 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
     /**
      * {@inheritDoc}
-     * @deprecated The disposable connection facade is always used, so this
-     *             property no longer has any effect.
+     *
+     * @deprecated The disposable connection facade is always used, so this property no longer has any effect.
      */
     @Override
     @Deprecated
@@ -1203,8 +1222,8 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
     /**
      * {@inheritDoc}
-     * @deprecated The disposable connection facade is always used, so this
-     *             property no longer has any effect.
+     *
+     * @deprecated The disposable connection facade is always used, so this property no longer has any effect.
      */
     @Override
     @Deprecated
@@ -1244,8 +1263,8 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
     /**
      * {@inheritDoc}
-     * @deprecated The statement facade is always used, so this property no
-     *             longer has any effect.
+     *
+     * @deprecated The statement facade is always used, so this property no longer has any effect.
      */
     @Override
     @Deprecated
@@ -1255,8 +1274,8 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
     /**
      * {@inheritDoc}
-     * @deprecated The statement facade is always used, so this property no
-     *             longer has any effect.
+     *
+     * @deprecated The statement facade is always used, so this property no longer has any effect.
      */
     @Override
     @Deprecated
@@ -1266,10 +1285,8 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
     @Override
     protected Object clone() throws CloneNotSupportedException {
-        // TODO Auto-generated method stub
         return super.clone();
     }
-
 
 
 }

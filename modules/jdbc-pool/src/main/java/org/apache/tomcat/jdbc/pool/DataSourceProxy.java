@@ -32,12 +32,11 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorDefinition;
 
 /**
- * The DataSource proxy lets us implements methods that don't exist in the current
- * compiler JDK but might be methods that are part of a future JDK DataSource interface.
- * <br>
- * It's a trick to work around compiler issues when implementing interfaces. For example,
- * I could put in Java 6 methods of javax.sql.DataSource here, and compile it with JDK 1.5
- * and still be able to run under Java 6 without getting NoSuchMethodException.
+ * The DataSource proxy lets us implements methods that don't exist in the current compiler JDK but might be methods
+ * that are part of a future JDK DataSource interface. <br>
+ * It's a trick to work around compiler issues when implementing interfaces. For example, I could put in Java 6 methods
+ * of javax.sql.DataSource here, and compile it with JDK 1.5 and still be able to run under Java 6 without getting
+ * NoSuchMethodException.
  */
 
 public class DataSourceProxy implements PoolConfiguration {
@@ -56,11 +55,10 @@ public class DataSourceProxy implements PoolConfiguration {
     protected volatile PoolConfiguration poolProperties = null;
 
     /**
-     * Terminal lifecycle flag. Set by {@link #close(boolean)} while holding
-     * this proxy's monitor, the same monitor that serializes pool creation in
-     * {@link #pCreatePool()}. Once set, no new {@link ConnectionPool} is
-     * created: {@link #createPool()} fails with a {@link SQLException} instead
-     * of resurrecting a pool that its owner has already stopped tracking.
+     * Terminal lifecycle flag. Set by {@link #close(boolean)} while holding this proxy's monitor, the same monitor that
+     * serializes pool creation in {@link #pCreatePool()}. Once set, no new {@link ConnectionPool} is created:
+     * {@link #createPool()} fails with a {@link SQLException} instead of resurrecting a pool that its owner has already
+     * stopped tracking.
      */
     private volatile boolean closed = false;
 
@@ -85,15 +83,15 @@ public class DataSourceProxy implements PoolConfiguration {
 
 
     /**
-     * Check if this proxy implements, or wraps an instance of, the given
-     * interface. The configured {@link PoolConfiguration#getDataSource()
-     * DataSource}, if any, is checked as the wrapped object.
+     * Check if this proxy implements, or wraps an instance of, the given interface. The configured
+     * {@link PoolConfiguration#getDataSource() DataSource}, if any, is checked as the wrapped object.
      * <p>
      * Has to match signature in DataSource.
      *
      * @param iface The interface to check
-     * @return {@code true} if this proxy implements the interface or wraps an
-     *         object that does
+     *
+     * @return {@code true} if this proxy implements the interface or wraps an object that does
+     *
      * @throws SQLException if the wrapped data source throws one
      */
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
@@ -105,10 +103,10 @@ public class DataSourceProxy implements PoolConfiguration {
             return true;
         }
         if (dataSource instanceof java.sql.Wrapper) {
-            //like the pooled connections, the configured data source may
-            //itself be a wrapper - of the driver's data source, of a
-            //pooling data source the configuration replaced - and it is
-            //what answers for its own layers
+            // Like the pooled connections, the configured data source may
+            // itself be a wrapper - of the driver's data source, of a
+            // pooling data source the configuration replaced - and it is
+            // what answers for its own layers
             return ((java.sql.Wrapper) dataSource).isWrapperFor(iface);
         }
         return false;
@@ -116,15 +114,16 @@ public class DataSourceProxy implements PoolConfiguration {
 
 
     /**
-     * Unwrap the proxy to the given interface. The configured
-     * {@link PoolConfiguration#getDataSource() DataSource}, if any, is
-     * checked as the wrapped object.
+     * Unwrap the proxy to the given interface. The configured {@link PoolConfiguration#getDataSource() DataSource}, if
+     * any, is checked as the wrapped object.
      * <p>
      * Has to match signature in DataSource
      *
-     * @param <T> The interface type
+     * @param <T>   The interface type
      * @param iface The interface to unwrap to
+     *
      * @return an object that implements the interface
+     *
      * @throws SQLException if no object implementing the interface is found
      */
     public <T> T unwrap(Class<T> iface) throws SQLException {
@@ -135,8 +134,7 @@ public class DataSourceProxy implements PoolConfiguration {
         if (iface.isInstance(dataSource)) {
             return iface.cast(dataSource);
         }
-        if (dataSource instanceof java.sql.Wrapper
-                && ((java.sql.Wrapper) dataSource).isWrapperFor(iface)) {
+        if (dataSource instanceof java.sql.Wrapper && ((java.sql.Wrapper) dataSource).isWrapperFor(iface)) {
             return ((java.sql.Wrapper) dataSource).unwrap(iface);
         }
         // The Wrapper contract asks for a failure, not for a silent null
@@ -146,13 +144,14 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
     /**
-     * Get a database connection.
-     * {@link javax.sql.DataSource#getConnection()}
+     * Get a database connection. {@link javax.sql.DataSource#getConnection()}
+     *
      * @param username The user name
      * @param password The password
+     *
      * @return the connection
-     * @throws SQLException Connection error, or this data source has been
-     *                      closed
+     *
+     * @throws SQLException Connection error, or this data source has been closed
      */
     public Connection getConnection(String username, String password) throws SQLException {
         if (this.getPoolProperties().isAlternateUsernameAllowed()) {
@@ -160,12 +159,13 @@ public class DataSourceProxy implements PoolConfiguration {
             // calling it: that reads the volatile field only once, so a
             // close() running concurrently cannot turn this borrow into a
             // NullPointerException.
-            return createPool().getConnection(username,password);
+            return createPool().getConnection(username, password);
         } else {
             if (connectionWithoutCredentialsWarningIssued.compareAndSet(false, true)) {
                 log.warn(String.format(
                         "alternateUsernameAllowed is set to false so the provided user name [%s] and associated " +
-                        "password have been ignored", username));
+                                "password have been ignored",
+                        username));
             }
             return getConnection();
         }
@@ -181,16 +181,14 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
     /**
-     * Sets up the connection pool, by creating a pooling driver.
-     * The reference is taken from the volatile field with a single read, so
-     * that the borrow paths which use this method as their single point of
-     * access cannot observe a {@code null} that a concurrent
-     * {@link #close(boolean)} published after they saw the field set. The
-     * result is never {@code null}: it is either the pool that is in use or
-     * this method fails with an {@link SQLException}.
+     * Sets up the connection pool, by creating a pooling driver. The reference is taken from the volatile field with a
+     * single read, so that the borrow paths which use this method as their single point of access cannot observe a
+     * {@code null} that a concurrent {@link #close(boolean)} published after they saw the field set. The result is
+     * never {@code null}: it is either the pool that is in use or this method fails with an {@link SQLException}.
+     *
      * @return the connection pool
-     * @throws SQLException Error creating pool, or if this data source has
-     *                      been closed
+     *
+     * @throws SQLException Error creating pool, or if this data source has been closed
      */
     public ConnectionPool createPool() throws SQLException {
         // Read the volatile field once. Guarding on it and then returning it
@@ -225,11 +223,11 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
     /**
-     * Get a database connection.
-     * {@link javax.sql.DataSource#getConnection()}
+     * Get a database connection. {@link javax.sql.DataSource#getConnection()}
+     *
      * @return the connection
-     * @throws SQLException Connection error, or this data source has been
-     *                      closed
+     *
+     * @throws SQLException Connection error, or this data source has been closed
      */
     public Connection getConnection() throws SQLException {
         // One read of the volatile field, through createPool(): a guard on
@@ -241,25 +239,27 @@ public class DataSourceProxy implements PoolConfiguration {
 
     /**
      * Invokes an sync operation to retrieve the connection.
+     *
      * @return a Future containing a reference to the connection when it becomes available
-     * @throws SQLException Connection error, or this data source has been
-     *                      closed
+     *
+     * @throws SQLException Connection error, or this data source has been closed
      */
     public Future<Connection> getConnectionAsync() throws SQLException {
-        // see getConnection() on why the pool is reached through createPool()
+        // See getConnection() on why the pool is reached through createPool()
         return createPool().getConnectionAsync();
     }
 
     /**
-     * Get a database connection.
-     * {@link javax.sql.XADataSource#getXAConnection()}
+     * Get a database connection. {@link javax.sql.XADataSource#getXAConnection()}
+     *
      * @return the connection
+     *
      * @throws SQLException Connection error
      */
     public XAConnection getXAConnection() throws SQLException {
         Connection con = getConnection();
         if (con instanceof XAConnection) {
-            return (XAConnection)con;
+            return (XAConnection) con;
         } else {
             try {
                 con.close();
@@ -271,17 +271,19 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
     /**
-     * Get a database connection.
-     * {@link javax.sql.XADataSource#getXAConnection(String, String)}
+     * Get a database connection. {@link javax.sql.XADataSource#getXAConnection(String, String)}
+     *
      * @param username The user name
      * @param password The password
+     *
      * @return the connection
+     *
      * @throws SQLException Connection error
      */
     public XAConnection getXAConnection(String username, String password) throws SQLException {
         Connection con = getConnection(username, password);
         if (con instanceof XAConnection) {
-            return (XAConnection)con;
+            return (XAConnection) con;
         } else {
             try {
                 con.close();
@@ -294,9 +296,10 @@ public class DataSourceProxy implements PoolConfiguration {
 
 
     /**
-     * Get a database connection.
-     * {@link javax.sql.DataSource#getConnection()}
+     * Get a database connection. {@link javax.sql.DataSource#getConnection()}
+     *
      * @return the connection
+     *
      * @throws SQLException Connection error
      */
     public javax.sql.PooledConnection getPooledConnection() throws SQLException {
@@ -304,28 +307,28 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
     /**
-     * Get a database connection.
-     * {@link javax.sql.DataSource#getConnection(String,String)}
+     * Get a database connection. {@link javax.sql.DataSource#getConnection(String,String)}
+     *
      * @param username The user name
      * @param password The password
+     *
      * @return the connection
+     *
      * @throws SQLException Connection error
      */
-    public javax.sql.PooledConnection getPooledConnection(String username,
-            String password) throws SQLException {
+    public javax.sql.PooledConnection getPooledConnection(String username, String password) throws SQLException {
         return (javax.sql.PooledConnection) getConnection(username, password);
     }
 
     /**
      * Return the underlying connection pool, creating it if necessary.
      *
-     * @return the connection pool, or null if creation failed or this data
-     *         source has been closed
+     * @return the connection pool, or null if creation failed or this data source has been closed
      */
     public ConnectionPool getPool() {
         try {
             return createPool();
-        }catch (SQLException x) {
+        } catch (SQLException x) {
             if (closed) {
                 // A closed data source legitimately has no pool; this is
                 // a normal lifecycle state, not a creation failure.
@@ -338,18 +341,16 @@ public class DataSourceProxy implements PoolConfiguration {
 
 
     /**
-     * Close the connection pool, returning connections to the database.
-     * The closure is terminal: later borrow or pool creation attempts on
-     * this data source fail with an <code>SQLException</code> instead of
-     * recreating the pool.
+     * Close the connection pool, returning connections to the database. The closure is terminal: later borrow or pool
+     * creation attempts on this data source fail with an <code>SQLException</code> instead of recreating the pool.
      */
     public void close() {
         close(false);
     }
+
     /**
-     * Close the connection pool. If the pool is being created concurrently,
-     * this method waits for the creation to complete and then closes the
-     * resulting pool rather than racing it.
+     * Close the connection pool. If the pool is being created concurrently, this method waits for the creation to
+     * complete and then closes the resulting pool rather than racing it.
      *
      * @param all if true close all connections, otherwise only idle ones
      */
@@ -390,13 +391,8 @@ public class DataSourceProxy implements PoolConfiguration {
 
     @Override
     public String toString() {
-        return super.toString()+"{"+getPoolProperties()+"}";
+        return super.toString() + "{" + getPoolProperties() + "}";
     }
-
-
-/*-----------------------------------------------------------------------*/
-//      PROPERTIES WHEN NOT USED WITH FACTORY
-/*------------------------------------------------------------------------*/
 
 
     @Override
@@ -478,7 +474,7 @@ public class DataSourceProxy implements PoolConfiguration {
     @Override
     public void setPassword(String password) {
         this.poolProperties.setPassword(password);
-        this.poolProperties.getDbProperties().setProperty("password",this.poolProperties.getPassword());
+        this.poolProperties.getDbProperties().setProperty("password", this.poolProperties.getPassword());
     }
 
 
@@ -533,7 +529,7 @@ public class DataSourceProxy implements PoolConfiguration {
     @Override
     public void setUsername(String username) {
         this.poolProperties.setUsername(username);
-        this.poolProperties.getDbProperties().setProperty("user",getPoolProperties().getUsername());
+        this.poolProperties.getDbProperties().setProperty("user", getPoolProperties().getUsername());
     }
 
 
@@ -625,9 +621,10 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
     /**
-     * no-op
-     * {@link javax.sql.DataSource#getParentLogger}
+     * no-op {@link javax.sql.DataSource#getParentLogger}
+     *
      * @return no return value
+     *
      * @throws SQLFeatureNotSupportedException Unsupported
      */
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
@@ -635,9 +632,10 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
     /**
-     * no-op
-     * {@link javax.sql.DataSource#getLogWriter}
+     * no-op {@link javax.sql.DataSource#getLogWriter}
+     *
      * @return null
+     *
      * @throws SQLException No exception
      */
     public PrintWriter getLogWriter() throws SQLException {
@@ -646,9 +644,10 @@ public class DataSourceProxy implements PoolConfiguration {
 
 
     /**
-     * no-op
-     * {@link javax.sql.DataSource#setLogWriter(PrintWriter)}
+     * no-op {@link javax.sql.DataSource#setLogWriter(PrintWriter)}
+     *
      * @param out Ignored
+     *
      * @throws SQLException No exception
      */
     public void setLogWriter(PrintWriter out) throws SQLException {
@@ -656,8 +655,8 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
     /**
-     * no-op
-     * {@link javax.sql.DataSource#getLoginTimeout}
+     * no-op {@link javax.sql.DataSource#getLoginTimeout}
+     *
      * @return the timeout
      */
     public int getLoginTimeout() {
@@ -670,6 +669,7 @@ public class DataSourceProxy implements PoolConfiguration {
 
     /**
      * {@link javax.sql.DataSource#setLoginTimeout(int)}
+     *
      * @param i The timeout value
      */
     public void setLoginTimeout(int i) {
@@ -680,7 +680,6 @@ public class DataSourceProxy implements PoolConfiguration {
         }
 
     }
-
 
 
     @Override
@@ -694,23 +693,24 @@ public class DataSourceProxy implements PoolConfiguration {
         getPoolProperties().setSuspectTimeout(seconds);
     }
 
-  //===============================================================================
-//  Expose JMX attributes through Tomcat's dynamic reflection
-//===============================================================================
+    // These members expose JMX attributes through Tomcat's dynamic
+    // reflection.
     /**
      * If the pool has not been created, it will be created during this call.
+     *
      * @return the number of established but idle connections
      */
     public int getIdle() {
         try {
             return createPool().getIdle();
-        }catch (SQLException x) {
+        } catch (SQLException x) {
             throw new RuntimeException(x);
         }
     }
 
     /**
      * {@link #getIdle()}
+     *
      * @return the number of established but idle connections
      */
     public int getNumIdle() {
@@ -718,13 +718,13 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
     /**
-     * Forces an abandon check on the connection pool.
-     * If connections that have been abandoned exists, they will be closed during this run
+     * Forces an abandon check on the connection pool. If connections that have been abandoned exists, they will be
+     * closed during this run
      */
     public void checkAbandoned() {
         try {
             createPool().checkAbandoned();
-        }catch (SQLException x) {
+        } catch (SQLException x) {
             throw new RuntimeException(x);
         }
     }
@@ -735,7 +735,7 @@ public class DataSourceProxy implements PoolConfiguration {
     public void checkIdle() {
         try {
             createPool().checkIdle();
-        }catch (SQLException x) {
+        } catch (SQLException x) {
             throw new RuntimeException(x);
         }
     }
@@ -748,13 +748,14 @@ public class DataSourceProxy implements PoolConfiguration {
     public int getActive() {
         try {
             return createPool().getActive();
-        }catch (SQLException x) {
+        } catch (SQLException x) {
             throw new RuntimeException(x);
         }
     }
 
     /**
      * Returns the number of connections currently in use by the application.
+     *
      * @return number of active connections
      */
     public int getNumActive() {
@@ -763,24 +764,26 @@ public class DataSourceProxy implements PoolConfiguration {
 
     /**
      * Returns the number of threads currently waiting for a connection from the pool.
+     *
      * @return number of waiting threads
      */
     public int getWaitCount() {
         try {
             return createPool().getWaitCount();
-        }catch (SQLException x) {
+        } catch (SQLException x) {
             throw new RuntimeException(x);
         }
     }
 
     /**
      * Returns the current total number of connections in the pool.
+     *
      * @return current pool size
      */
     public int getSize() {
         try {
             return createPool().getSize();
-        }catch (SQLException x) {
+        } catch (SQLException x) {
             throw new RuntimeException(x);
         }
     }
@@ -788,21 +791,21 @@ public class DataSourceProxy implements PoolConfiguration {
     /**
      * Performs a validation on idle connections.
      * <p>
-     * Note: when invoked while the per-connection lock is disabled (sweeper
-     * switched off and {@link PoolProperties#getUseLock()} returning
-     * {@code false}), see the residual overlap documented on
+     * Note: when invoked while the per-connection lock is disabled (sweeper switched off and
+     * {@link PoolProperties#getUseLock()} returning {@code false}), see the residual overlap documented on
      * {@link ConnectionPool#testAllIdle()}.
      */
     public void testIdle() {
         try {
             createPool().testAllIdle();
-        }catch (SQLException x) {
+        } catch (SQLException x) {
             throw new RuntimeException(x);
         }
     }
 
     /**
      * The total number of connections borrowed from this pool.
+     *
      * @return the borrowed connection count
      */
     public long getBorrowedCount() {
@@ -815,6 +818,7 @@ public class DataSourceProxy implements PoolConfiguration {
 
     /**
      * The total number of connections returned to this pool.
+     *
      * @return the returned connection count
      */
     public long getReturnedCount() {
@@ -827,6 +831,7 @@ public class DataSourceProxy implements PoolConfiguration {
 
     /**
      * The total number of connections created by this pool.
+     *
      * @return the created connection count
      */
     public long getCreatedCount() {
@@ -839,6 +844,7 @@ public class DataSourceProxy implements PoolConfiguration {
 
     /**
      * The total number of connections released from this pool.
+     *
      * @return the released connection count
      */
     public long getReleasedCount() {
@@ -851,6 +857,7 @@ public class DataSourceProxy implements PoolConfiguration {
 
     /**
      * The total number of connections reconnected by this pool.
+     *
      * @return the reconnected connection count
      */
     public long getReconnectedCount() {
@@ -863,6 +870,7 @@ public class DataSourceProxy implements PoolConfiguration {
 
     /**
      * The total number of connections released by remove abandoned.
+     *
      * @return the PoolCleaner removed abandoned connection count
      */
     public long getRemoveAbandonedCount() {
@@ -875,6 +883,7 @@ public class DataSourceProxy implements PoolConfiguration {
 
     /**
      * The total number of connections released by eviction.
+     *
      * @return the PoolCleaner evicted idle connection count
      */
     public long getReleasedIdleCount() {
@@ -896,10 +905,6 @@ public class DataSourceProxy implements PoolConfiguration {
         }
     }
 
-    //=========================================================
-    //  PROPERTIES / CONFIGURATION
-    //=========================================================
-
 
     @Override
     public String getConnectionProperties() {
@@ -908,15 +913,11 @@ public class DataSourceProxy implements PoolConfiguration {
 
 
     /**
-     * Returns a copy of the database properties with the password removed.
-     * This object doubles as its own JMX/bean surface and
-     * {@link #setPassword(String)} stores the password into the database
-     * properties, so returning them as they are would expose the plaintext
-     * password through a getter while {@link #getPassword()} is explicitly
-     * masked - the same protection the pool's own MBean
-     * ({@link org.apache.tomcat.jdbc.pool.jmx.ConnectionPool#getDbProperties()})
-     * already applies.
-     * {@inheritDoc}
+     * Returns a copy of the database properties with the password removed. This object doubles as its own JMX/bean
+     * surface and {@link #setPassword(String)} stores the password into the database properties, so returning them as
+     * they are would expose the plaintext password through a getter while {@link #getPassword()} is explicitly masked -
+     * the same protection the pool's own MBean
+     * ({@link org.apache.tomcat.jdbc.pool.jmx.ConnectionPool#getDbProperties()}) already applies. {@inheritDoc}
      */
     @Override
     public Properties getDbProperties() {
@@ -940,7 +941,6 @@ public class DataSourceProxy implements PoolConfiguration {
     public String getDriverClassName() {
         return getPoolProperties().getDriverClassName();
     }
-
 
 
     @Override
@@ -1023,7 +1023,6 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
 
-
     @Override
     public int getTimeBetweenEvictionRunsMillis() {
         return getPoolProperties().getTimeBetweenEvictionRunsMillis();
@@ -1075,7 +1074,6 @@ public class DataSourceProxy implements PoolConfiguration {
     public void setValidator(Validator validator) {
         getPoolProperties().setValidator(validator);
     }
-
 
 
     @Override
@@ -1142,7 +1140,6 @@ public class DataSourceProxy implements PoolConfiguration {
     public boolean isTestWhileIdle() {
         return getPoolProperties().isTestWhileIdle();
     }
-
 
 
     @Override
@@ -1275,8 +1272,8 @@ public class DataSourceProxy implements PoolConfiguration {
 
     /**
      * {@inheritDoc}
-     * @deprecated The disposable connection facade is always used, so this
-     *             property no longer has any effect.
+     *
+     * @deprecated The disposable connection facade is always used, so this property no longer has any effect.
      */
     @Override
     @Deprecated
@@ -1286,8 +1283,8 @@ public class DataSourceProxy implements PoolConfiguration {
 
     /**
      * {@inheritDoc}
-     * @deprecated The disposable connection facade is always used, so this
-     *             property no longer has any effect.
+     *
+     * @deprecated The disposable connection facade is always used, so this property no longer has any effect.
      */
     @Override
     @Deprecated
@@ -1327,8 +1324,8 @@ public class DataSourceProxy implements PoolConfiguration {
 
     /**
      * {@inheritDoc}
-     * @deprecated The statement facade is always used, so this property no
-     *             longer has any effect.
+     *
+     * @deprecated The statement facade is always used, so this property no longer has any effect.
      */
     @Override
     @Deprecated
@@ -1338,8 +1335,8 @@ public class DataSourceProxy implements PoolConfiguration {
 
     /**
      * {@inheritDoc}
-     * @deprecated The statement facade is always used, so this property no
-     *             longer has any effect.
+     *
+     * @deprecated The statement facade is always used, so this property no longer has any effect.
      */
     @Override
     @Deprecated
@@ -1350,11 +1347,11 @@ public class DataSourceProxy implements PoolConfiguration {
     /**
      * Purge all connections from the pool.
      */
-    public void purge()  {
+    public void purge() {
         try {
             createPool().purge();
-        }catch (SQLException x) {
-            log.error("Unable to purge pool.",x);
+        } catch (SQLException x) {
+            log.error("Unable to purge pool.", x);
         }
     }
 
@@ -1364,8 +1361,8 @@ public class DataSourceProxy implements PoolConfiguration {
     public void purgeOnReturn() {
         try {
             createPool().purgeOnReturn();
-        }catch (SQLException x) {
-            log.error("Unable to purge pool.",x);
+        } catch (SQLException x) {
+            log.error("Unable to purge pool.", x);
         }
     }
 }

@@ -41,34 +41,30 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
 /**
  * Slow query report interceptor. Tracks timing of query executions.
  * <p>
- * The statistics are published under the pool <em>name</em> (see
- * {@link #getPoolStats(String)}), registered when a pool starts and
- * released when the last live pool registered under that name closes.
- * Pools configured with the same name - possible with
- * {@code jmxEnabled=false}, which removes the JMX ObjectName clash that
- * would otherwise catch it - therefore share one statistics map; closing
- * one of them never takes the shared statistics away from the others.</p>
+ * The statistics are published under the pool <em>name</em> (see {@link #getPoolStats(String)}), registered when a pool
+ * starts and released when the last live pool registered under that name closes. Pools configured with the same name -
+ * possible with {@code jmxEnabled=false}, which removes the JMX ObjectName clash that would otherwise catch it -
+ * therefore share one statistics map; closing one of them never takes the shared statistics away from the others.
+ * </p>
  */
-public class SlowQueryReport extends AbstractQueryReport  {
-    //logger
+public class SlowQueryReport extends AbstractQueryReport {
+
     private static final Log log = LogFactory.getLog(SlowQueryReport.class);
 
     /**
-     * we will be keeping track of query stats on a per pool basis, keyed
-     * by pool name; pools registered under one name share the statistics
+     * we will be keeping track of query stats on a per pool basis, keyed by pool name; pools registered under one name
+     * share the statistics
      */
-    protected static final ConcurrentHashMap<String,PoolStatistics> perPoolStats =
-            new ConcurrentHashMap<>();
+    protected static final ConcurrentHashMap<String, PoolStatistics> perPoolStats = new ConcurrentHashMap<>();
     /**
      * the queries that are used for this interceptor.
      */
-    protected volatile ConcurrentHashMap<String,QueryStats> queries = null;
+    protected volatile ConcurrentHashMap<String, QueryStats> queries = null;
     /**
-     * Maximum number of queries we will be storing statistics for. Eviction
-     * keeps the number of stored queries near this amount; while queries are
-     * being executed concurrently it can briefly be exceeded.
+     * Maximum number of queries we will be storing statistics for. Eviction keeps the number of stored queries near
+     * this amount; while queries are being executed concurrently it can briefly be exceeded.
      */
-    protected int  maxQueries= 1000; //don't store more than this amount of queries
+    protected int maxQueries = 1000; // Don't store more than this amount of queries
 
     /**
      * Flag to enable disable logging of slow queries
@@ -87,14 +83,14 @@ public class SlowQueryReport extends AbstractQueryReport  {
 
     /**
      * Returns the query stats for a given pool
+     *
      * @param poolname - the name of the pool we want to retrieve stats for
-     * @return a hash map containing the statistics of the monitored queries,
-     *         kept near {@code maxQueries} entries by eviction, or
-     *         {@code null} if no live pool is registered under that name.
-     *         Pools registered under one name share the map, and it is
-     *         published until the last of them has closed
+     *
+     * @return a hash map containing the statistics of the monitored queries, kept near {@code maxQueries} entries by
+     *             eviction, or {@code null} if no live pool is registered under that name. Pools registered under one
+     *             name share the map, and it is published until the last of them has closed
      */
-    public static ConcurrentHashMap<String,QueryStats> getPoolStats(String poolname) {
+    public static ConcurrentHashMap<String, QueryStats> getPoolStats(String poolname) {
         PoolStatistics stats = perPoolStats.get(poolname);
         return stats == null ? null : stats.getQueryStats();
     }
@@ -119,7 +115,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
     @Override
     protected String reportFailedQuery(String query, Object[] args, String name, long start, Throwable t) {
         String sql = super.reportFailedQuery(query, args, name, start, t);
-        if (this.maxQueries > 0 ) {
+        if (this.maxQueries > 0) {
             long now = System.currentTimeMillis();
             long delta = now - start;
             QueryStats qs = this.getQueryStats(sql);
@@ -127,7 +123,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
                 qs.failure(delta, now);
             }
             if (isLogFailed() && log.isWarnEnabled()) {
-                log.warn("Failed Query Report SQL="+sql+"; time="+delta+" ms;");
+                log.warn("Failed Query Report SQL=" + sql + "; time=" + delta + " ms;");
             }
         }
         return sql;
@@ -136,7 +132,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
     @Override
     protected String reportQuery(String query, Object[] args, final String name, long start, long delta) {
         String sql = super.reportQuery(query, args, name, start, delta);
-        if (this.maxQueries > 0 ) {
+        if (this.maxQueries > 0) {
             QueryStats qs = this.getQueryStats(sql);
             if (qs != null) {
                 qs.add(delta, start);
@@ -148,12 +144,12 @@ public class SlowQueryReport extends AbstractQueryReport  {
     @Override
     protected String reportSlowQuery(String query, Object[] args, String name, long start, long delta) {
         String sql = super.reportSlowQuery(query, args, name, start, delta);
-        if (this.maxQueries > 0 ) {
+        if (this.maxQueries > 0) {
             QueryStats qs = this.getQueryStats(sql);
             if (qs != null) {
                 qs.add(delta, start);
                 if (isLogSlow() && log.isWarnEnabled()) {
-                    log.warn("Slow Query Report SQL="+sql+"; time="+delta+" ms;");
+                    log.warn("Slow Query Report SQL=" + sql + "; time=" + delta + " ms;");
                 }
             }
         }
@@ -161,8 +157,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
     }
 
     /**
-     * invoked when the connection receives the close request
-     * Not used for now.
+     * invoked when the connection receives the close request Not used for now.
      */
     @Override
     public void closeInvoked() {
@@ -172,12 +167,12 @@ public class SlowQueryReport extends AbstractQueryReport  {
     /**
      * Tracks the preparation time for a prepared statement.
      *
-     * @param sql the SQL statement
+     * @param sql  the SQL statement
      * @param time the time taken to prepare the statement
      */
     @Override
     public void prepareStatement(String sql, long time) {
-        if (this.maxQueries > 0 ) {
+        if (this.maxQueries > 0) {
             QueryStats qs = getQueryStats(sql);
             if (qs != null) {
                 qs.prepare(time);
@@ -188,12 +183,12 @@ public class SlowQueryReport extends AbstractQueryReport  {
     /**
      * Tracks the preparation time for a callable statement.
      *
-     * @param sql the SQL call
+     * @param sql  the SQL call
      * @param time the time taken to prepare the call
      */
     @Override
     public void prepareCall(String sql, long time) {
-        if (this.maxQueries > 0 ) {
+        if (this.maxQueries > 0) {
             QueryStats qs = getQueryStats(sql);
             if (qs != null) {
                 qs.prepare(time);
@@ -204,44 +199,40 @@ public class SlowQueryReport extends AbstractQueryReport  {
     /**
      * Initializes the query statistics map for the given connection pool.
      * <p>
-     * The map is registered under the pool name together with the pool
-     * instance itself. If a live pool is already registered under the
-     * name, both pools share one statistics map; that merging is the
-     * pre-existing behaviour, but it is a configuration mistake worth a
-     * warning, so it is logged.</p>
+     * The map is registered under the pool name together with the pool instance itself. If a live pool is already
+     * registered under the name, both pools share one statistics map; that merging is the pre-existing behaviour, but
+     * it is a configuration mistake worth a warning, so it is logged.
+     * </p>
      *
      * @param pool the connection pool that has started
      */
     @Override
     public void poolStarted(ConnectionPool pool) {
         super.poolStarted(pool);
-        //see if we already created a map for this pool - and register
-        //this pool as one of the live pools the map is held for
-        PoolStatistics stats = perPoolStats.compute(pool.getName(),
-                (name, existing) -> {
-                    PoolStatistics registration =
-                            (existing == null) ? new PoolStatistics() : existing;
-                    registration.addLivePool(pool);
-                    return registration;
-                });
+        // See if we already created a map for this pool - and register
+        // this pool as one of the live pools the map is held for
+        PoolStatistics stats = perPoolStats.compute(pool.getName(), (name, existing) -> {
+            PoolStatistics registration = (existing == null) ? new PoolStatistics() : existing;
+            registration.addLivePool(pool);
+            return registration;
+        });
         if (stats.hasOtherLivePools() && log.isWarnEnabled()) {
-            log.warn("Connection pool name [" + pool.getName() + "] is already in use by "
-                    + "another live pool; SlowQueryReport statistics are keyed by pool name, "
-                    + "so both pools report into the same statistics map.");
+            log.warn("Connection pool name [" + pool.getName() + "] is already in use by " +
+                    "another live pool; SlowQueryReport statistics are keyed by pool name, " +
+                    "so both pools report into the same statistics map.");
         }
         queries = stats.getQueryStats();
     }
 
     /**
-     * Releases the query statistics map for the given connection pool,
-     * unless another live pool is still registered under its name.
+     * Releases the query statistics map for the given connection pool, unless another live pool is still registered
+     * under its name.
      * <p>
-     * The callback is delivered by {@link ConnectionPool} to a freshly
-     * instantiated interceptor (see {@code ConnectionPool#close(boolean)}),
-     * which has never held a reference to the statistics, so the map to
-     * release can only be identified through the closing pool passed
-     * here, not through this instance's own state. The statistics stay
-     * published as long as one pool registered under the name is alive.</p>
+     * The callback is delivered by {@link ConnectionPool} to a freshly instantiated interceptor (see
+     * {@code ConnectionPool#close(boolean)}), which has never held a reference to the statistics, so the map to release
+     * can only be identified through the closing pool passed here, not through this instance's own state. The
+     * statistics stay published as long as one pool registered under the name is alive.
+     * </p>
      *
      * @param pool the connection pool that has been closed
      */
@@ -252,39 +243,33 @@ public class SlowQueryReport extends AbstractQueryReport  {
     }
 
     /**
-     * Whether the {@link #poolClosed(ConnectionPool)} delivered to this
-     * instance deregistered the closing pool as the last live pool under
-     * its name, meaning everything else registered for that name - the
-     * interceptor's MBean and broadcaster, for instance - can and must
-     * now be released with it. The deciding {@link
-     * #releaseStatistics(ConnectionPool)} call is atomic, so across
-     * concurrent closes of same-named pools and across the interceptor
-     * definitions of one close exactly one caller ever sees {@code true}.
+     * Whether the {@link #poolClosed(ConnectionPool)} delivered to this instance deregistered the closing pool as the
+     * last live pool under its name, meaning everything else registered for that name - the interceptor's MBean and
+     * broadcaster, for instance - can and must now be released with it. The deciding
+     * {@link #releaseStatistics(ConnectionPool)} call is atomic, so across concurrent closes of same-named pools and
+     * across the interceptor definitions of one close exactly one caller ever sees {@code true}.
      */
     protected boolean lastPoolOfNameClosed = false;
 
     /**
-     * Deregisters a closed pool from the live pools that the
-     * per-name statistics are held for, and releases the statistics
-     * once no live pool is registered under the name any more.
+     * Deregisters a closed pool from the live pools that the per-name statistics are held for, and releases the
+     * statistics once no live pool is registered under the name any more.
      * <p>
-     * The decision is taken inside a {@code compute} on the name, which
-     * atomises it against the concurrent removals of other same-named
-     * pools: exactly one of any number of concurrent {@code poolClosed}
-     * deliveries sees {@code true} returned, so the per-name entries are
-     * never released twice and never left behind.</p>
+     * The decision is taken inside a {@code compute} on the name, which atomises it against the concurrent removals of
+     * other same-named pools: exactly one of any number of concurrent {@code poolClosed} deliveries sees {@code true}
+     * returned, so the per-name entries are never released twice and never left behind.
+     * </p>
      *
      * @param pool the connection pool that has been closed
-     * @return {@code true} if this call removed the last live pool
-     *         registered under the name
+     *
+     * @return {@code true} if this call removed the last live pool registered under the name
      */
     protected static boolean releaseStatistics(ConnectionPool pool) {
         boolean[] last = new boolean[1];
-        perPoolStats.computeIfPresent(pool.getName(),
-                (name, existing) -> {
-                    last[0] = existing.removeLivePool(pool);
-                    return last[0] ? null : existing;
-                });
+        perPoolStats.computeIfPresent(pool.getName(), (name, existing) -> {
+            last[0] = existing.removeLivePool(pool);
+            return last[0] ? null : existing;
+        });
         return last[0];
     }
 
@@ -292,14 +277,15 @@ public class SlowQueryReport extends AbstractQueryReport  {
      * Retrieves or creates a QueryStats entry for the given SQL string.
      *
      * @param sql the SQL query string
+     *
      * @return the query statistics, or {@code null} if the pool has been closed
      */
     protected QueryStats getQueryStats(String sql) {
-        if (sql==null) {
+        if (sql == null) {
             sql = "";
         }
-        ConcurrentHashMap<String,QueryStats> queries = SlowQueryReport.this.queries;
-        if (queries==null) {
+        ConcurrentHashMap<String, QueryStats> queries = SlowQueryReport.this.queries;
+        if (queries == null) {
             if (log.isWarnEnabled()) {
                 log.warn("Connection has already been closed or abandoned");
             }
@@ -308,10 +294,10 @@ public class SlowQueryReport extends AbstractQueryReport  {
         QueryStats qs = queries.get(sql);
         if (qs == null) {
             qs = new QueryStats(sql);
-            if (queries.putIfAbsent(sql,qs)!=null) {
+            if (queries.putIfAbsent(sql, qs) != null) {
                 qs = queries.get(sql);
             } else {
-                //we added a new element, see if we need to remove the oldest
+                // We added a new element, see if we need to remove the oldest
                 if (queries.size() > maxQueries) {
                     removeOldest(queries);
                 }
@@ -321,16 +307,14 @@ public class SlowQueryReport extends AbstractQueryReport  {
     }
 
     /**
-     * Evicts the least recently invoked query statistics until the map is
-     * back within {@code maxQueries} entries. The map is shared by all the
-     * connections of the pool, so the eviction runs concurrently with the
-     * inserts and removals of the other borrower threads and can only do as
-     * much work as its own snapshot allows; it then leaves the map above
-     * capacity for the next new query to evict further.
+     * Evicts the least recently invoked query statistics until the map is back within {@code maxQueries} entries. The
+     * map is shared by all the connections of the pool, so the eviction runs concurrently with the inserts and removals
+     * of the other borrower threads and can only do as much work as its own snapshot allows; it then leaves the map
+     * above capacity for the next new query to evict further.
      *
      * @param queries The queries map
      */
-    protected void removeOldest(ConcurrentHashMap<String,QueryStats> queries) {
+    protected void removeOldest(ConcurrentHashMap<String, QueryStats> queries) {
         // Sort a snapshot of the statistics rather than the live entries:
         // the invocation times are updated concurrently, and a comparator
         // that reads mutable state may violate its own contract while the
@@ -353,7 +337,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
             removeIndex++;
             queries.remove(sql);
             if (log.isDebugEnabled()) {
-                log.debug("Removing slow query, capacity reached:"+sql);
+                log.debug("Removing slow query, capacity reached:" + sql);
             }
         }
     }
@@ -363,12 +347,12 @@ public class SlowQueryReport extends AbstractQueryReport  {
      * Resets the query statistics reference when a connection is reset.
      *
      * @param parent the connection pool
-     * @param con the pooled connection being reset
+     * @param con    the pooled connection being reset
      */
     @Override
     public void reset(ConnectionPool parent, PooledConnection con) {
         super.reset(parent, con);
-        if (parent!=null) {
+        if (parent != null) {
             queries = getPoolStats(parent.getName());
         } else {
             queries = null;
@@ -413,8 +397,8 @@ public class SlowQueryReport extends AbstractQueryReport  {
     }
 
     /**
-     * Configures this interceptor from the given properties map, supporting
-     * threshold, maxQueries, logSlow, and logFailed settings.
+     * Configures this interceptor from the given properties map, supporting threshold, maxQueries, logSlow, and
+     * logFailed settings.
      *
      * @param properties the interceptor properties
      */
@@ -422,49 +406,44 @@ public class SlowQueryReport extends AbstractQueryReport  {
     public void setProperties(Map<String, InterceptorProperty> properties) {
         super.setProperties(properties);
         final String threshold = "threshold";
-        final String maxqueries= "maxQueries";
+        final String maxqueries = "maxQueries";
         final String logslow = "logSlow";
         final String logfailed = "logFailed";
         InterceptorProperty p1 = properties.get(threshold);
         InterceptorProperty p2 = properties.get(maxqueries);
         InterceptorProperty p3 = properties.get(logslow);
         InterceptorProperty p4 = properties.get(logfailed);
-        if (p1!=null) {
+        if (p1 != null) {
             setThreshold(Long.parseLong(p1.getValue()));
         }
-        if (p2!=null) {
+        if (p2 != null) {
             setMaxQueries(Integer.parseInt(p2.getValue()));
         }
-        if (p3!=null) {
+        if (p3 != null) {
             setLogSlow(Boolean.parseBoolean(p3.getValue()));
         }
-        if (p4!=null) {
+        if (p4 != null) {
             setLogFailed(Boolean.parseBoolean(p4.getValue()));
         }
     }
 
 
     /**
-     * The query statistics published under one pool name, together with
-     * the live pools registered for that name. ConnectionPool does not
-     * override {@code equals} or {@code hashCode}, so pool membership is
-     * by instance identity. Instances are mutated only from within a
-     * {@code ConcurrentHashMap.compute} on their name key, which
-     * serialises them against each other.
+     * The query statistics published under one pool name, together with the live pools registered for that name.
+     * ConnectionPool does not override {@code equals} or {@code hashCode}, so pool membership is by instance identity.
+     * Instances are mutated only from within a {@code ConcurrentHashMap.compute} on their name key, which serialises
+     * them against each other.
      */
     protected static class PoolStatistics {
         /**
-         * the statistics map shared by all pools registered under the
-         * name, kept near {@code maxQueries} entries by eviction
+         * the statistics map shared by all pools registered under the name, kept near {@code maxQueries} entries by
+         * eviction
          */
-        private final ConcurrentHashMap<String,QueryStats> stats =
-                new ConcurrentHashMap<>();
+        private final ConcurrentHashMap<String, QueryStats> stats = new ConcurrentHashMap<>();
         /**
-         * the live pools registered under the name; the statistics are
-         * released once this set runs empty
+         * the live pools registered under the name; the statistics are released once this set runs empty
          */
-        private final Set<ConnectionPool> livePools =
-                ConcurrentHashMap.newKeySet();
+        private final Set<ConnectionPool> livePools = ConcurrentHashMap.newKeySet();
 
         /**
          * Registers a pool that started under this name.
@@ -479,8 +458,9 @@ public class SlowQueryReport extends AbstractQueryReport  {
          * Deregisters a pool that closed.
          *
          * @param pool the connection pool that has been closed
-         * @return {@code true} if this was the last live pool registered
-         *         under the name, so the statistics can be released
+         *
+         * @return {@code true} if this was the last live pool registered under the name, so the statistics can be
+         *             released
          */
         protected boolean removeLivePool(ConnectionPool pool) {
             livePools.remove(pool);
@@ -488,10 +468,8 @@ public class SlowQueryReport extends AbstractQueryReport  {
         }
 
         /**
-         * Returns whether pools other than the caller's own are
-         * registered under this name. The caller registers its own pool
-         * before asking, so more than one registration means another
-         * live pool shares the name.
+         * Returns whether pools other than the caller's own are registered under this name. The caller registers its
+         * own pool before asking, so more than one registration means another live pool shares the name.
          *
          * @return {@code true} if another live pool shares this name
          */
@@ -504,7 +482,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
          *
          * @return the shared query statistics map
          */
-        protected ConcurrentHashMap<String,QueryStats> getQueryStats() {
+        protected ConcurrentHashMap<String, QueryStats> getQueryStats() {
             return stats;
         }
     }
@@ -514,47 +492,24 @@ public class SlowQueryReport extends AbstractQueryReport  {
      * Holds timing and invocation statistics for a single SQL query.
      */
     public static class QueryStats {
-        static final String[] FIELD_NAMES = new String[] {
-            "query",
-            "nrOfInvocations",
-            "maxInvocationTime",
-            "maxInvocationDate",
-            "minInvocationTime",
-            "minInvocationDate",
-            "totalInvocationTime",
-            "failures",
-            "prepareCount",
-            "prepareTime",
-            "lastInvocation"
-        };
+        static final String[] FIELD_NAMES = new String[] { "query", "nrOfInvocations", "maxInvocationTime",
+                "maxInvocationDate", "minInvocationTime", "minInvocationDate", "totalInvocationTime", "failures",
+                "prepareCount", "prepareTime", "lastInvocation" };
 
-        static final  String[] FIELD_DESCRIPTIONS = new String[] {
-            "The SQL query",
-            "The number of query invocations, a call to executeXXX",
-            "The longest time for this query in milliseconds",
-            "The time and date for when the longest query took place",
-            "The shortest time for this query in milliseconds",
-            "The time and date for when the shortest query took place",
-            "The total amount of milliseconds spent executing this query",
-            "The number of failures for this query",
-            "The number of times this query was prepared (prepareStatement/prepareCall)",
-            "The total number of milliseconds spent preparing this query",
-            "The date and time of the last invocation or preparation"
-        };
+        static final String[] FIELD_DESCRIPTIONS = new String[] { "The SQL query",
+                "The number of query invocations, a call to executeXXX",
+                "The longest time for this query in milliseconds",
+                "The time and date for when the longest query took place",
+                "The shortest time for this query in milliseconds",
+                "The time and date for when the shortest query took place",
+                "The total amount of milliseconds spent executing this query", "The number of failures for this query",
+                "The number of times this query was prepared (prepareStatement/prepareCall)",
+                "The total number of milliseconds spent preparing this query",
+                "The date and time of the last invocation or preparation" };
 
-        static final OpenType<?>[] FIELD_TYPES = new OpenType[] {
-            SimpleType.STRING,
-            SimpleType.INTEGER,
-            SimpleType.LONG,
-            SimpleType.LONG,
-            SimpleType.LONG,
-            SimpleType.LONG,
-            SimpleType.LONG,
-            SimpleType.LONG,
-            SimpleType.INTEGER,
-            SimpleType.LONG,
-            SimpleType.LONG
-        };
+        static final OpenType<?>[] FIELD_TYPES = new OpenType[] { SimpleType.STRING, SimpleType.INTEGER,
+                SimpleType.LONG, SimpleType.LONG, SimpleType.LONG, SimpleType.LONG, SimpleType.LONG, SimpleType.LONG,
+                SimpleType.INTEGER, SimpleType.LONG, SimpleType.LONG };
 
         private final String query;
         private volatile int nrOfInvocations;
@@ -597,8 +552,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
 
         @Override
         public String toString() {
-            SimpleDateFormat sdf =
-                    new SimpleDateFormat("d MMM yyyy HH:mm:ss z", Locale.US);
+            SimpleDateFormat sdf = new SimpleDateFormat("d MMM yyyy HH:mm:ss z", Locale.US);
             sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
             StringBuilder buf = new StringBuilder("QueryStats[query:");
             buf.append(query);
@@ -615,7 +569,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
             buf.append(", totalInvocationTime:");
             buf.append(totalInvocationTime);
             buf.append(", averageInvocationTime:");
-            buf.append((float)totalInvocationTime / (float)nrOfInvocations);
+            buf.append((float) totalInvocationTime / (float) nrOfInvocations);
             buf.append(", failures:");
             buf.append(failures);
             buf.append(", prepareCount:");
@@ -630,24 +584,17 @@ public class SlowQueryReport extends AbstractQueryReport  {
          * Returns the query statistics as JMX CompositeData.
          *
          * @param type the composite type definition
+         *
          * @return the composite data representation of this query's statistics
+         *
          * @throws OpenDataException if the data cannot be converted
          */
-        public CompositeDataSupport getCompositeData(final CompositeType type) throws OpenDataException{
-            Object[] values = new Object[] {
-                    query,
-                    Integer.valueOf(nrOfInvocations),
-                    Long.valueOf(maxInvocationTime),
-                    Long.valueOf(maxInvocationDate),
-                    Long.valueOf(minInvocationTime),
-                    Long.valueOf(minInvocationDate),
-                    Long.valueOf(totalInvocationTime),
-                    Long.valueOf(failures),
-                    Integer.valueOf(prepareCount),
-                    Long.valueOf(prepareTime),
-                    Long.valueOf(lastInvocation)
-            };
-            return new CompositeDataSupport(type,FIELD_NAMES,values);
+        public CompositeDataSupport getCompositeData(final CompositeType type) throws OpenDataException {
+            Object[] values = new Object[] { query, Integer.valueOf(nrOfInvocations), Long.valueOf(maxInvocationTime),
+                    Long.valueOf(maxInvocationDate), Long.valueOf(minInvocationTime), Long.valueOf(minInvocationDate),
+                    Long.valueOf(totalInvocationTime), Long.valueOf(failures), Integer.valueOf(prepareCount),
+                    Long.valueOf(prepareTime), Long.valueOf(lastInvocation) };
+            return new CompositeDataSupport(type, FIELD_NAMES, values);
         }
 
         /**
@@ -660,10 +607,9 @@ public class SlowQueryReport extends AbstractQueryReport  {
         }
 
         /**
-         * Returns a snapshot of the data that orders this query for eviction.
-         * Only the query and the time of its last invocation are carried
-         * over: the snapshot exists to be sorted, and unlike the live
-         * statistics its ordering does not change while a sort is running.
+         * Returns a snapshot of the data that orders this query for eviction. Only the query and the time of its last
+         * invocation are carried over: the snapshot exists to be sorted, and unlike the live statistics its ordering
+         * does not change while a sort is running.
          *
          * @return a snapshot of this query and its last invocation time
          */
@@ -674,17 +620,15 @@ public class SlowQueryReport extends AbstractQueryReport  {
         }
 
         /**
-         * Records the time taken to prepare this query. Preparation counts as
-         * activity on the entry, so the last invocation time that orders the
-         * statistics for eviction is updated as well: a statement that is
-         * prepared but never executed must age like any other query instead
-         * of occupying a statistics slot for ever.
+         * Records the time taken to prepare this query. Preparation counts as activity on the entry, so the last
+         * invocation time that orders the statistics for eviction is updated as well: a statement that is prepared but
+         * never executed must age like any other query instead of occupying a statistics slot for ever.
          *
          * @param invocationTime the time in milliseconds to prepare the query
          */
         public synchronized void prepare(long invocationTime) {
             prepareCount++;
-            prepareTime+=invocationTime;
+            prepareTime += invocationTime;
             lastInvocation = System.currentTimeMillis();
         }
 
@@ -692,7 +636,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
          * Records a successful query invocation, updating min/max/total timing statistics.
          *
          * @param invocationTime the time in milliseconds the query took
-         * @param now the current timestamp in milliseconds
+         * @param now            the current timestamp in milliseconds
          */
         public synchronized void add(long invocationTime, long now) {
             maxInvocationTime = Math.max(invocationTime, maxInvocationTime);
@@ -700,11 +644,11 @@ public class SlowQueryReport extends AbstractQueryReport  {
                 maxInvocationDate = now;
             }
             minInvocationTime = Math.min(invocationTime, minInvocationTime);
-            if (minInvocationTime==invocationTime) {
+            if (minInvocationTime == invocationTime) {
                 minInvocationDate = now;
             }
             nrOfInvocations++;
-            totalInvocationTime+=invocationTime;
+            totalInvocationTime += invocationTime;
             lastInvocation = now;
         }
 
@@ -712,10 +656,10 @@ public class SlowQueryReport extends AbstractQueryReport  {
          * Records a failed query invocation, updating timing statistics and failure count.
          *
          * @param invocationTime the time in milliseconds the query took before failing
-         * @param now the current timestamp in milliseconds
+         * @param now            the current timestamp in milliseconds
          */
         public synchronized void failure(long invocationTime, long now) {
-            add(invocationTime,now);
+            add(invocationTime, now);
             failures++;
 
         }
@@ -791,7 +735,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
         @Override
         public boolean equals(Object other) {
             if (other instanceof QueryStats) {
-                QueryStats qs = (QueryStats)other;
+                QueryStats qs = (QueryStats) other;
                 return qs.query.equals(this.query);
             }
             return false;
@@ -801,6 +745,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
          * Returns whether this query was last invoked before the given query stats.
          *
          * @param other the other query statistics to compare against
+         *
          * @return {@code true} if this query's last invocation is older
          */
         public boolean isOlderThan(QueryStats other) {
@@ -809,9 +754,8 @@ public class SlowQueryReport extends AbstractQueryReport  {
     }
 
     /**
-     * Compares QueryStats by their lastInvocation value. QueryStats that have
-     * never been updated have a lastInvocation value of {@code 0} which is
-     * treated as the newest possible invocation.
+     * Compares QueryStats by their lastInvocation value. QueryStats that have never been updated have a lastInvocation
+     * value of {@code 0} which is treated as the newest possible invocation.
      */
     // Public for unit tests
     public static class QueryStatsComparator implements Comparator<QueryStats> {
@@ -824,8 +768,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
 
         @Override
         public int compare(QueryStats stats1, QueryStats stats2) {
-            return Long.compare(handleZero(stats1.lastInvocation),
-                    handleZero(stats2.lastInvocation));
+            return Long.compare(handleZero(stats1.lastInvocation), handleZero(stats2.lastInvocation));
         }
 
         private static long handleZero(long value) {
