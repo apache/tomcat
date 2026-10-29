@@ -81,9 +81,19 @@ class SSLContextWrapper implements SSLContext {
     }
 
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The wrapped {@code javax.net.ssl.SSLContext} and its key manager are supplied pre-configured, so Tomcat cannot
+     * reliably predict which alias a handshake will serve: the socket-based {@link X509KeyManager#chooseServerAlias}
+     * callback used elsewhere to probe the served alias may disagree with the {@code chooseEngineServerAlias} callback
+     * that an {@code SSLEngine} handshake actually uses. The alias the operator configured is therefore the only
+     * dependable answer for certificate monitoring.
+     */
     @Override
-    public X509KeyManager[] getServerKeyManagers(SSLHostConfigCertificate certificate) {
-        return new X509KeyManager[] { keyManager };
+    public String getServedAlias(SSLHostConfigCertificate certificate) {
+        String configuredAlias = certificate.getCertificateKeyAlias();
+        return configuredAlias == null ? SSLUtilBase.DEFAULT_KEY_ALIAS : configuredAlias;
     }
 
     @Override
