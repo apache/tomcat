@@ -631,7 +631,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
         List<Type> candidateTypes = new ArrayList<>();
         if (Type.UNDEFINED.equals(type)) {
-            // Try all types to find an suitable alias
+            // Try all types to find a suitable alias
             candidateTypes.addAll(Arrays.asList(Type.values()));
             candidateTypes.remove(Type.UNDEFINED);
         } else {

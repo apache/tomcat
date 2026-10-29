@@ -648,7 +648,7 @@ public abstract class AbstractEndpoint<S, U> {
         getLogCertificate().info(sm.getString("endpoint.tls.info", getName(), sslHostConfig.getHostName(),
                 certificate.getType(), certificateInfo, trustStoreSource));
 
-        // When a configured alias was resolved to a different alias that is actually served (e.g. a SunMSCAPI
+        // When a configured alias was resolved to a different alias than is actually served (e.g. a SunMSCAPI
         // Windows-MY numbered duplicate), report it so the alias logged above is not mistaken for the one in use.
         String configuredAlias = certificate.getCertificateKeyAlias();
         if (sslContext != null && configuredAlias != null) {
