@@ -249,4 +249,48 @@ class TestPoolProperties {
         Assertions.assertTrue(asString.contains("jdbc:h2:mem:shown"),
                 "the JDBC URL must stay readable, was: " + asString);
     }
+
+    @Test
+    void toStringMasksAPasswordEmbeddedInTheConnectionProperties() {
+        PoolProperties properties = new PoolProperties();
+        properties.setConnectionProperties("socketTimeout=1000;password=inline-secret;PWD=Shouted-Secret");
+
+        String asString = properties.toString();
+
+        Assertions.assertFalse(asString.contains("inline-secret"),
+                "the password embedded in the string must not leak, was: " + asString);
+        Assertions.assertFalse(asString.contains("Shouted-Secret"),
+                "the key must be recognised ignoring case, was: " + asString);
+        Assertions.assertTrue(asString.contains("connectionProperties=socketTimeout=1000;password=********;PWD=********"),
+                "the other pair must keep printing with the pair masked, was: " + asString);
+    }
+
+    @Test
+    void toStringMasksAPasswordParameterInTheUrl() {
+        PoolProperties properties = new PoolProperties();
+        properties.setUrl("jdbc:mysql://localhost:3306/db?user=me&password=url-secret&sessionVariables=foo=bar&ssl=true");
+
+        String asString = properties.toString();
+
+        Assertions.assertFalse(asString.contains("url-secret"),
+                "the password in the URL query must not leak, was: " + asString);
+        Assertions.assertTrue(asString.contains("url=jdbc:mysql://localhost:3306/db?user=me"
+                + "&password=********&sessionVariables=foo=bar&ssl=true"),
+                "the rest of the URL must stay readable, was: " + asString);
+    }
+
+    @Test
+    void toStringKeepsNonCredentialPairsInsideRawStringsUntouched() {
+        PoolProperties properties = new PoolProperties();
+        properties.setUrl("jdbc:h2:mem:shown");
+        properties.setConnectionProperties("socketTimeout=1000;mypassword=not-the-key;passwordfile=/etc/pw");
+
+        String asString = properties.toString();
+
+        Assertions.assertTrue(asString.contains("connectionProperties=socketTimeout=1000;"
+                        + "mypassword=not-the-key;passwordfile=/etc/pw"),
+                "only the whole keys password, pass and pwd may be masked, was: " + asString);
+        Assertions.assertTrue(asString.contains("url=jdbc:h2:mem:shown"),
+                "a URL without an equals sign must come out unchanged, was: " + asString);
+    }
 }

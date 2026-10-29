@@ -41,6 +41,9 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     private static final long serialVersionUID = -8519283440854213745L;
     private static final Log log = LogFactory.getLog(PoolProperties.class);
 
+    /** The mask the {@link #toString()} dump prints in place of a password. */
+    private static final String PASSWORD_MASK = "********";
+
     /**
      * Constructs a PoolProperties with default values.
      */
@@ -781,12 +784,19 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                     } catch (NoSuchMethodException nm) {
                         continue;
                     }
+                    Object value = m.invoke(this, new Object[0]);
                     buf.append(field);
                     buf.append('=');
                     if (DataSourceFactory.PROP_PASSWORD.equals(field)) {
-                        buf.append("********");
+                        buf.append(PASSWORD_MASK);
+                    } else if (DataSourceFactory.PROP_URL.equals(field)
+                            || DataSourceFactory.PROP_CONNECTIONPROPERTIES.equals(field)) {
+                        // The same dump prints these raw configuration
+                        // strings, so a credential typed into one of them
+                        // has to be masked too, not just the password field.
+                        buf.append(value == null ? "null" : maskCredentials((String) value));
                     } else {
-                        buf.append(m.invoke(this, new Object[0]));
+                        buf.append(value);
                     }
                     buf.append("; ");
                     break;
@@ -800,6 +810,99 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             }
         }
         return buf.toString();
+    }
+
+
+    /**
+     * Masks the value of credential-like {@code key=value} pairs embedded in a
+     * raw configuration string so that a password typed into the JDBC URL query
+     * string or the connection properties is not printed in cleartext the way
+     * the dedicated password field is masked in {@link #toString()}. The keys
+     * recognised, compared ignoring case, are {@code password}, {@code pass}
+     * and {@code pwd}. A key is honoured only at a segment boundary - the start
+     * of the string or one of {@code ;}, {@code &} or {@code ?} - so a key such
+     * as {@code compass} is left alone, and its value runs to the next
+     * {@code ;}, {@code &} or the end of the string.
+     * <p>
+     * Only the {@code key=value} shape is scrubbed. The
+     * {@code user:password@host} userinfo form, the {@code key:value} and
+     * {@code key value} forms that a {@link java.util.Properties} reader
+     * additionally accepts, and driver-specific secrets that use a key other
+     * than the three above are not recognised; recognising them would require
+     * a full parse of each driver's URL dialect.
+     *
+     * @param value the raw configuration string, may be {@code null}
+     *
+     * @return the string with every credential key's value replaced by the mask,
+     *         or the string unchanged when it holds no recognised credential key
+     */
+    private static String maskCredentials(String value) {
+        if (value == null || value.indexOf('=') < 0) {
+            return value;
+        }
+        StringBuilder result = new StringBuilder(value.length());
+        int i = 0;
+        while (i < value.length()) {
+            int equals = value.indexOf('=', i);
+            if (equals < 0) {
+                break;
+            }
+            int keyStart = equals;
+            while (keyStart > 0 && !isCredentialSegmentSeparator(value.charAt(keyStart - 1))) {
+                keyStart--;
+            }
+            String key = value.substring(keyStart, equals).trim();
+            int valueStart = equals + 1;
+            int valueEnd = value.length();
+            for (int k = valueStart; k < value.length(); k++) {
+                char c = value.charAt(k);
+                if (c == ';' || c == '&') {
+                    valueEnd = k;
+                    break;
+                }
+            }
+            result.append(value, i, equals);
+            result.append('=');
+            if (isCredentialKey(key)) {
+                result.append(PASSWORD_MASK);
+            } else {
+                result.append(value, valueStart, valueEnd);
+            }
+            // Resume after the value so a '=' inside a masked value cannot be
+            // mistaken for the start of a new key.
+            i = valueEnd;
+        }
+        result.append(value, i, value.length());
+        return result.toString();
+    }
+
+
+    /**
+     * Whether {@code c} ends one configuration segment and starts the next,
+     * covering the URL query separators and the semicolon used by the
+     * connection properties string.
+     *
+     * @param c the character to test
+     *
+     * @return {@code true} when the character is a segment boundary
+     */
+    private static boolean isCredentialSegmentSeparator(char c) {
+        return c == ';' || c == '&' || c == '?';
+    }
+
+
+    /**
+     * Whether {@code key} names a credential, ignoring case and surrounding
+     * whitespace.
+     *
+     * @param key the extracted key
+     *
+     * @return {@code true} when the key is one of the recognised credential keys
+     */
+    private static boolean isCredentialKey(String key) {
+        return DataSourceFactory.PROP_PASSWORD.equalsIgnoreCase(key)
+                || "pass".equalsIgnoreCase(key)
+                || "pwd".equalsIgnoreCase(key);
     }
 
     /**
