@@ -344,9 +344,9 @@ public class TestRewriteValve extends TomcatBaseTest {
 
     @Test
     public void testRewriteTimeMonModRewriteNumbering() throws Exception {
-        // mod_rewrite numbering: 1-12; two tokens in one rule also cover
+        // mod_rewrite numbering: 01-12; two tokens in one rule also cover
         // concatenation parsing
-        String expected = String.valueOf(LocalDate.now().getMonthValue());
+        String expected = String.format("%02d", Integer.valueOf(LocalDate.now().getMonthValue()));
         doTestRewrite("RewriteRule ^/c/x$ - [E=X-Test:%{TIME_MON}-%{TIME_MON}]",
                 "/c/x", "/c/x", null, expected + "-" + expected);
     }
@@ -358,6 +358,22 @@ public class TestRewriteValve extends TomcatBaseTest {
         String expected = String.valueOf(LocalDate.now().getDayOfWeek().getValue() % 7);
         doTestRewrite("RewriteRule ^/c/x$ - [E=X-Test:%{TIME_WDAY}TUE%{TIME_WDAY}]",
                 "/c/x", "/c/x", null, expected + "TUE" + expected);
+    }
+
+    @Test
+    public void testRewriteTimeValuesModRewriteFormat() throws Exception {
+        // The time values are zero padded to two digits (the year and the
+        // weekday are not) and TIME is yyyyMMddHHmmss. Matching the format
+        // rather than a value keeps the test independent of the clock.
+        doTestRewrite("RewriteCond %{TIME_YEAR} ^[0-9]{4}$\n" +
+                "RewriteCond %{TIME_MON} ^(0[1-9]|1[0-2])$\n" +
+                "RewriteCond %{TIME_DAY} ^(0[1-9]|[12][0-9]|3[01])$\n" +
+                "RewriteCond %{TIME_HOUR} ^([01][0-9]|2[0-3])$\n" +
+                "RewriteCond %{TIME_MIN} ^[0-5][0-9]$\n" +
+                "RewriteCond %{TIME_SEC} ^[0-5][0-9]$\n" +
+                "RewriteCond %{TIME_WDAY} ^[0-6]$\n" +
+                "RewriteCond %{TIME} ^[0-9]{14}$\n" +
+                "RewriteRule ^/c/x$ /c/ok", "/c/x", "/c/ok");
     }
 
     @Test

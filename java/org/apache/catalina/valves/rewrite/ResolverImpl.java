@@ -22,6 +22,8 @@ import java.nio.charset.Charset;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -35,7 +37,6 @@ import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.connector.Request;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.compat.JreCompat;
-import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.RequestUtil;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.jsse.PEMFile;
@@ -50,6 +51,11 @@ import org.apache.tomcat.util.res.StringManager;
 public class ResolverImpl extends Resolver {
 
     private static final StringManager sm = StringManager.getManager(ResolverImpl.class);
+
+    /**
+     * Format of the TIME variable, as used by mod_rewrite.
+     */
+    private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
     /**
      * The request being processed.
@@ -165,19 +171,19 @@ public class ResolverImpl extends Resolver {
         } else if (key.equals("TIME_MON")) {
             // Like mod_rewrite, TIME_MON is 1-12 and TIME_WDAY is 0-6 with Sunday first,
             // unlike the zero-based Calendar.MONTH and one-based Sunday-first Calendar.DAY_OF_WEEK
-            return String.valueOf(Calendar.getInstance().get(Calendar.MONTH) + 1);
+            return twoDigits(Calendar.getInstance().get(Calendar.MONTH) + 1);
         } else if (key.equals("TIME_DAY")) {
-            return String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+            return twoDigits(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
         } else if (key.equals("TIME_HOUR")) {
-            return String.valueOf(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
+            return twoDigits(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
         } else if (key.equals("TIME_MIN")) {
-            return String.valueOf(Calendar.getInstance().get(Calendar.MINUTE));
+            return twoDigits(Calendar.getInstance().get(Calendar.MINUTE));
         } else if (key.equals("TIME_SEC")) {
-            return String.valueOf(Calendar.getInstance().get(Calendar.SECOND));
+            return twoDigits(Calendar.getInstance().get(Calendar.SECOND));
         } else if (key.equals("TIME_WDAY")) {
             return String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1);
         } else if (key.equals("TIME")) {
-            return FastHttpDateFormat.getCurrentDate();
+            return TIME_FORMAT.format(LocalDateTime.now());
         }
         return null;
     }
@@ -461,6 +467,11 @@ public class ResolverImpl extends Resolver {
             }
         }
     }
+
+    private static String twoDigits(int value) {
+        return value < 10 ? "0" + value : String.valueOf(value);
+    }
+
 
     private static String emptyStringIfNull(String value) {
         if (value == null) {
