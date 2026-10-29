@@ -1677,8 +1677,10 @@
       extension remain eligible. If no eligible key entry is found, connector
       initialization fails.</p>
       <p>A configured alias is used even if its certificate is not valid for TLS
-      server authentication. The exception is the Windows-MY store accessed
-      through the SunMSCAPI provider: if the certificate at the configured alias is
+      server authentication. The exception is a Windows-MY store accessed through
+      the SunMSCAPI provider (key store type <code>Windows-MY</code>,
+      <code>Windows-MY-CURRENTUSER</code> or <code>Windows-MY-LOCALMACHINE</code>):
+      if the certificate at the configured alias is
       not valid there, but the store also contains a key entry whose alias is the
       configured alias with <code>" (1)"</code>, <code>" (2)"</code>, etc. appended
       and whose certificate is valid, that certificate is used instead. That store

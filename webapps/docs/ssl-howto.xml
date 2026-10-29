@@ -457,9 +457,11 @@ excludes both purposes or cannot be parsed are ignored. If no eligible key entry
 is found, connector initialization fails.</p>
 
 <p>A configured <strong>certificateKeyAlias</strong> is normally used even if its
-certificate is unsuitable for server authentication. The one exception is the
-Windows-MY store accessed through the SunMSCAPI provider: if the certificate at the
-configured alias is unsuitable there, but the store also holds a suitable
+certificate is unsuitable for server authentication. The one exception is a
+Windows-MY store accessed through the SunMSCAPI provider (key store type
+<code>Windows-MY</code>, <code>Windows-MY-CURRENTUSER</code> or
+<code>Windows-MY-LOCALMACHINE</code>): if the certificate at the configured alias
+is unsuitable there, but the store also holds a suitable
 certificate under that same name with <code>" (1)"</code>, <code>" (2)"</code>,
 etc. appended - the way that store gives unique aliases to several certificates
 that share a name, since the key store API requires aliases to be unique - the

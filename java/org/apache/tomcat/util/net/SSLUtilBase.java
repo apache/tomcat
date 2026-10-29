@@ -525,8 +525,9 @@ public abstract class SSLUtilBase implements SSLUtil {
      *     so rejecting them would needlessly exclude the many server certificates issued without an EKU.</li>
      * <li>A certificate that <strong>does</strong> carry an EKU extension is usable only if that extension explicitly
      *     lists the {@code id-kp-serverAuth} OID ({@value Constants#SERVER_AUTH_EXTENDED_KEY_USAGE_OID}) or the
-     *     {@code anyExtendedKeyUsage} OID ({@value Constants#ANY_EXTENDED_KEY_USAGE_OID}). Any other declared usage
-     *     - for example a certificate limited to client authentication - is rejected.</li>
+     *     {@code anyExtendedKeyUsage} OID ({@value Constants#ANY_EXTENDED_KEY_USAGE_OID}). Any other usage - for
+     *     example a certificate limited to client authentication, or an extension that lists no usages at all - is
+     *     rejected.</li>
      * <li>A certificate whose EKU extension <strong>cannot be decoded</strong> is ignored (treated as not usable).</li>
      * </ul>
      *
