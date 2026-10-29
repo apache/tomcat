@@ -538,6 +538,13 @@ with a configured alias, ensure that the
 renewed certificate is available under that alias. Reloading does not select a
 different alias or prefer a certificate with a later expiry date.</p>
 
+<p>If the certificate's private key is marked non-exportable, pin the JSSE implementation by adding
+<code>sslImplementationName="org.apache.tomcat.util.net.jsse.JSSEImplementation"</code>
+to the <strong>Connector</strong>. A connector otherwise selects an OpenSSL
+implementation automatically when one is available, and OpenSSL cannot use a
+private key it is unable to read, so initialization fails. An exportable key works
+with either implementation.</p>
+
 <p>Two points to note:</p>
 
 <ul>
