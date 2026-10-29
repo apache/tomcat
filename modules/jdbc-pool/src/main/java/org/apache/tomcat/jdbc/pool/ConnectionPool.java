@@ -1313,31 +1313,56 @@ public class ConnectionPool {
                     }
                 }
                 if (busy.remove(con)) {
-
-                    if (!shouldClose(con, PooledConnection.VALIDATE_RETURN) && reconnectIfExpired(con)) {
-                        con.clearWarnings();
-                        con.setStackTrace(null);
-                        con.setTimestamp(System.currentTimeMillis());
-                        // The application is done with the connection: close
-                        // the JDBC 4.3 request that beginRequest() opened in
-                        // setupConnection(). A connection discarded instead
-                        // of going back to the pool is not hinted; it is
-                        // about to be closed, which subsumes the hint.
-                        invokeRequestHint(END_REQUEST, con.getConnection());
-                        if (((idle.size() >= poolProperties.getMaxIdle()) && !poolProperties.isPoolSweeperEnabled()) ||
-                                (!idle.offer(con))) {
+                    try {
+                        if (!shouldClose(con, PooledConnection.VALIDATE_RETURN) && reconnectIfExpired(con)) {
+                            con.clearWarnings();
+                            con.setStackTrace(null);
+                            con.setTimestamp(System.currentTimeMillis());
+                            // The application is done with the connection:
+                            // close the JDBC 4.3 request that beginRequest()
+                            // opened in setupConnection(). A connection
+                            // discarded instead of going back to the pool is
+                            // not hinted; it is about to be closed, which
+                            // subsumes the hint.
+                            invokeRequestHint(END_REQUEST, con.getConnection());
+                            if (((idle.size() >= poolProperties.getMaxIdle()) && !poolProperties.isPoolSweeperEnabled()) ||
+                                    (!idle.offer(con))) {
+                                if (log.isDebugEnabled()) {
+                                    log.debug("Connection [" + con +
+                                            "] will be closed and not returned to the pool, idle[" + idle.size() +
+                                            "]>=maxIdle[" + poolProperties.getMaxIdle() + "] idle.offer failed.");
+                                }
+                                release(con);
+                            }
+                        } else {
                             if (log.isDebugEnabled()) {
-                                log.debug("Connection [" + con +
-                                        "] will be closed and not returned to the pool, idle[" + idle.size() +
-                                        "]>=maxIdle[" + poolProperties.getMaxIdle() + "] idle.offer failed.");
+                                log.debug("Connection [" + con + "] will be closed and not returned to the pool.");
                             }
                             release(con);
                         }
-                    } else {
-                        if (log.isDebugEnabled()) {
-                            log.debug("Connection [" + con + "] will be closed and not returned to the pool.");
-                        }
+                    } catch (RuntimeException x) {
+                        // Everything above runs after the connection was
+                        // claimed from the busy queue and calls into the
+                        // driver - a closed check, a transaction termination,
+                        // a validation, a warnings clear - before the
+                        // connection is handed to the idle queue or released.
+                        // A driver that fails one of those calls with an
+                        // unchecked exception must not strand the connection
+                        // between the two queues: it would be invisible to
+                        // checkAbandoned(), to checkIdle() and to the close()
+                        // drain alike, never disconnected, and the pool would
+                        // permanently lose one maxActive slot per occurrence.
+                        // Take it out of service instead, as a failed
+                        // validation already does: the application sees the
+                        // return complete quietly, just as it does when the
+                        // driver fails a check it does handle. Release
+                        // before logging: nothing but the release may keep a
+                        // claimed connection from being closed, and after it
+                        // the connection renders itself without consulting
+                        // the driver that failed.
+                        con.setDiscarded(true);
                         release(con);
+                        log.warn("Unable to return connection [" + con + "] to the pool, closing it.", x);
                     }
                 } else {
                     if (log.isDebugEnabled()) {
