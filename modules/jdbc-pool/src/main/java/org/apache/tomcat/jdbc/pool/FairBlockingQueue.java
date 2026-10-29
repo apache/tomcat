@@ -386,11 +386,12 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
     @Override
     public boolean addAll(Collection<? extends E> c) {
         Iterator<? extends E> i = c.iterator();
+        boolean changed = false;
         while (i.hasNext()) {
             E e = i.next();
-            offer(e);
+            changed |= offer(e);
         }
-        return true;
+        return changed;
     }
 
     /**
