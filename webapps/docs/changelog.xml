@@ -7919,6 +7919,9 @@
         default. Based on pull request <pr>1095</pr> provided by StrongOx.
         (markt)
       </fix>
+      <update>
+        Update Tomcat Native to 2.0.17. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
