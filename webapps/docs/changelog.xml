@@ -1363,6 +1363,19 @@
         releases it, as before, when it leaves the pool.
         (remm)
       </fix>
+      <fix>
+        Correct a defect that meant the JNDI factory for the JDBC pool aborted
+        with a <code>NullPointerException</code> when a resource reference
+        carried an attribute with null content, and that made it impossible to
+        give the pool a live <code>javax.sql.DataSource</code> through a
+        reference: an object-valued <code>dataSource</code> attribute was
+        stringified and then rejected with a message contradicting the
+        documented property type. Attributes with null content are now skipped
+        and an object-valued <code>dataSource</code> attribute is used to back
+        the pool, taking precedence over <code>dataSourceJNDI</code>; a string
+        value for that attribute is still rejected, with a message that now
+        points at the supported ways of providing a data source. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
