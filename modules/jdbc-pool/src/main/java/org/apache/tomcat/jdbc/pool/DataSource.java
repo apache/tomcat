@@ -92,12 +92,26 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
     }
 
     /**
-     * no-op<br>
+     * Releases the pool MBean that {@link #preRegister(MBeanServer, ObjectName)} published when the MBean server did
+     * not complete this DataSource's own registration. Per the {@link MBeanRegistration} contract a {@code false}
+     * {@code registrationDone} means that the registration phase failed, and after a failed registration the server
+     * does not call {@link #postDeregister()}: this callback is the only chance to undo that side effect. Leaving the
+     * pool MBean registered would keep a pool nobody manages reporting statistics and notifications, and would pin the
+     * pool - with its properties, its credentials and its JDBC driver class loader - in the MBean server.<br>
      * {@inheritDoc}
      */
     @Override
     public void postRegister(Boolean registrationDone) {
-        // NOOP
+        // The same check-and-clear of the registration handle as
+        // postDeregister() and close(): a handle this bean still holds at a
+        // failed registration is exactly the publish preRegister() made, since
+        // registerJmx() keeps a name only for an accepted publish. Clearing it
+        // here also makes a later close() or postDeregister() skip the
+        // unregister, so the cleanup is never performed twice.
+        if (!Boolean.TRUE.equals(registrationDone) && oname != null) {
+            unregisterJmx();
+            oname = null;
+        }
     }
 
 
