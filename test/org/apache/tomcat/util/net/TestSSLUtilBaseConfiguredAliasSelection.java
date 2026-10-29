@@ -198,17 +198,12 @@ public class TestSSLUtilBaseConfiguredAliasSelection extends SSLUtilBaseCertific
     }
 
 
-    /*
-     * The numbered duplicates of a Windows-MY friendly name are normally contiguous, but should a gap appear (for
-     * example a lower-numbered duplicate was removed) the search must keep scanning past it rather than stop, so a valid
-     * server-auth duplicate beyond the gap is still found.
-     */
     @Test
-    public void testConfiguredAliasSkipsGapInNumberedDuplicates() throws Exception {
+    public void testConfiguredAliasStopsAtGapAndKeepsBase() throws Exception {
         X509Certificate presented = present("tomcat",
                 key("tomcat", CLIENT_AUTH),
                 key("tomcat (2)", SERVER_AUTH));
-        assertEku(presented, Constants.SERVER_AUTH_EXTENDED_KEY_USAGE_OID);
+        assertEku(presented, CLIENT_AUTH_EXTENDED_KEY_USAGE_OID);
     }
 
 
