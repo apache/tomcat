@@ -389,16 +389,34 @@ public class DataSourceFactory implements ObjectFactory {
 
 
         Properties properties = new Properties();
+        DataSource dataSourceObject = null;
         for (int i = 0; i < ALL_PROPERTIES.length; i++) {
             String propertyName = ALL_PROPERTIES[i];
             RefAddr ra = ref.get(propertyName);
             if (ra != null) {
-                String propertyValue = ra.getContent().toString();
-                properties.setProperty(propertyName, propertyValue);
+                Object content = ra.getContent();
+                if (content == null) {
+                    // RefAddr.getContent() is nullable, and a property with no
+                    // content simply has no value to apply
+                    continue;
+                }
+                if (PROP_DATASOURCE.equals(propertyName) && content instanceof DataSource) {
+                    // A live data source cannot travel through Properties as a
+                    // string, so keep the object and hand it to the pool below
+                    dataSourceObject = (DataSource) content;
+                    continue;
+                }
+                properties.setProperty(propertyName, content.toString());
             }
         }
 
-        return createDataSource(properties, nameCtx, XA);
+        if (dataSourceObject == null) {
+            // no live data source involved - keep the legacy dispatch, so that
+            // subclasses overriding the three argument createDataSource() are
+            // still used for plain JNDI resources
+            return createDataSource(properties, nameCtx, XA);
+        }
+        return createDataSource(properties, nameCtx, XA, dataSourceObject);
     }
 
     /**
@@ -687,10 +705,14 @@ public class DataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_DATASOURCE);
         if (value != null) {
-            // This should never happen
-            throw new IllegalArgumentException(
-                    "Can't set dataSource property as a string, this must be a javax.sql.DataSource object.");
-
+            // Only genuinely string-valued dataSource attributes reach this
+            // point: getObjectInstance hands an actual javax.sql.DataSource
+            // RefAddr content straight to the pool instead of stringifying it.
+            // A string cannot be turned into a data source here.
+            throw new IllegalArgumentException("Can't set dataSource property as a string \"" + value +
+                    "\". Either carry the javax.sql.DataSource object itself under the dataSource attribute" +
+                    " of the Reference, or use the dataSourceJNDI attribute to name a data source bound in" +
+                    " JNDI.");
         }
 
         value = properties.getProperty(PROP_DATASOURCE_JNDI);
@@ -821,7 +843,33 @@ public class DataSourceFactory implements ObjectFactory {
      * @throws Exception if an error occurs creating the data source
      */
     public DataSource createDataSource(Properties properties, Context context, boolean XA) throws Exception {
+        return createDataSource(properties, context, XA, null);
+    }
+
+    /**
+     * Creates and configures a {@link DataSource} instance based on the given properties, with an optional live data
+     * source for the pool to wrap.
+     * <p>
+     * When {@code dataSourceObject} is not {@code null}, it is set on the pool configuration before the pool is
+     * created, and the {@code dataSourceJNDI} lookup is skipped: the pool is built around the object that was handed
+     * to the factory directly.
+     * </p>
+     *
+     * @param properties        The datasource configuration properties
+     * @param context           The JNDI context
+     * @param XA                {@code true} to create an XA data source
+     * @param dataSourceObject  A live {@link DataSource} the pool should wrap, or {@code null}
+     *
+     * @return The configured datasource
+     *
+     * @throws Exception if an error occurs creating the data source
+     */
+    protected DataSource createDataSource(Properties properties, Context context, boolean XA,
+            DataSource dataSourceObject) throws Exception {
         PoolConfiguration poolProperties = parsePoolProperties(properties);
+        if (dataSourceObject != null) {
+            poolProperties.setDataSource(dataSourceObject);
+        }
         if (poolProperties.getDataSourceJNDI() != null && poolProperties.getDataSource() == null) {
             performJNDILookup(context, poolProperties);
         }
