@@ -304,6 +304,13 @@
         <code>TIME</code> is now of the form <code>yyyyMMddHHmmss</code>
         rather than an HTTP date.
       </fix>
+      <fix>
+        Refactor to reduce duplication and improve consistency when working with
+        resources in multi-release JAR files. Versions that include signs,
+        leading zeros or values less than 8 are no longer considered valid. All
+        types of resources, not just class files, are now handled in
+        multi-release JAR files. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

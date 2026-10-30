@@ -140,13 +140,95 @@ public class TestJarWarResourceSet extends TomcatBaseTest {
         resourceSet.gc();
     }
 
+    @Test
+    public void testMultiReleaseVersionDirectoryRules() throws Exception {
+        // Version directories with a sign or a leading zero are not version
+        // directories as far as the JDK is concerned. An entry directly below
+        // META-INF/versions/ has no version directory at all. All of these
+        // stay in the index under their full name. A leading slash is not
+        // significant when identifying a versioned entry.
+        File warFile = File.createTempFile("test-jar-war-resource-set", ".war");
+        warFile.deleteOnExit();
+        try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(warFile))) {
+            out.putNextEntry(new ZipEntry("WEB-INF/lib/test.jar"));
+            out.write(createJar("META-INF/versions/+9/plus.txt", "META-INF/versions/-9/minus.txt",
+                    "META-INF/versions/09/zero.txt", "META-INF/versions/Foo.class",
+                    "/META-INF/versions/9/lead.txt", "META-INF/versions/9/ok.txt", "real.txt"));
+            out.closeEntry();
+        }
+
+        StandardRoot resourceRoot = new StandardRoot();
+        resourceRoot.setArchiveIndexStrategy("BLOOM");
+        JarWarResourceSet resourceSet = new JarWarResourceSet(resourceRoot, "/WEB-INF/classes",
+                warFile.getAbsolutePath(), "WEB-INF/lib/test.jar", "/");
+
+        Map<String,JarEntry> entries = resourceSet.getArchiveEntries(true);
+
+        Assert.assertTrue(entries.containsKey("META-INF/versions/+9/plus.txt"));
+        Assert.assertFalse(entries.containsKey("plus.txt"));
+        Assert.assertTrue(entries.containsKey("META-INF/versions/-9/minus.txt"));
+        Assert.assertFalse(entries.containsKey("minus.txt"));
+        Assert.assertTrue(entries.containsKey("META-INF/versions/09/zero.txt"));
+        Assert.assertFalse(entries.containsKey("zero.txt"));
+        Assert.assertTrue(entries.containsKey("META-INF/versions/Foo.class"));
+        Assert.assertTrue(entries.containsKey("lead.txt"));
+        Assert.assertTrue(entries.containsKey("ok.txt"));
+        Assert.assertTrue(entries.containsKey("real.txt"));
+
+        // The bloom filter has to agree with the index
+        JarContents jarContents = resourceSet.jarContents;
+        Assert.assertNotNull(jarContents);
+        Assert.assertTrue(jarContents.mightContainResource("META-INF/versions/+9/plus.txt"));
+        Assert.assertTrue(jarContents.mightContainResource("META-INF/versions/-9/minus.txt"));
+        Assert.assertTrue(jarContents.mightContainResource("META-INF/versions/09/zero.txt"));
+        Assert.assertTrue(jarContents.mightContainResource("META-INF/versions/Foo.class"));
+        Assert.assertTrue(jarContents.mightContainResource("lead.txt"));
+        Assert.assertTrue(jarContents.mightContainResource("ok.txt"));
+
+        Assert.assertTrue(resourceSet.getResource("/WEB-INF/classes/META-INF/versions/+9/plus.txt").exists());
+        Assert.assertTrue(resourceSet.getResource("/WEB-INF/classes/META-INF/versions/09/zero.txt").exists());
+        Assert.assertTrue(resourceSet.getResource("/WEB-INF/classes/META-INF/versions/Foo.class").exists());
+        Assert.assertTrue(resourceSet.getResource("/WEB-INF/classes/lead.txt").exists());
+
+        resourceSet.gc();
+    }
+
+    @Test
+    public void testMultiReleaseVersionDirectoryEntry() throws Exception {
+        // The entry for the version directory itself has no resource name so
+        // it must not be added to the index as an entry with an empty name.
+        File warFile = File.createTempFile("test-jar-war-resource-set", ".war");
+        warFile.deleteOnExit();
+        try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(warFile))) {
+            out.putNextEntry(new ZipEntry("WEB-INF/lib/test.jar"));
+            out.write(createJar("META-INF/versions/9/", "META-INF/versions/9/ok.txt", "real.txt"));
+            out.closeEntry();
+        }
+
+        StandardRoot resourceRoot = new StandardRoot();
+        resourceRoot.setArchiveIndexStrategy("BLOOM");
+        JarWarResourceSet resourceSet = new JarWarResourceSet(resourceRoot, "/WEB-INF/classes",
+                warFile.getAbsolutePath(), "WEB-INF/lib/test.jar", "/");
+
+        Map<String,JarEntry> entries = resourceSet.getArchiveEntries(true);
+
+        Assert.assertFalse(entries.containsKey(""));
+        Assert.assertTrue(entries.containsKey("ok.txt"));
+        Assert.assertTrue(entries.containsKey("real.txt"));
+        Assert.assertTrue(resourceSet.getResource("/WEB-INF/classes/ok.txt").exists());
+
+        resourceSet.gc();
+    }
+
     private static byte[] createMultiReleaseJar() throws IOException {
+        return createJar("META-INF/versions/9/ok.txt", "META-INF/versions/9x/foo.txt",
+                "META-INF/versions//bar.txt", "META-INF/versions/99999999999999/ovf.txt", "real.txt");
+    }
+
+    private static byte[] createJar(String... names) throws IOException {
         Manifest manifest = new Manifest();
         manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
         manifest.getMainAttributes().putValue("Multi-Release", "true");
-
-        String[] names = { "META-INF/versions/9/ok.txt", "META-INF/versions/9x/foo.txt",
-                "META-INF/versions//bar.txt", "META-INF/versions/99999999999999/ovf.txt", "real.txt" };
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (JarOutputStream jos = new JarOutputStream(baos, manifest)) {
