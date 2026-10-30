@@ -24,6 +24,7 @@ import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.Wrapper;
 
 import javax.management.ObjectName;
 
@@ -165,7 +166,9 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
 
     /**
      * Proxy for a statement that turns the result sets the statement hands out into {@link TimerResultSetProxy}
-     * instances. Every other call is passed straight through to the wrapped statement.
+     * instances, whatever the method that returned one was called. Every other call is passed straight through to the
+     * wrapped statement, and so is what the {@link java.sql.Wrapper} methods hand back: a driver object reached through
+     * {@code unwrap()} stays the driver's own object, even one that implements {@link java.sql.ResultSet}.
      */
     private final class TimerStatementProxy implements InvocationHandler {
         /**
@@ -204,21 +207,27 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
                 }
                 throw cause;
             }
-            // Wrap the same three result set producing calls that the
-            // statement facade wraps: executeQuery, getResultSet and
-            // getGeneratedKeys
-            if (result instanceof ResultSet) {
-                String name = method.getName();
-                if (compare(EXECUTE_QUERY, name) || compare(GET_RESULTSET, name) || compare(GET_GENERATED_KEYS, name)) {
-                    try {
-                        return getConstructor(RESULTSET_IDX, ResultSet.class)
-                                .newInstance(new Object[] { new TimerResultSetProxy(result, proxy) });
-                    } catch (Exception x) {
-                        // The application just does not get the timer reset
-                        // while reading this result set
-                        log.warn("Unable to create timer result set proxy for " +
-                                ResetAbandonedTimer.this.getClass().getName() + ".", x);
-                    }
+            // Wrap every result set the call hands back, whatever the method
+            // that returned it was called, on the same rule the statement
+            // facade uses: a decision made on the method name only sees the
+            // three calls the standard API names, and misses the result sets
+            // declared to come back as an Object - a cursor OUT-parameter
+            // reaches the application through CallableStatement.getObject(...),
+            // and iterating it keeps a cursor open on this connection just as
+            // an executeQuery one does. The Wrapper methods are kept out of
+            // this for the facade's reason: unwrap() is the documented way to
+            // reach the driver's own object, and a driver's cursor type is
+            // such an object, so what it hands back stays the driver's object
+            // even where that object implements ResultSet.
+            if (result instanceof ResultSet && method.getDeclaringClass() != Wrapper.class) {
+                try {
+                    return getConstructor(RESULTSET_IDX, ResultSet.class)
+                            .newInstance(new Object[] { new TimerResultSetProxy(result, proxy) });
+                } catch (Exception x) {
+                    // The application just does not get the timer reset
+                    // while reading this result set
+                    log.warn("Unable to create timer result set proxy for " +
+                            ResetAbandonedTimer.this.getClass().getName() + ".", x);
                 }
             }
             return result;
