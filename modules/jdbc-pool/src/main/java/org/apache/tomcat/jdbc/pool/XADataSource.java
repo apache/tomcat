@@ -87,9 +87,21 @@ public class XADataSource extends DataSource implements javax.sql.XADataSource {
             return;
         }
         if (ds == null) {
-            throw new SQLException("The connection pool [" + getName() + "] cannot provide XA connections: it is" +
-                    " configured with a JDBC driver and URL (or the 'dataSourceJNDI' lookup did not resolve to a" +
-                    " data source), so the pool holds plain JDBC connections. Set the 'dataSource' or" +
+            // A configured JNDI name only reaches the pool as a data source
+            // through the DataSourceFactory, which fails pool creation when
+            // the name cannot be resolved; a name set on a programmatically
+            // configured pool therefore never becomes a data source at all.
+            String jndiName = getPoolProperties().getDataSourceJNDI();
+            if (jndiName != null) {
+                throw new SQLException("The connection pool [" + getName() + "] cannot provide XA connections:" +
+                        " the name \"" + jndiName + "\" set through the 'dataSourceJNDI' attribute has not been" +
+                        " resolved into a data source; the name is only looked up when the pool is created" +
+                        " through the DataSourceFactory. Set the 'dataSource' attribute to a" +
+                        " javax.sql.XADataSource provided by the JDBC driver.");
+            }
+            throw new SQLException("The connection pool [" + getName() + "] cannot provide XA connections:" +
+                    " neither the 'dataSource' nor the 'dataSourceJNDI' attribute is set, so only plain JDBC" +
+                    " connections from a JDBC driver and URL can be pooled. Set the 'dataSource' or" +
                     " 'dataSourceJNDI' attribute to a javax.sql.XADataSource provided by the JDBC driver.");
         }
         throw new SQLException("The connection pool [" + getName() + "] cannot provide XA connections: the data" +
