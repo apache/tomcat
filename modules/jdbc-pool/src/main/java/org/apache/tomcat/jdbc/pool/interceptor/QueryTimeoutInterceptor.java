@@ -74,7 +74,12 @@ public class QueryTimeoutInterceptor extends AbstractCreateStatementInterceptor 
     }
 
     /**
-     * Initializes the {@code queryTimeout} property from the provided configuration map.
+     * Initializes the {@code queryTimeout} property from the provided configuration map. A value that is not an
+     * integer is not applied and is warned about: the timeout keeps the value it has - for a fresh instance the
+     * one-second default - so a misconfigured pool behaves as the default and the warning says so as the bad value
+     * is configured. The pool configures an interceptor instance once at pool start, once per physical connection
+     * chain, and once when the pool stops, so the report shares the per-connection reporting volume of the driver
+     * refusal below.
      *
      * @param properties map of interceptor properties
      */
@@ -82,8 +87,19 @@ public class QueryTimeoutInterceptor extends AbstractCreateStatementInterceptor 
     public void setProperties(Map<String, InterceptorProperty> properties) {
         super.setProperties(properties);
         InterceptorProperty p = properties.get("queryTimeout");
-        if (p != null) {
-            timeout = p.getValueAsInt(timeout);
+        if (p == null || p.getValue() == null) {
+            // No property, or one with no value to read: as ever, the timeout
+            // stays at the default it carries, without a word about it.
+            return;
+        }
+        try {
+            timeout = Integer.parseInt(p.getValue());
+        } catch (NumberFormatException x) {
+            log.warn("[QueryTimeoutInterceptor] The configured queryTimeout [" + p.getValue()
+                    + "] is not an integer number of seconds and is not applied: statements created through"
+                    + " this configuration keep the default " + timeout + "-second query timeout. Correct the"
+                    + " value in the jdbcInterceptors configuration to set the timeout that was meant to be"
+                    + " configured.");
         }
     }
 
