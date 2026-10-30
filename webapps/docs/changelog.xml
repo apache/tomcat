@@ -907,7 +907,6 @@
         recorded when a message is queued is now also the length used
         to release the accounting when the send completes. Previously,
         when a downstream interceptor like
-        <code>EncryptInterceptor</code> or
         <code>FragmentationInterceptor</code> replaced or extended the
         message payload while the message was sent, the recorded queue
         size drifted towards negative values and the
