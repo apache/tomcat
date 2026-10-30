@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.WebConnection;
 import jakarta.websocket.CloseReason;
 import jakarta.websocket.CloseReason.CloseCodes;
@@ -120,11 +119,7 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
             throw new IllegalStateException(sm.getString("wsHttpUpgradeHandler.noPreInit"));
         }
 
-        String httpSessionId = null;
         Object session = handshakeRequest.getHttpSession();
-        if (session != null) {
-            httpSessionId = ((HttpSession) session).getId();
-        }
 
         // Need to call onOpen using the web application's class loader
         // Create the frame using the application's class loader so it can pick
@@ -137,7 +132,7 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
                     new WsRemoteEndpointImplServer(socketWrapper, upgradeInfo, webSocketContainer, connection);
             wsSession = new WsSession(wsRemoteEndpointServer, webSocketContainer, handshakeRequest.getRequestURI(),
                     handshakeRequest.getParameterMap(), handshakeRequest.getQueryString(),
-                    handshakeRequest.getUserPrincipal(), httpSessionId, negotiatedExtensions, subProtocol,
+                    handshakeRequest.getUserPrincipal(), negotiatedExtensions, subProtocol,
                     pathParameters, secure, serverEndpointConfig);
             ep = wsSession.getLocal();
             wsFrame = new WsFrameServer(socketWrapper, upgradeInfo, wsSession, transformation, applicationClassLoader);

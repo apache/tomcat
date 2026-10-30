@@ -104,7 +104,6 @@ public class WsSession implements Session {
     private final String subProtocol;
     private final Map<String,String> pathParameters;
     private final boolean secure;
-    private final String httpSessionId;
     private final String id;
 
     // Expected to handle message types of <String> only
@@ -158,7 +157,6 @@ public class WsSession implements Session {
         this.requestParameterMap = Collections.emptyMap();
         this.queryString = null;
         this.userPrincipal = null;
-        this.httpSessionId = null;
         this.negotiatedExtensions = negotiatedExtensions;
         this.subProtocol = Objects.requireNonNullElse(subProtocol, "");
         this.pathParameters = pathParameters;
@@ -192,8 +190,6 @@ public class WsSession implements Session {
      *                                 <code>null</code> if this is a client session
      * @param userPrincipal        The principal associated with the request that initiated this session or
      *                                 <code>null</code> if this is a client session
-     * @param httpSessionId        The HTTP session ID associated with the request that initiated this session or
-     *                                 <code>null</code> if this is a client session
      * @param negotiatedExtensions The agreed extensions to use for this session
      * @param subProtocol          The agreed sub-protocol to use for this session
      * @param pathParameters       The path parameters associated with the request that initiated this session or
@@ -205,9 +201,8 @@ public class WsSession implements Session {
      */
     public WsSession(WsRemoteEndpointImplBase wsRemoteEndpoint, WsWebSocketContainer wsWebSocketContainer,
             URI requestUri, Map<String,List<String>> requestParameterMap, String queryString, Principal userPrincipal,
-            String httpSessionId, List<Extension> negotiatedExtensions, String subProtocol,
-            Map<String,String> pathParameters, boolean secure, ServerEndpointConfig serverEndpointConfig)
-            throws DeploymentException {
+            List<Extension> negotiatedExtensions, String subProtocol, Map<String,String> pathParameters, boolean secure,
+            ServerEndpointConfig serverEndpointConfig) throws DeploymentException {
 
         this.wsRemoteEndpoint = wsRemoteEndpoint;
         this.wsRemoteEndpoint.setSession(this);
@@ -223,7 +218,6 @@ public class WsSession implements Session {
         this.requestParameterMap = Objects.requireNonNullElse(requestParameterMap, Collections.emptyMap());
         this.queryString = queryString;
         this.userPrincipal = userPrincipal;
-        this.httpSessionId = httpSessionId;
         this.negotiatedExtensions = negotiatedExtensions;
         this.subProtocol = Objects.requireNonNullElse(subProtocol, "");
         this.pathParameters = pathParameters;
@@ -560,8 +554,8 @@ public class WsSession implements Session {
 
 
     /**
-     * RFC 6455, sections 5.5.1 and 7.4.2. Need internal close method as spec requires that the local endpoint
-     * receives a 1006 on timeout.
+     * RFC 6455, sections 5.5.1 and 7.4.2. Need internal close method as spec requires that the local endpoint receives
+     * a 1006 on timeout.
      *
      * @param closeReasonMessage The close reason to pass to the remote endpoint
      * @param closeReasonLocal   The close reason to pass to the local endpoint
@@ -572,8 +566,8 @@ public class WsSession implements Session {
 
 
     /**
-     * RFC 6455, sections 5.5.1 and 7.4.2. Need internal close method as spec requires that the local endpoint
-     * receives a 1006 on timeout.
+     * RFC 6455, sections 5.5.1 and 7.4.2. Need internal close method as spec requires that the local endpoint receives
+     * a 1006 on timeout.
      *
      * @param closeReasonMessage The close reason to pass to the remote endpoint
      * @param closeReasonLocal   The close reason to pass to the local endpoint
@@ -998,19 +992,6 @@ public class WsSession implements Session {
      */
     public Endpoint getLocal() {
         return localEndpoint;
-    }
-
-
-    /**
-     * Returns the HTTP session ID associated with this WebSocket session at the time the WebSocket session was created.
-     *
-     * @return the HTTP session ID, or null if not associated
-     *
-     * @deprecated Unused. Will be removed from Tomcat 12 onwards
-     */
-    @Deprecated
-    public String getHttpSessionId() {
-        return httpSessionId;
     }
 
 

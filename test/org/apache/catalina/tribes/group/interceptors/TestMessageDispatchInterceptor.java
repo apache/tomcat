@@ -321,8 +321,8 @@ public class TestMessageDispatchInterceptor {
     }
 
     /*
-     * Simulates interceptors such as EncryptInterceptor or FragmentationInterceptor that replace or extend the message
-     * payload while the message is being sent downstream.
+     * Simulates interceptors such as FragmentationInterceptor that replace or extend the message payload while the
+     * message is being sent downstream.
      */
     private static class MutatingCollector extends ChannelInterceptorBase {
 
