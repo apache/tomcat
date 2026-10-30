@@ -115,10 +115,16 @@ public class SlowQueryReport extends AbstractQueryReport {
 
 
     @Override
-    protected String reportFailedQuery(String query, Object[] args, String name, long start, Throwable t) {
-        String sql = super.reportFailedQuery(query, args, name, start, t);
+    protected String reportFailedQuery(String query, Object[] args, String name, long start, long delta,
+            Throwable t) {
+        String sql = super.reportFailedQuery(query, args, name, start, delta, t);
+        // The wall clock is read for the timestamp the failure is recorded
+        // against - a point in time, which is what the statistics keep the
+        // last invocation as. The duration is the monotonic elapsed time the
+        // statement proxy measured, so a step of the wall clock during the
+        // execution cannot make the booked duration negative, as it could
+        // while this hook recomputed it from start.
         long now = System.currentTimeMillis();
-        long delta = now - start;
         if (this.maxQueries > 0) {
             QueryStats qs = this.getQueryStats(sql);
             if (qs != null) {

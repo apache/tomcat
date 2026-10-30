@@ -60,17 +60,17 @@ class TestQueryReportExtraction {
     void aNonStringArgumentIsNotAQuery() {
         // the argument of setFetchSize(int) and friends is not SQL
         Assertions.assertNull(REPORT.reportFailedQuery(null, new Object[] { Integer.valueOf(5) },
-                "setFetchSize", 0, null));
+                "setFetchSize", 0, 1, null));
         // but the SQL of the prepared statement still is
         Assertions.assertEquals("SELECT 1", REPORT.reportFailedQuery("SELECT 1",
-                new Object[] { Integer.valueOf(5) }, "setFetchSize", 0, null));
+                new Object[] { Integer.valueOf(5) }, "setFetchSize", 0, 1, null));
     }
 
     @Test
     void aBatchOnAPlainStatementIsNamedBatch() {
         // a batch execution carries no SQL and no arguments at all
         Assertions.assertEquals("batch",
-                REPORT.reportFailedQuery(null, null, "executeBatch", 0, null));
+                REPORT.reportFailedQuery(null, null, "executeBatch", 0, 1, null));
         Assertions.assertEquals("batch",
                 REPORT.reportQuery(null, new Object[0], "executeBatch", 0, 1));
         Assertions.assertEquals("batch",

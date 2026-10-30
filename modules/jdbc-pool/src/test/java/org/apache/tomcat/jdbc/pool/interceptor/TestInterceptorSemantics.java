@@ -440,8 +440,8 @@ class TestInterceptorSemantics extends JdbcPoolBaseTest {
 
         @Override
         protected String reportFailedQuery(String query, Object[] args,
-                String name, long start, Throwable t) {
-            super.reportFailedQuery(query, args, name, start, t);
+                String name, long start, long delta, Throwable t) {
+            super.reportFailedQuery(query, args, name, start, delta, t);
             throw new IllegalStateException("reporter intentionally fails");
         }
     }

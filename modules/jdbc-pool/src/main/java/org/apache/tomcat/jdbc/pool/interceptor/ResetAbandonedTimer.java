@@ -152,9 +152,12 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
     }
 
     @Override
-    protected String reportFailedQuery(String query, Object[] args, String name, long start, Throwable t) {
+    protected String reportFailedQuery(String query, Object[] args, String name, long start, long delta,
+            Throwable t) {
+        // The timer only needs to know that the execution was attempted, so
+        // it takes no interest in the start or the duration it reports
         resetTimer();
-        return super.reportFailedQuery(query, args, name, start, t);
+        return super.reportFailedQuery(query, args, name, start, delta, t);
     }
 
     @Override

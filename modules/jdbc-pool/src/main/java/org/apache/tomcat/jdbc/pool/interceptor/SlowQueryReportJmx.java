@@ -340,15 +340,17 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
      *
      * @param query the SQL query
      * @param args  the query arguments
-     * @param name  the connection pool name
-     * @param start the start time in milliseconds
+     * @param name  the name of the method used to execute
+     * @param start the wall clock time the query execution started
+     * @param delta the time the execution took before it failed, measured with the monotonic clock
      * @param t     the throwable that caused the failure
      *
      * @return the formatted query string
      */
     @Override
-    protected String reportFailedQuery(String query, Object[] args, String name, long start, Throwable t) {
-        query = super.reportFailedQuery(query, args, name, start, t);
+    protected String reportFailedQuery(String query, Object[] args, String name, long start, long delta,
+            Throwable t) {
+        query = super.reportFailedQuery(query, args, name, start, delta, t);
         if (isLogFailed()) {
             notifyJmx(query, FAILED_QUERY_NOTIFICATION);
         }
