@@ -35,6 +35,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
+import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.DataSource;
 
 /**
@@ -219,5 +220,76 @@ class TestSlowQueryJmxMBeanSurface extends JdbcPoolBaseTest {
                             "SlowQueriesCD")).length,
                     "the exposed statistics must be empty for the owning pool as well");
         }
+    }
+
+    @Test
+    void slowQueriesCDIsAnEmptyArrayWhileTheReleasedStatisticsOutliveTheRegistration()
+            throws Exception {
+        String poolName = "JmxReleasedStats-" + System.nanoTime();
+        DataSource ds = reportingPoolNamed(poolName);
+
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        ObjectName oname = objectNameFor(poolName);
+        ConnectionPool pool = null;
+        try {
+            try (Connection con = ds.getConnection();
+                    Statement st = con.createStatement()) {
+                st.execute("SELECT 1");
+            }
+            pool = ds.getPool();
+            Assertions.assertEquals(1, ((CompositeData[]) server.getAttribute(oname,
+                            "SlowQueriesCD")).length,
+                    "the premise: the query must have been recorded while the pool was live");
+
+            // The window inside poolClosed: the close decides the release of
+            // the name's statistics first, and only after that gives up the
+            // registration - and JmxUtil.unregisterJmx swallows a refused
+            // unregistration, which leaves that state in place permanently.
+            // The window of a single close call is a thread race no test can
+            // force, so the test drives the two decided steps apart, in the
+            // order the race leaves them, and holds the registration back.
+            Assertions.assertTrue(SlowQueryReport.releaseStatistics(pool),
+                    "the premise: the pool must have been the last live pool of the name");
+            Assertions.assertTrue(server.isRegistered(oname),
+                    "the premise: the MBean of the name must still be registered");
+            Assertions.assertNull(SlowQueryReport.getPoolStats(poolName),
+                    "the premise: the statistics map of the name must be gone");
+
+            Object value = server.getAttribute(oname, "SlowQueriesCD");
+            Assertions.assertNotNull(value,
+                    "a client that reads the attribute - advertised as "
+                            + "[Ljavax.management.openmbean.CompositeData; - through the "
+                            + "still-registered MBean must never get null in its hands");
+            Assertions.assertEquals(0, ((CompositeData[]) value).length,
+                    "with the statistics gone the attribute must degrade to the empty "
+                            + "array, the way getPoolNames() degrades to an empty String array");
+        } finally {
+            ds.close();
+            // complete the release poolClosed decided with the statistics, so
+            // the window's registration is not left published behind this
+            // test: the close finds the statistics already decided free and
+            // skips the release of the name
+            SlowQueryReportJmx lateRelease = new SlowQueryReportJmx();
+            lateRelease.poolName = poolName;
+            lateRelease.releaseJmxRegistration(pool);
+            Assertions.assertFalse(server.isRegistered(oname),
+                    "teardown premise: completing the release must leave the name unregistered");
+        }
+    }
+
+    @Test
+    void slowQueriesCDIsEmptyArrayForANameThatHoldsNoStatistics() throws Exception {
+        // The same missing-map state pinned on the delegate method itself,
+        // the way the attribute-race test drives it: an interceptor bound to
+        // a name that holds no statistics map - the very state the registered
+        // MBean's delegate is in between the release of the name's statistics
+        // and its unregistration, and after an unregistration failure.
+        SlowQueryReportJmx interceptor = new SlowQueryReportJmx();
+        interceptor.poolName = "JmxNoStats-" + System.nanoTime();
+        Assertions.assertNull(SlowQueryReport.getPoolStats(interceptor.poolName),
+                "the premise: no statistics map may be registered under the name");
+        Assertions.assertEquals(0, interceptor.getSlowQueriesCD().length,
+                "with no statistics map the read must degrade to the empty array, "
+                        + "not to a null a JMX client has to trip over");
     }
 }
