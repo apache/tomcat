@@ -40,7 +40,13 @@ public class PoolUtilities {
     }
 
     /**
-     * Creates a shallow copy of the given properties.
+     * Creates a shallow copy of the given properties. Entries that the source
+     * resolves to a String through a defaults table are materialized into the
+     * copy as plain values, unless the source has a directly present entry
+     * under the same key, so the copy needs no defaults table of its own for
+     * them. Entries directly present in the source are copied as they are,
+     * including non-String values, and take precedence; the defaults table
+     * itself is not carried over.
      *
      * @param p the properties to clone
      *
@@ -49,6 +55,17 @@ public class PoolUtilities {
     public static Properties clone(Properties p) {
         Properties c = new Properties();
         c.putAll(p);
+        // putAll(...) copies only the entries directly present in the source,
+        // so materialize the String values the source resolves through
+        // defaults. Re-read each value from the source: stringPropertyNames()
+        // is only a snapshot and the source may be modified concurrently, so
+        // a snapshotted key may resolve to nothing by the time it is read
+        for (String key : p.stringPropertyNames()) {
+            String value = p.getProperty(key);
+            if (value != null && !c.containsKey(key)) {
+                c.setProperty(key, value);
+            }
+        }
         return c;
     }
 
