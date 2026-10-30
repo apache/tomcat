@@ -550,7 +550,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
         }
 
         @Override
-        public void closeInvoked() {
+        public void closeInvoked() throws SQLException {
             // Should we cache it. Read the counter once, as getCacheSize()
             // does: a disposal (reset(null, null) from a finalize or from an
             // abandoned or closed session) nulls the field, and a handle the
@@ -617,6 +617,11 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
                 }
             }
             if (shouldClose) {
+                // The physical close belongs to the superclass, and so does the
+                // retirement of this handle: a driver that refuses the close
+                // throws from there and the application hears about it. The
+                // statement never reached the cache in this branch, so nothing
+                // here has to be unwound for it.
                 super.closeInvoked();
             }
             closed = true;
@@ -633,11 +638,19 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
         }
 
         /**
-         * Forces immediate closure of this cached statement.
+         * Forces immediate closure of this cached statement. No application waits on this close - the
+         * pool is dropping the statement, from the purge that runs when a session is disconnected or
+         * from a cache hit on an entry of a replaced session - so a driver that refuses it is logged
+         * rather than thrown: the caller walks the cache, and one statement that will not close must
+         * not keep the entries after it from being dropped as well.
          */
         public void forceClose() {
             removeStatement(this);
-            super.closeInvoked();
+            try {
+                super.closeInvoked();
+            } catch (SQLException x) {
+                log.warn("Unable to close statement [" + getSql() + "] that the statement cache is discarding.", x);
+            }
         }
 
         /**
