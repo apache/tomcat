@@ -69,6 +69,21 @@ public class ConnectionState extends JdbcInterceptor {
     protected Integer transactionIsolation = null;
 
     /**
+     * The transaction isolation level this physical session refused, or
+     * {@link DataSourceFactory#UNKNOWN_TRANSACTIONISOLATION} when the session has
+     * not refused one. A refused level does not count as needing a restore on later
+     * borrows, which keeps the pool out of a loop of doomed restore attempts, error
+     * logs and transaction terminations on every borrow; see {@link #reset}. The
+     * record covers the refused level only: the pool reads the configured level on
+     * every borrow, so a level this session has not refused - for instance one
+     * configured after the refusal - is restored as usual. Cleared when the session
+     * is replaced, so every physical session gets its own attempt. The interceptor
+     * instance belongs to one pooled connection, so a plain field needs no
+     * synchronisation.
+     */
+    private int refusedIsolationLevel = DataSourceFactory.UNKNOWN_TRANSACTIONISOLATION;
+
+    /**
      * Cached read-only state of the connection.
      */
     protected Boolean readOnly = null;
@@ -87,10 +102,18 @@ public class ConnectionState extends JdbcInterceptor {
      * is restored, silently commit the previous borrower's uncommitted work). If terminating that transaction fails,
      * the borrow fails and the pool retires the connection. So does a failed restore of the read-only, auto-commit or
      * catalog state: a connection known to sit in a state other than the configured default must not reach the next
-     * borrower. A transaction isolation level the driver refuses is the exception - it is logged and the connection
-     * stays in service, so the pool never strands borrowers over that setting. Nothing is terminated when there is
-     * nothing to restore - no default is configured, or the cache already shows every configured default in place -
-     * so a pool that uses this interceptor only to cache the state does not pay for the termination.
+     * borrower. A transaction isolation level the driver refuses is the exception: the connection stays in service,
+     * so the pool never strands borrowers over that setting. The refusal is logged once, at refusal time, and that
+     * level then stops counting as a pending restore on that session - later borrows neither retry it nor log it
+     * again nor terminate a pending transaction on its behalf. The record covers the refused level only: the pool
+     * reads the configured level on every borrow, so a level the session has not refused yet - one configured after
+     * the refusal, for instance - is attempted and applied as usual, and a replaced session retries even the same
+     * level. If the refused level was the only pending restore, the next borrower then inherits an open transaction
+     * left by the previous one, exactly as it does for a pool that configures no defaults at all. Nothing is
+     * terminated when there is nothing to restore - no default is configured, the
+     * cache already shows every configured default in place, or the only default that would need restoring is one
+     * this session refused - so a pool that uses this interceptor only to cache the state does not pay for the
+     * termination.
      *
      * @param parent the pool the connection belongs to, or {@code null} when the interceptor chain is being torn down
      * @param con    the pooled connection being set up for its next borrower
@@ -104,6 +127,7 @@ public class ConnectionState extends JdbcInterceptor {
             transactionIsolation = null;
             readOnly = null;
             catalog = null;
+            refusedIsolationLevel = DataSourceFactory.UNKNOWN_TRANSACTIONISOLATION;
             return;
         }
         PoolConfiguration poolProperties = parent.getPoolProperties();
@@ -112,6 +136,7 @@ public class ConnectionState extends JdbcInterceptor {
         final Boolean defaultAutoCommit = poolProperties.getDefaultAutoCommit();
         final String defaultCatalog = poolProperties.getDefaultCatalog();
         boolean resetTransactionIsolation = defaultTransactionIsolation != DataSourceFactory.UNKNOWN_TRANSACTIONISOLATION &&
+                refusedIsolationLevel != defaultTransactionIsolation &&
                 (transactionIsolation == null || transactionIsolation.intValue() != defaultTransactionIsolation);
         boolean resetReadOnly = defaultReadOnly != null &&
                 (readOnly == null || readOnly.booleanValue() != defaultReadOnly.booleanValue());
@@ -150,7 +175,23 @@ public class ConnectionState extends JdbcInterceptor {
                 }
             } catch (SQLException x) {
                 transactionIsolation = null;
-                log.error("Unable to reset transaction isolation state to connection.", x);
+                // A driver that refuses a level refuses it for this session,
+                // and the configured level is pool configuration that changes
+                // rarely, so retrying the refused level per borrow would keep
+                // the pool paying a doomed round trip, a termination of
+                // whatever the previous borrower left pending, and this error
+                // log - on every borrow, forever. Record the refused level so
+                // it stops counting as a pending restore; the next borrower
+                // inherits an open transaction the way it does on a pool that
+                // configures no defaults at all. A later configuration of a
+                // different level, or a replaced session, clears the way for a
+                // fresh attempt: this record names only the refused level.
+                // Report it here, at refusal time, as no later borrow will log
+                // it again.
+                refusedIsolationLevel = defaultTransactionIsolation;
+                log.error("Unable to reset transaction isolation state to connection. The configured level "
+                        + defaultTransactionIsolation + " will not be retried on this session; it keeps its "
+                        + "current isolation level.", x);
             }
         }
         if (resetReadOnly) {
@@ -212,6 +253,7 @@ public class ConnectionState extends JdbcInterceptor {
         transactionIsolation = null;
         readOnly = null;
         catalog = null;
+        refusedIsolationLevel = DataSourceFactory.UNKNOWN_TRANSACTIONISOLATION;
         super.disconnected(parent, con, finalizing);
     }
 
