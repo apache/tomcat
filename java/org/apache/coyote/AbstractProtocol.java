@@ -91,11 +91,12 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
     /** Set of processors currently waiting for async processing. */
     private final Set<Processor> waitingProcessors = ConcurrentHashMap.newKeySet();
 
-    /** Controller for the timeout scheduling. Accessed under timeoutSchedulingLock. */
-    private ScheduledFuture<?> timeoutFuture = null;
     /** Scheduled future for the periodic monitor task. */
     private volatile ScheduledFuture<?> monitorFuture;
 
+    /** Controller for the timeout scheduling. Accessed under timeoutSchedulingLock. */
+    private ScheduledFuture<?> timeoutFuture = null;
+    private boolean timeoutEnabled;
     /** Guards the scheduling of the asynchronous timeout task. */
     private final Object timeoutSchedulingLock = new Object();
 
@@ -978,6 +979,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
         }
 
         endpoint.start();
+        synchronized (timeoutSchedulingLock) {
+            timeoutEnabled = true;
+        }
         monitorFuture = getUtilityExecutor().scheduleWithFixedDelay(this::startAsyncTimeout, 0, 60, TimeUnit.SECONDS);
     }
 
@@ -997,12 +1001,14 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
                         getLog().error(sm.getString("abstractProtocolHandler.asyncTimeoutError"), e);
                     }
                 }
-                timeoutFuture = getUtilityExecutor().scheduleAtFixedRate(() -> {
-                    long now = System.currentTimeMillis();
-                    for (Processor processor : waitingProcessors) {
-                        processor.timeoutAsync(now);
-                    }
-                }, 1, 1, TimeUnit.SECONDS);
+                if (timeoutEnabled) {
+                    timeoutFuture = getUtilityExecutor().scheduleAtFixedRate(() -> {
+                        long now = System.currentTimeMillis();
+                        for (Processor processor : waitingProcessors) {
+                            processor.timeoutAsync(now);
+                        }
+                    }, 1, 1, TimeUnit.SECONDS);
+                }
             }
         }
     }
@@ -1016,6 +1022,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
                 timeoutFuture.cancel(false);
                 timeoutFuture = null;
             }
+            timeoutEnabled = false;
         }
     }
 
