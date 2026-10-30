@@ -1910,9 +1910,11 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 try {
                     stream.incrementWindowSize(diff);
                 } catch (Http2Exception h2e) {
-                    ((Stream) stream).close(new StreamException(
+                    // Per RFC 9113 section 6.9.2, a change to SETTINGS_INITIAL_WINDOW_SIZE that
+                    // causes any flow-control window to exceed the maximum size is a connection error.
+                    throw new ConnectionException(
                             sm.getString("upgradeHandler.windowSizeTooBig", connectionId, stream.getIdAsString()),
-                            h2e.getError(), stream.getIdAsInt()));
+                            Http2Error.FLOW_CONTROL_ERROR);
                 }
             }
         } else if (setting == Setting.NO_RFC7540_PRIORITIES) {
