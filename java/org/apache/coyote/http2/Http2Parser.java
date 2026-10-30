@@ -743,7 +743,7 @@ class Http2Parser {
                 // NO-OP: RST is OK here
             } else if (frameType != FrameType.CONTINUATION) {
                 throw new ConnectionException(sm.getString("http2Parser.headers.wrongFrameType", connectionId,
-                        Integer.toString(headersCurrentStream), frameType), Http2Error.COMPRESSION_ERROR);
+                        Integer.toString(headersCurrentStream), frameType), Http2Error.PROTOCOL_ERROR);
             }
         }
 
