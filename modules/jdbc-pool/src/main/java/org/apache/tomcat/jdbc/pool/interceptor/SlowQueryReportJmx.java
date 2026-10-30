@@ -54,7 +54,9 @@ import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
  * to borrow a connection registers them, and every other instance sharing the name - the other connections of that
  * pool, the second interceptor of the recommended two-thresholds configuration, or a second pool configured with the
  * same name - reports through them. They stay published until the last live pool registered under the name closes;
- * closing one of several same-named pools leaves the registration with the survivors.
+ * closing one of several same-named pools leaves the registration with the survivors. A pool that starts under the
+ * name after that last close has decided its release - racing it - adopts the registration still published under the
+ * name, and the pending release notices the takeover and leaves the registration with the new pool.
  * </p>
  * <p>
  * A JMX client's listener subscription belongs to the registration it was added through. JMX cannot carry a
@@ -110,6 +112,15 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
      * the name's release runs through {@link #deregisterJmx()}, so a later failure cycle is reported loudly once again.
      */
     protected static final ConcurrentHashMap<String, ObjectName> registrationFailuresLogged = new ConcurrentHashMap<>();
+
+    /**
+     * The ObjectName this instance published itself under. {@link #registerJmx()} records it on the instance that
+     * took the registry slot, before the publish, and clears it again when the MBeanServer refused the MBean. The
+     * release in {@link #deregisterJmx()} unregisters exactly the name recorded on the registration the registry
+     * held, whatever class and {@code objectName} property the releasing instance carries - a closing pool delivers a
+     * freshly instantiated interceptor whose definitions need not match those of the pool that registered.
+     */
+    protected volatile ObjectName registeredUnder;
 
 
     /**
@@ -252,6 +263,11 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
      * close is the last one is decided atomically by {@link SlowQueryReport#releaseStatistics(ConnectionPool)} on the
      * way through {@code super.poolClosed}, so concurrent closes of same-named pools cannot all see a survivor and
      * leave the name registered for ever.
+     * <p>
+     * The decision and the release are separate steps, and a pool that starts under the name between them has taken
+     * the name - and the registration still published under it - back; {@link #releaseJmxRegistration(ConnectionPool)}
+     * therefore re-verifies the name before anything is taken down.
+     * </p>
      *
      * @param pool the connection pool being closed
      */
@@ -263,9 +279,48 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
             // The statistics of the name were freed by this very close,
             // so no live pool is registered under it any more - and the
             // registered MBean, whose delegate may be an interceptor
-            // instance of an already closed pool, goes with them
-            deregisterJmx();
+            // instance of an already closed pool, goes with them, unless
+            // a pool has taken the name back in the meantime
+            releaseJmxRegistration(pool);
         }
+    }
+
+    /**
+     * Completes the release of the current pool name whose statistics the given pool has just freed: drops the MBean
+     * registration with the name's broadcaster and registration-failure marker through {@link #deregisterJmx()} -
+     * unless a live pool is registered under the name again that does not include the releasing one. A pool that
+     * started under the name after the release was decided has taken the name over, adopting the registration still
+     * published under it, and it - not this close - owns the name's JMX state from then on; the last live pool of the
+     * name is the one to release it.
+     * <p>
+     * The statistics are read the plain way here, without a lock, deliberately: a check computed inside a
+     * {@code ConcurrentHashMap.compute} on the name would be atomic against a start but would also make that start
+     * wait behind the release, and a release must never block a pool that is coming up. Without the lock the check
+     * cannot see a start that begins after it has read - the {@link #deregisterJmx()} that follows then still takes
+     * down only the registration the registry held at its own read, never a fresher one, and only the name's
+     * broadcaster and failure marker can be hit early by a start landing inside that window; see
+     * {@link #deregisterJmx()}. The one case the value guard does not spare is a start whose fresh registration
+     * lands in the slot between the read here and the read in {@link #deregisterJmx()}: that release takes down
+     * the value it read, leaving the newcomer to republish on its next borrow - a window narrower than the one
+     * that existed before this guard, measured in the gap between two map reads. The guard likewise proceeds
+     * when the statistics still hold the very pool that is closing, which only happens when the same pool
+     * instance is restarted while this close is still in flight; the restarted generation then republishes its
+     * registration on its first borrow, like any pool whose registration was released.
+     * </p>
+     *
+     * @param releasedPool the pool whose statistics release decided this release of the name
+     */
+    protected void releaseJmxRegistration(ConnectionPool releasedPool) {
+        PoolStatistics stats = perPoolStats.get(poolName);
+        if (stats != null && !stats.hasLivePool(releasedPool)) {
+            // A pool has started under the name since this close released the
+            // statistics: the name is live again and the new pool owns
+            // everything registered under it now - the MBean it adopted, the
+            // broadcaster its clients' listeners are attached to, and the
+            // bookkeeping. Leave them for the last live pool of the name.
+            return;
+        }
+        deregisterJmx();
     }
 
     /**
@@ -472,22 +527,33 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     }
 
     /**
-     * Releases the MBean registration and the shared broadcaster held for the current pool name unconditionally - even
-     * when the pool name is still owned by live pools. Normal pool shutdown releases through {@code super.poolClosed}
-     * plus {@link #lastPoolOfNameClosed} in {@link #poolClosed(ConnectionPool)}, which keeps the registration for any
-     * surviving same-named pool.
+     * Releases the MBean registration and the shared broadcaster held for the current pool name - even when the pool
+     * name is still owned by live pools. Normal pool shutdown releases through {@code super.poolClosed} plus
+     * {@link #lastPoolOfNameClosed} in {@link #poolClosed(ConnectionPool)}, which keeps the registration for any
+     * surviving same-named pool and skips the release when a new pool has taken the name back
+     * ({@link #releaseJmxRegistration(ConnectionPool)}).
+     * <p>
+     * The registry slot is dropped only while it still holds the registration the registry was read at: a registration
+     * a pool installing itself behind this release puts into the slot belongs to that pool and keeps its MBean
+     * published. The unregistration uses the ObjectName that registration recorded when it was published, so it never
+     * depends on the class or the {@code objectName} property of the instance running this release - which a closing
+     * pool delivers freshly, and which need not share either with the registration it releases.
+     * </p>
      * <p>
      * The broadcaster and the registration-failure marker belong to the name as much as the MBean does, so the release
      * drops them even when this pool never held the registry slot: a pool whose every registration attempt was refused
      * still reported through the broadcaster, and its throttle marker must not outlive the name and hush the first
-     * failure of a later failure cycle under the name.
+     * failure of a later failure cycle under the name. Both entries are created lazily - by {@link #getNotifier()} and
+     * by listeners a client adds through interceptor handles it still holds - so a client subscribing to the released
+     * name concurrently with this release can have its late subscription re-insert an entry nothing registered under
+     * the name uses any more; a fresh registration under the name re-uses or replaces it.
      * </p>
      */
     protected void deregisterJmx() {
         try {
-            if (mbeans.remove(poolName) != null) {
-                ObjectName oname = getObjectName(getClass(), poolName);
-                JmxUtil.unregisterJmx(oname);
+            SlowQueryReportJmxMBean registered = mbeans.get(poolName);
+            if (registered != null && mbeans.remove(poolName, registered)) {
+                JmxUtil.unregisterJmx(registrationObjectName(registered));
             }
             notifiers.remove(poolName);
             registrationFailuresLogged.remove(poolName);
@@ -495,6 +561,38 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
             log.warn("Jmx deregistration failed.", e);
         }
 
+    }
+
+    /**
+     * Returns the ObjectName the given registry registration published itself under, as the registry owner recorded it
+     * when {@link #registerJmx()} took the slot. Unregistering this - rather than a name recomputed from the class and
+     * properties of the instance running the release - is what keeps the unregistration on the name the MBean actually
+     * occupies: two pools configured with one name may carry interceptor definitions that compute different
+     * ObjectNames, and the release run by one of them must not give up on the name the other one's registration was
+     * published under and leave it registered for ever.
+     *
+     * @param registered the registry value this release took out of the registry
+     *
+     * @return the ObjectName to unregister
+     *
+     * @throws MalformedObjectNameException if a fallback ObjectName cannot be formed
+     */
+    protected ObjectName registrationObjectName(SlowQueryReportJmxMBean registered)
+            throws MalformedObjectNameException {
+        if (registered instanceof SlowQueryReportJmx) {
+            SlowQueryReportJmx owner = (SlowQueryReportJmx) registered;
+            ObjectName published = owner.registeredUnder;
+            if (published != null) {
+                return published;
+            }
+            // The owner never got to record its name; fall back to the name
+            // its own registration would be attempted under - the owner's
+            // class and properties, not this releasing instance's
+            return owner.getObjectName(owner.getClass(), poolName);
+        }
+        // A value this class never registered - the protected registry is open
+        // to subclasses; the caller's own name shape is all there is to go by
+        return getObjectName(getClass(), poolName);
     }
 
 
@@ -541,12 +639,18 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
                 ObjectName oname = getObjectName(getClass(), poolName);
                 if (mbeans.putIfAbsent(poolName, this) == null) {
                     try {
+                        // Record the name this instance takes the slot for
+                        // before the publish: a release racing this
+                        // registration unregisters the very name being
+                        // published, not one of its own choosing
+                        registeredUnder = oname;
                         ManagementFactory.getPlatformMBeanServer().registerMBean(this, oname);
                         // A registration under the name works again - drop
                         // the marker so a later failure cycle reports loudly
                         registrationFailuresLogged.remove(poolName);
                     } catch (Exception x) {
                         mbeans.remove(poolName, this);
+                        registeredUnder = null;
                         if (oname.equals(registrationFailuresLogged.putIfAbsent(poolName, oname))) {
                             // The loud report went out with the first
                             // refusal of this name; repeats ride along at
