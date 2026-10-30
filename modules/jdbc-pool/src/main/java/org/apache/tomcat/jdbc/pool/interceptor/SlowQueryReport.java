@@ -478,6 +478,20 @@ public class SlowQueryReport extends AbstractQueryReport {
         }
 
         /**
+         * Returns whether the given pool is one of the live pools registered under this name. The live-pool set is
+         * concurrent, so this plain membership read is safe outside the {@code ConcurrentHashMap.compute} that mutates
+         * it: it tells a caller, without making a concurrent start wait behind a lock, whether the name is still held
+         * live by the given pool.
+         *
+         * @param pool the pool to look for
+         *
+         * @return {@code true} if the pool is registered as live under this name
+         */
+        protected boolean hasLivePool(ConnectionPool pool) {
+            return livePools.contains(pool);
+        }
+
+        /**
          * Returns the statistics map published under this name.
          *
          * @return the shared query statistics map
