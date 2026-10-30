@@ -22,6 +22,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Arrays;
 
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
@@ -120,7 +121,11 @@ public abstract class AbstractCreateStatementInterceptor extends JdbcInterceptor
             EXECUTE_LARGE_UPDATE, EXECUTE_LARGE_BATCH };
 
     /**
-     * the constructors that are used to create statement proxies
+     * the constructors that are used to create statement proxies. The cache is
+     * shared by all subclasses loaded through the same class loader, so every
+     * use of an index must pass an interface that the cached proxy implements,
+     * in practice always the same one; {@link #getConstructor(int, Class)}
+     * enforces this.
      */
     protected static final Constructor<?>[] constructors = new Constructor[STATEMENT_TYPE_COUNT + 1];
 
@@ -159,11 +164,18 @@ public abstract class AbstractCreateStatementInterceptor extends JdbcInterceptor
      * @return - returns a constructor used to create new instances
      *
      * @throws NoSuchMethodException Constructor not found
+     * @throws IllegalStateException The index is already cached for a proxy class that does not implement
+     *                                   {@code clazz}. Every use of an index in this shared cache must pass
+     *                                   an interface that the cached proxy implements.
      */
     /*
-     * Neither the class nor the constructor are exposed outside of jdbc-pool. Given the comments in the jdbc-pool code
-     * regarding caching for performance, continue to use Proxy.getProxyClass(). This will need to be revisited if that
-     * method is marked for removal.
+     * The cache, this method and the class itself are all reachable from subclasses, in-tree or third party. The
+     * cache is shared by every subclass loaded through the same class loader, so each index must always be
+     * paired with an interface that the cached proxy implements, in practice always the same one; a cache hit
+     * whose cached proxy does not implement the requested interface is rejected below rather than silently
+     * returning a proxy that does not implement what the caller asked for. Given the comments in the jdbc-pool
+     * code regarding caching for performance, continue to use Proxy.getProxyClass(). This will need to be
+     * revisited if that method is marked for removal.
      */
     @SuppressWarnings("deprecation")
     protected Constructor<?> getConstructor(int idx, Class<?> clazz) throws NoSuchMethodException {
@@ -171,6 +183,11 @@ public abstract class AbstractCreateStatementInterceptor extends JdbcInterceptor
             Class<?> proxyClass = Proxy.getProxyClass(AbstractCreateStatementInterceptor.class.getClassLoader(),
                     new Class[] { clazz });
             constructors[idx] = proxyClass.getConstructor(new Class[] { InvocationHandler.class });
+        } else if (!clazz.isAssignableFrom(constructors[idx].getDeclaringClass())) {
+            throw new IllegalStateException("Constructor cache index " + idx + " is already populated for "
+                    + Arrays.toString(constructors[idx].getDeclaringClass().getInterfaces()) + ", but "
+                    + clazz.getName() + " was requested. Every use of an index must pass an interface the cached"
+                    + " proxy implements.");
         }
         return constructors[idx];
     }
