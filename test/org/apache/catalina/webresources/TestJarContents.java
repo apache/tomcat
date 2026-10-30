@@ -65,42 +65,40 @@ public class TestJarContents {
 
     @Test
     public void testMightContainResource() {
-        Assert.assertTrue(testJarContentsObject.mightContainResource(
-                "/d1/d1-f1.txt", jar.getAbsolutePath()));
+        Assert.assertTrue(testJarContentsObject.mightContainResource("/d1/d1-f1.txt"));
 
         Assert.assertTrue(testJarContentsObject.mightContainResource(
-                "d1/d1-f1.txt", jar.getAbsolutePath()));
+                "d1/d1-f1.txt"));
 
         Assert.assertTrue(testJarContentsObject.mightContainResource(
-                "f9.txt", jar.getAbsolutePath()));
+                "f9.txt"));
 
         Assert.assertFalse(testJarContentsObject.mightContainResource(
-                "/d7/d1-f1.txt", jar.getAbsolutePath()));
+                "/d7/d1-f1.txt"));
 
         // A path that only contains slashes (once the webapp root and any
         // leading slashes have been removed) refers to the root of the
         // archive. That cannot be ruled out, so the method must return
         // true.
         Assert.assertTrue(testJarContentsObject.mightContainResource(
-                "/", jar.getAbsolutePath()));
+                "/"));
 
         Assert.assertTrue(testJarContentsObject.mightContainResource(
-                "/////", jar.getAbsolutePath()));
+                "/////"));
 
-        Assert.assertTrue(testJarContentsObject.mightContainResource(
-                jar.getAbsolutePath(), jar.getAbsolutePath()));
+        Assert.assertTrue(testJarContentsObject.mightContainResource(""));
     }
 
     @Test
     public void testEmptyPath() {
         // Must not throw and must return true since nothing can be ruled
         // out.
-        Assert.assertTrue(testJarContentsObject.mightContainResource("", jar.getAbsolutePath()));
+        Assert.assertTrue(testJarContentsObject.mightContainResource(""));
     }
 
     @Test(expected = NullPointerException.class)
     public void testNullPointerExceptions() {
-        testJarContentsObject.mightContainResource(null, jar.getAbsolutePath());
+        testJarContentsObject.mightContainResource(null);
     }
 
     @Test
@@ -147,20 +145,20 @@ public class TestJarContents {
         try (JarFile jarFile = new JarFile(f)) {
             JarContents jarContents = new JarContents(jarFile);
 
-            Assert.assertTrue(jarContents.mightContainResource("real.txt", ""));
+            Assert.assertTrue(jarContents.mightContainResource("real.txt"));
             Assert.assertTrue(
-                    jarContents.mightContainResource("META-INF/versions/9x/foo.txt", ""));
+                    jarContents.mightContainResource("META-INF/versions/9x/foo.txt"));
             Assert.assertTrue(
-                    jarContents.mightContainResource("META-INF/versions//bar.txt", ""));
+                    jarContents.mightContainResource("META-INF/versions//bar.txt"));
             Assert.assertTrue(jarContents.mightContainResource(
-                    "META-INF/versions/99999999999999/ovf.txt", ""));
+                    "META-INF/versions/99999999999999/ovf.txt"));
             // A leading slash is not significant
             Assert.assertTrue(
-                    jarContents.mightContainResource("/META-INF/versions/9x/lead.txt", ""));
+                    jarContents.mightContainResource("/META-INF/versions/9x/lead.txt"));
             // Signed and valid version segments record the base name
-            Assert.assertTrue(jarContents.mightContainResource("plus.txt", ""));
-            Assert.assertTrue(jarContents.mightContainResource("minus.txt", ""));
-            Assert.assertTrue(jarContents.mightContainResource("ok.txt", ""));
+            Assert.assertTrue(jarContents.mightContainResource("plus.txt"));
+            Assert.assertTrue(jarContents.mightContainResource("minus.txt"));
+            Assert.assertTrue(jarContents.mightContainResource("ok.txt"));
         }
     }
 }

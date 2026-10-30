@@ -280,7 +280,7 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
                 if (!path.endsWith("/")) {
                     path = path + "/";
                 }
-                return new JarResourceRoot(root, new File(getBase()), baseUrlString, path);
+                return new JarResourceRoot(root, new File(getBase()), baseUrlString, path, getInternalPath());
             }
 
             String pathInJar = getInternalPath() + pathSuffix;
@@ -296,7 +296,7 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
              * embedded in it) would result in false negatives.
              */
             JarContents contents = jarContents;
-            if (contents != null && !contents.mightContainResource(pathInJar, "")) {
+            if (contents != null && !contents.mightContainResource(pathInJar)) {
                 return new EmptyResource(root, path);
             }
 

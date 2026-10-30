@@ -122,9 +122,9 @@ public class TestJarWarResourceSet extends TomcatBaseTest {
         // The bloom filter is built from the resulting index
         JarContents jarContents = resourceSet.jarContents;
         Assert.assertNotNull(jarContents);
-        Assert.assertTrue(jarContents.mightContainResource("META-INF/versions/9x/foo.txt", ""));
-        Assert.assertTrue(jarContents.mightContainResource("ok.txt", ""));
-        Assert.assertTrue(jarContents.mightContainResource("real.txt", ""));
+        Assert.assertTrue(jarContents.mightContainResource("META-INF/versions/9x/foo.txt"));
+        Assert.assertTrue(jarContents.mightContainResource("ok.txt"));
+        Assert.assertTrue(jarContents.mightContainResource("real.txt"));
 
         // The index and the bloom filter have to agree on the name an entry is
         // stored under, otherwise these lookups would be rejected by the filter
