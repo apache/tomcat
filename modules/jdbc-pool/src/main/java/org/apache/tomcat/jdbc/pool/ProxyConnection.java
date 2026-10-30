@@ -111,6 +111,13 @@ public class ProxyConnection extends JdbcInterceptor {
      * @return true if this interceptor wraps the given interface
      */
     public boolean isWrapperFor(Class<?> iface) {
+        if (iface == PooledConnection.class) {
+            // The Wrapper answer must agree with what unwrap() hands out:
+            // for this class unwrap() returns the pooled connection this
+            // interceptor sits on, so the honest answer is whether one is
+            // still held. That object is pool-internal - see unwrap().
+            return connection != null;
+        }
         if (iface == XAConnection.class && connection.getXAConnection() != null) {
             return true;
         }
@@ -147,12 +154,25 @@ public class ProxyConnection extends JdbcInterceptor {
      *
      * @param iface the interface to unwrap to
      *
-     * @return the unwrapped connection
+     * @return the unwrapped connection. For {@link PooledConnection} this is
+     *         the pool's own pooled connection - a pool-internal object meant
+     *         for trusted callers such as interceptors, not for application
+     *         code, as it can close and discard the connection behind the
+     *         pool's own accounting.
      *
      * @throws SQLException if the connection does not wrap the given interface
      */
     public Object unwrap(Class<?> iface) throws SQLException {
         if (iface == PooledConnection.class) {
+            if (connection == null) {
+                // The same not-a-wrapper failure the XA branch below gives
+                // for a missing XA connection: with none held there is
+                // nothing to hand out, and the silent null would contradict
+                // what isWrapperFor() says and turn into an unrelated
+                // NullPointerException at the caller's first use of the
+                // "unwrapped" value.
+                throw new SQLException("Not a wrapper of " + iface.getName());
+            }
             return connection;
         } else if (iface == XAConnection.class) {
             javax.sql.XAConnection xa = connection.getXAConnection();
