@@ -36,6 +36,28 @@ import javax.sql.XAConnection;
  * </ul>
  * By default method comparisons is done on a String reference level, unless the
  * {@link PoolConfiguration#setUseEquals(boolean)} has been called with a <code>true</code> argument.
+ * <p>
+ * The connection handle the pool hands out implements {@link javax.sql.PooledConnection} (and
+ * {@link javax.sql.XAConnection} when the pool is backed by an {@link javax.sql.XADataSource}). The pool keeps no
+ * connection or statement event listeners of its own, so the four listener methods of
+ * {@code javax.sql.PooledConnection} - {@code addConnectionEventListener}, {@code removeConnectionEventListener},
+ * {@code addStatementEventListener} and {@code removeStatementEventListener} - are answered by the XA-family
+ * dispatch in {@link #invoke(Object, Method, Object[])}: where the handle is itself an {@code XAConnection} they
+ * reach the XA connection the driver created, whose implementation decides what registering them means; where it
+ * is not, the call has no dispatch target and each of the four fails with an {@link SQLException} naming the
+ * method. The refusal also stands on a pool backed by a {@link javax.sql.ConnectionPoolDataSource}: the pool does
+ * hold the driver's own pooled connection there, but it holds it for its own session management and does not
+ * route these calls to it. A handle whose session the pool discarded while it was still borrowed, or which its
+ * borrower has already closed, answers instead with the closed-connection failure the handle gives in those
+ * states. Either failure reaches a caller of the interface - the interface declares no checked exception - as an
+ * {@link java.lang.reflect.UndeclaredThrowableException} carrying it. That refusal is deliberate rather than
+ * unfinished work. The specification has the connection pool manager register through these methods, to be told
+ * to deactivate the logical handle and reuse or retire the physical session - decisions this pool makes and
+ * carries out itself: {@code close()} on the handle recycles a session that stays open and owned by the pool, and
+ * the next borrower is handed a new handle, so this handle is not the long-lived producer object whose listener
+ * list the specification describes; and where the pool does not observe statements - as it does not by default -
+ * a {@code statementClosed} event has no point from which it could be delivered. Accepting a registration it
+ * could not notify faithfully would only hide from the caller that no notification will ever arrive.
  */
 public class ProxyConnection extends JdbcInterceptor {
 
