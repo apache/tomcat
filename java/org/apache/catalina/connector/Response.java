@@ -271,7 +271,7 @@ public class Response implements HttpServletResponse {
      */
     public boolean isAppCommitted() {
         return this.appCommitted || isCommitted() || isSuspended() ||
-                ((getContentLength() > 0) && (getContentWritten() >= getContentLength()));
+                ((getContentLengthLong() > 0) && (getContentWritten() >= getContentLengthLong()));
     }
 
 
@@ -434,6 +434,16 @@ public class Response implements HttpServletResponse {
      */
     public int getContentLength() {
         return getCoyoteResponse().getContentLength();
+    }
+
+
+    /**
+     * Get the content length that was set or calculated for this response as a long.
+     *
+     * @return the content length that was set or calculated for this response
+     */
+    public long getContentLengthLong() {
+        return getCoyoteResponse().getContentLengthLong();
     }
 
 
