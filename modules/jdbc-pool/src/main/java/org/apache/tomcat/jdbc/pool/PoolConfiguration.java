@@ -663,6 +663,13 @@ public interface PoolConfiguration {
      * A custom query to be run when a connection is first created. The default value is null. This query only runs once
      * per connection, and that is when a new connection is established to the database. If this value is non null, it
      * will replace the validation query during connection creation.
+     * <p>
+     * The query runs while the pool is initializing the freshly established session, and the pool terminates the
+     * transaction it executes into by commit, so its effects - a data change or a session setting - persist for the
+     * lifetime of the connection even when the pool runs with auto commit off. A validation query follows the opposite
+     * rule and terminates an open transaction by rollback, so a health check never commits application work. A pool
+     * configured with a custom {@link Validator} does not run this query at all: the validator replaces the
+     * validation itself.
      *
      * @return the init SQL used to run against the DB or null if not set
      */
@@ -672,6 +679,13 @@ public interface PoolConfiguration {
      * A custom query to be run when a connection is first created. The default value is null. This query only runs once
      * per connection, and that is when a new connection is established to the database. If this value is non null, it
      * will replace the validation query during connection creation.
+     * <p>
+     * The query runs while the pool is initializing the freshly established session, and the pool terminates the
+     * transaction it executes into by commit, so its effects - a data change or a session setting - persist for the
+     * lifetime of the connection even when the pool runs with auto commit off. A validation query follows the opposite
+     * rule and terminates an open transaction by rollback, so a health check never commits application work. A pool
+     * configured with a custom {@link Validator} does not run this query at all: the validator replaces the
+     * validation itself.
      *
      * @param initSQL the init SQL used to run against the DB or null if no query should be executed
      */

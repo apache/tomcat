@@ -1133,6 +1133,18 @@
         connection is discarded. Restoring the transaction isolation level
         retains the previously logged-and-ignored behavior. (remm)
       </fix>
+      <fix>
+        <bug>56586</bug>: An <code>initSQL</code> statement run by the JDBC
+        pool while a connection is established is now committed when the pool
+        runs with auto commit off, so the initialization it performs - a data
+        change or a session setting - persists for the lifetime of the
+        connection. It previously ran inside a transaction that the
+        connect-time validation then rolled back again, so the effects were
+        discarded before the first borrower ever used the connection.
+        Validation queries and the <code>isValid()</code> check keep the
+        opposite rule and still terminate an open transaction with a rollback,
+        so a health check continues to never commit application work. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

@@ -50,11 +50,14 @@ import org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;
  * inherits its job under any name. An interceptor merely named after the
  * state interceptor does not.
  *
- * <p>When {@code connect()} applies {@code defaultAutoCommit=false} itself,
- * the freshly executed {@code initSQL} then sits in a transaction the init-time
- * validation rolls back, so the interceptor's name spelling silently decides
- * whether the init SQL persists for the connection's lifetime: the last test
- * pins that both spellings let it survive.</p>
+ * <p>The last test also pins that the {@code initSQL} persists for the
+ * connection's lifetime whichever spelling configures the interceptor. That
+ * persistence is an end-to-end invariant rather than a discriminator for the
+ * redundancy itself: when {@code connect()} applies
+ * {@code defaultAutoCommit=false} the freshly executed {@code initSQL} sits
+ * in a transaction that the init-time validation terminates by commit, so it
+ * survives even a redundant application. The driver call counts are what pin
+ * the redundancy away.</p>
  *
  * <p>Driver-level call counts are the measurement: the wrapping driver below
  * sees the direct applications from {@code connect()} (during
@@ -227,9 +230,12 @@ class TestDefaultStateAtConnect extends JdbcPoolBaseTest {
                 Assertions.assertFalse(borrower.getAutoCommit(),
                         "the first borrower must see the configured auto commit");
             }
-            // If connect() had applied autoCommit=false itself, the init-time
-            // validation would have found the init SQL in an open transaction
-            // and rolled it back.
+            // The end-to-end invariant: both name forms must hand the first
+            // borrower a session whose init SQL has persisted. A redundant
+            // application by connect() would not break this - the init-time
+            // validation now terminates an open transaction by commit - so
+            // the call counters, not this oracle, are what pin the
+            // redundancy away.
             Assertions.assertEquals(1, adminRowCount(table),
                     "the init SQL of a pool configured as '" + interceptorConfig
                             + "' must persist for the connection's lifetime");
