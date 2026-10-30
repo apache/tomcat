@@ -148,9 +148,20 @@ public class SlowQueryReport extends AbstractQueryReport {
             QueryStats qs = this.getQueryStats(sql);
             if (qs != null) {
                 qs.add(delta, start);
-                if (isLogSlow() && log.isWarnEnabled()) {
-                    log.warn("Slow Query Report SQL=" + sql + "; time=" + delta + " ms;");
-                }
+            }
+            // The WARN reports the event, not the statistics booking: it must
+            // go out whenever the query is reported as slow, whether or not
+            // this instance can resolve a statistics entry for it. Otherwise
+            // the log channel falls silent exactly on the windows where
+            // getQueryStats legitimately hands back no entry - this instance's
+            // statistics reference released by a chain release, or the entry
+            // lost to the post-putIfAbsent get race against capacity eviction -
+            // while SlowQueryReportJmx keeps sending the JMX notification
+            // behind isLogSlow() alone, and the two channels disagree on the
+            // same event. This mirrors how reportFailedQuery logs outside its
+            // own statistics guard.
+            if (isLogSlow() && log.isWarnEnabled()) {
+                log.warn("Slow Query Report SQL=" + sql + "; time=" + delta + " ms;");
             }
         }
         return sql;
