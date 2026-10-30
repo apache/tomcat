@@ -1158,6 +1158,24 @@
         opposite rule and still terminate an open transaction with a rollback,
         so a health check continues to never commit application work. (remm)
       </fix>
+      <fix>
+        <bug>65929</bug>: Calling <code>abort()</code> on a pooled connection
+        bypassed the pool. The call reached the physical connection while the
+        borrow stayed open: the session remained counted in the busy pool
+        against <code>maxActive</code>, and the handle kept reporting itself
+        open although the specification says a connection is closed once
+        <code>abort()</code> returns, so an application that trusts that and
+        does not call <code>close()</code> afterwards permanently consumed one
+        connection slot per call until the pool reported exhaustion. The pool
+        now intercepts <code>abort()</code>: the call is delegated to the
+        driver, the session is then taken out of service whatever the driver
+        made of it - no borrower may receive a session an abort was attempted
+        on - the slot is freed, and the handle is closed, reporting
+        <code>isClosed()</code> true, <code>isValid()</code> false and an
+        <code>SQLException</code> for any further use. On a handle already
+        closed, <code>abort()</code> is the no-op the specification
+        prescribes. Based on code submitted by Arturo Bernal. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

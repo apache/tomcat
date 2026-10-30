@@ -1035,7 +1035,8 @@ public class PooledConnection implements PooledConnectionMBean {
 
     /**
      * An interceptor can call this method with the value true, and the connection will be closed when it is returned to
-     * the pool.
+     * the pool. An {@link java.sql.Connection#abort(java.util.concurrent.Executor) abort()} on a handle to this
+     * connection completes the discard immediately rather than waiting for the return.
      *
      * @param discarded - only valid value is true
      *
