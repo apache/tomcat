@@ -34,7 +34,7 @@ import java.util.zip.ZipEntry;
 
 import org.apache.tomcat.Jar;
 import org.apache.tomcat.util.compat.JreCompat;
-import org.apache.tomcat.util.scan.MultiReleaseUtil.MultiVersionInfo;
+import org.apache.tomcat.util.scan.MultiReleaseUtil.MultiReleaseInfo;
 
 /**
  * Implementation of {@link Jar} that is optimised for file based JAR URLs that refer directly to a JAR file (e.g. URLs
@@ -178,7 +178,7 @@ public class JarFileUrlJar implements Jar {
                 if (entries.hasMoreElements()) {
                     entry = entries.nextElement();
                     name = entry.getName();
-                    MultiVersionInfo multiVersionInfo = MultiReleaseUtil.parseVersion(name);
+                    MultiReleaseInfo multiVersionInfo = MultiReleaseUtil.parseVersion(name);
                     // Get 'base' name
                     if (multiVersionInfo != null && multiVersionInfo.isValid()) {
                         name = name.substring(multiVersionInfo.namePos);
@@ -271,7 +271,7 @@ public class JarFileUrlJar implements Jar {
         while (jarEntries.hasMoreElements()) {
             JarEntry jarEntry = jarEntries.nextElement();
             String name = jarEntry.getName();
-            MultiVersionInfo multiVersionInfo = MultiReleaseUtil.parseVersion(name);
+            MultiReleaseInfo multiVersionInfo = MultiReleaseUtil.parseVersion(name);
             if (multiVersionInfo != null && multiVersionInfo.isValid()) {
                 String baseName = name.substring(multiVersionInfo.namePos);
 
