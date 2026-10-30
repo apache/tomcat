@@ -600,9 +600,42 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
         private final String stmtType;
         private final Object[] args;
 
+        /*
+         * The key must be an immutable snapshot of the call it was made for.
+         * It is built from the live argument array of the prepare call - the
+         * outer Object[] allocated by the connection proxy for that call,
+         * whose int[]/String[] elements (prepareStatement(String, int[]) and
+         * prepareStatement(String, String[])) are the application's own
+         * arrays - and the key built at creation time is the one that parks
+         * the statement, living as long as the physical session. Storing
+         * those arrays by reference would let a caller that reuses and
+         * mutates one of them after the prepare move the parked entry's hash
+         * bucket under the map, since hashCode() below re-computes
+         * Arrays.deepHashCode over the live data: the entry becomes
+         * unreachable to lookups while its statement stays open on the
+         * session and its slot stays counted, each further drifted key
+         * parking another such entry until the cache is full. So snapshot
+         * everything the hash and the comparison descend into: the outer
+         * array - per-call on the proxy path, but caller-owned through the
+         * createCacheKey entry point - and every array element, one level
+         * deep, which is as far as deepHashCode/deepEquals reach for the
+         * arrays the prepare methods can carry, whose own elements are
+         * immutable Strings or primitives. A null element is no array,
+         * instanceof answers false for it, and it is stored and hashed as
+         * it stands.
+         */
         private CacheKey(String type, Object[] methodArgs) {
             stmtType = type;
-            args = methodArgs;
+            args = new Object[methodArgs.length];
+            for (int i = 0; i < methodArgs.length; i++) {
+                Object arg = methodArgs[i];
+                if (arg instanceof int[]) {
+                    arg = ((int[]) arg).clone();
+                } else if (arg instanceof Object[]) {
+                    arg = ((Object[]) arg).clone();
+                }
+                args[i] = arg;
+            }
         }
 
         @Override
