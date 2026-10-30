@@ -23,6 +23,9 @@ import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -38,8 +41,8 @@ import org.junit.jupiter.api.Test;
  * surfaced later, as a {@code ClassCastException} against the application
  * or as a silently degraded, unproxied statement.
  *
- * <p>The tests below only ever populate an index with the interface every
- * in-tree call site pairs with it, and they leave the cache in that state,
+ * <p>The class initializer populates the cache with the canonical pairings;
+ * the tests below only ever use those pairings and never replace an entry,
  * so running them in the same JVM as the rest of the suite - and in any
  * method order - is safe.</p>
  */
@@ -122,5 +125,98 @@ class TestAbstractCreateStatementInterceptor {
         // must be accepted.
         Assertions.assertSame(cached, interceptor.getConstructor(idx, Statement.class));
         Assertions.assertTrue(newProxy(interceptor, idx, Statement.class) instanceof Statement);
+    }
+
+    /*
+     * Regression for the unsynchronized check-then-act on the cache: threads
+     * first hitting the same index used to race, each computing its own
+     * constructor and handing out a different (though equivalent) object,
+     * with no guarantee a reader ever saw a prior write. The canonical
+     * entries are now published once by the class initializer, which the JVM
+     * runs once and whose writes it makes visible to every thread, so every
+     * concurrent caller of one index must receive the very same constructor
+     * object.
+     *
+     * The assertion holds in any method order - a test that ran earlier can
+     * only have read these same published entries - and it asserts the
+     * outcome the published cache guarantees, never a timing-dependent count
+     * of computations, so it is deterministic.
+     */
+    @Test
+    void concurrentCallersOfOneIndexAllReceiveTheIdenticalConstructor() throws Exception {
+        int rounds = 32;
+        int threadsPerRound = 8;
+        Class<?>[] canonical = { Statement.class, PreparedStatement.class, CallableStatement.class, ResultSet.class };
+
+        for (int round = 0; round < rounds; round++) {
+            final int idx = round % canonical.length;
+            final Class<?> iface = canonical[idx];
+
+            final CountDownLatch start = new CountDownLatch(1);
+            final CountDownLatch done = new CountDownLatch(threadsPerRound);
+            final Constructor<?>[] results = new Constructor<?>[threadsPerRound];
+            final AtomicReference<Throwable> failure = new AtomicReference<>();
+
+            try {
+                for (int t = 0; t < threadsPerRound; t++) {
+                    final int slot = t;
+                    Thread thread = new Thread(() -> {
+                        try {
+                            start.await();
+                            // Distinct interceptor instances: the cache is
+                            // shared through the class loader, not the
+                            // instance.
+                            results[slot] = new CacheUser().getConstructor(idx, iface);
+                        } catch (Throwable x) {
+                            failure.compareAndSet(null, x);
+                        } finally {
+                            done.countDown();
+                        }
+                    });
+                    thread.start();
+                }
+            } finally {
+                // Release the threads even if a later start() failed, so a
+                // failure cannot leak threads parked on the start latch.
+                start.countDown();
+            }
+            Assertions.assertTrue(done.await(30, TimeUnit.SECONDS), "racing callers did not finish");
+
+            Assertions.assertNull(failure.get(), "racing callers must not fail: " + failure.get());
+            for (int t = 0; t < threadsPerRound; t++) {
+                Assertions.assertSame(results[0], results[t],
+                        "every concurrent caller of index " + idx + " must receive the same constructor");
+            }
+            Object proxy = results[0].newInstance(new Object[] { (InvocationHandler) (p, m, a) -> null });
+            Assertions.assertTrue(iface.isInstance(proxy),
+                    "the shared constructor must produce a proxy implementing " + iface.getName());
+        }
+    }
+
+    /*
+     * The canonical entries exist before any call to getConstructor: reading
+     * the cache directly, without going through the method, observes what
+     * class initialization published. The assertions are stable in any
+     * method order - no test can replace a published entry, since every
+     * getConstructor call uses the canonical pairing, which only ever reads
+     * a populated slot - but the test can only distinguish eager from lazy
+     * population when it reads the slots before anything in this JVM has
+     * called getConstructor; a cache warmed by an earlier test satisfies
+     * the same assertions either way.
+     */
+    @Test
+    void theCanonicalEntriesArePublishedByClassInitialization() throws Exception {
+        Class<?>[] canonical = { Statement.class, PreparedStatement.class, CallableStatement.class, ResultSet.class };
+        InvocationHandler handler = (proxy, method, args) -> null;
+
+        for (int idx = 0; idx < canonical.length; idx++) {
+            Constructor<?> published = AbstractCreateStatementInterceptor.constructors[idx];
+            Assertions.assertNotNull(published,
+                    "index " + idx + " must hold an entry once the class is initialized");
+            Assertions.assertSame(published, new CacheUser().getConstructor(idx, canonical[idx]),
+                    "getConstructor must hand out the entry published for index " + idx);
+            Assertions.assertTrue(canonical[idx].isInstance(published.newInstance(new Object[] { handler })),
+                    "the published constructor must produce a proxy implementing " + canonical[idx].getName());
+        }
     }
 }

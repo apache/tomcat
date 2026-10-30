@@ -20,10 +20,14 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Arrays;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
@@ -34,6 +38,8 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
  * {@link #createStatement(Object, Method, Object[], Object, long)} method.
  */
 public abstract class AbstractCreateStatementInterceptor extends JdbcInterceptor {
+    private static final Log log = LogFactory.getLog(AbstractCreateStatementInterceptor.class);
+
     /**
      * {@link java.sql.Connection#createStatement()}
      */
@@ -125,9 +131,49 @@ public abstract class AbstractCreateStatementInterceptor extends JdbcInterceptor
      * shared by all subclasses loaded through the same class loader, so every
      * use of an index must pass an interface that the cached proxy implements,
      * in practice always the same one; {@link #getConstructor(int, Class)}
-     * enforces this.
+     * enforces this. The canonical entries are populated by this class's
+     * initializer, which the JVM runs once and whose writes it publishes to
+     * every thread that uses the class, so reading a slot through
+     * {@link #getConstructor(int, Class)} needs no locking; writing an element
+     * directly from a subclass bypasses that guarantee and is the subclass's
+     * own responsibility.
      */
     protected static final Constructor<?>[] constructors = new Constructor[STATEMENT_TYPE_COUNT + 1];
+
+    static {
+        // Class initialization (JLS 12.4.2) runs once per class loader and its
+        // writes are visible to every thread once it completes, so populating
+        // the canonical slots here makes them safely published without any
+        // monitor on the hot statement path.
+        populateConstructor(CREATE_STATEMENT_IDX, Statement.class);
+        populateConstructor(PREPARE_STATEMENT_IDX, PreparedStatement.class);
+        populateConstructor(PREPARE_CALL_IDX, CallableStatement.class);
+        populateConstructor(RESULTSET_IDX, ResultSet.class);
+    }
+
+    /**
+     * Computes the proxy constructor for one index of {@link #constructors}
+     * and stores it in the cache. On failure the slot is left empty and only
+     * logged; {@link #getConstructor(int, Class)} then computes the entry on
+     * demand, so a failure here degrades to the pre-existing behavior rather
+     * than failing class initialization.
+     *
+     * @param idx   - the index of the constructor
+     * @param clazz - the interface that the proxy will implement
+     */
+    @SuppressWarnings("deprecation")
+    private static void populateConstructor(int idx, Class<?> clazz) {
+        try {
+            Class<?> proxyClass = Proxy.getProxyClass(AbstractCreateStatementInterceptor.class.getClassLoader(),
+                    new Class[] { clazz });
+            constructors[idx] = proxyClass.getConstructor(new Class[] { InvocationHandler.class });
+        } catch (ReflectiveOperationException | IllegalArgumentException | LinkageError e) {
+            // An exception escaping the class initializer would surface as an
+            // ExceptionInInitializerError at every use of every subclass.
+            log.warn("Unable to create the constructor cache entry for index " + idx + " (" + clazz.getName()
+                    + ").", e);
+        }
+    }
 
     /**
      * Default constructor
@@ -156,7 +202,11 @@ public abstract class AbstractCreateStatementInterceptor extends JdbcInterceptor
     }
 
     /**
-     * Creates a constructor for a proxy class, if one doesn't already exist
+     * Creates a constructor for a proxy class, if one doesn't already exist.
+     * The canonical entries are published by this class's initializer, so on
+     * the normal path the method only reads a safely published slot and is
+     * safe for concurrent use; {@code newInstance} on the returned
+     * constructor runs as it always has, outside this method.
      *
      * @param idx   - the index of the constructor
      * @param clazz - the interface that the proxy will implement
@@ -180,6 +230,9 @@ public abstract class AbstractCreateStatementInterceptor extends JdbcInterceptor
     @SuppressWarnings("deprecation")
     protected Constructor<?> getConstructor(int idx, Class<?> clazz) throws NoSuchMethodException {
         if (constructors[idx] == null) {
+            // Only reachable if the class initializer failed to populate this
+            // slot, or a subclass nulled the element directly; compute on
+            // demand, as before the cache was populated eagerly.
             Class<?> proxyClass = Proxy.getProxyClass(AbstractCreateStatementInterceptor.class.getClassLoader(),
                     new Class[] { clazz });
             constructors[idx] = proxyClass.getConstructor(new Class[] { InvocationHandler.class });
