@@ -202,7 +202,7 @@ class Http2Parser {
         } else {
             synchronized (dest) {
                 if (dest.remaining() < dataLength) {
-                    // Client has sent more data than permitted by Window size
+                    // Client has sent more data than permitted by the stream flow-control window.
                     swallowPayload(streamId, FrameType.DATA.getId(), dataLength, false, buffer);
                     if (Flags.hasPadding(flags)) {
                         swallowPayload(streamId, FrameType.DATA.getId(), padLength, true, buffer);
