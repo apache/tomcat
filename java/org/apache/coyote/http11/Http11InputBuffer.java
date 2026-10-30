@@ -401,6 +401,12 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                 int pos = byteBuffer.position();
                 chr = byteBuffer.get();
                 if (chr == Constants.SP || chr == Constants.HT) {
+                    if (pos == parsingRequestLineStart) {
+                        // No method
+                        // Avoid unknown protocol triggering an additional error
+                        request.protocol().setString(Constants.HTTP_11);
+                        throw new IllegalArgumentException(sm.getString("iib.invalidmethod", ""));
+                    }
                     space = true;
                     request.setMethod(byteBuffer.array(), parsingRequestLineStart, pos - parsingRequestLineStart);
                 } else if (!HttpParser.isToken(chr)) {
