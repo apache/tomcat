@@ -100,13 +100,15 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      * @param args  the arguments to the execution
      * @param name  the name of the method used to execute
      *                  {@link AbstractCreateStatementInterceptor#isExecute(Method, boolean)}
-     * @param start the time the query execution started
+     * @param start the wall clock time the query execution started
+     * @param delta the time the execution took before it failed, measured with the monotonic clock
      * @param t     the exception that happened
      *
      * @return - the SQL that was executed or the string &quot;batch&quot; if it was a batch execution, or {@code null}
      *             if the invocation carries no SQL string
      */
-    protected String reportFailedQuery(String query, Object[] args, final String name, long start, Throwable t) {
+    protected String reportFailedQuery(String query, Object[] args, final String name, long start, long delta,
+            Throwable t) {
         return extractQuery(query, args, name);
     }
 
@@ -119,8 +121,8 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      * @param args  the arguments to the execution
      * @param name  the name of the method used to execute
      *                  {@link AbstractCreateStatementInterceptor#isExecute(Method, boolean)}
-     * @param start the time the query execution started
-     * @param delta the time the execution took
+     * @param start the wall clock time the query execution started
+     * @param delta the time the execution took, measured with the monotonic clock
      *
      * @return - the SQL that was executed or the string &quot;batch&quot; if it was a batch execution, or {@code null}
      *             if the invocation carries no SQL string
@@ -138,8 +140,8 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      * @param args  the arguments to the execution
      * @param name  the name of the method used to execute
      *                  {@link AbstractCreateStatementInterceptor#isExecute(Method, boolean)}
-     * @param start the time the query execution started
-     * @param delta the time the execution took
+     * @param start the wall clock time the query execution started
+     * @param delta the time the execution took, measured with the monotonic clock
      *
      * @return - the SQL that was executed or the string &quot;batch&quot; if it was a batch execution, or {@code null}
      *             if the invocation carries no SQL string
@@ -216,6 +218,23 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
         return statement;
     }
 
+
+    /**
+     * Measures the milliseconds elapsed since the {@link System#nanoTime()}
+     * reading taken at {@code startNanos}, rounded to the nearest millisecond.
+     * <p>
+     * An interval is measured with the monotonic clock. The wall clock is not monotonic, so an NTP correction, a manual
+     * set, or resuming a suspended VM between two of its readings makes their difference negative, and a negative
+     * duration is never over the slow query threshold while the statistics book it as if it were real.
+     * </p>
+     *
+     * @param startNanos the {@link System#nanoTime()} reading the measurement began with
+     *
+     * @return the elapsed time in milliseconds
+     */
+    private static long elapsedMillis(long startNanos) {
+        return (System.nanoTime() - startNanos + 500000) / 1000000;
+    }
 
     /**
      * Class to measure query execute time
@@ -304,10 +323,11 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
             process = isExecute(method, process);
             // If we are executing, get the current time. The wall clock
             // only gives the timestamp the report hooks carry; the elapsed
-            // time is measured with the monotonic clock below, since a clock
-            // step between two wall clock reads could make a negative
-            // duration, which loses the slow query report and corrupts the
-            // statistics booked from it
+            // time is measured with the monotonic clock on both the success
+            // and the failure path below, since a clock step between two
+            // wall clock reads could make a negative duration, which loses
+            // the slow query report and corrupts the statistics booked from
+            // it either way
             long start = (process) ? System.currentTimeMillis() : 0;
             long startNanos = (process) ? System.nanoTime() : 0;
             Object result = null;
@@ -323,8 +343,17 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
                 // reporting it would replace the exception that the
                 // application is expecting with a reporting failure
                 if (process) {
+                    // The elapsed time of a failed execution is measured
+                    // here, on the same monotonic clock the success path
+                    // uses below, and handed to the hook along with the
+                    // wall clock start. A hook that recomputed it from that
+                    // start would read a step of the wall clock during the
+                    // execution as a negative duration, and the statistics
+                    // the failure is booked into are the ones the success
+                    // path keeps
+                    long failedDelta = elapsedMillis(startNanos);
                     try {
-                        reportFailedQuery(query, args, name, start, t);
+                        reportFailedQuery(query, args, name, start, failedDelta, t);
                     } catch (Throwable reporting) {
                         // Reporting must never disturb the application -
                         // the driver's exception is the one being thrown
@@ -340,8 +369,8 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
                     throw t;
                 }
             }
-            // Measure the time, rounded to the nearest millisecond
-            long delta = (process) ? (System.nanoTime() - startNanos + 500000) / 1000000 : Long.MIN_VALUE;
+            // Measure the elapsed time with the monotonic clock
+            long delta = (process) ? elapsedMillis(startNanos) : Long.MIN_VALUE;
             // See if we meet the requirements to measure. A negative
             // threshold keeps every execution out of the slow path: the
             // duration of an execution is never negative, so a bare
