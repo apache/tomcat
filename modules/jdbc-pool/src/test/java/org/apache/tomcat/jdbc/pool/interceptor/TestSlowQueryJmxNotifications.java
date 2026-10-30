@@ -96,13 +96,42 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
         }
     }
 
+    /*
+     * The notification under test is the one a slow query raises, so the
+     * query that must notify has to really run long: the pools here are
+     * configured with a threshold of zero - a negative threshold records
+     * every query as measured and never reports one as slow - and the
+     * query is made slow for a wall-clock reason: the database itself
+     * waits SLOW_WAIT_MILLIS while the WHERE clause is evaluated
+     * (java.lang.Thread.sleep exposed to SQL by an alias), holding the
+     * client's execute() open for at least that long on any hardware.
+     * A CPU-heavy query would scale with the machine; the wait does not.
+     */
+    private static final long SLOW_WAIT_MILLIS = 60;
+
+    /*
+     * The SQL of a query that reports itself under the "SELECT marker"
+     * name the assertions look for, while waiting inside the database.
+     * The alias is registered once per database; IF NOT EXISTS keeps
+     * every call cheap.
+     */
+    private String slowSql(int marker) throws SQLException {
+        try (Connection admin = adminConnection();
+                Statement st = admin.createStatement()) {
+            st.execute("CREATE ALIAS IF NOT EXISTS SLOW_SLEEP FOR "
+                    + "\"java.lang.Thread.sleep(long)\"");
+        }
+        return "SELECT " + marker + " FROM SYSTEM_RANGE(1,1) WHERE SLOW_SLEEP("
+                + SLOW_WAIT_MILLIS + ") IS NULL";
+    }
+
     @Test
     void notificationOfEveryConnectionSurvivesSerializationWithItsSource() throws Exception {
         String poolName = "JmxNotifySource-" + System.nanoTime();
         DataSource ds = newDataSource();
         ds.setName(poolName);
         ds.setJdbcInterceptors("org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx"
-                + "(notifyPool=false,threshold=-1)");
+                + "(notifyPool=false,threshold=0)");
         ds.getPoolProperties().setMaxActive(2);
         ds.getPoolProperties().setInitialSize(0);
 
@@ -125,8 +154,8 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
                     .addNotificationListener(listener, null, null);
             try (Statement st1 = first.createStatement();
                     Statement st2 = second.createStatement()) {
-                st1.execute("SELECT 1");
-                st2.execute("SELECT 2");
+                st1.execute(slowSql(1));
+                st2.execute(slowSql(2));
             }
         }
 
@@ -154,7 +183,7 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
         DataSource ds = newDataSource();
         ds.setName(poolName);
         ds.setJdbcInterceptors("org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx"
-                + "(notifyPool=false,threshold=-1)");
+                + "(notifyPool=false,threshold=0)");
         ds.getPoolProperties().setInitialSize(0);
 
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
@@ -169,7 +198,7 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
             interceptorOf(con, SlowQueryReportJmx.class)
                     .addNotificationListener(listener, null, null);
             try (Statement st = con.createStatement()) {
-                st.execute("SELECT 1");
+                st.execute(slowSql(1));
             }
         }
 
@@ -194,7 +223,7 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
         DataSource ds = newDataSource();
         ds.setName(poolName);
         ds.setJdbcInterceptors("org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx"
-                + "(notifyPool=false,threshold=-1,objectName=" + customName + ")");
+                + "(notifyPool=false,threshold=0,objectName=" + customName + ")");
         ds.getPoolProperties().setInitialSize(0);
 
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
@@ -208,7 +237,7 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
             interceptorOf(con, SlowQueryReportJmx.class)
                     .addNotificationListener(listener, null, null);
             try (Statement st = con.createStatement()) {
-                st.execute("SELECT 1");
+                st.execute(slowSql(1));
             }
         }
 
@@ -229,7 +258,7 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
         DataSource ds = newDataSource();
         ds.setName(poolName);
         ds.setJdbcInterceptors("org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx"
-                + "(notifyPool=false,threshold=-1)");
+                + "(notifyPool=false,threshold=0)");
         ds.getPoolProperties().setInitialSize(0);
 
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
@@ -243,7 +272,7 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
             interceptorOf(con, SlowQueryReportJmx.class)
                     .addNotificationListener(listener, null, null);
             try (Statement st = con.createStatement()) {
-                st.execute("SELECT 1");
+                st.execute(slowSql(1));
             }
         }
 
@@ -267,7 +296,7 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
         DataSource ds = newDataSource();
         ds.setName(poolName);
         ds.setJdbcInterceptors("org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx"
-                + "(notifyPool=false,threshold=-1)");
+                + "(notifyPool=false,threshold=0)");
         ds.getPoolProperties().setMaxActive(2);
         ds.getPoolProperties().setInitialSize(0);
 
@@ -288,8 +317,8 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
                 Assertions.assertEquals(2, ds.getNumActive());
                 try (Statement st1 = first.createStatement();
                         Statement st2 = second.createStatement()) {
-                    st1.execute("SELECT 1");
-                    st2.execute("SELECT 2");
+                    st1.execute(slowSql(1));
+                    st2.execute(slowSql(2));
                 }
             }
             server.removeNotificationListener(oname, listener);
@@ -312,7 +341,7 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
         DataSource ds = newDataSource();
         ds.setName(poolName);
         ds.setJdbcInterceptors("org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx"
-                + "(notifyPool=false,threshold=-1)");
+                + "(notifyPool=false,threshold=0)");
         ds.getPoolProperties().setMaxActive(2);
         ds.getPoolProperties().setInitialSize(0);
         ds.getPoolProperties().setMaxIdle(1);
@@ -341,8 +370,8 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
             server.addNotificationListener(oname, listener, null, null);
             try (Statement st1 = ownerConnection.createStatement();
                     Statement st2 = otherConnection.createStatement()) {
-                st1.execute("SELECT 1");
-                st2.execute("SELECT 2");
+                st1.execute(slowSql(1));
+                st2.execute(slowSql(2));
             }
 
             // return the non-owning connection first so it stays within
@@ -362,7 +391,7 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
             // listener that was attached before the eviction
             try (Connection survivor = ds.getConnection();
                     Statement st = survivor.createStatement()) {
-                st.execute("SELECT 3");
+                st.execute(slowSql(3));
             }
 
             List<String> messages = received.stream().map(Notification::getMessage)
@@ -390,7 +419,7 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
         DataSource ds = newDataSource();
         ds.setName(poolName);
         ds.setJdbcInterceptors("org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx"
-                + "(notifyPool=false,threshold=-1)");
+                + "(notifyPool=false,threshold=0)");
         ds.getPoolProperties().setInitialSize(0);
 
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
@@ -426,7 +455,7 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
         // pools' own ObjectName clash; the interceptor registers by name
         ds.getPoolProperties().setName(name);
         ds.setJdbcInterceptors("org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx"
-                + "(notifyPool=false,threshold=-1)");
+                + "(notifyPool=false,threshold=0)");
         ds.getPoolProperties().setInitialSize(0);
         return ds;
     }
@@ -455,9 +484,9 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
             server.addNotificationListener(oname, listener, null, null);
 
             try (Statement st = survivorConnection.createStatement()) {
-                st.execute("SELECT 1");
+                st.execute(slowSql(1));
             }
-            Assertions.assertTrue(received.stream().anyMatch(n -> "SELECT 1".equals(n.getMessage())),
+            Assertions.assertTrue(received.stream().anyMatch(n -> n.getMessage().contains("SELECT 1")),
                     "while both pools are live, the sharing pool's queries must reach the "
                             + "listener attached to the owning pool's MBean, received: " + received);
 
@@ -469,9 +498,9 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
             awaitSessions(1); // the owner pool's physical session is really gone
 
             try (Statement st = survivorConnection.createStatement()) {
-                st.execute("SELECT 2");
+                st.execute(slowSql(2));
             }
-            Assertions.assertTrue(received.stream().anyMatch(n -> "SELECT 2".equals(n.getMessage())),
+            Assertions.assertTrue(received.stream().anyMatch(n -> n.getMessage().contains("SELECT 2")),
                     "a query of the surviving pool must still reach the listener that "
                             + "subscribed before the other same-named pool closed, received: "
                             + received);
@@ -515,9 +544,9 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
         // twice on one pool; each connection's chain then holds two
         // instances of it, only one of which can win the registration
         ds.setJdbcInterceptors("org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx"
-                + "(notifyPool=false,threshold=-1);"
+                + "(notifyPool=false,threshold=0);"
                 + "org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx"
-                + "(notifyPool=false,threshold=-1)");
+                + "(notifyPool=false,threshold=0)");
         ds.getPoolProperties().setInitialSize(0);
 
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
@@ -550,7 +579,7 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
             Assertions.assertTrue(ownerIsFromThisChain,
                     "the registration must be owned by one of the pool's own instances");
 
-            st.execute("SELECT 1");
+            st.execute(slowSql(1));
         }
 
         // both instances of the chain see the one query; both must notify
@@ -594,7 +623,7 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
         DataSource ds = newDataSource();
         ds.setName(poolName);
         ds.setJdbcInterceptors("org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx"
-                + "(notifyPool=false,threshold=-1)");
+                + "(notifyPool=false,threshold=0)");
         ds.getPoolProperties().setInitialSize(0);
 
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
@@ -691,7 +720,7 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
                 // must release together with the name even though no MBean
                 // registration of this pool ever succeeded
                 try (Statement st = first.createStatement()) {
-                    st.execute("SELECT 1");
+                    st.execute(slowSql(1));
                 }
                 Assertions.assertNotNull(SlowQueryReportJmx.notifiers.get(poolName),
                         "reporting a query must have created the name's broadcaster");
