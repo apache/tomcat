@@ -762,9 +762,25 @@ public class PooledConnection implements PooledConnectionMBean {
                     }
                     return false;
                 }
-            } catch (SQLException e) {
+            } catch (SQLException | RuntimeException e) {
+                // A driver or connection wrapper can also fail isValid()
+                // with an unchecked exception, which likewise means the
+                // session cannot be vouched for; like the checked failure
+                // it is reported as a failed validation, because a throw
+                // escaping from here unwinds the borrow path between the
+                // idle and busy queues and strands the pooled connection -
+                // permanently shrinking the pool
                 if (getPoolProperties().getLogValidationErrors()) {
                     log.error("isValid() failed.", e);
+                } else if (e instanceof RuntimeException) {
+                    // Unlike the checked failure this anomaly would once
+                    // have escaped as the driver's own throw; the caller
+                    // is handed only a generic validation SQLException that
+                    // says nothing about it, so it is logged at warn rather
+                    // than debug - otherwise at the default log level a
+                    // broken driver would fail every validation with no
+                    // trace anywhere
+                    log.warn("isValid() failed.", e);
                 } else if (log.isDebugEnabled()) {
                     log.debug("isValid() failed.", e);
                 }
@@ -827,6 +843,27 @@ public class PooledConnection implements PooledConnectionMBean {
             return true;
         } catch (SQLException e) {
             log.debug("Failed to rollback transaction", e);
+        } catch (RuntimeException e) {
+            // A failure to end the transaction is a failure whether the
+            // driver reports it checked or unchecked: the caller reads the
+            // false as a failed validation and takes the session out of
+            // service, while a throw escaping from here would escape even
+            // through a caller's finally block, outside the catch that
+            // converts it, and strand the pooled connection between the
+            // idle and busy queues
+            if (getPoolProperties().getLogValidationErrors()) {
+                log.error("Failed to rollback transaction", e);
+            } else {
+                // The unchecked variant is an anomaly of the same kind as
+                // a throwing custom Validator, and unlike the checked
+                // rollback failure the pool surfaces it only as the same
+                // generic validation failure as any other, so it is logged
+                // at warn rather than debug: otherwise at the default log
+                // level a driver that fails to end a transaction unchecked
+                // would destroy connection after connection with no trace
+                // anywhere
+                log.warn("Failed to rollback transaction", e);
+            }
         }
         return false;
     }
