@@ -18,6 +18,7 @@ package org.apache.tomcat.jdbc.pool.interceptor;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -25,6 +26,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.management.ObjectName;
@@ -32,6 +34,7 @@ import javax.management.ObjectName;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
+import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
@@ -44,8 +47,9 @@ import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
  * listed <em>after</em> this one in {@link org.apache.tomcat.jdbc.pool.PoolConfiguration#setJdbcInterceptors(String)
  * jdbcInterceptors} therefore do not see reused statements - relevant to any interceptor whose {@code createStatement}
  * hook performs an action rather than only wrapping the statement: {@link QueryTimeoutInterceptor} must be listed
- * before this one to keep its timeout on cached statements, while wrapping-only interceptors are unaffected because
- * their wrapper is carried inside the cached proxy.
+ * before this one to keep its timeout on cached statements, while wrapping-only interceptors are unaffected: their
+ * wrapper is carried inside the cached proxy, and the cache binds a cached statement to the physical session the
+ * prepare ran on rather than to whatever connection a wrapper beneath it reports for the statement.
  */
 public class StatementCache extends StatementDecoratorInterceptor implements StatementCacheMBean {
     private static final Log log = LogFactory.getLog(StatementCache.class);
@@ -308,6 +312,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
             // disconnect/reconnect, landing after the disconnected() purge
             // had already run). The statement belongs to a dead connection
             // and must not be parked in the cache of the new one.
+            logLostAssociationOnce(proxy);
             return false;
         } else if (cacheSize.get() >= maxCacheSize) {
             return false;
@@ -376,6 +381,54 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
     }
 
     /**
+     * Whether a reported connection is one of the handles the pool itself hands out - a proxy whose invocation
+     * handler is a pool interceptor - rather than a physical connection. Only the pool's own handles are read this
+     * way; an answer from anything else stays the statement's reported binding, so a driver that honestly names a
+     * replaced (dead) session keeps refusing the park.
+     *
+     * @param reported the value reported as a statement's connection
+     *
+     * @return true if the value is one of the pool's own connection handles
+     */
+    private static boolean isPoolHandle(Connection reported) {
+        return reported != null && Proxy.isProxyClass(reported.getClass())
+                && Proxy.getInvocationHandler(reported) instanceof JdbcInterceptor;
+    }
+
+    /**
+     * Set once the refusal of a park for a lost association has been logged for the pooled connection this
+     * interceptor instance is bound to (the pool builds one chain, and so one interceptor instance, per pooled
+     * connection), so the note appears once per connection and not once per refused statement. The claim is a
+     * compare-and-set run under the debug guard, so of two refusals on concurrent closes exactly one logs, and
+     * a refusal met while debug is off leaves the claim unspent for a later refusal to make after debug is
+     * enabled.
+     */
+    private final AtomicBoolean associationLossLogged = new AtomicBoolean();
+
+    /**
+     * Logs, at most once per connection, that a park was refused because the connection recorded for the statement
+     * is not the current physical one. The usual cause is benign - a close racing a session replacement - but a
+     * wrapper beneath this cache that answers the statement's {@code getConnection()} with a value this cache
+     * cannot resolve to a physical session reaches this refusal for every statement it closes, and a cache that
+     * never caches is worth one line of log.
+     *
+     * @param proxy the statement whose park was refused
+     */
+    private void logLostAssociationOnce(CachedStatement proxy) {
+        // The debug guard runs first, so a refusal met while debug is off does
+        // not spend the claim, and the compare-and-set runs second, so of the
+        // refusals met while debug is on exactly one logs.
+        if (log.isDebugEnabled() && associationLossLogged.compareAndSet(false, true)) {
+            log.debug("Not caching statement [" + proxy.getSql() + "]: the connection recorded for it is "
+                    + "not the current physical connection. Either the session was replaced while the "
+                    + "statement was being closed, or an interceptor listed below "
+                    + getClass().getSimpleName() + " answers the statement's getConnection() with a value "
+                    + "that cannot be resolved to the physical session, which keeps every statement out "
+                    + "of the cache.");
+        }
+    }
+
+    /**
      * Returns the statement cache for the current pooled connection.
      *
      * @return the cache map, or null if the connection has been closed
@@ -424,7 +477,9 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
         private boolean poolable = true;
 
         /**
-         * Constructs a CachedStatement.
+         * Constructs a CachedStatement, recording the physical connection the statement was prepared on as the
+         * answer of the statement itself (or, when that answer is not a physical connection the cache can read, of
+         * the pool's own record of the session the prepare ran on).
          *
          * @param parent the parent prepared statement
          * @param sql    the SQL text
@@ -435,9 +490,29 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
         }
 
         /**
-         * Resolves the physical connection a statement belongs to. The connection the driver reports for the statement
-         * itself is authoritative; only when the driver will not answer does the pool's own record of the current
-         * connection serve as the binding.
+         * Constructs a CachedStatement with an already determined binding to the physical connection the statement
+         * was prepared on. {@link #closeInvoked()} parks through this constructor, carrying the binding that was
+         * made when the statement was prepared down to the proxy that enters the cache: asking the delegate again
+         * at park time would hand a wrapper beneath this cache another chance to answer with something that is not
+         * the physical session, while the binding made at prepare time names the session the statement was really
+         * prepared on and still lets a session replacement between the prepare and the park refuse it.
+         *
+         * @param parent               the parent prepared statement
+         * @param sql                  the SQL text
+         * @param associatedConnection the physical connection the statement was prepared on
+         */
+        CachedStatement(PreparedStatement parent, String sql, Connection associatedConnection) {
+            super(parent, sql);
+            this.associatedConnection = associatedConnection;
+        }
+
+        /**
+         * Resolves the physical connection a statement belongs to. The connection the driver reports for the
+         * statement itself is authoritative; a wrapper listed beneath this cache may however intercept the call and
+         * answer it with a pool handle rather than forward it to the driver, and a handle names no session of its
+         * own - the physical session that sits behind the handle now, and behind the prepare of this very
+         * statement, serves as the binding for that answer. Only when the driver will not answer does the pool's
+         * own record of the current connection serve as the binding.
          *
          * @param statement the statement whose associated connection to determine
          *
@@ -445,7 +520,21 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
          */
         private Connection associatedConnectionOf(PreparedStatement statement) {
             try {
-                return statement.getConnection();
+                Connection reported = statement.getConnection();
+                if (reported == currentPhysicalConnection()) {
+                    return reported;
+                }
+                if (isPoolHandle(reported)) {
+                    // A wrapper beneath the cache intercepted the call (the
+                    // StatementDecoratorInterceptor answers it with the
+                    // handle of the borrow, among others). The handle is
+                    // this pooled connection's own, and the current borrow
+                    // - on whose session this prepare ran - sits on its
+                    // current physical connection: that session is the
+                    // statement's binding.
+                    return currentPhysicalConnection();
+                }
+                return reported;
             } catch (SQLException x) {
                 return currentPhysicalConnection();
             }
@@ -472,8 +561,14 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
             AtomicInteger size = cacheSize;
             boolean shouldClose = true;
             if (size != null && size.get() < maxCacheSize) {
-                // Cache a proxy so that we don't reuse the facade
-                CachedStatement proxy = new CachedStatement(getDelegate(), getSql());
+                // Cache a proxy so that we don't reuse the facade. The
+                // binding to the physical session made at the prepare is
+                // carried over to the parked proxy rather than the delegate
+                // asked again: a wrapper beneath this cache would intercept
+                // that second question too, while the prepare-time binding
+                // still names the session the statement was prepared on for
+                // the session check in cacheStatement.
+                CachedStatement proxy = new CachedStatement(getDelegate(), getSql(), associatedConnection);
                 proxy.setCacheKey(getCacheKey());
                 try {
                     // Only cache if statement has been marked as poolable and not close on completion
