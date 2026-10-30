@@ -41,7 +41,7 @@ public class MultiReleaseUtil {
      * @return The {@code MultiVersionInfo} for the entry if the entry represents a versioned entry, otherwise
      *             {@code null}
      */
-    public static MultiVersionInfo parseVersion(String name) {
+    public static MultiReleaseInfo parseVersion(String name) {
         if (name == null || name.isEmpty()) {
             return null;
         }
@@ -55,7 +55,7 @@ public class MultiReleaseUtil {
                 for (int i = VERSION_PATH_LENGTH + start; i < end; i++) {
                     char c = name.charAt(i);
                     if (c < '0' || c > '9' || ((i == VERSION_PATH_LENGTH + start) && c == '0')) {
-                        return new MultiVersionInfo(-1, end + 1);
+                        return new MultiReleaseInfo(-1, end + 1);
                     }
                 }
                 try {
@@ -63,13 +63,13 @@ public class MultiReleaseUtil {
                     if (version < MINIMUM_VERSIONED_JAVA) {
                         version = -1;
                     }
-                    return new MultiVersionInfo(version, end + 1);
+                    return new MultiReleaseInfo(version, end + 1);
                 } catch (NumberFormatException e) {
                     // Must be overflow
-                    return new MultiVersionInfo(-1, end + 1);
+                    return new MultiReleaseInfo(-1, end + 1);
                 }
             }
-            return new MultiVersionInfo(-1, -1);
+            return new MultiReleaseInfo(-1, -1);
         }
 
         return null;
@@ -83,7 +83,7 @@ public class MultiReleaseUtil {
      * @param namePos The start position of the name. The first character after the '/' after the version. {@code -1} if
      *                    there was no '/' after the version or the version was not present
      */
-    public record MultiVersionInfo(int version, int namePos) {
+    public record MultiReleaseInfo(int version, int namePos) {
 
         /**
          * Has a valid multi-release entry been found?

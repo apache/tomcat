@@ -34,7 +34,7 @@ import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.tomcat.util.buf.UriUtil;
 import org.apache.tomcat.util.scan.MultiReleaseUtil;
-import org.apache.tomcat.util.scan.MultiReleaseUtil.MultiVersionInfo;
+import org.apache.tomcat.util.scan.MultiReleaseUtil.MultiReleaseInfo;
 
 /**
  * Represents a {@link org.apache.catalina.WebResourceSet} based on a JAR file that is nested inside a packed WAR file.
@@ -197,7 +197,7 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
             Entry<String,JarEntry> entry = iter.next();
             String name = entry.getKey();
             JarEntry jarEntry = entry.getValue();
-            MultiVersionInfo multiVersionInfo = MultiReleaseUtil.parseVersion(name);
+            MultiReleaseInfo multiVersionInfo = MultiReleaseUtil.parseVersion(name);
             if (multiVersionInfo != null && multiVersionInfo.isValid()) {
                 // Remove the multi-release version
                 iter.remove();

@@ -19,13 +19,13 @@ package org.apache.tomcat.util.scan;
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.apache.tomcat.util.scan.MultiReleaseUtil.MultiVersionInfo;
+import org.apache.tomcat.util.scan.MultiReleaseUtil.MultiReleaseInfo;
 
 public class TestMultiVersionUtil {
 
     @Test
     public void testValidVersion() {
-        MultiVersionInfo info = MultiReleaseUtil.parseVersion("META-INF/versions/9/test.txt");
+        MultiReleaseInfo info = MultiReleaseUtil.parseVersion("META-INF/versions/9/test.txt");
         Assert.assertNotNull(info);
         Assert.assertTrue(info.isValid());
         Assert.assertEquals(9, info.version());
@@ -39,7 +39,7 @@ public class TestMultiVersionUtil {
      */
     @Test
     public void testLeadingZeroVersionIsInvalid() {
-        MultiVersionInfo info = MultiReleaseUtil.parseVersion("META-INF/versions/09/test.txt");
+        MultiReleaseInfo info = MultiReleaseUtil.parseVersion("META-INF/versions/09/test.txt");
         Assert.assertNotNull(info);
         Assert.assertFalse(info.isValid());
     }
@@ -48,7 +48,7 @@ public class TestMultiVersionUtil {
     @Test
     public void testCurrentRuntimeVersion() {
         int feature = Runtime.version().feature();
-        MultiVersionInfo info = MultiReleaseUtil.parseVersion("META-INF/versions/" + feature + "/test.txt");
+        MultiReleaseInfo info = MultiReleaseUtil.parseVersion("META-INF/versions/" + feature + "/test.txt");
         Assert.assertNotNull(info);
         Assert.assertTrue(info.isValid());
         Assert.assertEquals(feature, info.version());
@@ -70,7 +70,7 @@ public class TestMultiVersionUtil {
     @Test
     public void testLeadingSlash() {
         String name = "/META-INF/versions/9/test.txt";
-        MultiVersionInfo info = MultiReleaseUtil.parseVersion(name);
+        MultiReleaseInfo info = MultiReleaseUtil.parseVersion(name);
         Assert.assertNotNull(info);
         Assert.assertTrue(info.isValid());
         Assert.assertEquals(9, info.version());
@@ -81,7 +81,7 @@ public class TestMultiVersionUtil {
     @Test
     public void testDirectoryEntry() {
         String name = "META-INF/versions/9/";
-        MultiVersionInfo info = MultiReleaseUtil.parseVersion(name);
+        MultiReleaseInfo info = MultiReleaseUtil.parseVersion(name);
         Assert.assertNotNull(info);
         Assert.assertTrue(info.isValid());
         Assert.assertEquals(name.length(), info.namePos());
@@ -93,7 +93,7 @@ public class TestMultiVersionUtil {
         String[] versions = { "+9", "-9", "9x", "x9", "9.0", "", "0", "09", "00", "99999999999999", "2147483648" };
         for (String version : versions) {
             String name = "META-INF/versions/" + version + "/test.txt";
-            MultiVersionInfo info = MultiReleaseUtil.parseVersion(name);
+            MultiReleaseInfo info = MultiReleaseUtil.parseVersion(name);
             Assert.assertNotNull(version, info);
             Assert.assertFalse(version, info.isValid());
             // The position of the resource name is still reported so callers can keep the entry under its full name
@@ -104,7 +104,7 @@ public class TestMultiVersionUtil {
 
     @Test
     public void testNoSeparatorAfterVersionsDirectory() {
-        MultiVersionInfo info = MultiReleaseUtil.parseVersion("META-INF/versions/Foo.class");
+        MultiReleaseInfo info = MultiReleaseUtil.parseVersion("META-INF/versions/Foo.class");
         Assert.assertNotNull(info);
         Assert.assertFalse(info.isValid());
         Assert.assertEquals(-1, info.namePos());
@@ -118,14 +118,14 @@ public class TestMultiVersionUtil {
     public void testMinimumVersion() {
         for (int version = 1; version < 8; version++) {
             String name = "META-INF/versions/" + version + "/test.txt";
-            MultiVersionInfo info = MultiReleaseUtil.parseVersion(name);
+            MultiReleaseInfo info = MultiReleaseUtil.parseVersion(name);
             Assert.assertNotNull(Integer.toString(version), info);
             Assert.assertFalse(Integer.toString(version), info.isValid());
             Assert.assertEquals(Integer.toString(version), "test.txt", name.substring(info.namePos()));
         }
 
         for (int version = 8; version <= 10; version++) {
-            MultiVersionInfo info = MultiReleaseUtil.parseVersion("META-INF/versions/" + version + "/test.txt");
+            MultiReleaseInfo info = MultiReleaseUtil.parseVersion("META-INF/versions/" + version + "/test.txt");
             Assert.assertNotNull(Integer.toString(version), info);
             Assert.assertTrue(Integer.toString(version), info.isValid());
             Assert.assertEquals(version, info.version());
