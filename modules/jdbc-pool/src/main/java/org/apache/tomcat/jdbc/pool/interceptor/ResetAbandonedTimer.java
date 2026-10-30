@@ -23,6 +23,7 @@ import java.lang.reflect.Proxy;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Wrapper;
 
@@ -42,10 +43,14 @@ import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
  * itself blocks on the database for longer than
  * {@link org.apache.tomcat.jdbc.pool.PoolConfiguration#setRemoveAbandonedTimeout(int)} still gets the connection
  * abandoned. The statement facade is always used, so a result set handle that outlives its borrow is sealed off before
- * it can go on refreshing the abandoned timer of whoever holds that physical connection next. This interceptor is
- * useful for when you have a {@link org.apache.tomcat.jdbc.pool.PoolConfiguration#setRemoveAbandonedTimeout(int)} that
- * is fairly low, and you want to reset the abandoned time each time any operation on the connection is performed This
- * is useful for batch processing programs that use connections for extensive amount of times.
+ * it can go on refreshing the abandoned timer of whoever holds that physical connection next. The handles this
+ * interceptor hands out release what they wrap - the statement layer, the physical result set - once a close has been
+ * forwarded to it, and answer any later call from the closed contract, as the statement facade's own handles do; a
+ * handle the application keeps beyond its close therefore stops keeping the physical objects below it reachable. This
+ * interceptor is useful for when you have a
+ * {@link org.apache.tomcat.jdbc.pool.PoolConfiguration#setRemoveAbandonedTimeout(int)} that is fairly low, and you
+ * want to reset the abandoned time each time any operation on the connection is performed This is useful for batch
+ * processing programs that use connections for extensive amount of times.
  */
 public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAbandonedTimerMBean {
 
@@ -172,9 +177,17 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
      */
     private final class TimerStatementProxy implements InvocationHandler {
         /**
-         * The statement proxy created by {@code AbstractQueryReport}.
+         * The statement proxy created by {@code AbstractQueryReport}, nulled
+         * once a close has been forwarded so that a handle the application
+         * keeps beyond its close stops pinning the statement layer beneath it.
+         * A close can come from a thread other than the one invoking on the
+         * handle - the pool's statement finalizer closes the statements it
+         * tracks from whichever thread closes the connection - so the field is
+         * read by more threads than the one that nulls it and, as in the
+         * facade's and the query report proxy, must be volatile to reach them
+         * at all.
          */
-        private final Object delegate;
+        private volatile Object delegate;
 
         TimerStatementProxy(Object delegate) {
             this.delegate = delegate;
@@ -197,15 +210,46 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
             if (compare(HASHCODE_VAL, method)) {
                 return Integer.valueOf(this.hashCode());
             }
+            // Read the delegate once for this call: the close that nulls it
+            // can come from another thread, and the guards and the forward
+            // must agree on the one value this call read. A call that finds
+            // the delegate gone is answered from the closed contract below -
+            // the same answers the query report proxy beneath gives for its
+            // own closed state - rather than by invoking on a null receiver:
+            // that is a NullPointerException, where the closed contract owes
+            // the application a SQLException. The window this cannot close is
+            // the race itself: a call that read the delegate while it was
+            // still live goes to it, an outcome indistinguishable from having
+            // simply outrun the close.
+            final Object target = delegate;
+            final boolean close = compare(CLOSE_VAL, method);
+            // Allow close to be called multiple times, from either thread
+            if (close && target == null) {
+                return null;
+            }
+            if (compare(ISCLOSED_VAL, method) && target == null) {
+                return Boolean.TRUE;
+            }
+            if (target == null) {
+                throw new SQLException("Statement closed.");
+            }
             Object result;
             try {
-                result = method.invoke(delegate, args);
+                // Execute the call on the delegate this call read as live:
+                // the snapshot keeps a concurrent close from replacing the
+                // receiver with null between the guards and the call
+                result = method.invoke(target, args);
             } catch (InvocationTargetException x) {
                 Throwable cause = x.getCause();
                 if (cause == null) {
                     throw x;
                 }
                 throw cause;
+            }
+            // Perform close cleanup: the handle kept beyond this close now
+            // holds nothing that can reach the statement beneath it
+            if (close) {
+                delegate = null;
             }
             // Wrap every result set the call hands back, whatever the method
             // that returned it was called, on the same rule the statement
@@ -256,16 +300,23 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
      */
     private final class TimerResultSetProxy implements InvocationHandler {
         /**
-         * The result set being read.
+         * The result set being read, nulled once a close has been forwarded so
+         * that a handle the application keeps beyond its close stops pinning
+         * the physical result set. Read by other threads than the one that
+         * nulls it - a close can come from a foreign thread, as in the
+         * statement proxy - so, as in the facade and the query report proxy,
+         * volatile.
          */
-        private final Object delegate;
+        private volatile Object delegate;
         /**
          * The statement handle in use by this interceptor, returned by {@link java.sql.ResultSet#getStatement()}. It
          * keeps the timer reset like the handle the application holds, but it is not necessarily that same outermost
          * handle: the statement facade substitutes its own handle from outside this interceptor, and any interceptor
-         * configured around this one may too.
+         * configured around this one may too. Nulled along with {@link #delegate} once a close has been forwarded, so
+         * that the handle of a closed result set stops pinning the statement layer either; read in the same snapshot as
+         * the delegate, so it is volatile for the same reason.
          */
-        private final Object statement;
+        private volatile Object statement;
 
         TimerResultSetProxy(Object delegate, Object statement) {
             this.delegate = delegate;
@@ -289,20 +340,59 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
             if (compare(HASHCODE_VAL, method)) {
                 return Integer.valueOf(this.hashCode());
             }
-            if (compare(GET_STATEMENT, method)) {
-                return statement;
-            }
             try {
-                return method.invoke(delegate, args);
-            } catch (InvocationTargetException x) {
-                Throwable cause = x.getCause();
-                if (cause == null) {
-                    throw x;
+                // Read both fields once for this call: the close that nulls
+                // them can come from another thread, and the guards and the
+                // forward must agree on the one value this call read. The
+                // close nulls the delegate before the statement, so reading
+                // the statement first keeps the snapshot coherent: a call that
+                // read the delegate as live cannot have missed the statement.
+                final Object stmt = statement;
+                final Object target = delegate;
+                final boolean close = compare(CLOSE_VAL, method);
+                // Allow close to be called multiple times, from either thread
+                if (close && target == null) {
+                    return null;
                 }
-                throw cause;
+                if (compare(ISCLOSED_VAL, method) && target == null) {
+                    return Boolean.TRUE;
+                }
+                if (target == null) {
+                    // Answered from the closed contract, as the facade's own
+                    // result set handle does, rather than by invoking on a
+                    // null receiver: that is a NullPointerException, where the
+                    // closed contract owes the application a SQLException
+                    throw new SQLException("ResultSet closed.");
+                }
+                if (compare(GET_STATEMENT, method)) {
+                    return stmt;
+                }
+                Object result;
+                try {
+                    // Invoke on the delegate this call read as live: the
+                    // snapshot keeps a concurrent close from replacing the
+                    // receiver with null between the guards and the call
+                    result = method.invoke(target, args);
+                } catch (InvocationTargetException x) {
+                    Throwable cause = x.getCause();
+                    if (cause == null) {
+                        throw x;
+                    }
+                    throw cause;
+                }
+                // Perform close cleanup: the handle kept beyond this close now
+                // holds nothing that can reach the cursor or the statement
+                if (close) {
+                    delegate = null;
+                    statement = null;
+                }
+                return result;
             } finally {
                 // Reading the result set is activity on the connection,
-                // even when the read failed
+                // even when the read failed. The guards above sit inside
+                // this block, so a read refused on a handle whose delegate
+                // has been released counts as activity too, like every
+                // other attempted operation on this connection.
                 resetTimer();
             }
         }
