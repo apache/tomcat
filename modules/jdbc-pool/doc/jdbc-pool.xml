@@ -747,6 +747,8 @@
         <p>(int as String) The number of seconds to set for the query timeout.
            A value less than or equal to zero will disable this feature.
            The default value is <code>1</code> seconds.
+           A value that is not an integer is not applied: the pool logs a
+           warning and the default stays in effect.
         </p>
       </attribute>
     </attributes>
