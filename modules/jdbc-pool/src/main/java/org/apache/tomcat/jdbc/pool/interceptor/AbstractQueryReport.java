@@ -37,9 +37,13 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
     private static final Log log = LogFactory.getLog(AbstractQueryReport.class);
 
     /**
-     * The threshold in milliseconds. If the query is faster than this, we don't measure it
+     * The threshold in milliseconds. An execution that takes longer than
+     * this is reported as a slow query; one that takes no longer is
+     * reported as a measured query. A negative threshold keeps every
+     * execution out of the slow path, so every execution is reported as
+     * measured.
      */
-    protected long threshold = 1000; // Don't report queries less than this
+    protected long threshold = 1000; // Executions slower than this are slow
 
     /**
      * Constructs a new {@code AbstractQueryReport} with the default threshold.
@@ -145,8 +149,10 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
     }
 
     /**
-     * returns the query measure threshold. This value is in milliseconds. If the query is faster than this threshold
-     * than it won't be accounted for
+     * returns the query measure threshold. This value is in milliseconds.
+     * An execution that takes longer than this threshold is reported as a
+     * slow query; see {@link #setThreshold(long)} for the meaning of a
+     * negative value.
      *
      * @return the threshold in milliseconds
      */
@@ -155,10 +161,16 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
     }
 
     /**
-     * Sets the query measurement threshold. The value is in milliseconds. If the query goes faster than this threshold
-     * it will not be recorded.
+     * Sets the query measurement threshold. The value is in milliseconds.
+     * A successful execution that takes longer than this threshold is
+     * reported through {@link #reportSlowQuery}; one that takes no longer
+     * is reported through {@link #reportQuery}. A negative threshold
+     * records every query: every execution is measured and reported as
+     * measured, and no execution is ever reported as slow.
      *
-     * @param threshold set to -1 to record every query. Value is in milliseconds.
+     * @param threshold the threshold in milliseconds; set to a negative
+     *             value (conventionally -1) to record every query as
+     *             measured without reporting any of them as slow
      */
     public void setThreshold(long threshold) {
         this.threshold = threshold;
@@ -305,8 +317,17 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
             }
             // Measure the time, rounded to the nearest millisecond
             long delta = (process) ? (System.nanoTime() - startNanos + 500000) / 1000000 : Long.MIN_VALUE;
-            // See if we meet the requirements to measure
-            if (delta > threshold) {
+            // See if we meet the requirements to measure. A negative
+            // threshold keeps every execution out of the slow path: the
+            // duration of an execution is never negative, so a bare
+            // comparison against a negative threshold would pass for
+            // every execution and leave reportQuery unreachable - the
+            // documented "record every query" setting must record the
+            // queries as measured, not report them all as slow. A
+            // non-execution never reaches either hook: it is not
+            // processed, and its sentinel duration would stay under every
+            // threshold anyway.
+            if (process && threshold >= 0 && delta > threshold) {
                 try {
                     // Report the slow query
                     reportSlowQuery(query, args, name, start, delta);

@@ -16,8 +16,6 @@
  */
 package org.apache.tomcat.jdbc.pool.interceptor;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.sql.Statement;
 
@@ -130,9 +128,10 @@ class TestQueryReportTiming {
     @Test
     void anExecutionIsNeverReportedWithANegativeDuration() throws Throwable {
         CapturingReport report = new CapturingReport();
-        // every execution goes down the slow path, even a trivially fast one
-        report.setThreshold(-1);
-        Object proxy = instrumentedProxy(report, slowDelegate(0));
+        // an execution slower than a threshold of zero reaches the slow
+        // path, which must receive a sound duration and start too
+        report.setThreshold(0);
+        Object proxy = instrumentedProxy(report, slowDelegate(40));
         Proxy.getInvocationHandler(proxy).invoke(proxy, Statement.class.getMethod("execute", String.class),
                 new Object[] { SQL });
 
@@ -142,6 +141,26 @@ class TestQueryReportTiming {
                 "a duration handed to the report hooks can never be negative, was " + report.slowDelta);
         Assertions.assertTrue(report.slowStart > 0,
                 "a reported execution must carry a wall clock start, was " + report.slowStart);
+    }
+
+    @Test
+    void aNegativeThresholdRecordsEveryExecutionAsMeasuredAndNoneAsSlow() throws Throwable {
+        CapturingReport report = new CapturingReport();
+        // the documented meaning of the negative threshold: record every
+        // query - which means every execution reaches reportQuery, the
+        // hook for an execution that was measured and is not slow; it
+        // must not arrive as a slow query, which for SlowQueryReport is a
+        // WARN log line for every query the pool executes
+        report.setThreshold(-1);
+        Object proxy = instrumentedProxy(report, slowDelegate(0));
+        Proxy.getInvocationHandler(proxy).invoke(proxy, Statement.class.getMethod("execute", String.class),
+                new Object[] { SQL });
+
+        Assertions.assertTrue(report.fastReported && !report.slowReported,
+                "a fast execution under a negative threshold must be recorded as a measured "
+                        + "query and must never be reported as slow");
+        Assertions.assertTrue(report.fastDelta >= 0,
+                "the recorded duration must be a real duration, was " + report.fastDelta);
     }
 
     @Test
