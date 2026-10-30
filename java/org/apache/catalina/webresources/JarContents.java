@@ -159,16 +159,13 @@ public final class JarContents {
     /**
      * Method that identifies whether a given path <b>MIGHT</b> be in this jar. Uses the Bloom filter mechanism.
      *
-     * @param path       Requested path, including any internal path of the resource set.
-     * @param webappRoot The web application mount point of the resource set, which can be stripped from the path.
+     * @param path Requested path, including any internal path of the resource set but excluding the web application
+     *                 mount.
      *
      * @return Whether the prefix of the path is known to be in this jar.
      */
-    public boolean mightContainResource(String path, String webappRoot) {
+    public boolean mightContainResource(String path) {
         int startPos = 0;
-        if (path.startsWith(webappRoot)) {
-            startPos = webappRoot.length();
-        }
         while (startPos < path.length() && path.charAt(startPos) == '/') {
             startPos++;
         }
