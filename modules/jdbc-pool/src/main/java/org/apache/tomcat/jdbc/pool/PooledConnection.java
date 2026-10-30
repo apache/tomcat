@@ -671,10 +671,14 @@ public class PooledConnection implements PooledConnectionMBean {
      *             A validation that runs its built-in check against the database also ends any transaction that is open
      *             on the session when the check completes - a pool configured with a custom {@link Validator} is not,
      *             as the validator replaces the check and owns the session state it observes. The transaction ended is
-     *             the one the check itself may have started, or one a previous borrower left open. It is ended with a
-     *             rollback, never with a commit: the check is read-only and a pool health check must not commit
-     *             application work the application itself never committed. When that rollback fails the session state
-     *             is unknown, so the validation is reported as failed and the pool takes the connection out of service.
+     *             the one the check itself may have started, or one a previous borrower left open. A read-only check is
+     *             ended with a rollback, never with a commit: a pool health check must not commit application work the
+     *             application itself never committed. The one exception is the {@link #VALIDATE_INIT} execution of the
+     *             configured {@link PoolConfiguration#getInitSQL() init SQL}: that query is not a check but the pool's
+     *             own initialization of the session it has just established, so its transaction is ended with a commit
+     *             and the initialization persists for the connection's lifetime. When the transaction cannot be ended -
+     *             by the commit or by the rollback - the session state is unknown, so the validation is reported as
+     *             failed and the pool takes the connection out of service.
      */
     public boolean validate(int validateAction, String sql) {
         if (connection == null) {
@@ -730,7 +734,16 @@ public class PooledConnection implements PooledConnectionMBean {
 
         String query = sql;
 
-        if (validateAction == VALIDATE_INIT && poolProperties.getInitSQL() != null) {
+        // The init SQL is not a health check: it is the pool deliberately
+        // initializing the physical session it has just established, and its
+        // documented purpose is to leave effects that persist for the
+        // connection's lifetime. The pool only ever runs the init action on a
+        // session that connect() established moments ago, so the transaction
+        // this execution opens is the pool's own initialization work, and
+        // nothing a borrower could have left behind on it.
+        boolean executingInitSql = validateAction == VALIDATE_INIT && poolProperties.getInitSQL() != null;
+
+        if (executingInitSql) {
             query = poolProperties.getInitSQL();
         }
 
@@ -805,13 +818,26 @@ public class PooledConnection implements PooledConnectionMBean {
             stmt.execute(query);
             stmt.close();
             this.lastValidated = now;
-            // Terminate - by rollback, never by commit - any transaction
-            // the validation query opened, or that a previous borrower left
-            // open: a read-only health check must not commit application
-            // work. A session whose transaction cannot be terminated is in
-            // an unknown state, so it fails the validation and the pool
-            // takes the connection out of service.
-            transactionTerminated = silentlyRollbackTransactionIfNeeded();
+            if (executingInitSql) {
+                // Terminate the transaction the init SQL executed into by
+                // committing it: this is the pool's own initialization of a
+                // freshly established session, and its effects are meant to
+                // persist (Bugzilla 56586). A commit the driver refuses
+                // leaves the session in an unknown state, so - like a failed
+                // rollback - it fails the validation and the pool takes the
+                // connection out of service, with the finally below rolling
+                // the session back to a clean state before it goes.
+                transactionTerminated = silentlyCommitTransactionIfNeeded();
+            } else {
+                // Terminate - by rollback, never by commit - any transaction
+                // the validation query opened, or that a previous borrower
+                // left open: a read-only health check must not commit
+                // application work. A session whose transaction cannot be
+                // terminated is in an unknown state, so it fails the
+                // validation and the pool takes the connection out of
+                // service.
+                transactionTerminated = silentlyRollbackTransactionIfNeeded();
+            }
             return transactionTerminated;
         } catch (Exception ex) {
             if (getPoolProperties().getLogValidationErrors()) {
@@ -829,6 +855,41 @@ public class PooledConnection implements PooledConnectionMBean {
         } finally {
             if (!transactionTerminated) {
                 silentlyRollbackTransactionIfNeeded();
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * Terminates a transaction open on the session by committing it, for the
+     * one case where the pending transaction is the pool's own deliberate
+     * initialization work: the init SQL the init-time validation has just
+     * executed on a freshly established session. A failure to commit -
+     * checked or unchecked - means the session cannot be vouched for, so it
+     * is reported as false and the caller treats the validation as failed;
+     * an unchecked failure must not escape through the caller's finally
+     * block, outside the catch that converts it, and strand the pooled
+     * connection between the idle and busy queues.
+     */
+    private boolean silentlyCommitTransactionIfNeeded() {
+        try {
+            if (!connection.getAutoCommit()) {
+                connection.commit();
+            }
+            return true;
+        } catch (SQLException e) {
+            log.debug("Failed to commit transaction", e);
+        } catch (RuntimeException e) {
+            if (getPoolProperties().getLogValidationErrors()) {
+                log.error("Failed to commit transaction", e);
+            } else {
+                // The unchecked variant is logged at warn rather than debug,
+                // like the rollback helper's: the caller surfaces it only as
+                // the generic validation failure, so at the default log level
+                // a driver that fails to commit would otherwise destroy
+                // connection after connection with no trace anywhere
+                log.warn("Failed to commit transaction", e);
             }
         }
         return false;
