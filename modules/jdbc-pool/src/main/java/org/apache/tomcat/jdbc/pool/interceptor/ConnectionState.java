@@ -85,9 +85,12 @@ public class ConnectionState extends JdbcInterceptor {
      * transaction, that transaction is terminated first: the isolation level and the read only state are transaction
      * scoped on many drivers, and an open transaction would otherwise absorb the restores below (or, when auto-commit
      * is restored, silently commit the previous borrower's uncommitted work). If terminating that transaction fails,
-     * the borrow fails and the pool retires the connection. Nothing is terminated when there is nothing to restore - no
-     * default is configured, or the cache already shows every configured default in place - so a pool that uses this
-     * interceptor only to cache the state does not pay for the termination.
+     * the borrow fails and the pool retires the connection. So does a failed restore of the read-only, auto-commit or
+     * catalog state: a connection known to sit in a state other than the configured default must not reach the next
+     * borrower. A transaction isolation level the driver refuses is the exception - it is logged and the connection
+     * stays in service, so the pool never strands borrowers over that setting. Nothing is terminated when there is
+     * nothing to restore - no default is configured, or the cache already shows every configured default in place -
+     * so a pool that uses this interceptor only to cache the state does not pay for the termination.
      *
      * @param parent the pool the connection belongs to, or {@code null} when the interceptor chain is being torn down
      * @param con    the pooled connection being set up for its next borrower
@@ -158,7 +161,13 @@ public class ConnectionState extends JdbcInterceptor {
                 }
             } catch (SQLException x) {
                 readOnly = null;
-                log.error("Unable to reset readonly state to connection.", x);
+                // The connection is known to sit in a state the pool was
+                // configured not to hand out, and the restore that would fix
+                // that failed, so it must not go to the next borrower.
+                // ConnectionPool.setupConnection() catches this, discards the
+                // connection and fails the borrow.
+                throw new IllegalStateException("Unable to restore the configured read-only state "
+                        + defaultReadOnly + " on the connection.", x);
             }
         }
         if (resetAutoCommit) {
@@ -169,7 +178,11 @@ public class ConnectionState extends JdbcInterceptor {
                 }
             } catch (SQLException x) {
                 autoCommit = null;
-                log.error("Unable to reset autocommit state to connection.", x);
+                // As for the read-only state above: the driver refused the
+                // configured auto-commit state, so the borrow fails and the
+                // connection is discarded.
+                throw new IllegalStateException("Unable to restore the configured auto-commit state "
+                        + defaultAutoCommit + " on the connection.", x);
             }
         }
         if (resetCatalog) {
@@ -180,7 +193,12 @@ public class ConnectionState extends JdbcInterceptor {
                 }
             } catch (SQLException x) {
                 catalog = null;
-                log.error("Unable to reset default catalog state to connection.", x);
+                // As for the read-only state above: the driver refused the
+                // configured catalog, so the borrower learns of the
+                // misconfiguration instead of getting a connection that was
+                // never pointed at the database the pool asks it to work in.
+                throw new IllegalStateException("Unable to restore the configured default catalog "
+                        + defaultCatalog + " on the connection.", x);
             }
         }
 
