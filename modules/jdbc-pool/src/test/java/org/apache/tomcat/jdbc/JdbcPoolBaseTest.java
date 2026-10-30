@@ -17,6 +17,7 @@
 package org.apache.tomcat.jdbc;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -181,6 +182,40 @@ public abstract class JdbcPoolBaseTest {
         public void disconnected(ConnectionPool parent, PooledConnection con,
                 boolean finalizing) {
             throw new IllegalStateException("boom from disconnected()");
+        }
+    }
+
+    /*
+     * An interceptor that drives the documented "close this session when it
+     * is returned" hook through the configured chain rather than by touching
+     * the pooled connection directly: the first isValid() call that passes
+     * through it is delegated as usual - answered by the driver, while the
+     * session is still live - and as it returns the interceptor marks the
+     * connection discarded, leaving the borrower holding a handle whose
+     * session is out of service. It is configured through the
+     * jdbcInterceptors class-name list, so it must stay a public static
+     * class with a no-arg constructor.
+     */
+    public static class DiscardMarkingInterceptor extends JdbcInterceptor {
+        private PooledConnection held;
+        private volatile boolean marked;
+
+        @Override
+        public void reset(ConnectionPool parent, PooledConnection con) {
+            held = con;
+            marked = false;
+        }
+
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args)
+                throws Throwable {
+            Object result = super.invoke(proxy, method, args);
+            if (!marked && "isValid".equals(method.getName())
+                    && held != null) {
+                marked = true;
+                held.setDiscarded(true);
+            }
+            return result;
         }
     }
 
