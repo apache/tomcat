@@ -270,4 +270,43 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
         Assert.assertEquals("3-RST-[" + Http2Error.FLOW_CONTROL_ERROR.getCode() + "]\n", output.getTrace());
 
     }
+
+
+    @Test
+    public void testDataFrameExceedsFlowControlWindow() throws Exception {
+        // Configure the server with a small initial flow-control window so it
+        // is easy to exceed from a test.
+        enableHttp2();
+        http2Protocol.setInitialWindowSize(1024);
+        configureAndStartWebApplication();
+        openClientConnection();
+        doHttpUpgrade();
+        sendClientPreface();
+
+        // Read initial server frames. The exact count varies (SETTINGS, SETTINGS-ACK,
+        // PING, response HEADERS and DATA for the upgrade request on stream 1).
+        // Keep reading until the SETTINGS frame with INITIAL_WINDOW_SIZE=1024 is seen.
+        s.setSoTimeout(5000);
+        while (!output.getTrace().contains("0-Settings-[4]-[1024]")) {
+            parser.readFrame();
+        }
+        output.clearTrace();
+
+        // Open a stream so the server expects request body data.
+        sendSimplePostRequest(3, null, false);
+        output.clearTrace();
+
+        // Send 2 kB of data, exceeding the advertised 1 kB stream window.
+        // Expect the stream to be reset with FLOW_CONTROL_ERROR; the connection
+        // must remain open because this is a stream-level window violation.
+        sendData(3, new byte[2048]);
+
+        // A connection-level WINDOW_UPDATE may precede the RST_STREAM as a
+        // side-effect of consuming the excess payload.
+        while (!output.getTrace().contains("3-RST-")) {
+            parser.readFrame();
+        }
+        Assert.assertTrue(output.getTrace(),
+                output.getTrace().contains("3-RST-[" + Http2Error.FLOW_CONTROL_ERROR.getCode() + "]"));
+    }
 }
