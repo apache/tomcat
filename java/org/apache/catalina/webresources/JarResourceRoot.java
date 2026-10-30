@@ -50,21 +50,6 @@ public class JarResourceRoot extends AbstractResource {
      * @param base the base file
      * @param baseUrl the base URL
      * @param webAppPath the web application path
-     *
-     * @deprecated Unused. Will be removed in Tomcat 12
-     */
-    @Deprecated
-    public JarResourceRoot(WebResourceRoot root, File base, String baseUrl, String webAppPath) {
-        this(root, base, baseUrl, webAppPath, "");
-    }
-
-    /**
-     * Constructs a new JarResourceRoot.
-     *
-     * @param root the resource root
-     * @param base the base file
-     * @param baseUrl the base URL
-     * @param webAppPath the web application path
      * @param internalPath the internal path that has been mounted
      */
     public JarResourceRoot(WebResourceRoot root, File base, String baseUrl, String webAppPath,
