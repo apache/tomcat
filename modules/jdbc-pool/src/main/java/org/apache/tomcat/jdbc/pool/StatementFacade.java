@@ -120,9 +120,11 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
          */
         protected boolean closed = false;
         /**
-         * The delegated statement.
+         * The delegated statement, nulled once a close has been forwarded. A handle can be closed from a thread other
+         * than the one invoking on it, so the field is read by more threads than the one that nulls it and, like the
+         * borrow-ended flag, must be volatile to reach them at all.
          */
-        protected Object delegate;
+        protected volatile Object delegate;
         /**
          * The SQL query text.
          */
@@ -163,19 +165,31 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
                 return Integer.valueOf(this.hashCode());
             }
             // Read the state once: whether the borrow has ended must not
-            // change while the call is being answered.
+            // change while the call is being answered, and the flag and the
+            // delegate are two separate fields, so a call that read the
+            // delegate as live can find it nulled by the next read - a
+            // close from another thread, interrupting a statement this call
+            // is blocking on, nulls it. A close that landed in between is
+            // then answered as closed, on the missing delegate as much as
+            // on the flag, rather than by invoking on a null object: that
+            // is a NullPointerException, and the application is owed the
+            // SQLException the closed contract promises. The window this
+            // cannot close is the race itself: a call that reads the
+            // delegate while it is still live goes to it, an outcome
+            // indistinguishable from having simply outrun the close.
             boolean ended = borrowEnded;
+            Object target = delegate;
             if (compare(CLOSE_VAL, method)) {
-                if (delegate == null || ended) {
+                if (target == null || ended) {
                     return null;
                 }
             }
             if (compare(ISCLOSED_VAL, method)) {
-                if (delegate == null || ended) {
+                if (target == null || ended) {
                     return Boolean.TRUE;
                 }
             }
-            if (delegate == null) {
+            if (target == null) {
                 throw new SQLException("Statement closed.");
             }
             if (ended) {
@@ -196,8 +210,10 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
 
             Object result;
             try {
-                // Invoke next
-                result = method.invoke(delegate, args);
+                // Invoke next, on the delegate this call read as live: the
+                // snapshot keeps a concurrent close from replacing the
+                // receiver with null between the guard and the call
+                result = method.invoke(target, args);
 
                 // Seal every result set the call hands back, whatever the
                 // method that returned it was called. Matching the three
@@ -242,6 +258,8 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
 
         @Override
         public String toString() {
+            // Reads the live delegate rather than a snapshot: a description
+            // says what the proxy holds as it is asked.
             StringBuffer buf = new StringBuffer(StatementProxy.class.getName());
             buf.append("[Proxy=");
             buf.append(hashCode());
@@ -260,7 +278,11 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
     protected class ResultSetProxy implements InvocationHandler {
 
         private final Object parent;
-        private Object delegate;
+        /**
+         * The delegated result set, nulled once a close has been forwarded. Read by other threads than the one that
+         * nulls it, so volatile, as in the statement proxy.
+         */
+        private volatile Object delegate;
 
         /**
          * Constructs a ResultSetProxy.
@@ -289,20 +311,26 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
             if (compare(HASHCODE_VAL, method)) {
                 return Integer.valueOf(this.hashCode());
             }
-            // Read the state once: whether the borrow has ended must not
-            // change while the call is being answered.
+            // Read the state once, both the borrow-ended flag and the
+            // delegate, for the statement proxy's reason: a close from
+            // another thread nulls the delegate, and a call that read the
+            // delegate as live must not find it nulled at the forward,
+            // where Method.invoke on a null receiver would answer with a
+            // NullPointerException rather than the SQLException the closed
+            // contract promises.
             boolean ended = borrowEnded;
+            Object target = delegate;
             if (compare(CLOSE_VAL, method)) {
-                if (delegate == null || ended) {
+                if (target == null || ended) {
                     return null;
                 }
             }
             if (compare(ISCLOSED_VAL, method)) {
-                if (delegate == null || ended) {
+                if (target == null || ended) {
                     return Boolean.TRUE;
                 }
             }
-            if (delegate == null) {
+            if (target == null) {
                 throw new SQLException("ResultSet closed.");
             }
             if (ended) {
@@ -318,8 +346,9 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
 
             Object result;
             try {
-                // Invoke next
-                result = method.invoke(delegate, args);
+                // Invoke next, on the delegate this call read as live, as
+                // in the statement proxy
+                result = method.invoke(target, args);
 
                 // The statement proxy's rule, mirrored one layer down: a
                 // cursor-valued column - a nested cursor, or a REF cursor
@@ -360,6 +389,8 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
 
         @Override
         public String toString() {
+            // Reads the live delegate rather than a snapshot, as in the
+            // statement proxy.
             return ResultSetProxy.class.getName() + "[Proxy=" + hashCode() + "; Delegate=" + delegate + ']';
         }
     }
