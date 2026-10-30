@@ -222,13 +222,17 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      */
     protected class StatementProxy implements InvocationHandler {
         /**
-         * Indicates whether the proxy has been closed.
+         * Indicates whether the proxy has been closed. A statement can be closed from a thread other than the one
+         * executing on it - the statement finalizer closes tracked statements from whichever thread closes the
+         * connection - so the flag is written by one thread and read by others, and must be volatile to reach them at
+         * all.
          */
-        protected boolean closed = false;
+        protected volatile boolean closed = false;
         /**
-         * The underlying statement or connection being proxied.
+         * The underlying statement or connection being proxied, nulled once a close has been forwarded. It is read by
+         * threads other than the one that nulls it, so, like {@link #closed}, volatile.
          */
-        protected Object delegate;
+        protected volatile Object delegate;
         /**
          * The SQL query being executed.
          */
@@ -267,16 +271,32 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
             }
             // Was close invoked?
             boolean close = compare(CLOSE_VAL, name);
-            // Allow close to be called multiple times
-            if (close && closed) {
+            // Read the state once: another thread's close() - the pool's
+            // statement finalizer closes tracked statements from whichever
+            // thread closes the connection - may complete while this call
+            // is being answered, and flag and delegate are two separate
+            // fields, so a call that read the flag as open can find the
+            // delegate already nulled. A close that finished in between is
+            // then answered as closed, on the missing delegate as much as
+            // on the flag, rather than by invoking on a null object: that
+            // is a NullPointerException, and the application is owed the
+            // SQLException the closed contract promises. The window this
+            // cannot close is the race itself: a call that reads the
+            // delegate while it is still live goes to it, an outcome
+            // indistinguishable from having simply outrun the close.
+            final boolean wasClosed = closed;
+            final Object target = delegate;
+            final boolean gone = wasClosed || target == null;
+            // Allow close to be called multiple times, from either thread
+            if (close && gone) {
                 return null;
             }
             // Are we calling isClosed?
             if (compare(ISCLOSED_VAL, name)) {
-                return Boolean.valueOf(closed);
+                return Boolean.valueOf(gone);
             }
             // If we are calling anything else, bail out
-            if (closed) {
+            if (gone) {
                 throw new SQLException("Statement closed.");
             }
             boolean process = false;
@@ -292,8 +312,11 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
             long startNanos = (process) ? System.nanoTime() : 0;
             Object result = null;
             try {
-                // Execute the query
-                result = method.invoke(delegate, args);
+                // Execute the query, on the delegate this call read as
+                // live: the snapshot keeps a concurrent close from
+                // replacing the receiver with null between the guard and
+                // the call
+                result = method.invoke(target, args);
             } catch (Throwable t) {
                 // Only report the failure if we were executing a query.
                 // For any other method there is no query to report, and
@@ -370,6 +393,8 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
 
         @Override
         public String toString() {
+            // Reads the live delegate rather than a snapshot: a description
+            // says what the proxy holds as it is asked.
             return AbstractQueryReport.this.getClass().getName() + "[Proxy=" + hashCode() + "; Query=" + query +
                     "; Delegate=" + delegate + ']';
         }
