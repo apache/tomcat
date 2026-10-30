@@ -143,14 +143,6 @@ public final class Constants {
      */
     public static final int SC_RESP_WWW_AUTHENTICATE = 0xA00B;
 
-    /**
-     * Maximum number of response header codes.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 12 onwards
-     */
-    @Deprecated
-    public static final int SC_RESP_AJP13_MAX = 11;
-
     // Integer codes for common (optional) request attribute names
 
     /**
