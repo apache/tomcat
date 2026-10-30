@@ -462,9 +462,16 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
 
         @Override
         public void closeInvoked() {
-            // Should we cache it
+            // Should we cache it. Read the counter once, as getCacheSize()
+            // does: a disposal (reset(null, null) from a finalize or from an
+            // abandoned or closed session) nulls the field, and a handle the
+            // application kept through that window must still close through
+            // the normal path - the sibling entry points answer a disposed
+            // cache quietly; this first read has to do the same rather than
+            // dereference the field.
+            AtomicInteger size = cacheSize;
             boolean shouldClose = true;
-            if (cacheSize.get() < maxCacheSize) {
+            if (size != null && size.get() < maxCacheSize) {
                 // Cache a proxy so that we don't reuse the facade
                 CachedStatement proxy = new CachedStatement(getDelegate(), getSql());
                 proxy.setCacheKey(getCacheKey());
