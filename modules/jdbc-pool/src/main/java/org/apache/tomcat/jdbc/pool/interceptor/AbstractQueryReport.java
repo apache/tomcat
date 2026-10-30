@@ -268,8 +268,14 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
             boolean process = false;
             // Check to see if we are about to execute a query
             process = isExecute(method, process);
-            // If we are executing, get the current time
+            // If we are executing, get the current time. The wall clock
+            // only gives the timestamp the report hooks carry; the elapsed
+            // time is measured with the monotonic clock below, since a clock
+            // step between two wall clock reads could make a negative
+            // duration, which loses the slow query report and corrupts the
+            // statistics booked from it
             long start = (process) ? System.currentTimeMillis() : 0;
+            long startNanos = (process) ? System.nanoTime() : 0;
             Object result = null;
             try {
                 // Execute the query
@@ -297,8 +303,8 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
                     throw t;
                 }
             }
-            // Measure the time
-            long delta = (process) ? (System.currentTimeMillis() - start) : Long.MIN_VALUE;
+            // Measure the time, rounded to the nearest millisecond
+            long delta = (process) ? (System.nanoTime() - startNanos + 500000) / 1000000 : Long.MIN_VALUE;
             // See if we meet the requirements to measure
             if (delta > threshold) {
                 try {
