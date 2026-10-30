@@ -579,6 +579,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             String alias = getServedAlias(certificate);
             X509Certificate[] chain = x509KeyManager.getCertificateChain(alias);
             PrivateKey key = x509KeyManager.getPrivateKey(alias);
+            if (key == null || key.getEncoded() == null || chain == null || chain.length == 0) {
+                throw new SSLException(sm.getString("openssl.errorLoadingCertificate", alias));
+            }
             String encodedKey = BEGIN_KEY +
                     Base64.getMimeEncoder(64, new byte[] { '\n' }).encodeToString(key.getEncoded()) + END_KEY;
             SSLContext.setCertificateRaw(state.ctx, chain[0].getEncoded(),
