@@ -62,7 +62,9 @@ public class SlowQueryReport extends AbstractQueryReport {
     protected volatile ConcurrentHashMap<String, QueryStats> queries = null;
     /**
      * Maximum number of queries we will be storing statistics for. Eviction keeps the number of stored queries near
-     * this amount; while queries are being executed concurrently it can briefly be exceeded.
+     * this amount; while queries are being executed concurrently it can briefly be exceeded. This sizes the statistics
+     * store only: the slow and failed query logging is configured by {@link #setLogSlow(boolean)} and
+     * {@link #setLogFailed(boolean)} independently of this value.
      */
     protected int maxQueries = 1000; // Don't store more than this amount of queries
 
@@ -115,16 +117,23 @@ public class SlowQueryReport extends AbstractQueryReport {
     @Override
     protected String reportFailedQuery(String query, Object[] args, String name, long start, Throwable t) {
         String sql = super.reportFailedQuery(query, args, name, start, t);
+        long now = System.currentTimeMillis();
+        long delta = now - start;
         if (this.maxQueries > 0) {
-            long now = System.currentTimeMillis();
-            long delta = now - start;
             QueryStats qs = this.getQueryStats(sql);
             if (qs != null) {
                 qs.failure(delta, now);
             }
-            if (isLogFailed() && log.isWarnEnabled()) {
-                log.warn("Failed Query Report SQL=" + sql + "; time=" + delta + " ms;");
-            }
+        }
+        // The WARN reports the event, not the statistics booking: the
+        // logFailed flag configures it, and maxQueries only sizes the
+        // statistics store. Keeping the log inside the capacity guard
+        // made maxQueries=0 - "store no per-query statistics" - silence
+        // the log channel while SlowQueryReportJmx kept sending the
+        // FAILED QUERY notification behind isLogFailed() alone, the two
+        // channels disagreeing on the same event.
+        if (isLogFailed() && log.isWarnEnabled()) {
+            log.warn("Failed Query Report SQL=" + sql + "; time=" + delta + " ms;");
         }
         return sql;
     }
@@ -149,20 +158,22 @@ public class SlowQueryReport extends AbstractQueryReport {
             if (qs != null) {
                 qs.add(delta, start);
             }
-            // The WARN reports the event, not the statistics booking: it must
-            // go out whenever the query is reported as slow, whether or not
-            // this instance can resolve a statistics entry for it. Otherwise
-            // the log channel falls silent exactly on the windows where
-            // getQueryStats legitimately hands back no entry - this instance's
-            // statistics reference released by a chain release, or the entry
-            // lost to the post-putIfAbsent get race against capacity eviction -
-            // while SlowQueryReportJmx keeps sending the JMX notification
-            // behind isLogSlow() alone, and the two channels disagree on the
-            // same event. This mirrors how reportFailedQuery logs outside its
-            // own statistics guard.
-            if (isLogSlow() && log.isWarnEnabled()) {
-                log.warn("Slow Query Report SQL=" + sql + "; time=" + delta + " ms;");
-            }
+        }
+        // The WARN reports the event, not the statistics booking: the
+        // logSlow flag configures it, and maxQueries only sizes the
+        // statistics store. The log must therefore sit outside the
+        // capacity guard, and outside the statistics lookup altogether:
+        // getQueryStats legitimately hands back no entry - when the
+        // store is disabled, when this instance's statistics reference
+        // was released by a chain release, or when the entry was lost to
+        // the post-putIfAbsent get race against capacity eviction - and
+        // gating the WARN on it would let the log channel fall silent
+        // while SlowQueryReportJmx keeps sending the SLOW QUERY
+        // notification behind isLogSlow() alone, the two channels
+        // disagreeing on the same event. This mirrors how
+        // reportFailedQuery reports its event.
+        if (isLogSlow() && log.isWarnEnabled()) {
+            log.warn("Slow Query Report SQL=" + sql + "; time=" + delta + " ms;");
         }
         return sql;
     }
