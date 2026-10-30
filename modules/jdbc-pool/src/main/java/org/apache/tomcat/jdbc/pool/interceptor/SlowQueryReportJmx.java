@@ -503,11 +503,20 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     /**
      * JMX operation - returns all the queries we have collected.
      *
-     * @return - the slow query report as composite data.
+     * @return - the slow query report as composite data; an empty array when the pool name holds no statistics map -
+     *             none was ever registered under it, or the last live pool of the name has closed and freed it
      */
     @Override
     public CompositeData[] getSlowQueriesCD() throws OpenDataException {
-        CompositeDataSupport[] result = null;
+        // Default to the empty array, never null: the descriptor advertises
+        // the attribute as a CompositeData array, getPoolNames() beside it
+        // already degrades to an empty String array, and the name's statistics
+        // map can be gone while a client still reaches this registration -
+        // reading between the release of the statistics and the unregistration
+        // in poolClosed, or permanently when the unregistration of the closed
+        // pool's MBean was refused and JmxUtil swallowed the failure. A client
+        // that trusts the advertised type must not find null in its hands.
+        CompositeDataSupport[] result = new CompositeDataSupport[0];
         ConcurrentHashMap<String, QueryStats> queries = getPoolStats(poolName);
         if (queries != null) {
             // Materialise a point-in-time snapshot before sizing the array:
