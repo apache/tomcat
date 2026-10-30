@@ -28,6 +28,7 @@ import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.sql.Statement;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
@@ -50,7 +51,9 @@ import org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;
  * is applied to the session, unusable configuration is normalised or
  * tolerated instead of wedging the pool, a state the driver refuses to
  * restore fails the borrow instead of silently handing out the wrong
- * state, and the session the application receives is in a defined state.
+ * state, an isolation default the driver refuses for good converges at its
+ * first refusal instead of looping on every borrow, and the session the
+ * application receives is in a defined state.
  *
  * <p>Scenarios harvested from the retired legacy classes
  * {@code Bug54225} (blank init SQL), {@code Bug54978} (init SQL used for
@@ -69,6 +72,23 @@ class TestConnectionSetup extends JdbcPoolBaseTest {
      * the failure window opens and closes.
      */
     private static final AtomicReference<String> THROW_FROM = new AtomicReference<>();
+
+    /*
+     * Driver-level call counters, fed by the same wrapping proxy: tests
+     * that must pin what a borrow did to the physical session - not just
+     * what the session ended up looking like - count through these. The
+     * tests below are sequential and reset what they observe.
+     */
+    private static final AtomicInteger ROLLBACKS = new AtomicInteger();
+    private static final AtomicInteger ISOLATION_ATTEMPTS = new AtomicInteger();
+
+    private int rowCount(Connection c, String table) throws Exception {
+        try (Statement st = c.createStatement();
+                ResultSet rs = st.executeQuery("SELECT COUNT(*) FROM " + table)) {
+            rs.next();
+            return rs.getInt(1);
+        }
+    }
 
     private static String initMarker(Connection c) throws Exception {
         try (Statement st = c.createStatement();
@@ -162,6 +182,105 @@ class TestConnectionSetup extends JdbcPoolBaseTest {
     }
 
     /*
+     * A permanently refused isolation default used to leave the pool in a
+     * loop: the failed restore re-nulled the cache, so every later borrow
+     * again saw a restore to do, again terminated whatever the previous
+     * borrower left pending - work the doomed restore could never make right
+     * - and again attempted, and logged, the same refused
+     * setTransactionIsolation. The refusal is now recorded per session, for
+     * the refused level (and logged there and then), so later borrows stop
+     * treating the level as a restore need: nothing is terminated, attempted
+     * or logged for it again, while a healthy restore still terminates as
+     * ever, and a later configuration of a different level is applied as
+     * usual. The honest
+     * trade-off, pinned below: with the refused level as the only restore
+     * need, a transaction the previous borrower left open now reaches the
+     * next one - the pre-existing behavior of a pool that configures no
+     * defaults at all, still covered by rollbackOnReturn or abandon handling
+     * where those are configured.
+     */
+    @Test
+    void aRefusedIsolationRestoreConvergesAfterTheFirstRefusal() throws Exception {
+        DataSource ds = newDataSource();
+        ds.setDriverClassName(FailingRestoreDriver.class.getName());
+        ds.getPoolProperties().setJdbcInterceptors(ConnectionState.class.getName());
+        // not a JDBC isolation level: H2 itself refuses it, nothing armed
+        ds.getPoolProperties().setDefaultTransactionIsolation(-55);
+        ds.createPool();
+        String t = uniqueTable();
+        try (Connection admin = adminConnection(); Statement st = admin.createStatement()) {
+            st.execute("CREATE TABLE " + t + " (v INT)");
+        }
+        ROLLBACKS.set(0);
+        ISOLATION_ATTEMPTS.set(0);
+
+        // The refusal surfaces on this first borrow; the borrower then
+        // returns the connection mid-transaction.
+        Connection first = ds.getConnection();
+        setSessionMarker(first, 51);
+        first.setAutoCommit(false);
+        try (Statement st = first.createStatement()) {
+            st.executeUpdate("INSERT INTO " + t + " VALUES (1)");
+        }
+        first.close(); // still in a transaction
+        Assertions.assertEquals(1, ISOLATION_ATTEMPTS.get(),
+                "the configured level must be attempted once on the first borrow");
+
+        // The two later borrows: pre-fix each of them rolled the abandoned
+        // row away and re-attempted (and re-logged) the doomed restore; now
+        // neither does, and the abandoned work survives to the new borrower.
+        for (int borrow = 2; borrow <= 3; borrow++) {
+            try (Connection later = ds.getConnection()) {
+                Assertions.assertEquals(Integer.valueOf(51), sessionMarker(later),
+                        "borrow " + borrow + " must reuse the same physical session");
+                Assertions.assertEquals(Connection.TRANSACTION_READ_COMMITTED,
+                        later.getTransactionIsolation(),
+                        "borrow " + borrow + " must be told the session's real "
+                                + "isolation level, never the refused default");
+                Assertions.assertEquals(1, rowCount(later, t),
+                        "borrow " + borrow + " must not terminate the transaction "
+                                + "the previous borrower left open");
+            }
+        }
+        Assertions.assertEquals(0, ROLLBACKS.get(),
+                "no borrow after the refusal may roll the session back");
+        Assertions.assertEquals(1, ISOLATION_ATTEMPTS.get(),
+                "the refused level must not be re-attempted on later borrows");
+        Assertions.assertEquals(1, poolSessions(), "the refused session stays in service");
+        Assertions.assertEquals(1, ds.getIdle(), "and the pool keeps pooling it");
+
+        // The refusal covers the refused level only: re-configuring a level
+        // this session has not refused (the JMX setter just writes the pool
+        // property, which the reset reads on every borrow) must be attempted
+        // on the same session, and applied.
+        ds.getPoolProperties().setDefaultTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
+        try (Connection corrected = ds.getConnection()) {
+            Assertions.assertEquals(Integer.valueOf(51), sessionMarker(corrected),
+                    "the re-configured level must be applied on the same physical session");
+            Assertions.assertEquals(Connection.TRANSACTION_REPEATABLE_READ,
+                    corrected.getTransactionIsolation(),
+                    "a level the session never refused must not be suppressed by the earlier refusal");
+        }
+        Assertions.assertEquals(2, ISOLATION_ATTEMPTS.get(),
+                "the re-configured level must be attempted exactly once");
+        Assertions.assertEquals(1, ROLLBACKS.get(),
+                "restoring the re-configured level must terminate the transaction left open");
+
+        // and it sticks: the cache shows it in place, so later borrows neither
+        // re-attempt nor terminate for it
+        try (Connection later = ds.getConnection()) {
+            Assertions.assertEquals(Integer.valueOf(51), sessionMarker(later),
+                    "later borrows still reuse the same physical session");
+            Assertions.assertEquals(Connection.TRANSACTION_REPEATABLE_READ,
+                    later.getTransactionIsolation(), "the re-configured level must stick");
+        }
+        Assertions.assertEquals(2, ISOLATION_ATTEMPTS.get(),
+                "the re-configured level must not be re-attempted once it is in place");
+        Assertions.assertEquals(1, ROLLBACKS.get(),
+                "and no borrow after the restore may terminate a transaction for it");
+    }
+
+    /*
      * The read-only, auto-commit and catalog defaults the ConnectionState
      * interceptor restores on every borrow. Unlike the isolation level above,
      * a driver that refuses one of these leaves the session KNOWN to sit in a
@@ -230,9 +349,10 @@ class TestConnectionSetup extends JdbcPoolBaseTest {
     /**
      * Driver handing out the real H2 connections wrapped in a proxy that
      * fails the currently armed method with a SQLException, as a real driver
-     * refuses a catalog it cannot select or a state it cannot apply.
-     * Configured through {@code driverClassName}, so it must stay a public
-     * static class with a no-arg constructor.
+     * refuses a catalog it cannot select or a state it cannot apply, and
+     * that counts the {@code rollback()} and {@code setTransactionIsolation()}
+     * calls reaching the driver. Configured through {@code driverClassName},
+     * so it must stay public with a no-arg constructor.
      */
     public static class FailingRestoreDriver implements Driver {
 
@@ -281,7 +401,10 @@ class TestConnectionSetup extends JdbcPoolBaseTest {
         }
     }
 
-    /* Fails the armed method by name; delegates everything else to H2. */
+    /*
+     * Fails the armed method by name and counts the rollback() and
+     * setTransactionIsolation() calls; delegates everything else to H2.
+     */
     private static class FailingHandler implements InvocationHandler {
 
         private final Connection vendor;
@@ -294,6 +417,11 @@ class TestConnectionSetup extends JdbcPoolBaseTest {
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             if (method.getName().equals(THROW_FROM.get())) {
                 throw new SQLException("driver refuses " + method.getName() + " with these arguments");
+            }
+            if ("rollback".equals(method.getName())) {
+                ROLLBACKS.incrementAndGet();
+            } else if ("setTransactionIsolation".equals(method.getName())) {
+                ISOLATION_ATTEMPTS.incrementAndGet();
             }
             try {
                 return method.invoke(vendor, args);
