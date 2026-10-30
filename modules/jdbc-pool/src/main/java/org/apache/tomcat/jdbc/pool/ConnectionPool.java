@@ -48,6 +48,8 @@ import javax.sql.XAConnection;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.jdbc.pool.interceptor.QueryTimeoutInterceptor;
+import org.apache.tomcat.jdbc.pool.interceptor.StatementCache;
 
 /**
  * Implementation of simple connection pool. The ConnectionPool uses a {@link PoolProperties} object for storing all the
@@ -694,6 +696,11 @@ public class ConnectionPool {
                 throw ex;
             }
         }
+        // Every interceptor class has now been loaded and instantiated above,
+        // so the parsed definitions can be compared against each other. The
+        // relative order of two interceptors in the chain is not something a
+        // single interceptor can see; only the pool holds the ordered list.
+        checkInterceptorOrder(proxies);
 
         // Initialize the pool with its initial set of members
         PooledConnection[] initialPool = new PooledConnection[poolProperties.getInitialSize()];
@@ -725,6 +732,48 @@ public class ConnectionPool {
         }
 
         closed = false;
+    }
+
+    /**
+     * Warns once at pool start when the configured interceptor chain lets the statement cache answer a cache hit
+     * before the query timeout interceptor can re-apply its timeout. A
+     * {@link org.apache.tomcat.jdbc.pool.interceptor.StatementCache} hit is served without invoking the rest of the
+     * chain, and a statement recycled into the cache carries query timeout zero, so a
+     * {@link org.apache.tomcat.jdbc.pool.interceptor.QueryTimeoutInterceptor} listed after the cache never sees the
+     * reuse and every cached statement executes with no timeout. The chain is built back-to-front in
+     * {@link #setupConnection(PooledConnection)}, making the first-listed interceptor the outermost one, so the
+     * timeout interceptor must be listed before the cache. This detection only reports the misconfiguration; no
+     * behaviour is changed.
+     *
+     * @param proxies the parsed interceptor definitions, in configuration order
+     */
+    private void checkInterceptorOrder(PoolProperties.InterceptorDefinition[] proxies) {
+        int firstCache = -1;
+        int lastTimeout = -1;
+        for (int i = 0; i < proxies.length; i++) {
+            try {
+                Class<? extends JdbcInterceptor> interceptorClass = proxies[i].getInterceptorClass();
+                if (StatementCache.class == interceptorClass) {
+                    if (firstCache < 0) {
+                        firstCache = i;
+                    }
+                } else if (QueryTimeoutInterceptor.class == interceptorClass) {
+                    lastTimeout = i;
+                }
+            } catch (ReflectiveOperationException | LinkageError x) {
+                // The pool-start loop above has already loaded and instantiated every one of these classes, so
+                // resolution cannot fail here. This check is diagnostic only; if it ever does fail, say nothing
+                // rather than disturbing a pool that started successfully.
+                return;
+            }
+        }
+        if (firstCache >= 0 && lastTimeout > firstCache) {
+            log.warn("The [StatementCache] interceptor is configured before [QueryTimeoutInterceptor]. "
+                    + "A statement cache hit is answered by the cache without invoking the timeout interceptor, "
+                    + "and a statement recycled into the cache carries no timeout, so cached statements run "
+                    + "without a query timeout. List QueryTimeoutInterceptor before StatementCache in the "
+                    + "jdbcInterceptors configuration.");
+        }
     }
 
     /**
