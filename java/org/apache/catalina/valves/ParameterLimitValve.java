@@ -90,12 +90,13 @@ import org.apache.tomcat.util.file.ConfigurationSource;
 public class ParameterLimitValve extends ValveBase {
 
     /**
-     * Map for URL-specific limits. Entries are kept in configuration order so that, when several patterns match a
-     * request, the first configured matching pattern wins. The map is published by replacing the reference rather than
-     * by being modified after publication, so readers work with a snapshot of the reference and never observe a
-     * partially updated map.
+     * Map for URL-specific limits, keyed by the regular expression of the URL pattern. {@link Pattern} does not
+     * implement value based equality so it can't be used as the key if a repeated pattern is to replace the earlier
+     * limits. Entries are kept in configuration order so that, when several patterns match a request, the first
+     * configured matching pattern wins. The map is published by replacing the reference rather than by being modified
+     * after publication, so readers work with a snapshot of the reference and never observe a partially updated map.
      */
-    private volatile Map<Pattern,Integer[]> urlPatternLimits = Collections.emptyMap();
+    private volatile Map<String,UrlPatternLimit> urlPatternLimits = Collections.emptyMap();
 
     /**
      * Relative path to the configuration file. Note: If the valve's container is a context, this will be relative to
@@ -199,18 +200,19 @@ public class ParameterLimitValve extends ValveBase {
      * @param urlPatternConfig The URL pattern to parameter limit mappings
      */
     public synchronized void setUrlPatternLimits(String urlPatternConfig) {
-        urlPatternLimits = Collections.unmodifiableMap(
-                parseUrlPatternLimits(new BufferedReader(new StringReader(urlPatternConfig))));
+        urlPatternLimits = Collections
+                .unmodifiableMap(parseUrlPatternLimits(new BufferedReader(new StringReader(urlPatternConfig))));
     }
 
     /**
      * Set the mapping of URL patterns to their corresponding parameter limits. The input should be provided line by
      * line, where each line contains a pattern and a limit, separated by the last '='. The parsed limits are added
-     * after any previously configured limits. If a parsed pattern matches an already configured pattern, its limit
-     * replaces the previous one at the original position, preserving the configuration order used to select the
-     * matching pattern. The parsed limits are only applied if the complete input is parsed successfully. If parsing
-     * fails, the exception is propagated and any previously configured limits are left unchanged. If a read error
-     * occurs, it is logged and the input read so far is discarded without modifying the configured limits.
+     * after any previously configured limits. If a parsed pattern has the same regular expression as an already
+     * configured pattern, its limit replaces the previous one at the original position, preserving the configuration
+     * order used to select the matching pattern. The same applies to a pattern repeated within the input. The parsed
+     * limits are only applied if the complete input is parsed successfully. If parsing fails, the exception is
+     * propagated and any previously configured limits are left unchanged. If a read error occurs, it is logged and the
+     * input read so far is discarded without modifying the configured limits.
      * <p>
      * Example:
      *
@@ -225,7 +227,7 @@ public class ParameterLimitValve extends ValveBase {
      *                   line.
      */
     public synchronized void setUrlPatternLimits(BufferedReader reader) {
-        Map<Pattern,Integer[]> newLimits = new LinkedHashMap<>(urlPatternLimits);
+        Map<String,UrlPatternLimit> newLimits = new LinkedHashMap<>(urlPatternLimits);
         newLimits.putAll(parseUrlPatternLimits(reader));
         urlPatternLimits = Collections.unmodifiableMap(newLimits);
     }
@@ -239,11 +241,11 @@ public class ParameterLimitValve extends ValveBase {
      *
      * @return The parsed mappings
      */
-    private Map<Pattern,Integer[]> parseUrlPatternLimits(BufferedReader reader) {
+    private Map<String,UrlPatternLimit> parseUrlPatternLimits(BufferedReader reader) {
         if (containerLog == null && getContainer() != null) {
             containerLog = LogFactory.getLog(getContainer().getLogName() + ".parameterLimit");
         }
-        Map<Pattern,Integer[]> newLimits = new LinkedHashMap<>();
+        Map<String,UrlPatternLimit> newLimits = new LinkedHashMap<>();
         try {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -262,16 +264,17 @@ public class ParameterLimitValve extends ValveBase {
                 String patternString = line.substring(0, lastEqualsIndex).strip();
                 String limitsString = line.substring(lastEqualsIndex + 1).strip();
 
-                Pattern pattern = Pattern.compile(UDecoder.URLDecode(patternString, StandardCharsets.UTF_8));
+                String regex = UDecoder.URLDecode(patternString, StandardCharsets.UTF_8);
+                Pattern pattern = Pattern.compile(regex);
                 String[] limits = limitsString.split(",");
                 if (limits.length == 1) {
-                    newLimits.put(pattern, new Integer[] { Integer.valueOf(limits[0]), null, null });
+                    newLimits.put(regex,
+                            new UrlPatternLimit(pattern, new Integer[] { Integer.valueOf(limits[0]), null, null }));
                 } else if (limits.length == 3) {
-                    newLimits.put(pattern, new Integer[] { Integer.valueOf(limits[0]),
-                            Integer.valueOf(limits[1]), Integer.valueOf(limits[2]) });
+                    newLimits.put(regex, new UrlPatternLimit(pattern, new Integer[] { Integer.valueOf(limits[0]),
+                            Integer.valueOf(limits[1]), Integer.valueOf(limits[2]) }));
                 } else {
-                    throw new IllegalArgumentException(
-                            sm.getString("parameterLimitValve.invalidLimits", limitsString));
+                    throw new IllegalArgumentException(sm.getString("parameterLimitValve.invalidLimits", limitsString));
                 }
                 if (containerLog != null && containerLog.isTraceEnabled()) {
                     containerLog.trace("Add pattern " + pattern + " and limit(s) " + limitsString);
@@ -296,13 +299,13 @@ public class ParameterLimitValve extends ValveBase {
     /**
      * {@inheritDoc}
      * <p>
-     * Checks if any of the defined patterns matches the URI of the request and if it does, enforces the parameter
-     * limit of the first matching pattern in configuration order. Then invoke the next Valve in the sequence.
+     * Checks if any of the defined patterns matches the URI of the request and if it does, enforces the parameter limit
+     * of the first matching pattern in configuration order. Then invoke the next Valve in the sequence.
      */
     @Override
     public void invoke(Request request, Response response) throws IOException, ServletException {
 
-        Map<Pattern,Integer[]> urlPatternLimitsSnapshot = urlPatternLimits;
+        Map<String,UrlPatternLimit> urlPatternLimitsSnapshot = urlPatternLimits;
 
         if (urlPatternLimitsSnapshot.isEmpty()) {
             getNext().invoke(request, response);
@@ -314,9 +317,9 @@ public class ParameterLimitValve extends ValveBase {
         // Iterate over the URL patterns and apply the limits of the first
         // matching pattern. The map is in configuration order, so when several
         // patterns match, the first configured matching pattern wins.
-        for (Map.Entry<Pattern,Integer[]> entry : urlPatternLimitsSnapshot.entrySet()) {
-            if (entry.getKey().matcher(requestURI).matches()) {
-                Integer[] limits = entry.getValue();
+        for (UrlPatternLimit urlPatternLimit : urlPatternLimitsSnapshot.values()) {
+            if (urlPatternLimit.pattern().matcher(requestURI).matches()) {
+                Integer[] limits = urlPatternLimit.limits();
                 // maxParameterCount should always be present
                 request.setMaxParameterCount(limits[0].intValue());
                 if (limits[1] != null) {
@@ -329,5 +332,16 @@ public class ParameterLimitValve extends ValveBase {
 
         // Invoke the next valve to continue processing the request
         getNext().invoke(request, response);
+    }
+
+
+    /**
+     * The compiled URL pattern and the limits to apply to the requests that match it.
+     *
+     * @param pattern The compiled URL pattern
+     * @param limits  The maxParameterCount, maxPartCount and maxPartHeaderSize limits, the latter two being
+     *                    {@code null} if not configured
+     */
+    private record UrlPatternLimit(Pattern pattern, Integer[] limits) {
     }
 }

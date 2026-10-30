@@ -319,7 +319,7 @@ public class SemaphoreValve extends ValveBase {
      * Async listener that releases the permit held for a request that entered asynchronous mode, exactly once, when
      * the asynchronous processing completes or fails.
      */
-    private class ReleasePermitAsyncListener implements AsyncListener {
+    private static class ReleasePermitAsyncListener implements AsyncListener {
 
         private final Semaphore semaphore;
         private final AtomicBoolean released = new AtomicBoolean(false);

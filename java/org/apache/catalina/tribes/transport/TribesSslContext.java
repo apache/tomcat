@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.catalina.tribes.group;
+package org.apache.catalina.tribes.transport;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;

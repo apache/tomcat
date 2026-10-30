@@ -560,7 +560,7 @@ public class RewriteValve extends ValveBase {
                 if (rule.isNext() && newtest != null) {
                     if (rounds >= MAX_REWRITE_ROUNDS) {
                         containerLog.warn(sm.getString("rewriteValve.maxRounds",
-                                Integer.valueOf(MAX_REWRITE_ROUNDS)));
+                                Integer.valueOf(MAX_REWRITE_ROUNDS), request.getRequestURI()));
                         break;
                     }
                     rounds++;
