@@ -314,16 +314,31 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
 
         /**
          * Called when the close method is invoked on the statement.
+         * <p>
+         * The driver's answer is passed on to the caller: {@code Statement.close()} declares
+         * {@link SQLException} for a database error while closing, and this proxy reports every other
+         * call as the delegate answered it, so a failed close must not come back as a success. The
+         * swallowed failure this replaces told the application that the statement was closed while
+         * the driver had left its resources on the session the pooled connection was about to hand to
+         * the next borrower, and nothing along the path recorded or retried it.
+         * <p>
+         * The handle is retired whichever way the driver answered: the application has been told, and
+         * a handle whose close failed must not go on answering calls on a statement the driver may
+         * have half released. Where no application waits on the close - the cache dropping a
+         * statement, see {@link StatementCache#closeStatement} - the failure is answered with a log
+         * line instead, so that one statement that will not close cannot stop the rest of that purge.
+         *
+         * @throws SQLException if the underlying statement could not be closed
          */
-        public void closeInvoked() {
-            if (getDelegate() != null) {
-                try {
+        public void closeInvoked() throws SQLException {
+            try {
+                if (getDelegate() != null) {
                     getDelegate().close();
-                } catch (SQLException ignore) {
                 }
+            } finally {
+                closed = true;
+                delegate = null;
             }
-            closed = true;
-            delegate = null;
         }
 
         @Override
