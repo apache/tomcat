@@ -257,9 +257,7 @@ public class PooledConnection implements PooledConnectionMBean {
         }
 
         // Set up the default state, unless we expect the interceptor to do it
-        if (poolProperties.getJdbcInterceptors() == null ||
-                poolProperties.getJdbcInterceptors().indexOf(ConnectionState.class.getName()) < 0 ||
-                poolProperties.getJdbcInterceptors().indexOf(ConnectionState.class.getSimpleName()) < 0) {
+        if (!hasConnectionStateInterceptor()) {
             if (poolProperties.getDefaultTransactionIsolation() != DataSourceFactory.UNKNOWN_TRANSACTIONISOLATION) {
                 connection.setTransactionIsolation(poolProperties.getDefaultTransactionIsolation());
             }
@@ -290,6 +288,31 @@ public class PooledConnection implements PooledConnectionMBean {
         if (parent.getJmxPool() != null) {
             createMBean();
         }
+    }
+
+    /**
+     * Returns <code>true</code> if the configured interceptor chain contains the {@link ConnectionState} interceptor
+     * or a subclass of it, which applies the configured default connection state itself every time the connection is
+     * borrowed.
+     *
+     * <p>The interceptor is recognized by its resolved class rather than by its name in the configuration string:
+     * the documented short name resolves to the same class as the fully qualified name, a subclass inherits the job
+     * whatever it is named, and an interceptor merely named after the state interceptor does not do its job.</p>
+     *
+     * @return <code>true</code> if a {@link ConnectionState} interceptor is configured
+     */
+    private boolean hasConnectionStateInterceptor() {
+        for (PoolProperties.InterceptorDefinition definition : poolProperties.getJdbcInterceptorsAsArray()) {
+            try {
+                if (ConnectionState.class.isAssignableFrom(definition.getInterceptorClass())) {
+                    return true;
+                }
+            } catch (ClassNotFoundException e) {
+                // An interceptor whose class cannot be loaded can never join the chain, so this definition cannot be
+                // the state interceptor; fall through to the next one.
+            }
+        }
+        return false;
     }
 
     /**
