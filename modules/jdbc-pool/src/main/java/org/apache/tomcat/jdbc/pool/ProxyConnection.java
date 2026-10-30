@@ -28,6 +28,10 @@ import javax.sql.XAConnection;
  * ProxyConnection intercepts, among the calls it forwards, the following methods:
  * <ul>
  * <li>{@link java.sql.Connection#close()} - returns the connection to the pool. May be called multiple times.</li>
+ * <li>{@link java.sql.Connection#abort(java.util.concurrent.Executor)} - delegates the abort to the physical
+ * connection and then ends the borrow: the session is taken out of service and the slot is freed. On a released
+ * handle it is the specification's no-op; on a handle whose session the pool discarded while borrowed it skips the
+ * driver and ends the borrow quietly.</li>
  * <li>{@link java.lang.Object#toString()} - returns a custom string for this object</li>
  * <li>{@link javax.sql.PooledConnection#getConnection()} - returns the underlying connection</li>
  * <li>{@link java.lang.Object#equals(Object)} and {@link java.lang.Object#hashCode()} - answered with the identity of
@@ -254,6 +258,71 @@ public class ProxyConnection extends JdbcInterceptor {
             PooledConnection poolc = this.connection;
             this.connection = null;
             pool.returnConnection(poolc);
+            return null;
+        } else if (compare(ABORT_VAL, method)) {
+            // java.sql.Connection.abort(Executor). The specification has the
+            // call mark the connection closed, close the physical session and
+            // release its resources, and it makes the call on a closed
+            // connection a no-op. A handle its borrower has already released
+            // is answered by the disposable facade, which disposes of abort
+            // as it does of close and then answers it quietly; the guard here
+            // covers the same state reached without a facade. The pool and
+            // session fields are read once, into locals, for the whole branch:
+            // a concurrent disposal of the session - which a destroy or a
+            // factory close can trigger at any moment, from the finalizer
+            // thread - nulls them, and reading them again after the guard
+            // would either fail the branch with a null pointer or silently
+            // skip the return that frees the slot the abort is there to free.
+            ConnectionPool poolRef = this.pool;
+            PooledConnection poolc = this.connection;
+            if (poolc == null || poolRef == null) {
+                return null;
+            }
+            // The borrow ends here, ahead of the driver call, which the
+            // specification allows to run long: from now on every use of this
+            // handle fails the way it fails on a closed connection, and a
+            // concurrent close of the same handle finds it already ended.
+            this.connection = null;
+            try {
+                if (!poolc.isDiscarded()) {
+                    // A session the pool marked to be taken out of service on
+                    // its return while this handle was borrowed makes the
+                    // handle report itself closed, and the no-op the
+                    // specification prescribes for a closed connection asks
+                    // nothing of the driver.
+                    Connection physical = poolc.getConnection();
+                    if (physical != null) {
+                        // The driver's own answer - including the failure the
+                        // specification prescribes for a null executor, and a
+                        // refusal - reaches the caller.
+                        method.invoke(physical, args);
+                    }
+                }
+            } catch (Throwable t) {
+                if (t instanceof InvocationTargetException) {
+                    throw t.getCause() != null ? t.getCause() : t;
+                } else {
+                    throw t;
+                }
+            } finally {
+                // Whatever the driver made of the call, the session cannot go
+                // back to the pool: the application holding this handle now
+                // believes the specification, which says the connection is
+                // closed after abort, and will not return it - leaving it in
+                // busy would strand one maxActive slot per abort (bug 65929) -
+                // and where the driver ran the closing work asynchronously the
+                // session may die at any moment, so no other borrower may
+                // receive it either. Marking it discarded first, the return
+                // takes it out of service whatever the driver's isClosed()
+                // says, the same terminal step the pool takes on a connection
+                // whose state it cannot trust; it frees the slot and wakes the
+                // threads waiting for one. For a session already marked
+                // discarded it is that step run early: this handle is now
+                // disposed, so the close that was to complete the discard
+                // will not come.
+                poolc.setDiscarded(true);
+                poolRef.returnConnection(poolc);
+            }
             return null;
         } else if (compare(TOSTRING_VAL, method)) {
             return this.toString();
