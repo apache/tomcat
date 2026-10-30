@@ -23,7 +23,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import org.apache.tomcat.util.scan.MultiReleaseUtil;
-import org.apache.tomcat.util.scan.MultiReleaseUtil.MultiVersionInfo;
+import org.apache.tomcat.util.scan.MultiReleaseUtil.MultiReleaseInfo;
 
 /**
  * This class represents the contents of a jar by determining whether a given resource <b>might</b> be in the cache,
@@ -98,7 +98,7 @@ public final class JarContents {
         }
 
         // Versioned entries should be added to the table according to their real name
-        MultiVersionInfo multiVersionInfo = MultiReleaseUtil.parseVersion(name);
+        MultiReleaseInfo multiVersionInfo = MultiReleaseUtil.parseVersion(name);
         if (multiVersionInfo != null) {
             if (multiVersionInfo.isValid() && multiVersionInfo.version <= Runtime.version().feature()) {
                 startPos = multiVersionInfo.namePos;

@@ -25,7 +25,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.Manifest;
 
 import org.apache.tomcat.Jar;
-import org.apache.tomcat.util.scan.MultiReleaseUtil.MultiVersionInfo;
+import org.apache.tomcat.util.scan.MultiReleaseUtil.MultiReleaseInfo;
 
 /**
  * Base implementation of Jar for implementations that use a JarInputStream to access the JAR file.
@@ -201,7 +201,7 @@ public abstract class AbstractInputStreamJar implements Jar {
      * ordinary entries.
      */
     private static boolean isVersionedEntry(String name) {
-        MultiVersionInfo multiVersionInfo = MultiReleaseUtil.parseVersion(name);
+        MultiReleaseInfo multiVersionInfo = MultiReleaseUtil.parseVersion(name);
         return multiVersionInfo != null && multiVersionInfo.isValid();
     }
 
@@ -251,7 +251,7 @@ public abstract class AbstractInputStreamJar implements Jar {
         // sufficient to be able to create the renaming map required
         while (jarEntry != null) {
             String name = jarEntry.getName();
-            MultiVersionInfo multiVersionInfo = MultiReleaseUtil.parseVersion(name);
+            MultiReleaseInfo multiVersionInfo = MultiReleaseUtil.parseVersion(name);
             if (multiVersionInfo != null && multiVersionInfo.isValid()) {
                 // Ignore any entries targeting for a later version than
                 // the target for this runtime
