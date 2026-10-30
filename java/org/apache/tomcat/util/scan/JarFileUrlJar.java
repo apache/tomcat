@@ -34,6 +34,7 @@ import java.util.zip.ZipEntry;
 
 import org.apache.tomcat.Jar;
 import org.apache.tomcat.util.compat.JreCompat;
+import org.apache.tomcat.util.scan.MultiReleaseUtil.MultiVersionInfo;
 
 /**
  * Implementation of {@link Jar} that is optimised for file based JAR URLs that refer directly to a JAR file (e.g. URLs
@@ -86,8 +87,7 @@ public class JarFileUrlJar implements Jar {
 
     @Override
     public InputStream getInputStream(String name) throws IOException {
-        // JarFile#getEntry() is multi-release aware
-        ZipEntry entry = jarFile.getEntry(name);
+        ZipEntry entry = getEntry(name);
         if (entry == null) {
             return null;
         } else {
@@ -97,8 +97,7 @@ public class JarFileUrlJar implements Jar {
 
     @Override
     public long getLastModified(String name) throws IOException {
-        // JarFile#getEntry() is multi-release aware
-        ZipEntry entry = jarFile.getEntry(name);
+        ZipEntry entry = getEntry(name);
         if (entry == null) {
             return -1;
         } else {
@@ -108,9 +107,25 @@ public class JarFileUrlJar implements Jar {
 
     @Override
     public boolean exists(String name) throws IOException {
-        // JarFile#getEntry() is multi-release aware
-        ZipEntry entry = jarFile.getEntry(name);
-        return entry != null;
+        return getEntry(name) != null;
+    }
+
+    /*
+     * JarFile#getEntry() is only multi-release aware if the JarFile was opened for the current runtime version. That is
+     * not the case when the JarFile is obtained from a jar: URL so, for multi-release JARs, use the same look-up of the
+     * highest applicable version that is used when enumerating the entries.
+     */
+    private ZipEntry getEntry(String name) {
+        if (multiRelease) {
+            if (multiReleaseMap == null) {
+                multiReleaseMap = populateMultiReleaseMap();
+            }
+            JarEntry versionedEntry = multiReleaseMap.get(name);
+            if (versionedEntry != null) {
+                return versionedEntry;
+            }
+        }
+        return jarFile.getEntry(name);
     }
 
     @Override
@@ -163,13 +178,10 @@ public class JarFileUrlJar implements Jar {
                 if (entries.hasMoreElements()) {
                     entry = entries.nextElement();
                     name = entry.getName();
+                    MultiVersionInfo multiVersionInfo = MultiReleaseUtil.parseVersion(name);
                     // Get 'base' name
-                    if (name.startsWith("META-INF/versions/")) {
-                        int i = name.indexOf('/', 18);
-                        if (i == -1) {
-                            continue;
-                        }
-                        name = name.substring(i + 1);
+                    if (multiVersionInfo != null && multiVersionInfo.isValid()) {
+                        name = name.substring(multiVersionInfo.namePos);
                     }
                     if (name.isEmpty() || entryNamesSeen.contains(name)) {
                         continue;
@@ -259,29 +271,19 @@ public class JarFileUrlJar implements Jar {
         while (jarEntries.hasMoreElements()) {
             JarEntry jarEntry = jarEntries.nextElement();
             String name = jarEntry.getName();
-            if (name.startsWith("META-INF/versions/") && name.endsWith(".class")) {
-                int i = name.indexOf('/', 18);
-                if (i > 0) {
-                    String baseName = name.substring(i + 1);
-                    int version;
-                    try {
-                        // Note: the Integer.parseInt(CharSequence,int,int,int)
-                        // overload is not available on Java 8
-                        version = Integer.parseInt(name.substring(18, i));
-                    } catch (NumberFormatException e) {
-                        continue;
-                    }
+            MultiVersionInfo multiVersionInfo = MultiReleaseUtil.parseVersion(name);
+            if (multiVersionInfo != null && multiVersionInfo.isValid()) {
+                String baseName = name.substring(multiVersionInfo.namePos);
 
-                    // Ignore any entries targeting for a later version than
-                    // the target for this runtime
-                    if (version <= targetVersion) {
-                        Integer mappedVersion = mrVersions.get(baseName);
-                        // Ignore any entry for which a later version has
-                        // already been found
-                        if (mappedVersion == null || version > mappedVersion.intValue()) {
-                            mrVersions.put(baseName, Integer.valueOf(version));
-                            result.put(baseName, jarEntry);
-                        }
+                // Ignore any entries targeting for a later version than
+                // the target for this runtime
+                if (multiVersionInfo.version <= targetVersion) {
+                    Integer mappedVersion = mrVersions.get(baseName);
+                    // Ignore any entry for which a later version has
+                    // already been found
+                    if (mappedVersion == null || multiVersionInfo.version > mappedVersion.intValue()) {
+                        mrVersions.put(baseName, Integer.valueOf(multiVersionInfo.version));
+                        result.put(baseName, jarEntry);
                     }
                 }
             }

@@ -28,6 +28,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.apache.catalina.WebResourceSet;
+import org.apache.tomcat.util.compat.JreCompat;
 
 public class TestJarContents {
 
@@ -152,10 +153,69 @@ public class TestJarContents {
             // A leading slash is not significant
             Assert.assertTrue(
                     jarContents.mightContainResource("/META-INF/versions/9x/lead.txt"));
-            // Signed and valid version segments record the base name
-            Assert.assertTrue(jarContents.mightContainResource("plus.txt"));
-            Assert.assertTrue(jarContents.mightContainResource("minus.txt"));
+            // Signed version segments are invalid
+            Assert.assertTrue(jarContents.mightContainResource("META-INF/versions/+9/plus.txt"));
+            Assert.assertTrue(jarContents.mightContainResource("META-INF/versions/-9/minus.txt"));
+            // Valid version segments record the base name
             Assert.assertTrue(jarContents.mightContainResource("ok.txt"));
         }
+    }
+
+    @Test
+    public void testVersionedEntryForCurrentRuntime() throws Exception {
+        // An entry below the version directory for the running Java version
+        // is resolved under its base name. An entry targeting a later
+        // version is not applicable and remains under its full name.
+        int feature = JreCompat.getInstance().jarFileRuntimeMajorVersion();
+        String current = "META-INF/versions/" + feature + "/current.txt";
+        String later = "META-INF/versions/" + (feature + 1) + "/later.txt";
+        File f = createJar(current, later);
+
+        try (JarFile jarFile = new JarFile(f)) {
+            JarContents jarContents = new JarContents(jarFile);
+
+            Assert.assertTrue(jarContents.mightContainResource("current.txt"));
+            Assert.assertTrue(jarContents.mightContainResource(later));
+        }
+    }
+
+    @Test
+    public void testLeadingZeroVersion() throws Exception {
+        // The JDK does not treat a version directory with a leading zero as a
+        // versioned entry so the entry stays under its full name.
+        File f = createJar("META-INF/versions/09/zero.txt");
+
+        try (JarFile jarFile = new JarFile(f)) {
+            JarContents jarContents = new JarContents(jarFile);
+
+            Assert.assertTrue(jarContents.mightContainResource("META-INF/versions/09/zero.txt"));
+        }
+    }
+
+    @Test
+    public void testEntryDirectlyBelowVersionsDirectory() throws Exception {
+        // There is no version directory so the entry stays under its full
+        // name and building the filter must not fail.
+        File f = createJar("META-INF/versions/Foo.class", "real.txt");
+
+        try (JarFile jarFile = new JarFile(f)) {
+            JarContents jarContents = new JarContents(jarFile);
+
+            Assert.assertTrue(jarContents.mightContainResource("META-INF/versions/Foo.class"));
+            Assert.assertTrue(jarContents.mightContainResource("real.txt"));
+        }
+    }
+
+    private static File createJar(String... names) throws Exception {
+        File f = File.createTempFile("test-jar-contents", ".jar");
+        f.deleteOnExit();
+        try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(f))) {
+            for (String name : names) {
+                out.putNextEntry(new ZipEntry(name));
+                out.write("x".getBytes(StandardCharsets.UTF_8));
+                out.closeEntry();
+            }
+        }
+        return f;
     }
 }

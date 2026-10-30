@@ -182,9 +182,8 @@ public class TestJarFileUrlJar {
 
     /*
      * Re-enumeration after reset() must produce the same selection. Entries under a version directory that cannot be
-     * parsed must not be returned. Versioned entries for resources (non-class entries) are handled the same way as by
-     * the stream based implementations: the base entry is used where one exists and the versioned entries are
-     * ignored.
+     * parsed must be treated as normal entries. Versioned entries for resources (non-class entries) are handled the
+     * same way as versioned classes: the highest applicable version is used in place of the base entry.
      */
     @Test
     public void testMultiReleaseResetAndUnusableEntries() throws Exception {
@@ -196,12 +195,12 @@ public class TestJarFileUrlJar {
                 VERSIONS + "11/" + BASE_CLASS, BASE_CLASS, resource);
         try (Jar jar = new JarFileUrlJar(file.toURI().toURL(), false)) {
             List<String> names = entryNames(jar);
-            Assert.assertFalse(names.contains(unparseable));
+            Assert.assertTrue(names.contains(unparseable));
             Assert.assertFalse(names.contains(VERSIONS + "9/" + BASE_CLASS));
             Assert.assertTrue(names.contains(VERSIONS + "11/" + BASE_CLASS));
             Assert.assertFalse(names.contains(BASE_CLASS));
-            Assert.assertFalse(names.contains(versionedResource));
-            Assert.assertTrue(names.contains(resource));
+            Assert.assertTrue(names.contains(versionedResource));
+            Assert.assertFalse(names.contains(resource));
 
             jar.reset();
             Assert.assertEquals(names, entryNames(jar));
@@ -221,6 +220,202 @@ public class TestJarFileUrlJar {
             Assert.assertTrue(names.contains(VERSIONS + "11/" + BASE_CLASS));
             Assert.assertFalse(names.contains(VERSIONS + "9/" + BASE_CLASS));
             Assert.assertFalse(names.contains(BASE_CLASS));
+        }
+    }
+
+
+    /*
+     * An entry directly below META-INF/versions/ has no version directory. It must not stop the JAR being scanned and
+     * is returned under its full name like any other entry that is not a versioned entry.
+     */
+    @Test
+    public void testMultiReleaseEntryDirectlyBelowVersionsDirectory() throws Exception {
+        File file = createMultiReleaseJar(VERSIONS + "Foo.class", VERSIONS + "9/" + BASE_CLASS, BASE_CLASS);
+        try (Jar jar = new JarFileUrlJar(file.toURI().toURL(), false)) {
+            List<String> names = entryNames(jar);
+            Assert.assertTrue(names.contains(VERSIONS + "Foo.class"));
+            Assert.assertTrue(names.contains(VERSIONS + "9/" + BASE_CLASS));
+            Assert.assertFalse(names.contains(BASE_CLASS));
+        }
+    }
+
+
+    /*
+     * Version directories with a sign or a leading zero are not version directories as far as the JDK is concerned.
+     * The entries below them are ordinary entries so they are returned under their full name and must not be selected
+     * in place of the base entry.
+     */
+    @Test
+    public void testMultiReleaseSignedAndLeadingZeroVersionsAreNotVersioned() throws Exception {
+        String[] versions = { "+9", "-9", "09" };
+        for (String version : versions) {
+            File file = createMultiReleaseJar(VERSIONS + version + "/" + BASE_CLASS, BASE_CLASS);
+            try (Jar jar = new JarFileUrlJar(file.toURI().toURL(), false)) {
+                List<String> names = entryNames(jar);
+                Assert.assertTrue(version, names.contains(VERSIONS + version + "/" + BASE_CLASS));
+                Assert.assertTrue(version, names.contains(BASE_CLASS));
+            }
+        }
+    }
+
+
+    /*
+     * A leading '/' is not significant when identifying a versioned entry.
+     */
+    @Test
+    public void testMultiReleaseLeadingSlash() throws Exception {
+        String versioned = "/" + VERSIONS + "9/" + BASE_CLASS;
+        File file = createMultiReleaseJar(versioned, BASE_CLASS);
+        try (Jar jar = new JarFileUrlJar(file.toURI().toURL(), false)) {
+            List<String> names = entryNames(jar);
+            Assert.assertTrue(names.contains(versioned));
+            Assert.assertFalse(names.contains(BASE_CLASS));
+        }
+    }
+
+
+    /*
+     * Multi-release applies to all types of resource, not just classes. The entry selected must be the highest version
+     * that applies to the current runtime, regardless of the order in which the entries appear in the JAR.
+     */
+    @Test
+    public void testMultiReleaseVersionSelectionForResources() throws Exception {
+        String base = "test/resource.txt";
+        String v9 = VERSIONS + "9/" + base;
+        String v11 = VERSIONS + "11/" + base;
+
+        File file = createMultiReleaseJar(v9, v11, base);
+        try (Jar jar = new JarFileUrlJar(file.toURI().toURL(), false)) {
+            List<String> names = entryNames(jar);
+            Assert.assertTrue(names.contains(v11));
+            Assert.assertFalse(names.contains(v9));
+            Assert.assertFalse(names.contains(base));
+        }
+
+        file = createMultiReleaseJar(base, v11, v9);
+        try (Jar jar = new JarFileUrlJar(file.toURI().toURL(), false)) {
+            List<String> names = entryNames(jar);
+            Assert.assertTrue(names.contains(v11));
+            Assert.assertFalse(names.contains(v9));
+            Assert.assertFalse(names.contains(base));
+        }
+    }
+
+
+    /*
+     * A resource that only exists in the versions location is available.
+     */
+    @Test
+    public void testMultiReleaseVersionedResourceWithoutBaseEntry() throws Exception {
+        String v9 = VERSIONS + "9/test/resource.txt";
+
+        File file = createMultiReleaseJar(v9);
+        try (Jar jar = new JarFileUrlJar(file.toURI().toURL(), false)) {
+            Assert.assertTrue(entryNames(jar).contains(v9));
+        }
+    }
+
+
+    /*
+     * Creates a multi-release JAR where the content of each entry is its own name so the entry that was selected can be
+     * identified from the content.
+     */
+    private File createMultiReleaseJarWithNameContent(String... entryNames) throws IOException {
+        Manifest manifest = new Manifest();
+        manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
+        manifest.getMainAttributes().putValue("Multi-Release", "true");
+
+        File file = new File(testDir.getRoot(), "named.jar");
+        try (JarOutputStream jos = new JarOutputStream(new FileOutputStream(file), manifest)) {
+            for (String entryName : entryNames) {
+                jos.putNextEntry(new JarEntry(entryName));
+                jos.write(entryName.getBytes("ISO-8859-1"));
+                jos.closeEntry();
+            }
+        }
+        return file;
+    }
+
+
+    private static String read(Jar jar, String name) throws IOException {
+        byte[] buf = new byte[1024];
+        try (InputStream is = jar.getInputStream(name);
+                ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            if (is == null) {
+                return null;
+            }
+            int read;
+            while ((read = is.read(buf)) >= 0) {
+                out.write(buf, 0, read);
+            }
+            return new String(out.toByteArray(), "ISO-8859-1");
+        }
+    }
+
+
+    /*
+     * Look-ups by name must be multi-release aware for every type of resource: the highest version that applies to the
+     * current runtime is used, versions for later runtimes are ignored and a resource that only exists in the versions
+     * location is available.
+     */
+    private void doTestMultiReleaseLookupByName(Jar jar) throws IOException {
+        String resource = "test/resource.txt";
+        String v11Resource = VERSIONS + "11/" + resource;
+        String only9 = "only9.txt";
+        String v9Only9 = VERSIONS + "9/" + only9;
+        String laterVersion = "later.txt";
+
+        // Highest applicable version used in place of the base entry or a lower version
+        Assert.assertEquals(v11Resource, read(jar, resource));
+        Assert.assertTrue(jar.exists(resource));
+        Assert.assertTrue(jar.getLastModified(resource) != -1);
+
+        // Class
+        Assert.assertEquals(VERSIONS + "11/" + BASE_CLASS, read(jar, BASE_CLASS));
+
+        // Only in the versions location
+        Assert.assertEquals(v9Only9, read(jar, only9));
+        Assert.assertTrue(jar.exists(only9));
+        Assert.assertTrue(jar.getLastModified(only9) != -1);
+
+        // Version for a later runtime ignored
+        Assert.assertEquals(laterVersion, read(jar, laterVersion));
+
+        // Not present at all
+        Assert.assertNull(read(jar, "missing.txt"));
+        Assert.assertFalse(jar.exists("missing.txt"));
+        Assert.assertEquals(-1, jar.getLastModified("missing.txt"));
+
+        // Entry that only exists for a later runtime is not available
+        Assert.assertNull(read(jar, "onlyLater.txt"));
+        Assert.assertFalse(jar.exists("onlyLater.txt"));
+    }
+
+
+    private File createLookupJar() throws IOException {
+        String resource = "test/resource.txt";
+        return createMultiReleaseJarWithNameContent(resource, VERSIONS + "9/" + resource, VERSIONS + "11/" + resource,
+                BASE_CLASS, VERSIONS + "9/" + BASE_CLASS, VERSIONS + "11/" + BASE_CLASS,
+                VERSIONS + "9/only9.txt", "later.txt", VERSIONS + "999/later.txt",
+                VERSIONS + "999/onlyLater.txt");
+    }
+
+
+    @Test
+    public void testMultiReleaseLookupByName() throws Exception {
+        File file = createLookupJar();
+        try (Jar jar = new JarFileUrlJar(file.toURI().toURL(), false)) {
+            doTestMultiReleaseLookupByName(jar);
+        }
+    }
+
+
+    @Test
+    public void testMultiReleaseLookupByNameViaJarUrl() throws Exception {
+        File file = createLookupJar();
+        URL url = URI.create("jar:" + file.toURI().toURL().toExternalForm() + "!/").toURL();
+        try (Jar jar = new JarFileUrlJar(url, true)) {
+            doTestMultiReleaseLookupByName(jar);
         }
     }
 }
