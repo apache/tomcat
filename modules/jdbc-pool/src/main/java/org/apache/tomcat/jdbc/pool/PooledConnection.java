@@ -297,7 +297,6 @@ public class PooledConnection implements PooledConnectionMBean {
      *
      * @throws SQLException if unable to obtain a connection from the DataSource
      */
-    @SuppressWarnings("null") // Suppress false positive warnings
     protected void connectUsingDataSource() throws SQLException {
         String usr = null;
         String pwd = null;
@@ -360,6 +359,13 @@ public class PooledConnection implements PooledConnectionMBean {
                 connection = ds.getConnection(usr, pwd);
             } else {
                 connection = ds.getConnection();
+            }
+            if (connection == null) {
+                // The DataSource contract allows getConnection to return null
+                // when no connection can be provided; keeping that null would
+                // surface later as a misleading validation failure, or as a
+                // null pointer when the default connection state is applied.
+                throw new SQLException("DataSource " + ds + " returned a null connection");
             }
         } else if (poolProperties.getDataSource() instanceof javax.sql.ConnectionPoolDataSource) {
             javax.sql.ConnectionPoolDataSource ds = (javax.sql.ConnectionPoolDataSource) poolProperties.getDataSource();
