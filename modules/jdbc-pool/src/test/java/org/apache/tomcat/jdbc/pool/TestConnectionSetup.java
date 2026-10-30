@@ -16,13 +16,28 @@
  */
 package org.apache.tomcat.jdbc.pool;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.DriverPropertyInfo;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.sql.Statement;
+import java.util.Properties;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
+import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -33,8 +48,9 @@ import org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;
  * Expected functionality of the per-connection setup the pool performs
  * while a physical session is being established: the configured init SQL
  * is applied to the session, unusable configuration is normalised or
- * tolerated instead of wedging the pool, and the session the application
- * receives is in a defined state.
+ * tolerated instead of wedging the pool, a state the driver refuses to
+ * restore fails the borrow instead of silently handing out the wrong
+ * state, and the session the application receives is in a defined state.
  *
  * <p>Scenarios harvested from the retired legacy classes
  * {@code Bug54225} (blank init SQL), {@code Bug54978} (init SQL used for
@@ -45,6 +61,14 @@ import org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;
 class TestConnectionSetup extends JdbcPoolBaseTest {
 
     private static final String INIT_MARKER = "SET @POOL_INIT_STATE = 'applied'";
+
+    /*
+     * The Connection method the wrapping driver below should fail from with
+     * a SQLException, or null to let everything through. Static, because the
+     * driver is instantiated by class name and the tests alone decide when
+     * the failure window opens and closes.
+     */
+    private static final AtomicReference<String> THROW_FROM = new AtomicReference<>();
 
     private static String initMarker(Connection c) throws Exception {
         try (Statement st = c.createStatement();
@@ -135,5 +159,147 @@ class TestConnectionSetup extends JdbcPoolBaseTest {
             }
         }
         Assertions.assertEquals(1, ds.getIdle(), "the pool must still pool the connection");
+    }
+
+    /*
+     * The read-only, auto-commit and catalog defaults the ConnectionState
+     * interceptor restores on every borrow. Unlike the isolation level above,
+     * a driver that refuses one of these leaves the session KNOWN to sit in a
+     * state the pool was configured never to hand out - swallowing that
+     * failure - the log-and-ignore of an unusable configured default that
+     * Bugzilla #50571 reports - delivered the wrong state to the application
+     * in silence. H2 accepts any catalog argument without a murmur, so the
+     * refusal is injected through the wrapping driver below.
+     */
+    static Stream<Arguments> refusedRestores() {
+        return Stream.of(
+                Arguments.of("setCatalog", "no_such_catalog",
+                        (Consumer<PoolConfiguration>) p -> p.setDefaultCatalog("no_such_catalog")),
+                Arguments.of("setReadOnly", "true",
+                        (Consumer<PoolConfiguration>) p -> p.setDefaultReadOnly(Boolean.TRUE)),
+                Arguments.of("setAutoCommit", "false",
+                        (Consumer<PoolConfiguration>) p -> p.setDefaultAutoCommit(Boolean.FALSE)));
+    }
+
+    @ParameterizedTest(name = "{0}({1})")
+    @MethodSource("refusedRestores")
+    void aRefusedStateRestoreFailsTheBorrowAndRetiresTheConnection(
+            String method, String value, Consumer<PoolConfiguration> configureDefault) throws Exception {
+        DataSource ds = newDataSource();
+        ds.setDriverClassName(FailingRestoreDriver.class.getName());
+        ds.getPoolProperties().setJdbcInterceptors(ConnectionState.class.getName());
+        configureDefault.accept(ds.getPoolProperties());
+        ds.createPool();
+        awaitSessions(1);
+
+        THROW_FROM.set(method);
+        SQLException borrowFailure;
+        try {
+            borrowFailure = Assertions.assertThrows(SQLException.class, ds::getConnection,
+                    "a borrow whose configured default could not be restored must fail");
+        } finally {
+            THROW_FROM.set(null);
+        }
+        Assertions.assertTrue(borrowFailure.getMessage().contains(ConnectionState.class.getName()),
+                "the borrow failure must name the failing interceptor, but was: " + borrowFailure);
+        Throwable restoreFailure = borrowFailure.getCause();
+        Assertions.assertInstanceOf(IllegalStateException.class, restoreFailure,
+                "the reset must report the failed restore through the pool's discard path");
+        Assertions.assertTrue(restoreFailure.getMessage().contains(value),
+                "the restore failure must name the configured value '" + value
+                        + "', but was: " + restoreFailure);
+        Assertions.assertInstanceOf(SQLException.class, restoreFailure.getCause(),
+                "the driver's refusal must survive as the cause");
+
+        // the wrong-state session was retired, and with it the pool kept
+        // neither a misconfigured session nor the slot it occupied
+        awaitSessions(0);
+        Assertions.assertEquals(0, ds.getIdle());
+        Assertions.assertEquals(0, ds.getActive());
+        Assertions.assertEquals(0, ds.getSize());
+
+        // one failed borrow does not wedge the pool: the next one is served
+        // by a fresh session
+        try (Connection again = ds.getConnection()) {
+            Assertions.assertTrue(again.createStatement().execute("SELECT 1"),
+                    "the replacement connection must work");
+        }
+        awaitSessions(1);
+    }
+
+    /**
+     * Driver handing out the real H2 connections wrapped in a proxy that
+     * fails the currently armed method with a SQLException, as a real driver
+     * refuses a catalog it cannot select or a state it cannot apply.
+     * Configured through {@code driverClassName}, so it must stay a public
+     * static class with a no-arg constructor.
+     */
+    public static class FailingRestoreDriver implements Driver {
+
+        private final Driver delegate = new org.h2.Driver();
+
+        @Override
+        public Connection connect(String url, Properties info) throws SQLException {
+            Connection connection = delegate.connect(url, info);
+            if (connection == null) {
+                return null;
+            }
+            return (Connection) Proxy.newProxyInstance(
+                    FailingRestoreDriver.class.getClassLoader(),
+                    new Class<?>[] { Connection.class },
+                    new FailingHandler(connection));
+        }
+
+        @Override
+        public boolean acceptsURL(String url) throws SQLException {
+            return delegate.acceptsURL(url);
+        }
+
+        @Override
+        public DriverPropertyInfo[] getPropertyInfo(String url, Properties info) throws SQLException {
+            return delegate.getPropertyInfo(url, info);
+        }
+
+        @Override
+        public int getMajorVersion() {
+            return delegate.getMajorVersion();
+        }
+
+        @Override
+        public int getMinorVersion() {
+            return delegate.getMinorVersion();
+        }
+
+        @Override
+        public boolean jdbcCompliant() {
+            return delegate.jdbcCompliant();
+        }
+
+        @Override
+        public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+            return delegate.getParentLogger();
+        }
+    }
+
+    /* Fails the armed method by name; delegates everything else to H2. */
+    private static class FailingHandler implements InvocationHandler {
+
+        private final Connection vendor;
+
+        FailingHandler(Connection vendor) {
+            this.vendor = vendor;
+        }
+
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            if (method.getName().equals(THROW_FROM.get())) {
+                throw new SQLException("driver refuses " + method.getName() + " with these arguments");
+            }
+            try {
+                return method.invoke(vendor, args);
+            } catch (InvocationTargetException x) {
+                throw x.getCause();
+            }
+        }
     }
 }

@@ -1398,6 +1398,17 @@
         publishing it. As before, no database session and no pool cleaner
         outlives the close, and the closure stays terminal. (remm)
       </fix>
+      <fix>
+        <bug>50571</bug>: A configured connection state (auto-commit,
+        read-only or catalog) that could not be restored on a pooled
+        connection was logged and ignored, and the connection was handed out
+        in the wrong state: a <code>defaultCatalog</code> naming a database
+        that does not exist, for example, left the application working on the
+        session's original catalog with nothing surfaced to the application.
+        The borrow now fails with an <code>SQLException</code> and the
+        connection is discarded. Restoring the transaction isolation level
+        retains the previously logged-and-ignored behavior. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
