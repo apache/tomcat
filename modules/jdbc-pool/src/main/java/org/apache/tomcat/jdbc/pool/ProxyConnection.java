@@ -199,6 +199,17 @@ public class ProxyConnection extends JdbcInterceptor {
         if (compare(ISCLOSED_VAL, method)) {
             return Boolean.valueOf(isClosed());
         }
+        if (compare(ISVALID_VAL, method) && isClosed()) {
+            // isValid() is the probe for liveness, and the JDBC contract
+            // answers a closed connection with false rather than with an
+            // exception. A session the pool discarded while its borrower
+            // still held the handle - an abandon, a forced pool close, an
+            // interceptor marking it discarded - does not seal the
+            // disposable facade, so without this branch the probe would
+            // reach the closed guard below and throw. The guard answers
+            // false, as the sealed facade does; a live handle falls through.
+            return Boolean.FALSE;
+        }
         if (compare(EQUALS_VAL, method)) {
             // With the DisposableConnectionFacade switched off, Object methods
             // reach this interceptor, and the XA branch below would dispatch
