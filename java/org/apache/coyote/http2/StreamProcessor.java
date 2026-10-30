@@ -85,6 +85,7 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
         try {
             // Note: The regular processor uses the socketWrapper lock, but using that here triggers a deadlock
             processLock.lock();
+            // HTTP/2 equivalent of AbstractConnectionHandler#process() without the socket <-> processor mapping
             try {
                 /*
                  * In some scenarios, error handling may trigger multiple ERROR events for the same stream. The first
@@ -95,8 +96,10 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
                 if (!stream.equals(handler.getStream(stream.getIdAsInt()))) {
                     return;
                 }
-                // HTTP/2 equivalent of AbstractConnectionHandler#process() without the
-                // socket <-> processor mapping
+                // Avoid duplicate timeout events
+                if (event == SocketEvent.TIMEOUT && !checkAsyncTimeoutGeneration()) {
+                    return;
+                }
                 SocketState state = SocketState.CLOSED;
                 boolean reuseRequestAndResponse = false;
                 try {
