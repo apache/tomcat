@@ -1176,6 +1176,23 @@
         closed, <code>abort()</code> is the no-op the specification
         prescribes. Based on code submitted by Arturo Bernal. (remm)
       </fix>
+      <fix>
+        Correct a defect in the <code>StatementCache</code> interceptor
+        where an interceptor listed after the cache that wraps statements
+        beneath it - <code>StatementDecoratorInterceptor</code>, for
+        example - silently stopped the cache from caching. The cached
+        statement recorded as its connection whatever that lower wrapper
+        answered for the statement's <code>getConnection()</code> - the
+        pool's handle for the borrow, not the physical connection - so no
+        closed statement ever passed the session check on the way into the
+        cache, every one was closed instead, and the next prepare prepared
+        again, at any log level. The cache now binds a cached statement to
+        the physical session the prepare ran on, using the driver's own
+        answer where it is readable, while a statement prepared on a
+        session that has since been replaced still refuses both caching
+        and reuse, and a park refused for a lost association is now noted
+        once per connection at debug level. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
