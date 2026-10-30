@@ -23,7 +23,9 @@ import java.util.Map;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
+import org.apache.tomcat.jdbc.pool.PooledConnection;
 
 /**
  * Interceptor that sets a query timeout on every created {@link Statement}.
@@ -36,6 +38,12 @@ import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
  * cache has its query timeout reset to zero, so an interceptor listed after the cache never sees the reuse and the
  * cached statement executes with no timeout. Listed before the cache, the hook runs for every creation request,
  * including the ones the cache serves, and the timeout is re-applied to the reused statement.
+ * <p>
+ * Whether a configured timeout actually interrupts a query is up to the driver. A driver that refuses
+ * {@link Statement#setQueryTimeout(int)} does not stop the statement from being handed out - the pool cannot enforce a
+ * timeout itself, so such a statement runs unbounded - and the refusal is reported once per physical connection rather
+ * than once per statement, so that the log says what is not in effect without repeating itself for every statement
+ * that connection creates.
  */
 public class QueryTimeoutInterceptor extends AbstractCreateStatementInterceptor {
     private static final Log log = LogFactory.getLog(QueryTimeoutInterceptor.class);
@@ -44,6 +52,19 @@ public class QueryTimeoutInterceptor extends AbstractCreateStatementInterceptor 
      * Query timeout value in seconds.
      */
     int timeout = 1;
+
+    /**
+     * Whether the driver of this connection has already been reported as refusing
+     * {@link Statement#setQueryTimeout(int)}. The pool builds one interceptor chain per pooled connection and reuses
+     * that chain for every borrow of it, so this record makes a refusal an event of the physical connection rather than
+     * of the statement creation that happened to notice it: a driver that refuses the call refuses it for every
+     * statement it is asked about, and one line per creation would bury the fact that the configured protection is not
+     * in effect. It is cleared when the physical session is replaced, so the session that takes over reports itself.
+     * The hook runs on the thread that borrowed the connection, and a pooled connection is only borrowed by one thread
+     * at a time - the next borrower reaches this instance through the pool's idle queue, which publishes what the
+     * previous one stored here - so a plain field is enough, as it is for the cached state of {@link ConnectionState}.
+     */
+    private boolean timeoutRefusalReported;
 
     /**
      * Default constructor.
@@ -84,14 +105,47 @@ public class QueryTimeoutInterceptor extends AbstractCreateStatementInterceptor 
             try {
                 s.setQueryTimeout(timeout);
             } catch (SQLException x) {
-                log.warn("[QueryTimeoutInterceptor] Unable to set query timeout:" + x.getMessage(), x);
+                reportTimeoutRefusal(x);
             }
         }
         return statement;
     }
 
+    /*
+     * Reports that the driver will not apply the configured timeout, once per physical connection.
+     *
+     * The statement is still handed out, unchanged: enforcing a timeout is something only the driver can do, so
+     * refusing to create a statement an application can use would trade a protection the pool cannot deliver for a
+     * driver that simply does not implement the call. What the pool can do is say so - and say it in a way that is
+     * readable, which per-statement warnings are not. The warning therefore names the timeout that is not in effect and
+     * says that this connection will not mention it again, so one line tells the operator both the state and the
+     * volume of what is missing from the log.
+     */
+    private void reportTimeoutRefusal(SQLException x) {
+        if (timeoutRefusalReported) {
+            return;
+        }
+        timeoutRefusalReported = true;
+        log.warn("[QueryTimeoutInterceptor] Unable to set the query timeout of " + timeout + " seconds on a statement"
+                + " of this connection: " + x.getMessage() + ". The driver does not apply the timeout, so statements"
+                + " created on this physical connection run without a query timeout. Refusals are not logged again on"
+                + " this connection.", x);
+    }
+
     /**
-     * No-op; this interceptor holds no state that requires cleanup on close.
+     * Forgets the reported refusal, as the physical connection this interceptor is attached to is gone: the session
+     * that replaces it gets its own refusal recorded and its own warning, the way it gets its own driver to answer the
+     * call.
+     */
+    @Override
+    public void disconnected(ConnectionPool parent, PooledConnection con, boolean finalizing) {
+        timeoutRefusalReported = false;
+        super.disconnected(parent, con, finalizing);
+    }
+
+    /**
+     * No-op; the refusal record belongs to the physical connection, not to the borrow, so ending a borrow has nothing
+     * here to clean up.
      */
     @Override
     public void closeInvoked() {
