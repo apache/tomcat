@@ -204,13 +204,17 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
     protected class StatementProxy<T extends Statement> implements InvocationHandler {
 
         /**
-         * Indicates whether this statement has been closed.
+         * Indicates whether this statement has been closed. A statement can be closed from a thread other than the one
+         * executing on it - the statement finalizer closes tracked statements from whichever thread closes the
+         * connection, and the statement cache forces a close from its own purge - so the flag is written by one thread
+         * and read by others, and must be volatile to reach them at all.
          */
-        protected boolean closed = false;
+        protected volatile boolean closed = false;
         /**
-         * The delegated statement.
+         * The delegated statement, nulled once a close has been forwarded. It is read by threads other than the one
+         * that nulls it, so, like {@link #closed}, volatile.
          */
-        protected T delegate;
+        protected volatile T delegate;
         private Object actualProxy;
         /**
          * The connection handle of the borrow during which this proxy was created, bound through
@@ -334,9 +338,17 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
          * @throws SQLException if the underlying statement could not be closed
          */
         public void closeInvoked() throws SQLException {
+            // Read the delegate once: a second close running concurrently -
+            // the cache purge, or the application and the finalizer closing
+            // the same handle - can null the field between two reads, and a
+            // second read that finds it gone would invoke close() on a null
+            // receiver. A close that already completed is the one this
+            // snapshot answers for: the delegate is gone, nothing is
+            // re-closed, and the handle is retired quietly all the same.
+            final T target = delegate;
             try {
-                if (getDelegate() != null) {
-                    getDelegate().close();
+                if (target != null) {
+                    target.close();
                 }
             } finally {
                 closed = true;
@@ -364,16 +376,33 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
             }
             // Was close invoked?
             boolean close = compare(CLOSE_VAL, method);
-            // Allow close to be called multiple times
-            if (close && closed) {
+            // Read the state once: another thread's close() - the pool's
+            // statement finalizer closes tracked statements from whichever
+            // thread closes the connection, and the statement cache forces a
+            // close from its purge - may complete while this call is being
+            // answered, and flag and delegate are two separate fields, so a
+            // call that read the flag as open can find the delegate already
+            // nulled. A close that finished in between is then answered as
+            // closed, on the missing delegate as much as on the flag, rather
+            // than by invoking on a null object: that is a
+            // NullPointerException, and the application is owed the
+            // SQLException the closed contract promises. The window this
+            // cannot close is the race itself: a call that reads the
+            // delegate while it is still live goes to it, an outcome
+            // indistinguishable from having simply outrun the close.
+            final boolean wasClosed = closed;
+            final T target = delegate;
+            final boolean gone = wasClosed || target == null;
+            // Allow close to be called multiple times, from either thread
+            if (close && gone) {
                 return null;
             }
             // Are we calling isClosed?
             if (compare(ISCLOSED_VAL, method)) {
-                return Boolean.valueOf(closed);
+                return Boolean.valueOf(gone);
             }
             // If we are calling anything else, bail out
-            if (closed) {
+            if (gone) {
                 throw new SQLException("Statement closed.");
             }
             if (compare(GETCONNECTION_VAL, method)) {
@@ -393,8 +422,11 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
                 if (close) {
                     closeInvoked();
                 } else {
-                    // Execute the query
-                    result = method.invoke(delegate, args);
+                    // Execute the query, on the delegate this call read as
+                    // live: the snapshot keeps a concurrent close from
+                    // replacing the receiver with null between the guard and
+                    // the call
+                    result = method.invoke(target, args);
                 }
             } catch (Throwable t) {
                 if (t instanceof InvocationTargetException && t.getCause() != null) {
@@ -428,6 +460,8 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
             buf.append("; Sql=");
             buf.append(getSql());
             buf.append("; Delegate=");
+            // Reads the live delegate rather than a snapshot: a description
+            // says what the proxy holds as it is asked.
             buf.append(getDelegate());
             buf.append("; Connection=");
             buf.append(getConnection());
