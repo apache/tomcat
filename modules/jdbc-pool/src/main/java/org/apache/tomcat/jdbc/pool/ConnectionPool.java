@@ -50,6 +50,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.interceptor.QueryTimeoutInterceptor;
 import org.apache.tomcat.jdbc.pool.interceptor.StatementCache;
+import org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
@@ -763,21 +764,26 @@ public class ConnectionPool {
     }
 
     /**
-     * Warns once at pool start when the configured interceptor chain lets the statement cache answer a cache hit
-     * before the query timeout interceptor can re-apply its timeout. A
+     * Warns once at pool start when the configured interceptor order defeats one of the pool's own interceptors. A
      * {@link org.apache.tomcat.jdbc.pool.interceptor.StatementCache} hit is served without invoking the rest of the
      * chain, and a statement recycled into the cache carries query timeout zero, so a
      * {@link org.apache.tomcat.jdbc.pool.interceptor.QueryTimeoutInterceptor} listed after the cache never sees the
-     * reuse and every cached statement executes with no timeout. The chain is built back-to-front in
-     * {@link #setupConnection(PooledConnection)}, making the first-listed interceptor the outermost one, so the
-     * timeout interceptor must be listed before the cache. This detection only reports the misconfiguration; no
-     * behaviour is changed.
+     * reuse and every cached statement executes with no timeout. And because a parked statement is deliberately left
+     * open, a {@link StatementFinalizer} listed after the cache still tracks that statement - it is reached only by the
+     * cache's own handle, never by the finalizer's close-aware proxy, so the close that parked it is invisible to the
+     * tracker - and the tracker's close on connection return then closes the parked statement out from under a live
+     * cache entry, leaving the next borrower with a closed statement. The chain is built back-to-front in
+     * {@link #setupConnection(PooledConnection)}, making the first-listed interceptor the outermost one, so both the
+     * timeout interceptor and the finalizer must be listed before the cache. This detection only reports the
+     * misconfiguration; the cache's own defence against the tracker beneath it is separate and does not depend on
+     * this check.
      *
      * @param proxies the parsed interceptor definitions, in configuration order
      */
     private void checkInterceptorOrder(PoolProperties.InterceptorDefinition[] proxies) {
         int firstCache = -1;
         int lastTimeout = -1;
+        int lastFinalizer = -1;
         for (int i = 0; i < proxies.length; i++) {
             try {
                 Class<? extends JdbcInterceptor> interceptorClass = proxies[i].getInterceptorClass();
@@ -787,6 +793,8 @@ public class ConnectionPool {
                     }
                 } else if (QueryTimeoutInterceptor.class == interceptorClass) {
                     lastTimeout = i;
+                } else if (StatementFinalizer.class == interceptorClass) {
+                    lastFinalizer = i;
                 }
             } catch (ReflectiveOperationException | LinkageError x) {
                 // The pool-start loop above has already loaded and instantiated every one of these classes, so
@@ -797,6 +805,11 @@ public class ConnectionPool {
         }
         if (firstCache >= 0 && lastTimeout > firstCache) {
             log.warn(MessageFactory.get("connectionPool.statementCacheBeforeQueryTimeout"));
+        }
+        // A finalizer beneath some cache is exactly lastFinalizer > firstCache, so this catches the case where
+        // the finalizer is listed on both sides of the cache (firstFinalizer would sit before it and stay silent).
+        if (firstCache >= 0 && lastFinalizer > firstCache) {
+            log.warn(MessageFactory.get("connectionPool.statementCacheBeforeStatementFinalizer"));
         }
     }
 

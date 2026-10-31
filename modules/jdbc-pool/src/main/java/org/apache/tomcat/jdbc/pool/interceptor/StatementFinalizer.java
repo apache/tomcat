@@ -43,11 +43,12 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  * when the connection is returned. Statements that the application does close are forgotten by the returned proxy at
  * the moment <code>close()</code> completes, keeping the tracked list bounded by the statements that are genuinely
  * still open and closed through that handle. (The removal cannot observe a close that reaches the statement by
- * another route: an interceptor placed outside this one may swallow the statement's <code>close()</code>, e.g. a
- * statement cache recycling instead of closing, and a statement the application closes through the driver handle
- * that <code>unwrap</code> hands back never passes through this proxy; such entries are simply reclaimed at the
- * connection return, where the renewed close meets a statement already closed as a harmless no-op, as they were
- * before.)
+ * another route: a statement the application closes through the driver handle that <code>unwrap</code> hands back
+ * never passes through this proxy; such entries are simply reclaimed at the connection return, where the renewed
+ * close meets a statement already closed as a harmless no-op, as they were before. An interceptor placed outside
+ * this one could swallow a close in the same way, but the pool's own {@link StatementCache} no longer does: listed
+ * above this interceptor it refuses to recycle, because a recycled statement is left open rather than closed and
+ * would be reclaimed here alive, out from under the cache.)
  * <p>
  * Tracked statements are handed to the application as proxies implementing the standard JDBC statement interfaces, as
  * is the statement facade the pool always installs in front of this interceptor and as are the proxies of the other
