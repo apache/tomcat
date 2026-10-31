@@ -55,8 +55,14 @@ import org.apache.tomcat.jdbc.pool.DataSource;
  * MBean as its own source, the MBean server replaces the source with the name
  * the MBean is registered under before it reaches its own listeners. That
  * rewriting is also what a client behind a connector effectively sees, which is
- * why the last test pins that the name the remote side reads does not change
- * with this fix.</p>
+ * why the test that subscribes through the server pins that the name the remote
+ * side reads does not change with this fix.</p>
+ * <p>
+ * The last test covers the pool MBean that was registered and then taken away
+ * from the MBean server while the pool it wraps keeps running. A deregistration
+ * releases the name: the server no longer resolves it, so a notification raised
+ * afterwards must name the pool the way an unregistered MBean does rather than
+ * attribute itself to a name that names nothing.</p>
  * <p>
  * Delivery is asynchronous (on the pool's notification thread), so the tests
  * wait for the expected notifications to arrive with the bounded
@@ -264,6 +270,71 @@ class TestJmxNotificationSource extends JdbcPoolBaseTest {
                 server.removeNotificationListener(poolOname, listener);
             }
         } finally {
+            ds.postDeregister();
+        }
+    }
+
+    @Test
+    void aNotificationOfADeregisteredPoolNamesThePoolNotTheReleasedName() throws Exception {
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setJmxEnabled(true);
+        String poolName = "JmxSourceDeregistered-" + System.nanoTime();
+        ds.getPoolProperties().setName(poolName);
+        ds.createPool();
+
+        ObjectName poolOname = registerPoolMBean(server, ds, "notification-deregistered");
+        ConnectionPool jmxPool = ds.getPool().getJmxPool();
+        List<Notification> received = new CopyOnWriteArrayList<>();
+        NotificationListener listener = (notification, handback) -> received.add(notification);
+        try {
+            Assertions.assertNotNull(poolOname, "an enabled pool must publish its MBean");
+            jmxPool.addListener(listener);
+            Assertions.assertTrue(
+                    jmxPool.notify(ConnectionPool.POOL_EMPTY, "raised while registered"),
+                    "the notification must be reported as sent");
+            awaitUntil(() -> !received.isEmpty());
+            Assertions.assertEquals(poolOname, received.get(0).getSource(),
+                    "a notification raised while the MBean is registered must name the "
+                            + "registration - the deregistration below must change the source "
+                            + "because the name is gone, not because it was never there");
+
+            // The container takes its DataSource back: postDeregister()
+            // unregisters the pool's MBean from the server, which runs the
+            // MBean's own deregistration callbacks - but it does not close the
+            // pool, and the pool goes on notifying whatever is still listening.
+            ds.postDeregister();
+            Assertions.assertFalse(server.isRegistered(poolOname),
+                    "the container's deregistration must have taken the pool MBean away");
+            Assertions.assertNull(jmxPool.getObjectName(),
+                    "an MBean the server has deregistered must not keep answering with the "
+                            + "name it no longer holds: that name resolves to no MBean, and "
+                            + "per-connection MBeans would still be published below a base that "
+                            + "names nothing");
+
+            Assertions.assertTrue(
+                    jmxPool.notify(ConnectionPool.POOL_EMPTY, "raised after the deregistration"),
+                    "a pool whose MBean was deregistered while the pool kept running still "
+                            + "reports its conditions");
+            awaitUntil(() -> received.size() >= 2);
+            Notification raised = received.get(1);
+            Assertions.assertEquals("[POOL EMPTY] raised after the deregistration",
+                    raised.getMessage());
+            Assertions.assertTrue(raised.getSource() instanceof String,
+                    "the source of a notification raised after the deregistration must be the "
+                            + "string naming the pool, as it is for an MBean that was never "
+                            + "registered, was " + (raised.getSource() == null ? "null"
+                                    : raised.getSource().getClass().getName()));
+            String source = (String) raised.getSource();
+            Assertions.assertEquals("tomcat.jdbc:type=ConnectionPool,name=" + poolName, source,
+                    "a remote listener cannot correlate a notification with a deregistered "
+                            + "name, so the source must at least identify the pool that "
+                            + "reported the condition");
+            Assertions.assertEquals(source, roundTrip(raised).getSource(),
+                    "that source must survive the delivery a serialized client sees");
+        } finally {
+            jmxPool.removeListener(listener);
+            ds.close();
             ds.postDeregister();
         }
     }

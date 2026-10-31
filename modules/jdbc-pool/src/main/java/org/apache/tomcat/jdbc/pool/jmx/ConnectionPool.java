@@ -87,9 +87,10 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
             });
 
     /**
-     * the ObjectName of this pool. Written by the thread that registers the MBean and read by the pool's own threads,
-     * so it is volatile - as it already is on the {@link org.apache.tomcat.jdbc.pool.DataSource} that publishes this
-     * MBean - to make the registration visible to the threads that raise notifications.
+     * the ObjectName of this pool, or {@code null} while this MBean is not registered - before its registration and
+     * after its deregistration. Written by the threads that register and deregister the MBean and read by the pool's
+     * own threads, so it is volatile - as it already is on the {@link org.apache.tomcat.jdbc.pool.DataSource} that
+     * publishes this MBean - to make those writes visible to the threads that raise notifications.
      */
     private volatile ObjectName oname = null;
 
@@ -126,7 +127,8 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     /**
      * Returns the JMX ObjectName under which this MBean is registered.
      *
-     * @return the JMX ObjectName, or {@code null} if not yet registered
+     * @return the JMX ObjectName, or {@code null} while this MBean is not registered - before its registration and
+     *             after its deregistration
      */
     public ObjectName getObjectName() {
         return oname;
@@ -146,8 +148,19 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     public void preDeregister() throws Exception {
     }
 
+    /**
+     * Drops the registration name.
+     * <p>
+     * The MBean server invokes this when the MBean is deregistered, and the pool it wraps may well keep running - a
+     * container that takes its DataSource back releases the pool MBean without closing the pool. From then on the name
+     * resolves to no MBean: notifications the pool still raises must not attribute themselves to it (see
+     * {@link #getNotificationSource()}, which falls back to naming the pool as a string), and no further MBean may be
+     * published below it. {@link #preRegister(MBeanServer, ObjectName)} writes the name again if this MBean is ever
+     * registered anew.
+     */
     @Override
     public void postDeregister() {
+        this.oname = null;
     }
 
     // The notification types this MBean sends are declared as constants on
@@ -253,17 +266,18 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      * {@link Notification} marshals its source, so a listener outside this JVM - one reached through a JMX connector,
      * or one that hands the notification on to another process - only receives the notification at all if the source is
      * serializable. This MBean is not, and neither is the pool it wraps, so the source is the {@link ObjectName} the
-     * MBean is registered under, which names the pool and is serializable. A pool MBean that has never been registered
-     * has no such name: the source is then a string of the shape the name would have had.
+     * MBean is registered under, which names the pool and is serializable. A pool MBean that is not registered - one
+     * that has never been registered, or one the server has taken back while its pool keeps running - has no such
+     * name: the source is then a string of the shape the name would have had.
      *
      * @return the registered ObjectName, or a string naming the pool if the MBean is not registered
      */
     protected Object getNotificationSource() {
-        // The registration handle is written by whichever thread registered the
-        // MBean; the field is volatile so that write becomes visible to the pool
-        // threads that read it here, and it is read once so that a single
-        // notification is sent with one source whatever happens to the field
-        // while the notification is on its way
+        // The registration handle is written by whichever thread registers or
+        // deregisters the MBean; the field is volatile so those writes become
+        // visible to the pool threads that read it here, and it is read once so
+        // that a single notification is sent with one source whatever happens
+        // to the field while the notification is on its way
         ObjectName name = oname;
         if (name != null) {
             return name;
