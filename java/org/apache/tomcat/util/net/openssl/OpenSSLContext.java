@@ -29,9 +29,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Base64;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
@@ -60,7 +58,6 @@ import org.apache.tomcat.util.net.SSLHostConfig.CertificateVerification;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
 import org.apache.tomcat.util.net.SSLHostConfigPreSharedKey;
-import org.apache.tomcat.util.net.SSLUtilBase;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -578,17 +575,13 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             SSLContext.setCertificateChainFile(state.ctx,
                     SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()), false);
         } else {
-            String alias = certificate.getCertificateKeyAlias();
             X509KeyManager x509KeyManager = certificate.getCertificateKeyManager();
-            if (alias == null) {
-                alias = SSLUtilBase.DEFAULT_KEY_ALIAS;
-            }
+            String alias = getServedAlias(certificate);
             X509Certificate[] chain = x509KeyManager.getCertificateChain(alias);
-            if (chain == null) {
-                alias = findAlias(x509KeyManager, certificate);
-                chain = x509KeyManager.getCertificateChain(alias);
-            }
             PrivateKey key = x509KeyManager.getPrivateKey(alias);
+            if (key == null || key.getEncoded() == null || chain == null || chain.length == 0) {
+                throw new SSLException(sm.getString("openssl.errorLoadingCertificate", alias));
+            }
             String encodedKey = BEGIN_KEY +
                     Base64.getMimeEncoder(64, new byte[] { '\n' }).encodeToString(key.getEncoded()) + END_KEY;
             SSLContext.setCertificateRaw(state.ctx, chain[0].getEncoded(),
@@ -620,32 +613,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         return result;
     }
 
-
-    /*
-     * Find a valid alias when none was specified in the config.
-     */
-    private static String findAlias(X509KeyManager keyManager, SSLHostConfigCertificate certificate) {
-
-        Type type = certificate.getType();
-        String result = null;
-
-        List<Type> candidateTypes = new ArrayList<>();
-        if (Type.UNDEFINED.equals(type)) {
-            // Try all types to find an suitable alias
-            candidateTypes.addAll(Arrays.asList(Type.values()));
-            candidateTypes.remove(Type.UNDEFINED);
-        } else {
-            // Look for the specific type to find a suitable alias
-            candidateTypes.add(type);
-        }
-
-        Iterator<Type> iter = candidateTypes.iterator();
-        while (result == null && iter.hasNext()) {
-            result = keyManager.chooseServerAlias(iter.next().getKeyType(), null, null);
-        }
-
-        return result;
-    }
 
     private static X509TrustManager chooseTrustManager(TrustManager[] managers) {
         for (TrustManager m : managers) {
@@ -695,20 +662,17 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
     @Override
     public X509Certificate[] getCertificateChain(String alias) {
-        X509Certificate[] chain = null;
         X509KeyManager x509KeyManager = certificate.getCertificateKeyManager();
-        if (x509KeyManager != null) {
-            if (alias == null) {
-                alias = SSLUtilBase.DEFAULT_KEY_ALIAS;
-            }
-            chain = x509KeyManager.getCertificateChain(alias);
-            if (chain == null) {
-                alias = findAlias(x509KeyManager, certificate);
-                chain = x509KeyManager.getCertificateChain(alias);
-            }
+        if (x509KeyManager == null) {
+            return null;
         }
+        return x509KeyManager.getCertificateChain(alias);
+    }
 
-        return chain;
+    @Override
+    public X509KeyManager[] getServerKeyManagers(SSLHostConfigCertificate certificate) {
+        X509KeyManager x509KeyManager = certificate.getCertificateKeyManager();
+        return x509KeyManager == null ? new X509KeyManager[0] : new X509KeyManager[] { x509KeyManager };
     }
 
     @Override

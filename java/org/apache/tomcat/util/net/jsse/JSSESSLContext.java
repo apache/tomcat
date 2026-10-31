@@ -20,8 +20,10 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.net.ssl.KeyManager;
@@ -34,6 +36,7 @@ import javax.net.ssl.X509KeyManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.apache.tomcat.util.net.SSLContext;
+import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 
 class JSSESSLContext implements SSLContext {
 
@@ -87,6 +90,21 @@ class JSSESSLContext implements SSLContext {
             }
         }
         return result;
+    }
+
+
+    @Override
+    public X509KeyManager[] getServerKeyManagers(SSLHostConfigCertificate certificate) {
+        if (kms == null) {
+            return new X509KeyManager[0];
+        }
+        List<X509KeyManager> x509KeyManagers = new ArrayList<>();
+        for (KeyManager km : kms) {
+            if (km instanceof X509KeyManager x509KeyManager) {
+                x509KeyManagers.add(x509KeyManager);
+            }
+        }
+        return x509KeyManagers.toArray(new X509KeyManager[0]);
     }
 
     @Override

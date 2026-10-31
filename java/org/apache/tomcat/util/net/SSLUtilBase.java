@@ -25,6 +25,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.DomainLoadStoreParameter;
 import java.security.Key;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.cert.CRL;
 import java.security.cert.CRLException;
 import java.security.cert.CertPathParameters;
@@ -36,6 +37,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.CertificateNotYetValidException;
+import java.security.cert.CertificateParsingException;
 import java.security.cert.CollectionCertStoreParameters;
 import java.security.cert.PKIXBuilderParameters;
 import java.security.cert.PKIXRevocationChecker;
@@ -393,21 +395,48 @@ public abstract class SSLUtilBase implements SSLUtil {
             ksUsed.setKeyEntry(keyAlias, privateKeyFile.getPrivateKey(), keyPassArray,
                     chain.toArray(new Certificate[0]));
         } else {
-            if (keyAlias != null && !ks.isKeyEntry(keyAlias)) {
-                throw new IOException(sm.getString("sslUtilBase.alias_no_key_entry", keyAlias));
-            } else if (keyAlias == null) {
+            if (keyAlias == null) {
                 Enumeration<String> aliases = ks.aliases();
                 if (!aliases.hasMoreElements()) {
                     throw new IOException(sm.getString("sslUtilBase.noKeys"));
                 }
+                boolean skippedForServerAuth = false;
                 while (aliases.hasMoreElements() && keyAlias == null) {
-                    keyAlias = aliases.nextElement();
-                    if (!ks.isKeyEntry(keyAlias)) {
-                        keyAlias = null;
+                    String candidate = aliases.nextElement();
+                    if (!ks.isKeyEntry(candidate)) {
+                        continue;
                     }
+                    Certificate cert = ks.getCertificate(candidate);
+                    if (cert instanceof X509Certificate x509 && !isServerAuthCapable(x509)) {
+                        if (log.isDebugEnabled()) {
+                            log.debug(sm.getString("sslUtilBase.skippedKeyUsage", candidate));
+                        }
+                        skippedForServerAuth = true;
+                        continue;
+                    }
+                    keyAlias = candidate;
                 }
                 if (keyAlias == null) {
+                    if (skippedForServerAuth) {
+                        throw new IOException(sm.getString("sslUtilBase.noServerAuthKey"));
+                    }
                     throw new IOException(sm.getString("sslUtilBase.alias_no_key_entry", (Object) null));
+                }
+            } else {
+                if (isSunMSCAPIWindowsMY(ks)) {
+                    Certificate configuredCert = ks.isKeyEntry(keyAlias) ? ks.getCertificate(keyAlias) : null;
+                    if (!(configuredCert instanceof X509Certificate x509) || !isServerAuthCapable(x509)) {
+                        String duplicateAlias = findServerAuthAliasInWindowsMYFamily(ks, keyAlias);
+                        if (duplicateAlias != null) {
+                            if (log.isDebugEnabled()) {
+                                log.debug(sm.getString("sslUtilBase.selectedServerAuthCert", duplicateAlias, keyAlias));
+                            }
+                            keyAlias = duplicateAlias;
+                        }
+                    }
+                }
+                if (!ks.isKeyEntry(keyAlias)) {
+                    throw new IOException(sm.getString("sslUtilBase.alias_no_key_entry", keyAlias));
                 }
             }
 
@@ -449,6 +478,98 @@ public abstract class SSLUtilBase implements SSLUtil {
         return kms;
     }
 
+
+    /**
+     * Searches a SunMSCAPI Windows-MY key store for a key entry whose certificate is valid for TLS server
+     * authentication, among the numbered duplicates of {@code baseAlias}. When several certificates share a Windows
+     * "friendly name", that provider appends {@code " (1)"}, {@code " (2)"}, etc. to give them unique aliases, as the
+     * key store API requires.
+     *
+     * @param ks        the SunMSCAPI Windows-MY key store to search
+     * @param baseAlias the configured alias. Not itself re-checked: the caller has already determined that its
+     *                      certificate is not valid for TLS server authentication.
+     *
+     * @return the alias of the first duplicate in the contiguous run (in increasing numeric order starting at 1) whose
+     *             certificate is valid for TLS server authentication, or {@code null} if there is no such duplicate
+     *
+     * @throws KeyStoreException if the key store has not been initialized
+     */
+    private static String findServerAuthAliasInWindowsMYFamily(KeyStore ks, String baseAlias) throws KeyStoreException {
+        int suffix = 1;
+        while (true) {
+            String candidateAlias = baseAlias + " (" + suffix + ")";
+            Certificate candidateCert = ks.getCertificate(candidateAlias);
+            if (candidateCert == null) {
+                // The first missing number ends the contiguous run of numbered duplicates.
+                return null;
+            }
+            if (candidateCert instanceof X509Certificate x509 && ks.isKeyEntry(candidateAlias) &&
+                    isServerAuthCapable(x509)) {
+                return candidateAlias;
+            }
+            suffix++;
+        }
+    }
+
+
+    /**
+     * Determines whether the given certificate may be used for TLS server authentication, based on its Extended Key
+     * Usage (EKU) extension. Used by {@link #getKeyManagers()} when auto-selecting a key entry so that certificates
+     * which are not valid for server authentication are ignored.
+     * <p>
+     * The policy is deliberately lenient about absent usage, strict about declared usage and tolerant of a malformed
+     * extension:
+     * <ul>
+     * <li>A certificate with <strong>no EKU extension</strong> ({@link X509Certificate#getExtendedKeyUsage()} returns
+     *     {@code null}) is treated as usable. An absent EKU places no restriction on the certificate's purpose
+     *     so rejecting them would needlessly exclude the many server certificates issued without an EKU.</li>
+     * <li>A certificate that <strong>does</strong> carry an EKU extension is usable only if that extension explicitly
+     *     lists the {@code id-kp-serverAuth} OID ({@value Constants#SERVER_AUTH_EXTENDED_KEY_USAGE_OID}) or the
+     *     {@code anyExtendedKeyUsage} OID ({@value Constants#ANY_EXTENDED_KEY_USAGE_OID}). Any other usage - for
+     *     example a certificate limited to client authentication, or an extension that lists no usages at all - is
+     *     rejected.</li>
+     * <li>A certificate whose EKU extension <strong>cannot be decoded</strong> is ignored (treated as not usable).</li>
+     * </ul>
+     *
+     * @param cert the certificate to test
+     *
+     * @return {@code true} if the certificate may be used for TLS server authentication
+     */
+    private static boolean isServerAuthCapable(X509Certificate cert) {
+        List<String> objectIdentifiers;
+        try {
+            objectIdentifiers = cert.getExtendedKeyUsage();
+        } catch (CertificateParsingException | RuntimeException e) {
+            return false;
+        }
+
+        if (objectIdentifiers == null) {
+            return true;
+        }
+
+        for (String objectIdentifier : objectIdentifiers) {
+            if (objectIdentifier.equals(Constants.SERVER_AUTH_EXTENDED_KEY_USAGE_OID) ||
+                    objectIdentifier.equals(Constants.ANY_EXTENDED_KEY_USAGE_OID)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static boolean isSunMSCAPIWindowsMY(KeyStore ks) {
+        if (ks == null || !Constants.SUNMSCAPI_PROVIDER_NAME.equals(ks.getProvider().getName())) {
+            return false;
+        }
+
+        //Windows-ROOT is excluded because it is a keyless trust store
+        return switch (ks.getType().toUpperCase(Locale.ROOT)) {
+            case Constants.WINDOWS_MY_KEYSTORE_TYPE,
+                    Constants.WINDOWS_MY_CURRENTUSER_KEYSTORE_TYPE,
+                    Constants.WINDOWS_MY_LOCALMACHINE_KEYSTORE_TYPE -> true;
+            default -> false;
+        };
+    }
 
     @Override
     public String[] getEnabledProtocols() {

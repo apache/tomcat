@@ -1587,11 +1587,8 @@ public class SSLHostConfig implements Serializable {
         for (SSLHostConfigCertificate sslHostConfigCertificate : sslHostConfigCertificates) {
             SSLContext sslContext = sslHostConfigCertificate.getSslContext();
             if (sslContext != null) {
-                String alias = sslHostConfigCertificate.getCertificateKeyAlias();
-                if (alias == null) {
-                    alias = SSLUtilBase.DEFAULT_KEY_ALIAS;
-                }
-                X509Certificate[] certificates = sslContext.getCertificateChain(alias);
+                X509Certificate[] certificates = sslContext.getCertificateChain(
+                        sslContext.getServedAlias(sslHostConfigCertificate));
                 if (certificates != null && certificates.length > 0) {
                     X509Certificate certificate = certificates[0];
                     Date expirationDate = certificate.getNotAfter();
