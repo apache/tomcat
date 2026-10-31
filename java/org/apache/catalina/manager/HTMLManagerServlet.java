@@ -865,6 +865,24 @@ public class HTMLManagerServlet extends ManagerServlet {
             req.setAttribute(APPLICATION_MESSAGE, outMessage);
             displaySessionDetailPage(req, resp, cn, sessionId, smClient);
             return;
+        } else if ("setMaxInactiveInterval".equals(action)) {
+            String sessionId = req.getParameter("sessionId");
+            String intervalParam = req.getParameter("maxInactiveInterval");
+            try {
+                int interval = Integer.parseInt(intervalParam);
+                if (setSessionMaxInactiveInterval(cn, sessionId, interval, smClient)) {
+                    req.setAttribute(APPLICATION_MESSAGE,
+                            smClient.getString("htmlManagerServlet.sessionTimeoutUpdated", sessionId, intervalParam));
+                } else {
+                    req.setAttribute(APPLICATION_ERROR,
+                            smClient.getString("htmlManagerServlet.sessionTimeoutNotUpdated", sessionId));
+                }
+            } catch (NumberFormatException nfe) {
+                req.setAttribute(APPLICATION_ERROR,
+                        smClient.getString("htmlManagerServlet.invalidSessionTimeout", intervalParam));
+            }
+            displaySessionDetailPage(req, resp, cn, sessionId, smClient);
+            return;
         } // else
         displaySessionsListPage(cn, req, resp, smClient);
     }
@@ -1088,6 +1106,42 @@ public class HTMLManagerServlet extends ManagerServlet {
             }
         }
         return wasPresent;
+    }
+
+    /**
+     * Set the maximum inactive interval for an HTTP session.
+     *
+     * @param cn                  Name of the application hosting the session
+     * @param sessionId           The session id
+     * @param maxInactiveInterval The maximum inactive interval in seconds
+     * @param smClient            StringManager for the client's locale
+     *
+     * @return {@code true} if the interval was updated, otherwise {@code false}
+     */
+    protected boolean setSessionMaxInactiveInterval(ContextName cn, String sessionId, int maxInactiveInterval,
+            StringManager smClient) {
+        Session session = getSessionForNameAndId(cn, sessionId, smClient);
+        if (session == null) {
+            if (debug >= 1) {
+                log("Cannot update maximum inactive interval for null session " + sessionId);
+            }
+            return false;
+        }
+        if (session.getSession() == null) {
+            if (debug >= 1) {
+                log("Cannot update maximum inactive interval for session with null HTTP session " + sessionId);
+            }
+            return false;
+        }
+        try {
+            session.setMaxInactiveInterval(maxInactiveInterval);
+            return true;
+        } catch (IllegalStateException ise) {
+            if (debug >= 1) {
+                log("Cannot update maximum inactive interval for invalidated session id " + sessionId);
+            }
+            return false;
+        }
     }
 
     /**
