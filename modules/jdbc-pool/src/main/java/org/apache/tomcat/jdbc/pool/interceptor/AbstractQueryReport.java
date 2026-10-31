@@ -28,6 +28,7 @@ import java.sql.Statement;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
  * Abstract class that wraps statements and intercepts query executions.
@@ -213,7 +214,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
             result = constructor.newInstance(new Object[] { new StatementProxy(statement, sql) });
             return result;
         } catch (Exception x) {
-            log.warn("Unable to create statement proxy for slow query report.", x);
+            log.warn(MessageFactory.get("abstractQueryReport.unableToCreateStatementProxy"), x);
         }
         return statement;
     }
@@ -316,7 +317,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
             }
             // If we are calling anything else, bail out
             if (gone) {
-                throw new SQLException("Statement closed.");
+                throw new SQLException(MessageFactory.get("abstractQueryReport.statementClosed"));
             }
             boolean process = false;
             // Check to see if we are about to execute a query
@@ -358,8 +359,8 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
                         // Reporting must never disturb the application -
                         // the driver's exception is the one being thrown
                         if (log.isWarnEnabled()) {
-                            log.warn("Unable to process failed query for " +
-                                    AbstractQueryReport.this.getClass().getName(), reporting);
+                            log.warn(MessageFactory.get("abstractQueryReport.unableToProcessFailedQuery",
+                                    AbstractQueryReport.this.getClass().getName()), reporting);
                         }
                     }
                 }
@@ -387,8 +388,8 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
                     reportSlowQuery(query, args, name, start, delta);
                 } catch (Throwable t) {
                     if (log.isWarnEnabled()) {
-                        log.warn("Unable to process slow query for " + AbstractQueryReport.this.getClass().getName(),
-                                t);
+                        log.warn(MessageFactory.get("abstractQueryReport.unableToProcessSlowQuery",
+                                AbstractQueryReport.this.getClass().getName()), t);
                     }
                 }
             } else if (process) {
@@ -397,8 +398,8 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
                 } catch (Throwable t) {
                     // Reporting must never disturb the application
                     if (log.isWarnEnabled()) {
-                        log.warn("Unable to process query report for " + AbstractQueryReport.this.getClass().getName(),
-                                t);
+                        log.warn(MessageFactory.get("abstractQueryReport.unableToProcessQueryReport",
+                                AbstractQueryReport.this.getClass().getName()), t);
                     }
                 }
             }

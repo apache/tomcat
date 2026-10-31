@@ -21,6 +21,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
 
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
+
 /**
  * Interceptor that traps any unhandled exception types and throws an exception that has been declared by the method
  * called, or throw an SQLException if it is declared. If the caught exception is not declared, and the method doesn't
@@ -50,11 +52,13 @@ public class TrapException extends JdbcInterceptor {
             Class<?> exceptionClass = exception.getClass();
             if (!isDeclaredException(method, exceptionClass)) {
                 if (isDeclaredException(method, SQLException.class)) {
-                    SQLException sqlx = new SQLException("Uncaught underlying exception.");
+                    SQLException sqlx =
+                            new SQLException(MessageFactory.get("trapException.uncaughtUnderlyingException"));
                     sqlx.initCause(exception);
                     exception = sqlx;
                 } else {
-                    RuntimeException rx = new RuntimeException("Uncaught underlying exception.");
+                    RuntimeException rx =
+                            new RuntimeException(MessageFactory.get("trapException.uncaughtUnderlyingException"));
                     rx.initCause(exception);
                     exception = rx;
                 }

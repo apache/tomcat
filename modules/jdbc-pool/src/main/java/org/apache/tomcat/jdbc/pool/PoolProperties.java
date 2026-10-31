@@ -32,6 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
  * Implementation of {@link PoolConfiguration} that holds the configuration properties for a connection pool.
@@ -477,8 +478,9 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                             }
                             int pidx = prop.indexOf('=');
                             if (pidx < 0) {
-                                throw new IllegalArgumentException("Invalid interceptor property '" + prop.trim() +
-                                        "', missing '=', in jdbcInterceptors value [" + interceptorValues[i] + "]");
+                                throw new IllegalArgumentException(MessageFactory.get(
+                                        "poolProperties.invalidInterceptorProperty", prop.trim(),
+                                        interceptorValues[i]));
                             }
                             String propName = prop.substring(0, pidx).trim();
                             String propValue = prop.substring(pidx + 1).trim();
@@ -727,14 +729,13 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                     PoolProperties.class.getClassLoader(), Thread.currentThread().getContextClassLoader());
             validator = validatorClass.getConstructor().newInstance();
         } catch (ClassNotFoundException e) {
-            log.warn("The class " + className + " cannot be found.", e);
+            log.warn(MessageFactory.get("poolProperties.validatorClassNotFound", className), e);
         } catch (ClassCastException e) {
-            log.warn("The class " + className + " does not implement the Validator interface.", e);
+            log.warn(MessageFactory.get("poolProperties.validatorNotValidator", className), e);
         } catch (IllegalAccessException e) {
-            log.warn("The class " + className + " or its no-arg constructor are inaccessible.", e);
+            log.warn(MessageFactory.get("poolProperties.validatorInaccessible", className), e);
         } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException e) {
-            log.warn("An object of class " + className + " cannot be instantiated. Make sure that " +
-                    "it includes an implicit or explicit no-arg constructor.", e);
+            log.warn(MessageFactory.get("poolProperties.validatorCannotInstantiate", className), e);
         }
     }
 
@@ -1315,7 +1316,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     @Override
     public void setDataSource(Object ds) {
         if (ds instanceof DataSourceProxy) {
-            throw new IllegalArgumentException("Layered pools are not allowed.");
+            throw new IllegalArgumentException(MessageFactory.get("poolProperties.layeredPoolsNotAllowed"));
         }
         this.dataSource = ds;
     }

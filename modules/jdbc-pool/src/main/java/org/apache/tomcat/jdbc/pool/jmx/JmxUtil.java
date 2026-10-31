@@ -24,6 +24,7 @@ import javax.management.ObjectName;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
  * Utility class for JMX registration of JDBC pool components.
@@ -62,7 +63,7 @@ public class JmxUtil {
                 oname = name;
             }
         } catch (Exception e) {
-            log.error("Jmx registration failed.", e);
+            log.error(MessageFactory.get("jmxUtil.jmxRegistrationFailed"), e);
         }
         return oname;
     }
@@ -79,7 +80,7 @@ public class JmxUtil {
         try {
             ManagementFactory.getPlatformMBeanServer().unregisterMBean(oname);
         } catch (Exception e) {
-            log.error("Jmx unregistration failed.", e);
+            log.error(MessageFactory.get("jmxUtil.jmxUnregistrationFailed"), e);
         }
     }
 

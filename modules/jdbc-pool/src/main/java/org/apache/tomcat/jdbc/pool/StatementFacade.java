@@ -31,6 +31,7 @@ import java.sql.Wrapper;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.interceptor.AbstractCreateStatementInterceptor;
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
  * Facade that creates statement and result set proxies.
@@ -204,13 +205,12 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
                 }
             }
             if (target == null) {
-                throw new SQLException("Statement closed.");
+                throw new SQLException(MessageFactory.get("statementFacade.statementClosed"));
             }
             if (ended) {
                 // The delegate is still open, but it is open on a session
                 // that belongs to the next borrower now.
-                throw new SQLException("Statement closed. The pooled connection this " +
-                        "statement was created from has been returned to the pool.");
+                throw new SQLException(MessageFactory.get("statementFacade.statementClosedConnectionReturned"));
             }
             // The connection a statement reports is the pooled handle the
             // application created it from, not the driver's own connection.
@@ -345,13 +345,12 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
                 }
             }
             if (target == null) {
-                throw new SQLException("ResultSet closed.");
+                throw new SQLException(MessageFactory.get("statementFacade.resultSetClosed"));
             }
             if (ended) {
                 // The cursor is still open, but it is open on a session that
                 // belongs to the next borrower now.
-                throw new SQLException("ResultSet closed. The pooled connection this " +
-                        "result set was read from has been returned to the pool.");
+                throw new SQLException(MessageFactory.get("statementFacade.resultSetClosedConnectionReturned"));
             }
 
             if (compare(GET_STATEMENT, method)) {

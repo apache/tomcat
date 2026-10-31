@@ -20,6 +20,8 @@ import java.sql.SQLException;
 
 import javax.sql.XAConnection;
 
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
+
 /**
  * XA-enabled data source for distributed transaction support.
  * <p>
@@ -93,19 +95,11 @@ public class XADataSource extends DataSource implements javax.sql.XADataSource {
             // configured pool therefore never becomes a data source at all.
             String jndiName = getPoolProperties().getDataSourceJNDI();
             if (jndiName != null) {
-                throw new SQLException("The connection pool [" + getName() + "] cannot provide XA connections:" +
-                        " the name \"" + jndiName + "\" set through the 'dataSourceJNDI' attribute has not been" +
-                        " resolved into a data source; the name is only looked up when the pool is created" +
-                        " through the DataSourceFactory. Set the 'dataSource' attribute to a" +
-                        " javax.sql.XADataSource provided by the JDBC driver.");
+                throw new SQLException(MessageFactory.get("xaDataSource.jndiNotResolved", getName(), jndiName));
             }
-            throw new SQLException("The connection pool [" + getName() + "] cannot provide XA connections:" +
-                    " neither the 'dataSource' nor the 'dataSourceJNDI' attribute is set, so only plain JDBC" +
-                    " connections from a JDBC driver and URL can be pooled. Set the 'dataSource' or" +
-                    " 'dataSourceJNDI' attribute to a javax.sql.XADataSource provided by the JDBC driver.");
+            throw new SQLException(MessageFactory.get("xaDataSource.noDataSource", getName()));
         }
-        throw new SQLException("The connection pool [" + getName() + "] cannot provide XA connections: the data" +
-                " source configured through the 'dataSource' or 'dataSourceJNDI' attribute (" +
-                ds.getClass().getName() + ") does not implement javax.sql.XADataSource.");
+        throw new SQLException(MessageFactory.get("xaDataSource.dataSourceNotXA", getName(),
+                ds.getClass().getName()));
     }
 }
