@@ -398,10 +398,18 @@ public class ConnectionPool {
             // Cache handler for the next iteration
             con.setHandler(handler);
         }
-        // Reset the chain in the order the interceptors are declared, for new and cached handlers alike
+        // Reset the chain in the order the interceptors are declared, for new and cached handlers alike,
+        // picking up the chain's tail on the way: the ProxyConnection at the bottom has to be told which
+        // handle this borrow is served under, and this walk is already visiting every link of the chain
+        // with the borrow not yet started - the one point where the tail can be armed before any call of
+        // this borrow can run.
         JdbcInterceptor next = handler;
+        ProxyConnection tail = null;
         try {
             while (next != null) {
+                if (next instanceof ProxyConnection) {
+                    tail = (ProxyConnection) next;
+                }
                 next.reset(this, con);
                 next = next.getNext();
             }
@@ -410,6 +418,18 @@ public class ConnectionPool {
                     (next != null ? next.getClass().getName() : "unknown")));
             sx.initCause(x);
             // The state of the connection is unknown, discard it so its partially reset chain is dropped
+            abandonSetup(con, sx, true);
+            throw sx;
+        }
+        if (tail == null) {
+            // Unreachable by construction: the chain is built with a ProxyConnection at its bottom and
+            // no path removes it. It is checked because a borrow without the tail could not be armed at
+            // all - nothing in its chain would know the handle it is served under, and every call that
+            // later reached the bottom of this chain would be refused as a foreign borrow - so the
+            // setup fails as the failed setup it is, and the half-armed chain goes out of service with
+            // the connection rather than handing out a handle that can never dispatch.
+            SQLException sx = new SQLException(
+                    MessageFactory.get("connectionPool.interceptorChainHasNoProxyConnection"));
             abandonSetup(con, sx, true);
             throw sx;
         }
@@ -434,6 +454,14 @@ public class ConnectionPool {
             // longer has any effect.)
             Connection connection = (Connection) proxyConstructor
                     .newInstance(new Object[] { new DisposableConnectionFacade(handler) });
+            // Tell the bottom of the chain which handle this borrow is served under. The chain is shared
+            // between the borrows of this pooled connection and only the handle is per-borrow: a call left
+            // parked in an interceptor above the tail descends carrying the handle of its own borrow, and
+            // the tail can tell the current borrow from a borrow that has ended - even after a clean
+            // recycle re-armed the session field - only by that identity. Recorded before the handle
+            // exists for anyone else: no call of this borrow can precede this point, and until the next
+            // borrow's reset clears it again, the tail refuses every other handle as an ended borrow.
+            tail.setBorrowHandle(connection);
             // The handle exists and the borrow is about to start: send the
             // JDBC 4.3 hint that opens the request, so a driver that
             // optimises per-request session handling knows the unit of work
