@@ -31,7 +31,9 @@ import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
  * hands out: it is a disposable facade over a pooled connection, so
  * closing it is permanent even though the physical session goes on
  * serving other borrowers, and the underlying session stays reachable
- * for the callers that need it.
+ * for the callers that need it - while the borrow is live; a handle that
+ * reports itself closed refuses that accessor, as the two discarded-
+ * handle scenarios pinned here show.
  *
  * <p>Scenario harvested from the retired legacy classes
  * {@code MultipleCloseTest} and {@code EqualsHashCodeTest}. The same
@@ -135,6 +137,96 @@ class TestProxyContract extends JdbcPoolBaseTest {
                 "a disposed facade must keep the equals(null) contract");
         Assertions.assertFalse(pooled.equals("a foreign object"),
                 "a disposed facade must keep the equals(non-proxy) contract");
+    }
+
+    /*
+     * The javax.sql.PooledConnection accessor on the handle answers the
+     * borrow, not the pooled connection: a handle that reports itself
+     * closed must refuse it rather than reveal the session below. The
+     * state pinned here is the reachable one - an interceptor marked the
+     * session discarded while this borrower still holds the handle, so
+     * the physical session stays open until the late return retires it -
+     * and the handle's own closed answer is pinned by the same probe the
+     * validity tests use.
+     */
+    @Test
+    void aDiscardedHandleRefusesToHandOutItsSession() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setJdbcInterceptors(
+                DiscardMarkingInterceptor.class.getName());
+        ds.createPool();
+
+        Connection held = ds.getConnection();
+        // While the borrow is live the accessor answers, as it must: the
+        // caller that needs the session behind a live handle still gets it.
+        Connection physical = ((PooledConnection) held).getConnection();
+        Assertions.assertNotNull(physical,
+                "precondition: a live handle must hand out the physical session");
+
+        // The marking probe leaves the borrower holding a handle whose
+        // session the pool has committed to retiring.
+        Assertions.assertTrue(held.isValid(1),
+                "precondition: the first probe finds the session live, at the driver");
+        Assertions.assertTrue(held.isClosed(),
+                "precondition: the interceptor's marking must have reached the handle");
+        Assertions.assertEquals(1, poolSessions(),
+                "precondition: the physical session is still open until the handle is returned");
+
+        Assertions.assertThrows(SQLException.class,
+                () -> ((PooledConnection) held).getConnection(),
+                "a handle that reports itself closed must not hand out the very session"
+                        + " the pool has committed to retiring");
+        Assertions.assertEquals(1, poolSessions(),
+                "the refusal is the handle's closed state, not a session the pool had"
+                        + " already taken out of service");
+
+        held.close();
+        awaitSessions(0); // the late return completes the discard
+    }
+
+    /*
+     * The other closed shape of the same accessor: the session was
+     * disconnected behind the still-held handle - what an abandon or a
+     * forced pool close does to a busy connection, which the handle
+     * keeps referencing until the release resets the interceptor chain.
+     * That window is pinned permanently here by making the reconnect the
+     * disconnect is followed by fail: the pooled connection then holds no
+     * physical session at all while the handle still stands on it, and
+     * the accessor must fail the caller, not answer with that null -
+     * which would surface as an unrelated NullPointerException at the
+     * caller's first use of the "physical" session.
+     */
+    @Test
+    void aSessionDisconnectedBehindAHeldHandleRefusesToBeHandedOut() throws Exception {
+        DataSource ds = newDataSource();
+        ds.createPool();
+
+        Connection held = ds.getConnection();
+        org.apache.tomcat.jdbc.pool.PooledConnection pooled =
+                interceptorOf(held, ProxyConnection.class).getDelegateConnection();
+
+        // A driver call to an unreachable port fails the reconnect, so the
+        // disconnected-behind-the-handle state the abandon window holds
+        // becomes the settled state this test observes.
+        ds.getPoolProperties().setUrl("jdbc:h2:tcp://localhost:1/mem:reconnect_must_fail");
+        Assertions.assertThrows(SQLException.class, () -> pooled.reconnect(),
+                "precondition: the reconnect must fail and leave the pooled connection"
+                        + " disconnected");
+        ds.getPoolProperties().setUrl(getUrl());
+
+        Assertions.assertNull(pooled.getConnection(),
+                "precondition: the pooled connection no longer holds a physical session");
+        Assertions.assertTrue(pooled.isDiscarded(),
+                "precondition: the session is marked out of service");
+        Assertions.assertTrue(held.isClosed(),
+                "precondition: the handle holding that session reports itself closed");
+
+        Assertions.assertThrows(SQLException.class,
+                () -> ((PooledConnection) held).getConnection(),
+                "a session the pool disconnected behind the handle must fail the accessor,"
+                        + " not hand out the null its field holds by then");
+
+        held.close(); // the late return releases the disconnected session
     }
 
     @Test

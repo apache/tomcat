@@ -170,6 +170,97 @@ class TestXaBranchDispatch extends JdbcPoolBaseTest {
     }
 
     @Test
+    void aDiscardedXaHandleFailsTheXaFamilyMethodsAsClosedInsteadOfDispatchingThemAtTheLiveXaConnection()
+            throws Exception {
+        org.h2.jdbcx.JdbcDataSource inner = new org.h2.jdbcx.JdbcDataSource();
+        inner.setUrl(getUrl());
+        inner.setUser("sa");
+        inner.setPassword("");
+        XADataSource ds = new XADataSource();
+        ds.setDriverClassName("org.h2.Driver");
+        ds.getPoolProperties().setJmxEnabled(false);
+        ds.getPoolProperties().setInitialSize(1);
+        ds.getPoolProperties().setMinIdle(0);
+        ds.getPoolProperties().setDataSource(inner);
+        // The marking interceptor takes the session out of service while the
+        // borrower still holds the handle - the same state the discard paths
+        // (an abandon, a forced close) pass through on their way to the
+        // disconnect, and the marking itself is pool-agnostic. Until the
+        // return the physical session, and with it the XA connection the
+        // driver created, are still open behind the handle.
+        ds.getPoolProperties().setJdbcInterceptors(
+                DiscardMarkingInterceptor.class.getName());
+        manage(ds);
+        ds.createPool();
+
+        Connection pooled = ds.getConnection();
+        Assertions.assertInstanceOf(javax.sql.XAConnection.class, pooled,
+                "an XA pool must hand out a handle that is an XA connection");
+        Assertions.assertTrue(pooled.isValid(1),
+                "precondition: the first probe finds the session live, at the driver");
+        Assertions.assertTrue(pooled.isClosed(),
+                "precondition: the interceptor's marking must have reached the handle");
+        Assertions.assertEquals(1, poolSessions(),
+                "precondition: the physical session, and with it the driver's XA "
+                + "connection, is still open until the handle is returned");
+
+        // The discarded handle answers every use with the closed-connection
+        // failure - the class documentation promises that answer for the
+        // listener methods too - rather than registering them at the XA
+        // connection of the session the pool is already retiring, where no
+        // notification the caller waits for could ever arrive.
+        ProxyConnection handler = interceptorOf(pooled, ProxyConnection.class);
+        for (String method : LISTENER_METHODS) {
+            Method m = PooledConnection.class.getMethod(method,
+                    method.contains("Statement")
+                            ? StatementEventListener.class
+                            : ConnectionEventListener.class);
+            Object[] args = listenerArgsFor(m);
+            Throwable thrown = Assertions.assertThrows(Throwable.class,
+                    () -> handler.invoke(pooled, m, args));
+            Assertions.assertInstanceOf(SQLException.class, thrown,
+                    method + " on a discarded handle must fail as the closed-connection"
+                    + " SQLException, not as " + thrown.getClass().getName()
+                    + " - a quiet return would mean the registration landed at the"
+                    + " live driver XA connection");
+            Assertions.assertEquals("Connection has already been closed.",
+                    thrown.getMessage(), method + " must give the same closed answer"
+                    + " every other use of this handle gives");
+        }
+
+        // The handle's own XA method is answered the same way: handing the
+        // borrower the XAResource of a session that is out of service would
+        // let it enlist work that the pool is about to roll the session out
+        // from under. The method declares SQLException, so the failure
+        // reaches the caller unwrapped.
+        SQLException xa = Assertions.assertThrows(SQLException.class,
+                () -> ((javax.sql.XAConnection) pooled).getXAResource());
+        Assertions.assertEquals("Connection has already been closed.", xa.getMessage());
+
+        // The same refusal reaches a caller of the listener interface. That
+        // interface declares no checked exception, so what surfaces is the
+        // chain's stand-in for an undeclared throw - the proxy's
+        // UndeclaredThrowableException, or, with interceptors configured,
+        // their TrapException's RuntimeException - and the closed-connection
+        // SQLException must sit at the bottom of either, rather than the
+        // registration quietly landing at the live driver XA connection.
+        PooledConnection asPooled = (PooledConnection) pooled;
+        Throwable thrown = Assertions.assertThrows(Throwable.class,
+                () -> asPooled.addConnectionEventListener(NOOP_CONNECTION_LISTENER));
+        Throwable root = thrown;
+        while (root.getCause() != null) {
+            root = root.getCause();
+        }
+        Assertions.assertInstanceOf(SQLException.class, root,
+                "the failure's root must be the closed-connection SQLException, was "
+                + root.getClass().getName());
+        Assertions.assertEquals("Connection has already been closed.", root.getMessage());
+
+        pooled.close(); // the late return ends the borrow
+        awaitSessions(0); // and takes the session, and its XA handle, out of service
+    }
+
+    @Test
     void anXaPoolStillDispatchesListenerMethodsToTheXaConnection()
             throws Exception {
         org.h2.jdbcx.JdbcDataSource inner = new org.h2.jdbcx.JdbcDataSource();
