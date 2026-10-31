@@ -23,7 +23,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -37,7 +39,12 @@ import org.apache.tomcat.jdbc.pool.DataSource;
  * forgotten the moment they are closed (the tracked list is bounded by
  * genuinely open statements, not by everything the borrow ever created),
  * and statements it <em>did not</em> close must survive garbage collection
- * so they can still be closed when the connection is returned.
+ * so they can still be closed when the connection is returned. What it owes
+ * on top of that is a handle that answers {@code equals} and
+ * {@code hashCode} on itself, like every other statement handle the pool
+ * hands out, so that the tracker's own bookkeeping is what decides which
+ * statements are retired and the handle's identity is what decides where it
+ * sits in a hash container.
  */
 class TestStatementFinalizer extends JdbcPoolBaseTest {
 
@@ -180,9 +187,11 @@ class TestStatementFinalizer extends JdbcPoolBaseTest {
             Assertions.assertTrue(wrapper.equals(wrapper), "the handle must be equal to itself");
             Assertions.assertFalse(wrapper.equals(pooled), "an unrelated object must not compare equal");
             Statement driver = driverStatement(ps);
-            Assertions.assertTrue(wrapper.equals(driver),
-                    "the wrapper must be equal to the statement it wraps");
-            java.util.Set<Statement> seen = new java.util.HashSet<>();
+            Assertions.assertFalse(wrapper.equals(driver),
+                    "the wrapper is a handle of its own, not the statement it wraps");
+            Assertions.assertFalse(driver.equals(wrapper),
+                    "and the two must not compare equal in either direction");
+            Set<Statement> seen = new HashSet<>();
             seen.add(wrapper);
             Assertions.assertTrue(seen.contains(wrapper), "hashCode must agree with equals");
             try (ResultSet rs = wrapper.executeQuery()) {
@@ -204,6 +213,128 @@ class TestStatementFinalizer extends JdbcPoolBaseTest {
                     "use after close must still be reported, not swallowed");
             call.close();
             Assertions.assertEquals(0, tracked(finalizer));
+        }
+    }
+
+    @SuppressWarnings("unlikely-arg-type") // Use of unlikely arg-type is deliberate
+    @Test
+    void theTrackingHandleAnswersObjectEqualityOnItself() throws Exception {
+        DataSource ds = finalizerPool();
+        ds.createPool();
+
+        try (Connection pooled = ds.getConnection()) {
+            StatementFinalizer finalizer = interceptorOf(pooled, StatementFinalizer.class);
+            Assertions.assertNotNull(finalizer);
+
+            PreparedStatement ps = pooled.prepareStatement("SELECT 1");
+            PreparedStatement handle = (PreparedStatement) proxiedObject(ps);
+            Statement driver = driverStatement(ps);
+            Assertions.assertNotSame(handle, ps, "the tracking handle was reached");
+            Assertions.assertNotSame(handle, driver, "the tracking handle is not the driver's statement");
+
+            // The handle is itself and nothing else. It used to answer equal
+            // to the statement it wraps while that statement - answering by
+            // its own equality, which is identity for a driver statement -
+            // did not answer equal to the handle back, and that one-sided
+            // relation is what Object.equals(Object) rules out.
+            Assertions.assertTrue(handle.equals(handle), "the handle must be equal to itself");
+            Assertions.assertFalse(handle.equals(driver),
+                    "the handle must not claim the statement it wraps as itself");
+            Assertions.assertFalse(driver.equals(handle),
+                    "and the relation must hold in the other direction too");
+            Assertions.assertFalse(handle.equals(null),
+                    "equals must answer a null argument rather than throw");
+            Assertions.assertFalse(handle.equals("not a statement"),
+                    "equals must answer a foreign argument rather than throw");
+
+            // The hash that goes with that equality: the handle's own, so it
+            // occupies one slot whatever else a container holds.
+            Assertions.assertEquals(Integer.valueOf(System.identityHashCode(handle)),
+                    Integer.valueOf(handle.hashCode()), "hashCode must be the handle's own identity hash");
+
+            // The pair whose membership used to be decided by insertion order:
+            // the same two objects, hashing alike, made one element or two.
+            Set<Statement> driverFirst = new HashSet<>();
+            Assertions.assertTrue(driverFirst.add(driver));
+            Assertions.assertTrue(driverFirst.add(handle),
+                    "the handle must be a second element next to the statement it wraps");
+            Set<Statement> handleFirst = new HashSet<>();
+            Assertions.assertTrue(handleFirst.add(handle));
+            Assertions.assertTrue(handleFirst.add(driver),
+                    "the same two objects must make two elements in the other order as well");
+            Assertions.assertEquals(2, driverFirst.size(),
+                    "membership must not depend on which of the two was added first");
+            Assertions.assertEquals(2, handleFirst.size(),
+                    "membership must not depend on which of the two was added first");
+
+            Set<Statement> seen = new HashSet<>();
+            Assertions.assertTrue(seen.add(handle));
+            Assertions.assertFalse(seen.add(handle), "the handle must occupy exactly one slot");
+            Assertions.assertTrue(seen.contains(handle), "hashCode must agree with equals");
+
+            handle.close();
+            Assertions.assertEquals(0, tracked(finalizer),
+                    "answering the Object methods on the handle must not cost the tracking its entry");
+        }
+    }
+
+    @Test
+    void twoTrackingHandlesOnOneStatementDoNotCompareEqual() throws Exception {
+        DataSource ds = finalizerPool();
+        // Two trackers in the chain: the outer one wraps - and tracks - the
+        // handle the inner one hands out, so one driver statement ends up
+        // behind two distinct tracking handles.
+        String tracker = StatementFinalizer.class.getName();
+        ds.getPoolProperties().setJdbcInterceptors(tracker + ";" + tracker);
+        ds.createPool();
+
+        try (Connection pooled = ds.getConnection()) {
+            StatementFinalizer outer = interceptorOf(pooled, StatementFinalizer.class);
+            Assertions.assertNotNull(outer);
+            StatementFinalizer inner = Assertions.assertInstanceOf(StatementFinalizer.class, outer.getNext(),
+                    "the second tracker must sit directly beneath the first");
+
+            PreparedStatement ps = pooled.prepareStatement("SELECT 1");
+            Statement outerHandle = (Statement) proxiedObject(ps);
+            Statement innerHandle = trackedStatement(trackedEntries(outer).get(0));
+            Statement driver = driverStatement(ps);
+            Assertions.assertNotSame(outerHandle, innerHandle,
+                    "the two trackers must hand out distinct handles");
+            Assertions.assertNotSame(innerHandle, driver);
+            Assertions.assertEquals(1, tracked(outer), "the outer tracker must track the inner handle");
+            Assertions.assertEquals(1, tracked(inner), "the inner tracker must track the driver statement");
+            Assertions.assertSame(driver, trackedStatement(trackedEntries(inner).get(0)),
+                    "both handles must front the very same driver statement");
+
+            // Neither handle may absorb the other: the outer one used to
+            // delegate its equality to the inner one, which made the outer
+            // handle equal to the inner handle while the inner one knew
+            // nothing of the outer - one more pair a set resolved by the
+            // order its elements arrived in.
+            Assertions.assertTrue(outerHandle.equals(outerHandle));
+            Assertions.assertTrue(innerHandle.equals(innerHandle));
+            Assertions.assertFalse(outerHandle.equals(innerHandle),
+                    "a tracking handle must not absorb the handle beneath it");
+            Assertions.assertFalse(innerHandle.equals(outerHandle),
+                    "and the relation must hold in the other direction too");
+            Assertions.assertFalse(outerHandle.equals(driver));
+            Assertions.assertFalse(driver.equals(outerHandle));
+
+            Set<Statement> innerFirst = new HashSet<>();
+            Assertions.assertTrue(innerFirst.add(innerHandle));
+            Assertions.assertTrue(innerFirst.add(outerHandle), "the two handles are two elements");
+            Set<Statement> outerFirst = new HashSet<>();
+            Assertions.assertTrue(outerFirst.add(outerHandle));
+            Assertions.assertTrue(outerFirst.add(innerHandle), "in either order");
+
+            // Both handles still drive the same statement, and closing the
+            // handle the application holds still retires the entry at both
+            // layers: the list removal keys on the entry, not on any answer
+            // to equals.
+            ps.close();
+            Assertions.assertTrue(driver.isClosed(), "the close must still reach the driver statement");
+            Assertions.assertEquals(0, tracked(outer), "the outer tracker must forget its entry");
+            Assertions.assertEquals(0, tracked(inner), "the inner tracker must forget its entry");
         }
     }
 }
