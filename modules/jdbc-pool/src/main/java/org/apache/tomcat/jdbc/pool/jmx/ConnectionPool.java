@@ -87,9 +87,11 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
             });
 
     /**
-     * the ObjectName of this pool.
+     * the ObjectName of this pool. Written by the thread that registers the MBean and read by the pool's own threads,
+     * so it is volatile - as it already is on the {@link org.apache.tomcat.jdbc.pool.DataSource} that publishes this
+     * MBean - to make the registration visible to the threads that raise notifications.
      */
-    private ObjectName oname = null;
+    private volatile ObjectName oname = null;
 
     /**
      * Creates a new JMX wrapper for the given connection pool.
@@ -258,8 +260,10 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      */
     protected Object getNotificationSource() {
         // The registration handle is written by whichever thread registered the
-        // MBean; read it once so a single notification is sent with one source
-        // whatever happens to the field while the notification is on its way
+        // MBean; the field is volatile so that write becomes visible to the pool
+        // threads that read it here, and it is read once so that a single
+        // notification is sent with one source whatever happens to the field
+        // while the notification is on its way
         ObjectName name = oname;
         if (name != null) {
             return name;

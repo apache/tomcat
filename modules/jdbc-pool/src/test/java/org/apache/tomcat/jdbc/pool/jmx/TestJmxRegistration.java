@@ -21,11 +21,17 @@ import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
+import javax.management.Notification;
+import javax.management.NotificationListener;
 import javax.management.ObjectName;
 
 import org.junit.jupiter.api.Assertions;
@@ -64,6 +70,12 @@ import org.apache.tomcat.jdbc.pool.interceptor.StatementCache;
  * which, running no {@code postDeregister()} at all, leaves
  * {@code postRegister(false)} as the only hook that could ever release the
  * pool's publication.</p>
+ * <p>
+ * The last test steps from what the helper reports to what the pool MBean
+ * itself remembers of its registration: the container writes that name on its
+ * own thread, while the pool raises its notifications on the threads that
+ * borrow, return and clean up connections, so the write has to become visible
+ * to those threads before their notifications can carry the published name.</p>
  */
 class TestJmxRegistration extends JdbcPoolBaseTest {
 
@@ -615,6 +627,81 @@ class TestJmxRegistration extends JdbcPoolBaseTest {
             // its handle under the second one, so a broken build would leave it
             // with no owner at all - take away anything that is still published
             for (ObjectName stale : publishedFor(server, blocked)) {
+                server.unregisterMBean(stale);
+            }
+        }
+    }
+
+    @Test
+    void aPoolThreadRaisesItsNotificationUnderTheNameTheRegistrationPublished() throws Exception {
+        MBeanServer server = server();
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setJmxEnabled(true);
+        ds.getPoolProperties().setInitialSize(0);
+        ds.createPool();
+        ConnectionPool jmx = ds.getPool().getJmxPool();
+        Assertions.assertNotNull(jmx, "an enabled pool has a JMX wrapper");
+        Assertions.assertNull(jmx.getObjectName(), "this pool is not registered yet");
+
+        BlockingQueue<Notification> delivered = new LinkedBlockingQueue<>();
+        NotificationListener listener = (n, handback) -> delivered.offer(n);
+        jmx.addListener(listener);
+
+        // A thread of the pool's kind, already running while the container
+        // publishes the pool: the pool raises its notifications on exactly
+        // such threads - the ones that borrow, return and clean up connections
+        // - while the registration handle is written on the thread the MBean
+        // server called preRegister() on. Nothing here may order the read
+        // after the write by thread handoff, since start() and join() alone
+        // would give the write a happens-before edge and hide the visibility
+        // problem this pins; the worker therefore waits by re-reading the
+        // handle, which on a correct build stops as soon as the registration
+        // lands - a bound on the wait, not a stress attempt.
+        AtomicReference<ObjectName> observed = new AtomicReference<>();
+        Thread poolThread = new Thread(() -> {
+            long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(30);
+            ObjectName name;
+            while ((name = jmx.getObjectName()) == null && System.nanoTime() < deadline) {
+                Thread.yield();
+            }
+            if (name != null) {
+                jmx.notify(ConnectionPool.POOL_EMPTY,
+                        "reported by a pool thread once it saw the registration");
+                observed.set(name);
+            }
+        }, "test-pool-thread-before-registration");
+        poolThread.setDaemon(true);
+        poolThread.start();
+
+        ObjectName dsName = uniqueName("notify-thread");
+        ObjectName poolOname = null;
+        try {
+            // the container's registration, on this test's thread: the MBean
+            // server calls the pool wrapper's preRegister() here synchronously
+            ds.preRegister(server, dsName);
+            poolOname = ds.createObjectName(dsName);
+
+            poolThread.join(TimeUnit.SECONDS.toMillis(60));
+            Assertions.assertEquals(poolOname, observed.get(),
+                    "a pool thread that was already running when the container registered the"
+                            + " pool must see the registered name: as long as the registration"
+                            + " never becomes visible to a thread, every notification it raises"
+                            + " keeps carrying the string fallback of an unregistered pool, even"
+                            + " long after the MBean server published the name");
+
+            Notification n = delivered.poll(30, TimeUnit.SECONDS);
+            Assertions.assertNotNull(n, "the pool thread handed its notification off for delivery");
+            Assertions.assertEquals(poolOname, n.getSource(),
+                    "a notification raised on a pool thread must be stamped with the name the"
+                            + " MBean server published the pool under, not with the fallback of"
+                            + " a pool that was never registered");
+        } finally {
+            jmx.removeListener(listener);
+            ds.close();
+            ds.postDeregister();
+            // test hygiene: the publication is released by the close above;
+            // take away anything a regression would have left published
+            for (ObjectName stale : publishedFor(server, dsName)) {
                 server.unregisterMBean(stale);
             }
         }
