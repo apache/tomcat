@@ -182,6 +182,21 @@ class TestJmxNotificationDelivery extends JdbcPoolBaseTest {
     }
 
     /*
+     * A listener that records the notifications it receives and then throws -
+     * the shape of a monitoring listener that is simply broken, and throws on
+     * every notification it is handed.
+     */
+    private static final class ThrowingListener implements NotificationListener {
+        private final List<Notification> received = new CopyOnWriteArrayList<>();
+
+        @Override
+        public void handleNotification(Notification notification, Object handback) {
+            received.add(notification);
+            throw new RuntimeException("this listener is broken");
+        }
+    }
+
+    /*
      * A listener that only records the notifications it receives.
      */
     private static final class RecordingListener implements NotificationListener {
@@ -225,6 +240,78 @@ class TestJmxNotificationDelivery extends JdbcPoolBaseTest {
         Assertions.assertTrue(stuck.completed.await(5, TimeUnit.SECONDS),
                 "the released listener must have finished handling the notification");
         jmxPool.removeListener(stuck);
+    }
+
+    /*
+     * The local fan-out hands the notification to each listener on its own:
+     * what one of them throws is contained at that one listener. It may not
+     * kill the notifier thread, and it may not suppress the delivery of that
+     * very notification to the listeners registered behind the thrower
+     * either. The queue is iterated in registration order, so with the thrower
+     * first, a fan-out that lets the exception escape its loop leaves every
+     * listener behind it hungry for exactly those notifications the thrower
+     * broke on - a silent, event-dependent gap that never surfaces anywhere
+     * else.
+     */
+    @Test
+    void aThrowingLocalListenerDoesNotSuppressTheListenersBehindIt() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setName("JmxDeliveryThrower-" + System.nanoTime());
+        ds.createPool();
+        // an unregistered MBean is enough: this is about the local fan-out
+        ConnectionPool jmxPool = new ConnectionPool(ds.getPool());
+        ThrowingListener throwing = new ThrowingListener();
+        RecordingListener second = new RecordingListener();
+        RecordingListener third = new RecordingListener();
+        // registration order is the local delivery order: the thrower goes first
+        jmxPool.addListener(throwing);
+        jmxPool.addListener(second);
+        jmxPool.addListener(third);
+        try {
+            Assertions.assertTrue(jmxPool.notify(ConnectionPool.NOTIFY_ABANDON, "first"),
+                    "the notification must be reported as handed off for delivery");
+
+            // the notification the thrower broke on must still reach both
+            // listeners behind it, once each, as one and the same notification
+            awaitUntil(() -> !second.received.isEmpty() && !third.received.isEmpty());
+            Assertions.assertEquals(1, second.received.size(),
+                    "the notification that broke the first listener must have reached the"
+                            + " listener behind it once");
+            Assertions.assertEquals(1, third.received.size(),
+                    "the notification that broke the first listener must have reached the"
+                            + " third listener once too");
+            Assertions.assertSame(second.received.get(0), third.received.get(0),
+                    "both listeners behind the thrower must have received that very"
+                            + " notification, not a later one");
+            Assertions.assertEquals(ConnectionPool.NOTIFY_ABANDON, second.received.get(0).getType(),
+                    "what reached the listeners behind the thrower must be the notification"
+                            + " the thrower broke on");
+            Assertions.assertEquals(1, throwing.received.size(),
+                    "the throwing listener must have been reached too - its own failure is"
+                            + " what the containment is about");
+
+            // and the contained failure does not break the notifier: the next
+            // notification runs the same fan-out, thrower and all, whole
+            Assertions.assertTrue(jmxPool.notify(ConnectionPool.NOTIFY_ABANDON, "second"),
+                    "a notification reported after a listener threw must still be handed off");
+            String secondMessage = "[" + ConnectionPool.NOTIFY_ABANDON + "] second";
+            awaitUntil(() -> containsMessage(second.received, secondMessage)
+                    && containsMessage(third.received, secondMessage));
+            Assertions.assertEquals(2, second.received.size(),
+                    "each listener behind the thrower must have received exactly the two"
+                            + " notifications, with nothing lost and nothing duplicated");
+            Assertions.assertEquals(2, third.received.size(),
+                    "each listener behind the thrower must have received exactly the two"
+                            + " notifications, with nothing lost and nothing duplicated");
+            Assertions.assertTrue(second.received.get(1).getSequenceNumber()
+                    > second.received.get(0).getSequenceNumber(),
+                    "a listener behind the thrower must observe the notifications in the"
+                            + " order the pool reported them");
+        } finally {
+            jmxPool.removeListener(throwing);
+            jmxPool.removeListener(second);
+            jmxPool.removeListener(third);
+        }
     }
 
     /*
