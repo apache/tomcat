@@ -37,8 +37,8 @@ import org.apache.tomcat.jdbc.pool.DataSource;
  * What {@code StatementFinalizer} owes the application from the other
  * side of the coin: statements the application <em>did</em> close must be
  * forgotten the moment they are closed (the tracked list is bounded by
- * genuinely open statements, not by everything the borrow ever created),
- * and statements it <em>did not</em> close must survive garbage collection
+ * genuinely open statements closed through its handle, not by everything
+ * the borrow ever created), and statements it <em>did not</em> close must survive garbage collection
  * so they can still be closed when the connection is returned. What it owes
  * on top of that is a handle that answers {@code equals} and
  * {@code hashCode} on itself, like every other statement handle the pool
@@ -276,6 +276,52 @@ class TestStatementFinalizer extends JdbcPoolBaseTest {
             Assertions.assertEquals(0, tracked(finalizer),
                     "answering the Object methods on the handle must not cost the tracking its entry");
         }
+    }
+
+    @Test
+    void aStatementClosedThroughTheUnwrappedDriverHandleLingersUntilTheReturn() throws Exception {
+        DataSource ds = finalizerPool();
+        ds.createPool();
+
+        Connection pooled = ds.getConnection();
+        StatementFinalizer finalizer = interceptorOf(pooled, StatementFinalizer.class);
+        Assertions.assertNotNull(finalizer);
+
+        // The result set back door stays on the handled route: the facade
+        // the pool always installs answers getStatement() with the pooled
+        // handle, so closing through it still passes through the tracking
+        // proxy, and the entry is forgotten right there.
+        Statement viaResultSet = pooled.createStatement();
+        try (ResultSet rs = viaResultSet.executeQuery("SELECT 1")) {
+            rs.next();
+            rs.getStatement().close();
+        }
+        Assertions.assertEquals(0, tracked(finalizer),
+                "a close through a result set's handle must still be noticed");
+
+        // The unwrap route leaves the handled path: the driver's own
+        // statement takes the close, and the tracking proxy - the one place
+        // the entry is removed - never sees it. The entry cannot observe a
+        // close performed through another handle, so the tracked list is
+        // bounded only by the statements closed through the handle this
+        // interceptor returns, and this one lingers until the return.
+        Statement viaUnwrap = pooled.createStatement();
+        Statement driver = driverStatement(viaUnwrap);
+        driver.close();
+        Assertions.assertTrue(driver.isClosed(),
+                "precondition: the driver's own statement is closed");
+        Assertions.assertEquals(1, tracked(finalizer),
+                "a close that bypassed the handle must not be noticed as removal");
+
+        // The return reclaims the stale entry, and the renewed close attempt
+        // there meets a statement that is already closed: a harmless no-op
+        // that must neither fail the return nor leave the entry behind.
+        Statement trackedStatement = trackedStatement(trackedEntries(finalizer).get(0));
+        pooled.close();
+        Assertions.assertEquals(0, tracked(finalizer),
+                "the connection return must clear the stale entry");
+        Assertions.assertTrue(trackedStatement.isClosed(),
+                "the statement behind the stale entry is closed all the same");
     }
 
     @Test
