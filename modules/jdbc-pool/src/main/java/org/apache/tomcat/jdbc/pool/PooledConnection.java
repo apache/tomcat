@@ -32,6 +32,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;
 import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
  * Represents a pooled connection and holds a reference to the {@link java.sql.Connection} object
@@ -235,7 +236,7 @@ public class PooledConnection implements PooledConnectionMBean {
      */
     public void connect() throws SQLException {
         if (released.get()) {
-            throw new SQLException("A connection once released, can't be reestablished.");
+            throw new SQLException(MessageFactory.get("pooledConnection.cannotReestablish"));
         }
         if (connection != null) {
             try {
@@ -356,7 +357,7 @@ public class PooledConnection implements PooledConnectionMBean {
                 // Contract-violating provider: a handle without a logical
                 // connection is of no use either.
                 failure = new SQLException(
-                        "XADataSource " + xds + " returned a null connection for the XA connection handle");
+                        MessageFactory.get("pooledConnection.xaDataSourceNullConnection", xds));
             }
             if (failure != null || failureRuntime != null) {
                 // Do not strand the handle if the logical connection
@@ -388,7 +389,7 @@ public class PooledConnection implements PooledConnectionMBean {
                 // when no connection can be provided; keeping that null would
                 // surface later as a misleading validation failure, or as a
                 // null pointer when the default connection state is applied.
-                throw new SQLException("DataSource " + ds + " returned a null connection");
+                throw new SQLException(MessageFactory.get("pooledConnection.dataSourceNullConnection", ds));
             }
         } else if (poolProperties.getDataSource() instanceof javax.sql.ConnectionPoolDataSource) {
             javax.sql.ConnectionPoolDataSource ds = (javax.sql.ConnectionPoolDataSource) poolProperties.getDataSource();
@@ -410,8 +411,8 @@ public class PooledConnection implements PooledConnectionMBean {
             if (connection == null && failure == null && failureRuntime == null) {
                 // Contract-violating provider: a handle without a logical
                 // connection is of no use either.
-                failure = new SQLException("ConnectionPoolDataSource " + ds +
-                        " returned a null connection for the pooled connection handle");
+                failure = new SQLException(
+                        MessageFactory.get("pooledConnection.connectionPoolDataSourceNullConnection", ds));
             }
             if (failure != null || failureRuntime != null) {
                 // Do not strand the handle if the logical connection
@@ -432,8 +433,8 @@ public class PooledConnection implements PooledConnectionMBean {
                 throw failure;
             }
         } else {
-            throw new SQLException("DataSource is of unknown class:" +
-                    (poolProperties.getDataSource() != null ? poolProperties.getDataSource().getClass() : "null"));
+            throw new SQLException(MessageFactory.get("pooledConnection.unknownDataSource",
+                    (poolProperties.getDataSource() != null ? poolProperties.getDataSource().getClass() : "null")));
         }
     }
 
@@ -519,7 +520,7 @@ public class PooledConnection implements PooledConnectionMBean {
             }
         }
         if (connection == null) {
-            throw new SQLException("Driver:" + driver + " returned null for URL:" + driverURL);
+            throw new SQLException(MessageFactory.get("pooledConnection.driverReturnedNull", driver, driverURL));
         }
     }
 
@@ -575,8 +576,7 @@ public class PooledConnection implements PooledConnectionMBean {
                 // catch only guards against a failure of the walk itself;
                 // an interceptor must not be able to keep the physical
                 // connection from being closed
-                log.warn("Interceptor threw an exception from the " + "disconnected() event; ignoring it so that the " +
-                        "physical connection can be closed.", x);
+                log.warn(MessageFactory.get("pooledConnection.interceptorDisconnectedFailed"), x);
             }
             try {
                 if (cpdsConnection != null) {
@@ -715,7 +715,8 @@ public class PooledConnection implements PooledConnectionMBean {
                 // between the idle and busy queues and strands the pooled
                 // connection - permanently shrinking the pool
                 if (getPoolProperties().getLogValidationErrors()) {
-                    log.error("Custom validation through " + poolProperties.getValidator() + " threw an exception.", x);
+                    log.error(MessageFactory.get("pooledConnection.customValidationThrew",
+                            poolProperties.getValidator()), x);
                 } else if (log.isDebugEnabled()) {
                     log.debug("Custom validation threw an exception.", x);
                 }
@@ -726,7 +727,8 @@ public class PooledConnection implements PooledConnectionMBean {
                 return true;
             } else {
                 if (getPoolProperties().getLogValidationErrors()) {
-                    log.error("Custom validation through " + poolProperties.getValidator() + " failed.");
+                    log.error(MessageFactory.get("pooledConnection.customValidationFailed",
+                            poolProperties.getValidator()));
                 }
                 return false;
             }
@@ -771,7 +773,7 @@ public class PooledConnection implements PooledConnectionMBean {
                     return transactionTerminated;
                 } else {
                     if (getPoolProperties().getLogValidationErrors()) {
-                        log.error("isValid() returned false.");
+                        log.error(MessageFactory.get("pooledConnection.isValidReturnedFalse"));
                     }
                     return false;
                 }
@@ -784,7 +786,7 @@ public class PooledConnection implements PooledConnectionMBean {
                 // idle and busy queues and strands the pooled connection -
                 // permanently shrinking the pool
                 if (getPoolProperties().getLogValidationErrors()) {
-                    log.error("isValid() failed.", e);
+                    log.error(MessageFactory.get("pooledConnection.isValidFailed"), e);
                 } else if (e instanceof RuntimeException) {
                     // Unlike the checked failure this anomaly would once
                     // have escaped as the driver's own throw; the caller
@@ -793,7 +795,7 @@ public class PooledConnection implements PooledConnectionMBean {
                     // than debug - otherwise at the default log level a
                     // broken driver would fail every validation with no
                     // trace anywhere
-                    log.warn("isValid() failed.", e);
+                    log.warn(MessageFactory.get("pooledConnection.isValidFailed"), e);
                 } else if (log.isDebugEnabled()) {
                     log.debug("isValid() failed.", e);
                 }
@@ -841,7 +843,7 @@ public class PooledConnection implements PooledConnectionMBean {
             return transactionTerminated;
         } catch (Exception ex) {
             if (getPoolProperties().getLogValidationErrors()) {
-                log.error("SQL Validation error", ex);
+                log.error(MessageFactory.get("pooledConnection.sqlValidationError"), ex);
             } else if (log.isDebugEnabled()) {
                 log.debug("Unable to validate object:", ex);
             }
@@ -882,14 +884,14 @@ public class PooledConnection implements PooledConnectionMBean {
             log.debug("Failed to commit transaction", e);
         } catch (RuntimeException e) {
             if (getPoolProperties().getLogValidationErrors()) {
-                log.error("Failed to commit transaction", e);
+                log.error(MessageFactory.get("pooledConnection.commitFailed"), e);
             } else {
                 // The unchecked variant is logged at warn rather than debug,
                 // like the rollback helper's: the caller surfaces it only as
                 // the generic validation failure, so at the default log level
                 // a driver that fails to commit would otherwise destroy
                 // connection after connection with no trace anywhere
-                log.warn("Failed to commit transaction", e);
+                log.warn(MessageFactory.get("pooledConnection.commitFailed"), e);
             }
         }
         return false;
@@ -913,7 +915,7 @@ public class PooledConnection implements PooledConnectionMBean {
             // converts it, and strand the pooled connection between the
             // idle and busy queues
             if (getPoolProperties().getLogValidationErrors()) {
-                log.error("Failed to rollback transaction", e);
+                log.error(MessageFactory.get("pooledConnection.rollbackFailed"), e);
             } else {
                 // The unchecked variant is an anomaly of the same kind as
                 // a throwing custom Validator, and unlike the checked
@@ -923,7 +925,7 @@ public class PooledConnection implements PooledConnectionMBean {
                 // level a driver that fails to end a transaction unchecked
                 // would destroy connection after connection with no trace
                 // anywhere
-                log.warn("Failed to rollback transaction", e);
+                log.warn(MessageFactory.get("pooledConnection.rollbackFailed"), e);
             }
         }
         return false;
@@ -1045,7 +1047,7 @@ public class PooledConnection implements PooledConnectionMBean {
      */
     public void setDiscarded(boolean discarded) {
         if (this.discarded && !discarded) {
-            throw new IllegalStateException("Unable to change the state once the connection has been discarded");
+            throw new IllegalStateException(MessageFactory.get("pooledConnection.discardedStateChange"));
         }
         this.discarded = discarded;
     }
@@ -1199,8 +1201,8 @@ public class PooledConnection implements PooledConnectionMBean {
                     } catch (Throwable t) {
                         // One broken interceptor must not stop the rest of the
                         // chain from being reset
-                        log.warn("Interceptor [" + interceptor.getClass().getName() +
-                                "] threw an exception from reset(); " + "continuing with the rest of the chain.", t);
+                        log.warn(MessageFactory.get("pooledConnection.interceptorResetFailed",
+                                interceptor.getClass().getName()), t);
                     }
                     interceptor = next;
                 }
@@ -1278,7 +1280,7 @@ public class PooledConnection implements PooledConnectionMBean {
     private java.sql.Connection requireConnection() throws SQLException {
         java.sql.Connection c = connection;
         if (c == null) {
-            throw new SQLException("Connection has been disconnected.");
+            throw new SQLException(MessageFactory.get("pooledConnection.disconnected"));
         }
         return c;
     }
@@ -1297,7 +1299,7 @@ public class PooledConnection implements PooledConnectionMBean {
         try {
             c.clearWarnings();
         } catch (SQLException e) {
-            log.warn("Unable to clear warnings on the connection.", e);
+            log.warn(MessageFactory.get("pooledConnection.unableToClearWarnings"), e);
         }
     }
 

@@ -26,6 +26,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
  * Interceptor that sets a query timeout on every created {@link Statement}.
@@ -95,11 +96,8 @@ public class QueryTimeoutInterceptor extends AbstractCreateStatementInterceptor 
         try {
             timeout = Integer.parseInt(p.getValue());
         } catch (NumberFormatException x) {
-            log.warn("[QueryTimeoutInterceptor] The configured queryTimeout [" + p.getValue()
-                    + "] is not an integer number of seconds and is not applied: statements created through"
-                    + " this configuration keep the default " + timeout + "-second query timeout. Correct the"
-                    + " value in the jdbcInterceptors configuration to set the timeout that was meant to be"
-                    + " configured.");
+            log.warn(MessageFactory.get("queryTimeoutInterceptor.invalidQueryTimeout",
+                    p.getValue(), timeout));
         }
     }
 
@@ -142,10 +140,7 @@ public class QueryTimeoutInterceptor extends AbstractCreateStatementInterceptor 
             return;
         }
         timeoutRefusalReported = true;
-        log.warn("[QueryTimeoutInterceptor] Unable to set the query timeout of " + timeout + " seconds on a statement"
-                + " of this connection: " + x.getMessage() + ". The driver does not apply the timeout, so statements"
-                + " created on this physical connection run without a query timeout. Refusals are not logged again on"
-                + " this connection.", x);
+        log.warn(MessageFactory.get("queryTimeoutInterceptor.queryTimeoutRefused", timeout, x.getMessage()), x);
     }
 
     /**

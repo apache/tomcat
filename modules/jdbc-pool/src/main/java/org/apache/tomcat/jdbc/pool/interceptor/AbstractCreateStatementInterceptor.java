@@ -31,6 +31,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
  * Abstraction interceptor. This component intercepts all calls to create some type of SQL statement. By extending this
@@ -170,8 +171,8 @@ public abstract class AbstractCreateStatementInterceptor extends JdbcInterceptor
         } catch (ReflectiveOperationException | IllegalArgumentException | LinkageError e) {
             // An exception escaping the class initializer would surface as an
             // ExceptionInInitializerError at every use of every subclass.
-            log.warn("Unable to create the constructor cache entry for index " + idx + " (" + clazz.getName()
-                    + ").", e);
+            log.warn(MessageFactory.get("abstractCreateStatementInterceptor.unableToCreateConstructorCacheEntry",
+                    idx, clazz.getName()), e);
         }
     }
 
@@ -237,10 +238,9 @@ public abstract class AbstractCreateStatementInterceptor extends JdbcInterceptor
                     new Class[] { clazz });
             constructors[idx] = proxyClass.getConstructor(new Class[] { InvocationHandler.class });
         } else if (!clazz.isAssignableFrom(constructors[idx].getDeclaringClass())) {
-            throw new IllegalStateException("Constructor cache index " + idx + " is already populated for "
-                    + Arrays.toString(constructors[idx].getDeclaringClass().getInterfaces()) + ", but "
-                    + clazz.getName() + " was requested. Every use of an index must pass an interface the cached"
-                    + " proxy implements.");
+            throw new IllegalStateException(MessageFactory.get(
+                    "abstractCreateStatementInterceptor.constructorCacheIndexPopulated",
+                    idx, Arrays.toString(constructors[idx].getDeclaringClass().getInterfaces()), clazz.getName()));
         }
         return constructors[idx];
     }

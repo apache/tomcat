@@ -45,6 +45,7 @@ import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
  * JMX-enabled slow query report interceptor. Publishes slow and failed query statistics to JMX and provides
@@ -231,7 +232,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
                         "Composite data type for query statistics", QueryStats.getFieldNames(),
                         QueryStats.getFieldDescriptions(), QueryStats.getFieldTypes());
             } catch (OpenDataException x) {
-                log.warn("Unable to initialize composite data type for JMX stats and notifications.", x);
+                log.warn(MessageFactory.get("slowQueryReportJmx.unableToInitCompositeType"), x);
             }
         }
         return SLOW_QUERY_TYPE;
@@ -569,7 +570,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
             notifiers.remove(poolName);
             registrationFailuresLogged.remove(poolName);
         } catch (MalformedObjectNameException | RuntimeOperationsException e) {
-            log.warn("Jmx deregistration failed.", e);
+            log.warn(MessageFactory.get("slowQueryReportJmx.jmxDeregistrationFailed"), e);
         }
 
     }
@@ -679,25 +680,19 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
                                 // Retryable: the name may be held by a stale
                                 // or foreign MBean that a later borrow finds
                                 // gone
-                                log.warn("Jmx registration of [" + oname +
-                                        "] failed: the name is already in use by another MBean." +
-                                        " The registration is retried by later borrows;" +
-                                        " repeated failures are logged at debug level.", x);
+                                log.warn(MessageFactory.get("slowQueryReportJmx.jmxRegistrationInUse", oname), x);
                             } else {
-                                log.error("Jmx registration of [" + oname +
-                                        "] failed, no JMX data will be exposed for the query stats" +
-                                        " until a registration succeeds. The registration is" +
-                                        " retried by later borrows; repeated failures are" + " logged at debug level.",
-                                        x);
+                                log.error(MessageFactory.get("slowQueryReportJmx.jmxRegistrationFailed", oname), x);
                             }
                         }
                     }
                 }
             } else {
-                log.warn(SlowQueryReport.class.getName() + "- No JMX support, composite type was not found.");
+                log.warn(MessageFactory.get("slowQueryReportJmx.noJmxSupport",
+                        SlowQueryReport.class.getName()));
             }
         } catch (MalformedObjectNameException | RuntimeOperationsException e) {
-            log.error("Jmx registration failed, no JMX data will be exposed for the query stats.", e);
+            log.error(MessageFactory.get("slowQueryReportJmx.jmxRegistrationFailedNoData"), e);
         }
     }
 

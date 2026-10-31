@@ -38,6 +38,7 @@ import javax.sql.DataSource;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
  * <p>
@@ -421,7 +422,7 @@ public class DataSourceFactory implements ObjectFactory {
         }
 
         if (!ok) {
-            log.warn(ref.getClassName() + " is not a valid class name/type for this JNDI factory.");
+            log.warn(MessageFactory.get("dataSourceFactory.invalidClassName", ref.getClassName()));
             return null;
         }
 
@@ -457,7 +458,7 @@ public class DataSourceFactory implements ObjectFactory {
             String addressName = addresses.nextElement().getType();
             if (!ALL_PROPERTY_NAMES.contains(addressName)
                     && !RESERVED_JNDI_ADDRESS_NAMES.contains(addressName)) {
-                log.warn(addressName + " is not a valid property, it will be ignored.");
+                log.warn(MessageFactory.get("dataSourceFactory.invalidProperty", addressName));
             }
         }
 
@@ -589,7 +590,7 @@ public class DataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_NUMTESTSPEREVICTIONRUN);
         if (value != null) {
-            log.warn(PROP_NUMTESTSPEREVICTIONRUN + " is not a valid setting, it will have no effect.");
+            log.warn(MessageFactory.get("dataSourceFactory.invalidSetting", PROP_NUMTESTSPEREVICTIONRUN));
             poolProperties.setNumTestsPerEvictionRun(Integer.parseInt(value));
         }
 
@@ -643,7 +644,7 @@ public class DataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED);
         if (value != null) {
-            log.warn(PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED + " is not a valid setting, it will have no effect.");
+            log.warn(MessageFactory.get("dataSourceFactory.invalidSetting", PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED));
             Boolean b = parseBoolean(PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED, value);
             if (b != null) {
                 poolProperties.setAccessToUnderlyingConnectionAllowed(b.booleanValue());
@@ -673,12 +674,12 @@ public class DataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_POOLPREPAREDSTATEMENTS);
         if (value != null) {
-            log.warn(PROP_POOLPREPAREDSTATEMENTS + " is not a valid setting, it will have no effect.");
+            log.warn(MessageFactory.get("dataSourceFactory.invalidSetting", PROP_POOLPREPAREDSTATEMENTS));
         }
 
         value = properties.getProperty(PROP_MAXOPENPREPAREDSTATEMENTS);
         if (value != null) {
-            log.warn(PROP_MAXOPENPREPAREDSTATEMENTS + " is not a valid setting, it will have no effect.");
+            log.warn(MessageFactory.get("dataSourceFactory.invalidSetting", PROP_MAXOPENPREPAREDSTATEMENTS));
         }
 
         value = properties.getProperty(PROP_CONNECTIONPROPERTIES);
@@ -762,10 +763,8 @@ public class DataSourceFactory implements ObjectFactory {
             // point: getObjectInstance hands an actual javax.sql.DataSource
             // RefAddr content straight to the pool instead of stringifying it.
             // A string cannot be turned into a data source here.
-            throw new IllegalArgumentException("Can't set dataSource property as a string \"" + value +
-                    "\". Either carry the javax.sql.DataSource object itself under the dataSource attribute" +
-                    " of the Reference, or use the dataSourceJNDI attribute to name a data source bound in" +
-                    " JNDI.");
+            throw new IllegalArgumentException(MessageFactory.get("dataSourceFactory.cannotSetDataSourceString",
+                    value));
         }
 
         value = properties.getProperty(PROP_DATASOURCE_JNDI);
@@ -868,7 +867,7 @@ public class DataSourceFactory implements ObjectFactory {
         if ("false".equalsIgnoreCase(trimmed)) {
             return Boolean.FALSE;
         }
-        throw new IllegalArgumentException("Invalid boolean value '" + value + "' for property " + name);
+        throw new IllegalArgumentException(MessageFactory.get("dataSourceFactory.invalidBoolean", value, name));
     }
 
     /**
@@ -951,7 +950,7 @@ public class DataSourceFactory implements ObjectFactory {
             if (context != null) {
                 jndiDS = context.lookup(poolProperties.getDataSourceJNDI());
             } else {
-                log.warn("dataSourceJNDI property is configured, but local JNDI context is null.");
+                log.warn(MessageFactory.get("dataSourceFactory.jndiContextNull"));
             }
         } catch (NamingException e) {
             if (log.isDebugEnabled()) {
@@ -967,19 +966,17 @@ public class DataSourceFactory implements ObjectFactory {
                 jndiDS = context.lookup(poolProperties.getDataSourceJNDI());
             } catch (NamingException e) {
                 initialContextFailure = e;
-                log.warn("The name \"" + poolProperties.getDataSourceJNDI() +
-                        "\" cannot be found in the InitialContext.", e);
+                log.warn(MessageFactory.get("dataSourceFactory.jndiNameNotFound",
+                        poolProperties.getDataSourceJNDI()), e);
             }
         }
         if (jndiDS != null) {
             poolProperties.setDataSource(jndiDS);
             return;
         }
-        NamingException failure = new NamingException("Unable to create the connection pool: the name [" +
-                poolProperties.getDataSourceJNDI() + "] configured through the 'dataSourceJNDI' attribute was" +
-                " not found in the local JNDI context nor in the InitialContext. The pool is built around the" +
-                " data source that name refers to; check that the name is correct and that the data source is" +
-                " bound and visible to the application before the pool is created.");
+        NamingException failure =
+                new NamingException(MessageFactory.get("dataSourceFactory.jndiLookupFailed",
+                        poolProperties.getDataSourceJNDI()));
         if (initialContextFailure != null) {
             failure.setRootCause(initialContextFailure);
         }

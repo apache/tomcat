@@ -23,6 +23,8 @@ import java.sql.SQLException;
 
 import javax.sql.XAConnection;
 
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
+
 /**
  * A ProxyConnection object is the bottom most interceptor that wraps an object of type {@link PooledConnection}. The
  * ProxyConnection intercepts, among the calls it forwards, the following methods:
@@ -197,7 +199,7 @@ public class ProxyConnection extends JdbcInterceptor {
                 // what isWrapperFor() says and turn into an unrelated
                 // NullPointerException at the caller's first use of the
                 // "unwrapped" value.
-                throw new SQLException("Not a wrapper of " + iface.getName());
+                throw new SQLException(MessageFactory.get("proxyConnection.notAWrapper", iface.getName()));
             }
             return connection;
         } else if (iface == XAConnection.class) {
@@ -206,7 +208,7 @@ public class ProxyConnection extends JdbcInterceptor {
                 // The Wrapper contract asks for a failure, not for a silent
                 // null that turns into an unrelated NullPointerException at
                 // the caller's first use of the "unwrapped" value.
-                throw new SQLException("Not a wrapper of " + iface.getName());
+                throw new SQLException(MessageFactory.get("proxyConnection.notAWrapper", iface.getName()));
             }
             return xa;
         } else if (iface.isInstance(connection.getConnection())) {
@@ -216,7 +218,7 @@ public class ProxyConnection extends JdbcInterceptor {
             // unwrapping that far is its answer to give, not ours
             return connection.getConnection().unwrap(iface);
         } else {
-            throw new SQLException("Not a wrapper of " + iface.getName());
+            throw new SQLException(MessageFactory.get("proxyConnection.notAWrapper", iface.getName()));
         }
     }
 
@@ -349,10 +351,9 @@ public class ProxyConnection extends JdbcInterceptor {
                     // The handle was disconnected while borrowed; report it
                     // the way every other method on this class does, rather
                     // than blaming the XA configuration.
-                    throw new SQLException("Connection has already been closed.");
+                    throw new SQLException(MessageFactory.get("proxyConnection.connectionClosed"));
                 }
-                throw new SQLException("The pooled connection is not an XA connection; " + "method [" +
-                        method.getName() + "] cannot be dispatched.");
+                throw new SQLException(MessageFactory.get("proxyConnection.notXAConnection", method.getName()));
             }
             try {
                 return method.invoke(xaConnection, args);
@@ -365,7 +366,7 @@ public class ProxyConnection extends JdbcInterceptor {
             }
         }
         if (isClosed()) {
-            throw new SQLException("Connection has already been closed.");
+            throw new SQLException(MessageFactory.get("proxyConnection.connectionClosed"));
         }
         if (compare(UNWRAP_VAL, method)) {
             Class<?> iface = (Class<?>) args[0];
@@ -392,7 +393,7 @@ public class ProxyConnection extends JdbcInterceptor {
             if (poolc != null) {
                 return method.invoke(poolc.getConnection(), args);
             } else {
-                throw new SQLException("Connection has already been closed.");
+                throw new SQLException(MessageFactory.get("proxyConnection.connectionClosed"));
             }
         } catch (Throwable t) {
             if (t instanceof InvocationTargetException) {
