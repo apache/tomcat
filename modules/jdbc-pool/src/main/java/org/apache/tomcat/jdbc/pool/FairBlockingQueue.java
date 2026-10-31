@@ -32,6 +32,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
+
 /**
  * A simple implementation of a blocking queue with fairness waiting. invocations to method poll(...) will get handed
  * out in the order they were received. Locking is fine grained, a shared lock is only used during the first level of
@@ -354,7 +356,7 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
      */
     @Override
     public int drainTo(Collection<? super E> c, int maxElements) {
-        throw new UnsupportedOperationException("int drainTo(Collection<? super E> c, int maxElements)");
+        throw new UnsupportedOperationException(MessageFactory.get("fairBlockingQueue.unsupportedDrainTo"));
     }
 
     /**
@@ -401,7 +403,7 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("void clear()");
+        throw new UnsupportedOperationException(MessageFactory.get("fairBlockingQueue.unsupportedClear"));
 
     }
 
@@ -412,7 +414,7 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
      */
     @Override
     public boolean containsAll(Collection<?> c) {
-        throw new UnsupportedOperationException("boolean containsAll(Collection<?> c)");
+        throw new UnsupportedOperationException(MessageFactory.get("fairBlockingQueue.unsupportedContainsAll"));
     }
 
     @Override
@@ -427,7 +429,7 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
      */
     @Override
     public boolean removeAll(Collection<?> c) {
-        throw new UnsupportedOperationException("boolean removeAll(Collection<?> c)");
+        throw new UnsupportedOperationException(MessageFactory.get("fairBlockingQueue.unsupportedRemoveAll"));
     }
 
     /**
@@ -437,7 +439,7 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
      */
     @Override
     public boolean retainAll(Collection<?> c) {
-        throw new UnsupportedOperationException("boolean retainAll(Collection<?> c)");
+        throw new UnsupportedOperationException(MessageFactory.get("fairBlockingQueue.unsupportedRetainAll"));
     }
 
     /**
@@ -447,7 +449,7 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
      */
     @Override
     public Object[] toArray() {
-        throw new UnsupportedOperationException("Object[] toArray()");
+        throw new UnsupportedOperationException(MessageFactory.get("fairBlockingQueue.unsupportedToArray"));
     }
 
     /**
@@ -457,7 +459,7 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
      */
     @Override
     public <T> T[] toArray(T[] a) {
-        throw new UnsupportedOperationException("<T> T[] toArray(T[] a)");
+        throw new UnsupportedOperationException(MessageFactory.get("fairBlockingQueue.unsupportedToArrayT"));
     }
 
     /**
@@ -467,7 +469,7 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
      */
     @Override
     public E element() {
-        throw new UnsupportedOperationException("E element()");
+        throw new UnsupportedOperationException(MessageFactory.get("fairBlockingQueue.unsupportedElement"));
     }
 
     /**
@@ -477,7 +479,7 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
      */
     @Override
     public E peek() {
-        throw new UnsupportedOperationException("E peek()");
+        throw new UnsupportedOperationException(MessageFactory.get("fairBlockingQueue.unsupportedPeek"));
     }
 
     /**
@@ -487,7 +489,7 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
      */
     @Override
     public E remove() {
-        throw new UnsupportedOperationException("E remove()");
+        throw new UnsupportedOperationException(MessageFactory.get("fairBlockingQueue.unsupportedRemove"));
     }
 
 
@@ -591,7 +593,8 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
                 }
                 return latch.getItem();
             } else {
-                throw new ExecutionException("ItemFuture incorrectly instantiated. Bug in the code?", new Exception());
+                throw new ExecutionException(MessageFactory.get("fairBlockingQueue.itemFutureInstantiationError"),
+                        new Exception());
             }
         }
 
@@ -661,7 +664,8 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
                     return latch.getItem();
                 }
             } else {
-                throw new ExecutionException("ItemFuture incorrectly instantiated. Bug in the code?", new Exception());
+                throw new ExecutionException(MessageFactory.get("fairBlockingQueue.itemFutureInstantiationError"),
+                        new Exception());
             }
         }
 
@@ -683,8 +687,7 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
          * @return the timeout failure to throw
          */
         private TimeoutException abandonedTimeout() {
-            return new TimeoutException("The waiter of this future timed out on an earlier" +
-                    " get() call and was deregistered from the queue; the future can no" + " longer receive an item");
+            return new TimeoutException(MessageFactory.get("fairBlockingQueue.itemFutureAbandoned"));
         }
 
         /**

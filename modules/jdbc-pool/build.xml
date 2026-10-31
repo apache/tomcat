@@ -154,6 +154,13 @@
       <include name="org/apache/tomcat/jdbc/**" />
     </javac>
 
+    <!-- Localized messages are stored with the sources -->
+    <copy todir="${tomcat.classes}">
+      <fileset dir="${basedir}/src/main/java">
+        <include name="org/apache/tomcat/jdbc/**/*.properties" />
+      </fileset>
+    </copy>
+
     <!-- connection pool JAR File -->
     <jar jarfile="${tomcat-jdbc.jar}"
          update="true"

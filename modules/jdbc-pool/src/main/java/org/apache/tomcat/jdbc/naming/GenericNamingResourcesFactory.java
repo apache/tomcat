@@ -37,6 +37,7 @@ import javax.naming.spi.ObjectFactory;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ClassLoaderUtil;
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
  * Simple way of configuring generic resources by using reflection. Example usage:
@@ -82,8 +83,8 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
 
         String type = ref.getClassName();
         if (type == null || type.isEmpty()) {
-            throw new NamingException("No resource type (the \"type\" attribute) is defined for reference [" + name +
-                    "]; GenericNamingResourcesFactory needs the class of the " + "object to create.");
+            throw new NamingException(
+                    MessageFactory.get("genericNamingResourcesFactory.noResourceType", name));
         }
         Object o;
         try {
@@ -91,7 +92,8 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
                     Thread.currentThread().getContextClassLoader());
             o = clazz.getConstructor().newInstance();
         } catch (ClassNotFoundException e) {
-            NamingException ne = new NamingException("Class [" + type + "] of reference [" + name + "] was not found");
+            NamingException ne =
+                    new NamingException(MessageFactory.get("genericNamingResourcesFactory.classNotFound", type, name));
             ne.setRootCause(e);
             throw ne;
         } catch (InvocationTargetException e) {
@@ -103,16 +105,17 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
             if (cause instanceof VirtualMachineError) {
                 throw (VirtualMachineError) cause;
             }
-            NamingException ne = new NamingException("The constructor of class [" + type + "] of reference [" + name +
-                    "] threw an exception and the object cannot be created");
+            NamingException ne =
+                    new NamingException(MessageFactory.get("genericNamingResourcesFactory.constructorThrew", type, name));
             ne.setRootCause(e);
             throw ne;
         } catch (ReflectiveOperationException e) {
             // No public no-arg constructor (NoSuchMethodException), or the
             // class cannot be instantiated (abstract, interface, illegal
             // access).
-            NamingException ne = new NamingException("Class [" + type + "] of reference [" + name +
-                    "] has no usable public no-argument constructor and " + "cannot be created by this factory");
+            NamingException ne =
+                    new NamingException(MessageFactory.get("genericNamingResourcesFactory.noUsableConstructor",
+                            type, name));
             ne.setRootCause(e);
             throw ne;
         }
@@ -129,8 +132,7 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
                 value = addr.getContent().toString();
             }
             if (!setProperty(o, param, value)) {
-                log.warn("Property [" + param + "] was not applied to [" + type + "]: no usable setter found, or the " +
-                        "configured value could not be applied.");
+                log.warn(MessageFactory.get("genericNamingResourcesFactory.propertyNotApplied", param, type));
             }
         }
         return o;
@@ -279,14 +281,14 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
             }
 
         } catch (IllegalArgumentException ex2) {
-            log.warn("Unable to set property [" + name + "] with value [" + value + "] on [" + o.getClass().getName() +
-                    "]", ex2);
+            log.warn(MessageFactory.get("genericNamingResourcesFactory.unableToSetProperty",
+                    name, value, o.getClass().getName()), ex2);
         } catch (SecurityException ex1) {
-            log.warn("SecurityException setting property [" + name + "] with value [" + value + "] on [" +
-                    o.getClass().getName() + "]", ex1);
+            log.warn(MessageFactory.get("genericNamingResourcesFactory.securityExceptionSettingProperty",
+                    name, value, o.getClass().getName()), ex1);
         } catch (IllegalAccessException iae) {
-            log.warn("IllegalAccessException setting property [" + name + "] with value [" + value + "] on [" +
-                    o.getClass().getName() + "]", iae);
+            log.warn(MessageFactory.get("genericNamingResourcesFactory.illegalAccessExceptionSettingProperty",
+                    name, value, o.getClass().getName()), iae);
         } catch (InvocationTargetException ie) {
             // In the spirit of ExceptionUtils.handleThrowable(), which is not
             // available to tomcat-jdbc.jar: propagate the fatal
@@ -298,8 +300,8 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
             if (cause instanceof VirtualMachineError) {
                 throw (VirtualMachineError) cause;
             }
-            log.warn("Setter for property [" + name + "] with value [" + value + "] threw an exception on [" +
-                    o.getClass().getName() + "]", ie);
+            log.warn(MessageFactory.get("genericNamingResourcesFactory.setterThrew",
+                    name, value, o.getClass().getName()), ie);
         }
         return false;
     }

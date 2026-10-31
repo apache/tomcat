@@ -32,6 +32,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
  * Keeps track of statements associated with a connection and invokes close upon {@link java.sql.Connection#close()}
@@ -113,7 +114,7 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
             // The statement is still tracked and will be closed when the
             // connection is returned, but closing it early will no longer
             // forget it before then.
-            log.warn("Unable to create statement tracking proxy.", x);
+            log.warn(MessageFactory.get("statementFinalizer.unableToCreateTrackingProxy"), x);
             return tracked;
         }
     }
@@ -216,7 +217,7 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
                 }
             }
             if (logCreationStack && shallClose) {
-                log.warn("Statement created, but was not closed at:", allocationStack);
+                log.warn(MessageFactory.get("statementFinalizer.statementNotClosed"), allocationStack);
             }
         }
     }

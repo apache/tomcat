@@ -37,6 +37,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
  * Slow query report interceptor. Tracks timing of query executions.
@@ -139,7 +140,7 @@ public class SlowQueryReport extends AbstractQueryReport {
         // FAILED QUERY notification behind isLogFailed() alone, the two
         // channels disagreeing on the same event.
         if (isLogFailed() && log.isWarnEnabled()) {
-            log.warn("Failed Query Report SQL=" + sql + "; time=" + delta + " ms;");
+            log.warn(MessageFactory.get("slowQueryReport.failedQueryReport", sql, delta));
         }
         return sql;
     }
@@ -179,7 +180,7 @@ public class SlowQueryReport extends AbstractQueryReport {
         // disagreeing on the same event. This mirrors how
         // reportFailedQuery reports its event.
         if (isLogSlow() && log.isWarnEnabled()) {
-            log.warn("Slow Query Report SQL=" + sql + "; time=" + delta + " ms;");
+            log.warn(MessageFactory.get("slowQueryReport.slowQueryReport", sql, delta));
         }
         return sql;
     }
@@ -245,9 +246,7 @@ public class SlowQueryReport extends AbstractQueryReport {
             return registration;
         });
         if (stats.hasOtherLivePools() && log.isWarnEnabled()) {
-            log.warn("Connection pool name [" + pool.getName() + "] is already in use by " +
-                    "another live pool; SlowQueryReport statistics are keyed by pool name, " +
-                    "so both pools report into the same statistics map.");
+            log.warn(MessageFactory.get("slowQueryReport.poolNameInUse", pool.getName()));
         }
         queries = stats.getQueryStats();
     }
@@ -315,7 +314,7 @@ public class SlowQueryReport extends AbstractQueryReport {
         ConcurrentHashMap<String, QueryStats> queries = SlowQueryReport.this.queries;
         if (queries == null) {
             if (log.isWarnEnabled()) {
-                log.warn("Connection has already been closed or abandoned");
+                log.warn(MessageFactory.get("slowQueryReport.connectionClosedOrAbandoned"));
             }
             return null;
         }

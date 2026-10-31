@@ -52,6 +52,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.interceptor.QueryTimeoutInterceptor;
 import org.apache.tomcat.jdbc.pool.interceptor.StatementCache;
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
  * Implementation of simple connection pool. The ConnectionPool uses a {@link PoolProperties} object for storing all the
@@ -213,12 +214,11 @@ public class ConnectionPool {
                 // future will never hand out a connection. Reject the borrow the
                 // same way a synchronous borrow on a closed pool does, rather than
                 // handing out a future that only ever fails with a cancellation.
-                throw new SQLException("Connection pool closed.");
+                throw new SQLException(MessageFactory.get("connectionPool.poolClosed"));
             }
             return new ConnectionFuture(pcf);
         } else {
-            throw new SQLException(
-                    "Connection pool is misconfigured, doesn't support async retrieval. Set the 'fair' property to 'true'");
+            throw new SQLException(MessageFactory.get("connectionPool.poolMisconfigured"));
         }
     }
 
@@ -367,7 +367,7 @@ public class ConnectionPool {
             try {
                 con.createMBean();
             } catch (Exception x) {
-                SQLException sx = new SQLException("Unable to register the pooled connection MBean.");
+                SQLException sx = new SQLException(MessageFactory.get("connectionPool.unableToRegisterMBean"));
                 sx.initCause(x);
                 // Nothing has been done to the connection, it can go back to the pool
                 abandonSetup(con, sx, false);
@@ -388,7 +388,7 @@ public class ConnectionPool {
                     // Configure the last one to be held by the connection
                     handler = interceptor;
                 } catch (Exception x) {
-                    SQLException sx = new SQLException("Unable to instantiate interceptor chain.");
+                    SQLException sx = new SQLException(MessageFactory.get("connectionPool.unableToInstantiateInterceptorChain"));
                     sx.initCause(x);
                     // Nothing has been done to the connection, it can go back to the pool
                     abandonSetup(con, sx, false);
@@ -406,8 +406,8 @@ public class ConnectionPool {
                 next = next.getNext();
             }
         } catch (Exception x) {
-            SQLException sx = new SQLException(
-                    "Unable to reset interceptor [" + (next != null ? next.getClass().getName() : "unknown") + "].");
+            SQLException sx = new SQLException(MessageFactory.get("connectionPool.unableToResetInterceptor",
+                    (next != null ? next.getClass().getName() : "unknown")));
             sx.initCause(x);
             // The state of the connection is unknown, discard it so its partially reset chain is dropped
             abandonSetup(con, sx, true);
@@ -502,10 +502,10 @@ public class ConnectionPool {
         try {
             hint.invoke(connection);
         } catch (InvocationTargetException x) {
-            log.warn("The request boundary hint [" + hint.getName() + "] was refused by the driver",
+            log.warn(MessageFactory.get("connectionPool.requestHintRefused", hint.getName()),
                     x.getTargetException());
         } catch (ReflectiveOperationException | IllegalArgumentException x) {
-            log.warn("Unable to send the request boundary hint [" + hint.getName() + "]", x);
+            log.warn(MessageFactory.get("connectionPool.unableToSendRequestHint", hint.getName()), x);
         }
     }
 
@@ -595,7 +595,7 @@ public class ConnectionPool {
                     } catch (Throwable x) {
                         // One failing connection must not leave the
                         // remaining idle and busy connections undisconnected
-                        log.warn("Unable to close pooled connection.", x);
+                        log.warn(MessageFactory.get("connectionPool.unableToClosePooledConnection"), x);
                     }
                     if (!pool.isEmpty()) {
                         con = pool.poll(1000, TimeUnit.MILLISECONDS);
@@ -682,7 +682,7 @@ public class ConnectionPool {
                 interceptor.setProperties(proxies[i].getProperties());
                 interceptor.poolStarted(this);
             } catch (Exception x) {
-                log.error("Unable to inform interceptor of pool start.", x);
+                log.error(MessageFactory.get("connectionPool.unableToInformInterceptorOfPoolStart"), x);
                 org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = jmxPool;
                 if (jmx != null) {
                     jmx.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.NOTIFY_INIT, getStackTrace(x));
@@ -707,7 +707,7 @@ public class ConnectionPool {
             }
 
         } catch (SQLException x) {
-            log.error("Unable to create initial connections of pool.", x);
+            log.error(MessageFactory.get("connectionPool.unableToCreateInitialConnections"), x);
             if (!poolProperties.isIgnoreExceptionOnPreLoad()) {
                 org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = jmxPool;
                 if (jmx != null) {
@@ -765,11 +765,7 @@ public class ConnectionPool {
             }
         }
         if (firstCache >= 0 && lastTimeout > firstCache) {
-            log.warn("The [StatementCache] interceptor is configured before [QueryTimeoutInterceptor]. "
-                    + "A statement cache hit is answered by the cache without invoking the timeout interceptor, "
-                    + "and a statement recycled into the cache carries no timeout, so cached statements run "
-                    + "without a query timeout. List QueryTimeoutInterceptor before StatementCache in the "
-                    + "jdbcInterceptors configuration.");
+            log.warn(MessageFactory.get("connectionPool.statementCacheBeforeQueryTimeout"));
         }
     }
 
@@ -782,29 +778,28 @@ public class ConnectionPool {
     public void checkPoolConfiguration(PoolConfiguration properties) {
         // Make sure the pool is properly configured
         if (properties.getMaxActive() < 1) {
-            log.warn("maxActive is smaller than 1, setting maxActive to: " + PoolProperties.DEFAULT_MAX_ACTIVE);
+            log.warn(MessageFactory.get("connectionPool.maxActiveTooSmall", PoolProperties.DEFAULT_MAX_ACTIVE));
             properties.setMaxActive(PoolProperties.DEFAULT_MAX_ACTIVE);
         }
         if (properties.getMaxActive() < properties.getInitialSize()) {
-            log.warn("initialSize is larger than maxActive, setting initialSize to: " + properties.getMaxActive());
+            log.warn(MessageFactory.get("connectionPool.initialSizeTooLarge", properties.getMaxActive()));
             properties.setInitialSize(properties.getMaxActive());
         }
         if (properties.getMinIdle() > properties.getMaxActive()) {
-            log.warn("minIdle is larger than maxActive, setting minIdle to: " + properties.getMaxActive());
+            log.warn(MessageFactory.get("connectionPool.minIdleTooLarge", properties.getMaxActive()));
             properties.setMinIdle(properties.getMaxActive());
         }
         if (properties.getMaxIdle() > properties.getMaxActive()) {
-            log.warn("maxIdle is larger than maxActive, setting maxIdle to: " + properties.getMaxActive());
+            log.warn(MessageFactory.get("connectionPool.maxIdleTooLarge", properties.getMaxActive()));
             properties.setMaxIdle(properties.getMaxActive());
         }
         if (properties.getMaxIdle() < properties.getMinIdle()) {
-            log.warn("maxIdle is smaller than minIdle, setting maxIdle to: " + properties.getMinIdle());
+            log.warn(MessageFactory.get("connectionPool.maxIdleTooSmall", properties.getMinIdle()));
             properties.setMaxIdle(properties.getMinIdle());
         }
         if (properties.getMaxAge() > 0 && properties.isPoolSweeperEnabled() &&
                 properties.getTimeBetweenEvictionRunsMillis() > properties.getMaxAge()) {
-            log.warn("timeBetweenEvictionRunsMillis is larger than maxAge, setting timeBetweenEvictionRunsMillis to: " +
-                    properties.getMaxAge());
+            log.warn(MessageFactory.get("connectionPool.timeBetweenEvictionRunsTooLarge", properties.getMaxAge()));
             properties.setTimeBetweenEvictionRunsMillis((int) properties.getMaxAge());
         }
     }
@@ -853,7 +848,7 @@ public class ConnectionPool {
             con.lock();
             String trace = con.getStackTrace();
             if (getPoolProperties().isLogAbandoned()) {
-                log.warn("Connection has been abandoned " + con + ":" + trace);
+                log.warn(MessageFactory.get("connectionPool.connectionAbandoned", con, trace));
             }
             org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = jmxPool;
             if (jmx != null) {
@@ -885,8 +880,8 @@ public class ConnectionPool {
             con.lock();
             String trace = con.getStackTrace();
             if (getPoolProperties().isLogAbandoned()) {
-                log.warn("Connection has been marked suspect, possibly abandoned " + con + "[" +
-                        (System.currentTimeMillis() - con.getTimestamp()) + " ms.]:" + trace);
+                log.warn(MessageFactory.get("connectionPool.connectionSuspect",
+                        con, (System.currentTimeMillis() - con.getTimestamp()), trace));
             }
             org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = jmxPool;
             if (jmx != null) {
@@ -937,8 +932,7 @@ public class ConnectionPool {
         // queue the placeholder while it is open.
         if (destroyed && !isClosed() && waitcount.get() > 0) {
             if (!idle.offer(create(true))) {
-                log.warn("Failed to add a new connection to the pool after releasing a connection " +
-                        "when at least one thread was waiting for a connection.");
+                log.warn(MessageFactory.get("connectionPool.failedToAddNewConnection"));
             }
         }
     }
@@ -958,7 +952,7 @@ public class ConnectionPool {
     private PooledConnection borrowConnection(int wait, String username, String password) throws SQLException {
 
         if (isClosed()) {
-            throw new SQLException("Connection pool closed.");
+            throw new SQLException(MessageFactory.get("connectionPool.poolClosed"));
         }
 
         // Get the current time stamp
@@ -1026,7 +1020,7 @@ public class ConnectionPool {
                 if (getPoolProperties().getPropagateInterruptState()) {
                     Thread.currentThread().interrupt();
                 }
-                SQLException sx = new SQLException("Pool wait interrupted.");
+                SQLException sx = new SQLException(MessageFactory.get("connectionPool.poolWaitInterrupted"));
                 sx.initCause(ex);
                 throw sx;
             } finally {
@@ -1037,9 +1031,8 @@ public class ConnectionPool {
                 if (jmx != null) {
                     jmx.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.POOL_EMPTY, "Pool empty - no wait.");
                 }
-                throw new PoolExhaustedException("[" + Thread.currentThread().getName() + "] " +
-                        "NoWait: Pool empty. Unable to fetch a connection, none available[" + busy.size() +
-                        " in use].");
+                throw new PoolExhaustedException(MessageFactory.get("connectionPool.poolEmptyNoWait",
+                        Thread.currentThread().getName(), busy.size()));
             }
             // We didn't get a connection, lets see if we timed out
             if (con == null) {
@@ -1049,10 +1042,9 @@ public class ConnectionPool {
                         jmx.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.POOL_EMPTY,
                                 "Pool empty - timeout.");
                     }
-                    throw new PoolExhaustedException("[" + Thread.currentThread().getName() + "] " +
-                            "Timeout: Pool empty. Unable to fetch a connection in " + (maxWait / 1000) +
-                            " seconds, none available[size:" + size.get() + "; busy:" + busy.size() + "; idle:" +
-                            idle.size() + "; lastwait:" + timetowait + "].");
+                    throw new PoolExhaustedException(MessageFactory.get("connectionPool.poolEmptyTimeout",
+                            Thread.currentThread().getName(), (maxWait / 1000), size.get(), busy.size(),
+                            idle.size(), timetowait));
                 } else {
                     // No timeout, lets try again
                     continue;
@@ -1093,7 +1085,7 @@ public class ConnectionPool {
                 // being created; the shutdown drain has already passed over
                 // the queues, so neither hand the connection out nor register
                 // it in busy - the error path below disconnects it
-                throw new SQLException("Connection pool closed.");
+                throw new SQLException(MessageFactory.get("connectionPool.poolClosed"));
             }
             if (con.validate(PooledConnection.VALIDATE_INIT)) {
                 // No need to lock a new one, its not contented
@@ -1109,7 +1101,7 @@ public class ConnectionPool {
             } else {
                 // Validation failed, make sure we disconnect
                 // and clean up
-                throw new SQLException("Validation Query Failed, enable logValidationErrors for more details.");
+                throw new SQLException(MessageFactory.get("connectionPool.validationQueryFailed"));
             }
         } catch (Exception e) {
             error = true;
@@ -1202,7 +1194,7 @@ public class ConnectionPool {
                     return con;
                 } else {
                     // Validation failed.
-                    throw new SQLException("Failed to validate a newly established connection.");
+                    throw new SQLException(MessageFactory.get("connectionPool.failedToValidateNewConnection"));
                 }
             } catch (Exception x) {
                 release(con);
@@ -1267,7 +1259,7 @@ public class ConnectionPool {
             }
             return true;
         } catch (SQLException x) {
-            log.warn("Unable to terminate transaction, connection will be closed.", x);
+            log.warn(MessageFactory.get("connectionPool.unableToTerminateTransaction"), x);
             return false;
         }
 
@@ -1293,7 +1285,7 @@ public class ConnectionPool {
                 return true;
             }
         } catch (SQLException e) {
-            log.warn("Unable to check if connection is closed", e);
+            log.warn(MessageFactory.get("connectionPool.unableToCheckClosed"), e);
             return true;
         }
         if (isClosed()) {
@@ -1339,7 +1331,7 @@ public class ConnectionPool {
                     return false;
                 }
             } catch (Exception e) {
-                log.error("Failed to re-connect connection [" + this + "] that expired because of maxAge", e);
+                log.error(MessageFactory.get("connectionPool.failedToReconnectExpired", this), e);
                 return false;
             }
         }
@@ -1367,9 +1359,8 @@ public class ConnectionPool {
                 con.lock();
                 if (con.isSuspect()) {
                     if (poolProperties.isLogAbandoned() && log.isInfoEnabled()) {
-                        log.info("Connection(" + con + ") that has been marked suspect was returned." +
-                                " The processing time is " + (System.currentTimeMillis() - con.getTimestamp()) +
-                                " ms.");
+                        log.info(MessageFactory.get("connectionPool.suspectConnectionReturned",
+                                con, (System.currentTimeMillis() - con.getTimestamp())));
                     }
                     org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = jmxPool;
                     if (jmx != null) {
@@ -1427,7 +1418,7 @@ public class ConnectionPool {
                         // the driver that failed.
                         con.setDiscarded(true);
                         release(con);
-                        log.warn("Unable to return connection [" + con + "] to the pool, closing it.", x);
+                        log.warn(MessageFactory.get("connectionPool.unableToReturnConnection", con), x);
                     }
                 } else {
                     if (log.isDebugEnabled()) {
@@ -1509,7 +1500,7 @@ public class ConnectionPool {
                 log.debug("checkAbandoned failed.", e);
             }
         } catch (Exception e) {
-            log.warn("checkAbandoned failed, it will be retried.", e);
+            log.warn(MessageFactory.get("connectionPool.checkAbandonedFailed"), e);
         }
     }
 
@@ -1571,7 +1562,7 @@ public class ConnectionPool {
                 log.debug("checkIdle failed.", e);
             }
         } catch (Exception e) {
-            log.warn("checkIdle failed, it will be retried.", e);
+            log.warn(MessageFactory.get("connectionPool.checkIdleFailed"), e);
         }
 
     }
@@ -1661,7 +1652,7 @@ public class ConnectionPool {
                         // service instead, as a failed check already does.
                         con.setDiscarded(true);
                         release(con);
-                        log.warn("Unable to test idle connection [" + con + "], closing it.", x);
+                        log.warn(MessageFactory.get("connectionPool.unableToTestIdleConnection", con), x);
                         continue;
                     }
                     if (keep) {
@@ -1697,7 +1688,7 @@ public class ConnectionPool {
                 log.debug("testAllIdle failed.", e);
             }
         } catch (Exception e) {
-            log.warn("testAllIdle failed, it will be retried.", e);
+            log.warn(MessageFactory.get("connectionPool.testAllIdleFailed"), e);
         }
 
     }
@@ -1793,8 +1784,8 @@ public class ConnectionPool {
             } catch (Throwable t) {
                 // One broken interceptor must not stop the rest of the
                 // chain from being reset
-                log.warn("Interceptor [" + handler.getClass().getName() + "] threw an exception from reset(); " +
-                        "continuing with the rest of the chain.", t);
+                log.warn(MessageFactory.get("connectionPool.interceptorResetFailed",
+                        handler.getClass().getName()), t);
             }
             handler = next;
         }
@@ -1817,8 +1808,8 @@ public class ConnectionPool {
             } catch (Throwable t) {
                 // One broken interceptor must not stop the rest of the
                 // chain from being notified
-                log.warn("Interceptor [" + handler.getClass().getName() + "] threw an exception from disconnected(); " +
-                        "continuing with the rest of the chain.", t);
+                log.warn(MessageFactory.get("connectionPool.interceptorDisconnectedFailed",
+                        handler.getClass().getName()), t);
             }
             handler = next;
         }
@@ -1840,8 +1831,7 @@ public class ConnectionPool {
         try {
             jmxPool = new org.apache.tomcat.jdbc.pool.jmx.ConnectionPool(this);
         } catch (Exception x) {
-            log.warn("Unable to start JMX integration for connection pool. Instance[" + getName() +
-                    "] can't be monitored.", x);
+            log.warn(MessageFactory.get("connectionPool.unableToStartJmx", getName()), x);
         }
     }
 
@@ -2134,10 +2124,7 @@ public class ConnectionPool {
                     // fails the caller instead. Every caller released on the
                     // latch below reports what this publishes, and an
                     // ExecutionException with no cause tells them nothing.
-                    cause = new SQLException("The pooled connection served to" +
-                            " this asynchronous borrow was released before it" +
-                            " could be set up; no connection was borrowed," +
-                            " borrow the pool again.");
+                    cause = new SQLException(MessageFactory.get("connectionPool.asyncBorrowConnectionReleased"));
                 }
             } catch (SQLException x) {
                 cause = x;
@@ -2204,7 +2191,7 @@ public class ConnectionPool {
                     }
                 }
             } catch (Exception x) {
-                log.error("Unable to cancel ConnectionFuture.", x);
+                log.error(MessageFactory.get("connectionPool.unableToCancelConnectionFuture"), x);
             } finally {
                 // Whatever came out of it, the callers waiting on the claim are
                 // done waiting
@@ -2314,10 +2301,10 @@ public class ConnectionPool {
             this.pool = new WeakReference<>(pool);
             this.sleepTime = sleepTime;
             if (sleepTime <= 0) {
-                log.warn("Database connection pool evicter thread interval is set to 0, defaulting to 30 seconds");
+                log.warn(MessageFactory.get("connectionPool.evicterIntervalZero"));
                 this.sleepTime = 1000 * 30;
             } else if (sleepTime < 1000) {
-                log.warn("Database connection pool evicter thread interval is set to lower than 1 second.");
+                log.warn(MessageFactory.get("connectionPool.evicterIntervalTooLow"));
             }
         }
 

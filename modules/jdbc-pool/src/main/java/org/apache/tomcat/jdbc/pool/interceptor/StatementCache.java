@@ -38,6 +38,7 @@ import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
  * Interceptor that caches {@code PreparedStatement} and/or {@code CallableStatement} instances on a connection.
@@ -282,7 +283,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
         }
         CacheKey key = createCacheKey(method, args);
         if (key == null) {
-            throw new IllegalArgumentException("Null key");
+            throw new IllegalArgumentException(MessageFactory.get("statementCache.nullKey"));
         }
         return cache.get(key);
     }
@@ -437,7 +438,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
         PooledConnection pCon = this.pcon;
         if (pCon == null) {
             if (log.isWarnEnabled()) {
-                log.warn("Connection has already been closed or abandoned");
+                log.warn(MessageFactory.get("statementCache.connectionClosedOrAbandoned"));
             }
             return null;
         }
@@ -649,7 +650,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
             try {
                 super.closeInvoked();
             } catch (SQLException x) {
-                log.warn("Unable to close statement [" + getSql() + "] that the statement cache is discarding.", x);
+                log.warn(MessageFactory.get("statementCache.unableToCloseDiscardedStatement", getSql()), x);
             }
         }
 

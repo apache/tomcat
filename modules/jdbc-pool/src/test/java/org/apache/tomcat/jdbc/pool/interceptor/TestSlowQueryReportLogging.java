@@ -232,7 +232,6 @@ class TestSlowQueryReportLogging extends JdbcPoolBaseTest {
     }
 
     /**
-
      * Captures what {@link SlowQueryReport} logs, following the handler
      * idiom of the pool's other diagnostic tests. The canary record -
      * written through the very JULI logger the interceptor logs through,

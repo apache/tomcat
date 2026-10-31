@@ -34,6 +34,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
  * Class that resets the abandoned timer on any activity on the Connection, on any query execution and on any read of a
@@ -130,7 +131,8 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
             }
             return getConstructor(index, type).newInstance(new Object[] { new TimerStatementProxy(result) });
         } catch (Exception x) {
-            log.warn("Unable to create timer statement proxy for " + getClass().getName() + ".", x);
+            log.warn(MessageFactory.get("resetAbandonedTimer.unableToCreateTimerStatementProxy",
+                    getClass().getName()), x);
         }
         return result;
     }
@@ -234,7 +236,7 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
                 return Boolean.TRUE;
             }
             if (target == null) {
-                throw new SQLException("Statement closed.");
+                throw new SQLException(MessageFactory.get("resetAbandonedTimer.statementClosed"));
             }
             Object result;
             try {
@@ -273,8 +275,8 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
                 } catch (Exception x) {
                     // The application just does not get the timer reset
                     // while reading this result set
-                    log.warn("Unable to create timer result set proxy for " +
-                            ResetAbandonedTimer.this.getClass().getName() + ".", x);
+                    log.warn(MessageFactory.get("resetAbandonedTimer.unableToCreateTimerResultSetProxy",
+                            ResetAbandonedTimer.this.getClass().getName()), x);
                 }
             }
             return result;
@@ -365,7 +367,7 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
                     // result set handle does, rather than by invoking on a
                     // null receiver: that is a NullPointerException, where the
                     // closed contract owes the application a SQLException
-                    throw new SQLException("ResultSet closed.");
+                    throw new SQLException(MessageFactory.get("resetAbandonedTimer.resultSetClosed"));
                 }
                 if (compare(GET_STATEMENT, method)) {
                     return stmt;

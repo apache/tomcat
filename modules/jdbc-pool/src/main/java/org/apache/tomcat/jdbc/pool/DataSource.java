@@ -26,6 +26,7 @@ import javax.management.ObjectName;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 
 /**
@@ -152,14 +153,14 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
             }
         } catch (MalformedObjectNameException x) {
             this.oname = null;
-            log.error("Unable to create object name for JDBC pool.", x);
+            log.error(MessageFactory.get("dataSource.unableToCreateObjectName"), x);
         } catch (RuntimeException x) {
             // Never break the caller's MBean registration because of
             // pool-side state (for instance a pool that has not been
             // created yet); preRegister throwing aborts the whole
             // registration in the MBean server.
             this.oname = null;
-            log.error("Unable to register JDBC pool MBean.", x);
+            log.error(MessageFactory.get("dataSource.unableToRegisterMBean"), x);
         }
         return name;
     }
@@ -207,8 +208,7 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
         // spurious error log
         final org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = p == null ? null : p.getJmxPool();
         if (jmx == null) {
-            log.warn("JDBC pool MBean [" + oname + "] not registered: the pool " +
-                    "has not been created yet or has already been closed.");
+            log.warn(MessageFactory.get("dataSource.mbeanNotRegistered", oname));
             // oname is the handle postDeregister() unregisters; do not keep
             // one that was never registered
             this.oname = null;
