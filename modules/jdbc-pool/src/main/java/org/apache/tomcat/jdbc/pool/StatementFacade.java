@@ -48,6 +48,20 @@ import org.apache.tomcat.jdbc.pool.interceptor.AbstractCreateStatementIntercepto
  * tracking the statements with {@link org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer} (or the application
  * closing them) keeps the statements underneath from outliving the borrow - unless an interceptor recycles them for the
  * next borrow, as a statement cache does.
+ * <p>
+ * The rule that decides what is sealed is a type rule, and its boundary is the type. A value a handle hands back
+ * that is not itself a result set is passed through as it came (what a statement handle reports as its connection
+ * is the pool's own handle, not the driver's), and a cursor that rides inside such a value reaches the application
+ * over that same unsealed path: the {@link java.sql.Array} read for an ARRAY column or an ARRAY OUT-parameter
+ * hands out its cursors through {@link java.sql.Array#getResultSet()}, a {@link java.sql.Struct} through its
+ * attributes, and the deprecated {@link java.sql.Ref} a <code>getRef</code> call hands back is itself the
+ * driver's object; the {@link java.sql.Blob}, {@link java.sql.Clob} and {@link java.sql.SQLXML} locators are the
+ * same shape without a cursor in them. None of that is sealed to the borrow, just as what <code>unwrap()</code>
+ * hands back is not: this facade seals the result sets a pooled statement hands out and the result sets those
+ * handles hand out in turn, not cursors that arrive inside values of another type - the REF cursor OUT-parameter
+ * and the nested cursor named above are themselves result sets, which is why they are sealed and these composites
+ * are not. Whether a driver object kept past the borrow still reads, and over what session, is the driver's affair;
+ * no handle of this facade retires it.
  */
 public class StatementFacade extends AbstractCreateStatementInterceptor {
 
