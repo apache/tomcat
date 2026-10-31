@@ -1215,6 +1215,22 @@
         and reuse, and a park refused for a lost association is now noted
         once per connection at debug level. (remm)
       </fix>
+      <fix>
+        Correct a defect where listing the <code>StatementCache</code>
+        interceptor before the <code>StatementFinalizer</code> interceptor in
+        <code>jdbcInterceptors</code> handed the next borrower of a session a
+        cached statement that failed on any use. The finalizer tracked the
+        driver statement beneath the cache and closed every statement still
+        open when the connection was returned, while a statement parked in
+        the cache is deliberately left open, so that return-time close killed
+        the cached statement out from under a live cache entry and the next
+        cache hit served a closed statement. The cache now refuses to park
+        statements when such a tracker is configured beneath it - the close
+        then reaches the statement through the normal path - and the pool
+        warns once at start when the configuration lists the cache before the
+        finalizer, as it already does for the analogous query timeout
+        ordering. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
