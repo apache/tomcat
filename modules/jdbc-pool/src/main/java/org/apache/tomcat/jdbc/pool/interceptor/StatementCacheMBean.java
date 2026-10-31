@@ -53,9 +53,15 @@ public interface StatementCacheMBean {
     int getCacheSize();
 
     /**
-     * Returns the cache size for the current connection.
+     * Returns the cache size for the current connection: the statements parked
+     * in this connection's cache. Parked statements are physically open until
+     * the cache is disposed, so this is not the number of statements ready to
+     * run. A read against an interceptor that is not bound to a pooled
+     * connection, for instance one made while a disposal is in progress, is
+     * answered quietly rather than logged.
      *
-     * @return number of cached statements for this connection
+     * @return number of cached statements for this connection, or {@code 0} if
+     *             this interceptor instance is not bound to a pooled connection
      */
     int getCacheSizePerConnection();
 }
