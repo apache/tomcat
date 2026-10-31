@@ -127,32 +127,6 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
         }
     }
 
-    /**
-     * This attribute is now hard-coded to {@code false} as the work-around this attribute enabled is no longer
-     * required.
-     *
-     * @return Always {@code false}
-     *
-     * @deprecated This method will be removed from Tomcat 12 onwards.
-     */
-    @Deprecated
-    public boolean getApplyJava8u40Fix() {
-        return false;
-    }
-
-    /**
-     * This method is now a NO-OP as the work-around this attribute enabled is no longer required.
-     *
-     * @param applyJava8u40Fix Ignored
-     *
-     * @deprecated This method will be removed from Tomcat 12 onwards.
-     */
-    @Deprecated
-    public void setApplyJava8u40Fix(boolean applyJava8u40Fix) {
-        // NO-OP
-    }
-
-
     @Override
     protected String getAuthMethod() {
         return Constants.SPNEGO_METHOD;

@@ -435,7 +435,7 @@ public class OutputBuffer extends Writer {
 
     private void updateBytesWritten(int increment) throws IOException {
         bytesWritten += increment;
-        int contentLength = coyoteResponse.getContentLength();
+        long contentLength = coyoteResponse.getContentLengthLong();
 
         /*
          * Handle the requirements of section 5.7 of the Servlet specification - Closure of the Response Object.

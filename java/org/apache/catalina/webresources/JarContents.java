@@ -22,6 +22,9 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import org.apache.tomcat.util.scan.MultiReleaseUtil;
+import org.apache.tomcat.util.scan.MultiReleaseUtil.MultiReleaseInfo;
+
 /**
  * This class represents the contents of a jar by determining whether a given resource <b>might</b> be in the cache,
  * based on a bloom filter. This is not a general-purpose bloom filter because it contains logic to strip out characters
@@ -95,19 +98,10 @@ public final class JarContents {
         }
 
         // Versioned entries should be added to the table according to their real name
-        if (name.startsWith("META-INF/versions/", startPos)) {
-            int i = name.indexOf('/', 18 + startPos);
-            if (i > 0) {
-                try {
-                    int version = Integer.parseInt(name.substring(18 + startPos, i));
-                    if (version <= Runtime.version().feature()) {
-                        startPos = i + 1;
-                    }
-                } catch (NumberFormatException e) {
-                    // The segment is not a valid version number, so the entry
-                    // is not a versioned entry that can be resolved under its
-                    // base name and is added to the table under its full name.
-                }
+        MultiReleaseInfo multiVersionInfo = MultiReleaseUtil.parseVersion(name);
+        if (multiVersionInfo != null) {
+            if (multiVersionInfo.isValid() && multiVersionInfo.version() <= Runtime.version().feature()) {
+                startPos = multiVersionInfo.namePos();
             }
             if (startPos == name.length()) {
                 return;
@@ -159,16 +153,13 @@ public final class JarContents {
     /**
      * Method that identifies whether a given path <b>MIGHT</b> be in this jar. Uses the Bloom filter mechanism.
      *
-     * @param path       Requested path, including any internal path of the resource set.
-     * @param webappRoot The web application mount point of the resource set, which can be stripped from the path.
+     * @param path Requested path, including any internal path of the resource set but excluding the web application
+     *                 mount.
      *
      * @return Whether the prefix of the path is known to be in this jar.
      */
-    public boolean mightContainResource(String path, String webappRoot) {
+    public boolean mightContainResource(String path) {
         int startPos = 0;
-        if (path.startsWith(webappRoot)) {
-            startPos = webappRoot.length();
-        }
         while (startPos < path.length() && path.charAt(startPos) == '/') {
             startPos++;
         }
