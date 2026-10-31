@@ -17,7 +17,10 @@
 package org.apache.tomcat.jdbc.pool.jmx;
 
 import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -66,6 +69,12 @@ class TestJmxNotificationDelivery extends JdbcPoolBaseTest {
     /* How many notifications are pushed at a queue nobody is draining. */
     private static final int FLOOD_SIZE = 4000;
 
+    /*
+     * How many notifications are pushed at the queue in the split test below.
+     * Above the queue bound (2000 tasks), so the queue certainly overflows.
+     */
+    private static final int SPLIT_FLOOD_SIZE = 2500;
+
     /**
      * Every notification type the pool MBean advertises, in the order the
      * burst test reports them.
@@ -103,6 +112,49 @@ class TestJmxNotificationDelivery extends JdbcPoolBaseTest {
                 Thread.currentThread().interrupt();
             }
             completed.countDown();
+        }
+    }
+
+    /*
+     * A listener that records the notifications it receives and blocks the
+     * notifier thread on the first one until the test opens the gate - for at
+     * most STUCK_LISTENER_TIMEOUT_S, bounding the stuck state as the listener
+     * above does - and from then on only records.
+     */
+    private static final class GateListener implements NotificationListener {
+        private final CountDownLatch gate;
+        private final CountDownLatch entered = new CountDownLatch(1);
+        private final List<Notification> received = new CopyOnWriteArrayList<>();
+        private boolean firstHolds = true;
+
+        GateListener(CountDownLatch gate) {
+            this.gate = gate;
+        }
+
+        @Override
+        public void handleNotification(Notification notification, Object handback) {
+            received.add(notification);
+            if (firstHolds) {
+                firstHolds = false;
+                entered.countDown();
+                try {
+                    gate.await(STUCK_LISTENER_TIMEOUT_S, TimeUnit.SECONDS);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
+    }
+
+    /*
+     * A listener that only records the notifications it receives.
+     */
+    private static final class RecordingListener implements NotificationListener {
+        private final List<Notification> received = new CopyOnWriteArrayList<>();
+
+        @Override
+        public void handleNotification(Notification notification, Object handback) {
+            received.add(notification);
         }
     }
 
@@ -277,5 +329,196 @@ class TestJmxNotificationDelivery extends JdbcPoolBaseTest {
         Assertions.assertEquals(ConnectionPool.POOL_EMPTY, stuck.received.get(0).getType(),
                 "the first notification must have been delivered, not dropped");
         jmxPool.removeListener(stuck);
+    }
+
+    /*
+     * The overflow drop is a per-notification decision, never a per-listener
+     * one. The JMX hand-off used to run on the thread that reported the
+     * condition: the JDK broadcaster hands the notification to the delivery
+     * queue once per selected JMX listener and lets a full queue throw from
+     * the middle of that loop, so on the notification that filled the queue
+     * between the JMX hand-off and the local one, notify() reported the
+     * notification dropped although some JMX listeners were already
+     * scheduled to receive it - and the local listeners never were. Delivery
+     * is now one task per notification, whose JMX hand-offs run inline on the
+     * notifier thread: the queue accepts or refuses the whole notification,
+     * so a notification reported dropped reaches no listener at all, and one
+     * reported accepted reaches every JMX listener and every local one once
+     * the queue has drained.
+     */
+    @Test
+    void aSaturatedQueueRefusesOrAcceptsTheWholeNotificationNotPartOfIt()
+            throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setName("JmxDeliverySplit-" + System.nanoTime());
+        ds.createPool();
+        // an unregistered MBean is enough: a listener can join its JMX
+        // listener list directly, no MBean server is involved
+        ConnectionPool jmxPool = new ConnectionPool(ds.getPool());
+        try {
+            /*
+             * The notifier and its queue are shared JVM-wide, so first let
+             * whatever an earlier test queued on it drain: once a probe
+             * notification is raised on its own wrapper and received, the
+             * notifier thread has finished everything that was queued before
+             * it. The probe wrapper keeps the probe deliveries off the
+             * listener lists of the wrapper under test.
+             */
+            ConnectionPool probePool = new ConnectionPool(ds.getPool());
+            RecordingListener probe = new RecordingListener();
+            probePool.addListener(probe);
+            awaitUntil(() -> {
+                probePool.notify(ConnectionPool.POOL_EMPTY, "drain-probe");
+                return !probe.received.isEmpty();
+            });
+            probePool.removeListener(probe);
+
+            CountDownLatch gate = new CountDownLatch(1);
+            GateListener jmxOne = new GateListener(gate);
+            RecordingListener jmxTwo = new RecordingListener();
+            RecordingListener jmxThree = new RecordingListener();
+            RecordingListener local = new RecordingListener();
+            // three JMX listeners: the old calling-thread fan-out queued four
+            // hand-offs for every notification (one per JMX listener plus the
+            // local one), so with the three hand-offs of the gate still
+            // queued the bound was reached partway through a later
+            // notification - some of its listeners scheduled although
+            // notify() reported it dropped - rather than cleanly between two
+            // notifications; that split is what the audit below trips on
+            jmxPool.addNotificationListener(jmxOne, null, null);
+            jmxPool.addNotificationListener(jmxTwo, null, null);
+            jmxPool.addNotificationListener(jmxThree, null, null);
+            jmxPool.addListener(local);
+            List<Boolean> accepted = new ArrayList<>();
+            try {
+                // the gate notification gets the notifier thread out of its
+                // idle state; it is then stuck delivering this very
+                // notification, and by the time it signals that it got in,
+                // the shared queue holds nothing but what this test queues
+                Assertions.assertTrue(
+                        jmxPool.notify(ConnectionPool.POOL_EMPTY, "gate"),
+                        "the notification that gates this test must be accepted");
+                Assertions.assertTrue(jmxOne.entered.await(5, TimeUnit.SECONDS),
+                        "the notifier thread must be stuck on the gate notification");
+                for (int i = 0; i < SPLIT_FLOOD_SIZE; i++) {
+                    accepted.add(jmxPool.notify(ConnectionPool.POOL_EMPTY, "split-" + i));
+                }
+            } finally {
+                gate.countDown();
+            }
+            int handedOff = 0;
+            int dropped = 0;
+            for (boolean reported : accepted) {
+                if (reported) {
+                    handedOff++;
+                } else {
+                    dropped++;
+                }
+            }
+            Assertions.assertTrue(dropped > 0,
+                    "a queue that nothing drains must start dropping: all " + SPLIT_FLOOD_SIZE
+                            + " notifications were accepted, so the queue is unbounded");
+            Assertions.assertTrue(handedOff > 0,
+                    "before the queue is full, the notifications must be handed off");
+
+            // drain what the queue took; the local listener is delivered in
+            // the notification's own task, so once it has every accepted
+            // notification, every task the queue took has run
+            int expected = 1 + handedOff;
+            awaitUntil(() -> local.received.size() >= expected);
+            Assertions.assertEquals(expected, local.received.size(),
+                    "every accepted notification must have reached the local listener, and no"
+                            + " refused one may reach it");
+
+            /*
+             * Let the queue drain completely before reading the JMX
+             * listeners' books: a per-listener hand-off that the old calling-
+             * thread fan-out had already queued when the notification as a
+             * whole was refused is itself queued behind the last accepted
+             * notification and must have run by the time the checks below
+             * look for it.
+             */
+            RecordingListener drained = new RecordingListener();
+            probePool.addListener(drained);
+            awaitUntil(() -> {
+                probePool.notify(ConnectionPool.POOL_EMPTY, "drained-probe");
+                return !drained.received.isEmpty();
+            });
+            probePool.removeListener(drained);
+
+            /*
+             * Every notification the queue accepted must have reached every
+             * listener, and one it refused must have reached none: the
+             * accepted task hands the notification to the JMX listeners
+             * inline before the local ones, so no per-listener hand-off is
+             * ever put at the queue's bound a second time, and the drain
+             * above has by now run every task the queue took.
+             */
+            Set<String> byJmxOne = new HashSet<>(messages(jmxOne.received));
+            Set<String> byJmxTwo = new HashSet<>(messages(jmxTwo.received));
+            Set<String> byJmxThree = new HashSet<>(messages(jmxThree.received));
+            Set<String> byLocal = new HashSet<>(messages(local.received));
+            for (int i = 0; i < accepted.size(); i++) {
+                String message = "[" + ConnectionPool.POOL_EMPTY + "] split-" + i;
+                if (accepted.get(i)) {
+                    Assertions.assertTrue(byJmxOne.contains(message),
+                            "the notification reported as sent must reach every JMX listener: split-" + i
+                                    + " was accepted but the first JMX listener did not receive it");
+                    Assertions.assertTrue(byJmxTwo.contains(message),
+                            "the notification reported as sent must reach every JMX listener: split-" + i
+                                    + " was accepted but the second JMX listener did not receive it");
+                    Assertions.assertTrue(byJmxThree.contains(message),
+                            "the notification reported as sent must reach every JMX listener: split-" + i
+                                    + " was accepted but the third JMX listener did not receive it");
+                    Assertions.assertTrue(byLocal.contains(message),
+                            "the notification reported as sent must reach the local listener: split-" + i
+                                    + " was accepted but the local listener did not receive it");
+                } else {
+                    Assertions.assertFalse(byJmxOne.contains(message),
+                            "the notification reported as dropped must reach no listener: the first JMX listener"
+                                    + " received split-" + i + " although notify() reported it dropped");
+                    Assertions.assertFalse(byJmxTwo.contains(message),
+                            "the notification reported as dropped must reach no listener: the second JMX listener"
+                                    + " received split-" + i + " although notify() reported it dropped");
+                    Assertions.assertFalse(byJmxThree.contains(message),
+                            "the notification reported as dropped must reach no listener: the third JMX listener"
+                                    + " received split-" + i + " although notify() reported it dropped");
+                    Assertions.assertFalse(byLocal.contains(message),
+                            "the notification reported as dropped must reach no listener: the local listener"
+                                    + " received split-" + i + " although notify() reported it dropped");
+                }
+            }
+            Assertions.assertTrue(jmxPool.notify(ConnectionPool.POOL_EMPTY, "final"),
+                    "a notification reported after the queue drained must be accepted");
+            String finalMessage = "[" + ConnectionPool.POOL_EMPTY + "] final";
+            awaitUntil(() -> containsMessage(jmxOne.received, finalMessage)
+                    && containsMessage(jmxTwo.received, finalMessage)
+                    && containsMessage(jmxThree.received, finalMessage)
+                    && containsMessage(local.received, finalMessage));
+
+            jmxPool.removeNotificationListener(jmxOne);
+            jmxPool.removeNotificationListener(jmxTwo);
+            jmxPool.removeNotificationListener(jmxThree);
+            jmxPool.removeListener(local);
+        } finally {
+            ds.close();
+        }
+    }
+
+    private static List<String> messages(List<Notification> received) {
+        List<String> messages = new ArrayList<>(received.size());
+        for (Notification n : received) {
+            messages.add(n.getMessage());
+        }
+        return messages;
+    }
+
+    private static boolean containsMessage(List<Notification> received, String message) {
+        for (Notification n : received) {
+            if (message.equals(n.getMessage())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
