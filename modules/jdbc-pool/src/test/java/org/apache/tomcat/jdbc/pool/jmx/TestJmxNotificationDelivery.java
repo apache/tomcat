@@ -24,8 +24,10 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.management.Notification;
+import javax.management.NotificationFilter;
 import javax.management.NotificationListener;
 
 import org.junit.jupiter.api.Assertions;
@@ -75,6 +77,12 @@ class TestJmxNotificationDelivery extends JdbcPoolBaseTest {
      */
     private static final int SPLIT_FLOOD_SIZE = 2500;
 
+    /*
+     * The name the pool MBean's notifier thread factory gives its thread; the
+     * thread the whole delivery - filters and listeners alike - must run on.
+     */
+    private static final String NOTIFIER_THREAD = "JDBC-Pool-JMX-Notifier";
+
     /**
      * Every notification type the pool MBean advertises, in the order the
      * burst test reports them.
@@ -112,6 +120,33 @@ class TestJmxNotificationDelivery extends JdbcPoolBaseTest {
                 Thread.currentThread().interrupt();
             }
             completed.countDown();
+        }
+    }
+
+    /*
+     * A JMX notification filter that records the thread evaluating it,
+     * signals that it has been reached, stays inside isNotificationEnabled
+     * until the test releases it - and never longer than
+     * STUCK_LISTENER_TIMEOUT_S, so that a filter evaluated on the reporting
+     * thread stalls notify() for that bound and no further.
+     */
+    private static final class StuckFilter implements NotificationFilter {
+        private final CountDownLatch entered = new CountDownLatch(1);
+        private final CountDownLatch release = new CountDownLatch(1);
+        private final CountDownLatch completed = new CountDownLatch(1);
+        private final AtomicReference<String> thread = new AtomicReference<>();
+
+        @Override
+        public boolean isNotificationEnabled(Notification notification) {
+            thread.set(Thread.currentThread().getName());
+            entered.countDown();
+            try {
+                release.await(STUCK_LISTENER_TIMEOUT_S, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            completed.countDown();
+            return true;
         }
     }
 
@@ -190,6 +225,62 @@ class TestJmxNotificationDelivery extends JdbcPoolBaseTest {
         Assertions.assertTrue(stuck.completed.await(5, TimeUnit.SECONDS),
                 "the released listener must have finished handling the notification");
         jmxPool.removeListener(stuck);
+    }
+
+    /*
+     * The filter a caller attaches directly to the MBean through the
+     * inherited addNotificationListener belongs to the notification's own
+     * delivery: the JDK evaluates it inside the hand-off the broadcaster
+     * makes for its listener, so while that hand-off ran on the thread which
+     * reported the condition, a slow or blocked filter stalled the pool path
+     * - with the listener handed off or not. Delivery is now one task that
+     * calls sendNotification on the notifier thread, and every filter of the
+     * MBean's own listener list is evaluated there, not on the caller.
+     */
+    @Test
+    void aStuckFilterOnADirectlyAttachedListenerDoesNotStallTheThreadThatReports()
+            throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setName("JmxDeliveryFilter-" + System.nanoTime());
+        ds.createPool();
+        // an unregistered MBean is enough: the filter sits on the MBean's own
+        // listener list, no MBean server is involved
+        ConnectionPool jmxPool = new ConnectionPool(ds.getPool());
+        StuckFilter filter = new StuckFilter();
+        RecordingListener listener = new RecordingListener();
+        jmxPool.addNotificationListener(listener, filter, null);
+        try {
+            long start = System.currentTimeMillis();
+            boolean reported = jmxPool.notify(ConnectionPool.NOTIFY_ABANDON,
+                    "a connection was abandoned");
+            long elapsedMs = System.currentTimeMillis() - start;
+
+            Assertions.assertTrue(reported,
+                    "the notification must be reported as handed off for delivery");
+            Assertions.assertTrue(filter.entered.await(5, TimeUnit.SECONDS),
+                    "the notification must still reach the filter");
+            Assertions.assertTrue(elapsedMs < CALLER_MUST_RETURN_WITHIN_MS,
+                    "reporting a condition must not wait for the filter: notify() took "
+                            + elapsedMs + " ms, of the " + STUCK_LISTENER_TIMEOUT_S
+                            + " s the filter holds on, so the filter ran on the"
+                            + " thread that reported the condition");
+            Assertions.assertEquals(1, filter.completed.getCount(),
+                    "the filter must still be stuck at the point the caller was released");
+        } finally {
+            filter.release.countDown();
+        }
+        Assertions.assertTrue(filter.completed.await(5, TimeUnit.SECONDS),
+                "the released filter must have finished evaluating");
+        Assertions.assertEquals(NOTIFIER_THREAD, filter.thread.get(),
+                "the filter must be evaluated on the pool's notification thread, not on the"
+                        + " thread that reported the condition, which was "
+                        + Thread.currentThread().getName());
+        // the filter let the notification through, so the listener behind it
+        // must have been reached on the same delivery
+        awaitUntil(() -> !listener.received.isEmpty());
+        Assertions.assertEquals(ConnectionPool.NOTIFY_ABANDON, listener.received.get(0).getType(),
+                "a notification the filter enabled must reach its listener");
+        jmxPool.removeNotificationListener(listener);
     }
 
     @Test
