@@ -20,6 +20,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.sql.SQLException;
 
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
+
 /**
  * A DisposableConnectionFacade object is the top most interceptor that wraps an object of type
  * {@link PooledConnection}. The DisposableConnectionFacade intercepts three methods:
@@ -123,7 +125,7 @@ public class DisposableConnectionFacade extends JdbcInterceptor {
                 if (compare(TOSTRING_VAL, method)) {
                     return "DisposableConnectionFacade[null]";
                 }
-                throw new SQLException("PooledConnection has already been closed.");
+                throw new SQLException(MessageFactory.get("disposableConnectionFacade.pooledConnectionClosed"));
             }
 
             throw e;

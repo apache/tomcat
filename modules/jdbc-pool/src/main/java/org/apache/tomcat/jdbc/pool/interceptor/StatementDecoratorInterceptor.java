@@ -29,6 +29,7 @@ import java.sql.Statement;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
  * Implementation of <b>JdbcInterceptor</b> that proxies resultSets and statements.
@@ -400,7 +401,7 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
             }
             // If we are calling anything else, bail out
             if (gone) {
-                throw new SQLException("Statement closed.");
+                throw new SQLException(MessageFactory.get("statementDecoratorInterceptor.statementClosed"));
             }
             if (compare(GETCONNECTION_VAL, method)) {
                 // The handle of the current borrow, as bound by

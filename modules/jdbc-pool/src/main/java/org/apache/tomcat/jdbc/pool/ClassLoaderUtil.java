@@ -19,6 +19,7 @@ package org.apache.tomcat.jdbc.pool;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
  * Utility class for loading classes using multiple class loaders.
@@ -56,7 +57,7 @@ public class ClassLoaderUtil {
                     }
                     return Class.forName(className, true, cl);
                 } else {
-                    throw new ClassNotFoundException("Classloader is null");
+                    throw new ClassNotFoundException(MessageFactory.get("classLoaderUtil.classLoaderNull"));
                 }
             } catch (ClassNotFoundException x) {
                 last = x;
@@ -72,7 +73,8 @@ public class ClassLoaderUtil {
                 break;
             }
         }
-        throw new ClassNotFoundException("Unable to load class: " + className + " from " + errorMsg, last);
+        throw new ClassNotFoundException(MessageFactory.get("classLoaderUtil.classLoadFailed", className, errorMsg),
+                last);
     }
 
 

@@ -27,6 +27,7 @@ import org.apache.tomcat.jdbc.pool.DataSourceFactory;
 import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
 import org.apache.tomcat.jdbc.pool.PoolConfiguration;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
  * Interceptor that keep track of connection state to avoid roundtrips to the database. The
@@ -163,8 +164,7 @@ public class ConnectionState extends JdbcInterceptor {
                 // ConnectionPool.setupConnection() catches this, discards the
                 // connection and fails the borrow.
                 throw new IllegalStateException(
-                        "Unable to check for, or terminate, the pending transaction before restoring the configured connection state.",
-                        x);
+                        MessageFactory.get("connectionState.unableToTerminatePendingTransaction"), x);
             }
         }
         if (resetTransactionIsolation) {
@@ -189,9 +189,8 @@ public class ConnectionState extends JdbcInterceptor {
                 // Report it here, at refusal time, as no later borrow will log
                 // it again.
                 refusedIsolationLevel = defaultTransactionIsolation;
-                log.error("Unable to reset transaction isolation state to connection. The configured level "
-                        + defaultTransactionIsolation + " will not be retried on this session; it keeps its "
-                        + "current isolation level.", x);
+                log.error(MessageFactory.get("connectionState.unableToResetTransactionIsolation",
+                        defaultTransactionIsolation), x);
             }
         }
         if (resetReadOnly) {
@@ -207,8 +206,8 @@ public class ConnectionState extends JdbcInterceptor {
                 // that failed, so it must not go to the next borrower.
                 // ConnectionPool.setupConnection() catches this, discards the
                 // connection and fails the borrow.
-                throw new IllegalStateException("Unable to restore the configured read-only state "
-                        + defaultReadOnly + " on the connection.", x);
+                throw new IllegalStateException(
+                        MessageFactory.get("connectionState.unableToRestoreReadOnly", defaultReadOnly), x);
             }
         }
         if (resetAutoCommit) {
@@ -222,8 +221,8 @@ public class ConnectionState extends JdbcInterceptor {
                 // As for the read-only state above: the driver refused the
                 // configured auto-commit state, so the borrow fails and the
                 // connection is discarded.
-                throw new IllegalStateException("Unable to restore the configured auto-commit state "
-                        + defaultAutoCommit + " on the connection.", x);
+                throw new IllegalStateException(
+                        MessageFactory.get("connectionState.unableToRestoreAutoCommit", defaultAutoCommit), x);
             }
         }
         if (resetCatalog) {
@@ -238,8 +237,8 @@ public class ConnectionState extends JdbcInterceptor {
                 // configured catalog, so the borrower learns of the
                 // misconfiguration instead of getting a connection that was
                 // never pointed at the database the pool asks it to work in.
-                throw new IllegalStateException("Unable to restore the configured default catalog "
-                        + defaultCatalog + " on the connection.", x);
+                throw new IllegalStateException(
+                        MessageFactory.get("connectionState.unableToRestoreCatalog", defaultCatalog), x);
             }
         }
 
@@ -327,7 +326,7 @@ public class ConnectionState extends JdbcInterceptor {
             }
         } catch (Throwable e) {
             if (write) {
-                log.warn("Reset state to null as an exception occurred while calling method[" + name + "].", e);
+                log.warn(MessageFactory.get("connectionState.resetStateToNull", name), e);
                 switch (index) {
                     case 0: {
                         autoCommit = null;

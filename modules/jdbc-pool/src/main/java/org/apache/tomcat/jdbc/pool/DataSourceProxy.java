@@ -30,6 +30,7 @@ import javax.sql.XAConnection;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorDefinition;
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
  * The DataSource proxy lets us implements methods that don't exist in the current compiler JDK but might be methods
@@ -91,7 +92,7 @@ public class DataSourceProxy implements PoolConfiguration {
      */
     public DataSourceProxy(PoolConfiguration poolProperties) {
         if (poolProperties == null) {
-            throw new NullPointerException("PoolConfiguration cannot be null.");
+            throw new NullPointerException(MessageFactory.get("dataSourceProxy.poolConfigurationNull"));
         }
         this.poolProperties = poolProperties;
     }
@@ -155,7 +156,7 @@ public class DataSourceProxy implements PoolConfiguration {
         // The Wrapper contract asks for a failure, not for a silent null
         // that turns into an unrelated NullPointerException at the caller's
         // first use of the "unwrapped" value.
-        throw new SQLException("Not a wrapper of " + iface.getName());
+        throw new SQLException(MessageFactory.get("dataSourceProxy.notAWrapper", iface.getName()));
     }
 
     /**
@@ -177,10 +178,7 @@ public class DataSourceProxy implements PoolConfiguration {
             return createPool().getConnection(username, password);
         } else {
             if (connectionWithoutCredentialsWarningIssued.compareAndSet(false, true)) {
-                log.warn(String.format(
-                        "alternateUsernameAllowed is set to false so the provided user name [%s] and associated " +
-                                "password have been ignored",
-                        username));
+                log.warn(MessageFactory.get("dataSourceProxy.alternateUsernameIgnored", username));
             }
             return getConnection();
         }
@@ -229,7 +227,7 @@ public class DataSourceProxy implements PoolConfiguration {
         // Returning null is not possible here: either the closed flag
         // rejects the caller or a pool is published and returned.
         if (closed) {
-            throw new SQLException("DataSource has been closed.");
+            throw new SQLException(MessageFactory.get("dataSourceProxy.dataSourceClosed"));
         }
         synchronized (poolCreationLock) {
             // Re-check under the gate: a close completed while this thread
@@ -237,7 +235,7 @@ public class DataSourceProxy implements PoolConfiguration {
             // gate has already published its pool. The gate also keeps this
             // the only construction the shared poolProperties ever faces.
             if (closed) {
-                throw new SQLException("DataSource has been closed.");
+                throw new SQLException(MessageFactory.get("dataSourceProxy.dataSourceClosed"));
             }
             final ConnectionPool existing = pool;
             if (existing != null) {
@@ -269,9 +267,9 @@ public class DataSourceProxy implements PoolConfiguration {
                 try {
                     fresh.close(true);
                 } catch (Exception x) {
-                    log.warn("Error during connection pool closure.", x);
+                    log.warn(MessageFactory.get("dataSourceProxy.errorClosingPool"), x);
                 }
-                throw new SQLException("DataSource has been closed.");
+                throw new SQLException(MessageFactory.get("dataSourceProxy.dataSourceClosed"));
             }
             return fresh;
         }
@@ -321,7 +319,7 @@ public class DataSourceProxy implements PoolConfiguration {
             } catch (Exception ignore) {
                 // Ignore
             }
-            throw new SQLException("Connection from pool does not implement javax.sql.XAConnection");
+            throw new SQLException(MessageFactory.get("dataSourceProxy.connectionNotXA"));
         }
     }
 
@@ -345,7 +343,7 @@ public class DataSourceProxy implements PoolConfiguration {
             } catch (Exception ignore) {
                 // Ignore
             }
-            throw new SQLException("Connection from pool does not implement javax.sql.XAConnection");
+            throw new SQLException(MessageFactory.get("dataSourceProxy.connectionNotXA"));
         }
     }
 
@@ -389,7 +387,7 @@ public class DataSourceProxy implements PoolConfiguration {
                 // a normal lifecycle state, not a creation failure.
                 return null;
             }
-            log.error("Error during connection pool creation.", x);
+            log.error(MessageFactory.get("dataSourceProxy.errorCreatingPool"), x);
             return null;
         }
     }
@@ -430,7 +428,7 @@ public class DataSourceProxy implements PoolConfiguration {
             try {
                 p.close(all);
             } catch (Exception x) {
-                log.warn("Error during connection pool closure.", x);
+                log.warn(MessageFactory.get("dataSourceProxy.errorClosingPool"), x);
             }
         }
     }
@@ -474,7 +472,7 @@ public class DataSourceProxy implements PoolConfiguration {
         // accessors would silently degrade. The class invariant is that this
         // field is never null, so reject the misuse at its site.
         if (poolProperties == null) {
-            throw new NullPointerException("PoolConfiguration cannot be null.");
+            throw new NullPointerException(MessageFactory.get("dataSourceProxy.poolConfigurationNull"));
         }
         this.poolProperties = poolProperties;
     }
@@ -710,7 +708,7 @@ public class DataSourceProxy implements PoolConfiguration {
             // interface (PoolProperties itself and the pool's JMX wrapper).
             getPoolProperties().setConnectionProperties(properties);
         } catch (RuntimeException x) {
-            log.error("Unable to parse connection properties.", x);
+            log.error(MessageFactory.get("dataSourceProxy.unableToParseConnectionProperties"), x);
             throw x;
         }
     }
@@ -1454,7 +1452,7 @@ public class DataSourceProxy implements PoolConfiguration {
         try {
             createPool().purge();
         } catch (SQLException x) {
-            log.error("Unable to purge pool.", x);
+            log.error(MessageFactory.get("dataSourceProxy.unableToPurgePool"), x);
         }
     }
 
@@ -1465,7 +1463,7 @@ public class DataSourceProxy implements PoolConfiguration {
         try {
             createPool().purgeOnReturn();
         } catch (SQLException x) {
-            log.error("Unable to purge pool.", x);
+            log.error(MessageFactory.get("dataSourceProxy.unableToPurgePool"), x);
         }
     }
 }

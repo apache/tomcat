@@ -37,6 +37,7 @@ import org.apache.tomcat.jdbc.pool.PoolConfiguration;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorDefinition;
 import org.apache.tomcat.jdbc.pool.PoolUtilities;
 import org.apache.tomcat.jdbc.pool.Validator;
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
  * JMX MBean wrapper for a {@link org.apache.tomcat.jdbc.pool.ConnectionPool}. Provides management and monitoring
@@ -260,8 +261,8 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
             // The delivery queue is full; dropping the notification is the
             // point of the bound, and must not fail the pool operation that
             // reported the condition
-            log.warn("Dropping notification of type [" + type + "] for pool [" + getNotificationSource() +
-                    "]: the notification delivery queue (" + NOTIFY_QUEUE_CAPACITY + " deliveries) is full");
+            log.warn(MessageFactory.get("jmxConnectionPool.droppingNotification",
+                    type, getNotificationSource(), NOTIFY_QUEUE_CAPACITY));
             return false;
         } catch (Exception x) {
             if (log.isDebugEnabled()) {
