@@ -41,9 +41,12 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
  * exactly the case the interceptor exists for, so finalisation must not depend on that statement still being reachable
  * when the connection is returned. Statements that the application does close are forgotten by the returned proxy at
  * the moment <code>close()</code> completes, keeping the tracked list bounded by the statements that are genuinely
- * still open. (An interceptor placed outside this one may swallow the statement's <code>close()</code>, e.g. a
- * statement cache recycling instead of closing; such entries are simply reclaimed at the connection return, as they
- * were before.)
+ * still open and closed through that handle. (The removal cannot observe a close that reaches the statement by
+ * another route: an interceptor placed outside this one may swallow the statement's <code>close()</code>, e.g. a
+ * statement cache recycling instead of closing, and a statement the application closes through the driver handle
+ * that <code>unwrap</code> hands back never passes through this proxy; such entries are simply reclaimed at the
+ * connection return, where the renewed close meets a statement already closed as a harmless no-op, as they were
+ * before.)
  * <p>
  * Tracked statements are handed to the application as proxies implementing the standard JDBC statement interfaces, as
  * is the statement facade the pool always installs in front of this interceptor and as are the proxies of the other
