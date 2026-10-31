@@ -273,21 +273,31 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     }
 
     /**
-     * Hands a notification to the listeners registered with this MBean outside JMX. Runs on the notifier thread. A
-     * listener that throws is contained here: its exception may not kill the notifier thread that every pool in the JVM
-     * delivers its notifications on.
+     * Hands a notification to the listeners registered with this MBean outside JMX. Runs on the notifier thread. Each
+     * listener is handed the notification on its own and what one of them throws is contained at that one listener: it
+     * may not kill the notifier thread that every pool in the JVM delivers its notifications on, and it may not
+     * suppress the delivery of that notification to the listeners registered behind the thrower either. An
+     * {@link Error} is not contained - as it is not on the JMX half of the delivery, where the JDK broadcaster catches
+     * only what a listener throws - and takes the notifier thread down; the next notification starts a new one.
      *
      * @param n    the notification to deliver
      * @param type the notification type, for the failure log
      */
     private void deliverLocally(Notification n, String type) {
-        try {
-            for (NotificationListener listener : listeners) {
+        for (NotificationListener listener : listeners) {
+            try {
                 listener.handleNotification(n, this);
-            }
-        } catch (Exception x) {
-            if (log.isDebugEnabled()) {
-                log.debug("Local notification listener failed. Type=" + type, x);
+            } catch (Exception x) {
+                // Contained at the listener that threw: the notification
+                // still reaches the listeners behind it and the notifier
+                // thread goes on to the next notification. An Error is left
+                // alone, as on the JMX half of the delivery - the JDK
+                // broadcaster's hand-off catches only a listener's exceptions
+                // - and takes this thread down, to be replaced when the next
+                // notification arrives
+                if (log.isDebugEnabled()) {
+                    log.debug("Local notification listener failed. Type=" + type, x);
+                }
             }
         }
     }
