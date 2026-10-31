@@ -248,4 +248,25 @@ public class TestHttp2Section_4_3 extends Http2TestBase {
 
         handleGoAwayResponse(3, Http2Error.COMPRESSION_ERROR);
     }
+
+
+    @Test
+    public void testHeaderContinuationInterleavedDataSameStream() throws Exception {
+        // HTTP2 upgrade
+        http2Connect();
+
+        // Start header block on stream 3 without END_HEADERS
+        byte[] frameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+        buildSimpleGetRequestPart1(frameHeader, headersPayload, 3);
+        writeFrame(frameHeader, headersPayload);
+
+        // Send a DATA frame on the same stream while the header block is open.
+        // RFC 9113, section 4.3: any frame other than CONTINUATION interleaved
+        // in a header block MUST be treated as a connection error of type
+        // PROTOCOL_ERROR.
+        sendData(3, new byte[0]);
+
+        handleGoAwayResponse(3, Http2Error.PROTOCOL_ERROR);
+    }
 }
