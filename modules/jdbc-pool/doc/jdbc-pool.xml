@@ -701,7 +701,11 @@
        driver defaults. Interceptors listed <em>after</em> the cache in
        <code>jdbcInterceptors</code> do not see reused statements &#8211; for example,
        <code>QueryTimeoutInterceptor</code> must be listed <em>before</em> the cache to keep
-       its timeout on cached statements.
+       its timeout on cached statements. An interceptor that tracks statements in order to
+       close them when the connection is returned, such as <code>StatementFinalizer</code>,
+       must also be listed <em>before</em> the cache: a parked statement is deliberately
+       left open, so a tracker beneath the cache would close entries out from under a live
+       cache, and the cache therefore refuses to park statements at all in that order.
     </p>
     <attributes>
       <attribute name="prepared" required="false">

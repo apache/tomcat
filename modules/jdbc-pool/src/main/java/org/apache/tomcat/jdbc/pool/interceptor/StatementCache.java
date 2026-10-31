@@ -50,7 +50,11 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  * hook performs an action rather than only wrapping the statement: {@link QueryTimeoutInterceptor} must be listed
  * before this one to keep its timeout on cached statements, while wrapping-only interceptors are unaffected: their
  * wrapper is carried inside the cached proxy, and the cache binds a cached statement to the physical session the
- * prepare ran on rather than to whatever connection a wrapper beneath it reports for the statement.
+ * prepare ran on rather than to whatever connection a wrapper beneath it reports for the statement. An interceptor
+ * that closes tracked statements at the connection return is affected too: {@link StatementFinalizer} must be listed
+ * before this one, because a parked statement is deliberately left open and a tracker beneath the cache would close
+ * it out from under a live cache entry; listed after this one, it makes this cache refuse to park at all, and
+ * statements are closed normally instead of cached.
  */
 public class StatementCache extends StatementDecoratorInterceptor implements StatementCacheMBean {
     private static final Log log = LogFactory.getLog(StatementCache.class);
@@ -77,6 +81,19 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
     protected static final String STATEMENT_CACHE_ATTR = StatementCache.class.getName() + ".cache";
 
     private static final String SET_POOLABLE = "setPoolable";
+
+    /**
+     * State of the one look for a tracker beneath this interceptor: the chain has not been looked at yet.
+     */
+    private static final int TRACKER_UNCHECKED = 0;
+    /**
+     * State of the look: no tracker that closes parked statements sits beneath this interceptor.
+     */
+    private static final int TRACKER_NONE_BELOW = 1;
+    /**
+     * State of the look: such a tracker sits beneath this interceptor and statements must not be recycled.
+     */
+    private static final int TRACKER_BELOW = 2;
 
     /**
      * Default constructor.
@@ -109,13 +126,27 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
 
     /**
      * Returns the statement types being cached.
+     * <p>
+     * A copy is returned because the arrays a cache matches against are shared
+     * by every instance in the class loader; mutating the array behind the
+     * accessor would change what every pool in the JVM caches, not just this
+     * one.
      *
      * @return array of statement type strings
      */
     public String[] getTypes() {
-        return types;
+        String[] t = this.types;
+        return t == null ? null : t.clone();
     }
 
+    /**
+     * The pool-wide count of statements parked in the caches of all
+     * connections. Parked statements are physically open until the cache is
+     * disposed, so this is not the number of statements ready to run.
+     *
+     * @return the count, or {@code -1} once this interceptor has been disposed
+     *         and the pool-wide counter is gone
+     */
     @Override
     public int getCacheSize() {
         AtomicInteger size = this.cacheSize;
@@ -152,6 +183,47 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
     private static ConcurrentHashMap<ConnectionPool, AtomicInteger> cacheSizeMap = new ConcurrentHashMap<>();
 
     private AtomicInteger cacheSize;
+
+    /**
+     * Whether a tracker that closes its tracked statements at the connection return sits beneath this interceptor in
+     * the chain. A {@link StatementFinalizer} below the cache tracks the driver's statement - its close-aware proxy is
+     * reached only by a close that descends through the cache, and the close that parks a statement stops here - so a
+     * parked statement, deliberately left open, would be closed by that tracker at the connection return out from
+     * under a live cache entry, and the next hit would hand the borrower a closed statement. A park is refused when
+     * this answers true, which leaves the close to the normal path; the safe order, in which the tracker sits above
+     * the cache and tracks the cache handle that retires itself at the park, answers false and keeps caching. The
+     * chain of an interceptor is fixed once built, so the first look settles the answer for the life of this
+     * connection's chain; the state is settled by compare-and-set, so of two concurrent first parks exactly one
+     * settles and reports, and the other re-reads the settled value.
+     */
+    private final AtomicInteger trackerBelow = new AtomicInteger(TRACKER_UNCHECKED);
+
+    /**
+     * Looks once down the chain below this interceptor for a statement tracker that would close a parked statement at
+     * the connection return.
+     *
+     * @return true if such a tracker sits beneath this cache, in which case statements are not recycled
+     */
+    private boolean trackerBelow() {
+        int state = trackerBelow.get();
+        if (state == TRACKER_UNCHECKED) {
+            boolean below = false;
+            for (JdbcInterceptor i = getNext(); i != null; i = i.getNext()) {
+                if (i instanceof StatementFinalizer) {
+                    below = true;
+                    break;
+                }
+            }
+            if (trackerBelow.compareAndSet(TRACKER_UNCHECKED, below ? TRACKER_BELOW : TRACKER_NONE_BELOW)) {
+                if (below) {
+                    log.warn(MessageFactory.get("statementCache.trackerBeneathCache"));
+                }
+                return below;
+            }
+            state = trackerBelow.get();
+        }
+        return state == TRACKER_BELOW;
+    }
 
     @Override
     public void poolStarted(ConnectionPool pool) {
@@ -302,7 +374,15 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
      */
     public boolean cacheStatement(CachedStatement proxy) {
         ConcurrentHashMap<CacheKey, CachedStatement> cache = getCache();
-        if (cache == null) {
+        // Read the counter once, like getCacheSize() and closeInvoked() do:
+        // a disposal (the reset(null, null) walks) nulls the field, and every
+        // read of the field itself - here at the entry check, and again in the
+        // withdrawal below - could meet a null in the middle of this call, so
+        // that the withdrawal throws and the increment this call made is never
+        // returned to the counter the whole pool shares. The counter object
+        // outlives the field's nulling, so a local keeps it reachable.
+        AtomicInteger size = cacheSize;
+        if (cache == null || size == null) {
             return false;
         }
         if (proxy.getCacheKey() == null) {
@@ -315,10 +395,10 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
             // and must not be parked in the cache of the new one.
             logLostAssociationOnce(proxy);
             return false;
-        } else if (cacheSize.get() >= maxCacheSize) {
+        } else if (size.get() >= maxCacheSize) {
             return false;
-        } else if (cacheSize.incrementAndGet() > maxCacheSize) {
-            cacheSize.decrementAndGet();
+        } else if (size.incrementAndGet() > maxCacheSize) {
+            size.decrementAndGet();
             return false;
         }
         // Reserve the slot first and let the map itself arbitrate the
@@ -342,7 +422,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
                 // statement is not in the map and never was. Undo exactly
                 // the one increment this call made and let the caller
                 // close it - nothing here can leak a slot or a statement.
-                cacheSize.decrementAndGet();
+                size.decrementAndGet();
             }
         }
         return parked;
@@ -359,11 +439,18 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
      */
     public boolean removeStatement(CachedStatement proxy) {
         ConcurrentHashMap<CacheKey, CachedStatement> cache = getCache();
-        if (cache == null) {
+        // The counter is read once for the same disposal window as in
+        // cacheStatement: a disposal is answered like at the other entry
+        // points, with false, because its disconnect purge has already walked
+        // the entries and withdrew their slots while the fields were still
+        // set. The counter object outlives the field's nulling, so the local
+        // keeps it reachable for the decrement below.
+        AtomicInteger size = cacheSize;
+        if (cache == null || size == null) {
             return false;
         }
         if (cache.remove(proxy.getCacheKey(), proxy)) {
-            cacheSize.decrementAndGet();
+            size.decrementAndGet();
             return true;
         } else {
             return false;
@@ -450,6 +537,12 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
 
     @Override
     public int getCacheSizePerConnection() {
+        // Answer a disposed or never set up binding quietly, as getCacheSize()
+        // does: a JMX read can land in the disposal window, and a benign
+        // monitoring call should not log.
+        if (pcon == null) {
+            return 0;
+        }
         ConcurrentHashMap<CacheKey, CachedStatement> cache = getCache();
         if (cache == null) {
             return 0;
@@ -556,12 +649,16 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
             // does: a disposal (reset(null, null) from a finalize or from an
             // abandoned or closed session) nulls the field, and a handle the
             // application kept through that window must still close through
-            // the normal path - the sibling entry points answer a disposed
-            // cache quietly; this first read has to do the same rather than
-            // dereference the field.
+            // the normal path. The sibling entry points tolerate a disposed
+            // cache and answer false or null - some of them through the
+            // warning in getCache(); this first read has to tolerate it the
+            // same way rather than dereference the field.
             AtomicInteger size = cacheSize;
             boolean shouldClose = true;
-            if (size != null && size.get() < maxCacheSize) {
+            if (size != null && size.get() < maxCacheSize && !trackerBelow()) {
+                // A tracker beneath this cache (see trackerBelow) would close a
+                // parked statement at the connection return, so the park is
+                // refused here and the close falls to the normal path below.
                 // Cache a proxy so that we don't reuse the facade. The
                 // binding to the physical session made at the prepare is
                 // carried over to the parked proxy rather than the delegate
