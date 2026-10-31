@@ -170,9 +170,16 @@ public final class AstFunction extends SimpleNode {
                             // Java semantics: an empty array is passed when no
                             // varargs elements are supplied
                             params[i] = new Object[0];
-                        } else if (inputParameterCount == methodParameterCount &&
-                                isArray(parameters.jjtGetChild(i).getValue(ctx))) {
-                            params[i] = parameters.jjtGetChild(i).getValue(ctx);
+                        } else if (inputParameterCount == methodParameterCount) {
+                            // Evaluate the single argument once: it is either
+                            // the varargs array itself or its only element
+                            Object value = parameters.jjtGetChild(i).getValue(ctx);
+                            if (isArray(value)) {
+                                params[i] = value;
+                            } else {
+                                params[i] = new Object[] { ELSupport.coerceToType(ctx, value,
+                                        paramTypes[i].getComponentType()) };
+                            }
                         } else {
                             Object[] varargs = new Object[inputParameterCount - methodParameterCount + 1];
                             Class<?> target = paramTypes[i].getComponentType();
