@@ -100,9 +100,18 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      * @param pool the connection pool to wrap
      */
     public ConnectionPool(org.apache.tomcat.jdbc.pool.ConnectionPool pool) {
-        // Hand the JMX listener delivery to the notifier thread as well;
-        // see notify(String,String)
-        super(NOTIFIER);
+        // Run the per-listener hand-offs that sendNotification builds on the
+        // thread that calls sendNotification instead of queueing one task per
+        // listener: notify() hands a notification to the notifier as a single
+        // task and calls sendNotification on that thread, so a queued
+        // hand-off would in the end only ever run on the very thread calling
+        // it - and a delivery queue that stayed full could refuse some of
+        // those re-queued tasks after the queue had accepted the notification
+        // as a whole, splitting one notification across its own listeners.
+        // Run inline, the bounded queue sees one task per notification and
+        // accepts or refuses the notification as a whole - see
+        // NOTIFY_QUEUE_CAPACITY and notify(String,String)
+        super(command -> command.run());
         this.pool = pool;
     }
 
@@ -197,32 +206,55 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     /**
      * Reports a condition to the pool's notification listeners.
      * <p>
-     * The delivery is asynchronous: both the listeners reached through JMX - delivered by
-     * {@link #sendNotification(Notification)} - and the ones registered locally with
-     * {@link #addListener(NotificationListener)} receive the notification on the pool's notification thread, not on the
-     * thread that calls this method. The pool raises several of its notifications from the connection lifecycle, some
-     * of them while holding the lock of the connection concerned, and a monitoring listener that is slow or blocked
-     * must not reach those paths. The notification itself is still built on the calling thread, so it carries the time,
-     * sequence number and serializable source of the condition it reports - see {@link #getNotificationSource()} - and,
-     * since the notifier is a single thread, listeners observe notifications in the order the pool reported them.
+     * The delivery is asynchronous: the notification is handed to the pool's notification thread as one task, and that
+     * task delivers it - first through {@link #sendNotification(Notification)} to the listeners reached through JMX,
+     * then to the ones registered locally with {@link #addListener(NotificationListener)}. Nothing of the delivery runs
+     * on the thread that calls this method, not even the JMX listeners' filters: the pool raises several of its
+     * notifications from the connection lifecycle, some of them while holding the lock of the connection concerned,
+     * and a monitoring listener - or a filter - that is slow or blocked must not reach those paths. The notification
+     * itself is still built on the calling thread, so it carries the time, sequence number and serializable source of
+     * the condition it reports - see {@link #getNotificationSource()} - and, since the notifier is a single thread and
+     * delivers a notification to all its listeners in one go, every listener observes the notifications in the order
+     * the pool reported them and a listener registered both through JMX and locally is reached through JMX before it
+     * is reached locally, as it was when delivery was synchronous.
      *
      * @param type    The notification type
      * @param message The message
      *
-     * @return true if the notification was accepted for delivery, false if it was dropped - which happens when the
-     *             delivery queue is full or the notification could not be built. The result reports the handoff only:
-     *             it says nothing about whether any listener was reached or what a listener did with the notification.
+     * @return true if the notification was accepted for delivery as a whole, false if it was dropped as a whole -
+     *             which happens when the delivery queue is full or the notification could not be built. A false means
+     *             nothing was scheduled: no listener will receive this notification. The result otherwise reports the
+     *             handoff only: it says nothing about whether any listener was reached or what a listener did with
+     *             the notification.
      */
     public boolean notify(final String type, String message) {
         try {
             Notification n = new Notification(type, getNotificationSource(), sequence.incrementAndGet(),
                     System.currentTimeMillis(), "[" + type + "] " + message);
-            // Queues the notification for the JMX listeners on the notifier
-            sendNotification(n);
-            // And the same for the local listeners, behind the JMX handoff so
-            // that per notification the listener order stays as it was when
-            // delivery was synchronous
-            NOTIFIER.execute(() -> deliverLocally(n, type));
+            // Hand the notification over as one task: the delivery queue is
+            // then the single gate that accepts or refuses it, so the result
+            // and the drop log below stay true to what was scheduled - a
+            // refusal never means the notification partly reached its
+            // listeners, it means nothing was queued at all. On the notifier
+            // thread the JMX listeners are reached first - the constructor
+            // runs their hand-offs inline, on this thread - and the local
+            // ones next, so a listener registered on both sides is reached
+            // through JMX before it is reached locally, as it was when
+            // delivery was synchronous.
+            NOTIFIER.execute(() -> {
+                try {
+                    sendNotification(n);
+                } catch (Exception x) {
+                    // sendNotification contains what a listener or a filter
+                    // throws, job per job; this catch is a defence against a
+                    // failure escaping it, which must not skip the local
+                    // listeners of this notification
+                    if (log.isDebugEnabled()) {
+                        log.debug("JMX notification hand-off failed. Type=" + type, x);
+                    }
+                }
+                deliverLocally(n, type);
+            });
             return true;
         } catch (RejectedExecutionException x) {
             // The delivery queue is full; dropping the notification is the
