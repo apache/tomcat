@@ -805,6 +805,11 @@
   </subsection>
   <subsection name="Cluster">
     <changelog>
+      <docs>
+        Expand the Tribes transport documentation to describe the current NIO
+        sender and receiver pipeline, TCP and UDP selection, delivery options,
+        configuration and security considerations. (sainadh777)
+      </docs>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
         When the cluster receiver automatically binds to a port other than the
