@@ -221,9 +221,15 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
     /**
      * Thin proxy around a tracked statement. Every call is delegated unchanged; only <code>close()</code> is reacted
      * to, by forgetting the tracked entry so that a statement the application closed properly neither lingers in the
-     * list nor is touched again when the connection is returned. Identity follows the statement underneath: the proxy
-     * is equal to itself and to its delegate, and hashes like its delegate, though the delegate's own equality -
-     * typically identity - will not recognise the proxy in the other direction.
+     * list nor is touched again when the connection is returned.
+     * <p>
+     * <code>Object.equals(Object)</code> and <code>hashCode()</code> are answered on the handle itself, as
+     * {@link org.apache.tomcat.jdbc.pool.ProxyConnection} and the pool's other statement proxies answer them: the
+     * handle equals only itself and hashes at its own identity. A container that holds this handle next to an
+     * unwrapped handle for the same statement therefore holds two elements, whichever of the two was added first,
+     * instead of resolving the pair to one element or the other by insertion order. The statement underneath stays a
+     * distinct object that the handle compares equal to in neither direction; reaching it is <code>unwrap</code>'s
+     * purpose, and there the driver's own equality applies, as it does for the statement facade's handle above.
      */
     protected class CloseAwareProxy implements InvocationHandler {
         private final StatementEntry entry;
@@ -240,14 +246,24 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             if (compare(EQUALS_VAL, method)) {
-                // Identity of the handle the application holds, else the
-                // statement underneath - a proxy that answered equals by
-                // delegating would not be equal to itself.
-                Object other = args[0];
-                return Boolean.valueOf(other == proxy || entry.getStatement().equals(other));
+                // The identity of the handle the application holds, and
+                // nothing else, as ProxyConnection answers it too. Equality
+                // was delegated to the statement underneath, which made the
+                // handle equal to a statement that - answering by its own
+                // equality, typically identity - did not answer equal to the
+                // handle back. That one-sided relation is what
+                // Object.equals(Object) rules out, and it decided membership
+                // of a container holding both objects by insertion order:
+                // the same pair hashed alike and came out as one element or
+                // two depending on which was added first.
+                Object other = (args == null || args.length == 0) ? null : args[0];
+                return Boolean.valueOf(proxy == other);
             }
             if (compare(HASHCODE_VAL, method)) {
-                return Integer.valueOf(entry.getStatement().hashCode());
+                // The hash that goes with the identity above: the handle's
+                // own, so that it keeps the same place in a hash container
+                // whatever it is compared against.
+                return Integer.valueOf(System.identityHashCode(proxy));
             }
             Object result;
             try {
