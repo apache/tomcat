@@ -39,6 +39,7 @@ import javax.naming.spi.ObjectFactory;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ClassLoaderUtil;
+import org.apache.tomcat.jdbc.pool.util.ExceptionUtils;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
@@ -127,14 +128,10 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
             ne.setRootCause(e);
             throw ne;
         } catch (InvocationTargetException e) {
-            // The class has a no-argument constructor, but it threw. Propagate
-            // only a fatal VirtualMachineError, in the spirit of
-            // ExceptionUtils.handleThrowable(), which tomcat-jdbc.jar cannot
-            // use directly.
-            Throwable cause = e.getCause();
-            if (cause instanceof VirtualMachineError) {
-                throw (VirtualMachineError) cause;
-            }
+            // The class has a no-argument constructor, but it threw.
+            // ExceptionUtils.handleThrowable(e.getCause()) propagates a fatal
+            // VirtualMachineError and accepts everything else for reporting.
+            ExceptionUtils.handleThrowable(e.getCause());
             NamingException ne =
                     new NamingException(MessageFactory.get("genericNamingResourcesFactory.constructorThrew", type, name));
             ne.setRootCause(e);
@@ -408,15 +405,13 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
                     name, o.getClass().getName()), iae);
             return SetResult.REPORTED;
         } catch (InvocationTargetException ie) {
-            // In the spirit of ExceptionUtils.handleThrowable(), which is not
-            // available to tomcat-jdbc.jar: propagate the fatal
-            // VirtualMachineError from the setter and report everything else.
-            // The configured value is deliberately not echoed: a failing
-            // password setter would otherwise write the secret to the log.
+            // ExceptionUtils.handleThrowable() propagates the fatal
+            // VirtualMachineError from the setter and accepts everything
+            // else for reporting. The configured value is deliberately not
+            // echoed: a failing password setter would otherwise write the
+            // secret to the log.
             Throwable cause = ie.getCause();
-            if (cause instanceof VirtualMachineError) {
-                throw (VirtualMachineError) cause;
-            }
+            ExceptionUtils.handleThrowable(cause);
             log.warn(MessageFactory.get("genericNamingResourcesFactory.setterThrew",
                     name, o.getClass().getName()), ie);
             return SetResult.REPORTED;
