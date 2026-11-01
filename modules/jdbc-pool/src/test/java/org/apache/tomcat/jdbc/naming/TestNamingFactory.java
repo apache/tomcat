@@ -61,6 +61,19 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
         return ref;
     }
 
+    /*
+     * A property that cannot be applied fails the lookup: the partially
+     * configured object must never be returned, for a singleton resource
+     * the container caches whatever object the factory returns. Targets
+     * that a test must inspect despite the failure self-register in the
+     * constructor, which runs before any property is applied.
+     */
+    private void assertLookupFails(Reference ref, String boundName) {
+        Assertions.assertThrows(NamingException.class,
+                () -> new GenericNamingResourcesFactory().getObjectInstance(
+                        ref, new CompositeName(boundName), null, null));
+    }
+
     @Test
     void referenceProducesWorkingConfiguredPool() throws Exception {
         Name name = new CompositeName("jdbc/FunctionalDS");
@@ -243,6 +256,108 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
         Assertions.assertTrue(target.isEnabled());
     }
 
+    @Test
+    void namingFactoryAppliesTheReferenceImplementationTypes()
+            throws Exception {
+        // BeanFactory converts all of these; the generic factory must not
+        // drop properties that the reference implementation configures
+        Reference ref = new Reference(WideTarget.class.getName(), null, null);
+        ref.add(new StringRefAddr("small", "7"));
+        ref.add(new StringRefAddr("tiny", "-3"));
+        ref.add(new StringRefAddr("ratio", "1.5"));
+        ref.add(new StringRefAddr("precise", "0.25"));
+        ref.add(new StringRefAddr("initial", "configured"));
+        ref.add(new StringRefAddr("boxed", "x"));
+
+        Object result = new GenericNamingResourcesFactory().getObjectInstance(
+                ref, new CompositeName("test/wide"), null, null);
+        Assertions.assertInstanceOf(WideTarget.class, result);
+        WideTarget target = (WideTarget) result;
+        Assertions.assertEquals((short) 7, target.getSmall());
+        Assertions.assertEquals((byte) -3, target.getTiny());
+        Assertions.assertEquals(1.5f, target.getRatio(), 0.0f);
+        Assertions.assertEquals(0.25d, target.getPrecise(), 0.0d);
+        Assertions.assertEquals('c', target.getInitial());
+        Assertions.assertEquals(Character.valueOf('x'), target.getBoxed());
+    }
+
+    @Test
+    void outOfRangeNumberFailsTheLookupNamingTheProperty() throws Exception {
+        Reference ref = new Reference(WideTarget.class.getName(), null, null);
+        // no short can hold this: the conversion must fail and, like every
+        // other unapplied property, fail the lookup
+        ref.add(new StringRefAddr("small", "99999"));
+
+        NamingException e = Assertions.assertThrows(NamingException.class,
+                () -> new GenericNamingResourcesFactory().getObjectInstance(
+                        ref, new CompositeName("test/widebad"), null, null));
+        Assertions.assertTrue(e.getMessage().contains("small"),
+                "the failure must name the property, was: " + e.getMessage());
+    }
+
+    @Test
+    void missingContentIsNotAppliedToAStringSetter() throws Exception {
+        Reference ref = new Reference(NamingTarget.class.getName(), null, null);
+        // pre-fix the String setter received a fabricated null, wiping the
+        // configured default and reporting success; missing content is not
+        // a value to apply, to a String setter no less than to a typed one
+        NamingTarget.last = null;
+        ref.add(new StringRefAddr("name", null));
+
+        assertLookupFails(ref, "test/nullstring");
+        NamingTarget target = NamingTarget.last;
+        Assertions.assertNotNull(target);
+        Assertions.assertEquals("untitled", target.getName(),
+                "the default must survive an address with no content");
+    }
+
+    /** Target with the numeric and character setters BeanFactory supports. */
+    public static class WideTarget {
+        private short small;
+        private byte tiny;
+        private float ratio;
+        private double precise;
+        private char initial;
+        private Character boxed;
+
+        public short getSmall() {
+            return small;
+        }
+        public void setSmall(short small) {
+            this.small = small;
+        }
+        public byte getTiny() {
+            return tiny;
+        }
+        public void setTiny(byte tiny) {
+            this.tiny = tiny;
+        }
+        public float getRatio() {
+            return ratio;
+        }
+        public void setRatio(float ratio) {
+            this.ratio = ratio;
+        }
+        public double getPrecise() {
+            return precise;
+        }
+        public void setPrecise(double precise) {
+            this.precise = precise;
+        }
+        public char getInitial() {
+            return initial;
+        }
+        public void setInitial(char initial) {
+            this.initial = initial;
+        }
+        public Character getBoxed() {
+            return boxed;
+        }
+        public void setBoxed(Character boxed) {
+            this.boxed = boxed;
+        }
+    }
+
     /*
      * An address that carries no content is a value the factory cannot
      * convert, not a value to fabricate: Boolean.valueOf(null or "") is
@@ -289,12 +404,11 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
             ref.add(new StringRefAddr("addr", null));
             ref.add(new StringRefAddr("host", ""));
 
-            Object result = new GenericNamingResourcesFactory()
-                    .getObjectInstance(
-                            ref, new CompositeName("test/converted"),
-                            null, null);
-            Assertions.assertInstanceOf(ConvertedTarget.class, result);
-            ConvertedTarget target = (ConvertedTarget) result;
+            ConvertedTarget.last = null;
+            assertLookupFails(ref, "test/converted");
+            ConvertedTarget target = ConvertedTarget.last;
+            Assertions.assertNotNull(target,
+                    "the object is created before properties are applied");
             for (String property : new String[] { "enabled", "checked",
                     "flag", "marker", "addr", "host" }) {
                 Assertions.assertFalse(target.isInvoked(property),
@@ -364,8 +478,97 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
                 target.getHost());
     }
 
+    /*
+     * Boolean.valueOf() maps everything that is not exactly "true" (ignore
+     * case) to false: whitespace-padded and misspelled configuration values
+     * were silently applied as false and reported as a successful set. The
+     * boolean conversion must accept only content that spells a boolean,
+     * like the pool's own DataSourceFactory.parseBoolean() does; anything
+     * else must leave the setter uninvoked and be reported as not applied.
+     */
+
+    @Test
+    void unrecognizedBooleanContentIsNotAppliedAsFalse() throws Exception {
+        Logger logger = Logger.getLogger(
+                GenericNamingResourcesFactory.class.getName());
+        Level originalLevel = logger.getLevel();
+        final List<LogRecord> records = new ArrayList<>();
+        Handler handler = new Handler() {
+            @Override
+            public void publish(LogRecord record) {
+                records.add(record);
+            }
+            @Override
+            public void flush() {
+                // no buffering
+            }
+            @Override
+            public void close() {
+                // nothing to release
+            }
+        };
+        logger.addHandler(handler);
+        logger.setLevel(Level.FINEST);
+        try {
+            Reference ref = new Reference(ConvertedTarget.class.getName(),
+                    null, null);
+            // the realistic configuration mistakes: a value padded by an XML
+            // line wrap, a synonym and a typo. Pre-fix every one of these
+            // was applied as false with no diagnostic.
+            ref.add(new StringRefAddr("checked", "Yes"));
+            ref.add(new StringRefAddr("flag", "1"));
+            ref.add(new StringRefAddr("marker", "ture"));
+            // surrounding whitespace around genuine content is still
+            // accepted, like DataSourceFactory.parseBoolean() does
+            ref.add(new StringRefAddr("enabled", " True "));
+
+            ConvertedTarget.last = null;
+            // checked/flag/marker are not applicable, so the lookup fails;
+            // enabled=" True " is applied first, verified via the target's
+            // self-registration before the failure
+            assertLookupFails(ref, "test/badboolean");
+            ConvertedTarget target = ConvertedTarget.last;
+            Assertions.assertNotNull(target);
+            Assertions.assertTrue(target.isEnabled(),
+                    "\" True \" is a padded true and must be applied");
+            for (String property : new String[] { "checked", "flag",
+                    "marker" }) {
+                Assertions.assertFalse(target.isInvoked(property),
+                        "the setter for [" + property
+                                + "] must not be invoked with content that"
+                                + " does not spell a boolean");
+            }
+            Assertions.assertFalse(target.isChecked());
+            Assertions.assertNull(target.getFlag(),
+                    "the default must survive unrecognized content");
+            Assertions.assertNull(target.getMarker(),
+                    "the default must survive unrecognized content");
+        } finally {
+            logger.removeHandler(handler);
+            logger.setLevel(originalLevel);
+        }
+        for (String property : new String[] { "checked", "flag",
+                "marker" }) {
+            boolean warned = false;
+            for (LogRecord record : records) {
+                if (record.getLevel().intValue() >= Level.WARNING.intValue()
+                        && record.getMessage() != null
+                        && record.getMessage().contains("[" + property + "]")) {
+                    warned = true;
+                    break;
+                }
+            }
+            Assertions.assertTrue(warned, "failure to apply property ["
+                    + property
+                    + "] must be reported at warn level or above");
+        }
+    }
+
     /** Target with primitive and boxed boolean and InetAddress setters. */
     public static class ConvertedTarget {
+        // set by the constructor so a test can inspect the created object
+        // even when the factory fails the lookup before returning it
+        static ConvertedTarget last;
         private final java.util.Set<String> invoked =
                 new java.util.HashSet<>();
         private boolean enabled;
@@ -374,6 +577,10 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
         private Boolean marker;
         private java.net.InetAddress addr;
         private java.net.InetAddress host;
+
+        public ConvertedTarget() {
+            last = this;
+        }
 
         public boolean isInvoked(String name) {
             return invoked.contains(name);
@@ -431,10 +638,10 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
         // null argument, wiping the configured default.
         ref.add(new StringRefAddr("props", "anything"));
 
-        Object result = new GenericNamingResourcesFactory().getObjectInstance(
-                ref, new CompositeName("test/unsupported"), null, null);
-        Assertions.assertInstanceOf(UnsupportedTypeTarget.class, result);
-        UnsupportedTypeTarget target = (UnsupportedTypeTarget) result;
+        UnsupportedTypeTarget.last = null;
+        assertLookupFails(ref, "test/unsupported");
+        UnsupportedTypeTarget target = UnsupportedTypeTarget.last;
+        Assertions.assertNotNull(target);
         Assertions.assertFalse(target.isPropsInvoked(),
                 "setter with an unsupported parameter type must not be "
                         + "invoked with a null value");
@@ -452,10 +659,10 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
         // must not be invoked with null instead.
         ref.add(new StringRefAddr("port", "12o"));
 
-        Object result = new GenericNamingResourcesFactory().getObjectInstance(
-                ref, new CompositeName("test/overloaded"), null, null);
-        Assertions.assertInstanceOf(OverloadedTarget.class, result);
-        OverloadedTarget target = (OverloadedTarget) result;
+        OverloadedTarget.last = null;
+        assertLookupFails(ref, "test/overloaded");
+        OverloadedTarget target = OverloadedTarget.last;
+        Assertions.assertNotNull(target);
         Assertions.assertFalse(target.isPropsInvoked(),
                 "the unsupported overload must not be invoked with null when "
                         + "the numeric conversion fails");
@@ -465,10 +672,15 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
 
     /** Target with a setter of a type the factory cannot convert to. */
     public static class UnsupportedTypeTarget {
+        static UnsupportedTypeTarget last;
         static final java.util.Properties DEFAULT_PROPS =
                 new java.util.Properties();
         private java.util.Properties props = DEFAULT_PROPS;
         private boolean propsInvoked;
+
+        public UnsupportedTypeTarget() {
+            last = this;
+        }
 
         public java.util.Properties getProps() {
             return props;
@@ -484,9 +696,14 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
 
     /** Target with an overloaded setter, one supported and one not. */
     public static class OverloadedTarget {
+        static OverloadedTarget last;
         private int port = -1;
         private java.util.Properties props;
         private boolean propsInvoked;
+
+        public OverloadedTarget() {
+            last = this;
+        }
 
         public int getPort() {
             return port;
@@ -576,12 +793,10 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
             // one can accept those arguments
             ref.add(new StringRefAddr("whatever", "v"));
 
-            Object result = new GenericNamingResourcesFactory()
-                    .getObjectInstance(
-                            ref, new CompositeName("test/decoy"), null, null);
-            Assertions.assertInstanceOf(DecoySetPropertyTarget.class, result);
+            DecoySetPropertyTarget.last = null;
+            assertLookupFails(ref, "test/decoy");
             Assertions.assertFalse(
-                    ((DecoySetPropertyTarget) result).isInvoked(),
+                    DecoySetPropertyTarget.last.isInvoked(),
                     "a setProperty overload the factory cannot call with the "
                             + "configured name and value must not run");
         } finally {
@@ -613,7 +828,12 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
      * invoked with two arguments, fails reflectively.
      */
     public static class DecoySetPropertyTarget {
+        static DecoySetPropertyTarget last;
         private boolean invoked;
+
+        public DecoySetPropertyTarget() {
+            last = this;
+        }
 
         public boolean isInvoked() {
             return invoked;
@@ -702,7 +922,113 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
     }
 
     @Test
-    void propertySetFailuresAreReportedAsWarnings() throws Exception {
+    void boxedBooleanBagRefusalFailsTheLookup() throws Exception {
+        Reference ref = new Reference(RefusingBoxedBagTarget.class.getName(),
+                null, null);
+        // pre-fix the boxed java.lang.Boolean return landed in the
+        // fire-and-forget bucket: the bag's refusal was counted as applied
+        // and the unconfigured object was returned
+        ref.add(new StringRefAddr("anything", "v"));
+
+        NamingException e = Assertions.assertThrows(NamingException.class,
+                () -> new GenericNamingResourcesFactory().getObjectInstance(
+                        ref, new CompositeName("test/boxedrefuse"),
+                        null, null));
+        Assertions.assertTrue(e.getMessage().contains("anything"),
+                "the failure must name the refused property, was: "
+                        + e.getMessage());
+    }
+
+    @Test
+    void boxedBooleanBagAcceptanceApplies() throws Exception {
+        Reference ref = new Reference(AcceptingBoxedBagTarget.class.getName(),
+                null, null);
+        ref.add(new StringRefAddr("databaseName", "sample"));
+
+        Object result = new GenericNamingResourcesFactory().getObjectInstance(
+                ref, new CompositeName("test/boxedaccept"), null, null);
+        Assertions.assertInstanceOf(AcceptingBoxedBagTarget.class, result);
+        Assertions.assertEquals(java.util.Collections.singletonMap(
+                        "databaseName", "sample"),
+                ((AcceptingBoxedBagTarget) result).getBag(),
+                "a boxed Boolean bag that returns TRUE must apply like "
+                        + "the primitive boolean one");
+    }
+
+    /** Property bag whose boxed Boolean return refuses every property. */
+    public static class RefusingBoxedBagTarget {
+        public Boolean setProperty(@SuppressWarnings("unused") String name,
+                @SuppressWarnings("unused") String value) {
+            return Boolean.FALSE;
+        }
+    }
+
+    /** Property bag whose boxed Boolean return accepts every property. */
+    public static class AcceptingBoxedBagTarget {
+        private final java.util.Map<String, String> bag =
+                new java.util.LinkedHashMap<>();
+
+        public Boolean setProperty(String name, String value) {
+            bag.put(name, value);
+            return Boolean.TRUE;
+        }
+        public java.util.Map<String, String> getBag() {
+            return bag;
+        }
+    }
+
+    @Test
+    void conversionFailureIsNotAbsorbedByThePropertyBag() throws Exception {
+        Reference ref = new Reference(
+                TypedSetterAndBagTarget.class.getName(), null, null);
+        // setCount(int) matches the property but the value does not build an
+        // int; pre-fix the permissive bag was still consulted, so the typo
+        // landed in the bag, the bean property kept its default and the
+        // lookup reported success
+        TypedSetterAndBagTarget.last = null;
+        ref.add(new StringRefAddr("count", "12o"));
+
+        NamingException e = Assertions.assertThrows(NamingException.class,
+                () -> new GenericNamingResourcesFactory().getObjectInstance(
+                        ref, new CompositeName("test/mixedbag"),
+                        null, null));
+        Assertions.assertTrue(e.getMessage().contains("count"),
+                "the failure must name the property, was: " + e.getMessage());
+        TypedSetterAndBagTarget target = TypedSetterAndBagTarget.last;
+        Assertions.assertNotNull(target);
+        Assertions.assertEquals(-1, target.getCount());
+        Assertions.assertTrue(target.getBag().isEmpty(),
+                "the bag must not absorb a value the typed setter rejected, "
+                        + "bag was: " + target.getBag());
+    }
+
+    /** Target with a typed setter and a permissive property bag. */
+    public static class TypedSetterAndBagTarget {
+        static TypedSetterAndBagTarget last;
+        private int count = -1;
+        private final java.util.Map<String, String> bag =
+                new java.util.LinkedHashMap<>();
+
+        public TypedSetterAndBagTarget() {
+            last = this;
+        }
+
+        public void setProperty(String name, String value) {
+            bag.put(name, value);
+        }
+        public void setCount(int count) {
+            this.count = count;
+        }
+        public int getCount() {
+            return count;
+        }
+        public java.util.Map<String, String> getBag() {
+            return bag;
+        }
+    }
+
+    @Test
+    void unappliedPropertiesFailTheLookupAndAreReportedAsWarnings() throws Exception {
         Logger logger = Logger.getLogger(
                 GenericNamingResourcesFactory.class.getName());
         Level originalLevel = logger.getLevel();
@@ -733,12 +1059,25 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
             // the matched setter throws
             ref.add(new StringRefAddr("boom", "go"));
 
-            Object result = new GenericNamingResourcesFactory()
-                    .getObjectInstance(
-                            ref, new CompositeName("test/warn"), null, null);
-            Assertions.assertInstanceOf(WarnTarget.class, result);
-            // the half-configured object is still returned, as documented
-            Assertions.assertEquals(-1, ((WarnTarget) result).getCount());
+            // a property that cannot be applied fails the lookup: the
+            // half-configured object must not be returned, for a singleton
+            // resource the container would cache it for every later lookup
+            NamingException e = Assertions.assertThrows(
+                    NamingException.class,
+                    () -> new GenericNamingResourcesFactory()
+                            .getObjectInstance(
+                                    ref, new CompositeName("test/warn"),
+                                    null, null));
+            for (String property : new String[] { "count", "noSuchProperty",
+                    "boom" }) {
+                Assertions.assertTrue(e.getMessage().contains(property),
+                        "the failure must name the unapplied property ["
+                                + property + "], was: " + e.getMessage());
+            }
+            Assertions.assertTrue(
+                    e.getMessage().contains(WarnTarget.class.getName()),
+                    "the failure must name the resource class, was: "
+                            + e.getMessage());
         } finally {
             logger.removeHandler(handler);
             logger.setLevel(originalLevel);
@@ -759,6 +1098,75 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
         }
     }
 
+    /*
+     * A failing setter must not write the configured value to the log: the
+     * property may well be a password, and the warn level is on by default.
+     * The real cause is reported once, by setProperty; the caller must not
+     * add a second, misleading "no usable setter found" warning on top.
+     */
+
+    @Test
+    void failureLogsDoNotEchoConfiguredValues() throws Exception {
+        Logger logger = Logger.getLogger(
+                GenericNamingResourcesFactory.class.getName());
+        Level originalLevel = logger.getLevel();
+        final List<LogRecord> records = new ArrayList<>();
+        Handler handler = new Handler() {
+            @Override
+            public void publish(LogRecord record) {
+                records.add(record);
+            }
+            @Override
+            public void flush() {
+                // no buffering
+            }
+            @Override
+            public void close() {
+                // nothing to release
+            }
+        };
+        logger.addHandler(handler);
+        logger.setLevel(Level.WARNING);
+        final String secret = "S3cr3t-Pa55word";
+        NamingException thrown;
+        try {
+            Reference ref = new Reference(WarnTarget.class.getName(),
+                    null, null);
+            // the matched setter throws with the secret in hand: pre-fix the
+            // WARN line echoed the value, and the caller added a second WARN
+            // claiming no usable setter had been found
+            ref.add(new StringRefAddr("password", secret));
+
+            thrown = Assertions.assertThrows(NamingException.class,
+                    () -> new GenericNamingResourcesFactory()
+                            .getObjectInstance(
+                                    ref, new CompositeName("test/secret"),
+                                    null, null));
+        } finally {
+            logger.removeHandler(handler);
+            logger.setLevel(originalLevel);
+        }
+        Assertions.assertFalse(thrown.getMessage().contains(secret),
+                "the failure must not echo the configured value, was: "
+                        + thrown.getMessage());
+        int reported = 0;
+        for (LogRecord record : records) {
+            Assertions.assertFalse(
+                    record.getMessage() != null
+                            && record.getMessage().contains(secret),
+                    "a failing setter must not write the configured value to"
+                            + " the log: " + record.getMessage());
+            if (record.getLevel().intValue() >= Level.WARNING.intValue()
+                    && record.getMessage() != null
+                    && record.getMessage().contains("[password]")) {
+                reported++;
+            }
+        }
+        Assertions.assertEquals(1, reported,
+                "the failing setter must be reported once, at warn level, "
+                        + "without a duplicate claim of a missing setter");
+    }
+
     /** Target exercising the property-set failure paths. */
     public static class WarnTarget {
         private int count = -1;
@@ -771,6 +1179,9 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
         }
         public void setBoom(@SuppressWarnings("unused") String value) {
             throw new IllegalStateException("setter always fails");
+        }
+        public void setPassword(@SuppressWarnings("unused") String password) {
+            throw new IllegalStateException("password setter always fails");
         }
     }
 
@@ -833,10 +1244,15 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
 
     /** Plain configuration target for the generic naming factory. */
     public static class NamingTarget {
-        private String name;
+        static NamingTarget last;
+        private String name = "untitled";
         private int count;
         private long ratio;
         private boolean enabled;
+
+        public NamingTarget() {
+            last = this;
+        }
 
         public String getName() {
             return name;
