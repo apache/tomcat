@@ -664,6 +664,13 @@
         Detect and disconnect a mis-behaving HTTP/2 client that sends large
         numbers of unexpected settings acknowledgement frames. (markt)
       </fix>
+      <add>
+        Add the <code>dropConnectionOnErrorStatus</code> attribute to the HTTP/1.1
+        connector to allow the closing of the connection after a response with
+        selected 4xx and 5xx status codes to be disabled, reducing the resources
+        used to re-establish those connections. The default value of
+        <code>true</code> retains the current behaviour. (ooeunz)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">

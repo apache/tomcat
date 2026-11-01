@@ -408,6 +408,7 @@ public class Http11Processor extends AbstractProcessor {
                     // If we fail here, then the response is likely already
                     // committed, so we can't try and set headers.
                     if (keepAlive && !getErrorState().isError() && !isAsync() &&
+                            protocol.getDropConnectionOnErrorStatus() &&
                             statusDropsConnection(response.getStatus())) {
                         setErrorState(ErrorState.CLOSE_CLEAN, null);
                     }
@@ -1028,7 +1029,8 @@ public class Http11Processor extends AbstractProcessor {
 
         // If we know that the request is bad this early, add the
         // Connection: close header.
-        if (keepAlive && statusDropsConnection(statusCode)) {
+        if (keepAlive && statusDropsConnection(statusCode) &&
+                (protocol.getDropConnectionOnErrorStatus() || getErrorState().isError())) {
             keepAlive = false;
         }
         if (!keepAlive) {

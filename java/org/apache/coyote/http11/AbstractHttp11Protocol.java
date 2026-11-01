@@ -212,6 +212,30 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
+    private boolean dropConnectionOnErrorStatus = true;
+
+    /**
+     * Get the flag that controls whether the connection is closed after a response with a status code from the list of
+     * codes that Tomcat treats as requiring the connection to be closed. Errors that make it unsafe to continue to use
+     * the connection, such as requests that can not be parsed, always close the connection regardless of this setting.
+     *
+     * @return {@code true} if the connection will be closed after such a response
+     */
+    public boolean getDropConnectionOnErrorStatus() {
+        return dropConnectionOnErrorStatus;
+    }
+
+    /**
+     * Set the flag that controls whether the connection is closed after a response with a status code from the list of
+     * codes that Tomcat treats as requiring the connection to be closed.
+     *
+     * @param dropConnectionOnErrorStatus {@code true} if the connection should be closed after such a response
+     */
+    public void setDropConnectionOnErrorStatus(boolean dropConnectionOnErrorStatus) {
+        this.dropConnectionOnErrorStatus = dropConnectionOnErrorStatus;
+    }
+
+
     private String relaxedPathChars = null;
 
     /**

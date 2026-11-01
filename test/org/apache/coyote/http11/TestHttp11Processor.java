@@ -29,6 +29,7 @@ import java.io.Writer;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.net.SocketException;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -1782,6 +1783,178 @@ public class TestHttp11Processor extends TomcatBaseTest {
                 Assert.assertEquals(1, connectionHeaders.size());
                 Assert.assertEquals("close", connectionHeaders.get(0));
                 Assert.assertNull(keepAliveHeaderValue);
+            }
+        }
+    }
+
+
+    @Test
+    public void testDropConnectionOnErrorStatusDefault() throws Exception {
+        Client client = startDropConnectionTest(null, null);
+        client.setRequest(new String[] { dropConnectionRequest("GET", "/error", "") });
+        client.processRequest(true);
+
+        Assert.assertTrue(client.isResponse50x());
+        assertConnectionClosedAfterResponse(client);
+    }
+
+
+    @Test
+    public void testDropConnectionOnErrorStatusDisabled() throws Exception {
+        Client client = startDropConnectionTest("false", null);
+        client.setRequest(new String[] { dropConnectionRequest("GET", "/error", "") });
+        client.processRequest(true);
+
+        Assert.assertTrue(client.isResponse50x());
+        Assert.assertNull(getConnectionHeader(client));
+        assertConnectionReusable(client);
+    }
+
+
+    @Test
+    public void testDropConnectionOnErrorStatusDisabledInvalidRequestLine() throws Exception {
+        Client client = startDropConnectionTest("false", null);
+        client.setRequest(new String[] { "GET /foo\u0001 HTTP/1.1" + CRLF + "Host: localhost" + CRLF + CRLF });
+        client.processRequest(true);
+
+        Assert.assertTrue(client.isResponse400());
+        assertConnectionClosedAfterResponse(client);
+    }
+
+
+    @Test
+    public void testDropConnectionOnErrorStatusDisabledMissingHost() throws Exception {
+        Client client = startDropConnectionTest("false", null);
+        client.setRequest(new String[] { "GET /foo HTTP/1.1" + CRLF + CRLF });
+        client.processRequest(true);
+
+        Assert.assertTrue(client.isResponse400());
+        assertConnectionClosedAfterResponse(client);
+    }
+
+
+    @Test
+    public void testDropConnectionOnErrorStatusDisabledUnsupportedEncoding() throws Exception {
+        Client client = startDropConnectionTest("false", null);
+        // @formatter:off
+        String request =
+                "POST /foo HTTP/1.1" + CRLF +
+                "Host: localhost" + CRLF +
+                "Transfer-Encoding: unsupported" + CRLF +
+                CRLF;
+        // @formatter:on
+        client.setRequest(new String[] { request });
+        client.processRequest(true);
+
+        Assert.assertTrue(client.isResponse50x());
+        Assert.assertTrue(client.getResponseLine(), client.getResponseLine().contains(" 501"));
+        assertConnectionClosedAfterResponse(client);
+    }
+
+
+    @Test
+    public void testDropConnectionOnErrorStatusDisabledSwallowBody() throws Exception {
+        Client client = startDropConnectionTest("false", null);
+        client.setRequest(new String[] { dropConnectionRequest("POST", "/error", "0123456789") });
+        client.processRequest(true);
+
+        Assert.assertTrue(client.isResponse50x());
+        Assert.assertNull(getConnectionHeader(client));
+        // The next request will fail to parse if the unread body was not swallowed
+        assertConnectionReusable(client);
+    }
+
+
+    @Test
+    public void testDropConnectionOnErrorStatusDisabledBodyExceedsMaxSwallowSize() throws Exception {
+        Client client = startDropConnectionTest("false", "10");
+        client.setRequest(new String[] { dropConnectionRequest("POST", "/error", "0123456789ABCDEF") });
+        client.processRequest(true);
+
+        Assert.assertTrue(client.isResponse50x());
+        assertConnectionClosedAfterResponse(client);
+    }
+
+
+    private Client startDropConnectionTest(String dropConnectionOnErrorStatus, String maxSwallowSize)
+            throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        if (dropConnectionOnErrorStatus != null) {
+            Assert.assertTrue(
+                    tomcat.getConnector().setProperty("dropConnectionOnErrorStatus", dropConnectionOnErrorStatus));
+        }
+        if (maxSwallowSize != null) {
+            Assert.assertTrue(tomcat.getConnector().setProperty("maxSwallowSize", maxSwallowSize));
+        }
+
+        // No file system docBase required
+        Context ctx = getProgrammaticRootContext();
+
+        Tomcat.addServlet(ctx, "ErrorStatusServlet", new ErrorStatusServlet());
+        ctx.addServletMapping("/*", "ErrorStatusServlet");
+
+        tomcat.start();
+
+        Client client = new Client(tomcat.getConnector().getLocalPort());
+        client.setUseContentLength(true);
+        client.connect();
+        return client;
+    }
+
+
+    private static String dropConnectionRequest(String method, String path, String body) {
+        // @formatter:off
+        return method + " " + path + " HTTP/1.1" + CRLF +
+                "Host: localhost" + CRLF +
+                (body.isEmpty() ? "" : "Content-Length: " + body.length() + CRLF) +
+                CRLF +
+                body;
+        // @formatter:on
+    }
+
+
+    private static String getConnectionHeader(Client client) {
+        for (String header : client.getResponseHeaders()) {
+            if (header.regionMatches(true, 0, "Connection:", 0, 11)) {
+                return header.substring(11).trim();
+            }
+        }
+        return null;
+    }
+
+
+    private static void assertConnectionClosedAfterResponse(Client client) throws IOException {
+        Assert.assertEquals("close", getConnectionHeader(client));
+        try {
+            Assert.assertNull(client.readLine());
+        } catch (SocketException e) {
+            // A TCP reset also shows that the server closed the connection
+        }
+    }
+
+
+    private static void assertConnectionReusable(Client client) throws Exception {
+        client.setRequest(new String[] { dropConnectionRequest("GET", "/ok", "") });
+        client.processRequest(true);
+
+        Assert.assertTrue(client.getResponseLine(), client.isResponse200());
+        Assert.assertEquals("OK", client.getResponseBody());
+    }
+
+
+    private static final class ErrorStatusServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void service(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+            if (req.getRequestURI().equals("/error")) {
+                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            } else {
+                resp.setContentType("text/plain");
+                resp.setContentLength(2);
+                resp.getWriter().print("OK");
             }
         }
     }

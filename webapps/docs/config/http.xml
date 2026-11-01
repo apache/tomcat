@@ -557,6 +557,17 @@
       </p>
     </attribute>
 
+    <attribute name="dropConnectionOnErrorStatus" required="false">
+      <p>(bool) Use this attribute to control whether the connection is closed
+      after a response with a status code of 400, 408, 411, 413, 414, 500, 501
+      or 503. If set to <code>false</code>, the connection may be re-used for
+      further requests after such a response. The connection will still be
+      closed if it is not safe to re-use it, for example if the request could
+      not be parsed, if the request used an unsupported transfer encoding or if
+      the unread part of the request body exceeds <strong>maxSwallowSize</strong>.
+      If not specified, this attribute is set to <code>true</code>.</p>
+    </attribute>
+
     <attribute name="executor" required="false">
       <p>A reference to the name in an <a href="executor.html">Executor</a>
       element. If this attribute is set, and the named executor exists, the
