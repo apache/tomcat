@@ -764,6 +764,8 @@
     <attributes>
       <attribute name="threshold" required="false">
         <p>(int as String) The number of milliseconds a query has to exceed before issuing a log alert.
+           A negative value (conventionally <code>-1</code>) records every execution as measured and
+           reports none as slow, so nothing is ever logged or notified as a slow query.
            The default value is <code>1000</code> milliseconds.
         </p>
       </attribute>

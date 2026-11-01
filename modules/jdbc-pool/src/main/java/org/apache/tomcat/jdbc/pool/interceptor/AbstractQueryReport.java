@@ -99,7 +99,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      *
      * @param query the query that was executed and failed
      * @param args  the arguments to the execution
-     * @param name  the name of the method used to execute
+     * @param name  the name of the method used to execute, as recognised by
      *                  {@link AbstractCreateStatementInterceptor#isExecute(Method, boolean)}
      * @param start the wall clock time the query execution started
      * @param delta the time the execution took before it failed, measured with the monotonic clock
@@ -118,9 +118,9 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      * {@link AbstractCreateStatementInterceptor#isExecute(Method, boolean)}, succeeded and was within the timing
      * threshold
      *
-     * @param query the query that was executed and failed
+     * @param query the query that was executed
      * @param args  the arguments to the execution
-     * @param name  the name of the method used to execute
+     * @param name  the name of the method used to execute, as recognised by
      *                  {@link AbstractCreateStatementInterceptor#isExecute(Method, boolean)}
      * @param start the wall clock time the query execution started
      * @param delta the time the execution took, measured with the monotonic clock
@@ -134,12 +134,12 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
 
     /**
      * Invoked when a query execution, a call to an execute method as recognised by
-     * {@link AbstractCreateStatementInterceptor#isExecute(Method, boolean)}, succeeded and was exceeded the timing
+     * {@link AbstractCreateStatementInterceptor#isExecute(Method, boolean)}, succeeded and exceeded the timing
      * threshold
      *
-     * @param query the query that was executed and failed
+     * @param query the query that was executed
      * @param args  the arguments to the execution
-     * @param name  the name of the method used to execute
+     * @param name  the name of the method used to execute, as recognised by
      *                  {@link AbstractCreateStatementInterceptor#isExecute(Method, boolean)}
      * @param start the wall clock time the query execution started
      * @param delta the time the execution took, measured with the monotonic clock
@@ -224,9 +224,11 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      * Measures the milliseconds elapsed since the {@link System#nanoTime()}
      * reading taken at {@code startNanos}, rounded to the nearest millisecond.
      * <p>
-     * An interval is measured with the monotonic clock. The wall clock is not monotonic, so an NTP correction, a manual
-     * set, or resuming a suspended VM between two of its readings makes their difference negative, and a negative
-     * duration is never over the slow query threshold while the statistics book it as if it were real.
+     * An interval is measured with the monotonic clock. Had it been measured
+     * with the wall clock instead, an NTP correction, a manual set, or
+     * resuming a suspended VM between the two readings could have made the
+     * difference negative, and a negative duration is never over the slow
+     * query threshold while the statistics book it as if it were real.
      * </p>
      *
      * @param startNanos the {@link System#nanoTime()} reading the measurement began with
@@ -249,20 +251,20 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
          */
         protected volatile boolean closed = false;
         /**
-         * The underlying statement or connection being proxied, nulled once a close has been forwarded. It is read by
-         * threads other than the one that nulls it, so, like {@link #closed}, volatile.
+         * The statement being proxied, or a further interceptor's proxy of it, nulled once a close has been forwarded.
+         * It is read by threads other than the one that nulls it, so, like {@link #closed}, volatile.
          */
         protected volatile Object delegate;
         /**
-         * The SQL query being executed.
+         * The SQL the statement was prepared with, or {@code null} when it was created without one.
          */
         protected final String query;
 
         /**
          * Constructs a new {@code StatementProxy}.
          *
-         * @param parent The underlying statement or connection
-         * @param query  The SQL query being executed
+         * @param parent The statement being proxied, or a further interceptor's proxy of it
+         * @param query  The SQL the statement was prepared with, or {@code null} when it was created without one
          */
         public StatementProxy(Object parent, String query) {
             this.delegate = parent;
