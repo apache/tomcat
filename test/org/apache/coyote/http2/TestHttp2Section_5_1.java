@@ -159,21 +159,14 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         // HTTP2 upgrade
         http2Connect();
 
-        // Build the simple request
-        byte[] frameHeader = new byte[9];
-        ByteBuffer headersPayload = ByteBuffer.allocate(128);
-        buildSimpleGetRequest(frameHeader, headersPayload, null, 3);
+        // Open stream 3 with a POST request (END_HEADERS, no END_STREAM) so the
+        // stream is in the 'open' state while the server waits for the request body.
+        sendSimplePostRequest(3, null, false);
 
-        // Remove the end of stream and end of headers flags
-        frameHeader[4] = 0;
+        // Send a RST_STREAM to close the stream from the client side.
+        sendRst(3, Http2Error.CANCEL.getCode());
 
-        // Process the request
-        writeFrame(frameHeader, headersPayload);
-
-        // Send a rst
-        sendRst(3, Http2Error.INTERNAL_ERROR.getCode());
-
-        // Then try sending some data (which should fail)
+        // Then try sending some data on the now-closed stream (which should fail).
         sendData(3, new byte[] {});
         parser.readFrame();
 

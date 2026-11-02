@@ -246,6 +246,47 @@ public class TestHttp2Section_4_3 extends Http2TestBase {
 
         sendPing();
 
-        handleGoAwayResponse(3, Http2Error.COMPRESSION_ERROR);
+        handleGoAwayResponse(3, Http2Error.PROTOCOL_ERROR);
+    }
+
+
+    @Test
+    public void testHeaderContinuationWrongStream() throws Exception {
+        // HTTP2 upgrade
+        http2Connect();
+
+        // Part 1: open a header block on stream 3 (no END_HEADERS)
+        byte[] frameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+        buildSimpleGetRequestPart1(frameHeader, headersPayload, 3);
+        writeFrame(frameHeader, headersPayload);
+
+        // Part 2: CONTINUATION on stream 5 instead of stream 3.
+        // RFC 9113, section 6.10 requires a connection error of type PROTOCOL_ERROR.
+        ByteBuffer contPayload = ByteBuffer.allocate(128);
+        buildSimpleGetRequestPart2(frameHeader, contPayload, 5);
+        writeFrame(frameHeader, contPayload);
+
+        handleGoAwayResponse(3, Http2Error.PROTOCOL_ERROR);
+    }
+
+
+    @Test
+    public void testHeaderContinuationInterruptedByRst() throws Exception {
+        // HTTP2 upgrade
+        http2Connect();
+
+        // Open a header block on stream 3 without setting END_HEADERS.
+        byte[] frameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+        buildSimpleGetRequestPart1(frameHeader, headersPayload, 3);
+        writeFrame(frameHeader, headersPayload);
+
+        // Send RST_STREAM on the same stream before completing the header block.
+        // RFC 9113, section 6.10: any frame other than CONTINUATION while a header
+        // block is in progress is a connection error of type PROTOCOL_ERROR.
+        sendRst(3, Http2Error.CANCEL.getCode());
+
+        handleGoAwayResponse(3, Http2Error.PROTOCOL_ERROR);
     }
 }
