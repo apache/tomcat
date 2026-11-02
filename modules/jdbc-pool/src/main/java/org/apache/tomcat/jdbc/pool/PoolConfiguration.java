@@ -102,9 +102,16 @@ public interface PoolConfiguration {
      * The properties that will be passed into {@link java.sql.Driver#connect(String, Properties)} method. Username and
      * password do not need to be stored here, they will be passed into the properties right before the connection is
      * established.
+     * <p>
+     * Re-setting the string re-applies it: the pairs the previous value of the
+     * string contributed are removed from the driver properties before the new
+     * ones are parsed in, so a reconfigure that drops a pair really stops
+     * sending it, while entries contributed from elsewhere - the explicitly
+     * passed user and password among them - are kept. A {@code null} value
+     * clears the string and takes its contributed pairs with it.
      *
      * @param connectionProperties properties - Format of the string is [propertyName=property;]* Example:
-     *                                 prop1=value1;prop2=value2
+     *                                 prop1=value1;prop2=value2, may be {@code null}
      */
     void setConnectionProperties(String connectionProperties);
 
