@@ -35,6 +35,7 @@ import javax.management.openmbean.SimpleType;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
+import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
@@ -46,6 +47,14 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  * starts and released when the last live pool registered under that name closes. Pools configured with the same name -
  * possible with {@code jmxEnabled=false}, which removes the JMX ObjectName clash that would otherwise catch it -
  * therefore share one statistics map; closing one of them never takes the shared statistics away from the others.
+ * </p>
+ * <p>
+ * More than one reporting definition can be configured on one pool - the two-thresholds configuration of
+ * {@link SlowQueryReportJmx} is documented as a supported use - and every definition sees every execution, so the
+ * shared statistics are booked by one definition only: the deepest one in the interceptor chain that stores statistics
+ * (see {@link #booksSharedStats()}). A configuration of several definitions books each execution once, like a single
+ * definition does; the per-definition channels - this definition's slow and failed query logging - keep firing for
+ * every definition that configures them.
  * </p>
  */
 public class SlowQueryReport extends AbstractQueryReport {
@@ -126,7 +135,7 @@ public class SlowQueryReport extends AbstractQueryReport {
         // execution cannot make the booked duration negative, as it could
         // while this hook recomputed it from start.
         long now = System.currentTimeMillis();
-        if (this.maxQueries > 0) {
+        if (booksSharedStats()) {
             QueryStats qs = this.getQueryStats(sql);
             if (qs != null) {
                 qs.failure(delta, now);
@@ -148,7 +157,7 @@ public class SlowQueryReport extends AbstractQueryReport {
     @Override
     protected String reportQuery(String query, Object[] args, final String name, long start, long delta) {
         String sql = super.reportQuery(query, args, name, start, delta);
-        if (this.maxQueries > 0) {
+        if (booksSharedStats()) {
             QueryStats qs = this.getQueryStats(sql);
             if (qs != null) {
                 qs.add(delta, start);
@@ -160,7 +169,7 @@ public class SlowQueryReport extends AbstractQueryReport {
     @Override
     protected String reportSlowQuery(String query, Object[] args, String name, long start, long delta) {
         String sql = super.reportSlowQuery(query, args, name, start, delta);
-        if (this.maxQueries > 0) {
+        if (booksSharedStats()) {
             QueryStats qs = this.getQueryStats(sql);
             if (qs != null) {
                 qs.add(delta, start);
@@ -201,7 +210,7 @@ public class SlowQueryReport extends AbstractQueryReport {
      */
     @Override
     public void prepareStatement(String sql, long time) {
-        if (this.maxQueries > 0) {
+        if (booksSharedStats()) {
             QueryStats qs = getQueryStats(sql);
             if (qs != null) {
                 qs.prepare(time);
@@ -217,7 +226,7 @@ public class SlowQueryReport extends AbstractQueryReport {
      */
     @Override
     public void prepareCall(String sql, long time) {
-        if (this.maxQueries > 0) {
+        if (booksSharedStats()) {
             QueryStats qs = getQueryStats(sql);
             if (qs != null) {
                 qs.prepare(time);
@@ -298,6 +307,43 @@ public class SlowQueryReport extends AbstractQueryReport {
             return last[0] ? null : existing;
         });
         return last[0];
+    }
+
+    /**
+     * Whether this instance is the one to book the shared per-pool-name statistics for the executions its chain
+     * reports.
+     * <p>
+     * Every configured reporting definition wraps the statement again, so one logical execution passes through every
+     * definition's hooks; booking the shared map from each of them would multiply its invocation counts, totals and
+     * prepare counters by the number of definitions. The booking therefore belongs to the deepest definition in the
+     * chain that stores statistics: it sees every execution the layers above it see, so no booking is lost, and its
+     * measurement is the one closest to the driver. The layers above it report only their own channels - logging and,
+     * for {@link SlowQueryReportJmx}, notifications. A definition that stores no statistics (a {@code maxQueries} of
+     * zero) never claims the booking, so it cannot hold the statistics silent for the definitions above it.
+     * </p>
+     * <p>
+     * The decision reads only the chain below this instance and the configured capacity of each layer found there.
+     * Both are fixed when the chain is built (properties are set before the link, and the chain is published through
+     * the connection's volatile handler reference), and nothing is remembered across executions, so a re-entered
+     * execution - a report hook that itself runs a query on this pool - books on its own chain's merits, whatever the
+     * enclosing execution's layers have already booked or passed on.
+     * </p>
+     *
+     * @return {@code true} if this instance must book the shared statistics for the executions it reports
+     */
+    protected boolean booksSharedStats() {
+        if (maxQueries <= 0) {
+            return false;
+        }
+        for (JdbcInterceptor i = getNext(); i != null; i = i.getNext()) {
+            if (i instanceof SlowQueryReport && ((SlowQueryReport) i).maxQueries > 0) {
+                // A definition that stores statistics lies beneath this one
+                // in the chain: it sees every execution this instance sees,
+                // and it is the one to book them
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
