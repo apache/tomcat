@@ -214,6 +214,65 @@ class TestPoolProperties {
     }
 
     @Test
+    void credentialsOverridingTheStringSurviveAReconfigureThatDropsThem() {
+        // The factory's own shape: the string names user/password, and the
+        // username/password attributes are injected over the string's pairs.
+        // Pre-fix the injection overwrote the values but the string stayed the
+        // owner of the keys, so a JMX reconfigure whose string no longer named
+        // the credentials removed them from the driver properties while the
+        // credential fields still held them.
+        Properties attrs = new Properties();
+        attrs.setProperty("connectionProperties",
+                "keep=yes;user=fromstring;password=fromstring");
+        attrs.setProperty("username", DEFAULT_USER);
+        attrs.setProperty("password", DEFAULT_PASSWD);
+
+        PoolProperties configured =
+                (PoolProperties) DataSourceFactory.parsePoolProperties(attrs);
+
+        Assertions.assertEquals(DEFAULT_USER,
+                configured.getDbProperties().getProperty("user"),
+                "the configured username must override the string's pair");
+        Assertions.assertEquals(DEFAULT_PASSWD,
+                configured.getDbProperties().getProperty("password"),
+                "the configured password must override the string's pair");
+
+        // the JMX reconfigure path
+        configured.setConnectionProperties("keep=again");
+
+        Assertions.assertEquals("again",
+                configured.getDbProperties().getProperty("keep"),
+                "a pair the new string names must carry the new value");
+        Assertions.assertEquals(DEFAULT_USER,
+                configured.getDbProperties().getProperty("user"),
+                "a credential the fields still carry must not be stripped by a"
+                        + " reconfigure that dropped the key from the string");
+        Assertions.assertEquals(DEFAULT_PASSWD,
+                configured.getDbProperties().getProperty("password"),
+                "a credential the fields still carry must not be stripped by a"
+                        + " reconfigure that dropped the key from the string");
+    }
+
+    @Test
+    void aCredentialEntryOnlyTheStringCarriesStaysTheStringsOwn() {
+        // Counterpart pin: with the field unset the entry is the string's, so
+        // the reconfigure really does drop it - the re-assert must not turn
+        // setConnectionProperties into a credential keeper that outlives both
+        // the field and the string.
+        PoolProperties properties = new PoolProperties();
+        properties.setConnectionProperties("user=fromstring");
+
+        Assertions.assertEquals("fromstring",
+                properties.getDbProperties().getProperty("user"),
+                "the string's pair must be applied while no username is set");
+
+        properties.setConnectionProperties("keep=yes");
+
+        Assertions.assertNull(properties.getDbProperties().getProperty("user"),
+                "the string must keep owning the entry while the field is unset");
+    }
+
+    @Test
     void clearedConnectionPropertiesRemoveEveryParsedPair() {
         PoolProperties properties = new PoolProperties();
         properties.setConnectionProperties("stale=leftover");
