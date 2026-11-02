@@ -119,6 +119,16 @@ class TestAsyncBorrow extends JdbcPoolBaseTest {
                     "a non-fair queue cannot hand out futures once the pool is exhausted");
             Assertions.assertTrue(error.getMessage().toLowerCase().contains("fair"),
                     "the failure must name the missing configuration, was: " + error.getMessage());
+            // The message is fetched for the application, not as a format
+            // pattern: it must render the writer's punctuation, not the
+            // doubled-quote escapes that only MessageFormat would collapse
+            Assertions.assertTrue(error.getMessage().contains("doesn't"),
+                    "the apostrophe must reach the application collapsed, was: "
+                            + error.getMessage());
+            Assertions.assertTrue(error.getMessage().contains("'fair'")
+                            && error.getMessage().contains("'true'"),
+                    "the quoted property names must reach the application with "
+                            + "single quotes, was: " + error.getMessage());
         } finally {
             holder.close();
         }
