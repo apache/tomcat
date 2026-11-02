@@ -1411,6 +1411,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
                         longPoll(wrapper, processor);
                         getProtocol().addWaitingProcessor(processor);
                     }
+                } else if (state == SocketState.UPGRADED_HALF_CLOSED) {
+                    // Don't add sockets back to the poller.
+                    // The handler will register for write as required
+                    // Add to waiting processors so the processor is visible if the protocol is stopped
+                    getProtocol().addWaitingProcessor(processor);
                 } else if (state == SocketState.ASYNC_IO) {
                     // Don't add sockets back to the poller.
                     // The handler will initiate all further I/O
