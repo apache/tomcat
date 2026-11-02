@@ -224,7 +224,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
 
     @Override
     protected HeaderFrameBuffers getHeaderFrameBuffers(int initialPayloadSize) {
-        return new AsyncHeaderFrameBuffers(initialPayloadSize);
+        return new AsyncHeaderFrameBuffers(initialPayloadSize, getHeaderWorkspaceLimit());
     }
 
 
@@ -538,14 +538,16 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     private static class AsyncHeaderFrameBuffers implements HeaderFrameBuffers {
 
         int payloadSize;
+        private final int workspaceLimit;
 
         private byte[] header;
         private ByteBuffer payload;
 
         private final List<ByteBuffer> bufs = new ArrayList<>();
 
-        AsyncHeaderFrameBuffers(int initialPayloadSize) {
+        AsyncHeaderFrameBuffers(int initialPayloadSize, int workspaceLimit) {
             this.payloadSize = initialPayloadSize;
+            this.workspaceLimit = workspaceLimit;
         }
 
         @Override
@@ -576,15 +578,13 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
 
         @Override
         public void expandPayload() {
-            // The encoded headers are written as the payload of a single
-            // frame so a buffer larger than the largest frame size that can
-            // be represented is never usable. Fail rather than continue
-            // doubling, which would eventually overflow the buffer size.
-            if (payloadSize >= ConnectionSettingsBase.MAX_MAX_FRAME_SIZE) {
-                throw new IllegalStateException(sm.getString("upgradeHandler.headerPayloadTooBig",
-                        Integer.toString(ConnectionSettingsBase.MAX_MAX_FRAME_SIZE)));
+            // Use the same workspace ceiling as the synchronous writer. The shared header encoding path checks
+            // the actual payload size before this frame can be queued for writing.
+            if (payloadSize >= workspaceLimit) {
+                throw new IllegalStateException(
+                        sm.getString("upgradeHandler.headerWorkspaceTooBig", Integer.toString(workspaceLimit)));
             }
-            payloadSize = Integer.min(payloadSize * 2, ConnectionSettingsBase.MAX_MAX_FRAME_SIZE);
+            payloadSize = Integer.min(payloadSize * 2, workspaceLimit);
             payload = ByteBuffer.allocate(payloadSize);
         }
     }
