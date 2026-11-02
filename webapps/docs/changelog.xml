@@ -596,6 +596,11 @@
         keeps the parameters of each tag to itself and never touches page
         scope attributes. (remm)
       </fix>
+      <fix>
+        <code>RecordELResolver</code> no longer prevents
+        <code>BeanELResolver</code> from resolving bean-style properties (such
+        as <code>isValid()</code>) on a <code>Record</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
