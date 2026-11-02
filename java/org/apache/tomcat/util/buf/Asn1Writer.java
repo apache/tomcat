@@ -106,40 +106,35 @@ public class Asn1Writer {
      */
     public static byte[] writeTag(byte tagId, byte[] data) {
         int dataSize = data.length;
-        // How many bytes to write the length?
-        int lengthSize = 1;
-        if (dataSize > 127) {
-            // 1 byte we have is now used to record how many bytes we need to
-            // record a length > 127
-            // Result is lengthSize = 1 + number of bytes to record length
-            // Note the limit is required to terminate the loop since the shift
-            // distance is evaluated modulo 32.
-            do {
-                lengthSize++;
-            } while (lengthSize < 4 && (dataSize >>> (lengthSize * 8)) > 0);
-        }
 
         byte[] result;
+        int headerSize;
         if (dataSize < 128) {
-            // 1 for tag + lengthSize + dataSize
-            result = new byte[1 + lengthSize + dataSize];
+            // Short form. The length is a single byte.
+            headerSize = 2;
+            result = new byte[headerSize + dataSize];
             result[1] = (byte) dataSize;
         } else {
-            // lengthSize is 1 + number of bytes for length
-            // 1 for tag + one for the lengthSize + lengthSize + dataSize
-            result = new byte[2 + lengthSize + dataSize];
-            result[1] = (byte) (128 + lengthSize);
-            int i = lengthSize;
-            while (dataSize > 0) {
-                result[i + 1] = (byte) (dataSize & 0xFF);
-                dataSize = dataSize >> 8;
-                i--;
+            /*
+             * Long form. The first length byte is 0x80 plus the number of bytes required to record the length. DER
+             * (X.690 10.1) requires the minimum number of length bytes. No more than 4 are required for a Java array
+             * length. The limit is also required to terminate the loop since the shift distance is evaluated modulo
+             * 32.
+             */
+            int lengthBytes = 1;
+            while (lengthBytes < 4 && (dataSize >>> (lengthBytes * 8)) != 0) {
+                lengthBytes++;
             }
-            lengthSize++; // we added the size.
+            headerSize = 2 + lengthBytes;
+            result = new byte[headerSize + dataSize];
+            result[1] = (byte) (0x80 + lengthBytes);
+            for (int i = 0; i < lengthBytes; i++) {
+                result[2 + i] = (byte) (dataSize >>> (8 * (lengthBytes - 1 - i)));
+            }
         }
         result[0] = tagId;
 
-        System.arraycopy(data, 0, result, 1 + lengthSize, data.length);
+        System.arraycopy(data, 0, result, headerSize, data.length);
 
         return result;
     }

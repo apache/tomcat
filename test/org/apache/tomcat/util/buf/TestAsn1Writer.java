@@ -131,6 +131,82 @@ public class TestAsn1Writer {
     }
 
 
+    // DER (X.690 10.1) requires the length to be encoded using the minimum number of octets: the short form up to
+    // 127 and then the fewest length octets that can hold the value.
+    @Test
+    public void testWriteTagShortFormLengths() {
+        assertLengthEncoding(0, new byte[] { 0x04, 0x00 });
+        assertLengthEncoding(1, new byte[] { 0x04, 0x01 });
+        assertLengthEncoding(127, new byte[] { 0x04, 0x7F });
+    }
+
+
+    @Test
+    public void testWriteTagOneLengthOctet() {
+        assertLengthEncoding(128, new byte[] { 0x04, (byte) 0x81, (byte) 0x80 });
+        assertLengthEncoding(200, new byte[] { 0x04, (byte) 0x81, (byte) 0xC8 });
+        assertLengthEncoding(255, new byte[] { 0x04, (byte) 0x81, (byte) 0xFF });
+    }
+
+
+    @Test
+    public void testWriteTagTwoLengthOctets() {
+        assertLengthEncoding(256, new byte[] { 0x04, (byte) 0x82, 0x01, 0x00 });
+        assertLengthEncoding(300, new byte[] { 0x04, (byte) 0x82, 0x01, 0x2C });
+        assertLengthEncoding(0xFFFF, new byte[] { 0x04, (byte) 0x82, (byte) 0xFF, (byte) 0xFF });
+    }
+
+
+    @Test
+    public void testWriteTagThreeLengthOctets() {
+        assertLengthEncoding(0x10000, new byte[] { 0x04, (byte) 0x83, 0x01, 0x00, 0x00 });
+        assertLengthEncoding(0xFFFFFF, new byte[] { 0x04, (byte) 0x83, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF });
+    }
+
+
+    @Test
+    public void testWriteTagLengthRoundTrip() {
+        // Every length around the short form, one octet and two octet boundaries and the transition to three octets.
+        // Check the size of the length field is the minimum and that the parser reads back the original content.
+        for (int size = 0; size <= 0x10100; size++) {
+            byte[] data = new byte[size];
+            Arrays.fill(data, (byte) 0x5A);
+            byte[] encoded = Asn1Writer.writeOctetString(data);
+
+            int lengthOctets;
+            if (size < 128) {
+                lengthOctets = 1;
+            } else {
+                // 1 octet for the number of length octets plus the unsigned minimal length octets
+                lengthOctets = 1 + (BigInteger.valueOf(size).bitLength() + 7) / 8;
+            }
+            Assert.assertEquals("Unexpected total length for " + size, 1 + lengthOctets + size, encoded.length);
+
+            Assert.assertArrayEquals("Round-trip failed for " + size, data,
+                    new Asn1Parser(encoded).parseOctetString());
+        }
+    }
+
+
+    @Test
+    public void testWriteSequenceLengthEncoding() {
+        // A SEQUENCE of 200 bytes of content must use a single length octet
+        byte[] encoded = Asn1Writer.writeSequence(new byte[200]);
+        Assert.assertEquals(0x30, encoded[0] & 0xFF);
+        Assert.assertEquals(0x81, encoded[1] & 0xFF);
+        Assert.assertEquals(200, encoded[2] & 0xFF);
+        Assert.assertEquals(3 + 200, encoded.length);
+    }
+
+
+    private static void assertLengthEncoding(int size, byte[] expectedHeader) {
+        byte[] encoded = Asn1Writer.writeOctetString(new byte[size]);
+        Assert.assertEquals("Unexpected total length for " + size, expectedHeader.length + size, encoded.length);
+        Assert.assertArrayEquals("Unexpected header for " + size, expectedHeader,
+                Arrays.copyOfRange(encoded, 0, expectedHeader.length));
+    }
+
+
     private static void assertIntegerEncoding(int value, byte[] expected) {
         Assert.assertArrayEquals("Unexpected encoding for " + value, expected, Asn1Writer.writeInteger(value));
     }
