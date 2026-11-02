@@ -476,6 +476,13 @@
         Detect and disconnect a mis-behaving HTTP/2 client that sends large
         numbers of unexpected settings acknowledgement frames. (markt)
       </fix>
+      <fix>
+        Fix excessive CPU usage after a client half-closes an upgraded
+        connection while the application keeps the output stream open to finish
+        its response. Stop polling for input at end of stream and ensure that a
+        subsequent <code>WebConnection.close()</code> closes the connection.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
