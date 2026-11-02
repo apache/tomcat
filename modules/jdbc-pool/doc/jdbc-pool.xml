@@ -154,6 +154,36 @@
       and it propagates the registration to the underlying pool. To do this you would call <code>mBeanServer.registerMBean(dataSource.getPool().getJmxPool(),objectname)</code>.
       Prior to this call, ensure that the pool has been created by calling <code>dataSource.createPool()</code>.
     </p>
+    <p>
+      The propagation of the registration to the connection pool MBean happens once,
+      at the moment the data source is registered. If the pool has not been created
+      at that point, no connection pool MBean is published, nothing is published
+      later when the pool is created, and the registration is not retried; a warning
+      is logged at registration time. Ensure the pool exists before the data source
+      is registered - in a container the resource factory creates it up front - or
+      deregister and register the data source again afterwards.
+    </p>
+    <p>
+      Only a registration propagated through the data source is taken back when the
+      data source is closed or deregistered. A connection pool MBean registered
+      directly, as in the call above, is not unregistered by <code>close()</code>;
+      unregister it yourself when you close the data source. (Inside Tomcat the
+      container registers the data source through its own wrapper, and the pool
+      MBean's lifecycle is managed for you.)
+    </p>
+  </subsection>
+  <subsection name="Closing the data source">
+    <p>
+      Calling <code>close()</code> or <code>close(false)</code> on the data source
+      closes the connection pool and is terminal: later calls to
+      <code>getConnection()</code> or <code>createPool()</code> fail with a
+      <code>SQLException</code> instead of silently recreating the pool. Connections
+      that are currently borrowed are not disconnected by <code>close(false)</code>;
+      they keep their database sessions and stay usable until their holders close
+      them. <code>close(true)</code> additionally disconnects the database sessions
+      of the connections that are still in use. JMX monitoring of the pool ends when
+      <code>close()</code> returns, including for connections that are still in use.
+    </p>
   </subsection>
 
 </section>
