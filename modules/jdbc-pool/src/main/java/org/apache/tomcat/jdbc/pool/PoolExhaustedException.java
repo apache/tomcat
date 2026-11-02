@@ -19,7 +19,13 @@ package org.apache.tomcat.jdbc.pool;
 import java.sql.SQLException;
 
 /**
- * Exception thrown when the connection pool is exhausted and no connections are available.
+ * Exception thrown when the connection pool is exhausted and no connections are available. The caller of a synchronous
+ * borrow that is refused - one whose wait on the empty pool timed out - receives it directly. On the asynchronous path
+ * of {@link ConnectionPool#getConnectionAsync()} the same exhaustion is absorbed into a wait instead and never surfaces
+ * as this exception: an exhausted pool surfaces there through the {@link java.util.concurrent.Future} as a
+ * {@link java.util.concurrent.TimeoutException} for a timed wait, a {@link java.util.concurrent.CancellationException}
+ * when the pool closes under the waiter, or an {@link java.util.concurrent.ExecutionException} carrying the underlying
+ * failure when the wait could not be completed.
  */
 public class PoolExhaustedException extends SQLException {
 
@@ -31,7 +37,14 @@ public class PoolExhaustedException extends SQLException {
      * error, so none of the connection-class states (the {@code 08xxx} family, which
      * describe the session itself failing) says exactly this; still, consumers that
      * multiplex many {@link SQLException} sources and classify them by state need a
-     * non-null label to recognize pool exhaustion without referencing pool classes.
+     * non-null label to sort on. HY000 is shared with unrelated driver-reported
+     * general errors, so a state-based classifier should treat the state as a
+     * pointer and corroborate it with {@code instanceof PoolExhaustedException}
+     * rather than treat it as exclusive to pool exhaustion. The state is stamped by
+     * the message-only constructor the pool throws through; the constructors that
+     * mirror the {@code SQLException} signatures without a state parameter (no-arg
+     * and cause-only) carry none, as those super-signatures take none, and an
+     * explicitly given state always wins.
      */
     public static final String SQL_STATE = "HY000";
 
@@ -64,10 +77,10 @@ public class PoolExhaustedException extends SQLException {
      * Constructs a PoolExhaustedException with the specified detail message and SQL state.
      *
      * @param reason   the detail message
-     * @param SQLState the SQL state code
+     * @param sqlState the SQL state code
      */
-    public PoolExhaustedException(String reason, String SQLState) {
-        super(reason, SQLState);
+    public PoolExhaustedException(String reason, String sqlState) {
+        super(reason, sqlState);
     }
 
     /**
@@ -84,11 +97,11 @@ public class PoolExhaustedException extends SQLException {
      * Constructs a PoolExhaustedException with the specified detail message, SQL state, and vendor code.
      *
      * @param reason     the detail message
-     * @param SQLState   the SQL state code
+     * @param sqlState   the SQL state code
      * @param vendorCode the vendor-specific error code
      */
-    public PoolExhaustedException(String reason, String SQLState, int vendorCode) {
-        super(reason, SQLState, vendorCode);
+    public PoolExhaustedException(String reason, String sqlState, int vendorCode) {
+        super(reason, sqlState, vendorCode);
     }
 
     /**
