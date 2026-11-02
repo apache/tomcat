@@ -165,7 +165,7 @@ class TestDataSourceFactoryUnknownPropertyWarnings extends JdbcPoolBaseTest {
 
         @Override
         protected javax.sql.DataSource createDataSource(Properties properties, Context context, boolean xa,
-                javax.sql.DataSource dataSourceObject) {
+                Object dataSourceObject) {
             // exactly what the real implementation does first
             parsed = DataSourceFactory.parsePoolProperties(properties);
             return null;

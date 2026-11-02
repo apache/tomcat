@@ -190,6 +190,15 @@
 <section name="Attributes">
   <p>To provide a very simple switch to and from commons-dbcp and tomcat-jdbc-pool,
      Most attributes are the same and have the same meaning.</p>
+  <p>When the pool is configured through the JNDI resource factory, an attribute whose
+     value is blank leaves its property at the default: clearing an attribute in a
+     resource definition switches the property off rather than configuring it to the
+     empty value. A value the property cannot take - an unparseable number, an unknown
+     boolean or transaction isolation level - fails the creation of the pool with an
+     error naming the attribute, rather than being silently ignored. Numeric, boolean
+     and keyword values, class names and JNDI names are read ignoring surrounding
+     whitespace; names, queries and URLs are stored verbatim, since a space can be
+     part of such a value.</p>
   <subsection name="JNDI Factory and Type">
     <attributes>
       <attribute name="factory" required="true">
@@ -199,8 +208,12 @@
         <p>Type should always be <code>javax.sql.DataSource</code> or <code>javax.sql.XADataSource</code></p>
         <p>Depending on the type a <code>org.apache.tomcat.jdbc.pool.DataSource</code> or a <code>org.apache.tomcat.jdbc.pool.XADataSource</code> will be created.</p>
         <p>Note that the <code>javax.sql.XADataSource</code> type only provides XA connections if the pool is backed
-        by an XA data source: the <code>dataSource</code> or <code>dataSourceJNDI</code> attribute must name a
-        <code>javax.sql.XADataSource</code> provided by the JDBC driver. A pool configured with
+        by an XA data source: the data source the pool takes its connections from - supplied through the
+        <code>dataSourceJNDI</code> or <code>dataSource</code> attribute - must implement
+        <code>javax.sql.XADataSource</code>. In an XML resource definition an attribute can only carry text,
+        while the <code>dataSource</code> attribute takes the data source object itself, so the XML route to a
+        backing data source is <code>dataSourceJNDI</code>, naming a <code>javax.sql.XADataSource</code>
+        provided by the JDBC driver and bound in JNDI. A pool configured with
         <code>driverClassName</code> and <code>url</code> pools plain JDBC connections, and a request for an XA
         connection from such a pool fails with an explicit error.</p>
       </attribute>
@@ -247,7 +260,11 @@
            <li><code>REPEATABLE_READ</code></li>
            <li><code>SERIALIZABLE</code></li>
          </ul>
-         <p>If not set, the method will not be called and it defaults to the JDBC driver.</p>
+         <p>The numeric transaction isolation level of <code>java.sql.Connection</code>, for example
+         <code>2</code> for <code>READ_COMMITTED</code>, is accepted in place of the name. The name or number
+         is matched ignoring surrounding whitespace, and any value other than the names above, their numbers
+         or a blank value fails the creation of the pool with an error naming the attribute.</p>
+         <p>If not set, or set to a blank value, the method will not be called and it defaults to the JDBC driver.</p>
     </attribute>
 
     <attribute name="defaultCatalog" required="false">
@@ -344,7 +361,9 @@
       <p>(String) The SQL query that will be used to validate connections from this pool before returning them to the caller.
          If specified, this query does not have to return any data, it just can't throw an <code>SQLException</code>.
          The default value is <code>null</code>.
-         If not specified, connections will be validation by the isValid() method.
+         If not specified, or set to a blank value, connections will be validated by the
+         <code>isValid()</code> method of <code>java.sql.Connection</code>: a blank query is not sent to the
+         database as an empty statement.
          Example values are <code>SELECT 1</code>(mysql), <code>select 1 from dual</code>(oracle), <code>SELECT 1</code>(MS Sql Server)
       </p>
     </attribute>
@@ -475,6 +494,16 @@
          The default value is <code>true</code>.</p>
     </attribute>
 
+    <attribute name="object_name" required="false">
+      <p>(String) The pool's name, used as the <code>name</code> key property of the JMX registrations of the
+         pool's MBean and of interceptors that register with the pool, such as
+         <code>SlowQueryReportJmx</code>. When the attribute is set through the JNDI resource factory,
+         surrounding whitespace is not stripped - the name is stored as it is written - and a blank value
+         leaves the pool with its generated name. Note that this attribute of the pool is spelled with an
+         underscore, unlike the <code>objectName</code> attribute of the <code>SlowQueryReportJmx</code>
+         interceptor described below, which overrides only that interceptor's registration.</p>
+    </attribute>
+
     <attribute name="fairQueue" required="false">
       <p>(boolean) Set to true if you wish that calls to getConnection should be treated
          fairly in a true FIFO fashion. This uses the <code>org.apache.tomcat.jdbc.pool.FairBlockingQueue</code>
@@ -524,6 +553,15 @@
          The default value is <code>true</code>.
       </p>
     </attribute>
+    <attribute name="useLock" required="false">
+      <p>(boolean) Set to true if a lock should be used when operations are performed on the connection object.
+         Should be set to <code>false</code> unless you plan to have a background thread of your own doing idle
+         and abandon checking, such as a JMX client. If the pool sweeper is enabled - the pool's own background
+         maintenance thread, started by <code>timeBetweenEvictionRunsMillis</code> together with one of the
+         checks it runs - the lock is used regardless of this setting.
+         The default value is <code>false</code>.
+      </p>
+    </attribute>
     <attribute name="suspectTimeout" required="false">
       <p>(int) Timeout value in seconds. Default value is <code>0</code>.<br/>
            Similar to to the <code>removeAbandonedTimeout</code> value but instead of treating the connection
@@ -568,9 +606,16 @@
       <p>(javax.sql.DataSource) Inject a data source to the connection pool, and the pool will use the data source to retrieve connections instead of establishing them using the <code>java.sql.Driver</code> interface.
          This is useful when you wish to pool XA connections or connections established using a data source instead of a connection string. Default value is <code>null</code>
       </p>
+      <p>When the pool is configured through the JNDI resource factory, this attribute carries the
+         data source object itself, and the object must be a <code>javax.sql.DataSource</code>, a
+         <code>javax.sql.XADataSource</code> or a <code>javax.sql.ConnectionPoolDataSource</code> provided by
+         the JDBC driver - and not another connection pool, which the pool refuses to wrap. A resource
+         definition can only give attributes as text, and text cannot carry a live object; a text value here
+         fails the creation of the pool. In a resource definition, use this attribute's JNDI counterpart,
+         <code>dataSourceJNDI</code>, to back the pool with a data source.</p>
     </attribute>
     <attribute name="dataSourceJNDI" required="false">
-      <p>(String) The JNDI name for a data source to be looked up in JNDI and then used to establish connections to the database. See the <code>dataSource</code> attribute. Default value is <code>null</code>. If the name cannot be resolved when the pool is created, the creation fails with an error naming the unresolved name rather than producing a pool that cannot provide connections.
+      <p>(String) The JNDI name for a data source to be looked up in JNDI and then used to establish connections to the database. See the <code>dataSource</code> attribute. Default value is <code>null</code>. Surrounding whitespace around the name is ignored. If the name cannot be resolved when the pool is created, or resolves to an object the pool cannot establish connections from, the creation fails with an error naming the unresolved name rather than producing a pool that cannot provide connections.
       </p>
     </attribute>
     <attribute name="useDisposableConnectionFacade" required="false">
@@ -835,6 +880,10 @@
         <p>(String) Define a valid <code>javax.management.ObjectName</code> string that will be used to register this object with the platform mbean server
            The default value is <code>null</code> and the object will be registered using
            tomcat.jdbc:type=org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx,name=the-name-of-the-pool
+           Note this interceptor attribute is spelled <code>objectName</code>, unlike the pool's own
+           <code>object_name</code> attribute, which names the pool in the registrations; a
+           <code>objectName</code> attribute on the pool itself is not a pool property and will be reported
+           as ignored.
         </p>
       </attribute>
     </attributes>
