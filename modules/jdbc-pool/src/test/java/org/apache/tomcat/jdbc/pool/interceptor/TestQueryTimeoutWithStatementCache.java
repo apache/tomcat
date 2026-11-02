@@ -159,6 +159,25 @@ class TestQueryTimeoutWithStatementCache extends JdbcPoolBaseTest {
     }
 
     /**
+     * One timeout interceptor listed before every cache protects every cache
+     * hit, because it sees the statement object the cache hands back - so a
+     * chain that also redundantly lists the timeout below the cache is
+     * protected and must not be told its cached statements run without a
+     * timeout. (This differs from the finalizer, which is defeated by any
+     * finalizer beneath the cache no matter what is listed above it.)
+     */
+    @Test
+    void timeoutListedOnBothSidesOfTheCacheIsNotWarnedAbout() throws Exception {
+        try (PoolLogCapture logs = new PoolLogCapture()) {
+            poolWith(
+                    QueryTimeoutInterceptor.class.getName() + "(queryTimeout=5)",
+                    StatementCache.class.getName() + "(prepared=true,max=5)",
+                    QueryTimeoutInterceptor.class.getName() + "(queryTimeout=5)");
+            logs.assertNoOrderWarningLogged();
+        }
+    }
+
+    /**
      * The check runs against the parsed, resolved interceptor definitions, so
      * a short name that only resolves against the interceptor package, and a
      * parameterized entry whose parenthesized properties the parser strips,

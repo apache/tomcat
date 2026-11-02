@@ -336,4 +336,208 @@ class TestCloseVsWaiters extends JdbcPoolBaseTest {
             waiter.join(AWAIT_TIMEOUT_MS);
         }
     }
+
+    @Test
+    void closingThePoolFailsASynchronousBorrowerWaitingForever() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setFairQueue(true);
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setMinIdle(0);
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setMaxIdle(1);
+        // <= 0 means: wait forever for a returned connection
+        ds.getPoolProperties().setMaxWait(-1);
+        ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(-1); // sweeper off
+        ds.createPool();
+        ConnectionPool pool = ds.getPool();
+
+        ds.getConnection(); // takes the only slot, and the pool is at maxActive
+
+        CountDownLatch finished = new CountDownLatch(1);
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+        Thread borrower = new Thread(() -> {
+            try {
+                ds.getConnection(); // parks without a timeout
+            } catch (Throwable x) {
+                failure.set(x);
+            } finally {
+                finished.countDown();
+            }
+        }, "infinite-wait-borrower");
+        borrower.setDaemon(true);
+        borrower.start();
+        awaitUntil(() -> ds.getWaitCount() == 1);
+
+        // Like the async twin of this scenario, the borrower cannot observe the
+        // closed pool itself - it is parked in the queue wait, and a closed pool
+        // never offers a connection to that queue again. Closing the pool has to
+        // terminate the parked wait instead.
+        ds.close(true);
+
+        Assertions.assertTrue(finished.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
+                "closing the pool must release a borrower parked without a timeout");
+        Assertions.assertTrue(failure.get() instanceof SQLException,
+                "the released borrow must fail as a SQLException, got " + failure.get());
+        Assertions.assertTrue(failure.get().getMessage().toLowerCase().contains("closed"),
+                "the failure must report the pool closure, was: " + failure.get().getMessage());
+        Assertions.assertEquals(0, pool.getWaitCount(),
+                "a borrower released by the closure must not keep its wait count");
+        awaitSessions(0);
+    }
+
+    /*
+     * The same on the plain queue: close() cannot fail a wait parked in a
+     * LinkedBlockingQueue - it has no termination hook - so the borrow loop
+     * itself has to notice the closure it is waiting through.
+     */
+    @Test
+    void closingThePoolFailsASynchronousBorrowerWaitingForeverOnThePlainQueue() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setFairQueue(false);
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setMinIdle(0);
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setMaxIdle(1);
+        // <= 0 means: wait forever for a returned connection
+        ds.getPoolProperties().setMaxWait(-1);
+        ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(-1); // sweeper off
+        ds.createPool();
+        ConnectionPool pool = ds.getPool();
+
+        ds.getConnection(); // takes the only slot, and the pool is at maxActive
+
+        CountDownLatch finished = new CountDownLatch(1);
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+        Thread borrower = new Thread(() -> {
+            try {
+                ds.getConnection(); // parks without a timeout
+            } catch (Throwable x) {
+                failure.set(x);
+            } finally {
+                finished.countDown();
+            }
+        }, "infinite-wait-borrower-plain-queue");
+        borrower.setDaemon(true);
+        borrower.start();
+        awaitUntil(() -> ds.getWaitCount() == 1);
+
+        ds.close(true);
+
+        Assertions.assertTrue(finished.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
+                "closing the pool must release a borrower parked without a "
+                        + "timeout even on a queue that cannot fail its waits");
+        Assertions.assertTrue(failure.get() instanceof SQLException,
+                "the released borrow must fail as a SQLException, got " + failure.get());
+        Assertions.assertTrue(failure.get().getMessage().toLowerCase().contains("closed"),
+                "the failure must report the pool closure, was: " + failure.get().getMessage());
+        Assertions.assertEquals(0, pool.getWaitCount(),
+                "a borrower released by the closure must not keep its wait count");
+        awaitSessions(0);
+    }
+
+    /*
+     * The loop's "keep polling" recovery after it has picked a released
+     * connection out of the idle queue must actually poll again: an endless
+     * wait that treats the dead connection it already consumed as still
+     * pending spins on a full core and cannot even be stopped by the close.
+     */
+    @Test
+    void anEndlessWaitOnThePlainQueueKeepsPollingAfterADroppedConnection() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setFairQueue(false);
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setMinIdle(0);
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setMaxIdle(1);
+        // <= 0 means: wait forever for a returned connection
+        ds.getPoolProperties().setMaxWait(-1);
+        ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(-1); // sweeper off
+        ds.createPool();
+        ConnectionPool pool = ds.getPool();
+
+        // A released connection left behind in the idle queue - the state the
+        // borrow loop's own comment names and promises to keep polling past.
+        Connection toIdle = ds.getConnection();
+        PooledConnection session = interceptorOf(toIdle, ProxyConnection.class).getConnection();
+        toIdle.close();
+        Assertions.assertEquals(1, ds.getIdle(), "the returned connection");
+        session.release();
+
+        CountDownLatch finished = new CountDownLatch(1);
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+        Thread borrower = new Thread(() -> {
+            try {
+                ds.getConnection(); // takes the dropped connection, then waits
+            } catch (Throwable x) {
+                failure.set(x);
+            } finally {
+                finished.countDown();
+            }
+        }, "dropped-connection-waiter");
+        borrower.setDaemon(true);
+        borrower.start();
+        awaitUntil(() -> ds.getWaitCount() == 1);
+
+        ds.close(true);
+
+        Assertions.assertTrue(finished.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
+                "an endless wait must keep polling and observe the closure, not "
+                        + "spin on the connection it already consumed");
+        Assertions.assertTrue(failure.get() instanceof SQLException
+                        && failure.get().getMessage().toLowerCase().contains("closed"),
+                "the endless wait must fail with the pool closure, got " + failure.get());
+        Assertions.assertEquals(0, pool.getWaitCount(),
+                "a borrower released by the closure must not keep its wait count");
+        awaitSessions(0);
+    }
+
+    /*
+     * A plain-queue wait that is long - far beyond any slice - must be cut
+     * into slices too: "sleeping through the close for a while" is the same
+     * stranded thread, only with a longer while. maxWait is an int of
+     * milliseconds, so the while can be up to about 24.8 days.
+     */
+    @Test
+    void closingThePoolFailsALongSynchronousWaitOnThePlainQueue() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setFairQueue(false);
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setMinIdle(0);
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setMaxIdle(1);
+        // far longer than any slice, yet finite
+        ds.getPoolProperties().setMaxWait(3600000);
+        ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(-1); // sweeper off
+        ds.createPool();
+        ConnectionPool pool = ds.getPool();
+
+        ds.getConnection(); // takes the only slot, and the pool is at maxActive
+
+        CountDownLatch finished = new CountDownLatch(1);
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+        Thread borrower = new Thread(() -> {
+            try {
+                ds.getConnection(); // parks for an hour
+            } catch (Throwable x) {
+                failure.set(x);
+            } finally {
+                finished.countDown();
+            }
+        }, "long-wait-borrower-plain-queue");
+        borrower.setDaemon(true);
+        borrower.start();
+        awaitUntil(() -> ds.getWaitCount() == 1);
+
+        ds.close(true);
+
+        Assertions.assertTrue(finished.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
+                "closing the pool must release a long plain-queue wait instead of "
+                        + "leaving it to sleep through the closure");
+        Assertions.assertTrue(failure.get() instanceof SQLException
+                        && failure.get().getMessage().toLowerCase().contains("closed"),
+                "the released wait must report the pool closure, got " + failure.get());
+        Assertions.assertEquals(0, pool.getWaitCount(),
+                "a borrower released by the closure must not keep its wait count");
+        awaitSessions(0);
+    }
 }
