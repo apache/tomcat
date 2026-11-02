@@ -419,27 +419,51 @@ public class DataSourceProxy implements PoolConfiguration {
      * Close the connection pool. If a pool creation is in flight, this method does not wait for it - the driver
      * connects of the creation's initial pre-load can block for an unbounded, uninterruptible time against a hung
      * database - it marks this data source closed and returns: the creation observes the closure at its publication
-     * step and closes the pool it built instead of publishing it.
+     * step and closes the pool it built instead of publishing it. The same reason keeps the teardown outside the
+     * monitor: the physical disconnect of every pooled session is as unbounded against a hung database as the
+     * connect is, and it must not park the paths that need the monitor meanwhile - a later borrow's publication step,
+     * or the container's JMX lifecycle callbacks.
      *
      * @param all if true close all connections, otherwise only idle ones
      */
-    public synchronized void close(boolean all) {
-        // Sets the terminal closed flag and takes the published pool in one
-        // step under this monitor - the check-and-publish race this closes
-        // with is told at pCreatePool()'s publication step. The closed flag
-        // makes the closure terminal for the pool creation paths as well: a
-        // closed data source no longer resurrects its pool on the next borrow
-        // or statistics access. The monitor is never held across a pool
-        // construction, so this method never waits on a driver connect.
+    public void close(boolean all) {
+        closePool(takePoolForClose(), all);
+    }
+
+    /**
+     * Sets the terminal closed flag and takes the published pool, as one step under this data source's monitor.
+     * The check-and-publish race this closes with is told at
+     * {@code pCreatePool()}'s publication step, which takes the same monitor: whichever of the
+     * two runs first wins. The closed flag makes the closure terminal for the pool creation paths as well: a closed
+     * data source no longer resurrects its pool on the next borrow or statistics access.
+     *
+     * @return the pool that must now be torn down, or {@code null} when nothing was published (yet)
+     */
+    protected synchronized ConnectionPool takePoolForClose() {
         closed = true;
         final ConnectionPool p = pool;
         pool = null;
-        if (p != null) {
-            try {
-                p.close(all);
-            } catch (Exception x) {
-                log.warn(MessageFactory.get("dataSourceProxy.errorClosingPool"), x);
-            }
+        return p;
+    }
+
+    /**
+     * Tears down the pool that {@link #takePoolForClose()} handed over, outside this data source's monitor: a
+     * physical disconnect against a hung database is unbounded and uninterruptible, and a parked teardown must not
+     * park the later borrows or lifecycle callbacks that need that monitor. A failure of the teardown is logged,
+     * not propagated: the closure already happened when the flag was set, and one failing session must not stop
+     * the rest from being disconnected or hide the closure from the caller.
+     *
+     * @param p   the pool to close, or {@code null} to close nothing
+     * @param all if true close all connections, otherwise only idle ones
+     */
+    protected void closePool(ConnectionPool p, boolean all) {
+        if (p == null) {
+            return;
+        }
+        try {
+            p.close(all);
+        } catch (Exception x) {
+            log.warn(MessageFactory.get("dataSourceProxy.errorClosingPool"), x);
         }
     }
 
