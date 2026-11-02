@@ -28,31 +28,32 @@ public class TestHttp2AsyncUpgradeHandler {
 
     /*
      * AsyncHeaderFrameBuffers is a private, static nested class so reflection is used to test that payload expansion is
-     * capped at the maximum frame size that can be represented in a frame header. Previously the payload size was
+     * capped at twice the maximum frame size that can be represented in a frame header. Previously the payload size was
      * simply doubled on every expansion which, for very large header blocks, eventually overflowed the size resulting
      * in an attempt to allocate a buffer with a negative capacity.
      */
     @Test
-    public void testPayloadExpansionIsCapped() throws Exception {
+    public void testWorkspaceExpansionIsCapped() throws Exception {
         Class<?> clazz = Class.forName("org.apache.coyote.http2.Http2AsyncUpgradeHandler$AsyncHeaderFrameBuffers");
-        Constructor<?> constructor = clazz.getDeclaredConstructor(int.class);
+        Constructor<?> constructor = clazz.getDeclaredConstructor(int.class, int.class);
         constructor.setAccessible(true);
-        Object buffers = constructor.newInstance(Integer.valueOf(1024));
+        int workspaceLimit = 2 * ConnectionSettingsBase.MAX_MAX_FRAME_SIZE;
+        Object buffers = constructor.newInstance(Integer.valueOf(1024), Integer.valueOf(workspaceLimit));
         Method expandPayload = clazz.getDeclaredMethod("expandPayload");
         expandPayload.setAccessible(true);
 
         int expectedSize = 1024;
-        while (expectedSize < ConnectionSettingsBase.MAX_MAX_FRAME_SIZE) {
+        while (expectedSize < workspaceLimit) {
             expandPayload.invoke(buffers);
-            expectedSize = Integer.min(expectedSize * 2, ConnectionSettingsBase.MAX_MAX_FRAME_SIZE);
+            expectedSize = Integer.min(expectedSize * 2, workspaceLimit);
             Assert.assertEquals(expectedSize, readPayloadSize(clazz, buffers));
         }
 
-        // A buffer that is already as large as the largest permitted frame
-        // can not be expanded further
+        // A buffer at the workspace limit cannot be expanded further. The encoded payload is checked separately
+        // before it is written, since it may be much smaller than the space reserved for encoding.
         try {
             expandPayload.invoke(buffers);
-            Assert.fail("Expansion beyond the maximum permitted frame size was expected to fail.");
+            Assert.fail("Expansion beyond the maximum permitted workspace size was expected to fail.");
         } catch (InvocationTargetException e) {
             Assert.assertEquals(IllegalStateException.class, e.getCause().getClass());
         }

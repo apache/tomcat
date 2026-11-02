@@ -592,7 +592,9 @@
         compliant client must treat as a connection error of type
         <code>FLOW_CONTROL_ERROR</code>. Streams that are left without an
         allocation remain in the back log and are considered again when the
-        next window increment arrives. (remm)
+        next window increment arrives. Any part of the increment left
+        unallocated by the rounding of the proportional shares is allocated to
+        the waiting streams in priority order rather than being lost. (remm)
       </fix>
       <fix>
         Permit the <code>WINDOW_UPDATE</code> and <code>RST_STREAM</code>
@@ -663,6 +665,22 @@
       <fix>
         Detect and disconnect a mis-behaving HTTP/2 client that sends large
         numbers of unexpected settings acknowledgement frames. (markt)
+      </fix>
+      <fix>
+        Fix excessive CPU usage after a client half-closes an upgraded
+        connection while the application keeps the output stream open to finish
+        its response. Stop polling for input at end of stream and ensure that a
+        subsequent <code>WebConnection.close()</code> closes the connection.
+        (markt)
+      </fix>
+      <fix>
+        Fix rejection of large HTTP/2 response headers that fit within a frame
+        after HPACK compression. Allow the encoding workspace to grow to the
+        larger of twice the peer's advertised maximum frame payload size and
+        the peer's dynamic table capacity, so indexed fields remain usable after
+        a frame size reduction. Check the encoded payload against the peer's
+        frame size limit before writing it and close the connection with an
+        <code>INTERNAL_ERROR</code> if a header block can not be written. (markt)
       </fix>
     </changelog>
   </subsection>
@@ -800,6 +818,11 @@
         <code>null</code>. This matches the reference implementation, which
         keeps the parameters of each tag to itself and never touches page
         scope attributes. (remm)
+      </fix>
+      <fix>
+        <code>RecordELResolver</code> no longer prevents
+        <code>BeanELResolver</code> from resolving bean-style properties (such
+        as <code>isValid()</code>) on a <code>Record</code>. (markt)
       </fix>
     </changelog>
   </subsection>
