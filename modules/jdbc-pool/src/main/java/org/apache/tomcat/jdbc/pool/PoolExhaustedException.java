@@ -26,18 +26,29 @@ public class PoolExhaustedException extends SQLException {
     private static final long serialVersionUID = 3501536931777262475L;
 
     /**
+     * SQL state reported with pool-exhaustion failures: {@code "HY000"}, the general
+     * error class. Pool exhaustion is a pool-side condition rather than a database
+     * error, so none of the connection-class states (the {@code 08xxx} family, which
+     * describe the session itself failing) says exactly this; still, consumers that
+     * multiplex many {@link SQLException} sources and classify them by state need a
+     * non-null label to recognize pool exhaustion without referencing pool classes.
+     */
+    public static final String SQL_STATE = "HY000";
+
+    /**
      * Constructs a PoolExhaustedException with no detail message.
      */
     public PoolExhaustedException() {
     }
 
     /**
-     * Constructs a PoolExhaustedException with the specified detail message.
+     * Constructs a PoolExhaustedException with the specified detail message. The
+     * exception carries {@link #SQL_STATE} as its SQL state.
      *
      * @param reason the detail message
      */
     public PoolExhaustedException(String reason) {
-        super(reason);
+        super(reason, SQL_STATE);
     }
 
     /**
