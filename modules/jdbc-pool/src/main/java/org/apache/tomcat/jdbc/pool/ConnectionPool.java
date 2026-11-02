@@ -212,15 +212,17 @@ public class ConnectionPool {
                 if (pc != null) {
                     return new ConnectionFuture(pc);
                 }
-            } catch (SQLException x) {
-                // JDBC exceptions may carry no message at all; a missing
-                // "NoWait" marker must be assumed for those, so that the
-                // original failure reaches the caller instead of a
-                // NullPointerException from dereferencing the message
-                String msg = x.getMessage();
-                if (msg == null || msg.indexOf("NoWait") < 0) {
-                    throw x;
-                }
+            } catch (PoolExhaustedException x) {
+                // A wait of zero is only refused with the no-wait variant of
+                // this exception, so the type itself is the "pool is empty
+                // right now" signal that this path converts into an async
+                // wait. Discriminating on the type rather than on a marker
+                // inside the localized message keeps the conversion alive
+                // when the message is reworded or translated. Every other
+                // SQLException this attempt can throw - a closed pool, an
+                // interrupted wait, a validation or connect failure - is a
+                // failure of the borrow itself and propagates from the
+                // method to the caller untouched.
             }
             // We can only retrieve a future if the underlying queue supports it.
             if (idle instanceof FairBlockingQueue<?>) {
