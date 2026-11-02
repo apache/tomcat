@@ -20,9 +20,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
  * Configuration only, no database and no pool: {@code PoolProperties}
