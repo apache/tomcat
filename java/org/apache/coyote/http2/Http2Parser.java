@@ -734,16 +734,18 @@ class Http2Parser {
 
         if (headersCurrentStream != -1) {
             if (headersCurrentStream != streamId) {
+                // RFC 9113, section 6.10: a CONTINUATION frame on a different stream is a
+                // connection error of type PROTOCOL_ERROR.
                 throw new ConnectionException(
                         sm.getString("http2Parser.headers.wrongStream", connectionId,
                                 Integer.toString(headersCurrentStream), Integer.toString(streamId)),
-                        Http2Error.COMPRESSION_ERROR);
+                        Http2Error.PROTOCOL_ERROR);
             }
-            if (frameType == FrameType.RST) {
-                // NO-OP: RST is OK here
-            } else if (frameType != FrameType.CONTINUATION) {
+            if (frameType != FrameType.CONTINUATION) {
+                // RFC 9113, section 6.10: any frame other than CONTINUATION while a header
+                // block is in progress is a connection error of type PROTOCOL_ERROR.
                 throw new ConnectionException(sm.getString("http2Parser.headers.wrongFrameType", connectionId,
-                        Integer.toString(headersCurrentStream), frameType), Http2Error.COMPRESSION_ERROR);
+                        Integer.toString(headersCurrentStream), frameType), Http2Error.PROTOCOL_ERROR);
             }
         }
 
