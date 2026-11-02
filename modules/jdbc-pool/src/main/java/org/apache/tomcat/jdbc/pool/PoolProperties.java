@@ -17,16 +17,19 @@
 package org.apache.tomcat.jdbc.pool;
 
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -34,6 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.jdbc.pool.util.ExceptionUtils;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
@@ -118,7 +122,13 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     private volatile int removeAbandonedTimeout = 60;
     /** Whether to log abandoned connections. */
     private volatile boolean logAbandoned = false;
-    /** The pool name. */
+    /**
+     * The pool name. The identity hash of the class object is the same for
+     * every pool in a JVM - it identifies the class loader that loaded this
+     * class, not the pool - so the per-pool uniqueness of the default name
+     * comes from the counter alone. The hash term is upstream's default-name
+     * shape and stays for that reason.
+     */
     private volatile String name = "Tomcat Connection Pool[" + (poolCounter.addAndGet(1)) + "-" +
             System.identityHashCode(PoolProperties.class) + "]";
     /** The database password. */
@@ -449,8 +459,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     @Override
     public synchronized InterceptorDefinition[] getJdbcInterceptorsAsArray() {
         if (interceptors == null) {
-            // One read of the reconfigurable string: the parse below must see
-            // a single value, not a fresh read per use.
+            // Read once: the parse below must work on a single snapshot.
             String interceptorList = jdbcInterceptors;
             if (interceptorList == null) {
                 interceptors = new InterceptorDefinition[0];
@@ -472,18 +481,17 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                         propsAsString = interceptorValues[i].substring(propIndex + 1, endIndex);
                     }
                     if (name.isEmpty()) {
-                        // The name is empty when a leading or doubled
-                        // separator leaves an empty segment, or when a
-                        // segment opens straight on "(": there is no
-                        // interceptor to load, and a definition without a
-                        // class name fails the whole pool start later, on
+                        // A leading or doubled separator, or a segment that
+                        // opens straight on "(", leaves no interceptor name:
+                        // there is nothing to load, and a definition without
+                        // a class name fails the whole pool start later, on
                         // the generated "...pool.interceptor." class, with a
                         // message naming nothing. split() already drops a
                         // redundant trailing separator and the property parse
-                        // below tolerates a redundant separator inside the
-                        // parentheses: skipping the empty name makes a
-                        // redundant separator cosmetic throughout the syntax
-                        // rather than fatal wherever split() kept it.
+                        // tolerates one inside the parentheses, so skipping
+                        // the empty name makes a redundant separator cosmetic
+                        // throughout the syntax rather than fatal wherever
+                        // split() kept it.
                         continue;
                     }
                     InterceptorDefinition definition = new InterceptorDefinition(name);
@@ -537,7 +545,10 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
      * field's value even when this string names that key, the rule the
      * credential setters establish. A configuration whose
      * database properties are {@code null} only stores the raw string, as there
-     * is no property collection to parse into. The remove and re-add run inside
+     * is no property collection to parse into. The string is parsed before any
+     * state is touched, so a value the parser rejects - a malformed Unicode
+     * escape - leaves the previous configuration fully in place
+     * along with the exception. The remove and re-add run inside
      * this one synchronized method; an unsynchronised reader of the database
      * properties, which {@link #getDbProperties()} has always handed out live,
      * can therefore observe the contributed keys briefly missing.
@@ -547,8 +558,13 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
      */
     @Override
     public synchronized void setConnectionProperties(String connectionProperties) {
-        this.connectionProperties = connectionProperties;
         Properties dbProps = getDbProperties();
+        // Parse into a fresh collection before anything is mutated: that is
+        // what tells apart the keys this string contributes from the ones
+        // dbProperties holds from elsewhere, and a string the parse rejects
+        // must not have cost the previous configuration its pairs yet.
+        Properties parsed = dbProps == null ? null : getProperties(connectionProperties, new Properties());
+        this.connectionProperties = connectionProperties;
         if (dbProps == null) {
             // The pairs have no collection to land in; nothing was contributed,
             // so there is nothing to track for a later removal either.
@@ -562,9 +578,6 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                 dbProps.remove(key);
             }
         }
-        // Parse into a fresh collection first: that is what tells apart the keys
-        // this string contributes from the ones dbProperties holds from elsewhere.
-        Properties parsed = getProperties(connectionProperties, new Properties());
         Set<String> keys = new HashSet<>(parsed.size());
         for (String key : parsed.stringPropertyNames()) {
             dbProps.setProperty(key, parsed.getProperty(key));
@@ -572,11 +585,15 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         }
         // The credential setters' rule outlives the string: while a credential
         // field is set, its dbProperties entry holds the field's value, even
-        // when this string named the key itself - DataSourceFactory injects the
+        // when this string named the key - DataSourceFactory injects the
         // configured username/password over the string's pairs, so a
         // reconfigure that drops the keys from the string must not strip
-        // credentials the configuration still carries. With the field unset the
-        // entry is the string's own again, exactly as after setPassword(null).
+        // credentials the configuration still carries. With the field unset
+        // this parse re-asserts nothing and the entry is the string's own
+        // again. The entry can also be missing here although the string names
+        // the key, because clearing a credential takes the entry away whatever
+        // contributed it; this parse hands the pair back - writing the string
+        // is a fresh declaration of what it contributes.
         if (username != null) {
             dbProps.setProperty(PoolUtilities.PROP_USER, username);
         }
@@ -699,6 +716,14 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
      * <p>
      * A configuration whose database properties are {@code null} has no collection to hold the entry, so only the
      * field is stored.
+     * <p>
+     * The removal covers the entry whatever put it there. A {@code connectionProperties} string that names
+     * {@code password} contributes the same entry, and clearing the password takes that entry away as well: clearing
+     * a credential has to win over every surface that still names the key, because it is the operation an operator
+     * uses to stop a credential authenticating connections. The string is not modified, so
+     * {@link #getConnectionProperties()} keeps reporting it and the next {@link #setConnectionProperties(String)}
+     * whose value names the key applies that pair again. Retiring a credential the string carries means taking it
+     * out of the string.
      *
      * @param password The password
      */
@@ -708,6 +733,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         if (this.dbProperties != null) {
             if (password == null) {
                 this.dbProperties.remove(PoolUtilities.PROP_PASSWORD);
+                warnStringStillNamesCredential(PoolUtilities.PROP_PASSWORD);
             } else {
                 this.dbProperties.setProperty(PoolUtilities.PROP_PASSWORD, password);
             }
@@ -759,7 +785,8 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
     /**
      * Stores the user name and keeps the {@code user} entry of the database properties in step with it, for the
-     * reason given on {@link #setPassword(String)}.
+     * reason given on {@link #setPassword(String)}. A {@code null} user name likewise removes the entry whatever
+     * contributed it, including a pair the {@code connectionProperties} string names.
      *
      * @param username The user name
      */
@@ -769,9 +796,28 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         if (this.dbProperties != null) {
             if (username == null) {
                 this.dbProperties.remove(PoolUtilities.PROP_USER);
+                warnStringStillNamesCredential(PoolUtilities.PROP_USER);
             } else {
                 this.dbProperties.setProperty(PoolUtilities.PROP_USER, username);
             }
+        }
+    }
+
+
+    /**
+     * Notes at warn level when clearing a credential has just removed an entry
+     * that the configured {@code connectionProperties} string still names, so
+     * the divergence between the reported configuration and the properties the
+     * driver is handed is not silent. Names the key, never the value: the clear
+     * is the operator's intent to retire the credential.
+     *
+     * @param key the credential key whose entry was removed
+     */
+    private void warnStringStillNamesCredential(String key) {
+        // Called with the monitor held, which is also the one setConnectionProperties
+        // publishes the tracking under.
+        if (connectionPropertyKeys != null && connectionPropertyKeys.contains(key)) {
+            log.warn(MessageFactory.get("poolProperties.credentialClearStripsStringEntry", key));
         }
     }
 
@@ -844,6 +890,21 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     }
 
 
+    /**
+     * Best-effort dump of the configuration. The {@code password} field is
+     * masked whenever it carries a secret and prints as {@code null} when
+     * none is configured, and the {@code url}, {@code connectionProperties}
+     * and {@code jdbcInterceptors} strings pass through credential masking,
+     * so the dump can be logged without carrying a cleartext credential. The
+     * masking is best effort in the way {@link #maskCredentials(String)} and
+     * {@link #maskInterceptorCredentials(String)} describe, so it removes the
+     * credentials an operator normally configures rather than proving the
+     * configuration holds no other secret. A property whose getter fails is
+     * reported as an error in its own field and does not truncate the rest of
+     * the dump.
+     *
+     * @return the dump, always bracket-balanced even on internal failure
+     */
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder("ConnectionPool[");
@@ -860,110 +921,464 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                     } catch (NoSuchMethodException nm) {
                         continue;
                     }
-                    Object value = m.invoke(this, new Object[0]);
                     buf.append(field);
                     buf.append('=');
-                    if (DataSourceFactory.PROP_PASSWORD.equals(field)) {
-                        buf.append(PASSWORD_MASK);
-                    } else if (DataSourceFactory.PROP_URL.equals(field)
-                            || DataSourceFactory.PROP_CONNECTIONPROPERTIES.equals(field)) {
-                        // The same dump prints these raw configuration
-                        // strings, so a credential typed into one of them
-                        // has to be masked too, not just the password field.
-                        buf.append(value == null ? "null" : maskCredentials((String) value));
-                    } else {
-                        buf.append(value);
+                    // One bad property - a subclass getter that throws, or a
+                    // dataSource object whose toString() throws - must cost
+                    // only its own field, not the rest of the dump. The
+                    // append itself is inside this try because buf.append
+                    // calls the object's toString() directly: an Error from a
+                    // hostile third-party toString() arrives unwrapped here,
+                    // not wrapped like one from inside Method.invoke, and a
+                    // dump that promises not to throw must hold that promise
+                    // against the arbitrary objects it prints - except for
+                    // the fatal errors, which the module convention is to
+                    // propagate rather than report.
+                    try {
+                        Object value = m.invoke(this, new Object[0]);
+                        if (DataSourceFactory.PROP_PASSWORD.equals(field)) {
+                            buf.append(value == null ? "null" : PASSWORD_MASK);
+                        } else if (DataSourceFactory.PROP_URL.equals(field)
+                                || DataSourceFactory.PROP_CONNECTIONPROPERTIES.equals(field)) {
+                            // The same dump prints these raw configuration
+                            // strings, so a credential typed into one of them
+                            // has to be masked too, not just the password field.
+                            buf.append(value == null ? "null" : maskCredentials((String) value));
+                        } else if (DataSourceFactory.PROP_INTERCEPTORS.equals(field)) {
+                            // Interceptor properties reach a third-party
+                            // interceptor through setProperties(), so this
+                            // configuration string carries credentials the
+                            // same way; its pairs live inside parentheses,
+                            // which the segment-start walk above cannot see.
+                            buf.append(value == null ? "null" : maskInterceptorCredentials((String) value));
+                        } else {
+                            buf.append(value);
+                        }
+                    } catch (ReflectiveOperationException | RuntimeException | Error x) {
+                        Throwable cause = ExceptionUtils.unwrapInvocationTargetException(x);
+                        ExceptionUtils.handleThrowable(cause);
+                        buf.append("<error: ").append(cause).append('>');
                     }
                     buf.append("; ");
                     break;
                 }
             }
-            buf.append(']');
         } catch (Exception x) {
             // Shouldn't happen
             if (log.isDebugEnabled()) {
                 log.debug("toString() call failed", x);
             }
+        } finally {
+            // The javadoc promises a bracket-balanced dump even on internal
+            // failure, and an unterminated "ConnectionPool[" line is what a
+            // truncated diagnostic log entry looks like.
+            buf.append(']');
         }
         return buf.toString();
     }
 
 
     /**
-     * Masks the value of credential-like {@code key=value} pairs embedded in a
-     * raw configuration string so that a password typed into the JDBC URL query
-     * string or the connection properties is not printed in cleartext the way
-     * the dedicated password field is masked in {@link #toString()}. The keys
-     * recognised, compared ignoring case, are {@code password}, {@code pass}
-     * and {@code pwd}. A key is honoured only at a segment boundary - the start
-     * of the string or one of {@code ;}, {@code &} or {@code ?} - so a key such
-     * as {@code compass} is left alone, and its value runs to the next
-     * {@code ;}, {@code &} or the end of the string.
+     * Masks the credentials embedded in a raw configuration string so that a
+     * password typed into the JDBC URL or the connection properties is not
+     * printed in cleartext the way the dedicated password field is masked in
+     * {@link #toString()}. Two shapes are scrubbed.
      * <p>
-     * Only the {@code key=value} shape is scrubbed. The
-     * {@code user:password@host} userinfo form, the {@code key:value} and
-     * {@code key value} forms that a {@link java.util.Properties} reader
-     * additionally accepts, and driver-specific secrets that use a key other
-     * than the three above are not recognised; recognising them would require
-     * a full parse of each driver's URL dialect.
+     * The value of a pair whose key - at the start of a segment, ignoring
+     * case - is one of {@code password}, {@code pass} and {@code pwd}. A
+     * segment starts at the beginning of the string or at {@code ;}, a new
+     * line, {@code &amp;} or {@code ?}. Only the first two are boundaries to
+     * the properties parser that applies a configuration string, and the
+     * pairs behind them are the pairs a driver receives: their value runs to
+     * the next such boundary, because an {@code &amp;} or {@code ?} is an
+     * ordinary character inside a delivered value and masking up to one
+     * would print the tail of the password the driver really receives, while
+     * a new line the reader deletes as a backslash continuation is no
+     * boundary at all and the mask runs across it into the next line. A pair
+     * that only appears to start behind {@code &amp;} or {@code ?} was
+     * folded into another pair's value by the parser, and it is masked to the
+     * end of its segment all the same - a secret typed there was typed as a
+     * credential. The key runs to the first value separator the parser
+     * accepts - {@code =}, {@code :} or white space - so a key such as
+     * {@code compass}, a credential-shaped word inside a longer value, and
+     * the colons of a JDBC URL scheme, host or port are all left alone.
+     * Either way a masked value cannot hide a later pair. A pair with an
+     * empty value is masked like any other, so a masked pair in the dump does
+     * not by itself say that a non-empty secret was configured.
+     * <p>
+     * The password of a URL {@code user:password@host} userinfo section, and
+     * of the equivalent {@code user/password@host} form used by the legacy
+     * Oracle driver URLs, wherever they appear in the string. The user name is
+     * kept visible for diagnostics.
+     * <p>
+     * The pass is best effort rather than a guarantee: colon-separated
+     * dialects that put a pair behind the colon rather than at the segment
+     * start, like DB2's {@code :user=x:password=y}, and driver-specific
+     * secrets that use a key other than the three above are not recognised,
+     * and recognising them would require a full parse of each driver's URL
+     * dialect. What a masked result says is that no credential of the
+     * recognised shapes remains in the string, not that the string carries no
+     * secret at all.
      *
      * @param value the raw configuration string, may be {@code null}
      *
-     * @return the string with every credential key's value replaced by the mask,
-     *         or the string unchanged when it holds no recognised credential key
+     * @return the string with every recognised credential replaced by the mask,
+     *         or the string unchanged when it holds none
      */
     private static String maskCredentials(String value) {
-        if (value == null || value.indexOf('=') < 0) {
-            return value;
+        if (value == null) {
+            return null;
         }
-        StringBuilder result = new StringBuilder(value.length());
+        // The authority pass runs first: a userinfo-only URL carries no pair
+        // the segment walk below would recognise, and its colons must not
+        // reach the walk as candidate value separators.
+        String scrubbed = maskUrlAuthority(value);
+        // Walk the parser's segments: one pair per segment, key first, exactly
+        // as java.util.Properties reads them after the semicolons became new
+        // lines. Anything that is not a recognised credential pair - the
+        // JDBC URL itself, driver values carrying colons or spaces - is copied
+        // verbatim.
+        StringBuilder result = new StringBuilder(scrubbed.length());
         int i = 0;
-        while (i < value.length()) {
-            int equals = value.indexOf('=', i);
-            if (equals < 0) {
-                break;
+        boolean afterPairBoundary = true;
+        while (i < scrubbed.length()) {
+            int segmentEnd = i;
+            while (segmentEnd < scrubbed.length() && !isCredentialSegmentSeparator(scrubbed.charAt(segmentEnd))) {
+                segmentEnd++;
             }
-            int keyStart = equals;
-            while (keyStart > 0 && !isCredentialSegmentSeparator(value.charAt(keyStart - 1))) {
-                keyStart--;
+            // The reader skips leading white space before a key.
+            int keyStart = i;
+            while (keyStart < segmentEnd && isCredentialValueSeparator(scrubbed.charAt(keyStart))) {
+                keyStart++;
             }
-            String key = value.substring(keyStart, equals).trim();
-            int valueStart = equals + 1;
-            int valueEnd = value.length();
-            for (int k = valueStart; k < value.length(); k++) {
-                char c = value.charAt(k);
-                if (c == ';' || c == '&') {
-                    valueEnd = k;
-                    break;
+            int keyEnd = keyStart;
+            while (keyEnd < segmentEnd && !isCredentialValueSeparator(scrubbed.charAt(keyEnd))) {
+                keyEnd++;
+            }
+            if (keyEnd < segmentEnd && isCredentialKey(scrubbed.substring(keyStart, keyEnd))) {
+                // Keep the pair's key and the separator, hide the value.
+                int valueEnd = segmentEnd;
+                if (afterPairBoundary) {
+                    // A pair the properties parser applies, so the value -
+                    // the password the driver really receives - runs to the
+                    // next boundary that parser sees. An '&' or '?' inside it
+                    // is an ordinary character there, and a boundary the
+                    // reader deletes as part of a backslash continuation is
+                    // not such a boundary either.
+                    valueEnd = segmentEnd;
+                    while (valueEnd < scrubbed.length()) {
+                        while (valueEnd < scrubbed.length()
+                                && !isPairSeparator(scrubbed.charAt(valueEnd))) {
+                            valueEnd++;
+                        }
+                        if (valueEnd < scrubbed.length() && continuesValueLine(scrubbed, valueEnd)) {
+                            valueEnd++;
+                            if (valueEnd < scrubbed.length() && scrubbed.charAt(valueEnd) == '\n') {
+                                // The new line of a \r\n pair, which the
+                                // reader deletes as one new line with the \r.
+                                valueEnd++;
+                            }
+                        } else {
+                            break;
+                        }
+                    }
                 }
-            }
-            result.append(value, i, equals);
-            result.append('=');
-            if (isCredentialKey(key)) {
+                result.append(scrubbed, i, keyEnd + 1);
                 result.append(PASSWORD_MASK);
+                i = valueEnd;
             } else {
-                result.append(value, valueStart, valueEnd);
+                result.append(scrubbed, i, segmentEnd);
+                i = segmentEnd;
             }
-            // Resume after the value so a '=' inside a masked value cannot be
-            // mistaken for the start of a new key.
-            i = valueEnd;
+            if (i < scrubbed.length()) {
+                // Keep the segment separator itself.
+                char boundary = scrubbed.charAt(i);
+                result.append(boundary);
+                i++;
+                afterPairBoundary = isPairSeparator(boundary);
+            }
         }
-        result.append(value, i, value.length());
         return result.toString();
     }
 
 
     /**
+     * Masks the credential values carried in an interceptor definition
+     * string, as a best-effort reading of that syntax rather than a parse of
+     * it. The pair reading mirrors what {@link
+     * #getJdbcInterceptorsAsArray()} delivers to an interceptor: the
+     * comma-separated pairs inside a definition's parentheses, with a pair's
+     * name being the text before its first {@code =}, trimmed. Every
+     * parenthesised list of a definition is read, not just the one the parse
+     * consumes, and a list that never closes is read to the end of the
+     * definition: a pair typed in either place was typed as a credential,
+     * even though a malformed definition hides it from the interceptor. A
+     * pair whose name is one of the keys {@link #isCredentialKey recognises}
+     * has its value replaced by the mask; everything else - the class names,
+     * the property names and the non-credential values - is copied verbatim,
+     * so the dump still shows which interceptors and properties are
+     * configured. Like {@link #maskCredentials(String)} this rules out the
+     * names this class treats as credentials, not any secret an interceptor
+     * may hold under another name.
+     *
+     * @param value the raw interceptor definition string, may be {@code null}
+     *
+     * @return the string with every recognised credential value replaced by
+     *         the mask, or the string unchanged when it holds none
+     */
+    private static String maskInterceptorCredentials(String value) {
+        if (value == null) {
+            return null;
+        }
+        StringBuilder result = new StringBuilder(value.length());
+        int segmentStart = 0;
+        while (segmentStart < value.length()) {
+            int segmentEnd = value.indexOf(';', segmentStart);
+            if (segmentEnd < 0) {
+                segmentEnd = value.length();
+            }
+            int cursor = segmentStart;
+            int open = value.indexOf('(', cursor);
+            while (open >= 0 && open < segmentEnd) {
+                result.append(value, cursor, open + 1);
+                int close = value.indexOf(')', open + 1);
+                if (close < 0 || close > segmentEnd) {
+                    // Never closed inside this segment (the closing
+                    // parenthesis of a later definition does not close this
+                    // one either): mask whatever was typed as a property to
+                    // the end of the segment.
+                    close = segmentEnd;
+                }
+                int pairStart = open + 1;
+                while (pairStart < close) {
+                    int pairEnd = value.indexOf(',', pairStart);
+                    if (pairEnd < 0 || pairEnd >= close) {
+                        pairEnd = close;
+                    }
+                    int separator = value.indexOf('=', pairStart);
+                    if (separator >= 0 && separator < pairEnd
+                            && isCredentialKey(value.substring(pairStart, separator).trim())) {
+                        result.append(value, pairStart, separator + 1);
+                        result.append(PASSWORD_MASK);
+                    } else {
+                        result.append(value, pairStart, pairEnd);
+                    }
+                    if (pairEnd < close) {
+                        result.append(',');
+                    }
+                    pairStart = pairEnd + 1;
+                }
+                cursor = close;
+                open = value.indexOf('(', cursor);
+            }
+            // What is left of the segment - the class name before the first
+            // parenthesis and the text after the last closed property list -
+            // is outside every property list.
+            result.append(value, cursor, segmentEnd);
+            if (segmentEnd < value.length()) {
+                // Keep the definition separator itself.
+                result.append(';');
+            }
+            segmentStart = segmentEnd + 1;
+        }
+        return result.toString();
+    }
+
+
+    /**
+     * Whether {@code c} ends a key and starts the pair's value, covering the
+     * separators a {@link java.util.Properties} reader accepts; white space
+     * doubles as the leading white space the reader skips before a key.
+     *
+     * @param c the character to test
+     *
+     * @return {@code true} when the character is a key/value separator
+     */
+    private static boolean isCredentialValueSeparator(char c) {
+        return c == '=' || c == ':' || c == ' ' || c == '\t' || c == '\f';
+    }
+
+
+    /**
+     * Masks the password of the authority section of every URL in a raw
+     * configuration string, as a best-effort reading of the URL rather than a
+     * parse of a driver's dialect, covering the {@code user:password@host}
+     * userinfo form of a {@code scheme://} URL and the {@code user/password@host}
+     * form of the legacy Oracle driver URLs. The scan of an authority is
+     * bounded so that a {@code :} of a port or an {@code @} or {@code :}
+     * appearing later in the path or query is not mistaken for a credential
+     * separator; a name that is not followed by a credential separator inside
+     * the authority is treated as a bare host and left alone rather than
+     * guessed at.
+     *
+     * @param value the raw configuration string, not {@code null}
+     *
+     * @return the string with every recognised authority password replaced by
+     *         the mask, or the string unchanged when it carries none
+     */
+    private static String maskUrlAuthority(String value) {
+        // Mask ranges are collected first and emitted in one pass at the end,
+        // so the two recognisers below cannot interfere through the order in
+        // which they happen to find their matches.
+        List<int[]> ranges = new ArrayList<>(2);
+        // Every scheme:// authority in the string: a failover or logging URL
+        // carried in a value is as credential-bearing as the URL in front of
+        // it, and the authority never contains "://" itself (the scan of one
+        // authority ends at the first '/'), so the search resumes after it.
+        int from = 0;
+        int schemeEnd;
+        while ((schemeEnd = value.indexOf("://", from)) >= 0) {
+            int authorityStart = schemeEnd + 3;
+            int authorityEnd = authorityStart;
+            while (authorityEnd < value.length() && !isAuthorityTerminator(value.charAt(authorityEnd))) {
+                authorityEnd++;
+            }
+            // An unencoded '@' inside the password itself can only extend the
+            // userinfo, so the credential runs up to the last '@' of the
+            // authority, if any.
+            int at = value.lastIndexOf('@', authorityEnd - 1);
+            if (at >= authorityStart) {
+                int colon = value.indexOf(':', authorityStart);
+                if (colon >= 0 && colon < at) {
+                    ranges.add(new int[] { colon + 1, at });
+                }
+            }
+            from = authorityEnd;
+        }
+        // Legacy Oracle form, e.g. jdbc:oracle:thin:user/password@host:1521:sid,
+        // wherever it appears in the string - as the URL itself or as the
+        // value of a pair. Its scan is bounded by the segment the prefix
+        // starts in, so an '@' of a later URL cannot drag the mask across it.
+        String oraclePrefix = "jdbc:oracle:";
+        for (int p = indexOfIgnoreCase(value, oraclePrefix, 0); p >= 0;
+                p = indexOfIgnoreCase(value, oraclePrefix, p + 1)) {
+            int prefixEnd = p + oraclePrefix.length();
+            int segmentEnd = prefixEnd;
+            while (segmentEnd < value.length() && !isCredentialSegmentSeparator(value.charAt(segmentEnd))) {
+                segmentEnd++;
+            }
+            int firstAt = value.indexOf('@', prefixEnd);
+            if (firstAt >= 0 && firstAt < segmentEnd) {
+                int slash = value.indexOf('/', prefixEnd);
+                if (slash >= 0 && slash < firstAt) {
+                    // The section opens with the user/password pair. An
+                    // unencoded '@' inside the password itself can only
+                    // extend the credential, so as in the scheme:// pass
+                    // above it runs up to the last '@' of the segment; the
+                    // at-sign-only connect forms, which carry neither a user
+                    // nor a password, are already excluded by the slash
+                    // lying behind the first '@'.
+                    int at = value.lastIndexOf('@', segmentEnd - 1);
+                    ranges.add(new int[] { slash + 1, at });
+                }
+            }
+        }
+        if (ranges.isEmpty()) {
+            return value;
+        }
+        ranges.sort(Comparator.comparingInt(range -> range[0]));
+        StringBuilder result = new StringBuilder(value.length());
+        int copied = 0;
+        for (int[] range : ranges) {
+            if (range[0] < copied) {
+                // Overlaps a mask already emitted - the pathological case of
+                // one recognised form nested in the other's credential. The
+                // earlier, outer mask has already hidden this region's start,
+                // and re-masked text is never re-scanned.
+                continue;
+            }
+            result.append(value, copied, range[0]);
+            result.append(PASSWORD_MASK);
+            copied = range[1];
+        }
+        result.append(value, copied, value.length());
+        return result.toString();
+    }
+
+
+    /**
+     * Finds the first occurrence of {@code needle} in {@code value} at or
+     * after {@code from}, ignoring case.
+     *
+     * @param value  the string to search
+     * @param needle the literal to look for
+     * @param from   the index to start at
+     *
+     * @return the index of the match, or {@code -1}
+     */
+    private static int indexOfIgnoreCase(String value, String needle, int from) {
+        for (int i = Math.max(from, 0); i <= value.length() - needle.length(); i++) {
+            if (value.regionMatches(true, i, needle, 0, needle.length())) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+
+    /**
+     * Whether {@code c} ends the authority section of a URL, covering the path,
+     * query and the semicolon used as a parameter separator by some drivers.
+     *
+     * @param c the character to test
+     *
+     * @return {@code true} when the character ends the authority section
+     */
+    private static boolean isAuthorityTerminator(char c) {
+        return c == '/' || c == '?' || c == ';';
+    }
+
+
+    /**
      * Whether {@code c} ends one configuration segment and starts the next,
-     * covering the URL query separators and the semicolon used by the
-     * connection properties string.
+     * covering the URL query separators, the semicolon used by the connection
+     * properties string and the new lines that separate the pairs for the
+     * parser that applies the string.
      *
      * @param c the character to test
      *
      * @return {@code true} when the character is a segment boundary
      */
     private static boolean isCredentialSegmentSeparator(char c) {
-        return c == ';' || c == '&' || c == '?';
+        return c == ';' || c == '&' || c == '?' || c == '\n' || c == '\r';
+    }
+
+
+    /**
+     * Whether {@code c} ends a pair for the properties parser that applies
+     * the connection properties string, one of the boundaries along which a
+     * delivered value cannot run - see {@link #continuesValueLine(String,
+     * int)} for the one new line that is no boundary at all. The query
+     * separators {@code &} and {@code ?} are ordinary characters inside a
+     * delivered value and so are deliberately not pair boundaries here,
+     * whatever they separate once a driver reads a URL-shaped value itself.
+     *
+     * @param c the character to test
+     *
+     * @return {@code true} when the character ends a pair for the parser
+     */
+    private static boolean isPairSeparator(char c) {
+        return c == ';' || c == '\n' || c == '\r';
+    }
+
+
+    /**
+     * Whether the new line at {@code lineBreak} is one the reader deletes as
+     * a line continuation, joining the next line into the delivered value:
+     * the line ends in an odd number of backslashes, of which the last one
+     * escapes the new line while the others stand as literal pairs.
+     *
+     * @param value     the string being walked
+     * @param lineBreak the index of the new line to test
+     *
+     * @return {@code true} when the value continues on the next line
+     */
+    private static boolean continuesValueLine(String value, int lineBreak) {
+        int backslashes = 0;
+        for (int i = lineBreak - 1; i >= 0 && value.charAt(i) == '\\'; i--) {
+            backslashes++;
+        }
+        return (backslashes & 1) == 1;
     }
 
 
@@ -1159,12 +1574,16 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         /**
          * Constructs an InterceptorProperty with the given name and value.
          *
-         * @param name  the property name
+         * @param name  the property name, not {@code null}
          * @param value the property value
+         * @throws NullPointerException if the name is {@code null} - the name
+         *                              keys the property in the definitions'
+         *                              map, so a nameless property could only
+         *                              fail later, from the map's hashing
          */
         public InterceptorProperty(String name, String value) {
-            assert (name != null);
-            this.name = name;
+            this.name = Objects.requireNonNull(name,
+                    () -> MessageFactory.get("poolProperties.interceptorPropertyNameRequired"));
             this.value = value;
         }
 
@@ -1317,6 +1736,10 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
         /**
          * Returns the property value as a char.
+         * <p>
+         * The method name is misspaced (capital {@code A} in {@code AsChar})
+         * in the upstream API. It is left as published so the existing public
+         * signature is not broken.
          *
          * @param def the default value if the property is null or invalid
          *
@@ -1335,7 +1758,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
         @Override
         public int hashCode() {
-            return name.hashCode();
+            return Objects.hashCode(name);
         }
 
         @Override
@@ -1345,7 +1768,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             }
             if (o instanceof InterceptorProperty) {
                 InterceptorProperty other = (InterceptorProperty) o;
-                return other.name.equals(this.name);
+                return Objects.equals(other.name, this.name);
             }
             return false;
         }
@@ -1545,9 +1968,57 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         this.useStatementFacade = useStatementFacade;
     }
 
+    /**
+     * Returns a copy of the configuration. Beyond the field-by-field copy,
+     * the driver-properties collection is copied too, through
+     * {@link PoolUtilities#clone(Properties)} - the same copy the connect
+     * path makes - so a defaults-backed property that resolves on the
+     * original also resolves on the copy.
+     * {@link #setConnectionProperties(String)} removes the keys the previous
+     * value of the string contributed, so a clone sharing the live collection
+     * would have a reconfigure on either copy strip the other one's pairs. The
+     * tracked key set is never mutated after publication, so both copies may
+     * share it, and it stays consistent with the copied entries.
+     * <p>
+     * The copy is taken under the monitor the reconfiguring setters hold, so
+     * a reconfiguration concurrent with the clone cannot appear in the copy
+     * as a state no setter ever published: a stale driver-property entry the
+     * copy's tracked key set would never remove again, or a fresh interceptor
+     * string whose published parse cache still holds the previous chain -
+     * which the cached read would then never re-parse.
+     *
+     * @return the copy
+     * @throws CloneNotSupportedException if cloning of this class is ever
+     *                                    refused
+     */
     @Override
-    protected Object clone() throws CloneNotSupportedException {
-        return super.clone();
+    protected synchronized Object clone() throws CloneNotSupportedException {
+        PoolProperties clone = (PoolProperties) super.clone();
+        Properties dbProperties = clone.dbProperties;
+        if (dbProperties != null) {
+            clone.dbProperties = PoolUtilities.clone(dbProperties);
+        }
+        return clone;
+    }
+
+
+    /**
+     * Serializes the configuration under the monitor the reconfiguring
+     * setters hold, for the same torn-snapshot reason {@link #clone()}
+     * synchronizes for: the setters publish a reconfiguration over several
+     * field writes, and a field-by-field serialization that lands between
+     * them would hand the stream a state no setter ever published. The
+     * monitor is a leaf, so holding it across the write cannot order against
+     * any other lock.
+     *
+     * @param oos the stream to write the object graph to
+     *
+     * @throws IOException if the stream fails
+     */
+    private void writeObject(ObjectOutputStream oos) throws IOException {
+        synchronized (this) {
+            oos.defaultWriteObject();
+        }
     }
 
 

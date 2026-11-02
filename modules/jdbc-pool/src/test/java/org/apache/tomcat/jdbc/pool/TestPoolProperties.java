@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -273,6 +274,62 @@ class TestPoolProperties {
     }
 
     @Test
+    void clearingTheFieldAlsoStripsTheEntryTheStringContributes() {
+        PoolProperties properties = new PoolProperties();
+        properties.setConnectionProperties("password=fromstring");
+        properties.setPassword("fromfield");
+
+        properties.setPassword(null);
+
+        Assertions.assertNull(properties.getDbProperties().getProperty("password"),
+                "clearing the credential must stop it authenticating connections,"
+                        + " whatever surface contributed the entry");
+        Assertions.assertEquals("password=fromstring", properties.getConnectionProperties(),
+                "the string is configuration and is not rewritten by a credential clear");
+    }
+
+    @Test
+    void rewritingTheStringAppliesItsCredentialPairAgain() {
+        PoolProperties properties = new PoolProperties();
+        properties.setConnectionProperties("password=fromstring");
+
+        properties.setPassword(null);
+        properties.setConnectionProperties("password=fromstring");
+
+        Assertions.assertEquals("fromstring", properties.getDbProperties().getProperty("password"),
+                "re-declaring the string re-declares its pair - retiring the credential"
+                        + " means taking it out of the string");
+    }
+
+    @Test
+    void aRejectedConnectionPropertiesStringLeavesTheConfigurationIntact() {
+        PoolProperties properties = new PoolProperties();
+        properties.setConnectionProperties("keep=yes;stale=x");
+
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> properties.setConnectionProperties("good=1;bad=\\uZZ"),
+                "a malformed unicode escape must be rejected");
+
+        Assertions.assertEquals("keep=yes;stale=x", properties.getConnectionProperties(),
+                "the rejected string must not have become the configured one");
+        Assertions.assertEquals("yes", properties.getDbProperties().getProperty("keep"),
+                "the pairs the previous string contributed must still be there");
+        Assertions.assertEquals("x", properties.getDbProperties().getProperty("stale"),
+                "the pairs the previous string contributed must still be there");
+
+        // The tracking must not have been lost either: a reconfigure after the
+        // rejected write must still remove the pairs of the string that really
+        // is configured.
+        properties.setConnectionProperties("only=new");
+
+        Assertions.assertEquals("new", properties.getDbProperties().getProperty("only"));
+        Assertions.assertNull(properties.getDbProperties().getProperty("keep"),
+                "a reconfigure after a rejected write must remove the old pairs");
+        Assertions.assertNull(properties.getDbProperties().getProperty("stale"),
+                "a reconfigure after a rejected write must remove the old pairs");
+    }
+
+    @Test
     void clearedConnectionPropertiesRemoveEveryParsedPair() {
         PoolProperties properties = new PoolProperties();
         properties.setConnectionProperties("stale=leftover");
@@ -288,6 +345,115 @@ class TestPoolProperties {
         properties.setConnectionProperties("");
         Assertions.assertTrue(properties.getDbProperties().isEmpty(),
                 "an empty string must clear the pairs just like a null one does");
+    }
+
+    @Test
+    void anErrorFromAPropertyObjectToStringStillProducesADump() {
+        // buf.append(Object) calls the object's toString() directly, so an
+        // Error from the arbitrary dataSource object arrives unwrapped, unlike
+        // one from inside a getter. The dump must not throw over it.
+        PoolProperties properties = new PoolProperties();
+        properties.setDataSource(new Object() {
+            @Override
+            public String toString() {
+                throw new StackOverflowError("boom");
+            }
+        });
+
+        String asString = Assertions.assertDoesNotThrow(properties::toString);
+
+        Assertions.assertTrue(asString.endsWith("]"),
+                "the dump must stay bracket-balanced, was: " + asString);
+        Assertions.assertTrue(asString.contains("dataSource=<error:"),
+                "the failing property must be reported in its own field, was: " + asString);
+    }
+
+    @Test
+    void aFatalErrorFromAPropertyObjectToStringIsPropagated() {
+        PoolProperties properties = new PoolProperties();
+        properties.setDataSource(new Object() {
+            @Override
+            public String toString() {
+                throw new OutOfMemoryError("pretend");
+            }
+        });
+
+        Assertions.assertThrows(OutOfMemoryError.class, properties::toString,
+                "fatal errors are propagated, per the module's handleThrowable convention");
+    }
+
+    @Test
+    void aNamelessInterceptorPropertyIsRefusedAtOnce() {
+        NullPointerException npe = Assertions.assertThrows(NullPointerException.class,
+                () -> new PoolProperties.InterceptorProperty(null, "value"),
+                "the name keys the property in the definitions' map, so the "
+                        + "constructor must refuse null instead of letting the "
+                        + "map's hashing fail later");
+        Assertions.assertEquals(
+                MessageFactory.get("poolProperties.interceptorPropertyNameRequired"),
+                npe.getMessage(), "the refusal must carry the localized message");
+    }
+
+    @Test
+    void aCloneCopiesTheDriverPropertiesCollection() throws Exception {
+        PoolProperties original = new PoolProperties();
+        original.setConnectionProperties("keep=yes;stale=x");
+
+        PoolProperties clone = (PoolProperties) original.clone();
+
+        clone.setConnectionProperties("only=clone");
+
+        Assertions.assertEquals("yes", original.getDbProperties().getProperty("keep"),
+                "a reconfigure of the copy must not strip the original's pairs");
+        Assertions.assertEquals("x", original.getDbProperties().getProperty("stale"),
+                "a reconfigure of the copy must not strip the original's pairs");
+        Assertions.assertEquals("clone", clone.getDbProperties().getProperty("only"));
+
+        original.setConnectionProperties(null);
+
+        Assertions.assertEquals("clone", clone.getDbProperties().getProperty("only"),
+                "and the other way around: the copy keeps what it configured");
+    }
+
+    @Test
+    void aCloneResolvesPropertiesDefaultsLikeTheOriginal() throws Exception {
+        Properties defaults = new Properties();
+        defaults.setProperty("socketTimeout", "1000");
+        Properties dbProperties = new Properties(defaults);
+        dbProperties.setProperty("keep", "yes");
+
+        PoolProperties original = new PoolProperties();
+        original.setDbProperties(dbProperties);
+
+        PoolProperties clone = (PoolProperties) original.clone();
+
+        Assertions.assertEquals("1000", clone.getDbProperties().getProperty("socketTimeout"),
+                "a property the original resolves through its defaults table "
+                        + "must resolve on the copy too, as it does on the connect path");
+        Assertions.assertEquals("yes", clone.getDbProperties().getProperty("keep"));
+    }
+
+    @Test
+    void aThrowingPropertyFailsOnlyItsOwnFieldOfTheDump() {
+        PoolProperties properties = new PoolProperties();
+        properties.setUrl("jdbc:h2:mem:shown");
+        properties.setDataSource(new Object() {
+            @Override
+            public String toString() {
+                throw new IllegalStateException("hostile dataSource");
+            }
+        });
+
+        String asString = properties.toString();
+
+        Assertions.assertTrue(asString.endsWith("]"),
+                "one throwing property must not truncate the dump, was: " + asString);
+        Assertions.assertTrue(asString.contains("dataSource=<error:"),
+                "the failing property must be reported in its own field, was: " + asString);
+        // dataSourceJNDI is listed after dataSource, so it is lost if the
+        // failure still truncates the dump.
+        Assertions.assertTrue(asString.contains("dataSourceJNDI"),
+                "the properties must keep being listed after the failing one, was: " + asString);
     }
 
     @Test
@@ -307,6 +473,19 @@ class TestPoolProperties {
                 "the non-secret configuration must still be readable, was: " + asString);
         Assertions.assertTrue(asString.contains("jdbc:h2:mem:shown"),
                 "the JDBC URL must stay readable, was: " + asString);
+    }
+
+    @Test
+    void toStringPrintsAnUnsetPasswordAsNullNotAsTheMask() {
+        // The mask hides a secret; it should not also pretend one is there.
+        // An unset password prints the way every other unset property does.
+        PoolProperties properties = new PoolProperties();
+        properties.setUrl("jdbc:h2:mem:shown");
+
+        String asString = properties.toString();
+
+        Assertions.assertTrue(asString.contains("password=null"),
+                "an unset password must say null, was: " + asString);
     }
 
     @Test
@@ -339,6 +518,230 @@ class TestPoolProperties {
     }
 
     @Test
+    void toStringMasksAPasswordInTheUrlUserinfo() {
+        PoolProperties properties = new PoolProperties();
+        properties.setUrl("jdbc:postgresql://user:inline-secret@host:5432/db");
+
+        String asString = properties.toString();
+
+        Assertions.assertFalse(asString.contains("inline-secret"),
+                "the password in the URL userinfo must not leak, was: " + asString);
+        Assertions.assertTrue(asString.contains("url=jdbc:postgresql://user:********@host:5432/db"),
+                "the user, host and port must stay readable, was: " + asString);
+    }
+
+    @Test
+    void toStringMasksAPasswordInTheLegacyOracleUserinfo() {
+        PoolProperties properties = new PoolProperties();
+        properties.setUrl("jdbc:oracle:thin:user/inline-secret@h:1521:ORCL");
+
+        String asString = properties.toString();
+
+        Assertions.assertFalse(asString.contains("inline-secret"),
+                "the password in the legacy Oracle userinfo must not leak, was: " + asString);
+        Assertions.assertTrue(asString.contains("url=jdbc:oracle:thin:user/********@h:1521:ORCL"),
+                "the user and connect string must stay readable, was: " + asString);
+    }
+
+    @Test
+    void toStringMasksALegacyOraclePasswordContainingAnAtSign() {
+        // An unencoded '@' inside the password can only extend the credential,
+        // exactly as in the scheme:// userinfo, so the credential runs to the
+        // last '@' of the section - masking to the first one printed the tail
+        // of the password in cleartext.
+        PoolProperties properties = new PoolProperties();
+        properties.setUrl("jdbc:oracle:thin:scott/se@cret1@dbhost:1521:ORCL");
+
+        String asString = properties.toString();
+
+        Assertions.assertFalse(asString.contains("cret1"),
+                "the tail of the password past the '@' must not leak, was: " + asString);
+        Assertions.assertTrue(asString.contains("url=jdbc:oracle:thin:scott/********@dbhost:1521:ORCL"),
+                "the user and connect string must stay readable, was: " + asString);
+    }
+
+    @Test
+    void toStringLeavesUrlAuthoritiesWithoutAUserinfoPasswordUntouched() {
+        String[] urls = {
+                "jdbc:mysql://host:3306/db",
+                "jdbc:postgresql://user@host/db",
+                "jdbc:sqlserver://host:1433;databaseName=x",
+                "jdbc:oracle:thin:@h:1521:ORCL",
+                // the at-sign-only forms carry no credential, whatever '@' a
+                // later part of the connect string may hold
+                "jdbc:oracle:thin:@//h:1521/svc@corp",
+                "jdbc:postgresql://host/db?mail=admin@corp.com",
+        };
+        for (String url : urls) {
+            PoolProperties properties = new PoolProperties();
+            properties.setUrl(url);
+
+            String asString = properties.toString();
+
+            Assertions.assertTrue(asString.contains("url=" + url),
+                    "an authority without a credential separator must come out unchanged: "
+                            + url + ", was: " + asString);
+        }
+    }
+
+    @Test
+    void toStringMasksPairsSeparatedByNewLinesInTheConnectionProperties() {
+        // The parser that applies the string splits pairs on new lines too - a
+        // .properties source expands \n into a real one - so the masking has to
+        // honour the same segmentation or a pair the driver really gets prints
+        // inside the previous value.
+        PoolProperties properties = new PoolProperties();
+        properties.setConnectionProperties("socketTimeout=1000\nuser=app\npassword=multiline-secret");
+
+        String asString = properties.toString();
+
+        Assertions.assertFalse(asString.contains("multiline-secret"),
+                "the pair behind a new line must not leak, was: " + asString);
+        Assertions.assertTrue(asString.contains("password=********"),
+                "the new-line separated pair must be masked, was: " + asString);
+    }
+
+    @Test
+    void toStringMasksTheWholeDeliveredValueOfACredentialPairInTheConnectionProperties() {
+        // The properties parser that applies the string delivers everything up
+        // to the next semicolon or new line as the pair's value, so an '&' or
+        // '?' inside it is part of the password the driver receives - masking
+        // only up to it printed the tail of the real password in cleartext.
+        PoolProperties properties = new PoolProperties();
+        properties.setConnectionProperties("timeout=5;password=pas&sW0rd;x=1");
+
+        String asString = properties.toString();
+
+        Assertions.assertFalse(asString.contains("sW0rd"),
+                "the tail of the delivered password past the '&' must not leak, was: " + asString);
+        Assertions.assertTrue(asString.contains("connectionProperties=timeout=5;password=********;x=1"),
+                "the pairs on either side of the credential must stay readable, was: " + asString);
+    }
+
+    @Test
+    void toStringMasksAQueryPairInsideAUrlShapedValueOfTheConnectionProperties() {
+        // The properties parser delivers the URL as one value, but a driver
+        // reading that value as a URL splits its query at the '?', so a pair
+        // behind the '?' keeps its fine segmentation and the value around it
+        // stays readable.
+        PoolProperties properties = new PoolProperties();
+        properties.setConnectionProperties("logUrl=http://h/db?password=queryvalue;x=1");
+
+        String asString = properties.toString();
+
+        Assertions.assertFalse(asString.contains("queryvalue"),
+                "the query pair of the URL-shaped value must not leak, was: " + asString);
+        Assertions.assertTrue(asString.contains("connectionProperties=logUrl=http://h/db?password=********;x=1"),
+                "the URL around the query pair must stay readable, was: " + asString);
+    }
+
+    @Test
+    void toStringMasksEveryAuthorityInAStringNotJustTheFirst() {
+        PoolProperties properties = new PoolProperties();
+        // A failover URL in a query value and a logging URL in a pair are as
+        // credential-bearing as the URL in front of them.
+        properties.setUrl("jdbc:db://host:5432/db?fallback=jdbc:db://backup:fallback-secret@h2:5432/db");
+        properties.setConnectionProperties("ping=http://a/b;logUrl=http://admin:logging-secret@h/x");
+
+        String asString = properties.toString();
+
+        Assertions.assertFalse(asString.contains("fallback-secret"),
+                "the second authority of the URL must not leak, was: " + asString);
+        Assertions.assertFalse(asString.contains("logging-secret"),
+                "the second authority of the pairs must not leak, was: " + asString);
+        Assertions.assertTrue(asString.contains("url=jdbc:db://host:5432/db?fallback=jdbc:db://backup:********@h2:5432/db"),
+                "the rest of both URLs must stay readable, was: " + asString);
+        Assertions.assertTrue(asString.contains("connectionProperties=ping=http://a/b;logUrl=http://admin:********@h/x"),
+                "the rest of the pairs must stay readable, was: " + asString);
+    }
+
+    @Test
+    void toStringMasksAQueryPairHidingBehindAnEarlierValue() {
+        PoolProperties properties = new PoolProperties();
+        properties.setUrl("jdbc:postgresql://host/db=seg?password=question-secret");
+
+        String asString = properties.toString();
+
+        Assertions.assertFalse(asString.contains("question-secret"),
+                "a pair after a '?' must not hide inside the earlier value, was: " + asString);
+        Assertions.assertTrue(asString.contains("url=jdbc:postgresql://host/db=seg?password=********"),
+                "the rest of the URL must stay readable, was: " + asString);
+    }
+
+    @Test
+    void toStringMasksCredentialPairsWrittenWithThePropertiesSeparators() {
+        // The parser that applies the string reads pairs whose key is followed
+        // by a colon or a space, so those forms really deliver a password and
+        // must be masked like the equals form.
+        PoolProperties properties = new PoolProperties();
+        properties.setConnectionProperties("timeout:5;password:colon-secret;pass spaceSecret");
+
+        String asString = properties.toString();
+
+        Assertions.assertFalse(asString.contains("colon-secret"),
+                "the colon pair must not leak, was: " + asString);
+        Assertions.assertFalse(asString.contains("spaceSecret"),
+                "the space pair must not leak, was: " + asString);
+        Assertions.assertTrue(asString.contains("connectionProperties=timeout:5;password:********;pass ********"),
+                "the keys stay visible and the non-credential pair untouched, was: " + asString);
+    }
+
+    @Test
+    void toStringMasksCredentialPairsWrittenWithTheFormFeedSeparator() {
+        // The reader the parser runs treats a form feed as white space too:
+        // it terminates the key and it is skipped as leading white space
+        // before one, so both spellings really deliver a password and must be
+        // masked like the equals, colon, space and tab forms.
+        String[][] forms = {
+            { "password\u000CsecretFF", "secretFF" },
+            { "\u000Cpassword=secretFF2", "secretFF2" },
+        };
+        for (String[] form : forms) {
+            PoolProperties properties = new PoolProperties();
+            properties.setConnectionProperties(form[0]);
+
+            Assertions.assertEquals(form[1], properties.getDbProperties().getProperty("password"),
+                    "the parser really delivers the value, so the dump has to mask it: " + form[0]);
+
+            String asString = properties.toString();
+
+            Assertions.assertFalse(asString.contains(form[1]),
+                    "the form feed pair must not leak, was: " + asString);
+        }
+    }
+
+    @Test
+    void toStringLeavesUrlsAndValuesWithColonsAndSpacesAlone() {
+        String[] connectionProperties = {
+                // the scheme, host:port and database-name colons of URLs,
+                "url=jdbc:h2:mem:pass;host=localhost:5432",
+                // and a value that merely mentions a credential word.
+                "note=the password policy applies",
+        };
+        for (String cp : connectionProperties) {
+            PoolProperties properties = new PoolProperties();
+            properties.setConnectionProperties(cp);
+
+            String asString = properties.toString();
+
+            Assertions.assertTrue(asString.contains("connectionProperties=" + cp),
+                    "only a credential key at a segment start may be masked: "
+                            + cp + ", was: " + asString);
+        }
+    }
+
+    @Test
+    void toStringMasksPairsWrittenWithThePropertiesSeparatorsInUrlQueries() {
+        PoolProperties properties = new PoolProperties();
+        properties.setUrl("jdbc:mysql://h:3306/db?user=me&password=colon-query-secret&x=1");
+
+        String asString = properties.toString();
+
+        Assertions.assertFalse(asString.contains("colon-query-secret"),
+                "the query pair must not leak, was: " + asString);
+    }
+
+    @Test
     void toStringKeepsNonCredentialPairsInsideRawStringsUntouched() {
         PoolProperties properties = new PoolProperties();
         properties.setUrl("jdbc:h2:mem:shown");
@@ -351,5 +754,163 @@ class TestPoolProperties {
                 "only the whole keys password, pass and pwd may be masked, was: " + asString);
         Assertions.assertTrue(asString.contains("url=jdbc:h2:mem:shown"),
                 "a URL without an equals sign must come out unchanged, was: " + asString);
+    }
+
+    @Test
+    void toStringMasksACredentialPropertyOfAnInterceptor() {
+        // An interceptor takes its properties - among them any credential it
+        // needs - out of this very string, so the dump must mask them as it
+        // masks the pair forms of the other configuration strings.
+        PoolProperties properties = new PoolProperties();
+        properties.setJdbcInterceptors("ResetAbandonedTimer;custom.MyInterceptor("
+                + "user=bob,password=interceptor-secret,PWD=Shouted-Secret)");
+
+        String asString = properties.toString();
+
+        Assertions.assertFalse(asString.contains("interceptor-secret"),
+                "the interceptor password must not leak, was: " + asString);
+        Assertions.assertFalse(asString.contains("Shouted-Secret"),
+                "the key must be recognised ignoring case, was: " + asString);
+        Assertions.assertTrue(asString.contains("jdbcInterceptors=ResetAbandonedTimer;"
+                        + "custom.MyInterceptor(user=bob,password=********,PWD=********)"),
+                "the class name and the other properties must stay readable, was: " + asString);
+    }
+
+    @Test
+    void toStringMasksAnInterceptorCredentialWrittenAroundSpacesAndLeavesOtherPairsAlone() {
+        PoolProperties properties = new PoolProperties();
+        properties.setJdbcInterceptors("SlowQueryReport(threshold=1000, Password = spaced-secret );"
+                + "custom.X(name=passwordish,user=pass)");
+
+        String asString = properties.toString();
+
+        Assertions.assertFalse(asString.contains("spaced-secret"),
+                "the name is the text before the first =, trimmed, was: " + asString);
+        Assertions.assertTrue(asString.contains("custom.X(name=passwordish,user=pass)"),
+                "only a whole property name may be masked, not a value that "
+                        + "merely looks like a credential: " + asString);
+    }
+
+    @Test
+    void cloneNeverCopiesATornInterceptorChain() throws Exception {
+        // A setter publishes a reconfiguration over several field writes under
+        // the configuration's monitor. A clone that skipped that monitor could
+        // land between the writes and copy a fresh interceptor string together
+        // with the previous string's parse cache - a chain the copy would then
+        // never re-parse. Cloning under the monitor makes the mismatch
+        // impossible, so this loop never observes one; it fails only if the
+        // synchronization is ever taken back off.
+        final String chainA = "org.apache.tomcat.jdbc.pool.interceptor.ResetAbandonedTimer";
+        final String chainB = "org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer";
+        for (int iter = 0; iter < 2000; iter++) {
+            final PoolProperties properties = new PoolProperties();
+            properties.setJdbcInterceptors(chainA);
+            properties.getJdbcInterceptorsAsArray();
+            final Thread reconfiguring = new Thread(() -> properties.setJdbcInterceptors(chainB));
+            reconfiguring.start();
+            PoolProperties copy = (PoolProperties) properties.clone();
+            reconfiguring.join();
+            String reported = copy.getJdbcInterceptors();
+            String cached = copy.getJdbcInterceptorsAsArray()[1].getClassName();
+            Assertions.assertEquals(reported, cached,
+                    "the clone reported one interceptor string while its chain came from another");
+        }
+    }
+
+    @Test
+    void serializationNeverCarriesAnUntrackedDriverProperty() throws Exception {
+        // The same multi-field publish, seen from the stream: a field-by-field
+        // serialization that lands between the writes hands the deserialized
+        // copy a driver-property entry that its own tracked key set never
+        // removes again, so a retired credential would survive every later
+        // reconfigure. After a reconfigure on the copy, every entry the string
+        // contributed must be gone; a leftover is a torn snapshot.
+        StringBuilder first = new StringBuilder(), second = new StringBuilder();
+        for (int i = 0; i < 40; i++) {
+            if (i > 0) {
+                first.append(';');
+                second.append(';');
+            }
+            first.append("y").append(i).append("=1");
+            second.append("z").append(i).append("=2");
+        }
+        final String keysFirst = first.toString(), keysSecond = second.toString();
+        for (int iter = 0; iter < 500; iter++) {
+            final PoolProperties properties = new PoolProperties();
+            properties.setConnectionProperties(keysFirst);
+            final Thread reconfiguring = new Thread(() -> properties.setConnectionProperties(keysSecond));
+            reconfiguring.start();
+            PoolProperties copy;
+            try (java.io.ByteArrayOutputStream bytes = new java.io.ByteArrayOutputStream();
+                    java.io.ObjectOutputStream out = new java.io.ObjectOutputStream(bytes)) {
+                out.writeObject(properties);
+                out.flush();
+                try (java.io.ObjectInputStream in =
+                        new java.io.ObjectInputStream(new java.io.ByteArrayInputStream(bytes.toByteArray()))) {
+                    copy = (PoolProperties) in.readObject();
+                }
+            }
+            reconfiguring.join();
+            copy.setConnectionProperties("q=1");
+            Assertions.assertEquals("1", copy.getDbProperties().getProperty("q"),
+                    "the fresh pair must be on the reconfigured copy");
+            for (String key : copy.getDbProperties().stringPropertyNames()) {
+                Assertions.assertFalse(key.startsWith("y") || key.startsWith("z"),
+                        "the deserialized copy carried a pair no key set tracks: " + key);
+            }
+        }
+    }
+
+    @Test
+    void toStringMasksAValueTheParserContinuesAcrossABacksslashLineBreak() {
+        // The reader deletes a new line escaped by a trailing backslash and
+        // joins the next line into the value, so the delivered password runs
+        // past the line break the dump's segmentation sees; two backslashes
+        // end the line and the next line really is its own pair.
+        PoolProperties continued = new PoolProperties();
+        continued.setConnectionProperties("password=abc\\\ncont16;x=1");
+
+        Assertions.assertEquals("abccont16",
+                continued.getDbProperties().getProperty("password"),
+                "the parser really joins the lines");
+
+        String asString = continued.toString();
+
+        Assertions.assertFalse(asString.contains("cont16"),
+                "the continuation tail of the delivered password must not leak, was: " + asString);
+        Assertions.assertTrue(asString.contains("connectionProperties=password=********;x=1"),
+                "the pair after the continuation must stay readable, was: " + asString);
+
+        PoolProperties escaped = new PoolProperties();
+        escaped.setConnectionProperties("password=abc\\\\\ncont16=y");
+
+        Assertions.assertEquals("abc\\", escaped.getDbProperties().getProperty("password"),
+                "two backslashes end the line instead of continuing it");
+
+        asString = escaped.toString();
+
+        Assertions.assertTrue(asString.contains("connectionProperties=password=********\ncont16=y"),
+                "the next pair is really separate and must stay readable, was: " + asString);
+    }
+
+    @Test
+    void toStringMasksAnInterceptorPropertyInAnUnclosedPropertyList() {
+        // The parse delivers nothing from a definition whose parenthesis
+        // never closes, but a pair typed inside it was typed as a credential;
+        // and a null string has no properties at all, so the dump must print
+        // it without reaching into the masker.
+        PoolProperties unterminated = new PoolProperties();
+        unterminated.setJdbcInterceptors("A(password=unterminated-secret;B(other=y)");
+
+        String asString = unterminated.toString();
+
+        Assertions.assertFalse(asString.contains("unterminated-secret"),
+                "the credential typed into the open list must not leak, was: " + asString);
+
+        PoolProperties none = new PoolProperties();
+        none.setJdbcInterceptors(null);
+
+        Assertions.assertTrue(none.toString().contains("jdbcInterceptors=null"),
+                "a null string must print as null, was: " + none);
     }
 }
