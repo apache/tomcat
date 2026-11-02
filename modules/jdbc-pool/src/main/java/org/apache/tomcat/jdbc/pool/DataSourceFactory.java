@@ -528,12 +528,13 @@ public class DataSourceFactory implements ObjectFactory {
      * template attribute yields - leaves the property at its
      * {@link PoolProperties} default. A value the property cannot take fails the
      * parse naming the attribute, rather than being silently dropped the way
-     * unparsed values used to be. Numeric, boolean and transaction-isolation
+     * unparsed values used to be. Numeric, boolean, transaction-isolation and
+     * class-name ({@code driverClassName} and {@code validatorClassName})
      * attributes apply their trimmed value, and so does the lookup of the name
      * given by {@code dataSourceJNDI}: whitespace around a number, a keyword or a
      * class or JNDI name is always noise. Other string values are stored verbatim
-     * - a catalog, a validation query or a URL can legitimately carry
-     * surrounding whitespace.
+     * - a catalog, a validation query, a credential or a URL can legitimately
+     * carry surrounding whitespace.
      * </p>
      *
      * <p>
@@ -723,17 +724,33 @@ public class DataSourceFactory implements ObjectFactory {
         }
 
         value = properties.getProperty(PROP_PASSWORD);
-        if (value != null) {
+        if (value != null && !value.trim().isEmpty()) {
+            // A stored empty value would go into the driver properties as an
+            // empty password entry and authenticate with it, while the
+            // documented meaning of a blank attribute is that the property
+            // stays at its default - no password entry at all. The value
+            // itself is kept untrimmed: a password may legitimately carry
+            // surrounding whitespace.
             poolProperties.setPassword(value);
         }
 
         value = properties.getProperty(PROP_URL);
-        if (value != null) {
+        if (value != null && !value.trim().isEmpty()) {
+            // A stored empty value would fail every physical connection
+            // attempt against the driver, while the documented meaning of a
+            // blank attribute is that the property stays at its default. The
+            // value itself is kept untrimmed, as the URL of a data source can
+            // carry whitespace the way a class name cannot.
             poolProperties.setUrl(value);
         }
 
         value = properties.getProperty(PROP_USERNAME);
-        if (value != null) {
+        if (value != null && !value.trim().isEmpty()) {
+            // A stored empty value would go into the driver properties as an
+            // empty user entry, while the documented meaning of a blank
+            // attribute is that the property stays at its default - no user
+            // entry at all. The value itself is kept untrimmed, as a user
+            // name is treated like the password here.
             poolProperties.setUsername(value);
         }
 
@@ -758,8 +775,15 @@ public class DataSourceFactory implements ObjectFactory {
         }
 
         value = properties.getProperty(PROP_VALIDATOR_CLASS_NAME);
-        if (value != null) {
-            poolProperties.setValidatorClassName(value);
+        if (value != null && !value.trim().isEmpty()) {
+            // A stored empty value would send the connect path looking for a
+            // class named "" - a ClassNotFoundException warning on every pool
+            // start before it fell back to standard validation - while the
+            // documented meaning of a blank attribute is that the property
+            // stays at its default standard validation. The trimmed value is
+            // applied, as a Java class name can never carry meaningful
+            // surrounding whitespace.
+            poolProperties.setValidatorClassName(value.trim());
         }
 
         value = properties.getProperty(PROP_VALIDATIONINTERVAL);
