@@ -230,7 +230,7 @@ public class TestHttp2UpgradeHandler extends Http2TestBase {
 
         Assert.assertTrue(test.buffers.maxWorkspaceSize > 2 * frameSize);
         Assert.assertEquals(tableSize, test.buffers.maxWorkspaceSize);
-        ByteBuffer indexedPayload = test.buffers.payloads.getLast();
+        ByteBuffer indexedPayload = test.buffers.payloads.get(test.buffers.payloads.size() - 1);
         Assert.assertEquals(1, indexedPayload.remaining());
         Assert.assertEquals(0x80 | (Hpack.STATIC_TABLE_LENGTH + 1), indexedPayload.get() & 0xFF);
     }
