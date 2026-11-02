@@ -439,9 +439,19 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         return getPoolProperties().getConnectionProperties();
     }
 
+    /**
+     * Returns a copy of the database properties with the password removed, so the JMX surface does not expose the
+     * plaintext password while {@link #getPassword()} is explicitly masked. A configuration whose database properties
+     * are {@code null} - a state {@link PoolConfiguration#setDbProperties(Properties)} accepts - has nothing to mask,
+     * so this returns {@code null}. {@inheritDoc}
+     */
     @Override
     public Properties getDbProperties() {
-        return PoolUtilities.cloneWithoutPassword(getPoolProperties().getDbProperties());
+        Properties live = getPoolProperties().getDbProperties();
+        if (live == null) {
+            return null;
+        }
+        return PoolUtilities.cloneWithoutPassword(live);
     }
 
     @Override
@@ -684,11 +694,8 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
 
     @Override
     public void setMaxAge(long maxAge) {
-        boolean wasEnabled = getPoolProperties().isPoolSweeperEnabled();
         getPoolProperties().setMaxAge(maxAge);
-        // Make sure the pool is properly configured
-        pool.checkPoolConfiguration(getPoolProperties());
-        poolCleanerAttributeUpdated(wasEnabled);
+        poolConfigurationUpdated();
     }
 
     @Override
@@ -774,17 +781,14 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     @Override
     public void setMaxActive(int maxActive) {
         getPoolProperties().setMaxActive(maxActive);
-        // Make sure the pool is properly configured
-        pool.checkPoolConfiguration(getPoolProperties());
+        poolConfigurationUpdated();
     }
 
 
     @Override
     public void setMaxIdle(int maxIdle) {
         getPoolProperties().setMaxIdle(maxIdle);
-        // Make sure the pool is properly configured
-        pool.checkPoolConfiguration(getPoolProperties());
-
+        poolConfigurationUpdated();
     }
 
 
@@ -796,17 +800,15 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
 
     @Override
     public void setMinEvictableIdleTimeMillis(int minEvictableIdleTimeMillis) {
-        boolean wasEnabled = getPoolProperties().isPoolSweeperEnabled();
         getPoolProperties().setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
-        poolCleanerAttributeUpdated(wasEnabled);
+        poolCleanerAttributeUpdated();
     }
 
 
     @Override
     public void setMinIdle(int minIdle) {
         getPoolProperties().setMinIdle(minIdle);
-        // Make sure the pool is properly configured
-        pool.checkPoolConfiguration(getPoolProperties());
+        poolConfigurationUpdated();
     }
 
 
@@ -816,6 +818,15 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     }
 
 
+    /**
+     * Sets the password on the running pool's configuration. The write carries the same meaning as
+     * {@link org.apache.tomcat.jdbc.pool.DataSourceProxy#setPassword(String)}: the credential also lives among the
+     * database properties the driver is given, and a {@code null} password takes it away from there as well, so that
+     * clearing it here really does stop new connections authenticating with it. Connections the pool had already
+     * established reconnect with the credential they were first established with.
+     *
+     * @param password the password, or {@code null} to take the credential away
+     */
     @Override
     public void setPassword(String password) {
         getPoolProperties().setPassword(password);
@@ -824,17 +835,15 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
 
     @Override
     public void setRemoveAbandoned(boolean removeAbandoned) {
-        boolean wasEnabled = getPoolProperties().isPoolSweeperEnabled();
         getPoolProperties().setRemoveAbandoned(removeAbandoned);
-        poolCleanerAttributeUpdated(wasEnabled);
+        poolCleanerAttributeUpdated();
     }
 
 
     @Override
     public void setRemoveAbandonedTimeout(int removeAbandonedTimeout) {
-        boolean wasEnabled = getPoolProperties().isPoolSweeperEnabled();
         getPoolProperties().setRemoveAbandonedTimeout(removeAbandonedTimeout);
-        poolCleanerAttributeUpdated(wasEnabled);
+        poolCleanerAttributeUpdated();
     }
 
 
@@ -858,38 +867,59 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
 
     @Override
     public void setTestWhileIdle(boolean testWhileIdle) {
-        boolean wasEnabled = getPoolProperties().isPoolSweeperEnabled();
         getPoolProperties().setTestWhileIdle(testWhileIdle);
-        poolCleanerAttributeUpdated(wasEnabled);
+        poolCleanerAttributeUpdated();
     }
 
 
     @Override
     public void setTimeBetweenEvictionRunsMillis(int timeBetweenEvictionRunsMillis) {
-        boolean wasEnabled = getPoolProperties().isPoolSweeperEnabled();
         getPoolProperties().setTimeBetweenEvictionRunsMillis(timeBetweenEvictionRunsMillis);
-        // Make sure the pool is properly configured
-        pool.checkPoolConfiguration(getPoolProperties());
-        poolCleanerAttributeUpdated(wasEnabled);
+        poolConfigurationUpdated();
     }
 
     /**
      * Starts/stops pool cleaner thread as necessary after its configuration properties were updated. This method must
      * be called <b>after</b> configuration properties affecting the pool cleaner have been updated.
-     *
-     * @param wasEnabled whether the pool cleaner was enabled <b>before</b> the configuration change occurred.
+     * <p>
+     * What is wanted and what is registered are both read, and the starting or
+     * stopping is done, under the pool's monitor, in
+     * {@link org.apache.tomcat.jdbc.pool.ConnectionPool#reconcilePoolCleaner(PoolConfiguration)}.
+     * Neither half happens here: this MBean holds no monitor of its own, and an
+     * operator writing through it is writing the same configuration an operator
+     * writing through the data source writes, so a decision taken here from what
+     * this writer saw can land after the other surface's write and either stop the
+     * task that write armed or leave running a task that write made unnecessary.
      */
-    private void poolCleanerAttributeUpdated(boolean wasEnabled) {
-        boolean shouldBeEnabled = getPoolProperties().isPoolSweeperEnabled();
+    private void poolCleanerAttributeUpdated() {
         // Make sure pool cleaner starts/stops when it should
-        if (!wasEnabled && shouldBeEnabled) {
-            pool.initializePoolCleaner(getPoolProperties());
-        } else if (wasEnabled) {
-            pool.terminatePoolCleaner();
-            if (shouldBeEnabled) {
-                pool.initializePoolCleaner(getPoolProperties());
-            }
-        }
+        pool.reconcilePoolCleaner(getPoolProperties());
+    }
+
+    /**
+     * Validates the configuration a setter of this MBean just wrote and looks the
+     * pool's cleaner over as a result of it, in that order.
+     * <p>
+     * The two halves belong together because the validation is not only about the
+     * attribute the caller wrote: among the corrections it makes is bringing the
+     * eviction interval down to the max age whenever the interval is the longer of
+     * the two, and a pool cleaner's period is fixed when the task is built. A setter
+     * that validated the configuration without then looking the cleaner over could
+     * therefore move the interval the configuration asks for and leave the running
+     * task on the interval it just replaced, a disagreement no getter shows until
+     * some sweeper attribute is written again. That is why the pairing is one step
+     * rather than something each setter remembers: it is what the data source does
+     * for the same attributes, and what the pool's creation does when it publishes a
+     * pool.
+     * <p>
+     * Which half is taken under the pool's monitor, and why neither half is decided
+     * from a reading this writer took, is recorded at poolCleanerAttributeUpdated.
+     */
+    private void poolConfigurationUpdated() {
+        // Make sure the pool is properly configured, and then start, stop or re-arm
+        // the cleaner to match what that correction left the configuration asking for.
+        pool.checkPoolConfiguration(getPoolProperties());
+        poolCleanerAttributeUpdated();
     }
 
     @Override
@@ -910,6 +940,13 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     }
 
 
+    /**
+     * Sets the user name on the running pool's configuration, with the same meaning as
+     * {@link org.apache.tomcat.jdbc.pool.DataSourceProxy#setUsername(String)}: a {@code null} user name takes the
+     * credential away from the database properties as well as from the configuration.
+     *
+     * @param username the user name, or {@code null} to take the credential away
+     */
     @Override
     public void setUsername(String username) {
         getPoolProperties().setUsername(username);
@@ -947,9 +984,8 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
 
     @Override
     public void setSuspectTimeout(int seconds) {
-        boolean wasEnabled = getPoolProperties().isPoolSweeperEnabled();
         getPoolProperties().setSuspectTimeout(seconds);
-        poolCleanerAttributeUpdated(wasEnabled);
+        poolCleanerAttributeUpdated();
     }
 
     @Override

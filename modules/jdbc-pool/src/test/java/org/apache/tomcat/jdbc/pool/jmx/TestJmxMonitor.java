@@ -33,6 +33,7 @@ import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 import org.apache.tomcat.jdbc.pool.DataSource;
+import org.apache.tomcat.jdbc.pool.PoolConfiguration;
 
 /**
  * Expected JMX monitoring functionality. A container registers the
@@ -247,6 +248,41 @@ class TestJmxMonitor extends JdbcPoolBaseTest {
             }
         } finally {
             ds.postDeregister();
+        }
+    }
+
+    @Test
+    void theJmxViewOfNullDatabasePropertiesReturnsNull() throws Exception {
+        // The MBean's db-properties getter masks the password by cloning the
+        // live store; the null store the configuration accepts (see
+        // PoolConfiguration#setDbProperties) must pass through as the null
+        // it is instead of being dereferenced by the masking clone. The pool
+        // is built with an initial size of zero, so nothing is connected.
+        DataSource ds = new DataSource();
+        PoolConfiguration props = ds.getPoolProperties();
+        props.setUrl(getUrl());
+        props.setDriverClassName("org.h2.Driver");
+        props.setUsername("sa");
+        props.setPassword("");
+        props.setJmxEnabled(false);
+        props.setInitialSize(0);
+        props.setMinIdle(0);
+        ds.createPool();
+        try {
+            ConnectionPool mbean = new ConnectionPool(ds.getPool());
+
+            props.setDbProperties(null);
+            Assertions.assertDoesNotThrow(mbean::getDbProperties);
+            Assertions.assertNull(mbean.getDbProperties(),
+                    "a configuration with no database properties has nothing to mask");
+
+            Properties live = new Properties();
+            live.setProperty("appconfigured", "yes");
+            props.setDbProperties(live);
+            Assertions.assertEquals("yes", mbean.getDbProperties().getProperty("appconfigured"),
+                    "a live store must still reach the JMX view");
+        } finally {
+            ds.close();
         }
     }
 

@@ -17,18 +17,25 @@
 package org.apache.tomcat.jdbc.pool;
 
 import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Configuration only, no database and no pool: the credential setters on
- * {@link DataSourceProxy} mirror the credential into the database properties
- * that {@link PooledConnection} clones when it hands them to the driver, and
- * passing {@code null} must clear the credential from both stores instead of
- * throwing halfway. The connection path only overrides the clone with the
- * stored password when that is non-null, so a mirror left behind keeps
- * authenticating freshly established connections with the cleared credential.
+ * Configuration only, no database and no pool: writing a credential through the
+ * data source's setters ends up in the database properties that
+ * {@link PooledConnection} clones when it hands them to the driver, and passing
+ * {@code null} must clear the credential from both stores instead of throwing
+ * halfway. The store that holds both - {@link PoolProperties}, which the data
+ * source and the pool's MBean each write through - is what keeps them together,
+ * so these assertions hold for either surface. The connection path only
+ * overrides the clone with the stored password when that is non-null, so a
+ * mirror left behind keeps authenticating freshly established connections with
+ * the cleared credential.
  */
 class TestDataSourceProxyCredentials {
 
@@ -96,5 +103,108 @@ class TestDataSourceProxyCredentials {
 
         Assertions.assertEquals("hunter2", proxy.getPoolProperties().getPassword());
         Assertions.assertNull(proxy.getPoolProperties().getUsername());
+    }
+
+    @Test
+    void readingDbPropertiesToleratesNullDatabaseProperties() {
+        // The same null state read back: the password-masking getter cloned
+        // the properties unconditionally, which turned the supported null
+        // into a NullPointerException on every read of the bean/JMX view.
+        // Before the masking rewrite the getter was a pass-through, so the
+        // null passed through; the masking must keep it passing through.
+        DataSourceProxy proxy = new DataSourceProxy();
+        proxy.getPoolProperties().setDbProperties(null);
+
+        Assertions.assertDoesNotThrow(proxy::getDbProperties);
+        Assertions.assertNull(proxy.getDbProperties(),
+                "a configuration with no database properties has nothing to mask");
+
+        // The masking getter must still hand out a copy for a live store.
+        Properties live = new Properties();
+        live.setProperty(PoolUtilities.PROP_PASSWORD, "hunter2");
+        proxy.getPoolProperties().setDbProperties(live);
+        Properties view = proxy.getDbProperties();
+        Assertions.assertNotNull(view);
+        Assertions.assertFalse(view.containsKey(PoolUtilities.PROP_PASSWORD),
+                "the copy must not carry the password");
+        Assertions.assertNotSame(live, view, "the copy must not be the live store");
+    }
+
+    /**
+     * Database properties whose {@code password} write, once armed, lets a
+     * concurrent credential change run inside it and then completes the write -
+     * exactly what a rotation writer sees when it is preempted between storing
+     * the field and mirroring it.
+     */
+    private static final class HookedDatabaseProperties extends Properties {
+
+        private static final long serialVersionUID = 1L;
+
+        private final AtomicBoolean armed = new AtomicBoolean();
+        volatile Runnable onMirrorWrite;
+
+        @Override
+        public Object setProperty(String key, String value) {
+            if (PoolUtilities.PROP_PASSWORD.equals(key) && armed.compareAndSet(true, false)) {
+                onMirrorWrite.run();
+            }
+            return super.setProperty(key, value);
+        }
+    }
+
+    @Test
+    void aConcurrentClearCannotLeaveTheClearedPasswordMirrored() throws Exception {
+        // The field write and the mirror write of setPassword had no common
+        // lock, so a rotation that read the field could still write its
+        // value into the database properties after a concurrent clear had
+        // removed it: the driver then authenticates freshly established
+        // connections with a credential that was cleared. The deterministic
+        // interleaving below is what the setters must exclude.
+        HookedDatabaseProperties dbProperties = new HookedDatabaseProperties();
+        PoolProperties props = new PoolProperties();
+        props.setDbProperties(dbProperties);
+        DataSourceProxy proxy = new DataSourceProxy();
+        proxy.setPoolProperties(props);
+        proxy.setPassword("old");
+        Assertions.assertEquals("old", dbProperties.getProperty(PoolUtilities.PROP_PASSWORD));
+
+        CountDownLatch cleared = new CountDownLatch(1);
+        AtomicReference<Throwable> clearerFailure = new AtomicReference<>();
+        Thread clearer = new Thread(() -> {
+            try {
+                proxy.setPassword(null);
+            } catch (Throwable t) {
+                clearerFailure.set(t);
+            } finally {
+                cleared.countDown();
+            }
+        }, "concurrent-credential-clear");
+
+        dbProperties.onMirrorWrite = () -> {
+            // The rotation pauses right here - field written, mirror not
+            // yet. Let the clear try to take this window.
+            clearer.start();
+            try {
+                cleared.await(500, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new AssertionError(e);
+            }
+        };
+        dbProperties.armed.set(true);
+
+        proxy.setPassword("rotated");
+
+        // If the clear could not run inside the window - the store holds one
+        // monitor across field and mirror - it runs as soon as the rotation
+        // returns, and its verdict is the final one.
+        clearer.join(5000);
+        Assertions.assertFalse(clearer.isAlive(), "the concurrent clear must eventually run");
+        Assertions.assertNull(clearerFailure.get(), "the clear must not fail");
+
+        Assertions.assertNull(proxy.getPoolProperties().getPassword(),
+                "the clear ran last, so the field must read cleared");
+        Assertions.assertFalse(dbProperties.containsKey(PoolUtilities.PROP_PASSWORD),
+                "a cleared password must not survive in the properties the driver is given");
     }
 }

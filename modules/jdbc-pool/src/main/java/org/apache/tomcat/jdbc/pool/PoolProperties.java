@@ -647,9 +647,32 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     }
 
 
+    /**
+     * Stores the password and, as {@link PoolConfiguration#setPassword(String)} promises, keeps the
+     * {@code password} entry of the database properties in step with it.
+     * <p>
+     * Both halves have to be written together. The connect path clones the database properties and then lets a
+     * non-null password override the copy, so while a password is set the entry is only what the override replaces;
+     * once the password is removed there is nothing left to override with and the entry alone decides what the
+     * driver is handed. A configuration that kept the two apart would therefore keep authenticating connections
+     * with a credential that had been set aside. Writing them as one step matters for the same reason: a reader
+     * that saw the field cleared but the entry still standing would be looking at exactly that state.
+     * <p>
+     * A configuration whose database properties are {@code null} has no collection to hold the entry, so only the
+     * field is stored.
+     *
+     * @param password The password
+     */
     @Override
-    public void setPassword(String password) {
+    public synchronized void setPassword(String password) {
         this.password = password;
+        if (this.dbProperties != null) {
+            if (password == null) {
+                this.dbProperties.remove(PoolUtilities.PROP_PASSWORD);
+            } else {
+                this.dbProperties.setProperty(PoolUtilities.PROP_PASSWORD, password);
+            }
+        }
     }
 
 
@@ -695,9 +718,22 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     }
 
 
+    /**
+     * Stores the user name and keeps the {@code user} entry of the database properties in step with it, for the
+     * reason given on {@link #setPassword(String)}.
+     *
+     * @param username The user name
+     */
     @Override
-    public void setUsername(String username) {
+    public synchronized void setUsername(String username) {
         this.username = username;
+        if (this.dbProperties != null) {
+            if (username == null) {
+                this.dbProperties.remove(PoolUtilities.PROP_USER);
+            } else {
+                this.dbProperties.setProperty(PoolUtilities.PROP_USER, username);
+            }
+        }
     }
 
 

@@ -111,14 +111,20 @@ public interface PoolConfiguration {
      * Returns the database properties that are passed into the {@link java.sql.Driver#connect(String, Properties)}
      * method.
      *
-     * @return database properties that are passed into the {@link java.sql.Driver#connect(String, Properties)} method.
+     * @return database properties that are passed into the {@link java.sql.Driver#connect(String, Properties)}
+     *             method, or {@code null} when the configuration has none
      */
     Properties getDbProperties();
 
     /**
-     * Overrides the database properties passed into the {@link java.sql.Driver#connect(String, Properties)} method.
+     * Overrides the database properties passed into the {@link java.sql.Driver#connect(String, Properties)} method. A
+     * {@code null} collection is accepted as a configuration state, and it means what it says: the configuration has no
+     * driver properties. The credential setters then have no property to mirror into and {@link #getDbProperties()}
+     * returns {@code null}. It is not a configuration that cannot connect - the URL and the {@link #getUsername() user
+     * name} and {@link #getPassword() password} still establish connections, with no extra properties sent along - and
+     * connections made through a configured {@link javax.sql.DataSource} do not consult the database properties at all.
      *
-     * @param dbProperties The database properties
+     * @param dbProperties The database properties, may be {@code null}
      */
     void setDbProperties(Properties dbProperties);
 
@@ -395,7 +401,11 @@ public interface PoolConfiguration {
 
     /**
      * Sets the password to establish the connection with. The password will be included as a database property with the
-     * name 'password'.
+     * name 'password'. A {@code null} password removes that entry instead, so that a credential which has been taken
+     * away is not left behind in the database properties to keep authenticating connections - the connect path lets a
+     * non-null password override the database property, but a removed one has nothing to override with. A
+     * configuration whose {@link #getDbProperties() database properties} are {@code null} has no property collection to
+     * hold the entry.
      *
      * @param password The password
      *
@@ -419,7 +429,8 @@ public interface PoolConfiguration {
 
     /**
      * Sets the username used to establish the connection with It will also be a property called 'user' in the database
-     * properties.
+     * properties. A {@code null} user name removes that entry instead, as {@link #setPassword(String)} does its
+     * password, and for the same reason.
      *
      * @param username The user name
      *
@@ -792,7 +803,7 @@ public interface PoolConfiguration {
     /**
      * Set to true if you wish the <code>ProxyConnection</code> class to use <code>String.equals</code> instead of
      * <code>==</code> when comparing method names. This property does not apply to added interceptors as those are
-     * configured individually. The default value is <code>false</code>.
+     * configured individually. The default value is <code>true</code>.
      *
      * @return true if pool uses {@link String#equals(Object)} instead of == when comparing method names on
      *             {@link java.sql.Connection} methods
@@ -802,7 +813,7 @@ public interface PoolConfiguration {
     /**
      * Set to true if you wish the <code>ProxyConnection</code> class to use <code>String.equals</code> instead of
      * <code>==</code> when comparing method names. This property does not apply to added interceptors as those are
-     * configured individually. The default value is <code>false</code>.
+     * configured individually. The default value is <code>true</code>.
      *
      * @param useEquals set to true if the pool should use {@link String#equals(Object)} instead of == when comparing
      *                      method names on {@link java.sql.Connection} methods
