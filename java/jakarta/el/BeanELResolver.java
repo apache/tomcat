@@ -357,6 +357,19 @@ public class BeanELResolver extends ELResolver {
                     value = this.longterm.get(key);
                 }
                 if (value != null) {
+                    // Handle a full eden in the same way as put(). Otherwise, a
+                    // workload dominated by cache hits could grow eden far
+                    // beyond the configured size. Not promoting when eden is
+                    // full is not an option either as, without any calls to
+                    // put(), eden would then be stuck with its current content
+                    // and every other hot entry would be read from the
+                    // long-term store, which requires a lock, for ever.
+                    if (this.eden.size() >= this.size) {
+                        synchronized (longterm) {
+                            this.longterm.putAll(this.eden);
+                        }
+                        this.eden.clear();
+                    }
                     this.eden.put(key, value);
                 }
             }
