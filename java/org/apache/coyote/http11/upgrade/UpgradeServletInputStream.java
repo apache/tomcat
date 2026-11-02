@@ -17,6 +17,7 @@
 package org.apache.coyote.http11.upgrade;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import jakarta.servlet.ReadListener;
@@ -176,10 +177,12 @@ public class UpgradeServletInputStream extends ServletInputStream {
     @Override
     public final int readLine(byte[] b, int off, int len) throws IOException {
         preReadChecks();
+        Objects.checkFromIndexSize(off, len, b.length);
 
-        if (len <= 0) {
+        if (len == 0) {
             return 0;
         }
+
         int count = 0, c;
 
         while ((c = readInternal()) != -1) {
@@ -201,9 +204,10 @@ public class UpgradeServletInputStream extends ServletInputStream {
     @Override
     public final int read(byte[] b, int off, int len) throws IOException {
         preReadChecks();
+        Objects.checkFromIndexSize(off, len, b.length);
 
         // The input must not be touched if the caller requested zero bytes.
-        if (len <= 0) {
+        if (len == 0) {
             return 0;
         }
 
