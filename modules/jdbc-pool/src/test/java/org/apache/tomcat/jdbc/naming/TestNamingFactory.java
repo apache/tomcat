@@ -36,6 +36,7 @@ import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.DataSourceFactory;
 import org.apache.tomcat.jdbc.pool.PoolConfiguration;
+import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.apache.tomcat.jdbc.pool.XADataSource;
 
 /**
@@ -102,6 +103,23 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
                 dataSourceReference("javax.sql.XADataSource"), name, null, null);
         Assertions.assertInstanceOf(XADataSource.class, result,
                 "a javax.sql.XADataSource reference must yield the pool's XA type");
+        if (result instanceof DataSource) {
+            manage((DataSource) result);
+        }
+    }
+
+    @Test
+    void concreteXaPoolClassNameReferenceProducesXaDataSourceType() throws Exception {
+        // A resource whose type names the factory's own XA class - the class
+        // the factory news for every XA reference - must build that XA pool,
+        // where previously only the sibling non-XA concrete class was
+        // accepted and this one came back as an unresolvable resource.
+        Name name = new CompositeName("jdbc/ConcreteXaDS");
+        Object result = new DataSourceFactory().getObjectInstance(
+                dataSourceReference("org.apache.tomcat.jdbc.pool.XADataSource"),
+                name, null, null);
+        Assertions.assertInstanceOf(XADataSource.class, result,
+                "the concrete XA class name must yield the pool's XA type");
         if (result instanceof DataSource) {
             manage((DataSource) result);
         }
@@ -226,6 +244,299 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
                 "\" False \" must be accepted as false, whitespace included");
         Assertions.assertFalse(configured.isRemoveAbandoned(),
                 "the exact lowercase spelling must keep working");
+    }
+
+    /*
+     * The defaultTransactionIsolation attribute follows the same strict
+     * policy: names and the numeric java.sql.Connection constants are
+     * accepted ignoring surrounding whitespace, an empty attribute means
+     * "unset" - the "leave the driver default alone" state - and anything
+     * else fails the parse. Pre-fix an unusable value was silently applied
+     * as that unset sentinel, so connections ran at the driver's isolation
+     * level while the only trace was a System.err line claiming the
+     * attribute had not been set at all.
+     */
+
+    @Test
+    void isolationLevelNamesApplyIgnoringCaseAndSurroundingWhitespace() {
+        java.util.Properties attrs = new java.util.Properties();
+        attrs.setProperty("defaultTransactionIsolation", " read_committed ");
+        Assertions.assertEquals(java.sql.Connection.TRANSACTION_READ_COMMITTED,
+                DataSourceFactory.parsePoolProperties(attrs)
+                        .getDefaultTransactionIsolation(),
+                "\" read_committed \" must be accepted, whitespace included");
+
+        attrs.setProperty("defaultTransactionIsolation", "NONE");
+        Assertions.assertEquals(java.sql.Connection.TRANSACTION_NONE,
+                DataSourceFactory.parsePoolProperties(attrs)
+                        .getDefaultTransactionIsolation(),
+                "the documented name must still apply");
+    }
+
+    @Test
+    void numericIsolationLevelAppliesIgnoringSurroundingWhitespace() {
+        java.util.Properties attrs = new java.util.Properties();
+        attrs.setProperty("defaultTransactionIsolation", " 2 ");
+        Assertions.assertEquals(2,
+                DataSourceFactory.parsePoolProperties(attrs)
+                        .getDefaultTransactionIsolation(),
+                "the numeric form must be accepted, whitespace included");
+    }
+
+    @Test
+    void unusableIsolationLevelFailsTheParseNamingTheProperty() {
+        java.util.Properties attrs = new java.util.Properties();
+        attrs.setProperty("defaultTransactionIsolation", "READ_COMMIT");
+
+        IllegalArgumentException e = Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> DataSourceFactory.parsePoolProperties(attrs),
+                "an unusable isolation level must fail the parse instead of "
+                        + "silently leaving the level at the driver default");
+        Assertions.assertTrue(e.getMessage().contains("defaultTransactionIsolation"),
+                "the failure must name the misconfigured attribute, was: "
+                        + e.getMessage());
+        Assertions.assertTrue(e.getMessage().contains("READ_COMMIT"),
+                "the failure must show the offending value, was: "
+                        + e.getMessage());
+        Assertions.assertNotNull(e.getCause(),
+                "the parse failure must be kept as the cause");
+    }
+
+    @Test
+    void emptyIsolationLevelAttributeLeavesThePropertyUnset() {
+        java.util.Properties attrs = new java.util.Properties();
+        attrs.setProperty("defaultTransactionIsolation", "");
+
+        PoolConfiguration configured =
+                DataSourceFactory.parsePoolProperties(attrs);
+
+        Assertions.assertEquals(DataSourceFactory.UNKNOWN_TRANSACTIONISOLATION,
+                configured.getDefaultTransactionIsolation(),
+                "an empty attribute must keep the \"leave the driver default "
+                        + "alone\" state");
+    }
+
+    /*
+     * The numeric attributes follow the same strict policy as the booleans:
+     * surrounding whitespace is ignored, an empty attribute means "unset"
+     * (the PoolProperties default) rather than a NumberFormatException for
+     * the empty string, and a value that cannot be parsed - or does not fit
+     * the property - fails the configuration naming the property, instead of
+     * aborting the whole JNDI resource with an exception that only quotes
+     * the offending text.
+     */
+
+    @Test
+    void numericAttributesApplyIgnoringSurroundingWhitespace() {
+        java.util.Properties attrs = new java.util.Properties();
+        attrs.setProperty("maxActive", " 12 ");
+        attrs.setProperty("maxAge", " 86400000000 ");
+
+        PoolConfiguration configured =
+                DataSourceFactory.parsePoolProperties(attrs);
+
+        Assertions.assertEquals(12, configured.getMaxActive(),
+                "\" 12 \" must be accepted, whitespace included");
+        Assertions.assertEquals(86400000000L, configured.getMaxAge(),
+                "a long attribute must be accepted, whitespace included");
+    }
+
+    @Test
+    void emptyNumericAttributesLeaveThePropertiesUnset() {
+        java.util.Properties attrs = new java.util.Properties();
+        attrs.setProperty("maxActive", "");
+        attrs.setProperty("maxWait", " ");
+
+        PoolConfiguration configured =
+                DataSourceFactory.parsePoolProperties(attrs);
+
+        Assertions.assertEquals(PoolProperties.DEFAULT_MAX_ACTIVE,
+                configured.getMaxActive(),
+                "an empty numeric attribute must leave the default in place");
+        Assertions.assertEquals(new PoolProperties().getMaxWait(),
+                configured.getMaxWait(),
+                "an all-whitespace numeric attribute must leave the default in place");
+    }
+
+    @Test
+    void unparseableNumericValueFailsTheParseNamingTheProperty() {
+        java.util.Properties attrs = new java.util.Properties();
+        attrs.setProperty("maxWait", "12 seconds");
+
+        IllegalArgumentException e = Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> DataSourceFactory.parsePoolProperties(attrs));
+        Assertions.assertTrue(e.getMessage().contains("maxWait"),
+                "the failure must name the misconfigured attribute, was: "
+                        + e.getMessage());
+        Assertions.assertTrue(e.getMessage().contains("12 seconds"),
+                "the failure must show the offending value, was: "
+                        + e.getMessage());
+        Assertions.assertInstanceOf(NumberFormatException.class, e.getCause(),
+                "the parse failure must be kept as the cause");
+    }
+
+    @Test
+    void numericValueBeyondThePropertyRangeFailsTheParseNamingTheProperty() {
+        java.util.Properties attrs = new java.util.Properties();
+        // a millisecond value no int setter can hold (~2.7 years)
+        attrs.setProperty("minEvictableIdleTimeMillis", "86400000000");
+
+        IllegalArgumentException e = Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> DataSourceFactory.parsePoolProperties(attrs));
+        Assertions.assertTrue(e.getMessage().contains("minEvictableIdleTimeMillis"),
+                "the failure must name the misconfigured attribute, was: "
+                        + e.getMessage());
+        Assertions.assertTrue(e.getMessage().contains("86400000000"),
+                "the failure must show the offending value, was: "
+                        + e.getMessage());
+    }
+
+    @Test
+    void blankStringAttributesLeaveThePropertiesUnset() {
+        // The same cleared-template policy the booleans, numerics, the
+        // isolation level and dataSourceJNDI follow. Pre-fix a stored empty
+        // defaultCatalog reached connection.setCatalog("") on every physical
+        // connection - driver-dependent from inert to a per-connect failure -
+        // and a blank dataSource aborted the resource with guidance about
+        // carrying the object, irrelevant to a value cleared to mean "off".
+        java.util.Properties attrs = new java.util.Properties();
+        attrs.setProperty("defaultCatalog", "");
+        attrs.setProperty("dataSource", " ");
+        attrs.setProperty("driverClassName", "");
+        attrs.setProperty("jdbcInterceptors", " ");
+        attrs.setProperty("validationQuery", "");
+
+        PoolConfiguration configured =
+                DataSourceFactory.parsePoolProperties(attrs);
+
+        Assertions.assertNull(configured.getDefaultCatalog(),
+                "an empty defaultCatalog must leave the property unset");
+        Assertions.assertNull(configured.getDataSource(),
+                "a blank dataSource must leave the property unset");
+        Assertions.assertNull(configured.getDriverClassName(),
+                "a blank driverClassName must leave the property unset");
+        Assertions.assertNull(configured.getJdbcInterceptors(),
+                "a blank jdbcInterceptors must leave the property unset");
+        Assertions.assertNull(configured.getValidationQuery(),
+                "a blank validationQuery must leave the property unset,"
+                        + " routing validation to isValid()");
+    }
+
+    @Test
+    void blankDriverClassNameStillBuildsTheDriverManagerFallbackPool()
+            throws Exception {
+        // Pre-fix, the empty attribute defeated the connect path's documented
+        // DriverManager fallback (keyed on the property being null) and
+        // aborted the whole resource on loading the empty class.
+        Reference ref = new Reference("javax.sql.DataSource", null, null);
+        ref.add(new StringRefAddr("jmxEnabled", "false"));
+        ref.add(new StringRefAddr("initialSize", "1"));
+        ref.add(new StringRefAddr("minIdle", "0"));
+        ref.add(new StringRefAddr("url", getUrl()));
+        ref.add(new StringRefAddr("username", "sa"));
+        ref.add(new StringRefAddr("password", ""));
+        ref.add(new StringRefAddr("driverClassName", ""));
+        ref.add(new StringRefAddr("jdbcInterceptors", " "));
+
+        DataSource ds = manage((DataSource) new DataSourceFactory()
+                .getObjectInstance(ref, new CompositeName("jdbc/BlankDS"),
+                        null, null));
+
+        try (java.sql.Connection c = ds.getConnection();
+                java.sql.ResultSet rs = c.createStatement().executeQuery("SELECT 1")) {
+            Assertions.assertTrue(rs.next(),
+                    "the pool must build and connect through the fallback");
+        }
+    }
+
+    @Test
+    void driverClassNameAppliesIgnoringSurroundingWhitespace() {
+        // A Java class name carries no meaningful surrounding whitespace, so
+        // the padded shape a line-wrapped XML attribute yields must load the
+        // class it names, like the padded numeric and boolean spellings
+        // already do. Pre-fix only the blank test trimmed and the padded
+        // value went to the class loader verbatim.
+        java.util.Properties attrs = new java.util.Properties();
+        attrs.setProperty("driverClassName", " org.h2.Driver ");
+
+        Assertions.assertEquals("org.h2.Driver",
+                DataSourceFactory.parsePoolProperties(attrs).getDriverClassName(),
+                "a padded class name must be applied trimmed");
+    }
+
+    @Test
+    void interceptorListWithRedundantSeparatorsStillBuildsThePool()
+            throws Exception {
+        // Pre-fix, one stray doubled separator - or one whitespace-only
+        // segment - made createPool() load the generated class "...
+        // pool.interceptor." and abort the whole resource with a
+        // SQLException whose message was null; the identical separator
+        // dropped at the end of the list was tolerated.
+        Reference ref = new Reference("javax.sql.DataSource", null, null);
+        ref.add(new StringRefAddr("jmxEnabled", "false"));
+        ref.add(new StringRefAddr("initialSize", "1"));
+        ref.add(new StringRefAddr("minIdle", "0"));
+        ref.add(new StringRefAddr("url", getUrl()));
+        ref.add(new StringRefAddr("username", "sa"));
+        ref.add(new StringRefAddr("password", ""));
+        ref.add(new StringRefAddr("jdbcInterceptors",
+                " ; StatementFinalizer;;SlowQueryReport ; "));
+
+        DataSource ds = manage((DataSource) new DataSourceFactory()
+                .getObjectInstance(ref, new CompositeName("jdbc/SemiDS"),
+                        null, null));
+
+        try (java.sql.Connection c = ds.getConnection();
+                java.sql.ResultSet rs = c.createStatement().executeQuery("SELECT 1")) {
+            Assertions.assertTrue(rs.next(),
+                    "the pool must build and borrow with its named chain");
+        }
+    }
+
+    @Test
+    void aConfiguredCatalogIsStoredUntrimmed() {
+        // The counterpart: a catalog name is a database identifier, so only
+        // the blank test trims - a configured name keeps its exact spelling.
+        java.util.Properties attrs = new java.util.Properties();
+        attrs.setProperty("defaultCatalog", " My Catalog ");
+
+        Assertions.assertEquals(" My Catalog ",
+                DataSourceFactory.parsePoolProperties(attrs).getDefaultCatalog(),
+                "a configured catalog name must be stored verbatim");
+    }
+
+    @Test
+    void blankObjectNameLeavesThePoolAtItsGeneratedName() {
+        // A cleared object_name attribute must not reach the pool as an
+        // empty quoted name - the JMX object name would carry an empty name
+        // component where the property being unset lets the pool name
+        // itself.
+        java.util.Properties attrs = new java.util.Properties();
+        attrs.setProperty("object_name", " ");
+
+        String name = DataSourceFactory.parsePoolProperties(attrs).getName();
+
+        Assertions.assertNotEquals("\"\"", name,
+                "a blank object_name must not become an empty quoted name");
+        Assertions.assertTrue(name.startsWith("Tomcat Connection Pool["),
+                "an unset object_name must leave the generated pool name,"
+                        + " was: " + name);
+    }
+
+    @Test
+    void aConfiguredObjectNameIsQuotedButStoredVerbatim() {
+        // The counterpart, like the catalog: the name is quoted precisely so
+        // that "My Pool" survives the JMX object name, and only the blank
+        // test trims - a configured name keeps its exact spelling.
+        java.util.Properties attrs = new java.util.Properties();
+        attrs.setProperty("object_name", " My Pool ");
+
+        Assertions.assertEquals("\" My Pool \"",
+                DataSourceFactory.parsePoolProperties(attrs).getName(),
+                "a configured pool name must be quoted but stored verbatim");
     }
 
     /* A factory-built pool, H2-backed, with one extra attribute. */

@@ -177,6 +177,103 @@ class TestDataSourceFactoryJndiLookup extends JdbcPoolBaseTest {
                 "the pool must establish connections through the looked up data source");
     }
 
+    @Test
+    void dataSourceJNDIBoundToSomethingElseFailsTheFactoryNamingTheClass() {
+        // The sibling dataSource attribute validates its object against the
+        // types the connect path understands; the lookup route must hold the
+        // bound object to the same requirement. Pre-fix any binding reached
+        // the pool and only surfaced at connect time as a generic error about
+        // an unknown class, if the initial size deferred the first connect at
+        // all.
+        Reference ref = backingDataSourceReference("0");
+        Context context = new ContextStub() {
+            @Override
+            public Object lookup(String name) {
+                return MISSING_JNDI_NAME.equals(name) ? "not-a-data-source" : null;
+            }
+
+            @Override
+            public Object lookup(Name name) {
+                return lookup(name.toString());
+            }
+        };
+
+        NamingException e = Assertions.assertThrows(NamingException.class,
+                () -> new DataSourceFactory().getObjectInstance(ref,
+                        new CompositeName("jdbc/TestDS"), context, null),
+                "a name bound to a class the pool cannot connect from must fail the factory call");
+        Assertions.assertTrue(e.getMessage().contains(MISSING_JNDI_NAME),
+                "the failure must name the misbound name, was: " + e.getMessage());
+        Assertions.assertTrue(e.getMessage().contains("dataSourceJNDI"),
+                "the failure must name the misconfigured attribute, was: "
+                        + e.getMessage());
+        Assertions.assertTrue(e.getMessage().contains(String.class.getName()),
+                "the failure must name the class the name resolved to, was: "
+                        + e.getMessage());
+    }
+
+    @Test
+    void dataSourceJNDIBoundToAnotherPoolFailsWithANamingException() {
+        // A binding of another tomcat-jdbc pool is rejected by setDataSource
+        // as a layered pool - but performJNDILookup promises NamingException,
+        // and the bare IllegalArgumentException carried neither the attribute
+        // nor the name that resolved to the other pool.
+        Reference ref = backingDataSourceReference("0");
+        org.apache.tomcat.jdbc.pool.DataSource otherPool =
+                new org.apache.tomcat.jdbc.pool.DataSource();
+        Context context = new ContextStub() {
+            @Override
+            public Object lookup(String name) {
+                return MISSING_JNDI_NAME.equals(name) ? otherPool : null;
+            }
+
+            @Override
+            public Object lookup(Name name) {
+                return lookup(name.toString());
+            }
+        };
+
+        NamingException e = Assertions.assertThrows(NamingException.class,
+                () -> new DataSourceFactory().getObjectInstance(ref,
+                        new CompositeName("jdbc/TestDS"), context, null),
+                "a layered-pool binding must fail with the method's declared"
+                        + " exception type, not an unchecked rejection");
+        Assertions.assertTrue(e.getMessage().contains(MISSING_JNDI_NAME),
+                "the failure must name the misbound name, was: " + e.getMessage());
+        Assertions.assertTrue(e.getMessage().contains("dataSourceJNDI"),
+                "the failure must name the misconfigured attribute, was: "
+                        + e.getMessage());
+    }
+
+    @Test
+    void blankDataSourceJNDIAttributeLeavesThePropertyUnset() throws Exception {
+        // A blank value means "not configured", as it does for the boolean,
+        // numeric and isolation attributes of the same factory. Pre-fix the
+        // blank was stored and looked up as a name, and the resource died on
+        // a NamingException about the name [] even though the pool had a
+        // perfectly usable driver/URL configuration.
+        Reference ref = new Reference("javax.sql.DataSource", null, null);
+        ref.add(new StringRefAddr("jmxEnabled", "false"));
+        ref.add(new StringRefAddr("initialSize", "1"));
+        ref.add(new StringRefAddr("minIdle", "0"));
+        ref.add(new StringRefAddr("driverClassName", "org.h2.Driver"));
+        ref.add(new StringRefAddr("url", getUrl()));
+        ref.add(new StringRefAddr("username", "sa"));
+        ref.add(new StringRefAddr("password", ""));
+        ref.add(new StringRefAddr("dataSourceJNDI", " "));
+
+        DataSource ds = manage((DataSource) new DataSourceFactory()
+                .getObjectInstance(ref, new CompositeName("jdbc/TestDS"), null, null));
+
+        Assertions.assertNull(ds.getPoolProperties().getDataSourceJNDI(),
+                "a blank dataSourceJNDI must leave the property unset");
+        try (java.sql.Connection c = ds.getConnection();
+                java.sql.ResultSet rs = c.createStatement().executeQuery("SELECT 1")) {
+            Assertions.assertTrue(rs.next(),
+                    "the pool must still work from its driver/URL configuration");
+        }
+    }
+
     /**
      * A JNDI context in which nothing is bound: every operation except
      * {@code lookup} is unsupported, and no {@code lookup} can succeed.

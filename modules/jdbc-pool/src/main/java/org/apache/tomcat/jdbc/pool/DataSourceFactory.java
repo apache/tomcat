@@ -42,22 +42,20 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
  * <p>
- * JNDI object factory that creates an instance of <code>BasicDataSource</code> that has been configured based on the
- * <code>RefAddr</code> values of the specified <code>Reference</code>, which must match the names and data types of the
- * <code>BasicDataSource</code> bean properties.
+ * JNDI object factory that creates an instance of
+ * {@link org.apache.tomcat.jdbc.pool.DataSource} - or {@link XADataSource}, when the
+ * reference names a type to be built as XA - configured from the {@code RefAddr}
+ * values of the specified {@code Reference}. Address names are matched against the
+ * pool properties listed in {@link #ALL_PROPERTIES}; they are the attributes of the
+ * pool documented with {@link PoolConfiguration}'s setters, not the property set of
+ * any other pool implementation.
  * </p>
- * <br>
- * Properties available for configuration:<br>
- * <a href="https://commons.apache.org/dbcp/configuration.html">Commons DBCP properties</a><br>
- * <ol>
- * <li>initSQL - A query that gets executed once, right after the connection is established.</li>
- * <li>testOnConnect - run validationQuery after connection has been established.</li>
- * <li>validationInterval - avoid excess validation, only run validation at most at this frequency - time in
- * milliseconds.</li>
- * <li>jdbcInterceptors - a semicolon separated list of classnames extending {@link JdbcInterceptor} class.</li>
- * <li>jmxEnabled - true of false, whether to register the pool with JMX.</li>
- * <li>fairQueue - true of false, whether the pool should sacrifice a little bit of performance for true fairness.</li>
- * </ol>
+ * <p>
+ * The factory applies a strict reading of the reference: an attribute whose value is
+ * blank leaves its property at the {@link PoolProperties} default, and a value the
+ * property cannot take fails the lookup with an exception naming the attribute
+ * instead of being silently ignored.
+ * </p>
  */
 public class DataSourceFactory implements ObjectFactory {
     /**
@@ -261,7 +259,7 @@ public class DataSourceFactory implements ObjectFactory {
     /**
      * Property name for useLock.
      */
-    protected static final String PROP_USE_CON_LOCK = "useLock";
+    protected static final String PROP_USE_LOCK = "useLock";
 
     /**
      * Property name for dataSource.
@@ -343,7 +341,7 @@ public class DataSourceFactory implements ObjectFactory {
             PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED, PROP_REMOVEABANDONED, PROP_REMOVEABANDONEDTIMEOUT,
             PROP_LOGABANDONED, PROP_POOLPREPAREDSTATEMENTS, PROP_MAXOPENPREPAREDSTATEMENTS, PROP_CONNECTIONPROPERTIES,
             PROP_INITSQL, PROP_INTERCEPTORS, PROP_JMX_ENABLED, PROP_FAIR_QUEUE, PROP_USE_EQUALS, OBJECT_NAME,
-            PROP_ABANDONWHENPERCENTAGEFULL, PROP_MAXAGE, PROP_USE_CON_LOCK, PROP_DATASOURCE, PROP_DATASOURCE_JNDI,
+            PROP_ABANDONWHENPERCENTAGEFULL, PROP_MAXAGE, PROP_USE_LOCK, PROP_DATASOURCE, PROP_DATASOURCE_JNDI,
             PROP_SUSPECT_TIMEOUT, PROP_ALTERNATE_USERNAME_ALLOWED, PROP_COMMITONRETURN, PROP_ROLLBACKONRETURN,
             PROP_USEDISPOSABLECONNECTIONFACADE, PROP_LOGVALIDATIONERRORS, PROP_PROPAGATEINTERRUPTSTATE,
             PROP_IGNOREEXCEPTIONONPRELOAD, PROP_USESTATEMENTFACADE };
@@ -373,20 +371,14 @@ public class DataSourceFactory implements ObjectFactory {
     private static final Set<String> RESERVED_JNDI_ADDRESS_NAMES = Collections.unmodifiableSet(
             new HashSet<>(Arrays.asList("factory", "singleton", "scope", "auth", "description", "forceString")));
 
-    /*
-     * The recognized property names as a set, for the sweep over the
-     * reference's addresses that reports everything the lookup loop above
-     * never read.
-     */
-    private static final Set<String> ALL_PROPERTY_NAMES = Collections.unmodifiableSet(
-            new HashSet<>(Arrays.asList(ALL_PROPERTIES)));
-
     // -------------------------------------------------- ObjectFactory Methods
 
     /**
      * <p>
-     * Create and return a new <code>BasicDataSource</code> instance. If no instance can be created, return
-     * <code>null</code> instead.
+     * Creates and returns the pooled data source that the given {@code Reference}
+     * describes: an {@link org.apache.tomcat.jdbc.pool.DataSource}, or an
+     * {@link XADataSource} when the reference names {@code javax.sql.XADataSource}
+     * or the pool's own XA class.
      * </p>
      *
      * @param obj         The possibly null object containing location or reference information that can be used in
@@ -396,14 +388,26 @@ public class DataSourceFactory implements ObjectFactory {
      *                        <code>null</code> if <code>name</code> is relative to the default initial context
      * @param environment The possibly null environment that is used in creating this object
      *
+     * @return the configured data source, or <code>null</code> if <code>obj</code> is not a
+     *         <code>Reference</code> or names a class this factory does not build (the
+     *         latter is logged)
+     *
+     * @throws IllegalArgumentException if an attribute carries a value its property cannot
+     *         take: an unusable boolean, numeric or transaction-isolation value, or a
+     *         {@code dataSource} attribute holding a String or another connection pool
+     * @throws NamingException if the name given by the {@code dataSourceJNDI} attribute does
+     *         not resolve to a data source that can back the pool
+     *
      * @exception Exception if an exception occurs creating the instance
      */
     @Override
     public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable<?, ?> environment)
             throws Exception {
 
-        // We only know how to deal with <code>javax.naming.Reference</code>s
-        // that specify a class name of "javax.sql.DataSource"
+        // The reference must name one of the types this factory builds: the
+        // two documented interface names and the pool's own concrete classes
+        // (the non-XA one has always been accepted; the XA one is exactly
+        // what the factory news for an XA reference).
         if ((obj == null) || !(obj instanceof Reference)) {
             return null;
         }
@@ -420,30 +424,51 @@ public class DataSourceFactory implements ObjectFactory {
         if (org.apache.tomcat.jdbc.pool.DataSource.class.getName().equals(ref.getClassName())) {
             ok = true;
         }
+        if (org.apache.tomcat.jdbc.pool.XADataSource.class.getName().equals(ref.getClassName())) {
+            ok = true;
+            XA = true;
+        }
 
         if (!ok) {
             log.warn(MessageFactory.get("dataSourceFactory.invalidClassName", ref.getClassName()));
             return null;
         }
 
-
         Properties properties = new Properties();
-        DataSource dataSourceObject = null;
+        Object dataSourceObject = null;
         for (int i = 0; i < ALL_PROPERTIES.length; i++) {
             String propertyName = ALL_PROPERTIES[i];
             RefAddr ra = ref.get(propertyName);
             if (ra != null) {
                 Object content = ra.getContent();
                 if (content == null) {
-                    // RefAddr.getContent() is nullable, and a property with no
-                    // content simply has no value to apply
+                    // RefAddr.getContent() is nullable: a property carrying no
+                    // content has no value to apply. The name is recognised,
+                    // so note the skip where an operator wondering why a
+                    // configured attribute did not take effect will look.
+                    if (log.isDebugEnabled()) {
+                        log.debug(MessageFactory.get("dataSourceFactory.nullContentProperty", propertyName));
+                    }
                     continue;
                 }
-                if (PROP_DATASOURCE.equals(propertyName) && content instanceof DataSource) {
-                    // A live data source cannot travel through Properties as a
-                    // string, so keep the object and hand it to the pool below
-                    dataSourceObject = (DataSource) content;
-                    continue;
+                if (PROP_DATASOURCE.equals(propertyName)) {
+                    if (content instanceof DataSourceProxy) {
+                        // A pool cannot wrap another pool; reported with the
+                        // attribute and the object's class, the context the
+                        // layered-pool rejection deeper down cannot supply -
+                        // the lookup route already diagnoses this binding with
+                        // the same details.
+                        throw new IllegalArgumentException(MessageFactory.get(
+                                "dataSourceFactory.cannotSetDataSourceLayered",
+                                content.getClass().getName()));
+                    }
+                    if (isSupportedDataSourceObject(content)) {
+                        // A live data source cannot travel through Properties
+                        // as a string, so keep the object and hand it to the
+                        // pool below
+                        dataSourceObject = content;
+                        continue;
+                    }
                 }
                 properties.setProperty(propertyName, content.toString());
             }
@@ -452,11 +477,16 @@ public class DataSourceFactory implements ObjectFactory {
         // Whatever the lookup above did not recognize is never read, so the
         // operator hears about it here instead of watching the pool come up
         // with defaults. Names the JNDI container itself uses to build the
-        // reference are not pool properties and stay unmentioned.
+        // reference are not pool properties and stay unmentioned. The set is
+        // read from ALL_PROPERTIES at lookup time rather than snapshotted at
+        // class-initialisation: the array is protected so a subclass can
+        // extend it, and a snapshot would leave the loop reading one list
+        // while this sweep judged against another.
+        Set<String> knownPropertyNames = new HashSet<>(Arrays.asList(ALL_PROPERTIES));
         Enumeration<RefAddr> addresses = ref.getAll();
         while (addresses.hasMoreElements()) {
             String addressName = addresses.nextElement().getType();
-            if (!ALL_PROPERTY_NAMES.contains(addressName)
+            if (!knownPropertyNames.contains(addressName)
                     && !RESERVED_JNDI_ADDRESS_NAMES.contains(addressName)) {
                 log.warn(MessageFactory.get("dataSourceFactory.invalidProperty", addressName));
             }
@@ -472,11 +502,55 @@ public class DataSourceFactory implements ObjectFactory {
     }
 
     /**
+     * Whether content carried under the {@code dataSource} attribute is an
+     * object the pool can build its connections from. The pool accepts the
+     * three JDBC data source types its connect path understands
+     * ({@code javax.sql.DataSource}, {@code javax.sql.XADataSource} and
+     * {@code javax.sql.ConnectionPoolDataSource}, see
+     * {@link PooledConnection#connectUsingDataSource()}); only the first is a
+     * {@code javax.sql.DataSource}, so testing for that one type alone would
+     * stringify an XA or pooled data source and then reject the string.
+     *
+     * @param content the {@code RefAddr} content of a {@code dataSource} attribute
+     *
+     * @return {@code true} if the object can back the pool
+     */
+    private static boolean isSupportedDataSourceObject(Object content) {
+        return content instanceof DataSource || content instanceof javax.sql.XADataSource
+                || content instanceof javax.sql.ConnectionPoolDataSource;
+    }
+
+    /**
      * Parse the given properties into a PoolConfiguration.
+     *
+     * <p>
+     * A blank attribute value - empty or whitespace only, the shape a cleared
+     * template attribute yields - leaves the property at its
+     * {@link PoolProperties} default. A value the property cannot take fails the
+     * parse naming the attribute, rather than being silently dropped the way
+     * unparsed values used to be. Numeric, boolean and transaction-isolation
+     * attributes apply their trimmed value, and so does the lookup of the name
+     * given by {@code dataSourceJNDI}: whitespace around a number, a keyword or a
+     * class or JNDI name is always noise. Other string values are stored verbatim
+     * - a catalog, a validation query or a URL can legitimately carry
+     * surrounding whitespace.
+     * </p>
+     *
+     * <p>
+     * Two attributes are not plain property assignments: {@code connectionProperties}
+     * is resolved into the driver properties through
+     * {@link PoolProperties#setConnectionProperties(String)}, and
+     * {@code username}/{@code password} are merged into that same driver property
+     * set afterwards, so credentials configured as their own attributes override a
+     * {@code user} or {@code password} pair inside {@code connectionProperties}.
+     * </p>
      *
      * @param properties The properties to parse
      *
      * @return The configured PoolConfiguration
+     *
+     * @throws IllegalArgumentException if an attribute carries a value its property
+     *         cannot take
      */
     public static PoolConfiguration parsePoolProperties(Properties properties) {
         PoolConfiguration poolProperties = new PoolProperties();
@@ -500,63 +574,95 @@ public class DataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_DEFAULTTRANSACTIONISOLATION);
         if (value != null) {
-            int level = UNKNOWN_TRANSACTIONISOLATION;
-            if ("NONE".equalsIgnoreCase(value)) {
-                level = Connection.TRANSACTION_NONE;
-            } else if ("READ_COMMITTED".equalsIgnoreCase(value)) {
-                level = Connection.TRANSACTION_READ_COMMITTED;
-            } else if ("READ_UNCOMMITTED".equalsIgnoreCase(value)) {
-                level = Connection.TRANSACTION_READ_UNCOMMITTED;
-            } else if ("REPEATABLE_READ".equalsIgnoreCase(value)) {
-                level = Connection.TRANSACTION_REPEATABLE_READ;
-            } else if ("SERIALIZABLE".equalsIgnoreCase(value)) {
-                level = Connection.TRANSACTION_SERIALIZABLE;
-            } else {
-                try {
-                    level = Integer.parseInt(value);
-                } catch (NumberFormatException e) {
-                    System.err.println("Could not parse defaultTransactionIsolation: " + value);
-                    System.err.println("WARNING: defaultTransactionIsolation not set");
-                    System.err.println("using default value of database driver");
-                    level = UNKNOWN_TRANSACTIONISOLATION;
+            String trimmed = value.trim();
+            if (!trimmed.isEmpty()) {
+                // Unset means the pool stays in the "use the driver default"
+                // state it comes with.
+                int level;
+                if ("NONE".equalsIgnoreCase(trimmed)) {
+                    level = Connection.TRANSACTION_NONE;
+                } else if ("READ_COMMITTED".equalsIgnoreCase(trimmed)) {
+                    level = Connection.TRANSACTION_READ_COMMITTED;
+                } else if ("READ_UNCOMMITTED".equalsIgnoreCase(trimmed)) {
+                    level = Connection.TRANSACTION_READ_UNCOMMITTED;
+                } else if ("REPEATABLE_READ".equalsIgnoreCase(trimmed)) {
+                    level = Connection.TRANSACTION_REPEATABLE_READ;
+                } else if ("SERIALIZABLE".equalsIgnoreCase(trimmed)) {
+                    level = Connection.TRANSACTION_SERIALIZABLE;
+                } else {
+                    try {
+                        level = Integer.parseInt(trimmed);
+                    } catch (NumberFormatException e) {
+                        // An unusable value fails the resource naming the
+                        // property, instead of silently dropping the
+                        // configured isolation level.
+                        throw new IllegalArgumentException(MessageFactory.get(
+                                "dataSourceFactory.invalidTransactionIsolation", trimmed,
+                                PROP_DEFAULTTRANSACTIONISOLATION), e);
+                    }
                 }
+                poolProperties.setDefaultTransactionIsolation(level);
             }
-            poolProperties.setDefaultTransactionIsolation(level);
         }
 
         value = properties.getProperty(PROP_DEFAULTCATALOG);
-        if (value != null) {
+        if (value != null && !value.trim().isEmpty()) {
+            // A stored empty value would be pushed into every physical
+            // connection as setCatalog("") and whether that is inert or fails
+            // is driver-dependent. The value itself is kept untrimmed - a
+            // catalog name is a database identifier, which may carry
+            // whitespace the way a JNDI name cannot.
             poolProperties.setDefaultCatalog(value);
         }
 
         value = properties.getProperty(PROP_DRIVERCLASSNAME);
-        if (value != null) {
-            poolProperties.setDriverClassName(value);
+        if (value != null && !value.trim().isEmpty()) {
+            // The connect path's DriverManager fallback is keyed on the
+            // property being null, so a stored empty class name would defeat
+            // the fallback and abort the pool loading the empty class. The
+            // trimmed value is applied: a Java class name can never carry
+            // meaningful surrounding whitespace.
+            poolProperties.setDriverClassName(value.trim());
         }
 
         value = properties.getProperty(PROP_MAXACTIVE);
         if (value != null) {
-            poolProperties.setMaxActive(Integer.parseInt(value));
+            Integer parsed = parseInteger(PROP_MAXACTIVE, value);
+            if (parsed != null) {
+                poolProperties.setMaxActive(parsed.intValue());
+            }
         }
 
         value = properties.getProperty(PROP_MAXIDLE);
         if (value != null) {
-            poolProperties.setMaxIdle(Integer.parseInt(value));
+            Integer parsed = parseInteger(PROP_MAXIDLE, value);
+            if (parsed != null) {
+                poolProperties.setMaxIdle(parsed.intValue());
+            }
         }
 
         value = properties.getProperty(PROP_MINIDLE);
         if (value != null) {
-            poolProperties.setMinIdle(Integer.parseInt(value));
+            Integer parsed = parseInteger(PROP_MINIDLE, value);
+            if (parsed != null) {
+                poolProperties.setMinIdle(parsed.intValue());
+            }
         }
 
         value = properties.getProperty(PROP_INITIALSIZE);
         if (value != null) {
-            poolProperties.setInitialSize(Integer.parseInt(value));
+            Integer parsed = parseInteger(PROP_INITIALSIZE, value);
+            if (parsed != null) {
+                poolProperties.setInitialSize(parsed.intValue());
+            }
         }
 
         value = properties.getProperty(PROP_MAXWAIT);
         if (value != null) {
-            poolProperties.setMaxWait(Integer.parseInt(value));
+            Integer parsed = parseInteger(PROP_MAXWAIT, value);
+            if (parsed != null) {
+                poolProperties.setMaxWait(parsed.intValue());
+            }
         }
 
         value = properties.getProperty(PROP_TESTONBORROW);
@@ -585,18 +691,27 @@ public class DataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_TIMEBETWEENEVICTIONRUNSMILLIS);
         if (value != null) {
-            poolProperties.setTimeBetweenEvictionRunsMillis(Integer.parseInt(value));
+            Integer parsed = parseInteger(PROP_TIMEBETWEENEVICTIONRUNSMILLIS, value);
+            if (parsed != null) {
+                poolProperties.setTimeBetweenEvictionRunsMillis(parsed.intValue());
+            }
         }
 
         value = properties.getProperty(PROP_NUMTESTSPEREVICTIONRUN);
         if (value != null) {
             log.warn(MessageFactory.get("dataSourceFactory.invalidSetting", PROP_NUMTESTSPEREVICTIONRUN));
-            poolProperties.setNumTestsPerEvictionRun(Integer.parseInt(value));
+            Integer parsed = parseInteger(PROP_NUMTESTSPEREVICTIONRUN, value);
+            if (parsed != null) {
+                poolProperties.setNumTestsPerEvictionRun(parsed.intValue());
+            }
         }
 
         value = properties.getProperty(PROP_MINEVICTABLEIDLETIMEMILLIS);
         if (value != null) {
-            poolProperties.setMinEvictableIdleTimeMillis(Integer.parseInt(value));
+            Integer parsed = parseInteger(PROP_MINEVICTABLEIDLETIMEMILLIS, value);
+            if (parsed != null) {
+                poolProperties.setMinEvictableIdleTimeMillis(parsed.intValue());
+            }
         }
 
         value = properties.getProperty(PROP_TESTWHILEIDLE);
@@ -623,13 +738,23 @@ public class DataSourceFactory implements ObjectFactory {
         }
 
         value = properties.getProperty(PROP_VALIDATIONQUERY);
-        if (value != null) {
+        if (value != null && !value.trim().isEmpty()) {
+            // The way to express "no validation query" is the property being
+            // unset, which routes validation to Connection.isValid(); a
+            // stored empty string instead runs the empty string as SQL on
+            // every validation - a no-op on forgiving drivers and a failed
+            // validation, session discard and reconnect on stricter ones. The
+            // query itself is kept untrimmed; whitespace around real SQL is
+            // the driver's to chew.
             poolProperties.setValidationQuery(value);
         }
 
         value = properties.getProperty(PROP_VALIDATIONQUERY_TIMEOUT);
         if (value != null) {
-            poolProperties.setValidationQueryTimeout(Integer.parseInt(value));
+            Integer parsed = parseInteger(PROP_VALIDATIONQUERY_TIMEOUT, value);
+            if (parsed != null) {
+                poolProperties.setValidationQueryTimeout(parsed.intValue());
+            }
         }
 
         value = properties.getProperty(PROP_VALIDATOR_CLASS_NAME);
@@ -639,7 +764,10 @@ public class DataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_VALIDATIONINTERVAL);
         if (value != null) {
-            poolProperties.setValidationInterval(Long.parseLong(value));
+            Long parsed = parseNumber(PROP_VALIDATIONINTERVAL, value);
+            if (parsed != null) {
+                poolProperties.setValidationInterval(parsed.longValue());
+            }
         }
 
         value = properties.getProperty(PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED);
@@ -661,7 +789,10 @@ public class DataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_REMOVEABANDONEDTIMEOUT);
         if (value != null) {
-            poolProperties.setRemoveAbandonedTimeout(Integer.parseInt(value));
+            Integer parsed = parseInteger(PROP_REMOVEABANDONEDTIMEOUT, value);
+            if (parsed != null) {
+                poolProperties.setRemoveAbandonedTimeout(parsed.intValue());
+            }
         }
 
         value = properties.getProperty(PROP_LOGABANDONED);
@@ -684,10 +815,9 @@ public class DataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_CONNECTIONPROPERTIES);
         if (value != null) {
-            // Use the canonical setter so that the configured string also
-            // round-trips through getConnectionProperties(); it parses the
-            // pairs into getDbProperties() with the very same parser that
-            // getProperties(value) below used to apply.
+            // The canonical setter parses the pairs into the driver
+            // properties and keeps the string round-tripping through
+            // getConnectionProperties().
             poolProperties.setConnectionProperties(value);
         } else {
             poolProperties.setDbProperties(new Properties());
@@ -706,7 +836,10 @@ public class DataSourceFactory implements ObjectFactory {
         }
 
         value = properties.getProperty(PROP_INTERCEPTORS);
-        if (value != null) {
+        if (value != null && !value.trim().isEmpty()) {
+            // Storing the empty string would leave the property non-null, and
+            // the pool treats that as a configured chain whose only segment is
+            // the empty one.
             poolProperties.setJdbcInterceptors(value);
         }
 
@@ -735,46 +868,67 @@ public class DataSourceFactory implements ObjectFactory {
         }
 
         value = properties.getProperty(OBJECT_NAME);
-        if (value != null) {
+        if (value != null && !value.trim().isEmpty()) {
+            // An empty attribute would be quoted into an empty pool name,
+            // giving the JMX object name an empty name component where the
+            // property being unset lets the pool name itself. The configured
+            // name is stored verbatim - it is an identifier and can carry
+            // meaningful whitespace, which is also why it is quoted.
             poolProperties.setName(ObjectName.quote(value));
         }
 
         value = properties.getProperty(PROP_ABANDONWHENPERCENTAGEFULL);
         if (value != null) {
-            poolProperties.setAbandonWhenPercentageFull(Integer.parseInt(value));
+            Integer parsed = parseInteger(PROP_ABANDONWHENPERCENTAGEFULL, value);
+            if (parsed != null) {
+                poolProperties.setAbandonWhenPercentageFull(parsed.intValue());
+            }
         }
 
         value = properties.getProperty(PROP_MAXAGE);
         if (value != null) {
-            poolProperties.setMaxAge(Long.parseLong(value));
+            Long parsed = parseNumber(PROP_MAXAGE, value);
+            if (parsed != null) {
+                poolProperties.setMaxAge(parsed.longValue());
+            }
         }
 
-        value = properties.getProperty(PROP_USE_CON_LOCK);
+        value = properties.getProperty(PROP_USE_LOCK);
         if (value != null) {
-            Boolean b = parseBoolean(PROP_USE_CON_LOCK, value);
+            Boolean b = parseBoolean(PROP_USE_LOCK, value);
             if (b != null) {
                 poolProperties.setUseLock(b.booleanValue());
             }
         }
 
         value = properties.getProperty(PROP_DATASOURCE);
-        if (value != null) {
+        if (value != null && !value.trim().isEmpty()) {
             // Only genuinely string-valued dataSource attributes reach this
-            // point: getObjectInstance hands an actual javax.sql.DataSource
-            // RefAddr content straight to the pool instead of stringifying it.
-            // A string cannot be turned into a data source here.
+            // point: getObjectInstance hands a live data source object
+            // carried under the attribute (DataSource, XADataSource or
+            // ConnectionPoolDataSource) straight to the pool instead of
+            // stringifying it. A string cannot be turned into a data source
+            // here.
             throw new IllegalArgumentException(MessageFactory.get("dataSourceFactory.cannotSetDataSourceString",
                     value));
         }
 
         value = properties.getProperty(PROP_DATASOURCE_JNDI);
         if (value != null) {
-            poolProperties.setDataSourceJNDI(value);
+            String trimmed = value.trim();
+            if (!trimmed.isEmpty()) {
+                // A stored blank name would be one no context can resolve,
+                // failing the whole resource on the lookup.
+                poolProperties.setDataSourceJNDI(trimmed);
+            }
         }
 
         value = properties.getProperty(PROP_SUSPECT_TIMEOUT);
         if (value != null) {
-            poolProperties.setSuspectTimeout(Integer.parseInt(value));
+            Integer parsed = parseInteger(PROP_SUSPECT_TIMEOUT, value);
+            if (parsed != null) {
+                poolProperties.setSuspectTimeout(parsed.intValue());
+            }
         }
 
         value = properties.getProperty(PROP_ALTERNATE_USERNAME_ALLOWED);
@@ -871,6 +1025,62 @@ public class DataSourceFactory implements ObjectFactory {
     }
 
     /**
+     * Parses the value configured for a numeric attribute. Like
+     * {@link #parseBoolean(String, String)} the value tolerates surrounding
+     * whitespace, an empty value means "leave the property unset" rather than
+     * failing the parse, and a value that cannot be parsed fails the
+     * configuration naming the property and quoting the value instead of
+     * surfacing as a bare {@link NumberFormatException} about an anonymous
+     * input string.
+     *
+     * @param name  the property name, for the error message
+     * @param value the configured value, never {@code null}
+     *
+     * @return the parsed value, or {@code null} when the value is empty and
+     *             the property is therefore to be left unset
+     *
+     * @throws IllegalArgumentException if the value is not a whole number
+     */
+    private static Long parseNumber(String name, String value) {
+        String trimmed = value.trim();
+        if (trimmed.isEmpty()) {
+            return null;
+        }
+        try {
+            return Long.valueOf(trimmed);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(
+                    MessageFactory.get("dataSourceFactory.invalidNumber", trimmed, name), e);
+        }
+    }
+
+    /**
+     * Parses the value configured for a numeric attribute whose setter takes
+     * an {@code int}.
+     *
+     * @param name  the property name, for the error message
+     * @param value the configured value, never {@code null}
+     *
+     * @return the parsed value, or {@code null} when the value is empty and
+     *             the property is therefore to be left unset
+     *
+     * @throws IllegalArgumentException if the value is not a whole number, or
+     *                                      is outside the range an {@code int}
+     *                                      can hold
+     */
+    private static Integer parseInteger(String name, String value) {
+        Long parsed = parseNumber(name, value);
+        if (parsed == null) {
+            return null;
+        }
+        if (parsed.longValue() < Integer.MIN_VALUE || parsed.longValue() > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException(
+                    MessageFactory.get("dataSourceFactory.numberOutOfRange", value, name));
+        }
+        return Integer.valueOf(parsed.intValue());
+    }
+
+    /**
      * Creates and configures a {@link DataSource} instance based on the given properties.
      *
      * @param properties the datasource configuration properties
@@ -904,20 +1114,22 @@ public class DataSourceFactory implements ObjectFactory {
      * <p>
      * When {@code dataSourceObject} is not {@code null}, it is set on the pool configuration before the pool is
      * created, and the {@code dataSourceJNDI} lookup is skipped: the pool is built around the object that was handed
-     * to the factory directly.
+     * to the factory directly. The object is one of the data source types the pool's connect path accepts
+     * ({@code javax.sql.DataSource}, {@code javax.sql.XADataSource} or
+     * {@code javax.sql.ConnectionPoolDataSource}), not necessarily a {@code javax.sql.DataSource}.
      * </p>
      *
      * @param properties        The datasource configuration properties
      * @param context           The JNDI context
      * @param XA                {@code true} to create an XA data source
-     * @param dataSourceObject  A live {@link DataSource} the pool should wrap, or {@code null}
+     * @param dataSourceObject  A live data source object the pool should wrap, or {@code null}
      *
      * @return The configured datasource
      *
      * @throws Exception if an error occurs creating the data source
      */
     protected DataSource createDataSource(Properties properties, Context context, boolean XA,
-            DataSource dataSourceObject) throws Exception {
+            Object dataSourceObject) throws Exception {
         PoolConfiguration poolProperties = parsePoolProperties(properties);
         if (dataSourceObject != null) {
             poolProperties.setDataSource(dataSourceObject);
@@ -927,9 +1139,7 @@ public class DataSourceFactory implements ObjectFactory {
         }
         org.apache.tomcat.jdbc.pool.DataSource dataSource = XA ? new XADataSource(poolProperties)
                 : new org.apache.tomcat.jdbc.pool.DataSource(poolProperties);
-        // Initialise the pool itself
         dataSource.createPool();
-        // Return the configured DataSource instance
         return dataSource;
     }
 
@@ -939,8 +1149,9 @@ public class DataSourceFactory implements ObjectFactory {
      * @param context        The JNDI context
      * @param poolProperties The pool configuration
      *
-     * @throws NamingException if the name configured through the dataSourceJNDI property cannot be resolved. The name
-     *                             was configured specifically to supply the connections for the pool, so a pool without
+     * @throws NamingException if the name configured through the dataSourceJNDI property cannot be resolved, or
+     *                             resolves to an object the pool cannot create connections from. The name was
+     *                             configured specifically to supply the connections for the pool, so a pool without
      *                             that data source is not a usable fallback and the failure is reported instead of
      *                             being deferred to the first connection request.
      */
@@ -950,13 +1161,15 @@ public class DataSourceFactory implements ObjectFactory {
             if (context != null) {
                 jndiDS = context.lookup(poolProperties.getDataSourceJNDI());
             } else {
-                log.warn(MessageFactory.get("dataSourceFactory.jndiContextNull"));
+                // Not a fault: a bare Reference lookup outside a container
+                // arrives with no local context, and the InitialContext
+                // fallback below is written for exactly that.
+                log.debug(MessageFactory.get("dataSourceFactory.jndiContextNull"));
             }
         } catch (NamingException e) {
             if (log.isDebugEnabled()) {
-                log.debug(
-                        "The name \"" + poolProperties.getDataSourceJNDI() + "\" cannot be found in the local context.",
-                        e);
+                log.debug(MessageFactory.get("dataSourceFactory.jndiLocalNameNotFound",
+                        poolProperties.getDataSourceJNDI()), e);
             }
         }
         NamingException initialContextFailure = null;
@@ -965,12 +1178,37 @@ public class DataSourceFactory implements ObjectFactory {
                 context = new InitialContext();
                 jndiDS = context.lookup(poolProperties.getDataSourceJNDI());
             } catch (NamingException e) {
+                // Not warned here: this failure always ends in the thrown
+                // jndiLookupFailed below, which names the same name and
+                // carries this exception as its cause, and the caller logs
+                // that - warning as well only made the one failed resource
+                // read as two.
                 initialContextFailure = e;
-                log.warn(MessageFactory.get("dataSourceFactory.jndiNameNotFound",
-                        poolProperties.getDataSourceJNDI()), e);
             }
         }
         if (jndiDS != null) {
+            if (jndiDS instanceof DataSourceProxy) {
+                // setDataSource's own rejection of layered pools, reported as
+                // this method's contract promises and with the context the
+                // rejection alone lacks: the attribute and the name that
+                // resolved to the other pool.
+                throw new NamingException(MessageFactory.get(
+                        "dataSourceFactory.jndiLayeredPool",
+                        poolProperties.getDataSourceJNDI(),
+                        jndiDS.getClass().getName()));
+            }
+            if (!isSupportedDataSourceObject(jndiDS)) {
+                // The same requirement the object-valued dataSource attribute
+                // enforces: the name was configured to supply the pool's
+                // connections, and a binding the connect path cannot use must
+                // fail here naming the attribute and the name, rather than
+                // surfacing at connect time as a generic error about an
+                // unknown class.
+                throw new NamingException(MessageFactory.get(
+                        "dataSourceFactory.jndiNotDataSource",
+                        poolProperties.getDataSourceJNDI(),
+                        jndiDS.getClass().getName()));
+            }
             poolProperties.setDataSource(jndiDS);
             return;
         }
@@ -985,6 +1223,14 @@ public class DataSourceFactory implements ObjectFactory {
 
     /**
      * Parse properties from the string. Format of the string must be [propertyName=property;]*.
+     *
+     * <p>
+     * Kept as a protected extension point for subclasses that parse property
+     * strings of their own; this factory no longer calls it, as its
+     * {@code connectionProperties} attribute goes through the canonical
+     * {@link PoolProperties#setConnectionProperties(String)}, which parses with the
+     * same delegate used here.
+     * </p>
      *
      * @param propText The properties string
      *

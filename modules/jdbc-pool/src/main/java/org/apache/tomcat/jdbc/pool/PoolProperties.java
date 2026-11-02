@@ -20,9 +20,11 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -454,18 +456,38 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                 interceptors = new InterceptorDefinition[0];
             } else {
                 String[] interceptorValues = interceptorList.split(";");
-                InterceptorDefinition[] definitions = new InterceptorDefinition[interceptorValues.length + 1];
+                List<InterceptorDefinition> definitions =
+                        new ArrayList<>(interceptorValues.length + 1);
                 // Always add the trap interceptor to the mix
-                definitions[0] = new InterceptorDefinition(TrapException.class);
+                definitions.add(new InterceptorDefinition(TrapException.class));
                 for (int i = 0; i < interceptorValues.length; i++) {
                     int propIndex = interceptorValues[i].indexOf('(');
                     int endIndex = interceptorValues[i].indexOf(')');
+                    String name;
+                    String propsAsString = null;
                     if (propIndex < 0 || endIndex < 0 || endIndex <= propIndex) {
-                        definitions[i + 1] = new InterceptorDefinition(interceptorValues[i].trim());
+                        name = interceptorValues[i].trim();
                     } else {
-                        String name = interceptorValues[i].substring(0, propIndex).trim();
-                        definitions[i + 1] = new InterceptorDefinition(name);
-                        String propsAsString = interceptorValues[i].substring(propIndex + 1, endIndex);
+                        name = interceptorValues[i].substring(0, propIndex).trim();
+                        propsAsString = interceptorValues[i].substring(propIndex + 1, endIndex);
+                    }
+                    if (name.isEmpty()) {
+                        // The name is empty when a leading or doubled
+                        // separator leaves an empty segment, or when a
+                        // segment opens straight on "(": there is no
+                        // interceptor to load, and a definition without a
+                        // class name fails the whole pool start later, on
+                        // the generated "...pool.interceptor." class, with a
+                        // message naming nothing. split() already drops a
+                        // redundant trailing separator and the property parse
+                        // below tolerates a redundant separator inside the
+                        // parentheses: skipping the empty name makes a
+                        // redundant separator cosmetic throughout the syntax
+                        // rather than fatal wherever split() kept it.
+                        continue;
+                    }
+                    InterceptorDefinition definition = new InterceptorDefinition(name);
+                    if (propsAsString != null) {
                         String[] props = propsAsString.split(",");
                         for (int j = 0; j < props.length; j++) {
                             String prop = props[j];
@@ -484,11 +506,12 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                             }
                             String propName = prop.substring(0, pidx).trim();
                             String propValue = prop.substring(pidx + 1).trim();
-                            definitions[i + 1].addProperty(new InterceptorProperty(propName, propValue));
+                            definition.addProperty(new InterceptorProperty(propName, propValue));
                         }
                     }
+                    definitions.add(definition);
                 }
-                interceptors = definitions;
+                interceptors = definitions.toArray(new InterceptorDefinition[0]);
             }
         }
         return interceptors;
@@ -509,7 +532,10 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
      * properties to the driver instead of leaving them merged in. Entries the
      * string never contributed, such as the {@code user} and {@code password}
      * injected by {@link DataSourceFactory#parsePoolProperties(Properties)} or
-     * mirrored in by {@link DataSourceProxy}, are kept. A configuration whose
+     * mirrored in by {@link DataSourceProxy}, are kept, and while a
+     * {@code username}/{@code password} field is set its entry holds the
+     * field's value even when this string names that key, the rule the
+     * credential setters establish. A configuration whose
      * database properties are {@code null} only stores the raw string, as there
      * is no property collection to parse into. The remove and re-add run inside
      * this one synchronized method; an unsynchronised reader of the database
@@ -543,6 +569,19 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         for (String key : parsed.stringPropertyNames()) {
             dbProps.setProperty(key, parsed.getProperty(key));
             keys.add(key);
+        }
+        // The credential setters' rule outlives the string: while a credential
+        // field is set, its dbProperties entry holds the field's value, even
+        // when this string named the key itself - DataSourceFactory injects the
+        // configured username/password over the string's pairs, so a
+        // reconfigure that drops the keys from the string must not strip
+        // credentials the configuration still carries. With the field unset the
+        // entry is the string's own again, exactly as after setPassword(null).
+        if (username != null) {
+            dbProps.setProperty(PoolUtilities.PROP_USER, username);
+        }
+        if (password != null) {
+            dbProps.setProperty(PoolUtilities.PROP_PASSWORD, password);
         }
         connectionPropertyKeys = keys;
     }
