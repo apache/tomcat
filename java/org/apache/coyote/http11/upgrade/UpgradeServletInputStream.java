@@ -324,4 +324,9 @@ public class UpgradeServletInputStream extends ServletInputStream {
     final boolean isClosed() {
         return closed;
     }
+
+
+    final boolean isEof() {
+        return eof;
+    }
 }

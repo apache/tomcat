@@ -125,6 +125,10 @@ public abstract class AbstractEndpoint<S, U> {
              */
             UPGRADED,
             /**
+             * The connection has been closed for reads from the client but writes to the client may continue.
+             */
+            UPGRADED_HALF_CLOSED,
+            /**
              * Asynchronous I/O is in progress.
              */
             ASYNC_IO,

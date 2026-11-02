@@ -30,6 +30,9 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
 
 import javax.net.SocketFactory;
@@ -49,14 +52,18 @@ import org.junit.Test;
 
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
+import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.coyote.UpgradeToken;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
+import org.apache.coyote.http11.Http11NioProtocol;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.ContextBind;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
+import org.apache.tomcat.util.net.NioChannel;
+import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.SocketWrapperBase;
@@ -150,6 +157,105 @@ public class TestUpgrade extends TomcatBaseTest {
         Assert.assertEquals(NonBlockingEof.EOF_MARKER, c);
 
         uc.shutdownInput();
+    }
+
+    @Test
+    public void testDelayedResponseAfterEofNonBlockingReadNonBlockingWrite() throws Exception {
+        doTestDelayedResponseAfterEof(false, false);
+    }
+
+    @Test
+    public void testDelayedResponseAfterEofNonBlockingReadBlockingWrite() throws Exception {
+        doTestDelayedResponseAfterEof(false, true);
+    }
+
+    @Test
+    public void testDelayedResponseAfterEofBlockingReadNonBlockingWrite() throws Exception {
+        doTestDelayedResponseAfterEof(true, false);
+    }
+
+    @Test
+    public void testDelayedResponseAfterEofBlockingReadBlockingWrite() throws Exception {
+        doTestDelayedResponseAfterEof(true, true);
+    }
+
+    private void doTestDelayedResponseAfterEof(boolean blockingRead, boolean blockingWrite) throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        CountingEndpoint endpoint = new CountingEndpoint();
+        Connector connector = new Connector(new Http11NioProtocol(endpoint));
+        connector.setPort(0);
+        connector.setThrowOnFailure(true);
+        Assert.assertTrue(connector.setProperty("address", "localhost"));
+        tomcat.getService().removeConnector(tomcat.getConnector());
+        tomcat.setConnector(connector);
+        Context context = getProgrammaticRootContext();
+        AtomicReference<EofHandler> handlerRef = new AtomicReference<>();
+        Tomcat.addServlet(context, "upgrade", new HttpServlet() {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected void doGet(HttpServletRequest request, HttpServletResponse response)
+                    throws ServletException, IOException {
+                response.setHeader("Upgrade", "test");
+                EofHandler handler = request.upgrade(EofHandler.class);
+                handler.blockingRead = blockingRead;
+                handlerRef.set(handler);
+            }
+        });
+        context.addServletMapping("/", "upgrade");
+        tomcat.start();
+
+        try (Socket socket = new Socket("localhost", getPort())) {
+            socket.setSoTimeout(5000);
+            socket.getOutputStream().write(
+                    "GET / HTTP/1.1\r\nHost: localhost\r\nUpgrade: test\r\n\r\n".getBytes(StandardCharsets.US_ASCII));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream(),
+                    StandardCharsets.US_ASCII));
+            Assert.assertTrue(reader.readLine().contains("101"));
+            while (!reader.readLine().isEmpty()) {
+                // Skip response headers
+            }
+            socket.shutdownOutput();
+
+            EofHandler handler = handlerRef.get();
+            try {
+                Assert.assertTrue(handler.inputFinished.await(5, TimeUnit.SECONDS));
+                Assert.assertNull(handler.error);
+                endpoint.inputFinished = true;
+                /*
+                 * A read event may already be queued, but EOF must not cause repeated dispatches while output is open.
+                 *
+                 * There is a trade-off here. On slow systems a repeated read may take a while to arrive but the longer
+                 * the wait, the more delay it adds to the tests. 300ms is a reasonable delay and while a heavily loaded
+                 * test machine may miss the failure, the tests are run often enough that that is acceptable.
+                 */
+                Assert.assertFalse("Read polling continued after EOF",
+                        endpoint.repeatedReads.await(300, TimeUnit.MILLISECONDS));
+
+                if (blockingWrite) {
+                    handler.writeResponse();
+                } else {
+                    handler.connection.getOutputStream().setWriteListener(new WriteListener() {
+                        @Override
+                        public void onWritePossible() throws IOException {
+                            handler.writeResponse();
+                        }
+
+                        @Override
+                        public void onError(Throwable t) {
+                            handler.error = t;
+                        }
+                    });
+                }
+                Assert.assertEquals('O', reader.read());
+                // Closing from an application thread must still close the socket when read polling has stopped.
+                Assert.assertEquals(-1, reader.read());
+                Assert.assertTrue(handler.destroyed.await(5, TimeUnit.SECONDS));
+                Assert.assertNull(handler.error);
+            } finally {
+                handler.connection.close();
+            }
+        }
     }
 
     @Test
@@ -877,6 +983,84 @@ public class TestUpgrade extends TomcatBaseTest {
                     // Ignore
                 }
             }
+        }
+    }
+
+
+    public static class CountingEndpoint extends NioEndpoint {
+        private volatile boolean inputFinished;
+        private final CountDownLatch repeatedReads = new CountDownLatch(2);
+
+        @Override
+        public boolean processSocket(SocketWrapperBase<NioChannel> socket, SocketEvent event, boolean dispatch) {
+            if (inputFinished && event == SocketEvent.OPEN_READ) {
+                repeatedReads.countDown();
+            }
+            return super.processSocket(socket, event, dispatch);
+        }
+    }
+
+    public static class EofHandler implements HttpUpgradeHandler, ReadListener {
+        private boolean blockingRead;
+        private WebConnection connection;
+        private ServletInputStream input;
+        private final CountDownLatch inputFinished = new CountDownLatch(1);
+        private final CountDownLatch destroyed = new CountDownLatch(1);
+        private volatile Throwable error;
+
+        @Override
+        public void init(WebConnection connection) {
+            this.connection = connection;
+            try {
+                input = connection.getInputStream();
+                if (blockingRead) {
+                    byte[] buffer = new byte[1024];
+                    while (input.read(buffer) != -1) {
+                        // Discard data until EOF
+                    }
+                    inputFinished.countDown();
+                } else {
+                    input.setReadListener(this);
+                }
+            } catch (IOException e) {
+                onError(e);
+            }
+        }
+
+        @Override
+        public void onDataAvailable() throws IOException {
+            byte[] buffer = new byte[1024];
+            while (input.isReady() && input.read(buffer) != -1) {
+                // Discard data until EOF
+            }
+        }
+
+        @Override
+        public void onAllDataRead() {
+            // Leave both streams open until the application is ready to send a response.
+            inputFinished.countDown();
+        }
+
+        @Override
+        public void onError(Throwable t) {
+            error = t;
+            inputFinished.countDown();
+        }
+
+        private void writeResponse() throws IOException {
+            ServletOutputStream output = connection.getOutputStream();
+            output.write('O');
+            output.flush();
+            try {
+                connection.close();
+            } catch (Exception e) {
+                throw new IOException(e);
+            }
+        }
+
+        @Override
+        public void destroy() {
+            destroyed.countDown();
         }
     }
 
