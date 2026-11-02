@@ -29,12 +29,13 @@ import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorDefinition;
 public interface PoolConfiguration {
 
     /**
-     * JMX prefix for interceptors that register themselves with JMX
+     * Package name prefix used to resolve unqualified interceptor class names configured through the
+     * {@link #setJdbcInterceptors(String) jdbcInterceptors} property.
      */
     String PKG_PREFIX = "org.apache.tomcat.jdbc.pool.interceptor.";
 
     /**
-     * Connections that have been abandoned (timed out) wont get closed and reported up unless the number of connections
+     * Connections that have been abandoned (timed out) won't get closed and reported up unless the number of connections
      * in use are above the percentage defined by abandonWhenPercentageFull. The value should be between 0-100. The
      * default value is 0, which implies that connections are eligible for closure as soon as removeAbandonedTimeout has
      * been reached.
@@ -45,7 +46,7 @@ public interface PoolConfiguration {
     void setAbandonWhenPercentageFull(int percentage);
 
     /**
-     * Connections that have been abandoned (timed out) wont get closed and reported up unless the number of connections
+     * Connections that have been abandoned (timed out) won't get closed and reported up unless the number of connections
      * in use are above the percentage defined by abandonWhenPercentageFull. The value should be between 0-100. The
      * default value is 0, which implies that connections are eligible for closure as soon as removeAbandonedTimeout has
      * been reached.
@@ -288,7 +289,7 @@ public interface PoolConfiguration {
 
     /**
      * The maximum number of connections that should be kept in the idle pool if {@link #isPoolSweeperEnabled()} returns
-     * false. If the If {@link #isPoolSweeperEnabled()} returns true, then the idle pool can grow up to
+     * false. If {@link #isPoolSweeperEnabled()} returns true, then the idle pool can grow up to
      * {@link #getMaxActive} and will be shrunk according to {@link #getMinEvictableIdleTimeMillis()} setting. Default
      * value is maxActive:100
      *
@@ -298,7 +299,7 @@ public interface PoolConfiguration {
 
     /**
      * The maximum number of connections that should be kept in the idle pool if {@link #isPoolSweeperEnabled()} returns
-     * false. If the If {@link #isPoolSweeperEnabled()} returns true, then the idle pool can grow up to
+     * false. If {@link #isPoolSweeperEnabled()} returns true, then the idle pool can grow up to
      * {@link #getMaxActive} and will be shrunk according to {@link #getMinEvictableIdleTimeMillis()} setting. Default
      * value is maxActive:100
      *
@@ -308,8 +309,9 @@ public interface PoolConfiguration {
 
     /**
      * The maximum number of milliseconds that the pool will wait (when there are no available connections and the
-     * {@link #getMaxActive} has been reached) for a connection to be returned before throwing an exception. Default
-     * value is 30000 (30 seconds)
+     * {@link #getMaxActive} has been reached) for a connection to be returned before throwing an exception. A value
+     * less than or equal to zero makes the pool wait indefinitely for a connection to be returned instead of timing
+     * out. Default value is 30000 (30 seconds)
      *
      * @return the number of milliseconds to wait for a connection to become available if the pool is maxed out.
      */
@@ -317,8 +319,9 @@ public interface PoolConfiguration {
 
     /**
      * The maximum number of milliseconds that the pool will wait (when there are no available connections and the
-     * {@link #getMaxActive} has been reached) for a connection to be returned before throwing an exception. Default
-     * value is 30000 (30 seconds)
+     * {@link #getMaxActive} has been reached) for a connection to be returned before throwing an exception. A value
+     * less than or equal to zero makes the pool wait indefinitely for a connection to be returned instead of timing
+     * out. Default value is 30000 (30 seconds)
      *
      * @param maxWait the maximum number of milliseconds to wait.
      */
@@ -345,9 +348,10 @@ public interface PoolConfiguration {
     /**
      * The minimum number of established connections that should be kept in the pool at all times. The connection pool
      * can shrink below this number if validation queries fail and connections get closed. Default value is derived from
-     * {@link #getInitialSize()} (also see {@link #setTestWhileIdle(boolean)} The idle pool will not shrink below this
-     * value during an eviction run, hence the number of actual connections can be between {@link #getMinIdle()} and
-     * somewhere between {@link #getMaxIdle()} and {@link #getMaxActive()}
+     * {@link #getInitialSize()} (also see {@link #setTestWhileIdle(boolean)}). The eviction run never shrinks the
+     * total number of connections in the pool - idle plus busy - below this value, hence the number of actual
+     * connections can be between {@link #getMinIdle()} and somewhere between {@link #getMaxIdle()} and
+     * {@link #getMaxActive()}
      *
      * @return the minimum number of idle or established connections
      */
@@ -356,16 +360,18 @@ public interface PoolConfiguration {
     /**
      * The minimum number of established connections that should be kept in the pool at all times. The connection pool
      * can shrink below this number if validation queries fail and connections get closed. Default value is derived from
-     * {@link #getInitialSize()} (also see {@link #setTestWhileIdle(boolean)} The idle pool will not shrink below this
-     * value during an eviction run, hence the number of actual connections can be between {@link #getMinIdle()} and
-     * somewhere between {@link #getMaxIdle()} and {@link #getMaxActive()}
+     * {@link #getInitialSize()} (also see {@link #setTestWhileIdle(boolean)}). The eviction run never shrinks the
+     * total number of connections in the pool - idle plus busy - below this value, hence the number of actual
+     * connections can be between {@link #getMinIdle()} and somewhere between {@link #getMaxIdle()} and
+     * {@link #getMaxActive()}
      *
      * @param minIdle the minimum number of idle or established connections
      */
     void setMinIdle(int minIdle);
 
     /**
-     * Returns the name of the connection pool. By default a JVM unique random name is assigned.
+     * Returns the name of the connection pool. By default a name unique within the JVM is assigned; it is a counter
+     * with a JVM-scoped suffix, so it is unique but predictable, not random.
      *
      * @return the name of the pool, should be unique in a JVM
      */
@@ -381,7 +387,7 @@ public interface PoolConfiguration {
     /**
      * Property not used
      *
-     * @return unknown value
+     * @return the stored value, which the pool never reads
      */
     int getNumTestsPerEvictionRun();
 
@@ -393,9 +399,12 @@ public interface PoolConfiguration {
     void setNumTestsPerEvictionRun(int numTestsPerEvictionRun);
 
     /**
-     * Returns the password used when establishing connections to the database.
+     * Returns the password used when establishing connections to the database. Some implementations mask the value -
+     * the {@link DataSourceProxy} and the JMX bean return a placeholder instead of the password so that it cannot be
+     * read out through JMX - so a consumer of this contract must not treat the returned string as the configured
+     * password.
      *
-     * @return the password in string format
+     * @return the password in string format, or a masking placeholder in implementations that hide it
      */
     String getPassword();
 
@@ -483,9 +492,10 @@ public interface PoolConfiguration {
 
     /**
      * The indication of whether objects will be validated before being borrowed from the pool. If the object fails to
-     * validate, it will be dropped from the pool, and we will attempt to borrow another. NOTE - for a true value to
-     * have any effect, the validationQuery parameter must be set to a non-null string. Default value is false In order
-     * to have a more efficient validation, see {@link #setValidationInterval(long)}
+     * validate, a reconnection of the same pooled connection is attempted and validated again; if that also fails, the
+     * object is dropped from the pool and the borrow fails with an SQLException. NOTE - if no validationQuery is set,
+     * {@link java.sql.Connection#isValid(int)} is used to validate the connection. Default value is false In order to
+     * have a more efficient validation, see {@link #setValidationInterval(long)}
      *
      * @return true if the connection is to be validated upon borrowing a connection from the pool
      *
@@ -495,9 +505,10 @@ public interface PoolConfiguration {
 
     /**
      * The indication of whether objects will be validated before being borrowed from the pool. If the object fails to
-     * validate, it will be dropped from the pool, and we will attempt to borrow another. NOTE - for a true value to
-     * have any effect, the validationQuery parameter must be set to a non-null string. Default value is false In order
-     * to have a more efficient validation, see {@link #setValidationInterval(long)}
+     * validate, a reconnection of the same pooled connection is attempted and validated again; if that also fails, the
+     * object is dropped from the pool and the borrow fails with an SQLException. NOTE - if no validationQuery is set,
+     * {@link java.sql.Connection#isValid(int)} is used to validate the connection. Default value is false In order to
+     * have a more efficient validation, see {@link #setValidationInterval(long)}
      *
      * @param testOnBorrow set to true if validation should take place before a connection is handed out to the
      *                         application
@@ -508,9 +519,9 @@ public interface PoolConfiguration {
 
     /**
      * The indication of whether objects will be validated after being returned to the pool. If the object fails to
-     * validate, it will be dropped from the pool. NOTE - for a true value to have any effect, the validationQuery
-     * parameter must be set to a non-null string. Default value is false In order to have a more efficient validation,
-     * see {@link #setValidationInterval(long)}
+     * validate, it will be dropped from the pool. NOTE - if no validationQuery is set,
+     * {@link java.sql.Connection#isValid(int)} is used to validate the connection. Default value is false In order to
+     * have a more efficient validation, see {@link #setValidationInterval(long)}
      *
      * @return true if validation should take place after a connection is returned to the pool
      *
@@ -520,9 +531,9 @@ public interface PoolConfiguration {
 
     /**
      * The indication of whether objects will be validated after being returned to the pool. If the object fails to
-     * validate, it will be dropped from the pool. NOTE - for a true value to have any effect, the validationQuery
-     * parameter must be set to a non-null string. Default value is false In order to have a more efficient validation,
-     * see {@link #setValidationInterval(long)}
+     * validate, it will be dropped from the pool. NOTE - if no validationQuery is set,
+     * {@link java.sql.Connection#isValid(int)} is used to validate the connection. Default value is false In order to
+     * have a more efficient validation, see {@link #setValidationInterval(long)}
      *
      * @param testOnReturn true if validation should take place after a connection is returned to the pool
      *
@@ -728,7 +739,8 @@ public interface PoolConfiguration {
      * {@link org.apache.tomcat.jdbc.pool.interceptor.ResetAbandonedTimer ResetAbandonedTimer} resets the timer upon any
      * activity on the connection, upon any statement execution and upon any read of a result set, whether the operation
      * succeeded or failed. {@link org.apache.tomcat.jdbc.pool.interceptor.ConnectionState ConnectionState} caches the
-     * auto commit, read only and catalog settings to avoid round trips to the DB. The default value is null.
+     * auto commit, read only, transaction isolation and catalog settings to avoid round trips to the DB. The default
+     * value is null.
      *
      * @return the interceptors that are used for connections. Example format:
      *             'ConnectionState(useEquals=true,fast=yes);ResetAbandonedTimer'
@@ -743,7 +755,8 @@ public interface PoolConfiguration {
      * {@link org.apache.tomcat.jdbc.pool.interceptor.ResetAbandonedTimer ResetAbandonedTimer} resets the timer upon any
      * activity on the connection, upon any statement execution and upon any read of a result set, whether the operation
      * succeeded or failed. {@link org.apache.tomcat.jdbc.pool.interceptor.ConnectionState ConnectionState} caches the
-     * auto commit, read only and catalog settings to avoid round trips to the DB. The default value is null.
+     * auto commit, read only, transaction isolation and catalog settings to avoid round trips to the DB. The default
+     * value is null.
      *
      * @param jdbcInterceptors the interceptors that are used for connections. Example format:
      *                             'ConnectionState(useEquals=true,fast=yes);ResetAbandonedTimer'
@@ -772,7 +785,7 @@ public interface PoolConfiguration {
      * that can be registered with JMX to receive notifications and state about the pool. The ConnectionPool object
      * doesn't register itself, as there is no way to keep a static non changing ObjectName across JVM restarts.
      *
-     * @param jmxEnabled set to to if the mbean object should be created upon startup.
+     * @param jmxEnabled set to true if the mbean object should be created upon startup.
      */
     void setJmxEnabled(boolean jmxEnabled);
 
@@ -904,11 +917,15 @@ public interface PoolConfiguration {
     Object getDataSource();
 
     /**
-     * Configure the connection pool to use a DataSource according to {@link PoolConfiguration#setDataSource(Object)}
-     * But instead of injecting the object, specify the JNDI location. After a successful JNDI look, the
-     * {@link PoolConfiguration#getDataSource()} will not return null.
+     * Configures a JNDI name for the backing data source. Instead of injecting the object through
+     * {@link PoolConfiguration#setDataSource(Object)}, this names it. The name is resolved by
+     * {@link DataSourceFactory}, which looks it up when the pool is created through the factory and JNDI path and
+     * injects the found object through {@link PoolConfiguration#setDataSource(Object)}; after that lookup,
+     * {@link PoolConfiguration#getDataSource()} does not return null. Nothing else performs the lookup: set on a pool
+     * configured programmatically, the property never becomes a data source and the pool keeps connecting through the
+     * driver properties.
      *
-     * @param jndiDS -the JNDI string @TODO specify the rules here.
+     * @param jndiDS the JNDI name of the data source to wrap
      */
     void setDataSourceJNDI(String jndiDS);
 
@@ -931,7 +948,7 @@ public interface PoolConfiguration {
 
     /**
      * Set to true if the call {@link DataSource#getConnection(String, String) getConnection(username,password)} is
-     * allowed and honored.. This is used for when the pool is used by an application accessing multiple schemas. There
+     * allowed and honored. This is used for when the pool is used by an application accessing multiple schemas. There
      * is a performance impact turning this option on, even when not used due to username checks.
      *
      * @param alternateUsernameAllowed - set true if {@link DataSource#getConnection(String, String)
@@ -960,8 +977,8 @@ public interface PoolConfiguration {
 
     /**
      * Set to true if you want the connection pool to rollback any pending transaction when a connection is returned.
-     * The default value is false, as this could result in committing data. The rollback is only performed when the
-     * returned connection is actually in a transaction.
+     * The default value is false, as this could result in discarding data the application has not committed. The
+     * rollback is only performed when the returned connection is actually in a transaction.
      *
      * @param rollbackOnReturn set to true if the pool should call {@link java.sql.Connection#rollback()} when a
      *                             connection is returned to the pool. Default is false
