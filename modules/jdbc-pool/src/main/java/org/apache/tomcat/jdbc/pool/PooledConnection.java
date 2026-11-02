@@ -129,7 +129,12 @@ public class PooledConnection implements PooledConnectionMBean {
 
     private static final AtomicLong connectionIndex = new AtomicLong(0);
 
-    private ObjectName oname = null;
+    /**
+     * The JMX name this connection is registered under, or null while it is not registered. Written and cleared under
+     * this connection's monitor (see {@link #createMBean()} and {@link #release()}), and read unlocked by
+     * {@link #getObjectName()}, so the field is volatile.
+     */
+    private volatile ObjectName oname = null;
 
     /**
      * Weak reference to cache the list of interceptors for this connection so that we don't create a new list of
@@ -965,11 +970,28 @@ public class PooledConnection implements PooledConnectionMBean {
                 log.debug("Unable to close SQL connection", x);
             }
         }
-        if (oname != null) {
-            JmxUtil.unregisterJmx(oname);
-            oname = null;
+        // Under this connection's monitor - the one lock every registration
+        // holds from its released-check through its name assignment (see
+        // createMBean()), and the only lock that every configuration shares,
+        // the per-connection lock being a deliberate no-op unless the sweeper
+        // or useLock is on. Without this pairing a close could read the name
+        // while a registration still runs: it would find null, unregister
+        // nothing, and the registration would then publish an MBean of this
+        // now-dead connection that nothing is left ever to take back. The
+        // flag that tells a registration this connection is gone is settled
+        // inside the same step: set only after leaving the monitor, it would
+        // leave a registration that wins the monitor in between seeing
+        // neither the name nor the flag, and publishing the orphan anyway.
+        // With both settled here, either the registration completes first and
+        // this unregisters it, or this passes first and the registration
+        // sees the released flag and publishes nothing.
+        synchronized (this) {
+            if (oname != null) {
+                JmxUtil.unregisterJmx(oname);
+                oname = null;
+            }
+            return released.compareAndSet(false, true);
         }
-        return released.compareAndSet(false, true);
 
     }
 
@@ -1253,7 +1275,11 @@ public class PooledConnection implements PooledConnectionMBean {
      * live connection from the connect path, from the first-borrow path and from the sweep it runs when its own MBean
      * is published - and for a released one, which would leave a registration of a dead connection behind with nothing
      * left to unregister it. The check and the publish are one synchronized step because those paths can meet on the
-     * same connection and must never publish it twice: only one of the registrations would ever be unregistered.
+     * same connection and must never publish it twice: only one of the registrations would ever be unregistered. The
+     * release of a connection settles its unregistration and its released flag under this same monitor (see
+     * {@link #release()}), so whichever of the two passes first settles the outcome: a registration after a release
+     * sees the released flag and publishes nothing, and a release after a registration finds the name and takes it
+     * back.
      */
     public synchronized void createMBean() {
         if (oname != null || released.get()) {

@@ -76,6 +76,12 @@ public class ConnectionPool {
     private static final Log log = LogFactory.getLog(ConnectionPool.class);
 
     /**
+     * The longest single park of a long wait on a queue that cannot be told to fail its waiters, so that pool
+     * closure is noticed within a slice instead of only when the wait expires.
+     */
+    private static final long WAIT_SLICE_MILLIS = 500;
+
+    /**
      * The JDBC 4.3 <code>beginRequest()</code> hint, looked up by reflection because this module compiles against Java
      * 8, whose {@link java.sql.Connection} does not declare it; on a runtime that predates JDBC 4.3 the lookup yields
      * null and the hint is not sent.
@@ -188,36 +194,56 @@ public class ConnectionPool {
      * @throws SQLException Cannot use asynchronous connect
      */
     public Future<Connection> getConnectionAsync() throws SQLException {
+        // Hold a wait count across the whole attempt, including the queue
+        // registration below: the release of a destroyed connection decides
+        // whether to wake anybody from the wait counter and the waiters
+        // registered on the queue, and between a failed no-wait attempt here
+        // and that registration both of them read empty. A release landing
+        // in that gap would find no waiter to wake and park this future
+        // forever on a slot its own failed attempt could not take. While the
+        // count is held, such a release instead queues the slot, which the
+        // registration below - polling the queue first - then takes.
+        waitcount.incrementAndGet();
         try {
-            PooledConnection pc = borrowConnection(0, null, null);
-            if (pc != null) {
-                return new ConnectionFuture(pc);
+            try {
+                PooledConnection pc = borrowConnection(0, null, null);
+                if (pc != null) {
+                    return new ConnectionFuture(pc);
+                }
+            } catch (SQLException x) {
+                // JDBC exceptions may carry no message at all; a missing
+                // "NoWait" marker must be assumed for those, so that the
+                // original failure reaches the caller instead of a
+                // NullPointerException from dereferencing the message
+                String msg = x.getMessage();
+                if (msg == null || msg.indexOf("NoWait") < 0) {
+                    throw x;
+                }
             }
-        } catch (SQLException x) {
-            // JDBC exceptions may carry no message at all; a missing
-            // "NoWait" marker must be assumed for those, so that the
-            // original failure reaches the caller instead of a
-            // NullPointerException from dereferencing the message
-            String msg = x.getMessage();
-            if (msg == null || msg.indexOf("NoWait") < 0) {
-                throw x;
+            // We can only retrieve a future if the underlying queue supports it.
+            if (idle instanceof FairBlockingQueue<?>) {
+                Future<PooledConnection> pcf = ((FairBlockingQueue<PooledConnection>) idle).pollAsync();
+                if (isClosed() && pcf.isCancelled()) {
+                    // The pool was closed between the borrow attempt above and
+                    // the registration of the waiter: close() fails every
+                    // waiter the queue holds and a later poll cannot register
+                    // one, so this future will never hand out a connection.
+                    // Reject the borrow the same way a synchronous borrow on a
+                    // closed pool does, rather than handing out a future that
+                    // only ever fails with a cancellation.
+                    throw new SQLException(MessageFactory.get("connectionPool.poolClosed"));
+                }
+                return new ConnectionFuture(pcf);
+            } else {
+                // The pattern is written with MessageFormat escapes like every
+                // other key of the bundle, so it is fetched through the
+                // formatting overload: the no-arg lookup would hand the raw
+                // pattern to the application, doubled quotes and all
+                throw new SQLException(MessageFactory.get("connectionPool.poolMisconfigured",
+                        new Object[0]));
             }
-        }
-        // We can only retrieve a future if the underlying queue supports it.
-        if (idle instanceof FairBlockingQueue<?>) {
-            Future<PooledConnection> pcf = ((FairBlockingQueue<PooledConnection>) idle).pollAsync();
-            if (isClosed() && pcf.isCancelled()) {
-                // The pool was closed between the borrow attempt above and the
-                // registration of the waiter: close() fails every waiter the
-                // queue holds and a later poll cannot register one, so this
-                // future will never hand out a connection. Reject the borrow the
-                // same way a synchronous borrow on a closed pool does, rather than
-                // handing out a future that only ever fails with a cancellation.
-                throw new SQLException(MessageFactory.get("connectionPool.poolClosed"));
-            }
-            return new ConnectionFuture(pcf);
-        } else {
-            throw new SQLException(MessageFactory.get("connectionPool.poolMisconfigured"));
+        } finally {
+            waitcount.decrementAndGet();
         }
     }
 
@@ -364,7 +390,22 @@ public class ConnectionPool {
             // server refused the name, and a refused publish must be retried
             // once the obstacle is gone rather than count as a registration.
             try {
-                con.createMBean();
+                // Under the connection's own lock, as every connection MBean
+                // registration is (see registerConnectionMBeans). The check
+                // and the publish inside run as one synchronized step, and
+                // the release of the same connection unregisters under that
+                // same monitor - the only lock every configuration shares,
+                // the connection lock being a deliberate no-op unless the
+                // sweeper or useLock is on - so a registration can never slip
+                // in beside a release that had already found no name to take
+                // back and leave an MBean of a dead connection, and the class
+                // loader it pins, registered for the life of the JVM.
+                con.lock();
+                try {
+                    con.createMBean();
+                } finally {
+                    con.unlock();
+                }
             } catch (Exception x) {
                 SQLException sx = new SQLException(MessageFactory.get("connectionPool.unableToRegisterMBean"));
                 sx.initCause(x);
@@ -584,7 +625,9 @@ public class ConnectionPool {
         if (this.closed) {
             return;
         }
-        // Prevent other threads from entering
+        // Publish the closure: operations that observe it fail fast - this
+        // write itself blocks nothing, the detailed comment below covers
+        // what each kind of concurrent operation does once it sees it
         this.closed = true;
         // Stop background thread
         terminatePoolCleaner();
@@ -592,8 +635,14 @@ public class ConnectionPool {
         // An asynchronous borrow waits on the idle queue, where a thread cannot
         // observe the closed flag: this pool never offers a connection to that
         // queue once it is closed, so a caller parked in the Future.get() of
-        // getConnectionAsync() would stay parked forever. Fail the waiters that
-        // are registered on the queue, so that the futures handed out terminate.
+        // getConnectionAsync() would stay parked forever. The same holds for a
+        // synchronous borrower whose wait has no timeout to run out. Fail the
+        // waiters that are registered on the queue, so that the futures handed
+        // out terminate and the parked synchronous waits return empty-handed to
+        // the borrow loop, which turns the closure into a failure. A plain
+        // queue has no such lever; there, long waits are taken in slices
+        // instead, so the borrow loop observes the closure on its own within
+        // a slice.
         if (idle instanceof FairBlockingQueue<?>) {
             ((FairBlockingQueue<PooledConnection>) idle).cancelWaiters();
         }
@@ -683,10 +732,10 @@ public class ConnectionPool {
         // Make sure the pool is properly configured
         checkPoolConfiguration(properties);
 
-        // Make space for 10 extra in case we flow over a bit
+        // Both queues are unbounded by design: membership is bounded by the
+        // maxActive/size bookkeeping, not by queue capacity.
         busy = new LinkedBlockingQueue<>();
         // busy = new FairBlockingQueue<PooledConnection>();
-        // Make space for 10 extra in case we flow over a bit
         if (properties.isFairQueue()) {
             idle = new FairBlockingQueue<>();
             // idle = new LinkedTransferQueue<PooledConnection>();
@@ -752,11 +801,14 @@ public class ConnectionPool {
                 throw x;
             }
         } finally {
-            // Return the members as idle to the pool
+            // Return the members as idle to the pool. These hand-backs are
+            // not counted as returns: no borrower ever received them, and
+            // counting them would inflate the returned statistic for the
+            // pool's whole life
             for (int i = 0; i < initialPool.length; i++) {
                 if (initialPool[i] != null) {
                     try {
-                        this.returnConnection(initialPool[i]);
+                        this.returnConnection(initialPool[i], false);
                     } catch (Exception x) {
                         /* NOOP */}
                 }
@@ -789,24 +841,34 @@ public class ConnectionPool {
      * {@link #setupConnection(PooledConnection)}, making the first-listed interceptor the outermost one, so both the
      * timeout interceptor and the finalizer must be listed before the cache. This detection only reports the
      * misconfiguration; the cache's own defence against the tracker beneath it is separate and does not depend on
-     * this check.
+     * this check. A subclass of one of these interceptors inherits its job whatever it is named, so each role is
+     * recognised with {@link Class#isAssignableFrom} rather than by exact class - the same convention the pool's
+     * own {@code hasConnectionStateInterceptor} check follows.
      *
      * @param proxies the parsed interceptor definitions, in configuration order
      */
     private void checkInterceptorOrder(PoolProperties.InterceptorDefinition[] proxies) {
         int firstCache = -1;
-        int lastTimeout = -1;
+        int firstTimeout = -1;
         int lastFinalizer = -1;
         for (int i = 0; i < proxies.length; i++) {
             try {
                 Class<? extends JdbcInterceptor> interceptorClass = proxies[i].getInterceptorClass();
-                if (StatementCache.class == interceptorClass) {
+                // The roles are not exclusive: one class may inherit the job
+                // of more than one of them, and then it counts in all of the
+                // roles it fills, exactly as a chain listing them separately
+                // would.
+                if (StatementCache.class.isAssignableFrom(interceptorClass)) {
                     if (firstCache < 0) {
                         firstCache = i;
                     }
-                } else if (QueryTimeoutInterceptor.class == interceptorClass) {
-                    lastTimeout = i;
-                } else if (StatementFinalizer.class == interceptorClass) {
+                }
+                if (QueryTimeoutInterceptor.class.isAssignableFrom(interceptorClass)) {
+                    if (firstTimeout < 0) {
+                        firstTimeout = i;
+                    }
+                }
+                if (StatementFinalizer.class.isAssignableFrom(interceptorClass)) {
                     lastFinalizer = i;
                 }
             } catch (ReflectiveOperationException | LinkageError x) {
@@ -816,7 +878,17 @@ public class ConnectionPool {
                 return;
             }
         }
-        if (firstCache >= 0 && lastTimeout > firstCache) {
+        // The two checks read the same positions differently, because the two
+        // interceptors are defeated differently. A timeout interceptor listed
+        // before the first cache protects every cache hit: it sees the
+        // statement object the innermost cache hands back - hits included -
+        // and re-applies the timeout there, so one further down the chain is
+        // redundant but harmless and no warning belongs to that chain. A
+        // chain with no timeout interceptor at all is nothing to warn about
+        // either: firstTimeout stays -1. The finalizer, by contrast, is
+        // defeated by any finalizer beneath the cache no matter what is
+        // listed above it, so its check looks at the last one.
+        if (firstCache >= 0 && firstTimeout > firstCache) {
             log.warn(MessageFactory.get("connectionPool.statementCacheBeforeQueryTimeout"));
         }
         // A finalizer beneath some cache is exactly lastFinalizer > firstCache, so this catches the case where
@@ -833,7 +905,6 @@ public class ConnectionPool {
      * @param properties the pool configuration to validate and correct
      */
     public void checkPoolConfiguration(PoolConfiguration properties) {
-        // Make sure the pool is properly configured
         if (properties.getMaxActive() < 1) {
             log.warn(MessageFactory.get("connectionPool.maxActiveTooSmall", PoolProperties.DEFAULT_MAX_ACTIVE));
             properties.setMaxActive(PoolProperties.DEFAULT_MAX_ACTIVE);
@@ -983,8 +1054,9 @@ public class ConnectionPool {
 
     /**
      * Thread safe way to suspect a connection. Similar to {@link #abandon(PooledConnection)}, but instead of actually
-     * abandoning the connection, this will log a warning and set the suspect flag on the {@link PooledConnection} if
-     * logAbandoned=true
+     * abandoning the connection, this marks the suspect flag on the {@link PooledConnection} and reports it through the
+     * JMX suspect notification - in every configuration, whatever later reporting keys off that flag must see it. A
+     * warning log on top of that is only produced when logAbandoned is set.
      *
      * @param con PooledConnection
      */
@@ -997,6 +1069,15 @@ public class ConnectionPool {
         }
         try {
             con.lock();
+            // The guard above runs unlocked, and checkAbandoned() has two
+            // drivers - the cleaner timer and a JMX-invoked one - so both
+            // can pass it for the same connection before either marks it.
+            // Re-check under the lock that the marking happens on, or the
+            // second driver logs and notifies a connection the first has
+            // already reported.
+            if (con.isSuspect()) {
+                return;
+            }
             String trace = con.getStackTrace();
             if (getPoolProperties().isLogAbandoned()) {
                 log.warn(MessageFactory.get("connectionPool.connectionSuspect",
@@ -1029,8 +1110,14 @@ public class ConnectionPool {
                 // Counter only decremented once
                 size.addAndGet(-1);
                 con.setHandler(null);
+                // Counted with the destruction, not with the call: a
+                // connection the abandon path already released can reach
+                // this method once more - a return whose busy.remove lost
+                // that race ends here as well - and only the call that
+                // actually destroyed the connection closes the bookkeeping
+                // one the creation opened.
+                releasedCount.incrementAndGet();
             }
-            releasedCount.incrementAndGet();
         } finally {
             con.unlock();
         }
@@ -1049,11 +1136,92 @@ public class ConnectionPool {
         // would queue the next one, spinning for as long as any thread holds
         // a wait count. A closed pool serves no more borrowers, so only
         // queue the placeholder while it is open.
-        if (destroyed && !isClosed() && waitcount.get() > 0) {
-            if (!idle.offer(create(true))) {
+        // The wait counter also sees only synchronous borrowers: a caller
+        // registered on a fair queue by a timed or asynchronous poll waits
+        // where the counter cannot reach it, and is a prospective consumer
+        // the queue itself can report.
+        // The destroy above and the slot a placeholder stands for are also
+        // separate steps: a borrower racing in between can claim the freed
+        // slot for itself, and claiming a slot that is no longer free would
+        // stand the pool up over maxActive. When the claim fails there is no
+        // free slot left to wake anyone for; the waiter is served by the
+        // borrower that won the slot once it returns its connection, or by
+        // that borrower's own release should its creation fail.
+        if (destroyed && !isClosed() && (waitcount.get() > 0 || queueWaiterPresent()) && claimSlot()) {
+            PooledConnection placeholder = create(false);
+            // A placeholder that has never been borrowed carries no borrow or
+            // return timestamp, and the idle sweep measures age from that
+            // timestamp. Left at its epoch default the age rule finds it older
+            // than minEvictableIdleTimeMillis the instant it is offered, so a
+            // sweep racing its still-coming waiter would release it as an
+            // expired idle connection - a phantom release of a slot that
+            // stands for a live one. Stamp the moment it entered the queue so
+            // it ages like the connection it stands in for.
+            placeholder.setTimestamp(System.currentTimeMillis());
+            if (!idle.offer(placeholder)) {
+                size.decrementAndGet(); // hand the claimed slot back
                 log.warn(MessageFactory.get("connectionPool.failedToAddNewConnection"));
+            } else if (isClosed() && idle.remove(placeholder)) {
+                // The closed check that gated this placeholder and the offer
+                // below are not one atomic step: a close arriving in between
+                // has drained the queue once already, and this placeholder
+                // would park in it holding its claimed slot, invisible to the
+                // drain that has passed and to every later sweep, which a
+                // closed pool no longer runs. Take the placeholder back out of
+                // a queue that has been drained past and hand its slot back.
+                // If it is no longer there, a registered waiter took it in a
+                // hand-off, and that taker's own setup re-checks the closure.
+                size.decrementAndGet(); // hand the claimed slot back
+            } else {
+                // The placeholder has entered circulation, so count it as a
+                // creation. Every way it leaves circulation - a waiter that
+                // re-establishes it and later returns it, an idle sweep that
+                // finds it unusable, a close drain - releases it through
+                // release(), and that released count needs this matching
+                // created count to stay reconcilable with it: a placeholder
+                // that is only ever released would run the released count
+                // permanently ahead of the created one, by one per
+                // placeholder, leaving monitoring unable to read the pair.
+                createdCount.incrementAndGet();
             }
         }
+    }
+
+    /**
+     * Claims one of the pool's {@link PoolProperties#getMaxActive()} slots for
+     * a connection that is about to be put in a queue, and that without the
+     * ability to run the pool over the limit: a plain increment would race a
+     * borrower claiming the same slot. Unlike the borrow loop's reservation -
+     * which reserves for the calling borrower itself - this claim backs a
+     * wake-up placeholder whose consumer is somebody else, so it must stand
+     * down when no slot is free.
+     *
+     * @return <code>true</code> if a slot was claimed
+     */
+    private boolean claimSlot() {
+        int maxActive = getPoolProperties().getMaxActive();
+        int current = size.get();
+        while (current < maxActive) {
+            if (size.compareAndSet(current, current + 1)) {
+                return true;
+            }
+            current = size.get();
+        }
+        return false;
+    }
+
+    /**
+     * Whether a caller is registered on the idle queue waiting for an item.
+     * An asynchronous borrow registers its latch on the queue itself and
+     * never passes through the pool's wait counter, so a release consulting
+     * only that counter would never wake such a waiter. Only the fair queue
+     * supports these registrations; a plain queue holds none.
+     *
+     * @return <code>true</code> if the idle queue reports a registered waiter
+     */
+    private boolean queueWaiterPresent() {
+        return idle instanceof FairBlockingQueue<?>
+                && ((FairBlockingQueue<PooledConnection>) idle).hasRegisteredWaiter();
     }
 
     /**
@@ -1081,15 +1249,21 @@ public class ConnectionPool {
 
         while (true) {
             if (con != null) {
-                // Configure the connection and return it
-                PooledConnection result = borrowConnection(now, con, username, password);
+                PooledConnection result = borrowConnection(con, username, password);
                 if (result != null) {
                     return result;
                 }
                 // The connection was released while it sat idle, so this
                 // poll got nothing to hand out; keep polling. Nothing is
                 // counted here: a borrow is counted on the hand-off that
-                // succeeds, in setupConnection().
+                // succeeds, in setupConnection(). The consumed connection is
+                // dropped here so that "keep polling" really polls again: a
+                // wait that ends only on an item would otherwise treat the
+                // dead connection it already took out of the queue as still
+                // pending, and spin on a full core through any later check -
+                // including the closed re-check that a pool closure needs this
+                // borrower to reach.
+                con = null;
             }
 
             // If we get here, see if we need to create one
@@ -1103,7 +1277,7 @@ public class ConnectionPool {
                     size.decrementAndGet();
                 } else {
                     // Create a connection, we're below the limit
-                    return createConnection(now, con, username, password);
+                    return createConnection(con, username, password);
                 }
             }
 
@@ -1126,15 +1300,38 @@ public class ConnectionPool {
                 if (idle.isEmpty() && size.get() < getPoolProperties().getMaxActive()) {
                     // Atomic duplicate check
                     if (size.addAndGet(1) > getPoolProperties().getMaxActive()) {
-                        // If we got here, two threads passed through the first if
                         size.decrementAndGet();
                     } else {
-                        // Create a connection, we're below the limit
-                        return createConnection(now, con, username, password);
+                        return createConnection(con, username, password);
                     }
                 }
                 // Retrieve an existing connection
-                con = idle.poll(timetowait, TimeUnit.MILLISECONDS);
+                if (!(idle instanceof FairBlockingQueue) && timetowait > WAIT_SLICE_MILLIS) {
+                    // A plain queue knows nothing about failing a wait that is
+                    // parked in it - only the fair queue is told to terminate
+                    // when the pool closes. A long wait parked here would
+                    // therefore sleep through the close for its whole
+                    // duration - and a wait whose timeout never runs out, or
+                    // whose int-millisecond maxWait reaches into days, sleeps
+                    // through it forever, parking its borrower thread and
+                    // classloader past the pool's own death. Park in bounded
+                    // slices instead, so the loop's own closed and timeout
+                    // checks run between slices; the timeout is still measured
+                    // from now, so the slicing never moves when a wait
+                    // expires, it only lets a closure be noticed early.
+                    while (con == null && !isClosed()) {
+                        long remaining = maxWait - (System.currentTimeMillis() - now);
+                        if (remaining <= WAIT_SLICE_MILLIS) {
+                            if (remaining > 0) {
+                                con = idle.poll(remaining, TimeUnit.MILLISECONDS);
+                            }
+                            break;
+                        }
+                        con = idle.poll(WAIT_SLICE_MILLIS, TimeUnit.MILLISECONDS);
+                    }
+                } else {
+                    con = idle.poll(timetowait, TimeUnit.MILLISECONDS);
+                }
             } catch (InterruptedException ex) {
                 if (getPoolProperties().getPropagateInterruptState()) {
                     Thread.currentThread().interrupt();
@@ -1155,6 +1352,17 @@ public class ConnectionPool {
             }
             // We didn't get a connection, lets see if we timed out
             if (con == null) {
+                if (isClosed()) {
+                    // The pool closed while we waited: close() fails every
+                    // waiter registered on the idle queue, and a closed pool
+                    // never offers a connection to it again, so no further
+                    // wait can end any differently than this one did. Fail
+                    // the borrow the way a borrow that caught the closure on
+                    // entry does, rather than register a wait nothing can
+                    // ever serve - which for an unbounded maxWait would park
+                    // this borrower for the life of the pool's classloader.
+                    throw new SQLException(MessageFactory.get("connectionPool.poolClosed"));
+                }
                 if ((System.currentTimeMillis() - now) >= maxWait) {
                     org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = jmxPool;
                     if (jmx != null) {
@@ -1175,7 +1383,6 @@ public class ConnectionPool {
     /**
      * Creates a JDBC connection and tries to connect to the database.
      *
-     * @param now      timestamp of when this was called
      * @param notUsed  Argument not used
      * @param username The user name to use for the connection
      * @param password The password for the connection
@@ -1184,10 +1391,17 @@ public class ConnectionPool {
      *
      * @throws SQLException Failed to get a connection
      */
-    protected PooledConnection createConnection(long now, PooledConnection notUsed, String username, String password)
+    protected PooledConnection createConnection(PooledConnection notUsed, String username, String password)
             throws SQLException {
         // No connections where available we'll create one
         PooledConnection con = create(false);
+        // Counted where the pool takes the object into service, not where
+        // the attempt succeeds: the error path below retires a failed
+        // creation through release(), which counts it as released, and a
+        // creation counted only on success would leave that release without
+        // its counterpart - one per failed attempt, permanently running the
+        // released count ahead of the created one.
+        createdCount.incrementAndGet();
         if (username != null) {
             con.getAttributes().put(PooledConnection.PROP_USER, username);
         }
@@ -1207,15 +1421,28 @@ public class ConnectionPool {
                 throw new SQLException(MessageFactory.get("connectionPool.poolClosed"));
             }
             if (con.validate(PooledConnection.VALIDATE_INIT)) {
-                // No need to lock a new one, its not contented
-                con.setTimestamp(now);
+                // Stamped with the moment of the hand-off, not with the
+                // borrow loop's entry: checkAbandoned() measures the checkout
+                // age from this timestamp, and a connection created at the
+                // end of a long wait must not be born already past the
+                // abandon timeout.
+                con.setTimestamp(System.currentTimeMillis());
                 if (getPoolProperties().isLogAbandoned()) {
                     con.setStackTraceElements(getThreadDumpElements());
                 }
                 if (!busy.offer(con)) {
                     log.debug("Connection doesn't fit into busy array, connection will not be traceable.");
+                } else if (isClosed()) {
+                    // The closed check above and this publish are not one
+                    // atomic step: a forced close may already have drained
+                    // busy, and this entry would sit there unseen while the
+                    // borrower is handed a connection from a dead pool.
+                    // Retract the publish and fail the borrow the way the
+                    // check does; the error path below disconnects the
+                    // session, or finds the drain already disconnected it.
+                    busy.remove(con);
+                    throw new SQLException(MessageFactory.get("connectionPool.poolClosed"));
                 }
-                createdCount.incrementAndGet();
                 return con;
             } else {
                 // Validation failed, make sure we disconnect
@@ -1246,7 +1473,6 @@ public class ConnectionPool {
     /**
      * Validates and configures a previously idle connection
      *
-     * @param now      - timestamp
      * @param con      - the connection to validate and configure
      * @param username The user name to use for the connection
      * @param password The password for the connection
@@ -1255,7 +1481,7 @@ public class ConnectionPool {
      *
      * @throws SQLException if a validation error happens
      */
-    protected PooledConnection borrowConnection(long now, PooledConnection con, String username, String password)
+    protected PooledConnection borrowConnection(PooledConnection con, String username, String password)
             throws SQLException {
         // We have a connection, lets set it up
 
@@ -1278,14 +1504,32 @@ public class ConnectionPool {
 
             if (!forceReconnect) {
                 if ((!con.isDiscarded()) && con.validate(PooledConnection.VALIDATE_BORROW)) {
-                    // Set the timestamp
-                    con.setTimestamp(now);
+                    // Stamp the checkout with this hand-off moment, not the
+                    // borrow loop's entry: the abandoned check measures the
+                    // time since here, and a borrower that queued longer
+                    // than the abandon timeout must not be born abandoned.
+                    con.setTimestamp(System.currentTimeMillis());
                     if (getPoolProperties().isLogAbandoned()) {
-                        // Set the stack trace for this pool
                         con.setStackTraceElements(getThreadDumpElements());
                     }
                     if (!busy.offer(con)) {
                         log.debug("Connection doesn't fit into busy array, connection will not be traceable.");
+                    } else if (isClosed()) {
+                        // The close this path races had already drained busy
+                        // once when this offer landed, and - unlike the
+                        // returning thread, which reclaims what it offered
+                        // too late - this publish would hand the session to
+                        // the borrower over a pool that has shut down: the
+                        // return that handed this connection over lets it go
+                        // precisely because it trusts the taker to see to the
+                        // connection's closure. Retract the publish and
+                        // retire the connection; the borrow loop's own closed
+                        // re-check turns this into the failure a closed pool
+                        // owes the borrower.
+                        busy.remove(con);
+                        release(con);
+                        setToNull = true;
+                        return null;
                     }
                     return con;
                 }
@@ -1295,20 +1539,47 @@ public class ConnectionPool {
             // We will make one more attempt
             // in order to guarantee that the thread that just acquired
             // the connection shouldn't have to poll again.
+            if (isClosed()) {
+                // The pool closed between taking this connection out of the
+                // idle queue and setting it up here - a close lands after
+                // this path's own entry check whenever the item was already
+                // in hand, queued or handed straight over a waiter's latch,
+                // none of which observes the flag again. The shutdown drain
+                // has passed the queues, so the reconnect below would open a
+                // fresh session on a closed pool and hand it to this borrower
+                // out of every shutdown path. Retire the connection instead
+                // and report nothing handed out: the synchronous loop
+                // re-checks the closure on its next pass and fails the
+                // borrow, and an asynchronous poll publishes the failure.
+                release(con);
+                setToNull = true;
+                return null;
+            }
             try {
                 con.reconnect();
                 reconnectedCount.incrementAndGet();
                 int validationMode = isInitNewConnections() ? PooledConnection.VALIDATE_INIT
                         : PooledConnection.VALIDATE_BORROW;
                 if (con.validate(validationMode)) {
-                    // Set the timestamp
-                    con.setTimestamp(now);
+                    // Same hand-off stamping as the validate-pass branch
+                    // above: the abandoned check measures the time since this
+                    // moment, not since the borrow loop's entry.
+                    con.setTimestamp(System.currentTimeMillis());
                     if (getPoolProperties().isLogAbandoned()) {
-                        // Set the stack trace for this pool
                         con.setStackTraceElements(getThreadDumpElements());
                     }
                     if (!busy.offer(con)) {
                         log.debug("Connection doesn't fit into busy array, connection will not be traceable.");
+                    } else if (isClosed()) {
+                        // Same closed-versus-publish race as in the
+                        // validate-pass branch above: retract the offer and
+                        // retire the connection, and let the borrow loop's
+                        // own closed re-check turn this into the failure a
+                        // closed pool owes the borrower.
+                        busy.remove(con);
+                        release(con);
+                        setToNull = true;
+                        return null;
                     }
                     return con;
                 } else {
@@ -1354,9 +1625,13 @@ public class ConnectionPool {
      */
     protected boolean terminateTransaction(PooledConnection con) {
         try {
-            // Terminate the transaction of any connection that is returned
-            // while still in one; the pool-level defaultAutoCommit property
-            // must not gate this, the connection's own state is what matters
+            // Terminate the pending transaction of a returned connection
+            // when the pool is configured to commit or roll back on return -
+            // without that configuration the pending work is deliberately
+            // left to the interceptors that own it, the ConnectionState
+            // interceptor chief among them. The pool-level defaultAutoCommit
+            // property must not gate this; the connection's own state is what
+            // matters.
             boolean doRollback = getPoolProperties().getRollbackOnReturn();
             boolean doCommit = !doRollback && getPoolProperties().getCommitOnReturn();
             if (doRollback || doCommit) {
@@ -1442,7 +1717,7 @@ public class ConnectionPool {
         if (con.isMaxAgeExpired()) {
             try {
                 if (log.isDebugEnabled()) {
-                    log.debug("Connection [" + this + "] expired because of maxAge, trying to reconnect");
+                    log.debug("Connection [" + con + "] expired because of maxAge, trying to reconnect");
                 }
                 con.reconnect();
                 reconnectedCount.incrementAndGet();
@@ -1450,7 +1725,11 @@ public class ConnectionPool {
                     return false;
                 }
             } catch (Exception e) {
-                log.error(MessageFactory.get("connectionPool.failedToReconnectExpired", this), e);
+                // The pattern names a connection, so the argument is the
+                // connection that expired and failed - the pool identity
+                // would send operators chasing one session to the wrong
+                // subject entirely
+                log.error(MessageFactory.get("connectionPool.failedToReconnectExpired", con), e);
                 return false;
             }
         }
@@ -1465,6 +1744,18 @@ public class ConnectionPool {
      * @param con PooledConnection to be returned to the pool
      */
     protected void returnConnection(PooledConnection con) {
+        returnConnection(con, true);
+    }
+
+    /**
+     * Returns a connection to the pool, optionally without the returned-connection statistic.
+     *
+     * @param con         PooledConnection to be returned to the pool
+     * @param countReturn whether this hand-back is one borrower's return to count: the pool's own preload hands back
+     *                        connections no borrower ever received, and counting them would run the returned count
+     *                        permanently ahead of the borrowed one
+     */
+    private void returnConnection(PooledConnection con, boolean countReturn) {
         if (isClosed()) {
             // If the connection pool is closed
             // close the connection instead of returning it
@@ -1474,7 +1765,13 @@ public class ConnectionPool {
 
         if (con != null) {
             try {
-                returnedCount.incrementAndGet();
+                if (countReturn) {
+                    // A borrower's hand-back is the counterpart of its borrow;
+                    // the pool's preload returns connections it never handed
+                    // out, and counting those would run the returned count
+                    // permanently ahead of the borrowed one
+                    returnedCount.incrementAndGet();
+                }
                 con.lock();
                 if (con.isSuspect()) {
                     if (poolProperties.isLogAbandoned() && log.isInfoEnabled()) {
@@ -1500,12 +1797,43 @@ public class ConnectionPool {
                             // not hinted; it is about to be closed, which
                             // subsumes the hint.
                             invokeRequestHint(END_REQUEST, con.getConnection());
-                            if (((idle.size() >= poolProperties.getMaxIdle()) && !poolProperties.isPoolSweeperEnabled()) ||
+                            if (isClosed()) {
+                                // The pool closed while this return was in
+                                // flight: the checks above each read the flag
+                                // before the driver work they gate ran, and
+                                // close() drains the queues only once - an
+                                // offer now would park a live session in a
+                                // queue nothing will ever drain again, out of
+                                // reach of every shutdown path. Retire the
+                                // connection instead, the way testAllIdle()
+                                // re-reads the flag before its own offer-back.
+                                if (log.isDebugEnabled()) {
+                                    log.debug("Connection [" + con +
+                                            "] will be closed and not returned to the pool, pool closed.");
+                                }
+                                release(con);
+                            } else if (((idle.size() >= poolProperties.getMaxIdle()) && !poolProperties.isPoolSweeperEnabled()) ||
                                     (!idle.offer(con))) {
                                 if (log.isDebugEnabled()) {
                                     log.debug("Connection [" + con +
                                             "] will be closed and not returned to the pool, idle[" + idle.size() +
                                             "]>=maxIdle[" + poolProperties.getMaxIdle() + "] idle.offer failed.");
+                                }
+                                release(con);
+                            } else if (isClosed() && idle.remove(con)) {
+                                // The closed check above and this offer are
+                                // not one atomic step: a close arriving in
+                                // between drains the queue this offer then
+                                // fills for the last time, stranding the
+                                // session out of every shutdown path. Take
+                                // the connection back out of a queue that
+                                // has already been drained past. If it is
+                                // no longer there, the drain - or a waiting
+                                // borrower - took ownership of it, and the
+                                // holder sees to its closure.
+                                if (log.isDebugEnabled()) {
+                                    log.debug("Connection [" + con +
+                                            "] was offered after the close drained the queue and is closed now.");
                                 }
                                 release(con);
                             }
@@ -1793,6 +2121,18 @@ public class ConnectionPool {
                                         poolProperties.getMaxIdle() + "] idle.offer failed.");
                             }
                             release(con);
+                        } else if (isClosed() && idle.remove(con)) {
+                            // The closed check above and this offer are not
+                            // one atomic step: a close arriving in between
+                            // drains the queue this offer then fills for the
+                            // last time. Take the connection back out of a
+                            // queue that has already been drained past; if
+                            // it is gone, whoever polled it owns its closure.
+                            if (log.isDebugEnabled()) {
+                                log.debug("Connection [" + con +
+                                        "] was offered back after the close drained the queue and is closed now.");
+                            }
+                            release(con);
                         }
                     } else {
                         releasedIdleCount.incrementAndGet();
@@ -1982,10 +2322,13 @@ public class ConnectionPool {
         for (PooledConnection con : pool) {
             try {
                 // Under the connection's own lock, as every operation acting
-                // on a pooled connection is: the registration must not slip in
-                // beside the release of the same connection, whose
-                // unregistration would then find no name to take back and this
-                // one would leave a MBean of a dead connection behind forever.
+                // on a pooled connection is, and - inside createMBean() -
+                // under the connection's monitor, which that release of the
+                // same connection shares as its unregistering lock in every
+                // configuration: the registration must not slip in beside
+                // the release, whose unregistration would then find no name
+                // to take back and this one would leave a MBean of a dead
+                // connection behind forever.
                 con.lock();
                 // A connection that is still without a physical connection is a
                 // placeholder for a slot, not a session to monitor, and it
@@ -2232,7 +2575,7 @@ public class ConnectionPool {
          */
         private void configure(PooledConnection pooled) {
             try {
-                PooledConnection pc = borrowConnection(System.currentTimeMillis(), pooled, null, null);
+                PooledConnection pc = borrowConnection(pooled, null, null);
                 if (pc != null) {
                     result = ConnectionPool.this.setupConnection(pc);
                 } else {
@@ -2296,7 +2639,7 @@ public class ConnectionPool {
                 }
                 if (pooled != null) {
                     try {
-                        PooledConnection pc = borrowConnection(System.currentTimeMillis(), pooled, null, null);
+                        PooledConnection pc = borrowConnection(pooled, null, null);
                         if (pc != null) {
                             Connection con = ConnectionPool.this.setupConnection(pc);
                             if (con != null) {

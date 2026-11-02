@@ -142,7 +142,9 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
     /**
      * Fair retrieval of an object in the queue. Objects are returned in the order the threads requested them. If the
      * wait is interrupted but an object was handed over to this waiter all the same, the object is returned and the
-     * interrupt status of the calling thread is restored instead of being cleared.
+     * interrupt status of the calling thread is restored instead of being cleared. On a queue whose waiters the
+     * {@link #cancelWaiters()} method has failed, an empty queue hands back no item right away instead of parking the
+     * caller: such a queue is never fed again, so waiting could only end in the same empty-handed return.
      * {@inheritDoc}
      */
     @Override
@@ -154,7 +156,7 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
         try {
             // Check to see if we have objects
             result = items.poll();
-            if (result == null && timeout > 0) {
+            if (result == null && timeout > 0 && !waitersCancelled) {
                 // The queue is empty we will wait for an object
                 ExchangeCountDownLatch<E> c = new ExchangeCountDownLatch<>(1);
                 // Add to the bottom of the wait list
@@ -196,7 +198,8 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
                     }
                 }
             } else {
-                // We have an object, release
+                // We have an object, or there is none and none can arrive on
+                // a queue whose waiters are failed; either way, do not park
                 lock.unlock();
             }
         } finally {
@@ -257,17 +260,19 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
     }
 
     /**
-     * Cancel the futures of all the asynchronous polls that are waiting for an item on this queue. A thread that is
-     * blocked in one of the {@link Future#get()} methods of such a future observes a {@link CancellationException}
-     * instead of waiting for an item that will never be offered, and later calls to {@link #pollAsync()} do not
-     * register a waiter at all. A future an item has already been handed over to is not cancelled, it completes with
-     * that item as usual. <br>
+     * Fail all the polls that are waiting for an item on this queue. A thread blocked in one of the
+     * {@link Future#get()} methods of an asynchronous poll observes a {@link CancellationException}, and a waiter of a
+     * timed {@link #poll(long, TimeUnit)} is woken without an item, the way its timeout ends the wait. Later calls to
+     * {@link #pollAsync()} and {@link #poll(long, TimeUnit)} do not register a waiter at all. A poll an item has
+     * already been handed over to is not failed, it completes with that item as usual. <br>
      * This makes a queue that is never fed again terminate the callers that wait on it, instead of leaving them parked
-     * forever.
+     * forever - including the timed waiters, whose own timeout the caller cannot know: the pool hands out waits of
+     * unbounded length, where waiting for the timeout would be waiting forever.
      */
     public void cancelWaiters() {
         final ReentrantLock lock = this.lock;
         List<ItemFuture<E>> futures;
+        List<ExchangeCountDownLatch<E>> timedWaiters;
         lock.lock();
         try {
             // The caller that cancels the waiters offers no further item from
@@ -275,21 +280,52 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
             // served either
             waitersCancelled = true;
             futures = new ArrayList<>(waiters.size());
-            for (ExchangeCountDownLatch<E> c : waiters) {
+            timedWaiters = new ArrayList<>(waiters.size());
+            for (Iterator<ExchangeCountDownLatch<E>> it = waiters.iterator(); it.hasNext();) {
+                ExchangeCountDownLatch<E> c = it.next();
                 ItemFuture<E> future = c.getFuture();
                 if (future != null) {
-                    // Only the asynchronous polls have a future to cancel, the
-                    // waiters of poll(long,TimeUnit) time out on their own
+                    // The asynchronous polls are failed through their future
                     futures.add(future);
+                } else {
+                    // A timed poll has no future to cancel: deregister its
+                    // waiter here, so no offer hands an item to a caller that
+                    // is being failed, and wake it below with the item still
+                    // null, so its poll returns null as a timeout does
+                    it.remove();
+                    timedWaiters.add(c);
                 }
             }
         } finally {
             lock.unlock();
         }
-        // Cancel outside of the lock, as the cancellation wakes up the callers
-        // and deregisters their waiter itself
+        // Cancel and wake outside of the lock, as both wake up the callers; a
+        // cancelled future deregisters its waiter itself
         for (ItemFuture<E> future : futures) {
             future.cancel(false);
+        }
+        for (ExchangeCountDownLatch<E> c : timedWaiters) {
+            c.countDown();
+        }
+    }
+
+    /**
+     * Reports whether any caller is registered on this queue waiting for an
+     * item - through a timed poll or an asynchronous one. A releaser that
+     * decides whether an offered item has a prospective consumer cannot see
+     * these registrations through the pool's wait counter, which counts only
+     * the synchronous borrow waits.
+     *
+     * @return <code>true</code> if at least one caller is registered waiting
+     *             for an item
+     */
+    public boolean hasRegisteredWaiter() {
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            return !waiters.isEmpty();
+        } finally {
+            lock.unlock();
         }
     }
 
