@@ -592,7 +592,9 @@
         compliant client must treat as a connection error of type
         <code>FLOW_CONTROL_ERROR</code>. Streams that are left without an
         allocation remain in the back log and are considered again when the
-        next window increment arrives. (remm)
+        next window increment arrives. Any part of the increment left
+        unallocated by the rounding of the proportional shares is allocated to
+        the waiting streams in priority order rather than being lost. (remm)
       </fix>
       <fix>
         Permit the <code>WINDOW_UPDATE</code> and <code>RST_STREAM</code>

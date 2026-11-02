@@ -1408,6 +1408,30 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                         }
                     }
                 }
+
+                /*
+                 * Rounding down the proportional shares may leave part of the increment unallocated. The allocations
+                 * on this path are the only record of the connection window the client made available so allocate
+                 * what is left, in priority order, to the streams that are still waiting. The streams in the back log
+                 * are still waiting for at least the remaining increment (the back log is larger than the increment)
+                 * so all of it can be allocated. Otherwise the client could be waiting for data the server will not
+                 * send until it receives a further window update the client has no reason to send.
+                 */
+                if (remaining > 0) {
+                    for (Stream s : orderedStreams) {
+                        if (s.getConnectionAllocationRequested() < 1) {
+                            continue;
+                        }
+                        remaining = allocate(s, remaining);
+                        result.add(s);
+                        if (s.getConnectionAllocationRequested() == 0) {
+                            backLogStreams.remove(s);
+                        }
+                        if (remaining < 1) {
+                            break;
+                        }
+                    }
+                }
             }
             return result;
         } finally {
