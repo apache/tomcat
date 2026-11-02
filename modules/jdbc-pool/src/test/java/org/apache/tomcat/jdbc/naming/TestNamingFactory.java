@@ -37,6 +37,7 @@ import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.DataSourceFactory;
 import org.apache.tomcat.jdbc.pool.PoolConfiguration;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
+import org.apache.tomcat.jdbc.pool.Validator;
 import org.apache.tomcat.jdbc.pool.XADataSource;
 
 /**
@@ -200,6 +201,64 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
         Assertions.assertTrue(configured.isFairQueue(),
                 "an empty plain boolean attribute must leave the "
                         + "PoolProperties default in place");
+    }
+
+    @Test
+    void emptyCredentialUrlAndValidatorAttributesLeaveThePropertiesUnset() {
+        // Pre-fix these four attributes stored the blank verbatim even
+        // though the factory contract promises a blank leaves the property
+        // at its PoolProperties default: a cleared password attribute left
+        // the pool authenticating with an empty password entry, a cleared
+        // url made every physical connection attempt fail against the
+        // driver, and a cleared validatorClassName looked for a class named
+        // "" on every pool start and warned of the ClassNotFoundException
+        // before falling back to standard validation.
+        java.util.Properties attrs = new java.util.Properties();
+        attrs.setProperty("username", " ");
+        attrs.setProperty("password", "");
+        attrs.setProperty("url", "  ");
+        attrs.setProperty("validatorClassName", "");
+
+        PoolConfiguration configured =
+                DataSourceFactory.parsePoolProperties(attrs);
+
+        Assertions.assertNull(configured.getUsername(),
+                "a blank username attribute must leave the driver "
+                        + "properties without a user entry");
+        Assertions.assertNull(configured.getPassword(),
+                "a blank password attribute must leave the driver "
+                        + "properties without a password entry");
+        Assertions.assertNull(configured.getUrl(),
+                "a blank url attribute must leave the url unset");
+        Assertions.assertNull(configured.getValidatorClassName(),
+                "a blank validatorClassName attribute must keep the "
+                        + "standard validation default");
+    }
+
+    @Test
+    void credentialAttributesApplyVerbatimAndValidatorClassNameAppliesTrimmed() {
+        // A credential can legitimately carry surrounding whitespace, so it
+        // is stored verbatim; a Java class name never can, so the factory
+        // trims it the same way it trims driverClassName.
+        java.util.Properties attrs = new java.util.Properties();
+        attrs.setProperty("username", " scott ");
+        attrs.setProperty("password", " secret ");
+        attrs.setProperty("validatorClassName",
+                " " + ParsingValidator.class.getName() + " ");
+
+        PoolConfiguration configured =
+                DataSourceFactory.parsePoolProperties(attrs);
+
+        Assertions.assertEquals(" scott ", configured.getUsername(),
+                "a non-blank username must be stored verbatim");
+        Assertions.assertEquals(" secret ", configured.getPassword(),
+                "a non-blank password must be stored verbatim");
+        Assertions.assertEquals(ParsingValidator.class.getName(),
+                configured.getValidatorClassName(),
+                "a non-blank validatorClassName must be stored trimmed");
+        Assertions.assertInstanceOf(ParsingValidator.class,
+                configured.getValidator(),
+                "the trimmed class name must be the one loaded");
     }
 
     @Test
@@ -1538,6 +1597,23 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
                 "message must report the failing constructor");
         Assertions.assertInstanceOf(java.lang.reflect.InvocationTargetException.class,
                 ne.getRootCause());
+    }
+
+    /**
+     * Validator the trimmed {@code validatorClassName} attribute applied by
+     * the parsing tests above must resolve to. Instantiated reflectively by
+     * PoolProperties, hence public with a public constructor, the same
+     * shape as the naming targets below.
+     */
+    public static class ParsingValidator implements Validator {
+
+        public ParsingValidator() {
+        }
+
+        @Override
+        public boolean validate(java.sql.Connection connection, int validateAction) {
+            return true;
+        }
     }
 
     /**
