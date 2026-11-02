@@ -483,6 +483,15 @@
         subsequent <code>WebConnection.close()</code> closes the connection.
         (markt)
       </fix>
+      <fix>
+        Fix rejection of large HTTP/2 response headers that fit within a frame
+        after HPACK compression. Allow the encoding workspace to grow to the
+        larger of twice the peer's advertised maximum frame payload size and
+        the peer's dynamic table capacity, so indexed fields remain usable after
+        a frame size reduction. Check the encoded payload against the peer's
+        frame size limit before writing it and close the connection with an
+        <code>INTERNAL_ERROR</code> if a header block can not be written. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

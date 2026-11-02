@@ -881,39 +881,58 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         boolean first = true;
         State state = null;
 
-        while (state != State.COMPLETE) {
-            headerFrameBuffers.startFrame();
-            if (first && pushedStreamIdBytes != null) {
-                headerFrameBuffers.getPayload().put(pushedStreamIdBytes);
-            }
-            state = getHpackEncoder().encode(mimeHeaders, headerFrameBuffers.getPayload());
-            headerFrameBuffers.getPayload().flip();
-            if (state == State.COMPLETE || headerFrameBuffers.getPayload().limit() > 0) {
-                ByteUtil.setThreeBytes(headerFrameBuffers.getHeader(), 0, headerFrameBuffers.getPayload().limit());
-                if (first) {
-                    first = false;
-                    if (pushedStreamIdBytes == null) {
-                        headerFrameBuffers.getHeader()[3] = FrameType.HEADERS.getIdByte();
+        try {
+            while (state != State.COMPLETE) {
+                headerFrameBuffers.startFrame();
+                if (first && pushedStreamIdBytes != null) {
+                    headerFrameBuffers.getPayload().put(pushedStreamIdBytes);
+                }
+                state = getHpackEncoder().encode(mimeHeaders, headerFrameBuffers.getPayload());
+                headerFrameBuffers.getPayload().flip();
+                // The workspace may be larger than a frame. Check the encoded payload before serializing its length or
+                // passing it to either the synchronous writer or the asynchronous frame queue.
+                int framePayloadSize = headerFrameBuffers.getPayload().remaining();
+                int maxFramePayloadSize = remoteSettings.getMaxFrameSize();
+                if (framePayloadSize > maxFramePayloadSize) {
+                    throw new IllegalStateException(sm.getString("upgradeHandler.headerPayloadTooBig",
+                            Integer.toString(framePayloadSize), Integer.toString(maxFramePayloadSize)));
+                }
+                if (state == State.COMPLETE || headerFrameBuffers.getPayload().limit() > 0) {
+                    ByteUtil.setThreeBytes(headerFrameBuffers.getHeader(), 0, headerFrameBuffers.getPayload().limit());
+                    if (first) {
+                        first = false;
+                        if (pushedStreamIdBytes == null) {
+                            headerFrameBuffers.getHeader()[3] = FrameType.HEADERS.getIdByte();
+                        } else {
+                            headerFrameBuffers.getHeader()[3] = FrameType.PUSH_PROMISE.getIdByte();
+                        }
+                        if (endOfStream) {
+                            headerFrameBuffers.getHeader()[4] = FLAG_END_OF_STREAM;
+                        }
                     } else {
-                        headerFrameBuffers.getHeader()[3] = FrameType.PUSH_PROMISE.getIdByte();
+                        headerFrameBuffers.getHeader()[3] = FrameType.CONTINUATION.getIdByte();
                     }
-                    if (endOfStream) {
-                        headerFrameBuffers.getHeader()[4] = FLAG_END_OF_STREAM;
+                    if (state == State.COMPLETE) {
+                        headerFrameBuffers.getHeader()[4] += FLAG_END_OF_HEADERS;
                     }
-                } else {
-                    headerFrameBuffers.getHeader()[3] = FrameType.CONTINUATION.getIdByte();
+                    if (log.isTraceEnabled()) {
+                        log.trace(headerFrameBuffers.getPayload().limit() + " bytes");
+                    }
+                    ByteUtil.set31Bits(headerFrameBuffers.getHeader(), 5, stream.getIdAsInt());
+                    headerFrameBuffers.endFrame();
+                } else if (state == State.UNDERFLOW) {
+                    headerFrameBuffers.expandPayload();
                 }
-                if (state == State.COMPLETE) {
-                    headerFrameBuffers.getHeader()[4] += FLAG_END_OF_HEADERS;
-                }
-                if (log.isTraceEnabled()) {
-                    log.trace(headerFrameBuffers.getPayload().limit() + " bytes");
-                }
-                ByteUtil.set31Bits(headerFrameBuffers.getHeader(), 5, stream.getIdAsInt());
-                headerFrameBuffers.endFrame();
-            } else if (state == State.UNDERFLOW) {
-                headerFrameBuffers.expandPayload();
             }
+        } catch (IllegalStateException ise) {
+            /*
+             * The header block can not be written. Frames of the block may already have been written (synchronous
+             * I/O) and the HPACK encoder may have updated its dynamic table for fields the peer has not received. The
+             * connection can not be used any further so it is closed. The exception is re-thrown to make the calling
+             * code aware of the problem.
+             */
+            closeConnection(new ConnectionException(ise.getMessage(), Http2Error.INTERNAL_ERROR, ise));
+            throw ise;
         }
         headerFrameBuffers.endHeaders();
         return headerFrameBuffers;
@@ -927,7 +946,24 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
      * @return the header frame buffers
      */
     protected HeaderFrameBuffers getHeaderFrameBuffers(int initialPayloadSize) {
-        return new DefaultHeaderFrameBuffers(initialPayloadSize);
+        return new DefaultHeaderFrameBuffers(initialPayloadSize, getHeaderWorkspaceLimit());
+    }
+
+
+    /**
+     * Obtain the maximum size to which the header encoding workspace may be expanded. HPACK reserves space using
+     * uncompressed header lengths before attempting Huffman encoding. The shortest Huffman codes use five bits per
+     * octet, so literals may need up to 8/5 of their encoded size as workspace. Twice the peer's maximum frame payload
+     * size allows for this estimate and encoding overhead. Indexed fields still need space for this estimate even
+     * though their encoded representation is only a few bytes. Allow at least the peer's dynamic table capacity so
+     * existing entries remain usable after a frame size reduction. The 32-byte overhead of a table entry exceeds the
+     * encoder's 12-byte estimate overhead. This is only a workspace limit: frame payloads are checked separately
+     * against the peer's advertised maximum before they are written.
+     *
+     * @return the workspace limit in bytes
+     */
+    protected final int getHeaderWorkspaceLimit() {
+        return Math.max(2 * remoteSettings.getMaxFrameSize(), remoteSettings.getHeaderTableSize());
     }
 
 
@@ -2342,9 +2378,11 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     private class DefaultHeaderFrameBuffers implements HeaderFrameBuffers {
 
         private final byte[] header;
+        private final int workspaceLimit;
         private ByteBuffer payload;
 
-        DefaultHeaderFrameBuffers(int initialPayloadSize) {
+        DefaultHeaderFrameBuffers(int initialPayloadSize, int workspaceLimit) {
+            this.workspaceLimit = workspaceLimit;
             header = new byte[9];
             payload = ByteBuffer.allocate(initialPayloadSize);
         }
@@ -2384,16 +2422,13 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
         @Override
         public void expandPayload() {
-            // The encoded headers are written as the payload of a single
-            // frame so a buffer larger than the largest frame size that can
-            // be represented is never usable. Fail rather than continue
-            // doubling, which would eventually overflow the buffer size.
-            if (payload.capacity() >= ConnectionSettingsBase.MAX_MAX_FRAME_SIZE) {
-                throw new IllegalStateException(sm.getString("upgradeHandler.headerPayloadTooBig",
-                        Integer.toString(ConnectionSettingsBase.MAX_MAX_FRAME_SIZE)));
+            // Bound the encoding workspace independently of the encoded frame payload. The ceiling also keeps
+            // doubling below the point where the buffer size could overflow.
+            if (payload.capacity() >= workspaceLimit) {
+                throw new IllegalStateException(
+                        sm.getString("upgradeHandler.headerWorkspaceTooBig", Integer.toString(workspaceLimit)));
             }
-            payload = ByteBuffer.allocate(
-                    Integer.min(payload.capacity() * 2, ConnectionSettingsBase.MAX_MAX_FRAME_SIZE));
+            payload = ByteBuffer.allocate(Integer.min(payload.capacity() * 2, workspaceLimit));
         }
     }
 }
