@@ -1478,6 +1478,16 @@
         finalizer, as it already does for the analogous query timeout
         ordering. (remm)
       </fix>
+      <fix>
+        Mask the password carried in the <code>user:password@host</code>
+        userinfo section of a JDBC URL, and in the equivalent
+        <code>user/password@host</code> form of the legacy Oracle URLs, in the
+        <code>toString()</code> dump of the pool configuration, where the rest
+        of the dump is masked and the leak gave a false impression that the
+        dump carried no credential. The user name, host, port and the rest of
+        the URL stay readable, and an authority that carries no credential -
+        a bare host or a port - is left untouched. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
