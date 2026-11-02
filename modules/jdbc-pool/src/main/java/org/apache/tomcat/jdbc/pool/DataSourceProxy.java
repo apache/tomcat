@@ -33,11 +33,10 @@ import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorDefinition;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
- * The DataSource proxy lets us implements methods that don't exist in the current compiler JDK but might be methods
- * that are part of a future JDK DataSource interface. <br>
- * It's a trick to work around compiler issues when implementing interfaces. For example, I could put in Java 6 methods
- * of javax.sql.DataSource here, and compile it with JDK 1.5 and still be able to run under Java 6 without getting
- * NoSuchMethodException.
+ * The data source base of the pool: it delegates every configuration property to the
+ * {@link PoolConfiguration} it holds and implements the {@link javax.sql.DataSource} accessors on top of a lazily
+ * created {@link ConnectionPool}. The class doubles as the data source's own JMX/bean surface, which is why the
+ * public getters and setters here are the attribute surface a container publishes.
  */
 
 public class DataSourceProxy implements PoolConfiguration {
@@ -171,10 +170,7 @@ public class DataSourceProxy implements PoolConfiguration {
      */
     public Connection getConnection(String username, String password) throws SQLException {
         if (this.getPoolProperties().isAlternateUsernameAllowed()) {
-            // Go through createPool() rather than testing the field and then
-            // calling it: that reads the volatile field only once, so a
-            // close() running concurrently cannot turn this borrow into a
-            // NullPointerException.
+            // Reach the pool through createPool(), as every borrow path does.
             return createPool().getConnection(username, password);
         } else {
             if (connectionWithoutCredentialsWarningIssued.compareAndSet(false, true)) {
@@ -204,9 +200,9 @@ public class DataSourceProxy implements PoolConfiguration {
      * @throws SQLException Error creating pool, or if this data source has been closed
      */
     public ConnectionPool createPool() throws SQLException {
-        // Read the volatile field once. Guarding on it and then returning it
+        // Read the volatile field once: guarding on it and then returning it
         // would read it twice, and a close() landing between the reads makes
-        // the second one null and hands a null pool out to the caller.
+        // the second one null.
         final ConnectionPool p = pool;
         if (p != null) {
             return p;
@@ -216,16 +212,15 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
     /**
-     * Sets up the connection pool, by creating a pooling driver.
+     * Sets up the connection pool, by creating a pooling driver, unless this data source has been closed - which
+     * then rejects the caller, save for a pool that a racing creation still publishes in time for the closure to
+     * take it down again.
      */
     private ConnectionPool pCreatePool() throws SQLException {
         // Runs under the construction gate, not under the monitor that
-        // close(boolean) takes: the constructor pre-connects the initial
-        // size of the pool, so against a hung database it blocks inside the
-        // driver's connect for as long as the JDBC login timeout, and a
-        // close parked behind that would be unbounded and uninterruptible.
-        // Returning null is not possible here: either the closed flag
-        // rejects the caller or a pool is published and returned.
+        // close(boolean) takes; why the two are separate is recorded at
+        // poolCreationLock. Returning null is not possible here: either the
+        // closed flag rejects the caller or a pool is published and returned.
         if (closed) {
             throw new SQLException(MessageFactory.get("dataSourceProxy.dataSourceClosed"));
         }
@@ -256,7 +251,26 @@ public class DataSourceProxy implements PoolConfiguration {
                 // is never neither - that was the leak - and never both.
                 rejected = closed;
                 if (!rejected) {
+                    // Finish the configuration before the pool can be read from.
+                    // A write of one of the attributes the check corrects - the
+                    // eviction interval is brought down to the max age - lands its
+                    // value in the shared configuration but skips that correction,
+                    // because the setters run it only once a pool is reachable. The
+                    // publication is where such a write has to be picked up, and it
+                    // has to come before the cleaner is looked over: the check is
+                    // what decides the interval the cleaner should be running on.
+                    fresh.checkPoolConfiguration(poolProperties);
                     pool = fresh;
+                    // Look the cleaner over now that the pool is reachable.
+                    // It was armed while this pool was still under
+                    // construction, and a sweeper write that landed between
+                    // that arming's reading and this publication found no
+                    // pool to report itself to: the setters take this same
+                    // monitor, so a write is either fully before this point,
+                    // where the arming had not read it yet and this does, or
+                    // fully after it, where the setter finds the pool and
+                    // re-arms itself. Nothing is left in between.
+                    fresh.reconcilePoolCleaner(poolProperties);
                 }
             }
             if (rejected) {
@@ -283,22 +297,22 @@ public class DataSourceProxy implements PoolConfiguration {
      * @throws SQLException Connection error, or this data source has been closed
      */
     public Connection getConnection() throws SQLException {
-        // One read of the volatile field, through createPool(): a guard on
-        // the field followed by a call on it reads it twice, and a close()
-        // landing between the two reads makes the second one null and a
-        // NullPointerException escapes this SQLException contract.
+        // One read of the volatile pool field, through createPool() - see
+        // that method for why the borrow paths reach the pool only this way.
         return createPool().getConnection();
     }
 
     /**
-     * Invokes an sync operation to retrieve the connection.
+     * Retrieves a connection future: the pool's synchronous borrow is invoked first with no wait, and when a
+     * connection cannot be handed out immediately the returned future completes once one becomes available.
      *
      * @return a Future containing a reference to the connection when it becomes available
      *
      * @throws SQLException Connection error, or this data source has been closed
      */
     public Future<Connection> getConnectionAsync() throws SQLException {
-        // See getConnection() on why the pool is reached through createPool()
+        // One read of the volatile pool field, through createPool() - see
+        // that method for why the borrow paths reach the pool only this way.
         return createPool().getConnectionAsync();
     }
 
@@ -411,16 +425,12 @@ public class DataSourceProxy implements PoolConfiguration {
      */
     public synchronized void close(boolean all) {
         // Sets the terminal closed flag and takes the published pool in one
-        // step under this monitor, which the publication step of
-        // pCreatePool() also takes as one step: a creation whose pool is not
-        // yet published cannot be missed by this close and then published
-        // after it - it either wins the monitor and this close closes its
-        // pool, or this close wins and that creation tears its pool down as
-        // rejected. The closed flag makes the closure terminal for the pool
-        // creation paths as well: a closed data source no longer resurrects
-        // its pool on the next borrow or statistics access. The monitor is
-        // never held across a pool construction, so this method never waits
-        // on a driver connect.
+        // step under this monitor - the check-and-publish race this closes
+        // with is told at pCreatePool()'s publication step. The closed flag
+        // makes the closure terminal for the pool creation paths as well: a
+        // closed data source no longer resurrects its pool on the next borrow
+        // or statistics access. The monitor is never held across a pool
+        // construction, so this method never waits on a driver connect.
         closed = true;
         final ConnectionPool p = pool;
         pool = null;
@@ -434,9 +444,11 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
     /**
-     * Return the current number of connections in the pool.
+     * Return the current number of connections in the pool. The pool is not created by this call: before the pool
+     * has been created, and after it has been closed, this returns <code>0</code> even though the configuration
+     * asks for more connections. See {@link #getSize()} for the reading that creates the pool when necessary.
      *
-     * @return the pool size
+     * @return the pool size, or <code>0</code> while no pool instance exists
      */
     public int getPoolSize() {
         final ConnectionPool p = pool;
@@ -461,7 +473,19 @@ public class DataSourceProxy implements PoolConfiguration {
 
 
     /**
-     * Set the pool configuration properties directly.
+     * Replaces the configuration this data source hands out. The replacement is
+     * the one a pool created afterwards is built from; a pool that has already
+     * been created keeps the configuration it was built from, as that is the
+     * object it reads, and no part of it is reconfigured by this method. So on a
+     * running pool the accessors that follow keep reporting the replacement while
+     * the pool carries on with the original for everything it reads for itself -
+     * the borrow gates, the tests, the timeouts - and the way to change a running
+     * pool's behaviour is to close it and create another data source. The one
+     * thing the replacement does reach is the pool's background maintenance: a
+     * sweeper write made after the replacement is judged from this class's
+     * configuration, which is now the replacement, so the maintenance starts or
+     * stops according to a configuration the pool was not built from. See
+     * poolCleanerAttributeUpdated for that judgement.
      *
      * @param poolProperties The new pool configuration
      */
@@ -503,14 +527,16 @@ public class DataSourceProxy implements PoolConfiguration {
 
 
     @Override
-    public void setMaxActive(int maxActive) {
+    public synchronized void setMaxActive(int maxActive) {
         this.poolProperties.setMaxActive(maxActive);
+        poolConfigurationUpdated();
     }
 
 
     @Override
-    public void setMaxIdle(int maxIdle) {
+    public synchronized void setMaxIdle(int maxIdle) {
         this.poolProperties.setMaxIdle(maxIdle);
+        poolConfigurationUpdated();
     }
 
 
@@ -521,14 +547,16 @@ public class DataSourceProxy implements PoolConfiguration {
 
 
     @Override
-    public void setMinEvictableIdleTimeMillis(int minEvictableIdleTimeMillis) {
+    public synchronized void setMinEvictableIdleTimeMillis(int minEvictableIdleTimeMillis) {
         this.poolProperties.setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
+        poolCleanerAttributeUpdated();
     }
 
 
     @Override
-    public void setMinIdle(int minIdle) {
+    public synchronized void setMinIdle(int minIdle) {
         this.poolProperties.setMinIdle(minIdle);
+        poolConfigurationUpdated();
     }
 
 
@@ -539,37 +567,119 @@ public class DataSourceProxy implements PoolConfiguration {
 
 
     /**
-     * Sets the password used to establish connections with, and mirrors it into the {@code password} database
-     * property. A {@code null} password clears the credential: the entry is removed from the database properties
-     * instead of the properties being set to null, which {@link java.util.Properties} rejects and which previously
-     * threw after the field had already been cleared, leaving the previous password behind for the driver to keep
-     * using. A configuration whose database properties are {@code null} only stores the field, as there is no
-     * property collection to mirror into. {@inheritDoc}
+     * Sets the password used to establish connections with. The value goes to the pool configuration, which - as
+     * {@link PoolConfiguration#setPassword(String)} promises - keeps the {@code password} entry of the database
+     * properties the driver is given in step with it: a {@code null} password takes the entry away as well, so a
+     * credential that has been set aside does not go on authenticating connections that are established from now on.
+     * <p>
+     * Only connections established from now on. A pooled connection keeps the credential it first connected with and
+     * reconnects with that one, so an already established session goes on authenticating with the previous credential
+     * until it leaves the pool; {@link #purge()} or a borrow with explicit
+     * credentials under {@link PoolConfiguration#isAlternateUsernameAllowed()} clears them out when a rotation has to
+     * take effect at once.
+     *
+     * @param password the password, or {@code null} to take the credential away
      */
     @Override
     public void setPassword(String password) {
         this.poolProperties.setPassword(password);
-        Properties dbProperties = this.poolProperties.getDbProperties();
-        if (dbProperties != null) {
-            String storedPassword = this.poolProperties.getPassword();
-            if (storedPassword == null) {
-                dbProperties.remove(PoolUtilities.PROP_PASSWORD);
-            } else {
-                dbProperties.setProperty(PoolUtilities.PROP_PASSWORD, storedPassword);
-            }
-        }
     }
 
 
     @Override
-    public void setRemoveAbandoned(boolean removeAbandoned) {
+    public synchronized void setRemoveAbandoned(boolean removeAbandoned) {
         this.poolProperties.setRemoveAbandoned(removeAbandoned);
+        poolCleanerAttributeUpdated();
     }
 
 
     @Override
-    public void setRemoveAbandonedTimeout(int removeAbandonedTimeout) {
+    public synchronized void setRemoveAbandonedTimeout(int removeAbandonedTimeout) {
         this.poolProperties.setRemoveAbandonedTimeout(removeAbandonedTimeout);
+        poolCleanerAttributeUpdated();
+    }
+
+
+    /**
+     * Validates the configuration a setter of this class just wrote and looks the
+     * pool's cleaner over as a result of it, in that order, and does neither for a
+     * data source whose pool has not been created yet.
+     * <p>
+     * The two halves belong together because the validation is not only about the
+     * attribute the caller wrote: among the corrections it makes is bringing the
+     * eviction interval down to the max age whenever the interval is the longer of
+     * the two, and a pool cleaner's period is fixed when the task is built. A setter
+     * that validated the configuration without then looking the cleaner over could
+     * therefore move the interval the configuration asks for and leave the running
+     * task on the interval it just replaced, a disagreement no getter shows. That is
+     * why the pairing is one step rather than something each setter remembers: the
+     * pool's creation runs the same pair at the point it publishes the pool, and
+     * every setter of a count, of the max age or of the eviction interval - on
+     * this class and on the pool's MBean alike - ends with it.
+     * <p>
+     * Which configuration object is handed over, and why the cleaner's state is not
+     * decided from a reading taken before the write, is recorded at
+     * poolCleanerAttributeUpdated.
+     */
+    private void poolConfigurationUpdated() {
+        final ConnectionPool p = pool;
+        if (p == null) {
+            return;
+        }
+        // Make sure the pool is properly configured, on the configuration the
+        // calling setter wrote, and then start, stop or re-arm the cleaner to match
+        // what that correction left the configuration asking for.
+        p.checkPoolConfiguration(poolProperties);
+        p.reconcilePoolCleaner(poolProperties);
+    }
+
+
+    /**
+     * Starts or stops a created pool's background maintenance after a change
+     * to one of the properties {@link PoolConfiguration#isPoolSweeperEnabled()}
+     * computes from, mirroring the handling of the same attributes by the
+     * pool's own MBean ({@link org.apache.tomcat.jdbc.pool.jmx.ConnectionPool}).
+     * Without this, a sweeper trigger switched on through these accessors after the
+     * pool had started - a pool created with the eviction interval running and every
+     * trigger off - would raise the getter's promise of maintenance without ever
+     * arming the thread that performs it. It has to be the interval that is already
+     * running: {@link PoolConfiguration#isPoolSweeperEnabled()} counts a trigger only
+     * while the interval is on, so a pool created with the interval switched off
+     * raises no promise when a trigger is switched on, and there is nothing here for
+     * it to arm.
+     * <p>
+     * A pool that has not been created yet has nothing to report to: the write has
+     * landed in the configuration that pool will be built from, and its creation
+     * validates that configuration and then looks the cleaner over once the pool is
+     * built, in that order, at its publication.
+     * <p>
+     * The callers hold this data source's monitor, which keeps the write of the
+     * attribute together with {@link #close()} and with every other accessor of
+     * this class. What the sweeper needs as a result of that write is not decided
+     * here, and in particular it is not decided from a reading taken before the
+     * write: the pool's MBean writes these same attributes holding no monitor at
+     * all, so an operator on that surface can change any of them between this
+     * writer's reading and its own, and a decision made from the earlier reading
+     * either stops a task the other operator just armed or spares one the other
+     * operator just made unnecessary. Both surfaces therefore hand the change to
+     * {@link ConnectionPool#reconcilePoolCleaner(PoolConfiguration)}, which reads
+     * what is wanted and what is registered under the pool's monitor - the one
+     * monitor the two surfaces reach.
+     * <p>
+     * The configuration handed over is this data source's own rather than the
+     * pool's, which is what the mirrored MBean helper hands: the write being
+     * handled has just landed in it, and reconciling from the pool's copy would
+     * answer the question about a configuration the write did not touch. The two
+     * objects are the same one unless {@link #setPoolProperties(PoolConfiguration)}
+     * replaced this class's after the pool was created, the case that method's
+     * javadoc states and the one judgement that replacement reaches.
+     */
+    private void poolCleanerAttributeUpdated() {
+        final ConnectionPool p = pool;
+        if (p == null) {
+            return;
+        }
+        p.reconcilePoolCleaner(poolProperties);
     }
 
 
@@ -592,14 +702,16 @@ public class DataSourceProxy implements PoolConfiguration {
 
 
     @Override
-    public void setTestWhileIdle(boolean testWhileIdle) {
+    public synchronized void setTestWhileIdle(boolean testWhileIdle) {
         this.poolProperties.setTestWhileIdle(testWhileIdle);
+        poolCleanerAttributeUpdated();
     }
 
 
     @Override
-    public void setTimeBetweenEvictionRunsMillis(int timeBetweenEvictionRunsMillis) {
+    public synchronized void setTimeBetweenEvictionRunsMillis(int timeBetweenEvictionRunsMillis) {
         this.poolProperties.setTimeBetweenEvictionRunsMillis(timeBetweenEvictionRunsMillis);
+        poolConfigurationUpdated();
     }
 
 
@@ -610,25 +722,18 @@ public class DataSourceProxy implements PoolConfiguration {
 
 
     /**
-     * Sets the user name used to establish connections with, and mirrors it into the {@code user} database property.
-     * A {@code null} user name clears the credential: the entry is removed from the database properties instead of the
-     * properties being set to null, which {@link java.util.Properties} rejects and which previously threw after the
-     * field had already been cleared, leaving the previous user name behind for the driver to keep using. A
-     * configuration whose database properties are {@code null} only stores the field, as there is no property
-     * collection to mirror into. {@inheritDoc}
+     * Sets the user name used to establish connections with. The value goes to the pool configuration, which - as
+     * {@link PoolConfiguration#setUsername(String)} promises - keeps the {@code user} entry of the database properties
+     * the driver is given in step with it, and takes that entry away as well for a {@code null} user name.
+     * <p>
+     * Only connections established from now on, as {@link #setPassword(String)} explains: a pooled connection
+     * reconnects with the credential it first connected with.
+     *
+     * @param username the user name, or {@code null} to take the credential away
      */
     @Override
     public void setUsername(String username) {
         this.poolProperties.setUsername(username);
-        Properties dbProperties = this.poolProperties.getDbProperties();
-        if (dbProperties != null) {
-            String storedUsername = this.poolProperties.getUsername();
-            if (storedUsername == null) {
-                dbProperties.remove(PoolUtilities.PROP_USER);
-            } else {
-                dbProperties.setProperty(PoolUtilities.PROP_USER, storedUsername);
-            }
-        }
     }
 
 
@@ -754,30 +859,31 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
     /**
-     * no-op {@link javax.sql.DataSource#getLoginTimeout}
+     * The pool's borrow wait timeout, {@link PoolConfiguration#getMaxWait()}, expressed in whole seconds:
+     * {@link javax.sql.DataSource#getLoginTimeout()} is mapped onto that property rather than ignored. A
+     * sub-second <code>maxWait</code> therefore reads back as zero.
      *
-     * @return the timeout
+     * @return the timeout in whole seconds
      */
     public int getLoginTimeout() {
-        if (poolProperties == null) {
-            return 0;
-        } else {
-            return poolProperties.getMaxWait() / 1000;
-        }
+        return poolProperties.getMaxWait() / 1000;
     }
 
     /**
-     * {@link javax.sql.DataSource#setLoginTimeout(int)}
+     * Reconfigures the pool's borrow wait timeout: {@link javax.sql.DataSource#setLoginTimeout(int)} is mapped onto
+     * {@link PoolConfiguration#setMaxWait(int)} as {@code 1000 * i} milliseconds, with the seconds-to-milliseconds
+     * conversion of an {@code int} seconds value. A seconds value too large to be represented in milliseconds is
+     * clamped to the largest representable timeout rather than wrapped.
      *
-     * @param i The timeout value
+     * @param i The timeout in seconds
      */
     public void setLoginTimeout(int i) {
-        if (poolProperties == null) {
-            return;
-        } else {
-            poolProperties.setMaxWait(1000 * i);
-        }
-
+        // The multiplication happens in long and the result is clamped: in
+        // int arithmetic the product of a seconds value above a little under
+        // 25 days wraps into the negatives, and the borrow path reads a
+        // maxWait of zero or less as the pool's "no timeout" setting - the
+        // wrapped value would invert the meaning of the timeout just set.
+        poolProperties.setMaxWait((int) Math.min(Integer.MAX_VALUE, 1000L * i));
     }
 
 
@@ -788,8 +894,9 @@ public class DataSourceProxy implements PoolConfiguration {
 
 
     @Override
-    public void setSuspectTimeout(int seconds) {
+    public synchronized void setSuspectTimeout(int seconds) {
         getPoolProperties().setSuspectTimeout(seconds);
+        poolCleanerAttributeUpdated();
     }
 
     // These members expose JMX attributes through Tomcat's dynamic
@@ -875,7 +982,10 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
     /**
-     * Returns the current total number of connections in the pool.
+     * Returns the current total number of connections in the pool. If the pool has not been created, it will be
+     * created during this call, and a data source that has been closed throws {@link RuntimeException}. See
+     * {@link #getPoolSize()} for the reading that never creates the pool and answers <code>0</code> while none
+     * exists.
      *
      * @return current pool size
      */
@@ -890,11 +1000,10 @@ public class DataSourceProxy implements PoolConfiguration {
     /**
      * Performs a validation on idle connections.
      * <p>
-     * Note: this operation is safe with concurrent traffic and with a closing pool even when the per-connection lock
-     * is disabled (sweeper switched off and {@link PoolProperties#getUseLock()} returning {@code false}): each idle
-     * connection is claimed out of the idle queue before it is validated or reconnected and is handed back, released
-     * or - if the pool closed in the meantime - disconnected without ever re-entering the queue, as described on
-     * {@link ConnectionPool#testAllIdle()}.
+     * Note: this operation is safe with concurrent traffic and with a closing
+     * pool even when the per-connection lock is disabled (sweeper switched
+     * off and {@link PoolProperties#getUseLock()} returning {@code false}),
+     * as described on {@link ConnectionPool#testAllIdle()}.
      */
     public void testIdle() {
         try {
@@ -1015,14 +1124,20 @@ public class DataSourceProxy implements PoolConfiguration {
 
     /**
      * Returns a copy of the database properties with the password removed. This object doubles as its own JMX/bean
-     * surface and {@link #setPassword(String)} stores the password into the database properties, so returning them as
+     * surface and {@link #setPassword(String)} puts the password into the database properties, so returning them as
      * they are would expose the plaintext password through a getter while {@link #getPassword()} is explicitly masked -
      * the same protection the pool's own MBean
-     * ({@link org.apache.tomcat.jdbc.pool.jmx.ConnectionPool#getDbProperties()}) already applies. {@inheritDoc}
+     * ({@link org.apache.tomcat.jdbc.pool.jmx.ConnectionPool#getDbProperties()}) already applies. A configuration whose
+     * database properties are {@code null} - a state {@link #setPassword(String)} and {@link #setUsername(String)}
+     * document as supported - has nothing to mask, so this returns {@code null}. {@inheritDoc}
      */
     @Override
     public Properties getDbProperties() {
-        return PoolUtilities.cloneWithoutPassword(getPoolProperties().getDbProperties());
+        Properties live = getPoolProperties().getDbProperties();
+        if (live == null) {
+            return null;
+        }
+        return PoolUtilities.cloneWithoutPassword(live);
     }
 
 
@@ -1310,8 +1425,9 @@ public class DataSourceProxy implements PoolConfiguration {
 
 
     @Override
-    public void setMaxAge(long maxAge) {
+    public synchronized void setMaxAge(long maxAge) {
         getPoolProperties().setMaxAge(maxAge);
+        poolConfigurationUpdated();
     }
 
 

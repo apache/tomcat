@@ -485,7 +485,15 @@ public class PooledConnection implements PooledConnectionMBean {
             pwd = poolProperties.getPassword();
             getAttributes().put(PROP_PASSWORD, pwd);
         }
-        Properties properties = PoolUtilities.clone(poolProperties.getDbProperties());
+        // A configuration whose database properties are null - a state
+        // PoolConfiguration#setDbProperties accepts, and that the credential
+        // setters and setConnectionProperties already tolerate - carries no
+        // driver properties. That is not a configuration that cannot connect:
+        // the URL and the credential below are enough for the driver, so the
+        // absent collection becomes an empty one rather than a failed connect.
+        Properties dbProperties = poolProperties.getDbProperties();
+        Properties properties =
+                dbProperties == null ? new Properties() : PoolUtilities.clone(dbProperties);
         if (usr != null) {
             properties.setProperty(PROP_USER, usr);
         }
