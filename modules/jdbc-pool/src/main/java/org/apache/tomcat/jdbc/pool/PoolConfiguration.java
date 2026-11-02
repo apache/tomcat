@@ -1036,7 +1036,7 @@ public interface PoolConfiguration {
     /**
      * Returns true if the pool is configured to propagate interrupt state of a thread. A thread waiting for a
      * connection, can have its wait interrupted, and by default will clear the interrupt flag and throw a
-     * {@link PoolExhaustedException}
+     * {@link java.sql.SQLException} reporting the interrupted wait, with the {@link InterruptedException} as its cause.
      *
      * @return true if the pool is configured to propagate and not clear the thread interrupt state
      */
@@ -1045,8 +1045,9 @@ public interface PoolConfiguration {
     /**
      * Configure the pool to propagate interrupt state for interrupted threads waiting for a connection A thread waiting
      * for a connection, can have its wait interrupted, and by default will clear the interrupt flag and throw a
-     * {@link PoolExhaustedException} If set to true, this behavior will change, while the
-     * {@link PoolExhaustedException} is still thrown, the threads interrupted state is still set.
+     * {@link java.sql.SQLException} reporting the interrupted wait, with the {@link InterruptedException} as its cause.
+     * If set to true, this behavior will change, while the {@link java.sql.SQLException} is still thrown, the threads
+     * interrupted state is still set.
      *
      * @param propagateInterruptState - set to true to not clear, but propagate, a threads interrupted state.
      */
