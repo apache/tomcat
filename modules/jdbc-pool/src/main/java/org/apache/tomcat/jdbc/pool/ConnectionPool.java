@@ -697,8 +697,6 @@ public class ConnectionPool {
             idle = new LinkedBlockingQueue<>();
         }
 
-        initializePoolCleaner(properties);
-
         // Create JMX MBean
         if (this.getPoolProperties().isJmxEnabled()) {
             createMBean();
@@ -734,7 +732,12 @@ public class ConnectionPool {
         checkInterceptorOrder(proxies);
 
         // Initialize the pool with its initial set of members
-        PooledConnection[] initialPool = new PooledConnection[poolProperties.getInitialSize()];
+        // The count is bounded at the reading that consumes it, not only in
+        // the check: a writer of this attribute holds no monitor the
+        // construction takes, so a store can land between the check above
+        // (which repairs and reads) and this allocation (which builds).
+        PooledConnection[] initialPool =
+                new PooledConnection[Math.max(0, poolProperties.getInitialSize())];
         try {
             for (int i = 0; i < initialPool.length; i++) {
                 initialPool[i] = this.borrowConnection(0, null, null); // Don't wait, should be no contention
@@ -761,6 +764,16 @@ public class ConnectionPool {
                 }
             }
         }
+
+        // Arm the sweeper last. Everything below the point where it used to be
+        // armed can still change the sweeper configuration: an interceptor's
+        // poolStarted() callback, and the initial pre-load, which is where a
+        // management write can land while the pool is still being built and not
+        // yet published. Arming before them hands the pool the cleaner that the
+        // earlier configuration called for, and a trigger turned on during
+        // startup then leaves the getters promising maintenance that no thread
+        // ever performs for the life of the pool.
+        initializePoolCleaner(properties);
 
         closed = false;
     }
@@ -827,6 +840,13 @@ public class ConnectionPool {
             log.warn(MessageFactory.get("connectionPool.maxActiveTooSmall", PoolProperties.DEFAULT_MAX_ACTIVE));
             properties.setMaxActive(PoolProperties.DEFAULT_MAX_ACTIVE);
         }
+        if (properties.getInitialSize() < 0) {
+            // The count of connections to pre-load is used to size an array while
+            // the pool is being built, so a negative one is not a number the pool
+            // can work with at all. Corrected before the rule below reads it.
+            log.warn(MessageFactory.get("connectionPool.initialSizeTooSmall"));
+            properties.setInitialSize(0);
+        }
         if (properties.getMaxActive() < properties.getInitialSize()) {
             log.warn(MessageFactory.get("connectionPool.initialSizeTooLarge", properties.getMaxActive()));
             properties.setInitialSize(properties.getMaxActive());
@@ -853,13 +873,23 @@ public class ConnectionPool {
     /**
      * Starts the pool cleaner (evicter) thread if pool sweeper is enabled. A cleaner that is still running from a
      * previous start is terminated first, so this call never leaves a replaced task registered on the shared timer
-     * without a reference to stop it.
+     * without a reference to stop it. A pool that has been closed never gets a cleaner at all.
+     * <p>
+     * {@link #close(boolean)} sets the closed flag before it terminates the cleaner, and that termination and the
+     * registration below both run under this object's monitor, so whichever of the two calls happens last wins: a
+     * close that arrives first is seen here and no task is created, a close that arrives afterwards terminates the
+     * task that was created. Without the check, a thread writing a sweep attribute concurrently with the close -
+     * either of the configuration setters that re-arm the sweeper, or the JMX resource attributes - could register
+     * a task for a pool that had already released its connections. Nothing else ever unregisters such a task: it
+     * keeps the shared cleaner timer, and the thread it owns, alive for the lifetime of the class loader that
+     * loaded the pool. The task itself does no work, as its run method checks the closed flag, but it is never
+     * removed from the timer.
      *
      * @param properties the pool configuration containing sweeper settings
      */
     public synchronized void initializePoolCleaner(PoolConfiguration properties) {
         // If the evictor thread is supposed to run, start it now
-        if (properties.isPoolSweeperEnabled()) {
+        if (properties.isPoolSweeperEnabled() && !closed) {
             // Never overwrite a running cleaner: the replaced task would
             // stay registered on the shared timer with no reference left to
             // stop it, duplicating maintenance work for the pool's lifetime
@@ -879,6 +909,51 @@ public class ConnectionPool {
         }
     }
 
+    /**
+     * Brings the pool cleaner in line with a configuration: what is running now is
+     * compared against what the configuration asks for, including the interval the
+     * running task was built with, and only a disagreement is acted on. Nothing the
+     * caller noticed before it wrote is taken into account, because a change to a
+     * pool is something an operator can make from either of two surfaces at the
+     * same moment, and what an operator saw on the way in is not what the other
+     * operator left behind.
+     * <p>
+     * Both writers of the sweeper's attributes hand their change here rather than
+     * deciding it themselves - the data source and this pool's own MBean - because
+     * this object's monitor is the only thing the two are certain to serialise on:
+     * the data source holds its own monitor, the MBean holds nothing, and they write
+     * the same configuration through whichever of them is reached for. Whether the
+     * sweeper is wanted, and what interval it wants, are therefore both read here,
+     * under that monitor, together with the task that is registered; whoever decides
+     * last sees every write that any setter has made, and no arm can slip between one
+     * writer's reading and another's stopping of the task that arm registered. A
+     * writer of an attribute the configuration check covers ends here as well, even
+     * when that attribute is not one the sweeper computes from: the check can move
+     * the interval the sweeper runs on, and a task's period is fixed when it is
+     * built, so checking without then looking the cleaner over is what leaves a task
+     * running on an interval the configuration has already replaced.
+     * <p>
+     * The pool's creation uses this too, after it has validated the configuration
+     * and published the pool. Its own arming happened while the pool was still
+     * under construction, so a change that landed between that arming and the
+     * publication is something the arming never saw and that no setter could
+     * report to the pool; see {@link DataSourceProxy} for that window. A change
+     * that moved the interval is expected here rather than surprising: the
+     * validation can shorten it to the max age, which leaves the task the
+     * constructor armed running on the longer one.
+     *
+     * @param properties the pool configuration containing sweeper settings
+     */
+    public synchronized void reconcilePoolCleaner(PoolConfiguration properties) {
+        if (!properties.isPoolSweeperEnabled()) {
+            terminatePoolCleaner();
+        } else if (poolCleaner == null ||
+                poolCleaner.sleepTime != properties.getTimeBetweenEvictionRunsMillis()) {
+            // Arm it, or replace the running task: its period is fixed at
+            // construction, so it re-reads it only from a new one
+            initializePoolCleaner(properties);
+        }
+    }
 
     /**
      * thread safe way to abandon a connection signals a connection to be abandoned. this will disconnect the
