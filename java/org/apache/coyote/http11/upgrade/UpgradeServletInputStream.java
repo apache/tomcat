@@ -17,6 +17,7 @@
 package org.apache.coyote.http11.upgrade;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.ReadListener;
@@ -176,10 +177,12 @@ public class UpgradeServletInputStream extends ServletInputStream {
     @Override
     public final int readLine(byte[] b, int off, int len) throws IOException {
         preReadChecks();
+        bufferChecks(b, off, len);
 
-        if (len <= 0) {
+        if (len == 0) {
             return 0;
         }
+
         int count = 0, c;
 
         while ((c = readInternal()) != -1) {
@@ -201,9 +204,10 @@ public class UpgradeServletInputStream extends ServletInputStream {
     @Override
     public final int read(byte[] b, int off, int len) throws IOException {
         preReadChecks();
+        bufferChecks(b, off, len);
 
         // The input must not be touched if the caller requested zero bytes.
-        if (len <= 0) {
+        if (len == 0) {
             return 0;
         }
 
@@ -238,6 +242,15 @@ public class UpgradeServletInputStream extends ServletInputStream {
         }
         // No longer know if data is available
         ready = null;
+    }
+
+
+    private void bufferChecks(byte[] b, int off, int len) {
+        Objects.requireNonNull(b);
+        if (off < 0 || len < 0 || off > b.length - len) {
+            throw new IndexOutOfBoundsException(sm.getString("upgrade.sis.read.ioobe",
+                    Integer.valueOf(off), Integer.valueOf(len), Integer.valueOf(b.length)));
+        }
     }
 
 
