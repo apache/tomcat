@@ -42,11 +42,15 @@ public class PoolUtilities {
     /**
      * Creates a shallow copy of the given properties. Entries that the source
      * resolves to a String through a defaults table are materialized into the
-     * copy as plain values, unless the source has a directly present entry
-     * under the same key, so the copy needs no defaults table of its own for
-     * them. Entries directly present in the source are copied as they are,
-     * including non-String values, and take precedence; the defaults table
-     * itself is not carried over.
+     * copy as plain values, so the copy resolves every String the source
+     * resolves and needs no defaults table of its own. A String directly
+     * present in the source under the same key shadows the defaults there and
+     * takes precedence in the copy. A non-String directly present value
+     * shadows nothing, because {@link Properties#getProperty(String)} falls
+     * through to the defaults whenever the direct value is not a String, so
+     * where the source resolves a String under such a key the resolved String
+     * takes its place in the copy; entries the source resolves to no String
+     * are copied as they are. The defaults table itself is not carried over.
      *
      * @param p the properties to clone
      *
@@ -59,10 +63,16 @@ public class PoolUtilities {
         // so materialize the String values the source resolves through
         // defaults. Re-read each value from the source: stringPropertyNames()
         // is only a snapshot and the source may be modified concurrently, so
-        // a snapshotted key may resolve to nothing by the time it is read
+        // a snapshotted key may resolve to nothing by the time it is read.
+        // Skip only a directly copied String, which is what the source
+        // resolves too; a non-String directly copied value resolves to
+        // nothing on its own - getProperty(...) only falls through to the
+        // defaults when the direct value is not a String - so the value the
+        // source resolves replaces it, keeping the copy able to resolve every
+        // String the source resolves
         for (String key : p.stringPropertyNames()) {
             String value = p.getProperty(key);
-            if (value != null && !c.containsKey(key)) {
+            if (value != null && !(c.get(key) instanceof String)) {
                 c.setProperty(key, value);
             }
         }
