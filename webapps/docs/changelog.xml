@@ -388,6 +388,23 @@
         modulo 32. (remm)
       </fix>
       <fix>
+        The JSON parser now accepts numbers that have an exponent but no
+        fraction, such as <code>1e5</code>, as required by RFC 8259. Note that
+        when the lenient dialect is used, a bare object key that is such a
+        number (for example <code>{1e5:1}</code>) is now a number and the key
+        is the string form of the parsed number (<code>1E+5</code>) rather than
+        the original text, as already happened for bare keys that have both a
+        fraction and an exponent. Quoted keys are not affected. Numbers with an
+        exponent that is too large or too small to be represented are now
+        rejected with a <code>ParseException</code> rather than an unchecked
+        <code>NumberFormatException</code>. (remm)
+      </fix>
+      <fix>
+        With native numbers enabled, the JSON parser now returns integers that
+        do not fit in a <code>long</code> as <code>BigInteger</code> rather than
+        failing with an unchecked <code>NumberFormatException</code>. (remm)
+      </fix>
+      <fix>
         The JSON parser now rejects input with a nesting depth greater than
         1000 with a <code>ParseException</code>. Previously, deeply nested
         input caused a <code>StackOverflowError</code> since the parser
