@@ -24,6 +24,15 @@ import java.util.ResourceBundle;
 
 /**
  * Factory for creating localized JDBC pool messages.
+ * <p>
+ * The messages are read from the {@code LocalStrings} resource bundle of this
+ * package, which the JVM resolves once, under the default locale in effect at
+ * class initialization. A message is handed out unchanged by
+ * {@link #get(String)} and passed through {@link java.text.MessageFormat} by
+ * {@link #get(String, Object...)}, so bundle text must match how its key is
+ * fetched: a key fetched without arguments is written literally, while a key
+ * fetched with arguments follows the MessageFormat conventions, where a
+ * literal single quote is written {@code ''}.
  */
 public final class MessageFactory {
 
@@ -33,7 +42,8 @@ public final class MessageFactory {
     private static final MessageFactory DEFAULT_MESSAGE_FACTORY = new MessageFactory(DEFAULT_BUNDLE);
 
     /**
-     * Get a localized message.
+     * Get a localized message. The message is returned exactly as written in
+     * the bundle, with no argument substitution and no MessageFormat applied.
      *
      * @param key the message key
      *
@@ -44,7 +54,9 @@ public final class MessageFactory {
     }
 
     /**
-     * Get a localized message with arguments.
+     * Get a localized message with arguments substituted by MessageFormat.
+     * The argument array is never modified. A pattern that MessageFormat
+     * cannot apply is returned unformatted rather than reported as a failure.
      *
      * @param key  the message key
      * @param args the arguments
@@ -92,25 +104,37 @@ public final class MessageFactory {
     protected String getInternal(final String key, final Object... args) {
         String value = getInternal(key);
 
-        MessageFormat mf = new MessageFormat(value);
-        Format[] formats = null;
+        try {
+            MessageFormat mf = new MessageFormat(value);
+            Format[] formats = null;
 
-        // Unless an argument has been explicitly configured to use a number
-        // format, convert all Number arguments to String else MessageFormat may
-        // try to format them in unexpected ways.
-        if (args != null) {
-            for (int i = 0; i < args.length; i++) {
-                if (args[i] instanceof Number) {
-                    if (formats == null) {
-                        formats = mf.getFormatsByArgumentIndex();
-                    }
-                    if (i < formats.length && !(formats[i] instanceof NumberFormat)) {
-                        args[i] = args[i].toString();
+            // Convert Number arguments to String unless the pattern asks for a
+            // number format at that index, so MessageFormat cannot group them
+            // by locale. Work on a copy: the array belongs to the caller.
+            Object[] formatted = args;
+            if (args != null) {
+                for (int i = 0; i < args.length; i++) {
+                    if (args[i] instanceof Number) {
+                        if (formats == null) {
+                            formats = mf.getFormatsByArgumentIndex();
+                        }
+                        if (i < formats.length && !(formats[i] instanceof NumberFormat)) {
+                            if (formatted == args) {
+                                formatted = args.clone();
+                            }
+                            formatted[i] = args[i].toString();
+                        }
                     }
                 }
             }
-        }
 
-        return mf.format(args, new StringBuffer(), null).toString();
+            return mf.format(formatted, new StringBuffer(), null).toString();
+        } catch (IllegalArgumentException e) {
+            // A pattern MessageFormat cannot parse or apply - reachable only
+            // through a malformed, typically translated, message - degrades to
+            // the raw pattern rather than taking down the caller, which at
+            // these sites is building an exception or a log line.
+            return value;
+        }
     }
 }
