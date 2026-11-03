@@ -1689,6 +1689,20 @@ public class ConnectionPool {
         if (isClosed()) {
             return true;
         }
+        if (con.hasUnresolvedXaBranches()) {
+            // A branch that was started through this session's XA resource
+            // and never committed, rolled back or forgotten stays attached to
+            // the physical connection, and neither the transaction
+            // termination below nor a plain rollback can resolve it: pooling
+            // the session would hand the branch and every database lock held
+            // for it to the next borrower, while the transaction manager's
+            // late commit would land on a session that does not carry it.
+            // Close the session instead - the resource manager drops the
+            // branch with it, and the manager's late call then fails visibly
+            // against a closed session.
+            log.warn(MessageFactory.get("connectionPool.unresolvedXaBranchReturned", con));
+            return true;
+        }
         // Terminate the transaction before validating. When the pool is
         // configured to commit or roll back on return, that is the explicit
         // choice for the pending work, and a validation that runs first
