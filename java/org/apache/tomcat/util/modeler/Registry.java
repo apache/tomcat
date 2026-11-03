@@ -18,6 +18,7 @@ package org.apache.tomcat.util.modeler;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.net.URL;
@@ -574,6 +575,12 @@ public class Registry implements RegistryMBean, MBeanRegistration {
     /**
      * Load descriptors.
      *
+     * <p>
+     * If the source is a {@link URL} or a {@link File}, the stream opened to read it is closed before this method
+     * returns. If the source is an {@link InputStream}, that stream is closed before this method returns as well. In
+     * both cases the stream is closed whether or not loading succeeds, so the caller must not use a stream passed to
+     * this method after the call.
+     *
      * @param sourceType The source type
      * @param source     The bean
      * @param param      A type to load
@@ -624,12 +631,27 @@ public class Registry implements RegistryMBean, MBeanRegistration {
             case null, default -> throw new IllegalArgumentException(sm.getString("registry.invalidSource"));
         }
 
-        if (sourceType == null) {
-            sourceType = "MbeansDescriptorsDigesterSource";
-        }
-        ModelerSource ds = getModelerSource(sourceType);
+        try {
+            if (sourceType == null) {
+                sourceType = "MbeansDescriptorsDigesterSource";
+            }
+            ModelerSource ds = getModelerSource(sourceType);
 
-        return ds.loadDescriptors(this, type, inputsource);
+            return ds.loadDescriptors(this, type, inputsource);
+        } finally {
+            // The source does not keep the stream. Close it here, whichever way loading ended, since this method opened
+            // it or was given it.
+            if (inputsource instanceof InputStream stream) {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                    // Do not hide the outcome of the load
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("registry.closeSourceError"), e);
+                    }
+                }
+            }
+        }
     }
 
 
