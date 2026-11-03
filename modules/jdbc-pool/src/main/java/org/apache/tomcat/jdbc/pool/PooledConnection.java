@@ -185,12 +185,16 @@ public class PooledConnection implements PooledConnectionMBean {
      * {@link PoolConfiguration#isAlternateUsernameAllowed()} method returns false. Returns false if the
      * username/password has not changed since this connection was connected
      *
+     * <p>This is a comparison only. It records nothing: the identity a session is established with is written by the
+     * reconnect that follows this decision (see {@link #reconnectWith(String, String)}), so that a reconnect the
+     * database refused cannot leave this connection carrying credentials that were never accepted.</p>
+     *
      * @param username the username you wish to connect with, pass in null to accept the default username from
      *                     {@link PoolConfiguration#getUsername()}
      * @param password the password you wish to connect with, pass in null to accept the default username from
      *                     {@link org.apache.tomcat.jdbc.pool.PoolConfiguration#getPassword()}
      *
-     * @return true is the pool must reconnect
+     * @return true if the pool must reconnect
      */
     public boolean shouldForceReconnect(String username, String password) {
 
@@ -213,17 +217,6 @@ public class PooledConnection implements PooledConnectionMBean {
 
         noChangeInCredentials = noChangeInCredentials &&
                 ((password == null && storedPwd == null) || (password != null && password.equals(storedPwd)));
-
-        if (username == null) {
-            getAttributes().remove(PROP_USER);
-        } else {
-            getAttributes().put(PROP_USER, username);
-        }
-        if (password == null) {
-            getAttributes().remove(PROP_PASSWORD);
-        } else {
-            getAttributes().put(PROP_PASSWORD, password);
-        }
 
         return !noChangeInCredentials;
     }
@@ -596,6 +589,127 @@ public class PooledConnection implements PooledConnectionMBean {
     }
 
     /**
+     * Re-establishes this connection under the credentials handed in, giving up the session it currently holds only
+     * once a session established under those credentials has been opened.
+     *
+     * <p>
+     * {@link #reconnect()} closes the session in hand before it asks for another one, which is the right order for a
+     * session the pool is retiring on its own account - because it reached {@link PoolConfiguration#getMaxAge() maxAge}
+     * or failed a validation. It is the wrong order for a session that is being handed to a borrower under different
+     * credentials: the database decides whether those credentials are acceptable, and a database that refuses them
+     * would, with that order, have taken a healthy session out of the pool - a session every other borrower of the
+     * pool can still use, and one the refused borrower never had a claim on. Here the order is reversed: the
+     * credentials are put to the database while the session in hand stays in place, and only a session the database
+     * has accepted replaces it.</p>
+     *
+     * <p>
+     * The credentials themselves are written into {@link #getAttributes()} for the attempt, because that is where the
+     * connect reads them from, and are put back as they were if the attempt fails. So neither a refusal nor a
+     * connection that could not be established leaves this connection carrying credentials the database never
+     * accepted - which matters because those attributes decide the identity of every later reconnect.</p>
+     *
+     * @param username the username to re-establish the connection with, pass in null to accept the default username
+     *                     from {@link PoolConfiguration#getUsername()}
+     * @param password the password to re-establish the connection with, pass in null to accept the default password
+     *                     from {@link PoolConfiguration#getPassword()}
+     *
+     * @throws SQLException if the database refused the credentials or a session under them could not be established.
+     *                         This connection then still holds the session, and carries the credentials, it held
+     *                         before the call.
+     */
+    public void reconnectWith(String username, String password) throws SQLException {
+        if (username == null) {
+            username = poolProperties.getUsername();
+        }
+        if (password == null) {
+            password = poolProperties.getPassword();
+        }
+
+        // The state a refused attempt has to hand back: the session this
+        // connection is serving and the identity that session was opened
+        // with.
+        java.sql.Connection served = connection;
+        javax.sql.XAConnection servedXa = xaConnection;
+        javax.sql.PooledConnection servedCpds = cpdsConnection;
+        HashMap<Object, Object> sessionAttributes = getAttributes();
+        boolean hadUser = sessionAttributes.containsKey(PROP_USER);
+        Object servedUser = sessionAttributes.get(PROP_USER);
+        boolean hadPassword = sessionAttributes.containsKey(PROP_PASSWORD);
+        Object servedPassword = sessionAttributes.get(PROP_PASSWORD);
+
+        // Stage the credentials the attempt is made under. A null stands for
+        // the pool's default, which the connect substitutes the same way it
+        // does for a plain connect.
+        if (username == null) {
+            sessionAttributes.remove(PROP_USER);
+        } else {
+            sessionAttributes.put(PROP_USER, username);
+        }
+        if (password == null) {
+            sessionAttributes.remove(PROP_PASSWORD);
+        } else {
+            sessionAttributes.put(PROP_PASSWORD, password);
+        }
+
+        // Set the session being replaced out of reach of the connect below,
+        // which closes any session it finds before it opens the new one. This
+        // one has to stay open until the attempt that replaces it is known to
+        // have succeeded.
+        connection = null;
+        xaConnection = null;
+        cpdsConnection = null;
+        try {
+            connect();
+        } catch (SQLException | RuntimeException x) {
+            // A connect can fail after it established the session - the
+            // default state it applies to a new session can be refused - so
+            // whatever is in the fields is closed here rather than dropped.
+            // The interceptor chain is told nothing: this session never
+            // served anyone, and the state the chain holds belongs to the
+            // session that is about to be back in service.
+            closeSession(connection, xaConnection, cpdsConnection);
+            connection = served;
+            xaConnection = servedXa;
+            cpdsConnection = servedCpds;
+            if (hadUser) {
+                sessionAttributes.put(PROP_USER, servedUser);
+            } else {
+                sessionAttributes.remove(PROP_USER);
+            }
+            if (hadPassword) {
+                sessionAttributes.put(PROP_PASSWORD, servedPassword);
+            } else {
+                sessionAttributes.remove(PROP_PASSWORD);
+            }
+            throw x;
+        }
+
+        if (served == null) {
+            // There was no session to replace: this is a plain connect of a
+            // connection that had none, and the new session is already in
+            // place.
+            return;
+        }
+
+        // The database accepted the credentials, so the session they replace
+        // can be given up now. The fields are turned back to it while it is
+        // retired, so that the chain is told - as it is for every other
+        // retirement - about the session it has been serving rather than
+        // about the one that takes its place.
+        java.sql.Connection accepted = connection;
+        javax.sql.XAConnection acceptedXa = xaConnection;
+        javax.sql.PooledConnection acceptedCpds = cpdsConnection;
+        connection = served;
+        xaConnection = servedXa;
+        cpdsConnection = servedCpds;
+        notifyDisconnected(false);
+        closeSession(served, servedXa, servedCpds);
+        connection = accepted;
+        xaConnection = acceptedXa;
+        cpdsConnection = acceptedCpds;
+    }
+
+    /**
      * Disconnects the connection. All exceptions are logged using debug level.
      *
      * @param finalize if set to true, a call to {@link ConnectionPool#finalize(PooledConnection)} is called.
@@ -606,39 +720,8 @@ public class PooledConnection implements PooledConnectionMBean {
         }
         setDiscarded(true);
         if (connection != null) {
-            try {
-                parent.disconnectEvent(this, finalize);
-            } catch (Throwable x) {
-                // The event itself isolates each link of the chain, so this
-                // catch only guards against a failure of the walk itself;
-                // an interceptor must not be able to keep the physical
-                // connection from being closed
-                log.warn(MessageFactory.get("pooledConnection.interceptorDisconnectedFailed"), x);
-            }
-            javax.sql.XAConnection retired = xaConnection;
-            if (retired instanceof XABranchTracker) {
-                // Mark the handle retired before the physical close: branch
-                // work on a resource captured from this handle then meets the
-                // pool's clean XA refusal instead of the driver's half-closed
-                // state.
-                ((XABranchTracker) retired).markClosed();
-            }
-            try {
-                if (cpdsConnection != null) {
-                    // Closing the handle closes the physical connection
-                    // and invalidates the logical connection; closing the
-                    // logical connection alone would not.
-                    cpdsConnection.close();
-                } else if (xaConnection == null) {
-                    connection.close();
-                } else {
-                    xaConnection.close();
-                }
-            } catch (Exception ignore) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Unable to close underlying SQL connection", ignore);
-                }
-            }
+            notifyDisconnected(finalize);
+            closeSession(connection, xaConnection, cpdsConnection);
         }
         connection = null;
         xaConnection = null;
@@ -646,6 +729,63 @@ public class PooledConnection implements PooledConnectionMBean {
         lastConnected = -1;
         if (finalize) {
             parent.finalize(this);
+        }
+    }
+
+    /**
+     * Tells the interceptor chain that the connection is going out of service, so that each link can give up what it
+     * holds for the session being retired.
+     *
+     * @param finalizing whether the retirement is the one that ends the pooled connection
+     */
+    private void notifyDisconnected(boolean finalizing) {
+        try {
+            parent.disconnectEvent(this, finalizing);
+        } catch (Throwable x) {
+            // The event itself isolates each link of the chain, so this
+            // catch only guards against a failure of the walk itself;
+            // an interceptor must not be able to keep the physical
+            // connection from being closed
+            log.warn(MessageFactory.get("pooledConnection.interceptorDisconnectedFailed"), x);
+        }
+    }
+
+    /**
+     * Closes a physical session and the handle it came in on, if it came in on one. The session is passed in rather
+     * than read from the fields, because a caller that has already taken on the session replacing this one - see
+     * {@link #reconnectWith(String, String)} - still has to close the session it gave up.
+     *
+     * @param session    the session to close, ignored when null
+     * @param xaHandle   the XA handle the session was obtained through, or null
+     * @param cpdsHandle the {@link javax.sql.PooledConnection} handle the session was obtained through, or null
+     */
+    private void closeSession(java.sql.Connection session, javax.sql.XAConnection xaHandle,
+            javax.sql.PooledConnection cpdsHandle) {
+        if (cpdsHandle == null && xaHandle == null && session == null) {
+            return;
+        }
+        if (xaHandle instanceof XABranchTracker) {
+            // Mark the handle retired before the physical close: branch
+            // work on a resource captured from this handle then meets the
+            // pool's clean XA refusal instead of the driver's half-closed
+            // state.
+            ((XABranchTracker) xaHandle).markClosed();
+        }
+        try {
+            if (cpdsHandle != null) {
+                // Closing the handle closes the physical connection
+                // and invalidates the logical connection; closing the
+                // logical connection alone would not.
+                cpdsHandle.close();
+            } else if (xaHandle != null) {
+                xaHandle.close();
+            } else {
+                session.close();
+            }
+        } catch (Exception ignore) {
+            if (log.isDebugEnabled()) {
+                log.debug("Unable to close underlying SQL connection", ignore);
+            }
         }
     }
 
