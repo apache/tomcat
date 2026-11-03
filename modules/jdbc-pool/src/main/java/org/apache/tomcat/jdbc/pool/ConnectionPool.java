@@ -523,7 +523,14 @@ public class ConnectionPool {
         } catch (Exception x) {
             SQLException s = new SQLException();
             s.initCause(x);
-            abandonSetup(con, s, false);
+            // The reset walk above has already armed every interceptor of the chain for this borrow, and from here
+            // no close() will ever travel that chain - the handle was never handed out - while the return path does
+            // not walk the chain either. The connection itself is healthy; it is the borrow state that is unusable,
+            // and there is no chain-wide unwind that is safe for arbitrary interceptors, as each keys its disposal
+            // on the reset(null, null) call the release's setHandler(null) makes (StatementCache.reset is one).
+            // So the half-armed chain goes out of service with the connection, the posture the two catches above
+            // take, rather than being parked idle armed for a borrow that never started.
+            abandonSetup(con, s, true);
             throw s;
         }
 

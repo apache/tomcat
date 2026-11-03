@@ -1511,6 +1511,18 @@
         the URL stay readable, and an authority that carries no credential -
         a bare host or a port - is left untouched. (remm)
       </fix>
+      <fix>
+        Correct a defect in the <code>ResetAbandonedTimer</code> interceptor
+        where a call that was still in flight when its borrow ended, and that
+        completed after the same connection had been handed to the next
+        borrower, reset the timer of that next borrower and cleared its
+        suspect state: the completing call is refused by the pool below, but
+        the interceptor booked its activity from the completion of the call,
+        where the connection looked checked out again, and the borrower the
+        abandoned check was watching read as active. Stamps from calls are now
+        booked only for the borrow the call started under, while the
+        <code>resetTimer()</code> management operation is unchanged. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
