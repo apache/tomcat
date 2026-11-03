@@ -356,7 +356,7 @@ public abstract class SSLUtilBase implements SSLUtil {
             }
             if (ks == null) {
                 if (certificate.getCertificateFile() == null) {
-                    throw new IOException(sm.getString("sslUtilBase.noCertFile"));
+                    throw new IOException(sm.getString("sslUtilBase.fipsNoCertFile"));
                 }
                 // Importing PEM format certificates into an in memory key store
                 // requires the key manipulation that is avoided above. Passing a
