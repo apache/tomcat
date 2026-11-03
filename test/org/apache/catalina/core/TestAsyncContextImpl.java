@@ -66,11 +66,13 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.valves.TesterAccessLogValve;
 import org.apache.catalina.valves.ValveBase;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.unittest.TesterContext;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.EncodedSolidusHandling;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 import org.apache.tomcat.util.descriptor.web.ErrorPage;
+import org.apache.tomcat.util.scan.StandardJarScanner;
 import org.easymock.EasyMock;
 
 public class TestAsyncContextImpl extends TomcatBaseTest {
@@ -2520,6 +2522,73 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
     }
 
 
+    /*
+     * A %3b in the request URI is an encoded semi-colon that is part of the path, not a path parameter delimiter. After
+     * AsyncContext.dispatch() the servlet should see exactly the same path info as it saw for the original request.
+     */
+    @Test
+    public void testAsyncDispatchEncodedSemicolon() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        Context context = tomcat.addContext("/test", null);
+        // Disable class path scanning - it slows the tests down by almost an order of magnitude
+        ((StandardJarScanner) context.getJarScanner()).setScanClassPath(false);
+
+        Wrapper w = Tomcat.addServlet(context, "semicolon", new AsyncDispatchPathInfoServlet());
+        w.setAsyncSupported(true);
+        context.addServletMapping("/semicolon/*", "semicolon");
+        tomcat.start();
+
+        ByteChunk responseBody = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/a/b/../../test/semicolon/foo%3bbar", responseBody, null);
+
+        Assert.assertEquals(200, rc);
+        // Same pathInfo before and after the dispatch
+        Assert.assertEquals("/foo;bar|/foo;bar", responseBody.toString());
+    }
+
+
+    /*
+     * Multiple leading slashes in the request URI must not break AsyncContext.dispatch(). The servlet should see
+     * exactly the same path info before and after the dispatch.
+     */
+    @Test
+    public void testAsyncDispatchMultipleLeadingSlashes() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        Context context = tomcat.addContext("/test", null);
+        // Disable class path scanning - it slows the tests down by almost an order of magnitude
+        ((StandardJarScanner) context.getJarScanner()).setScanClassPath(false);
+
+        Wrapper w = Tomcat.addServlet(context, "slashes", new AsyncDispatchPathInfoServlet());
+        w.setAsyncSupported(true);
+        context.addServletMapping("/slashes/*", "slashes");
+        tomcat.start();
+
+        ByteChunk responseBody = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "//test/slashes/foo", responseBody, null);
+
+        Assert.assertEquals(200, rc);
+        Assert.assertEquals("/foo|/foo", responseBody.toString());
+    }
+
+
+    private static class AsyncDispatchPathInfoServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            if (req.getAttribute("first") == null) {
+                req.setAttribute("first", req.getPathInfo());
+                AsyncContext ac = req.startAsync();
+                ac.dispatch();
+            } else {
+                resp.setContentType("text/plain");
+                resp.getWriter().print(req.getAttribute("first") + "|" + req.getPathInfo());
+            }
+        }
+    }
+
+
     private static class AsyncDispatchUrlWithSpacesServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
@@ -2665,6 +2734,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
 
     private void doTestAsyncIoEnd(boolean useThread, boolean useComplete) throws Exception {
+        // Make sure the logger exists before setting the level
+        LogFactory.getLog("org.apache.coyote");
         LogManager.getLogManager().getLogger("org.apache.coyote").setLevel(Level.ALL);
         try {
             Tomcat tomcat = getTomcatInstance();
