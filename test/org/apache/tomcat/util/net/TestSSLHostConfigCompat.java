@@ -240,6 +240,27 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
     }
 
 
+    /*
+     * The certificate and key files are read using the ConfigFileLoader so, as well as file paths, URLs are accepted.
+     * The OpenSSL implementation that uses Tomcat Native needs a file path so is not tested here.
+     */
+    @Test
+    public void testHostRSAWithPemFileUrls() throws Exception {
+        Assume.assumeTrue("Only applies to PEM files", storeType == StoreType.PEM);
+        Assume.assumeFalse("Tomcat Native requires file paths",
+                "org.apache.tomcat.util.net.openssl.OpenSSLImplementation".equals(sslImplementationName));
+
+        SSLHostConfig sslHostConfig = getSSLHostConfig();
+        SSLHostConfigCertificate certificate = new SSLHostConfigCertificate(sslHostConfig, Type.RSA);
+        certificate.setCertificateFile(getFileUrl(TesterSupport.LOCALHOST_RSA_CERT_PEM));
+        certificate.setCertificateKeyFile(getFileUrl(TesterSupport.LOCALHOST_RSA_KEY_PEM));
+        certificate.setCertificateKeyPassword(TesterSupport.JKS_PASS);
+        sslHostConfig.addCertificate(certificate);
+
+        doTest();
+    }
+
+
     private void configureHostRSA() {
         SSLHostConfig sslHostConfig = getSSLHostConfig();
         switch (storeType) {
@@ -334,6 +355,11 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         Connector connector = tomcat.getConnector();
         return connector.findSslHostConfigs()[0];
+    }
+
+
+    private static String getFileUrl(String relativePath) {
+        return new File(relativePath).toURI().toString();
     }
 
 

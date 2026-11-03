@@ -19,6 +19,7 @@ package org.apache.tomcat.util.net.openssl.panama;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -149,8 +150,9 @@ public final class CertificateLoader {
      *
      * @param certificate     the certificate configuration
      * @param arena           arena for the native allocations
-     * @param engineKeyLoader fallback invoked with the adjusted key file path
-     *                        when PEM parsing fails, returning a private key
+     * @param engineKeyLoader fallback invoked with the path of the key file
+     *                        (relative paths resolved against the Catalina
+     *                        base) when PEM parsing fails, returning a private key
      *                        loaded through an OpenSSL ENGINE or
      *                        {@code MemorySegment.NULL} when none is
      *                        available; may be {@code null}
@@ -175,9 +177,11 @@ public final class CertificateLoader {
                 return null;
             }
 
+            // The configured locations are resolved by the ConfigFileLoader when the
+            // files are read so, as well as paths relative to the Catalina base,
+            // URLs it supports can be used. Do not adjust them here.
             String certFile = certificate.getCertificateFile();
             if (certFile != null) {
-                certFile = SSLHostConfig.adjustRelativePath(certFile);
                 if (certFile.toLowerCase(Locale.ENGLISH).endsWith(".pkcs12")) {
                     return loadPkcs12(certificate, hostName, certFile, keyPassToUse, arena);
                 }
@@ -268,7 +272,7 @@ public final class CertificateLoader {
      * @param certificate  The certificate configuration
      * @param hostName     The host name the certificate belongs to, used for
      *                     logging
-     * @param certFile     The (adjusted) path to the certificate file
+     * @param certFile     The location of the certificate file
      * @param keyPassToUse The key passphrase, or {@code null} if none
      * @param arena        Arena for the native allocations
      *
@@ -291,11 +295,12 @@ public final class CertificateLoader {
      * @param certificate     The certificate configuration
      * @param hostName        The host name the certificate belongs to, used
      *                        for logging
-     * @param certFile        The (adjusted) path to the certificate file
+     * @param certFile        The location of the certificate file
      * @param keyPassToUse    The key passphrase, or {@code null} if none
      * @param arena           Arena for the native allocations
-     * @param engineKeyLoader fallback invoked with the adjusted key file
-     *                        path when PEM parsing fails, returning a
+     * @param engineKeyLoader fallback invoked with the path of the key file
+     *                        (relative paths resolved against the Catalina
+     *                        base) when PEM parsing fails, returning a
      *                        private key loaded through an OpenSSL ENGINE or
      *                        {@code MemorySegment.NULL} when none is
      *                        available; may be {@code null}
@@ -311,13 +316,8 @@ public final class CertificateLoader {
         String keyFile = certificate.getCertificateKeyFile();
         if (keyFile == null) {
             keyFile = certFile;
-        } else {
-            keyFile = SSLHostConfig.adjustRelativePath(keyFile);
         }
         String chainFile = certificate.getCertificateChainFile();
-        if (chainFile != null) {
-            chainFile = SSLHostConfig.adjustRelativePath(chainFile);
-        }
 
         byte[] certBytes = readConfigFileBytes(certFile);
         if (certBytes == null) {
@@ -356,7 +356,10 @@ public final class CertificateLoader {
         if (key.equals(MemorySegment.NULL) && engineKeyLoader != null) {
             // Not a parseable PEM key: try the configured OpenSSL ENGINE.
             // The loader returns NULL when no ENGINE is available.
-            key = engineKeyLoader.apply(keyFile);
+            String engineKeyFile = adjustForEngine(keyFile);
+            if (engineKeyFile != null) {
+                key = engineKeyLoader.apply(engineKeyFile);
+            }
         }
         if (key.equals(MemorySegment.NULL)) {
             for (MemorySegment extra : chain) {
@@ -392,7 +395,7 @@ public final class CertificateLoader {
      * @param certificate  The certificate configuration
      * @param hostName     The host name the certificate belongs to, used for
      *                     logging
-     * @param certFile     The (adjusted) path to the PKCS#12 file
+     * @param certFile     The location of the PKCS#12 file
      * @param keyPassToUse The bundle password, or {@code null} if none
      * @param arena        Arena for the native allocations
      *
@@ -602,6 +605,23 @@ public final class CertificateLoader {
 
 
     // ------------------------------------- File and native reading helpers
+
+    /**
+     * An OpenSSL ENGINE needs a real file. Resolves a configured location, relative to the Catalina base if
+     * necessary, to the path of an existing file.
+     *
+     * @param location The configured location of the file
+     *
+     * @return the path of the file, or {@code null} if the location is not an existing file (for example, a URL)
+     */
+    private static String adjustForEngine(String location) {
+        try {
+            return SSLHostConfig.adjustRelativePath(location);
+        } catch (FileNotFoundException e) {
+            return null;
+        }
+    }
+
 
     /**
      * Reads a configuration file (relative paths are resolved against the
@@ -839,7 +859,6 @@ public final class CertificateLoader {
         try {
             String certFile = certificate.getCertificateFile();
             if (certFile != null) {
-                certFile = SSLHostConfig.adjustRelativePath(certFile);
                 if (certFile.toLowerCase(Locale.ENGLISH).endsWith(".pkcs12")) {
                     return getCertificateChainPkcs12(certificate, certFile);
                 }
@@ -858,7 +877,7 @@ public final class CertificateLoader {
      * leaf; a separately configured chain file is appended to the chain.
      *
      * @param certificate The certificate entry the file belongs to
-     * @param certFile    The (adjusted) path to the certificate file
+     * @param certFile    The location of the certificate file
      *
      * @return The certificate chain, or {@code null} if it could not be read
      */
@@ -876,7 +895,6 @@ public final class CertificateLoader {
 
         String chainFile = certificate.getCertificateChainFile();
         if (chainFile != null) {
-            chainFile = SSLHostConfig.adjustRelativePath(chainFile);
             byte[] chainBytes = readConfigFileBytes(chainFile);
             if (chainBytes != null) {
                 addX509Certificates(chain, factory, chainBytes);
@@ -908,7 +926,7 @@ public final class CertificateLoader {
      * key entry in the bundle.
      *
      * @param certificate The certificate entry the file belongs to
-     * @param certFile    The (adjusted) path to the PKCS#12 file
+     * @param certFile    The location of the PKCS#12 file
      *
      * @return The certificate chain, or {@code null} if it could not be read
      */

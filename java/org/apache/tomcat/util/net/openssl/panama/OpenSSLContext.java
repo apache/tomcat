@@ -1120,8 +1120,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
             // Try to read DH parameters from the SSLCertificateFile, and
             // similarly the ECDH curve name
-            byte[] certificateFileBytes = CertificateLoader.readConfigFileBytes(
-                    SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()));
+            byte[] certificateFileBytes =
+                    CertificateLoader.readConfigFileBytes(certificate.getCertificateFile());
             MemorySegment certificateBIO = certificateFileBytes == null ? MemorySegment.NULL
                     : createMemoryBio(localArena, certificateFileBytes);
             if (!MemorySegment.NULL.equals(certificateBIO)) {
