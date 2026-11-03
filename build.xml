@@ -218,6 +218,11 @@
   <!-- set above.                                                            -->
   <property name="test.jvmarg.egd" value="-Dignore" />
 
+  <!-- Flag for building FFM and associated tests -->
+  <condition property="has-ffm">
+    <javaversion atleast="${release.java.version}" />
+  </condition>
+
   <!-- Location of OpenSSL binary (file name, not directory) -->
   <!-- The OpenSSL tests cases be disabled by specifying an invalid path here -->
   <property name="test.openssl.path" value="" />
@@ -1053,9 +1058,6 @@
       <exclude name="org/apache/tomcat/util/openssl/**"/>
     </javac>
     <!-- Compile internal server components that use FFM -->
-    <condition property="has-ffm">
-      <javaversion atleast="${release.java.version}" />
-    </condition>
     <javac srcdir="java" destdir="${tomcat.classes}"
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
@@ -1947,6 +1949,24 @@
       <!-- Exclude these by default as Gump can't run them because the -->
       <!-- classes on which they depend are not in any output JAR.     -->
       <exclude name="org/apache/tomcat/buildutil/**" unless="test.includeBuildutil"/>
+      <!-- Exclude FFM tests as they are compiled below -->
+      <exclude name="org/apache/tomcat/util/net/openssl/panama/**"/>
+      <exclude name="org/apache/tomcat/util/openssl/**"/>
+    </javac>
+    <!-- Compile tests that use FFM -->
+    <javac srcdir="test" destdir="${test.classes}"
+           debug="${compile.debug}"
+           deprecation="${compile.deprecation}"
+           release="${release.java.version}"
+           encoding="ISO-8859-1"
+           includeAntRuntime="true"
+           if:set="has-ffm" >
+      <!-- Uncomment this to show unchecked warnings:
+      <compilerarg value="-Xlint:unchecked"/>
+      -->
+      <classpath refid="tomcat.test.classpath" />
+      <include name="org/apache/tomcat/util/net/openssl/panama/**"/>
+      <include name="org/apache/tomcat/util/openssl/**"/>
     </javac>
     <copy todir="${test.classes}">
       <fileset dir="test">
@@ -2291,6 +2311,9 @@
               <exclude name="**/integration/**" unless="test.includeIntegration" />
               <!-- Exclude tests that require large heaps -->
               <exclude name="**/*LargeHeap.java" unless="${test.includeLargeHeap}" />
+              <!-- Exclude FFM tests unless FFM has been compiled -->
+              <exclude name="org/apache/tomcat/util/net/openssl/panama/**" unless="has-ffm"/>
+              <exclude name="org/apache/tomcat/util/openssl/**" unless="has-ffm"/>
             </fileset>
           </batchtest>
         </junit>
