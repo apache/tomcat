@@ -186,9 +186,56 @@ public class TestSSLHostConfig {
     public void testCiphersuite05() {
         SSLHostConfig hc = new SSLHostConfig();
 
-        // Null should be handled without an error, as it is for setCiphers()
+        // Null restores the default, as it does for setCiphers()
+        hc.setCipherSuites(Cipher.TLS_AES_128_CCM_SHA256.getOpenSSLAlias());
         hc.setCipherSuites(null);
-        Assert.assertNull(hc.getCipherSuites());
+        Assert.assertEquals(SSLHostConfig.DEFAULT_TLS_CIPHERS_13, hc.getCipherSuites());
+        // and the derived values must be usable
+        Assert.assertFalse(hc.getJsseCipherNames().isEmpty());
+    }
+
+
+    @Test
+    public void testCiphersWithoutTls13KeepDefaultCipherSuites() {
+        // Setting ciphers that do not include any TLS 1.3 cipher suites must not remove the default TLS 1.3 cipher
+        // suites, whatever the format of the ciphers list
+        String[] ciphersLists = { Cipher.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256.getOpenSSLAlias(),
+                Cipher.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256.getOpenSSLAlias() + ":" +
+                        Cipher.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384.getOpenSSLAlias(),
+                Cipher.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256.getOpenSSLAlias() + "," +
+                        Cipher.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384.getOpenSSLAlias(),
+                "" };
+
+        for (String ciphersList : ciphersLists) {
+            SSLHostConfig hc = new SSLHostConfig();
+            hc.setCiphers(ciphersList);
+            Assert.assertEquals(ciphersList, SSLHostConfig.DEFAULT_TLS_CIPHERS_13, hc.getCipherSuites());
+        }
+    }
+
+
+    @Test
+    public void testCiphersWithoutTls13KeepJsseCipherSuites() {
+        SSLHostConfig hc = new SSLHostConfig();
+
+        // A single TLS 1.2 cipher, which is not in OpenSSL (colon separated) format
+        hc.setCiphers(Cipher.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256.getOpenSSLAlias());
+        String tls13Name = Cipher.TLS_AES_256_GCM_SHA384.getJsseNames().iterator().next();
+        Assert.assertTrue(hc.getJsseCipherNames().contains(tls13Name));
+    }
+
+
+    @Test
+    public void testCiphersNull() {
+        SSLHostConfig hc = new SSLHostConfig();
+
+        // Null restores the default
+        hc.setCiphers(Cipher.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256.getOpenSSLAlias());
+        hc.setCiphers(null);
+        Assert.assertEquals(SSLHostConfig.DEFAULT_TLS_CIPHERS_12, hc.getCiphers());
+        // and the derived values must be usable
+        Assert.assertFalse(hc.getCipherList().isEmpty());
+        Assert.assertFalse(hc.getJsseCipherNames().isEmpty());
     }
 
 
