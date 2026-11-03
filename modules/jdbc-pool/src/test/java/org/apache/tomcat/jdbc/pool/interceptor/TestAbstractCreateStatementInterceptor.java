@@ -19,16 +19,21 @@ package org.apache.tomcat.jdbc.pool.interceptor;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
 
 /**
  * The contract of the constructor cache that every subclass of
@@ -42,9 +47,10 @@ import org.junit.jupiter.api.Test;
  * or as a silently degraded, unproxied statement.
  *
  * <p>The class initializer populates the cache with the canonical pairings;
- * the tests below only ever use those pairings and never replace an entry,
- * so running them in the same JVM as the rest of the suite - and in any
- * method order - is safe.</p>
+ * the tests below use only those pairings, and the one test that simulates a
+ * slot the initializer failed to populate restores the published entry in a
+ * finally block, so running them in the same JVM as the rest of the suite -
+ * and in any method order - is safe.</p>
  */
 class TestAbstractCreateStatementInterceptor {
 
@@ -108,7 +114,7 @@ class TestAbstractCreateStatementInterceptor {
 
         // The rejection must leave the cached entry untouched, so a caller
         // with the correct pairing is unaffected.
-        Assertions.assertSame(cached, AbstractCreateStatementInterceptor.constructors[idx]);
+        Assertions.assertSame(cached, AbstractCreateStatementInterceptor.cachedConstructor(idx));
         Assertions.assertSame(cached, interceptor.getConstructor(idx, Statement.class));
     }
 
@@ -210,7 +216,7 @@ class TestAbstractCreateStatementInterceptor {
         InvocationHandler handler = (proxy, method, args) -> null;
 
         for (int idx = 0; idx < canonical.length; idx++) {
-            Constructor<?> published = AbstractCreateStatementInterceptor.constructors[idx];
+            Constructor<?> published = AbstractCreateStatementInterceptor.cachedConstructor(idx);
             Assertions.assertNotNull(published,
                     "index " + idx + " must hold an entry once the class is initialized");
             Assertions.assertSame(published, new CacheUser().getConstructor(idx, canonical[idx]),
@@ -218,5 +224,322 @@ class TestAbstractCreateStatementInterceptor {
             Assertions.assertTrue(canonical[idx].isInstance(published.newInstance(new Object[] { handler })),
                     "the published constructor must produce a proxy implementing " + canonical[idx].getName());
         }
+    }
+
+    /*
+     * A slot the class initializer failed to populate must still yield a
+     * working constructor, and the method must not write the shared slot from
+     * the calling thread: the class initializer is the only writer of the
+     * cache, which is what makes every read safely published without a lock.
+     * Before the fix, a degraded slot was lazily written without any
+     * happens-before edge - a data race against the concurrent readers of the
+     * other entries.
+     *
+     * The test replaces a canonical slot, so it restores the exact published
+     * reference in a finally block; the suite runs methods sequentially in a
+     * single thread (no Jupiter parallel execution is configured), which is
+     * what makes the temporary nulling safe.
+     */
+    @Test
+    void anEmptySlotIsServedWithoutWritingTheCache() throws Exception {
+        CacheUser interceptor = new CacheUser();
+        int idx = AbstractCreateStatementInterceptor.CREATE_STATEMENT_IDX;
+        Constructor<?> published = AbstractCreateStatementInterceptor.cachedConstructor(idx);
+
+        AbstractCreateStatementInterceptor.replaceCachedConstructor(idx, null);
+        try {
+            Constructor<?> first = interceptor.getConstructor(idx, Statement.class);
+            Constructor<?> second = interceptor.getConstructor(idx, Statement.class);
+
+            Assertions.assertNull(AbstractCreateStatementInterceptor.cachedConstructor(idx),
+                    "a degraded slot must not be written by the thread that served it");
+            Assertions.assertTrue(first.getDeclaringClass().isInstance(
+                            first.newInstance(new Object[] { (InvocationHandler) (p, m, a) -> null })),
+                    "a constructor computed on demand must still produce the proxy");
+            Assertions.assertEquals(first, second,
+                    "the constructor computed on demand must be equivalent for the same request");
+        } finally {
+            AbstractCreateStatementInterceptor.replaceCachedConstructor(idx, published);
+        }
+
+        // The published entry is untouched by the degraded calls.
+        Assertions.assertSame(published, interceptor.getConstructor(idx, Statement.class));
+    }
+
+    /* A hook that fails, as a third-party subclass or an Error can. */
+    private static class ThrowingHook extends AbstractCreateStatementInterceptor {
+
+        private final RuntimeException failure;
+
+        ThrowingHook(RuntimeException failure) {
+            this.failure = failure;
+        }
+
+        @Override
+        public Object createStatement(Object proxy, Method method, Object[] args, Object statement, long time) {
+            throw failure;
+        }
+
+        @Override
+        public void closeInvoked() {
+            // NOOP
+        }
+    }
+
+    /* A hook whose closeInvoked() does whatever the test handed it. */
+    private static class CloseHook extends AbstractCreateStatementInterceptor {
+
+        private final Runnable behaviour;
+        final AtomicBoolean ran = new AtomicBoolean();
+
+        CloseHook(Runnable behaviour) {
+            this.behaviour = behaviour;
+        }
+
+        @Override
+        public Object createStatement(Object proxy, Method method, Object[] args, Object statement, long time) {
+            return statement;
+        }
+
+        @Override
+        public void closeInvoked() {
+            ran.set(true);
+            behaviour.run();
+        }
+    }
+
+    /* The link a hand-built chain ends in, recording whether the call arrived. */
+    private static JdbcInterceptor terminal(AtomicBoolean reached) {
+        return new JdbcInterceptor() {
+            @Override
+            public Object invoke(Object proxy, Method method, Object[] args) {
+                reached.set(true);
+                return null;
+            }
+
+            @Override
+            public void reset(org.apache.tomcat.jdbc.pool.ConnectionPool parent,
+                    org.apache.tomcat.jdbc.pool.PooledConnection con) {
+                // NOOP
+            }
+        };
+    }
+
+    /* A hook that records the elapsed time handed to it. */
+    private static class TimingHook extends AbstractCreateStatementInterceptor {
+
+        final AtomicLong timeSeen = new AtomicLong(Long.MIN_VALUE);
+
+        @Override
+        public Object createStatement(Object proxy, Method method, Object[] args, Object statement, long time) {
+            timeSeen.set(time);
+            return statement;
+        }
+
+        @Override
+        public void closeInvoked() {
+            // NOOP
+        }
+    }
+
+    /* A statement stand-in that records whether it was closed. */
+    private static Statement recordingStatement(AtomicBoolean closed, RuntimeException closeFailure) {
+        return (Statement) Proxy.newProxyInstance(
+                TestAbstractCreateStatementInterceptor.class.getClassLoader(),
+                new Class<?>[] { Statement.class },
+                (proxy, method, args) -> {
+                    if ("close".equals(method.getName())) {
+                        closed.set(true);
+                        if (closeFailure != null) {
+                            throw closeFailure;
+                        }
+                    }
+                    return null;
+                });
+    }
+
+    /* A chain of one interceptor over a terminal that hands out the statement. */
+    private static void chainOver(AbstractCreateStatementInterceptor interceptor, Statement real) {
+        interceptor.setNext(new JdbcInterceptor() {
+            @Override
+            public Object invoke(Object proxy, Method method, Object[] args) {
+                return real;
+            }
+
+            @Override
+            public void reset(org.apache.tomcat.jdbc.pool.ConnectionPool parent,
+                    org.apache.tomcat.jdbc.pool.PooledConnection con) {
+                // NOOP
+            }
+        });
+    }
+
+    /*
+     * Regression for the orphaned statement: when the createStatement hook
+     * throws, the application never receives the statement, so the base must
+     * not leave it open and unreachable on the pooled connection. Before the
+     * fix the throwable propagated and the just-created statement stayed open
+     * for the life of the physical connection.
+     */
+    @Test
+    void aFailingCreateHookClosesTheStatementTheApplicationNeverReceives() throws Throwable {
+        AtomicBoolean closed = new AtomicBoolean();
+        Statement real = recordingStatement(closed, null);
+        RuntimeException hookFailure = new RuntimeException("hook-failed");
+
+        ThrowingHook interceptor = new ThrowingHook(hookFailure);
+        chainOver(interceptor, real);
+
+        Method create = java.sql.Connection.class.getMethod("createStatement");
+        RuntimeException thrown = Assertions.assertThrows(RuntimeException.class,
+                () -> interceptor.invoke(null, create, null),
+                "the hook failure must still reach the application");
+
+        Assertions.assertSame(hookFailure, thrown, "the original throwable must propagate unchanged");
+        Assertions.assertTrue(closed.get(),
+                "the statement the application never received must not be orphaned");
+    }
+
+    /*
+     * A failing close of the orphaned statement must not mask the hook's
+     * failure: the original throwable is still the one the application sees,
+     * with the close failure suppressed.
+     */
+    @Test
+    void aCloseFailureOfTheOrphanedStatementIsSuppressedNotThrown() throws Throwable {
+        AtomicBoolean closed = new AtomicBoolean();
+        RuntimeException closeFailure = new RuntimeException("close-failed");
+        Statement real = recordingStatement(closed, closeFailure);
+        RuntimeException hookFailure = new RuntimeException("hook-failed");
+
+        ThrowingHook interceptor = new ThrowingHook(hookFailure);
+        chainOver(interceptor, real);
+
+        Method create = java.sql.Connection.class.getMethod("createStatement");
+        RuntimeException thrown = Assertions.assertThrows(RuntimeException.class,
+                () -> interceptor.invoke(null, create, null));
+
+        Assertions.assertSame(hookFailure, thrown);
+        Assertions.assertTrue(closed.get());
+        Assertions.assertArrayEquals(new Throwable[] { closeFailure }, thrown.getSuppressed(),
+                "the close failure must be attached to the exception the application receives");
+    }
+
+    /*
+     * Regression for the unguarded close fan-out: a throwing closeInvoked()
+     * used to short-circuit the dispatch before the close reached the chain
+     * terminal, so the session was never returned to the pool - and, with the
+     * handle already disposed, the application could not even retry the
+     * close. A hook failure must instead be isolated: logged, the close still
+     * travels the rest of the chain, and the borrow ends.
+     */
+    @Test
+    void aFailingCloseHookStillEndsTheBorrow() throws Throwable {
+        AtomicBoolean terminalReached = new AtomicBoolean();
+        CloseHook throwing = new CloseHook(() -> {
+            throw new IllegalStateException("close-hook-failed");
+        });
+        throwing.setNext(terminal(terminalReached));
+
+        Method close = java.sql.Connection.class.getMethod("close");
+        throwing.invoke(null, close, null);
+
+        Assertions.assertTrue(throwing.ran.get(), "the hook must have been attempted");
+        Assertions.assertTrue(terminalReached.get(),
+                "the close must still reach the terminal so the borrow ends");
+    }
+
+    /*
+     * Isolation is per link: a throwing hook may not stop the hooks below it
+     * from receiving the close, just as the reset and disconnected fan-outs
+     * isolate each interceptor individually.
+     */
+    @Test
+    void aFailingCloseHookDoesNotStopTheHooksBelowIt() throws Throwable {
+        AtomicBoolean terminalReached = new AtomicBoolean();
+        CloseHook throwing = new CloseHook(() -> {
+            throw new IllegalStateException("close-hook-failed");
+        });
+        CloseHook inner = new CloseHook(() -> {
+        });
+        throwing.setNext(inner);
+        inner.setNext(terminal(terminalReached));
+
+        Method close = java.sql.Connection.class.getMethod("close");
+        throwing.invoke(null, close, null);
+
+        Assertions.assertTrue(throwing.ran.get(), "the throwing hook ran and failed");
+        Assertions.assertTrue(inner.ran.get(), "the hook beneath the thrower must still receive the close");
+        Assertions.assertTrue(terminalReached.get(), "the close must still reach the terminal");
+    }
+
+    /*
+     * A StackOverflowError is the recoverable Error, and TrapException does
+     * not convert Errors, so the isolation must catch it; a
+     * VirtualMachineError must instead propagate, per the policy
+     * ExceptionUtils.handleThrowable enforces across the module.
+     */
+    @Test
+    void anErrorThrownByTheCloseHookIsIsolatedToo() throws Throwable {
+        AtomicBoolean terminalReached = new AtomicBoolean();
+        CloseHook throwing = new CloseHook(() -> {
+            throw new StackOverflowError("close-hook-failed");
+        });
+        throwing.setNext(terminal(terminalReached));
+
+        Method close = java.sql.Connection.class.getMethod("close");
+        throwing.invoke(null, close, null);
+
+        Assertions.assertTrue(terminalReached.get(),
+                "even a recoverable Error from the hook must not strand the session as busy");
+    }
+
+    @Test
+    void aFatalErrorThrownByTheCloseHookPropagates() throws Exception {
+        AtomicBoolean terminalReached = new AtomicBoolean();
+        InternalError fatal = new InternalError("close-hook-fatal");
+        CloseHook throwing = new CloseHook(() -> {
+            throw fatal;
+        });
+        throwing.setNext(terminal(terminalReached));
+
+        Method close = java.sql.Connection.class.getMethod("close");
+        InternalError thrown = Assertions.assertThrows(InternalError.class,
+                () -> throwing.invoke(null, close, null),
+                "the fatal errors the pool never swallows must propagate from the close dispatch");
+        Assertions.assertSame(fatal, thrown);
+    }
+
+    /*
+     * The time handed to the hook is booked as a duration (prepare totals and
+     * the averages derived from them), and measuring it on the wall clock let
+     * a clock step between the two readings book a negative or wildly large
+     * duration. Pin the contract: milliseconds, and from the monotonic clock
+     * the never-negative guarantee comes from.
+     */
+    @Test
+    void theElapsedTimeBookedByTheHookIsAMonotonicMillisecondDuration() throws Throwable {
+        TimingHook hook = new TimingHook();
+        hook.setNext(new JdbcInterceptor() {
+            @Override
+            public Object invoke(Object proxy, Method method, Object[] args) throws InterruptedException {
+                Thread.sleep(25);
+                return null;
+            }
+
+            @Override
+            public void reset(org.apache.tomcat.jdbc.pool.ConnectionPool parent,
+                    org.apache.tomcat.jdbc.pool.PooledConnection con) {
+                // NOOP
+            }
+        });
+
+        Method prepare = java.sql.Connection.class.getMethod("prepareStatement", String.class);
+        hook.invoke(null, prepare, new Object[] { "SELECT 1" });
+
+        Assertions.assertTrue(hook.timeSeen.get() >= 20,
+                "the hook must observe the creation duration in milliseconds, saw " + hook.timeSeen.get());
+        Assertions.assertTrue(AbstractCreateStatementInterceptor.elapsedMillis(System.nanoTime()) >= 0,
+                "a duration measured with the monotonic clock cannot come out negative");
     }
 }

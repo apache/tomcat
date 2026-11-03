@@ -218,25 +218,6 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
     }
 
     /**
-     * Measures the milliseconds elapsed since the {@link System#nanoTime()}
-     * reading taken at {@code startNanos}, rounded to the nearest millisecond.
-     * <p>
-     * An interval is measured with the monotonic clock. Had it been measured
-     * with the wall clock instead, an NTP correction, a manual set, or
-     * resuming a suspended VM between the two readings could have made the
-     * difference negative, and a negative duration is never over the slow
-     * query threshold while the statistics book it as if it were real.
-     * </p>
-     *
-     * @param startNanos the {@link System#nanoTime()} reading the measurement began with
-     *
-     * @return the elapsed time in milliseconds
-     */
-    private static long elapsedMillis(long startNanos) {
-        return (System.nanoTime() - startNanos + 500000) / 1000000;
-    }
-
-    /**
      * Class to measure query execute time
      */
     protected class StatementProxy implements InvocationHandler {
