@@ -19,7 +19,9 @@ package org.apache.tomcat.jdbc.pool;
 import java.util.Properties;
 
 /**
- * Utility methods for managing JDBC pool properties.
+ * Utility methods for managing JDBC pool properties: the copy the connect
+ * path hands to the JDBC driver, and the password-masked copies the JMX and
+ * bean property getters expose, are all built here.
  */
 public class PoolUtilities {
 
@@ -43,33 +45,41 @@ public class PoolUtilities {
      * Creates a shallow copy of the given properties. Entries that the source
      * resolves to a String through a defaults table are materialized into the
      * copy as plain values, so the copy resolves every String the source
-     * resolves and needs no defaults table of its own. A String directly
-     * present in the source under the same key shadows the defaults there and
-     * takes precedence in the copy. A non-String directly present value
-     * shadows nothing, because {@link Properties#getProperty(String)} falls
-     * through to the defaults whenever the direct value is not a String, so
-     * where the source resolves a String under such a key the resolved String
-     * takes its place in the copy; entries the source resolves to no String
-     * are copied as they are. The defaults table itself is not carried over.
+     * resolves and needs no defaults table of its own; the defaults table
+     * itself is not carried over. A String directly present in the source
+     * under the same key shadows the defaults there and takes precedence in
+     * the copy. A non-String directly present value shadows nothing, because
+     * {@link Properties#getProperty(String)} falls through to the defaults
+     * whenever the direct value is not a String, so where the source resolves
+     * a String under such a key the resolved String takes its place in the
+     * copy; entries the source resolves to no String are copied as they are,
+     * and a non-String held only in a defaults table - which neither the
+     * source nor the copy resolves - does not appear in the copy at all.
+     * <p>
+     * The copy is per-key best effort against a source modified concurrently:
+     * an entry the modification removes may still be copied, and an entry it
+     * adds is copied only if it was already there when the copy sampled the
+     * source. A caller that needs the copy to show one state the source was
+     * actually in must serialize it against the modifications itself.
      *
-     * @param p the properties to clone
+     * @param p the properties to clone, not {@code null}
      *
-     * @return a new Properties instance containing all entries from the source
+     * @return a new Properties instance, without a defaults table, resolving
+     *         every String the source resolves and carrying over its other
+     *         direct entries
+     *
+     * @throws NullPointerException if the source is {@code null}
      */
     public static Properties clone(Properties p) {
         Properties c = new Properties();
         c.putAll(p);
         // putAll(...) copies only the entries directly present in the source,
         // so materialize the String values the source resolves through
-        // defaults. Re-read each value from the source: stringPropertyNames()
-        // is only a snapshot and the source may be modified concurrently, so
-        // a snapshotted key may resolve to nothing by the time it is read.
-        // Skip only a directly copied String, which is what the source
-        // resolves too; a non-String directly copied value resolves to
-        // nothing on its own - getProperty(...) only falls through to the
-        // defaults when the direct value is not a String - so the value the
-        // source resolves replaces it, keeping the copy able to resolve every
-        // String the source resolves
+        // defaults; the precedence rule deciding which of them are skipped is
+        // the javadoc's. Re-read each value from the source:
+        // stringPropertyNames() is only a snapshot and the source may be
+        // modified concurrently, so a snapshotted key may resolve to nothing
+        // by the time it is read
         for (String key : p.stringPropertyNames()) {
             String value = p.getProperty(key);
             if (value != null && !(c.get(key) instanceof String)) {
@@ -80,11 +90,17 @@ public class PoolUtilities {
     }
 
     /**
-     * Creates a copy of the given properties with the password entry removed.
+     * Creates a copy of the given properties as {@link #clone(Properties)}
+     * does, with the password entry removed. The copy carries no defaults
+     * table, so the removal also reaches a password the source only resolved
+     * through its defaults - a reference copy would let the remove walk past
+     * the defaults table and leave the password resolvable.
      *
-     * @param p the properties to clone
+     * @param p the properties to clone, not {@code null}
      *
      * @return a new Properties instance with all entries except the password
+     *
+     * @throws NullPointerException if the source is {@code null}
      */
     public static Properties cloneWithoutPassword(Properties p) {
         Properties result = clone(p);
