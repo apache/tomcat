@@ -7803,53 +7803,53 @@ public class openssl_h {
         }
     }
 
-    private static class SSL_set_info_callback {
+    private static class SSL_CTX_set_info_callback {
         public static final FunctionDescriptor DESC =
                 FunctionDescriptor.ofVoid(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
-        public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_set_info_callback");
+        public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CTX_set_info_callback");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
 
     /**
      * Function descriptor for:
-     * {@snippet lang = c : * void SSL_set_info_callback(SSL *ssl, void (*cb)(const SSL *, int, int))
+     * {@snippet lang = c : * void SSL_CTX_set_info_callback(SSL_CTX *ctx, void (*cb)(const SSL *, int, int))
      * }
      */
-    public static FunctionDescriptor SSL_set_info_callback$descriptor() {
-        return SSL_set_info_callback.DESC;
+    public static FunctionDescriptor SSL_CTX_set_info_callback$descriptor() {
+        return SSL_CTX_set_info_callback.DESC;
     }
 
     /**
      * Downcall method handle for:
-     * {@snippet lang = c : * void SSL_set_info_callback(SSL *ssl, void (*cb)(const SSL *, int, int))
+     * {@snippet lang = c : * void SSL_CTX_set_info_callback(SSL_CTX *ctx, void (*cb)(const SSL *, int, int))
      * }
      */
-    public static MethodHandle SSL_set_info_callback$handle() {
-        return SSL_set_info_callback.HANDLE;
+    public static MethodHandle SSL_CTX_set_info_callback$handle() {
+        return SSL_CTX_set_info_callback.HANDLE;
     }
 
     /**
      * Address for:
-     * {@snippet lang = c : * void SSL_set_info_callback(SSL *ssl, void (*cb)(const SSL *, int, int))
+     * {@snippet lang = c : * void SSL_CTX_set_info_callback(SSL *ctx, void (*cb)(const SSL *, int, int))
      * }
      */
-    public static MemorySegment SSL_set_info_callback$address() {
-        return SSL_set_info_callback.ADDR;
+    public static MemorySegment SSL_CTX_set_info_callback$address() {
+        return SSL_CTX_set_info_callback.ADDR;
     }
 
     /**
-     * {@snippet lang = c : * void SSL_set_info_callback(SSL *ssl, void (*cb)(const SSL *, int, int))
+     * {@snippet lang = c : * void SSL_CTX_set_info_callback(SSL_CTX *ctx, void (*cb)(const SSL *, int, int))
      * }
      */
-    public static void SSL_set_info_callback(MemorySegment ssl, MemorySegment cb) {
-        var mh$ = SSL_set_info_callback.HANDLE;
+    public static void SSL_CTX_set_info_callback(MemorySegment ctx, MemorySegment cb) {
+        var mh$ = SSL_CTX_set_info_callback.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("SSL_set_info_callback", ssl, cb);
+                traceDowncall("SSL_CTX_set_info_callback", ctx, cb);
             }
-            mh$.invokeExact(ssl, cb);
+            mh$.invokeExact(ctx, cb);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }

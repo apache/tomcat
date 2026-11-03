@@ -72,6 +72,7 @@ import org.apache.tomcat.util.openssl.SSL_CTX_set_verify$callback;
 import org.apache.tomcat.util.openssl.SSL_psk_client_cb_func;
 import org.apache.tomcat.util.openssl.SSL_psk_server_cb_func;
 import org.apache.tomcat.util.openssl.SSL_psk_use_session_cb_func;
+import org.apache.tomcat.util.openssl.SSL_set_info_callback$cb;
 import org.apache.tomcat.util.openssl.openssl_h;
 import org.apache.tomcat.util.openssl.openssl_h_Compatibility;
 import org.apache.tomcat.util.openssl.pem_password_cb;
@@ -271,6 +272,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
             // Set int pem_password_cb(char *buf, int size, int rwflag, void *u) callback
             SSL_CTX_set_default_passwd_cb(sslCtx, pem_password_cb.allocate(new PasswordCallback(null), contextArena));
+
+            // Set ssl_info_callback
+            SSL_CTX_set_info_callback(sslCtx, SSL_set_info_callback$cb.allocate(new OpenSSLEngine.InfoCallback(), contextArena));
 
             // Set server groups
             // Note: It is also possible to override setSSLParameters in OpenSSLEngine to set the final
