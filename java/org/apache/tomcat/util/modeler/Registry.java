@@ -537,6 +537,8 @@ public class Registry implements RegistryMBean, MBeanRegistration {
      * @param value String value to be converted
      *
      * @return Converted value
+     *
+     * @throws NumberFormatException If the value is null or is not valid for a numeric or character type
      */
     public Object convertValue(String type, String value) {
         Object objValue = value;
@@ -556,19 +558,33 @@ public class Registry implements RegistryMBean, MBeanRegistration {
         } else if ("java.lang.Boolean".equals(type) || "boolean".equals(type)) {
             objValue = Boolean.valueOf(value);
         } else if ("java.lang.Double".equals(type) || "double".equals(type)) {
-            objValue = Double.valueOf(value);
+            objValue = Double.valueOf(requireValue(type, value));
         } else if ("java.lang.Float".equals(type) || "float".equals(type)) {
-            objValue = Float.valueOf(value);
+            objValue = Float.valueOf(requireValue(type, value));
         } else if ("java.lang.Short".equals(type) || "short".equals(type)) {
             objValue = Short.valueOf(value);
         } else if ("java.lang.Byte".equals(type) || "byte".equals(type)) {
             objValue = Byte.valueOf(value);
-        } else if (("java.lang.Character".equals(type) || "char".equals(type)) &&
-                value != null && !value.isEmpty()) {
-            // A null or empty string cannot be converted to a character
+        } else if ("java.lang.Character".equals(type) || "char".equals(type)) {
+            requireValue(type, value);
+            if (value.length() != 1) {
+                throw new NumberFormatException(sm.getString("registry.invalidCharValue", value));
+            }
             objValue = Character.valueOf(value.charAt(0));
         }
         return objValue;
+    }
+
+
+    /*
+     * Double.valueOf() and Float.valueOf() throw a NullPointerException for a null value. Report it the same way as
+     * the integral types do.
+     */
+    private String requireValue(String type, String value) {
+        if (value == null) {
+            throw new NumberFormatException(sm.getString("registry.nullValue", type));
+        }
+        return value;
     }
 
 
