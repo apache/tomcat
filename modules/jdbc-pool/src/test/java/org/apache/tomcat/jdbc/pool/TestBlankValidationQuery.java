@@ -37,7 +37,10 @@ import org.junit.jupiter.params.provider.ValueSource;
  * reads a blank as unset even when it reaches the configuration around that
  * setter - through a {@link PoolConfiguration} implementation of the pool's
  * own, or as the explicit statement argument of
- * {@link PooledConnection#validate(int, String)}.
+ * {@link PooledConnection#validate(int, String)}. The init SQL the pool runs
+ * on a session it has just established is a statement of the same path and
+ * reads the same way: a blank one means there is nothing to initialize the
+ * session with, not an emptiness to execute.
  *
  * <p>The path witness is a recording {@link Connection}: the built-in check
  * goes through {@code isValid()} and the statement path goes through
@@ -128,26 +131,33 @@ class TestBlankValidationQuery {
         return null;
     }
 
-    /** A configuration handing out a query that never passed through the collapsing setter. */
+    /** A configuration handing out statements that never passed through the collapsing setters. */
     private static final class BypassedConfiguration extends PoolProperties {
         private final String rawQuery;
+        private final String rawInitSql;
 
-        BypassedConfiguration(String rawQuery) {
+        BypassedConfiguration(String rawQuery, String rawInitSql) {
             this.rawQuery = rawQuery;
+            this.rawInitSql = rawInitSql;
         }
 
         @Override
         public String getValidationQuery() {
             return rawQuery;
         }
+
+        @Override
+        public String getInitSQL() {
+            return rawInitSql;
+        }
     }
 
     /**
-     * A connection that is up against a stand-in {@link javax.sql.DataSource}
-     * handing out the recording connection - the connect genuinely runs, but
-     * every call the validation makes lands in the recorder.
+     * Applies the stand-in plumbing around a recording session and brings the
+     * pool up on it. Whatever the pool reads while it starts - the initial
+     * size, JMX - must already be set on the configuration when this runs.
      */
-    private static PooledConnection connectedTo(PoolProperties props, Recording rec) throws Exception {
+    private static ConnectionPool standInPool(PoolProperties props, Recording rec) throws Exception {
         props.setDataSource(Proxy.newProxyInstance(TestBlankValidationQuery.class.getClassLoader(),
                 new Class<?>[] { javax.sql.DataSource.class }, (proxy, method, args) -> {
                     switch (method.getName()) {
@@ -164,14 +174,18 @@ class TestBlankValidationQuery {
                     }
                 }));
         props.setJmxEnabled(false);
-        props.setInitialSize(0);
         props.setTimeBetweenEvictionRunsMillis(-1);
         // Without this the interval suppression - by design - answers "true"
         // for the first seconds after construction and the validation never
         // reaches the calls this recorder watches.
         props.setValidationInterval(0);
+        return new ConnectionPool(props);
+    }
+
+    private static PooledConnection connectedTo(PoolProperties props, Recording rec) throws Exception {
+        props.setInitialSize(0);
         props.setTestOnBorrow(true);
-        PooledConnection con = new PooledConnection(props, new ConnectionPool(props));
+        PooledConnection con = new PooledConnection(props, standInPool(props, rec));
         con.connect();
         return con;
     }
@@ -182,7 +196,7 @@ class TestBlankValidationQuery {
         Recording rec = new Recording();
         // A PoolConfiguration implementation of the caller's own can hand out a
         // blank the pool's setter would never have stored.
-        PooledConnection con = connectedTo(new BypassedConfiguration(blank), rec);
+        PooledConnection con = connectedTo(new BypassedConfiguration(blank, null), rec);
 
         Assertions.assertTrue(con.validate(PooledConnection.VALIDATE_BORROW),
                 "a blank query means the built-in check, which the session passes");
@@ -217,6 +231,47 @@ class TestBlankValidationQuery {
                 "a caller that names a statement gets that statement, not the built-in check");
     }
 
+    @ParameterizedTest(name = "init SQL [{0}] is not executed as a statement")
+    @ValueSource(strings = { "", " ", "\t" })
+    void aBlankInitSqlReachingTheValidationAroundTheSetterIsNotExecuted(String blank) throws Exception {
+        Recording rec = new Recording();
+        PooledConnection con = connectedTo(new BypassedConfiguration(null, blank), rec);
+
+        Assertions.assertTrue(con.validate(PooledConnection.VALIDATE_INIT),
+                "a blank init SQL means the unset value, and a session with nothing to run needs no check");
+        Assertions.assertEquals(0, rec.executeCalls,
+                "an emptiness must not be executed as the session's initialization");
+        Assertions.assertEquals(0, rec.isValidCalls,
+                "with the init statement unset and no test on connect configured, there is nothing to run");
+    }
+
+    @Test
+    void aBlankInitSqlLeavesTheBuiltInCheckToRunWhenConnectTestsTheSession() throws Exception {
+        Recording rec = new Recording();
+        BypassedConfiguration props = new BypassedConfiguration(null, "   ");
+        props.setTestOnConnect(true);
+        PooledConnection con = connectedTo(props, rec);
+
+        Assertions.assertTrue(con.validate(PooledConnection.VALIDATE_INIT),
+                "the built-in check the unset statement means, against a session that is up");
+        Assertions.assertEquals(1, rec.isValidCalls, "the built-in check is what the init action ran");
+        Assertions.assertEquals(0, rec.executeCalls, "and no emptiness alongside it");
+    }
+
+    @Test
+    void aConfiguredInitSqlIsStillExecutedOnConnect() throws Exception {
+        Recording rec = new Recording();
+        PoolProperties props = new PoolProperties();
+        props.setInitSQL("SET SESSION MARK 7");
+        PooledConnection con = connectedTo(props, rec);
+
+        Assertions.assertTrue(con.validate(PooledConnection.VALIDATE_INIT));
+        Assertions.assertEquals(1, rec.executeCalls);
+        Assertions.assertEquals("SET SESSION MARK 7", rec.lastExecuted,
+                "an init SQL that carries something is still the session's initialization");
+        Assertions.assertEquals(0, rec.isValidCalls, "a named init statement is what runs, not the built-in check");
+    }
+
     @ParameterizedTest(name = "setter collapses [{0}] to unset")
     @ValueSource(strings = { "", " ", "\t" })
     void theSetterStoresABlankQueryAsTheUnsetValue(String blank) {
@@ -233,5 +288,57 @@ class TestBlankValidationQuery {
         props.setValidationQuery(" SELECT 1 FROM DUAL ");
         Assertions.assertEquals(" SELECT 1 FROM DUAL ", props.getValidationQuery(),
                 "a query that carries anything is stored exactly as written");
+    }
+
+    @Test
+    void aBorrowThatReconnectsStillRunsTheConfiguredBorrowCheck() throws Exception {
+        Recording rec = new Recording();
+        BypassedConfiguration props = new BypassedConfiguration("SELECT 1", "   ");
+        props.setTestOnBorrow(true);
+        props.setInitialSize(1);
+        // The session goes stale the moment the pool makes it, so the borrow
+        // below takes the reconnect path - the path on which the pool decides
+        // between the init check and the borrow check by whether an init
+        // statement is configured. A blank one must not read as configured.
+        props.setMaxAge(1);
+        ConnectionPool pool = standInPool(props, rec);
+        Thread.sleep(5);
+        int executedBefore = rec.executeCalls;
+
+        // The witness is read before the connection goes back: at a maxAge of
+        // a millisecond the return path reconnects the session it is handed,
+        // and that hand-off is no more this test's subject than the borrow's.
+        Connection c = pool.getConnection();
+        int executedByBorrow = rec.executeCalls;
+        c.close();
+
+        Assertions.assertNotNull(c, "the borrow must succeed");
+        Assertions.assertEquals(executedBefore + 1, executedByBorrow,
+                "a blank init SQL leaves the configured borrow check standing, reconnect path and all");
+        Assertions.assertEquals("SELECT 1", rec.lastExecuted);
+    }
+
+    @Test
+    void aReconnectOnBorrowStillRunsTheConnectCheckWhenThatIsWhatIsConfigured() throws Exception {
+        Recording rec = new Recording();
+        // Nothing but the blank init statement and a test on connect: the
+        // re-established session is still due its check, the built-in one.
+        BypassedConfiguration props = new BypassedConfiguration(null, "   ");
+        props.setTestOnConnect(true);
+        props.setInitialSize(1);
+        props.setMaxAge(1);
+        ConnectionPool pool = standInPool(props, rec);
+        Thread.sleep(5);
+        int checkedBefore = rec.isValidCalls;
+
+        // Read before the return, for the same reason as the test above.
+        Connection c = pool.getConnection();
+        int checkedByBorrow = rec.isValidCalls;
+        c.close();
+
+        Assertions.assertNotNull(c, "the borrow must succeed");
+        Assertions.assertEquals(checkedBefore + 1, checkedByBorrow,
+                "a configured test on connect keeps checking the re-established session");
+        Assertions.assertEquals(0, rec.executeCalls, "and no emptiness runs alongside it");
     }
 }

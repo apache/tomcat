@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.management.ObjectName;
@@ -90,15 +91,22 @@ public class PooledConnection implements PooledConnectionMBean {
      */
     private volatile javax.sql.PooledConnection cpdsConnection;
     /**
-     * When we track abandon traces, this string holds the formatted thread dump
+     * When we track abandon traces, the borrow site of this connection, in one
+     * of three shapes: a {@link StackTraceElement} array as captured at the
+     * borrow and not yet formatted, the formatted trace (a String) that such an
+     * array was turned into, or {@code null} for no site recorded. The formatting
+     * is deferred to {@link #getStackTrace()} because a pool with logAbandoned
+     * borrows constantly and reports rarely, so the cost is only paid when the
+     * trace is actually read - and it is one slot rather than two fields, with
+     * the formatting published by compare-and-set on the very array it read,
+     * because the read-modify-write has no lock to sit in: the abandoned check
+     * that reads it can be JMX-invoked, and con.lock() is a no-op unless the
+     * sweeper or useLock is on. A formatting of an older borrow's frames then
+     * loses the slot to any re-borrow that swapped its own site in meanwhile,
+     * so a live session always carries its own borrow site rather than a
+     * previous borrower's.
      */
-    private String abandonTrace = null;
-    /**
-     * When we track abandon traces, the frames of the borrow site as they were captured, until an abandoned-connection
-     * report reads the trace and they are formatted into {@link #abandonTrace}. A pool with logAbandoned borrows
-     * constantly and reports rarely, so the formatting cost is only paid when the trace is actually read.
-     */
-    private StackTraceElement[] abandonTraceElements = null;
+    private final AtomicReference<Object> abandonTrace = new AtomicReference<>();
     /**
      * Timestamp the connection was last 'touched' by the pool
      */
@@ -138,8 +146,10 @@ public class PooledConnection implements PooledConnectionMBean {
     private volatile ObjectName oname = null;
 
     /**
-     * Weak reference to cache the list of interceptors for this connection so that we don't create a new list of
-     * interceptors each time we borrow the connection
+     * The first link of the interceptor chain built for this connection, cached so that the chain is not rebuilt on
+     * every borrow. The cache holds the chain by ordinary strong references - a pooled connection keeps the interceptors
+     * it was given alive with itself. The pool writes the chain at each borrow (see
+     * {@link #setHandler(JdbcInterceptor)}) and clears it when the connection goes out of service.
      */
     private volatile JdbcInterceptor handler = null;
 
@@ -173,7 +183,7 @@ public class PooledConnection implements PooledConnectionMBean {
      * @param username The user name
      * @param password The password
      *
-     * @return <code>true</code>if the pool does not need to reconnect
+     * @return <code>true</code> if the pool does not need to reconnect
      */
     @Deprecated
     public boolean checkUser(String username, String password) {
@@ -181,13 +191,19 @@ public class PooledConnection implements PooledConnectionMBean {
     }
 
     /**
-     * Returns true if we must force reconnect based on credentials passed in. Returns false if
-     * {@link PoolConfiguration#isAlternateUsernameAllowed()} method returns false. Returns false if the
+     * Returns true if we must force reconnect based on credentials passed in. Returns false if the
      * username/password has not changed since this connection was connected
      *
      * <p>This is a comparison only. It records nothing: the identity a session is established with is written by the
      * reconnect that follows this decision (see {@link #reconnectWith(String, String)}), so that a reconnect the
      * database refused cannot leave this connection carrying credentials that were never accepted.</p>
+     *
+     * <p>Where {@link PoolConfiguration#isAlternateUsernameAllowed()} is false the passed credentials carry no
+     * weight - the pool ignores them at the borrow, as it does at every other surface - but the comparison is not
+     * skipped: with alternate identities disallowed the identity every session must serve under is the pool's own
+     * configured one, and a session carrying any other identity, however it came to carry it - the flag was turned
+     * at runtime over a session a borrower had re-established under its own credentials - is re-established rather
+     * than served.</p>
      *
      * @param username the username you wish to connect with, pass in null to accept the default username from
      *                     {@link PoolConfiguration#getUsername()}
@@ -199,7 +215,15 @@ public class PooledConnection implements PooledConnectionMBean {
     public boolean shouldForceReconnect(String username, String password) {
 
         if (!getPoolProperties().isAlternateUsernameAllowed()) {
-            return false;
+            // Not the pool's answer to skip the comparison here: this is the
+            // gate that keeps a session's authenticated identity matched to
+            // the identity it is served under, and with alternates disallowed
+            // that identity is always the pool's configured one. Comparing
+            // against the configured credentials rather than against what the
+            // borrower asked for is what keeps a session that carries another
+            // identity from being served to a borrower that never claimed it.
+            username = poolProperties.getUsername();
+            password = poolProperties.getPassword();
         }
 
         if (username == null) {
@@ -246,10 +270,6 @@ public class PooledConnection implements PooledConnectionMBean {
                 }
             }
         }
-        // if (poolProperties.getDataSource()==null && poolProperties.getDataSourceJNDI()!=null) {
-        // TODO lookup JNDI name
-        // }
-
         if (poolProperties.getDataSource() != null) {
             connectUsingDataSource();
         } else {
@@ -555,7 +575,15 @@ public class PooledConnection implements PooledConnectionMBean {
             }
         }
         if (connection == null) {
-            throw new SQLException(MessageFactory.get("pooledConnection.driverReturnedNull", driver, driverURL));
+            // A driver declining the URL is the persistent-misconfiguration
+            // case: this message leaves connect() as the borrow's own
+            // SQLException and is logged as the pool's failure on every
+            // attempt, at the default log level. It carries the pool's own
+            // words, so it carries the URL masked - the way the dump and the
+            // debug line above do; the driver's identity and the rest of the
+            // URL stay readable.
+            throw new SQLException(MessageFactory.get("pooledConnection.driverReturnedNull",
+                    driver, PoolProperties.maskCredentials(driverURL)));
         }
     }
 
@@ -822,7 +850,8 @@ public class PooledConnection implements PooledConnectionMBean {
             return true;
         } else if (action == VALIDATE_INIT && poolProperties.isTestOnConnect()) {
             return true;
-        } else if (action == VALIDATE_INIT && poolProperties.getInitSQL() != null) {
+        } else if (action == VALIDATE_INIT &&
+                PoolProperties.configuredStatement(poolProperties.getInitSQL()) != null) {
             return true;
         } else {
             return false;
@@ -830,8 +859,10 @@ public class PooledConnection implements PooledConnectionMBean {
     }
 
     /**
-     * Returns <code>true</code> if the object is still valid. if not the pool will call the getExpiredAction() and
-     * follow up with one of the four expired methods
+     * Returns <code>true</code> if the object is still valid. A false answer is the caller's cue to stop trusting this
+     * session: a newly established connection that fails its check is released rather than pooled, a borrow whose check
+     * fails is re-established before it is served, and an idle sweep that reports failure takes the connection out of
+     * service.
      *
      * @param validateAction The value
      *
@@ -847,8 +878,11 @@ public class PooledConnection implements PooledConnectionMBean {
      * @param validateAction the action used. One of {@link #VALIDATE_BORROW}, {@link #VALIDATE_IDLE},
      *                           {@link #VALIDATE_INIT} or {@link #VALIDATE_RETURN}
      * @param sql            the SQL to be used during validation. If the {@link PoolConfiguration#setInitSQL(String)}
-     *                           has been called with a non null value and the action is {@link #VALIDATE_INIT} the init
-     *                           SQL will be used for validation.
+     *                           has been called with a statement and the action is {@link #VALIDATE_INIT} the init SQL
+     *                           will be used for validation, and a blank argument, like a blank configured statement,
+     *                           reads as no statement. Whether anything runs at all is the action's own configuration
+     *                           that decides: for an action the pool has not enabled, this method returns true without
+     *                           executing the statement or touching the connection.
      *
      * @return true if the connection was validated successfully. It returns true even if validation was not performed,
      *             such as when {@link PoolConfiguration#setValidationInterval(long)} has been called with a positive
@@ -924,7 +958,7 @@ public class PooledConnection implements PooledConnectionMBean {
             }
         }
 
-        String query = executableStatement(sql);
+        String query = PoolProperties.configuredStatement(sql);
 
         // The init SQL is not a health check: it is the pool deliberately
         // initializing the physical session it has just established, and its
@@ -933,14 +967,15 @@ public class PooledConnection implements PooledConnectionMBean {
         // session that connect() established moments ago, so the transaction
         // this execution opens is the pool's own initialization work, and
         // nothing a borrower could have left behind on it.
-        boolean executingInitSql = validateAction == VALIDATE_INIT && poolProperties.getInitSQL() != null;
+        String initSql = PoolProperties.configuredStatement(poolProperties.getInitSQL());
+        boolean executingInitSql = validateAction == VALIDATE_INIT && initSql != null;
 
         if (executingInitSql) {
-            query = poolProperties.getInitSQL();
+            query = initSql;
         }
 
         if (query == null) {
-            query = executableStatement(poolProperties.getValidationQuery());
+            query = PoolProperties.configuredStatement(poolProperties.getValidationQuery());
         }
 
         if (query == null) {
@@ -955,10 +990,7 @@ public class PooledConnection implements PooledConnectionMBean {
                     // Terminate - by rollback, never by commit - any
                     // transaction the isValid() call opened, or that a
                     // previous borrower left open: a read-only health check
-                    // must not commit application work. A session whose
-                    // transaction cannot be terminated is in an unknown
-                    // state, so it fails the validation and the pool takes
-                    // the connection out of service.
+                    // must not commit application work.
                     transactionTerminated = silentlyRollbackTransactionIfNeeded();
                     return transactionTerminated;
                 } else {
@@ -1054,31 +1086,6 @@ public class PooledConnection implements PooledConnectionMBean {
 
 
     /**
-     * Returns the statement a validation should execute, or {@code null} when
-     * it has none and the built-in {@link java.sql.Connection#isValid(int)}
-     * check runs instead.
-     *
-     * <p>A blank string is not a statement. A configuration surface that
-     * cannot express the unset value - a JNDI attribute, a connection of the
-     * two-argument {@link #validate(int, String)} - is written blank to mean
-     * exactly what the unset value means, so a blank is read as unset here as
-     * well. {@link PoolProperties#setValidationQuery(String)} already collapses
-     * a blank at the write, so what reaches this point blank is a configuration
-     * that did not pass through that setter - one handed in as another
-     * {@link PoolConfiguration} implementation - or a caller's explicit
-     * argument, and neither should have an emptiness executed as SQL.</p>
-     *
-     * @param query the configured or passed statement, may be {@code null}
-     *
-     * @return the query itself if it carries anything, {@code null} if it is
-     *             null or blank
-     */
-    private static String executableStatement(String query) {
-        return query == null || query.trim().isEmpty() ? null : query;
-    }
-
-
-    /**
      * Terminates a transaction open on the session by committing it, for the
      * one case where the pending transaction is the pool's own deliberate
      * initialization work: the init SQL the init-time validation has just
@@ -1157,21 +1164,24 @@ public class PooledConnection implements PooledConnectionMBean {
     }
 
     /**
-     * This method is called if (Now - timeCheckedIn &gt; getReleaseTime()) This method disconnects the connection, logs
-     * an error in debug mode if it happens then sets the {@link #released} flag to false. Any attempts to connect this
-     * cached object again will fail per {@link #connect()} The connection pool uses the atomic return value to
-     * decrement the pool size counter.
+     * This method is called if (Now - timeCheckedIn &gt; getReleaseTime()). It disconnects the connection - a failure of
+     * the disconnect itself is logged at debug level - and then sets the {@link #released} flag to true, so any attempt
+     * to connect this cached object again fails per {@link #connect()}. Only the call that settles the flag drives the
+     * disconnection; later calls return without touching the session. The connection pool uses the atomic return value
+     * to decrement the pool size counter.
      *
      * @return true if this is the first time this method has been called. false if this method has been called before.
      */
     public boolean release() {
-        try {
-            disconnect(true);
-        } catch (Exception x) {
-            if (log.isDebugEnabled()) {
-                log.debug("Unable to close SQL connection", x);
-            }
-        }
+        // The claim precedes the acting. release() reaches a connection from
+        // several hands at once - the abandon check and a losing return both
+        // call it on the same connection - and the terminal sequence it
+        // drives (the chain's disconnected(finalizing=true), the physical
+        // close, the chain teardown at parent.finalize) is not a sequence a
+        // session can be taken through twice: an interceptor would meet its
+        // own disposal, then the same close again. So the winner is settled
+        // first, under this connection's monitor, and only that winner acts.
+        //
         // Under this connection's monitor - the one lock every registration
         // holds from its released-check through its name assignment (see
         // createMBean()), and the only lock that every configuration shares,
@@ -1186,38 +1196,53 @@ public class PooledConnection implements PooledConnectionMBean {
         // neither the name nor the flag, and publishing the orphan anyway.
         // With both settled here, either the registration completes first and
         // this unregisters it, or this passes first and the registration
-        // sees the released flag and publishes nothing.
+        // sees the released flag and publishes nothing. Settling the flag
+        // before the disconnect rather than after it is what stops a racing
+        // connect() from passing that check on a session already being torn
+        // down, and the MBean going before the session is what stops a JMX
+        // reader from watching the teardown as a live connection.
+        boolean first;
         synchronized (this) {
             if (oname != null) {
                 JmxUtil.unregisterJmx(oname);
                 oname = null;
             }
-            return released.compareAndSet(false, true);
+            first = released.compareAndSet(false, true);
         }
-
+        if (first) {
+            try {
+                disconnect(true);
+            } catch (Exception x) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Unable to close SQL connection", x);
+                }
+            }
+        }
+        return first;
     }
 
     /**
-     * The pool will set the stack trace when it is check out and checked in
+     * Replaces the abandoned-connection trace. The pool itself only ever clears it - the return path hands the session
+     * back with a null trace so no report can read the finished borrow's site - and a non-null value is the externally
+     * supplied form of the trace, kept public for that use. Either way the value lands in the same slot the borrow-site
+     * frames live in (see {@link #abandonTrace}), so a hand-written trace is replaced by the next borrow's site just
+     * like a recorded one is.
      *
-     * @param trace the stack trace for this connection
+     * @param trace the stack trace for this connection, or null to clear it
      */
-
     public void setStackTrace(String trace) {
-        abandonTrace = trace;
-        abandonTraceElements = null;
+        abandonTrace.set(trace);
     }
 
     /**
-     * The pool will set the borrow-site frames when it hands the connection out; they are formatted into a trace only
-     * if an abandoned-connection report reads it back. The pool writes and reads the trace under the lock of this
-     * connection.
+     * Records the borrow-site frames for this connection. They are formatted into a trace only if an
+     * abandoned-connection report reads them back (see {@link #getStackTrace()}), and each borrow simply swaps its own
+     * frames into the slot, replacing whatever an earlier borrow's site had become.
      *
      * @param trace the borrow-site frames for this connection
      */
     void setStackTraceElements(StackTraceElement[] trace) {
-        abandonTraceElements = trace;
-        abandonTrace = null;
+        abandonTrace.set(trace);
     }
 
     /**
@@ -1226,20 +1251,25 @@ public class PooledConnection implements PooledConnectionMBean {
      * @return the stack trace or null of no trace was set
      */
     public String getStackTrace() {
-        String trace = abandonTrace;
-        if (trace == null) {
-            // Format the deferred borrow site, if one is pending, and cache
-            // the result: the abandon path logs the trace and notifies of it,
-            // and both readings should pay for a single formatting
-            StackTraceElement[] elements = abandonTraceElements;
-            if (elements != null) {
-                Exception x = new Exception();
-                x.setStackTrace(elements);
-                trace = ConnectionPool.getStackTrace(x);
-                abandonTrace = trace;
-                abandonTraceElements = null;
-            }
+        Object site = abandonTrace.get();
+        if (site instanceof String) {
+            // Already formatted and cached by this or an earlier read.
+            return (String) site;
         }
+        StackTraceElement[] elements = (StackTraceElement[]) site;
+        if (elements == null) {
+            return null;
+        }
+        Exception x = new Exception();
+        x.setStackTrace(elements);
+        String trace = ConnectionPool.getStackTrace(x);
+        // Publish through compare-and-set on the very frames that were formatted:
+        // a re-borrow that swapped its own site in during the formatting wins the
+        // slot, and this reader's text - which it still returns - was for the
+        // borrow that has since been replaced. (The abandonTrace field explains
+        // why the swap has to be atomic; caching the text is what makes the
+        // abandon path's two readings pay for a single formatting.)
+        abandonTrace.compareAndSet(elements, trace);
         return trace;
     }
 
@@ -1288,6 +1318,10 @@ public class PooledConnection implements PooledConnectionMBean {
      * Set the timestamp the connection was last validated. This flag is used to keep track when we are using a
      * {@link PoolConfiguration#setValidationInterval(long) validation-interval}.
      *
+     * <p>The pool stamps this itself as each of its own validations completes; writing it by hand suppresses the checks
+     * the interval would otherwise run for up to that interval, which makes the setter a surface for tests and for an
+     * embedder driving that bookkeeping directly rather than a way to operate a running pool.</p>
+     *
      * @param lastValidated a timestamp as defined by {@link System#currentTimeMillis()}
      */
     public void setLastValidated(long lastValidated) {
@@ -1297,6 +1331,13 @@ public class PooledConnection implements PooledConnectionMBean {
     /**
      * Sets the pool configuration for this connection and connection pool. Object is shared with the
      * {@link ConnectionPool}
+     *
+     * <p>Every connection of a pool reads the same configuration object, and the pool builds each connection against
+     * the one it was created with; replacing the reference here therefore changes what this single connection sees
+     * while the rest of the pool keeps reading the old configuration. That makes the setter a surface for tests and
+     * for an embedder that owns the wiring, not a way to reconfigure a running pool - which is what
+     * {@link DataSourceProxy#setPoolProperties(PoolConfiguration)} is, since it rebuilds the pool on the
+     * configuration it is given.</p>
      *
      * @param poolProperties The pool properties
      */
@@ -1375,11 +1416,12 @@ public class PooledConnection implements PooledConnectionMBean {
     }
 
     /**
-     * Returns the underlying connection
+     * Returns the underlying connection: the session the pool established for this entry, not a logical handle created
+     * on demand. On a CPDS-configured pool the {@link javax.sql.PooledConnection} handle that creates such logical
+     * handles is the separate <code>cpdsConnection</code> this class keeps, just as the XA handle is
+     * {@link #getXaConnection()}.
      *
      * @return the underlying JDBC connection as it was returned from the JDBC driver
-     *
-     * @see javax.sql.PooledConnection#getConnection()
      */
     public java.sql.Connection getConnection() {
         return this.connection;

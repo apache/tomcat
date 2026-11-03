@@ -341,8 +341,14 @@ class TestJmxMonitor extends JdbcPoolBaseTest {
         dbProperties.setProperty("injected", "through-the-view");
         Assertions.assertNull(ds.getPoolProperties().getDbProperties().getProperty("injected"),
                 "the exposed db-properties must be a view, not the live object");
-        // and the pool must still authenticate - the copy is display-side
-        // only, the connect path keeps its own credentials
+        // The display path corrupted nothing live: with the fixture password
+        // back, a borrow succeeds. It would not while the fake secret stood:
+        // a session authenticated with anything other than the configured
+        // credentials is re-established for the next borrower rather than
+        // served, and this secret never existed in the database - the display
+        // path's silence about a credential cannot be matched by the connect
+        // path's use of it.
+        ds.setPassword("");
         Assertions.assertDoesNotThrow(() -> ds.getConnection().close());
     }
 
