@@ -198,8 +198,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         if (MemorySegment.NULL.equals(ssl)) {
             throw new IllegalStateException(sm.getString("engine.noSSL", OpenSSLLibrary.getLastError()));
         }
-        // Set ssl_info_callback
-        SSL_set_info_callback(ssl, SSL_set_info_callback$cb.allocate(new InfoCallback(), engineArena));
         if (clientMode) {
             SSL_set_connect_state(ssl);
         } else {
@@ -1122,14 +1120,14 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 case REQUIRE -> SSL_VERIFY_PEER() | SSL_VERIFY_FAIL_IF_NO_PEER_CERT();
                 case OPTIONAL -> SSL_VERIFY_PEER();
             };
-            // Note: Since a callback is always set by the context, the callback here could in theory
-            // be set to NULL (at the time of creation of the SSL, the SSL_CTX will have a non-null callback)
-            SSL_set_verify(state.ssl, value, SSL_set_verify$callback.allocate(new VerifyCallback(), engineArena));
+            // Note: Since a callback is always set by the context, the callback here can be set to NULL
+            // (at the time of creation of the SSL, the SSL_CTX will have a non-null callback)
+            SSL_set_verify(state.ssl, value, MemorySegment.NULL);
             clientAuth = mode;
         }
     }
 
-    private static class InfoCallback implements SSL_set_info_callback$cb.Function {
+    static class InfoCallback implements SSL_set_info_callback$cb.Function {
         @Override
         public void apply(MemorySegment ssl, int where, int ret) {
             EngineState state = getState(ssl);

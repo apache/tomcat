@@ -511,6 +511,10 @@
         frame size limit before writing it and close the connection with an
         <code>INTERNAL_ERROR</code> if a header block can not be written. (markt)
       </fix>
+      <fix>
+        <bug>70305</bug>: Move callback registrations in FFM code to the
+        SSL context. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
