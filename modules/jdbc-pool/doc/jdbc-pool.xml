@@ -832,13 +832,25 @@
        to zero, so an interceptor listed after the cache does not see cached statements on reuse and those
        statements execute with no timeout.
     </p>
+    <p><strong>Note:</strong> the timeout is applied by an interceptor, so it only covers statements that pass
+       through the interceptor chain. Statements created from a connection reached through
+       <code>XAConnection.getConnection()</code>, <code>PooledConnection.getConnection()</code> or
+       <code>unwrap()</code> are created outside the chain and keep whatever timeout the driver gives them. On a
+       pool backed by an <code>XADataSource</code> the first of these is the normal route an application takes to
+       its connection, so the pool logs a warning at startup when a positive query timeout is configured on such
+       a pool.
+    </p>
     <attributes>
-      <attribute name="queryTimeout" required="true">
+      <attribute name="queryTimeout" required="false">
         <p>(int as String) The number of seconds to set for the query timeout.
            A value less than or equal to zero will disable this feature.
-           The default value is <code>1</code> seconds.
-           A value that is not an integer is not applied: the pool logs a
-           warning and the default stays in effect.
+           The default value is <code>1</code> seconds, and omitting the
+           attribute still arms that default: any query that needs longer than
+           one second will be cancelled by the driver, so set the attribute
+           deliberately. The attribute name is matched exactly: an unrecognized
+           name is not applied and is logged as a warning, leaving the default
+           in effect. A value that is not an integer is likewise not applied:
+           the pool logs a warning and the default stays in effect.
         </p>
       </attribute>
     </attributes>

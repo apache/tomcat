@@ -25,9 +25,10 @@ import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
 import java.sql.Statement;
 
-import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
  * Pins the exception translation the trap performs on each of its paths: a
