@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.modeler;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.management.Attribute;
@@ -150,7 +151,7 @@ public class TestBaseModelMBeanNotifications {
         send(mbean, "D");
 
         Assert.assertTrue(listener.received.isEmpty());
-        Assert.assertEquals(List.of("A:other"), otherListener.received);
+        Assert.assertEquals(Arrays.asList("A:other"), otherListener.received);
     }
 
     @Test
@@ -164,7 +165,7 @@ public class TestBaseModelMBeanNotifications {
         Assert.assertTrue(listener.received.isEmpty());
 
         mbean.sendNotification("message");
-        Assert.assertEquals(List.of("jmx.modelmbean.generic:hb"), listener.received);
+        Assert.assertEquals(Arrays.asList("jmx.modelmbean.generic:hb"), listener.received);
     }
 
     @Test
@@ -182,8 +183,8 @@ public class TestBaseModelMBeanNotifications {
         send(mbean, "A");
         send(mbean, "B");
 
-        Assert.assertEquals(List.of("B:hb1"), listener1.received);
-        Assert.assertEquals(List.of("A:hb2", "B:hb2"), listener2.received);
+        Assert.assertEquals(Arrays.asList("B:hb1"), listener1.received);
+        Assert.assertEquals(Arrays.asList("A:hb2", "B:hb2"), listener2.received);
     }
 
     /*
@@ -204,8 +205,8 @@ public class TestBaseModelMBeanNotifications {
         send(mbean, "A");
         send(mbean, "B");
 
-        Assert.assertEquals(List.of("A:hb1", "B:hb1"), listener1.received);
-        Assert.assertEquals(List.of("A:hb2"), listener2.received);
+        Assert.assertEquals(Arrays.asList("A:hb1", "B:hb1"), listener1.received);
+        Assert.assertEquals(Arrays.asList("A:hb2"), listener2.received);
         Assert.assertArrayEquals(new String[] { "A" }, filter.getNames());
     }
 
@@ -221,7 +222,7 @@ public class TestBaseModelMBeanNotifications {
         mbean.addAttributeChangeNotificationListener(listener1, null, "hb1");
         send(mbean, "Z");
 
-        Assert.assertEquals(List.of("Z:hb1"), listener1.received);
+        Assert.assertEquals(Arrays.asList("Z:hb1"), listener1.received);
         Assert.assertTrue(listener2.received.isEmpty());
         Assert.assertArrayEquals(new String[] { "A" }, filter.getNames());
     }
@@ -235,7 +236,7 @@ public class TestBaseModelMBeanNotifications {
         mbean.addAttributeChangeNotificationListener(listener, "A", "hb");
         send(mbean, "Z");
 
-        Assert.assertEquals(List.of("Z:hb"), listener.received);
+        Assert.assertEquals(Arrays.asList("Z:hb"), listener.received);
     }
 
     /*
@@ -259,7 +260,7 @@ public class TestBaseModelMBeanNotifications {
         send(mbean, "A");
         send(mbean, "B");
 
-        Assert.assertEquals(List.of("B:hb"), listener.received);
+        Assert.assertEquals(Arrays.asList("B:hb"), listener.received);
     }
 
     @Test
@@ -277,8 +278,8 @@ public class TestBaseModelMBeanNotifications {
         mbean.removeAttributeChangeNotificationListener(listener1, "A");
         send(mbean, "A");
         send(mbean, "B");
-        Assert.assertEquals(List.of("B:hb1"), listener1.received);
-        Assert.assertEquals(List.of("A:hb2", "B:hb2"), listener2.received);
+        Assert.assertEquals(Arrays.asList("B:hb1"), listener1.received);
+        Assert.assertEquals(Arrays.asList("A:hb2", "B:hb2"), listener2.received);
 
         // Removing the remaining name must not turn the registration into an accept-all filter.
         listener1.received.clear();
@@ -288,7 +289,7 @@ public class TestBaseModelMBeanNotifications {
         send(mbean, "B");
         send(mbean, "C");
         Assert.assertTrue(listener1.received.isEmpty());
-        Assert.assertEquals(List.of("A:hb2", "B:hb2"), listener2.received);
+        Assert.assertEquals(Arrays.asList("A:hb2", "B:hb2"), listener2.received);
     }
 
     @Test
@@ -312,12 +313,12 @@ public class TestBaseModelMBeanNotifications {
         send(mbean, "A");
         send(mbean, "B");
         send(mbean, "C");
-        Assert.assertEquals(List.of("B:hb"), listener.received);
+        Assert.assertEquals(Arrays.asList("B:hb"), listener.received);
 
         // Changes to the original subclass filter still apply to the registration.
         filter.addAttribute("D");
         send(mbean, "D");
-        Assert.assertEquals(List.of("B:hb", "D:hb"), listener.received);
+        Assert.assertEquals(Arrays.asList("B:hb", "D:hb"), listener.received);
     }
 
     @Test
@@ -340,7 +341,7 @@ public class TestBaseModelMBeanNotifications {
         mbean.removeAttributeChangeNotificationListener(listener, "A");
         send(mbean, "A");
         send(mbean, "B");
-        Assert.assertEquals(List.of("B:hb"), listener.received);
+        Assert.assertEquals(Arrays.asList("B:hb"), listener.received);
     }
 
     @Test
