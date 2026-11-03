@@ -17,6 +17,7 @@
 package org.apache.tomcat.jdbc.pool;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.io.StringReader;
@@ -872,6 +873,16 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             log.warn(MessageFactory.get("poolProperties.validatorInaccessible", className), e);
         } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException e) {
             log.warn(MessageFactory.get("poolProperties.validatorCannotInstantiate", className), e);
+        }
+
+        if (validator == null) {
+            // The line above names the cause; this names the consequence,
+            // at the level an operator sees without enabling anything: the
+            // configuration keeps reporting the validator's class name,
+            // while validation in fact runs on the query path. Left at the
+            // warning alone, that disagreement is invisible in the default
+            // log.
+            log.error(MessageFactory.get("poolProperties.validatorNotInEffect", className));
         }
     }
 
@@ -2075,6 +2086,30 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     private void writeObject(ObjectOutputStream oos) throws IOException {
         synchronized (this) {
             oos.defaultWriteObject();
+        }
+    }
+
+
+    /**
+     * Replays the validator configuration after deserialization. The validator
+     * instance is transient - it is runtime state, an object loaded through
+     * some class loader and carrying whatever that loader can reach - but the
+     * class name it was built from is serialized, and a configuration that
+     * read back the name without rebuilding the instance would validate on the
+     * query path while reporting the validator as configured, which is the
+     * disagreement {@link #setValidatorClassName(String)} was made to log.
+     * Replaying the setter rebuilds the instance in the reading JVM, or
+     * reports - as the original setter did - why it could not be built there.
+     *
+     * @param ois the stream to read the object graph from
+     *
+     * @throws IOException if the stream fails
+     * @throws ClassNotFoundException if a serialized class cannot be found
+     */
+    private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+        ois.defaultReadObject();
+        if (validatorClassName != null) {
+            setValidatorClassName(validatorClassName);
         }
     }
 
