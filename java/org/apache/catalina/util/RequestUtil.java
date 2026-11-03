@@ -22,7 +22,6 @@ import java.util.Enumeration;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.Request;
 import org.apache.tomcat.util.buf.EncodedSolidusHandling;
@@ -208,32 +207,28 @@ public final class RequestUtil {
     }
 
 
-    public static String getContextPathUndecoded(Request request) {
+    /**
+     * Obtains the original, encoded, non-normalized (including sequences of multiple '/') context path as provided by
+     * the user agent.
+     *
+     * @param connector          The Connector on which the request was received
+     * @param httpServletRequest The request from which the original context path should be extracted
+     *
+     * @return The original, encoded, non-normalized context path
+     */
+    public static String getContextPathEncoded(Connector connector, HttpServletRequest httpServletRequest) {
 
-        int lastSlash = request.getMappingData().contextSlashCount;
+        String canonicalContextPath = httpServletRequest.getServletContext().getContextPath();
+        int lastSlash = slashCount(canonicalContextPath);
         // Special case handling for the root context
         if (lastSlash == 0) {
             return "";
         }
 
-        String uri = request.getRequestURI();
-        Context context = request.getContext();
-        String canonicalContextPath = request.getServletContext().getContextPath();
-        Connector connector = request.getConnector();
+        String uri = httpServletRequest.getRequestURI();
         EncodedSolidusHandling encodedSolidusHandling = connector.getEncodedSolidusHandlingInternal();
 
         int pos = 0;
-        if (!context.getAllowMultipleLeadingForwardSlashInPath()) {
-            // Ensure that the returned value only starts with a single '/'.
-            // This prevents the value being misinterpreted as a protocol-relative
-            // URI if used with sendRedirect().
-            do {
-                pos++;
-            } while (pos < uri.length() && uri.charAt(pos) == '/');
-            pos--;
-            uri = uri.substring(pos);
-        }
-
         char[] uriChars = uri.toCharArray();
         // Need at least the number of slashes in the context path
         while (lastSlash > 0) {
@@ -323,5 +318,17 @@ public final class RequestUtil {
             pos++;
         }
         return -1;
+    }
+
+
+    private static int slashCount(String uri) {
+        int result = 0;
+        int start = 0;
+        while ((start = uri.indexOf('/', start)) > -1) {
+            start++;
+            result++;
+        }
+
+        return result;
     }
 }
