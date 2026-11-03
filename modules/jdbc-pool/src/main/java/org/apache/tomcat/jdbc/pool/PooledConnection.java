@@ -33,6 +33,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;
 import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
+import org.apache.tomcat.jdbc.pool.util.ExceptionUtils;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
@@ -943,13 +944,20 @@ public class PooledConnection implements PooledConnectionMBean {
             boolean valid;
             try {
                 valid = poolProperties.getValidator().validate(connection, validateAction);
-            } catch (RuntimeException x) {
+            } catch (Throwable x) {
+                ExceptionUtils.handleThrowable(x);
                 // The SPI declares no checked exception, so throwing is the
                 // only way an implementation can report its own failure; the
                 // pool must treat that as a failed validation, because a
                 // throw escaping from here unwinds the borrow or return path
                 // between the idle and busy queues and strands the pooled
-                // connection - permanently shrinking the pool
+                // connection - permanently shrinking the pool. Errors belong
+                // in this guard too: an implementation loaded through a web
+                // application class loader fails with LinkageError variants -
+                // a NoClassDefFoundError once the context has stopped is the
+                // common one - and that is a check that cannot vouch for the
+                // session, nothing else. Only the fatal conditions that
+                // handleThrowable re-throws keep propagating.
                 if (getPoolProperties().getLogValidationErrors()) {
                     log.error(MessageFactory.get("pooledConnection.customValidationThrew",
                             poolProperties.getValidator()), x);
@@ -1034,6 +1042,23 @@ public class PooledConnection implements PooledConnectionMBean {
                     log.debug("isValid() failed.", e);
                 }
                 return false;
+            } catch (Throwable x) {
+                // Same reasoning one step further: a driver or wrapper that
+                // fails the check with an Error - a LinkageError surfacing
+                // through a wrapper whose class loader has lost a class is
+                // the realistic arrival - has answered the question the
+                // check asks, "can this session be vouched for", with
+                // nothing better than an exception would; handleThrowable
+                // keeps the fatal conditions it keeps everywhere else.
+                ExceptionUtils.handleThrowable(x);
+                if (getPoolProperties().getLogValidationErrors()) {
+                    log.error(MessageFactory.get("pooledConnection.isValidFailed"), x);
+                } else {
+                    // Logged like the unchecked case above: this is the
+                    // same anomaly one type further out
+                    log.warn(MessageFactory.get("pooledConnection.isValidFailed"), x);
+                }
+                return false;
             } finally {
                 if (!transactionTerminated) {
                     silentlyRollbackTransactionIfNeeded();
@@ -1075,7 +1100,13 @@ public class PooledConnection implements PooledConnectionMBean {
                 transactionTerminated = silentlyRollbackTransactionIfNeeded();
             }
             return transactionTerminated;
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
+            // The checked and unchecked failures of the driver calls above
+            // are failed validations, and so is an Error short of the fatal
+            // conditions handleThrowable keeps: an escaping throw unwinds
+            // the borrow path between the idle and busy queues and strands
+            // the pooled connection, whatever the throw's type.
+            ExceptionUtils.handleThrowable(ex);
             if (getPoolProperties().getLogValidationErrors()) {
                 log.error(MessageFactory.get("pooledConnection.sqlValidationError"), ex);
             } else if (log.isDebugEnabled()) {
