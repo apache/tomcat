@@ -396,6 +396,10 @@ public class NoDescriptorRegistry extends Registry {
 
         @Override
         public ClassLoader getClassLoader(ObjectName loaderName) throws InstanceNotFoundException {
+            if (loaderName == null) {
+                // A null name selects this server's class loader without looking up an MBean.
+                return getClass().getClassLoader();
+            }
             throw notFound(loaderName);
         }
 
