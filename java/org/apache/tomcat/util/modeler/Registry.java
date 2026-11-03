@@ -79,7 +79,8 @@ public class Registry implements RegistryMBean, MBeanRegistration {
      */
     private final Map<String,ManagedBean> descriptorsByClass = new ConcurrentHashMap<>();
 
-    // map to avoid duplicated searching or loading descriptors
+    // Map to avoid duplicated searching or loading descriptors. Its monitor also guards loading and checking the
+    // search records, so another thread cannot treat an in-progress load as a completed search.
     private final Map<String,URL> searchedPaths = new ConcurrentHashMap<>();
 
     private Object guard;
@@ -168,9 +169,11 @@ public class Registry implements RegistryMBean, MBeanRegistration {
      */
     @Override
     public void stop() {
-        descriptorsByClass.clear();
-        descriptors.clear();
-        searchedPaths.clear();
+        synchronized (searchedPaths) {
+            descriptorsByClass.clear();
+            descriptors.clear();
+            searchedPaths.clear();
+        }
     }
 
 
@@ -685,6 +688,15 @@ public class Registry implements RegistryMBean, MBeanRegistration {
      * @param classLoader The class loader
      */
     public void loadDescriptors(String packageName, ClassLoader classLoader) {
+        // Hold the lock until the descriptors have been registered. A concurrent caller must wait for the load,
+        // rather than returning early and falling back to introspection while the metadata is still unavailable.
+        synchronized (searchedPaths) {
+            loadDescriptorsInternal(packageName, classLoader);
+        }
+    }
+
+
+    private void loadDescriptorsInternal(String packageName, ClassLoader classLoader) {
         String res = packageName.replace('.', '/');
 
         if (log.isTraceEnabled()) {
@@ -705,10 +717,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
         if (log.isTraceEnabled()) {
             log.trace("Found " + dURL);
         }
-        if (searchedPaths.putIfAbsent(packageName, dURL) != null) {
-            // Another thread claimed this package first and is loading it
-            return;
-        }
+        searchedPaths.put(packageName, dURL);
         try {
             load("MbeansDescriptorsDigesterSource", dURL, null);
         } catch (Exception e) {
@@ -742,8 +751,10 @@ public class Registry implements RegistryMBean, MBeanRegistration {
                 return;
             }
             pkg = pkg.substring(0, lastComp);
-            if (searchedPaths.get(pkg) != null) {
-                return;
+            synchronized (searchedPaths) {
+                if (searchedPaths.get(pkg) != null) {
+                    return;
+                }
             }
             loadDescriptors(pkg, classLoader);
         }
