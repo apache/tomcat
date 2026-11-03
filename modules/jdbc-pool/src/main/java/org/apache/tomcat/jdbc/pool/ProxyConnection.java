@@ -379,8 +379,10 @@ public class ProxyConnection extends JdbcInterceptor {
             // connection behind it also provides - java.sql.Connection
             // first of all - keep resolving to the physical connection;
             // javax.sql.XAConnection is excluded because unwrapping to it
-            // has always yielded the driver's XA connection object where one
-            // exists, and the failure below where none does. This answer
+            // has always yielded the XA connection object the pooled
+            // connection holds - the driver's handle, wrapped by the pool's
+            // branch tracker on an XA session - and the failure below where
+            // none does. This answer
             // runs below the fence like every other handout here: above it,
             // a marking or a seal landing with the caller's re-check left
             // could hand the handle out on a borrow the pool was already

@@ -66,9 +66,11 @@ public class XADataSource extends DataSource implements javax.sql.XADataSource {
      * returns the session to the pool instead of closing the physical connection; every XA branch started through the
      * returned {@link javax.transaction.xa.XAResource} must therefore be completed - committed or rolled back - before
      * {@code close()}, and neither the handle nor its {@code XAResource} may be used after it. A handle closed while a
-     * branch stands prepared parks that in-doubt branch, and the database locks held for it, on a session the pool
-     * hands to another borrower: the pool's return-time rollback unwinds only local work and can never resolve a
-     * prepared branch.
+     * branch stands unresolved is not returned to the pool: the pool's return-time rollback unwinds only local work
+     * and can never resolve a branch that stands prepared, so the pool closes the session instead of handing another
+     * borrower a connection that carries that branch and the database locks held for it. The transaction manager's
+     * late commit or rollback of the abandoned branch then fails against the closed session rather than landing,
+     * silently, on a session that does not carry it.
      * <p>
      * The connection obtained from the returned handle's
      * {@link javax.sql.PooledConnection#getConnection()} is the driver's raw logical session, not a pool-managed
