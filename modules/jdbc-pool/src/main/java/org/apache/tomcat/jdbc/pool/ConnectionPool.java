@@ -26,10 +26,12 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -986,6 +988,28 @@ public class ConnectionPool {
             poolCleaner.stopRunning();
             poolCleaner = null;
         }
+    }
+
+    /**
+     * Arms a replacement for this pool's maintenance task when the task the pool still holds is the one that lost the
+     * shared timer, and does nothing when it is not. A pool whose cleaner has meanwhile been armed by a configuration
+     * write is served by that task, and one that has been stopped - by a close, or by a configuration that no longer
+     * asks for a sweeper - is served by none on purpose; reviving the spent task would either duplicate the
+     * maintenance work for the pool's lifetime or arm a pool that has given its connections back.
+     *
+     * @param stranded the task that was scheduled on the shared timer that died
+     */
+    synchronized void rearmPoolCleaner(PoolCleaner stranded) {
+        if (poolCleaner != stranded) {
+            return;
+        }
+        // The spent task goes first whatever the configuration now asks for: its
+        // registry entry would otherwise stand for a task that can never run
+        // again, and no close would hand it back. What is armed after it is what
+        // the configuration asks for now, so a pool that has closed in the
+        // meantime, or has had its sweeper switched off, is left as it is.
+        terminatePoolCleaner();
+        initializePoolCleaner(getPoolProperties());
     }
 
     /**
@@ -2782,31 +2806,129 @@ public class ConnectionPool {
     private static synchronized void registerCleaner(PoolCleaner cleaner) {
         unregisterCleaner(cleaner);
         cleaners.add(cleaner);
-        // A timer cancels itself when a task throws an uncaught throwable,
-        // and scheduling onto such a dead timer fails - which would make
-        // every pool that needs a cleaner afterwards fail the same way for
-        // the rest of the JVM's life. PoolCleaner.run no longer lets
-        // anything escape; this is the safety net for a timer that is
-        // already dead when it arrives: replace it rather than refuse.
-        while (true) {
-            if (poolCleanTimer == null) {
-                ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        if (poolCleanTimer == null) {
+            poolCleanTimer = newPoolTimer();
+        }
+        try {
+            poolCleanTimer.schedule(cleaner, cleaner.sleepTime, cleaner.sleepTime);
+            return;
+        } catch (IllegalStateException x) {
+            // Two different failures answer with this exception and they call
+            // for opposite handling. A timer cancels itself for good the
+            // moment a task lets a throwable escape it, and every pool this
+            // class loader holds shares the one timer, so a timer that died
+            // refuses every pool that needs a cleaner afterwards for the rest
+            // of the JVM's life - unless it is replaced. The other failure is
+            // the task itself, which has been scheduled once already and no
+            // timer will ever accept again. The replacement is attempted on a
+            // timer built for the attempt, which is a question the second
+            // cause cannot fake: a task the new timer takes was refused by
+            // the old timer's death. Attempted once, because keyed on the
+            // refusal alone the second cause is incurable and the loop spins,
+            // handing out a fresh timer per turn and scheduling nothing on
+            // any of them.
+            Timer replacement = newPoolTimer();
+            try {
+                replacement.schedule(cleaner, cleaner.sleepTime, cleaner.sleepTime);
+            } catch (IllegalStateException y) {
+                // The task is the spent one, so nothing is rebuilt. The timer
+                // this call found may well be alive and serving the tasks
+                // registered on it; the one just discarded was never asked to
+                // hold anything, and the registry goes back as this call found
+                // it. The refusal itself goes back to the caller, which is
+                // what starting a spent task has always answered with.
+                cleaners.remove(cleaner);
+                replacement.cancel();
+                log.error(MessageFactory.get("connectionPool.cleanerSchedulingFailed"), y);
+                throw y;
+            }
+            // The diagnosis is the acceptance: every task the registry holds
+            // besides this one was scheduled on the timer that died. A spent
+            // task can never be scheduled again, so replacing the timer
+            // revives nothing by itself - each pool has to build a new task,
+            // and only that pool's monitor can arm it. Pool threads reach
+            // this method's monitor from behind their own, so arming them
+            // from here would cross the two orders; the new timer's thread
+            // holds no pool monitor and takes them one at a time.
+            List<PoolCleaner> stranded = new ArrayList<>(cleaners);
+            stranded.remove(cleaner);
+            poolCleanTimer = replacement;
+            if (!stranded.isEmpty()) {
+                log.error(MessageFactory.get("connectionPool.cleanerTimerReplaced",
+                        Integer.valueOf(stranded.size())), x);
                 try {
-                    Thread.currentThread().setContextClassLoader(ConnectionPool.class.getClassLoader());
-                    // Create the timer thread in a PrivilegedAction so that a
-                    // reference to the web application class loader is not created
-                    // via Thread.inheritedAccessControlContext
-                    PrivilegedAction<Timer> pa = new PrivilegedNewTimer();
-                    poolCleanTimer = AccessController.doPrivileged(pa);
-                } finally {
-                    Thread.currentThread().setContextClassLoader(loader);
+                    replacement.schedule(new CleanerReviver(stranded), 0);
+                } catch (RuntimeException z) {
+                    // The recovery's own step is the one failing here. The pool
+                    // that arrived has its task on the new timer and owes its
+                    // configuration write no failure it did not cause, so this
+                    // is reported rather than thrown back at it; the pools left
+                    // stranded are what the message counts.
+                    log.error(MessageFactory.get("connectionPool.cleanerRearmFailed"), z);
                 }
             }
-            try {
-                poolCleanTimer.schedule(cleaner, cleaner.sleepTime, cleaner.sleepTime);
-                return;
-            } catch (IllegalStateException x) {
-                poolCleanTimer = null;
+        }
+    }
+
+    /**
+     * Builds the timer that carries the maintenance of every pool this class
+     * loader holds. Its thread is created with the pool's own class loader as
+     * the context one, so that a reference to a web application class loader is
+     * not created via Thread.inheritedAccessControlContext.
+     *
+     * @return a timer with no tasks scheduled on it
+     */
+    private static Timer newPoolTimer() {
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(ConnectionPool.class.getClassLoader());
+            // Create the timer thread in a PrivilegedAction so that a
+            // reference to the web application class loader is not created
+            // via Thread.inheritedAccessControlContext
+            PrivilegedAction<Timer> pa = new PrivilegedNewTimer();
+            return AccessController.doPrivileged(pa);
+        } finally {
+            Thread.currentThread().setContextClassLoader(loader);
+        }
+    }
+
+    /**
+     * Arms a fresh maintenance task for each pool whose task was scheduled on
+     * the shared timer that died. The revival cannot reuse those tasks - one
+     * that has been scheduled once is spent - so it asks the pools themselves
+     * through {@link ConnectionPool#rearmPoolCleaner(PoolCleaner)}, which takes
+     * effect only for a pool still holding the spent task.
+     */
+    private static final class CleanerReviver extends TimerTask {
+        private final List<PoolCleaner> stranded;
+
+        CleanerReviver(List<PoolCleaner> stranded) {
+            this.stranded = stranded;
+        }
+
+        @Override
+        public void run() {
+            for (PoolCleaner cleaner : stranded) {
+                try {
+                    ConnectionPool pool = cleaner.pool.get();
+                    if (pool == null) {
+                        // Nothing holds the pool any more. Its task will never
+                        // run again, so it is the one entry in the registry that
+                        // no cleaner will ever stop and no close will ever hand
+                        // back - drop it here, as the task's own run method does
+                        // when it outlives the pool.
+                        unregisterCleaner(cleaner);
+                        continue;
+                    }
+                    pool.rearmPoolCleaner(cleaner);
+                } catch (Throwable x) {
+                    // The module's fatal policy runs first, as everywhere else.
+                    // This is a timer task: a throwable that escaped it would
+                    // take the replacement timer down the way the last one went,
+                    // and the pools further down this list with it.
+                    ExceptionUtils.handleThrowable(x);
+                    log.error(MessageFactory.get("connectionPool.cleanerRearmFailed"), x);
+                }
             }
         }
     }
