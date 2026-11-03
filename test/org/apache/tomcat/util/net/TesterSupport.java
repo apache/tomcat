@@ -18,10 +18,8 @@ package org.apache.tomcat.util.net;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -292,41 +290,6 @@ public final class TesterSupport {
             ks.load(is, JKS_PASS.toCharArray());
         }
         return ks;
-    }
-
-    /**
-     * Creates a PKCS#12 bundle (the file name ends with {@code .pkcs12}) that holds the localhost RSA private key and
-     * only its own certificate, i.e. without the certificate of the CA that issued it. The bundle is protected with
-     * {@link #JKS_PASS}.
-     *
-     * @return the bundle, which is deleted when the JVM exits
-     *
-     * @throws Exception if the bundle could not be created
-     */
-    public static File createLocalhostRsaLeafOnlyPkcs12() throws Exception {
-        KeyStore jks = getKeyStore(LOCALHOST_RSA_JKS);
-        String alias = null;
-        Enumeration<String> aliases = jks.aliases();
-        while (alias == null && aliases.hasMoreElements()) {
-            String candidate = aliases.nextElement();
-            if (jks.isKeyEntry(candidate)) {
-                alias = candidate;
-            }
-        }
-        Assert.assertNotNull(alias);
-        PrivateKey key = (PrivateKey) jks.getKey(alias, JKS_PASS.toCharArray());
-        Certificate leaf = jks.getCertificateChain(alias)[0];
-
-        KeyStore pkcs12 = KeyStore.getInstance("PKCS12");
-        pkcs12.load(null, null);
-        pkcs12.setKeyEntry("localhost", key, JKS_PASS.toCharArray(), new Certificate[] { leaf });
-
-        File file = File.createTempFile("tomcat-test-", ".pkcs12");
-        file.deleteOnExit();
-        try (OutputStream os = new FileOutputStream(file)) {
-            pkcs12.store(os, JKS_PASS.toCharArray());
-        }
-        return file;
     }
 
     protected static boolean isClientRenegotiationSupported(Tomcat tomcat) {

@@ -17,16 +17,9 @@
 package org.apache.tomcat.util.net;
 
 import java.io.File;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 import org.junit.Assert;
 import org.junit.Assume;
@@ -265,60 +258,6 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
         sslHostConfig.addCertificate(certificate);
 
         doTest();
-    }
-
-
-    /*
-     * The certificates of the chain file must be sent after the certificate of a PKCS#12 bundle just as they are for a
-     * PEM certificate. The bundle only holds the leaf certificate so the CA certificate can only come from the chain
-     * file. This is a feature of the OpenSSL FFM implementation which is the only one that reads PKCS#12 bundles
-     * through the certificate file.
-     */
-    @Test
-    public void testHostRSAWithPkcs12AndChainFile() throws Exception {
-        Assume.assumeTrue("Only needs to be run once", storeType == StoreType.PEM);
-        Assume.assumeTrue("Only applies to the OpenSSL FFM implementation",
-                "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation".equals(sslImplementationName));
-
-        SSLHostConfig sslHostConfig = getSSLHostConfig();
-        SSLHostConfigCertificate certificate = new SSLHostConfigCertificate(sslHostConfig, Type.RSA);
-        certificate.setCertificateFile(TesterSupport.createLocalhostRsaLeafOnlyPkcs12().getAbsolutePath());
-        certificate.setCertificateKeyPassword(TesterSupport.JKS_PASS);
-        certificate.setCertificateChainFile(getPath(TesterSupport.CA_CERT_PEM));
-        sslHostConfig.addCertificate(certificate);
-
-        Tomcat tomcat = getTomcatInstance();
-        tomcat.start();
-
-        // Trust everything, the test is about what the server sends
-        SSLContext clientContext = SSLContext.getInstance("TLS");
-        clientContext.init(null, new TrustManager[] { new X509TrustManager() {
-            @Override
-            public void checkClientTrusted(X509Certificate[] chain, String authType) {
-                // NO-OP
-            }
-
-            @Override
-            public void checkServerTrusted(X509Certificate[] chain, String authType) {
-                // NO-OP
-            }
-
-            @Override
-            public X509Certificate[] getAcceptedIssuers() {
-                return new X509Certificate[0];
-            }
-        } }, null);
-
-        try (SSLSocket socket = (SSLSocket) clientContext.getSocketFactory().createSocket("localhost", getPort())) {
-            socket.setSoTimeout(5000);
-            socket.startHandshake();
-            Certificate[] peerCertificates = socket.getSession().getPeerCertificates();
-
-            Assert.assertEquals("The chain file was not sent", 2, peerCertificates.length);
-            X509Certificate leaf = (X509Certificate) peerCertificates[0];
-            X509Certificate ca = (X509Certificate) peerCertificates[1];
-            Assert.assertEquals(leaf.getIssuerX500Principal(), ca.getSubjectX500Principal());
-        }
     }
 
 

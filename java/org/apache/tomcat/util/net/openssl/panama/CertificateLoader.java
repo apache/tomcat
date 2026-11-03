@@ -371,9 +371,19 @@ public final class CertificateLoader {
             return null;
         }
 
-        // Append the separately configured chain to the intermediates (if any)
-        // read from the certificate file.
-        chain = appendChainFile(chainFile, hostName, chain);
+        if (chainFile != null) {
+            byte[] chainBytes = readConfigFileBytes(chainFile);
+            if (chainBytes == null) {
+                log.warn(sm.getString("certificateLoader.certificateLoadFailed", hostName, chainFile));
+            } else {
+                // Append the separately configured chain to the intermediates
+                // (if any) read from the certificate file.
+                MemorySegment[] extraChain = readX509ChainFromBytes(chainBytes);
+                chain = Arrays.copyOf(chain, chain.length + extraChain.length);
+                System.arraycopy(extraChain, 0, chain, chain.length - extraChain.length,
+                        extraChain.length);
+            }
+        }
 
         return new CertificateEntry(leaf, key, chain);
     }
@@ -409,15 +419,8 @@ public final class CertificateLoader {
             KeyStore keyStore = KeyStore.getInstance("PKCS12");
             keyStore.load(new ByteArrayInputStream(fileBytes),
                     (keyPassToUse != null) ? keyPassToUse.toCharArray() : null);
-            CertificateEntry entry = loadJavaKeyStoreKey(keyStore, certificate.getCertificateKeyAlias(),
-                    keyPassToUse, certFile, hostName, arena);
-            if (entry != null && certificate.getCertificateChainFile() != null) {
-                // Append the separately configured chain to the intermediates
-                // (if any) held by the bundle.
-                entry = new CertificateEntry(entry.leaf, entry.key,
-                        appendChainFile(certificate.getCertificateChainFile(), hostName, entry.chain));
-            }
-            return entry;
+            return loadJavaKeyStoreKey(keyStore, certificate.getCertificateKeyAlias(), keyPassToUse,
+                    certFile, hostName, arena);
         } catch (IOException e) {
             // Covers a wrong password: the JDK fails the MAC check
             log.warn(sm.getString("certificateLoader.certificateLoadFailed", hostName,
@@ -602,32 +605,6 @@ public final class CertificateLoader {
 
 
     // ------------------------------------- File and native reading helpers
-
-    /**
-     * Reads the certificates of the configured chain file and appends them to the given chain. A chain file that
-     * cannot be read is logged and ignored.
-     *
-     * @param chainFile The location of the chain file, or {@code null} if none is configured
-     * @param hostName  The host name the certificate belongs to, used for logging
-     * @param chain     The certificates (owned by the caller) to append to
-     *
-     * @return the chain with the certificates of the chain file appended, which owns all the native objects
-     */
-    private static MemorySegment[] appendChainFile(String chainFile, String hostName, MemorySegment[] chain) {
-        if (chainFile == null) {
-            return chain;
-        }
-        byte[] chainBytes = readConfigFileBytes(chainFile);
-        if (chainBytes == null) {
-            log.warn(sm.getString("certificateLoader.certificateLoadFailed", hostName, chainFile));
-            return chain;
-        }
-        MemorySegment[] extraChain = readX509ChainFromBytes(chainBytes);
-        MemorySegment[] result = Arrays.copyOf(chain, chain.length + extraChain.length);
-        System.arraycopy(extraChain, 0, result, chain.length, extraChain.length);
-        return result;
-    }
-
 
     /**
      * An OpenSSL ENGINE needs a real file. Resolves a configured location, relative to the Catalina base if
@@ -964,19 +941,8 @@ public final class CertificateLoader {
         KeyStore keyStore = KeyStore.getInstance("PKCS12");
         keyStore.load(new ByteArrayInputStream(fileBytes),
                 (password != null) ? password.toCharArray() : null);
-        X509Certificate[] bundleChain = getCertificateChainKeyStore(keyStore,
+        return getCertificateChainKeyStore(keyStore,
                 certificate.getCertificateKeyAlias());
-        String chainFile = certificate.getCertificateChainFile();
-        if (bundleChain == null || chainFile == null) {
-            return bundleChain;
-        }
-        // A separately configured chain file is appended to the chain
-        List<X509Certificate> chain = new ArrayList<>(Arrays.asList(bundleChain));
-        byte[] chainBytes = readConfigFileBytes(chainFile);
-        if (chainBytes != null) {
-            addX509Certificates(chain, CertificateFactory.getInstance("X.509"), chainBytes);
-        }
-        return chain.toArray(new X509Certificate[0]);
     }
 
 
