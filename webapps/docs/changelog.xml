@@ -1563,6 +1563,14 @@
       <update>
         Update Tomcat Native to 2.0.17. (markt)
       </update>
+      <fix>
+        <bug>70285</bug>: Fix the <code>deploy</code> build target so
+        <code>*.sh</code> files in the build directory use LF line endings and
+        <code>*.bat</code> files use CRLF line endings on both Windows and
+        Unix. A Windows build otherwise writes scripts such as
+        <code>catalina.sh</code> with CRLF line endings, and those scripts fail
+        when the build output is run on Linux. (strongox)
+      </fix>
     </changelog>
   </subsection>
 </section>

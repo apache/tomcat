@@ -1556,6 +1556,9 @@
     </copy>
     <!-- Copy doesn't retain permissions -->
     <chmod dir="${tomcat.build}/bin" includes="*.sh" perm="+x"/>
+    <!-- Copy with an encoding rewrites newlines as the platform default -->
+    <fixcrlf srcdir="${tomcat.build}/bin" includes="*.sh"  eol="lf"   encoding="ISO-8859-1" fixlast="false" />
+    <fixcrlf srcdir="${tomcat.build}/bin" includes="*.bat" eol="crlf" encoding="ISO-8859-1" fixlast="false" />
 
     <!-- Copy static resource files -->
     <copy todir="${tomcat.build}/conf" encoding="ISO-8859-1">
@@ -2398,9 +2401,7 @@
 
     <touch file="${tomcat.dist}/temp/safeToDelete.tmp" />
 
-    <!-- Correct permissions and line endings on "bin" scripts -->
-    <fixcrlf srcdir="${tomcat.dist}/bin" includes="*.sh"  eol="lf"   encoding="ISO-8859-1" fixlast="false" />
-    <fixcrlf srcdir="${tomcat.dist}/bin" includes="*.bat" eol="crlf" encoding="ISO-8859-1" fixlast="false" />
+    <!-- Line endings were set on ${tomcat.build}/bin. Copy keeps the bytes. -->
     <chmod      dir="${tomcat.dist}/bin" includes="*.sh"  perm="+x"/>
 
     <!-- Windows binaries -->
@@ -2864,6 +2865,8 @@ You may need a custom build of makensis. Instructions for this may be found in B
     </copy>
     <fixcrlf srcdir="${tomcat.dist}" eol="crlf" encoding="ISO-8859-1" fixlast="false">
       <patternset refid="text.files"/>
+      <exclude name="bin/*.sh"/>
+      <exclude name="bin/*.bat"/>
     </fixcrlf>
     <!-- Reproducible builds: consistent timestamps for installer files -->
     <touch datetime="${tstamp.file}" pattern="yyyy-MM-dd HH:mm:ss">
@@ -3237,6 +3240,8 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
     <fixcrlf srcdir="${tomcat.dist}" eol="crlf"
         encoding="ISO-8859-1" fixlast="false" >
       <patternset refid="text.files" />
+      <exclude name="bin/*.sh"/>
+      <exclude name="bin/*.bat"/>
     </fixcrlf>
 
     <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}.zip"
@@ -3280,6 +3285,8 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
     <fixcrlf srcdir="${tomcat.dist}" eol="crlf"
         encoding="ISO-8859-1" fixlast="false" >
       <patternset refid="text.files" />
+      <exclude name="bin/*.sh"/>
+      <exclude name="bin/*.bat"/>
     </fixcrlf>
 
     <!-- Windows x64 package -->
@@ -3314,6 +3321,8 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
     <fixcrlf srcdir="${tomcat.dist}" eol="crlf"
         encoding="ISO-8859-1" fixlast="false" >
       <patternset refid="text.files" />
+      <exclude name="bin/*.sh"/>
+      <exclude name="bin/*.bat"/>
     </fixcrlf>
     <fixcrlf srcdir="${tomcat.deployer}" eol="crlf"
         encoding="ISO-8859-1" fixlast="false" >
@@ -3339,6 +3348,8 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
     <fixcrlf srcdir="${tomcat.dist}" eol="lf"
         encoding="ISO-8859-1" fixlast="false" >
       <patternset refid="text.files" />
+      <exclude name="bin/*.sh"/>
+      <exclude name="bin/*.bat"/>
     </fixcrlf>
 
     <!-- Reproducible builds: consistent timestamps for distributed files -->
@@ -3387,6 +3398,8 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
     <fixcrlf srcdir="${tomcat.dist}" eol="lf"
         encoding="ISO-8859-1" fixlast="false" >
       <patternset refid="text.files" />
+      <exclude name="bin/*.sh"/>
+      <exclude name="bin/*.bat"/>
     </fixcrlf>
     <fixcrlf srcdir="${tomcat.deployer}" eol="lf"
         encoding="ISO-8859-1" fixlast="false" >
@@ -3420,6 +3433,8 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
     <fixcrlf srcdir="${tomcat.dist}" eol="lf"
         encoding="ISO-8859-1" fixlast="false" >
       <patternset refid="text.files" />
+      <exclude name="bin/*.sh"/>
+      <exclude name="bin/*.bat"/>
     </fixcrlf>
 
     <!-- Reproducible builds: consistent timestamps for distributed files.   -->
