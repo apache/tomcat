@@ -173,7 +173,7 @@ public final class CertificateLoader {
                 if (keyPassFile == null) {
                     keyPassFile = certificate.getCertificateKeystorePasswordFile();
                 }
-                log.warn(sm.getString("certificateLoader.certificateLoadFailed", hostName, keyPassFile), ioe);
+                log.error(sm.getString("certificateLoader.certificateLoadFailed", hostName, keyPassFile), ioe);
                 return null;
             }
 
@@ -190,7 +190,7 @@ public final class CertificateLoader {
             }
             return loadKeyStore(certificate, hostName, keyPassToUse, arena);
         } catch (Throwable t) {
-            log.warn(sm.getString("certificateLoader.certificateLoadFailed", hostName,
+            log.error(sm.getString("certificateLoader.certificateLoadFailed", hostName,
                     t.getClass().getName() + (t.getMessage() != null ? ": " + t.getMessage() : "")), t);
             return null;
         }
@@ -320,12 +320,12 @@ public final class CertificateLoader {
 
         byte[] certBytes = readConfigFileBytes(certFile);
         if (certBytes == null) {
-            log.warn(sm.getString("certificateLoader.certificateLoadFailed", hostName, certFile));
+            log.error(sm.getString("certificateLoader.certificateLoadFailed", hostName, certFile));
             return null;
         }
         byte[] keyBytes = readConfigFileBytes(keyFile);
         if (keyBytes == null) {
-            log.warn(sm.getString("certificateLoader.certificateLoadFailed", hostName, keyFile));
+            log.error(sm.getString("certificateLoader.certificateLoadFailed", hostName, keyFile));
             return null;
         }
 
@@ -347,7 +347,7 @@ public final class CertificateLoader {
             for (MemorySegment extra : chain) {
                 openssl_h.X509_free(extra);
             }
-            log.warn(sm.getString("certificateLoader.certificateLoadFailed", hostName,
+            log.error(sm.getString("certificateLoader.certificateLoadFailed", hostName,
                     certFile + " (" + OpenSSLLibrary.getLastError() + ")"));
             return null;
         }
@@ -365,7 +365,7 @@ public final class CertificateLoader {
                 openssl_h.X509_free(extra);
             }
             openssl_h.X509_free(leaf);
-            log.warn(sm.getString("certificateLoader.certificateLoadFailed", hostName,
+            log.error(sm.getString("certificateLoader.certificateLoadFailed", hostName,
                     keyFile + " (" + OpenSSLLibrary.getLastError() + ")"));
             return null;
         }
@@ -396,7 +396,7 @@ public final class CertificateLoader {
             String certFile, String keyPassToUse, Arena arena) {
         byte[] fileBytes = readConfigFileBytes(certFile);
         if (fileBytes == null) {
-            log.warn(sm.getString("certificateLoader.certificateLoadFailed", hostName, certFile));
+            log.error(sm.getString("certificateLoader.certificateLoadFailed", hostName, certFile));
             return null;
         }
 
@@ -421,11 +421,11 @@ public final class CertificateLoader {
             return entry;
         } catch (IOException e) {
             // Covers a wrong password: the JDK fails the MAC check
-            log.warn(sm.getString("certificateLoader.certificateLoadFailed", hostName,
+            log.error(sm.getString("certificateLoader.certificateLoadFailed", hostName,
                     certFile + " (" + sm.getString("certificateLoader.badPassword") + ")"));
             return null;
         } catch (Throwable t) {
-            log.warn(sm.getString("certificateLoader.certificateLoadFailed", hostName,
+            log.error(sm.getString("certificateLoader.certificateLoadFailed", hostName,
                     certFile + " (" + t.getClass().getName() +
                     (t.getMessage() != null ? ": " + t.getMessage() : "") + ")"), t);
             return null;
@@ -452,12 +452,12 @@ public final class CertificateLoader {
         try {
             keyStore = certificate.getCertificateKeystore();
         } catch (Throwable e) {
-            log.warn(sm.getString("certificateLoader.certificateLoadFailed", hostName,
+            log.error(sm.getString("certificateLoader.certificateLoadFailed", hostName,
                     certificate.getCertificateKeystoreFile()), e);
             return null;
         }
         if (keyStore == null) {
-            log.warn(sm.getString("certificateLoader.certificateLoadFailed", hostName,
+            log.error(sm.getString("certificateLoader.certificateLoadFailed", hostName,
                     certificate.getCertificateKeystoreFile()));
             return null;
         }
@@ -489,7 +489,7 @@ public final class CertificateLoader {
         try {
             String alias = resolveKeyAlias(keyStore, configuredAlias);
             if (alias == null || !keyStore.isKeyEntry(alias)) {
-                log.warn(sm.getString("certificateLoader.certificateLoadFailed", hostName,
+                log.error(sm.getString("certificateLoader.certificateLoadFailed", hostName,
                         source + " (" + sm.getString("certificateLoader.noKeyEntry") + ")"));
                 return null;
             }
@@ -497,21 +497,21 @@ public final class CertificateLoader {
             char[] keyPass = (keyPassToUse != null) ? keyPassToUse.toCharArray() : new char[0];
             java.security.Key keyObj = keyStore.getKey(alias, keyPass);
             if (!(keyObj instanceof PrivateKey)) {
-                log.warn(sm.getString("certificateLoader.certificateLoadFailed", hostName,
+                log.error(sm.getString("certificateLoader.certificateLoadFailed", hostName,
                         source + " (" + sm.getString("certificateLoader.noKeyEntry") + ")"));
                 return null;
             }
             PrivateKey javaKey = (PrivateKey) keyObj;
             Certificate[] chain = keyStore.getCertificateChain(alias);
             if (chain == null || chain.length == 0) {
-                log.warn(sm.getString("certificateLoader.certificateLoadFailed", hostName,
+                log.error(sm.getString("certificateLoader.certificateLoadFailed", hostName,
                         source + " (" + sm.getString("certificateLoader.noKeyEntry") + ")"));
                 return null;
             }
             X509Certificate[] x509Chain = new X509Certificate[chain.length];
             for (int i = 0; i < chain.length; i++) {
                 if (!(chain[i] instanceof X509Certificate)) {
-                    log.warn(sm.getString("certificateLoader.certificateLoadFailed", hostName,
+                    log.error(sm.getString("certificateLoader.certificateLoadFailed", hostName,
                             source + " (" + sm.getString("certificateLoader.noKeyEntry") + ")"));
                     return null;
                 }
@@ -520,13 +520,13 @@ public final class CertificateLoader {
 
             CertificateEntry entry = toCertEntry(javaKey, x509Chain, arena);
             if (entry == null) {
-                log.warn(sm.getString("certificateLoader.certificateLoadFailed", hostName,
+                log.error(sm.getString("certificateLoader.certificateLoadFailed", hostName,
                         source + " (" + OpenSSLLibrary.getLastError() + ")"));
                 return null;
             }
             return entry;
         } catch (Throwable e) {
-            log.warn(sm.getString("certificateLoader.certificateLoadFailed", hostName, source), e);
+            log.error(sm.getString("certificateLoader.certificateLoadFailed", hostName, source), e);
             return null;
         }
     }
@@ -671,6 +671,9 @@ public final class CertificateLoader {
             }
             return bos.toByteArray();
         } catch (Exception e) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("certificateLoader.readFailed", path), e);
+            }
             return null;
         }
     }

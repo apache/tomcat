@@ -19,12 +19,18 @@ package org.apache.tomcat.util.net;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
@@ -39,6 +45,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
@@ -352,6 +359,169 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
     }
 
 
+    /*
+     * A failure to read the server certificate or key is logged at ERROR with the failure to read the file logged at
+     * DEBUG. A failure to read a chain file only needs to be logged at WARN. These are features of the OpenSSL FFM
+     * implementation.
+     */
+    @Test
+    public void testHostRSAPemMissingCertificateFile() throws Exception {
+        assumeOpenSSLFFMAndPem();
+
+        SSLHostConfigCertificate certificate = addHostRSAPem(getPath(TesterSupport.LOCALHOST_RSA_KEY_PEM));
+        String missing = new File("test/org/apache/tomcat/util/net/missing-cert.pem").getAbsolutePath();
+        certificate.setCertificateFile(missing);
+
+        try (LogCapture loaderLog = new LogCapture(CERTIFICATE_LOADER_LOGGER, Level.FINE)) {
+            Assert.assertThrows(LifecycleException.class, () -> getTomcatInstance().start());
+
+            Assert.assertTrue("No ERROR for the certificate file", loaderLog.contains(Level.SEVERE, missing));
+            Assert.assertTrue("No DEBUG for the failure to read the file",
+                    loaderLog.contains(Level.FINE, missing));
+        }
+    }
+
+
+    @Test
+    public void testHostRSAPemMissingKeyFile() throws Exception {
+        assumeOpenSSLFFMAndPem();
+
+        String missing = new File("test/org/apache/tomcat/util/net/missing-key.pem").getAbsolutePath();
+        addHostRSAPem(missing);
+
+        try (LogCapture loaderLog = new LogCapture(CERTIFICATE_LOADER_LOGGER, Level.FINE)) {
+            Assert.assertThrows(LifecycleException.class, () -> getTomcatInstance().start());
+
+            Assert.assertTrue("No ERROR for the key file", loaderLog.contains(Level.SEVERE, missing));
+            Assert.assertTrue("No DEBUG for the failure to read the file",
+                    loaderLog.contains(Level.FINE, missing));
+        }
+    }
+
+
+    @Test
+    public void testHostRSAPemMissingChainFile() throws Exception {
+        assumeOpenSSLFFMAndPem();
+
+        SSLHostConfigCertificate certificate = addHostRSAPem(getPath(TesterSupport.LOCALHOST_RSA_KEY_PEM));
+        certificate.setCertificateFile(getPath(TesterSupport.LOCALHOST_RSA_CERT_PEM));
+        String missing = new File("test/org/apache/tomcat/util/net/missing-chain.pem").getAbsolutePath();
+        certificate.setCertificateChainFile(missing);
+
+        try (LogCapture loaderLog = new LogCapture(CERTIFICATE_LOADER_LOGGER, Level.FINE)) {
+            getTomcatInstance().start();
+
+            // The certificate is still used
+            Assert.assertEquals(1, getServerCertificateCount());
+            Assert.assertTrue("No WARN for the chain file", loaderLog.contains(Level.WARNING, missing));
+            Assert.assertFalse("The chain file was logged at ERROR", loaderLog.contains(Level.SEVERE, missing));
+        }
+    }
+
+
+    @Test
+    public void testHostRSAPemUnreadableCaCertificateFile() throws Exception {
+        assumeOpenSSLFFMAndPem();
+
+        SSLHostConfigCertificate certificate = addHostRSAPem(getPath(TesterSupport.LOCALHOST_RSA_KEY_PEM));
+        certificate.setCertificateFile(getPath(TesterSupport.LOCALHOST_RSA_CERT_PEM));
+
+        // A file that exists but does not contain any CA certificates
+        File caFile = File.createTempFile("tomcat-test-", ".pem");
+        caFile.deleteOnExit();
+        Files.writeString(caFile.toPath(), "This is not a certificate\n");
+        getSSLHostConfig().setCaCertificateFile(caFile.getAbsolutePath());
+
+        try (LogCapture contextLog = new LogCapture(CONTEXT_LOGGER, Level.INFO)) {
+            getTomcatInstance().start();
+
+            Assert.assertTrue("No ERROR for the CA certificate file", contextLog.contains(Level.SEVERE, null));
+        }
+    }
+
+
+    private void assumeOpenSSLFFMAndPem() {
+        Assume.assumeTrue("Only needs to be run once", storeType == StoreType.PEM);
+        Assume.assumeTrue("Only applies to the OpenSSL FFM implementation",
+                "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation".equals(sslImplementationName));
+    }
+
+
+    private SSLHostConfigCertificate addHostRSAPem(String keyFile) {
+        SSLHostConfig sslHostConfig = getSSLHostConfig();
+        SSLHostConfigCertificate certificate = new SSLHostConfigCertificate(sslHostConfig, Type.RSA);
+        certificate.setCertificateFile(getPath(TesterSupport.LOCALHOST_RSA_CERT_PEM));
+        certificate.setCertificateKeyFile(keyFile);
+        certificate.setCertificateKeyPassword(TesterSupport.JKS_PASS);
+        sslHostConfig.addCertificate(certificate);
+        return certificate;
+    }
+
+
+    private static final String CERTIFICATE_LOADER_LOGGER =
+            "org.apache.tomcat.util.net.openssl.panama.CertificateLoader";
+    private static final String CONTEXT_LOGGER = "org.apache.tomcat.util.net.openssl.panama.OpenSSLContext";
+
+
+    /*
+     * Captures the log records of a logger. The logger is referenced so it is not garbage collected while the capture
+     * is in use.
+     */
+    private static class LogCapture extends Handler implements AutoCloseable {
+
+        private final Logger logger;
+        private final Level originalLevel;
+        private final List<LogRecord> records = new CopyOnWriteArrayList<>();
+
+        LogCapture(String loggerName, Level level) {
+            logger = Logger.getLogger(loggerName);
+            originalLevel = logger.getLevel();
+            logger.setLevel(level);
+            setLevel(Level.ALL);
+            logger.addHandler(this);
+        }
+
+        @Override
+        public void publish(LogRecord record) {
+            records.add(record);
+        }
+
+        @Override
+        public void flush() {
+            // NO-OP
+        }
+
+        @Override
+        public void close() {
+            logger.removeHandler(this);
+            logger.setLevel(originalLevel);
+        }
+
+        /*
+         * Is there a record at the given level that mentions the text (any text if null)?
+         */
+        boolean contains(Level level, String text) {
+            for (LogRecord record : records) {
+                if (record.getLevel().equals(level)) {
+                    String message = record.getMessage();
+                    Object[] parameters = record.getParameters();
+                    if (text == null || message != null && message.contains(text)) {
+                        return true;
+                    }
+                    if (parameters != null) {
+                        for (Object parameter : parameters) {
+                            if (parameter != null && parameter.toString().contains(text)) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+    }
+
+
     private void configureHostRSAChainFileTest(File certificateFile, boolean pkcs12) throws Exception {
         Assume.assumeTrue("Only needs to be run once for each implementation", storeType == StoreType.PEM);
         if (pkcs12) {
@@ -374,6 +544,14 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
 
 
     /*
+     * Returns the number of certificates the server sends.
+     */
+    private int getServerCertificateCount() throws Exception {
+        return getServerCertificates().length;
+    }
+
+
+    /*
      * Checks the server sends the server certificate followed by the certificate in the given file and nothing else.
      */
     private void assertServerChain(String expectedChainCertificate) throws Exception {
@@ -382,6 +560,17 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
             expected = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(is);
         }
 
+        Certificate[] peerCertificates = getServerCertificates();
+
+        Assert.assertEquals(2, peerCertificates.length);
+        Assert.assertEquals(expected, peerCertificates[1]);
+    }
+
+
+    /*
+     * Returns the certificates the server sends.
+     */
+    private Certificate[] getServerCertificates() throws Exception {
         // Trust everything, the test is about what the server sends
         SSLContext clientContext = SSLContext.getInstance("TLS");
         clientContext.init(null, new TrustManager[] { new X509TrustManager() {
@@ -404,10 +593,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
         try (SSLSocket socket = (SSLSocket) clientContext.getSocketFactory().createSocket("localhost", getPort())) {
             socket.setSoTimeout(5000);
             socket.startHandshake();
-            Certificate[] peerCertificates = socket.getSession().getPeerCertificates();
-
-            Assert.assertEquals(2, peerCertificates.length);
-            Assert.assertEquals(expected, peerCertificates[1]);
+            return socket.getSession().getPeerCertificates();
         }
     }
 
