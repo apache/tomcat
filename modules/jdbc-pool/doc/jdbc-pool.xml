@@ -917,8 +917,10 @@
         This means if you have a 30second timeout and run 10x10second queries using the connection
         it will be marked abandoned and potentially reclaimed depending on the <code>abandonWhenPercentageFull</code>
         attribute.
-        Using this interceptor it will reset the checkout timer every time you perform an operation on the connection or execute a
-        query successfully.
+        Using this interceptor it will reset the checkout timer every time you perform an operation on the
+        connection or attempt to execute a query, whether the attempt succeeds or fails, and on every read of a
+        result set returned through the connection. Iterating a large result set therefore keeps the connection
+        alive through the fetch phase, rather than only until the query returns.
     </p>
     <attributes>
     </attributes>
