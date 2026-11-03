@@ -505,9 +505,24 @@ public class PooledConnection implements PooledConnectionMBean {
         // driver properties. That is not a configuration that cannot connect:
         // the URL and the credential below are enough for the driver, so the
         // absent collection becomes an empty one rather than a failed connect.
-        Properties dbProperties = poolProperties.getDbProperties();
-        Properties properties =
-                dbProperties == null ? new Properties() : PoolUtilities.clone(dbProperties);
+        // The copy is taken under the configuration's monitor, for the same
+        // torn-snapshot reason PoolProperties#clone() synchronizes for:
+        // setConnectionProperties and the credential setters mutate the live
+        // collection in place under that monitor, while its reads of the
+        // collection are not atomic against such mutation. A copy taken
+        // outside the monitor can therefore mix two published generations:
+        // the driver then sees a key a concurrent reconfigure has just
+        // removed next to the keys that replaced it, or - when the credential
+        // travels in the connection-properties string rather than in the
+        // credential fields that are overlaid below - a user/password pair no
+        // generation ever published together. The configuration monitor is a
+        // leaf, so taking it here orders against no other lock.
+        Properties properties;
+        synchronized (poolProperties) {
+            Properties dbProperties = poolProperties.getDbProperties();
+            properties =
+                    dbProperties == null ? new Properties() : PoolUtilities.clone(dbProperties);
+        }
         if (usr != null) {
             properties.setProperty(PROP_USER, usr);
         }
