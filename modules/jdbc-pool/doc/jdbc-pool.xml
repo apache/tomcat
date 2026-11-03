@@ -244,11 +244,13 @@
   <attributes>
 
     <attribute name="defaultAutoCommit" required="false">
-      <p>(boolean) The default auto-commit state of connections created by this pool. If not set, default is JDBC driver default (If not set then the <code>setAutoCommit</code> method will not be called.)</p>
+      <p>(boolean) The default auto-commit state of connections created by this pool. If not set, default is JDBC driver default (If not set then the <code>setAutoCommit</code> method will not be called.)
+      When the <code>ConnectionState</code> interceptor is configured, it applies this setting on every borrow instead of at connection creation, and re-applies it whenever a borrower has changed it.</p>
     </attribute>
 
     <attribute name="defaultReadOnly" required="false">
-      <p>(boolean) The default read-only state of connections created by this pool. If not set then the <code>setReadOnly</code> method will not be called. (Some drivers don't support read only mode, ex: Informix)</p>
+      <p>(boolean) The default read-only state of connections created by this pool. If not set then the <code>setReadOnly</code> method will not be called. (Some drivers don't support read only mode, ex: Informix)
+      When the <code>ConnectionState</code> interceptor is configured, it applies this setting on every borrow instead of at connection creation, and re-applies it whenever a borrower has changed it.</p>
     </attribute>
 
     <attribute name="defaultTransactionIsolation" required="false">
@@ -264,11 +266,11 @@
          <code>2</code> for <code>READ_COMMITTED</code>, is accepted in place of the name. The name or number
          is matched ignoring surrounding whitespace, and any value other than the names above, their numbers
          or a blank value fails the creation of the pool with an error naming the attribute.</p>
-         <p>If not set, or set to a blank value, the method will not be called and it defaults to the JDBC driver.</p>
+         <p>If not set, or set to a blank value, the method will not be called and it defaults to the JDBC driver. When the <code>ConnectionState</code> interceptor is configured, it applies this setting on every borrow instead of at connection creation, and re-applies it whenever a borrower has changed it.</p>
     </attribute>
 
     <attribute name="defaultCatalog" required="false">
-      <p>(String) The default catalog of connections created by this pool.</p>
+      <p>(String) The default catalog of connections created by this pool. When the <code>ConnectionState</code> interceptor is configured, it applies this setting on every borrow instead of at connection creation, and re-applies it whenever a borrower has changed it.</p>
     </attribute>
 
     <attribute name="driverClassName" required="true">
@@ -677,8 +679,8 @@
   <subsection name="JDBC interceptors">
     <p>To see an example of how to use an interceptor, take a look at
     <code>org.apache.tomcat.jdbc.pool.interceptor.ConnectionState</code>.
-    This simple interceptor is a cache of three attributes, transaction isolation level, auto commit and read only state,
-    in order for the system to avoid not needed roundtrips to the database.
+    This simple interceptor is a cache of four attributes - transaction isolation level, auto commit, read only state
+    and catalog - in order for the system to avoid not needed roundtrips to the database.
     </p>
     <p>Further interceptors will be added to the core of the pool as the need arises. Contributions are always welcome!</p>
     <p>Interceptors are of course not limited to just <code>java.sql.Connection</code> but can be used to wrap any
@@ -730,7 +732,16 @@
   <subsection name="org.apache.tomcat.jdbc.pool.interceptor.ConnectionState">
     <p>Caches the connection for the following attributes <code>autoCommit</code>, <code>readOnly</code>,
        <code>transactionIsolation</code> and <code>catalog</code>.
-       It is a performance enhancement to avoid roundtrip to the database when getters are called or setters are called with an already set value.
+       It is a performance enhancement to avoid roundtrip to the database when getters are called;
+       setters always reach the driver, and only a successful call updates the cache.
+    </p>
+    <p>Once this interceptor is configured, the pool also leaves the enforcement of its configured defaults -
+       <code>defaultAutoCommit</code>, <code>defaultReadOnly</code>, <code>defaultTransactionIsolation</code> and
+       <code>defaultCatalog</code> - to it: they are no longer applied at connection creation, the interceptor applies
+       them on every borrow and restores any of them a previous borrower changed, terminating a transaction left open
+       by that borrower first. A restore the driver refuses for the read only, auto commit or catalog state fails the
+       borrow and the pool takes the connection out of service. A refused transaction isolation level is the one
+       exception: the connection stays in service and that level is not retried on it.
     </p>
     <attributes>
     </attributes>
@@ -1020,8 +1031,9 @@
     <p>Interceptors are a powerful way to enable, disable or modify functionality on a specific connection or its sub components.
        There are many different use cases for when interceptors are useful. By default, and for performance reasons, the connection pool is stateless.
        The only state the pool itself inserts are <code>defaultAutoCommit</code>, <code>defaultReadOnly</code>, <code>defaultTransactionIsolation</code>, <code>defaultCatalog</code> if
-       these are set. These 4 properties are only set upon connection creation. Should these properties be modified during the usage of the connection,
-       the pool itself will not reset them.</p>
+       these are set. Without a state interceptor these 4 properties are only set upon connection creation; should they be modified during the usage of the connection,
+       the pool itself will not reset them. When the <code>ConnectionState</code> interceptor is configured, it applies the 4 properties on every borrow
+       instead of at connection creation, and restores them whenever a borrower has changed them.</p>
     <p>An interceptor has to extend the <code>org.apache.tomcat.jdbc.pool.JdbcInterceptor</code> class. This class is fairly simple,
        You will need to have a no arg constructor</p>
 <source><![CDATA[  public JdbcInterceptor() {
