@@ -62,23 +62,19 @@ public class TestRegistryConvertValue {
     }
 
     @Test
-    public void testConvertEmptyStringToCharacterIsNotConverted() {
-        // An empty string has no character to convert to
-        Object result = registry.convertValue("char", "");
-        Assert.assertEquals("", result);
+    public void testConvertCharacterTypeRejectsOtherLengths() {
+        // Exactly one character is required, anything else is an error rather than being truncated or ignored
+        Assert.assertThrows(NumberFormatException.class, () -> registry.convertValue("char", ""));
+        Assert.assertThrows(NumberFormatException.class, () -> registry.convertValue("char", "xy"));
+        Assert.assertThrows(NumberFormatException.class, () -> registry.convertValue("java.lang.Character", "xy"));
     }
 
     @Test
-    public void testConvertCharacterTypeTruncatesLongerString() {
-        // The first character is the only one that can be converted
-        Assert.assertEquals(Character.valueOf('x'), registry.convertValue("char", "xy"));
-    }
-
-    @Test
-    public void testConvertNullValueIsNotConvertedForCharacter() {
-        // Only the character type leaves a null value unconverted rather than
-        // throwing, matching the historical behavior for this branch
-        Assert.assertNull(registry.convertValue("char", null));
+    public void testConvertNullValueThrowsForNumericAndCharacterTypes() {
+        for (String type : new String[] { "int", "long", "short", "byte", "double", "float", "char",
+                "java.lang.Double", "java.lang.Float", "java.lang.Character" }) {
+            Assert.assertThrows(type, NumberFormatException.class, () -> registry.convertValue(type, null));
+        }
     }
 
     @Test
