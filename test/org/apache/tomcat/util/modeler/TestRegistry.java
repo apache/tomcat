@@ -36,7 +36,7 @@ import org.junit.Test;
 
 public class TestRegistry {
 
-    private static final String PACKAGE = TestRegistry.class.getPackageName();
+    private static final String PACKAGE = TestRegistry.class.getPackage().getName();
     private static final String TYPE = TesterBean.class.getName();
     private static final byte[] XML = ("<mbeans-descriptors><mbean name=\"ConcurrentBean\" type=\"" + TYPE +
             "\" description=\"XML descriptor\"/></mbeans-descriptors>").getBytes(StandardCharsets.UTF_8);
