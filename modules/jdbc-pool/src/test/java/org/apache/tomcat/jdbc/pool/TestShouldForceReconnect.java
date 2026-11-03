@@ -151,15 +151,22 @@ class TestShouldForceReconnect {
     }
 
     @Test
-    void withoutAlternateCredentialsSupportNoBorrowerEverForcesAReconnect()
-            throws Exception {
+    void withoutAlternateCredentialsSupportThePoolServesOnlyItsOwnIdentity() throws Exception {
         properties.setAlternateUsernameAllowed(false);
         PooledConnection con = pooledConnection();
-        loggedInAs(con, ALT_USER, ALT_PASSWD);
+        loggedInAs(con, DEFAULT_USER, DEFAULT_PASSWD);
 
-        Assertions.assertFalse(con.shouldForceReconnect(DEFAULT_USER, DEFAULT_PASSWD),
+        Assertions.assertFalse(con.shouldForceReconnect(ALT_USER, ALT_PASSWD),
                 "with alternates disallowed the credentials of the borrower are ignored, "
-                        + "so the session can never mismatch");
-        Assertions.assertFalse(con.shouldForceReconnect(ALT_USER, ALT_PASSWD));
+                        + "and this session already serves the pool's own identity");
+
+        loggedInAs(con, ALT_USER, ALT_PASSWD);
+        Assertions.assertTrue(con.shouldForceReconnect(DEFAULT_USER, DEFAULT_PASSWD),
+                "but a session carrying another identity than the pool's own is re-established, "
+                        + "however it came to carry it - the flag can be turned at runtime "
+                        + "over a session that was re-established while alternates were allowed");
+        Assertions.assertTrue(con.shouldForceReconnect(null, null),
+                "including for the default borrower, whose claim is exactly the identity "
+                        + "this session lacks");
     }
 }
