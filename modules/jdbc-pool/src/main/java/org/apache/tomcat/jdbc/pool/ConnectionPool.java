@@ -1652,7 +1652,20 @@ public class ConnectionPool {
                     // Validation failed.
                     throw new SQLException(MessageFactory.get("connectionPool.failedToValidateNewConnection"));
                 }
-            } catch (Exception x) {
+            } catch (Throwable x) {
+                // The module's fatal policy runs first, as everywhere else.
+                // What is left is the refused borrow this guard already
+                // reports: the reconnect and the validation above reach the
+                // driver over a connection this borrow has claimed out of the
+                // idle queue, and a throwable that unwound them now would leave
+                // that connection in neither queue - invisible to the abandoned
+                // check, to the sweep and to the close drain alike, and gone
+                // from the budget for the life of the pool. A LinkageError is
+                // an ordinary arrival behind a driver loaded or wrapped through
+                // a web application class loader, and a borrow the driver could
+                // not carry out is what the borrower is owed, as the checked
+                // exception a borrow answers with.
+                ExceptionUtils.handleThrowable(x);
                 if (credentialsDiffer && !reconnected && con.isInitialized() && !con.isDiscarded()) {
                     // The attempt was refused before it gave up the session
                     // this connection was holding: that session is open, it
@@ -1977,7 +1990,15 @@ public class ConnectionPool {
                             }
                             release(con);
                         }
-                    } catch (RuntimeException x) {
+                    } catch (Throwable x) {
+                        // The module's fatal policy runs first: what a driver
+                        // fails with an Error is the same failed check this
+                        // guard already retires on an unchecked exception, and
+                        // the Error a driver wrapper loaded through a web
+                        // application class loader throws once that context has
+                        // stopped is that loader's ordinary failure, not a sign
+                        // the JVM cannot be carried on.
+                        ExceptionUtils.handleThrowable(x);
                         // Everything above runs after the connection was
                         // claimed from the busy queue and calls into the
                         // driver - a closed check, a transaction termination,
@@ -2222,7 +2243,13 @@ public class ConnectionPool {
                         } else {
                             keep = reconnectIfExpired(con) && con.validate(PooledConnection.VALIDATE_IDLE);
                         }
-                    } catch (RuntimeException x) {
+                    } catch (Throwable x) {
+                        // The module's fatal policy runs first, as everywhere
+                        // else: a non-fatal Error from behind one of the calls
+                        // below is a check that cannot vouch for the session,
+                        // which is what this guard already retires a driver's
+                        // unchecked exception as.
+                        ExceptionUtils.handleThrowable(x);
                         // The checks above swallow every checked driver
                         // failure, but an unchecked throw from behind one of
                         // them - a validation ending a transaction is one
