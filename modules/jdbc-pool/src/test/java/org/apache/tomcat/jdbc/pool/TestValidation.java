@@ -207,6 +207,33 @@ class TestValidation extends JdbcPoolBaseTest {
     }
 
     @Test
+    void aConfiguredValidatorReplacesTheInitSql() throws Exception {
+        // The contract the Validator javadoc states: a configured init SQL
+        // arms the init validation even with no test flag set, and the
+        // validator replaces the statement rather than running beside it.
+        // The statement is executable and observable - it stamps the
+        // session variable the suite uses as a session probe - so a pool
+        // that ran it next to the validator, tolerantly or not, would be
+        // caught by the marker staying null.
+        CountingValidator validator = new CountingValidator();
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setValidator(validator);
+        ds.getPoolProperties().setInitSQL("SET @POOL_TEST_MARKER = 7");
+        ds.getPoolProperties().setInitialSize(0);
+        ds.createPool();
+
+        try (Connection c = ds.getConnection()) {
+            Assertions.assertNull(sessionMarker(c),
+                    "the configured init SQL must not run while a validator replaces it");
+        }
+        Assertions.assertEquals(1, validator.actions.size(),
+                "the validator must be consulted exactly once, on the new session");
+        Assertions.assertEquals(Integer.valueOf(PooledConnection.VALIDATE_INIT),
+                validator.actions.get(0),
+                "a configured init SQL must arm the init action with no test flag set");
+    }
+
+    @Test
     void validationTerminatesTheTransactionOpenOnTheSession() throws Exception {
         // Corrected contract (legacy TestValidation pinned "no transaction
         // must be running" after a validation - that property still holds):
