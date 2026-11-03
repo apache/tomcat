@@ -153,7 +153,7 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource {
                 digester = createDigester();
             }
 
-            // Process the input file to configure our registry
+            // Process the input file to configure our registry. The stream is closed by the caller (Registry.load()).
             try {
                 // Push our registry object onto the stack
                 digester.push(loadedMbeans);

@@ -17,10 +17,15 @@
 package org.apache.tomcat.util.modeler.modules;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLStreamHandler;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -77,6 +82,87 @@ public class TestMbeansDescriptorsDigesterSource {
         } catch (Exception e) {
             // Expected
         }
+
+        Assert.assertTrue(closed.get());
+    }
+
+    /*
+     * Registry.load() closes the stream whatever the outcome, including when the modeler source can't be created or
+     * rejects the source.
+     */
+    @Test
+    public void testLoadClosesStreamWhenSourceTypeIsUnknown() throws Exception {
+        AtomicBoolean closed = new AtomicBoolean();
+        Registry registry = Registry.getRegistry(null);
+
+        Assert.assertThrows(ClassNotFoundException.class,
+                () -> registry.load("NoSuchModelerSource", createTrackingStream(XML, closed), null));
+
+        Assert.assertTrue(closed.get());
+    }
+
+    /*
+     * The stream that Registry.load() opens for a URL is closed too.
+     */
+    @Test
+    public void testLoadClosesStreamOpenedForUrl() throws Exception {
+        AtomicBoolean closed = new AtomicBoolean();
+        URL url = new URL(null, "memory:/mbeans-descriptors.xml", new URLStreamHandler() {
+            @Override
+            protected URLConnection openConnection(URL resource) {
+                return new URLConnection(resource) {
+                    @Override
+                    public void connect() {
+                        // NO-OP
+                    }
+
+                    @Override
+                    public InputStream getInputStream() {
+                        return createTrackingStream(XML, closed);
+                    }
+                };
+            }
+        });
+        Registry registry = Registry.getRegistry(null);
+
+        registry.load(null, url, null);
+
+        Assert.assertTrue(closed.get());
+        Assert.assertNotNull(registry.findManagedBean("TestDigesterSourceBean"));
+    }
+
+    @Test
+    public void testLoadClosesStreamOpenedForFile() throws Exception {
+        File file = File.createTempFile("tomcat-test-", ".xml");
+        try {
+            Files.writeString(file.toPath(), XML);
+            Registry registry = Registry.getRegistry(null);
+
+            registry.load(null, file, null);
+
+            Assert.assertNotNull(registry.findManagedBean("TestDigesterSourceBean"));
+        } finally {
+            // Can't be deleted on some platforms if the stream is still open
+            Assert.assertTrue(file.delete());
+        }
+    }
+
+    /*
+     * A failure to close the stream must not hide the outcome of the load.
+     */
+    @Test
+    public void testFailureToCloseStreamDoesNotHideLoadFailure() throws Exception {
+        AtomicBoolean closed = new AtomicBoolean();
+        InputStream stream = new FilterInputStream(new ByteArrayInputStream(XML.getBytes(StandardCharsets.UTF_8))) {
+            @Override
+            public void close() throws IOException {
+                closed.set(true);
+                throw new IOException("Close failed");
+            }
+        };
+        Registry registry = Registry.getRegistry(null);
+
+        Assert.assertThrows(ClassNotFoundException.class, () -> registry.load("NoSuchModelerSource", stream, null));
 
         Assert.assertTrue(closed.get());
     }
