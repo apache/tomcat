@@ -835,9 +835,22 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     }
 
 
+    /**
+     * Stores the validation query, treating a blank string as the unset value
+     * it means. A configuration surface that cannot express {@code null} - a
+     * JNDI attribute, a connection-properties line - is routinely written with
+     * an empty value to say "no statement, validate the way an unset query
+     * does", and a statement cannot be blank anyway; keeping such a value
+     * would make the pool execute the emptiness as SQL. This mirrors
+     * {@link #setInitSQL(String)}; a query that carries anything is stored
+     * verbatim.
+     *
+     * @param validationQuery the query used for validation, or null or a blank
+     *                            string if no validation query is set
+     */
     @Override
     public void setValidationQuery(String validationQuery) {
-        this.validationQuery = validationQuery;
+        this.validationQuery = validationQuery != null && validationQuery.trim().length() > 0 ? validationQuery : null;
     }
 
 

@@ -608,7 +608,9 @@ public interface PoolConfiguration {
     /**
      * The SQL query that will be used to validate connections from this pool before returning them to the caller or
      * pool. If specified, this query does not have to return any data, it just can't throw an SQLException. The default
-     * value is null. Example values are SELECT 1(mysql), select 1 from dual(oracle), SELECT 1(MS Sql Server)
+     * value is null. A blank query means the unset value: no statement, the built-in
+     * {@link java.sql.Connection#isValid(int)} check runs instead. Example values are SELECT 1(mysql), select 1 from
+     * dual(oracle), SELECT 1(MS Sql Server)
      *
      * @return the query used for validation or null if no validation is performed
      */
@@ -617,9 +619,11 @@ public interface PoolConfiguration {
     /**
      * The SQL query that will be used to validate connections from this pool before returning them to the caller or
      * pool. If specified, this query does not have to return any data, it just can't throw an SQLException. The default
-     * value is null. Example values are SELECT 1(mysql), select 1 from dual(oracle), SELECT 1(MS Sql Server)
+     * value is null. A blank query is stored as the unset value: a configuration surface that cannot express null is
+     * written empty to mean "no statement", and no statement can be blank. Example values are SELECT 1(mysql), select
+     * 1 from dual(oracle), SELECT 1(MS Sql Server)
      *
-     * @param validationQuery the query used for validation or null if no validation is performed
+     * @param validationQuery the query used for validation, or null or a blank string if no validation query is set
      */
     void setValidationQuery(String validationQuery);
 
