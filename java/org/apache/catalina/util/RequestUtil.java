@@ -208,7 +208,7 @@ public final class RequestUtil {
     }
 
 
-    public static String getContextPathUndecoded(Request request) {
+    public static String getContextPathEncoded(Request request) {
 
         int lastSlash = request.getMappingData().contextSlashCount;
         // Special case handling for the root context

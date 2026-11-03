@@ -2089,7 +2089,7 @@ public class Request implements HttpServletRequest {
 
     @Override
     public String getContextPath() {
-        return RequestUtil.getContextPathUndecoded(this);
+        return RequestUtil.getContextPathEncoded(this);
     }
 
 
