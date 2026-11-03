@@ -108,9 +108,11 @@ public class PooledConnection implements PooledConnectionMBean {
      */
     private final AtomicReference<Object> abandonTrace = new AtomicReference<>();
     /**
-     * Timestamp the connection was last 'touched' by the pool
+     * Timestamp the connection was last 'touched' by the pool. Seeded at construction - itself a pool action - so a
+     * connection that registers its MBean inside a successful connect() never publishes the epoch-0 initial value
+     * before the pool's first setTimestamp() lands.
      */
-    private volatile long timestamp;
+    private volatile long timestamp = System.currentTimeMillis();
     /**
      * Lock for this connection only
      */
@@ -124,7 +126,9 @@ public class PooledConnection implements PooledConnectionMBean {
      */
     private volatile long lastConnected = -1;
     /**
-     * timestamp to keep track of validation intervals
+     * Timestamp of the last completed successful validation, used to keep track of validation intervals. Seeded with
+     * the time this pooled connection was created, so on a pool that runs no validation it never moves and cannot be
+     * told apart from a real validation at that instant.
      */
     private volatile long lastValidated = System.currentTimeMillis();
     /**
@@ -597,7 +601,9 @@ public class PooledConnection implements PooledConnectionMBean {
 
     /**
      * Returns true if the connection has been connected more than {@link PoolConfiguration#getMaxAge()} milliseconds.
-     * false otherwise.
+     * false otherwise. When a max age is configured, a connection that currently has no physical session - see
+     * {@link #getLastConnected()} - also returns true, as a session that is not connected is never young enough to
+     * keep; without a configured max age this method always returns false.
      *
      * @return Returns true if the connection has been connected more than {@link PoolConfiguration#getMaxAge()}
      *             milliseconds. false otherwise.
@@ -664,6 +670,7 @@ public class PooledConnection implements PooledConnectionMBean {
         java.sql.Connection served = connection;
         javax.sql.XAConnection servedXa = xaConnection;
         javax.sql.PooledConnection servedCpds = cpdsConnection;
+        long servedLastConnected = lastConnected;
         HashMap<Object, Object> sessionAttributes = getAttributes();
         boolean hadUser = sessionAttributes.containsKey(PROP_USER);
         Object servedUser = sessionAttributes.get(PROP_USER);
@@ -687,10 +694,14 @@ public class PooledConnection implements PooledConnectionMBean {
         // Set the session being replaced out of reach of the connect below,
         // which closes any session it finds before it opens the new one. This
         // one has to stay open until the attempt that replaces it is known to
-        // have succeeded.
+        // have succeeded. The connected timestamp goes with it: while the
+        // fields read null, the published LastConnected must read -1 like in
+        // every other no-session state, as the per-connection MBean stays
+        // registered across this window.
         connection = null;
         xaConnection = null;
         cpdsConnection = null;
+        lastConnected = -1;
         try {
             connect();
         } catch (SQLException | RuntimeException x) {
@@ -704,6 +715,7 @@ public class PooledConnection implements PooledConnectionMBean {
             connection = served;
             xaConnection = servedXa;
             cpdsConnection = servedCpds;
+            lastConnected = servedLastConnected;
             if (hadUser) {
                 sessionAttributes.put(PROP_USER, servedUser);
             } else {
@@ -947,7 +959,7 @@ public class PooledConnection implements PooledConnectionMBean {
                 return false;
             }
             if (valid) {
-                this.lastValidated = now;
+                this.lastValidated = System.currentTimeMillis();
                 return true;
             } else {
                 if (getPoolProperties().getLogValidationErrors()) {
@@ -986,7 +998,7 @@ public class PooledConnection implements PooledConnectionMBean {
             }
             try {
                 if (connection.isValid(validationQueryTimeout)) {
-                    this.lastValidated = now;
+                    this.lastValidated = System.currentTimeMillis();
                     // Terminate - by rollback, never by commit - any
                     // transaction the isValid() call opened, or that a
                     // previous borrower left open: a read-only health check
@@ -1041,7 +1053,7 @@ public class PooledConnection implements PooledConnectionMBean {
 
             stmt.execute(query);
             stmt.close();
-            this.lastValidated = now;
+            this.lastValidated = System.currentTimeMillis();
             if (executingInitSql) {
                 // Terminate the transaction the init SQL executed into by
                 // committing it: this is the pool's own initialization of a
@@ -1370,9 +1382,11 @@ public class PooledConnection implements PooledConnectionMBean {
     }
 
     /**
-     * Returns the timestamp of the last successful validation query execution.
+     * Returns the timestamp at which the last successful validation completed. Until a validation has completed for
+     * the first time, this is the time this pooled connection was created - which on a pool with no validation
+     * configured is the value the attribute keeps.
      *
-     * @return the timestamp of the last successful validation query execution as defined by
+     * @return the timestamp at which the last successful validation completed as defined by
      *             {@link System#currentTimeMillis()}
      */
     @Override
@@ -1460,10 +1474,12 @@ public class PooledConnection implements PooledConnectionMBean {
 
 
     /**
-     * Returns the timestamp of when the connection was last connected to the database. ie, a successful call to
+     * Returns the timestamp of when the connection was last connected to the database, ie, a successful call to
      * {@link java.sql.Driver#connect(String, java.util.Properties)}.
      *
-     * @return the timestamp when this connection was created as defined by {@link System#currentTimeMillis()}
+     * @return the timestamp of the last successful connection as defined by {@link System#currentTimeMillis()}, or -1
+     *             when this pooled connection currently has no physical session - never connected, disconnected, or
+     *             mid-reconnect
      */
     @Override
     public long getLastConnected() {
@@ -1586,21 +1602,20 @@ public class PooledConnection implements PooledConnectionMBean {
     }
 
     /**
-     * Clears the warnings on the physical connection. A no-op while this pooled connection has no physical connection,
-     * as there is nothing to clear warnings on. A driver failure to clear the warnings is logged and swallowed rather
-     * than propagated; the operation is JMX-exposed and therefore declares no exception.
+     * Clears the warnings on the physical connection. A no-op while this pooled connection has no physical
+     * connection, as there is nothing to clear warnings on. Like the delegating getters below, this operation is
+     * best effort against the live session: it does not take the per-connection lock, and the session it reaches
+     * may be in use by a borrower or by the pool's own work.
+     *
+     * @throws SQLException if the driver refuses to clear the warnings
      */
     @Override
-    public void clearWarnings() {
+    public void clearWarnings() throws SQLException {
         java.sql.Connection c = connection;
         if (c == null) {
             return;
         }
-        try {
-            c.clearWarnings();
-        } catch (SQLException e) {
-            log.warn(MessageFactory.get("pooledConnection.unableToClearWarnings"), e);
-        }
+        c.clearWarnings();
     }
 
     /**

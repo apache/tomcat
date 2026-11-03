@@ -1883,7 +1883,17 @@ public class ConnectionPool {
                 if (busy.remove(con)) {
                     try {
                         if (!shouldClose(con, PooledConnection.VALIDATE_RETURN) && reconnectIfExpired(con)) {
-                            con.clearWarnings();
+                            try {
+                                con.clearWarnings();
+                            } catch (SQLException x) {
+                                // The application is done with the session and
+                                // the return must not fail over a warning chain
+                                // the driver refuses to drop; this is the one
+                                // caller for which a refused clear carries no
+                                // outcome anyone can act on, unlike the JMX
+                                // operation, which reports it to its client
+                                log.warn(MessageFactory.get("pooledConnection.unableToClearWarnings"), x);
+                            }
                             con.setStackTrace(null);
                             con.setTimestamp(System.currentTimeMillis());
                             // The application is done with the connection:
