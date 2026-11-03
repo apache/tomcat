@@ -54,6 +54,14 @@ class TestQueryTimeoutMalformedProperty extends JdbcPoolBaseTest {
      */
     private static final String MALFORMED_REPORT = "is not an integer number of seconds";
 
+    /*
+     * Stable fragment of the report of an unrecognized property name. The
+     * name-typo case is the asymmetric one: a bad value warns while a
+     * mis-cased name used to leave the aggressive one-second default armed in
+     * silence, degrading protection in the destructive direction.
+     */
+    private static final String UNKNOWN_NAME_REPORT = "is not recognized and is not applied";
+
     private DataSource poolWith(String interceptorEntry) {
         DataSource ds = newDataSource();
         ds.getPoolProperties().setJdbcInterceptors(interceptorEntry);
@@ -148,6 +156,45 @@ class TestQueryTimeoutMalformedProperty extends JdbcPoolBaseTest {
         }
     }
 
+    @Test
+    void unknownPropertyNameIsReportedAndKeepsTheDefault() throws Exception {
+        try (PoolLogCapture logs = new PoolLogCapture()) {
+            // the lowercase t makes this a different name, not a spelling of
+            // the property: the intended ten seconds never arrive and the
+            // one-second default goes on cancelling real queries
+            DataSource ds = poolWith(QueryTimeoutInterceptor.class.getName() + "(querytimeout=10)");
+            ds.createPool();
+            try (Connection pooled = ds.getConnection()) {
+                assertDriverTimeout(pooled, 1,
+                        "an unrecognized name must not be read as the property - the default stays in"
+                                + " effect, which is exactly why the typo must not pass in silence");
+            }
+            List<LogRecord> reports = logs.assertUnknownNameReports(2,
+                    "the instance the pool configures at start plus the chain the first borrow builds;"
+                            + " the pool-stop instance is configured after this capture is closed");
+            for (LogRecord report : reports) {
+                Assertions.assertTrue(report.getMessage().contains("[querytimeout]"),
+                        "the report must name the unrecognized property: " + report.getMessage());
+            }
+        }
+    }
+
+    @Test
+    void knownPropertyNamesAreSilent() throws Exception {
+        try (PoolLogCapture logs = new PoolLogCapture()) {
+            // useEquals is a name the JdbcInterceptor base reads; recognizing
+            // it keeps the warning a report about typos and not about every
+            // configuration that is more than a single property
+            DataSource ds = poolWith(
+                    QueryTimeoutInterceptor.class.getName() + "(queryTimeout=5,useEquals=false)");
+            ds.createPool();
+            try (Connection pooled = ds.getConnection()) {
+                assertDriverTimeout(pooled, 5, "both known names apply as themselves");
+            }
+            logs.assertUnknownNameReports(0, "a configuration made only of known names is not a typo");
+        }
+    }
+
     /**
      * Captures what {@link QueryTimeoutInterceptor} logs, following the
      * handler idiom of the pool's other diagnostic tests. The canary record -
@@ -215,6 +262,31 @@ class TestQueryTimeoutMalformedProperty extends JdbcPoolBaseTest {
                         "the report of a bad value is a warning, not something quieter: " + record.getMessage());
                 Assertions.assertTrue(record.getMessage().contains("queryTimeout"),
                         "the report must name the property it rejected: " + record.getMessage());
+            }
+            return reports;
+        }
+
+        /*
+         * Every report of an unrecognized property name, with the volume
+         * pinned and each report checked to be a warning naming the property,
+         * the way the bad-value reports above are checked.
+         */
+        List<LogRecord> assertUnknownNameReports(int expected, String why) {
+            List<LogRecord> seen;
+            synchronized (records) {
+                seen = new ArrayList<>(records);
+            }
+            List<LogRecord> reports = seen.stream()
+                    .filter(r -> r.getMessage() != null && r.getMessage().contains(UNKNOWN_NAME_REPORT))
+                    .collect(Collectors.toList());
+            Assertions.assertEquals(expected, reports.size(),
+                    why + ", messages seen: " + seen.stream().map(LogRecord::getMessage)
+                            .collect(Collectors.toList()));
+            for (LogRecord record : reports) {
+                Assertions.assertEquals(Level.WARNING.intValue(), record.getLevel().intValue(),
+                        "the report of a bad name is a warning, not something quieter: " + record.getMessage());
+                Assertions.assertTrue(record.getMessage().contains("property"),
+                        "the report must say it rejects a property: " + record.getMessage());
             }
             return reports;
         }
