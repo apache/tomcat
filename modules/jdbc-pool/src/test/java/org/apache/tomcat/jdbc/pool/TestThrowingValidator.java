@@ -31,6 +31,12 @@ import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
  * escape {@code getConnection()}/{@code close()}, must not strand the
  * pooled connection between the idle and busy queues (a permanently lost
  * slot), and must not silently disable idle eviction.
+ *
+ * <p>An {@code Error} thrown from behind an implementation counts the
+ * same way: an implementation loaded through a web-application class
+ * loader fails with {@code LinkageError} variants long after any
+ * deliberate throw, and the guard must be as wide as the stranding it
+ * prevents - fatal JVM errors excepted.</p>
  */
 class TestThrowingValidator extends JdbcPoolBaseTest {
 
@@ -39,6 +45,18 @@ class TestThrowingValidator extends JdbcPoolBaseTest {
         @Override
         public boolean validate(Connection connection, int validateAction) {
             throw new IllegalStateException("validator boom");
+        }
+    }
+
+    /**
+     * The broken implementation of the stopped-web-application case: a
+     * class the implementation can no longer reach fails every call with
+     * a LinkageError, which no implementation author throws on purpose.
+     */
+    public static class ErrorThrowingValidator implements Validator {
+        @Override
+        public boolean validate(Connection connection, int validateAction) {
+            throw new NoClassDefFoundError("the context this validator was loaded from is stopped");
         }
     }
 
@@ -52,6 +70,11 @@ class TestThrowingValidator extends JdbcPoolBaseTest {
 
     /* One-slot pool with a throwing validator, gated on by the caller's test flag. */
     private DataSource throwingPool() {
+        return throwingPool(new ThrowingValidator());
+    }
+
+    /* As above, with the implementation of the caller's choosing. */
+    private DataSource throwingPool(Validator validator) {
         DataSource ds = newDataSource();
         ds.getPoolProperties().setInitialSize(0);
         // exactly one slot: any leaked slot exhausts the pool immediately
@@ -61,7 +84,7 @@ class TestThrowingValidator extends JdbcPoolBaseTest {
         // background sweep would now be a working competitor for the idle
         // assertions below
         ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(0);
-        ds.getPoolProperties().setValidator(new ThrowingValidator());
+        ds.getPoolProperties().setValidator(validator);
         return ds;
     }
 
@@ -145,6 +168,76 @@ class TestThrowingValidator extends JdbcPoolBaseTest {
         Assertions.assertThrows(SQLException.class, ds::getConnection);
         awaitSessions(0);
         Assertions.assertEquals(0, ds.getPool().getSize());
+    }
+
+    @Test
+    void errorThrowingValidatorOnBorrowFailsAsCheckedException() throws Exception {
+        DataSource ds = throwingPool(new ErrorThrowingValidator());
+        ds.getPoolProperties().setTestOnBorrow(true);
+        // The stopped-class-loader failure mode: the LinkageError must be
+        // read as a check that cannot vouch for the session, not as a
+        // condition beyond the pool's handling - a throw escaping the
+        // borrow would strand the session outside both queues, where no
+        // drain, sweep or abandoned check can ever reach it.
+        Connection first = ds.getConnection();
+        awaitSessions(1);
+        first.close();
+        Assertions.assertEquals(1, ds.getPool().getIdle());
+
+        SQLException sqlX = Assertions.assertThrows(SQLException.class, ds::getConnection);
+        Assertions.assertTrue(sqlX.getMessage().contains("Failed to validate"),
+                "expected a validation failure, got: " + sqlX.getMessage());
+        awaitSessions(0);
+        Assertions.assertEquals(0, ds.getPool().getSize());
+
+        // and the slot survived its own validator: the pool is whole
+        ds.getPoolProperties().setValidator(null);
+        try (Connection again = ds.getConnection()) {
+            Assertions.assertNotNull(again);
+        }
+        // the returned session parks in idle, where it is whole and
+        // reusable - the failed borrow cost the pool nothing
+        Assertions.assertEquals(1, ds.getPool().getIdle());
+        Assertions.assertEquals(1, ds.getPool().getSize());
+        ds.close();
+        awaitSessions(0);
+    }
+
+    @Test
+    void errorThrowingValidatorOnReturnDoesNotEscapeOrStrand() throws Exception {
+        DataSource ds = throwingPool(new ErrorThrowingValidator());
+        ds.getPoolProperties().setTestOnReturn(true);
+        Connection first = ds.getConnection();
+        awaitSessions(1);
+
+        Assertions.assertDoesNotThrow(first::close);
+        awaitSessions(0);
+        Assertions.assertEquals(0, ds.getPool().getIdle());
+        Assertions.assertEquals(0, ds.getPool().getActive());
+        Assertions.assertEquals(0, ds.getPool().getSize());
+
+        ds.getPoolProperties().setValidator(null);
+        try (Connection again = ds.getConnection()) {
+            Assertions.assertNotNull(again);
+        }
+        ds.close();
+        awaitSessions(0);
+    }
+
+    @Test
+    void errorThrowingValidatorOnIdleValidationDoesNotAbortTheSweep() throws Exception {
+        DataSource ds = throwingPool(new ErrorThrowingValidator());
+        ds.getPoolProperties().setTestWhileIdle(true);
+        Connection first = ds.getConnection();
+        first.close();
+        awaitSessions(1);
+        Assertions.assertEquals(1, ds.getPool().getIdle());
+
+        // the Error must not escape the sweep with the tested connection
+        // claimed out of idle and stranded, nor leave it parked untested
+        Assertions.assertDoesNotThrow(ds::testIdle);
+        awaitSessions(0);
+        Assertions.assertEquals(0, ds.getPool().getIdle());
     }
 
     @Test
