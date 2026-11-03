@@ -104,7 +104,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
                 return false;
             }
             // The line folding (CRLF + HTAB) is replaced with a single SP as
-            // required by RFC 9110 section 5.2
+            // required by RFC 9112 section 5.2
             if (!getResponseBody().contains("abcd efgh")) {
                 return false;
             }
