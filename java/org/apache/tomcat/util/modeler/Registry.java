@@ -603,7 +603,8 @@ public class Registry implements RegistryMBean, MBeanRegistration {
      *
      * @return List of object names. The sources provided with Tomcat
      *         register the descriptors with this registry instead of
-     *         returning object names, so the returned list is empty.
+     *         returning object names, so the returned list is empty and
+     *         unmodifiable.
      *
      * @throws Exception Error loading descriptors
      */
