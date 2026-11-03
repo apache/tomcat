@@ -836,21 +836,16 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
 
     /**
-     * Stores the validation query, treating a blank string as the unset value
-     * it means. A configuration surface that cannot express {@code null} - a
-     * JNDI attribute, a connection-properties line - is routinely written with
-     * an empty value to say "no statement, validate the way an unset query
-     * does", and a statement cannot be blank anyway; keeping such a value
-     * would make the pool execute the emptiness as SQL. This mirrors
-     * {@link #setInitSQL(String)}; a query that carries anything is stored
-     * verbatim.
+     * Stores the validation query through {@link #configuredStatement(String)}:
+     * a blank query is the unset value it means, not a statement. A query that
+     * carries anything is stored verbatim.
      *
      * @param validationQuery the query used for validation, or null or a blank
      *                            string if no validation query is set
      */
     @Override
     public void setValidationQuery(String validationQuery) {
-        this.validationQuery = validationQuery != null && validationQuery.trim().length() > 0 ? validationQuery : null;
+        this.validationQuery = configuredStatement(validationQuery);
     }
 
 
@@ -881,9 +876,19 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     }
 
 
+    /**
+     * Stores the init SQL through {@link #configuredStatement(String)}: a
+     * blank init SQL is the unset value it means, not a statement a new
+     * session should be given. A statement that carries anything is stored
+     * verbatim.
+     *
+     * @param initSQL the statement a newly established session is
+     *                    initialized with, or null or a blank string if there
+     *                    is none
+     */
     @Override
     public void setInitSQL(String initSQL) {
-        this.initSQL = initSQL != null && initSQL.trim().length() > 0 ? initSQL : null;
+        this.initSQL = configuredStatement(initSQL);
     }
 
 
@@ -995,6 +1000,33 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             buf.append(']');
         }
         return buf.toString();
+    }
+
+
+    /**
+     * Returns the statement an SQL setting of the configuration carries, or
+     * {@code null} when it carries none.
+     *
+     * <p>A blank is not a statement. A configuration surface that cannot
+     * express the unset value - a JNDI attribute, a connection-properties
+     * line - is written blank to mean exactly what the unset value means, and
+     * no statement can be blank. Both SQL settings the configuration keeps,
+     * {@link #setValidationQuery(String)} and {@link #setInitSQL(String)},
+     * store through this rule, and everything that later reads them reads them
+     * through it as well: the statements a validation may execute, and the
+     * pool's decision whether a newly established session has an init
+     * statement to run at all. A blank that reaches the pool around a setter
+     * - from a {@link PoolConfiguration} implementation of the caller's own,
+     * or a caller's explicit validation argument - is therefore never executed
+     * as SQL and never counted as a configured statement.</p>
+     *
+     * @param sql the configured or passed statement, may be {@code null}
+     *
+     * @return the statement itself if it carries anything, {@code null} if it
+     *         is null or blank
+     */
+    static String configuredStatement(String sql) {
+        return sql != null && sql.trim().length() > 0 ? sql : null;
     }
 
 

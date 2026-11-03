@@ -381,6 +381,39 @@ class TestAbortEndsTheBorrow extends JdbcPoolBaseTest {
     }
 
     @Test
+    void anAbortAfterTheCheckEndedTheBorrowIsTheSpecificationsNoOp() throws Exception {
+        // The sequential form of the round below where the watchdog wins the
+        // claim: the check ends the borrow, and the application - unaware -
+        // aborts the handle it still holds. The abort is then what the
+        // specification prescribes for a closed connection, a no-op, and this
+        // test pins what that costs the bookkeeping: no hand-back is counted
+        // for a borrow whose end the pool already paid for.
+        SpecAbortDriver.ABORTS.set(0);
+        DataSource ds = abortPool(SpecAbortDriver.class, 1);
+        ds.getPoolProperties().setRemoveAbandoned(true);
+        ds.getPoolProperties().setRemoveAbandonedTimeout(1);
+        ConnectionPool pool = ds.getPool();
+
+        Connection overdue = ds.getConnection();
+        Thread.sleep(1100);
+
+        pool.checkAbandoned();
+        Assertions.assertEquals(1, pool.getRemoveAbandonedCount(), "the check claimed and abandoned the borrow");
+        Assertions.assertEquals(1, pool.getReleasedCount(), "exactly one terminal release settled it");
+        Assertions.assertTrue(overdue.isClosed(), "the handle of an abandoned borrow reports itself closed");
+
+        Assertions.assertDoesNotThrow(() -> overdue.abort(DIRECT_EXECUTOR),
+                "aborting a handle the pool already ended is the specification's no-op");
+        Assertions.assertEquals(0, SpecAbortDriver.ABORTS.get(), "the no-op does not reach the driver");
+        Assertions.assertEquals(0, pool.getActive());
+        Assertions.assertEquals(0, pool.getSize());
+        Assertions.assertEquals(1, pool.getReleasedCount(), "the abort added no second terminal step");
+        Assertions.assertEquals(0, pool.getReturnedCount(),
+                "and nothing was handed back for a borrow the check had already ended");
+        awaitSessions(0);
+    }
+
+    @Test
     void abortingABorrowThatTheAbandonedCheckAlsoClaimsEndsItExactlyOnce() throws Exception {
         // The abandoned-connection check and the borrower's abort are two
         // ways to end the same borrow, live at the same time: the pool's
@@ -448,8 +481,21 @@ class TestAbortEndsTheBorrow extends JdbcPoolBaseTest {
             awaitSessions(0); // and the physical session really left the database
         }
         Assertions.assertEquals(rounds, pool.getBorrowedCount());
-        Assertions.assertEquals(rounds, pool.getReturnedCount(),
-                "every borrow ended exactly once, whichever of the two steps won each race");
+        // The single-shot witness across the two claimants is the terminal
+        // release, not the hand-back count. The released guard settles exactly
+        // one release per borrow whichever step claimed it, while a hand-back
+        // is counted only when the abort reached the return: an abort that
+        // arrived after the check's teardown is the no-op the test above
+        // pins, and owes no count. Every round did end - the per-round
+        // assertions ruled the stranded shapes out, and each borrow below was
+        // either handed back or abandoned.
+        Assertions.assertEquals(rounds, pool.getReleasedCount(),
+                "every borrow was settled by exactly one terminal release, whichever of the two steps won each race");
+        Assertions.assertTrue(pool.getReturnedCount() + pool.getRemoveAbandonedCount() >= rounds,
+                () -> "every borrow was either handed back or abandoned, got returned="
+                        + pool.getReturnedCount() + " abandoned=" + pool.getRemoveAbandonedCount());
+        Assertions.assertTrue(pool.getReturnedCount() <= rounds,
+                "no borrow was handed back more than once");
     }
 
     @Test

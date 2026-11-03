@@ -17,6 +17,7 @@
 package org.apache.tomcat.jdbc.pool;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,20 +30,22 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.juli.logging.LogFactory;
-
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 
 /**
- * The debug line {@code connectUsingDriver()} writes when it instantiates the
- * configured driver prints the JDBC URL of the configuration, and enabling
- * DEBUG on this package is a standard support step. A pool whose configuration
- * carries its credential inside the URL - the {@code ;PASSWORD=...} pair an H2
- * or PostgreSQL style URL accepts - must therefore not have that credential
- * written to the log: the same masking that keeps the configuration dump
- * clean ({@code TestPoolProperties}) has to cover this line too, while the
- * driver itself still receives the real URL.
+ * The diagnostics {@code connectUsingDriver()} emits about the configured JDBC
+ * URL - the debug line it writes when instantiating the driver, and the
+ * {@link java.sql.SQLException} it throws when a driver declines the URL by
+ * returning null - print that URL, which legitimately carries an inline
+ * credential (the {@code ;PASSWORD=...} pair an H2 or PostgreSQL style URL
+ * accepts, or a {@code ?password=...} query pair). Enabling DEBUG is a standard
+ * support step and the returned-null failure is logged at the default level on
+ * every attempt, so a credential in the URL must not reach either surface: the
+ * same masking that keeps the configuration dump clean
+ * ({@code TestPoolProperties}) has to cover them, while the driver still
+ * receives the real URL.
  */
-class TestDriverInstantiationLog extends JdbcPoolBaseTest {
+class TestDriverConnectDiagnostics extends JdbcPoolBaseTest {
 
     /**
      * Captures what the pooled connection class logs. The handler goes in
@@ -161,5 +164,73 @@ class TestDriverInstantiationLog extends JdbcPoolBaseTest {
             Assertions.assertTrue(line.contains("[url=" + getUrl() + "]"),
                     "a URL with nothing to mask must print exactly as configured, was: " + line);
         }
+    }
+
+    /**
+     * A driver that answers every URL the way the JDBC contract lets a driver
+     * answer one it does not recognise: {@code connect} returns null. This is
+     * the persistent-misconfiguration case that makes the returned-null failure
+     * recur on every attempt, so it is where that failure's message reaches the
+     * log.
+     */
+    public static class NullReturningDriver implements java.sql.Driver {
+        @Override
+        public Connection connect(String url, java.util.Properties info) {
+            return null;
+        }
+
+        @Override
+        public boolean acceptsURL(String url) {
+            return true;
+        }
+
+        @Override
+        public java.sql.DriverPropertyInfo[] getPropertyInfo(String url, java.util.Properties info) {
+            return new java.sql.DriverPropertyInfo[0];
+        }
+
+        @Override
+        public int getMajorVersion() {
+            return 0;
+        }
+
+        @Override
+        public int getMinorVersion() {
+            return 0;
+        }
+
+        @Override
+        public boolean jdbcCompliant() {
+            return false;
+        }
+
+        @Override
+        public Logger getParentLogger() throws java.sql.SQLFeatureNotSupportedException {
+            throw new java.sql.SQLFeatureNotSupportedException();
+        }
+    }
+
+    @Test
+    void aDriverThatDeclinesTheUrlIsReportedWithTheUrlMasked() throws Exception {
+        // The failure is the borrow's own SQLException and the pool logs it at
+        // the default level, so a driver declining a credential-bearing URL
+        // must not have that credential written into the message.
+        String secret = "S3cret-In-The-Declined-Url";
+        PoolProperties properties = new PoolProperties();
+        properties.setUrl("jdbc:declined:thin:@dbhost:1521:sid?user=appuser&password=" + secret);
+        properties.setDriverClassName(NullReturningDriver.class.getName());
+        properties.setJmxEnabled(false);
+        properties.setInitialSize(0);
+        properties.setTimeBetweenEvictionRunsMillis(-1);
+        PooledConnection con = new PooledConnection(properties, new ConnectionPool(properties));
+
+        SQLException thrown = Assertions.assertThrows(SQLException.class, con::connect);
+        String message = thrown.getMessage();
+        Assertions.assertTrue(message.contains("password=********"),
+                "the pool's own failure message must mask the URL, was: " + message);
+        Assertions.assertTrue(message.contains("jdbc:declined:thin:@dbhost:1521:sid?user=appuser"),
+                "the URL must stay diagnosable with only its credential masked, was: " + message);
+        Assertions.assertFalse(message.contains(secret),
+                "the declined-URL failure must not carry the credential, was: " + message);
     }
 }

@@ -168,6 +168,11 @@ public class ConnectionPool {
     private final AtomicLong removeAbandonedCount = new AtomicLong(0);
     private final AtomicLong releasedIdleCount = new AtomicLong(0);
 
+    // Guards the one-per-pool warning that a borrow carried credentials the
+    // configuration will not honour, mirroring how DataSourceProxy issues the
+    // same warning at the application surface.
+    private final AtomicBoolean ignoredBorrowCredentialsWarned = new AtomicBoolean(false);
+
     /**
      * Instantiate a connection pool. This will create connections if initialSize is larger than 0. The
      * {@link PoolProperties} should not be reused for another connection pool.
@@ -1244,6 +1249,27 @@ public class ConnectionPool {
             throw new SQLException(MessageFactory.get("connectionPool.poolClosed"));
         }
 
+        if (username != null || password != null) {
+            if (!poolProperties.isAlternateUsernameAllowed()) {
+                // The credentials are not this pool's to honour. DataSourceProxy
+                // already ignores them at the application surface; this is the
+                // same contract at the pool's own, which is also reachable as
+                // getConnection(user,password). Honouring them here would
+                // authenticate a session as the borrower's identity and - since
+                // with alternates disallowed every later borrow is served under
+                // the pool's identity - hand that session to later borrowers as
+                // the identity they never claimed. Dropping them before the
+                // borrow decision below is what makes the decision's premise,
+                // that no session carries another identity, one the pool keeps
+                // rather than one it hopes for.
+                if (ignoredBorrowCredentialsWarned.compareAndSet(false, true)) {
+                    log.warn(MessageFactory.get("connectionPool.alternateUsernameIgnored", username));
+                }
+                username = null;
+                password = null;
+            }
+        }
+
         // Get the current time stamp
         long now = System.currentTimeMillis();
         // See if there is one available immediately
@@ -1661,11 +1687,18 @@ public class ConnectionPool {
      * Returns whether new connections should be initialized by invoking {@link PooledConnection#validate(int)} with
      * {@link PooledConnection#VALIDATE_INIT}.
      *
-     * @return true if pool is either configured to test connections on connect or a non-NULL init SQL has been
-     *             configured
+     * @return true if pool is either configured to test connections on connect or an init SQL that carries a statement
+     *             has been configured
      */
     private boolean isInitNewConnections() {
-        return getPoolProperties().isTestOnConnect() || getPoolProperties().getInitSQL() != null;
+        // The same reading the validation path applies to this setting: a
+        // blank init SQL is the unset value, so it gives a new session
+        // nothing to run. Counting the blank as a configured statement here
+        // would send a freshly re-established session down the init-check
+        // path - which an unset statement makes a check that runs nothing -
+        // instead of the borrow check the configuration did ask for.
+        return getPoolProperties().isTestOnConnect() ||
+                PoolProperties.configuredStatement(getPoolProperties().getInitSQL()) != null;
     }
 
     /**
