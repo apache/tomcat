@@ -176,11 +176,11 @@ public class SSLHostConfig implements Serializable {
     /**
      * The cipher configuration for TLS 1.2 and below (OpenSSL format).
      */
-    private String ciphers = DEFAULT_TLS_CIPHERS_12;
+    private String ciphers = null;
     /**
      * The cipher suite configuration for TLS 1.3.
      */
-    private String cipherSuites = DEFAULT_TLS_CIPHERS_13;
+    private String cipherSuites = null;
     private String cipherSuitesFromCiphers = null;
     /**
      * The parsed cipher list for TLS 1.2 and below.
@@ -727,16 +727,17 @@ public class SSLHostConfig implements Serializable {
      * Set the new cipher (TLSv1.2 and below) configuration. Note: Regardless of the format used to set the
      * configuration, it is always stored in OpenSSL format.
      *
-     * @param ciphersList The new cipher configuration in OpenSSL or JSSE format
+     * @param ciphersList The new cipher configuration in OpenSSL or JSSE format. A value of {@code null} restores the
+     *                        default, {@link #DEFAULT_TLS_CIPHERS_12}.
      */
     public void setCiphers(String ciphersList) {
         // Ciphers is stored in OpenSSL format. Convert the provided value if
         // necessary.
         if (ciphersList != null) {
+            StringBuilder sbCiphers = new StringBuilder();
+            StringBuilder sbCipherSuitesFromCiphers = new StringBuilder();
             if (ciphersList.contains(":")) {
                 // OpenSSL format
-                StringBuilder sbCiphers = new StringBuilder();
-                StringBuilder sbCipherSuitesFromCiphers = new StringBuilder();
                 String[] components = ciphersList.split(":");
                 // Remove any TLS 1.3 cipher suites
                 for (String component : components) {
@@ -754,13 +755,9 @@ public class SSLHostConfig implements Serializable {
                         sbCiphers.append(trimmed);
                     }
                 }
-                this.ciphers = sbCiphers.toString();
-                this.cipherSuitesFromCiphers = sbCipherSuitesFromCiphers.toString();
             } else {
                 // Not obviously in OpenSSL format. Might be a single OpenSSL or JSSE
                 // cipher name. Might be a comma separated list of cipher names
-                StringBuilder sbCiphers = new StringBuilder();
-                StringBuilder sbCipherSuitesFromCiphers = new StringBuilder();
                 String[] ciphers = ciphersList.split(",");
                 for (String cipher : ciphers) {
                     String trimmed = cipher.strip();
@@ -784,9 +781,9 @@ public class SSLHostConfig implements Serializable {
                         }
                     }
                 }
-                this.ciphers = sbCiphers.toString();
-                this.cipherSuitesFromCiphers = sbCipherSuitesFromCiphers.toString();
             }
+            this.ciphers = sbCiphers.toString();
+            this.cipherSuitesFromCiphers = sbCipherSuitesFromCiphers.toString();
         } else {
             this.ciphers = null;
             this.cipherSuitesFromCiphers = null;
@@ -800,9 +797,13 @@ public class SSLHostConfig implements Serializable {
     /**
      * Returns the cipher (TLSv1.2 and below) configuration.
      *
-     * @return An OpenSSL cipher string for the current configuration.
+     * @return An OpenSSL cipher string for the current configuration. If no configuration has been set, or it was set
+     *             to {@code null}, this is {@link #DEFAULT_TLS_CIPHERS_12}.
      */
     public String getCiphers() {
+        if (ciphers == null) {
+            return DEFAULT_TLS_CIPHERS_12;
+        }
         return ciphers;
     }
 
@@ -841,11 +842,13 @@ public class SSLHostConfig implements Serializable {
      * Set the cipher suite (TLSv1.3) configuration. Note: Regardless of the format used to set the configuration, it is
      * always stored in OpenSSL format.
      *
-     * @param cipherSuites The cipher suites to use in a colon-separated, preference order list
+     * @param cipherSuites The cipher suites to use in a preference order list. The list may be colon-separated
+     *                         (OpenSSL format) or comma-separated (JSSE format). A value of {@code null} restores the
+     *                         default, {@link #DEFAULT_TLS_CIPHERS_13}.
      */
     public void setCipherSuites(String cipherSuites) {
         if (cipherSuites == null) {
-            // As for setCiphers(), a null value is stored as provided.
+            // As for setCiphers(), a null value restores the default.
             this.cipherSuites = null;
             this.cipherSuiteList = null;
             this.jsseCipherNames = null;
@@ -894,17 +897,13 @@ public class SSLHostConfig implements Serializable {
     /**
      * Obtain the current cipher suite (TLSv1.3) configuration.
      *
-     * @return An OpenSSL cipher suite string for the current configuration
-     *         or {@code null} if no cipher suites have been configured.
+     * @return An OpenSSL cipher suite string for the current configuration. If no configuration has been set, or it
+     *             was set to {@code null}, this is {@link #DEFAULT_TLS_CIPHERS_13}.
      */
     public String getCipherSuites() {
-        if (cipherSuites == null && cipherSuitesFromCiphers == null) {
-            return null;
-        }
         StringBuilder sb = new StringBuilder();
-        if (cipherSuites != null) {
-            sb.append(cipherSuites);
-        }
+        // The default applies unless cipher suites have been configured explicitly
+        sb.append(cipherSuites != null ? cipherSuites : DEFAULT_TLS_CIPHERS_13);
         if (cipherSuitesFromCiphers != null && !cipherSuitesFromCiphers.isEmpty()) {
             if (sb.length() > 0) {
                 sb.append(':');
