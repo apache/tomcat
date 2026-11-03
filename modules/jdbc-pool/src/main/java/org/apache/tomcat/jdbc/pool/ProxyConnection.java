@@ -84,8 +84,10 @@ public class ProxyConnection extends JdbcInterceptor {
 
     /**
      * The connection handle the pool handed to the borrow this interceptor is currently armed for, or
-     * <code>null</code> from {@link #reset(ConnectionPool, PooledConnection)} until
-     * {@link ConnectionPool#setupConnection(PooledConnection)} records the new borrow's handle. This interceptor is
+     * <code>null</code> once the borrow has ended: the close and abort branches of
+     * {@link #invoke(Object, Method, Object[])} seal it where they end a borrow, and
+     * {@link #reset(ConnectionPool, PooledConnection)} clears it and holds it clear until
+     * {@link ConnectionPool#setupConnection(PooledConnection)} records the next borrow's handle. This interceptor is
      * cached on the pooled connection and a clean recycle re-arms it with the same {@link PooledConnection} object
      * the ended borrow held, so neither the session field nor the discarded flag can tell a call of the current
      * borrow from one that entered the interceptor chain before the borrow ended and descends only after the
@@ -128,8 +130,8 @@ public class ProxyConnection extends JdbcInterceptor {
     /**
      * Returns the handle of the borrow this interceptor is armed for.
      *
-     * @return the current borrow's handle, or <code>null</code> between a reset and the recording of the new
-     *             borrow's handle
+     * @return the current borrow's handle, or <code>null</code> once that borrow has ended - its own close
+     *             or abort, or a teardown reset - until the recording of the next borrow's handle
      */
     public Object getBorrowHandle() {
         return borrowHandle;
@@ -423,7 +425,8 @@ public class ProxyConnection extends JdbcInterceptor {
     /**
      * Whether the given caller is the handle of the borrow this interceptor is armed for. The read is volatile,
      * mirroring the reads of the session field: the recording by {@link ConnectionPool#setupConnection(PooledConnection)}
-     * and the clearing by {@link #reset(ConnectionPool, PooledConnection)} have no synchronization on this side.
+     * and the clearing by the close and abort branches of {@link #invoke(Object, Method, Object[])} and by
+     * {@link #reset(ConnectionPool, PooledConnection)} have no synchronization on this side.
      *
      * @param proxy the receiver the call arrived on
      *
@@ -509,6 +512,15 @@ public class ProxyConnection extends JdbcInterceptor {
             // runs on the captured objects, never on the fields again; a
             // concurrent pool-side release counts the two paths' one terminal
             // step exactly once through its busy claim and released guard.
+            // The per-borrow identity is sealed beside the session field, not
+            // left to the next borrow's reset walk: a clean return runs no
+            // walk over this cached interceptor at all, so an unsealed handle
+            // would go on matching the armed identity - while the session sits
+            // idle, and again while the next borrow's walk is between the
+            // interceptors that consult it and this one's own reset - long
+            // enough for a call parked above the guards to be answered as the
+            // current borrow's when its own borrow ended here.
+            this.borrowHandle = null;
             this.connection = null;
             poolRef.returnConnection(poolc);
             return null;
@@ -539,7 +551,12 @@ public class ProxyConnection extends JdbcInterceptor {
             // The borrow ends here, ahead of the driver call, which the
             // specification allows to run long: from now on every use of this
             // handle fails the way it fails on a closed connection, and a
-            // concurrent close of the same handle finds it already ended.
+            // concurrent close of the same handle finds it already ended. The
+            // identity is sealed with the session for the same reason as in
+            // the close branch: the guards above read it, and the promise
+            // this comment makes is only true for all of them once a late
+            // call of this handle can no longer pass as the current borrow.
+            this.borrowHandle = null;
             this.connection = null;
             try {
                 if (!poolc.isDiscarded()) {

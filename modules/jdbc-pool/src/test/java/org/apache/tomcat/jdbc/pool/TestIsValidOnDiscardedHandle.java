@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
+import org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;
 
 /**
  * The JDBC liveness probe, {@code isValid(int)}, answers a closed
@@ -44,7 +45,10 @@ import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
  * reach the driver instead: the driver's own answer - including the
  * {@code SQLException} the specification prescribes for a negative timeout,
  * and including a driver-side failure of the check itself - is the
- * caller's to receive, not one the pool may replace with its own.
+ * caller's to receive, not one the pool may replace with its own. The
+ * {@code ConnectionState} interceptor's cached state reads, which answer
+ * above the borrow fence, are pinned on the same ground: on a closed-state
+ * handle they must fail like every other call.
  */
 class TestIsValidOnDiscardedHandle extends JdbcPoolBaseTest {
 
@@ -126,8 +130,48 @@ class TestIsValidOnDiscardedHandle extends JdbcPoolBaseTest {
         held.close(); // and its close stays the documented no-op
     }
 
+    /*
+     * The state caches of the ConnectionState interceptor answer reads
+     * above the borrow fence at the chain's tail, so a cached read is the
+     * one answer that could keep vouching for a session the pool took out
+     * of service under the borrower. It must not: on a discarded handle
+     * every call - the cached state reads included - fails or answers
+     * closed alike, and only after the marking does the read fall to the
+     * fence. While the session is live, the reads keep being answered from
+     * the caches (pinned by the driver-call counters elsewhere).
+     */
+    @Test
+    void aCachedStateReadOnADiscardedHandleAnswersLikeEveryOtherCall() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setJdbcInterceptors(
+                ConnectionState.class.getName() + ";" + DiscardMarkingInterceptor.class.getName());
+        ds.createPool();
+
+        Connection held = ds.getConnection();
+        // The write reaches the driver and lands in the interceptor's cache.
+        held.setAutoCommit(false);
+        Assertions.assertFalse(held.getAutoCommit(),
+                "precondition: while the session is live the read is served, cached");
+
+        // The marking interceptor discards the session on the first probe,
+        // while the borrower still holds the handle.
+        Assertions.assertTrue(held.isValid(1), "precondition: the first probe is answered live");
+        Assertions.assertTrue(held.isClosed(), "precondition: the marking reached the handle");
+
+        Assertions.assertThrows(SQLException.class, held::createStatement,
+                "precondition: a call that reaches the fence fails as closed");
+        Assertions.assertThrows(SQLException.class, held::getAutoCommit,
+                "a cached state read must not vouch for a session the pool discarded"
+                        + " under its borrower; it must fail like every other call on"
+                        + " the handle");
+
+        held.close(); // the late return stays the documented no-op
+        awaitSessions(0); // and the marked session left with it
+    }
+
     @Test
     void aSealedHandleKeepsAnsweringTheValidityProbeWithFalse() throws Exception {
+
         DataSource ds = newDataSource();
         ds.createPool();
 

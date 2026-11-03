@@ -139,6 +139,9 @@ public interface PoolConfiguration {
     /**
      * The default auto-commit state of connections created by this pool. If not set (null), default is JDBC driver
      * default (If set to null then the {@link java.sql.Connection#setAutoCommit(boolean)} method will not be called.)
+     * When the {@link org.apache.tomcat.jdbc.pool.interceptor.ConnectionState} interceptor is configured, it applies
+     * this setting on every borrow rather than at connection creation, and re-applies it whenever a borrower has
+     * changed it.
      *
      * @return the default auto commit setting, null is Driver default.
      */
@@ -147,6 +150,9 @@ public interface PoolConfiguration {
     /**
      * The default auto-commit state of connections created by this pool. If not set (null), default is JDBC driver
      * default (If set to null then the {@link java.sql.Connection#setAutoCommit(boolean)} method will not be called.)
+     * When the {@link org.apache.tomcat.jdbc.pool.interceptor.ConnectionState} interceptor is configured, it applies
+     * this setting on every borrow rather than at connection creation, and re-applies it whenever a borrower has
+     * changed it.
      *
      * @return the default auto commit setting, null is Driver default.
      */
@@ -155,6 +161,9 @@ public interface PoolConfiguration {
     /**
      * The default auto-commit state of connections created by this pool. If not set (null), default is JDBC driver
      * default (If set to null then the {@link java.sql.Connection#setAutoCommit(boolean)} method will not be called.)
+     * When the {@link org.apache.tomcat.jdbc.pool.interceptor.ConnectionState} interceptor is configured, it applies
+     * this setting on every borrow rather than at connection creation, and re-applies it whenever a borrower has
+     * changed it.
      *
      * @param defaultAutoCommit default auto commit setting, null is Driver default.
      */
@@ -162,7 +171,9 @@ public interface PoolConfiguration {
 
     /**
      * If non null, during connection creation the method {@link java.sql.Connection#setCatalog(String)} will be called
-     * with the set value.
+     * with the set value. When the {@link org.apache.tomcat.jdbc.pool.interceptor.ConnectionState} interceptor is
+     * configured, it applies this setting on every borrow rather than at connection creation, and re-applies it
+     * whenever a borrower has changed it.
      *
      * @return the default catalog, null if not set and accepting the driver default.
      */
@@ -170,7 +181,9 @@ public interface PoolConfiguration {
 
     /**
      * If non null, during connection creation the method {@link java.sql.Connection#setCatalog(String)} will be called
-     * with the set value.
+     * with the set value. When the {@link org.apache.tomcat.jdbc.pool.interceptor.ConnectionState} interceptor is
+     * configured, it applies this setting on every borrow rather than at connection creation, and re-applies it
+     * whenever a borrower has changed it.
      *
      * @param defaultCatalog null if not set and accepting the driver default.
      */
@@ -178,7 +191,9 @@ public interface PoolConfiguration {
 
     /**
      * If non null, during connection creation the method {@link java.sql.Connection#setReadOnly(boolean)} will be
-     * called with the set value.
+     * called with the set value. When the {@link org.apache.tomcat.jdbc.pool.interceptor.ConnectionState} interceptor
+     * is configured, it applies this setting on every borrow rather than at connection creation, and re-applies it
+     * whenever a borrower has changed it.
      *
      * @return null if not set and accepting the driver default otherwise the read only value
      */
@@ -186,7 +201,9 @@ public interface PoolConfiguration {
 
     /**
      * If non null, during connection creation the method {@link java.sql.Connection#setReadOnly(boolean)} will be
-     * called with the set value.
+     * called with the set value. When the {@link org.apache.tomcat.jdbc.pool.interceptor.ConnectionState} interceptor
+     * is configured, it applies this setting on every borrow rather than at connection creation, and re-applies it
+     * whenever a borrower has changed it.
      *
      * @return null if not set and accepting the driver default otherwise the read only value
      */
@@ -194,7 +211,9 @@ public interface PoolConfiguration {
 
     /**
      * If non null, during connection creation the method {@link java.sql.Connection#setReadOnly(boolean)} will be
-     * called with the set value.
+     * called with the set value. When the {@link org.apache.tomcat.jdbc.pool.interceptor.ConnectionState} interceptor
+     * is configured, it applies this setting on every borrow rather than at connection creation, and re-applies it
+     * whenever a borrower has changed it.
      *
      * @param defaultReadOnly null if not set and accepting the driver default.
      */
@@ -204,7 +223,10 @@ public interface PoolConfiguration {
     /**
      * Returns the default transaction isolation level. If set to {@link DataSourceFactory#UNKNOWN_TRANSACTIONISOLATION}
      * the method {@link java.sql.Connection#setTransactionIsolation(int)} will not be called during connection
-     * creation.
+     * creation. When the {@link org.apache.tomcat.jdbc.pool.interceptor.ConnectionState} interceptor is configured, it
+     * applies this setting on every borrow rather than at connection creation, and re-applies it whenever a borrower
+     * has changed it; a level the driver refuses on a session is the one documented exception to that enforcement -
+     * the session stays in service and that level is not retried on it.
      *
      * @return driver transaction isolation level, or -1 {@link DataSourceFactory#UNKNOWN_TRANSACTIONISOLATION} if not
      *             set.
@@ -214,7 +236,10 @@ public interface PoolConfiguration {
     /**
      * If set to {@link DataSourceFactory#UNKNOWN_TRANSACTIONISOLATION} the method
      * {@link java.sql.Connection#setTransactionIsolation(int)} will not be called during connection creation. Otherwise
-     * the method will be called with the isolation level set by this property.
+     * the method will be called with the isolation level set by this property. When the
+     * {@link org.apache.tomcat.jdbc.pool.interceptor.ConnectionState} interceptor is configured, it applies this
+     * setting on every borrow rather than at connection creation, and re-applies it whenever a borrower has changed it
+     * (see {@link #getDefaultTransactionIsolation()} for the refused-level exception).
      *
      * @param defaultTransactionIsolation a value of {@link java.sql.Connection#TRANSACTION_NONE},
      *                                        {@link java.sql.Connection#TRANSACTION_READ_COMMITTED},
