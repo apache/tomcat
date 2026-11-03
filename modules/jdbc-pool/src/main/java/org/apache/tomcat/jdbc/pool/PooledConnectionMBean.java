@@ -19,14 +19,19 @@ package org.apache.tomcat.jdbc.pool;
 import java.sql.SQLException;
 
 /**
- * JMX MBean interface for monitoring pooled connections.
+ * JMX MBean interface for monitoring and managing pooled connections.
  */
 public interface PooledConnectionMBean {
     // PooledConnection
     /**
-     * Returns the connection version.
+     * Returns the connection version: the pool purge generation in force
+     * when this pooled connection was created. The pool counter is seeded
+     * from {@link Long#MIN_VALUE}, so a connection created against a freshly
+     * started pool reports a large negative number; it is not a connection
+     * age and not a version of the driver. Connections older than the pool's
+     * current generation are retired by the pool as they are used or swept.
      *
-     * @return the connection version
+     * @return the pool purge generation at connection creation
      */
     long getConnectionVersion();
 
@@ -38,7 +43,11 @@ public interface PooledConnectionMBean {
     boolean isInitialized();
 
     /**
-     * Returns true if the connection has exceeded its maximum age.
+     * Returns true if the connection has exceeded its maximum age. When a
+     * maximum age is configured, a connection that currently has no physical
+     * session - see {@link #getLastConnected()} - also returns true, as a
+     * session that is not connected is never young enough to keep; without a
+     * configured maximum age this attribute always reports false.
      *
      * @return true if max age expired
      */
@@ -52,9 +61,16 @@ public interface PooledConnectionMBean {
     boolean isSuspect();
 
     /**
-     * Returns the timestamp of the last pool action.
+     * Returns the timestamp of the last pool action on this connection.
+     * Timestamps are set when the pool hands the connection out or takes it
+     * back, and the value drives the abandoned-connection check - it is also
+     * reset by the ResetAbandonedTimer interceptor on application calls,
+     * which additionally clears the suspect flag, so a reset need not be a
+     * pool action. The value starts at the time this pooled connection was
+     * created.
      *
-     * @return the timestamp
+     * @return the timestamp of the last pool action as defined by
+     *             {@link System#currentTimeMillis()}
      */
     long getTimestamp();
 
@@ -66,16 +82,25 @@ public interface PooledConnectionMBean {
     boolean isDiscarded();
 
     /**
-     * Returns the timestamp of the last successful validation.
+     * Returns the timestamp at which the last successful validation
+     * completed. Until a validation has completed for the first time, this is
+     * the time this pooled connection was created - which on a pool with no
+     * validation configured is the value the attribute keeps, so a
+     * never-validated connection cannot be told apart from one validated at
+     * its creation instant.
      *
-     * @return the last validated timestamp
+     * @return the last validated timestamp as defined by
+     *             {@link System#currentTimeMillis()}
      */
     long getLastValidated();
 
     /**
-     * Returns the timestamp of the last successful connection.
+     * Returns the timestamp of the last successful connection, or -1 when
+     * this pooled connection currently has no physical session - never
+     * connected, disconnected, or mid-reconnect.
      *
-     * @return the last connected timestamp
+     * @return the last connected timestamp as defined by
+     *             {@link System#currentTimeMillis()}, or -1
      */
     long getLastConnected();
 
@@ -88,16 +113,23 @@ public interface PooledConnectionMBean {
 
     // java.sql.Connection
     /**
-     * Clears any warnings reported on this connection.
+     * Clears any warnings reported on this connection. The operation reaches
+     * a live session whether or not it is currently borrowed, so warnings an
+     * application has not yet read are cleared as well. It is a no-op while
+     * the pooled connection has no physical session.
+     *
+     * @throws SQLException if the driver refuses to clear the warnings, so a
+     *             JMX client can tell a refused clear from a completed one
      */
-    void clearWarnings();
+    void clearWarnings() throws SQLException;
 
     /**
-     * Returns true if the connection has been closed.
+     * Returns true if the connection has been closed, including the case
+     * where the pooled connection currently has no physical session.
      *
      * @return true if closed
      *
-     * @throws SQLException if a database access error occurs
+     * @throws SQLException if the physical connection reports a failure
      */
     boolean isClosed() throws SQLException;
 
