@@ -42,6 +42,13 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
  * Implementation of {@link PoolConfiguration} that holds the configuration properties for a connection pool.
+ * <p>
+ * The reconfiguring setters publish their changes under this instance's monitor, which makes that monitor the
+ * snapshot boundary of the configuration: {@link #clone()} takes its copy under it, and so does the connect path
+ * when it copies the live {@link #getDbProperties()} collection for the driver. A copy taken under the monitor
+ * therefore always shows one state some setter published, never a mix of two. Setters that reconfigure in place
+ * must keep acquiring this monitor, and a reader that needs a consistent snapshot rather than the momentary view
+ * the unsynchronized getters hand out must take the monitor too.
  */
 public class PoolProperties implements PoolConfiguration, Cloneable, Serializable {
 
