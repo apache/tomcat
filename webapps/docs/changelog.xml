@@ -495,6 +495,15 @@
   </subsection>
   <subsection name="Coyote">
     <changelog>
+      <fix>
+        Use the <code>certificateChainFile</code> only if the PEM certificate
+        file (all TLS implementations) or the PKCS#12 bundle (OpenSSL FFM
+        implementation) contains the server certificate alone. If it already
+        contains the certificate chain, the <code>certificateChainFile</code>
+        is ignored. The OpenSSL FFM implementation now sends the intermediate
+        certificates of a PEM certificate file or a PKCS#12 bundle to the
+        client. (markt)
+      </fix>
       <update>
         Change the default value of the <code>cookiesWithoutEquals</code>
         attribute of the <code>Rfc6265CookieProcessor</code> from

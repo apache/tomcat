@@ -375,12 +375,23 @@ public abstract class SSLUtilBase implements SSLUtil {
             PEMFile privateKeyFile =
                     new PEMFile(certificate.getCertificateKeyFile() != null ? certificate.getCertificateKeyFile() :
                             certificate.getCertificateFile(), keyPass, keyPassFile, null);
-            PEMFile certificateFile = new PEMFile(certificate.getCertificateFile());
+            // The certificate file may also hold the private key, which may be encrypted, so the key password is
+            // needed to read the file.
+            PEMFile certificateFile = new PEMFile(certificate.getCertificateFile(), keyPass, keyPassFile, null);
 
             Collection<Certificate> chain = new ArrayList<>(certificateFile.getCertificates());
             if (certificate.getCertificateChainFile() != null) {
-                PEMFile certificateChainFile = new PEMFile(certificate.getCertificateChainFile());
-                chain.addAll(certificateChainFile.getCertificates());
+                if (chain.size() > 1) {
+                    // The chain file is only used if the certificate file holds the server certificate alone. If the
+                    // certificate file already contains the certificate chain, the chain file is ignored.
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("sslUtilBase.chainFileIgnored", certificate.getCertificateChainFile(),
+                                certificate.getCertificateFile()));
+                    }
+                } else {
+                    PEMFile certificateChainFile = new PEMFile(certificate.getCertificateChainFile());
+                    chain.addAll(certificateChainFile.getCertificates());
+                }
             }
 
             if (keyAlias == null) {

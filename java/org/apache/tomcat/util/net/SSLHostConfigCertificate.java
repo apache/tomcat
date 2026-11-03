@@ -478,7 +478,9 @@ public class SSLHostConfigCertificate implements Serializable {
     // OpenSSL
 
     /**
-     * Sets the path to the certificate chain file used by OpenSSL.
+     * Sets the path to the certificate chain file. The chain file is only used if the certificate file
+     * (a PEM file or a PKCS#12 bundle) contains the server certificate alone. If the certificate file already contains
+     * the certificate chain, the chain file is ignored.
      *
      * @param certificateChainFile the path to the certificate chain file
      */
@@ -489,7 +491,7 @@ public class SSLHostConfigCertificate implements Serializable {
 
 
     /**
-     * Returns the path to the certificate chain file used by OpenSSL.
+     * Returns the path to the certificate chain file.
      *
      * @return the certificate chain file path
      */

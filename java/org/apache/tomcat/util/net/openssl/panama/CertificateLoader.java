@@ -371,19 +371,10 @@ public final class CertificateLoader {
             return null;
         }
 
-        if (chainFile != null) {
-            byte[] chainBytes = readConfigFileBytes(chainFile);
-            if (chainBytes == null) {
-                log.warn(sm.getString("certificateLoader.certificateLoadFailed", hostName, chainFile));
-            } else {
-                // Append the separately configured chain to the intermediates
-                // (if any) read from the certificate file.
-                MemorySegment[] extraChain = readX509ChainFromBytes(chainBytes);
-                chain = Arrays.copyOf(chain, chain.length + extraChain.length);
-                System.arraycopy(extraChain, 0, chain, chain.length - extraChain.length,
-                        extraChain.length);
-            }
-        }
+        // The configured chain file is only used if the certificate file holds
+        // the leaf certificate alone. If the certificate file already contains
+        // the intermediate certificates, the chain file is ignored.
+        chain = appendChainFile(certificate.getCertificateChainFile(), hostName, certFile, chain);
 
         return new CertificateEntry(leaf, key, chain);
     }
@@ -419,8 +410,16 @@ public final class CertificateLoader {
             KeyStore keyStore = KeyStore.getInstance("PKCS12");
             keyStore.load(new ByteArrayInputStream(fileBytes),
                     (keyPassToUse != null) ? keyPassToUse.toCharArray() : null);
-            return loadJavaKeyStoreKey(keyStore, certificate.getCertificateKeyAlias(), keyPassToUse,
-                    certFile, hostName, arena);
+            CertificateEntry entry = loadJavaKeyStoreKey(keyStore, certificate.getCertificateKeyAlias(),
+                    keyPassToUse, certFile, hostName, arena);
+            if (entry != null && certificate.getCertificateChainFile() != null) {
+                // The configured chain file is only used if the bundle holds
+                // the leaf certificate alone. If the bundle already contains
+                // the intermediate certificates, the chain file is ignored.
+                entry = new CertificateEntry(entry.leaf, entry.key, appendChainFile(
+                        certificate.getCertificateChainFile(), hostName, certFile, entry.chain));
+            }
+            return entry;
         } catch (IOException e) {
             // Covers a wrong password: the JDK fails the MAC check
             log.warn(sm.getString("certificateLoader.certificateLoadFailed", hostName,
@@ -605,6 +604,38 @@ public final class CertificateLoader {
 
 
     // ------------------------------------- File and native reading helpers
+
+    /**
+     * Applies the configured certificate chain file. The chain file is only used if the certificate source (a PEM
+     * certificate file or a PKCS#12 bundle) holds the leaf certificate alone. If the source already provides
+     * intermediate certificates, the chain file is ignored. A chain file that cannot be read is logged and ignored.
+     *
+     * @param chainFile  The location of the chain file, or {@code null} if none is configured
+     * @param hostName   The host name the certificate belongs to, used for logging
+     * @param source     The certificate source, used for logging
+     * @param chain      The intermediate certificates (owned by the caller) read from the certificate source
+     *
+     * @return the chain to use, which owns all the native objects
+     */
+    private static MemorySegment[] appendChainFile(String chainFile, String hostName, String source,
+            MemorySegment[] chain) {
+        if (chainFile == null) {
+            return chain;
+        }
+        if (chain.length > 0) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("certificateLoader.chainFileIgnored", hostName, chainFile, source));
+            }
+            return chain;
+        }
+        byte[] chainBytes = readConfigFileBytes(chainFile);
+        if (chainBytes == null) {
+            log.warn(sm.getString("certificateLoader.certificateLoadFailed", hostName, chainFile));
+            return chain;
+        }
+        return readX509ChainFromBytes(chainBytes);
+    }
+
 
     /**
      * An OpenSSL ENGINE needs a real file. Resolves a configured location, relative to the Catalina base if
@@ -893,8 +924,9 @@ public final class CertificateLoader {
         CertificateFactory factory = CertificateFactory.getInstance("X.509");
         addX509Certificates(chain, factory, fileBytes);
 
+        // Only used if the certificate file holds the leaf certificate alone
         String chainFile = certificate.getCertificateChainFile();
-        if (chainFile != null) {
+        if (chainFile != null && chain.size() <= 1) {
             byte[] chainBytes = readConfigFileBytes(chainFile);
             if (chainBytes != null) {
                 addX509Certificates(chain, factory, chainBytes);
@@ -941,8 +973,19 @@ public final class CertificateLoader {
         KeyStore keyStore = KeyStore.getInstance("PKCS12");
         keyStore.load(new ByteArrayInputStream(fileBytes),
                 (password != null) ? password.toCharArray() : null);
-        return getCertificateChainKeyStore(keyStore,
+        X509Certificate[] bundleChain = getCertificateChainKeyStore(keyStore,
                 certificate.getCertificateKeyAlias());
+        // Only used if the bundle holds the leaf certificate alone
+        String chainFile = certificate.getCertificateChainFile();
+        if (bundleChain == null || bundleChain.length > 1 || chainFile == null) {
+            return bundleChain;
+        }
+        List<X509Certificate> chain = new ArrayList<>(Arrays.asList(bundleChain));
+        byte[] chainBytes = readConfigFileBytes(chainFile);
+        if (chainBytes != null) {
+            addX509Certificates(chain, CertificateFactory.getInstance("X.509"), chainBytes);
+        }
+        return chain.toArray(new X509Certificate[0]);
     }
 
 
