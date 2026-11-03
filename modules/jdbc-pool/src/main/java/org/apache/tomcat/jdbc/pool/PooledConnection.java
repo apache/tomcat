@@ -461,8 +461,13 @@ public class PooledConnection implements PooledConnectionMBean {
                     }
                 } else {
                     if (log.isDebugEnabled()) {
+                        // The dump of the configuration masks this URL (see
+                        // PoolProperties#maskCredentials), and a DEBUG level
+                        // is a standard support step, so a URL that carries
+                        // its credential inline must reach this line masked
+                        // as well - the driver is handed the real URL below.
                         log.debug("Instantiating driver using class: " + poolProperties.getDriverClassName() +
-                                " [url=" + poolProperties.getUrl() + "]");
+                                " [url=" + PoolProperties.maskCredentials(poolProperties.getUrl()) + "]");
                     }
                     driver = (java.sql.Driver) ClassLoaderUtil.loadClass(poolProperties.getDriverClassName(),
                             PooledConnection.class.getClassLoader(), Thread.currentThread().getContextClassLoader())

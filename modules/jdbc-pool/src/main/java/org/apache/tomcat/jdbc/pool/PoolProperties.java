@@ -989,7 +989,12 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
      * Masks the credentials embedded in a raw configuration string so that a
      * password typed into the JDBC URL or the connection properties is not
      * printed in cleartext the way the dedicated password field is masked in
-     * {@link #toString()}. Two shapes are scrubbed.
+     * {@link #toString()}. Beyond that dump, the pool applies this masking
+     * wherever it logs diagnostics about these configuration strings - the
+     * driver-instantiation debug line of
+     * {@link PooledConnection#connectUsingDriver()} is one - so the log and
+     * the dump agree on what a masked configuration looks like. Two shapes
+     * are scrubbed.
      * <p>
      * The value of a pair whose key - at the start of a segment, ignoring
      * case - is one of {@code password}, {@code pass} and {@code pwd}. A
@@ -1032,7 +1037,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
      * @return the string with every recognised credential replaced by the mask,
      *         or the string unchanged when it holds none
      */
-    private static String maskCredentials(String value) {
+    static String maskCredentials(String value) {
         if (value == null) {
             return null;
         }
