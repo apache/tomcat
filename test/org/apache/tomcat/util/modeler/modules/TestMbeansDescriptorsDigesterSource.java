@@ -135,7 +135,7 @@ public class TestMbeansDescriptorsDigesterSource {
     public void testLoadClosesStreamOpenedForFile() throws Exception {
         File file = File.createTempFile("tomcat-test-", ".xml");
         try {
-            Files.writeString(file.toPath(), XML);
+            Files.write(file.toPath(), XML.getBytes(StandardCharsets.UTF_8));
             Registry registry = Registry.getRegistry(null);
 
             registry.load(null, file, null);
