@@ -51,6 +51,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.interceptor.QueryTimeoutInterceptor;
 import org.apache.tomcat.jdbc.pool.interceptor.StatementCache;
 import org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer;
+import org.apache.tomcat.jdbc.pool.util.ExceptionUtils;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
@@ -2779,22 +2780,35 @@ public class ConnectionPool {
     private static synchronized void registerCleaner(PoolCleaner cleaner) {
         unregisterCleaner(cleaner);
         cleaners.add(cleaner);
-        if (poolCleanTimer == null) {
-            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        // A timer cancels itself when a task throws an uncaught throwable,
+        // and scheduling onto such a dead timer fails - which would make
+        // every pool that needs a cleaner afterwards fail the same way for
+        // the rest of the JVM's life. PoolCleaner.run no longer lets
+        // anything escape; this is the safety net for a timer that is
+        // already dead when it arrives: replace it rather than refuse.
+        while (true) {
+            if (poolCleanTimer == null) {
+                ClassLoader loader = Thread.currentThread().getContextClassLoader();
+                try {
+                    Thread.currentThread().setContextClassLoader(ConnectionPool.class.getClassLoader());
+                    // Create the timer thread in a PrivilegedAction so that a
+                    // reference to the web application class loader is not created
+                    // via Thread.inheritedAccessControlContext
+                    poolCleanTimer = new Timer(
+                            "Tomcat JDBC Pool Cleaner[" + System.identityHashCode(ConnectionPool.class.getClassLoader()) +
+                                    ":" + System.currentTimeMillis() + "]",
+                            true);
+                } finally {
+                    Thread.currentThread().setContextClassLoader(loader);
+                }
+            }
             try {
-                Thread.currentThread().setContextClassLoader(ConnectionPool.class.getClassLoader());
-                // Create the timer thread in a PrivilegedAction so that a
-                // reference to the web application class loader is not created
-                // via Thread.inheritedAccessControlContext
-                poolCleanTimer = new Timer(
-                        "Tomcat JDBC Pool Cleaner[" + System.identityHashCode(ConnectionPool.class.getClassLoader()) +
-                                ":" + System.currentTimeMillis() + "]",
-                        true);
-            } finally {
-                Thread.currentThread().setContextClassLoader(loader);
+                poolCleanTimer.schedule(cleaner, cleaner.sleepTime, cleaner.sleepTime);
+                return;
+            } catch (IllegalStateException x) {
+                poolCleanTimer = null;
             }
         }
-        poolCleanTimer.schedule(cleaner, cleaner.sleepTime, cleaner.sleepTime);
     }
 
     private static synchronized void unregisterCleaner(PoolCleaner cleaner) {
@@ -2896,8 +2910,16 @@ public class ConnectionPool {
                     } else if (pool.getPoolProperties().getMaxAge() > 0) {
                         pool.testAllIdle(true);
                     }
-                } catch (Exception x) {
-                    log.error(x.toString(), x);
+                } catch (Throwable x) {
+                    // The guards on the maintenance paths convert exceptions
+                    // and - since handleThrowable joined them - non-fatal
+                    // Errors, but a throwable can still reach here from a
+                    // path without a guard of its own. The module's fatal
+                    // policy runs first, as everywhere else; losing this
+                    // task's next runs to a timer that dies on a fatal Error
+                    // is borne by the replacement in registerCleaner.
+                    ExceptionUtils.handleThrowable(x);
+                    log.error(MessageFactory.get("connectionPool.poolCleanerFailed"), x);
                 }
             }
         }
