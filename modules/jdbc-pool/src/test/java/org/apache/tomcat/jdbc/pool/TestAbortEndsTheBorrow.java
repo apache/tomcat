@@ -21,8 +21,10 @@ import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverPropertyInfo;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
+import java.sql.Statement;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
@@ -125,6 +127,41 @@ class TestAbortEndsTheBorrow extends JdbcPoolBaseTest {
                     "the next borrower must get a new session, never the one an "
                             + "abort was attempted on");
         }
+    }
+
+    @Test
+    void anAbortSealsTheStatementAndResultSetHandlesOfTheBorrow() throws Exception {
+        // Plain H2 here on purpose, as in the test above: its abort is a
+        // no-op that leaves the session open, so this is the honest probe
+        // that the seal runs at the pool layer - the handles of the aborted
+        // borrow must retire whatever the driver's abort did, mirroring the
+        // close-path pins of TestStatementHandleLifetime.
+        DataSource ds = abortPool(org.h2.Driver.class, 2);
+
+        Connection first = ds.getConnection();
+        Statement survivor = first.createStatement();
+        ResultSet cursor = survivor.executeQuery("SELECT 1");
+        Assertions.assertTrue(cursor.next(), "precondition: the cursor is live during the borrow");
+        Assertions.assertFalse(survivor.isClosed(), "precondition: the handle is live during the borrow");
+        first.abort(DIRECT_EXECUTOR);
+
+        Assertions.assertTrue(survivor.isClosed(),
+                "a statement whose borrow an abort ended must report itself closed");
+        SQLException thrown = Assertions.assertThrows(SQLException.class,
+                () -> survivor.execute("SELECT 1"),
+                "a statement whose borrow an abort ended must not run on the session");
+        Assertions.assertTrue(thrown.getMessage().contains("returned to the pool"),
+                "the failure must say what happened, but said: " + thrown.getMessage());
+        Assertions.assertThrows(SQLException.class, () -> survivor.unwrap(Statement.class),
+                "a handle retired by an abort must not reach the driver through unwrap()");
+        Assertions.assertDoesNotThrow(survivor::close,
+                "closing such a statement twice over stays the harmless no-op");
+
+        Assertions.assertTrue(cursor.isClosed(),
+                "a result set whose borrow an abort ended must report itself closed");
+        Assertions.assertThrows(SQLException.class, cursor::next,
+                "a result set whose borrow an abort ended must not read the session");
+        Assertions.assertDoesNotThrow(cursor::close);
     }
 
     @Test
