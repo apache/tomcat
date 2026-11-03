@@ -317,7 +317,6 @@ public final class CertificateLoader {
         if (keyFile == null) {
             keyFile = certFile;
         }
-        String chainFile = certificate.getCertificateChainFile();
 
         byte[] certBytes = readConfigFileBytes(certFile);
         if (certBytes == null) {
