@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -64,10 +65,23 @@ class TestQueryTimeoutDriverRefusal extends JdbcPoolBaseTest {
 
     private static final String QUERY_TIMEOUT_WARNING = "Unable to set the query timeout of 5 seconds";
 
+    /* Substring identifying the unexpected-failure warning among the records. */
+    private static final String UNEXPECTED_FAILURE_WARNING = "an exception other than a refusal";
+
     /* A pool whose driver refuses the timeout the interceptor configures. */
     private DataSource refusingTimeoutPool() {
         DataSource ds = newDataSource();
         ds.setDriverClassName(RefusingTimeoutDriver.class.getName());
+        ds.getPoolProperties().setJdbcInterceptors(
+                QueryTimeoutInterceptor.class.getName() + "(queryTimeout=5)");
+        return ds;
+    }
+
+    /* The same, with a driver that refuses the timeout unchecked, as a
+     * non-spec-compliant wrapper driver does. */
+    private DataSource uncheckedRefusingTimeoutPool() {
+        DataSource ds = newDataSource();
+        ds.setDriverClassName(UncheckedRefusingTimeoutDriver.class.getName());
         ds.getPoolProperties().setJdbcInterceptors(
                 QueryTimeoutInterceptor.class.getName() + "(queryTimeout=5)");
         return ds;
@@ -117,6 +131,117 @@ class TestQueryTimeoutDriverRefusal extends JdbcPoolBaseTest {
             }
             plain.close();
             prepared.close();
+        }
+    }
+
+    /**
+     * The report's job is the driver's reason for the refusal, so a driver
+     * that refuses without stating one must still produce a readable line:
+     * the exception's own name fills the reason slot, rather than the literal
+     * "null" the raw message would render there - a line the operator is told
+     * they will not get again should not be unreadable.
+     */
+    @Test
+    void aRefusalWithoutAMessageIsStillReportedWithAReadableReason() throws Exception {
+        DataSource ds = newDataSource();
+        ds.setDriverClassName(SilentRefusingTimeoutDriver.class.getName());
+        ds.getPoolProperties().setJdbcInterceptors(
+                QueryTimeoutInterceptor.class.getName() + "(queryTimeout=5)");
+        ds.createPool();
+
+        try (PoolLogCapture logs = new PoolLogCapture()) {
+            try (Connection pooled = ds.getConnection();
+                    Statement st = pooled.createStatement()) {
+                Assertions.assertTrue(st.execute("SELECT 1"),
+                        "a message-less refusal must cost the timeout only, not the statement");
+            }
+            List<String> refusals = logs.refusalMessages();
+            Assertions.assertEquals(1, refusals.size(), "the message-less refusal is reported once");
+            String message = refusals.get(0);
+            Assertions.assertFalse(message.contains(": null."),
+                    "the reason slot must not render the raw null message: " + message);
+            Assertions.assertTrue(message.contains("java.sql.SQLException"),
+                    "the exception's own name must stand in for the missing message: " + message);
+        }
+    }
+
+    /**
+     * The widening that lets an unchecked refusal cost the timeout rather
+     * than the statement must not turn every unrelated driver stumble in
+     * that call into the assertion "the driver does not apply the timeout",
+     * and above all must not let one odd failure spend the single report the
+     * physical connection will ever get: a driver that fails the call oddly
+     * once and genuinely refuses it later has to be heard refusing it, or
+     * the one line the operator does get says the wrong thing about the
+     * wrong exception.
+     */
+    @Test
+    void anUnexpectedFailureIsNeitherCalledARefusalNorSilencesOne() throws Exception {
+        DataSource ds = newDataSource();
+        ds.setDriverClassName(MixedFailureTimeoutDriver.class.getName());
+        ds.getPoolProperties().setJdbcInterceptors(
+                QueryTimeoutInterceptor.class.getName() + "(queryTimeout=5)");
+        ds.createPool();
+        MixedFailureTimeoutDriver.reset();
+
+        try (PoolLogCapture logs = new PoolLogCapture()) {
+            try (Connection pooled = ds.getConnection()) {
+                for (int creation = 1; creation <= 3; creation++) {
+                    try (Statement st = pooled.createStatement()) {
+                        Assertions.assertTrue(st.execute("SELECT 1"),
+                                "an unexpected failure in the timeout call must still cost only the timeout");
+                    }
+                }
+            }
+            List<String> unexpected = logs.unexpectedFailures();
+            List<String> refusals = logs.refusalMessages();
+            Assertions.assertEquals(1, unexpected.size(),
+                    "the unexpected failure is reported once per connection like a refusal");
+            Assertions.assertEquals(1, refusals.size(),
+                    "the genuine refusal after the unexpected failure must still be reported");
+            Assertions.assertTrue(refusals.get(0).contains("genuine refusal"),
+                    "the refusal line must carry the refusal's own reason: " + refusals.get(0));
+            Assertions.assertFalse(unexpected.get(0).contains("does not apply"),
+                    "the unexpected failure must not assert a driver refusal: " + unexpected.get(0));
+        }
+    }
+
+    /**
+     * A driver that refuses the timeout with an unchecked exception - the shape
+     * a non-spec-compliant wrapper driver uses, where the spec-compliant
+     * refusal is an exception the hook has to see coming - must fail exactly
+     * like the checked refusal. The interceptor's promise is that a refusal
+     * costs the timeout and not the statement, and that promise does not depend
+     * on whether the driver's refusal happens to be a checked exception; a
+     * refusal the hook lets escape closes the statement behind the failed
+     * creation and leaves the pool unable to create any statement at all, in
+     * silence.
+     */
+    @Test
+    void anUncheckedRefusalStillLeavesAUsableStatementAndReportsItOnce() throws Exception {
+        DataSource ds = uncheckedRefusingTimeoutPool();
+        ds.createPool();
+        TIMEOUT_ATTEMPTS.set(0);
+
+        try (PoolLogCapture logs = new PoolLogCapture()) {
+            try (Connection pooled = ds.getConnection()) {
+                try (Statement st = pooled.createStatement()) {
+                    Assertions.assertTrue(st.execute("SELECT 1"),
+                            "a statement whose timeout the driver refused unchecked must still run its query");
+                    Assertions.assertEquals(0, st.getQueryTimeout(),
+                            "a statement the driver refused must not claim a timeout");
+                }
+                Assertions.assertEquals(1, TIMEOUT_ATTEMPTS.get(),
+                        "the hook must try the configured timeout before noticing the refusal");
+                logs.assertRefusals(1, UnsupportedOperationException.class,
+                        "the unchecked refusal is as reportable as the checked one");
+                try (Statement again = pooled.createStatement()) {
+                    Assertions.assertTrue(again.execute("SELECT 1"),
+                            "the refusal must not poison the connection for later statements");
+                }
+                logs.assertRefusals(1, UnsupportedOperationException.class,
+                        "the unchecked refusal is reported once per physical connection like the checked one");
+            }
         }
     }
 
@@ -247,6 +372,16 @@ class TestQueryTimeoutDriverRefusal extends JdbcPoolBaseTest {
          * interceptor having gone quiet.
          */
         void assertRefusals(int expected, String why) {
+            assertRefusals(expected, SQLException.class, why);
+        }
+
+        /*
+         * As above, with the shape of the driver's refusal pinned per case:
+         * the spec-compliant refusal is checked, the wrapper-driver one is
+         * not, and the report must carry the driver's own exception either
+         * way.
+         */
+        void assertRefusals(int expected, Class<? extends Throwable> thrownType, String why) {
             List<LogRecord> seen;
             synchronized (records) {
                 seen = new ArrayList<>(records);
@@ -264,7 +399,7 @@ class TestQueryTimeoutDriverRefusal extends JdbcPoolBaseTest {
                         "the report must say that the timeout is not in effect: " + record.getMessage());
                 Assertions.assertTrue(record.getMessage().contains("not logged again"),
                         "the report must say what the log will not show later: " + record.getMessage());
-                Assertions.assertInstanceOf(SQLException.class, record.getThrown(),
+                Assertions.assertInstanceOf(thrownType, record.getThrown(),
                         "the driver's refusal must survive as the cause: " + record.getMessage());
             }
         }
@@ -273,6 +408,26 @@ class TestQueryTimeoutDriverRefusal extends JdbcPoolBaseTest {
         public void close() {
             logger.removeHandler(handler);
             logger.setLevel(originalLevel);
+        }
+
+        /* The refusal warning messages captured, for content assertions. */
+        List<String> refusalMessages() {
+            synchronized (records) {
+                return records.stream()
+                        .map(LogRecord::getMessage)
+                        .filter(m -> m != null && m.contains(QUERY_TIMEOUT_WARNING))
+                        .collect(Collectors.toList());
+            }
+        }
+
+        /* The unexpected-failure warning messages captured. */
+        List<String> unexpectedFailures() {
+            synchronized (records) {
+                return records.stream()
+                        .map(LogRecord::getMessage)
+                        .filter(m -> m != null && m.contains(UNEXPECTED_FAILURE_WARNING))
+                        .collect(Collectors.toList());
+            }
         }
     }
 
@@ -287,6 +442,18 @@ class TestQueryTimeoutDriverRefusal extends JdbcPoolBaseTest {
 
         private final Driver delegate = new org.h2.Driver();
 
+        /**
+         * The refusal this driver's statements hand out. Checked, the way the
+         * JDBC spec says a driver refuses a feature; the subclass below swaps
+         * in the unchecked shape a non-compliant wrapper uses.
+         *
+         * @return the supplier of the exception the wrapped statements throw
+         *         from {@code setQueryTimeout}
+         */
+        protected Supplier<Throwable> refusal() {
+            return () -> new SQLException("this driver does not support query timeouts");
+        }
+
         @Override
         public Connection connect(String url, Properties info) throws SQLException {
             Connection connection = delegate.connect(url, info);
@@ -296,7 +463,7 @@ class TestQueryTimeoutDriverRefusal extends JdbcPoolBaseTest {
             return (Connection) Proxy.newProxyInstance(
                     RefusingTimeoutDriver.class.getClassLoader(),
                     new Class<?>[] { Connection.class },
-                    new RefusingConnectionHandler(connection));
+                    new RefusingConnectionHandler(connection, refusal()));
         }
 
         @Override
@@ -337,9 +504,11 @@ class TestQueryTimeoutDriverRefusal extends JdbcPoolBaseTest {
     private static class RefusingConnectionHandler implements InvocationHandler {
 
         private final Connection vendor;
+        private final Supplier<Throwable> refusal;
 
-        RefusingConnectionHandler(Connection vendor) {
+        RefusingConnectionHandler(Connection vendor, Supplier<Throwable> refusal) {
             this.vendor = vendor;
+            this.refusal = refusal;
         }
 
         @Override
@@ -360,7 +529,7 @@ class TestQueryTimeoutDriverRefusal extends JdbcPoolBaseTest {
 
         private Object refusing(Statement statement, Class<?> api) {
             return Proxy.newProxyInstance(RefusingTimeoutDriver.class.getClassLoader(),
-                    new Class<?>[] { api }, new RefusingStatementHandler(statement));
+                    new Class<?>[] { api }, new RefusingStatementHandler(statement, refusal));
         }
     }
 
@@ -371,18 +540,77 @@ class TestQueryTimeoutDriverRefusal extends JdbcPoolBaseTest {
     private static class RefusingStatementHandler implements InvocationHandler {
 
         private final Statement vendor;
+        private final Supplier<Throwable> refusal;
 
-        RefusingStatementHandler(Statement vendor) {
+        RefusingStatementHandler(Statement vendor, Supplier<Throwable> refusal) {
             this.vendor = vendor;
+            this.refusal = refusal;
         }
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             if ("setQueryTimeout".equals(method.getName())) {
                 TIMEOUT_ATTEMPTS.incrementAndGet();
-                throw new SQLException("this driver does not support query timeouts");
+                throw refusal.get();
             }
             return delegate(vendor, method, args);
+        }
+    }
+
+    /*
+     * The same refusal as {@link RefusingTimeoutDriver}, but thrown unchecked -
+     * a shape no compliant driver uses and wrapper drivers do. Configured
+     * through {@code driverClassName}, so it must stay public with a no-arg
+     * constructor.
+     */
+    public static class UncheckedRefusingTimeoutDriver extends RefusingTimeoutDriver {
+
+        @Override
+        protected Supplier<Throwable> refusal() {
+            return () -> new UnsupportedOperationException("query timeouts are not implemented");
+        }
+    }
+
+    /*
+     * Refuses the timeout with a checked exception that carries no message -
+     * a driver stating that it refuses without saying why. Configured through
+     * {@code driverClassName}, so it must stay public with a no-arg
+     * constructor.
+     */
+    public static class SilentRefusingTimeoutDriver extends RefusingTimeoutDriver {
+
+        @Override
+        protected Supplier<Throwable> refusal() {
+            return SQLException::new;
+        }
+    }
+
+    /*
+     * A driver whose setQueryTimeout fails three ways in a row: once with an
+     * unrelated unchecked exception (a driver bug, not a refusal), then with a
+     * genuine checked refusal, then with the unrelated failure again. The
+     * interceptor must tell the bug from the refusal, and the bug must not
+     * spend the refusal's single report. Configured through
+     * {@code driverClassName}, so it must stay public with a no-arg
+     * constructor.
+     */
+    public static class MixedFailureTimeoutDriver extends RefusingTimeoutDriver {
+
+        private static final AtomicInteger ATTEMPTS = new AtomicInteger();
+
+        static void reset() {
+            ATTEMPTS.set(0);
+        }
+
+        @Override
+        protected Supplier<Throwable> refusal() {
+            return () -> {
+                int attempt = ATTEMPTS.incrementAndGet();
+                if (attempt == 2) {
+                    return new SQLException("genuine refusal");
+                }
+                return new IllegalStateException("driver bug number " + attempt);
+            };
         }
     }
 
