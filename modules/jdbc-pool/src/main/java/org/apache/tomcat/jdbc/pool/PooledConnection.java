@@ -924,7 +924,7 @@ public class PooledConnection implements PooledConnectionMBean {
             }
         }
 
-        String query = sql;
+        String query = executableStatement(sql);
 
         // The init SQL is not a health check: it is the pool deliberately
         // initializing the physical session it has just established, and its
@@ -940,7 +940,7 @@ public class PooledConnection implements PooledConnectionMBean {
         }
 
         if (query == null) {
-            query = poolProperties.getValidationQuery();
+            query = executableStatement(poolProperties.getValidationQuery());
         }
 
         if (query == null) {
@@ -1050,6 +1050,31 @@ public class PooledConnection implements PooledConnectionMBean {
             }
         }
         return false;
+    }
+
+
+    /**
+     * Returns the statement a validation should execute, or {@code null} when
+     * it has none and the built-in {@link java.sql.Connection#isValid(int)}
+     * check runs instead.
+     *
+     * <p>A blank string is not a statement. A configuration surface that
+     * cannot express the unset value - a JNDI attribute, a connection of the
+     * two-argument {@link #validate(int, String)} - is written blank to mean
+     * exactly what the unset value means, so a blank is read as unset here as
+     * well. {@link PoolProperties#setValidationQuery(String)} already collapses
+     * a blank at the write, so what reaches this point blank is a configuration
+     * that did not pass through that setter - one handed in as another
+     * {@link PoolConfiguration} implementation - or a caller's explicit
+     * argument, and neither should have an emptiness executed as SQL.</p>
+     *
+     * @param query the configured or passed statement, may be {@code null}
+     *
+     * @return the query itself if it carries anything, {@code null} if it is
+     *             null or blank
+     */
+    private static String executableStatement(String query) {
+        return query == null || query.trim().isEmpty() ? null : query;
     }
 
 
