@@ -230,6 +230,15 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             path = request.getRequestURI();
             cpath = request.getContextPath();
         }
+        int pos = 0;
+        if (!context.getAllowMultipleLeadingForwardSlashInPath()) {
+            do {
+                pos++;
+            } while (pos < path.length() && path.charAt(pos) == '/');
+            pos--;
+            path = path.substring(pos);
+
+        }
         if (cpath.length() > 1) {
             path = path.substring(cpath.length());
         }
