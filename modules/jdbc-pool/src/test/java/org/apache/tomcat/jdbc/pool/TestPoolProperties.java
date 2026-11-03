@@ -16,6 +16,11 @@
  */
 package org.apache.tomcat.jdbc.pool;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -913,5 +918,39 @@ class TestPoolProperties {
 
         Assertions.assertTrue(none.toString().contains("jdbcInterceptors=null"),
                 "a null string must print as null, was: " + none);
+    }
+
+    /** The implementation a configured validator must be rebuilt to. */
+    public static class RebuiltValidator implements Validator {
+        @Override
+        public boolean validate(Connection connection, int validateAction) {
+            return true;
+        }
+    }
+
+    @Test
+    void serializationRebuildsTheValidatorConfiguredByName() throws Exception {
+        PoolProperties props = new PoolProperties();
+        props.setValidatorClassName(RebuiltValidator.class.getName());
+        Assertions.assertNotNull(props.getValidator(),
+                "configuring by class name must build the instance");
+
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        try (ObjectOutputStream out = new ObjectOutputStream(bytes)) {
+            out.writeObject(props);
+        }
+        PoolProperties read;
+        try (ObjectInputStream in =
+                new ObjectInputStream(new ByteArrayInputStream(bytes.toByteArray()))) {
+            read = (PoolProperties) in.readObject();
+        }
+
+        // The instance is transient and the name alone does not validate:
+        // without the read-side replay, the deserialized configuration
+        // reports the validator by name while the query path does the work.
+        Assertions.assertNotNull(read.getValidator(),
+                "the deserialized configuration must not report a validator it does not run");
+        Assertions.assertTrue(read.getValidator() instanceof RebuiltValidator,
+                "the replay must rebuild the configured class");
     }
 }
