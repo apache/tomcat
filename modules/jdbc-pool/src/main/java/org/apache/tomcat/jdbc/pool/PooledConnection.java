@@ -940,10 +940,21 @@ public class PooledConnection implements PooledConnectionMBean {
             return true;
         }
 
-        if (poolProperties.getValidator() != null) {
+        // One read of a runtime-reconfigurable field. The validator is
+        // volatile and its setter is a supported live surface (JMX, the
+        // DataSource), so a second read could name a different validator
+        // than the one being called: the call would NPE on a null
+        // replacement and the guard below would read it as this session
+        // failing its own check, retiring a healthy connection that no
+        // validator ever refused; a swap to a different validator would
+        // run that one mid-borrow and name it in a log line about work
+        // the first one did. The snapshot decides, is called, and signs
+        // the log lines alike.
+        final Validator validator = poolProperties.getValidator();
+        if (validator != null) {
             boolean valid;
             try {
-                valid = poolProperties.getValidator().validate(connection, validateAction);
+                valid = validator.validate(connection, validateAction);
             } catch (Throwable x) {
                 ExceptionUtils.handleThrowable(x);
                 // The SPI declares no checked exception, so throwing is the
@@ -960,7 +971,7 @@ public class PooledConnection implements PooledConnectionMBean {
                 // handleThrowable re-throws keep propagating.
                 if (getPoolProperties().getLogValidationErrors()) {
                     log.error(MessageFactory.get("pooledConnection.customValidationThrew",
-                            poolProperties.getValidator()), x);
+                            validator), x);
                 } else if (log.isDebugEnabled()) {
                     log.debug("Custom validation threw an exception.", x);
                 }
@@ -972,7 +983,7 @@ public class PooledConnection implements PooledConnectionMBean {
             } else {
                 if (getPoolProperties().getLogValidationErrors()) {
                     log.error(MessageFactory.get("pooledConnection.customValidationFailed",
-                            poolProperties.getValidator()));
+                            validator));
                 }
                 return false;
             }
