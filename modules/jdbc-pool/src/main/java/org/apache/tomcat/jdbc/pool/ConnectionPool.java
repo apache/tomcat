@@ -1496,7 +1496,8 @@ public class ConnectionPool {
             }
 
             // Evaluate username/password change as well as max age functionality
-            boolean forceReconnect = con.shouldForceReconnect(username, password) || con.isMaxAgeExpired();
+            boolean credentialsDiffer = con.shouldForceReconnect(username, password);
+            boolean forceReconnect = credentialsDiffer || con.isMaxAgeExpired();
 
             if (!con.isDiscarded() && !con.isInitialized()) {
                 // Here it states that the connection not discarded, but the connection is null
@@ -1557,8 +1558,20 @@ public class ConnectionPool {
                 setToNull = true;
                 return null;
             }
+            // Whether the reconnect below took on a new session: only a
+            // reconnect that never got that far can have left a session worth
+            // keeping behind it.
+            boolean reconnected = false;
             try {
-                con.reconnect();
+                if (credentialsDiffer) {
+                    // A session the database has not refused is not this
+                    // borrower's to spend, so the new identity is put to the
+                    // database before the session it replaces is given up.
+                    con.reconnectWith(username, password);
+                } else {
+                    con.reconnect();
+                }
+                reconnected = true;
                 reconnectedCount.incrementAndGet();
                 int validationMode = isInitNewConnections() ? PooledConnection.VALIDATE_INIT
                         : PooledConnection.VALIDATE_BORROW;
@@ -1589,7 +1602,17 @@ public class ConnectionPool {
                     throw new SQLException(MessageFactory.get("connectionPool.failedToValidateNewConnection"));
                 }
             } catch (Exception x) {
-                release(con);
+                if (credentialsDiffer && !reconnected && con.isInitialized() && !con.isDiscarded()) {
+                    // The attempt was refused before it gave up the session
+                    // this connection was holding: that session is open, it
+                    // carries its own still-valid credentials, and it belongs
+                    // to the pool and to every borrower the database does not
+                    // turn away. It goes back to the queue it came from
+                    // instead of paying for a borrow that never used it.
+                    returnToIdle(con);
+                } else {
+                    release(con);
+                }
                 setToNull = true;
                 if (x instanceof SQLException) {
                     throw (SQLException) x;
@@ -1604,6 +1627,33 @@ public class ConnectionPool {
             if (setToNull) {
                 con = null;
             }
+        }
+    }
+
+    /**
+     * Hands a connection back to the idle queue after a borrow attempt that failed without using the session the
+     * connection holds. The attempt neither handed the session out nor closed it, so the connection is exactly as
+     * usable as it was before the attempt and the pool keeps it: a borrower the database refused is not a reason to
+     * destroy a session, and the slot it stands for.
+     *
+     * @param con the connection to hand back to the idle queue
+     */
+    private void returnToIdle(PooledConnection con) {
+        if (isClosed()) {
+            // A close has drained the queues once already, so a session
+            // handed to the idle queue now would sit there out of reach of
+            // every shutdown path. Retire it instead.
+            release(con);
+        } else if (!idle.offer(con)) {
+            release(con);
+        } else if (isClosed() && idle.remove(con)) {
+            // The closed check above and this offer are not one atomic step:
+            // a close arriving in between has drained the queue this offer
+            // then fills for the last time. Take the connection back out of a
+            // queue that has already been drained past; if it is no longer
+            // there, a taker has taken ownership of it and sees to its
+            // closure.
+            release(con);
         }
     }
 
