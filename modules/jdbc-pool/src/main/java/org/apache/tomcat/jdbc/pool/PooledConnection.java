@@ -1419,7 +1419,7 @@ public class PooledConnection implements PooledConnectionMBean {
      * Returns the underlying connection: the session the pool established for this entry, not a logical handle created
      * on demand. On a CPDS-configured pool the {@link javax.sql.PooledConnection} handle that creates such logical
      * handles is the separate <code>cpdsConnection</code> this class keeps, just as the XA handle is
-     * {@link #getXaConnection()}.
+     * {@link #getXAConnection()}.
      *
      * @return the underlying JDBC connection as it was returned from the JDBC driver
      */
