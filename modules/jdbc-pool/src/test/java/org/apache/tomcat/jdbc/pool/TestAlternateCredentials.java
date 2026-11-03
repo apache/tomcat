@@ -152,6 +152,46 @@ class TestAlternateCredentials extends JdbcPoolBaseTest {
     }
 
     @Test
+    void aRefusedCredentialChangeCostsThePoolNothing() throws Exception {
+        DataSource ds = alternatePool(true);
+        ds.getPoolProperties().setMaxWait(5000);
+        ds.createPool();
+
+        // One healthy session of the pool's own user, checked back in: this is
+        // the session a later alternate-credential borrow picks up and is
+        // refused with.
+        try (Connection c = ds.getConnection()) {
+            setSessionMarker(c, 42);
+        }
+        int sizeBefore = ds.getSize();
+        int sessionsBefore = poolSessions();
+        long reconnectionsBefore = ds.getReconnectedCount();
+
+        Assertions.assertThrows(SQLException.class,
+                () -> ds.getConnection(ALT_USER, "wrong-password"),
+                "the database must refuse a borrow with a wrong password");
+
+        Assertions.assertEquals(sizeBefore, ds.getSize(),
+                "an attempt the database refused must not take a session - and with "
+                        + "it a maxActive slot - out of the pool");
+        Assertions.assertEquals(sessionsBefore, poolSessions(),
+                "the session the refused attempt was made on must still be open");
+        Assertions.assertEquals(reconnectionsBefore, ds.getReconnectedCount(),
+                "a refused attempt is not a reconnection");
+
+        // The session came back where it was, still authenticated as the user
+        // it was opened as: the refused credentials are not what it will be
+        // re-established with either.
+        try (Connection c = ds.getConnection()) {
+            Assertions.assertEquals(DEFAULT_USER, sessionUser(c));
+            Assertions.assertEquals(Integer.valueOf(42), sessionMarker(c),
+                    "the refused attempt must not have replaced the session");
+        }
+        Assertions.assertEquals(sizeBefore, ds.getSize(),
+                "serving the next borrower must not have needed a new session");
+    }
+
+    @Test
     void anUnknownUserIsRefusedByTheDatabase() throws Exception {
         DataSource ds = alternatePool(true);
         ds.getPoolProperties().setMaxWait(5000);
