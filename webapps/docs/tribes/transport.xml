@@ -28,9 +28,153 @@
 
 <body>
 
+<section name="Table of Contents">
+<toc/>
+</section>
 
-<section name="Transport">
-    <p>TODO</p>
+<section name="Overview">
+  <p>
+    The Tribes transport moves application and replication messages between
+    known cluster members. Membership discovery is a separate part of the
+    channel. It supplies the address and ports that the transport uses for each
+    destination.
+  </p>
+  <p>
+    Sending and receiving are deliberately separate. The sender opens
+    connections on demand for outbound messages, while the receiver owns the
+    listening sockets and the worker pool for inbound messages. The current
+    implementations use Java non-blocking I/O (NIO).
+  </p>
+</section>
+
+<section name="Sending messages">
+  <p>
+    The default channel sender is <code>ReplicationTransmitter</code>. It
+    delegates network delivery to <code>PooledParallelSender</code>, which uses
+    a pool of <code>ParallelNioSender</code> instances. A message addressed to
+    multiple members can therefore be written to those members in parallel,
+    and independent messages do not have to share one connection.
+  </p>
+  <p>
+    Each NIO sender manages the socket for a destination and applies the
+    configured connection timeout, retry, buffer and keep-alive settings.
+    Connections may be reused until a <code>keepAliveCount</code> or
+    <code>keepAliveTime</code> limit closes them.
+  </p>
+</section>
+
+<section name="Receiving messages">
+  <p>
+    <code>NioReceiver</code> accepts incoming connections and uses a selector
+    to detect sockets that are ready for reading. Completed messages are passed
+    to a pool of <code>NioReplicationTask</code> workers. The workers decode the
+    Tribes message, return any requested acknowledgement and pass the message
+    up through the channel interceptor stack.
+  </p>
+  <p>
+    This design lets a small receiver thread pool service many connections.
+    The pool size should be tuned for the number of members, message rate,
+    message processing cost and available CPU rather than simply set as high as
+    possible.
+  </p>
+</section>
+
+<section name="TCP and UDP">
+  <p>
+    TCP is the default transport for data messages. A message sent with
+    <code>Channel.SEND_OPTIONS_UDP</code> uses UDP instead. UDP delivery
+    requires a <code>udpPort</code> on the receiver so that each member can
+    advertise a destination UDP port.
+  </p>
+  <p>
+    TCP is appropriate for the normal replication path and for messages that
+    may exceed a single datagram. UDP avoids establishing a TCP connection, but
+    applications must account for datagram size limits, loss and reordering.
+    Transport selection is made per message, so a channel can carry both TCP
+    and UDP traffic.
+  </p>
+</section>
+
+<section name="Delivery options">
+  <p>
+    Send options are bit flags and may be combined for each message:
+  </p>
+  <ul>
+    <li>
+      With no acknowledgement option, completion means the message was written
+      to the transport.
+    </li>
+    <li>
+      <code>SEND_OPTIONS_USE_ACK</code> waits for the destination to confirm
+      receipt. This is the default option.
+    </li>
+    <li>
+      <code>SEND_OPTIONS_SYNCHRONIZED_ACK</code>, when combined with
+      <code>SEND_OPTIONS_USE_ACK</code>, waits until the destination has also
+      processed the message.
+    </li>
+    <li>
+      <code>SEND_OPTIONS_ASYNCHRONOUS</code> hands delivery to the
+      <code>MessageDispatchInterceptor</code> queue when that interceptor is in
+      the channel stack.
+    </li>
+  </ul>
+  <p>
+    Acknowledgements detect a delivery or processing failure and report it to
+    the sender. They do not provide transaction semantics across multiple
+    destinations.
+  </p>
+</section>
+
+<section name="Configuration">
+  <subsection name="Sender">
+    <p>
+      Configure the sender's nested <code>Transport</code> element to control
+      its connection pool, timeouts, retry count, socket buffers and keep-alive
+      policy. See the
+      <a href="../config/cluster-sender.html">Cluster Sender reference</a> for
+      the complete attribute list and defaults.
+    </p>
+  </subsection>
+
+  <subsection name="Receiver">
+    <p>
+      The receiver configuration defines its bind address, TCP port, optional
+      UDP port, automatic port range, worker limits and socket buffers. See the
+      <a href="../config/cluster-receiver.html">Cluster Receiver reference</a>
+      for the complete attribute list and defaults.
+    </p>
+  </subsection>
+
+  <subsection name="Tuning">
+    <p>
+      Start with the defaults and measure under representative traffic. If
+      senders wait for a pooled connection, review <code>poolSize</code> and
+      <code>maxWait</code>. If receiving work queues behind available sockets,
+      review the receiver's thread limits and the time spent by channel
+      listeners. Increasing buffers or thread counts without measuring can add
+      memory use and scheduling overhead without increasing throughput.
+    </p>
+  </subsection>
+</section>
+
+<section name="Network and security">
+  <p>
+    Every member must advertise an address and port reachable by the other
+    members. Firewalls and network policy must allow the receiver's TCP port
+    and, when used, its UDP port. Membership traffic and data transport traffic
+    use separate sockets and may require separate network rules.
+  </p>
+  <p>
+    Cluster traffic should use a trusted network. If a trusted network is not
+    available, configure the channel to use TLS with static membership and a
+    secure receiver port. TLS protects confidentiality and integrity, but not
+    availability. See the
+    <a href="../config/cluster.html#Security">Cluster security reference</a>
+    and the
+    <a href="https://tomcat.apache.org/security-model.html">Tomcat security
+    model</a> when designing the cluster network.
+  </p>
 </section>
 </body>
 
