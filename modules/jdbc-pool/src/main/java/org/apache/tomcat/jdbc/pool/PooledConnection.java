@@ -79,7 +79,8 @@ public class PooledConnection implements PooledConnectionMBean {
     private volatile java.sql.Connection connection;
 
     /**
-     * If using a XAConnection underneath.
+     * If using a XAConnection underneath. On an XA session this is the pool's
+     * {@link XABranchTracker} wrapper around the handle the data source returned.
      */
     protected volatile javax.sql.XAConnection xaConnection;
     /**
@@ -382,6 +383,14 @@ public class PooledConnection implements PooledConnectionMBean {
                 }
                 throw failure;
             }
+            // Once the session is fully established, hand out the pool's
+            // wrapper rather than the driver's handle: it tracks the
+            // transaction branches started through this session, so a return
+            // can tell whether its borrower is leaving a branch behind (see
+            // hasUnresolvedXaBranches()). The connect above holds the driver's
+            // handle directly, and the wrapper below only delegates - a close
+            // through the field still physically closes the session.
+            xaConnection = new XABranchTracker(pooled);
         } else if (poolProperties.getDataSource() instanceof javax.sql.DataSource) {
             javax.sql.DataSource ds = (javax.sql.DataSource) poolProperties.getDataSource();
             if (usr != null && pwd != null) {
@@ -590,6 +599,14 @@ public class PooledConnection implements PooledConnectionMBean {
                 // an interceptor must not be able to keep the physical
                 // connection from being closed
                 log.warn(MessageFactory.get("pooledConnection.interceptorDisconnectedFailed"), x);
+            }
+            javax.sql.XAConnection retired = xaConnection;
+            if (retired instanceof XABranchTracker) {
+                // Mark the handle retired before the physical close: branch
+                // work on a resource captured from this handle then meets the
+                // pool's clean XA refusal instead of the driver's half-closed
+                // state.
+                ((XABranchTracker) retired).markClosed();
             }
             try {
                 if (cpdsConnection != null) {
@@ -1186,10 +1203,32 @@ public class PooledConnection implements PooledConnectionMBean {
     /**
      * Returns the underlying XA connection
      *
-     * @return the underlying XA connection as it was returned from the Datasource
+     * @return the XA connection of this session on an XA pool - the pool's
+     *             {@link XABranchTracker} wrapper around the handle that the data
+     *             source returned, which delegates every call to it - or null when
+     *             the pool is not backed by an XA data source or this session has
+     *             been disconnected
      */
     public javax.sql.XAConnection getXAConnection() {
         return this.xaConnection;
+    }
+
+    /**
+     * Reports whether this session carries an XA transaction branch that was
+     * started through its XA resource and never resolved. Such a branch is
+     * attached to the physical connection until the database drops it - the
+     * pool's return-time transaction termination unwinds only local work - so
+     * the session must not go back to the idle queue with one on it.
+     *
+     * @return true if at least one branch started on this session was never
+     *             committed, rolled back or forgotten
+     */
+    boolean hasUnresolvedXaBranches() {
+        javax.sql.XAConnection xa = xaConnection;
+        if (xa instanceof XABranchTracker) {
+            return ((XABranchTracker) xa).hasUnresolvedBranches();
+        }
+        return false;
     }
 
 
