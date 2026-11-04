@@ -947,18 +947,17 @@ public class JspUtil {
             for (int i = 0; i < skip; i++) {
                 in.read();
             }
-        } catch (IOException ioe) {
-            try {
-                in.close();
-            } catch (IOException ignore) {
-                // Ignore
-            }
-            throw ioe;
-        }
-        try {
             reader = new InputStreamReader(in, encoding);
         } catch (UnsupportedEncodingException ex) {
             err.jspError("jsp.error.unsupported.encoding", encoding);
+        } finally {
+            if (reader == null) {
+                try {
+                    in.close();
+                } catch (IOException ignore) {
+                    // Ignore
+                }
+            }
         }
 
         return reader;
