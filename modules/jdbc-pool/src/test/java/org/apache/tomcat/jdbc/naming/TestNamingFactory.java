@@ -16,13 +16,17 @@
  */
 package org.apache.tomcat.jdbc.naming;
 
+import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import javax.naming.CompositeName;
 import javax.naming.Name;
 import javax.naming.NamingException;
@@ -39,6 +43,8 @@ import org.apache.tomcat.jdbc.pool.PoolConfiguration;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.apache.tomcat.jdbc.pool.Validator;
 import org.apache.tomcat.jdbc.pool.XADataSource;
+import org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport;
+import org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx;
 
 /**
  * Expected JNDI/naming factory functionality: a container-style
@@ -596,6 +602,96 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
         Assertions.assertEquals("\" My Pool \"",
                 DataSourceFactory.parsePoolProperties(attrs).getName(),
                 "a configured pool name must be quoted but stored verbatim");
+    }
+
+    @Test
+    void aContainerShapedObjectNameIsUsedVerbatim() throws Exception {
+        // The container passes this name to a pool that does not name
+        // itself. The factory stores it through ObjectName.quote(), the way
+        // it stores every configured name, and nothing else may touch it:
+        // the pool name, the registration name and the statistics key must
+        // all carry that one stored form.
+        String containerName = "Catalina/localhost/app1/jdbc/DS";
+        String storedName = ObjectName.quote(containerName);
+
+        Reference ref = dataSourceReference("javax.sql.DataSource");
+        ref.add(new StringRefAddr("jmxEnabled", "false"));
+        ref.add(new StringRefAddr("object_name", containerName));
+        ref.add(new StringRefAddr("jdbcInterceptors", "SlowQueryReport"));
+
+        DataSource ds = manage((DataSource) new DataSourceFactory().getObjectInstance(
+                ref, new CompositeName("jdbc/DS"), null, null));
+
+        Assertions.assertEquals(storedName, ds.getPoolProperties().getName(),
+                "the container-passed name must be the pool name, only the storage quote applied");
+
+        try (java.sql.Connection c = ds.getConnection();
+                java.sql.ResultSet rs = c.createStatement().executeQuery("SELECT 1")) {
+            Assertions.assertTrue(rs.next());
+        }
+
+        Assertions.assertEquals(storedName, ds.getPool().getRegistrationName(),
+                "the pool must register under the container-passed name");
+        ConcurrentHashMap<String, SlowQueryReport.QueryStats> stats =
+                SlowQueryReport.getPoolStats(storedName);
+        Assertions.assertNotNull(stats,
+                "the statistics registry must key the pool by its container name");
+        Assertions.assertTrue(stats.containsKey("SELECT 1"),
+                "the executed query must be recorded under the container name");
+    }
+
+    /* A factory-built pool carrying a container-shaped object_name. */
+    private DataSource containerNamedPool(String containerName) throws Exception {
+        Reference ref = dataSourceReference("javax.sql.DataSource");
+        ref.add(new StringRefAddr("jmxEnabled", "false"));
+        ref.add(new StringRefAddr("object_name", containerName));
+        ref.add(new StringRefAddr("jdbcInterceptors",
+                "SlowQueryReportJmx(notifyPool=false,threshold=-1)"));
+        return manage((DataSource) new DataSourceFactory().getObjectInstance(
+                ref, new CompositeName("jdbc/DS"), null, null));
+    }
+
+    @Test
+    void twoContainerNamedPoolsKeepSeparateRegistries() throws Exception {
+        // The two-webapp case at pool level: one JNDI name, two contexts, so
+        // two generated names of the container shape. Nothing may merge the
+        // pools: each keeps its own statistics registry and its own JMX
+        // registration, where the counter names of unnamed pools could once
+        // collide.
+        String name1 = "Catalina/localhost/app1/jdbc/DS";
+        String name2 = "Catalina/localhost/app2/jdbc/DS";
+        String stored1 = ObjectName.quote(name1);
+        String stored2 = ObjectName.quote(name2);
+
+        DataSource ds1 = containerNamedPool(name1);
+        DataSource ds2 = containerNamedPool(name2);
+
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        ObjectName oname1 = new ObjectName("tomcat.jdbc:type="
+                + SlowQueryReportJmx.class.getName() + ",name=" + stored1);
+        ObjectName oname2 = new ObjectName("tomcat.jdbc:type="
+                + SlowQueryReportJmx.class.getName() + ",name=" + stored2);
+
+        try (java.sql.Connection c1 = ds1.getConnection();
+                java.sql.Connection c2 = ds2.getConnection()) {
+            Assertions.assertTrue(server.isRegistered(oname1),
+                    "the first pool must publish its interceptor MBean under its own name");
+            Assertions.assertTrue(server.isRegistered(oname2),
+                    "the second pool must publish its interceptor MBean under its own name");
+            Assertions.assertEquals(stored1, ds1.getPool().getRegistrationName());
+            Assertions.assertEquals(stored2, ds2.getPool().getRegistrationName());
+        }
+
+        ConcurrentHashMap<String, SlowQueryReport.QueryStats> stats1 =
+                SlowQueryReport.getPoolStats(stored1);
+        ConcurrentHashMap<String, SlowQueryReport.QueryStats> stats2 =
+                SlowQueryReport.getPoolStats(stored2);
+        Assertions.assertNotNull(stats1);
+        Assertions.assertNotNull(stats2);
+        Assertions.assertSame(stats1, SlowQueryReport.getPoolStats(stored1),
+                "the statistics of one name must stay one registry");
+        Assertions.assertNotSame(stats1, stats2,
+                "the two container names must not share one statistics registry");
     }
 
     /* A factory-built pool, H2-backed, with one extra attribute. */

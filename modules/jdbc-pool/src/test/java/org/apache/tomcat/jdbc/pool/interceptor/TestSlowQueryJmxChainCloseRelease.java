@@ -32,20 +32,19 @@ import org.apache.tomcat.jdbc.pool.DataSource;
 
 /**
  * The {@code SlowQueryReportJmx} interceptor publishes its MBean and
- * notification broadcaster for the pool <em>name</em> and must take them
- * down once the last live pool of that name closes. Pool closure delivers
- * the close to one freshly instantiated interceptor per configured
- * definition, in declaration order, and the statistics release hands its
- * "last pool of the name closed" signal to whichever definition runs
- * first - which a base {@link SlowQueryReport} definition above the JMX
- * one consumes before the definition that owns the JMX state ever sees it.
- * The JMX definition must therefore read the name's freed statistics as
- * the same signal, or the registration of a pool that is already gone
- * stays published forever, pinning the dead delegate and blocking a later
- * same-named pool from registering.
+ * notification broadcaster for the pool it reports on, and gives them up
+ * when that pool closes. Pool closure delivers the close to one freshly
+ * instantiated interceptor per configured definition, in declaration
+ * order, and the release hangs from the pool's statistics store rather
+ * than from a signal one definition hands to the next: whichever
+ * definition is asked to release the store gives up the JMX state
+ * published for it, so the order the definitions come down in - and a
+ * base {@link SlowQueryReport} definition above the JMX one - cannot
+ * strand the registration of a pool that is already gone.
  *
  * <p>Reproducer for the release-signal ordering defect of
- * {@code defects-reports/defects-org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport.md}.</p>
+ * {@code defects-reports/defects-org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport.md},
+ * which the per-pool release replaced.</p>
  */
 class TestSlowQueryJmxChainCloseRelease extends JdbcPoolBaseTest {
 
@@ -119,34 +118,37 @@ class TestSlowQueryJmxChainCloseRelease extends JdbcPoolBaseTest {
     }
 
     @Test
-    void closingOneOfTwoSameNamedChainedPoolsKeepsTheRegistration() throws Exception {
-        // The statistics-gone release must not fire while a same-named
-        // survivor still runs: the registration belongs to the name
+    void eachOfTwoSameNamedChainedPoolsReleasesOnlyItsOwnRegistration() throws Exception {
+        // The publication belongs to the pool that made it: the close of that
+        // pool takes it down even while a pool configured with the same name is
+        // still running, and that other pool - whose own publication the
+        // MBeanServer refused - keeps its own statistics either way
         String poolName = "chain-survivors-" + System.nanoTime();
         String chain = SQR + ";" + SQRJ + "(notifyPool=false)";
-        DataSource first = poolNamed(poolName, chain);
-        DataSource second = poolNamed(poolName, chain);
-        first.createPool();
-        second.createPool();
-        run(first, "SELECT 1");
-        run(second, "SELECT 2");
+        DataSource publisher = poolNamed(poolName, chain);
+        DataSource refused = poolNamed(poolName, chain);
+        publisher.createPool();
+        refused.createPool();
+        run(publisher, "SELECT 1");
+        run(refused, "SELECT 2");
 
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
         ObjectName oname = interceptorName(poolName);
-
-        first.close();
-
         Assertions.assertTrue(server.isRegistered(oname),
-                "closing one of two live pools of the same name must keep the shared"
-                        + " registration for the survivor");
-        Assertions.assertNotNull(SlowQueryReport.getPoolStats(poolName),
-                "and the statistics of the name");
+                "the premise: the first pool's borrow published the MBean");
 
-        second.close();
+        publisher.close();
 
         Assertions.assertFalse(server.isRegistered(oname),
-                "closing the last pool of the name must take the registration down");
+                "the close of the pool that published the MBean takes it down, whatever"
+                        + " position the JMX definition has in its chain and whatever other"
+                        + " pool was configured with the same name");
+        Assertions.assertNotNull(SlowQueryReport.getPoolStats(poolName),
+                "and the other pool's statistics are untouched by it");
+
+        refused.close();
+
         Assertions.assertNull(SlowQueryReport.getPoolStats(poolName),
-                "and the statistics with it");
+                "its own close releases the statistics it registered under the name");
     }
 }
