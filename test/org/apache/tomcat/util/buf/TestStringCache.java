@@ -20,7 +20,9 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 public class TestStringCache {
@@ -41,14 +43,48 @@ public class TestStringCache {
         INPUT_INVALID.setCharset(StandardCharsets.UTF_8);
     }
 
+    private final StringCache sc = new StringCache();
+    private boolean byteEnabledBefore;
+
+    @Before
+    public void saveState() {
+        byteEnabledBefore = sc.getByteEnabled();
+    }
+
+    @After
+    public void restoreState() {
+        sc.reset();
+        sc.setByteEnabled(byteEnabledBefore);
+    }
+
+
+    @Test
+    public void testCountersDoNotOverflow() throws Exception {
+        sc.setByteEnabled(true);
+        sc.reset();
+
+        // Train the cache so subsequent lookups go through the hot path
+        for (int i = 0; i < StringCache.trainThreshold * 2; i++) {
+            INPUT_VALID.toString(CodingErrorAction.REPLACE, CodingErrorAction.REPLACE);
+        }
+        Assert.assertNotNull(StringCache.bcCache);
+
+        // Set both counters one below Integer.MAX_VALUE; two cache hits must carry them past it
+        StringCache.accessCount = Integer.MAX_VALUE - 1;
+        StringCache.hitCount = Integer.MAX_VALUE - 1;
+
+        INPUT_VALID.toString(CodingErrorAction.REPLACE, CodingErrorAction.REPLACE);
+        INPUT_VALID.toString(CodingErrorAction.REPLACE, CodingErrorAction.REPLACE);
+
+        Assert.assertEquals(Integer.MAX_VALUE + 1L, StringCache.accessCount);
+        Assert.assertEquals(Integer.MAX_VALUE + 1L, StringCache.hitCount);
+    }
+
 
     @Test
     public void testCodingErrorLookup() {
 
-        System.setProperty("tomcat.util.buf.StringCache.byte.enabled", "true");
-
-        Assert.assertTrue(StringCache.byteEnabled);
-        StringCache sc = new StringCache();
+        sc.setByteEnabled(true);
         sc.reset();
 
         for (int i = 0; i < StringCache.trainThreshold * 2; i++) {

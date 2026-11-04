@@ -118,13 +118,13 @@ public class StringCache {
     /**
      * Access count.
      */
-    protected static int accessCount = 0;
+    protected static long accessCount = 0;
 
 
     /**
      * Hit count.
      */
-    protected static int hitCount = 0;
+    protected static long hitCount = 0;
 
 
     // ------------------------------------------------------------ Properties
@@ -215,7 +215,7 @@ public class StringCache {
      *
      * @return the access count
      */
-    public int getAccessCount() {
+    public long getAccessCount() {
         return accessCount;
     }
 
@@ -225,7 +225,7 @@ public class StringCache {
      *
      * @return the hit count
      */
-    public int getHitCount() {
+    public long getHitCount() {
         return hitCount;
     }
 
