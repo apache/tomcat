@@ -27,21 +27,31 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
+import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 
 /**
@@ -515,6 +525,131 @@ class TestStatementFinalizer extends JdbcPoolBaseTest {
         finalizer.reset(null, null);
         Assertions.assertEquals(0, tracked(finalizer),
                 "a teardown drops the list; the statements die with the destroyed session");
+    }
+
+    /*
+     * A statement from a driver that cannot answer whether it is closed:
+     * isClosed() always throws, while an attempted close is taken.
+     */
+    private static Statement fakedDriverThatCannotSay(AtomicBoolean closeWasTaken) {
+        return (Statement) Proxy.newProxyInstance(
+                TestStatementFinalizer.class.getClassLoader(),
+                new Class<?>[] { Statement.class },
+                (p, m, a) -> {
+                    switch (m.getName()) {
+                        case "close":
+                            closeWasTaken.set(true);
+                            return null;
+                        case "isClosed":
+                            throw new SQLException("this driver cannot say");
+                        case "equals":
+                            return Boolean.valueOf(p == (a == null || a.length == 0 ? null : a[0]));
+                        case "hashCode":
+                            return Integer.valueOf(System.identityHashCode(p));
+                        default:
+                            return null;
+                    }
+                });
+    }
+
+    @Test
+    void traceReportsOnlyWhatTheDriverCouldAnswer() throws Exception {
+        // With trace on, the interceptor tells the operator which statements
+        // the application left open. A driver that cannot answer isClosed()
+        // must still be forced through the close - a statement that may hold
+        // server-side state must not be skipped - but that forced attempt is
+        // no evidence that the application leaked the statement: one that was
+        // already closed takes the extra close as the no-op JDBC demands of
+        // it. So the report keeps its silence on a driver that could not
+        // answer, and has to keep speaking where the driver did.
+        StatementFinalizer finalizer = new StatementFinalizer();
+        Map<String, PoolProperties.InterceptorProperty> properties = new HashMap<>();
+        properties.put("trace", new PoolProperties.InterceptorProperty("trace", "true"));
+        finalizer.setProperties(properties);
+
+        Method create = Connection.class.getMethod("createStatement");
+        finalizer.reset(null, null);
+        Statement leftOpen = fakedStatement(); // answers honestly, and is left open
+        AtomicBoolean blindCloseTaken = new AtomicBoolean();
+        Statement muteAboutClosure = fakedDriverThatCannotSay(blindCloseTaken);
+        finalizer.createStatement(null, create, null, leftOpen, 0L);
+        finalizer.createStatement(null, create, null, muteAboutClosure, 0L);
+
+        try (NotClosedReports reports = new NotClosedReports()) {
+            finalizer.closeInvoked();
+            List<LogRecord> seen = reports.seen();
+            Assertions.assertEquals(1, seen.size(),
+                    "only the statement the driver admitted leaving open may be reported, saw: " +
+                            seen.stream().map(LogRecord::getMessage).collect(Collectors.toList()));
+            LogRecord report = seen.get(0);
+            Assertions.assertEquals(Level.WARNING.intValue(), report.getLevel().intValue(),
+                    "the report is a warning, not something quieter: " + report.getMessage());
+            Assertions.assertNotNull(report.getThrown(),
+                    "the report has to name where the statement was created");
+            Assertions.assertTrue(blindCloseTaken.get(),
+                    "the driver that could not answer must still have been asked to close");
+        }
+    }
+
+    /**
+     * Captures the unclosed-statement reports this interceptor logs,
+     * following the handler idiom of the pool's other diagnostic tests. The
+     * canary record - written through the very JULI logger the interceptor
+     * logs through, not through JUL directly - proves the wiring observes
+     * those records before the finalizer under test gets its chance to log.
+     */
+    private static final class NotClosedReports implements AutoCloseable {
+        private static final String CANARY = "statement-finalizer-trace-handler-wiring-canary";
+        private static final String REPORT = "was not closed";
+
+        private final Logger logger = Logger.getLogger(StatementFinalizer.class.getName());
+        private final Level originalLevel = logger.getLevel();
+        private final List<LogRecord> records = new ArrayList<>();
+        private final Handler handler = new Handler() {
+            @Override
+            public void publish(LogRecord record) {
+                synchronized (records) {
+                    records.add(record);
+                }
+            }
+
+            @Override
+            public void flush() {
+                // no buffering
+            }
+
+            @Override
+            public void close() {
+                // nothing to release
+            }
+        };
+
+        NotClosedReports() {
+            logger.addHandler(handler);
+            logger.setLevel(Level.ALL);
+            LogFactory.getLog(StatementFinalizer.class).error(CANARY);
+            synchronized (records) {
+                if (records.stream().noneMatch(r -> CANARY.equals(r.getMessage()))) {
+                    close();
+                    throw new AssertionError("the test handler must observe what this class logs");
+                }
+            }
+        }
+
+        /* The unclosed-statement reports seen so far; the canary is not one. */
+        List<LogRecord> seen() {
+            synchronized (records) {
+                return records.stream()
+                        .filter(r -> r.getMessage() != null && r.getMessage().contains(REPORT))
+                        .collect(Collectors.toList());
+            }
+        }
+
+        @Override
+        public void close() {
+            logger.removeHandler(handler);
+            logger.setLevel(originalLevel);
+        }
     }
 
     private DataSource finalizerPoolGated() {
