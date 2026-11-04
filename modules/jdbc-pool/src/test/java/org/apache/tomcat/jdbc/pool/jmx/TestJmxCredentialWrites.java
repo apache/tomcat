@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.jdbc.pool.jmx;
 
+import java.lang.management.ManagementFactory;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverPropertyInfo;
@@ -28,6 +29,10 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
+
+import javax.management.Attribute;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -49,9 +54,18 @@ import org.apache.tomcat.jdbc.pool.PoolUtilities;
  * The pool here is configured the way the complaint is configured in practice - the credential sits among the
  * database properties, with no top-level property overriding it. The driver records the properties it is handed and
  * then connects with the test database's own credentials, so that the assertions are about what the pool offers the
- * driver rather than about what the database would have accepted. The last test leaves that fixture for one where the
- * credential is a top level property and the database refuses a superseded password, because what it pins is how a
- * write reaches the connections that were already in service when it was written.
+ * driver rather than about what the database would have accepted. The rotation test leaves that fixture for one where
+ * the credential is a top level property and the database refuses a superseded password, because what it pins is how
+ * a write reaches the connections that were already in service when it was written.
+ * <p>
+ * The last two tests pin the database properties attribute itself, the one configuration surface whose read and
+ * write are the same attribute: the read is masked and the write replaces the whole set, so the ordinary idiom of
+ * reading the attribute, changing one entry and writing it back is a write of the set without the password. That
+ * consequence is deliberate and documented on {@link ConnectionPool#getDbProperties()} and
+ * {@link ConnectionPool#setDbProperties(Properties)}, and what these tests pin is that it costs exactly what the
+ * documentation says: over a pool whose credential lives only among the database properties the round trip takes it
+ * away and new connections go out with nothing to authenticate them, while over a pool whose credential the password
+ * property also holds, the mirrored entry still drops but the property is what signs the connections afterwards.
  */
 class TestJmxCredentialWrites extends JdbcPoolBaseTest {
 
@@ -244,6 +258,140 @@ class TestJmxCredentialWrites extends JdbcPoolBaseTest {
             st.execute("SELECT 1");
         } catch (SQLException x) {
             throw new AssertionError(x);
+        }
+    }
+
+    /* A published-MBean pool whose credential is a top level property, so the setters mirror it into the entries. */
+    private DataSource poolWithTopLevelCredential() throws Exception {
+        RecordingDriver.lastConnectInfo.set(null);
+        DataSource ds = newDataSource();
+        ds.setDriverClassName(RecordingDriver.class.getName());
+        PoolConfiguration properties = ds.getPoolProperties();
+        properties.setJmxEnabled(true);
+        properties.setInitialSize(0);
+        properties.setUsername("alice");
+        properties.setPassword("first-secret");
+        properties.getDbProperties().setProperty("applicationName", "pool-jmx-test");
+        ds.createPool();
+        Assertions.assertNotNull(ds.getPool().getJmxPool(),
+                "precondition: the fixture must have published the pool's own MBean");
+        return ds;
+    }
+
+    /*
+     * The platform server the pool's own MBean is published to, and the registration a container would have made:
+     * the data source itself is not a JMX compliant MBean, so preRegister() is what publishes the pool MBean. The
+     * round-trip tests read and write the database properties attribute over the server rather than calling the
+     * wrapper, because it is the attribute - as any console sees it - whose masked value makes the write destructive.
+     */
+    private static MBeanServer server() {
+        return ManagementFactory.getPlatformMBeanServer();
+    }
+
+    private static ObjectName publish(DataSource ds) throws Exception {
+        ObjectName dsName = new ObjectName("tomcat:type=JmxCredentialWritesTest,uid=" + System.nanoTime());
+        ds.preRegister(server(), dsName);
+        ObjectName poolOname = ds.createObjectName(dsName);
+        Assertions.assertTrue(server().isRegistered(poolOname),
+                "precondition: the container's registration must have published the pool's own MBean");
+        return poolOname;
+    }
+
+    /* Takes a registration down the way a closing container does, and leaves nothing of it published. */
+    private static void unpublish(DataSource ds, ObjectName poolOname) throws Exception {
+        MBeanServer server = server();
+        ds.close();
+        ds.postDeregister();
+        String uid = poolOname.getKeyProperty("uid");
+        for (ObjectName stale : server.queryNames(new ObjectName("tomcat.jdbc:*"), null)) {
+            if (uid.equals(stale.getKeyProperty("uid"))) {
+                server.unregisterMBean(stale);
+            }
+        }
+    }
+
+    /**
+     * The database properties attribute is published read-write, and unlike the masked strings beside it the masked
+     * value it reads is a whole configuration: an operator who reads it, changes one entry and writes it back hands
+     * the pool a set with the password taken out, and because the write replaces the live collection, that is the
+     * credential's last appearance. Nothing on the read, the write or the MBeanInfo says so - every attribute of a
+     * standard registration carries the same boilerplate description - so the hazard is documented on the attribute
+     * instead, and what is pinned here is that it costs exactly what that documentation says: the live configuration
+     * loses the entry, a connection the pool establishes afterwards is handed no password, and the Password
+     * attribute - the credential's owning control, which mirrors into the database properties - is what puts it back.
+     */
+    @Test
+    void aDatabasePropertiesRoundTripThroughThePoolMBeanTakesTheCredentialAway() throws Exception {
+        DataSource ds = poolWithMBean();
+        Assertions.assertEquals("first-secret", establishFreshConnection(ds).getProperty(PoolUtilities.PROP_PASSWORD),
+                "precondition: the credential among the database properties is what connects");
+
+        ObjectName poolOname = publish(ds);
+        try {
+            Properties read = (Properties) server().getAttribute(poolOname, "DbProperties");
+            Assertions.assertEquals("alice", read.getProperty(PoolUtilities.PROP_USER),
+                    "precondition: the published read still carries the user name - it looks complete");
+            Assertions.assertEquals("pool-jmx-test", read.getProperty("applicationName"),
+                    "precondition: and the ordinary properties unchanged");
+            Assertions.assertFalse(read.containsKey(PoolUtilities.PROP_PASSWORD),
+                    "precondition: the read is the masked one - and nothing in the set it hands the caller says "
+                            + "which pair it left out");
+
+            server().setAttribute(poolOname, new Attribute("DbProperties", read));
+
+            Assertions.assertFalse(ds.getPoolProperties().getDbProperties().containsKey(PoolUtilities.PROP_PASSWORD),
+                    "the write is the whole set the read handed it, so the live configuration now holds no password "
+                            + "entry: the write is a replacement, not a change applied over the set the pool holds");
+            Properties handed = establishFreshConnection(ds);
+            Assertions.assertFalse(handed.containsKey(PoolUtilities.PROP_PASSWORD),
+                    "and the pool that lost the entry establishes its connections with nothing to authenticate them - "
+                            + "the documented, deliberate consequence of a masked read beside a whole-set write, "
+                            + "pinned so that the documentation cannot silently drift from the behaviour");
+            Assertions.assertEquals("alice", handed.getProperty(PoolUtilities.PROP_USER),
+                    "the round trip changed the credential and nothing else");
+            Assertions.assertEquals("pool-jmx-test", handed.getProperty("applicationName"),
+                    "the ordinary properties came back exactly as written");
+
+            ds.getPool().getJmxPool().setPassword("first-secret");
+            Assertions.assertEquals("first-secret",
+                    establishFreshConnection(ds).getProperty(PoolUtilities.PROP_PASSWORD),
+                    "the Password attribute is the credential's owning control: writing it mirrors the entry back "
+                            + "among the database properties and the pool authenticates again");
+        } finally {
+            unpublish(ds, poolOname);
+        }
+    }
+
+    /**
+     * The same round trip over a pool whose password the property also holds, which is where the two configurations
+     * part: the replaced set carries no password entry whatever mirrored it, because the write re-mirrors nothing -
+     * but the connect path falls back on the property, so this configuration loses the mirrored entry, not its
+     * credential.
+     */
+    @Test
+    void aDatabasePropertiesRoundTripThroughThePoolMBeanLeavesATopLevelPasswordAuthenticating() throws Exception {
+        DataSource ds = poolWithTopLevelCredential();
+        Assertions.assertEquals("first-secret", establishFreshConnection(ds).getProperty(PoolUtilities.PROP_PASSWORD),
+                "precondition: the mirrored entry is present and what the driver is handed");
+        Assertions.assertEquals("first-secret", ds.getPoolProperties().getDbProperties()
+                .getProperty(PoolUtilities.PROP_PASSWORD), "precondition: and it mirrors the property");
+
+        ObjectName poolOname = publish(ds);
+        try {
+            Properties read = (Properties) server().getAttribute(poolOname, "DbProperties");
+            server().setAttribute(poolOname, new Attribute("DbProperties", read));
+
+            Assertions.assertFalse(ds.getPoolProperties().getDbProperties().containsKey(PoolUtilities.PROP_PASSWORD),
+                    "even here the replaced set holds no password entry: the write mirrors nothing back from the "
+                            + "properties beside it");
+            Assertions.assertEquals("first-secret", ds.getPoolProperties().getPassword(),
+                    "while the property the credential also lives in is untouched by the write");
+            Assertions.assertEquals("first-secret",
+                    establishFreshConnection(ds).getProperty(PoolUtilities.PROP_PASSWORD),
+                    "and what authenticates afterwards is the property: this configuration loses an entry it had "
+                            + "been mirroring, not the credential that signs its connections");
+        } finally {
+            unpublish(ds, poolOname);
         }
     }
 

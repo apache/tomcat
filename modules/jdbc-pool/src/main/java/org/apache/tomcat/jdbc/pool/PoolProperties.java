@@ -1264,6 +1264,58 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
 
     /**
+     * Masks the credential values carried by an array of parsed interceptor
+     * definitions, the display counterpart of
+     * {@link #maskInterceptorCredentials(String)} for what
+     * {@link #getJdbcInterceptorsAsArray()} has already parsed out of that
+     * string. Every definition of the array is replaced by a new definition of
+     * the same class name, and every property whose name is one of the keys
+     * {@link #isCredentialKey recognises} by a property holding the mask; the
+     * other property names and values, and the order of the array, are copied as
+     * they stand, so the copy still shows which interceptors are configured and
+     * which properties they carry. The copy is also defensive: it shares no
+     * definition, no property and no array slot with the array it was made from,
+     * so a reader handed the copy cannot reach through it to the definitions the
+     * pool builds its interceptor chains from. Like the masking of the string
+     * this rules out the names this class treats as credentials, not any secret
+     * an interceptor may hold under another name.
+     * <p>
+     * The copy carries the interceptor's class <em>name</em> rather than the
+     * class object a definition may have cached: a display copy is never meant
+     * to instantiate an interceptor, and loading a class is not something a
+     * read of the configuration should do.
+     * </p>
+     *
+     * @param definitions the parsed definitions, may be {@code null}
+     *
+     * @return a masked copy of the array, or {@code null} when the array is
+     *         {@code null}
+     */
+    public static InterceptorDefinition[] maskInterceptorCredentials(InterceptorDefinition[] definitions) {
+        if (definitions == null) {
+            return null;
+        }
+        InterceptorDefinition[] result = new InterceptorDefinition[definitions.length];
+        for (int i = 0; i < definitions.length; i++) {
+            InterceptorDefinition definition = definitions[i];
+            if (definition == null) {
+                // An array this class did not build may hold a hole; a hole is
+                // copied as a hole rather than turned into a failure on the
+                // read of a configuration.
+                continue;
+            }
+            InterceptorDefinition copy = new InterceptorDefinition(definition.getClassName());
+            for (InterceptorProperty property : definition.getProperties().values()) {
+                copy.addProperty(new InterceptorProperty(property.getName(),
+                        isCredentialKey(property.getName()) ? PASSWORD_MASK : property.getValue()));
+            }
+            result[i] = copy;
+        }
+        return result;
+    }
+
+
+    /**
      * Whether {@code c} ends a key and starts the pair's value, covering the
      * separators a {@link java.util.Properties} reader accepts; white space
      * doubles as the leading white space the reader skips before a key.
