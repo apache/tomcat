@@ -437,8 +437,32 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
                 }
             }
             if (process && result != null) {
-                Constructor<?> cons = getResultSetConstructor();
-                result = cons.newInstance(new Object[] { new ResultSetProxy(actualProxy, result) });
+                try {
+                    Constructor<?> cons = getResultSetConstructor();
+                    result = cons.newInstance(new Object[] { new ResultSetProxy(actualProxy, result) });
+                } catch (ReflectiveOperationException x) {
+                    // The proxied methods that produce a result set -
+                    // executeQuery, getResultSet, getGeneratedKeys - all
+                    // declare SQLException and nothing else. A checked
+                    // reflective failure escaping here would be wrapped by
+                    // the proxy machinery into an UndeclaredThrowableException,
+                    // breaking the declared contract of the call; report it as
+                    // the exception the method does declare. The driver result
+                    // set the call already opened belongs to the physical
+                    // session this pooled connection will hand to the next
+                    // borrower, so a failed wrap closes it rather than
+                    // stranding the cursor there.
+                    SQLException sx = new SQLException(
+                            MessageFactory.get("statementDecoratorInterceptor.unableToWrapResultSet"), x);
+                    try {
+                        ((ResultSet) result).close();
+                    } catch (SQLException | RuntimeException ignore) {
+                        // The failure reported above is the one the
+                        // application is owed; a cursor that will not close
+                        // on top of it adds nothing to tell.
+                    }
+                    throw sx;
+                }
             }
             return result;
         }
