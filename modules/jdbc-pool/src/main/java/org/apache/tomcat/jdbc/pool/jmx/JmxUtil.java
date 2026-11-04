@@ -32,9 +32,7 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  */
 public class JmxUtil {
 
-    /**
-     * Constructs a new JmxUtil.
-     */
+    // Not instantiable: this class only holds the static registration helpers
     private JmxUtil() {
     }
 
@@ -43,13 +41,17 @@ public class JmxUtil {
     /**
      * Register an object as an MBean.
      *
-     * @param base    the base object name
+     * @param base    the base object name, or {@code null} to register nothing -
+     *             the skip a component whose own registration is absent relies
+     *             on, so it is deliberate and unlogged
      * @param keyprop the key property
      * @param obj     the object to register
      *
-     * @return the registered object name, or {@code null} on failure. A registration the MBean server refused - because
-     *             the name is already in use by another MBean, for instance - is such a failure, so a non-{@code null}
-     *             name always means this call is the one that published the object under that name
+     * @return the registered object name, or {@code null} on failure - or on the
+     *             absent-base skip. A registration the MBean server refused - because
+     *             the name is already in use by another MBean, for instance - is such
+     *             a failure, so a non-{@code null} name always means this call is the
+     *             one that published the object under that name
      */
     public static ObjectName registerJmx(ObjectName base, String keyprop, Object obj) {
         ObjectName oname = null;
@@ -64,7 +66,12 @@ public class JmxUtil {
                 oname = name;
             }
         } catch (Exception e) {
-            log.error(MessageFactory.get("jmxUtil.jmxRegistrationFailed"), e);
+            // The log is the only record this failure ever gets, and the JDK
+            // message of a malformed composed name does not quote that name:
+            // name the pieces, so a refused registration is attributable when
+            // several pools share the platform server.
+            log.error(MessageFactory.get("jmxUtil.jmxRegistrationFailed", base, keyprop,
+                    obj == null ? null : obj.getClass().getName()), e);
         }
         return oname;
     }
@@ -78,9 +85,12 @@ public class JmxUtil {
      * @return {@code true} if the name is no longer registered - either this
      *             call took it down, or it was already gone, or there was
      *             nothing to release; {@code false} if the MBean server refused
-     *             to unregister it, which means the MBean is still published
-     *             under that name and, since callers drop their handle
-     *             regardless, held by nothing for the rest of the JVM's life
+     *             to unregister it, which means the MBean is normally still
+     *             published under that name and, since callers drop their
+     *             handle regardless, held by nothing for the rest of the JVM's
+     *             life (an MBean whose {@code postDeregister()} throws reports
+     *             the same failure although the server already took it down;
+     *             the pool's own MBeans never do)
      */
     public static boolean unregisterJmx(ObjectName oname) {
         if (oname == null) {
@@ -92,16 +102,25 @@ public class JmxUtil {
         } catch (InstanceNotFoundException e) {
             // The MBean is already down - the end state this call was asked to
             // bring about, not a failure, and no caller can act on it
-            log.debug(MessageFactory.get("jmxUtil.jmxUnregistrationFailed") + " " + oname);
+            log.debug(MessageFactory.get("jmxUtil.jmxAlreadyUnregistered") + " " + oname);
             return true;
         } catch (Exception e) {
-            // The MBean is still registered, and this name is now owned by
+            // Normally the MBean kept its name and that name is now owned by
             // nobody: say so, with the name, so an operator can take it down
             log.error(MessageFactory.get("jmxUtil.jmxUnregistrationRefused", oname), e);
             return false;
         }
     }
 
+    /*
+     * Concatenates base and keyprop into one object name, so the key
+     * property must carry its own leading comma and a value the ObjectName
+     * grammar accepts unquoted (or already quoted): a missing comma mis-parses
+     * into the base's last key or throws, and the concatenation validates
+     * neither - safe today because every caller passes an internal constant
+     * as the key property and a previously registered (so valid, non-pattern)
+     * name as the base. A null base is the documented skip: it returns null.
+     */
     private static ObjectName getObjectName(ObjectName base, String keyprop) throws MalformedObjectNameException {
         if (base == null) {
             return null;
