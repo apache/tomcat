@@ -26,6 +26,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.ListenerNotFoundException;
 import javax.management.MBeanNotificationInfo;
+import javax.management.MBeanRegistration;
+import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.Notification;
 import javax.management.NotificationBroadcasterSupport;
@@ -44,12 +46,21 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
+import org.apache.tomcat.jdbc.pool.jmx.ConnectionPoolMBean;
 import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
  * JMX-enabled slow query report interceptor. Publishes slow and failed query statistics to JMX and provides
  * notifications when slow or failed queries are detected.
+ * <p>
+ * All of the publication described below belongs to the interceptor's own MBean, which exists only when the
+ * interceptor is configured with {@code notifyPool=false}. In the default {@code notifyPool=true} mode this class
+ * registers nothing of its own: the notifications are raised on the pool's own MBean instead, through
+ * {@link org.apache.tomcat.jdbc.pool.jmx.ConnectionPool#notify(String, String)}, and that MBean is registered by the
+ * pool itself when its {@code jmxEnabled} property is on - so a pool that is neither JMX-enabled nor configured with
+ * {@code notifyPool=false} reports its slow and failed queries to its log alone.
+ * </p>
  * <p>
  * The MBean and the notification broadcaster are published for the pool <em>name</em>: the first interceptor instance
  * to borrow a connection registers them, and every other instance sharing the name - the other connections of that
@@ -74,13 +85,28 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  */
 public class SlowQueryReportJmx extends SlowQueryReport implements NotificationEmitter, SlowQueryReportJmxMBean {
     /**
-     * Notification type for slow query events.
+     * Notification type for slow query events. The pool's own MBean reports the same event under the same type when
+     * this interceptor is configured with {@code notifyPool=true}, so this is that very type and not a copy of its
+     * text: a client filters notifications on the type, and the two channels have to answer to one string.
      */
-    public static final String SLOW_QUERY_NOTIFICATION = "SLOW QUERY";
+    public static final String SLOW_QUERY_NOTIFICATION = ConnectionPoolMBean.SLOW_QUERY_NOTIFICATION;
     /**
-     * Notification type for failed query events.
+     * Notification type for failed query events, shared with the pool's own MBean for the same reason as
+     * {@link #SLOW_QUERY_NOTIFICATION}.
      */
-    public static final String FAILED_QUERY_NOTIFICATION = "FAILED QUERY";
+    public static final String FAILED_QUERY_NOTIFICATION = ConnectionPoolMBean.FAILED_QUERY_NOTIFICATION;
+
+    /**
+     * The notification information every broadcaster of this class is built with, so that both the published MBean and
+     * the interceptor's own emitter surface advertise the two types above. JMX clients discover what an MBean can send
+     * through {@code MBeanInfo.getNotifications()} - consoles, monitoring and bridge agents, tooling that builds a
+     * notification filter from the advertised types - and a broadcaster constructed without this information leaves the
+     * MBean advertising none of the types it actually delivers.
+     */
+    private static final MBeanNotificationInfo[] NOTIFICATION_INFO = { new MBeanNotificationInfo(
+            new String[] { SLOW_QUERY_NOTIFICATION, FAILED_QUERY_NOTIFICATION },
+            Notification.class.getName(),
+            "A slow or failed query was detected by the slow query report.") };
 
     /**
      * Property key for overriding the JMX object name.
@@ -132,10 +158,12 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     protected static final ConcurrentHashMap<String, ObjectName> registrationFailuresLogged = new ConcurrentHashMap<>();
 
     /**
-     * Notification broadcaster used before the pool name is known; once the pool name is known, {@link #getNotifier()}
-     * returns the broadcaster shared by all interceptor instances of that pool.
+     * Notification broadcaster used before the pool name is known, and the one a notification of a name that has been
+     * released is sent through; once the pool name is known and live, {@link #getNotifier()} returns the broadcaster
+     * shared by all interceptor instances of that pool. Like the shared broadcasters, it is built with
+     * {@link #NOTIFICATION_INFO}, so every handle's emitter surface advertises the types it sends.
      */
-    protected volatile NotificationBroadcasterSupport notifier = new NotificationBroadcasterSupport();
+    protected volatile NotificationBroadcasterSupport notifier = new NotificationBroadcasterSupport(NOTIFICATION_INFO);
 
     /**
      * Returns the notification broadcaster shared by all registrants of the given pool name.
@@ -145,7 +173,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
      * @return the shared broadcaster registered for that name
      */
     private static NotificationBroadcasterSupport broadcasterFor(String name) {
-        return notifiers.computeIfAbsent(name, key -> new NotificationBroadcasterSupport());
+        return notifiers.computeIfAbsent(name, key -> new NotificationBroadcasterSupport(NOTIFICATION_INFO));
     }
 
     /**
@@ -160,6 +188,35 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
             return notifier;
         }
         return broadcasterFor(name);
+    }
+
+    /**
+     * Returns the broadcaster that the notifications of this interceptor's pool are sent through. Unlike
+     * {@link #getNotifier()} this one reads rather than provides: a send is not a reason for a name to exist. The
+     * name's broadcaster is made for a live pool - including one whose registration was refused, which reports
+     * through it all the same - but a name that no live pool holds any more has been released, and an entry put back
+     * under it by a notification that was simply still in flight when the last pool came down is taken down by
+     * nothing ever again: not the close that already ran, and not a later one, because no later pool of that name
+     * exists. What such a send can still serve is whoever reached this instance, so it falls back to the
+     * instance's own broadcaster.
+     *
+     * @return the broadcaster to send a notification of this interceptor's pool through
+     */
+    private NotificationBroadcasterSupport broadcasterToSendTo() {
+        String name = poolName;
+        if (name == null) {
+            return notifier;
+        }
+        NotificationBroadcasterSupport shared = notifiers.get(name);
+        if (shared != null) {
+            return shared;
+        }
+        if (mbeans.containsKey(name) || getPoolStats(name) != null) {
+            // A pool of the name is live: its broadcaster is built by the first
+            // thing that needs it, and a send of a live pool is one
+            return broadcasterFor(name);
+        }
+        return notifier;
     }
 
     /**
@@ -412,7 +469,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
                     jmx.notify(type, query);
                 }
             } else {
-                NotificationBroadcasterSupport target = getNotifier();
+                NotificationBroadcasterSupport target = broadcasterToSendTo();
                 if (target != null) {
                     Notification notification = new Notification(type, getNotificationSource(), sequence,
                             System.currentTimeMillis(), query);
@@ -435,24 +492,44 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
      * serializable. This MBean is not, and neither is the pool it reports on, so the source is the {@link ObjectName}
      * the MBean is registered under, which names the pool and is serializable. Interceptor instances are created per
      * pooled connection and none of them is the published resource - that is the pool name's {@link Registration} - so
-     * an instance cannot name itself: every instance of a pool name sends the very name its registration was published
-     * under. An instance whose name cannot be formed - a malformed {@code objectName} property or a pool name that
-     * cannot be quoted into an ObjectName - was never registered at all, so no listener reached through a connector can
-     * exist for it; the source is then a string of the default name's shape, which still names the pool for the local
-     * listeners the broadcaster serves.
+     * an instance cannot name itself: the source is the name the registry's registration records as published, which
+     * every instance of the name sends alike. Instances of a second definition under the same name - a two-thresholds
+     * chain, or a pool that adopted a name another definition published - never published anything themselves and must
+     * not stamp the notifications with the name their own properties would compute: that name is registered under
+     * nothing, and a client filtering or grouping by source reads the published one. An instance whose name cannot be
+     * formed - a malformed {@code objectName} property or a pool name that cannot be quoted into an ObjectName - was
+     * never registered at all, so no listener reached through a connector can exist for it; the source is then a string
+     * of the default name's shape, which still names the pool for the local listeners the broadcaster serves. A pool
+     * that carries no name at all is the same case taken to its end: it holds no registration to name itself by, and
+     * the shape its source takes is the default one with no name in it - whatever survives delivery, it cannot name a
+     * pool that never had a name to register.
      *
-     * @return the ObjectName the registration of this interceptor's pool name is published under, or, when that name
-     *             cannot be formed, a string of the default name's shape
+     * @return the ObjectName the registration of this interceptor's pool name is published under, or, when nothing is
+     *             registered under the name or the published name cannot be told, a name formed from this instance -
+     *             as an ObjectName where that succeeds, and as a string of the default name's shape where it does not
      */
     protected Object getNotificationSource() {
+        String name = poolName;
         try {
-            return getObjectName(getClass(), poolName);
-        } catch (MalformedObjectNameException x) {
+            // A pool that carries no name holds no registration to name itself
+            // by: nothing can be keyed under no name (see registerJmx), and the
+            // registry would refuse the lookup before answering it
+            SlowQueryReportJmxMBean registered = name == null ? null : mbeans.get(name);
+            if (registered != null) {
+                // The name as that registration itself recorded it: the same
+                // derivation the release path uses to unregister exactly the
+                // occupied name, for the same reason - a name recomputed from
+                // the properties of the instance that happens to be sending
+                // can differ from the one the MBeanServer actually occupies
+                return registrationObjectName(registered);
+            }
+            return getObjectName(getClass(), name);
+        } catch (MalformedObjectNameException | RuntimeOperationsException x) {
             // The name construction getObjectName uses when no override is
             // configured - with a malformed name this MBean was never
             // registered, so this fallback is only read by local listeners,
             // for which it must still name the pool
-            return ConnectionPool.POOL_JMX_TYPE_PREFIX + getClass().getName() + ",name=" + poolName;
+            return ConnectionPool.POOL_JMX_TYPE_PREFIX + getClass().getName() + ",name=" + name;
         }
     }
 
@@ -623,24 +700,41 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
      * The broadcaster and the registration-failure marker belong to the name as much as the MBean does, so the release
      * drops them even when this pool never held the registry slot: a pool whose every registration attempt was refused
      * still reported through the broadcaster, and its throttle marker must not outlive the name and hush the first
-     * failure of a later failure cycle under the name. Both entries are created lazily - by {@link #getNotifier()} and
-     * by listeners a client adds through interceptor handles it still holds - so a client subscribing to the released
-     * name concurrently with this release can have its late subscription re-insert an entry nothing registered under
-     * the name uses any more; a fresh registration under the name re-uses or replaces it.
+     * failure of a later failure cycle under the name. Both entries are created lazily - by a report of a name that
+     * is still live and by listeners a client adds through interceptor handles it still holds - so a client
+     * subscribing to the released name concurrently with this release can have its late subscription re-insert an
+     * entry nothing registered under the name uses any more; a fresh registration under the name re-uses or replaces
+     * it. A notification that is merely still in flight while this release runs is not given that power, as
+     * broadcasterToSendTo() reads the name's broadcaster instead of providing one: an intent to listen is a reason to
+     * give the name a broadcaster again, a send that lost the race to the close is not.
+     * </p>
+     * <p>
+     * The ObjectName to unregister is derived while the registry still holds the slot, before the slot is dropped: the
+     * derivation can fail for a registration this class did not publish itself (see {@link
+     * #registrationObjectName(SlowQueryReportJmxMBean)}), and a release that cannot tell the MBeanServer which name to
+     * take down must leave the slot held so that a later release still can. Dropping the slot on the way to a failed
+     * derivation would strand the published MBean behind a registry that no longer records it - the one half-released
+     * state no later release of the name can repair.
      * </p>
      */
     protected void deregisterJmx() {
+        SlowQueryReportJmxMBean registered = mbeans.get(poolName);
         try {
-            SlowQueryReportJmxMBean registered = mbeans.get(poolName);
-            if (registered != null && mbeans.remove(poolName, registered)) {
-                JmxUtil.unregisterJmx(registrationObjectName(registered));
+            if (registered != null) {
+                // Derivation first, while the slot is still held: if it
+                // throws, the registry still records the published MBean and
+                // a later release of the name can still take it down
+                ObjectName name = registrationObjectName(registered);
+                if (mbeans.remove(poolName, registered)) {
+                    JmxUtil.unregisterJmx(name);
+                }
             }
-            notifiers.remove(poolName);
-            registrationFailuresLogged.remove(poolName);
         } catch (MalformedObjectNameException | RuntimeOperationsException e) {
             log.warn(MessageFactory.get("slowQueryReportJmx.jmxDeregistrationFailed"), e);
+        } finally {
+            notifiers.remove(poolName);
+            registrationFailuresLogged.remove(poolName);
         }
-
     }
 
     /**
@@ -680,6 +774,14 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
 
     /**
      * Returns the JMX ObjectName for the given class and pool name.
+     * <p>
+     * A property carrying no value - which the interceptor-string grammar
+     * cannot produce, but a programmatically built {@link
+     * org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorDefinition} can
+     * hand through - names nothing to override, and reads as if the property
+     * were absent, the way every sibling property of this family reads its
+     * null value.
+     * </p>
      *
      * @param clazz    the interceptor class
      * @param poolName the name of the connection pool
@@ -691,8 +793,9 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     public ObjectName getObjectName(Class<?> clazz, String poolName) throws MalformedObjectNameException {
         ObjectName oname;
         Map<String, InterceptorProperty> properties = getProperties();
-        if (properties != null && properties.containsKey(objectNameAttribute)) {
-            oname = new ObjectName(properties.get(objectNameAttribute).getValue());
+        InterceptorProperty override = properties == null ? null : properties.get(objectNameAttribute);
+        if (override != null && override.getValue() != null) {
+            oname = new ObjectName(override.getValue());
         } else {
             oname = new ObjectName(ConnectionPool.POOL_JMX_TYPE_PREFIX + clazz.getName() + ",name=" + poolName);
         }
@@ -709,16 +812,57 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
      * and skip the registration, so the pool would claim an MBean for its whole life that was never published - and
      * would not re-register even after whatever made the MBeanServer refuse it is gone. Releasing the slot lets a later
      * borrow retry; {@code JmxUtil.registerJmx} cannot be used for the attempt because it swallows every exception and
-     * returns a name whatever happened, so the failure of its own call is unobservable to the caller. Only the first
-     * refusal of a name is logged with its exception, so a persistent refusal is not reported once per borrow.
+     * returns a name whatever happened, so the failure of its own call is unobservable to the caller. The retry is not
+     * made cheaper than the attempt it repeats, and that is deliberate: the first borrow that finds the name free
+     * publishes it, so a clash with a stale or foreign MBean costs monitoring only for as long as that MBean is there,
+     * while a backoff would make every pool that ever clashed wait out a delay before its monitoring came back. What a
+     * persistent refusal therefore costs is one publish attempt per borrow - the name formed, a {@link Registration}
+     * built, and the MBeanServer's refusal - on a pool whose monitoring is misconfigured, which is the cost paid for
+     * that recovery. Only the first
+     * refusal of a name is logged with its exception, so a persistent refusal is not reported once per borrow. A borrow
+     * that finds the slot held is skipped before the ObjectName is formed: forming it and building a {@link
+     * Registration} for that race can only ever lose the race, and the healthy path pays that price once per pool
+     * name rather than once per borrow. A pool that carries no name is skipped before any of it: no name is not a
+     * key the registry takes, and the start-time refusal of such a pool (see {@link SlowQueryReport#poolStarted})
+     * does not reach a definition the mutable interceptor property hands over later, so this is where that pairing
+     * is met - and it costs the monitoring, never the borrow.
+     * The one outcome this method cannot observe - a publication that lands after a release already let go of the slot
+     * it took - is undone by the {@link Registration} itself, which checks its own publication as the server commits
+     * it (see {@link Registration#postRegister(Boolean)}).
      */
     protected void registerJmx() {
         try {
-            // Only if we notify the pool itself
+            // With the pool notified, the notifications go to the pool's own
+            // MBean and there is nothing for this interceptor to register
             if (isNotifyPool()) {
-
-            } else if (getCompositeType() != null) {
-                ObjectName oname = getObjectName(getClass(), poolName);
+                return;
+            }
+            if (getCompositeType() != null) {
+                String name = poolName;
+                if (name == null) {
+                    // The pool carries no name, and no name is not a name: the
+                    // registry, the failure throttle and the ObjectName are all
+                    // keyed by it, and the map takes no null key. A definition
+                    // the pool was started with refuses this pool at its start
+                    // with a message naming the missing setting (see
+                    // SlowQueryReport#poolStarted); a definition the mutable
+                    // interceptor property hands over later never runs that
+                    // start callback, so the borrow path is where the pairing
+                    // shows up - and a borrow is not the place to decide it.
+                    // Declining quietly costs the monitoring, which is all a
+                    // name that cannot be had can ever cost.
+                    return;
+                }
+                if (mbeans.containsKey(name)) {
+                    // The name holds a registration - published, or being
+                    // published by a concurrent borrow: this borrow cannot
+                    // take the slot either way, so it forms no ObjectName and
+                    // builds no Registration just to lose the race to its own
+                    // name's registration. A refused publish frees the slot
+                    // again, so a retry needs no fresh look past this read.
+                    return;
+                }
+                ObjectName oname = getObjectName(getClass(), name);
                 // The registry and the MBeanServer keep the registration
                 // resource, never this instance: an instance reaches the pool
                 // (its own and the inherited pool fields), so publishing one
@@ -726,8 +870,8 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
                 // abandoned without closing - the only path that ever takes a
                 // registration down again is a close, which abandonment
                 // never runs
-                Registration registration = new Registration(poolName, oname);
-                if (mbeans.putIfAbsent(poolName, registration) == null) {
+                Registration registration = new Registration(name, oname);
+                if (mbeans.putIfAbsent(name, registration) == null) {
                     try {
                         // The registration carries the ObjectName it is to be
                         // published under from its construction: a release
@@ -737,10 +881,10 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
                                 .registerMBean(registration, oname);
                         // A registration under the name works again - drop
                         // the marker so a later failure cycle reports loudly
-                        registrationFailuresLogged.remove(poolName);
+                        registrationFailuresLogged.remove(name);
                     } catch (Exception x) {
-                        mbeans.remove(poolName, registration);
-                        if (oname.equals(registrationFailuresLogged.putIfAbsent(poolName, oname))) {
+                        mbeans.remove(name, registration);
+                        if (oname.equals(registrationFailuresLogged.putIfAbsent(name, oname))) {
                             // The loud report went out with the first
                             // refusal of this name; repeats ride along at
                             // debug, without a stack trace, so a persistent
@@ -752,7 +896,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
                             // First refusal for the name, or the name now
                             // fails under a different ObjectName: report it
                             // loudly and remember to throttle the repeats
-                            registrationFailuresLogged.put(poolName, oname);
+                            registrationFailuresLogged.put(name, oname);
                             if (x instanceof InstanceAlreadyExistsException) {
                                 // Retryable: the name may be held by a stale
                                 // or foreign MBean that a later borrow finds
@@ -769,6 +913,17 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
                         SlowQueryReport.class.getName()));
             }
         } catch (MalformedObjectNameException | RuntimeOperationsException e) {
+            // A name that cannot be formed - a malformed objectName property,
+            // or a pool name carrying characters the ObjectName grammar
+            // reserves - fails here, before the registry slot and the
+            // registrationFailuresLogged throttle are reachable: there is no
+            // ObjectName to record against the name, so the per-name throttle
+            // cannot key this failure. The error is therefore reported on
+            // every borrow of such a pool. That is acceptable: the condition
+            // is a permanent misconfiguration, the stack trace is the signal
+            // that makes the operator fix it, and a busy pool with a
+            // misnamed monitoring MBean is rarer - and less costly - than a
+            // suppressed error nobody ever acts on.
             log.error(MessageFactory.get("slowQueryReportJmx.jmxRegistrationFailedNoData"), e);
         }
     }
@@ -807,8 +962,22 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
      * The class is public because the Standard-MBean introspection publishes the resource through its interfaces;
      * instances are created only by {@link #registerJmx()}.
      * </p>
+     * <p>
+     * A registration is valid only while the {@link #mbeans} slot of its name holds it. The publication and the
+     * release of a name are separate, unguarded steps, so a publication can land behind a release of its own slot:
+     * the release takes the slot out and unregisters a name nothing was published under yet, and the publication then
+     * completes with nothing left in the JVM that still knows of it. The registration is the one object that can tell
+     * its own publication apart from a name already let go of - {@link #postRegister(Boolean)} is the server
+     * announcing that its repository has taken the registration, and a registration that finds its slot gone by then
+     * takes that late publication back down itself, leaving the name free for the next pool to register it cleanly.
+     * A slot by then held by another registration is not gone, but it only settles the question for the name that
+     * registration occupies: a takeover published under this very name can only have got there after the release took
+     * this publication down, so there is nothing of this one left to undo and the takeover is left alone, while a
+     * takeover published under another name leaves this publication standing under a name the registry no longer
+     * records - which nothing but the registration itself can still give up.
+     * </p>
      */
-    public static class Registration implements NotificationEmitter, RegistrationMBean {
+    public static class Registration implements NotificationEmitter, RegistrationMBean, MBeanRegistration {
         /**
          * The pool name this registration reports for.
          */
@@ -830,6 +999,87 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
         public Registration(String poolName, ObjectName publishedUnder) {
             this.registrationPoolName = poolName;
             this.publishedUnder = publishedUnder;
+        }
+
+        /*
+         * The registration is published under exactly the ObjectName it was
+         * constructed with; that name is also what a release unregisters, so
+         * the server is answered with the name it asked about, unchanged.
+         */
+        @Override
+        public ObjectName preRegister(MBeanServer server, ObjectName name) throws Exception {
+            return name;
+        }
+
+        /*
+         * A registration is published under its ObjectName and held by the
+         * per-name slot, and those are two different questions: two
+         * definitions of one pool name may compute different ObjectNames (see
+         * registrationObjectName), so what the slot answers is not what decides
+         * whether unregistering this name destroys somebody else's live MBean.
+         * postRegister is the MBeanServer announcing that its repository has
+         * taken this registration, the earliest point at which the outcome of
+         * the publication is known here. A publication whose slot is gone was
+         * decided away by a release that ran while it was in flight - the
+         * release took the slot out and unregistered a name nothing had been
+         * published under yet, so nothing else in the JVM knows to take this
+         * now-late publication down. A publication whose slot is held by
+         * another registration is only accounted for when that registration
+         * occupies this very name: it can have committed there only after this
+         * publication was already given up, which is why unregistering now
+         * would take down the live MBean of the pool that took the name over,
+         * with the registry correctly claiming that one is published. Under a
+         * different name the successor's commit never needed this publication
+         * to be given up first, the registry records only the successor's name,
+         * and no release of the pool can ever reach this one - so the
+         * registration is the only object that can still undo it. A
+         * registration refused before its commit was never published and keeps
+         * its name - if any - with whoever else holds it, which is why only a
+         * completed registration here undoes anything.
+         */
+        @Override
+        public void postRegister(Boolean registrationDone) {
+            if (Boolean.TRUE.equals(registrationDone) && publicationIsLeftWithoutOwner()) {
+                JmxUtil.unregisterJmx(publishedUnder);
+            }
+        }
+
+        /*
+         * Whether this publication, at the moment its commit is announced,
+         * stands under a name nothing in this JVM can give up any more.
+         */
+        private boolean publicationIsLeftWithoutOwner() {
+            SlowQueryReportJmxMBean held = mbeans.get(registrationPoolName);
+            if (held == null) {
+                // The release ran while this publication was in flight: it is
+                // an orphan, and the name it carries is free for the next pool
+                return true;
+            }
+            if (held == this) {
+                // The registry holds this publication: it is the name's own
+                return false;
+            }
+            if (held instanceof Registration) {
+                // A takeover - and the only question that matters is whether it
+                // occupies this name or came to the slot by another one
+                return !((Registration) held).publishedUnder.equals(publishedUnder);
+            }
+            // A value a subclass put into the registry itself: the name it
+            // occupies cannot be told from here, so it is given the field and
+            // this publication leaves the name alone
+            return false;
+        }
+
+        @Override
+        public void preDeregister() throws Exception {
+            // nothing to guard: the registry bookkeeping runs around the
+            // unregistration in deregisterJmx(), not in the resource
+        }
+
+        @Override
+        public void postDeregister() {
+            // nothing to release: the resource holds no state beyond the two
+            // fields a construction gave it
         }
 
         @Override
