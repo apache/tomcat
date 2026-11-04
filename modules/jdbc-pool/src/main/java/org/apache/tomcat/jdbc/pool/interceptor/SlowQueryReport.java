@@ -741,6 +741,15 @@ public class SlowQueryReport extends AbstractQueryReport {
                 .synchronizedSet(Collections.newSetFromMap(new WeakHashMap<ConnectionPool, Boolean>()));
 
         /**
+         * Creates the registration of one name: an empty statistics map and no live pools until the first pool
+         * {@link #addLivePool registers itself} under it.
+         */
+        protected PoolStatistics() {
+            // The two collections are initialised at their declarations; a
+            // registration of a name starts with nothing else.
+        }
+
+        /**
          * Registers a pool that started under this name.
          *
          * @param pool the connection pool that has started
