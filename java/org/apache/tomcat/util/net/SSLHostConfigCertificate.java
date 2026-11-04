@@ -245,9 +245,11 @@ public class SSLHostConfigCertificate implements Serializable {
 
     /**
      * Returns the alias the given key manager would choose to serve for this certificate, or {@code null} if it has no
-     * suitable entry. When {@link #getType()} is {@link Type#UNDEFINED} every key type is tried. This reflects the
-     * alias actually used in a handshake, which can differ from {@link #getCertificateKeyAlias()} - for example after
-     * the SunMSCAPI Windows-MY numbered-duplicate resolution performed by SSLUtilBase#getKeyManagers().
+     * suitable entry. When {@link #getType()} is {@link Type#UNDEFINED} every key type is tried. For a key manager that
+     * Tomcat has pinned to an alias this is the alias used in every handshake, which can differ from
+     * {@link #getCertificateKeyAlias()} - for example after the SunMSCAPI Windows-MY numbered-duplicate resolution
+     * performed by SSLUtilBase#getKeyManagers(). Other key managers may choose differently in a handshake, for example
+     * depending on the negotiated key type or the requested server name.
      *
      * @param keyManager the key manager that will serve this certificate
      *

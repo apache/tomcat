@@ -538,10 +538,10 @@ public abstract class AbstractEndpoint<S, U> {
         if (sslContext != null) {
             String servedAlias = sslContext.getServedAlias(certificate);
 
-            // When a configured alias was resolved to a different alias than is actually served (e.g. a SunMSCAPI
-            // Windows-MY numbered duplicate), report it so the alias logged above is not mistaken for the one in use.
+            // Only a SunMSCAPI Windows-MY numbered duplicate ("alias (1)" etc., see SSLUtilBase) replaces a configured
+            // alias. Report it so the alias logged above is not mistaken for the one in use.
             String configuredAlias = certificate.getCertificateKeyAlias();
-            if (configuredAlias != null && servedAlias != null && !servedAlias.equalsIgnoreCase(configuredAlias)) {
+            if (configuredAlias != null && servedAlias.startsWith(configuredAlias + " (")) {
                 getLogCertificate()
                         .info(sm.getString("endpoint.tls.info.cert.aliasResolved", configuredAlias, servedAlias));
             }
