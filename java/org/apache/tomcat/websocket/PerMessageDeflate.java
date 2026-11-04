@@ -122,6 +122,7 @@ public class PerMessageDeflate implements Transformation {
             try {
                 for (Parameter param : preference) {
                     if (SERVER_NO_CONTEXT_TAKEOVER.equals(param.getName())) {
+                        checkNoValue(param);
                         if (serverContextTakeover) {
                             serverContextTakeover = false;
                         } else {
@@ -130,6 +131,7 @@ public class PerMessageDeflate implements Transformation {
                                     sm.getString("perMessageDeflate.duplicateParameter", SERVER_NO_CONTEXT_TAKEOVER));
                         }
                     } else if (CLIENT_NO_CONTEXT_TAKEOVER.equals(param.getName())) {
+                        checkNoValue(param);
                         if (clientContextTakeover) {
                             clientContextTakeover = false;
                         } else {
@@ -139,7 +141,7 @@ public class PerMessageDeflate implements Transformation {
                         }
                     } else if (SERVER_MAX_WINDOW_BITS.equals(param.getName())) {
                         if (serverMaxWindowBits == -1) {
-                            serverMaxWindowBits = Integer.parseInt(param.getValue());
+                            serverMaxWindowBits = parseWindowBits(param);
                             if (serverMaxWindowBits < 8 || serverMaxWindowBits > 15) {
                                 throw new IllegalArgumentException(sm.getString("perMessageDeflate.invalidWindowSize",
                                         SERVER_MAX_WINDOW_BITS, Integer.valueOf(serverMaxWindowBits)));
@@ -169,7 +171,7 @@ public class PerMessageDeflate implements Transformation {
                                 // effectively hard-coded to 15
                                 clientMaxWindowBits = 15;
                             } else {
-                                clientMaxWindowBits = Integer.parseInt(param.getValue());
+                                clientMaxWindowBits = parseWindowBits(param);
                                 if (clientMaxWindowBits < 8 || clientMaxWindowBits > 15) {
                                     throw new IllegalArgumentException(
                                             sm.getString("perMessageDeflate.invalidWindowSize", CLIENT_MAX_WINDOW_BITS,
@@ -212,6 +214,31 @@ public class PerMessageDeflate implements Transformation {
         }
         // Failed to negotiate agreeable terms
         return null;
+    }
+
+
+    /*
+     * RFC 7692, section 7.1.1: the no_context_takeover parameters have no value.
+     */
+    private static void checkNoValue(Parameter param) {
+        if (param.getValue() != null) {
+            throw new IllegalArgumentException(
+                    sm.getString("perMessageDeflate.invalidParameterValue", param.getName(), param.getValue()));
+        }
+    }
+
+
+    /*
+     * RFC 7692, section 7.1.2: the value is a decimal integer without leading zeroes (1*DIGIT).
+     */
+    private static int parseWindowBits(Parameter param) {
+        String value = param.getValue();
+        if (value == null || value.isEmpty() || value.charAt(0) == '0' ||
+                !value.chars().allMatch(c -> c >= '0' && c <= '9')) {
+            throw new IllegalArgumentException(
+                    sm.getString("perMessageDeflate.invalidParameterValue", param.getName(), value));
+        }
+        return Integer.parseInt(value);
     }
 
 
