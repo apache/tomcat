@@ -57,7 +57,10 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  * same name - reports through them. They stay published until the last live pool registered under the name closes;
  * closing one of several same-named pools leaves the registration with the survivors. A pool that starts under the
  * name after that last close has decided its release - racing it - adopts the registration still published under the
- * name, and the pending release notices the takeover and leaves the registration with the new pool.
+ * name, and the pending release notices the takeover and leaves the registration with the new pool. The name is the
+ * one the pool started with - see {@link ConnectionPool#getRegistrationName()} - so renaming a running pool, which
+ * the pool's own JMX allows, moves nothing: the MBean stays published under the name it was registered under, and the
+ * pool keeps reporting through it exactly as before the rename.
  * </p>
  * <p>
  * A JMX client's listener subscription belongs to the registration it was added through. JMX cannot carry a
@@ -248,7 +251,10 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     public void reset(ConnectionPool parent, PooledConnection con) {
         super.reset(parent, con);
         if (parent != null) {
-            poolName = parent.getName();
+            // The name the pool's registrations are keyed under, recorded at
+            // its start - renaming the pool does not move them, and does not
+            // make a borrow register a second MBean under the new name
+            poolName = parent.getRegistrationName();
             pool = parent;
             registerJmx();
         }
@@ -281,7 +287,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
      */
     @Override
     public void poolClosed(ConnectionPool pool) {
-        this.poolName = pool.getName();
+        this.poolName = pool.getRegistrationName();
         super.poolClosed(pool);
         // Either this instance's releaseStatistics call deregistered the
         // closing pool as the last live pool of the name, or an earlier
@@ -290,8 +296,10 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
         // registered under it either. In both cases the registered MBean,
         // whose delegate may be an interceptor instance of an already closed
         // pool, goes with them, unless a pool has taken the name back in the
-        // meantime - which releaseJmxRegistration re-verifies.
-        if (lastPoolOfNameClosed || getPoolStats(poolName) == null) {
+        // meantime - which releaseJmxRegistration re-verifies. A pool that
+        // never got far enough into its start to record a name never had
+        // anything registered, and needs no release.
+        if (lastPoolOfNameClosed || (poolName != null && getPoolStats(poolName) == null)) {
             releaseJmxRegistration(pool);
         }
     }
@@ -343,7 +351,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     public void poolStarted(ConnectionPool pool) {
         this.pool = pool;
         super.poolStarted(pool);
-        this.poolName = pool.getName();
+        this.poolName = pool.getRegistrationName();
     }
 
     /**
