@@ -315,6 +315,15 @@
         types of resources, not just class files, are now handled in
         multi-release JAR files. (markt)
       </fix>
+      <fix>
+        Singleton JNDI resources built by the Tomcat JDBC pool factory that do
+        not configure the pool's <code>object_name</code> attribute are now
+        given a container-generated pool name, of the form
+        <code>domain/host/context-path/JNDI-name</code> for webapp resources
+        and <code>domain/JNDI-name</code> for global resources. Previously,
+        the pool generated a name that repeated across pools, which caused
+        pools to share the same name. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
