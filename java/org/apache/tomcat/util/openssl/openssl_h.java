@@ -1799,6 +1799,57 @@ public class openssl_h {
         }
     }
 
+    private static class BN_free {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER);
+
+        public static final MemorySegment ADDR = openssl_h.findOrThrow("BN_free");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang = c : * void BN_free(BIGNUM *a)
+     * }
+     */
+    public static FunctionDescriptor BN_free$descriptor() {
+        return BN_free.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang = c : * void BN_free(BIGNUM *a)
+     * }
+     */
+    public static MethodHandle BN_free$handle() {
+        return BN_free.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang = c : * void BN_free(BIGNUM *a)
+     * }
+     */
+    public static MemorySegment BN_free$address() {
+        return BN_free.ADDR;
+    }
+
+    /**
+     * {@snippet lang = c : * void BN_free(BIGNUM *a)
+     * }
+     */
+    public static void BN_free(MemorySegment a) {
+        var mh$ = BN_free.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("BN_free", a);
+            }
+            mh$.invokeExact(a);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class BN_new {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER);
 

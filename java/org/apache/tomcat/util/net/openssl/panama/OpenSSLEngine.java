@@ -207,7 +207,11 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         try (var localArena = Arena.ofConfined()) {
             var internalBIOPointer = localArena.allocate(ValueLayout.ADDRESS);
             var networkBIOPointer = localArena.allocate(ValueLayout.ADDRESS);
-            BIO_new_bio_pair(internalBIOPointer, 0, networkBIOPointer, 0);
+            if (BIO_new_bio_pair(internalBIOPointer, 0, networkBIOPointer, 0) <= 0) {
+                String error = OpenSSLLibrary.getLastError();
+                SSL_free(ssl);
+                throw new IllegalStateException(sm.getString("engine.errMakeBIO", error));
+            }
             var internalBIO = internalBIOPointer.get(ValueLayout.ADDRESS, 0);
             var networkBIO = networkBIOPointer.get(ValueLayout.ADDRESS, 0);
             SSL_set_bio(ssl, internalBIO, internalBIO);
