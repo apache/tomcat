@@ -17,6 +17,10 @@
 package org.apache.tomcat.jdbc.pool.interceptor;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -26,12 +30,19 @@ import java.sql.Statement;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
+import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.DataSource;
+import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
+import org.apache.tomcat.jdbc.pool.PooledConnection;
 
 /**
  * What {@code StatementFinalizer} owes the application from the other
@@ -381,6 +392,276 @@ class TestStatementFinalizer extends JdbcPoolBaseTest {
             Assertions.assertTrue(driver.isClosed(), "the close must still reach the driver statement");
             Assertions.assertEquals(0, tracked(outer), "the outer tracker must forget its entry");
             Assertions.assertEquals(0, tracked(inner), "the inner tracker must forget its entry");
+        }
+    }
+
+    /*
+     * A statement handle the test holds while pinning whether the tracker
+     * ever asked its driver object to close.
+     */
+    private static Statement fakedStatement() {
+        final AtomicBoolean closed = new AtomicBoolean();
+        return (Statement) Proxy.newProxyInstance(
+                TestStatementFinalizer.class.getClassLoader(),
+                new Class<?>[] { Statement.class },
+                (p, m, a) -> {
+                    switch (m.getName()) {
+                        case "close":
+                            closed.set(true);
+                            return null;
+                        case "isClosed":
+                            return Boolean.valueOf(closed.get());
+                        case "equals":
+                            return Boolean.valueOf(p == (a == null || a.length == 0 ? null : a[0]));
+                        case "hashCode":
+                            return Integer.valueOf(System.identityHashCode(p));
+                        default:
+                            return null;
+                    }
+                });
+    }
+
+    private static boolean closeWasAsked(Statement fake) {
+        // The fake records the close on the object itself; re-reading
+        // isClosed() through the handle is what the interceptor would see.
+        try {
+            return fake.isClosed();
+        } catch (SQLException x) {
+            throw new IllegalStateException(x);
+        }
+    }
+
+    @Test
+    void aStatementRegisteringAfterTheReturnHasDrainedIsClosedWhereItArrives() throws Exception {
+        // The interleaving the race produces, driven at the hook level so
+        // it is deterministic: the driver create has completed (the
+        // statement is open in the hand of the tracker), the connection
+        // return drains the list before the registration lands, and the
+        // late entry must not sit on a list that no return will ever read
+        // again.
+        StatementFinalizer finalizer = new StatementFinalizer();
+        Method create = Connection.class.getMethod("createStatement");
+
+        finalizer.reset(null, null); // the borrow starts, creating is accepted
+        finalizer.closeInvoked();    // the return drains the (empty) list
+
+        Statement late = fakedStatement();
+        Object handle = finalizer.createStatement(null, create, null, late, 0L);
+
+        Assertions.assertTrue(closeWasAsked(late),
+                "a create that raced the return must be closed where it registers - it would otherwise "
+                        + "survive untracked on a session the pool hands to the next borrower");
+        Assertions.assertSame(late, handle,
+                "nothing was tracked, so the handle is the statement itself");
+        Assertions.assertEquals(0, tracked(finalizer),
+                "the closed late statement must not enter the list");
+
+        // The next borrow re-arms the tracker: ordinary creates are tracked
+        // and reclaimed at the return again.
+        Statement fresh = fakedStatement();
+        finalizer.reset(null, null);
+        finalizer.createStatement(null, create, null, fresh, 0L);
+        Assertions.assertEquals(1, tracked(finalizer), "creating must be accepted again at the next borrow");
+        finalizer.closeInvoked();
+        Assertions.assertTrue(closeWasAsked(fresh), "the return must still reclaim ordinary statements");
+        Assertions.assertEquals(0, tracked(finalizer));
+    }
+
+    @Test
+    void aCreateStillInFlightWhileTheConnectionIsReturnedDoesNotReachTheNextBorrower() throws Exception {
+        // The same interleaving through the whole chain and a real driver:
+        // a leaked statement parks the return inside the close that the
+        // tracker itself issues, and while the return is held there - after
+        // its drain, before the session is handed back - another thread's
+        // in-flight create lands.
+        DataSource ds = finalizerPool();
+        ds.getPoolProperties().setJdbcInterceptors(StatementFinalizer.class.getName() + ';'
+                + StatementGateInterceptor.class.getName());
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setMaxIdle(1);
+        ds.createPool();
+
+        Connection first = ds.getConnection();
+        setSessionMarker(first, 11);
+        StatementFinalizer finalizer = interceptorOf(first, StatementFinalizer.class);
+        Assertions.assertNotNull(finalizer);
+
+        StatementGateInterceptor.holdFirstClose();
+        Statement leaked = first.createStatement(); // its return-time close is the parking post
+
+        CountDownLatch createEntered = new CountDownLatch(1);
+        CountDownLatch createRelease = new CountDownLatch(1);
+        StatementGateInterceptor.holdCreateOf("in-flight-prepare", createEntered, createRelease);
+
+        final AtomicReference<PreparedStatement> holder = new AtomicReference<>();
+        final AtomicReference<Throwable> failure = new AtomicReference<>();
+        Thread creator = new Thread(() -> {
+            try {
+                holder.set(first.prepareStatement("SELECT 42"));
+            } catch (Throwable x) {
+                failure.set(x);
+            }
+        }, "in-flight-prepare");
+
+        final AtomicReference<Throwable> closeFailure = new AtomicReference<>();
+        CountDownLatch closeParked = new CountDownLatch(1);
+        CountDownLatch closeRelease = new CountDownLatch(1);
+        StatementGateInterceptor.parkFirstCloseOnReturn(closeParked, closeRelease);
+        Thread closer = new Thread(() -> {
+            try {
+                first.close();
+            } catch (Throwable x) {
+                closeFailure.set(x);
+            }
+        }, "returning-thread");
+
+        creator.start();
+        Assertions.assertTrue(createEntered.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
+                "the prepare is in flight inside the chain");
+        closer.start();
+        Assertions.assertTrue(closeParked.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
+                "the return is parked inside the tracker's close of the leaked statement");
+
+        createRelease.countDown();
+        creator.join(AWAIT_TIMEOUT_MS);
+        Assertions.assertFalse(creator.isAlive(), "the prepare completed within the timeout");
+        Assertions.assertNull(failure.get(), "the in-flight create must not fail: " + failure.get());
+        Assertions.assertEquals(0, tracked(finalizer),
+                "the create that landed behind the drain must not sit on the tracker - no later return "
+                        + "will ever read it");
+
+        closeRelease.countDown();
+        closer.join(AWAIT_TIMEOUT_MS);
+        Assertions.assertFalse(closer.isAlive(), "the return completed within the timeout");
+        Assertions.assertNull(closeFailure.get(), "the return must not fail: " + closeFailure.get());
+        StatementGateInterceptor.disarm();
+
+        PreparedStatement inFlight = holder.get();
+        Assertions.assertNotNull(inFlight);
+        Assertions.assertTrue(inFlight.isClosed(),
+                "the statement that raced the return must be closed where it registers, not left "
+                        + "open on the session that goes back to the pool");
+        Assertions.assertEquals(0, tracked(finalizer),
+                "nothing may be left on the tracker after the return");
+
+        Connection second = ds.getConnection();
+        try {
+            Assertions.assertEquals(Integer.valueOf(11), sessionMarker(second),
+                    "precondition: the same physical session serves the next borrower");
+            Assertions.assertEquals(0, tracked(interceptorOf(second, StatementFinalizer.class)),
+                    "the next borrow must start with an empty tracker");
+            try (ResultSet rs = inFlight.executeQuery()) {
+                Assertions.fail("the leaked statement still executes: " + (rs.next() ? rs.getInt(1) : "?"));
+            } catch (SQLException expected) {
+                // closed statements refuse use - the point of the assertion
+            }
+        } finally {
+            second.close();
+        }
+    }
+
+    /**
+     * Statement gate for the race test: wraps every statement the chain
+     * creates so the test can park a close issued from inside the pool
+     * (the tracker's own return-time close), and can hold one named
+     * thread's statement creation in flight while the return is parked.
+     * Armed through statics because the pool instantiates configured
+     * interceptors itself; hence public static with a no-arg constructor.
+     */
+    public static class StatementGateInterceptor extends JdbcInterceptor {
+
+        private static final AtomicBoolean holdFirstCloseArmed = new AtomicBoolean();
+        private static volatile CountDownLatch closeParked;
+        private static volatile CountDownLatch closeRelease;
+        private static final AtomicBoolean closeHoldTaken = new AtomicBoolean();
+        private static volatile String createHoldThread;
+        private static volatile CountDownLatch createEntered;
+        private static volatile CountDownLatch createRelease;
+
+        static void holdFirstClose() {
+            closeHoldTaken.set(false);
+            holdFirstCloseArmed.set(true);
+        }
+
+        static void parkFirstCloseOnReturn(CountDownLatch parked, CountDownLatch release) {
+            closeParked = parked;
+            closeRelease = release;
+        }
+
+        static void holdCreateOf(String threadName, CountDownLatch entered, CountDownLatch release) {
+            createHoldThread = threadName;
+            createEntered = entered;
+            createRelease = release;
+        }
+
+        static void disarm() {
+            closeParked = null;
+            closeRelease = null;
+            createHoldThread = null;
+            createEntered = null;
+            createRelease = null;
+            holdFirstCloseArmed.set(false);
+            closeHoldTaken.set(false);
+        }
+
+        @Override
+        public void reset(ConnectionPool parent, PooledConnection con) {
+            // no per-borrow state
+        }
+
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            String name = method.getName();
+            boolean isCreate = "createStatement".equals(name) || "prepareStatement".equals(name)
+                    || "prepareCall".equals(name);
+            CountDownLatch entered = createEntered;
+            if (isCreate && entered != null && Thread.currentThread().getName().equals(createHoldThread)) {
+                entered.countDown();
+                CountDownLatch release = createRelease;
+                if (release != null) {
+                    release.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+                }
+            }
+            Object result = super.invoke(proxy, method, args);
+            if (isCreate && result instanceof Statement) {
+                boolean parkItsClose = holdFirstCloseArmed.get() && closeHoldTaken.compareAndSet(false, true);
+                Statement created = (Statement) result;
+                Class<?> iface = created instanceof CallableStatement ? CallableStatement.class
+                        : created instanceof PreparedStatement ? PreparedStatement.class : Statement.class;
+                return Proxy.newProxyInstance(StatementGateInterceptor.class.getClassLoader(),
+                        new Class<?>[] { iface }, new StatementGate(created, parkItsClose));
+            }
+            return result;
+        }
+
+        static class StatementGate implements InvocationHandler {
+            private final Statement delegate;
+            private final boolean parkClose;
+            private final AtomicBoolean closeParkedOnce = new AtomicBoolean();
+
+            StatementGate(Statement delegate, boolean parkClose) {
+                this.delegate = delegate;
+                this.parkClose = parkClose;
+            }
+
+            @Override
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                if ("close".equals(method.getName()) && parkClose && closeParkedOnce.compareAndSet(false, true)) {
+                    CountDownLatch parked = closeParked;
+                    CountDownLatch release = closeRelease;
+                    if (parked != null) {
+                        parked.countDown();
+                        if (release != null) {
+                            release.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+                        }
+                    }
+                }
+                try {
+                    return method.invoke(delegate, args);
+                } catch (InvocationTargetException x) {
+                    throw x.getCause() != null ? x.getCause() : x;
+                }
+            }
         }
     }
 }
