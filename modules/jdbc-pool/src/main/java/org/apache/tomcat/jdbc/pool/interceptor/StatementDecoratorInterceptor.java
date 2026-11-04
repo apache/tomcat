@@ -32,27 +32,28 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
- * Implementation of <b>JdbcInterceptor</b> that proxies resultSets and statements.
+ * Implementation of <b>JdbcInterceptor</b> that proxies statements and result sets so that neither the physical
+ * session nor the driver's own handles reach the application through them: {@link Statement#getConnection()} is
+ * answered with the pool's connection handle rather than the driver's connection, and {@link ResultSet#getStatement()}
+ * with the statement handle rather than the driver's statement - the hiding of the physical connection this
+ * interceptor exists for (Bug 48392, described in this interceptor's section of the <code>jdbc-pool</code>
+ * documentation page).
+ * <p>
+ * Beyond the hiding, the statement proxy keeps its own handle contract: calls reach the driver statement only
+ * while the proxy is open, a repeat close answers as a no-op, every other call on a retired handle is refused with
+ * an {@link SQLException}, and the driver's answer to a close that failed is passed to the caller - the handle is
+ * retired whichever way the driver answered. The connection the proxy reports is a snapshot of the borrow that
+ * created it, so a component that reuses a statement across borrows - {@link StatementCache} - must re-bind the
+ * handle first, as {@link StatementProxy#setConnection(Object)} documents. The result set proxy answers only
+ * {@link ResultSet#getStatement()} itself; everything else, {@link java.sql.Wrapper#unwrap(Class)} included,
+ * reaches the driver object unchanged.
  */
 public class StatementDecoratorInterceptor extends AbstractCreateStatementInterceptor {
 
     private static final Log logger = LogFactory.getLog(StatementDecoratorInterceptor.class);
 
     /**
-     * Method name for executeQuery.
-     */
-    protected static final String EXECUTE_QUERY = "executeQuery";
-    /**
-     * Method name for getGeneratedKeys.
-     */
-    protected static final String GET_GENERATED_KEYS = "getGeneratedKeys";
-    /**
-     * Method name for getResultSet.
-     */
-    protected static final String GET_RESULTSET = "getResultSet";
-
-    /**
-     * Method names that return a ResultSet.
+     * Method names that return a ResultSet, spelled with the base class's constants.
      */
     protected static final String[] RESULTSET_TYPES = { EXECUTE_QUERY, GET_GENERATED_KEYS, GET_RESULTSET };
 
@@ -73,9 +74,13 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
     }
 
     /*
-     * Neither the class nor the constructor are exposed outside of jdbc-pool. Given the comments in the jdbc-pool code
-     * regarding caching for performance, continue to use Proxy.getProxyClass(). This will need to be revisited if that
-     * method is marked for removal.
+     * The accessor and the cached constructor are protected, so a subclass - in-tree or third party, since the pool
+     * instantiates interceptors reflectively from the configured class names - can reach and replace both. Like the
+     * base class's constructor cache, every use must create a proxy implementing the ResultSet interface; overriding
+     * the accessor is the supported way for a subclass to supply its own. The cache duplicates the constructor the
+     * base class caches at its RESULTSET_IDX slot, but is computed lazily rather than in a class initializer. Given
+     * the comments in the jdbc-pool code regarding caching for performance, continue to use Proxy.getProxyClass().
+     * This will need to be revisited if that method is marked for removal.
      */
     /**
      * Gets the constructor for creating ResultSet proxies.
@@ -95,7 +100,12 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
     }
 
     /**
-     * Creates a statement interceptor to monitor query response times
+     * Wraps the statement the connection call has just created in this interceptor's proxy.
+     * {@inheritDoc}
+     * <p>
+     * The {@code time} argument is unused - this interceptor does no timing. If building the proxy fails, the
+     * failure is logged and the unproxied driver statement is returned, so a failure degrades the connection
+     * hiding rather than failing the application's call.
      */
     @Override
     public Object createStatement(Object proxy, Method method, Object[] args, Object statement, long time) {
@@ -104,14 +114,11 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
             Constructor<?> constructor = null;
             String sql = null;
             if (compare(CREATE_STATEMENT, name)) {
-                // createStatement
                 constructor = getConstructor(CREATE_STATEMENT_IDX, Statement.class);
             } else if (compare(PREPARE_STATEMENT, name)) {
-                // prepareStatement
                 constructor = getConstructor(PREPARE_STATEMENT_IDX, PreparedStatement.class);
                 sql = (String) args[0];
             } else if (compare(PREPARE_CALL, name)) {
-                // prepareCall
                 constructor = getConstructor(PREPARE_CALL_IDX, CallableStatement.class);
                 sql = (String) args[0];
             } else {
@@ -127,7 +134,7 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
                     throw (VirtualMachineError) cause;
                 }
             }
-            logger.warn("Unable to create statement proxy for slow query report.", x);
+            logger.warn(MessageFactory.get("statementDecoratorInterceptor.unableToCreateStatementProxy"), x);
         }
         return statement;
     }
@@ -140,7 +147,7 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
      * @param args        The arguments passed as part of the method call to the proxy
      * @param statement   The statement object that is to be proxied
      * @param constructor The constructor for the desired proxy
-     * @param sql         The sql of of the statement
+     * @param sql         The sql of the statement
      *
      * @return A new proxy for the Statement
      *
@@ -161,29 +168,8 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
     }
 
     /**
-     * Checks if the given method name is executeQuery.
-     *
-     * @param methodName the method name to check
-     *
-     * @return true if the method is executeQuery
-     */
-    protected boolean isExecuteQuery(String methodName) {
-        return EXECUTE_QUERY.equals(methodName);
-    }
-
-    /**
-     * Checks if the given method is executeQuery.
-     *
-     * @param method the method to check
-     *
-     * @return true if the method is executeQuery
-     */
-    protected boolean isExecuteQuery(Method method) {
-        return isExecuteQuery(method.getName());
-    }
-
-    /**
-     * Checks if the given method returns a ResultSet.
+     * Checks if the given method returns a ResultSet. This, not any executeQuery-specific test, is the dispatch
+     * predicate the proxies consult.
      *
      * @param method  the method to check
      * @param process whether processing is already enabled
@@ -195,7 +181,9 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
     }
 
     /**
-     * Class to measure query execute time.
+     * Invocation handler behind a statement proxy: it keeps the handle contract the class javadoc describes -
+     * lifecycle answered from its own state, close failures passed on, the borrow's connection handle reported
+     * instead of the driver's - and wraps the result sets of the calls named in {@link #RESULTSET_TYPES}.
      *
      * @param <T> The type of Statement being proxied.
      */
@@ -216,8 +204,10 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
         private Object actualProxy;
         /**
          * The connection handle of the borrow during which this proxy was created, bound through
-         * {@link #setConnection(Object)}. It is a creation-time snapshot, not a live view: once that borrow is returned
-         * the handle answers nothing. A component that lets a statement proxy outlive its borrow -
+         * {@link #setConnection(Object)}. It is a creation-time snapshot, not a live view: once that borrow is
+         * returned the snapshot is the disposed facade, which answers close, abort, isClosed, isValid, toString,
+         * equals and hashCode itself and refuses everything else. A component that lets a statement proxy
+         * outlive its borrow -
          * {@link StatementCache} recycling a parked statement, for instance - must therefore re-bind the handle to the
          * new borrower before handing the proxy out; see {@link StatementCache#invoke(Object, Method, Object[])}.
          */
@@ -298,7 +288,6 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
             return this.actualProxy;
         }
 
-
         /**
          * Returns the constructor used to create this proxy.
          *
@@ -372,7 +361,6 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
             if (compare(HASHCODE_VAL, method)) {
                 return Integer.valueOf(this.hashCode());
             }
-            // Was close invoked?
             boolean close = compare(CLOSE_VAL, method);
             // Read the state once: another thread's close() - the pool's
             // statement finalizer closes tracked statements from whichever
@@ -395,11 +383,21 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
             if (close && gone) {
                 return null;
             }
-            // Are we calling isClosed?
+            // Answered from this handle's own state, not from the driver:
+            // while the handle is open, a delegate closed behind the proxy's
+            // back - the closeOnCompletion() auto-close, or an out-of-band
+            // close of the object reached through unwrap() - is reported
+            // open by design, and the next forwarded call surfaces the
+            // driver's own failure. This is the answer an application sees
+            // through a live facade handle, because StatementFacade forwards
+            // isClosed while that layer is itself live. Answering from the
+            // flag once retired is deliberate and pinned by
+            // TestStatementDecoratorCloseFailure: a handle whose close the
+            // driver refused must still report itself closed, so this arm
+            // must not be "simplified" into a pure forward.
             if (compare(ISCLOSED_VAL, method)) {
                 return Boolean.valueOf(gone);
             }
-            // If we are calling anything else, bail out
             if (gone) {
                 throw new SQLException(MessageFactory.get("statementDecoratorInterceptor.statementClosed"));
             }
@@ -410,13 +408,13 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
                 // thrown above
                 return connection;
             }
-            boolean process = false;
-            process = isResultSet(method, process);
-            // Check to see if we are about to execute a query
-            // if we are executing, get the current time
+            // Whether this call hands out a result set that must be wrapped
+            boolean process = isResultSet(method, false);
             Object result = null;
             try {
-                // Perform close cleanup
+                // The driver's answer to a close reaches the caller:
+                // closeInvoked propagates it, the handle being retired
+                // whichever way the driver answered
                 if (close) {
                     closeInvoked();
                 } else {
