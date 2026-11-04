@@ -215,6 +215,23 @@ public class TestCollectionOperations extends ELBaseTest {
 
 
     @Test
+    public void testSortedLambdaExpression02() {
+        // A comparator that returns null coerces to zero, treating all
+        // elements as equal. The sort is stable, so the order is unchanged.
+        ELProcessor processor = new ELProcessor();
+        Object result = processor.getValue(
+                "[3, 1, 2].stream().sorted((x,y)->null).toList()",
+                List.class);
+        List<Long> expected = new ArrayList<>(3);
+        expected.add(Long.valueOf(3));
+        expected.add(Long.valueOf(1));
+        expected.add(Long.valueOf(2));
+
+        Assert.assertEquals(expected, result);
+    }
+
+
+    @Test
     public void testForEach01() {
         ELProcessor processor = new ELProcessor();
         processor.defineBean("beans", beans);
@@ -305,6 +322,79 @@ public class TestCollectionOperations extends ELBaseTest {
         expected.add(bean02);
 
         Assert.assertEquals(expected, result);
+    }
+
+
+    @Test
+    public void testSubstreamStart02() {
+        // A start that is less than or equal to zero skips no elements
+        ELProcessor processor = new ELProcessor();
+
+        Object result = processor.getValue(
+                "[1, 2, 3, 4, 5].stream().substream(-2).toList()",
+                Object.class);
+
+        List<Long> expected = new ArrayList<>(5);
+        expected.add(Long.valueOf(1));
+        expected.add(Long.valueOf(2));
+        expected.add(Long.valueOf(3));
+        expected.add(Long.valueOf(4));
+        expected.add(Long.valueOf(5));
+
+        Assert.assertEquals(expected, result);
+    }
+
+
+    @Test
+    public void testSubstreamStartEnd02() {
+        // A start that is less than or equal to zero skips no elements and
+        // the number of elements included is end minus start
+        ELProcessor processor = new ELProcessor();
+
+        Object result = processor.getValue(
+                "[1, 2, 3, 4, 5].stream().substream(-2,3).toList()",
+                Object.class);
+
+        List<Long> expected = new ArrayList<>(5);
+        expected.add(Long.valueOf(1));
+        expected.add(Long.valueOf(2));
+        expected.add(Long.valueOf(3));
+        expected.add(Long.valueOf(4));
+        expected.add(Long.valueOf(5));
+
+        Assert.assertEquals(expected, result);
+    }
+
+
+    @Test
+    public void testSubstreamStartEnd03() {
+        // The zero end position still includes end minus start elements when
+        // the start is negative
+        ELProcessor processor = new ELProcessor();
+
+        Object result = processor.getValue(
+                "[1, 2, 3, 4, 5].stream().substream(-2,0).toList()",
+                Object.class);
+
+        List<Long> expected = new ArrayList<>(2);
+        expected.add(Long.valueOf(1));
+        expected.add(Long.valueOf(2));
+
+        Assert.assertEquals(expected, result);
+    }
+
+
+    @Test
+    public void testSubstreamStartEnd04() {
+        // A source with fewer elements than the number to skip includes
+        // nothing
+        ELProcessor processor = new ELProcessor();
+
+        Object result = processor.getValue(
+                "[1].stream().substream(2,3).toList()",
+                Object.class);
+
+        Assert.assertEquals(new ArrayList<>(), result);
     }
 
 
@@ -434,6 +524,34 @@ public class TestCollectionOperations extends ELBaseTest {
 
         Assert.assertEquals(bean03, ((Optional) result).get());
     }
+
+
+    @Test
+    public void testMaxLambda03() {
+        // A comparator that returns null coerces to zero, treating all
+        // elements as equal. The first element is retained.
+        ELProcessor processor = new ELProcessor();
+
+        Object result = processor.getValue(
+                "[1, 2, 3].stream().max((x,y)->null)",
+                Object.class);
+
+        Assert.assertEquals(Long.valueOf(1), ((Optional) result).get());
+    }
+
+
+    @Test(expected=ELException.class)
+    public void testMaxLambda04() {
+        // A comparator result that cannot be coerced to a number is reported
+        // as an ELException
+        ELProcessor processor = new ELProcessor();
+
+        processor.getValue(
+                "[1, 2, 3].stream().max((x,y)->'abc')",
+                Object.class);
+    }
+
+
     @Test
     public void testMin01() {
         ELProcessor processor = new ELProcessor();
@@ -491,6 +609,20 @@ public class TestCollectionOperations extends ELBaseTest {
                 Object.class);
 
         Assert.assertEquals(bean01, ((Optional) result).get());
+    }
+
+
+    @Test
+    public void testMinLambda02() {
+        // A comparator that returns null coerces to zero, treating all
+        // elements as equal. The first element is retained.
+        ELProcessor processor = new ELProcessor();
+
+        Object result = processor.getValue(
+                "[1, 2, 3].stream().min((x,y)->null)",
+                Object.class);
+
+        Assert.assertEquals(Long.valueOf(1), ((Optional) result).get());
     }
 
 
@@ -749,6 +881,65 @@ public class TestCollectionOperations extends ELBaseTest {
                 Object.class);
 
         result.get();
+    }
+
+
+    @Test(expected=ELException.class)
+    public void testAnyMatch04() {
+        // A predicate that returns a non-boolean must be coerced, producing an
+        // ELException, as for filter()
+        ELProcessor processor = new ELProcessor();
+
+        processor.getValue(
+                "[1,2,3].stream().anyMatch(x->x)",
+                Object.class);
+    }
+
+
+    @Test
+    public void testAnyMatch05() {
+        // A null predicate result is coerced to false, as for filter()
+        ELProcessor processor = new ELProcessor();
+
+        Optional result = (Optional) processor.getValue(
+                "[1,2,3].stream().anyMatch(x->null)",
+                Object.class);
+
+        Assert.assertEquals(Boolean.FALSE, result.get());
+    }
+
+
+    @Test(expected=ELException.class)
+    public void testAllMatch05() {
+        ELProcessor processor = new ELProcessor();
+
+        processor.getValue(
+                "[1,2,3].stream().allMatch(x->x)",
+                Object.class);
+    }
+
+
+    @Test
+    public void testAllMatch06() {
+        ELProcessor processor = new ELProcessor();
+
+        Optional result = (Optional) processor.getValue(
+                "[1,2,3].stream().allMatch(x->null)",
+                Object.class);
+
+        Assert.assertEquals(Boolean.FALSE, result.get());
+    }
+
+
+    @Test
+    public void testNoneMatch05() {
+        ELProcessor processor = new ELProcessor();
+
+        Optional result = (Optional) processor.getValue(
+                "[1,2,3].stream().noneMatch(x->null)",
+                Object.class);
+
+        Assert.assertEquals(Boolean.TRUE, result.get());
     }
 
 

@@ -840,7 +840,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         checkStateForResourceLoading(name);
 
         if (name == null || name.startsWith("/")) {
-            return null;
+            return Collections.emptyEnumeration();
         }
 
         String path = nameToPath(name);

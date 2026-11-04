@@ -157,8 +157,13 @@ public class HeartbeatListener implements LifecycleListener {
      * Set the TTL for Multicast packets.
      *
      * @param ttl value for TTL.
+     *
+     * @throws IllegalArgumentException if the value is outside the valid range of 0 to 255
      */
     public void setTtl(int ttl) {
+        if (ttl < 0 || ttl > 255) {
+            throw new IllegalArgumentException(sm.getString("heartbeatListener.invalidTtl", Integer.valueOf(ttl)));
+        }
         this.ttl = ttl;
     }
 

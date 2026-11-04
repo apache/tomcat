@@ -56,6 +56,7 @@ public class TestNonBlockingCoordinator {
             for ( int i=0; i<CHANNEL_COUNT; i++ ) {
                 channels[i] = new GroupChannel();
                 ((ReceiverBase) channels[i].getChannelReceiver()).setHost("localhost");
+                ((ReceiverBase) channels[i].getChannelReceiver()).setPort(0);
                 coordinators[i] = new NonBlockingCoordinator();
                 channels[i].addInterceptor(coordinators[i]);
                 TcpFailureDetector tcpFailureDetector = new TcpFailureDetector();

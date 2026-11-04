@@ -176,6 +176,11 @@ public class SessionConfig {
      * @param cookieMaxAge the max age
      */
     public void setCookieMaxAge(String cookieMaxAge) {
+        // Validate the value at deployment time, consistently with
+        // setSessionTimeout(), so an invalid value fails the deployment with a
+        // parse error instead of causing a NumberFormatException at run time
+        // when the value is parsed to create each session cookie
+        Integer.valueOf(cookieMaxAge);
         setCookieAttribute(Constants.COOKIE_MAX_AGE_ATTR, cookieMaxAge);
     }
 

@@ -16,7 +16,18 @@
  */
 package org.apache.catalina.webresources;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+import java.util.jar.Attributes;
+import java.util.jar.JarEntry;
+import java.util.jar.JarOutputStream;
+import java.util.jar.Manifest;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -52,5 +63,182 @@ public class TestJarWarResourceSet extends TomcatBaseTest {
         Assert.assertNotNull(results);
         Assert.assertEquals(1, results.length);
         Assert.assertNotNull(results[0].getURL());
+    }
+
+    @Test
+    public void testBloomFilterIsNotRebuiltOnEveryIndexRead() {
+        // Regression test: the bloom filter for the JAR nested in the WAR
+        // must be built once when the archive index is built and then
+        // reused. It previously was re-created on every call to
+        // getArchiveEntries(), adding work linear in the number of entries
+        // of the JAR to each resource lookup.
+        StandardRoot resourceRoot = new StandardRoot();
+        resourceRoot.setArchiveIndexStrategy("BLOOM");
+        File warFile = new File("test/webresources/war-url-connection.war");
+        JarWarResourceSet resourceSet = new JarWarResourceSet(resourceRoot, "/WEB-INF/classes",
+                warFile.getAbsolutePath(), "WEB-INF/lib/test.jar", "/");
+
+        Map<String,JarEntry> entries = resourceSet.getArchiveEntries(true);
+        Assert.assertNotNull(entries);
+        JarContents jarContents = resourceSet.jarContents;
+        Assert.assertNotNull(jarContents);
+
+        Assert.assertSame(entries, resourceSet.getArchiveEntries(true));
+        Assert.assertSame(jarContents, resourceSet.jarContents);
+
+        resourceSet.gc();
+    }
+
+    @Test
+    public void testMultiReleaseWithInvalidVersionDirectories() throws Exception {
+        // An entry below a directory whose name is not a valid version number
+        // must not stop the archive index being built. Such an entry is not a
+        // versioned entry, so it stays in the index under its full name. An
+        // entry below a valid version directory is indexed under its base
+        // name.
+        File warFile = File.createTempFile("test-jar-war-resource-set", ".war");
+        warFile.deleteOnExit();
+        try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(warFile))) {
+            out.putNextEntry(new ZipEntry("WEB-INF/lib/test.jar"));
+            out.write(createMultiReleaseJar());
+            out.closeEntry();
+        }
+
+        StandardRoot resourceRoot = new StandardRoot();
+        resourceRoot.setArchiveIndexStrategy("BLOOM");
+        JarWarResourceSet resourceSet = new JarWarResourceSet(resourceRoot, "/WEB-INF/classes",
+                warFile.getAbsolutePath(), "WEB-INF/lib/test.jar", "/");
+
+        Map<String,JarEntry> entries = resourceSet.getArchiveEntries(true);
+
+        Assert.assertTrue(entries.containsKey("META-INF/versions/9x/foo.txt"));
+        Assert.assertTrue(entries.containsKey("META-INF/versions//bar.txt"));
+        Assert.assertTrue(entries.containsKey("META-INF/versions/99999999999999/ovf.txt"));
+        Assert.assertTrue(entries.containsKey("ok.txt"));
+        Assert.assertEquals("META-INF/versions/9/ok.txt", entries.get("ok.txt").getName());
+        Assert.assertFalse(entries.containsKey("META-INF/versions/9/ok.txt"));
+        Assert.assertTrue(entries.containsKey("real.txt"));
+
+        // The bloom filter is built from the resulting index
+        JarContents jarContents = resourceSet.jarContents;
+        Assert.assertNotNull(jarContents);
+        Assert.assertTrue(jarContents.mightContainResource("META-INF/versions/9x/foo.txt"));
+        Assert.assertTrue(jarContents.mightContainResource("ok.txt"));
+        Assert.assertTrue(jarContents.mightContainResource("real.txt"));
+
+        // The index and the bloom filter have to agree on the name an entry is
+        // stored under, otherwise these lookups would be rejected by the filter
+        WebResource invalidVersion =
+                resourceSet.getResource("/WEB-INF/classes/META-INF/versions/9x/foo.txt");
+        Assert.assertTrue(invalidVersion instanceof JarWarResource);
+        Assert.assertTrue(invalidVersion.exists());
+
+        WebResource versioned = resourceSet.getResource("/WEB-INF/classes/ok.txt");
+        Assert.assertTrue(versioned instanceof JarWarResource);
+        Assert.assertTrue(versioned.exists());
+
+        resourceSet.gc();
+    }
+
+    @Test
+    public void testMultiReleaseVersionDirectoryRules() throws Exception {
+        // Version directories with a sign or a leading zero are not version
+        // directories as far as the JDK is concerned. An entry directly below
+        // META-INF/versions/ has no version directory at all. All of these
+        // stay in the index under their full name. A leading slash is not
+        // significant when identifying a versioned entry.
+        File warFile = File.createTempFile("test-jar-war-resource-set", ".war");
+        warFile.deleteOnExit();
+        try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(warFile))) {
+            out.putNextEntry(new ZipEntry("WEB-INF/lib/test.jar"));
+            out.write(createJar("META-INF/versions/+9/plus.txt", "META-INF/versions/-9/minus.txt",
+                    "META-INF/versions/09/zero.txt", "META-INF/versions/Foo.class",
+                    "/META-INF/versions/9/lead.txt", "META-INF/versions/9/ok.txt", "real.txt"));
+            out.closeEntry();
+        }
+
+        StandardRoot resourceRoot = new StandardRoot();
+        resourceRoot.setArchiveIndexStrategy("BLOOM");
+        JarWarResourceSet resourceSet = new JarWarResourceSet(resourceRoot, "/WEB-INF/classes",
+                warFile.getAbsolutePath(), "WEB-INF/lib/test.jar", "/");
+
+        Map<String,JarEntry> entries = resourceSet.getArchiveEntries(true);
+
+        Assert.assertTrue(entries.containsKey("META-INF/versions/+9/plus.txt"));
+        Assert.assertFalse(entries.containsKey("plus.txt"));
+        Assert.assertTrue(entries.containsKey("META-INF/versions/-9/minus.txt"));
+        Assert.assertFalse(entries.containsKey("minus.txt"));
+        Assert.assertTrue(entries.containsKey("META-INF/versions/09/zero.txt"));
+        Assert.assertFalse(entries.containsKey("zero.txt"));
+        Assert.assertTrue(entries.containsKey("META-INF/versions/Foo.class"));
+        Assert.assertTrue(entries.containsKey("lead.txt"));
+        Assert.assertTrue(entries.containsKey("ok.txt"));
+        Assert.assertTrue(entries.containsKey("real.txt"));
+
+        // The bloom filter has to agree with the index
+        JarContents jarContents = resourceSet.jarContents;
+        Assert.assertNotNull(jarContents);
+        Assert.assertTrue(jarContents.mightContainResource("META-INF/versions/+9/plus.txt"));
+        Assert.assertTrue(jarContents.mightContainResource("META-INF/versions/-9/minus.txt"));
+        Assert.assertTrue(jarContents.mightContainResource("META-INF/versions/09/zero.txt"));
+        Assert.assertTrue(jarContents.mightContainResource("META-INF/versions/Foo.class"));
+        Assert.assertTrue(jarContents.mightContainResource("lead.txt"));
+        Assert.assertTrue(jarContents.mightContainResource("ok.txt"));
+
+        Assert.assertTrue(resourceSet.getResource("/WEB-INF/classes/META-INF/versions/+9/plus.txt").exists());
+        Assert.assertTrue(resourceSet.getResource("/WEB-INF/classes/META-INF/versions/09/zero.txt").exists());
+        Assert.assertTrue(resourceSet.getResource("/WEB-INF/classes/META-INF/versions/Foo.class").exists());
+        Assert.assertTrue(resourceSet.getResource("/WEB-INF/classes/lead.txt").exists());
+
+        resourceSet.gc();
+    }
+
+    @Test
+    public void testMultiReleaseVersionDirectoryEntry() throws Exception {
+        // The entry for the version directory itself has no resource name so
+        // it must not be added to the index as an entry with an empty name.
+        File warFile = File.createTempFile("test-jar-war-resource-set", ".war");
+        warFile.deleteOnExit();
+        try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(warFile))) {
+            out.putNextEntry(new ZipEntry("WEB-INF/lib/test.jar"));
+            out.write(createJar("META-INF/versions/9/", "META-INF/versions/9/ok.txt", "real.txt"));
+            out.closeEntry();
+        }
+
+        StandardRoot resourceRoot = new StandardRoot();
+        resourceRoot.setArchiveIndexStrategy("BLOOM");
+        JarWarResourceSet resourceSet = new JarWarResourceSet(resourceRoot, "/WEB-INF/classes",
+                warFile.getAbsolutePath(), "WEB-INF/lib/test.jar", "/");
+
+        Map<String,JarEntry> entries = resourceSet.getArchiveEntries(true);
+
+        Assert.assertFalse(entries.containsKey(""));
+        Assert.assertTrue(entries.containsKey("ok.txt"));
+        Assert.assertTrue(entries.containsKey("real.txt"));
+        Assert.assertTrue(resourceSet.getResource("/WEB-INF/classes/ok.txt").exists());
+
+        resourceSet.gc();
+    }
+
+    private static byte[] createMultiReleaseJar() throws IOException {
+        return createJar("META-INF/versions/9/ok.txt", "META-INF/versions/9x/foo.txt",
+                "META-INF/versions//bar.txt", "META-INF/versions/99999999999999/ovf.txt", "real.txt");
+    }
+
+    private static byte[] createJar(String... names) throws IOException {
+        Manifest manifest = new Manifest();
+        manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
+        manifest.getMainAttributes().putValue("Multi-Release", "true");
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (JarOutputStream jos = new JarOutputStream(baos, manifest)) {
+            for (String name : names) {
+                jos.putNextEntry(new JarEntry(name));
+                jos.write("x".getBytes(StandardCharsets.UTF_8));
+                jos.closeEntry();
+            }
+        }
+
+        return baos.toByteArray();
     }
 }

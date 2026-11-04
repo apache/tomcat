@@ -24,7 +24,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.net.ConnectException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -78,6 +80,12 @@ public class Catalina {
      * Default path to the server configuration file.
      */
     public static final String SERVER_XML = "conf/server.xml";
+
+    /**
+     * Timeout, in milliseconds, for connecting to the shutdown port when
+     * stopping the server.
+     */
+    private static final int SHUTDOWN_CONNECT_TIMEOUT_MS = 10000;
 
     // ----------------------------------------------------- Instance Variables
 
@@ -777,12 +785,17 @@ public class Catalina {
         // Stop the existing server
         s = getServer();
         if (s.getPortWithOffset() > 0) {
-            try (Socket socket = new Socket(s.getAddress(), s.getPortWithOffset());
-                    OutputStream stream = socket.getOutputStream()) {
-                String shutdown = s.getShutdown();
-                for (int i = 0; i < shutdown.length(); i++) {
-                    stream.write(shutdown.charAt(i));
-                }
+            // Use a connect timeout so a shutdown port that silently drops
+            // packets does not block the stop command indefinitely
+            try (Socket socket = new Socket()) {
+                socket.connect(new InetSocketAddress(s.getAddress(), s.getPortWithOffset()),
+                        SHUTDOWN_CONNECT_TIMEOUT_MS);
+                OutputStream stream = socket.getOutputStream();
+                // Send the shutdown command as UTF-8 bytes. Writing the
+                // characters one at a time with OutputStream.write(int) would
+                // silently truncate any character above U+00FF and the server
+                // would then never match the configured shutdown string.
+                stream.write(s.getShutdown().getBytes(StandardCharsets.UTF_8));
                 stream.flush();
             } catch (ConnectException ce) {
                 log.error(sm.getString("catalina.stopServer.connectException", s.getAddress(),

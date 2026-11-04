@@ -49,11 +49,16 @@ public class PooledParallelSender extends PooledSender implements PooledParallel
         }
         ParallelNioSender sender = (ParallelNioSender) getSender();
         if (sender == null) {
-            ChannelException cx = new ChannelException(
+            // A null sender means either that the wait timed out or that the thread was interrupted while waiting
+            boolean interrupted = Thread.currentThread().isInterrupted();
+            ChannelException cx = new ChannelException(interrupted ?
+                    sm.getString("pooledParallelSender.unable.retrieveSender.interrupted") :
                     sm.getString("pooledParallelSender.unable.retrieveSender.timeout", Long.toString(getMaxWait())));
-            for (Member member : destination) {
-                cx.addFaultyMember(member,
-                        new NullPointerException(sm.getString("pooledParallelSender.unable.retrieveSender")));
+            if (!interrupted) {
+                for (Member member : destination) {
+                    cx.addFaultyMember(member,
+                            new NullPointerException(sm.getString("pooledParallelSender.unable.retrieveSender")));
+                }
             }
             throw cx;
         } else {

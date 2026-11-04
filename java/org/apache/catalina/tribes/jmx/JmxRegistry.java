@@ -88,12 +88,16 @@ public class JmxRegistry {
     }
 
     /**
-     * Remove the JMX registry for the given channel.
+     * Remove the JMX registry for the given channel. Does nothing if the channel or its name is
+     * {@code null}.
      *
      * @param channel the channel
      * @param clear whether to clear the MBeans
      */
     public static void removeRegistry(Channel channel, boolean clear) {
+        if (channel == null || channel.getName() == null) {
+            return;
+        }
         JmxRegistry registry = registryCache.get(channel.getName());
         if (registry == null) {
             return;

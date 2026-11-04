@@ -16,6 +16,8 @@
  */
 package org.apache.naming;
 
+import java.util.Hashtable;
+
 import javax.naming.Context;
 import javax.naming.NamingException;
 
@@ -92,6 +94,31 @@ public class TestNamingContext extends TomcatBaseTest {
         // Shortcut should fail too
         obj = factory.getObjectInstance(rlr, null, null, null);
         Assert.assertNull(obj);
+    }
+
+
+    @Test
+    public void testResourceLinkWithoutGlobalName() {
+        // Use a private context to keep the global context validation out of
+        // the way, whatever test order is used within the JVM
+        Context context = new NamingContext(new Hashtable<>(), "test");
+        ResourceLinkFactory.setGlobalContext(context);
+
+        // A resource link without a global name is a configuration error that
+        // must be reported as such, not as a NullPointerException
+        try {
+            ResourceLinkFactory.registerGlobalResourceAccess(context, LOCAL_NAME, null);
+            Assert.fail("Expected an IllegalArgumentException for the missing global name");
+        } catch (IllegalArgumentException iae) {
+            // Expected
+        }
+
+        try {
+            ResourceLinkFactory.registerGlobalResourceAccess(context, null, GLOBAL_NAME);
+            Assert.fail("Expected an IllegalArgumentException for the missing local name");
+        } catch (IllegalArgumentException iae) {
+            // Expected
+        }
     }
 
 

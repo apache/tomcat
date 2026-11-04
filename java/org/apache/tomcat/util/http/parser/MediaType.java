@@ -155,10 +155,14 @@ public class MediaType {
                         if (entry.getKey().equalsIgnoreCase("charset")) {
                             continue;
                         }
+                        String value = entry.getValue();
+                        if (value == null || value.isEmpty()) {
+                            continue;
+                        }
                         result.append(';');
                         result.append(entry.getKey());
                         result.append('=');
-                        result.append(entry.getValue());
+                        result.append(value);
                     }
 
                     noCharset = result.toString();
@@ -213,7 +217,7 @@ public class MediaType {
                 value = "";
             }
 
-            if (attribute != null) {
+            if (attribute != null && !attribute.isEmpty()) {
                 parameters.put(attribute.toLowerCase(Locale.ENGLISH), value);
             }
 

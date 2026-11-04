@@ -155,9 +155,10 @@ public class WebdavIfHeader {
     }
 
     /**
-     * Returns true if an If header is present. False otherwise.
+     * Returns true if an If header is present and was parsed successfully. False if no If header is present or the
+     * header value contains invalid syntax.
      *
-     * @return true if an If header is present.
+     * @return true if an If header is present and was parsed successfully. False otherwise.
      */
     public boolean hasValue() {
         return ifHeader != null;
@@ -269,7 +270,7 @@ public class WebdavIfHeader {
      *
      * @param reader the reader
      *
-     * @return the parsed map
+     * @return the parsed map, or <code>null</code> if an invalid (empty) <em>IfList</em> was encountered
      */
     private IfHeaderMap parseTagged(StringReader reader) throws IOException {
         IfHeaderMap map = new IfHeaderMap();
@@ -284,7 +285,13 @@ public class WebdavIfHeader {
                 String resource = readWord(reader, '>');
                 if (resource != null) {
                     // go to untagged after reading the resource
-                    map.put(resource, parseUntagged(reader));
+                    IfHeaderList untagged = parseUntagged(reader);
+                    if (untagged == null) {
+                        // An invalid (empty) IfList makes the whole header
+                        // invalid, stop parsing
+                        return null;
+                    }
+                    map.put(resource, untagged);
                     resources.add(resource);
                 } else {
                     break;
@@ -309,7 +316,8 @@ public class WebdavIfHeader {
      *
      * @param reader The <code>StringReader</code> to read from for parsing
      *
-     * @return An <code>ArrayList</code> of {@link IfList} entries.
+     * @return An <code>ArrayList</code> of {@link IfList} entries, or <code>null</code> if an invalid (empty)
+     *             <em>IfList</em> was encountered.
      */
     private IfHeaderList parseUntagged(StringReader reader) throws IOException {
         IfHeaderList list = new IfHeaderList();
@@ -323,7 +331,13 @@ public class WebdavIfHeader {
 
             } else if (c == '(') {
                 // start of an IfList, parse
-                list.add(parseIfList(reader));
+                IfList ifList = parseIfList(reader);
+                if (ifList == null) {
+                    // An invalid (empty) IfList makes the whole header
+                    // invalid, stop parsing
+                    return null;
+                }
+                list.add(ifList);
 
             } else if (c == '<') {
                 // start of a tag, return current list
@@ -349,7 +363,8 @@ public class WebdavIfHeader {
      *
      * @param reader The <code>StringReader</code> to read from for parsing
      *
-     * @return The {@link IfList} for the input <em>IfList</em>.
+     * @return The {@link IfList} for the input <em>IfList</em>, or <code>null</code> if the list did not contain at
+     *             least one valid entry.
      *
      * @throws IOException if a problem occurs during reading.
      */
@@ -427,7 +442,19 @@ public class WebdavIfHeader {
             }
         }
 
-        // return the current list anyway
+        // RFC 4918 section 10.4.2 requires an IfList to contain at least one
+        // condition:
+        //    List = "(" 1*Condition ")"
+        // An empty list (e.g. "()") is invalid syntax. Return null so that
+        // the caller treats the entire header value as invalid which allows
+        // strict mode to reject it.
+        if (res.isEmpty()) {
+            if (log.isTraceEnabled()) {
+                log.trace("parseIfList: Empty If list, treating header as invalid");
+            }
+            return null;
+        }
+
         return res;
     }
 

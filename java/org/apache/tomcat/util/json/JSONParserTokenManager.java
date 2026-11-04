@@ -34,14 +34,14 @@ public class JSONParserTokenManager implements JSONParserConstants {
         switch (pos) {
             case 0:
                 if ((active0 & 0x1000000L) != 0L) {
-                    return 48;
+                    return 51;
                 }
                 if ((active0 & 0xe0000L) != 0L) {
                     jjmatchedKind = 30;
                     return 25;
                 }
                 if ((active0 & 0x2000000L) != 0L) {
-                    return 49;
+                    return 52;
                 }
                 return -1;
             case 1:
@@ -243,7 +243,7 @@ public class JSONParserTokenManager implements JSONParserConstants {
 
     private int jjMoveNfa_0(int startState, int curPos) {
         int startsAt = 0;
-        jjnewStateCnt = 48;
+        jjnewStateCnt = 51;
         int i = 1;
         jjstateSet[0] = startState;
         int kind = 0x7fffffff;
@@ -255,12 +255,6 @@ public class JSONParserTokenManager implements JSONParserConstants {
                 long l = 1L << curChar;
                 do {
                     switch (jjstateSet[--i]) {
-                        case 49:
-                        case 16:
-                            if ((0xfffffffbffffc9ffL & l) != 0L) {
-                                jjCheckNAddStates(0, 2);
-                            }
-                            break;
                         case 0:
                             if ((0x3ff000000000000L & l) != 0L) {
                                 if (kind > 30) {
@@ -278,9 +272,9 @@ public class JSONParserTokenManager implements JSONParserConstants {
                                     kind = 4;
                                 }
                             } else if (curChar == 45) {
-                                jjCheckNAddStates(3, 6);
+                                jjCheckNAddStates(0, 3);
                             } else if (curChar == 47) {
-                                jjAddStates(7, 8);
+                                jjAddStates(4, 5);
                             } else if (curChar == 34) {
                                 jjCheckNAddTwoStates(16, 18);
                             } else if (curChar == 39) {
@@ -293,21 +287,27 @@ public class JSONParserTokenManager implements JSONParserConstants {
                                     kind = 15;
                                 }
                                 {
-                                    jjCheckNAddStates(9, 11);
+                                    jjCheckNAddStates(6, 9);
                                 }
                             } else if (curChar == 48) {
                                 if (kind > 15) {
                                     kind = 15;
                                 }
                                 {
-                                    jjCheckNAddStates(12, 14);
+                                    jjCheckNAddStates(10, 13);
                                 }
                             }
                             break;
-                        case 48:
+                        case 52:
+                        case 16:
+                            if ((0xfffffffbffffc9ffL & l) != 0L) {
+                                jjCheckNAddStates(14, 16);
+                            }
+                            break;
+                        case 51:
                         case 6:
                             if ((0xffffff7fffffc9ffL & l) != 0L) {
-                                jjCheckNAddStates(15, 17);
+                                jjCheckNAddStates(17, 19);
                             }
                             break;
                         case 1:
@@ -342,7 +342,7 @@ public class JSONParserTokenManager implements JSONParserConstants {
                             break;
                         case 9:
                             if ((0x808000000000L & l) != 0L) {
-                                jjCheckNAddStates(15, 17);
+                                jjCheckNAddStates(17, 19);
                             }
                             break;
                         case 11:
@@ -362,7 +362,7 @@ public class JSONParserTokenManager implements JSONParserConstants {
                             break;
                         case 14:
                             if ((0x3ff000000000000L & l) != 0L) {
-                                jjCheckNAddStates(15, 17);
+                                jjCheckNAddStates(17, 19);
                             }
                             break;
                         case 15:
@@ -377,7 +377,7 @@ public class JSONParserTokenManager implements JSONParserConstants {
                             break;
                         case 19:
                             if ((0x800400000000L & l) != 0L) {
-                                jjCheckNAddStates(0, 2);
+                                jjCheckNAddStates(14, 16);
                             }
                             break;
                         case 21:
@@ -397,7 +397,7 @@ public class JSONParserTokenManager implements JSONParserConstants {
                             break;
                         case 24:
                             if ((0x3ff000000000000L & l) != 0L) {
-                                jjCheckNAddStates(0, 2);
+                                jjCheckNAddStates(14, 16);
                             }
                             break;
                         case 25:
@@ -412,7 +412,7 @@ public class JSONParserTokenManager implements JSONParserConstants {
                             break;
                         case 26:
                             if (curChar == 47) {
-                                jjAddStates(7, 8);
+                                jjAddStates(4, 5);
                             }
                             break;
                         case 27:
@@ -451,7 +451,7 @@ public class JSONParserTokenManager implements JSONParserConstants {
                             break;
                         case 34:
                             if (curChar == 45) {
-                                jjCheckNAddStates(3, 6);
+                                jjCheckNAddStates(0, 3);
                             }
                             break;
                         case 35:
@@ -486,7 +486,7 @@ public class JSONParserTokenManager implements JSONParserConstants {
                             break;
                         case 38:
                             if (curChar == 48) {
-                                jjCheckNAddTwoStates(38, 39);
+                                jjCheckNAddStates(20, 22);
                             }
                             break;
                         case 39:
@@ -519,34 +519,49 @@ public class JSONParserTokenManager implements JSONParserConstants {
                             jjCheckNAdd(43);
                         }
                             break;
-                        case 44:
-                            if ((0x3fe000000000000L & l) != 0L) {
-                                jjCheckNAddTwoStates(45, 39);
-                            }
-                            break;
                         case 45:
-                            if ((0x3ff000000000000L & l) != 0L) {
-                                jjCheckNAddTwoStates(45, 39);
+                            if ((0x280000000000L & l) != 0L) {
+                                jjCheckNAdd(46);
                             }
                             break;
                         case 46:
+                            if ((0x3ff000000000000L & l) == 0L) {
+                                break;
+                            }
+                            if (kind > 16) {
+                                kind = 16;
+                            } {
+                            jjCheckNAdd(46);
+                        }
+                            break;
+                        case 47:
+                            if ((0x3fe000000000000L & l) != 0L) {
+                                jjCheckNAddStates(23, 25);
+                            }
+                            break;
+                        case 48:
+                            if ((0x3ff000000000000L & l) != 0L) {
+                                jjCheckNAddStates(23, 25);
+                            }
+                            break;
+                        case 49:
                             if (curChar != 48) {
                                 break;
                             }
                             if (kind > 15) {
                                 kind = 15;
                             } {
-                            jjCheckNAddStates(12, 14);
+                            jjCheckNAddStates(10, 13);
                         }
                             break;
-                        case 47:
+                        case 50:
                             if ((0x3fe000000000000L & l) == 0L) {
                                 break;
                             }
                             if (kind > 15) {
                                 kind = 15;
                             } {
-                            jjCheckNAddStates(9, 11);
+                            jjCheckNAddStates(6, 9);
                         }
                             break;
                         default:
@@ -557,13 +572,6 @@ public class JSONParserTokenManager implements JSONParserConstants {
                 long l = 1L << (curChar & 077);
                 do {
                     switch (jjstateSet[--i]) {
-                        case 49:
-                            if ((0xffffffffefffffffL & l) != 0L) {
-                                jjCheckNAddStates(0, 2);
-                            } else if (curChar == 92) {
-                                jjAddStates(18, 19);
-                            }
-                            break;
                         case 0:
                         case 25:
                             if ((0x7fffffe07fffffeL & l) == 0L) {
@@ -575,30 +583,37 @@ public class JSONParserTokenManager implements JSONParserConstants {
                             jjCheckNAdd(25);
                         }
                             break;
-                        case 48:
+                        case 52:
                             if ((0xffffffffefffffffL & l) != 0L) {
-                                jjCheckNAddStates(15, 17);
+                                jjCheckNAddStates(14, 16);
                             } else if (curChar == 92) {
-                                jjAddStates(20, 21);
+                                jjAddStates(26, 27);
+                            }
+                            break;
+                        case 51:
+                            if ((0xffffffffefffffffL & l) != 0L) {
+                                jjCheckNAddStates(17, 19);
+                            } else if (curChar == 92) {
+                                jjAddStates(28, 29);
                             }
                             break;
                         case 1: {
-                            jjAddStates(22, 23);
+                            jjAddStates(30, 31);
                         }
                             break;
                         case 6:
                             if ((0xffffffffefffffffL & l) != 0L) {
-                                jjCheckNAddStates(15, 17);
+                                jjCheckNAddStates(17, 19);
                             }
                             break;
                         case 8:
                             if (curChar == 92) {
-                                jjAddStates(20, 21);
+                                jjAddStates(28, 29);
                             }
                             break;
                         case 9:
                             if ((0x14404410144044L & l) != 0L) {
-                                jjCheckNAddStates(15, 17);
+                                jjCheckNAddStates(17, 19);
                             }
                             break;
                         case 10:
@@ -623,22 +638,22 @@ public class JSONParserTokenManager implements JSONParserConstants {
                             break;
                         case 14:
                             if ((0x7e0000007eL & l) != 0L) {
-                                jjCheckNAddStates(15, 17);
+                                jjCheckNAddStates(17, 19);
                             }
                             break;
                         case 16:
                             if ((0xffffffffefffffffL & l) != 0L) {
-                                jjCheckNAddStates(0, 2);
+                                jjCheckNAddStates(14, 16);
                             }
                             break;
                         case 18:
                             if (curChar == 92) {
-                                jjAddStates(18, 19);
+                                jjAddStates(26, 27);
                             }
                             break;
                         case 19:
                             if ((0x14404410144044L & l) != 0L) {
-                                jjCheckNAddStates(0, 2);
+                                jjCheckNAddStates(14, 16);
                             }
                             break;
                         case 20:
@@ -663,20 +678,25 @@ public class JSONParserTokenManager implements JSONParserConstants {
                             break;
                         case 24:
                             if ((0x7e0000007eL & l) != 0L) {
-                                jjCheckNAddStates(0, 2);
+                                jjCheckNAddStates(14, 16);
                             }
                             break;
                         case 28: {
-                            jjAddStates(24, 25);
+                            jjAddStates(32, 33);
                         }
                             break;
                         case 31: {
-                            jjAddStates(26, 27);
+                            jjAddStates(34, 35);
                         }
                             break;
                         case 41:
                             if ((0x2000000020L & l) != 0L) {
-                                jjAddStates(28, 29);
+                                jjAddStates(36, 37);
+                            }
+                            break;
+                        case 44:
+                            if ((0x2000000020L & l) != 0L) {
+                                jjAddStates(38, 39);
                             }
                             break;
                         default:
@@ -691,31 +711,31 @@ public class JSONParserTokenManager implements JSONParserConstants {
                 long l2 = 1L << (curChar & 077);
                 do {
                     switch (jjstateSet[--i]) {
-                        case 49:
+                        case 52:
                         case 16:
                             if (jjCanMove_0(hiByte, i1, i2, l1, l2)) {
-                                jjCheckNAddStates(0, 2);
+                                jjCheckNAddStates(14, 16);
                             }
                             break;
-                        case 48:
+                        case 51:
                         case 6:
                             if (jjCanMove_0(hiByte, i1, i2, l1, l2)) {
-                                jjCheckNAddStates(15, 17);
+                                jjCheckNAddStates(17, 19);
                             }
                             break;
                         case 1:
                             if (jjCanMove_0(hiByte, i1, i2, l1, l2)) {
-                                jjAddStates(22, 23);
+                                jjAddStates(30, 31);
                             }
                             break;
                         case 28:
                             if (jjCanMove_0(hiByte, i1, i2, l1, l2)) {
-                                jjAddStates(24, 25);
+                                jjAddStates(32, 33);
                             }
                             break;
                         case 31:
                             if (jjCanMove_0(hiByte, i1, i2, l1, l2)) {
-                                jjAddStates(26, 27);
+                                jjAddStates(34, 35);
                             }
                             break;
                         default:
@@ -733,7 +753,7 @@ public class JSONParserTokenManager implements JSONParserConstants {
                 kind = 0x7fffffff;
             }
             ++curPos;
-            if ((i = jjnewStateCnt) == (startsAt = 48 - (jjnewStateCnt = startsAt))) {
+            if ((i = jjnewStateCnt) == (startsAt = 51 - (jjnewStateCnt = startsAt))) {
                 return curPos;
             }
             try {
@@ -772,8 +792,8 @@ public class JSONParserTokenManager implements JSONParserConstants {
         return t;
     }
 
-    static final int[] jjnextStates = { 16, 17, 18, 35, 36, 38, 44, 27, 30, 37, 45, 39, 35, 38, 39, 6, 7, 8, 19, 20, 9,
-            10, 1, 2, 28, 29, 31, 33, 42, 43, };
+    static final int[] jjnextStates = { 35, 36, 38, 47, 27, 30, 37, 48, 39, 44, 35, 38, 39, 44, 16, 17, 18, 6, 7, 8, 38,
+            39, 44, 48, 39, 44, 19, 20, 9, 10, 1, 2, 28, 29, 31, 33, 42, 43, 45, 46, };
 
     private static final boolean jjCanMove_0(int hiByte, int i1, int i2, long l1, long l2) {
         switch (hiByte) {
@@ -924,7 +944,7 @@ public class JSONParserTokenManager implements JSONParserConstants {
     private void ReInitRounds() {
         int i;
         jjround = 0x80000001;
-        for (i = 48; i-- > 0;) {
+        for (i = 51; i-- > 0;) {
             jjrounds[i] = 0x80000000;
         }
     }
@@ -958,8 +978,8 @@ public class JSONParserTokenManager implements JSONParserConstants {
     static final long[] jjtoMore = { 0x0L, };
     protected SimpleCharStream input_stream;
 
-    private final int[] jjrounds = new int[48];
-    private final int[] jjstateSet = new int[2 * 48];
+    private final int[] jjrounds = new int[51];
+    private final int[] jjstateSet = new int[2 * 51];
     private final StringBuilder jjimage = new StringBuilder();
     private StringBuilder image = jjimage;
     private int jjimageLen;

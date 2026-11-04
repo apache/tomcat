@@ -72,16 +72,14 @@ public class TestReflectionUtil {
         ExpressionFactory factory = ExpressionFactory.newInstance();
         ELContext context = new ELContextImpl();
 
-        MethodExpression methodExpression = factory.createMethodExpression(context, "${\"1\".format(2)}", String.class, new Class<?>[] {});
+        MethodExpression methodExpression = factory.createMethodExpression(context, "${\"1\".format(2)}", String.class,
+                new Class<?>[] {});
 
-        try {
-            methodExpression.invoke(context, null);
-        } catch (IllegalArgumentException iae) {
-            // Ensure correct IllegalArgumentException is thrown
-            String msg = iae.getMessage();
-            Assert.assertTrue(msg, msg.contains("[format]"));
-            return;
-        }
-        Assert.fail("No exception");
+        // The static method format(String,Object...) must be resolvable and
+        // invocable when called on an instance. The single argument is the
+        // format string. No varargs elements are provided which is valid.
+        Object result = methodExpression.invoke(context, null);
+
+        Assert.assertEquals("2", result);
     }
 }

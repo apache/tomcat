@@ -23,10 +23,8 @@ import java.util.Map;
  * server. There will be a delay between calling a setter and the setting taking effect at the client. When a setter is
  * called, the new value is added to the set of pending settings. Once the ACK is received, the new value is moved to
  * the current settings. While waiting for the ACK, the getters will return the most lenient / generous / relaxed of the
- * current setting and the pending setting. Values passed to the setters are validated by the base class, except for
- * {@code MAX_CONCURRENT_STREAMS} and {@code MAX_HEADER_LIST_SIZE}. If an invalid value is used the client will respond
- * (almost certainly by closing the connection) as defined in the HTTP/2
- * specification.
+ * current setting and the pending setting. Values passed to the setters are validated by the base class. If an invalid
+ * value is used an {@link IllegalArgumentException} is thrown.
  */
 class ConnectionSettingsLocal extends ConnectionSettingsBase<IllegalArgumentException> {
 

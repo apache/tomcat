@@ -53,8 +53,8 @@ public class TestGroupChannelTlsFFM extends GroupChannelTlsTestBase {
 
     @After
     public void teardown() throws Exception {
-        if (explicit) {
-            // Models OpenSSLLifecycleListener. Stop FFM.
+        if (explicit && OpenSSLStatus.isAvailable()) {
+            // Models OpenSSLLifecycleListener. Stop FFM if it was started.
             openSSLLibraryDestroy();
         }
     }

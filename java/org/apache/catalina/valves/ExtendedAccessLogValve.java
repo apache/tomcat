@@ -32,6 +32,7 @@ import java.util.TimeZone;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpSession;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.ServerInfo;
@@ -132,7 +133,9 @@ public class ExtendedAccessLogValve extends AccessLogValve {
     @Override
     protected synchronized void open() {
         super.open();
-        if (currentLogFile.length() == 0) {
+        // The base class tolerates a failed open and leaves the writer null
+        // in which case there is nothing to write the header to
+        if (writer != null && currentLogFile.length() == 0) {
             writer.println("#Fields: " + pattern);
             writer.println("#Version: 2.0");
             writer.println("#Software: " + ServerInfo.getServerInfo());
@@ -260,7 +263,11 @@ public class ExtendedAccessLogValve extends AccessLogValve {
 
         @Override
         public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
-            wrap(request.getContext().getServletContext().getAttribute(attribute), buf);
+            // The request may not have mapped to a context, for example when a
+            // valve attached to a Host or Engine logs requests that matched no
+            // context
+            Context context = request.getContext();
+            wrap(context == null ? null : context.getServletContext().getAttribute(attribute), buf);
         }
     }
 

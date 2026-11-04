@@ -583,7 +583,7 @@ public final class Bootstrap {
         while (matcher.find()) {
             String path = value.substring(matcher.start(), matcher.end());
 
-            path = path.trim();
+            path = path.strip();
             if (path.isEmpty()) {
                 continue;
             }
@@ -593,7 +593,7 @@ public final class Bootstrap {
 
             if (first == '"' && last == '"' && path.length() > 1) {
                 path = path.substring(1, path.length() - 1);
-                path = path.trim();
+                path = path.strip();
                 if (path.isEmpty()) {
                     continue;
                 }

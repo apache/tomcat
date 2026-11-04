@@ -184,7 +184,8 @@ public final class CustomObjectInputStream extends ObjectInputStream {
             String msg = sm.getString("customObjectInputStream.nomatch", name, allowedClassNameFilter);
             if (doLog) {
                 log.warn(msg);
-            } else if (log.isDebugEnabled()) {
+            } else if (log != null && log.isDebugEnabled()) {
+                // A null log is permitted by the constructor when warnOnFailure is false
                 log.debug(msg);
             }
             throw new InvalidClassException(msg);

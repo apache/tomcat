@@ -17,7 +17,6 @@
 package org.apache.catalina.tribes.group;
 
 import java.io.Serializable;
-import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -105,9 +104,8 @@ public class GroupChannelTlsTestBase {
         channel.setPskDigest(digest);
         ReceiverBase receiver = (ReceiverBase) channel.getChannelReceiver();
         receiver.setHost("localhost");
-        try (ServerSocket socket = new ServerSocket(0)) {
-            receiver.setSecurePort(socket.getLocalPort());
-        }
+        receiver.setPort(0);
+        receiver.setSecurePort(0);
         return channel;
     }
 }

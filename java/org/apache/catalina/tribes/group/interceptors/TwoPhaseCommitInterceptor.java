@@ -34,8 +34,16 @@ import org.apache.juli.logging.LogFactory;
 
 /**
  * Two-phase commit interceptor. The sender transmits a confirmation message after each message. The receiver stores
- * each message and only passes it on when the matching confirmation message is received. There is no retransmission,
- * so a message whose confirmation is lost, or that arrives out of order, is dropped after the expiration time.
+ * each message and only passes it on when the matching confirmation message is received. A confirmation that arrives
+ * before its original message is remembered for the expiration time, so the original is still released when it
+ * arrives late. There is no retransmission, so a message whose confirmation is lost is dropped after the expiration
+ * time. <br>
+ * <b>Configuration Options</b><br>
+ * When combined with the <code>FragmentationInterceptor</code>, this interceptor must be declared before it in the
+ * channel configuration, so that it confirms complete messages and never individual fragments. All fragments of a
+ * message share its unique id; if this interceptor is declared below the fragmentation interceptor, it sees the
+ * fragments as separate messages with equal ids, keeps only one of them in its pending map, and the large message is
+ * never delivered.
  */
 public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
 
@@ -61,6 +69,20 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
     protected final Map<UniqueId,MapEntry> messages = new ConcurrentHashMap<>();
 
     /**
+     * Map of confirmations that were received before the original message they confirm,
+     * mapped to the time of their arrival. An original message that arrives while its
+     * confirmation is pending here is released immediately instead of waiting for a
+     * confirmation that has already been consumed.
+     */
+    protected final Map<UniqueId,Long> earlyConfirmations = new ConcurrentHashMap<>();
+
+    /**
+     * Lock used to hand over messages and confirmations that arrive concurrently, so that
+     * the check of one against the other cannot miss an insertion of the other.
+     */
+    private final Object deliveryLock = new Object();
+
+    /**
      * Message expiration time in milliseconds.
      */
     protected long expire = 1000 * 60; // one minute expiration
@@ -78,7 +100,11 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
         // msg.setOptions(msg.getOptions() & (~getOptionFlag())
         // and just send one message
         if (okToProcess(msg.getOptions())) {
-            super.sendMessage(destination, msg, null);
+            // The payload carries the application error handler. It applies to the real
+            // message, so forward it with the original. The confirmation is an internal
+            // message with a random id the application cannot correlate, so it goes without
+            // a payload, which also keeps the handler from being notified twice per send
+            super.sendMessage(destination, msg, payload);
             ChannelMessage confirmation;
             if (deepclone) {
                 confirmation = (ChannelMessage) msg.deepclone();
@@ -90,7 +116,7 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
             confirmation.getMessage().append(START_DATA, 0, START_DATA.length);
             confirmation.getMessage().append(msg.getUniqueId(), 0, msg.getUniqueId().length);
             confirmation.getMessage().append(END_DATA, 0, END_DATA.length);
-            super.sendMessage(destination, confirmation, payload);
+            super.sendMessage(destination, confirmation, null);
         } else {
             // turn off two phase commit
             // this won't work if the interceptor has 0 as a flag
@@ -109,7 +135,15 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
                             END_DATA, 0, END_DATA.length)) {
                 UniqueId id =
                         new UniqueId(msg.getMessage().getBytesDirect(), START_DATA.length, msg.getUniqueId().length);
-                MapEntry original = messages.remove(id);
+                MapEntry original = null;
+                synchronized (deliveryLock) {
+                    original = messages.remove(id);
+                    if (original == null) {
+                        // The confirmation overtook its original message. Remember the
+                        // confirmation, so the original is released as soon as it arrives
+                        earlyConfirmations.put(id, Long.valueOf(System.currentTimeMillis()));
+                    }
+                }
                 if (original != null) {
                     super.messageReceived(original.msg);
                 } else {
@@ -119,7 +153,16 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
             } else {
                 UniqueId id = new UniqueId(msg.getUniqueId());
                 MapEntry entry = new MapEntry((ChannelMessage) msg.deepclone(), id, System.currentTimeMillis());
-                messages.put(id, entry);
+                MapEntry release = null;
+                synchronized (deliveryLock) {
+                    messages.put(id, entry);
+                    if (earlyConfirmations.remove(id) != null) {
+                        release = messages.remove(id);
+                    }
+                }
+                if (release != null) {
+                    super.messageReceived(release.msg);
+                }
             }
         } else {
             super.messageReceived(msg);
@@ -169,6 +212,15 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
                 if (value.expired(now, expire)) {
                     log.info(sm.getString("twoPhaseCommitInterceptor.expiredMessage", value.id));
                     iter.remove();
+                }
+            }
+            Iterator<Map.Entry<UniqueId,Long>> confirmations = earlyConfirmations.entrySet().iterator();
+            while (confirmations.hasNext()) {
+                Map.Entry<UniqueId,Long> entry = confirmations.next();
+                if (now - entry.getValue().longValue() > expire) {
+                    log.info(sm.getString("twoPhaseCommitInterceptor.expiredConfirmation",
+                            Arrays.toString(entry.getKey().getBytes())));
+                    confirmations.remove();
                 }
             }
         } catch (Exception e) {

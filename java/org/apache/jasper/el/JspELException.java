@@ -35,6 +35,6 @@ public class JspELException extends ELException {
      * @param e the underlying ELException
      */
     public JspELException(String mark, ELException e) {
-        super(mark + " " + e.getMessage(), e.getCause());
+        super(mark + " " + e.getMessage(), e);
     }
 }

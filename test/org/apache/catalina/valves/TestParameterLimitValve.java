@@ -22,6 +22,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
@@ -579,6 +580,120 @@ public class TestParameterLimitValve extends TomcatBaseTest {
     @Test
     public void testMaxParameterCountLimitExceeded03_01_01_01() throws Exception {
         doTestMaxParameterCountLimitExceeded(3, 1, 1, 1, true);
+    }
+
+
+    @Test
+    public void testOverlappingPatternsFirstConfiguredWins() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
+
+        ParameterLimitValve parameterLimitValve = new ParameterLimitValve();
+        ctx.getPipeline().addValve(parameterLimitValve);
+        // The general pattern is configured first, so its limit applies even
+        // to URIs that also match the more specific pattern configured after
+        parameterLimitValve.setUrlPatternLimits(
+                "/.*=100" + CRLF + "/special/.*=2");
+
+        Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
+        ctx.addServletMapping("/special/endpoint", "snoop");
+
+        tomcat.start();
+
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/special/endpoint?param1=value1&param2=value2&param3=value3",
+            new ByteChunk(), null);
+        Assert.assertEquals(200, rc);
+    }
+
+    @Test
+    public void testOverlappingPatternsSpecificConfiguredFirstApplies() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
+
+        ParameterLimitValve parameterLimitValve = new ParameterLimitValve();
+        ctx.getPipeline().addValve(parameterLimitValve);
+        // The specific pattern is configured first, so its limit applies to
+        // matching URIs while the general pattern applies to the others
+        parameterLimitValve.setUrlPatternLimits(
+                "/special/.*=2" + CRLF + "/.*=100");
+
+        Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
+        ctx.addServletMapping("/special/endpoint", "snoop");
+        ctx.addServletMapping("/other/endpoint", "snoop");
+
+        tomcat.start();
+
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/special/endpoint?param1=value1&param2=value2&param3=value3",
+            new ByteChunk(), null);
+        Assert.assertEquals(400, rc);
+
+        rc = getUrl("http://localhost:" + getPort() +
+                "/other/endpoint?param1=value1&param2=value2&param3=value3",
+            new ByteChunk(), null);
+        Assert.assertEquals(200, rc);
+    }
+
+    @Test
+    public void testRepeatedPatternReplacesLimitAtOriginalPosition() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
+
+        ParameterLimitValve parameterLimitValve = new ParameterLimitValve();
+        ctx.getPipeline().addValve(parameterLimitValve);
+        parameterLimitValve.setUrlPatternLimits("/special/.*=100" + CRLF + "/.*=100");
+        // Appending the same pattern must replace its limit, not add a shadowed entry
+        parameterLimitValve.setUrlPatternLimits(new BufferedReader(new StringReader("/special/.*=2")));
+
+        Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
+        ctx.addServletMapping("/special/endpoint", "snoop");
+
+        tomcat.start();
+
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/special/endpoint?param1=value1&param2=value2&param3=value3",
+            new ByteChunk(), null);
+        Assert.assertEquals(400, rc);
+    }
+
+    @Test
+    public void testInvalidConfigLeavesLimitsUnchanged() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
+
+        ParameterLimitValve parameterLimitValve = new ParameterLimitValve();
+        ctx.getPipeline().addValve(parameterLimitValve);
+        parameterLimitValve.setUrlPatternLimits("/special/.*=2");
+
+        // An invalid configuration update must fail and must leave the
+        // previously configured limits in effect. Previously, the limits were
+        // cleared first and the lines parsed before the failure remained.
+        try {
+            parameterLimitValve.setUrlPatternLimits(
+                    "/other/.*=5" + CRLF + "invalid-line-without-equals");
+            Assert.fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException expected) {
+            // Expected
+        }
+
+        Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
+        ctx.addServletMapping("/special/endpoint", "snoop");
+
+        tomcat.start();
+
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/special/endpoint?param1=value1&param2=value2&param3=value3",
+            new ByteChunk(), null);
+        Assert.assertEquals(400, rc);
+
+        rc = getUrl("http://localhost:" + getPort() + "/special/endpoint?param1=value1&param2=value2",
+            new ByteChunk(), null);
+        Assert.assertEquals(200, rc);
     }
 
 

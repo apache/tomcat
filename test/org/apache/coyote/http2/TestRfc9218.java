@@ -25,52 +25,43 @@ import org.junit.Test;
 public class TestRfc9218 extends Http2TestBase {
 
     @Test
-    public void testPriority() throws Exception {
-        http2Connect();
+    public void testBackLogRoundingRemainderAllocated() throws Exception {
+        blockStreams();
+
+        // Make all three streams incremental with the same urgency so the increment is shared proportionally
+        sendPriorityUpdate(17, 3, true);
+        sendPriorityUpdate(19, 3, true);
+        sendPriorityUpdate(21, 3, true);
 
         /*
-         * This test uses small window updates and data frames that will trigger the excessive overhead protection so
-         * disable it.
+         * Add 10 bytes to the connection window. The proportional shares are 3.04, 3.47 and 3.47 bytes. Rounding each
+         * down allocates 9 bytes. The remaining byte is part of the window the client made available so it must be
+         * allocated rather than lost. It goes to 17 since that is first in priority order.
          */
-        http2Protocol.setOverheadWindowUpdateThreshold(0);
-        http2Protocol.setOverheadDataThreshold(0);
-
-        // Default connection window size is 64k - 1. Initial request will have used 8k (56k -1). Increase it to 57k.
-        sendWindowUpdate(0, 1 + 1024);
-
-        // Consume 56k of the connection window
-        for (int i = 3; i < 17; i += 2) {
-            sendSimpleGetRequest(i);
-            readSimpleGetResponse();
-        }
+        sendWindowUpdate(0, 10);
+        parser.readFrame();
+        parser.readFrame();
+        parser.readFrame();
 
         String trace = output.getTrace();
         System.out.println(trace);
+        Assert.assertTrue(trace, trace.contains("17-Body-4\n"));
+        trace = trace.replace("17-Body-4\n", "");
+        Assert.assertTrue(trace, trace.contains("19-Body-3\n"));
+        trace = trace.replace("19-Body-3\n", "");
+        Assert.assertTrue(trace, trace.contains("21-Body-3\n"));
+        trace = trace.replace("21-Body-3\n", "");
+        Assert.assertEquals(0, trace.length());
         output.clearTrace();
+    }
 
-        // At this point the connection window should be 1k
 
-        // Process a request on stream 17. This should consume the connection window.
-        sendSimpleGetRequest(17);
-        // 17-headers, 17-1k-body
-        parser.readFrame();
-        parser.readFrame();
-        trace = output.getTrace();
-        System.out.println(trace);
-        output.clearTrace();
+    @Test
+    public void testPriority() throws Exception {
+        blockStreams();
 
-        // Send additional requests. Connection window is empty so only headers will be returned.
-        sendSimpleGetRequest(19);
-        sendSimpleGetRequest(21);
+        String trace;
 
-        // 19-headers, 21-headers
-        parser.readFrame();
-        parser.readFrame();
-        trace = output.getTrace();
-        System.out.println(trace);
-        output.clearTrace();
-
-        // At this point 17, 19 and 21 are all blocked because the connection window is zero.
         // 17 - 7k body left
         // 19 - 8k body left
         // 21 - 8k body left
@@ -117,8 +108,8 @@ public class TestRfc9218 extends Http2TestBase {
 
         trace = output.getTrace();
         System.out.println(trace);
-        Assert.assertTrue(trace.contains("17-Body-877\n"));
-        trace = trace.replace("17-Body-877\n", "");
+        Assert.assertTrue(trace.contains("17-Body-878\n"));
+        trace = trace.replace("17-Body-878\n", "");
         Assert.assertTrue(trace.contains("19-Body-1170\n"));
         trace = trace.replace("19-Body-1170\n", "");
         Assert.assertTrue(trace.contains("21-Body-1024\n"));
@@ -126,34 +117,24 @@ public class TestRfc9218 extends Http2TestBase {
         Assert.assertEquals(0, trace.length());
         output.clearTrace();
 
-        // 1 byte unallocated in connection window
-        // 17 - 5267 body left
+        // 17 - 5266 body left
         // 19 - 7022 body left
         // 21 - 6144 body left
 
-        // Add 1 byte to the connection window. Due to rounding up, each stream should get 1 byte.
+        // Add 1 byte to the connection window. Rounding up means stream 17 takes the whole allocation. The other
+        // streams remain in the back log since allocating to them as well would exceed the window the client made
+        // available.
         sendWindowUpdate(0, 1);
-        parser.readFrame();
-        System.out.println(output.getTrace());
-        parser.readFrame();
-        System.out.println(output.getTrace());
         parser.readFrame();
 
         trace = output.getTrace();
         System.out.println(trace);
-        Assert.assertTrue(trace.contains("17-Body-1\n"));
-        trace = trace.replace("17-Body-1\n", "");
-        Assert.assertTrue(trace.contains("19-Body-1\n"));
-        trace = trace.replace("19-Body-1\n", "");
-        Assert.assertTrue(trace.contains("21-Body-1\n"));
-        trace = trace.replace("21-Body-1\n", "");
-        Assert.assertEquals(0, trace.length());
+        Assert.assertEquals("17-Body-1\n", trace);
         output.clearTrace();
 
-        // 1 byte over allocated in connection window
-        // 17 - 5266 body left
-        // 19 - 7021 body left
-        // 21 - 6143 body left
+        // 17 - 5265 body left
+        // 19 - 7022 body left
+        // 21 - 6144 body left
 
         // BZ 69614 - invalid priority update frames should be ignored
         sendInvalidPriorityUpdate(17);
@@ -162,8 +143,8 @@ public class TestRfc9218 extends Http2TestBase {
         sendPriorityUpdate(17, 2, true);
 
         /*
-         * Add 8k to the connection window. Should clear the connection window over allocation and fully allocate 17
-         * with the remainder split proportionally between 19 and 21.
+         * Add 8k to the connection window. Should fully allocate 17 with the remainder split proportionally between 19
+         * and 21.
          */
         sendWindowUpdate(0, 1024 * 8);
         // Use try/catch as third read has been failing on some tests runs
@@ -179,18 +160,18 @@ public class TestRfc9218 extends Http2TestBase {
 
         trace = output.getTrace();
         System.out.println(trace);
-        Assert.assertTrue(trace.contains("17-Body-5266\n"));
-        trace = trace.replace("17-Body-5266\n", "");
+        Assert.assertTrue(trace.contains("17-Body-5265\n"));
+        trace = trace.replace("17-Body-5265\n", "");
         Assert.assertTrue(trace.contains("17-EndOfStream\n"));
         trace = trace.replace("17-EndOfStream\n", "");
-        Assert.assertTrue(trace.contains("19-Body-1560\n"));
-        trace = trace.replace("19-Body-1560\n", "");
+        Assert.assertTrue(trace.contains("19-Body-1562\n"));
+        trace = trace.replace("19-Body-1562\n", "");
         Assert.assertTrue(trace.contains("21-Body-1365\n"));
         trace = trace.replace("21-Body-1365\n", "");
         Assert.assertEquals(0, trace.length());
 
-        // 19 - 5641 body left
-        // 21 - 4778 body left
+        // 19 - 5460 body left
+        // 21 - 4779 body left
 
         // Add 16k to the connection window. Should fully allocate 19 and 21.
         sendWindowUpdate(0, 1024 * 16);
@@ -204,6 +185,61 @@ public class TestRfc9218 extends Http2TestBase {
         }
     }
 
+
+    /*
+     * Opens the connection and leaves streams 17, 19 and 21 blocked because the connection window is zero.
+     *
+     * 17 - 7k body left
+     * 19 - 8k body left
+     * 21 - 8k body left
+     */
+    private void blockStreams() throws Exception {
+        http2Connect();
+
+        /*
+         * This test uses small window updates and data frames that will trigger the excessive overhead protection so
+         * disable it.
+         */
+        http2Protocol.setOverheadWindowUpdateThreshold(0);
+        http2Protocol.setOverheadDataThreshold(0);
+
+        // Default connection window size is 64k - 1. Initial request will have used 8k (56k -1). Increase it to 57k.
+        sendWindowUpdate(0, 1 + 1024);
+
+        // Consume 56k of the connection window
+        for (int i = 3; i < 17; i += 2) {
+            sendSimpleGetRequest(i);
+            readSimpleGetResponse();
+        }
+
+        String trace = output.getTrace();
+        System.out.println(trace);
+        output.clearTrace();
+
+        // At this point the connection window should be 1k
+
+        // Process a request on stream 17. This should consume the connection window.
+        sendSimpleGetRequest(17);
+        // 17-headers, 17-1k-body
+        parser.readFrame();
+        parser.readFrame();
+        trace = output.getTrace();
+        System.out.println(trace);
+        output.clearTrace();
+
+        // Send additional requests. Connection window is empty so only headers will be returned.
+        sendSimpleGetRequest(19);
+        sendSimpleGetRequest(21);
+
+        // 19-headers, 21-headers
+        parser.readFrame();
+        parser.readFrame();
+        trace = output.getTrace();
+        System.out.println(trace);
+        output.clearTrace();
+
+        // At this point 17, 19 and 21 are all blocked because the connection window is zero.
+    }
 
     private void sendInvalidPriorityUpdate(int streamId) throws IOException {
         byte[] payload = "u=1:i".getBytes(StandardCharsets.US_ASCII);

@@ -66,6 +66,8 @@ public class SSLValve extends ValveBase {
 
     private static final Log log = LogFactory.getLog(SSLValve.class);
 
+    private static final String CERTIFICATE_BEGIN = "-----BEGIN CERTIFICATE-----";
+
     private String sslClientCertHeader = "ssl_client_cert";
     private String sslClientEscapedCertHeader = "ssl_client_escaped_cert";
     private String sslSecureProtocolHeader = "ssl_secure_protocol";
@@ -219,25 +221,34 @@ public class SSLValve extends ValveBase {
          * into ' ' - nginx converts the '\n' into multiple ' ' - nginx ssl_client_escaped_cert uses "uri component"
          * escaping, keeping only ALPHA, DIGIT, "-", ".", "_", "~"
          *
-         * The code assumes that the trimmed header value starts with '-----BEGIN CERTIFICATE-----' and ends with
-         * '-----END CERTIFICATE-----'.
+         * A header value that, once trimmed, does not start with '-----BEGIN CERTIFICATE-----' is not a PEM encoded
+         * certificate and is ignored.
          *
          * Note: As long as the BEGIN marker and the rest of the content are on separate lines, the CertificateFactory
          * is tolerant of any additional whitespace.
          */
-        String headerValue;
+        String headerValue = null;
+        String certHeaderName = sslClientCertHeader;
         String headerEscapedValue = mygetHeader(request, sslClientEscapedCertHeader);
         if (headerEscapedValue != null) {
-            headerValue = UDecoder.URLDecode(headerEscapedValue, null);
-        } else {
+            try {
+                headerValue = UDecoder.URLDecode(headerEscapedValue, null);
+                certHeaderName = sslClientEscapedCertHeader;
+            } catch (IllegalArgumentException e) {
+                // Invalid percent-encoding. Treat the header as absent and fall back to the unescaped header.
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("sslValve.invalidEscapedCertHeader", sslClientEscapedCertHeader), e);
+                }
+            }
+        }
+        if (headerValue == null) {
             headerValue = mygetHeader(request, sslClientCertHeader);
         }
         if (headerValue != null) {
             headerValue = headerValue.trim();
-            if (headerValue.length() > 27) {
-                String body = headerValue.substring(27);
-                String header = "-----BEGIN CERTIFICATE-----\n";
-                String strcerts = header.concat(body);
+            if (headerValue.startsWith(CERTIFICATE_BEGIN)) {
+                String body = headerValue.substring(CERTIFICATE_BEGIN.length());
+                String strcerts = CERTIFICATE_BEGIN.concat("\n").concat(body);
                 ByteArrayInputStream bais = new ByteArrayInputStream(strcerts.getBytes(StandardCharsets.ISO_8859_1));
                 X509Certificate[] jsseCerts = null;
                 String providerName = (String) request.getConnector().getProperty("clientCertProvider");
@@ -258,6 +269,8 @@ public class SSLValve extends ValveBase {
                 }
                 // If parsing fails, remove certificates
                 request.setAttribute(Globals.CERTIFICATES_ATTR, jsseCerts);
+            } else if (log.isDebugEnabled()) {
+                log.debug(sm.getString("sslValve.invalidCertHeader", certHeaderName));
             }
         }
         headerValue = mygetHeader(request, sslSecureProtocolHeader);

@@ -18,7 +18,11 @@ package org.apache.tomcat.util.modeler;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
+import javax.management.AttributeChangeNotification;
 import javax.management.ListenerNotFoundException;
 import javax.management.MBeanNotificationInfo;
 import javax.management.Notification;
@@ -70,21 +74,33 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
 
         synchronized (entries) {
 
-            // Optimization to coalesce attribute name filters
-            if (filter instanceof BaseAttributeFilter newFilter) {
+            /*
+             * Optimization to coalesce attribute name filters. The filters are never modified. A filter may be shared
+             * with other registrations or broadcasters so the entry is given a new filter instead. Only plain
+             * BaseAttributeFilter instances are coalesced. A sub-class may change how notifications are filtered, which
+             * a plain filter would not preserve.
+             */
+            if (isPlainAttributeFilter(filter)) {
+                BaseAttributeFilter newFilter = (BaseAttributeFilter) filter;
                 for (BaseNotificationBroadcasterEntry item : entries) {
-                    if ((item.listener == listener) && (item.filter instanceof BaseAttributeFilter oldFilter) &&
+                    if ((item.listener == listener) && isPlainAttributeFilter(item.filter) &&
                             (item.handback == handback)) {
                         String[] newNames = newFilter.getNames();
-                        String[] oldNames = oldFilter.getNames();
+                        String[] oldNames = ((BaseAttributeFilter) item.filter).getNames();
                         if (newNames.length == 0) {
-                            oldFilter.clear();
-                        } else {
                             if (oldNames.length != 0) {
-                                for (String newName : newNames) {
-                                    oldFilter.addAttribute(newName);
-                                }
+                                // Now accepts all attribute names
+                                item.filter = new BaseAttributeFilter(null);
                             }
+                        } else if (oldNames.length != 0) {
+                            BaseAttributeFilter combined = new BaseAttributeFilter(null);
+                            for (String oldName : oldNames) {
+                                combined.addAttribute(oldName);
+                            }
+                            for (String newName : newNames) {
+                                combined.addAttribute(newName);
+                            }
+                            item.filter = combined;
                         }
                         return;
                     }
@@ -125,6 +141,72 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
 
 
     /**
+     * Remove an attribute change notification event listener for a specific attribute name from this MBean, or all
+     * attribute change registrations for the listener if the name is <code>null</code>. For a specific name, other
+     * registrations of the same listener are left untouched. If a coalesced filter ends up accepting no explicit
+     * names, the corresponding entry is removed entirely rather than being turned into an accept-all filter. A
+     * registration that accepts all attribute names (a filter with no explicit names, created when the listener was
+     * added with a <code>null</code> attribute name) can only be removed by passing a <code>null</code> name here.
+     *
+     * @param listener The listener to be removed
+     * @param name     The attribute name for which the registration should be removed, or <code>null</code> to remove
+     *                     all attribute change registrations for the listener
+     */
+    public void removeAttributeNotificationListener(NotificationListener listener, String name) {
+
+        synchronized (entries) {
+            Iterator<BaseNotificationBroadcasterEntry> iterator = entries.iterator();
+            while (iterator.hasNext()) {
+                BaseNotificationBroadcasterEntry item = iterator.next();
+                if (item.listener != listener) {
+                    continue;
+                }
+                if (name == null) {
+                    iterator.remove();
+                } else if (item.filter instanceof BaseAttributeFilter filter) {
+                    String[] names = filter.getNames();
+                    if (!isPlainAttributeFilter(filter)) {
+                        if (names.length > 0) {
+                            // Keep the subclass's filtering behavior and its shared state intact. The subclass may
+                            // accept names beyond those reported by getNames(), so exclude only the requested name
+                            // from this entry rather than replacing the filter or removing the entry.
+                            item.excludeAttribute(name);
+                        }
+                    } else if (names.length == 1 && name.equals(names[0])) {
+                        iterator.remove();
+                    } else if (names.length > 1) {
+                        // The filter may be shared with other registrations or broadcasters. Replace this entry's
+                        // filter rather than changing the shared filter.
+                        BaseAttributeFilter replacement = new BaseAttributeFilter(null);
+                        boolean removed = false;
+                        for (String attributeName : names) {
+                            if (name.equals(attributeName)) {
+                                removed = true;
+                            } else {
+                                replacement.addAttribute(attributeName);
+                            }
+                        }
+                        if (removed) {
+                            item.filter = replacement;
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+
+    /**
+     * Is the filter a plain <code>BaseAttributeFilter</code> rather than an instance of a sub-class, which may change
+     * how notifications are filtered?
+     */
+    private static boolean isPlainAttributeFilter(NotificationFilter filter) {
+        return filter != null && filter.getClass() == BaseAttributeFilter.class;
+    }
+
+
+    /**
      * Send the specified notification to all interested listeners.
      *
      * @param notification The notification to be sent
@@ -133,7 +215,7 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
 
         synchronized (entries) {
             for (BaseNotificationBroadcasterEntry item : entries) {
-                if ((item.filter != null) && (!item.filter.isNotificationEnabled(notification))) {
+                if (!item.isNotificationEnabled(notification)) {
                     continue;
                 }
                 item.listener.handleNotification(notification, item.handback);
@@ -162,5 +244,23 @@ class BaseNotificationBroadcasterEntry {
     public Object handback;
 
     public NotificationListener listener;
+
+    // Accessed only while holding the broadcaster's entries lock.
+    private Set<String> excludedAttributes;
+
+    void excludeAttribute(String name) {
+        if (excludedAttributes == null) {
+            excludedAttributes = new HashSet<>();
+        }
+        excludedAttributes.add(name);
+    }
+
+    boolean isNotificationEnabled(Notification notification) {
+        if (excludedAttributes != null && notification instanceof AttributeChangeNotification acn &&
+                excludedAttributes.contains(acn.getAttributeName())) {
+            return false;
+        }
+        return filter == null || filter.isNotificationEnabled(notification);
+    }
 
 }

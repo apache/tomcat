@@ -18,6 +18,7 @@ package org.apache.tomcat.util.xreflection;
 
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -116,8 +117,8 @@ public final class ObjectReflectionPropertyInspector {
      *
      * @param baseClasses The classes to process
      * @param packageName The package name for generated code
-     * @param location The output directory (the package sub-directory derived from <code>packageName</code> must
-     *                    already exist)
+     * @param location The output directory (the package sub-directory derived from <code>packageName</code> is
+     *                    created if it does not exist)
      * @param className The class name for generated code
      * @throws Exception if an error occurs
      */
@@ -125,6 +126,9 @@ public final class ObjectReflectionPropertyInspector {
             String className) throws Exception {
         String packageDirectory = packageName.replace('.', '/');
         File sourceFileLocation = new File(location, packageDirectory);
+        if (!sourceFileLocation.exists() && !sourceFileLocation.mkdirs()) {
+            throw new IOException("Unable to create directory [" + sourceFileLocation.getAbsolutePath() + "]");
+        }
         ReflectionLessCodeGenerator.generateCode(sourceFileLocation, className, packageName, baseClasses);
     }
 

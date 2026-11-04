@@ -285,8 +285,8 @@ public final class XMLFormatPreserver {
         }
         String freshText = fresh.getText();
         String candidateText = candidate.getText();
-        if (freshText != null && !freshText.trim().isEmpty()
-                && Objects.equals(freshText.trim(), candidateText == null ? null : candidateText.trim())) {
+        if (freshText != null && !freshText.strip().isEmpty()
+                && Objects.equals(freshText.strip(), candidateText == null ? null : candidateText.strip())) {
             score += 50;
         }
         return score;
@@ -346,7 +346,7 @@ public final class XMLFormatPreserver {
         }
         boolean hasChildren = !fresh.children.isEmpty();
         String text = fresh.getText();
-        boolean hasText = text != null && !text.trim().isEmpty();
+        boolean hasText = text != null && !text.strip().isEmpty();
         // Reproduce the attribute line wrapping of StoreAppender: the position starts at the indentation level and
         // the attributes are wrapped on a new line once the position exceeds 60 characters
         int position = indent;
@@ -483,8 +483,8 @@ public final class XMLFormatPreserver {
         // Only the significant text is compared: whitespace between child elements is layout, not content
         String aText = a.getText();
         String bText = b.getText();
-        String aTrimmed = (aText == null || aText.trim().isEmpty()) ? null : aText.trim();
-        String bTrimmed = (bText == null || bText.trim().isEmpty()) ? null : bText.trim();
+        String aTrimmed = (aText == null || aText.strip().isEmpty()) ? null : aText.strip();
+        String bTrimmed = (bText == null || bText.strip().isEmpty()) ? null : bText.strip();
         if (!Objects.equals(aTrimmed, bTrimmed)) {
             return false;
         }

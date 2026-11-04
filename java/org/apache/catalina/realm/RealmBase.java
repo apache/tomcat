@@ -909,7 +909,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             }
         }
 
-        // Should be overridden in JAASRealm - to avoid pretty inefficient conversions
         if (principal == null || role == null) {
             return false;
         }
@@ -945,7 +944,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         }
         List<String> attrs = new ArrayList<>();
         for (String name : userAttributes.split(USER_ATTRIBUTES_DELIMITER)) {
-            name = name.trim();
+            name = name.strip();
             if (name.isEmpty()) {
                 continue;
             }
@@ -975,7 +974,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      *             Realm; otherwise return <code>false</code>.
      */
     protected boolean hasRoleInternal(Principal principal, String role) {
-        // Should be overridden in JAASRealm - to avoid pretty inefficient conversions
         if (!(principal instanceof GenericPrincipal gp)) {
             return false;
         }
@@ -1448,7 +1446,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                 Class<?> clazz = Class.forName(handlerClassName);
                 handler = (DigestCredentialHandlerBase) clazz.getConstructor().newInstance();
                 IntrospectionUtils.setProperty(handler, "algorithm", algorithm);
-            } catch (ReflectiveOperationException e) {
+            } catch (ReflectiveOperationException | ClassCastException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -1611,7 +1609,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     }
 
     private static X509UsernameRetriever createUsernameRetriever(String className) throws LifecycleException {
-        if (null == className || className.trim().isEmpty()) {
+        if (null == className || className.strip().isEmpty()) {
             return new X509SubjectDnRetriever();
         }
 

@@ -69,7 +69,10 @@ public class JavacErrorDetail {
         this.errMsg = errMsg;
         this.jspFileName = jspFileName;
         // Note: this.jspBeginLineNum is set at the end of this method as it may
-        // be modified (corrected) during the execution of this method
+        // be modified (corrected) during the execution of this method. It is
+        // left at -1, which marks the error detail as unusable, if the
+        // generated Java source turns out to belong to a different compilation
+        // of the JSP page.
 
         if (jspBeginLineNum > 0 && ctxt != null) {
             InputStream is = null;
@@ -83,6 +86,12 @@ public class JavacErrorDetail {
                 } else {
                     is = ctxt.getResourceAsStream(jspFileName);
                 }
+                if (is == null) {
+                    // The JSP source is no longer available. Report only the
+                    // details of the error in the generated Java source.
+                    this.jspBeginLineNum = -1;
+                    return;
+                }
                 // Read both files in, so we can inspect them
                 String[] jspLines = readFile(is);
 
@@ -93,6 +102,9 @@ public class JavacErrorDetail {
                         // Avoid ArrayIndexOutOfBoundsException
                         // Probably bug 48498 but could be some other cause
                         jspExtract = Localizer.getMessage("jsp.error.bug48498");
+                        // Report only the Java line, since the JSP line
+                        // cannot be validated against the truncated source
+                        this.jspBeginLineNum = -1;
                         return;
                     }
 
@@ -101,7 +113,7 @@ public class JavacErrorDetail {
                     // faulty. Scan forward to match the java line...
                     if (jspLines[jspBeginLineNum - 1].lastIndexOf("<%") > jspLines[jspBeginLineNum - 1]
                             .lastIndexOf("%>")) {
-                        String javaLine = javaLines[javaLineNum - 1].trim();
+                        String javaLine = javaLines[javaLineNum - 1].strip();
 
                         for (int i = jspBeginLineNum - 1; i < jspLines.length; i++) {
                             if (jspLines[i].contains(javaLine)) {

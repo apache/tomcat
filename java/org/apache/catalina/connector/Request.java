@@ -115,6 +115,7 @@ import org.apache.tomcat.util.http.fileupload.impl.InvalidContentTypeException;
 import org.apache.tomcat.util.http.fileupload.impl.SizeException;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletRequestContext;
 import org.apache.tomcat.util.http.parser.AcceptLanguage;
+import org.apache.tomcat.util.http.parser.AcceptLanguage2;
 import org.apache.tomcat.util.http.parser.MediaType;
 import org.apache.tomcat.util.http.parser.Upgrade;
 import org.apache.tomcat.util.net.SSLSupport;
@@ -128,6 +129,12 @@ import org.ietf.jgss.GSSException;
 public class Request implements HttpServletRequest {
 
     private static final String HTTP_UPGRADE_HEADER_NAME = "upgrade";
+
+    /*
+     * Use AcceptLanguage2 parser rather than the StandardAcceptLanguageParser.
+     */
+    private static final boolean USE_STANDARD_ACCEPT_LANGUAGE_PARSER = Boolean.parseBoolean(
+            System.getProperty("org.apache.tomcat.util.http.parser.StandardAcceptLanguageParser", "false"));
 
     private static final Log log = LogFactory.getLog(Request.class);
 
@@ -147,6 +154,7 @@ public class Request implements HttpServletRequest {
             maxParameterCount = connector.getMaxParameterCount();
             maxPartCount = connector.getMaxPartCount();
             maxPartHeaderSize = connector.getMaxPartHeaderSize();
+            maxLocaleCount = connector.getMaxLocaleCount();
         }
         this.coyoteRequest = coyoteRequest;
         inputBuffer = new InputBuffer(coyoteRequest);
@@ -418,6 +426,11 @@ public class Request implements HttpServletRequest {
      */
     protected Boolean asyncSupported = null;
 
+    /**
+     * Has HttpServletRequest.upgrade() been called for this request?
+     */
+    private boolean upgradeRequested = false;
+
     private HttpServletRequest applicationRequest = null;
 
     /**
@@ -428,6 +441,14 @@ public class Request implements HttpServletRequest {
     private int maxPartCount = -1;
 
     private int maxPartHeaderSize = -1;
+
+    /**
+     * The maximum number of locales permitted for a request. The Accept-Language header value is untrusted input
+     * bounded only by the maximum header size so the number of locales is bounded by default to limit the
+     * per-request processing and the number of distinct locales exposed to web applications and internal components.
+     * A value of less than zero means no limit.
+     */
+    private int maxLocaleCount = -1;
 
     // --------------------------------------------------------- Public Methods
 
@@ -479,10 +500,12 @@ public class Request implements HttpServletRequest {
             maxParameterCount = connector.getMaxParameterCount();
             maxPartCount = connector.getMaxPartCount();
             maxPartHeaderSize = connector.getMaxPartHeaderSize();
+            maxLocaleCount = connector.getMaxLocaleCount();
         } else {
             maxParameterCount = -1;
             maxPartCount = -1;
             maxPartHeaderSize = -1;
+            maxLocaleCount = -1;
         }
         if (parts != null) {
             for (Part part : parts) {
@@ -542,6 +565,7 @@ public class Request implements HttpServletRequest {
         }
 
         asyncSupported = null;
+        upgradeRequested = false;
         if (asyncContext != null) {
             asyncContext.recycle();
             asyncContext = null;
@@ -1129,7 +1153,9 @@ public class Request implements HttpServletRequest {
         }
 
         if (!locales.isEmpty()) {
-            return Collections.enumeration(locales);
+            // Take a copy to prevent ConcurrentModificationExceptions if the
+            // list is modified while the enumeration is being iterated
+            return Collections.enumeration(new ArrayList<>(locales));
         }
         ArrayList<Locale> results = new ArrayList<>();
         results.add(defaultLocale);
@@ -1567,6 +1593,10 @@ public class Request implements HttpServletRequest {
             throw ise;
         }
 
+        if (upgradeRequested) {
+            throw new IllegalStateException(sm.getString("coyoteRequest.asyncAfterUpgrade"));
+        }
+
         if (asyncContext == null) {
             asyncContext = new AsyncContextImpl(this);
         }
@@ -1892,6 +1922,13 @@ public class Request implements HttpServletRequest {
     @Override
     public <T extends HttpUpgradeHandler> T upgrade(Class<T> httpUpgradeHandlerClass)
             throws IOException, ServletException {
+        if (isAsyncStarted()) {
+            throw new IllegalStateException(sm.getString("coyoteRequest.upgradeAfterAsync"));
+        }
+        if (response.isCommitted()) {
+            throw new IllegalStateException(sm.getString("coyoteRequest.upgradeAfterCommit"));
+        }
+
         T handler;
         InstanceManager instanceManager = null;
         try {
@@ -1910,6 +1947,7 @@ public class Request implements HttpServletRequest {
                 getUpgradeProtocolName(httpUpgradeHandlerClass));
 
         coyoteRequest.action(ActionCode.UPGRADE, upgradeToken);
+        upgradeRequested = true;
 
         // Output required by RFC2616. Protocol specific headers should have
         // already been set.
@@ -1934,9 +1972,15 @@ public class Request implements HttpServletRequest {
         }
 
         if (result == null) {
-            // Ugly but use the class name - it is better than nothing
+            /*
+             * Use the class name temporarily. It will be replaced at the end of Servlet.service() by the upgrade header
+             * field value.
+             */
             result = httpUpgradeHandlerClass.getName();
+        } else {
+            result = result.trim();
         }
+
         return result;
     }
 
@@ -3098,6 +3142,10 @@ public class Request implements HttpServletRequest {
         // negating the Double value when creating the key)
         for (ArrayList<Locale> list : locales.values()) {
             for (Locale locale : list) {
+                if (maxLocaleCount > -1 && this.locales.size() >= maxLocaleCount) {
+                    log.info(sm.getString("coyoteRequest.tooManyLocales", Integer.valueOf(maxLocaleCount)));
+                    return;
+                }
                 addLocale(locale);
             }
         }
@@ -3112,9 +3160,30 @@ public class Request implements HttpServletRequest {
      */
     protected void parseLocalesHeader(String value, TreeMap<Double,ArrayList<Locale>> locales) {
 
+        // Determine how many more entries are of interest. One more than the
+        // maximum is parsed so that a header that exceeds the limit is
+        // rejected rather than silently truncated. Parsing no further entries
+        // once the limit is reached avoids creating Locale objects for entries
+        // that can never be used.
+        int maxElements = -1;
+        if (maxLocaleCount > -1) {
+            int current = 0;
+            for (ArrayList<Locale> list : locales.values()) {
+                current += list.size();
+            }
+            maxElements = maxLocaleCount + 1 - current;
+            if (maxElements < 1) {
+                return;
+            }
+        }
+
         List<AcceptLanguage> acceptLanguages;
         try {
-            acceptLanguages = AcceptLanguage.parse(new StringReader(value));
+            if (USE_STANDARD_ACCEPT_LANGUAGE_PARSER) {
+                acceptLanguages = AcceptLanguage.parse(new StringReader(value), maxElements);
+            } else {
+                acceptLanguages = AcceptLanguage2.parse(new StringReader(value), maxElements);
+            }
         } catch (IOException ioe) {
             // Mal-formed headers are ignore. Do the same in the unlikely event
             // of an IOException.

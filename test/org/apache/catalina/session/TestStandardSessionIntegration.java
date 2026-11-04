@@ -32,6 +32,8 @@ import org.apache.catalina.Context;
 import org.apache.catalina.ha.tcp.SimpleTcpCluster;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.tribes.ManagedChannel;
+import org.apache.catalina.tribes.TesterUtil;
 import org.apache.catalina.tribes.group.GroupChannel;
 import org.apache.catalina.tribes.transport.ReceiverBase;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -63,7 +65,11 @@ public class TestStandardSessionIntegration extends TomcatBaseTest {
 
         if (useClustering) {
             SimpleTcpCluster cluster = new SimpleTcpCluster();
-            ((ReceiverBase) ((GroupChannel) cluster.getChannel()).getChannelReceiver()).setHost("localhost");
+            GroupChannel channel = (GroupChannel) cluster.getChannel();
+            ((ReceiverBase) channel.getChannelReceiver()).setHost("localhost");
+            ((ReceiverBase) channel.getChannelReceiver()).setPort(0);
+            // Avoid discovering unrelated cluster members and waiting for their session state.
+            TesterUtil.addRandomDomain(new ManagedChannel[] { channel });
             tomcat.getEngine().setCluster(cluster);
             ctx.setDistributable(true);
             ctx.setManager(ctx.getCluster().createManager(""));

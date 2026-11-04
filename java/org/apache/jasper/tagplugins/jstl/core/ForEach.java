@@ -30,8 +30,6 @@ public final class ForEach implements TagPlugin {
         // Default constructor
     }
 
-    private boolean hasVar, hasBegin, hasEnd, hasStep;
-
     @Override
     public void doTag(TagPluginContext ctxt) {
 
@@ -43,36 +41,76 @@ public final class ForEach implements TagPlugin {
             return;
         }
 
-        hasVar = ctxt.isAttributeSpecified("var");
-        hasBegin = ctxt.isAttributeSpecified("begin");
-        hasEnd = ctxt.isAttributeSpecified("end");
-        hasStep = ctxt.isAttributeSpecified("step");
+        // Local variables, not instance fields: a single plugin instance is
+        // shared by all translations of the web application, which may run
+        // concurrently.
+        boolean hasVar = ctxt.isAttributeSpecified("var");
+        boolean hasBegin = ctxt.isAttributeSpecified("begin");
+        boolean hasEnd = ctxt.isAttributeSpecified("end");
+        boolean hasStep = ctxt.isAttributeSpecified("step");
 
         boolean hasItems = ctxt.isAttributeSpecified("items");
         if (hasItems) {
-            doCollection(ctxt);
+            doCollection(ctxt, hasVar, hasBegin, hasEnd, hasStep);
             return;
         }
 
-        // We must have a begin and end attributes
+        // We must have begin and end attributes. Evaluate the loop control
+        // attributes once and validate them, as the setters of the reference
+        // implementation LoopTagSupport do.
         index = ctxt.getTemporaryVariableName();
-        ctxt.generateJavaSource("for (int " + index + " = ");
-        ctxt.generateAttribute("begin");
-        ctxt.generateJavaSource("; " + index + " <= ");
-        ctxt.generateAttribute("end");
-        if (hasStep) {
-            ctxt.generateJavaSource("; " + index + "+=");
-            ctxt.generateAttribute("step");
-            ctxt.generateJavaSource(") {");
+
+        String beginName = ctxt.getTemporaryVariableName();
+        ctxt.generateJavaSource("int " + beginName + " = ");
+        if (hasBegin) {
+            ctxt.generateAttribute("begin");
         } else {
-            ctxt.generateJavaSource("; " + index + "++) {");
+            ctxt.generateJavaSource("0");
+        }
+        ctxt.generateJavaSource(";");
+        if (hasBegin) {
+            ctxt.generateJavaSource("if (" + beginName + " < 0) {" +
+                    "throw new jakarta.servlet.jsp.JspTagException(\"'begin' < 0\");}");
+        }
+
+        String endName = ctxt.getTemporaryVariableName();
+        ctxt.generateJavaSource("int " + endName + " = ");
+        if (hasEnd) {
+            ctxt.generateAttribute("end");
+        } else {
+            // Same default as the reference implementation, which results in
+            // zero iterations when end is not specified.
+            ctxt.generateJavaSource("-1");
+        }
+        ctxt.generateJavaSource(";");
+        if (hasEnd) {
+            ctxt.generateJavaSource("if (" + endName + " < 0) {" +
+                    "throw new jakarta.servlet.jsp.JspTagException(\"'end' < 0\");}");
+        }
+
+        String stepName = null;
+        if (hasStep) {
+            stepName = ctxt.getTemporaryVariableName();
+            ctxt.generateJavaSource("int " + stepName + " = ");
+            ctxt.generateAttribute("step");
+            ctxt.generateJavaSource(";");
+            ctxt.generateJavaSource("if (" + stepName + " <= 0) {" +
+                    "throw new jakarta.servlet.jsp.JspTagException(\"'step' <= 0\");}");
+        }
+
+        ctxt.generateJavaSource("for (int " + index + " = " + beginName + "; " + index + " <= " + endName + ";");
+        if (hasStep) {
+            ctxt.generateJavaSource(" " + index + " += " + stepName + ") {");
+        } else {
+            ctxt.generateJavaSource(" " + index + "++) {");
         }
 
         // If var is specified, sync the var attribute
         if (hasVar /* && ctxt.hasEL() */) {
             ctxt.generateJavaSource("_jspx_page_context.setAttribute(");
             ctxt.generateAttribute("var");
-            ctxt.generateJavaSource(", String.valueOf(" + index + "));");
+            // The reference implementation exposes the index as an Integer.
+            ctxt.generateJavaSource(", Integer.valueOf(" + index + "));");
         }
         ctxt.generateBody();
         ctxt.generateJavaSource("}");
@@ -81,7 +119,8 @@ public final class ForEach implements TagPlugin {
     /**
      * Generate codes for Collections.
      */
-    private void doCollection(TagPluginContext ctxt) {
+    private void doCollection(TagPluginContext ctxt, boolean hasVar,
+            boolean hasBegin, boolean hasEnd, boolean hasStep) {
 
         ctxt.generateImport("java.util.*");
         generateIterators(ctxt);
@@ -97,6 +136,8 @@ public final class ForEach implements TagPlugin {
             ctxt.generateJavaSource("int " + beginV + " = ");
             ctxt.generateAttribute("begin");
             ctxt.generateJavaSource(";");
+            ctxt.generateJavaSource("if (" + beginV + " < 0) {" +
+                    "throw new jakarta.servlet.jsp.JspTagException(\"'begin' < 0\");}");
         }
         if (hasEnd) {
             indexV = ctxt.getTemporaryVariableName();
@@ -105,12 +146,16 @@ public final class ForEach implements TagPlugin {
             ctxt.generateJavaSource("int " + endV + " = ");
             ctxt.generateAttribute("end");
             ctxt.generateJavaSource(";");
+            ctxt.generateJavaSource("if (" + endV + " < 0) {" +
+                    "throw new jakarta.servlet.jsp.JspTagException(\"'end' < 0\");}");
         }
         if (hasStep) {
             stepV = ctxt.getTemporaryVariableName();
             ctxt.generateJavaSource("int " + stepV + " = ");
             ctxt.generateAttribute("step");
             ctxt.generateJavaSource(";");
+            ctxt.generateJavaSource("if (" + stepV + " <= 0) {" +
+                    "throw new jakarta.servlet.jsp.JspTagException(\"'step' <= 0\");}");
         }
 
         String iterV = ctxt.getTemporaryVariableName();

@@ -584,11 +584,14 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
         if (!isAsync) {
             nrOfRequests.increment();
             if (log.isDebugEnabled()) {
-                if ((nrOfRequests.longValue() % 100) == 0) {
+                // Snapshot the counter to avoid a division by zero if
+                // resetStatistics() runs concurrently (JMX operation)
+                long requests = nrOfRequests.longValue();
+                if (requests > 0 && (requests % 100) == 0) {
                     log.debug(sm.getString("ReplicationValve.stats",
-                            Long.valueOf(totalRequestTime.longValue() / nrOfRequests.longValue()),
-                            Long.valueOf(totalSendTime.longValue() / nrOfRequests.longValue()),
-                            Long.valueOf(nrOfRequests.longValue()), Long.valueOf(nrOfSendRequests.longValue()),
+                            Long.valueOf(totalRequestTime.longValue() / requests),
+                            Long.valueOf(totalSendTime.longValue() / requests),
+                            Long.valueOf(requests), Long.valueOf(nrOfSendRequests.longValue()),
                             Long.valueOf(nrOfCrossContextSendRequests.longValue()),
                             Long.valueOf(nrOfFilterRequests.longValue()), Long.valueOf(totalRequestTime.longValue()),
                             Long.valueOf(totalSendTime.longValue())));

@@ -115,11 +115,23 @@ public class TestMemoryUserDatabase {
         Assert.assertEquals("Unexpected number of users in test database", 3, userCount);
     }
 
+    @Test
     public void testReloadUserDatabase()
         throws Exception {
+        File file = File.createTempFile("tomcat-users", ".xml");
+        file.deleteOnExit();
+
+        try(BufferedWriter out = new BufferedWriter(new FileWriter(file))) {
+            out.write(TestMemoryRealm.CONFIG);
+        }
+
+        MemoryUserDatabase mud = new MemoryUserDatabase();
+        mud.setPathname(file.toURI().toURL().toString());
+        mud.open();
+
         // Change the database on the disk and reload
 
-        try(BufferedWriter out = new BufferedWriter(new FileWriter(TEST_FILE))) {
+        try(BufferedWriter out = new BufferedWriter(new FileWriter(file))) {
             out.write("<?xml version=\"1.0\" ?>"
                     + "<tomcat-users xmlns=\"http://tomcat.apache.org/xml\""
                     + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
@@ -129,14 +141,14 @@ public class TestMemoryUserDatabase {
                     + "<group groupname=\"bar\" />"
                     + "<user username=\"root\" password=\"sup3Rsekr3t\" roles=\"foo, bar\" groups=\"bar, foo\" />"
                     + "</tomcat-users>");
-
-            db.open();
         }
 
-        assertPrincipalNames(new String[] { "foo", "bar"}, db.getRoles());
-        assertPrincipalNames(new String[] { "bar", "foo"}, db.getGroups());
+        mud.open();
 
-        Iterator<User> users = db.getUsers();
+        assertPrincipalNames(new String[] { "foo", "bar"}, mud.getRoles());
+        assertPrincipalNames(new String[] { "bar", "foo"}, mud.getGroups());
+
+        Iterator<User> users = mud.getUsers();
 
         Assert.assertTrue("No users found", users.hasNext());
 

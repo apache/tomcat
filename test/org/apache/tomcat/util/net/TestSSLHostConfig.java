@@ -148,6 +148,47 @@ public class TestSSLHostConfig {
 
 
     @Test
+    public void testCiphersuite04() {
+        SSLHostConfig hc = new SSLHostConfig();
+        Cipher c1 = Cipher.TLS_AES_128_CCM_SHA256;
+        Cipher c2 = Cipher.TLS_AES_256_GCM_SHA384;
+
+        // JSSE format (comma separated) list of JSSE names. The result should be
+        // an OpenSSL format (colon separated) list of OpenSSL names.
+        hc.setCipherSuites(c1.getJsseNames().iterator().next() + "," +
+                c2.getJsseNames().iterator().next());
+        Assert.assertEquals(c1.getOpenSSLAlias() + ":" + c2.getOpenSSLAlias(), hc.getCipherSuites());
+    }
+
+
+    @Test
+    public void testCiphersuite05() {
+        SSLHostConfig hc = new SSLHostConfig();
+
+        // Null restores the default, as it does for setCiphers()
+        hc.setCipherSuites(Cipher.TLS_AES_128_CCM_SHA256.getOpenSSLAlias());
+        hc.setCipherSuites(null);
+        Assert.assertEquals(SSLHostConfig.DEFAULT_TLS_CIPHERS_13, hc.getCipherSuites());
+        // and the derived values must be usable
+        Assert.assertFalse(hc.getJsseCipherNames().isEmpty());
+    }
+
+
+    @Test
+    public void testCiphersNull() {
+        SSLHostConfig hc = new SSLHostConfig();
+
+        // Null restores the default
+        hc.setCiphers(Cipher.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256.getOpenSSLAlias());
+        hc.setCiphers(null);
+        Assert.assertEquals(SSLHostConfig.DEFAULT_TLS_CIPHERS_12, hc.getCiphers());
+        // and the derived values must be usable
+        Assert.assertFalse(hc.getCipherList().isEmpty());
+        Assert.assertFalse(hc.getJsseCipherNames().isEmpty());
+    }
+
+
+    @Test
     public void testPreSharedKey() {
         SSLHostConfig sslHostConfig = new SSLHostConfig();
         SSLHostConfigPreSharedKey preSharedKey = new SSLHostConfigPreSharedKey(sslHostConfig);

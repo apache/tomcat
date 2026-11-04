@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.websocket.ContainerProvider;
+import jakarta.websocket.DeploymentException;
 import jakarta.websocket.OnClose;
 import jakarta.websocket.OnMessage;
 import jakarta.websocket.OnOpen;
@@ -93,6 +94,134 @@ public class TestPojoMethodMapping extends TomcatBaseTest {
             System.err.println(error);
         }
         Assert.assertEquals("Found errors", 0, errors.size());
+    }
+
+
+    /*
+     * Only String, byte[] and ByteBuffer payloads (plus the boolean last flag) are permitted for partial messages. A
+     * primitive payload combined with a boolean last flag must be rejected at deployment time rather than resulting in
+     * a partial message handler that fails when the first fragmented message arrives.
+     */
+    @Test
+    public void testPrimitiveAndBooleanParameters() throws Exception {
+        try {
+            @SuppressWarnings("unused")
+            PojoMethodMapping mapping = new PojoMethodMapping(PrimitiveAndBooleanServer.class, new ArrayList<>(),
+                    "/primitiveAndBoolean", null);
+            Assert.fail("Expected a DeploymentException");
+        } catch (DeploymentException de) {
+            Assert.assertTrue("Unexpected message: " + de.getMessage(), de.getMessage().contains("primitive type"));
+        }
+    }
+
+
+    @ServerEndpoint("/primitiveAndBoolean")
+    public static final class PrimitiveAndBooleanServer {
+
+        @OnMessage
+        public void onMessage(@SuppressWarnings("unused") int payload, @SuppressWarnings("unused") boolean last) {
+            // No-Op
+        }
+    }
+
+
+    /*
+     * A sub-class method that overrides an annotated super class method using a covariant return type is still an
+     * override. Re-declaring the annotation on the override must not be treated as a duplicate annotation and the
+     * sub-class method must be the one that is mapped.
+     */
+    @Test
+    public void testCovariantReturnOverride() throws Exception {
+        PojoMethodMapping mapping =
+                new PojoMethodMapping(CovariantReturnServer.class, new ArrayList<>(), "/covariantReturn", null);
+        Assert.assertEquals(CovariantReturnServer.class.getMethod("onOpen", Session.class), mapping.getOnOpen());
+    }
+
+
+    /*
+     * A non-annotated sub-class method that overrides an annotated super class method using a covariant return type
+     * should result in the super class method being ignored. Note that a compiler generated bridge method previously
+     * masked this in compiled code.
+     */
+    @Test
+    public void testCovariantReturnOverrideWithoutAnnotation() throws Exception {
+        PojoMethodMapping mapping = new PojoMethodMapping(CovariantReturnOverrideServer.class, new ArrayList<>(),
+                "/covariantReturnOverride", null);
+        Assert.assertNull(mapping.getOnOpen());
+    }
+
+
+    /*
+     * A sub-class method that is not an override of the annotated super class method must still be rejected as a
+     * duplicate annotation if it handles the same message type.
+     */
+    @Test
+    public void testAnnotatedMethodNotAnOverride() throws Exception {
+        try {
+            @SuppressWarnings("unused")
+            PojoMethodMapping mapping =
+                    new PojoMethodMapping(NotAnOverrideServer.class, new ArrayList<>(), "/notAnOverride", null);
+            Assert.fail("Expected a DeploymentException");
+        } catch (DeploymentException de) {
+            Assert.assertTrue("Unexpected message: " + de.getMessage(),
+                    de.getMessage().contains("Duplicate annotations"));
+        }
+    }
+
+
+    public static class CovariantReturnBase {
+
+        @OnOpen
+        public Object onOpen(Session session) {
+            return session;
+        }
+
+        @OnMessage
+        public Object onMessage(String message) {
+            return message;
+        }
+    }
+
+
+    @ServerEndpoint("/covariantReturn")
+    public static final class CovariantReturnServer extends CovariantReturnBase {
+
+        @Override
+        @OnOpen
+        public String onOpen(Session session) {
+            return session.toString();
+        }
+
+        @Override
+        @OnMessage
+        public String onMessage(String message) {
+            return message;
+        }
+    }
+
+
+    @ServerEndpoint("/covariantReturnOverride")
+    public static final class CovariantReturnOverrideServer extends CovariantReturnBase {
+
+        @Override
+        public String onOpen(Session session) {
+            return session.toString();
+        }
+
+        @Override
+        public String onMessage(String message) {
+            return message;
+        }
+    }
+
+
+    @ServerEndpoint("/notAnOverride")
+    public static final class NotAnOverrideServer extends CovariantReturnBase {
+
+        @OnMessage
+        public String otherMessage(String message) {
+            return message;
+        }
     }
 
 

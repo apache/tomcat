@@ -23,7 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -102,7 +102,7 @@ public class Txt2Html extends Task {
                 File from = new File(basedir, file);
                 File to = new File(todir, file + ".html");
                 if (!to.exists() || (from.lastModified() > to.lastModified())) {
-                    log("Converting file '" + from.getAbsolutePath() + "' to '" + to.getAbsolutePath(),
+                    log("Converting file '" + from.getAbsolutePath() + "' to '" + to.getAbsolutePath() + "'",
                             Project.MSG_VERBOSE);
                     try {
                         convert(from, to);
@@ -114,9 +114,9 @@ public class Txt2Html extends Task {
                     count++;
                 }
             }
-            if (count > 0) {
-                log("Converted " + count + " file" + (count > 1 ? "s" : "") + " to " + todir.getAbsolutePath());
-            }
+        }
+        if (count > 0) {
+            log("Converted " + count + " file" + (count > 1 ? "s" : "") + " to " + todir.getAbsolutePath());
         }
     }
 
@@ -132,11 +132,10 @@ public class Txt2Html extends Task {
         // Open files:
         try (BufferedReader in =
                 new BufferedReader(new InputStreamReader(new FileInputStream(from), SOURCE_ENCODING))) {
-            try (PrintWriter out =
-                    new PrintWriter(new OutputStreamWriter(new FileOutputStream(to), StandardCharsets.UTF_8))) {
+            try (Writer out = new OutputStreamWriter(new FileOutputStream(to), StandardCharsets.UTF_8)) {
 
                 // Output header:
-                out.print("<!DOCTYPE html><html><head><meta charset=\"UTF-8\" />" +
+                out.write("<!DOCTYPE html><html><head><meta charset=\"UTF-8\" />" +
                         "<title>Source Code</title></head><body><pre>");
 
                 // Convert, line-by-line:
@@ -157,11 +156,11 @@ public class Txt2Html extends Task {
                                 result.append(c);
                         }
                     }
-                    out.print(result.toString() + LINE_SEPARATOR);
+                    out.write(result.toString() + LINE_SEPARATOR);
                 }
 
                 // Output footer:
-                out.print("</pre></body></html>");
+                out.write("</pre></body></html>");
 
             }
         }

@@ -20,12 +20,18 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Arrays;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
  * Abstraction interceptor. This component intercepts all calls to create some type of SQL statement. By extending this
@@ -33,6 +39,8 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
  * {@link #createStatement(Object, Method, Object[], Object, long)} method.
  */
 public abstract class AbstractCreateStatementInterceptor extends JdbcInterceptor {
+    private static final Log log = LogFactory.getLog(AbstractCreateStatementInterceptor.class);
+
     /**
      * {@link java.sql.Connection#createStatement()}
      */
@@ -103,16 +111,70 @@ public abstract class AbstractCreateStatementInterceptor extends JdbcInterceptor
      * {@link java.sql.Statement#executeBatch()}
      */
     protected static final String EXECUTE_BATCH = "executeBatch";
+    /**
+     * {@link java.sql.Statement#executeLargeUpdate} and its overloads, and
+     * {@link java.sql.PreparedStatement#executeLargeUpdate()}
+     */
+    protected static final String EXECUTE_LARGE_UPDATE = "executeLargeUpdate";
+    /**
+     * {@link java.sql.Statement#executeLargeBatch()}
+     */
+    protected static final String EXECUTE_LARGE_BATCH = "executeLargeBatch";
 
     /**
      * Array of execute type method names
      */
-    protected static final String[] EXECUTE_TYPES = { EXECUTE, EXECUTE_QUERY, EXECUTE_UPDATE, EXECUTE_BATCH };
+    protected static final String[] EXECUTE_TYPES = { EXECUTE, EXECUTE_QUERY, EXECUTE_UPDATE, EXECUTE_BATCH,
+            EXECUTE_LARGE_UPDATE, EXECUTE_LARGE_BATCH };
 
     /**
-     * the constructors that are used to create statement proxies
+     * the constructors that are used to create statement proxies. The cache is
+     * shared by all subclasses loaded through the same class loader, so every
+     * use of an index must pass an interface that the cached proxy implements,
+     * in practice always the same one; {@link #getConstructor(int, Class)}
+     * enforces this. The canonical entries are populated by this class's
+     * initializer, which the JVM runs once and whose writes it publishes to
+     * every thread that uses the class, so reading a slot through
+     * {@link #getConstructor(int, Class)} needs no locking; writing an element
+     * directly from a subclass bypasses that guarantee and is the subclass's
+     * own responsibility.
      */
     protected static final Constructor<?>[] constructors = new Constructor[STATEMENT_TYPE_COUNT + 1];
+
+    static {
+        // Class initialization (JLS 12.4.2) runs once per class loader and its
+        // writes are visible to every thread once it completes, so populating
+        // the canonical slots here makes them safely published without any
+        // monitor on the hot statement path.
+        populateConstructor(CREATE_STATEMENT_IDX, Statement.class);
+        populateConstructor(PREPARE_STATEMENT_IDX, PreparedStatement.class);
+        populateConstructor(PREPARE_CALL_IDX, CallableStatement.class);
+        populateConstructor(RESULTSET_IDX, ResultSet.class);
+    }
+
+    /**
+     * Computes the proxy constructor for one index of {@link #constructors}
+     * and stores it in the cache. On failure the slot is left empty and only
+     * logged; {@link #getConstructor(int, Class)} then computes the entry on
+     * demand, so a failure here degrades to the pre-existing behavior rather
+     * than failing class initialization.
+     *
+     * @param idx   - the index of the constructor
+     * @param clazz - the interface that the proxy will implement
+     */
+    @SuppressWarnings("deprecation")
+    private static void populateConstructor(int idx, Class<?> clazz) {
+        try {
+            Class<?> proxyClass = Proxy.getProxyClass(AbstractCreateStatementInterceptor.class.getClassLoader(),
+                    new Class[] { clazz });
+            constructors[idx] = proxyClass.getConstructor(new Class[] { InvocationHandler.class });
+        } catch (ReflectiveOperationException | IllegalArgumentException | LinkageError e) {
+            // An exception escaping the class initializer would surface as an
+            // ExceptionInInitializerError at every use of every subclass.
+            log.warn(MessageFactory.get("abstractCreateStatementInterceptor.unableToCreateConstructorCacheEntry",
+                    idx, clazz.getName()), e);
+        }
+    }
 
     /**
      * Default constructor
@@ -141,7 +203,11 @@ public abstract class AbstractCreateStatementInterceptor extends JdbcInterceptor
     }
 
     /**
-     * Creates a constructor for a proxy class, if one doesn't already exist
+     * Creates a constructor for a proxy class, if one doesn't already exist.
+     * The canonical entries are published by this class's initializer, so on
+     * the normal path the method only reads a safely published slot and is
+     * safe for concurrent use; {@code newInstance} on the returned
+     * constructor runs as it always has, outside this method.
      *
      * @param idx   - the index of the constructor
      * @param clazz - the interface that the proxy will implement
@@ -149,18 +215,32 @@ public abstract class AbstractCreateStatementInterceptor extends JdbcInterceptor
      * @return - returns a constructor used to create new instances
      *
      * @throws NoSuchMethodException Constructor not found
+     * @throws IllegalStateException The index is already cached for a proxy class that does not implement
+     *                                   {@code clazz}. Every use of an index in this shared cache must pass
+     *                                   an interface that the cached proxy implements.
      */
     /*
-     * Neither the class nor the constructor are exposed outside of jdbc-pool. Given the comments in the jdbc-pool code
-     * regarding caching for performance, continue to use Proxy.getProxyClass(). This will need to be revisited if that
-     * method is marked for removal.
+     * The cache, this method and the class itself are all reachable from subclasses, in-tree or third party. The
+     * cache is shared by every subclass loaded through the same class loader, so each index must always be
+     * paired with an interface that the cached proxy implements, in practice always the same one; a cache hit
+     * whose cached proxy does not implement the requested interface is rejected below rather than silently
+     * returning a proxy that does not implement what the caller asked for. Given the comments in the jdbc-pool
+     * code regarding caching for performance, continue to use Proxy.getProxyClass(). This will need to be
+     * revisited if that method is marked for removal.
      */
     @SuppressWarnings("deprecation")
     protected Constructor<?> getConstructor(int idx, Class<?> clazz) throws NoSuchMethodException {
         if (constructors[idx] == null) {
+            // Only reachable if the class initializer failed to populate this
+            // slot, or a subclass nulled the element directly; compute on
+            // demand, as before the cache was populated eagerly.
             Class<?> proxyClass = Proxy.getProxyClass(AbstractCreateStatementInterceptor.class.getClassLoader(),
                     new Class[] { clazz });
             constructors[idx] = proxyClass.getConstructor(new Class[] { InvocationHandler.class });
+        } else if (!clazz.isAssignableFrom(constructors[idx].getDeclaringClass())) {
+            throw new IllegalStateException(MessageFactory.get(
+                    "abstractCreateStatementInterceptor.constructorCacheIndexPopulated",
+                    idx, Arrays.toString(constructors[idx].getDeclaringClass().getInterfaces()), clazz.getName()));
         }
         return constructors[idx];
     }
@@ -213,10 +293,8 @@ public abstract class AbstractCreateStatementInterceptor extends JdbcInterceptor
     /**
      * Returns true if the method that is being invoked matches one of the method names passed in
      *
-     * @param names list of method names that we want to intercept
-     *
-     * @param method the method being invoked on the proxy
-     *
+     * @param names   list of method names that we want to intercept
+     * @param method  the method being invoked on the proxy
      * @param process boolean result used for recursion
      *
      * @return returns true if the method name matched

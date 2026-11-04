@@ -69,6 +69,13 @@ public class RewriteValve extends ValveBase {
     private static final URLEncoder REWRITE_DEFAULT_ENCODER;
     private static final URLEncoder REWRITE_QUERY_ENCODER;
 
+    /**
+     * The maximum number of rounds of rewrite rules triggered by the next flag [N]. This bounds the processing of
+     * configurations whose next rules do not converge, which would otherwise spin in the rule loop without ever
+     * completing the request.
+     */
+    private static final int MAX_REWRITE_ROUNDS = 1000;
+
     static {
         /*
          * See the detailed explanation of encoding/decoding during URL re-writing in the invoke() method.
@@ -399,6 +406,7 @@ public class RewriteValve extends ValveBase {
             boolean qsa = false;
             boolean qsd = false;
             boolean valveSkip = false;
+            int rounds = 0;
 
             // Step 2. Process the URL using the re-write rules.
             for (int i = 0; i < rules.length; i++) {
@@ -550,6 +558,12 @@ public class RewriteValve extends ValveBase {
                 }
                 // - next (redo again)
                 if (rule.isNext() && newtest != null) {
+                    if (rounds >= MAX_REWRITE_ROUNDS) {
+                        containerLog.warn(sm.getString("rewriteValve.maxRounds",
+                                Integer.valueOf(MAX_REWRITE_ROUNDS), request.getRequestURI()));
+                        break;
+                    }
+                    rounds++;
                     i = -1;
                     continue;
                 }
@@ -694,6 +708,10 @@ public class RewriteValve extends ValveBase {
                         parseCondFlag(line, condition, flagsTokenizer.nextToken());
                     }
                 }
+                if (tokenizer.hasMoreTokens()) {
+                    // Too many tokens on the line
+                    throw new IllegalArgumentException(sm.getString("rewriteValve.invalidLine", line));
+                }
                 return condition;
             } else if (token.equals("RewriteRule")) {
                 // RewriteRule Pattern Substitution [Flags]
@@ -717,6 +735,10 @@ public class RewriteValve extends ValveBase {
                     if (rule.isQsdiscard()) {
                         rule.setQsappend(false);
                     }
+                }
+                if (tokenizer.hasMoreTokens()) {
+                    // Too many tokens on the line
+                    throw new IllegalArgumentException(sm.getString("rewriteValve.invalidLine", line));
                 }
                 return rule;
             } else if (token.equals("RewriteMap")) {
@@ -806,9 +828,9 @@ public class RewriteValve extends ValveBase {
             rule.setChain(true);
         } else if (flag.startsWith("cookie=") || flag.startsWith("CO=")) {
             rule.setCookie(true);
-            if (flag.startsWith("cookie")) {
+            if (flag.startsWith("cookie=")) {
                 flag = flag.substring("cookie=".length());
-            } else if (flag.startsWith("CO=")) {
+            } else {
                 flag = flag.substring("CO=".length());
             }
             StringTokenizer tokenizer = new StringTokenizer(flag, ":");
@@ -849,27 +871,29 @@ public class RewriteValve extends ValveBase {
             }
             rule.addEnvName(flag.substring(0, pos));
             rule.addEnvValue(flag.substring(pos + 1));
-        } else if (flag.startsWith("forbidden") || flag.startsWith("F")) {
+        } else if (flag.equals("forbidden") || flag.equals("F")) {
             rule.setForbidden(true);
-        } else if (flag.startsWith("gone") || flag.startsWith("G")) {
+        } else if (flag.equals("gone") || flag.equals("G")) {
             rule.setGone(true);
-        } else if (flag.startsWith("host") || flag.startsWith("H")) {
+        } else if (flag.equals("host") || flag.equals("H") ||
+                flag.startsWith("host=") || flag.startsWith("H=")) {
             rule.setHost(true);
-        } else if (flag.startsWith("last") || flag.startsWith("L")) {
+        } else if (flag.equals("last") || flag.equals("L")) {
             rule.setLast(true);
-        } else if (flag.startsWith("nocase") || flag.startsWith("NC")) {
+        } else if (flag.equals("nocase") || flag.equals("NC")) {
             rule.setNocase(true);
-        } else if (flag.startsWith("noescape") || flag.startsWith("NE")) {
+        } else if (flag.equals("noescape") || flag.equals("NE")) {
             rule.setNoescape(true);
-        } else if (flag.startsWith("next") || flag.startsWith("N")) {
+        } else if (flag.equals("next") || flag.equals("N")) {
             rule.setNext(true);
             // Note: Proxy is not supported as Tomcat does not have proxy
             // capabilities
-        } else if (flag.startsWith("qsappend") || flag.startsWith("QSA")) {
+        } else if (flag.equals("qsappend") || flag.equals("QSA")) {
             rule.setQsappend(true);
-        } else if (flag.startsWith("qsdiscard") || flag.startsWith("QSD")) {
+        } else if (flag.equals("qsdiscard") || flag.equals("QSD")) {
             rule.setQsdiscard(true);
-        } else if (flag.startsWith("redirect") || flag.startsWith("R")) {
+        } else if (flag.equals("redirect") || flag.equals("R") ||
+                flag.startsWith("redirect=") || flag.startsWith("R=")) {
             rule.setRedirect(true);
             int redirectCode = HttpServletResponse.SC_FOUND;
             if (flag.startsWith("redirect=") || flag.startsWith("R=")) {
@@ -886,22 +910,25 @@ public class RewriteValve extends ValveBase {
                 };
             }
             rule.setRedirectCode(redirectCode);
-        } else if (flag.startsWith("skip") || flag.startsWith("S")) {
+        } else if (flag.startsWith("skip=") || flag.startsWith("S=")) {
             if (flag.startsWith("skip=")) {
                 flag = flag.substring("skip=".length());
-            } else if (flag.startsWith("S=")) {
+            } else {
                 flag = flag.substring("S=".length());
             }
             rule.setSkip(Integer.parseInt(flag));
-        } else if (flag.startsWith("type") || flag.startsWith("T")) {
+            if (rule.getSkip() < 0) {
+                throw new IllegalArgumentException(sm.getString("rewriteValve.invalidFlags", line, flag));
+            }
+        } else if (flag.startsWith("type=") || flag.startsWith("T=")) {
             if (flag.startsWith("type=")) {
                 flag = flag.substring("type=".length());
-            } else if (flag.startsWith("T=")) {
+            } else {
                 flag = flag.substring("T=".length());
             }
             rule.setType(true);
             rule.setTypeValue(flag);
-        } else if (flag.startsWith("valveSkip") || flag.startsWith("VS")) {
+        } else if (flag.equals("valveSkip") || flag.equals("VS")) {
             rule.setValveSkip(true);
         } else {
             throw new IllegalArgumentException(sm.getString("rewriteValve.invalidFlags", line, flag));

@@ -1538,6 +1538,68 @@ public class TestWebdavServlet extends TomcatBaseTest {
         Assert.assertEquals(WebdavStatus.SC_CREATED, client.getStatusCode());
     }
 
+    /*
+     * An If header value that contains an empty list is invalid syntax (RFC 4918 requires at least one entry in a
+     * list). With strict If processing (the default) such a header must fail the precondition check. Without strict
+     * If processing the header is ignored, as for any other invalid If header syntax.
+     */
+    @Test
+    public void testIfHeaderEmptyListStrict() throws Exception {
+        Client client = doTestIfHeaderEmptyList("webdav-emptyif-strict", true);
+        client.setRequest(new String[] {
+                "PUT /file1.txt HTTP/1.1" + CRLF +
+                    "Host: localhost:" + getPort() + CRLF +
+                    "If: ()" + CRLF +
+                    "Content-Length: 6" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    CONTENT
+                });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(WebdavStatus.SC_PRECONDITION_FAILED, client.getStatusCode());
+    }
+
+
+    @Test
+    public void testIfHeaderEmptyListNonStrict() throws Exception {
+        Client client = doTestIfHeaderEmptyList("webdav-emptyif-nonstrict", false);
+        client.setRequest(new String[] {
+                "PUT /file1.txt HTTP/1.1" + CRLF +
+                    "Host: localhost:" + getPort() + CRLF +
+                    "If: ()" + CRLF +
+                    "Content-Length: 6" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    CONTENT
+                });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_CREATED, client.getStatusCode());
+    }
+
+
+    private Client doTestIfHeaderEmptyList(String webappName, boolean strictIfProcessing) throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // Create a temp webapp that can be safely written to
+        File tempWebapp = new File(getTemporaryDirectory(), webappName);
+        tempWebapp.deleteOnExit();
+        Assert.assertTrue(tempWebapp.mkdirs());
+        Context ctxt = tomcat.addContext("", tempWebapp.getAbsolutePath());
+        Wrapper webdavServlet = Tomcat.addServlet(ctxt, "webdav", new WebdavServlet());
+        webdavServlet.addInitParameter("readonly", "false");
+        webdavServlet.addInitParameter("strictIfProcessing", Boolean.toString(strictIfProcessing));
+        ctxt.addServletMapping("/*", "webdav");
+        ctxt.addMimeMapping("txt", "text/plain");
+        tomcat.start();
+
+        Client client = new Client();
+        client.setPort(getPort());
+        return client;
+    }
+
+
     @Test
     public void testPropertyStore() throws Exception {
         Tomcat tomcat = getTomcatInstance();
@@ -1592,6 +1654,130 @@ public class TestWebdavServlet extends TomcatBaseTest {
     @Test
     public void testPropFindBodyLimit() throws Exception {
         doTestLimit("PROPFIND", PROPFIND_PROP);
+    }
+
+
+    /*
+     * The XML error reports start with a declaration that states UTF-8, so the
+     * response needs to name a content type with a matching charset. Without a
+     * content type the response writer falls back to the default body charset,
+     * which is ISO-8859-1.
+     */
+    @Test
+    public void testErrorReportsUseTheDeclaredCharset() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // Create a temp webapp that can be safely written to
+        File tempWebapp = new File(getTemporaryDirectory(), "webdav-errorreport");
+        tempWebapp.deleteOnExit();
+        Assert.assertTrue(tempWebapp.mkdirs());
+        Context ctxt = tomcat.addContext("", tempWebapp.getAbsolutePath());
+        Wrapper webdavServlet = Tomcat.addServlet(ctxt, "webdav", new WebdavServlet());
+        webdavServlet.addInitParameter("listings", "true");
+        webdavServlet.addInitParameter("secret", "foo");
+        webdavServlet.addInitParameter("readonly", "false");
+        ctxt.addServletMapping("/*", "webdav");
+        tomcat.start();
+
+        Client client = new Client();
+        client.setPort(getPort());
+
+        // Create a collection
+        // @formatter:off
+        client.setRequest(new String[] {
+                "MKCOL /myfolder HTTP/1.1" + CRLF +
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_CREATED, client.getStatusCode());
+
+        // Create a file in the collection
+        // @formatter:off
+        client.setRequest(new String[] {
+                "PUT /myfolder/file.txt HTTP/1.1" + CRLF +
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: " + CONTENT.length() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    CONTENT
+                });
+        // @formatter:on
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_CREATED, client.getStatusCode());
+
+        // Lock the file
+        // @formatter:off
+        client.setRequest(new String[] {
+                "LOCK /myfolder/file.txt HTTP/1.1" + CRLF +
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: " + LOCK_BODY.length() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    LOCK_BODY
+                });
+        // @formatter:on
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+
+        // Unlock the file with a token that locks nothing, which is reported
+        // with an error document
+        // @formatter:off
+        client.setRequest(new String[] {
+                "UNLOCK /myfolder/file.txt HTTP/1.1" + CRLF +
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Lock-Token: <my:token>" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_CONFLICT, client.getStatusCode());
+        Assert.assertTrue(client.getResponseBody().contains("<D:lock-token-matches-request-uri>"));
+        assertXmlContentType(client);
+        validateXml(client.getResponseBody());
+
+        // Lock the collection, which conflicts with the lock of the child
+        // file and is reported with a multi-status document
+        // @formatter:off
+        client.setRequest(new String[] {
+                "LOCK /myfolder HTTP/1.1" + CRLF +
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: " + LOCK_BODY.length() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    LOCK_BODY
+                });
+        // @formatter:on
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(WebdavStatus.SC_MULTI_STATUS, client.getStatusCode());
+        Assert.assertTrue(client.getResponseBody().contains("<D:href>/myfolder/file.txt</D:href>"));
+        assertXmlContentType(client);
+        validateXml(client.getResponseBody());
+
+        // Delete the collection, which cannot delete the locked file and is
+        // reported with a multi-status document
+        // @formatter:off
+        client.setRequest(new String[] {
+                "DELETE /myfolder HTTP/1.1" + CRLF +
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(WebdavStatus.SC_MULTI_STATUS, client.getStatusCode());
+        Assert.assertTrue(client.getResponseBody().contains("<D:href>/myfolder/file.txt</D:href>"));
+        assertXmlContentType(client);
+        validateXml(client.getResponseBody());
     }
 
 
@@ -1721,6 +1907,21 @@ public class TestWebdavServlet extends TomcatBaseTest {
 
     private void validateXml(String xmlContent) throws Exception {
         SAXParserFactory.newInstance().newSAXParser().getXMLReader().parse(new InputSource(new StringReader(xmlContent)));
+    }
+
+
+    private static void assertXmlContentType(SimpleHttpClient client) {
+        for (String header : client.getResponseHeaders()) {
+            if (header.regionMatches(true, 0, "Content-Type: ", 0, "Content-Type: ".length())) {
+                String contentType = header.substring("Content-Type: ".length()).trim();
+                int semicolon = contentType.indexOf(';');
+                Assert.assertTrue("The content type has no charset: " + contentType, semicolon >= 0);
+                Assert.assertEquals("text/xml", contentType.substring(0, semicolon).trim());
+                Assert.assertEquals("charset=UTF-8", contentType.substring(semicolon + 1).trim());
+                return;
+            }
+        }
+        Assert.fail("The response has no content type");
     }
 
     private static final class Client extends SimpleHttpClient {

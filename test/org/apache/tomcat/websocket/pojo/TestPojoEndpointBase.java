@@ -120,6 +120,45 @@ public class TestPojoEndpointBase extends TomcatBaseTest {
     }
 
 
+    /*
+     * A POJO endpoint class with no annotated methods deploys but has no handlers.
+     * Previously, the method mapping was not made available to the endpoint wrapper
+     * for such a class, resulting in a NullPointerException when handling the first
+     * connection and an abnormal close of that connection.
+     */
+    @Test
+    public void testNoMethodsServerEndpoint() throws Exception {
+        // Set up utility classes
+        ServerConfigListener.setPojoClazz(NoMethodsServerEndpoint.class);
+
+        Tomcat tomcat = getTomcatInstance();
+        // No file system docBase required
+        Context ctx = getProgrammaticRootContext();
+        ctx.addApplicationListener(ServerConfigListener.class.getName());
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMapping("/", "default");
+
+        WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
+
+        tomcat.start();
+
+        Client client = new Client();
+        URI uri = new URI("ws://localhost:" + getPort() + "/");
+
+        Session session = wsContainer.connectToServer(client, uri);
+
+        // Nothing should happen on the connection. Prior to the fix, the
+        // connection was closed abnormally as soon as it was opened.
+        Assert.assertFalse("Connection was closed unexpectedly", client.waitForClose(2));
+        Assert.assertTrue(session.isOpen());
+    }
+
+
+    @ServerEndpoint("/")
+    public static class NoMethodsServerEndpoint {
+    }
+
+
     @ServerEndpoint("/")
     public static class Bug54716 {
 

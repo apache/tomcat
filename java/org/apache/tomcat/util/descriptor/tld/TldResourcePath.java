@@ -22,6 +22,7 @@ import java.net.URL;
 import java.util.Objects;
 
 import org.apache.tomcat.Jar;
+import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.scan.JarFactory;
 import org.apache.tomcat.util.scan.ReferenceCountedJar;
 
@@ -39,6 +40,9 @@ import org.apache.tomcat.util.scan.ReferenceCountedJar;
  * URL and entryName when using this implementation.
  */
 public class TldResourcePath {
+
+    private static final StringManager sm = StringManager.getManager(TldResourcePath.class);
+
     private final URL url;
     private final String webappPath;
     private final String entryName;
@@ -48,6 +52,8 @@ public class TldResourcePath {
      *
      * @param url        the location of the TLD
      * @param webappPath the web application path, if any, of the TLD
+     *
+     * @throws IllegalArgumentException if the provided URL is null
      */
     public TldResourcePath(URL url, String webappPath) {
         this(url, webappPath, null);
@@ -59,8 +65,13 @@ public class TldResourcePath {
      * @param url        the location of the JAR
      * @param webappPath the web application path, if any, of the JAR
      * @param entryName  the name of the entry in the JAR
+     *
+     * @throws IllegalArgumentException if the provided URL is null
      */
     public TldResourcePath(URL url, String webappPath, String entryName) {
+        if (url == null) {
+            throw new IllegalArgumentException(sm.getString("tldResourcePath.nullUrl"));
+        }
         this.url = url;
         this.webappPath = webappPath;
         this.entryName = entryName;

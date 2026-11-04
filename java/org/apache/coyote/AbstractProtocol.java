@@ -21,6 +21,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -90,12 +91,14 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
     /** Set of processors currently waiting for async processing. */
     private final Set<Processor> waitingProcessors = ConcurrentHashMap.newKeySet();
 
-    /**
-     * Controller for the timeout scheduling.
-     */
-    private ScheduledFuture<?> timeoutFuture = null;
     /** Scheduled future for the periodic monitor task. */
-    private ScheduledFuture<?> monitorFuture;
+    private volatile ScheduledFuture<?> monitorFuture;
+
+    /** Controller for the timeout scheduling. Accessed under timeoutSchedulingLock. */
+    private ScheduledFuture<?> timeoutFuture = null;
+    private boolean timeoutEnabled;
+    /** Guards the scheduling of the asynchronous timeout task. */
+    private final Object timeoutSchedulingLock = new Object();
 
     /**
      * Creates a new protocol handler.
@@ -976,6 +979,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
         }
 
         endpoint.start();
+        synchronized (timeoutSchedulingLock) {
+            timeoutEnabled = true;
+        }
         monitorFuture = getUtilityExecutor().scheduleWithFixedDelay(this::startAsyncTimeout, 0, 60, TimeUnit.SECONDS);
     }
 
@@ -985,21 +991,25 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
      * represent a timeout that is triggered independently of the socket read/write timeouts.
      */
     protected void startAsyncTimeout() {
-        if (timeoutFuture == null || timeoutFuture.isDone()) {
-            if (timeoutFuture != null && timeoutFuture.isDone()) {
-                // There was an error executing the scheduled task, get it and log it
-                try {
-                    timeoutFuture.get();
-                } catch (InterruptedException | ExecutionException e) {
-                    getLog().error(sm.getString("abstractProtocolHandler.asyncTimeoutError"), e);
+        synchronized (timeoutSchedulingLock) {
+            if (timeoutFuture == null || timeoutFuture.isDone()) {
+                if (timeoutFuture != null && timeoutFuture.isDone()) {
+                    // There was an error executing the scheduled task, get it and log it
+                    try {
+                        timeoutFuture.get();
+                    } catch (InterruptedException | ExecutionException | CancellationException e) {
+                        getLog().error(sm.getString("abstractProtocolHandler.asyncTimeoutError"), e);
+                    }
+                }
+                if (timeoutEnabled) {
+                    timeoutFuture = getUtilityExecutor().scheduleAtFixedRate(() -> {
+                        long now = System.currentTimeMillis();
+                        for (Processor processor : waitingProcessors) {
+                            processor.timeoutAsync(now);
+                        }
+                    }, 1, 1, TimeUnit.SECONDS);
                 }
             }
-            timeoutFuture = getUtilityExecutor().scheduleAtFixedRate(() -> {
-                long now = System.currentTimeMillis();
-                for (Processor processor : waitingProcessors) {
-                    processor.timeoutAsync(now);
-                }
-            }, 1, 1, TimeUnit.SECONDS);
         }
     }
 
@@ -1007,9 +1017,12 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
      * Stops the async timeout scheduler.
      */
     protected void stopAsyncTimeout() {
-        if (timeoutFuture != null) {
-            timeoutFuture.cancel(false);
-            timeoutFuture = null;
+        synchronized (timeoutSchedulingLock) {
+            if (timeoutFuture != null) {
+                timeoutFuture.cancel(false);
+                timeoutFuture = null;
+            }
+            timeoutEnabled = false;
         }
     }
 
@@ -1398,6 +1411,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
                         longPoll(wrapper, processor);
                         getProtocol().addWaitingProcessor(processor);
                     }
+                } else if (state == SocketState.UPGRADED_HALF_CLOSED) {
+                    // Don't add sockets back to the poller.
+                    // The handler will register for write as required
+                    // Add to waiting processors so the processor is visible if the protocol is stopped
+                    getProtocol().addWaitingProcessor(processor);
                 } else if (state == SocketState.ASYNC_IO) {
                     // Don't add sockets back to the poller.
                     // The handler will initiate all further I/O

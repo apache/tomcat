@@ -371,12 +371,14 @@ public class XByteBuffer implements Serializable {
             }
             // next 4 bytes are the size of the package
             int size = toInt(buf, pos);
-            // now the total buffer has to be long enough to hold
-            // START_DATA.length+4+size+END_DATA.length
-            pos = start + START_DATA.length + 4 + size;
-            if ((pos + END_DATA.length) > bufSize) {
+            // the size must not be negative and the total buffer has to be
+            // long enough to hold START_DATA.length+4+size+END_DATA.length;
+            // use long arithmetic so that a large size cannot overflow and
+            // wrap around to a negative or small value
+            if (size < 0 || (long) start + START_DATA.length + 4 + size + END_DATA.length > bufSize) {
                 break;
             }
+            pos = start + START_DATA.length + 4 + size;
             // and finally check the footer of the package END_DATA
             int newpos = firstIndexOf(buf, pos, END_DATA);
             // mismatch, there is no package
@@ -635,8 +637,8 @@ public class XByteBuffer implements Serializable {
         if (find.length == 0) {
             return result;
         }
-        if (srcOff >= src.length) {
-            throw new ArrayIndexOutOfBoundsException();
+        if (srcOff < 0 || srcOff >= src.length) {
+            throw new ArrayIndexOutOfBoundsException(srcOff);
         }
         boolean found = false;
         int srclen = src.length;

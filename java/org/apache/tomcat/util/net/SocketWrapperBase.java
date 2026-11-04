@@ -555,7 +555,8 @@ public abstract class SocketWrapperBase<E> {
      * @param off The offset in the array
      * @param len The number of bytes to read
      *
-     * @return the number of bytes read
+     * @return the number of bytes read, or -1 if the end of the input has been
+     *         reached
      *
      * @throws IOException If an I/O error occurs
      */
@@ -567,14 +568,17 @@ public abstract class SocketWrapperBase<E> {
      * @param block Whether to block
      * @param to The ByteBuffer to read into
      *
-     * @return the number of bytes read
+     * @return the number of bytes read, or -1 if the end of the input has been
+     *         reached
      *
      * @throws IOException If an I/O error occurs
      */
     public abstract int read(boolean block, ByteBuffer to) throws IOException;
 
     /**
-     * Checks if the socket is ready for reading.
+     * Checks if the socket is ready for reading. Note that this method may
+     * return {@code true} at the end of the input since, in that case, a
+     * subsequent read is able to report the end of the input immediately.
      *
      * @return {@code true} if data is available to read
      *

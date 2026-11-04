@@ -1440,7 +1440,7 @@ public class ExpiresFilter extends FilterBase {
             try {
                 if (name.startsWith(PARAMETER_EXPIRES_BY_TYPE)) {
                     String contentType =
-                            name.substring(PARAMETER_EXPIRES_BY_TYPE.length()).trim().toLowerCase(Locale.ENGLISH);
+                            name.substring(PARAMETER_EXPIRES_BY_TYPE.length()).strip().toLowerCase(Locale.ENGLISH);
                     ExpiresConfiguration expiresConfiguration = parseExpiresConfiguration(value);
                     this.expiresConfigurationByContentType.put(contentType, expiresConfiguration);
                 } else if (name.equalsIgnoreCase(PARAMETER_EXPIRES_DEFAULT)) {
@@ -1547,7 +1547,12 @@ public class ExpiresFilter extends FilterBase {
                         Integer.valueOf(response.getStatus()), response.getContentType(), expirationDate));
             }
 
-            String maxAgeDirective = "max-age=" + ((expirationDate.getTime() - System.currentTimeMillis()) / 1000);
+            long maxAgeSeconds = (expirationDate.getTime() - System.currentTimeMillis()) / 1000;
+            if (maxAgeSeconds < 0) {
+                maxAgeSeconds = 0;
+            }
+
+            String maxAgeDirective = "max-age=" + maxAgeSeconds;
 
             String cacheControlHeader = response.getCacheControlHeader();
             String newCacheControlHeader =
@@ -1567,7 +1572,7 @@ public class ExpiresFilter extends FilterBase {
      * @return the parsed expires
      */
     protected ExpiresConfiguration parseExpiresConfiguration(String inputLine) {
-        String line = inputLine.trim();
+        String line = inputLine.strip();
 
         StringTokenizer tokenizer = new StringTokenizer(line, " ");
 

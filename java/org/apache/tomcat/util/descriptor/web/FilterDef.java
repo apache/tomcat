@@ -247,19 +247,21 @@ public class FilterDef implements Serializable {
     }
 
     /**
-     * Sets the async-supported setting for this filter.
+     * Sets the async-supported setting for this filter. Only the value
+     * <code>"true"</code> enables async support; anything else, including
+     * <code>null</code>, leaves the specification default of no async support.
      *
      * @param asyncSupported The async-supported value
      */
     public void setAsyncSupported(String asyncSupported) {
         this.asyncSupported = asyncSupported;
-        asyncSupportedBoolean = !("false".equalsIgnoreCase(asyncSupported));
+        asyncSupportedBoolean = "true".equalsIgnoreCase(asyncSupported);
     }
 
     /**
      * The async-supported boolean setting for this filter.
      */
-    private boolean asyncSupportedBoolean = true;
+    private boolean asyncSupportedBoolean = false;
 
     /**
      * Returns whether async processing is supported for this filter.

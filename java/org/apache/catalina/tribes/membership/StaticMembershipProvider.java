@@ -73,7 +73,7 @@ public class StaticMembershipProvider extends MembershipProviderBase
     /**
      * List of static members for this cluster.
      */
-    protected ArrayList<StaticMember> staticMembers;
+    protected List<StaticMember> staticMembers;
     /**
      * Send options flag for channel messages.
      */
@@ -123,6 +123,16 @@ public class StaticMembershipProvider extends MembershipProviderBase
         // All the default properties have been set by StaticMembershipService.setDefaults, so no need to check
         String expirationTimeStr = properties.getProperty("expirationTime");
         this.expirationTime = Long.parseLong(expirationTimeStr);
+        if (expirationTime <= 0) {
+            throw new IllegalArgumentException(sm.getString("membershipService.invalidTimingProperty", "expirationTime",
+                    Long.valueOf(expirationTime)));
+        }
+        String pingIntervalStr = properties.getProperty("pingInterval");
+        this.pingInterval = Long.parseLong(pingIntervalStr);
+        if (pingInterval <= 0) {
+            throw new IllegalArgumentException(sm.getString("membershipService.invalidTimingProperty", "pingInterval",
+                    Long.valueOf(pingInterval)));
+        }
         String connectTimeoutStr = properties.getProperty("connectTimeout");
         this.connectTimeout = Integer.parseInt(connectTimeoutStr);
         String rpcTimeouStr = properties.getProperty("rpcTimeout");
@@ -134,8 +144,6 @@ public class StaticMembershipProvider extends MembershipProviderBase
         this.channel.addChannelListener(this);
         String useThreadStr = properties.getProperty("useThread");
         this.useThread = Boolean.parseBoolean(useThreadStr);
-        String pingIntervalStr = properties.getProperty("pingInterval");
-        this.pingInterval = Long.parseLong(pingIntervalStr);
     }
 
     @Override
@@ -422,7 +430,7 @@ public class StaticMembershipProvider extends MembershipProviderBase
      * Sets the static members for this cluster.
      * @param staticMembers the list of static members
      */
-    public void setStaticMembers(ArrayList<StaticMember> staticMembers) {
+    public void setStaticMembers(List<StaticMember> staticMembers) {
         this.staticMembers = staticMembers;
     }
 
@@ -558,7 +566,7 @@ public class StaticMembershipProvider extends MembershipProviderBase
                     sleep(pingInterval);
                     ping();
                 } catch (InterruptedException ix) {
-                    // Ignore
+                    // Expected during shutdown. The running flag is already set to false, so the loop will exit.
                 } catch (Exception e) {
                     log.warn(sm.getString("staticMembershipProvider.pingThread.failed"), e);
                 }

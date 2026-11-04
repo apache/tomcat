@@ -20,7 +20,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import org.apache.catalina.tribes.Member;
-import org.apache.catalina.tribes.group.TribesSslContext;
 
 /** Abstract base implementation of a data sender. */
 public abstract class AbstractSender implements DataSender {
@@ -88,6 +87,8 @@ public abstract class AbstractSender implements DataSender {
     public static void transferProperties(AbstractSender from, AbstractSender to) {
         to.rxBufSize = from.rxBufSize;
         to.txBufSize = from.txBufSize;
+        to.udpRxBufSize = from.udpRxBufSize;
+        to.udpTxBufSize = from.udpTxBufSize;
         to.directBuffer = from.directBuffer;
         to.keepAliveCount = from.keepAliveCount;
         to.keepAliveTime = from.keepAliveTime;
@@ -221,10 +222,18 @@ public abstract class AbstractSender implements DataSender {
         return port;
     }
 
+    /**
+     * Returns the SSL context used to secure the connection with TLS.
+     * @return the SSL context, or <code>null</code> if the channel is not secure
+     */
     public TribesSslContext getSslContext() {
         return sslContext;
     }
 
+    /**
+     * Sets the SSL context used to secure the connection with TLS.
+     * @param sslContext the SSL context to use
+     */
     public void setSslContext(TribesSslContext sslContext) {
         this.sslContext = sslContext;
     }

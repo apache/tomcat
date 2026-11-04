@@ -17,6 +17,7 @@
 package jakarta.servlet.http;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Serial;
@@ -99,12 +100,15 @@ public abstract class HttpServlet extends GenericServlet {
     @Deprecated(forRemoval = true, since = "Servlet 6.0")
     public static final String LEGACY_DO_HEAD = "jakarta.servlet.http.legacyDoHead";
 
-    private final transient Object cachedAllowHeaderValueLock = new Object();
+    // Non-final so it can be recreated on deserialization
+    private transient Object cachedAllowHeaderValueLock = new Object();
 
     /**
      * Cached value of the HTTP {@code Allow} header for this servlet.
+     * <p>
+     * Derived cache that is recomputed lazily.
      */
-    private volatile String cachedAllowHeaderValue = null;
+    private transient volatile String cachedAllowHeaderValue = null;
 
     /**
      * Cached value read from {@link HttpServlet#LEGACY_DO_HEAD} system property.
@@ -394,6 +398,11 @@ public abstract class HttpServlet extends GenericServlet {
         if (protocol.isEmpty() || protocol.endsWith("0.9") || protocol.endsWith("1.0")) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
         } else {
+            // RFC 9110, section 15.5.6: a 405 response must include an Allow header field
+            // Don't override an Allow header field the application may have set
+            if (!resp.containsHeader("Allow")) {
+                resp.setHeader("Allow", getAllowHeaderValue(req));
+            }
             resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, msg);
         }
     }
@@ -526,7 +535,9 @@ public abstract class HttpServlet extends GenericServlet {
      * OPTIONS request determines which HTTP methods the server supports and returns an appropriate header. For example,
      * if a servlet overrides <code>doGet</code>, this method returns the following header:
      * <p>
-     * <code>Allow: GET, HEAD, TRACE, OPTIONS</code>
+     * <code>Allow: GET, HEAD, OPTIONS</code>
+     * <p>
+     * The TRACE method may also be present depending on container configuration.
      * <p>
      * There's no need to override this method unless the servlet implements new HTTP methods, beyond those implemented
      * by HTTP 1.1.
@@ -538,7 +549,11 @@ public abstract class HttpServlet extends GenericServlet {
      * @exception ServletException if the request for the OPTIONS cannot be handled
      */
     protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setHeader("Allow", getAllowHeaderValue(req));
+    }
 
+
+    private String getAllowHeaderValue(HttpServletRequest req) {
         String allow = getCachedAllowHeaderValue();
 
         // Tomcat specific hack to see if TRACE is allowed
@@ -550,7 +565,7 @@ public abstract class HttpServlet extends GenericServlet {
             }
         }
 
-        resp.setHeader("Allow", allow);
+        return allow;
     }
 
 
@@ -745,6 +760,21 @@ public abstract class HttpServlet extends GenericServlet {
             throw new ServletException(lStrings.getString("http.non_http"));
         }
         service(request, response);
+    }
+
+
+    /**
+     * Restores the transient lock object used to guard the cached Allow header after deserialization. The cached
+     * header is recomputed lazily so it isn't restored here.
+     *
+     * @param stream the object input stream
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if a serialized class cannot be found
+     */
+    @Serial
+    private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+        stream.defaultReadObject();
+        cachedAllowHeaderValueLock = new Object();
     }
 
 

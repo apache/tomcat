@@ -280,7 +280,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         long timeout = Constants.IO_TIMEOUT_MS_DEFAULT;
         String timeoutValue = (String) userProperties.get(Constants.IO_TIMEOUT_MS_PROPERTY);
         if (timeoutValue != null) {
-            timeout = Long.valueOf(timeoutValue).intValue();
+            timeout = Long.valueOf(timeoutValue).longValue();
         }
 
         AsynchronousSocketChannel socketChannel;
@@ -1022,6 +1022,10 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
     @Override
     public void setDefaultMaxBinaryMessageBufferSize(int max) {
+        if (max < 1) {
+            throw new IllegalArgumentException(
+                    sm.getString("wsWebSocketContainer.illegalBufferSize", Integer.valueOf(max)));
+        }
         maxBinaryMessageBufferSize = max;
     }
 
@@ -1034,6 +1038,10 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
     @Override
     public void setDefaultMaxTextMessageBufferSize(int max) {
+        if (max < 1) {
+            throw new IllegalArgumentException(
+                    sm.getString("wsWebSocketContainer.illegalBufferSize", Integer.valueOf(max)));
+        }
         maxTextMessageBufferSize = max;
     }
 

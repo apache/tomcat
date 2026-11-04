@@ -24,10 +24,21 @@ public class TestChannelData {
     @Test
     public void testClone() {
         ChannelData original = new ChannelData();
+        byte[] payload = new byte[] { 1, 2, 3, 4 };
+        XByteBuffer message = new XByteBuffer(1024, false);
+        message.append(payload, 0, payload.length);
+        original.setMessage(message);
+
         ChannelData clone = original.clone();
 
         Assert.assertFalse(original == clone);
         Assert.assertTrue(original.getClass() == clone.getClass());
         Assert.assertTrue(original.equals(clone));
+        Assert.assertNotSame(message, clone.getMessage());
+        Assert.assertArrayEquals(payload, clone.getMessage().getBytes());
+        Assert.assertEquals(payload.length, clone.getMessage().getCapacity());
+
+        message.getBytesDirect()[0] = 99;
+        Assert.assertEquals(1, clone.getMessage().getBytesDirect()[0]);
     }
 }

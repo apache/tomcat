@@ -22,23 +22,10 @@
 # in the top-level source directory, and customize it as needed.
 # -----------------------------------------------------------------------------
 
-# ----- Version Control Flags -----
-version.major=1
-version.minor=1
-version.build=0
-version.patch=1
-version.suffix=
-
 # ----- Reproducible builds -----
 # Uncomment and set to current time for reproducible builds
 #2021-03-18T06:00:00Z
 #ant.tstamp.now=1616047200
-
-# ----- Default Base Path for Dependent Packages -----
-# Please note this path must be absolute, not relative,
-# as it is referenced with different working directory
-# contexts by the various build scripts.
-base.path=${basedir}/includes
 
 compile.source=1.8
 compile.target=1.8
@@ -47,61 +34,3 @@ compile.debug=true
 
 # Do not pass -deprecation (-Xlint:deprecation) flag to javac
 compile.deprecation=false
-
-# ----- Settings for Junit test database.
-
-# Common settings
-testdb.username=root
-testdb.password=password
-
-# H2
-testdb.url=jdbc:h2:~/.h2/test;QUERY_TIMEOUT=0;DB_CLOSE_ON_EXIT=TRUE;LOCK_TIMEOUT=50000;DEFAULT_LOCK_TIMEOUT=50000
-testdb.driverClassName=org.h2.Driver
-testdb.validationQuery=SELECT 1
-
-# MySQL
-#testdb.url=jdbc:mysql://localhost:3306/mysql?autoReconnect=true
-#testdb.driverClassName=com.mysql.jdbc.Driver
-#testdb.validationQuery=SELECT 1
-
-# Derby
-#testdb.url=jdbc:derby:derbyDB;create=true
-#testdb.driverClassName=org.apache.derby.jdbc.EmbeddedDriver
-#testdb.validationQuery=VALUES 1
-
-# JUnit Unit Test Suite
-junit.version=4.13
-junit.home=${base.path}/junit-${junit.version}
-junit.jar=${junit.home}/junit-${junit.version}.jar
-junit.loc=https://repo.maven.apache.org/maven2/junit/junit/${junit.version}/junit-${junit.version}.jar
-
-# Hamcrest Library, used by JUnit
-hamcrest.version=2.2
-hamcrest.home=${base.path}/hamcrest-${hamcrest.version}
-hamcrest.jar=${hamcrest.home}/hamcrest-${hamcrest.version}.jar
-hamcrest.loc=https://repo.maven.apache.org/maven2/org/hamcrest/hamcrest/${hamcrest.version}/hamcrest-${hamcrest.version}.jar
-
-mysql.home=${base.path}/mysql-connector-java-5.1.12
-mysql.jar=${mysql.home}/mysql-connector-java-5.1.12-bin.jar
-mysql.loc=http://mysql.mirrors.hoobly.com/Downloads/Connector-J/mysql-connector-java-5.1.12.zip
-
-tomcat.version=8.0.14
-tomcat.home=${base.path}/apache-tomcat-${tomcat.version}
-tomcat.dbcp.jar=${tomcat.home}/lib/tomcat-dbcp.jar
-tomcat.juli.jar=${tomcat.home}/bin/tomcat-juli.jar
-tomcat.loc=https://archive.apache.org/dist/tomcat/tomcat-8/v${tomcat.version}/bin/apache-tomcat-${tomcat.version}.zip
-
-tomcat.project.loc=https://svn.apache.org/repos/asf/tomcat/trunk/webapps/docs/project.xml
-tomcat.project.dest=${base.path}/project.xml
-
-tomcat.xsl.loc=https://svn.apache.org/repos/asf/tomcat/trunk/webapps/docs/tomcat-docs.xsl
-tomcat.xsl.dest=${base.path}/tomcat-docs.xsl
-
-derby.home=${base.path}/db-derby-10.5.1.1-bin
-derby.loc=https://archive.apache.org/dist/db/derby/db-derby-10.5.1.1/db-derby-10.5.1.1-bin.tar.gz
-derby.jar=${derby.home}/lib/derby.jar
-
-h2.version=2.1.210
-h2.home=${base.path}/h2-${h2.version}
-h2.loc=https://repo.maven.apache.org/maven2/com/h2database/h2/${h2.version}/h2-${h2.version}.jar
-h2.jar=${h2.home}/h2-${h2.version}.jar

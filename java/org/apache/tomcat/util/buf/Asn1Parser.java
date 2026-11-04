@@ -60,6 +60,12 @@ public class Asn1Parser {
      */
     public static final int TAG_ATTRIBUTE_BASE = 0xA0;
 
+    /**
+     * The maximum number of subsequent octets that may be used to encode a length. X.690 8.1.3.5 c) prohibits the
+     * initial length octet value that would permit 127 subsequent octets, which restricts the count to this value.
+     */
+    private static final int MAX_LENGTH_OCTETS = 126;
+
     private final byte[] source;
 
     private int pos = 0;
@@ -173,27 +179,48 @@ public class Asn1Parser {
      * Parses an ASN.1 length field.
      *
      * @return the parsed length value
+     *
+     * @throws IllegalArgumentException if the length uses a form that is not supported by this implementation, if the
+     *             decoded length cannot be represented by this implementation, or if the decoded length exceeds the
+     *             number of bytes remaining in the input data
      */
     public int parseLength() {
         int len = next();
         if (len > 127) {
             int bytes = len - 128;
-            if (bytes > 4) {
-                throw new IllegalArgumentException(sm.getString("asn1Parser.lengthInvalid", Integer.valueOf(-1),
-                        Integer.valueOf(source.length - pos)));
+            /*
+             * X.690 8.1.3.6.1 defines the single octet 0x80, which requests zero subsequent octets, as the indefinite
+             * length form. DER does not permit that form (X.690 10.1) and it is not supported here. Treating it as a
+             * length of zero would silently consume the identifier and desynchronise the parse, since the contents are
+             * terminated by end-of-contents octets (X.690 8.1.5) rather than by a length.
+             */
+            if (bytes == 0) {
+                throw new IllegalArgumentException(sm.getString("asn1Parser.indefiniteLength"));
             }
-            len = 0;
+            /*
+             * X.690 8.1.3.5 c) prohibits the initial length octet value 0xFF, which is reserved for future extension,
+             * so the number of subsequent octets is limited to MAX_LENGTH_OCTETS. Any value within that range is
+             * accepted, including the non-minimal encodings that are permitted by BER (X.690 8.1.3.5, Note 2) even
+             * though DER requires the minimum number of octets.
+             */
+            if (bytes > MAX_LENGTH_OCTETS) {
+                throw new IllegalArgumentException(sm.getString("asn1Parser.lengthOctetsInvalid",
+                        Integer.valueOf(bytes), Integer.valueOf(MAX_LENGTH_OCTETS)));
+            }
+            byte[] lenBytes = new byte[bytes];
             for (int i = 0; i < bytes; i++) {
-                len = len << 8;
-                len = len + next();
+                lenBytes[i] = (byte) next();
             }
-            if (len < 0) {
-                throw new IllegalArgumentException(sm.getString("asn1Parser.lengthInvalid", Integer.valueOf(-1),
-                        Integer.valueOf(source.length - pos)));
+            // Length octets are always unsigned per X.690 8.1.3.5.
+            BigInteger bigLen = new BigInteger(1, lenBytes);
+            if (bigLen.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
+                throw new IllegalArgumentException(sm.getString("asn1Parser.lengthUnsupported", bigLen,
+                        Integer.valueOf(Integer.MAX_VALUE)));
             }
+            len = bigLen.intValue();
         }
         if (source.length - pos < len) {
-            throw new IllegalArgumentException(sm.getString("asn1Parser.lengthInvalid", Integer.valueOf(-1),
+            throw new IllegalArgumentException(sm.getString("asn1Parser.lengthInvalid", Integer.valueOf(len),
                     Integer.valueOf(source.length - pos)));
         }
 

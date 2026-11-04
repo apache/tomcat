@@ -158,4 +158,53 @@ public class TestDataSourceRealm extends LoggingBaseTest {
 
         db.stop();
     }
+
+    @Test
+    public void testRealmWithoutRoleStore() throws Exception {
+
+        db = new DerbyDataSourceRealm("dsRealmNoRoles");
+        db.setUserTable("users");
+        db.setUserNameCol("user_name");
+        db.setUserCredCol("user_pass");
+
+        // Create only the users table, no role store is configured
+        Connection connection = db.open();
+        for (String sql: SIMPLE_SCHEMA.split(";")) {
+            if (sql.contains("user_roles")) {
+                continue;
+            }
+            try (Statement statement = connection.createStatement()) {
+                statement.execute(sql);
+            }
+        }
+
+        try (PreparedStatement stmt = connection.prepareStatement(USERS_INSERT)) {
+            stmt.setString(1, "tomcat");
+            stmt.setString(2, "password");
+            stmt.executeUpdate();
+        }
+
+        db.start();
+
+        // Default strict mode with no role store. Authentication of a valid
+        // user must succeed with an empty role list rather than fail.
+        Principal p = db.authenticate("tomcat", "bar");
+        Assert.assertNull(p);
+
+        p = db.authenticate("tomcat", "password");
+        Assert.assertTrue(p instanceof GenericPrincipal);
+        GenericPrincipal gp = (GenericPrincipal) p;
+        Assert.assertEquals(0, gp.getRoles().length);
+
+        p = db.getPrincipal("tomcat");
+        Assert.assertTrue(p instanceof GenericPrincipal);
+        gp = (GenericPrincipal) p;
+        Assert.assertEquals(0, gp.getRoles().length);
+
+        List<String> roles = db.getRoles("tomcat");
+        Assert.assertNotNull(roles);
+        Assert.assertEquals(0, roles.size());
+
+        db.stop();
+    }
 }

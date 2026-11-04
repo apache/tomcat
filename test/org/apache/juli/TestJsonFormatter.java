@@ -56,6 +56,47 @@ public class TestJsonFormatter {
     }
 
     @Test
+    public void testNullMessage() throws Exception {
+
+        Formatter formatter = new JsonFormatter();
+        LogRecord logRecord = new LogRecord(Level.FINE, null);
+        logRecord.setLoggerName("test");
+
+        String result = formatter.format(logRecord);
+
+        // Verify JSON content
+        Assert.assertTrue(result.startsWith("{"));
+        JSONParser parser = new JSONParser(new StringReader(result));
+        LinkedHashMap<String,Object> json = parser.object();
+        Assert.assertEquals("", json.get("message"));
+    }
+
+    @Test
+    public void testCircularCause() throws Exception {
+
+        Exception a = new Exception("A");
+        Exception b = new Exception("B");
+        a.initCause(b);
+        b.initCause(a);
+
+        LogRecord logRecord = new LogRecord(Level.FINE, "Test log message");
+        logRecord.setThrown(a);
+
+        Formatter formatter = new JsonFormatter();
+
+        // Without cycle detection this call would never complete
+        String result = formatter.format(logRecord);
+
+        // Verify JSON content
+        Assert.assertTrue(result.startsWith("{"));
+        JSONParser parser = new JSONParser(new StringReader(result));
+        LinkedHashMap<String,Object> json = parser.object();
+        @SuppressWarnings("unchecked")
+        ArrayList<Object> trace = (ArrayList<Object>) json.get("throwable");
+        Assert.assertTrue(String.valueOf(trace.get(trace.size() - 1)).startsWith("[Circular reference]"));
+    }
+
+    @Test
     public void testEscaping() {
         String[][] tests = new String[][] {
             new String[] { "x", "x" }, // Don't escape

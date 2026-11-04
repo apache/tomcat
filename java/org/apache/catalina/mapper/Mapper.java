@@ -166,6 +166,12 @@ public final class Mapper {
         if (host == null || host.isAlias()) {
             return;
         }
+        // Requests must not keep going to a removed host, even if it was the
+        // default host. A new default host is resolved again if the
+        // configuration still refers to a host that exists.
+        if (defaultHost != null && defaultHost.getRealHost() == host) {
+            defaultHost = null;
+        }
         MappedHost[] newHosts = hosts.clone();
         // Remove real host and all its aliases
         int j = 0;
@@ -239,10 +245,12 @@ public final class Mapper {
         }
         MappedHost[] newHosts = new MappedHost[hosts.length - 1];
         if (removeMap(hosts, newHosts, alias)) {
-            hosts = newHosts;
             hostMapping.getRealHost().removeAlias(hostMapping);
+            if (defaultHost == hostMapping) {
+                defaultHost = null;
+            }
+            hosts = newHosts;
         }
-
     }
 
     /**

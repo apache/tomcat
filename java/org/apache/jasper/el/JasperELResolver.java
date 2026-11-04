@@ -215,8 +215,7 @@ public class JasperELResolver extends CompositeELResolver {
                     method.setAccessible(true);
                     value = method.invoke(base, (Object[]) null);
                 } catch (Exception e) {
-                    Throwable thr = ExceptionUtils.unwrapInvocationTargetException(e);
-                    ExceptionUtils.handleThrowable(thr);
+                    throw toELException(e);
                 }
             }
             return value;
@@ -228,15 +227,17 @@ public class JasperELResolver extends CompositeELResolver {
             if (base == null || property == null) {
                 return;
             }
-            Method method = getWriteMethod(base.getClass(), property.toString(), value.getClass());
+            // A null value has no class to check the setter against. Pass null
+            // and let getWriteMethod() select a reference-typed setter
+            Class<?> valueClass = value == null ? null : value.getClass();
+            Method method = getWriteMethod(base.getClass(), property.toString(), valueClass);
             if (method != null) {
                 context.setPropertyResolved(base, property);
                 try {
                     method.setAccessible(true);
                     method.invoke(base, value);
                 } catch (Exception e) {
-                    Throwable thr = ExceptionUtils.unwrapInvocationTargetException(e);
-                    ExceptionUtils.handleThrowable(thr);
+                    throw toELException(e);
                 }
             }
         }
@@ -274,11 +275,17 @@ public class JasperELResolver extends CompositeELResolver {
             Method[] methods = beanClass.getMethods();
             for (Method method : methods) {
                 if (method.getParameterCount() == 1 && setter.equals(method.getName()) &&
-                        (valueClass == null || valueClass.isAssignableFrom(method.getParameterTypes()[0]))) {
+                        (valueClass == null || method.getParameterTypes()[0].isAssignableFrom(valueClass))) {
                     return method;
                 }
             }
             return null;
+        }
+
+        private static ELException toELException(Exception e) {
+            Throwable thr = ExceptionUtils.unwrapInvocationTargetException(e);
+            ExceptionUtils.handleThrowable(thr);
+            return new ELException(thr);
         }
 
         private static String capitalize(String name) {

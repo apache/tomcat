@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ChannelInterceptor;
+import org.apache.catalina.tribes.transport.ReceiverBase;
 import org.apache.tomcat.util.res.StringManager;
 
 public class TestGroupChannelOptionFlag {
@@ -33,6 +34,7 @@ public class TestGroupChannelOptionFlag {
     @Before
     public void setUp() throws Exception {
         channel = new GroupChannel();
+        ((ReceiverBase) channel.getChannelReceiver()).setPort(0);
     }
 
     @After

@@ -21,6 +21,7 @@ import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -56,7 +57,6 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource {
 
     private Registry registry;
     private String type;
-    private final List<ObjectName> mbeans = new ArrayList<>();
 
     /**
      * Set the registry.
@@ -91,7 +91,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource {
         setType(type);
         setSource(source);
         execute();
-        return mbeans;
+        return Collections.emptyList();
     }
 
     /**

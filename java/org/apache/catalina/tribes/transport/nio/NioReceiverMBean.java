@@ -45,6 +45,14 @@ public interface NioReceiverMBean {
     int getPort();
 
     /**
+     * Returns the TCP port the receiver is actually bound to, which may differ from the configured port if
+     * auto-bind was used.
+     *
+     * @return the bound TCP port, -1 if not bound
+     */
+    int getBoundPort();
+
+    /**
      * Returns the auto-bind mode.
      *
      * @return the auto-bind mode
@@ -59,11 +67,27 @@ public interface NioReceiverMBean {
     int getSecurePort();
 
     /**
+     * Returns the secure port the receiver is actually bound to, which may differ from the configured secure port if
+     * auto-bind was used.
+     *
+     * @return the bound secure port, -1 if not bound
+     */
+    int getBoundSecurePort();
+
+    /**
      * Returns the UDP port.
      *
      * @return the UDP port
      */
     int getUdpPort();
+
+    /**
+     * Returns the UDP port the receiver is actually bound to, which may differ from the configured UDP port if
+     * auto-bind was used.
+     *
+     * @return the bound UDP port, -1 if not bound
+     */
+    int getBoundUdpPort();
 
     /**
      * Returns the selector timeout.

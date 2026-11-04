@@ -22,10 +22,12 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.Certificate;
 import java.util.jar.Manifest;
 
 import org.apache.catalina.WebResourceRoot;
+import org.apache.catalina.util.URLEncoder;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -38,6 +40,7 @@ public class JarResourceRoot extends AbstractResource {
 
     private final File base;
     private final String baseUrl;
+    private final String internalPath;
     private final String name;
 
     /**
@@ -47,8 +50,10 @@ public class JarResourceRoot extends AbstractResource {
      * @param base the base file
      * @param baseUrl the base URL
      * @param webAppPath the web application path
+     * @param internalPath the internal path that has been mounted
      */
-    public JarResourceRoot(WebResourceRoot root, File base, String baseUrl, String webAppPath) {
+    public JarResourceRoot(WebResourceRoot root, File base, String baseUrl, String webAppPath,
+            String internalPath) {
         super(root, webAppPath);
         // Validate the webAppPath before going any further
         if (!webAppPath.endsWith("/")) {
@@ -56,6 +61,7 @@ public class JarResourceRoot extends AbstractResource {
         }
         this.base = base;
         this.baseUrl = "jar:" + baseUrl;
+        this.internalPath = internalPath;
         // Extract the name from the webAppPath
         // Strip the trailing '/' character
         String resourceName = webAppPath.substring(0, webAppPath.length() - 1);
@@ -133,7 +139,12 @@ public class JarResourceRoot extends AbstractResource {
 
     @Override
     public URL getURL() {
-        String url = baseUrl + "!/";
+        String url;
+        if (internalPath.isEmpty()) {
+            url = baseUrl + "!/";
+        } else {
+            url = baseUrl + "!" + URLEncoder.DEFAULT.encode(internalPath, StandardCharsets.UTF_8) + "/";
+        }
         try {
             return new URI(url).toURL();
         } catch (MalformedURLException | URISyntaxException | IllegalArgumentException e) {

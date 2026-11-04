@@ -20,6 +20,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.io.Serial;
 
 import jakarta.el.ELContext;
 import jakarta.el.ELException;
@@ -66,6 +67,9 @@ import org.apache.el.util.ReflectionUtil;
  * @see jakarta.el.MethodExpression
  */
 public final class MethodExpressionImpl extends MethodExpression implements Externalizable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private Class<?> expectedType;
 
@@ -128,7 +132,14 @@ public final class MethodExpressionImpl extends MethodExpression implements Exte
      */
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof MethodExpressionImpl && obj.hashCode() == this.hashCode());
+        if (!(obj instanceof MethodExpressionImpl)) {
+            return false;
+        }
+        if (obj.hashCode() != this.hashCode()) {
+            return false;
+        }
+
+        return this.getNode().equals(((MethodExpressionImpl) obj).getNode());
     }
 
     /**
@@ -207,7 +218,7 @@ public final class MethodExpressionImpl extends MethodExpression implements Exte
      */
     @Override
     public int hashCode() {
-        return this.expr.hashCode();
+        return this.getNode().hashCode();
     }
 
     /**

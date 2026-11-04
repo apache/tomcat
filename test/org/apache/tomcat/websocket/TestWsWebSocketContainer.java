@@ -25,6 +25,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.function.IntConsumer;
 
 import jakarta.servlet.ServletContextEvent;
 import jakarta.websocket.ClientEndpointConfig;
@@ -103,6 +104,52 @@ public class TestWsWebSocketContainer extends WsWebSocketContainerBaseTest {
         Assert.assertEquals(MESSAGE_STRING_1, messages.peek());
 
         ((WsWebSocketContainer) wsContainer).destroy();
+    }
+
+
+    @Test
+    public void testMaxMessageBufferSizeValidation() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        // No file system docBase required
+        Context ctx = getProgrammaticRootContext();
+        ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMapping("/", "default");
+
+        tomcat.start();
+
+        WsWebSocketContainer wsContainer = new WsWebSocketContainer();
+
+        doTestIllegalBufferSize(wsContainer::setDefaultMaxBinaryMessageBufferSize);
+        doTestIllegalBufferSize(wsContainer::setDefaultMaxTextMessageBufferSize);
+
+        Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class,
+                ClientEndpointConfig.Builder.create().build(),
+                new URI("ws://" + getHostName() + ":" + getPort() + TesterEchoServer.Config.PATH_ASYNC));
+
+        doTestIllegalBufferSize(wsSession::setMaxBinaryMessageBufferSize);
+        doTestIllegalBufferSize(wsSession::setMaxTextMessageBufferSize);
+
+        // Positive values remain valid
+        wsSession.setMaxBinaryMessageBufferSize(1);
+        Assert.assertEquals(1, wsSession.getMaxBinaryMessageBufferSize());
+        wsSession.setMaxTextMessageBufferSize(1);
+        Assert.assertEquals(1, wsSession.getMaxTextMessageBufferSize());
+
+        wsSession.close();
+        wsContainer.destroy();
+    }
+
+
+    private static void doTestIllegalBufferSize(IntConsumer setter) {
+        for (int size : new int[] { 0, -1 }) {
+            try {
+                setter.accept(size);
+                Assert.fail("No exception thrown for buffer size [" + size + "]");
+            } catch (IllegalArgumentException iae) {
+                // Expected
+            }
+        }
     }
 
 

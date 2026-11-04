@@ -18,6 +18,7 @@ package org.apache.catalina.filters;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Locale;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -114,17 +115,20 @@ public class AddDefaultCharsetFilter extends FilterBase {
         @Override
         public void setContentType(String contentType) {
 
-            if (contentType != null && contentType.startsWith("text/")) {
-                if (!contentType.contains("charset=")) {
-                    super.setContentType(contentType + ";charset=" + encoding);
-                } else {
-                    super.setContentType(contentType);
-                    encoding = getCharacterEncoding();
+            if (contentType != null) {
+                String lowerCaseContentType = contentType.toLowerCase(Locale.ENGLISH).trim();
+                if (lowerCaseContentType.startsWith("text/")) {
+                    if (!lowerCaseContentType.contains("charset=")) {
+                        super.setContentType(contentType + ";charset=" + encoding);
+                    } else {
+                        super.setContentType(contentType);
+                        encoding = getCharacterEncoding();
+                    }
+                    return;
                 }
-            } else {
-                super.setContentType(contentType);
             }
 
+            super.setContentType(contentType);
         }
 
         @Override
@@ -148,7 +152,21 @@ public class AddDefaultCharsetFilter extends FilterBase {
         @Override
         public void setCharacterEncoding(String charset) {
             super.setCharacterEncoding(charset);
-            encoding = charset;
+            if (charset == null) {
+                encoding = DEFAULT_ENCODING;
+            } else {
+                encoding = charset;
+            }
+        }
+
+        @Override
+        public void setCharacterEncoding(Charset encoding) {
+            super.setCharacterEncoding(encoding);
+            if (encoding == null) {
+                this.encoding = DEFAULT_ENCODING;
+            } else {
+                this.encoding = encoding.name();
+            }
         }
     }
 }

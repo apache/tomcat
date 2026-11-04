@@ -24,6 +24,7 @@ import javax.management.ObjectName;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
  * Utility class for JMX registration of JDBC pool components.
@@ -41,20 +42,28 @@ public class JmxUtil {
     /**
      * Register an object as an MBean.
      *
-     * @param base the base object name
+     * @param base    the base object name
      * @param keyprop the key property
-     * @param obj the object to register
-     * @return the registered object name, or {@code null} on failure
+     * @param obj     the object to register
+     *
+     * @return the registered object name, or {@code null} on failure. A registration the MBean server refused - because
+     *             the name is already in use by another MBean, for instance - is such a failure, so a non-{@code null}
+     *             name always means this call is the one that published the object under that name
      */
     public static ObjectName registerJmx(ObjectName base, String keyprop, Object obj) {
         ObjectName oname = null;
         try {
-            oname = getObjectName(base, keyprop);
-            if (oname != null) {
-                ManagementFactory.getPlatformMBeanServer().registerMBean(obj, oname);
+            ObjectName name = getObjectName(base, keyprop);
+            if (name != null) {
+                ManagementFactory.getPlatformMBeanServer().registerMBean(obj, name);
+                // Only a publish the MBean server accepted is a registration:
+                // handing back the name of a refused one would have the caller
+                // treat it as its own, and its later unregistration would then
+                // take the name away from the MBean that really owns it
+                oname = name;
             }
         } catch (Exception e) {
-            log.error("Jmx registration failed.",e);
+            log.error(MessageFactory.get("jmxUtil.jmxRegistrationFailed"), e);
         }
         return oname;
     }
@@ -65,18 +74,17 @@ public class JmxUtil {
      * @param oname the object name to unregister
      */
     public static void unregisterJmx(ObjectName oname) {
-        if (oname ==null) {
+        if (oname == null) {
             return;
         }
         try {
             ManagementFactory.getPlatformMBeanServer().unregisterMBean(oname);
         } catch (Exception e) {
-            log.error("Jmx unregistration failed.",e);
+            log.error(MessageFactory.get("jmxUtil.jmxUnregistrationFailed"), e);
         }
     }
 
-    private static ObjectName getObjectName(ObjectName base, String keyprop)
-            throws MalformedObjectNameException {
+    private static ObjectName getObjectName(ObjectName base, String keyprop) throws MalformedObjectNameException {
         if (base == null) {
             return null;
         }

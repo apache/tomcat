@@ -82,7 +82,7 @@ public class JspHelper {
      */
     public static String getDisplayCreationTimeForSession(Session in_session) {
         try {
-            if (in_session.getCreationTime() == 0) {
+            if (in_session.getCreationTime() <= 0) {
                 return "";
             }
             DateFormat formatter = new SimpleDateFormat(DATE_TIME_FORMAT);
@@ -101,7 +101,7 @@ public class JspHelper {
      */
     public static String getDisplayLastAccessedTimeForSession(Session in_session) {
         try {
-            if (in_session.getLastAccessedTime() == 0) {
+            if (in_session.getLastAccessedTime() <= 0) {
                 return "";
             }
             DateFormat formatter = new SimpleDateFormat(DATE_TIME_FORMAT);
@@ -120,7 +120,7 @@ public class JspHelper {
      */
     public static String getDisplayUsedTimeForSession(Session in_session) {
         try {
-            if (in_session.getCreationTime() == 0) {
+            if (in_session.getCreationTime() <= 0) {
                 return "";
             }
         } catch (IllegalStateException ise) {
@@ -134,18 +134,23 @@ public class JspHelper {
      * Returns the formatted time-to-live for the given session.
      *
      * @param in_session the session
-     * @return the formatted TTL string
+     * @return the formatted TTL string, or the infinity symbol for sessions that never time out
      */
     public static String getDisplayTTLForSession(Session in_session) {
         try {
-            if (in_session.getCreationTime() == 0) {
+            if (in_session.getCreationTime() <= 0) {
                 return "";
             }
         } catch (IllegalStateException ise) {
             // ignore: invalidated session
             return "";
         }
-        return secondsToTimeString(SessionUtils.getTTLForSession(in_session) / 1000);
+        long ttl = SessionUtils.getTTLForSession(in_session);
+        if (ttl == Long.MAX_VALUE) {
+            // Use the infinity symbol here rather than 'Unlimited' or similar to avoid i18n.
+            return "\u221e";
+        }
+        return secondsToTimeString(ttl / 1000);
     }
 
     /**
@@ -156,7 +161,7 @@ public class JspHelper {
      */
     public static String getDisplayInactiveTimeForSession(Session in_session) {
         try {
-            if (in_session.getCreationTime() == 0) {
+            if (in_session.getCreationTime() <= 0) {
                 return "";
             }
         } catch (IllegalStateException ise) {

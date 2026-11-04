@@ -181,11 +181,17 @@ public class NioSender extends AbstractSender {
     }
 
     private void configureSocket() throws IOException {
+        // The timeout is a long in milliseconds but SO_TIMEOUT is an int,
+        // so cap it at the largest value the socket option can represent.
+        // Casting directly would overflow to a negative value for timeouts
+        // larger than Integer.MAX_VALUE, which the socket then rejects with
+        // an IllegalArgumentException.
+        int soTimeout = (int) Math.min(getTimeout(), Integer.MAX_VALUE);
         if (socketChannel != null) {
             socketChannel.configureBlocking(false);
             socketChannel.socket().setSendBufferSize(getTxBufSize());
             socketChannel.socket().setReceiveBufferSize(getRxBufSize());
-            socketChannel.socket().setSoTimeout((int) getTimeout());
+            socketChannel.socket().setSoTimeout(soTimeout);
             socketChannel.socket().setTcpNoDelay(getTcpNoDelay());
             socketChannel.socket().setKeepAlive(getSoKeepAlive());
             socketChannel.socket().setReuseAddress(getSoReuseAddress());
@@ -196,7 +202,7 @@ public class NioSender extends AbstractSender {
             dataChannel.configureBlocking(false);
             dataChannel.socket().setSendBufferSize(getUdpTxBufSize());
             dataChannel.socket().setReceiveBufferSize(getUdpRxBufSize());
-            dataChannel.socket().setSoTimeout((int) getTimeout());
+            dataChannel.socket().setSoTimeout(soTimeout);
             dataChannel.socket().setReuseAddress(getSoReuseAddress());
             dataChannel.socket().setTrafficClass(getSoTrafficClass());
         }

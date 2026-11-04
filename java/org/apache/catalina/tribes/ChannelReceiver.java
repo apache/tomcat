@@ -57,6 +57,14 @@ public interface ChannelReceiver extends Heartbeat {
     int getPort();
 
     /**
+     * Returns the port the receiver is actually bound to. This may differ from the configured port if the receiver
+     * automatically bound to another port because the configured port was not available.
+     *
+     * @return the bound port, -1 if the non-secure port is not bound
+     */
+    int getBoundPort();
+
+    /**
      * Returns the secure listening port
      *
      * @return port, -1 if a secure port is not activated
@@ -64,11 +72,27 @@ public interface ChannelReceiver extends Heartbeat {
     int getSecurePort();
 
     /**
+     * Returns the secure port the receiver is actually bound to. This may differ from the configured secure port if
+     * the receiver automatically bound to another port because the configured port was not available.
+     *
+     * @return the bound secure port, -1 if the secure port is not bound
+     */
+    int getBoundSecurePort();
+
+    /**
      * Returns the UDP port
      *
      * @return port, -1 if the UDP port is not activated.
      */
     int getUdpPort();
+
+    /**
+     * Returns the UDP port the receiver is actually bound to. This may differ from the configured UDP port if the
+     * receiver automatically bound to another port because the configured port was not available.
+     *
+     * @return the bound UDP port, -1 if the UDP port is not bound
+     */
+    int getBoundUdpPort();
 
     /**
      * Sets the message listener to receive notification of incoming messages.

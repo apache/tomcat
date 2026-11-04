@@ -20,6 +20,12 @@ on:
     branches:
       - main
 
+# Only one run of the same workflow per branch or pull request runs at a time. A run that is still queued is
+# cancelled when the workflow is triggered for a newer commit, but a run that is already in progress is left to finish.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
 permissions:
   contents: read
 

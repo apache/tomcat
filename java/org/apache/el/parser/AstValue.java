@@ -250,7 +250,11 @@ public final class AstValue extends SimpleNode {
         // Handle varArgs and any coercion required
         values = convertArgs(ctx, values, m);
 
-        return new MethodReference(t.base, getMethodInfo(ctx, types), m.getAnnotations(), values);
+        // The method information is taken from the method resolved above, so
+        // that the base chain and the parameters are evaluated only once
+        MethodInfo mi = new MethodInfo(m.getName(), m.getReturnType(), m.getParameterTypes());
+
+        return new MethodReference(t.base, mi, m.getAnnotations(), values);
     }
 
     private Object[] convertArgs(EvaluationContext ctx, Object[] src, Method m) {
@@ -262,7 +266,10 @@ public final class AstValue extends SimpleNode {
 
         int paramCount = types.length;
 
-        if (m.isVarArgs() && paramCount > 1 && (src == null || paramCount > src.length) ||
+        // For a varargs method, the final parameter may be supplied by zero or
+        // more arguments so the minimum number of arguments is one less than
+        // the number of parameters.
+        if (m.isVarArgs() && paramCount > 1 && (src == null || paramCount - 1 > src.length) ||
                 !m.isVarArgs() && (src == null || src.length != paramCount)) {
             String srcCount = null;
             if (src != null) {
@@ -271,7 +278,7 @@ public final class AstValue extends SimpleNode {
             String msg;
             if (m.isVarArgs()) {
                 msg = MessageFactory.get("error.invoke.tooFewParams", m.getName(), srcCount,
-                        Integer.toString(paramCount));
+                        Integer.toString(paramCount - 1));
             } else {
                 msg = MessageFactory.get("error.invoke.wrongParams", m.getName(), srcCount,
                         Integer.toString(paramCount));
@@ -427,7 +434,7 @@ public final class AstValue extends SimpleNode {
     @Override
     public ValueReference getValueReference(EvaluationContext ctx) {
         // Check this is a reference to a base and a property
-        if (this.children.length > 2 && this.jjtGetChild(2) instanceof AstMethodParameters) {
+        if (isParametersProvided()) {
             // This is a method call
             return null;
         }

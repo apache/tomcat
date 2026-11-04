@@ -35,6 +35,6 @@ public class JspPropertyNotWritableException extends PropertyNotWritableExceptio
      * @param e The cause exception
      */
     public JspPropertyNotWritableException(String mark, PropertyNotWritableException e) {
-        super(mark + " " + e.getMessage(), e.getCause());
+        super(mark + " " + e.getMessage(), e);
     }
 }

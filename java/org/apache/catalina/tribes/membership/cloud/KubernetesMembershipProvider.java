@@ -67,8 +67,6 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
             return;
         }
 
-        super.start(level);
-
         // Set up Kubernetes API parameters
         String namespace = getNamespace();
 
@@ -101,13 +99,19 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                 streamProvider = new TokenStreamProvider(new String(bytes, StandardCharsets.US_ASCII), caCertFile);
                 saTokenLastModifiedTime = Files.getLastModifiedTime(saTokenPath);
             } catch (IOException ioe) {
-                log.error(sm.getString("kubernetesMembershipProvider.streamError"), ioe);
+                // Without the token, the Kubernetes API cannot be accessed and a provider without a
+                // stream provider never recovers, keeping this node out of the membership for its
+                // whole lifetime while the other nodes keep replicating to it. Fail the start
+                // instead, as the client certificate branch does for its own errors.
+                throw new IllegalStateException(sm.getString(
+                        "kubernetesMembershipProvider.serviceAccountTokenReadFailed", saTokenFile), ioe);
             }
         } else {
             String clientKeyFile = getEnv("KUBERNETES_CLIENT_KEY_FILE");
             if (clientKeyFile == null) {
-                log.error(sm.getString("kubernetesMembershipProvider.noKey"));
-                return;
+                // Without the key, the Kubernetes API cannot be accessed and a provider without a stream provider
+                // never recovers. Fail the start, as is done when the service account token cannot be read.
+                throw new IllegalStateException(sm.getString("kubernetesMembershipProvider.noKey"));
             }
             String clientKeyPassword = getEnv("KUBERNETES_CLIENT_KEY_PASSWORD");
             String clientKeyAlgo = getEnv("KUBERNETES_CLIENT_KEY_ALGO");
@@ -137,6 +141,10 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
         if (labels != null && !labels.isEmpty()) {
             url = url + "?labelSelector=" + labels;
         }
+
+        // Everything that can reject the configuration is done. Only now create the membership and register as a
+        // channel listener so that a failed start does not leave the listener registered.
+        super.start(level);
 
         // Fetch initial members
         heartbeat();

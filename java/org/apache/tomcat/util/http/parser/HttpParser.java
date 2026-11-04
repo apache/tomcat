@@ -835,17 +835,17 @@ public class HttpParser {
             // No q value just whitespace
             return 1;
         } else if (c != 'q') {
-            // Malformed. Use quality of zero so it is dropped.
+            // Malformed. Use quality of -1 so it is dropped.
             skipUntil(input, c, delimiter);
-            return 0;
+            return -1;
         }
         // RFC 7231 does not allow whitespace here but be tolerant
         skipWhitespace(input);
         c = input.read();
         if (c != '=') {
-            // Malformed. Use quality of zero so it is dropped.
+            // Malformed. Use quality of -1 so it is dropped.
             skipUntil(input, c, delimiter);
-            return 0;
+            return -1;
         }
 
         // RFC 7231 does not allow whitespace here but be tolerant
@@ -875,10 +875,9 @@ public class HttpParser {
                 c = input.read();
             }
         } else {
-            // Malformed. Use quality of zero so it is dropped and skip until
-            // EOF or the next delimiter
+            // Malformed. Use quality of -1 so it is dropped and skip until EOF or the next delimiter
             skipUntil(input, c, delimiter);
-            return 0;
+            return -1;
         }
 
         if (c == 9 || c == 32) {
@@ -888,15 +887,15 @@ public class HttpParser {
 
         // Must be at delimiter or EOF
         if (c != delimiter && c != -1) {
-            // Malformed. Use quality of zero so it is dropped and skip until
-            // EOF or the next delimiter
+            // Malformed. Use quality of -1 so it is dropped and skip until EOF or the next delimiter
             skipUntil(input, c, delimiter);
-            return 0;
+            return -1;
         }
 
         double result = Double.parseDouble(value.toString());
+        // Malformed. Use quality of -1 so it is dropped
         if (result > 1) {
-            return 0;
+            return -1;
         }
         return result;
     }
@@ -1108,6 +1107,10 @@ public class HttpParser {
 
     static int validatePort(Reader reader, int colonPosition) throws IOException {
         // Remaining characters should be numeric ...
+        // An empty port (a ':' not followed by any digits) is permitted by the
+        // grammar (RFC 3986, section 3.2.3). It is treated as equivalent to no
+        // port being present: the colon position is returned and the caller
+        // must not overwrite the port already associated with the request.
         readInteger(reader);
         // ... followed by EOS
         if (reader.read() == -1) {

@@ -78,12 +78,12 @@ public class OpenSSLLibrary {
 
     static MemorySegment enginePointer = MemorySegment.NULL;
 
-    static void initLibrary() {
+    public static void initLibrary() {
         synchronized (lock) {
             if (OpenSSLStatus.isLibraryInitialized()) {
                 return;
             }
-            long initParam = (OpenSSL_version_num() >= 0x3000000fL) ? 0 : OPENSSL_INIT_ENGINE_ALL_BUILTIN();
+            long initParam = (OpenSSL_version_num() >= 0x30000000L) ? 0 : OPENSSL_INIT_ENGINE_ALL_BUILTIN();
             OPENSSL_init_ssl(initParam, MemorySegment.NULL);
             OpenSSLStatus.setLibraryInitialized(true);
         }
@@ -181,7 +181,9 @@ public class OpenSSLLibrary {
                 OpenSSLStatus.setVersion(OpenSSL_version_num());
                 OpenSSLStatus.setMajorVersion(openssl_h_Compatibility.MAJOR);
                 OpenSSLStatus.setMinorVersion(openssl_h_Compatibility.MINOR);
-                if (openssl_h_Compatibility.OPENSSL3) {
+                if (openssl_h_Compatibility.OPENSSL4) {
+                    OpenSSLStatus.setName(OpenSSLStatus.Name.OPENSSL4);
+                } else if (openssl_h_Compatibility.OPENSSL3) {
                     OpenSSLStatus.setName(OpenSSLStatus.Name.OPENSSL3);
                 } else if (openssl_h_Compatibility.OPENSSL) {
                     OpenSSLStatus.setName(OpenSSLStatus.Name.OPENSSL);
@@ -362,7 +364,7 @@ public class OpenSSLLibrary {
             OpenSSLStatus.setAvailable(false);
 
             try {
-                if (OpenSSL_version_num() < 0x3000000fL) {
+                if (OpenSSL_version_num() < 0x30000000L) {
                     // There could be unreferenced SSL_CTX still waiting for GC
                     System.gc();
                     freeDHParameters();
@@ -445,10 +447,16 @@ public class OpenSSLLibrary {
         try (var localArena = Arena.ofConfined()) {
             initLibrary();
             var sslCtx = SSL_CTX_new(TLS_server_method());
+            if (MemorySegment.NULL.equals(sslCtx)) {
+                throw new IllegalStateException(sm.getString("openssl.errMakeContext", getLastError()));
+            }
             try {
                 openssl_h_Compatibility.SSL_CTX_set_options(sslCtx, SSL_OP_ALL());
                 SSL_CTX_set_cipher_list(sslCtx, localArena.allocateFrom(ciphers));
                 var ssl = SSL_new(sslCtx);
+                if (MemorySegment.NULL.equals(ssl)) {
+                    throw new IllegalStateException(sm.getString("engine.noSSL", getLastError()));
+                }
                 SSL_set_accept_state(ssl);
                 try {
                     for (String c : getCiphers(ssl)) {
@@ -456,7 +464,12 @@ public class OpenSSLLibrary {
                         if (c == null || c.isEmpty() || ciphersList.contains(c)) {
                             continue;
                         }
-                        ciphersList.add(OpenSSLCipherConfigurationParser.openSSLToJsse(c));
+                        String jsseName = OpenSSLCipherConfigurationParser.openSSLToJsse(c);
+                        // Ignore ciphers with no JSSE equivalent.
+                        if (jsseName == null) {
+                            continue;
+                        }
+                        ciphersList.add(jsseName);
                     }
                 } finally {
                     SSL_free(ssl);

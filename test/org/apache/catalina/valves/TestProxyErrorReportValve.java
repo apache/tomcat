@@ -18,6 +18,7 @@ package org.apache.catalina.valves;
 
 import java.io.IOException;
 import java.io.Serial;
+import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -333,6 +334,223 @@ public class TestProxyErrorReportValve extends TomcatBaseTest {
         String body = res.toString();
         Assert.assertNotNull(body);
         Assert.assertFalse(body.contains("Server broke"));
+    }
+
+
+    @Test
+    public void testProxyModeRelativeLocationFallsBackToSuper() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        StandardHost host = (StandardHost) tomcat.getHost();
+        host.setErrorReportValveClass(PROXY_VALVE);
+
+        Context ctx = getProgrammaticRootContext();
+
+        Tomcat.addServlet(ctx, "error", new SendErrorServlet(
+                HttpServletResponse.SC_NOT_FOUND, "Not found"));
+        ctx.addServletMapping("/", "error");
+
+        tomcat.start();
+
+        ProxyErrorReportValve valve = null;
+        Valve[] valves = host.getPipeline().getValves();
+        for (Valve valveCandidate : valves) {
+            if (PROXY_VALVE.equals(valveCandidate.getClass().getName())) {
+                valve = (ProxyErrorReportValve)valveCandidate;
+                break;
+            }
+        }
+        Assert.assertNotNull(valve);
+        valve.setUseRedirect(false);
+        // Relative locations cannot be proxied. The default error report must
+        // be produced rather than an empty response.
+        valve.setProperty("errorCode." + HttpServletResponse.SC_NOT_FOUND, "/error-page");
+
+        ByteChunk res = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort(), res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
+
+        String body = res.toString();
+        Assert.assertNotNull("Response body should not be empty", body);
+        Assert.assertTrue("Should contain HTML error report",
+                body.contains("html") &&
+                    body.contains(String.valueOf(HttpServletResponse.SC_NOT_FOUND)));
+    }
+
+
+    @Test
+    public void testProxyModeUnreachableTargetFallsBackToSuper() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        StandardHost host = (StandardHost) tomcat.getHost();
+        host.setErrorReportValveClass(PROXY_VALVE);
+
+        Context ctx = getProgrammaticRootContext();
+
+        Tomcat.addServlet(ctx, "error", new SendErrorServlet(
+                HttpServletResponse.SC_NOT_FOUND, "Not found"));
+        ctx.addServletMapping("/", "error");
+
+        // Find a port that is not in use
+        int deadPort;
+        try (ServerSocket listener = new ServerSocket(0)) {
+            deadPort = listener.getLocalPort();
+        }
+
+        tomcat.start();
+
+        ProxyErrorReportValve valve = null;
+        Valve[] valves = host.getPipeline().getValves();
+        for (Valve valveCandidate : valves) {
+            if (PROXY_VALVE.equals(valveCandidate.getClass().getName())) {
+                valve = (ProxyErrorReportValve)valveCandidate;
+                break;
+            }
+        }
+        Assert.assertNotNull(valve);
+        valve.setUseRedirect(false);
+        // An unreachable proxy target must not result in an empty response.
+        valve.setProperty("errorCode." + HttpServletResponse.SC_NOT_FOUND,
+                "http://localhost:" + deadPort + "/error-page");
+
+        ByteChunk res = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort(), res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
+
+        String body = res.toString();
+        Assert.assertNotNull("Response body should not be empty", body);
+        Assert.assertTrue("Should contain HTML error report",
+                body.contains("html") &&
+                    body.contains(String.valueOf(HttpServletResponse.SC_NOT_FOUND)));
+    }
+
+
+    @Test
+    public void testProxyModeUnsupportedProtocolFallsBackToSuper() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        StandardHost host = (StandardHost) tomcat.getHost();
+        host.setErrorReportValveClass(PROXY_VALVE);
+
+        Context ctx = getProgrammaticRootContext();
+
+        Tomcat.addServlet(ctx, "error", new SendErrorServlet(
+                HttpServletResponse.SC_NOT_FOUND, "Not found"));
+        ctx.addServletMapping("/", "error");
+
+        tomcat.start();
+
+        ProxyErrorReportValve valve = null;
+        Valve[] valves = host.getPipeline().getValves();
+        for (Valve valveCandidate : valves) {
+            if (PROXY_VALVE.equals(valveCandidate.getClass().getName())) {
+                valve = (ProxyErrorReportValve)valveCandidate;
+                break;
+            }
+        }
+        Assert.assertNotNull(valve);
+        valve.setUseRedirect(false);
+        // Only http and https URLs can be proxied. The default error report
+        // must be produced rather than an empty response.
+        valve.setProperty("errorCode." + HttpServletResponse.SC_NOT_FOUND,
+                "file:///tmp/does-not-exist");
+
+        ByteChunk res = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort(), res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
+
+        String body = res.toString();
+        Assert.assertNotNull("Response body should not be empty", body);
+        Assert.assertTrue("Should contain HTML error report",
+                body.contains("html") &&
+                    body.contains(String.valueOf(HttpServletResponse.SC_NOT_FOUND)));
+    }
+
+
+    @Test
+    public void testProxyModeTargetErrorStatusFallsBackToSuper() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        StandardHost host = (StandardHost) tomcat.getHost();
+        host.setErrorReportValveClass(PROXY_VALVE);
+
+        Context ctx = getProgrammaticRootContext();
+
+        Tomcat.addServlet(ctx, "error", new SendErrorServlet(
+                HttpServletResponse.SC_NOT_FOUND, "Not found"));
+        ctx.addServletMapping("/", "error");
+
+        // The proxy target itself responds with an error status
+        Tomcat.addServlet(ctx, "failingErrorPage", new SendErrorServlet(
+                HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Target broke"));
+        ctx.addServletMapping("/error-page", "failingErrorPage");
+
+        tomcat.start();
+
+        ProxyErrorReportValve valve = null;
+        Valve[] valves = host.getPipeline().getValves();
+        for (Valve valveCandidate : valves) {
+            if (PROXY_VALVE.equals(valveCandidate.getClass().getName())) {
+                valve = (ProxyErrorReportValve)valveCandidate;
+                break;
+            }
+        }
+        Assert.assertNotNull(valve);
+        valve.setUseRedirect(false);
+        valve.setProperty("errorCode." + HttpServletResponse.SC_NOT_FOUND,
+                "http://localhost:" + getPort() + "/error-page");
+
+        ByteChunk res = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort(), res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
+
+        // A target that responds with an error status cannot be proxied. The
+        // default error report must not be corrupted by target metadata.
+        String body = res.toString();
+        Assert.assertNotNull("Response body should not be empty", body);
+        Assert.assertTrue("Should contain HTML error report",
+                body.contains("html") &&
+                    body.contains(String.valueOf(HttpServletResponse.SC_NOT_FOUND)));
+    }
+
+
+    @Test
+    public void testMissingPropertiesBundleFallsBackToSuper() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        ((StandardHost) tomcat.getHost()).setErrorReportValveClass(PROXY_VALVE);
+
+        Context ctx = getProgrammaticRootContext();
+
+        Tomcat.addServlet(ctx, "error", new SendErrorServlet(
+                HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server broke"));
+        ctx.addServletMapping("/", "error");
+
+        tomcat.start();
+
+        ProxyErrorReportValve valve = null;
+        Valve[] valves = tomcat.getHost().getPipeline().getValves();
+        for (Valve valveCandidate : valves) {
+            if (PROXY_VALVE.equals(valveCandidate.getClass().getName())) {
+                valve = (ProxyErrorReportValve)valveCandidate;
+                break;
+            }
+        }
+        Assert.assertNotNull(valve);
+        // No ProxyErrorReportValve.properties bundle is available on the
+        // test class path. The default error report must be produced rather
+        // than an empty response.
+        valve.setUsePropertiesFile(true);
+
+        ByteChunk res = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort(), res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+
+        String body = res.toString();
+        Assert.assertNotNull("Response body should not be empty", body);
+        Assert.assertTrue("Should contain HTML error report",
+                body.contains("html") &&
+                    body.contains(String.valueOf(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)));
     }
 
 

@@ -100,13 +100,12 @@ These are bugs, correctness issues, or missing functionality that may affect pro
 
 | # | File:Line | Description | Fix Idea | Effort | Difficulty |
 |---|-----------|-------------|----------|--------|------------|
-| 7.1 | `BaseModelMBean.java:520` | `removeAttributeChangeNotificationListener` removes ALL notifications for a listener | Track per-attribute listener registrations. Only remove the listener for the specified attribute name. | 1 day | Medium |
 | 7.2 | `ManagedBean.java:606` | Method signature from `opInfo` not used for reflection lookup | Use the signature from `opInfo` to locate the method, falling back to the MBean descriptor signature. | 0.5-1 day | Low |
 | 7.3 | `ManagedBean.java:614` | Methods declared in superinterfaces not found by reflection | Walk the class hierarchy and all implemented interfaces when searching for the method. | 0.5-1 day | Low |
 
-**Summary:** JMX MBean infrastructure issues. 7.1 is a behavioral bug; 7.2 and 7.3 are limitations.
+**Summary:** JMX MBean infrastructure limitations.
 
-**Total estimated effort: 2-3 days, Low-Medium difficulty**
+**Total estimated effort: 1-2 days, Low difficulty**
 
 ---
 
@@ -400,16 +399,6 @@ These are bugs, correctness issues, or missing functionality that may affect pro
 
 ---
 
-### 35. Jasper Ant Logging (1 item)
-
-| # | File:Line | Description | Fix Idea | Effort | Difficulty |
-|---|-----------|-------------|----------|--------|------------|
-| 35.1 | `JspC.java:1775` | Uses `System.out` instead of Ant Project log | Pass the Ant `Project` reference through to `initServletContext` and use `Project.log()` for output. | 0.5 day | Low |
-
-**Total estimated effort: 0.5 day, Low difficulty**
-
----
-
 ### 36. Jasper JspC ClassLoader / Filter Config (2 items)
 
 | # | File:Line | Description | Fix Idea | Effort | Difficulty |
@@ -440,16 +429,6 @@ These are bugs, correctness issues, or missing functionality that may affect pro
 | 38.1 | `ConnectionPool.java:339` | New facade generated every borrow even if connection returned properly | Track a `cleanReturn` flag on pooled connection. Reuse existing facade if flag is set. | 1-2 days | Medium |
 
 **Total estimated effort: 1-2 days, Medium difficulty**
-
----
-
-### 39. Connection Pool Thread Dump Optimization (1 item)
-
-| # | File:Line | Description | Fix Idea | Effort | Difficulty |
-|---|-----------|-------------|----------|--------|------------|
-| 39.1 | `ConnectionPool.java:1273` | Stores full stack trace string; could store `StackTraceElement[]` directly | Change `getThreadDump()` to return `StackTraceElement[]`. Store array and format on-demand for display. Saves memory. | 0.5-1 day | Low |
-
-**Total estimated effort: 0.5-1 day, Low difficulty**
 
 ---
 
@@ -827,19 +806,18 @@ These are bugs, correctness issues, or missing functionality that may affect pro
 
 ## Documentation TODOs
 
-### 75. Tribes Documentation (7 files)
+### 75. Tribes Documentation (6 files)
 
 | # | File:Line | Description | Fix Idea | Effort | Difficulty |
 |---|-----------|-------------|----------|--------|------------|
 | 75.1 | `docs/tribes/transport.xml:33` | Empty TODO placeholder | Write transport layer documentation: NIO vs BIO sender, UDP vs TCP, configuration options. | 2-3 days | Medium |
-| 75.2 | `docs/tribes/status.xml:33` | Empty TODO placeholder | Document cluster status monitoring: MBeans, statistics, health checks. | 1-2 days | Medium |
 | 75.3 | `docs/tribes/setup.xml:33` | Empty TODO placeholder | Write cluster setup guide: single-point vs multi-point, load balancer config, session replication. | 3-5 days | Medium |
 | 75.4 | `docs/tribes/membership.xml:33` | Empty TODO placeholder | Document membership service: multicast, static members, dynamic discovery. | 1-2 days | Medium |
 | 75.5 | `docs/tribes/interceptors.xml:33` | Empty TODO placeholder | Document all cluster interceptors: fault tolerance, flow control, message dispatch, etc. | 2-3 days | Medium |
 | 75.6 | `docs/tribes/faq.xml:33` | Empty TODO placeholder | Compile common clustering questions and answers from mailing lists and JIRA. | 2-3 days | Medium |
 | 75.7 | `docs/tribes/developers.xml:33` | Empty TODO placeholder | Developer guide for extending Tribes: custom channels, interceptors, senders. | 2-3 days | Medium |
 
-**Total estimated effort: 13-21 days, Medium difficulty**
+**Total estimated effort: 12-19 days, Medium difficulty**
 
 ---
 
@@ -899,26 +877,6 @@ These are bugs, correctness issues, or missing functionality that may affect pro
 | 80.1 | `TestHpack.java:39` | Huffman encoding not predictable in tests | Use `HpackHeaderFunction` to force huffman encoding for test headers, ensuring deterministic test results. | 0.5-1 day | Low |
 
 **Total estimated effort: 0.5-1 day, Low difficulty**
-
----
-
-### 81. OpenSSL Cipher Test Coverage (1 item)
-
-| # | File:Line | Description | Fix Idea | Effort | Difficulty |
-|---|-----------|-------------|----------|--------|------------|
-| 81.1 | `TestOpenSSLCipherConfigurationParser.java:497` | Individual operator tests missing | Add unit tests for each cipher string operator: `+`, `-`, `!`, `@`, colon separator, etc. | 1-2 days | Medium |
-
-**Total estimated effort: 1-2 days, Medium difficulty**
-
----
-
-### 82. OCSP Test Hardcoded Serials (1 item)
-
-| # | File:Line | Description | Fix Idea | Effort | Difficulty |
-|---|-----------|-------------|----------|--------|------------|
-| 82.1 | `TesterOcspResponderServlet.java:221` | Certificate serial numbers hardcoded instead of read from index.db | Parse the OpenSSL CA `index.txt` file to extract serial numbers dynamically. | 1 day | Medium |
-
-**Total estimated effort: 1 day, Medium difficulty**
 
 ---
 
@@ -994,16 +952,6 @@ These are bugs, correctness issues, or missing functionality that may affect pro
 | 89.5 | `DrawMessage.java:31` | Color object creation for integer representation | Use a cached color map or accept the allocation cost. | 0.25 day | Low |
 
 **Total estimated effort: 2.5-4.5 days, Low-Medium difficulty**
-
----
-
-### 90. Example WebSocket Draw Message (1 item)
-
-| # | File:Line | Description | Fix Idea | Effort | Difficulty |
-|---|-----------|-------------|----------|--------|------------|
-| 90.1 | `DrawMessage.java:163` | Axis-aligned rectangles should be drawn as lines | Add a check: if `x1 == x2` or `y1 == y2`, draw a line instead of a rectangle. | 0.25 day | Low |
-
-**Total estimated effort: 0.25 day, Low difficulty**
 
 ---
 

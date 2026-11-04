@@ -75,10 +75,12 @@ public class TestJNDIRealmIntegration {
                 }
             }
             parameterSets.add(new Object[] { "cn={0},ou=s\\;ub,ou=people,dc=example,dc=com", null, null, ROLE_SEARCH_A,
-                    "{3},ou=people,dc=example,dc=com", "testsub", "test", new String[] { "TestGroup4" },
+                    "{3},ou=people,dc=example,dc=com", "testsub", "test",
+                    new String[] { "TestGroup4", "TestGroup5" },
                     userRoleAttribute, Integer.valueOf(1) });
             parameterSets.add(new Object[] { "cn={0},ou=s\\;ub,ou=people,dc=example,dc=com", null, null, ROLE_SEARCH_A,
-                    "{3},ou=people,dc=example,dc=com", "testsub", "test", new String[] { "TestGroup4" },
+                    "{3},ou=people,dc=example,dc=com", "testsub", "test",
+                    new String[] { "TestGroup4", "TestGroup5" },
                     userRoleAttribute, Integer.valueOf(4) });
         }
         /*
@@ -317,6 +319,17 @@ public class TestJNDIRealmIntegration {
                     "cn: TestGroup4",
                     "member: cn=testsub,ou=s\\;ub,ou=people,dc=example,dc=com");
             result = conn.processOperation(addGroupTest4);
+            Assert.assertEquals(ResultCode.SUCCESS, result.getResultCode());
+
+            // Nested one level below TestGroup4 so the patterned roleBase must be resolved correctly for the
+            // member filter of the second nested search round to match
+            AddRequest addGroupTest5 = new AddRequest(
+                    "dn: cn=TestGroup5,ou=s\\;ub,ou=people,dc=example,dc=com",
+                    "objectClass: top",
+                    "objectClass: groupOfNames",
+                    "cn: TestGroup5",
+                    "member: cn=TestGroup4,ou=s\\;ub,ou=people,dc=example,dc=com");
+            result = conn.processOperation(addGroupTest5);
             Assert.assertEquals(ResultCode.SUCCESS, result.getResultCode());
 
             // Bug 65373

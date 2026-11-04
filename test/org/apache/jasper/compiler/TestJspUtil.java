@@ -37,7 +37,7 @@ public class TestJspUtil extends TomcatBaseTest {
         String[] lines = body.split("\n");
 
         for (String line : lines) {
-            line = line.trim();
+            line = line.strip();
             if (line.startsWith("<p>")) {
                 line = line.substring(3, line.length() - 4);
                 String[] parts = line.split(":");

@@ -38,6 +38,12 @@ public class OpenSSLPreSharedKeySelector implements PreSharedKeySelector {
 
     private final Map<String,SSLHostConfigPreSharedKey> identityToKeyMap = new HashMap<>();
 
+    /**
+     * Creates a selector for the given set of pre-shared keys.
+     *
+     * @param psks The pre-shared keys to select from
+     * @throws IllegalArgumentException if multiple pre-shared keys share the same identity
+     */
     public OpenSSLPreSharedKeySelector(Set<SSLHostConfigPreSharedKey> psks) {
         for (SSLHostConfigPreSharedKey psk : psks) {
             SSLHostConfigPreSharedKey old = identityToKeyMap.put(psk.getIdentity(), psk);

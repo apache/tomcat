@@ -20,11 +20,13 @@ import java.util.function.Function;
 
 import jakarta.el.ELBaseTest;
 import jakarta.el.ELContext;
+import jakarta.el.ELManager;
 import jakarta.el.ELProcessor;
 import jakarta.el.ExpressionFactory;
 import jakarta.el.MethodExpression;
 import jakarta.el.MethodInfo;
 import jakarta.el.MethodNotFoundException;
+import jakarta.el.MethodReference;
 import jakarta.el.ValueExpression;
 
 import org.junit.Assert;
@@ -495,9 +497,13 @@ public class TestMethodExpressionImpl extends ELBaseTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testBug60844() {
+        // Fewer parameter values than the minimum required by a varargs
+        // method (here, the fixed parameters only). A single value would be
+        // a valid number of arguments for this method, so the call below
+        // with no values is the too-few-parameters case.
         MethodExpression me2 = factory.createMethodExpression(context, "${beanC.sayHello}", null,
-                new Class[] { TesterBeanA.class, TesterBeanB.class });
-        me2.invoke(context, new Object[] { new Object() });
+                new Class[] { TesterBeanA.class });
+        me2.invoke(context, new Object[] { });
     }
 
 
@@ -725,6 +731,67 @@ public class TestMethodExpressionImpl extends ELBaseTest {
 
 
     @Test
+    public void testVarArgsZeroVarArgsElements() {
+        // A call that supplies only the fixed parameters of a varargs method
+        // is valid Java. The method expression mechanism must accept it, as
+        // the value expression mechanism already does.
+        context.getVariableMapper().setVariable("beanH",
+                factory.createValueExpression(new TesterBeanH(), TesterBeanH.class));
+
+        MethodExpression me = factory.createMethodExpression(context, "${beanH.doTest}", String.class,
+                new Class<?>[] { String.class });
+
+        Assert.assertEquals("String-VString", me.invoke(context, new Object[] { "apple" }));
+    }
+
+
+    @Test
+    public void testVarArgsOneVarArgsElement() {
+        context.getVariableMapper().setVariable("beanH",
+                factory.createValueExpression(new TesterBeanH(), TesterBeanH.class));
+
+        MethodExpression me = factory.createMethodExpression(context, "${beanH.doTest}", String.class,
+                new Class<?>[] { String.class, String.class });
+
+        Assert.assertEquals("String-VString", me.invoke(context, new Object[] { "apple", "apple" }));
+    }
+
+
+    @Test
+    public void testGetReference01() {
+        // Building a method reference must evaluate the base chain and the
+        // parameters exactly once
+        ELProcessor elp = new ELProcessor();
+        TesterBeanK bean = new TesterBeanK();
+        TesterBeanK child = new TesterBeanK();
+        bean.setChild(child);
+        elp.defineBean("beanK", bean);
+        ELContext elpContext = elp.getELManager().getELContext();
+
+        MethodExpression me = ELManager.getExpressionFactory().createMethodExpression(elpContext,
+                "${beanK.child.format(beanK.next())}", String.class, null);
+
+        MethodReference ref = me.getMethodReference(elpContext);
+
+        Assert.assertEquals(1, bean.baseCalls);
+        Assert.assertEquals(1, bean.argCalls);
+        Assert.assertEquals("format", ref.getMethodInfo().getName());
+        // The base, parameters and method information must all come from the
+        // single evaluation
+        Assert.assertSame(child, ref.getBase());
+        Assert.assertArrayEquals(new Object[] { Integer.valueOf(1) }, ref.getEvaluatedParameters());
+
+        // Invoke must also evaluate each exactly once
+        bean.baseCalls = 0;
+        bean.argCalls = 0;
+
+        Assert.assertEquals("formatted-1", me.invoke(elpContext, null));
+        Assert.assertEquals(1, bean.baseCalls);
+        Assert.assertEquals(1, bean.argCalls);
+    }
+
+
+    @Test
     public void testGetMethodInfo01() throws Exception {
         MethodExpression me = factory.createMethodExpression(context, "#{beanA.setName('New value')}", null, null);
         // This is the call that failed
@@ -746,5 +813,74 @@ public class TestMethodExpressionImpl extends ELBaseTest {
         Assert.assertEquals(void.class, mi.getReturnType());
         Assert.assertEquals(1, mi.getParamTypes().length);
         Assert.assertEquals(String.class, mi.getParamTypes()[0]);
+    }
+
+
+    @Test
+    public void testEqualsHashCodeSameExpression() {
+        MethodExpression me1 = factory.createMethodExpression(context, "${beanB.getName}", String.class,
+                new Class<?>[] {});
+        MethodExpression me2 = factory.createMethodExpression(context, "${beanB.getName}", String.class,
+                new Class<?>[] {});
+
+        Assert.assertEquals(me1, me2);
+        Assert.assertEquals(me1.hashCode(), me2.hashCode());
+    }
+
+
+    @Test
+    public void testEqualsHashCodeWhitespaceVariants() {
+        MethodExpression me1 = factory.createMethodExpression(context, "${beanB.getName}", String.class,
+                new Class<?>[] {});
+        MethodExpression me2 = factory.createMethodExpression(context, "${ beanB.getName }", String.class,
+                new Class<?>[] {});
+
+        Assert.assertEquals(me1, me2);
+        Assert.assertEquals(me1.hashCode(), me2.hashCode());
+    }
+
+
+    @Test
+    public void testNotEqualsDifferentExpression() {
+        MethodExpression me1 = factory.createMethodExpression(context, "${beanB.getName}", String.class,
+                new Class<?>[] {});
+        MethodExpression me2 = factory.createMethodExpression(context, "${beanBB.getName}", String.class,
+                new Class<?>[] {});
+
+        Assert.assertNotEquals(me1, me2);
+    }
+
+
+    @Test
+    public void testNotEqualsHashCollidingExpressions() {
+        // "Aa" and "BB" are a well known pair of strings with the same hash code
+        Assert.assertEquals("Aa".hashCode(), "BB".hashCode());
+
+        MethodExpression me1 = factory.createMethodExpression(context, "${Aa}", String.class, new Class<?>[] {});
+        MethodExpression me2 = factory.createMethodExpression(context, "${BB}", String.class, new Class<?>[] {});
+
+        Assert.assertNotEquals(me1, me2);
+    }
+
+
+    @Test
+    public void testEqualsHashCodeSameLiteral() {
+        MethodExpression me1 = factory.createMethodExpression(context, "'Aa'", String.class, new Class<?>[] {});
+        MethodExpression me2 = factory.createMethodExpression(context, "'Aa'", String.class, new Class<?>[] {});
+
+        Assert.assertEquals(me1, me2);
+        Assert.assertEquals(me1.hashCode(), me2.hashCode());
+    }
+
+
+    @Test
+    public void testNotEqualsHashCollidingLiterals() {
+        // "Aa" and "BB" are a well known pair of strings with the same hash code
+        Assert.assertEquals("'Aa'".hashCode(), "'BB'".hashCode());
+
+        MethodExpression me1 = factory.createMethodExpression(context, "'Aa'", String.class, new Class<?>[] {});
+        MethodExpression me2 = factory.createMethodExpression(context, "'BB'", String.class, new Class<?>[] {});
+
+        Assert.assertNotEquals(me1, me2);
     }
 }

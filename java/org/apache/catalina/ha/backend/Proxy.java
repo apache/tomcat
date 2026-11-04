@@ -24,6 +24,12 @@ import java.net.InetAddress;
 public class Proxy {
 
     /**
+     * The host name or address of the front-end proxy server as configured. Retained so that the address can be
+     * re-resolved if the proxy's DNS entry changes.
+     */
+    public String host = null;
+
+    /**
      * The IP address of the front-end proxy server.
      */
     public InetAddress address = null;

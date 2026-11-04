@@ -111,6 +111,9 @@ public class SSIExec implements SSICommand {
                 }
                 lastModified = System.currentTimeMillis();
             } catch (InterruptedException e) {
+                // Restore the interrupt status so that the enclosing container
+                // thread can continue its shutdown processing
+                Thread.currentThread().interrupt();
                 ssiMediator.log(sm.getString("ssiExec.executeFailed", substitutedValue), e);
                 writer.write(configErrMsg);
             } catch (IOException ioe) {

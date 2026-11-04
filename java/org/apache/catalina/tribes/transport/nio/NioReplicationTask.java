@@ -42,10 +42,8 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * A worker thread class which drains a channel and processes received messages.
- * Each instance services a single SelectionKey per invocation. After completion,
- * the worker returns itself to its parent pool for reuse, unless the key is null
- * in which case it returns early without doing so.
+ * A worker thread class which drains a channel and processes received messages. Each instance services a single
+ * SelectionKey per invocation. After completion, the worker returns itself to its parent pool for reuse.
  */
 public class NioReplicationTask extends AbstractRxTask {
 
@@ -89,61 +87,87 @@ public class NioReplicationTask extends AbstractRxTask {
     // loop forever waiting for work to do
     @Override
     public synchronized void run() {
-        if (buffer == null) {
-            int size = getRxBufSize();
-            if (key.channel() instanceof DatagramChannel) {
-                size = ChannelReceiver.MAX_UDP_SIZE;
-            }
-            if ((getOptions() & OPTION_DIRECT_BUFFER) == OPTION_DIRECT_BUFFER) {
-                buffer = ByteBuffer.allocateDirect(size);
-            } else {
-                buffer = ByteBuffer.allocate(size);
-            }
-        } else {
-            buffer.clear();
-        }
-        if (key == null) {
-            return; // just in case
-        }
-        if (log.isTraceEnabled()) {
-            log.trace("Servicing key:" + key);
-        }
-
         try {
-            ObjectReader reader = (ObjectReader) key.attachment();
-            if (reader == null) {
-                if (log.isTraceEnabled()) {
-                    log.trace("No object reader, cancelling:" + key);
+            if (key == null) {
+                return; // just in case
+            }
+            if (buffer == null) {
+                int size = getRxBufSize();
+                if (key.channel() instanceof DatagramChannel) {
+                    size = ChannelReceiver.MAX_UDP_SIZE;
+                }
+                if ((getOptions() & OPTION_DIRECT_BUFFER) == OPTION_DIRECT_BUFFER) {
+                    buffer = ByteBuffer.allocateDirect(size);
+                } else {
+                    buffer = ByteBuffer.allocate(size);
+                }
+            } else {
+                buffer.clear();
+            }
+            if (log.isTraceEnabled()) {
+                log.trace("Servicing key:" + key);
+            }
+
+            try {
+                ObjectReader reader = (ObjectReader) key.attachment();
+                if (reader == null) {
+                    if (log.isTraceEnabled()) {
+                        log.trace("No object reader, cancelling:" + key);
+                    }
+                    cancelKey(key);
+                } else {
+                    if (log.isTraceEnabled()) {
+                        log.trace("Draining channel:" + key);
+                    }
+
+                    drainChannel(key, reader);
+                }
+            } catch (Exception e) {
+                // this is common, since the sockets on the other
+                // end expire after a certain time.
+                if (e instanceof CancelledKeyException) {
+                    // do nothing
+                } else if (e instanceof IOException) {
+                    // don't spew out stack traces for IO exceptions unless debug is enabled.
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("nioReplicationTask.unable.drainChannel.ioe", e.getMessage()), e);
+                    } else {
+                        log.warn(sm.getString("nioReplicationTask.unable.drainChannel.ioe", e.getMessage()));
+                    }
+                } else if (log.isErrorEnabled()) {
+                    // this is a real error, log it.
+                    log.error(sm.getString("nioReplicationTask.exception.drainChannel"), e);
                 }
                 cancelKey(key);
-            } else {
-                if (log.isTraceEnabled()) {
-                    log.trace("Draining channel:" + key);
-                }
-
-                drainChannel(key, reader);
             }
-        } catch (Exception e) {
-            // this is common, since the sockets on the other
-            // end expire after a certain time.
-            if (e instanceof CancelledKeyException) {
-                // do nothing
-            } else if (e instanceof IOException) {
-                // don't spew out stack traces for IO exceptions unless debug is enabled.
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("nioReplicationTask.unable.drainChannel.ioe", e.getMessage()), e);
-                } else {
-                    log.warn(sm.getString("nioReplicationTask.unable.drainChannel.ioe", e.getMessage()));
-                }
-            } else if (log.isErrorEnabled()) {
-                // this is a real error, log it.
-                log.error(sm.getString("nioReplicationTask.exception.drainChannel"), e);
+        } catch (Error e) {
+            // The key no longer has any interest ops so nothing would ever service it again. Cancel it so that the
+            // connection is released, then let the Error propagate.
+            if (key != null) {
+                cancelKey(key);
             }
-            cancelKey(key);
+            throw e;
+        } finally {
+            key = null;
+            // done, ready for more, return to pool -- done from a finally
+            // block so the worker can never leak out of the pool, not even
+            // when an Error escapes the catch block above
+            getTaskPool().returnWorker(this);
         }
-        key = null;
-        // done, ready for more, return to pool
-        getTaskPool().returnWorker(this);
+    }
+
+    /**
+     * Cancel the current selection key.
+     */
+    synchronized void cancel() {
+        try {
+            if (key != null) {
+                cancelKey(key);
+            }
+        } finally {
+            key = null;
+            getTaskPool().returnWorker(this);
+        }
     }
 
     /**
@@ -284,7 +308,7 @@ public class NioReplicationTask extends AbstractRxTask {
     /**
      * Registers a selection key for read interest.
      *
-     * @param key The selection key
+     * @param key    The selection key
      * @param reader The object reader
      */
     protected void registerForRead(final SelectionKey key, ObjectReader reader) {

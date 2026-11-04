@@ -20,8 +20,10 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
@@ -100,6 +102,12 @@ public class SSIMediator {
      * Number of regex match groups from the last match operation.
      */
     protected int lastMatchCount = 0;
+    /**
+     * Built-in variables supplied by this mediator, keyed by upper-case name. These are held
+     * locally rather than in the external resolver since the resolver rejects names under the
+     * reserved prefixes, which included the names historically used for these variables.
+     */
+    private final Map<String, String> builtinVariables = new HashMap<>();
 
 
     /**
@@ -111,7 +119,7 @@ public class SSIMediator {
     public SSIMediator(SSIExternalResolver ssiExternalResolver, long lastModifiedDate) {
         this.ssiExternalResolver = ssiExternalResolver;
         this.lastModifiedDate = lastModifiedDate;
-        setConfigTimeFmt(DEFAULT_CONFIG_TIME_FMT, true);
+        setConfigTimeFmt(DEFAULT_CONFIG_TIME_FMT);
     }
 
 
@@ -131,24 +139,13 @@ public class SSIMediator {
      * @param configTimeFmt the time format string
      */
     public void setConfigTimeFmt(String configTimeFmt) {
-        setConfigTimeFmt(configTimeFmt, false);
-    }
-
-
-    /**
-     * Sets the time format string and updates date variables accordingly.
-     *
-     * @param configTimeFmt    the time format string
-     * @param fromConstructor true if called from the constructor
-     */
-    public void setConfigTimeFmt(String configTimeFmt, boolean fromConstructor) {
         this.configTimeFmt = configTimeFmt;
         this.strftime = new Strftime(configTimeFmt, Locale.US);
         /*
          * Variables like DATE_LOCAL, DATE_GMT, and LAST_MODIFIED need to be updated when the timefmt changes. This is
          * what Apache SSI does.
          */
-        setDateVariables(fromConstructor);
+        setDateVariables();
     }
 
 
@@ -308,8 +305,7 @@ public class SSIMediator {
             // Try getting it externally first, if it fails, try getting the 'built-in' value
             variableValue = ssiExternalResolver.getVariableValue(variableName);
             if (variableValue == null) {
-                variableName = variableName.toUpperCase(Locale.ENGLISH);
-                variableValue = ssiExternalResolver.getVariableValue(className + "." + variableName);
+                variableValue = builtinVariables.get(variableName.toUpperCase(Locale.ENGLISH));
             }
             if (variableValue != null) {
                 variableValue = encode(variableValue, encoding);
@@ -517,30 +513,23 @@ public class SSIMediator {
 
     /**
      * Updates the built-in date variables (DATE_GMT, DATE_LOCAL, LAST_MODIFIED).
-     *
-     * @param fromConstructor true if called from the constructor
      */
-    protected void setDateVariables(boolean fromConstructor) {
-        boolean alreadySet = ssiExternalResolver.getVariableValue(className + ".alreadyset") != null;
-        // skip this if we are being called from the constructor, and this has already been set
-        if (!(fromConstructor && alreadySet)) {
-            ssiExternalResolver.setVariableValue(className + ".alreadyset", "true");
-            Date date = new Date();
-            TimeZone timeZone = TimeZone.getTimeZone("GMT");
-            String retVal = formatDate(date, timeZone);
-            /*
-             * If we are setting on of the date variables, we want to remove them from the user defined list of
-             * variables, because this is what Apache does.
-             */
-            setVariableValue("DATE_GMT", null);
-            ssiExternalResolver.setVariableValue(className + ".DATE_GMT", retVal);
-            retVal = formatDate(date, null);
-            setVariableValue("DATE_LOCAL", null);
-            ssiExternalResolver.setVariableValue(className + ".DATE_LOCAL", retVal);
-            retVal = formatDate(new Date(lastModifiedDate), null);
-            setVariableValue("LAST_MODIFIED", null);
-            ssiExternalResolver.setVariableValue(className + ".LAST_MODIFIED", retVal);
-        }
+    protected void setDateVariables() {
+        Date date = new Date();
+        TimeZone timeZone = TimeZone.getTimeZone("GMT");
+        String retVal = formatDate(date, timeZone);
+        /*
+         * If we are setting on of the date variables, we want to remove them from the user defined list of variables,
+         * because this is what Apache does.
+         */
+        setVariableValue("DATE_GMT", null);
+        builtinVariables.put("DATE_GMT", retVal);
+        retVal = formatDate(date, null);
+        setVariableValue("DATE_LOCAL", null);
+        builtinVariables.put("DATE_LOCAL", retVal);
+        retVal = formatDate(new Date(lastModifiedDate), null);
+        setVariableValue("LAST_MODIFIED", null);
+        builtinVariables.put("LAST_MODIFIED", retVal);
     }
 
 

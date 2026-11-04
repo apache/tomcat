@@ -49,10 +49,27 @@ public final class AstIdentifier extends SimpleNode {
         }
         ctx.setPropertyResolved(false);
         Class<?> result = ctx.getELResolver().getType(ctx, null, this.image);
-        if (!ctx.isPropertyResolved()) {
-            throw new PropertyNotFoundException(MessageFactory.get("error.resolver.unhandled.null", this.image));
+        if (ctx.isPropertyResolved()) {
+            return result;
         }
-        return result;
+
+        // Import
+        Object imported = ctx.getImportHandler().resolveClass(this.image);
+        if (imported != null) {
+            // getValue() returns an ELClass for an imported class
+            return ELClass.class;
+        }
+        imported = ctx.getImportHandler().resolveStatic(this.image);
+        if (imported != null) {
+            // getValue() returns the value of a statically imported field
+            try {
+                return ((Class<?>) imported).getField(this.image).getType();
+            } catch (IllegalArgumentException | NoSuchFieldException | SecurityException e) {
+                throw new ELException(e);
+            }
+        }
+
+        throw new PropertyNotFoundException(MessageFactory.get("error.resolver.unhandled.null", this.image));
     }
 
     @Override

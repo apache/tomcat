@@ -753,9 +753,24 @@ class Validator {
 
             Node.Nodes namedAttrs = n.getNamedAttributeNodes();
 
+            /*
+             * XML allows attributes with the same local name as long as they
+             * use different namespace prefixes so the number of 'name'
+             * attributes must be counted rather than assumed to be one.
+             */
+            int nameAttrCount = 0;
+            for (int i = 0; i < xmlAttrLen; i++) {
+                if ("name".equals(attrs.getLocalName(i))) {
+                    nameAttrCount++;
+                }
+            }
+            if (nameAttrCount > 1) {
+                err.jspError(n, "jsp.error.jspelement.duplicate.name");
+            }
+
             // XML-style 'name' attribute, which is mandatory, must not be
             // included in JspAttribute array
-            int jspAttrSize = xmlAttrLen - 1 + namedAttrs.size();
+            int jspAttrSize = xmlAttrLen - nameAttrCount + namedAttrs.size();
 
             Node.JspAttribute[] jspAttrs = new Node.JspAttribute[jspAttrSize];
             int jspAttrIndex = 0;
@@ -903,6 +918,17 @@ class Validator {
             TagAttributeInfo[] tldAttrs = tagInfo.getAttributes();
             Attributes attrs = n.getAttributes();
 
+            // The required version of the tag library is constant for the tag,
+            // so parse it once rather than for every attribute
+            double libraryVersion = 0;
+            try {
+                libraryVersion = Double.parseDouble(tagInfo.getTagLibrary().getRequiredVersion());
+            } catch (NumberFormatException e) {
+                // Never reached: jspError always throws
+                err.jspError(n, "jsp.error.invalid.taglib.version", tagInfo.getTagLibrary().getRequiredVersion(),
+                        n.getQName());
+            }
+
             for (int i = 0; attrs != null && i < attrs.getLength(); i++) {
                 boolean found = false;
 
@@ -910,7 +936,6 @@ class Validator {
                         (!n.getRoot().isXmlSyntax() && attrs.getValue(i).startsWith("<%=")));
                 boolean elExpression = false;
                 boolean deferred = false;
-                double libraryVersion = Double.parseDouble(tagInfo.getTagLibrary().getRequiredVersion());
                 boolean deferredSyntaxAllowedAsLiteral =
                         pageInfo.isDeferredSyntaxAllowedAsLiteral() || libraryVersion < 2.1;
 
@@ -971,10 +996,10 @@ class Validator {
                                     // for the attribute
                                     String m = tldAttr.getMethodSignature();
                                     if (m != null) {
-                                        m = m.trim();
+                                        m = m.strip();
                                         int rti = m.indexOf(' ');
                                         if (rti > 0) {
-                                            expectedType = m.substring(0, rti).trim();
+                                            expectedType = m.substring(0, rti).strip();
                                         }
                                     } else {
                                         expectedType = "java.lang.Object";
@@ -1419,7 +1444,7 @@ class Validator {
                     }
                     lastArg = true;
                 }
-                String arg = signature.substring(start, p).trim();
+                String arg = signature.substring(start, p).strip();
                 if (!arg.isEmpty()) {
                     params.add(arg);
                 }
@@ -1551,7 +1576,7 @@ class Validator {
         PageInfo pageInfo = compiler.getPageInfo();
         String contentType = pageInfo.getContentType();
 
-        if (contentType == null || !contentType.contains("charset=")) {
+        if (contentType == null || !contentType.toLowerCase(Locale.ENGLISH).contains("charset=")) {
             boolean isXml = page.getRoot().isXmlSyntax();
             String defaultType;
             defaultType = Objects.requireNonNullElse(contentType, isXml ? "text/xml" : "text/html");
@@ -1621,8 +1646,10 @@ class Validator {
                 for (ValidationMessage error : errors) {
                     if (error != null) {
                         errMsg.append("<p>");
-                        errMsg.append(error.getId());
-                        errMsg.append(": ");
+                        if (error.getId() != null) {
+                            errMsg.append(error.getId());
+                            errMsg.append(": ");
+                        }
                         errMsg.append(error.getMessage());
                         errMsg.append("</p>");
                     }

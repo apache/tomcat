@@ -218,6 +218,11 @@
   <!-- set above.                                                            -->
   <property name="test.jvmarg.egd" value="-Dignore" />
 
+  <!-- Flag for building FFM and associated tests -->
+  <condition property="has-ffm">
+    <javaversion atleast="${release.java.version}" />
+  </condition>
+
   <!-- Location of OpenSSL binary (file name, not directory) -->
   <!-- The OpenSSL tests cases be disabled by specifying an invalid path here -->
   <property name="test.openssl.path" value="" />
@@ -623,7 +628,6 @@
     <exclude name="org/apache/catalina/realm/DataSourceRealm.class" />
     <exclude name="org/apache/catalina/realm/JAASCallbackHandler.class" />
     <exclude name="org/apache/catalina/realm/JAASMemoryLoginModule.class" />
-    <exclude name="org/apache/catalina/realm/JAASRealm.class" />
     <exclude name="org/apache/catalina/realm/JNDIRealm$User.class" />
     <exclude name="org/apache/catalina/realm/JNDIRealm.class" />
     <exclude name="org/apache/catalina/realm/LockOutRealm*" />
@@ -937,6 +941,7 @@
       <fileset dir="modules/jdbc-pool" >
         <exclude name=".*/**"/>
         <exclude name="**/MANIFEST.MF"/>
+        <exclude name="src/test/**" />
         <patternset refid="text.files" />
         <!-- Exclude developer specific local files -->
         <exclude name="build.properties" />
@@ -972,6 +977,10 @@
         <exclude name="webapp/jsp/encoding/**"/>
         <!-- Exclude OpenSSL index files -->
         <exclude name="**/index.db" />
+      </fileset>
+      <fileset dir="modules/jdbc-pool" >
+        <include name="src/test/**" />
+        <exclude name="**/MANIFEST.MF"/>
       </fileset>
     </checkstyle>
   </target>
@@ -1049,9 +1058,6 @@
       <exclude name="org/apache/tomcat/util/openssl/**"/>
     </javac>
     <!-- Compile internal server components that use FFM -->
-    <condition property="has-ffm">
-      <javaversion atleast="${release.java.version}" />
-    </condition>
     <javac srcdir="java" destdir="${tomcat.classes}"
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
@@ -1893,13 +1899,13 @@
     <zip destfile="${tomcat.embed}/${final.name}-embed.zip"
          modificationtime="${tstamp.iso.release}"
          encoding="UTF8">
-      <fileset dir="${tomcat.embed}">
+      <zipfileset dir="${tomcat.embed}" prefix="${final.name}-embed">
         <include name="**" />
         <exclude name="*.asc" />
         <exclude name="*.sha512" />
         <exclude name="*.zip" />
         <exclude name="*.tar.gz" />
-      </fileset>
+      </zipfileset>
     </zip>
     <hashAndSign file="${tomcat.embed}/${final.name}-embed.zip" />
 
@@ -1943,6 +1949,24 @@
       <!-- Exclude these by default as Gump can't run them because the -->
       <!-- classes on which they depend are not in any output JAR.     -->
       <exclude name="org/apache/tomcat/buildutil/**" unless="test.includeBuildutil"/>
+      <!-- Exclude FFM tests as they are compiled below -->
+      <exclude name="org/apache/tomcat/util/net/openssl/panama/**"/>
+      <exclude name="org/apache/tomcat/util/openssl/**"/>
+    </javac>
+    <!-- Compile tests that use FFM -->
+    <javac srcdir="test" destdir="${test.classes}"
+           debug="${compile.debug}"
+           deprecation="${compile.deprecation}"
+           release="${release.java.version}"
+           encoding="ISO-8859-1"
+           includeAntRuntime="true"
+           if:set="has-ffm" >
+      <!-- Uncomment this to show unchecked warnings:
+      <compilerarg value="-Xlint:unchecked"/>
+      -->
+      <classpath refid="tomcat.test.classpath" />
+      <include name="org/apache/tomcat/util/net/openssl/panama/**"/>
+      <include name="org/apache/tomcat/util/openssl/**"/>
     </javac>
     <copy todir="${test.classes}">
       <fileset dir="test">
@@ -2287,6 +2311,9 @@
               <exclude name="**/integration/**" unless="test.includeIntegration" />
               <!-- Exclude tests that require large heaps -->
               <exclude name="**/*LargeHeap.java" unless="${test.includeLargeHeap}" />
+              <!-- Exclude FFM tests unless FFM has been compiled -->
+              <exclude name="org/apache/tomcat/util/net/openssl/panama/**" unless="has-ffm"/>
+              <exclude name="org/apache/tomcat/util/openssl/**" unless="has-ffm"/>
             </fileset>
           </batchtest>
         </junit>
@@ -2311,6 +2338,7 @@
         </sourcefiles>
       </structure>
       <html destdir="${coverage.out}"/>
+      <xml destfile="${coverage.out}/jacoco.xml"/>
     </jacoco:report>
 
   </target>
@@ -3238,9 +3266,11 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
          modificationtime="${tstamp.iso.release}"
          encoding="UTF8">
       <zipfileset file="${tomcat.dist}" fullpath="${final.name}"/>
-      <zipfileset dir="${tomcat.dist}" prefix="${final.name}">
-        <include name="bin/**"/>
+      <zipfileset dir="${tomcat.dist}" dirmode="700" filemode="600" prefix="${final.name}">
         <include name="conf/**"/>
+      </zipfileset>
+      <zipfileset dir="${tomcat.dist}" dirmode="750" filemode="640" prefix="${final.name}">
+        <include name="bin/**"/>
         <include name="logs/**"/>
         <include name="lib/**"/>
         <include name="webapps/**"/>
@@ -3254,8 +3284,14 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
         <include name="BUILDING.txt" />
         <include name="CONTRIBUTING.md"/>
         <exclude name="bin/service.bat"/>
+        <exclude name="bin/*.sh"/>
         <exclude name="bin/*.exe"/>
         <exclude name="bin/*.dll"/>
+      </zipfileset>
+      <!-- These need to be added after the bin directory is added else the  -->
+      <!-- bin directory will pick up the wrong permissions.                 -->
+      <zipfileset dir="${tomcat.dist}" dirmode="750" filemode="750" prefix="${final.name}">
+        <include name="bin/*.sh"/>
       </zipfileset>
     </zip>
 
@@ -3457,6 +3493,7 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
       <include name=".travis/*.sh" />
       <include name="res/graal/*.sh" />
       <include name="res/openssl/*.sh" />
+      <include name="test/org/apache/tomcat/util/net/*.sh" />
       <include name="test/org/apache/tomcat/util/net/ocsp/*.sh" />
     </fixcrlf>
 
@@ -3480,6 +3517,7 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
       <include name=".travis/*.sh" />
       <include name="res/graal/*.sh" />
       <include name="res/openssl/*.sh" />
+      <include name="test/org/apache/tomcat/util/net/*.sh" />
       <include name="test/org/apache/tomcat/util/net/ocsp/*.sh" />
     </fixcrlf>
 
@@ -3869,6 +3907,15 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
       <param name="checksum.enabled" value="${spotbugs.checksum.enabled}"/>
       <param name="checksum.algorithm" value="${spotbugs.checksum.algorithm}"/>
       <param name="checksum.value" value="${spotbugs.checksum.value}"/>
+    </antcall>
+
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${findsecbugs.loc}"/>
+      <param name="destfile" value="${findsecbugs.jar}"/>
+      <param name="destdir" value="${findsecbugs.home}"/>
+      <param name="checksum.enabled" value="${findsecbugs.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${findsecbugs.checksum.algorithm}"/>
+      <param name="checksum.value" value="${findsecbugs.checksum.value}"/>
     </antcall>
 
   </target>

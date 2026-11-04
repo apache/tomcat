@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import jakarta.el.ELContext;
+import jakarta.el.ELException;
 import jakarta.el.ELResolver;
 import jakarta.servlet.jsp.el.ImplicitObjectELResolver;
 
@@ -88,7 +89,55 @@ public class TestJasperELResolver {
         Assert.assertNull(resolver.getValue(context, new TestBean(), "foobar"));
         Assert.assertNull(resolver.getValue(context, new TestBean(), "bar"));
         Assert.assertFalse(resolver.isReadOnly(context, new TestBean(), "foo"));
-        Assert.assertTrue(resolver.isReadOnly(context, new TestBean(), "bla"));
+        Assert.assertFalse(resolver.isReadOnly(context, new TestBean(), "bla"));
+
+        // A setter whose parameter type is a supertype of the value type must
+        // be used. The inverted assignability check in getWriteMethod()
+        // previously rejected such setters, silently dropping the write.
+        TestBean bean = new TestBean();
+        resolver.setValue(context, bean, "bla", "a string value");
+        Assert.assertEquals("a string value", bean.getLastBla());
+
+        // A null value has no class to check the setter against. It must reach
+        // a setter whose parameter can hold null. Before the fix, deriving the
+        // value class from the null value caused a NullPointerException here.
+        context.setPropertyResolved(false);
+        resolver.setValue(context, bean, "bla", null);
+        Assert.assertNull("A null value should be written to a reference-typed setter", bean.getLastBla());
+        Assert.assertTrue("A null value should resolve the property", context.isPropertyResolved());
+
+        // A value whose type the setter parameter cannot hold must be left
+        // unresolved so that another resolver in the chain can handle it
+        context.setPropertyResolved(false);
+        resolver.setValue(context, bean, "foo", Integer.valueOf(7));
+        Assert.assertFalse("A mismatched value must leave the property unresolved",
+                context.isPropertyResolved());
+
+        // An exception thrown by a getter must be reported rather than
+        // swallowed. Before the fix it produced a silently resolved null.
+        context.setPropertyResolved(false);
+        try {
+            resolver.getValue(context, bean, "failing");
+            Assert.fail("A getter exception must be reported");
+        } catch (ELException e) {
+            Assert.assertTrue("The reported cause must be the thrown exception",
+                    e.getCause() instanceof IllegalStateException);
+            Assert.assertEquals("getter failed", e.getCause().getMessage());
+            Assert.assertTrue("A found property should be marked resolved", context.isPropertyResolved());
+        }
+
+        // An exception thrown by a setter must be reported rather than
+        // swallowed. Before the fix the failed write went unnoticed.
+        context.setPropertyResolved(false);
+        try {
+            resolver.setValue(context, bean, "failing", "some value");
+            Assert.fail("A setter exception must be reported");
+        } catch (ELException e) {
+            Assert.assertTrue("The reported cause must be the thrown exception",
+                    e.getCause() instanceof IllegalStateException);
+            Assert.assertEquals("setter failed", e.getCause().getMessage());
+            Assert.assertTrue("A found property should be marked resolved", context.isPropertyResolved());
+        }
     }
 
     public static class TestBean {
@@ -108,10 +157,21 @@ public class TestJasperELResolver {
         public String isFoobar() {
             return "foobar";
         }
+        private Object bla;
         public String getBla() {
             return "bla";
         }
-        public void setBla(@SuppressWarnings("unused") Object bla) {
+        public void setBla(Object bla) {
+            this.bla = bla;
+        }
+        public Object getLastBla() {
+            return bla;
+        }
+        public String getFailing() {
+            throw new IllegalStateException("getter failed");
+        }
+        public void setFailing(@SuppressWarnings("unused") String value) {
+            throw new IllegalStateException("setter failed");
         }
     }
 }

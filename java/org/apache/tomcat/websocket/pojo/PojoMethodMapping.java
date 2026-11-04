@@ -204,7 +204,14 @@ public class PojoMethodMapping {
 
 
     private boolean isMethodOverride(Method method1, Method method2) {
-        return method1.getName().equals(method2.getName()) && method1.getReturnType().equals(method2.getReturnType()) &&
+        // An overriding method may use a covariant return type so the return
+        // types do not have to be equal. They do need to be compatible. The
+        // methods may be passed in either order so both directions are
+        // checked.
+        Class<?> returnType1 = method1.getReturnType();
+        Class<?> returnType2 = method2.getReturnType();
+        return method1.getName().equals(method2.getName()) &&
+                (returnType1.isAssignableFrom(returnType2) || returnType2.isAssignableFrom(returnType1)) &&
                 Arrays.equals(method1.getParameterTypes(), method2.getParameterTypes());
     }
 
@@ -606,6 +613,11 @@ public class PojoMethodMapping {
             if (indexInputStream != -1 && indexBoolean != -1) {
                 throw new DeploymentException(sm.getString("pojoMethodMapping.partialInputStream", m.getName(),
                         m.getDeclaringClass().getName()));
+            }
+            if (indexPrimitive != -1 && indexBoolean != -1) {
+                throw new DeploymentException(
+                        sm.getString("pojoMethodMapping.partialPrimitive", m.getName(),
+                                m.getDeclaringClass().getName()));
             }
             if (decoderMatch != null && decoderMatch.hasMatches() && indexBoolean != -1) {
                 throw new DeploymentException(

@@ -105,7 +105,7 @@ public final class XmlIdentifiers {
     /**
      * Web Services 1.2 XSD.
      */
-    public static final String WEBSERVICES_12_XSD = JAVAEE_5_NS + "javaee_web_services_1_2.xsd";
+    public static final String WEBSERVICES_12_XSD = JAVAEE_5_NS + "/javaee_web_services_1_2.xsd";
 
     // from JavaEE 6
     /**

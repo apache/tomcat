@@ -495,6 +495,48 @@ public class Http11Processor extends AbstractProcessor {
     }
 
 
+    private boolean validateUpgradeToken() {
+        // Can't upgrade in an error state
+        if (getErrorState().isError()) {
+            return false;
+        }
+        // Make sure the application hasn't changed the status
+        if (response.getStatus() != HttpServletResponse.SC_SWITCHING_PROTOCOLS) {
+            return false;
+        }
+        // Make sure the application has set the Upgrade header
+        String upgrade = response.getMimeHeaders().getHeader("upgrade");
+        if (upgrade == null) {
+            return false;
+        } else {
+            upgrade = upgrade.trim();
+        }
+
+        if (!upgradeToken.protocol().equalsIgnoreCase(upgrade)) {
+            // The application set/updated the upgrade protocol name. Update the token.
+            upgradeToken = new UpgradeToken(upgradeToken.httpUpgradeHandler(), upgradeToken.contextBind(),
+                    upgradeToken.instanceManager(), upgrade);
+        }
+        return true;
+    }
+
+
+    private void cleanUpgradeToken() {
+        if (upgradeToken.instanceManager() != null) {
+            ClassLoader oldCL = upgradeToken.contextBind().bind(null);
+            try {
+                upgradeToken.instanceManager().destroyInstance(upgradeToken.httpUpgradeHandler());
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                log.warn(sm.getString("http11processor.upgrade.clean.fail"), t);
+            } finally {
+                upgradeToken.contextBind().unbind(oldCL);
+            }
+        }
+        upgradeToken = null;
+    }
+
+
     @Override
     protected final void setSocketWrapper(SocketWrapperBase<?> socketWrapper) {
         super.setSocketWrapper(socketWrapper);
@@ -1046,6 +1088,19 @@ public class Http11Processor extends AbstractProcessor {
         if (altService != null && headers.getValue(Constants.ALT_SVC_HEADER_NAME) == null) {
             headers.addValue(Constants.ALT_SVC_HEADER_NAME)
                     .setString(altService + "=\":" + request.getServerPort() + "\"");
+        }
+
+        if (upgradeToken != null && !validateUpgradeToken()) {
+            /*
+             * doHttpUpgrade() stopped further HTTP output. The upgrade has failed so the HTTP response must be
+             * completed.
+             */
+            outputBuffer.responseFinished = false;
+            cleanUpgradeToken();
+            // Don't overwrite any existing error
+            if (!getErrorState().isError()) {
+                setErrorState(ErrorState.CLOSE_CLEAN, null);
+            }
         }
 
         writeHeaders(response.getStatus(), headers);

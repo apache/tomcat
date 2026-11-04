@@ -85,59 +85,6 @@
 
   </mbean>
 
-  <mbean         name="JAASRealm"
-          description="Implementation of Realm that authenticates users via the Java Authentication and Authorization Service (JAAS)"
-               domain="Catalina"
-                group="Realm"
-                 type="org.apache.catalina.realm.JAASRealm">
-
-    <attribute   name="allRolesMode"
-          description="The all roles mode."
-                 type="java.lang.String"/>
-
-    <attribute   name="appName"
-          description="The application name passed to the JAAS LoginContext, which uses it to select the set of relevant LoginModules"
-                 type="java.lang.String"/>
-
-    <attribute   name="className"
-          description="Fully qualified class name of the managed object"
-                 type="java.lang.String"
-            writeable="false"/>
-
-    <attribute   name="roleClassNames"
-          description="Comma-delimited list of javax.security.Principal classes that represent security roles"
-                 type="java.lang.String"/>
-
-    <attribute   name="realmPath"
-          description="The realm path"
-                 type="java.lang.String"/>
-
-    <attribute   name="stateName"
-          description="The name of the LifecycleState that this component is currently in"
-                 type="java.lang.String"
-                 writeable="false"/>
-
-    <attribute   name="userClassNames"
-          description="Comma-delimited list of javax.security.Principal classes that represent individual users"
-                 type="java.lang.String"/>
-
-    <attribute   name="useContextClassLoader"
-          description="Sets whether to use the context or default ClassLoader."
-                   is="true"
-                 type="boolean"/>
-
-    <attribute   name="validate"
-          description="Should we validate client certificate chains when they are presented?"
-                 type="boolean"/>
-
-
-    <operation name="start" description="Start" impact="ACTION" returnType="void" />
-    <operation name="stop" description="Stop" impact="ACTION" returnType="void" />
-    <operation name="init" description="Init" impact="ACTION" returnType="void" />
-    <operation name="destroy" description="Destroy" impact="ACTION" returnType="void" />
-  </mbean>
-
-
   <mbean         name="JNDIRealm"
           description="Implementation of Realm that works with a directory server accessed via the Java Naming and Directory Interface (JNDI) APIs"
                domain="Catalina"

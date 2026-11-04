@@ -745,7 +745,7 @@ public abstract class Node implements TagConstants {
             if (importEntry.indexOf(';') > -1) {
                 throw new IllegalArgumentException(Localizer.getMessage("jsp.error.page.invalid.import"));
             }
-            return importEntry.trim();
+            return importEntry.strip();
         }
     }
 
@@ -815,14 +815,14 @@ public abstract class Node implements TagConstants {
             int start = 0;
             int index;
             while ((index = value.indexOf(',', start)) != -1) {
-                imports.add(value.substring(start, index).trim());
+                imports.add(value.substring(start, index).strip());
                 start = index + 1;
             }
             if (start == 0) {
                 // No comma found
-                imports.add(value.trim());
+                imports.add(value.strip());
             } else {
-                imports.add(value.substring(start).trim());
+                imports.add(value.substring(start).strip());
             }
         }
 
@@ -2200,6 +2200,23 @@ public abstract class Node implements TagConstants {
     }
 
     /**
+     * Used as a placeholder for the insertion of page termination code (used by the tag plugin machinery only).
+     */
+    public static class PageTerminationGenerator extends Node {
+
+        /**
+         * Zero-arg Constructor.
+         */
+        PageTerminationGenerator() {
+        }
+
+        @Override
+        void accept(Visitor v) throws JasperException {
+            v.visit(this);
+        }
+    }
+
+    /**
      * Represents the body of a &lt;jsp:text&gt; element
      */
     public static class JspText extends Node {
@@ -2611,9 +2628,9 @@ public abstract class Node implements TagConstants {
                 } else if (this.isDeferredMethodInput()) {
                     String m = this.tai.getMethodSignature();
                     if (m != null) {
-                        int rti = m.trim().indexOf(' ');
+                        int rti = m.strip().indexOf(' ');
                         if (rti > 0) {
-                            return m.substring(0, rti).trim();
+                            return m.substring(0, rti).strip();
                         }
                     }
                 }
@@ -2631,13 +2648,13 @@ public abstract class Node implements TagConstants {
                 if (this.isDeferredMethodInput()) {
                     String m = this.tai.getMethodSignature();
                     if (m != null) {
-                        m = m.trim();
+                        m = m.strip();
                         m = m.substring(m.indexOf('(') + 1);
                         m = m.substring(0, m.length() - 1);
-                        if (!m.trim().isEmpty()) {
+                        if (!m.strip().isEmpty()) {
                             String[] p = m.split(",");
                             for (int i = 0; i < p.length; i++) {
-                                p[i] = p[i].trim();
+                                p[i] = p[i].strip();
                             }
                             return p;
                         }
@@ -3180,6 +3197,16 @@ public abstract class Node implements TagConstants {
          * @throws JasperException if an error occurs while visiting the node
          */
         public void visit(AttributeGenerator n) throws JasperException {
+            doVisit(n);
+        }
+
+        /**
+         * Visits an page termination generator node.
+         *
+         * @param n The page termination generator node to visit
+         * @throws JasperException if an error occurs while visiting the node
+         */
+        public void visit(PageTerminationGenerator n) throws JasperException {
             doVisit(n);
         }
     }

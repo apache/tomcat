@@ -216,11 +216,8 @@ public class UpgradeUtil {
             try {
                 PojoMethodMapping methodMapping = new PojoMethodMapping(sec.getEndpointClass(), sec.getDecoders(),
                         sec.getPath(), sc.getInstanceManager(Thread.currentThread().getContextClassLoader()));
-                if (methodMapping.getOnClose() != null || methodMapping.getOnOpen() != null ||
-                        methodMapping.getOnError() != null || methodMapping.hasMessageHandlers()) {
-                    sec.getUserProperties().put(org.apache.tomcat.websocket.pojo.Constants.POJO_METHOD_MAPPING_KEY,
-                            methodMapping);
-                }
+                sec.getUserProperties().put(org.apache.tomcat.websocket.pojo.Constants.POJO_METHOD_MAPPING_KEY,
+                        methodMapping);
             } catch (DeploymentException e) {
                 throw new ServletException(sm.getString("upgradeUtil.pojoMapFail", sec.getEndpointClass().getName()),
                         e);
@@ -229,7 +226,18 @@ public class UpgradeUtil {
 
         WsPerSessionServerEndpointConfig perSessionServerEndpointConfig = new WsPerSessionServerEndpointConfig(sec);
 
-        WsHandshakeRequest wsRequest = new WsHandshakeRequest(req, pathParams);
+        WsHandshakeRequest wsRequest;
+        try {
+            wsRequest = new WsHandshakeRequest(req, pathParams);
+        } catch (IllegalArgumentException iae) {
+            // The request target could not be represented as a URI, for example because the query
+            // string contains an invalid percent-escape sequence. Reject the handshake. The
+            // response is reset first so the rejection is not sent with headers that would
+            // indicate a successful handshake.
+            resp.reset();
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
         WsHandshakeResponse wsResponse = new WsHandshakeResponse();
         sec.getConfigurator().modifyHandshake(perSessionServerEndpointConfig, wsRequest, wsResponse);
         wsRequest.finished();

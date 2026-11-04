@@ -64,8 +64,6 @@ public class McastService extends MembershipServiceBase implements MessageListen
      * The local member
      */
     protected MemberImpl localMember;
-    private int mcastSoTimeout;
-    private int mcastTTL;
 
     /**
      * The payload for multicast messages.
@@ -385,18 +383,32 @@ public class McastService extends MembershipServiceBase implements MessageListen
             }
         }
 
-        impl = new McastServiceImpl(localMember, Long.parseLong(properties.getProperty("mcastFrequency")),
-                Long.parseLong(properties.getProperty("memberDropTime")),
+        long frequency = Long.parseLong(properties.getProperty("mcastFrequency"));
+        if (frequency <= 0) {
+            throw new IllegalArgumentException(
+                    sm.getString("membershipService.invalidTimingProperty", "mcastFrequency", Long.valueOf(frequency)));
+        }
+        long dropTime = Long.parseLong(properties.getProperty("memberDropTime"));
+        if (dropTime <= 0) {
+            throw new IllegalArgumentException(
+                    sm.getString("membershipService.invalidTimingProperty", "memberDropTime", Long.valueOf(dropTime)));
+        }
+        // The recovery sleep time only matters if recovery is enabled
+        boolean recEnabled = Boolean.parseBoolean(properties.getProperty("recoveryEnabled"));
+        long recSlpTime = Long.parseLong(properties.getProperty("recoverySleepTime"));
+        if (recEnabled && recSlpTime <= 0) {
+            throw new IllegalArgumentException(sm.getString("membershipService.invalidTimingProperty",
+                    "recoverySleepTime", Long.valueOf(recSlpTime)));
+        }
+
+        impl = new McastServiceImpl(localMember, frequency, dropTime,
                 Integer.parseInt(properties.getProperty("mcastPort")), bind,
                 java.net.InetAddress.getByName(properties.getProperty("mcastAddress")), ttl, soTimeout, this, this,
                 Boolean.parseBoolean(properties.getProperty("localLoopbackDisabled")));
         impl.setMembershipService(this);
-        String value = properties.getProperty("recoveryEnabled");
-        boolean recEnabled = Boolean.parseBoolean(value);
         impl.setRecoveryEnabled(recEnabled);
         int recCnt = Integer.parseInt(properties.getProperty("recoveryCounter"));
         impl.setRecoveryCounter(recCnt);
-        long recSlpTime = Long.parseLong(properties.getProperty("recoverySleepTime"));
         impl.setRecoverySleepTime(recSlpTime);
         impl.setChannel(channel);
 
@@ -418,7 +430,10 @@ public class McastService extends MembershipServiceBase implements MessageListen
         try {
             if (impl != null && impl.stop(svc)) {
                 if (oname != null) {
-                    JmxRegistry.getRegistry(channel).unregisterJmx(oname);
+                    JmxRegistry jmxRegistry = JmxRegistry.getRegistry(channel);
+                    if (jmxRegistry != null) {
+                        jmxRegistry.unregisterJmx(oname);
+                    }
                     oname = null;
                 }
                 impl.setChannel(null);
@@ -465,9 +480,9 @@ public class McastService extends MembershipServiceBase implements MessageListen
         }
 
         byte[] data = XByteBuffer.createDataPackage((ChannelData) message);
-        if (data.length > McastServiceImpl.MAX_PACKET_SIZE) {
+        if (data.length > McastServiceImpl.MAX_SEND_SIZE) {
             throw new ChannelException(sm.getString("mcastService.exceed.maxPacketSize", Integer.toString(data.length),
-                    Integer.toString(McastServiceImpl.MAX_PACKET_SIZE)));
+                    Integer.toString(McastServiceImpl.MAX_SEND_SIZE)));
         }
         DatagramPacket packet = new DatagramPacket(data, 0, data.length);
         try {
@@ -479,7 +494,11 @@ public class McastService extends MembershipServiceBase implements MessageListen
 
     @Override
     public int getSoTimeout() {
-        return mcastSoTimeout;
+        String p = properties.getProperty("mcastSoTimeout");
+        if (p != null) {
+            return Integer.parseInt(p);
+        }
+        return 0;
     }
 
     /**
@@ -487,13 +506,16 @@ public class McastService extends MembershipServiceBase implements MessageListen
      * @param mcastSoTimeout the timeout in milliseconds
      */
     public void setSoTimeout(int mcastSoTimeout) {
-        this.mcastSoTimeout = mcastSoTimeout;
         properties.setProperty("mcastSoTimeout", String.valueOf(mcastSoTimeout));
     }
 
     @Override
     public int getTtl() {
-        return mcastTTL;
+        String p = properties.getProperty("mcastTTL");
+        if (p != null) {
+            return Integer.parseInt(p);
+        }
+        return 0;
     }
 
     /**
@@ -514,7 +536,6 @@ public class McastService extends MembershipServiceBase implements MessageListen
      * @param mcastTTL the TTL value
      */
     public void setTtl(int mcastTTL) {
-        this.mcastTTL = mcastTTL;
         properties.setProperty("mcastTTL", String.valueOf(mcastTTL));
     }
 

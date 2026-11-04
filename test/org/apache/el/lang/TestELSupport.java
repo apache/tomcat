@@ -269,6 +269,87 @@ public class TestELSupport {
         Assert.assertNull("Result: " + result, result);
     }
 
+    @Test
+    public void testCompareNonMutuallyComparable01() {
+        // The ClassCastException raised by obj0's compareTo() must be wrapped
+        try {
+            ELSupport.compare(null, new TesterComparableA(), new TesterComparableB());
+            Assert.fail("An ELException was expected");
+        } catch (ELException e) {
+            Assert.assertTrue("Unexpected cause: " + e.getCause(), e.getCause() instanceof ClassCastException);
+        }
+    }
+
+    @Test
+    public void testCompareNonMutuallyComparable02() {
+        // obj0 is not Comparable, so obj1's compareTo() is used. The resulting
+        // ClassCastException must be wrapped
+        try {
+            ELSupport.compare(null, new Object(), new TesterComparableB());
+            Assert.fail("An ELException was expected");
+        } catch (ELException e) {
+            Assert.assertTrue("Unexpected cause: " + e.getCause(), e.getCause() instanceof ClassCastException);
+        }
+    }
+
+    @Test
+    public void testCompareBigDecimalWithNonFiniteThrowsELException() {
+        // Coercing NaN to BigDecimal uses new BigDecimal(double) which rejects the
+        // value. The failure must surface as ELException.
+        try {
+            ELSupport.compare(null, BigDecimal.ONE, Double.valueOf(Double.NaN));
+            Assert.fail("An ELException was expected");
+        } catch (ELException e) {
+            Assert.assertTrue("Unexpected cause: " + e.getCause(), e.getCause() instanceof NumberFormatException);
+        }
+    }
+
+    @Test
+    public void testEqualsBigDecimalWithNonFiniteThrowsELException() {
+        try {
+            ELSupport.equals(null, BigDecimal.ONE, Double.valueOf(Double.NaN));
+            Assert.fail("An ELException was expected");
+        } catch (ELException e) {
+            Assert.assertTrue("Unexpected cause: " + e.getCause(), e.getCause() instanceof NumberFormatException);
+        }
+    }
+
+    @Test
+    public void testCoerceToTypeNonFiniteToBigDecimalThrowsELException() {
+        try {
+            ELSupport.coerceToType(null, Double.valueOf(Double.POSITIVE_INFINITY), BigDecimal.class);
+            Assert.fail("An ELException was expected");
+        } catch (ELException e) {
+            Assert.assertTrue("Unexpected cause: " + e.getCause(), e.getCause() instanceof NumberFormatException);
+        }
+    }
+
+    @Test
+    public void testCoerceToTypeExtremeBigDecimalToBigIntegerThrowsELException() {
+        // BigDecimal.toBigInteger() declares ArithmeticException for overflow with
+        // extreme exponents. The failure must surface as ELException.
+        try {
+            ELSupport.coerceToType(null, new BigDecimal("1e999999999"), BigInteger.class);
+            Assert.fail("An ELException was expected");
+        } catch (ELException e) {
+            Assert.assertTrue("Unexpected cause: " + e.getCause(), e.getCause() instanceof ArithmeticException);
+        }
+    }
+
+    private static class TesterComparableA implements Comparable<TesterComparableA> {
+        @Override
+        public int compareTo(TesterComparableA o) {
+            return 0;
+        }
+    }
+
+    private static class TesterComparableB implements Comparable<TesterComparableB> {
+        @Override
+        public int compareTo(TesterComparableB o) {
+            return 0;
+        }
+    }
+
     private static void testIsSame(Object value) {
         Assert.assertEquals(value, ELSupport.coerceToNumber(null, value, value.getClass()));
     }

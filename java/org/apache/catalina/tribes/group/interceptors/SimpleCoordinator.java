@@ -37,7 +37,7 @@ public class SimpleCoordinator extends ChannelInterceptorBase {
         // NO-OP
     }
 
-    private Member[] view;
+    private volatile Member[] view;
 
     private final AtomicBoolean membershipChanged = new AtomicBoolean();
 
@@ -60,7 +60,9 @@ public class SimpleCoordinator extends ChannelInterceptorBase {
     }
 
     /**
-     * Override to receive view changes.
+     * Override to receive view changes. The callback is invoked while holding the monitor of
+     * this interceptor, so implementations must not block for long or acquire external or
+     * channel locks. The view array must not be modified by the callback.
      *
      * @param view The members array
      */
@@ -90,15 +92,22 @@ public class SimpleCoordinator extends ChannelInterceptorBase {
         }
 
         final Member[] members = getMembers();
-        final Member[] view = new Member[members.length + 1];
-        System.arraycopy(members, 0, view, 0, members.length);
-        view[members.length] = getLocalMember(false);
-        Arrays.sort(view, AbsoluteOrder.comp);
-        if (Arrays.equals(view, this.view)) {
-            return;
+        final Member[] newView = new Member[members.length + 1];
+        System.arraycopy(members, 0, newView, 0, members.length);
+        newView[members.length] = getLocalMember(false);
+        Arrays.sort(newView, AbsoluteOrder.comp);
+        // The view is published from the membership callback threads while the
+        // accessors below are called from arbitrary threads. The lock keeps the
+        // comparison, the publication and the view change notification atomic,
+        // so that concurrent installs of the same view only notify once and
+        // viewChange observers see the views in install order
+        synchronized (this) {
+            if (Arrays.equals(view, newView)) {
+                return;
+            }
+            view = newView;
+            viewChange(newView);
         }
-        this.view = view;
-        viewChange(view);
     }
 
     @Override
@@ -121,7 +130,8 @@ public class SimpleCoordinator extends ChannelInterceptorBase {
      * @return the coordinator member, or {@code null} if no view is established
      */
     public Member getCoordinator() {
-        return view == null ? null : view[0];
+        final Member[] current = view;
+        return current == null ? null : current[0];
     }
 
     /**
@@ -130,7 +140,8 @@ public class SimpleCoordinator extends ChannelInterceptorBase {
      * @return {@code true} if this member is the coordinator
      */
     public boolean isCoordinator() {
-        return view != null && getLocalMember(false).equals(getCoordinator());
+        final Member[] current = view;
+        return current != null && getLocalMember(false).equals(current[0]);
     }
 
 }

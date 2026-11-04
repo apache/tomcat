@@ -16,9 +16,13 @@
  */
 package org.apache.tomcat.jdbc.pool.interceptor;
 
-import java.lang.ref.WeakReference;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -28,19 +32,47 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
  * Keeps track of statements associated with a connection and invokes close upon {@link java.sql.Connection#close()}
  * Useful for applications that don't close the associated statements after being done with a connection.
- *
+ * <p>
+ * A statement is tracked with a strong reference until it is closed: an application that forgot about a statement is
+ * exactly the case the interceptor exists for, so finalisation must not depend on that statement still being reachable
+ * when the connection is returned. Statements that the application does close are forgotten by the returned proxy at
+ * the moment <code>close()</code> completes, keeping the tracked list bounded by the statements that are genuinely
+ * still open and closed through that handle. (The removal cannot observe a close that reaches the statement by
+ * another route: a statement the application closes through the driver handle that <code>unwrap</code> hands back
+ * never passes through this proxy; such entries are simply reclaimed at the connection return, where the renewed
+ * close meets a statement already closed as a harmless no-op, as they were before. An interceptor placed outside
+ * this one could swallow a close in the same way, but the pool's own {@link StatementCache} no longer does: listed
+ * above this interceptor it refuses to recycle, because a recycled statement is left open rather than closed and
+ * would be reclaimed here alive, out from under the cache.)
+ * <p>
+ * Tracked statements are handed to the application as proxies implementing the standard JDBC statement interfaces, as
+ * is the statement facade the pool always installs in front of this interceptor and as are the proxies of the other
+ * statement-wrapping interceptors; the driver's own statement class is therefore not reachable by casting. The
+ * <code>Wrapper</code> methods are delegated to the driver, and <code>unwrap</code> is the supported way to reach
+ * driver-specific statement methods. A statement the application reaches that way is still tracked here and is closed,
+ * like any other tracked statement, when the connection is returned - unless an interceptor listed after this one
+ * recycles the statement instead of closing it, as a statement cache beneath this interceptor does.
  */
 public class StatementFinalizer extends AbstractCreateStatementInterceptor {
     private static final Log log = LogFactory.getLog(StatementFinalizer.class);
 
     /**
-     * List of statements created on the associated connection.
+     * Statements created on the associated connection that have not been closed yet. Every access must be guarded by
+     * {@link #statementsLock}.
      */
-    protected List<StatementEntry> statements = new LinkedList<>();
+    protected final List<StatementEntry> statements = new LinkedList<>();
+
+    /**
+     * Monitor guarding {@link #statements}. The pool's cleaner thread may clear the list (through {@link #reset}) while
+     * a borrower is still creating or closing statements on an abandoned connection, so subclasses that access the list
+     * must hold this lock as well.
+     */
+    protected final Object statementsLock = new Object();
 
     /**
      * Default constructor.
@@ -48,41 +80,60 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
     public StatementFinalizer() {
     }
 
-    private boolean logCreationStack = false;
+    private volatile boolean logCreationStack = false;
 
     @Override
     public Object createStatement(Object proxy, Method method, Object[] args, Object statement, long time) {
-        try {
-            if (statement instanceof Statement) {
-                statements.add(new StatementEntry((Statement)statement));
-            }
-        }catch (ClassCastException x) {
-            //ignore this one
+        if (!(statement instanceof Statement)) {
+            return statement;
         }
-        return statement;
+        Statement tracked = (Statement) statement;
+        String name = method.getName();
+        int constructorIndex;
+        Class<?> statementInterface;
+        if (compare(CREATE_STATEMENT, name)) {
+            constructorIndex = CREATE_STATEMENT_IDX;
+            statementInterface = Statement.class;
+        } else if (compare(PREPARE_STATEMENT, name)) {
+            constructorIndex = PREPARE_STATEMENT_IDX;
+            statementInterface = PreparedStatement.class;
+        } else if (compare(PREPARE_CALL, name)) {
+            constructorIndex = PREPARE_CALL_IDX;
+            statementInterface = CallableStatement.class;
+        } else {
+            // Not one of the statement creation methods; nothing to track
+            return tracked;
+        }
+        StatementEntry entry = new StatementEntry(tracked);
+        synchronized (statementsLock) {
+            statements.add(entry);
+        }
+        try {
+            return getConstructor(constructorIndex, statementInterface)
+                    .newInstance(new Object[] { new CloseAwareProxy(entry) });
+        } catch (Exception x) {
+            // The statement is still tracked and will be closed when the
+            // connection is returned, but closing it early will no longer
+            // forget it before then.
+            log.warn(MessageFactory.get("statementFinalizer.unableToCreateTrackingProxy"), x);
+            return tracked;
+        }
     }
 
-    @SuppressWarnings("null") // st is not null when used
     @Override
     public void closeInvoked() {
-        while (!statements.isEmpty()) {
-            StatementEntry ws = statements.remove(0);
-            Statement st = ws.getStatement();
-            boolean shallClose = false;
-            try {
-                shallClose = st!=null && (!st.isClosed());
-                if (shallClose) {
-                    st.close();
-                }
-            } catch (Exception ignore) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Unable to closed statement upon connection close.",ignore);
-                }
-            } finally {
-                if (logCreationStack && shallClose) {
-                    log.warn("Statement created, but was not closed at:", ws.getAllocationStack());
-                }
+        List<StatementEntry> unclosed;
+        synchronized (statementsLock) {
+            if (statements.isEmpty()) {
+                return;
             }
+            unclosed = new ArrayList<>(statements);
+            statements.clear();
+        }
+        // Closing a statement can block on the database, so it happens
+        // outside the lock that guards the list.
+        for (StatementEntry entry : unclosed) {
+            entry.close();
         }
     }
 
@@ -98,44 +149,145 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
 
     @Override
     public void reset(ConnectionPool parent, PooledConnection con) {
-        statements.clear();
+        synchronized (statementsLock) {
+            statements.clear();
+        }
         super.reset(parent, con);
     }
 
     /**
-     * Entry that tracks a statement and its allocation stack.
+     * Entry that tracks a statement and its allocation stack. The statement is held strongly: it must stay closeable
+     * until the application or the connection return disposes of it.
      */
     protected class StatementEntry {
-        private WeakReference<Statement> statement;
-        private Throwable allocationStack;
+        private final Statement statement;
+        private final Throwable allocationStack;
 
         /**
          * Creates a new StatementEntry.
+         *
          * @param statement the statement to track
          */
         public StatementEntry(Statement statement) {
-            this.statement = new WeakReference<>(statement);
+            this.statement = statement;
             if (logCreationStack) {
                 this.allocationStack = new Throwable();
+            } else {
+                this.allocationStack = null;
             }
         }
 
         /**
          * Returns the tracked statement.
-         * @return the statement, or null if it has been garbage collected
+         *
+         * @return the statement
          */
         public Statement getStatement() {
-            return statement.get();
+            return statement;
         }
 
         /**
          * Returns the stack trace from when this statement was created.
+         *
          * @return the allocation stack trace, or null if tracing is disabled
          */
         public Throwable getAllocationStack() {
             return allocationStack;
         }
+
+        /**
+         * Closes the tracked statement, reporting failure the same way the connection return does.
+         */
+        public void close() {
+            boolean shallClose = false;
+            try {
+                shallClose = !statement.isClosed();
+            } catch (Exception ignore) {
+                // A driver that cannot say whether the statement is closed
+                // must not get to skip the close attempt - the statement
+                // may still hold server-side state.
+                shallClose = true;
+            }
+            if (shallClose) {
+                try {
+                    statement.close();
+                } catch (Exception ignore) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Unable to close statement upon connection close.", ignore);
+                    }
+                }
+            }
+            if (logCreationStack && shallClose) {
+                log.warn(MessageFactory.get("statementFinalizer.statementNotClosed"), allocationStack);
+            }
+        }
     }
 
+    /**
+     * Thin proxy around a tracked statement. Every call is delegated unchanged; only <code>close()</code> is reacted
+     * to, by forgetting the tracked entry so that a statement the application closed properly neither lingers in the
+     * list nor is touched again when the connection is returned.
+     * <p>
+     * <code>Object.equals(Object)</code> and <code>hashCode()</code> are answered on the handle itself, as
+     * {@link org.apache.tomcat.jdbc.pool.ProxyConnection} and the pool's other statement proxies answer them: the
+     * handle equals only itself and hashes at its own identity. A container that holds this handle next to an
+     * unwrapped handle for the same statement therefore holds two elements, whichever of the two was added first,
+     * instead of resolving the pair to one element or the other by insertion order. The statement underneath stays a
+     * distinct object that the handle compares equal to in neither direction; reaching it is <code>unwrap</code>'s
+     * purpose, and there the driver's own equality applies, as it does for the statement facade's handle above.
+     */
+    protected class CloseAwareProxy implements InvocationHandler {
+        private final StatementEntry entry;
 
+        /**
+         * Creates a handler for the given tracked statement.
+         *
+         * @param entry the list entry tracking the statement
+         */
+        public CloseAwareProxy(StatementEntry entry) {
+            this.entry = entry;
+        }
+
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            if (compare(EQUALS_VAL, method)) {
+                // The identity of the handle the application holds, and
+                // nothing else, as ProxyConnection answers it too. Equality
+                // was delegated to the statement underneath, which made the
+                // handle equal to a statement that - answering by its own
+                // equality, typically identity - did not answer equal to the
+                // handle back. That one-sided relation is what
+                // Object.equals(Object) rules out, and it decided membership
+                // of a container holding both objects by insertion order:
+                // the same pair hashed alike and came out as one element or
+                // two depending on which was added first.
+                Object other = (args == null || args.length == 0) ? null : args[0];
+                return Boolean.valueOf(proxy == other);
+            }
+            if (compare(HASHCODE_VAL, method)) {
+                // The hash that goes with the identity above: the handle's
+                // own, so that it keeps the same place in a hash container
+                // whatever it is compared against.
+                return Integer.valueOf(System.identityHashCode(proxy));
+            }
+            Object result;
+            try {
+                result = method.invoke(entry.getStatement(), args);
+            } catch (InvocationTargetException ite) {
+                // The close failed in the statement - keep the entry so the
+                // connection return tries again.
+                Throwable cause = ite.getTargetException();
+                if (cause != null) {
+                    throw cause;
+                }
+                throw ite;
+            }
+            if (compare(CLOSE_VAL, method)) {
+                synchronized (statementsLock) {
+                    statements.remove(entry);
+                }
+            }
+            return result;
+        }
+    }
 }

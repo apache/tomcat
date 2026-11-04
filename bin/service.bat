@@ -41,6 +41,7 @@ set "SELF=%~dp0%service.bat"
 
 set DEFAULT_SERVICE_NAME=Tomcat@VERSION_MAJOR@
 set SERVICE_NAME=%DEFAULT_SERVICE_NAME%
+set "RENAMED_SERVICE_EXE="
 
 set "CURRENT_DIR=%cd%"
 
@@ -161,9 +162,28 @@ echo Failed removing '%SERVICE_NAME%' service
 exit /b 1
 :removed
 echo The service '%SERVICE_NAME%' has been removed
-if exist "%CATALINA_HOME%\bin\%SERVICE_NAME%.exe" (
-    rename "%SERVICE_NAME%.exe" "%DEFAULT_SERVICE_NAME%.exe"
-    rename "%SERVICE_NAME%w.exe" "%DEFAULT_SERVICE_NAME%w.exe"
+rem Restore the default executable names only when install --rename changed them.
+rem The default executable is not a renamed copy, and renaming a file to itself fails.
+rem The source path is required: rename looks up a bare file name in the current directory, not in CATALINA_HOME\bin.
+if /I not "%SERVICE_NAME%" == "%DEFAULT_SERVICE_NAME%" (
+    if exist "%CATALINA_HOME%\bin\%SERVICE_NAME%.exe" (
+        rename "%CATALINA_HOME%\bin\%SERVICE_NAME%.exe" "%DEFAULT_SERVICE_NAME%.exe"
+        if errorlevel 1 (
+            echo Failed to rename "%SERVICE_NAME%.exe" to "%DEFAULT_SERVICE_NAME%.exe"
+            exit /b 1
+        )
+        set "RENAMED_SERVICE_EXE=1"
+    )
+    if exist "%CATALINA_HOME%\bin\%SERVICE_NAME%w.exe" (
+        rename "%CATALINA_HOME%\bin\%SERVICE_NAME%w.exe" "%DEFAULT_SERVICE_NAME%w.exe"
+        if errorlevel 1 (
+            echo Failed to rename "%SERVICE_NAME%w.exe" to "%DEFAULT_SERVICE_NAME%w.exe"
+            if defined RENAMED_SERVICE_EXE (
+                rename "%CATALINA_HOME%\bin\%DEFAULT_SERVICE_NAME%.exe" "%SERVICE_NAME%.exe"
+            )
+            exit /b 1
+        )
+    )
 )
 exit /b 0
 
@@ -192,11 +212,37 @@ if "%SERVICE_STARTUP_MODE%" == "" set SERVICE_STARTUP_MODE=manual
 if "%JvmMs%" == "" set JvmMs=128
 if "%JvmMx%" == "" set JvmMx=256
 
-if exist "%CATALINA_HOME%\bin\%DEFAULT_SERVICE_NAME%.exe" (
+rem Rename using the full source path. A bare file name is resolved against
+rem the current directory, so "install service_name --rename" failed unless
+rem it was started from CATALINA_HOME\bin. The new name must be a file name
+rem only. Skip when the requested name is already the default: renaming a
+rem file to itself fails, and there is nothing to rename. If the default
+rem executable is already absent, a previous --rename left the service name
+rem in place and install continues with that file.
+if /I not "%SERVICE_NAME%" == "%DEFAULT_SERVICE_NAME%" (
     if "x%RENAME%x" == "x--renamex" (
-        rename "%DEFAULT_SERVICE_NAME%.exe" "%SERVICE_NAME%.exe"
-        rename "%DEFAULT_SERVICE_NAME%w.exe" "%SERVICE_NAME%w.exe"
-        set "EXECUTABLE=%CATALINA_HOME%\bin\%SERVICE_NAME%.exe"
+        if exist "%CATALINA_HOME%\bin\%DEFAULT_SERVICE_NAME%.exe" (
+            if exist "%CATALINA_HOME%\bin\%SERVICE_NAME%.exe" (
+                echo The file "%SERVICE_NAME%.exe" already exists. The executables were not renamed.
+                exit /b 1
+            )
+            if exist "%CATALINA_HOME%\bin\%SERVICE_NAME%w.exe" (
+                echo The file "%SERVICE_NAME%w.exe" already exists. The executables were not renamed.
+                exit /b 1
+            )
+            rename "%CATALINA_HOME%\bin\%DEFAULT_SERVICE_NAME%.exe" "%SERVICE_NAME%.exe"
+            if errorlevel 1 (
+                echo Failed to rename "%DEFAULT_SERVICE_NAME%.exe" to "%SERVICE_NAME%.exe"
+                exit /b 1
+            )
+            rename "%CATALINA_HOME%\bin\%DEFAULT_SERVICE_NAME%w.exe" "%SERVICE_NAME%w.exe"
+            if errorlevel 1 (
+                echo Failed to rename "%DEFAULT_SERVICE_NAME%w.exe" to "%SERVICE_NAME%w.exe"
+                rename "%CATALINA_HOME%\bin\%SERVICE_NAME%.exe" "%DEFAULT_SERVICE_NAME%.exe"
+                exit /b 1
+            )
+            set "EXECUTABLE=%CATALINA_HOME%\bin\%SERVICE_NAME%.exe"
+        )
     )
 )
 

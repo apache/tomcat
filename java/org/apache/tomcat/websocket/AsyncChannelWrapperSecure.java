@@ -131,7 +131,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
             throw new IllegalStateException(sm.getString("asyncChannelWrapperSecure.concurrentWrite"));
         }
 
-        WriteTask writeTask = new WriteTask(srcs, offset, length, future);
+        WriteTask writeTask = new WriteTask(srcs, offset, length, timeout, unit, future);
 
         executor.execute(writeTask);
     }
@@ -173,13 +173,24 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
         private final ByteBuffer[] srcs;
         private final int offset;
         private final int length;
+        // The time by which the write must complete (a System.nanoTime()
+        // based deadline) or -1 if no timeout was requested
+        private final long deadline;
         private final WrapperFuture<Long,?> future;
 
         WriteTask(ByteBuffer[] srcs, int offset, int length, WrapperFuture<Long,?> future) {
+            this(srcs, offset, length, 0, null, future);
+        }
+
+        WriteTask(ByteBuffer[] srcs, int offset, int length, long timeout, TimeUnit unit,
+                WrapperFuture<Long,?> future) {
             this.srcs = srcs;
             this.future = future;
             this.offset = offset;
             this.length = length;
+            // Match the AsynchronousSocketChannel semantics: a timeout of
+            // zero or less means wait indefinitely
+            this.deadline = unit == null || timeout <= 0 ? -1 : System.nanoTime() + unit.toNanos(timeout);
         }
 
         @Override
@@ -221,8 +232,14 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                         int toWrite = r.bytesProduced();
                         while (toWrite > 0) {
                             Future<Integer> f = socketChannel.write(socketWriteBuffer);
-                            Integer socketWrite = f.get();
-                            toWrite -= socketWrite.intValue();
+                            try {
+                                toWrite -= awaitWrite(f).intValue();
+                            } catch (TimeoutException te) {
+                                // Ensure the pending write is not left
+                                // outstanding on the channel
+                                f.cancel(true);
+                                throw te;
+                            }
                         }
                     }
                 }
@@ -237,6 +254,18 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                 writing.set(false);
                 future.fail(e);
             }
+        }
+
+        private Integer awaitWrite(Future<Integer> f)
+                throws InterruptedException, ExecutionException, TimeoutException {
+            if (deadline == -1) {
+                return f.get();
+            }
+            long remaining = deadline - System.nanoTime();
+            if (remaining <= 0) {
+                throw new TimeoutException();
+            }
+            return f.get(remaining, TimeUnit.NANOSECONDS);
         }
     }
 

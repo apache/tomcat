@@ -61,14 +61,12 @@ public class Utils {
     }
 
 
-    static Properties load(File f) {
+    static Properties load(File f) throws IOException {
         Properties props = new Properties();
 
         try (FileInputStream fis = new FileInputStream(f);
                 Reader r = new InputStreamReader(fis, StandardCharsets.UTF_8)) {
             props.load(r);
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
         }
         return props;
     }
@@ -208,7 +206,7 @@ public class Utils {
     }
 
 
-    static void export(String language, Properties translation, File storageDir) {
+    static void export(String language, Properties translation, File storageDir) throws IOException {
         File out = new File(storageDir, Constants.L10N_PREFIX + language + Constants.L10N_SUFFIX);
         try (FileOutputStream fos = new FileOutputStream(out);
                 Writer w = new OutputStreamWriter(fos, StandardCharsets.UTF_8)) {
@@ -217,8 +215,6 @@ public class Utils {
             for (String key : keys) {
                 w.write(key + "=" + formatValueExport(translation.getProperty(key)) + "\n");
             }
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
         }
     }
 

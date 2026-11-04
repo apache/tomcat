@@ -940,7 +940,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                     return null;
                 }
 
-                dbCredentials = (dbCredentials != null) ? dbCredentials.trim() : null;
+                dbCredentials = (dbCredentials != null) ? dbCredentials.strip() : null;
             }
         } catch (SQLException e) {
             log.error(sm.getString("dataSourceUserDatabase.exception"), e);

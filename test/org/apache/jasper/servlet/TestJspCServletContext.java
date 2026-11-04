@@ -17,6 +17,10 @@
 package org.apache.jasper.servlet;
 
 import java.io.File;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
@@ -170,6 +174,46 @@ public class TestJspCServletContext {
                 null, appDir.toURI().toURL(), null, false, false);
         Assert.assertEquals(6, context.getEffectiveMajorVersion());
         Assert.assertEquals(2, context.getEffectiveMinorVersion());
+    }
+
+
+    @Test
+    public void testGetResourceWithUriIllegalCharacters() throws Exception {
+        // A resource path is a decoded logical path. Resources whose name
+        // contains characters that are not permitted in a URI, for example a
+        // space or a non-ASCII character, resolve correctly at runtime so
+        // they must also resolve for the offline compiler rather than be
+        // silently reported as not found.
+        File docBase = Files.createTempDirectory("jspc-illegal-chars").toFile();
+        try {
+            Files.writeString(new File(docBase, "my file.jsp").toPath(),
+                    "<jsp/>", StandardCharsets.UTF_8);
+            Files.writeString(new File(docBase, "unicode-\u00fc.jsp").toPath(),
+                    "<jsp/>", StandardCharsets.UTF_8);
+            JspCServletContext context = new JspCServletContext(
+                    null, docBase.toURI().toURL(), null, false, false);
+
+            URL url = context.getResource("/my file.jsp");
+            Assert.assertNotNull(url);
+            try (InputStream is = url.openStream()) {
+                Assert.assertEquals("<jsp/>",
+                        new String(is.readAllBytes(), StandardCharsets.UTF_8));
+            }
+            Assert.assertNotNull(context.getResource("/unicode-\u00fc.jsp"));
+        } finally {
+            deleteRecursively(docBase);
+        }
+    }
+
+
+    private static void deleteRecursively(File file) {
+        File[] children = file.listFiles();
+        if (children != null) {
+            for (File child : children) {
+                deleteRecursively(child);
+            }
+        }
+        Assert.assertTrue(file.delete());
     }
 
 

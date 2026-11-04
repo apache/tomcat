@@ -18,6 +18,7 @@ package org.apache.coyote;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
@@ -102,7 +103,8 @@ public final class Request {
     private final MessageBytes queryMB = MessageBytes.newInstance();
     private final MessageBytes protoMB = MessageBytes.newInstance();
 
-    private volatile String requestId = Long.toString(requestIdGenerator.getAndIncrement());
+    // The hexadecimal format here matches the identifiers generated in recycle()
+    private volatile String requestId = Long.toHexString(requestIdGenerator.getAndIncrement());
 
     // remote address/host
     private final MessageBytes remoteAddrMB = MessageBytes.newInstance();
@@ -381,14 +383,23 @@ public final class Request {
     }
 
     /**
-     * Set the HTTP method from a byte buffer.
+     * Set the HTTP method from a byte buffer. The bytes are assumed to be an
+     * ISO-8859-1 encoded representation of an HTTP method token. If the
+     * method is not one of the methods known to Tomcat, the raw token is
+     * stored as-is.
      *
      * @param buf the byte buffer
      * @param start the start offset
      * @param len the length
      */
     public void setMethod(byte[] buf, int start, int len) {
-        this.method = Method.bytesToString(buf, start, len);
+        String method = Method.bytesToString(buf, start, len);
+        if (method == null) {
+            // Unknown method. Fall back to converting the raw method token,
+            // assumed to be ISO-8859-1 encoded, to a String.
+            method = new String(buf, start, len, StandardCharsets.ISO_8859_1);
+        }
+        this.method = method;
     }
 
     /**
@@ -587,12 +598,13 @@ public final class Request {
     /**
      * Return the content length.
      *
-     * @return the content length
+     * @return the content length, or -1 if the length is unknown or exceeds
+     *             Integer.MAX_VALUE
      */
     public int getContentLength() {
         long length = getContentLengthLong();
 
-        if (length < Integer.MAX_VALUE) {
+        if (length <= Integer.MAX_VALUE) {
             return (int) length;
         }
         return -1;

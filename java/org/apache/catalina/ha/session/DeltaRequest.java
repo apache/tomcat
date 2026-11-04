@@ -23,6 +23,7 @@ import java.io.ObjectOutputStream;
 import java.security.Principal;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Iterator;
 
 import org.apache.catalina.SessionListener;
 import org.apache.catalina.realm.GenericPrincipal;
@@ -276,13 +277,22 @@ public class DeltaRequest implements Externalizable {
         } else {
             info = new AttributeInfo(type, action, name, value);
         }
-        // if we have already done something to this attribute, make sure
-        // we don't send multiple actions across the wire
-        if (!recordAllActions) {
-            try {
-                actions.remove(info);
-            } catch (java.util.NoSuchElementException x) {
-                // do nothing, we wanted to remove it anyway
+        /*
+         * If we have already done something to this attribute, make sure we don't send multiple actions across the
+         * wire. Listeners are a special case as they are stored (in StandardSession) as a List not a Map so two calls
+         * to addSessionListener(l) should add the same listener twice. Therefore always send all listener events.
+         */
+        if (!recordAllActions && type != TYPE_LISTENER) {
+            Iterator<AttributeInfo> iterator = actions.iterator();
+            while (iterator.hasNext()) {
+                AttributeInfo existing = iterator.next();
+                if (existing.equals(info)) {
+                    iterator.remove();
+                    // Return the evicted action to the pool
+                    existing.recycle();
+                    actionPool.addLast(existing);
+                    break;
+                }
             }
         }
         // add the action
@@ -522,7 +532,8 @@ public class DeltaRequest implements Externalizable {
 
         @Override
         public int hashCode() {
-            return name.hashCode();
+            // Must be consistent with equals() which compares name and type (while action overrides)
+            return name.hashCode() * 31 + type;
         }
 
         public String getName() {
@@ -541,7 +552,10 @@ public class DeltaRequest implements Externalizable {
             if (!(o instanceof AttributeInfo other)) {
                 return false;
             }
-            return other.getName().equals(this.getName());
+            // Attributes and notes are different stores and setting and
+            // removing are different changes, so a name match alone is not
+            // enough, but two actions on the same item would override
+            return other.getType() == this.getType() && other.getName().equals(this.getName());
         }
 
         @Override

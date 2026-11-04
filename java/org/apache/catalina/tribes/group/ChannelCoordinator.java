@@ -125,6 +125,15 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
         this.internalStop(svc);
     }
 
+    /**
+     * Returns the bit mask of the services that are currently started.
+     *
+     * @return the started service flags
+     */
+    synchronized int getStartLevel() {
+        return startLevel;
+    }
+
 
     /**
      * Starts up the channel. This can be called multiple times for individual services to start The svc parameter can
@@ -152,56 +161,63 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
                 return;// nothing to start
             }
 
-            if (svc == (svc & startLevel)) {
+            // only start the services that are not started yet, so that a request
+            // that partially overlaps with the started services does not start the
+            // already started ones a second time
+            int toStart = svc & ~startLevel;
+            if (toStart == 0) {
                 throw new ChannelException(sm.getString("channelCoordinator.alreadyStarted", Integer.toString(svc)));
             }
 
             // must start the receiver first so that we can coordinate the port it
             // listens to with the local membership settings
-            if (Channel.SND_RX_SEQ == (svc & Channel.SND_RX_SEQ)) {
+            if (Channel.SND_RX_SEQ == (toStart & Channel.SND_RX_SEQ)) {
                 clusterReceiver.setMessageListener(this);
                 clusterReceiver.setChannel(getChannel());
                 clusterReceiver.start();
+                startLevel = startLevel | Channel.SND_RX_SEQ;
                 // synchronize, big time FIXME
                 Member localMember = getChannel().getLocalMember(false);
                 if (localMember instanceof StaticMember staticMember) {
                     // static member
                     staticMember.setHost(getClusterReceiver().getHost());
-                    staticMember.setPort(getClusterReceiver().getPort());
-                    staticMember.setSecurePort(getClusterReceiver().getSecurePort());
+                    staticMember.setPort(getClusterReceiver().getBoundPort());
+                    staticMember.setSecurePort(getClusterReceiver().getBoundSecurePort());
                 } else {
                     // multicast member
                     membershipService.setLocalMemberProperties(getClusterReceiver().getHost(),
-                            getClusterReceiver().getPort(), getClusterReceiver().getSecurePort(),
-                            getClusterReceiver().getUdpPort());
+                            getClusterReceiver().getBoundPort(), getClusterReceiver().getBoundSecurePort(),
+                            getClusterReceiver().getBoundUdpPort());
                 }
                 valid = true;
             }
-            if (Channel.SND_TX_SEQ == (svc & Channel.SND_TX_SEQ)) {
+            if (Channel.SND_TX_SEQ == (toStart & Channel.SND_TX_SEQ)) {
                 clusterSender.setChannel(getChannel());
                 clusterSender.start();
+                startLevel = startLevel | Channel.SND_TX_SEQ;
                 valid = true;
             }
 
-            if (Channel.MBR_RX_SEQ == (svc & Channel.MBR_RX_SEQ)) {
+            if (Channel.MBR_RX_SEQ == (toStart & Channel.MBR_RX_SEQ)) {
                 membershipService.setMembershipListener(this);
                 membershipService.setChannel(getChannel());
                 if (membershipService instanceof McastService) {
                     ((McastService) membershipService).setMessageListener(this);
                 }
                 membershipService.start(MembershipService.MBR_RX);
+                startLevel = startLevel | Channel.MBR_RX_SEQ;
                 valid = true;
             }
-            if (Channel.MBR_TX_SEQ == (svc & Channel.MBR_TX_SEQ)) {
+            if (Channel.MBR_TX_SEQ == (toStart & Channel.MBR_TX_SEQ)) {
                 membershipService.setChannel(getChannel());
                 membershipService.start(MembershipService.MBR_TX);
+                startLevel = startLevel | Channel.MBR_TX_SEQ;
                 valid = true;
             }
 
             if (!valid) {
                 throw new IllegalArgumentException(sm.getString("channelCoordinator.invalid.startLevel"));
             }
-            startLevel = (startLevel | svc);
         } catch (ChannelException cx) {
             throw cx;
         } catch (Exception e) {

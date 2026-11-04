@@ -55,4 +55,58 @@ public class TestForEach extends AbstractTestTag {
         Assert.assertTrue(body.contains("OK - 2"));
         Assert.assertTrue(body.contains("OK - 3"));
     }
+
+
+    @Test
+    public void testNumericRangeVarType() throws Exception {
+        ByteChunk res = new ByteChunk();
+
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/test/jstl/foreach-numeric-var.jsp", res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+
+        // The reference implementation exposes the loop variable as an
+        // Integer, not a String.
+        String body = res.toString();
+        Assert.assertEquals(2, body.split("java\\.lang\\.Integer", -1).length - 1);
+        Assert.assertFalse(body, body.contains("java.lang.String"));
+    }
+
+
+    /*
+     * The reference implementation validates the begin, end and step
+     * attributes in their setters, throwing a JspTagException. The plugin
+     * must generate the equivalent checks rather than, for example, looping
+     * forever on step="0". The pages wrap the tag in c:catch and render the
+     * caught exception, pinning the reference exception type and message.
+     */
+    @Test
+    public void testStepZero() throws Exception {
+        doTestInvalidAttribute("foreach-step-zero.jsp", "'step' <= 0");
+    }
+
+
+    @Test
+    public void testBeginNegative() throws Exception {
+        doTestInvalidAttribute("foreach-begin-negative.jsp", "'begin' < 0");
+    }
+
+
+    @Test
+    public void testEndNegative() throws Exception {
+        doTestInvalidAttribute("foreach-end-negative.jsp", "'end' < 0");
+    }
+
+
+    private void doTestInvalidAttribute(String jsp, String message) throws Exception {
+        ByteChunk res = new ByteChunk();
+
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/test/jstl/" + jsp, res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertTrue(res.toString(), res.toString()
+                .contains("jakarta.servlet.jsp.JspTagException: " + message));
+    }
 }

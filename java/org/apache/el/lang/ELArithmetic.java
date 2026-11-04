@@ -303,7 +303,11 @@ public abstract class ELArithmetic {
      *
      * @param obj0 The first operand
      * @param obj1 The second operand
+     *
      * @return The result of the addition
+     *
+     * @throws ELException if the operands cannot be coerced to numbers or if the addition cannot be computed, for
+     *                         example overflow with extreme BigDecimal values
      */
     public static Number add(final Object obj0, final Object obj1) {
         final ELArithmetic delegate = findDelegate(obj0, obj1);
@@ -311,10 +315,14 @@ public abstract class ELArithmetic {
             return Long.valueOf(0);
         }
 
-        Number num0 = delegate.coerce(obj0);
-        Number num1 = delegate.coerce(obj1);
+        try {
+            Number num0 = delegate.coerce(obj0);
+            Number num1 = delegate.coerce(obj1);
 
-        return delegate.add(num0, num1);
+            return delegate.add(num0, num1);
+        } catch (ArithmeticException ae) {
+            throw new ELException(MessageFactory.get("error.add", obj0, obj1), ae);
+        }
     }
 
     /**
@@ -322,7 +330,11 @@ public abstract class ELArithmetic {
      *
      * @param obj0 The dividend
      * @param obj1 The divisor
+     *
      * @return The result of the modulo operation
+     *
+     * @throws ELException if the operands cannot be coerced to numbers or if the modulo cannot be computed, for example
+     *                         division by zero with integer operands
      */
     public static Number mod(final Object obj0, final Object obj1) {
         if (obj0 == null && obj1 == null) {
@@ -340,10 +352,14 @@ public abstract class ELArithmetic {
             delegate = LONG;
         }
 
-        Number num0 = delegate.coerce(obj0);
-        Number num1 = delegate.coerce(obj1);
+        try {
+            Number num0 = delegate.coerce(obj0);
+            Number num1 = delegate.coerce(obj1);
 
-        return delegate.mod(num0, num1);
+            return delegate.mod(num0, num1);
+        } catch (ArithmeticException ae) {
+            throw new ELException(MessageFactory.get("error.mod", obj0, obj1), ae);
+        }
     }
 
     /**
@@ -351,7 +367,11 @@ public abstract class ELArithmetic {
      *
      * @param obj0 The minuend
      * @param obj1 The subtrahend
+     *
      * @return The result of the subtraction
+     *
+     * @throws ELException if the operands cannot be coerced to numbers or if the subtraction cannot be computed, for
+     *                         example overflow with extreme BigDecimal values
      */
     public static Number subtract(final Object obj0, final Object obj1) {
         final ELArithmetic delegate = findDelegate(obj0, obj1);
@@ -359,10 +379,14 @@ public abstract class ELArithmetic {
             return Long.valueOf(0);
         }
 
-        Number num0 = delegate.coerce(obj0);
-        Number num1 = delegate.coerce(obj1);
+        try {
+            Number num0 = delegate.coerce(obj0);
+            Number num1 = delegate.coerce(obj1);
 
-        return delegate.subtract(num0, num1);
+            return delegate.subtract(num0, num1);
+        } catch (ArithmeticException ae) {
+            throw new ELException(MessageFactory.get("error.subtract", obj0, obj1), ae);
+        }
     }
 
     /**
@@ -370,7 +394,11 @@ public abstract class ELArithmetic {
      *
      * @param obj0 The dividend
      * @param obj1 The divisor
+     *
      * @return The result of the division
+     *
+     * @throws ELException if the operands cannot be coerced to numbers or if the division cannot be computed, for
+     *                         example division by zero with BigDecimal or BigInteger operands
      */
     public static Number divide(final Object obj0, final Object obj1) {
         if (obj0 == null && obj1 == null) {
@@ -386,10 +414,14 @@ public abstract class ELArithmetic {
             delegate = DOUBLE;
         }
 
-        Number num0 = delegate.coerce(obj0);
-        Number num1 = delegate.coerce(obj1);
+        try {
+            Number num0 = delegate.coerce(obj0);
+            Number num1 = delegate.coerce(obj1);
 
-        return delegate.divide(num0, num1);
+            return delegate.divide(num0, num1);
+        } catch (ArithmeticException ae) {
+            throw new ELException(MessageFactory.get("error.divide", obj0, obj1), ae);
+        }
     }
 
     /**
@@ -397,6 +429,7 @@ public abstract class ELArithmetic {
      *
      * @param obj0 The first factor
      * @param obj1 The second factor
+     *
      * @return The result of the multiplication
      */
     public static Number multiply(final Object obj0, final Object obj1) {
@@ -435,6 +468,7 @@ public abstract class ELArithmetic {
      * Check if the given object is a number.
      *
      * @param obj The object to check
+     *
      * @return true if the object is a number
      */
     public static boolean isNumber(final Object obj) {
@@ -445,6 +479,7 @@ public abstract class ELArithmetic {
      * Check if the given class is a number type.
      *
      * @param type The class to check
+     *
      * @return true if the class is a number type
      */
     public static boolean isNumberType(final Class<?> type) {
@@ -464,6 +499,7 @@ public abstract class ELArithmetic {
      *
      * @param num0 The first number
      * @param num1 The second number
+     *
      * @return The sum
      */
     protected abstract Number add(Number num0, Number num1);
@@ -473,6 +509,7 @@ public abstract class ELArithmetic {
      *
      * @param num0 The first number
      * @param num1 The second number
+     *
      * @return The product
      */
     protected abstract Number multiply(Number num0, Number num1);
@@ -482,6 +519,7 @@ public abstract class ELArithmetic {
      *
      * @param num0 The minuend
      * @param num1 The subtrahend
+     *
      * @return The difference
      */
     protected abstract Number subtract(Number num0, Number num1);
@@ -491,6 +529,7 @@ public abstract class ELArithmetic {
      *
      * @param num0 The dividend
      * @param num1 The divisor
+     *
      * @return The remainder
      */
     protected abstract Number mod(Number num0, Number num1);
@@ -499,6 +538,7 @@ public abstract class ELArithmetic {
      * Coerce a number to the delegate's preferred type.
      *
      * @param num The number to coerce
+     *
      * @return The coerced number
      */
     protected abstract Number coerce(Number num);
@@ -507,21 +547,28 @@ public abstract class ELArithmetic {
      * Coerce an object to a number.
      *
      * @param obj The object to coerce
+     *
      * @return The coerced number
+     *
+     * @throws ELException if the object cannot be coerced to a number
      */
     protected final Number coerce(final Object obj) {
-
-        if (isNumber(obj)) {
-            return coerce((Number) obj);
-        }
-        if (obj == null || "".equals(obj)) {
-            return coerce(ZERO);
-        }
-        if (obj instanceof String) {
-            return coerce((String) obj);
-        }
-        if (obj instanceof Character) {
-            return coerce(Short.valueOf((short) ((Character) obj).charValue()));
+        try {
+            if (isNumber(obj)) {
+                return coerce((Number) obj);
+            }
+            if (obj == null || "".equals(obj)) {
+                return coerce(ZERO);
+            }
+            if (obj instanceof String) {
+                return coerce((String) obj);
+            }
+            if (obj instanceof Character) {
+                return coerce(Short.valueOf((short) ((Character) obj).charValue()));
+            }
+        } catch (NumberFormatException nfe) {
+            throw new ELException(
+                    MessageFactory.get("error.convert", obj, obj == null ? null : obj.getClass(), "Number"), nfe);
         }
 
         throw new ELException(MessageFactory.get("error.convert", obj, obj.getClass(), "Number"));
@@ -531,6 +578,7 @@ public abstract class ELArithmetic {
      * Coerce a string to a number.
      *
      * @param str The string to coerce
+     *
      * @return The coerced number
      */
     protected abstract Number coerce(String str);
@@ -540,6 +588,7 @@ public abstract class ELArithmetic {
      *
      * @param num0 The dividend
      * @param num1 The divisor
+     *
      * @return The quotient
      */
     protected abstract Number divide(Number num0, Number num1);
@@ -549,6 +598,7 @@ public abstract class ELArithmetic {
      *
      * @param obj0 The first operand
      * @param obj1 The second operand
+     *
      * @return true if this delegate should handle these types
      */
     protected abstract boolean matches(Object obj0, Object obj1);

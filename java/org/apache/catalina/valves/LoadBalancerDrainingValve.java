@@ -23,6 +23,7 @@ import jakarta.servlet.SessionCookieConfig;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.SessionConfig;
@@ -168,7 +169,16 @@ public class LoadBalancerDrainingValve extends ValveBase {
 
             final Cookie[] cookies = request.getCookies();
 
-            final String sessionCookieName = SessionConfig.getSessionCookieName(request.getContext());
+            // The context may be null, for example for a valve attached to the
+            // Engine receiving a request that matched no context
+            final Context context = request.getContext();
+
+            // The requested session id may be null, for example when session
+            // tracking via cookies is disabled for the context while the
+            // client still sends a session cookie
+            final String requestedSessionId = request.getRequestedSessionId();
+
+            final String sessionCookieName = SessionConfig.getSessionCookieName(context);
 
             if (null != cookies) {
                 for (Cookie cookie : cookies) {
@@ -177,8 +187,8 @@ public class LoadBalancerDrainingValve extends ValveBase {
                         containerLog.trace("Checking cookie " + cookieName + "=" + cookie.getValue());
                     }
 
-                    if (sessionCookieName.equals(cookieName) &&
-                            request.getRequestedSessionId().equals(cookie.getValue())) {
+                    if (sessionCookieName.equals(cookieName) && requestedSessionId != null &&
+                            requestedSessionId.equals(cookie.getValue())) {
                         sessionCookie = cookie;
                     } else if (null != _ignoreCookieName && _ignoreCookieName.equals(cookieName) &&
                             null != _ignoreCookieValue && _ignoreCookieValue.equals(cookie.getValue())) {
@@ -200,20 +210,23 @@ public class LoadBalancerDrainingValve extends ValveBase {
 
             // Kill any session cookie that was found
             // TODO: Consider implications of SSO cookies
-            if (null != sessionCookie) {
-                sessionCookie.setPath(SessionConfig.getSessionCookiePath(request.getContext()));
+            // A context is needed for the cookie path and secure configuration
+            // and, when the context is null, no requested session id can have
+            // been parsed so no session cookie would have been found anyway
+            if (null != sessionCookie && context != null) {
+                sessionCookie.setPath(SessionConfig.getSessionCookiePath(context));
                 sessionCookie.setMaxAge(0); // Delete
                 sessionCookie.setValue(""); // Purge the cookie's value
                 // Replicate logic used to set secure attribute for session cookies
                 SessionCookieConfig sessionCookieConfig =
-                        request.getContext().getServletContext().getSessionCookieConfig();
+                        context.getServletContext().getSessionCookieConfig();
                 sessionCookie.setSecure(request.isSecure() || sessionCookieConfig.isSecure());
                 response.addCookie(sessionCookie);
             }
 
             String uri = collapseLeadingSlashes(request.getRequestURI());
             // Re-write the URI if it contains a ;jsessionid parameter
-            String sessionURIParamName = SessionConfig.getSessionUriParamName(request.getContext());
+            String sessionURIParamName = SessionConfig.getSessionUriParamName(context);
             if (uri.contains(";" + sessionURIParamName + "=")) {
                 uri = uri.replaceFirst(";" + sessionURIParamName + "=[^;/]*", "");
             }

@@ -22,6 +22,7 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URL;
@@ -33,6 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -66,10 +69,16 @@ import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.valves.TesterAccessLogValve;
+import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
+import org.apache.coyote.http11.Constants;
+import org.apache.coyote.http11.Http11InputBuffer;
+import org.apache.coyote.http11.InputFilter;
+import org.apache.coyote.http11.filters.ChunkedInputFilter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.net.ApplicationBufferHandler;
 
 public class TestNonBlockingAPI extends TomcatBaseTest {
 
@@ -626,7 +635,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         // No file system docBase required
         Context ctx = getProgrammaticRootContext();
 
-        NBReadServlet servlet = new NBReadServlet(false, true, expectedTrailerFieldValue);
+        ReadProgress readProgress = new ReadProgress();
+        NBReadServlet servlet = new NBReadServlet(false, true, expectedTrailerFieldValue, readProgress);
         String servletName = NBReadServlet.class.getName();
         Tomcat.addServlet(ctx, servletName, servlet);
         ctx.addServletMapping("/", servletName);
@@ -635,6 +645,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         tomcat.start();
 
+        int firstBodyLength = requestBody[0].getBytes(StandardCharsets.ISO_8859_1).length;
         // Add the headers to the first part of the chunked body
         // @formatter:off
         requestBody[0] =
@@ -647,14 +658,18 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         Client client = new Client();
         client.setPort(getPort());
-        client.setRequest(requestBody);
-        /*
-         * Reduce default pause to speed up test execution. Pause only needs to be long enough that each part of the
-         * request is read separately.
-         */
-        client.setRequestPause(200);
         client.connect();
-        client.sendRequest();
+        int bodyBytesSent = 0;
+        for (int i = 0; i < requestBody.length; i++) {
+            client.setRequest(new String[] { requestBody[i] });
+            client.sendRequest();
+            bodyBytesSent += i == 0 ? firstBodyLength :
+                    requestBody[i].getBytes(StandardCharsets.ISO_8859_1).length;
+            if (i + 1 < requestBody.length) {
+                // Include chunk headers and trailers, which need not produce an application read callback.
+                readProgress.awaitConsumed(bodyBytesSent);
+            }
+        }
 
         client.setUseContentLength(true);
         client.readResponse(true);
@@ -666,9 +681,91 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     private static class Client extends SimpleHttpClient {
         @Override
+        protected OutputStream createOutputStream(Socket socket) throws IOException {
+            socket.setTcpNoDelay(true);
+            return super.createOutputStream(socket);
+        }
+
+        @Override
         public boolean isResponseBodyOK() {
             return "OK".equals(getResponseBody());
         }
+    }
+
+
+    private static class ReadProgress implements InputBuffer {
+
+        private InputBuffer buffer;
+        private long bytesRead;
+        private long exhaustedAt = -1;
+
+        void observe(AsyncContext context) throws ServletException {
+            try {
+                org.apache.catalina.connector.Request request =
+                        (org.apache.catalina.connector.Request) CTX_REQUEST_FIELD.get(context);
+                Http11InputBuffer input = (Http11InputBuffer) request.getCoyoteRequest().getInputBuffer();
+                Field filtersField = Http11InputBuffer.class.getDeclaredField("filterLibrary");
+                filtersField.setAccessible(true);
+                InputFilter[] filters = (InputFilter[]) filtersField.get(input);
+                ChunkedInputFilter chunked = (ChunkedInputFilter) filters[Constants.CHUNKED_FILTER];
+                Field bufferField = ChunkedInputFilter.class.getDeclaredField("buffer");
+                bufferField.setAccessible(true);
+                buffer = (InputBuffer) bufferField.get(chunked);
+                // Observe the original raw input without changing the chunk parser or its buffered data.
+                chunked.setBuffer(this);
+            } catch (ReflectiveOperationException e) {
+                throw new ServletException(e);
+            }
+        }
+
+        @Override
+        public int doRead(ApplicationBufferHandler handler) throws IOException {
+            int read = buffer.doRead(handler);
+            synchronized (this) {
+                if (read > 0) {
+                    bytesRead += read;
+                } else if (read == 0) {
+                    exhaustedAt = bytesRead;
+                    notifyAll();
+                }
+            }
+            return read;
+        }
+
+        @Override
+        public int available() {
+            int available = buffer.available();
+            if (available == 0) {
+                synchronized (this) {
+                    exhaustedAt = bytesRead;
+                    notifyAll();
+                }
+            }
+            return available;
+        }
+
+        synchronized void awaitConsumed(int expected) throws IOException {
+            long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
+            while (exhaustedAt < expected) {
+                long remaining = deadline - System.nanoTime();
+                if (remaining <= 0) {
+                    throw new IOException("Chunk parser did not exhaust fragment ending at byte " + expected);
+                }
+                try {
+                    TimeUnit.NANOSECONDS.timedWait(this, remaining);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new IOException(e);
+                }
+            }
+        }
+    }
+
+
+    private static class WriteProgress {
+        final CountDownLatch blocked = new CountDownLatch(1);
+        final CountDownLatch resumed = new CountDownLatch(1);
+        final CountDownLatch completed = new CountDownLatch(1);
     }
 
 
@@ -684,12 +781,13 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     private void testNonBlockingWriteInternal(boolean keepAlive) throws Exception {
         AtomicBoolean asyncContextIsComplete = new AtomicBoolean(false);
+        WriteProgress writeProgress = new WriteProgress();
 
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
         Context ctx = getProgrammaticRootContext();
 
-        NBWriteServlet servlet = new NBWriteServlet(asyncContextIsComplete);
+        NBWriteServlet servlet = new NBWriteServlet(asyncContextIsComplete, false, true, writeProgress);
         String servletName = NBWriteServlet.class.getName();
         Tomcat.addServlet(ctx, servletName, servlet);
         ctx.addServletMapping("/", servletName);
@@ -700,7 +798,10 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         tomcat.start();
 
         SocketFactory factory = SocketFactory.getDefault();
-        Socket s = factory.createSocket("localhost", getPort());
+        Socket s = factory.createSocket();
+        // Keep the receive buffer smaller than the response to ensure that writes encounter backpressure.
+        s.setReceiveBufferSize(CHUNK_SIZE);
+        s.connect(new InetSocketAddress("localhost", getPort()), 10000);
 
         InputStream is = s.getInputStream();
         byte[] buffer = new byte[8192];
@@ -724,21 +825,14 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                 .getBytes(StandardCharsets.ISO_8859_1));
         os.flush();
 
+        Assert.assertTrue("Server did not encounter write backpressure",
+                writeProgress.blocked.await(10, TimeUnit.SECONDS));
+
         int read = 0;
-        int readSinceLastPause = 0;
         while (read != -1) {
             read = is.read(buffer);
-            if (readSinceLastPause == 0) {
-                log.info("Reading data");
-            }
             if (read > 0) {
                 result.append(buffer, 0, read);
-            }
-            readSinceLastPause += read;
-            if (readSinceLastPause > WRITE_SIZE / 16) {
-                log.info("Read " + readSinceLastPause + " bytes, pause 500ms");
-                readSinceLastPause = 0;
-                Thread.sleep(500);
             }
         }
 
@@ -839,7 +933,10 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         }
 
         Assert.assertEquals(WRITE_SIZE, totalBodyRead);
-        Assert.assertTrue("AsyncContext should have been completed.", asyncContextIsComplete.get());
+        Assert.assertTrue("Server did not resume writing after backpressure",
+                writeProgress.resumed.await(10, TimeUnit.SECONDS));
+        Assert.assertTrue("AsyncContext should have been completed.",
+                writeProgress.completed.await(10, TimeUnit.SECONDS) && asyncContextIsComplete.get());
     }
 
 
@@ -1039,12 +1136,19 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         private final boolean async;
         private final boolean ignoreIsReady;
         private final String expectedTrailerFieldValue;
+        private final transient ReadProgress readProgress;
         transient TestReadListener listener;
 
         public NBReadServlet(boolean ignoreIsReady, boolean async, String expectedTrailerFieldValue) {
+            this(ignoreIsReady, async, expectedTrailerFieldValue, null);
+        }
+
+        private NBReadServlet(boolean ignoreIsReady, boolean async, String expectedTrailerFieldValue,
+                ReadProgress readProgress) {
             this.async = async;
             this.ignoreIsReady = ignoreIsReady;
             this.expectedTrailerFieldValue = expectedTrailerFieldValue;
+            this.readProgress = readProgress;
         }
 
         @Override
@@ -1052,6 +1156,9 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             // step 1 - start async
             AsyncContext actx = req.startAsync();
             actx.setTimeout(Long.MAX_VALUE);
+            if (readProgress != null) {
+                readProgress.observe(actx);
+            }
             actx.addListener(new AsyncListener() {
 
                 @Override
@@ -1095,6 +1202,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         private final AtomicBoolean asyncContextIsComplete;
         private final boolean unlimited;
         private final boolean listenerCompletesOnError;
+        private final transient WriteProgress writeProgress;
         public transient volatile TestWriteListener wlistener;
 
         public NBWriteServlet(AtomicBoolean asyncContextIsComplete) {
@@ -1104,9 +1212,15 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         public NBWriteServlet(AtomicBoolean asyncContextIsComplete, boolean unlimited,
                 boolean listenerCompletesOnError) {
+            this(asyncContextIsComplete, unlimited, listenerCompletesOnError, null);
+        }
+
+        private NBWriteServlet(AtomicBoolean asyncContextIsComplete, boolean unlimited,
+                boolean listenerCompletesOnError, WriteProgress writeProgress) {
             this.asyncContextIsComplete = asyncContextIsComplete;
             this.unlimited = unlimited;
             this.listenerCompletesOnError = listenerCompletesOnError;
+            this.writeProgress = writeProgress;
         }
 
 
@@ -1139,12 +1253,15 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                 public void onComplete(AsyncEvent event) throws IOException {
                     log.info("onComplete");
                     asyncContextIsComplete.set(true);
+                    if (writeProgress != null) {
+                        writeProgress.completed.countDown();
+                    }
                 }
             });
             // step 2 - notify on read
             ServletOutputStream out = resp.getOutputStream();
             resp.setBufferSize(200 * 1024);
-            wlistener = new TestWriteListener(actx, unlimited);
+            wlistener = new TestWriteListener(actx, unlimited, writeProgress);
             out.setWriteListener(wlistener);
         }
 
@@ -1239,6 +1356,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     private static class TestAsyncReadListener extends TestReadListener {
 
+        private final ExecutorService executor = Executors.newSingleThreadExecutor();
+
         AtomicInteger isReadyCount = new AtomicInteger(0);
         AtomicInteger notReadyCount = new AtomicInteger(0);
         AtomicInteger containerThreadCount = new AtomicInteger(0);
@@ -1263,7 +1382,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             } else {
                 nonContainerThreadCount.incrementAndGet();
             }
-            new Thread() {
+            executor.execute(new Runnable() {
                 @Override
                 public void run() {
                     try {
@@ -1287,11 +1406,12 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                         onError(ioe);
                     }
                 }
-            }.start();
+            });
         }
 
         @Override
         public void onAllDataRead() {
+            executor.shutdown();
             super.onAllDataRead();
             log.info("isReadyCount=" + isReadyCount + " notReadyCount=" + notReadyCount + " containerThreadCount=" +
                     containerThreadCount + " nonContainerThreadCount=" + nonContainerThreadCount);
@@ -1299,6 +1419,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         @Override
         public void onError(Throwable throwable) {
+            executor.shutdown();
             super.onError(throwable);
             log.info("isReadyCount=" + isReadyCount + " notReadyCount=" + notReadyCount + " containerThreadCount=" +
                     containerThreadCount + " nonContainerThreadCount=" + nonContainerThreadCount);
@@ -1308,19 +1429,30 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     private static class TestWriteListener implements WriteListener {
         AsyncContext ctx;
         private final boolean unlimited;
+        private final WriteProgress writeProgress;
         int written = 0;
         public volatile boolean onErrorInvoked = false;
 
-        TestWriteListener(AsyncContext ctx, boolean unlimited) {
+        TestWriteListener(AsyncContext ctx, boolean unlimited, WriteProgress writeProgress) {
             this.ctx = ctx;
             this.unlimited = unlimited;
+            this.writeProgress = writeProgress;
         }
 
         @Override
         public void onWritePossible() throws IOException {
+            if (writeProgress != null && writeProgress.blocked.getCount() == 0) {
+                writeProgress.resumed.countDown();
+            }
             long start = System.currentTimeMillis();
             int before = written;
-            while ((written < WRITE_SIZE || unlimited) && ctx.getResponse().getOutputStream().isReady()) {
+            while (written < WRITE_SIZE || unlimited) {
+                if (!ctx.getResponse().getOutputStream().isReady()) {
+                    if (writeProgress != null) {
+                        writeProgress.blocked.countDown();
+                    }
+                    break;
+                }
                 ctx.getResponse().getOutputStream().write(DATA, written, CHUNK_SIZE);
                 written += CHUNK_SIZE;
             }
@@ -1336,6 +1468,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                 // it is illegal to call complete
                 // if there is a write in progress
                 ctx.complete();
+            } else if (writeProgress != null) {
+                writeProgress.blocked.countDown();
             }
         }
 

@@ -54,6 +54,7 @@ import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.catalina.util.ToStringUtil;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -375,16 +376,11 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     }
 
     /**
-     * has members
-     */
-    protected boolean hasMembers = false;
-
-    /**
      * {@inheritDoc}
      */
     @Override
     public boolean hasMembers() {
-        return hasMembers;
+        return channel.hasMembers();
     }
 
     /**
@@ -464,6 +460,10 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
         } catch (Exception e) {
             log.error(sm.getString("simpleTcpCluster.clustermanager.cloneFailed"), e);
             manager = new DeltaManager();
+            // The name is required for replication message routing, a null
+            // name would make the receiving nodes apply the messages to all
+            // contexts
+            manager.setName(name);
         } finally {
             if (manager != null) {
                 manager.setCluster(this);
@@ -689,25 +689,89 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     protected void stopInternal() throws LifecycleException {
 
         setState(LifecycleState.STOPPING);
+        LifecycleException stopException = null;
 
-        unregisterMember(channel.getLocalMember(false));
         if (clusterDeployer != null) {
-            clusterDeployer.stop();
+            try {
+                clusterDeployer.stop();
+            } catch (Throwable t) {
+                log.error(sm.getString("simpleTcpCluster.stopUnable"), t);
+                stopException = handleExceptionDuringStop(stopException, t);
+            }
         }
         this.managers.clear();
         try {
             if (clusterDeployer != null) {
                 clusterDeployer.setCluster(null);
             }
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            log.error(sm.getString("simpleTcpCluster.stopUnable"), t);
+            stopException = handleExceptionDuringStop(stopException, t);
+        }
+        try {
             channel.stop(channelStartOptions);
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            log.error(sm.getString("simpleTcpCluster.stopUnable"), t);
+            stopException = handleExceptionDuringStop(stopException, t);
+        }
+        // These steps must also run when stopping the channel failed,
+        // otherwise the cluster valves remain in the container pipeline and
+        // would be linked a second time on the next start
+        try {
             channel.removeChannelListener(this);
             channel.removeMembershipListener(this);
-            this.unregisterClusterValve();
-        } catch (Exception e) {
-            log.error(sm.getString("simpleTcpCluster.stopUnable"), e);
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            log.error(sm.getString("simpleTcpCluster.stopUnable"), t);
+            stopException = handleExceptionDuringStop(stopException, t);
+        }
+        try {
+            unregisterClusterValve();
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            log.error(sm.getString("simpleTcpCluster.stopUnable"), t);
+            stopException = handleExceptionDuringStop(stopException, t);
+        }
+        // Unregister the MBeans of the local member and of any remote members
+        // for which memberDisappeared() did not fire during the stop
+        for (ObjectName oname : memberOnameMap.values()) {
+            try {
+                unregister(oname);
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                log.error(sm.getString("simpleTcpCluster.stopUnable"), t);
+                stopException = handleExceptionDuringStop(stopException, t);
+            }
+        }
+        memberOnameMap.clear();
+
+        try {
+            channel.setUtilityExecutor(null);
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            log.error(sm.getString("simpleTcpCluster.stopUnable"), t);
+            stopException = handleExceptionDuringStop(stopException, t);
         }
 
-        channel.setUtilityExecutor(null);
+        if (stopException != null) {
+            throw stopException;
+        }
+    }
+
+
+    private LifecycleException handleExceptionDuringStop(LifecycleException stopException, Throwable t) {
+        if (stopException == null) {
+            if (t instanceof LifecycleException le) {
+                return le;
+            } else {
+                return new LifecycleException(sm.getString("simpleTcpCluster.stopUnable"), t);
+            }
+        } else {
+            stopException.addSuppressed(t);
+            return stopException;
+        }
     }
 
 
@@ -771,6 +835,10 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
             }
         } catch (Exception e) {
             log.error(sm.getString("simpleTcpCluster.sendFailed"), e);
+            if (notifyLifecycleListenerOnFailure) {
+                // Notify our interested LifecycleListeners
+                fireLifecycleEvent(SEND_MESSAGE_FAILURE_EVENT, new SendMessageData(msg, dest, e));
+            }
         }
     }
 
@@ -780,7 +848,6 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     @Override
     public void memberAdded(Member member) {
         try {
-            hasMembers = channel.hasMembers();
             if (log.isInfoEnabled()) {
                 log.info(sm.getString("simpleTcpCluster.member.added", member));
             }
@@ -803,7 +870,6 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     @Override
     public void memberDisappeared(Member member) {
         try {
-            hasMembers = channel.hasMembers();
             if (log.isInfoEnabled()) {
                 log.info(sm.getString("simpleTcpCluster.member.disappeared", member));
             }

@@ -130,6 +130,10 @@ public abstract class AbstractEndpoint<S, U> {
              */
             UPGRADED,
             /**
+             * The connection has been closed for reads from the client but writes to the client may continue.
+             */
+            UPGRADED_HALF_CLOSED,
+            /**
              * Asynchronous I/O is in progress.
              */
             ASYNC_IO,
@@ -499,7 +503,12 @@ public abstract class AbstractEndpoint<S, U> {
         // internally because they are used as keys in a ConcurrentMap where
         // keys are compared in a case-sensitive manner.
         String hostNameLower = hostName.toLowerCase(Locale.ENGLISH);
-        if (hostNameLower.equals(getDefaultSSLHostConfigName())) {
+        // The default host configuration is the fallback for handshakes
+        // without a matching SNI name, so it cannot be removed while the
+        // endpoint is still serving TLS. Once TLS is switched off (for
+        // example to remove the last remaining host configuration) the
+        // guard no longer applies.
+        if (isSSLEnabled() && hostNameLower.equals(getDefaultSSLHostConfigName())) {
             throw new IllegalArgumentException(sm.getString("endpoint.removeDefaultSslHostConfig", hostName));
         }
         SSLHostConfig sslHostConfig = sslHostConfigs.remove(hostNameLower);
@@ -825,11 +834,15 @@ public abstract class AbstractEndpoint<S, U> {
 
 
     /**
-     * Initialise the SSL configuration.
+     * Initialize the SSL implementation and (re-)create the SSL context
+     * of every SSL host configuration. Called from {@code bind()} but
+     * also made available to components that switch an already bound,
+     * running endpoint to TLS after the initial bind (which is when the
+     * SSL implementation and contexts are validated and created).
      *
      * @throws Exception If an error occurs while initializing SSL
      */
-    protected void initialiseSsl() throws Exception {
+    public void initialiseSsl() throws Exception {
         if (isSSLEnabled()) {
             sslImplementation = SSLImplementation.getInstance(getSslImplementationName());
 
@@ -929,6 +942,9 @@ public abstract class AbstractEndpoint<S, U> {
      *    protocol host name uses the default SSLHostConfig configuration, and false otherwise
      */
     public boolean checkSni(String sniHostName, String protocolHostName) {
+        if (protocolHostName != null && protocolHostName.endsWith(".")) {
+            protocolHostName = protocolHostName.substring(0, protocolHostName.length() - 1);
+        }
         return (!strictSni || !isSSLEnabled()
                 || (sniHostName != null && sniHostName.equalsIgnoreCase(protocolHostName))
                 || getSSLHostConfig(sniHostName) == getSSLHostConfig(
@@ -1112,9 +1128,19 @@ public abstract class AbstractEndpoint<S, U> {
 
 
     /**
-     * External Executor based thread pool for utility tasks.
+     * External Executor based thread pool for utility tasks. Lazily created
+     * when none was set. The race between concurrent creators is benign: the
+     * executor is only requested from the protocol lifecycle and the
+     * scheduled async-timeout task, both serialised per endpoint, and a
+     * duplicated pool would at worst replicate the pre-existing behaviour.
      */
-    private ScheduledExecutorService utilityExecutor = null;
+    private volatile ScheduledExecutorService utilityExecutor = null;
+
+    /**
+     * The utility executor created by this endpoint, if any. It is tracked so
+     * that it can be shut down when the endpoint is destroyed.
+     */
+    private volatile ScheduledExecutorService createdUtilityExecutor = null;
 
     /**
      * Set the utility executor.
@@ -1126,16 +1152,19 @@ public abstract class AbstractEndpoint<S, U> {
     }
 
     /**
-     * Get the utility executor.
+     * Get the utility executor, creating one if none has been set.
      *
      * @return The utility executor
      */
     public ScheduledExecutorService getUtilityExecutor() {
-        if (utilityExecutor == null) {
+        ScheduledExecutorService result = utilityExecutor;
+        if (result == null) {
             getLog().warn(sm.getString("endpoint.warn.noUtilityExecutor"));
-            utilityExecutor = new ScheduledThreadPoolExecutor(1);
+            result = new ScheduledThreadPoolExecutor(1);
+            utilityExecutor = result;
+            createdUtilityExecutor = result;
         }
-        return utilityExecutor;
+        return result;
     }
 
 
@@ -1970,6 +1999,12 @@ public abstract class AbstractEndpoint<S, U> {
                 }
                 TaskQueue queue = (TaskQueue) tpe.getQueue();
                 queue.setParent(null);
+            } else if (executor instanceof VirtualThreadExecutor virtualThreadExecutor) {
+                // The virtual thread executor accepts new tasks until it is shut
+                // down. Shut it down, so tasks submitted via a reference captured
+                // before this point are rejected, as they are with the thread
+                // pool executor.
+                virtualThreadExecutor.shutdownNow();
             }
         }
     }
@@ -2347,6 +2382,14 @@ public abstract class AbstractEndpoint<S, U> {
      * @throws java.lang.Exception If an error occurs while destroying the endpoint
      */
     public final void destroy() throws Exception {
+        ScheduledExecutorService created = createdUtilityExecutor;
+        if (created != null) {
+            createdUtilityExecutor = null;
+            created.shutdown();
+        }
+        // Deliberately leave utilityExecutor set: later calls to
+        // getUtilityExecutor() then return the shut-down executor instead of
+        // creating a new pool that would never be destroyed
         if (bindState == BindState.BOUND_ON_INIT) {
             unbind();
             bindState = BindState.UNBOUND;

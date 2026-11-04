@@ -284,6 +284,38 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         Assert.assertEquals("remoteHost", "remote-host-original-value", actualRemoteHost);
     }
 
+    /*
+     * A remote IP header value that contains nothing but whitespace (or commas) must leave the request untouched,
+     * just like an absent header, rather than setting an empty remote address.
+     */
+    @Test
+    public void testInvokeAllowedRemoteAddrWithWhitespaceOnlyRemoteIpHeader() throws Exception {
+        // PREPARE
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("internalProxies", "192\\.168\\.0\\.10|192\\.168\\.0\\.11");
+        filterDef.addInitParameter("trustedProxies", "200.0.0.1,200.0.0.2,200.0.0.3");
+        filterDef.addInitParameter("remoteIpHeader", "x-forwarded-for");
+        filterDef.addInitParameter("proxiesHeader", "x-forwarded-by");
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRemoteAddr("192.168.0.10");
+        request.setRemoteHost("remote-host-original-value");
+        request.addHeader("x-forwarded-for", " ");
+
+        // TEST
+        HttpServletRequest actualRequest = testRemoteIpFilter(filterDef, request).getRequest();
+
+        // VERIFY
+        String actualXForwardedBy = actualRequest.getHeader("x-forwarded-by");
+        Assert.assertNull("x-forwarded-by must not be added", actualXForwardedBy);
+
+        String actualRemoteAddr = actualRequest.getRemoteAddr();
+        Assert.assertEquals("remoteAddr", "192.168.0.10", actualRemoteAddr);
+
+        String actualRemoteHost = actualRequest.getRemoteHost();
+        Assert.assertEquals("remoteHost", "remote-host-original-value", actualRemoteHost);
+    }
+
     @Test
     public void testInvokeAllProxiesAreInternal() throws Exception {
 
@@ -596,6 +628,60 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
 
         boolean actualSecure = actualRequest.isSecure();
         Assert.assertTrue("postInvoke secure", actualSecure);
+    }
+
+    @Test
+    public void testInvokeXforwardedPortOutOfRange() throws Exception {
+        // PREPARE
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("portHeader", "x-forwarded-port");
+        filterDef.addInitParameter("protocolHeader", "x-forwarded-proto");
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        // client ip
+        request.setRemoteAddr("192.168.0.10");
+        request.setRemoteHost("192.168.0.10");
+        // protocol
+        request.setSecure(false);
+        request.setServerPort(8080);
+        request.setScheme("http");
+        // port
+        request.setHeader("x-forwarded-port", "99999");
+        request.setHeader("x-forwarded-proto", "https");
+
+        // TEST
+        HttpServletRequest actualRequest = testRemoteIpFilter(filterDef, request).getRequest();
+
+        // VERIFY
+        int actualServerPort = actualRequest.getServerPort();
+        Assert.assertEquals("postInvoke serverPort", 443, actualServerPort);
+    }
+
+    @Test
+    public void testInvokeXforwardedPortNegative() throws Exception {
+        // PREPARE
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("portHeader", "x-forwarded-port");
+        filterDef.addInitParameter("protocolHeader", "x-forwarded-proto");
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        // client ip
+        request.setRemoteAddr("192.168.0.10");
+        request.setRemoteHost("192.168.0.10");
+        // protocol
+        request.setSecure(false);
+        request.setServerPort(8080);
+        request.setScheme("http");
+        // port
+        request.setHeader("x-forwarded-port", "-5");
+        request.setHeader("x-forwarded-proto", "https");
+
+        // TEST
+        HttpServletRequest actualRequest = testRemoteIpFilter(filterDef, request).getRequest();
+
+        // VERIFY
+        int actualServerPort = actualRequest.getServerPort();
+        Assert.assertEquals("postInvoke serverPort", 443, actualServerPort);
     }
 
     @Test

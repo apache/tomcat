@@ -20,12 +20,13 @@ package org.apache.tomcat.jdbc.pool;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
+
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
+
 /**
  * Interceptor that traps any unhandled exception types and throws an exception that has been declared by the method
- * called, or throw an SQLException if it is declared.
- * If the caught exception is not declared, and the method doesn't throw SQLException, then this interceptor will
- * throw a RuntimeException
- *
+ * called, or throw an SQLException if it is declared. If the caught exception is not declared, and the method doesn't
+ * throw SQLException, then this interceptor will throw a RuntimeException
  */
 public class TrapException extends JdbcInterceptor {
 
@@ -40,7 +41,7 @@ public class TrapException extends JdbcInterceptor {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         try {
             return super.invoke(proxy, method, args);
-        }catch (Exception t) {
+        } catch (Exception t) {
             Throwable exception = t;
             if (t instanceof InvocationTargetException && t.getCause() != null) {
                 exception = t.getCause();
@@ -50,12 +51,14 @@ public class TrapException extends JdbcInterceptor {
             }
             Class<?> exceptionClass = exception.getClass();
             if (!isDeclaredException(method, exceptionClass)) {
-                if (isDeclaredException(method,SQLException.class)) {
-                    SQLException sqlx = new SQLException("Uncaught underlying exception.");
+                if (isDeclaredException(method, SQLException.class)) {
+                    SQLException sqlx =
+                            new SQLException(MessageFactory.get("trapException.uncaughtUnderlyingException"));
                     sqlx.initCause(exception);
                     exception = sqlx;
                 } else {
-                    RuntimeException rx = new RuntimeException("Uncaught underlying exception.");
+                    RuntimeException rx =
+                            new RuntimeException(MessageFactory.get("trapException.uncaughtUnderlyingException"));
                     rx.initCause(exception);
                     exception = rx;
                 }
@@ -68,7 +71,7 @@ public class TrapException extends JdbcInterceptor {
     /**
      * Checks if the given exception class is declared in the throws clause of the specified method.
      *
-     * @param m    The method to check
+     * @param m     The method to check
      * @param clazz The exception class to look for
      *
      * @return {@code true} if the exception is declared, {@code false} otherwise

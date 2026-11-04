@@ -17,6 +17,8 @@
 package org.apache.tomcat.util.http;
 
 import java.text.ParseException;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
@@ -147,7 +149,7 @@ public final class FastHttpDateFormat {
         long date = -1;
         for (int i = 0; (date == -1) && (i < httpParseFormats.length); i++) {
             try {
-                date = httpParseFormats[i].parse(value).getTime();
+                date = parse(httpParseFormats[i], value).getTime();
                 updateParseCache(value, Long.valueOf(date));
             } catch (ParseException e) {
                 // Ignore
@@ -155,6 +157,20 @@ public final class FastHttpDateFormat {
         }
 
         return date;
+    }
+
+
+    private static Date parse(ConcurrentDateFormat format, String value) throws ParseException {
+        if (format == FORMAT_OBSOLETE_RFC850) {
+            /*
+             * RFC 9110, section 5.6.7: a two-digit year that appears to be more than 50 years in the future is the most
+             * recent year in the past with the same last two digits. That is the 100 year period that starts 50 years
+             * ago.
+             */
+            Date twoDigitYearStart = Date.from(ZonedDateTime.now(ZoneOffset.UTC).minusYears(50).toInstant());
+            return format.parse(value, twoDigitYearStart);
+        }
+        return format.parse(value);
     }
 
 

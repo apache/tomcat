@@ -213,7 +213,7 @@ public class WebappServiceLoader<T> {
                 if (i >= 0) {
                     line = line.substring(0, i);
                 }
-                line = line.trim();
+                line = line.strip();
                 if (line.isEmpty()) {
                     continue;
                 }
@@ -230,7 +230,10 @@ public class WebappServiceLoader<T> {
             try {
                 Class<?> clazz = Class.forName(serviceClass, true, loader);
                 services.add(serviceType.cast(clazz.getConstructor().newInstance()));
-            } catch (ReflectiveOperationException | ClassCastException e) {
+            } catch (ReflectiveOperationException | ClassCastException | LinkageError e) {
+                // Loading with initialization enabled can fail with an Error, for example a missing
+                // transitive dependency or a failing static initializer. Report those via the
+                // documented IOException contract rather than letting the Error escape.
                 throw new IOException(e);
             }
         }

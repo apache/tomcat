@@ -67,10 +67,6 @@
   </ul>
 
   <p>
-  The <code>EncryptInterceptor</code> is deprecated and should no longer be used to secure cluster traffic.
-  </p>
-
-  <p>
   Other options for providing a secure, trusted network for use by a Tomcat cluster include:
   </p>
   <ul>

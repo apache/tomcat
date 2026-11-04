@@ -212,6 +212,7 @@ public class SSIServlet extends HttpServlet {
 
         try (BufferedReader bufferedReader = new BufferedReader(isr)) {
             long lastModified = ssiProcessor.process(bufferedReader, resourceInfo.getLastModified(), printWriter);
+            // Setting last-modified as best effort
             if (lastModified > 0) {
                 res.setDateHeader("last-modified", lastModified);
             }

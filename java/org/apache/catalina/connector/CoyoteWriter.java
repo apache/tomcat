@@ -115,8 +115,8 @@ public class CoyoteWriter extends PrintWriter {
         // so the stream can be reused. We close ob.
         try {
             ob.close();
-        } catch (IOException ignore) {
-            // Ignore
+        } catch (IOException ioe) {
+            setErrorException(ioe);
         }
 
     }

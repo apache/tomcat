@@ -122,8 +122,11 @@ public class HTMLHostManagerServlet extends HostManagerServlet {
         } else if (command.equals("/persist")) {
             message = persist(smClient);
         } else {
-            // Try GET
+            // Try GET. The GET handling renders the response in full, so
+            // nothing must be rendered afterwards to avoid writing a second
+            // document on the closed writer.
             doGet(request, response);
+            return;
         }
 
         list(request, response, message, smClient);

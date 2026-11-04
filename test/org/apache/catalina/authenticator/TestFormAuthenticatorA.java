@@ -449,6 +449,7 @@ public class TestFormAuthenticatorA extends TomcatBaseTest {
 
         private void doRequest(String request[]) throws Exception {
             setRequest(request);
+            setRequestPause(250);
             connect();
             processRequest();
             disconnect();

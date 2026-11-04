@@ -60,7 +60,9 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tools.ant.AntClassLoader;
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
+import org.apache.tools.ant.taskdefs.LogOutputStream;
 import org.apache.tools.ant.util.FileUtils;
 import org.xml.sax.SAXException;
 
@@ -452,7 +454,9 @@ public class JspC extends Task implements Options {
                 xpoweredBy = true;
             } else if (tok.equals(SWITCH_TRIM_SPACES)) {
                 tok = nextArg();
-                if (TrimSpacesOption.SINGLE.toString().equalsIgnoreCase(tok)) {
+                if (tok == null) {
+                    setTrimSpaces(TrimSpacesOption.TRUE);
+                } else if (TrimSpacesOption.SINGLE.toString().equalsIgnoreCase(tok)) {
                     setTrimSpaces(TrimSpacesOption.SINGLE);
                 } else {
                     setTrimSpaces(TrimSpacesOption.TRUE);
@@ -504,10 +508,14 @@ public class JspC extends Task implements Options {
                 if (tok.startsWith("-")) {
                     throw new JasperException(Localizer.getMessage("jspc.error.unknownOption", tok));
                 }
-                if (!fullstop) {
-                    argPos--;
-                }
+                // Re-process this argument as a JSP page
+                argPos--;
                 // Start treating the rest as JSP Pages
+                break;
+            }
+            if (fullstop) {
+                // A full stop argument encountered while reading an option
+                // value also stops option parsing
                 break;
             }
         }
@@ -1644,32 +1652,37 @@ public class JspC extends Task implements Options {
     // ==================== protected utility methods ====================
 
     /**
-     * Returns the next command-line argument.
+     * Returns the next command-line argument. Option parsing stops when the
+     * full stop argument {@code --} is encountered. The full stop argument is
+     * consumed and is never returned.
      *
-     * @return the next argument, or {@code null} if no more arguments
+     * @return the next argument, or {@code null} if no more arguments are
+     *             available or the full stop argument was reached
      */
     protected String nextArg() {
-        if ((argPos >= args.length) || (fullstop = SWITCH_FULL_STOP.equals(args[argPos]))) {
+        if (argPos >= args.length) {
             return null;
-        } else {
-            return args[argPos++];
         }
+        if (SWITCH_FULL_STOP.equals(args[argPos])) {
+            fullstop = true;
+            argPos++;
+            return null;
+        }
+        return args[argPos++];
     }
 
     /**
-     * Returns the next file argument from the command-line.
+     * Returns the next file argument from the command-line. All remaining
+     * arguments are treated as files once option parsing has stopped.
      *
-     * @return the next file argument, or {@code null} if no more arguments
+     * @return the next file argument, or {@code null} if no more arguments are
+     *             available
      */
     protected String nextFile() {
-        if (fullstop) {
-            argPos++;
-        }
         if (argPos >= args.length) {
             return null;
-        } else {
-            return args[argPos++];
         }
+        return args[argPos++];
     }
 
     /**
@@ -1772,8 +1785,12 @@ public class JspC extends Task implements Options {
      * @throws JasperException If a JSP error occurs
      */
     protected void initServletContext(ClassLoader classLoader) throws IOException, JasperException {
-        // TODO: should we use the Ant Project's log?
-        PrintWriter log = new PrintWriter(System.out);
+        PrintWriter log;
+        if (getProject() == null) {
+            log = new PrintWriter(System.out);
+        } else {
+            log = new PrintWriter(new LogOutputStream(this, Project.MSG_INFO), true);
+        }
         URL resourceBase = new File(uriRoot).getCanonicalFile().toURI().toURL();
 
         context = new JspCServletContext(log, resourceBase, classLoader, isValidateXml(), isBlockExternal());

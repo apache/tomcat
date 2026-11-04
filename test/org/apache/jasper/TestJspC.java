@@ -23,11 +23,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import org.apache.tools.ant.BuildEvent;
+import org.apache.tools.ant.DefaultLogger;
+import org.apache.tools.ant.Project;
 
 public class TestJspC {
 
@@ -135,6 +141,98 @@ public class TestJspC {
         verify(webappOut);
     }
 
+    @Test
+    public void argsNoFullStop() throws Exception {
+        jspc.setArgs(new String[] {"a.jsp", "b.jsp"});
+        Assert.assertEquals(List.of("a.jsp", "b.jsp"), jspc.pages);
+    }
+
+    @Test
+    public void argsFullStop() throws Exception {
+        jspc.setArgs(new String[] {"--", "a.jsp", "b.jsp", "c.jsp"});
+        Assert.assertEquals(List.of("a.jsp", "b.jsp", "c.jsp"), jspc.pages);
+    }
+
+    @Test
+    public void argsFullStopAfterOptions() throws Exception {
+        jspc.setArgs(new String[] {"-compile", "--", "a.jsp", "b.jsp"});
+        Assert.assertTrue(jspc.compile);
+        Assert.assertEquals(List.of("a.jsp", "b.jsp"), jspc.pages);
+    }
+
+    @Test
+    public void argsFullStopFileStartingWithDash() throws Exception {
+        jspc.setArgs(new String[] {"--", "-a.jsp", "b.jsp"});
+        Assert.assertEquals(List.of("-a.jsp", "b.jsp"), jspc.pages);
+    }
+
+    @Test
+    public void argsFullStopAsOptionValue() throws Exception {
+        // The full stop argument takes the place of the missing option value
+        // and must not cause the first file argument to be dropped
+        jspc.setArgs(new String[] {"-d", "--", "a.jsp", "b.jsp"});
+        Assert.assertEquals(List.of("a.jsp", "b.jsp"), jspc.pages);
+    }
+
+    @Test
+    public void argsFullStopInOptionValuePositionStopsOptionParsing()
+            throws Exception {
+        jspc.setArgs(new String[] {"-cache", "--", "-compile", "a.jsp"});
+        Assert.assertFalse(jspc.compile);
+        Assert.assertEquals(List.of("-compile", "a.jsp"), jspc.pages);
+    }
+
+    @Test
+    public void argsTrimSpacesLast() throws Exception {
+        // The setArgs() call must return, applying the default value of TRUE.
+        // Use a thread to avoid the test harness hanging if the option is
+        // ever re-processed in a loop again.
+        Thread thread = new Thread(() -> {
+            try {
+                jspc.setArgs(new String[] {"-trimSpaces"});
+            } catch (JasperException e) {
+                // Ignore
+            }
+        });
+        thread.setDaemon(true);
+        thread.start();
+        thread.join(10000);
+        Assert.assertFalse("setArgs() did not return", thread.isAlive());
+        Assert.assertEquals(TrimSpacesOption.TRUE, jspc.getTrimSpaces());
+        Assert.assertTrue(jspc.pages.isEmpty());
+    }
+
+    @Test
+    public void argsTrimSpacesBeforeFullStop() throws Exception {
+        // The full stop argument takes the place of the missing option value
+        // and must not be added to the list of JSP pages
+        jspc.setArgs(new String[] {"-trimSpaces", "--", "a.jsp", "b.jsp"});
+        Assert.assertEquals(TrimSpacesOption.TRUE, jspc.getTrimSpaces());
+        Assert.assertEquals(List.of("a.jsp", "b.jsp"), jspc.pages);
+    }
+
+    @Test
+    public void servletContextUsesAntLog() throws Exception {
+        List<String> messages = new ArrayList<>();
+        Project project = new Project();
+        project.addBuildListener(new DefaultLogger() {
+            @Override
+            public void messageLogged(BuildEvent event) {
+                messages.add(event.getMessage());
+            }
+        });
+
+        TesterJspC testerJspC = new TesterJspC();
+        testerJspC.setProject(project);
+        testerJspC.setUriroot("test/webapp-2.2");
+        testerJspC.setValidateTld(false);
+        testerJspC.initServletContext();
+
+        String message = "JspCServletContext Ant log test";
+        testerJspC.logToServletContext(message);
+        Assert.assertTrue(messages.contains(message));
+    }
+
     private void verify(File webappOut) {
         // for now, just check some expected files exist
         Assert.assertTrue(new File(webappOut, "generated_web.xml").exists());
@@ -174,5 +272,16 @@ public class TestJspC {
                 return FileVisitResult.CONTINUE;
             }
         });
+    }
+
+    private static class TesterJspC extends JspC {
+
+        void initServletContext() throws IOException, JasperException {
+            initServletContext(getClass().getClassLoader());
+        }
+
+        void logToServletContext(String message) {
+            context.log(message);
+        }
     }
 }

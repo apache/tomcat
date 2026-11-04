@@ -660,7 +660,20 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * ScheduledThreadPoolExecutor.
      */
     final void reject(Runnable command) {
-        handler.rejectedExecution(command, this);
+        try {
+            handler.rejectedExecution(command, this);
+        } catch (RejectedExecutionException rx) {
+            // The caller in execute() decrements the submitted count, or, when a retryable queue is used, re-queues
+            // the task which will then be counted by afterExecute() once it completes.
+            throw rx;
+        } catch (RuntimeException | Error e) {
+            // The task will not be executed by a worker, so afterExecute() will not decrement the submitted count.
+            submittedCount.decrementAndGet();
+            throw e;
+        }
+        // The handler completed without throwing. The task was discarded or run directly by the handler. It will not
+        // pass through afterExecute(), so decrement the submitted count here.
+        submittedCount.decrementAndGet();
     }
 
     /**
@@ -942,7 +955,15 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
                     wt.interrupt();
                 }
                 try {
-                    beforeExecute(wt, task);
+                    try {
+                        beforeExecute(wt, task);
+                    } catch (Throwable ex) {
+                        // beforeExecute() threw. The task will not be executed
+                        // and afterExecute() will not be called, so decrement
+                        // the submitted count here.
+                        submittedCount.decrementAndGet();
+                        throw ex;
+                    }
                     try {
                         task.run();
                         afterExecute(task, null);
@@ -1090,6 +1111,11 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
 
     @Override
     public void execute(Runnable command) {
+        // Check for null before counting the task, so a rejected null
+        // argument does not leave the submitted count inflated.
+        if (command == null) {
+            throw new NullPointerException();
+        }
         submittedCount.incrementAndGet();
         try {
             executeInternal(command);
@@ -1150,7 +1176,11 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
         }
         if (isRunning(c) && workQueue.offer(command)) {
             int recheck = ctl.get();
-            if (!isRunning(recheck) && remove(command)) {
+            // Remove directly from the queue here. The public remove(Runnable)
+            // method also adjusts the submitted count, which would double the
+            // adjustment for this task, since the reject() call below and the
+            // catch block in execute() take care of that.
+            if (!isRunning(recheck) && workQueue.remove(command)) {
                 reject(command);
             } else if (workerCountOf(recheck) == 0) {
                 addWorker(null, false);
@@ -1558,6 +1588,10 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      */
     public boolean remove(Runnable task) {
         boolean removed = workQueue.remove(task);
+        if (removed) {
+            // The removed task will never be executed, so afterExecute() will not decrement the submitted count.
+            submittedCount.decrementAndGet();
+        }
         tryTerminate(); // In case SHUTDOWN and now empty
         return removed;
     }
@@ -1571,18 +1605,31 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      */
     public void purge() {
         final BlockingQueue<Runnable> q = workQueue;
+        // Count the cancelled tasks that are removed. These will never be
+        // executed, so afterExecute() will not decrement the submitted count.
+        final AtomicInteger purged = new AtomicInteger(0);
         try {
-            q.removeIf(r -> r instanceof Future<?> && ((Future<?>) r).isCancelled());
+            q.removeIf(r -> {
+                if (r instanceof Future<?> future && future.isCancelled()) {
+                    purged.incrementAndGet();
+                    return true;
+                }
+                return false;
+            });
         } catch (ConcurrentModificationException fallThrough) {
             // Take slow path if we encounter interference during traversal.
             // Make copy for traversal and call remove for cancelled entries.
-            // The slow path is more likely to be O(N*N).
+            // The slow path is more likely to be O(N*N). Any entries removed
+            // before the interference occurred are already accounted for in
+            // the purged count and will not appear in the copy taken below.
             for (Object r : q.toArray()) {
-                if (r instanceof Future<?> && ((Future<?>) r).isCancelled()) {
-                    q.remove(r);
+                if (r instanceof Future<?> future && future.isCancelled() && q.remove(r)) {
+                    purged.incrementAndGet();
                 }
             }
         }
+
+        submittedCount.addAndGet(-purged.get());
 
         tryTerminate(); // In case SHUTDOWN and now empty
     }

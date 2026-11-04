@@ -26,6 +26,8 @@ import javax.naming.NamingException;
 import javax.naming.RefAddr;
 import javax.naming.spi.ObjectFactory;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.naming.ResourceLinkRef;
 import org.apache.naming.StringManager;
 
@@ -47,6 +49,8 @@ public class ResourceLinkFactory implements ObjectFactory {
      * The string manager for this package.
      */
     protected static final StringManager sm = StringManager.getManager(ResourceLinkFactory.class);
+
+    private static final Log log = LogFactory.getLog(ResourceLinkFactory.class);
 
     /**
      * Global naming context.
@@ -73,9 +77,15 @@ public class ResourceLinkFactory implements ObjectFactory {
      * @param globalContext The global naming context
      * @param localName     The local name of the resource
      * @param globalName    The global name of the resource
+     *
+     * @throws IllegalArgumentException if the local or global name is not specified
      */
     public static void registerGlobalResourceAccess(Context globalContext, String localName, String globalName) {
         validateGlobalContext(globalContext);
+        if (localName == null || globalName == null) {
+            throw new IllegalArgumentException(
+                    sm.getString("resourceLinkFactory.nullName", localName, globalName));
+        }
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         globalResourceRegistrations.computeIfAbsent(cl, k -> new ConcurrentHashMap<>()).put(localName, globalName);
     }
@@ -138,7 +148,7 @@ public class ResourceLinkFactory implements ObjectFactory {
      * @param nameCtx     unused
      * @param environment unused
      *
-     * @return the object instance
+     * @return the object instance or {@code null} if the reference cannot be resolved
      *
      * @throws IllegalArgumentException if the type of the reference is missing or does not match the type of the
      *                                  global resource
@@ -161,6 +171,13 @@ public class ResourceLinkFactory implements ObjectFactory {
             // Confirm that the current web application is currently configured
             // to access the specified global resource
             if (!validateGlobalResourceAccess(globalName)) {
+                return null;
+            }
+            // The global context may be missing if the web application was
+            // registered before the server created its naming context, which
+            // can happen with embedded start-up ordering
+            if (globalContext == null) {
+                log.warn(sm.getString("resourceLinkFactory.noGlobalContext", globalName));
                 return null;
             }
             Object result = globalContext.lookup(globalName);

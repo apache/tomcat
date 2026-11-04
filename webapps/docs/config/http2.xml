@@ -101,7 +101,10 @@
 
     <attribute name="initialWindowSize" required="false">
       <p>Controls the initial size of the flow control window for streams that
-      Tomcat advertises to clients. If not specified, the default value of
+      Tomcat advertises to clients. The value must be in the range <code>0</code>
+      to <code>2^31-1</code> (both inclusive) as defined by the HTTP/2
+      specification. Values outside of this range will cause HTTP/2 connections
+      to be rejected. If not specified, the default value of
       <code>65535</code> is used.</p>
     </attribute>
 
@@ -124,6 +127,10 @@
       <p>The controls the maximum number of active streams permitted for any one
       connection. If a client attempts to open more active streams than this
       limit, the stream will be reset with a <code>STREAM_REFUSED</code> error.
+      The value must be in the range <code>0</code> to <code>2^32-1</code>
+      (both inclusive) as this value is advertised to the client as an
+      unsigned 32-bit integer. Values outside of this range will cause HTTP/2
+      connections to be rejected.
       If not specified, the default value of <code>100</code> will be used.</p>
     </attribute>
 

@@ -33,6 +33,8 @@ import jakarta.websocket.ContainerProvider;
 import jakarta.websocket.Decoder;
 import jakarta.websocket.DeploymentException;
 import jakarta.websocket.Encoder;
+import jakarta.websocket.Endpoint;
+import jakarta.websocket.EndpointConfig;
 import jakarta.websocket.HandshakeResponse;
 import jakarta.websocket.Session;
 import jakarta.websocket.WebSocketContainer;
@@ -362,6 +364,19 @@ public class TestWsServerContainer extends WebSocketBaseTest {
         sc.addEndpoint(configA);
 
         Assert.assertNotEquals(configA, sc.findMapping("/foo/{a}").config());
+
+        // The old match must remain stored under the normalized path. Ignoring the new match must
+        // not add an additional entry to the map.
+        Field configTemplateMatchMapField = WsServerContainer.class.getDeclaredField("configTemplateMatchMap");
+        configTemplateMatchMapField.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        Map<Integer, ConcurrentSkipListMap<String, Object>> configTemplateMatchMap =
+                (Map<Integer, ConcurrentSkipListMap<String, Object>>) configTemplateMatchMapField.get(sc);
+
+        ConcurrentSkipListMap<String, Object> templateMatches = configTemplateMatchMap.get(Integer.valueOf(2));
+
+        Assert.assertEquals(1, templateMatches.size());
+        Assert.assertTrue(templateMatches.containsKey("/foo/{0}"));
     }
 
 
@@ -439,6 +454,43 @@ public class TestWsServerContainer extends WebSocketBaseTest {
     public static class PojoTemplate {
     }
 
+
+    /*
+     * The method mapping must be stored in the user properties for POJO endpoints even when the class has no annotated
+     * methods since PojoEndpointServer expects it to be present. Without it, handling the first connection results in a
+     * NullPointerException. The mapping must not be stored for programmatic endpoints (Endpoint subclasses) since it is
+     * not used (see bug 58232).
+     */
+    @Test
+    public void testMethodMappingStoredForPojoWithNoAnnotatedMethods() throws Exception {
+        WsServerContainer sc = new WsServerContainer(new TesterServletContext());
+
+        ServerEndpointConfig pojoConfig = ServerEndpointConfig.Builder.create(PojoNoMethods.class, "/noMethods")
+                .build();
+        sc.addEndpoint(pojoConfig);
+        Assert.assertNotNull(pojoConfig.getUserProperties()
+                .get(org.apache.tomcat.websocket.pojo.Constants.POJO_METHOD_MAPPING_KEY));
+
+        ServerEndpointConfig endpointConfig = ServerEndpointConfig.Builder.create(NoMethodsEndpoint.class, "/endpoint")
+                .build();
+        sc.addEndpoint(endpointConfig);
+        Assert.assertNull(endpointConfig.getUserProperties()
+                .get(org.apache.tomcat.websocket.pojo.Constants.POJO_METHOD_MAPPING_KEY));
+    }
+
+
+    @ServerEndpoint("/noMethods")
+    public static class PojoNoMethods {
+    }
+
+
+    public static class NoMethodsEndpoint extends Endpoint {
+        @Override
+        public void onOpen(Session session, EndpointConfig config) {
+            // NO-OP
+        }
+    }
+
     @Test
     public void testUpgradeHttpToWebSocket01() throws Exception {
         TesterHttpServletRequest request = new TesterHttpServletRequest();
@@ -462,6 +514,10 @@ public class TestWsServerContainer extends WebSocketBaseTest {
 
         Assert.assertEquals(Constants.UPGRADE_HEADER_VALUE, response.getHeader(Constants.UPGRADE_HEADER_NAME));
         Assert.assertEquals("aJvXj0bbnSSeXm32ngvbBilP0lE=", response.getHeader(HandshakeResponse.SEC_WEBSOCKET_ACCEPT));
+        // The endpoint class is not an Endpoint subclass so the method mapping must
+        // have been created and stored for the POJO endpoint path.
+        Assert.assertNotNull(sec.getUserProperties()
+                .get(org.apache.tomcat.websocket.pojo.Constants.POJO_METHOD_MAPPING_KEY));
     }
 
     @Test(expected = DeploymentException.class)

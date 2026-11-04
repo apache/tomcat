@@ -157,10 +157,12 @@ HSTS header. It allows you to communicate to the browser that your site should
 always be accessed over https.</p>
 
 <p>Using name-based virtual hosts on a secured connection requires careful
-configuration of the names specified in a single certificate or Tomcat 8.5
-onwards where Server Name Indication (SNI) support is available. SNI allows
-multiple certificates with different names to be associated with a single TLS
-connector.</p>
+configuration of the names specified in a single certificate or the use of SNI.
+SNI allows multiple certificates with different names to be associated with a
+single TLS connector. Administrators should be aware that virtual host matching
+using the HTTP host name header and TLS configuration (including certificate)
+matching using SNI are completely separate processes and that it is likely that
+they will want to keep the two configurations synchronized.</p>
 
 </section>
 
@@ -348,6 +350,12 @@ so it looks something like this:</p>
         />
   </SSLHostConfig>
 </Connector>]]></source>
+<p>The <code>certificateChainFile</code> is only used if the
+<code>certificateFile</code> contains the server certificate alone. If the
+<code>certificateFile</code> already contains the intermediate certificates
+after the server certificate, the <code>certificateChainFile</code> is ignored.
+The same applies when the OpenSSL FFM implementation reads the certificate from
+a PKCS#12 bundle.</p>
 
 
 <p>The configuration options and information on which attributes

@@ -143,11 +143,6 @@ public final class Constants {
      */
     public static final int SC_RESP_WWW_AUTHENTICATE = 0xA00B;
 
-    /**
-     * Maximum number of response header codes.
-     */
-    public static final int SC_RESP_AJP13_MAX = 11;
-
     // Integer codes for common (optional) request attribute names
 
     /**
@@ -280,7 +275,7 @@ public final class Constants {
      *
      * @param code the coded value
      *
-     * @return the string value of the method
+     * @return the string value of the method, or <code>null</code> if the code is out of range
      */
     public static String getMethodForCode(final int code) {
         if (code < 0 || code >= methodTransArray.length) {
@@ -376,7 +371,7 @@ public final class Constants {
      *
      * @param code the coded value
      *
-     * @return the string value of the header name
+     * @return the string value of the header name, or <code>null</code> if the code is out of range
      */
     public static String getHeaderForCode(final int code) {
         if (code < 0 || code >= headerTransArray.length) {
@@ -394,16 +389,19 @@ public final class Constants {
      *
      * @param code the coded value
      *
-     * @return the string value of the header
+     * @return the string value of the header, or <code>null</code> if the code is out of range
      */
     public static String getResponseHeaderForCode(final int code) {
+        if (code < 0 || code >= responseTransArray.length) {
+            return null;
+        }
         return responseTransArray[code];
     }
 
     private static final Map<String,Integer> responseTransMap = new HashMap<>(20);
 
     static {
-        for (int i = 0; i < SC_RESP_AJP13_MAX; i++) {
+        for (int i = 0; i < responseTransArray.length; i++) {
             responseTransMap.put(getResponseHeaderForCode(i), Integer.valueOf(0xA001 + i));
         }
     }

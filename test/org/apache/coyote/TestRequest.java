@@ -19,6 +19,7 @@ package org.apache.coyote;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -150,6 +151,38 @@ public class TestRequest {
         public void expand(int size) {
 
         }
+    }
+
+
+    @Test
+    public void testRequestIdFormatConsistency() {
+        // Recycle the request until the generated identifier has a value for
+        // which the hexadecimal and decimal representations differ
+        String recycledId;
+        do {
+            request.markStartTime();
+            request.recycle();
+            recycledId = request.getRequestId();
+        } while (recycledId.length() == 1 && Long.parseLong(recycledId, 16) < 10);
+
+        // The initial identifier of a new request must use the same
+        // hexadecimal representation as the identifiers generated on recycle
+        Request newRequest = new Request();
+        Assert.assertEquals(Long.toHexString(Long.parseLong(recycledId, 16) + 1), newRequest.getRequestId());
+    }
+
+
+    @Test
+    public void testGetContentLengthIntegerMaxValue() {
+        Request newRequest = new Request();
+
+        Assert.assertEquals(-1, newRequest.getContentLength());
+
+        newRequest.setContentLength(Integer.MAX_VALUE);
+        Assert.assertEquals(Integer.MAX_VALUE, newRequest.getContentLength());
+
+        newRequest.setContentLength(Integer.MAX_VALUE + 1L);
+        Assert.assertEquals(-1, newRequest.getContentLength());
     }
 
 

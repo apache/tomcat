@@ -49,7 +49,9 @@ public class TestTcpFailureDetector {
         channel1 = new GroupChannel();
         channel2 = new GroupChannel();
         ((ReceiverBase) channel1.getChannelReceiver()).setHost("localhost");
+        ((ReceiverBase) channel1.getChannelReceiver()).setPort(0);
         ((ReceiverBase) channel2.getChannelReceiver()).setHost("localhost");
+        ((ReceiverBase) channel2.getChannelReceiver()).setPort(0);
         channel1.getMembershipService().setPayload("Channel-1".getBytes("ASCII"));
         channel2.getMembershipService().setPayload("Channel-2".getBytes("ASCII"));
         mbrlist1 = new TestMbrListener("Channel-1");

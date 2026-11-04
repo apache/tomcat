@@ -199,7 +199,8 @@ public class FilterValve extends ValveBase implements FilterConfig {
 
             filter.init(this);
         } catch (ServletException | InstantiationException | IllegalAccessException | IllegalArgumentException |
-                InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException se) {
+                InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException |
+                ClassCastException se) {
             throw new LifecycleException(sm.getString("filterValve.initError", getFilterClassName()), se);
         }
     }

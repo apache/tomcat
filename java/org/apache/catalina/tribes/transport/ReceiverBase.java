@@ -65,6 +65,9 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     private String host = "auto";
     private InetAddress bind;
     private int port = 4000;
+    private volatile int boundPort = -1;
+    private volatile int boundSecurePort = -1;
+    private volatile int boundUdpPort = -1;
     private int udpPort = -1;
     private int securePort = -1;
     private int rxBufSize = Constants.DEFAULT_CLUSTER_MSG_BUFFER_SIZE;
@@ -140,10 +143,16 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
         }
         executor = null;
         if (oname != null) {
-            JmxRegistry.getRegistry(channel).unregisterJmx(oname);
+            JmxRegistry jmxRegistry = JmxRegistry.getRegistry(channel);
+            if (jmxRegistry != null) {
+                jmxRegistry.unregisterJmx(oname);
+            }
             oname = null;
         }
         channel = null;
+        boundPort = -1;
+        boundSecurePort = -1;
+        boundUdpPort = -1;
     }
 
     @Override
@@ -154,6 +163,11 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     @Override
     public int getPort() {
         return port;
+    }
+
+    @Override
+    public int getBoundPort() {
+        return boundPort;
     }
 
     /**
@@ -198,11 +212,11 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     }
 
     /**
-     * Returns the bind address.
+     * Returns the bind address, resolving the configured host on first use.
      *
-     * @return the bind address
+     * @return the bind address or <code>null</code> if the configured host could not be resolved
      */
-    public InetAddress getBind() {
+    public synchronized InetAddress getBind() {
         if (bind == null) {
             try {
                 if ("auto".equals(host)) {
@@ -220,27 +234,26 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     }
 
     /**
-     * Attempts to bind using the provided port and if that fails attempts to bind to each of the ports from portstart
-     * to (portstart + retries -1) until either there are no more ports or the bind is successful. The address to bind
-     * to is obtained via a call to {@link #getBind()}.
+     * Resolves the bind address, failing if the configured host cannot be resolved. This avoids silently binding to
+     * the wildcard address when {@link #getBind()} returns <code>null</code> after a failed resolution.
      *
-     * @param socket    The socket to bind
-     * @param portstart Starting port for bind attempts
-     * @param retries   Number of times to attempt to bind (port incremented between attempts)
+     * @return the resolved bind address
      *
-     * @throws IOException Socket bind error
-     *
-     * @deprecated Use {@link #bind(ServerSocket, int, int, boolean)}. This method will be removed in Tomcat 12.
+     * @throws IOException If the configured host could not be resolved
      */
-    @Deprecated
-    protected void bind(ServerSocket socket, int portstart, int retries) throws IOException {
-        bind(socket, portstart, retries, false);
+    protected InetAddress resolveBind() throws IOException {
+        InetAddress address = getBind();
+        if (address == null) {
+            // The cause has already been logged by getBind()
+            throw new IOException(sm.getString("receiverBase.address.unresolvable", host));
+        }
+        return address;
     }
 
     /**
      * Attempts to bind using the provided port and if that fails attempts to bind to each of the ports from portstart
      * to (portstart + retries -1) until either there are no more ports or the bind is successful. The address to bind
-     * to is obtained via a call to {@link #getBind()}.
+     * to is obtained via a call to {@link #resolveBind()}.
      *
      * @param socket    The socket to bind
      * @param portstart Starting port for bind attempts
@@ -251,15 +264,16 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
      */
     protected void bind(ServerSocket socket, int portstart, int retries, boolean secure) throws IOException {
         synchronized (bindLock) {
+            InetAddress address = resolveBind();
             InetSocketAddress addr = null;
             int port = portstart;
             while (retries > 0) {
                 try {
-                    addr = new InetSocketAddress(getBind(), port);
+                    addr = new InetSocketAddress(address, port);
                     socket.bind(addr);
                     String type;
                     if (secure) {
-                        setSecurePort(port);
+                        boundSecurePort = socket.getLocalPort();
                         if (getChannel() instanceof GroupChannel groupChannel) {
                             type = groupChannel.getSslContext().getImplementationName();
                         } else {
@@ -267,7 +281,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
                         }
                     } else {
                         type = "cleartext";
-                        setPort(port);
+                        boundPort = socket.getLocalPort();
                     }
                     log.info(sm.getString("receiverBase.socket.bind", addr, type));
                     retries = 0;
@@ -297,13 +311,14 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
      * @throws IOException Socket bind error
      */
     protected int bindUdp(DatagramSocket socket, int portstart, int retries) throws IOException {
+        InetAddress address = resolveBind();
         InetSocketAddress addr = null;
         int port = portstart;
         while (retries > 0) {
             try {
-                addr = new InetSocketAddress(getBind(), port);
+                addr = new InetSocketAddress(address, port);
                 socket.bind(addr);
-                setUdpPort(port);
+                boundUdpPort = socket.getLocalPort();
                 log.info(sm.getString("receiverBase.udp.bind", addr));
                 return 0;
             } catch (IOException ioe) {
@@ -551,6 +566,11 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     @Override
     public int getSecurePort() {
         return securePort;
+    }
+
+    @Override
+    public int getBoundSecurePort() {
+        return boundSecurePort;
     }
 
     /**
@@ -818,6 +838,11 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     @Override
     public int getUdpPort() {
         return udpPort;
+    }
+
+    @Override
+    public int getBoundUdpPort() {
+        return boundUdpPort;
     }
 
     /**

@@ -218,8 +218,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
      * @param path The path of the resource to retrieve
      * @param validate Whether to validate and normalize the path
      * @param useClassLoaderResources Whether to search class loader resources
-     * @return The web resource, or a non-existent resource if not found. May return {@code null} if the resource sets
-     *             are being removed concurrently while this method is executing (during shutdown)
+     * @return The web resource, or a non-existent resource if not found
      */
     protected WebResource getResource(String path, boolean validate, boolean useClassLoaderResources) {
         if (validate) {
@@ -316,6 +315,13 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
         }
 
         // Default is empty resource in main resources
+        if (mainEmpty == null) {
+            // The main resources are removed from allResources while the root
+            // is stopping, but requests that are still in progress during that
+            // window need a non-existent resource rather than null.
+            return new EmptyResource(this, path);
+        }
+
         return mainEmpty;
     }
 

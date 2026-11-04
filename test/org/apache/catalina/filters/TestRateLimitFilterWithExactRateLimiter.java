@@ -59,11 +59,12 @@ public class TestRateLimitFilterWithExactRateLimiter extends TomcatBaseTest {
         System.out.printf("Sleeping %d millis for the next time bucket to start\n", Long.valueOf(sleepTime));
         Thread.sleep(sleepTime);
 
-        TestClient tc1 = new TestClient(rateLimitFilter, filterChain, "10.20.20.5", 50, 5); // TPS: 5
-        TestClient tc2 = new TestClient(rateLimitFilter, filterChain, "10.20.20.10", 100, 10); // TPS: 10
+        // Stop each client after the last response checked below.
+        TestClient tc1 = new TestClient(rateLimitFilter, filterChain, "10.20.20.5", 25, 5); // TPS: 5
+        TestClient tc2 = new TestClient(rateLimitFilter, filterChain, "10.20.20.10", 50, 10); // TPS: 10
 
-        TestClient tc3 = new TestClient(rateLimitFilter, filterChain, "10.20.20.20", 200, 20); // TPS: 20
-        TestClient tc4 = new TestClient(rateLimitFilter, filterChain, "10.20.20.40", 400, 40); // TPS: 40
+        TestClient tc3 = new TestClient(rateLimitFilter, filterChain, "10.20.20.20", allowedRequests + 1, 20); // TPS: 20
+        TestClient tc4 = new TestClient(rateLimitFilter, filterChain, "10.20.20.40", allowedRequests + 1, 40); // TPS: 40
         tc1.join();
         tc2.join();
         tc3.join();
@@ -164,7 +165,7 @@ public class TestRateLimitFilterWithExactRateLimiter extends TomcatBaseTest {
              */
             long expectedDuration = (requestIndex + 1) * timePerRequest;
             long duration = (System.nanoTime() - start) / 1000000;
-            if (expectedDuration > duration) {
+            if (requestIndex + 1 < requests && expectedDuration > duration) {
                 sleep(expectedDuration - duration);
             }
         }

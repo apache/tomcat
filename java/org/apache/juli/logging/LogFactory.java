@@ -18,6 +18,8 @@ package org.apache.juli.logging;
 
 import java.lang.reflect.Constructor;
 import java.nio.file.FileSystems;
+import java.util.Iterator;
+import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.logging.LogManager;
 
@@ -70,16 +72,23 @@ public class LogFactory {
         FileSystems.getDefault();
 
         // Look via a ServiceLoader for a Log implementation that has a
-        // constructor taking the String name.
+        // constructor taking the String name. Providers that cannot be
+        // loaded or that do not expose the required constructor are
+        // ignored, so a malformed provider does not prevent the discovery
+        // of a usable one, nor the fall back to DirectJDKLog. Note that,
+        // as the ServiceLoader requires, a provider also needs a public
+        // no-argument constructor to be considered at all.
         ServiceLoader<Log> logLoader = ServiceLoader.load(Log.class);
         Constructor<? extends Log> m = null;
-        for (Log log : logLoader) {
-            Class<? extends Log> c = log.getClass();
+        Iterator<ServiceLoader.Provider<Log>> providers = logLoader.stream().iterator();
+        while (m == null) {
             try {
-                m = c.getConstructor(String.class);
-                break;
-            } catch (NoSuchMethodException | SecurityException e) {
-                throw new Error(e);
+                if (!providers.hasNext()) {
+                    break;
+                }
+                m = providers.next().type().getConstructor(String.class);
+            } catch (ReflectiveOperationException | SecurityException | ServiceConfigurationError e) {
+                // Not a usable provider. Ignore it and look at the next one.
             }
         }
         discoveredLogConstructor = m;
@@ -145,7 +154,8 @@ public class LogFactory {
      * <p>
      * Return the singleton <code>LogFactory</code> instance. The {@link Log} implementation is discovered once, using
      * a {@link java.util.ServiceLoader} lookup for providers of the <code>Log</code> interface, falling back to
-     * {@link DirectJDKLog} if no suitable provider is found.
+     * {@link DirectJDKLog} if no suitable provider is found. Providers that cannot be loaded or that do not expose a
+     * public constructor taking the log name as its only argument are ignored.
      * </p>
      *
      * @return The singleton LogFactory instance
@@ -187,18 +197,36 @@ public class LogFactory {
 
 
     /**
-     * Reset the {@link java.util.logging.LogManager}, unless the standard <code>java.util.logging.LogManager</code>
-     * implementation is in use. The given class loader is not used: the JULI log manager associates its configuration
-     * with the current thread's context class loader.
+     * Release the log handlers that the JULI {@link java.util.logging.LogManager} has associated with the given class
+     * loader, so a stopped application no longer keeps its log files open. If the class loader has no logging
+     * configuration yet, one is briefly created for it and released again. This is a NO-OP when the standard
+     * <code>java.util.logging.LogManager</code> implementation is in use: that one has a single global configuration
+     * and resetting it would discard the logging of the whole JVM. The JULI log manager associates its configuration
+     * with the current thread's context class loader, so the given class loader is made current for the duration of
+     * the reset.
      *
-     * @param classLoader ClassLoader for which to release the LogFactory. Not used by this implementation.
+     * @param classLoader ClassLoader for which to release the LogFactory. Must not be null.
      */
     public static void release(ClassLoader classLoader) {
-        // JULI's log manager looks at the current classLoader so there is no
-        // need to use the passed in classLoader, the default implementation
-        // does not so call reset in that case will break things
+        // JULI's log manager looks at the current classLoader so the
+        // classLoader to release has to be the current one, the default
+        // implementation does not so calling reset in that case would reset
+        // the global configuration and break the logging of the whole JVM
         if (!LogManager.getLogManager().getClass().getName().equals("java.util.logging.LogManager")) {
-            LogManager.getLogManager().reset();
+            Thread currentThread = Thread.currentThread();
+            ClassLoader originalClassLoader = currentThread.getContextClassLoader();
+            if (originalClassLoader == classLoader) {
+                // The class loader to release is already the current one, as on the
+                // regular container stop path that binds its thread beforehand
+                LogManager.getLogManager().reset();
+            } else {
+                try {
+                    currentThread.setContextClassLoader(classLoader);
+                    LogManager.getLogManager().reset();
+                } finally {
+                    currentThread.setContextClassLoader(originalClassLoader);
+                }
+            }
         }
     }
 }

@@ -22,6 +22,8 @@ import java.nio.charset.Charset;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -35,7 +37,6 @@ import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.connector.Request;
 import org.apache.juli.logging.Log;
-import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.RequestUtil;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.jsse.PEMFile;
@@ -50,6 +51,11 @@ import org.apache.tomcat.util.res.StringManager;
 public class ResolverImpl extends Resolver {
 
     private static final StringManager sm = StringManager.getManager(ResolverImpl.class);
+
+    /**
+     * Format of the TIME variable, as used by mod_rewrite.
+     */
+    private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
     /**
      * The request being processed.
@@ -80,6 +86,7 @@ public class ResolverImpl extends Resolver {
      * <li>SERVER_ADMIN</li>
      * <li>API_VERSION</li>
      * <li>IS_SUBREQ</li>
+     * <li>REMOTE_IDENT (no RFC 931 ident protocol support)</li>
      * </ul>
      */
     @Override
@@ -101,7 +108,10 @@ public class ResolverImpl extends Resolver {
             case "REMOTE_HOST" -> request.getRemoteHost();
             case "REMOTE_PORT" -> String.valueOf(request.getRemotePort());
             case "REMOTE_USER" -> request.getRemoteUser();
-            case "REMOTE_IDENT" -> request.getRemoteUser();
+            // REMOTE_IDENT is the RFC 931 ident protocol user name, which
+            // Tomcat does not support. It must not resolve to the remote
+            // user, as that would silently turn ident-based rules into
+            // authentication checks.
             case "REQUEST_METHOD" -> request.getMethod();
             case "SCRIPT_FILENAME" -> request.getServletContext().getRealPath(request.getServletPath());
             case "REQUEST_PATH" -> request.getRequestPathMB().toString();
@@ -121,13 +131,16 @@ public class ResolverImpl extends Resolver {
             case "REQUEST_FILENAME" -> request.getPathTranslated();
             case "HTTPS" -> request.isSecure() ? "on" : "off";
             case "TIME_YEAR" -> String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
-            case "TIME_MON" -> String.valueOf(Calendar.getInstance().get(Calendar.MONTH));
-            case "TIME_DAY" -> String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
-            case "TIME_HOUR" -> String.valueOf(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
-            case "TIME_MIN" -> String.valueOf(Calendar.getInstance().get(Calendar.MINUTE));
-            case "TIME_SEC" -> String.valueOf(Calendar.getInstance().get(Calendar.SECOND));
-            case "TIME_WDAY" -> String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK));
-            case "TIME" -> FastHttpDateFormat.getCurrentDate();
+            // Like mod_rewrite, TIME_MON is 01-12, TIME_WDAY is 0-6 with Sunday first and the other time values
+            // are zero padded to two digits, unlike the zero-based Calendar.MONTH and the one-based Sunday-first
+            // Calendar.DAY_OF_WEEK
+            case "TIME_MON" -> twoDigits(Calendar.getInstance().get(Calendar.MONTH) + 1);
+            case "TIME_DAY" -> twoDigits(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+            case "TIME_HOUR" -> twoDigits(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
+            case "TIME_MIN" -> twoDigits(Calendar.getInstance().get(Calendar.MINUTE));
+            case "TIME_SEC" -> twoDigits(Calendar.getInstance().get(Calendar.SECOND));
+            case "TIME_WDAY" -> String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1);
+            case "TIME" -> TIME_FORMAT.format(LocalDateTime.now());
             default -> null;
         };
     }
@@ -312,7 +325,7 @@ public class ResolverImpl extends Resolver {
                 break;
             }
 
-            String key = unescape(fullDN.substring(start, eqPos)).trim();
+            String key = unescape(fullDN.substring(start, eqPos)).strip();
             int valStart = eqPos + 1;
 
             // Find the unescaped ',' that ends this RDN, or end of string
@@ -327,7 +340,7 @@ public class ResolverImpl extends Resolver {
                 }
             }
 
-            String value = unescape(fullDN.substring(valStart, commaPos)).trim();
+            String value = unescape(fullDN.substring(valStart, commaPos)).strip();
             if (!key.isEmpty()) {
                 components.put(key, value);
             }
@@ -400,6 +413,11 @@ public class ResolverImpl extends Resolver {
             };
         }
     }
+
+    private static String twoDigits(int value) {
+        return value < 10 ? "0" + value : String.valueOf(value);
+    }
+
 
     private static String emptyStringIfNull(String value) {
         return Objects.requireNonNullElse(value, "");

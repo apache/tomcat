@@ -94,6 +94,80 @@ public class CaseInsensitiveKeyMap<V> extends AbstractMap<String,V> {
     }
 
 
+    /*
+     * The AbstractMap.keySet() implementation cannot be used since its contains() method is case-insensitive (it
+     * delegates to containsKey()) while its remove() method is case-sensitive (it iterates the keys comparing them
+     * using String.equals()). That violates the Set contract for keys that differ in case. This view keeps all
+     * operations case-insensitive.
+     */
+    @Override
+    public Set<String> keySet() {
+        return new KeySet<>(map);
+    }
+
+
+    private static class KeySet<V> extends AbstractSet<String> {
+
+        private final Map<Key,V> map;
+
+        KeySet(Map<Key,V> map) {
+            this.map = map;
+        }
+
+        @Override
+        public Iterator<String> iterator() {
+            return new KeyIterator(map.keySet().iterator());
+        }
+
+        @Override
+        public int size() {
+            return map.size();
+        }
+
+        @Override
+        public boolean contains(Object o) {
+            return map.containsKey(Key.getInstance(o));
+        }
+
+        @Override
+        public boolean remove(Object o) {
+            Key key = Key.getInstance(o);
+            if (key == null) {
+                return false;
+            }
+            if (!map.containsKey(key)) {
+                return false;
+            }
+            map.remove(key);
+            return true;
+        }
+
+        @Override
+        public void clear() {
+            map.clear();
+        }
+    }
+
+
+    private record KeyIterator(Iterator<Key> iterator) implements Iterator<String> {
+
+        @Override
+        public boolean hasNext() {
+            return iterator.hasNext();
+        }
+
+        @Override
+        public String next() {
+            return iterator.next().getKey();
+        }
+
+        @Override
+        public void remove() {
+            iterator.remove();
+        }
+    }
+
+
     private static class EntrySet<V> extends AbstractSet<Entry<String,V>> {
 
         private final Set<Entry<Key,V>> entrySet;

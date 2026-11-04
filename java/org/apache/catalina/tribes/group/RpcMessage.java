@@ -57,7 +57,8 @@ public class RpcMessage implements Externalizable {
     }
 
     /**
-     * Create a new RpcMessage.
+     * Create a new RpcMessage. A null identifier is serialized as a zero-length
+     * array and deserialized back into one.
      *
      * @param rpcId   The RPC channel identifier
      * @param uuid    The unique identifier for this message
@@ -84,10 +85,14 @@ public class RpcMessage implements Externalizable {
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeBoolean(reply);
-        out.writeInt(uuid.length);
-        out.write(uuid, 0, uuid.length);
-        out.writeInt(rpcId.length);
-        out.write(rpcId, 0, rpcId.length);
+        out.writeInt(uuid != null ? uuid.length : 0);
+        if (uuid != null) {
+            out.write(uuid, 0, uuid.length);
+        }
+        out.writeInt(rpcId != null ? rpcId.length : 0);
+        if (rpcId != null) {
+            out.write(rpcId, 0, rpcId.length);
+        }
         out.writeObject(message);
     }
 
@@ -132,10 +137,14 @@ public class RpcMessage implements Externalizable {
 
         @Override
         public void writeExternal(ObjectOutput out) throws IOException {
-            out.writeInt(uuid.length);
-            out.write(uuid, 0, uuid.length);
-            out.writeInt(rpcId.length);
-            out.write(rpcId, 0, rpcId.length);
+            out.writeInt(uuid != null ? uuid.length : 0);
+            if (uuid != null) {
+                out.write(uuid, 0, uuid.length);
+            }
+            out.writeInt(rpcId != null ? rpcId.length : 0);
+            if (rpcId != null) {
+                out.write(rpcId, 0, rpcId.length);
+            }
         }
     }
 

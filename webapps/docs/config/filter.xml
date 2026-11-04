@@ -1035,11 +1035,14 @@ FINE: Request "/docs/config/manager.html" with response status "200"
     using bit shift arithmetic. In order to remain true to the user intent, the
     configured number of requests is then multiplied by the same ratio, so a
     configuration of 100 Requests per 60 seconds, has the real values of 109
-    Requests per 65 seconds. An alternative implementation,
+    Requests per 65 seconds. Because of this conversion, the default
+    implementation rejects a configured duration of more than 1073741 seconds
+    (about 12 days). An alternative implementation,
     <code>org.apache.catalina.util.ExactRateLimiter</code>, is intended to
     provide a less efficient but more accurate control, whose effective duration
     in seconds and number of requests allowed are consist with the configured
-    values. You can specify a different class as long as it implements the
+    values and does not have that limit on the duration. You can specify a
+    different class as long as it implements the
     <code>org.apache.catalina.util.RateLimiter</code> interface.</p>
 
     <p>It is common to set up different restrictions for different URIs.

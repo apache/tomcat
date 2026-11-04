@@ -93,6 +93,11 @@ public final class UEncoder {
             bb.recycle();
             cb.recycle();
             output.recycle();
+            // Recycle the converter as well. Otherwise, an unpaired surrogate
+            // left over from the previous call is retained in the converter's
+            // internal buffer and silently combined with the start of the
+            // next, unrelated string.
+            c2b.recycle();
         }
 
         for (int i = start; i < end; i++) {

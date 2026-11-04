@@ -18,6 +18,7 @@ package org.apache.catalina.core;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,6 +26,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
@@ -551,7 +553,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
                 // Wait for the next connection
                 Socket socket = null;
-                StringBuilder command = new StringBuilder();
+                ByteArrayOutputStream commandBytes = new ByteArrayOutputStream();
                 try {
                     InputStream stream;
                     long acceptStartTime = System.nanoTime();
@@ -574,9 +576,10 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                         break;
                     }
 
-                    // Read a set of characters from the socket
+                    // Read a set of bytes from the socket
                     int expected = 1024; // Cut off to avoid DoS attack
-                    while (expected < shutdown.length()) {
+                    int shutdownLength = shutdown.getBytes(StandardCharsets.UTF_8).length;
+                    while (expected < shutdownLength) {
                         if (random == null) {
                             random = new Random();
                         }
@@ -594,7 +597,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                         if (ch < 32 || ch == 127) {
                             break;
                         }
-                        command.append((char) ch);
+                        commandBytes.write(ch);
                         expected--;
                     }
                 } finally {
@@ -608,13 +611,17 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                     }
                 }
 
+                // Decode the received bytes as UTF-8, matching the encoding
+                // used by the stop command
+                String command = commandBytes.toString(StandardCharsets.UTF_8);
+
                 // Match against our command string
-                boolean match = command.toString().equals(shutdown);
+                boolean match = command.equals(shutdown);
                 if (match) {
                     log.info(sm.getString("standardServer.shutdownViaPort"));
                     break;
                 } else {
-                    log.warn(sm.getString("standardServer.invalidShutdownCommand", command.toString()));
+                    log.warn(sm.getString("standardServer.invalidShutdownCommand", command));
                 }
             }
         } finally {

@@ -553,7 +553,7 @@ public class ApplicationContext implements ServletContext {
 
         // Remove the specified attribute
         // Check for read only attribute
-        if (readOnlyAttributes.containsKey(name)) {
+        if (isReadOnlyAttribute(name)) {
             return;
         }
         Object value = attributes.remove(name);
@@ -561,6 +561,17 @@ public class ApplicationContext implements ServletContext {
             return;
         }
 
+        fireContextAttributeRemoved(name, value);
+    }
+
+
+    /**
+     * Notify the application's <code>ServletContextAttributeListener</code>s of an attribute removal.
+     *
+     * @param name  The name of the attribute
+     * @param value The value the attribute had before it was removed
+     */
+    protected void fireContextAttributeRemoved(String name, Object value) {
         // Notify interested application event listeners
         Object[] listeners = context.getApplicationEventListeners();
         if (listeners == null || listeners.length == 0) {
@@ -599,24 +610,32 @@ public class ApplicationContext implements ServletContext {
 
         // Add or replace the specified attribute
         // Check for read only attribute
-        if (readOnlyAttributes.containsKey(name)) {
+        if (isReadOnlyAttribute(name)) {
             return;
         }
 
         Object oldValue = attributes.put(name, value);
         boolean replaced = oldValue != null;
 
+        fireContextAttributeAddedOrReplaced(replaced, name, replaced ? oldValue : value);
+    }
+
+
+    /**
+     * Notify the application's <code>ServletContextAttributeListener</code>s of an attribute addition or replacement.
+     *
+     * @param replaced Whether the attribute was replaced rather than added
+     * @param name     The name of the attribute
+     * @param value    The value for the event: the previous value when the attribute was replaced, otherwise the new
+     *                     value
+     */
+    protected void fireContextAttributeAddedOrReplaced(boolean replaced, String name, Object value) {
         // Notify interested application event listeners
         Object[] listeners = context.getApplicationEventListeners();
         if (listeners == null || listeners.length == 0) {
             return;
         }
-        ServletContextAttributeEvent event;
-        if (replaced) {
-            event = new ServletContextAttributeEvent(context.getServletContext(), name, oldValue);
-        } else {
-            event = new ServletContextAttributeEvent(context.getServletContext(), name, value);
-        }
+        ServletContextAttributeEvent event = new ServletContextAttributeEvent(context.getServletContext(), name, value);
 
         for (Object obj : listeners) {
             if (!(obj instanceof ServletContextAttributeListener listener)) {
@@ -1194,14 +1213,43 @@ public class ApplicationContext implements ServletContext {
 
 
     /**
-     * Set an attribute as read only.
+     * Set an attribute as read only. The attribute is only marked read only if it is currently stored, possibly in
+     * a store maintained by a subclass.
+     *
+     * @param name The attribute name
      */
     void setAttributeReadOnly(String name) {
 
-        if (attributes.containsKey(name)) {
+        if (isAttributeStored(name)) {
             readOnlyAttributes.put(name, name);
         }
 
+    }
+
+
+    /**
+     * Check if an attribute with the given name is currently stored in this context, possibly in a store
+     * maintained by a subclass. Subclasses that keep some attributes outside the main attribute map should
+     * override this method to allow those attributes to be made read only.
+     *
+     * @param name The attribute name
+     *
+     * @return {@code true} if an attribute with the given name is present
+     */
+    protected boolean isAttributeStored(String name) {
+        return attributes.containsKey(name);
+    }
+
+
+    /**
+     * Check if the attribute with the given name has been made read only.
+     *
+     * @param name The attribute name
+     *
+     * @return {@code true} if the attribute has been made read only
+     */
+    protected boolean isReadOnlyAttribute(String name) {
+        return readOnlyAttributes.containsKey(name);
     }
 
 
@@ -1213,6 +1261,7 @@ public class ApplicationContext implements ServletContext {
     protected void setNewServletContextListenerAllowed(boolean allowed) {
         this.newServletContextListenerAllowed = allowed;
     }
+
 
     /**
      * Internal class used as thread-local storage when doing path mapping during dispatch.

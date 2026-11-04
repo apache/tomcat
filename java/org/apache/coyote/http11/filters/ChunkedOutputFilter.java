@@ -154,11 +154,17 @@ public class ChunkedOutputFilter implements OutputFilter {
 
         if (trailerFields == null) {
             // Write end chunk
-            buffer.doWrite(endChunk);
-            endChunk.position(0).limit(endChunk.capacity());
+            try {
+                buffer.doWrite(endChunk);
+            } finally {
+                endChunk.position(0).limit(endChunk.capacity());
+            }
         } else {
-            buffer.doWrite(lastChunk);
-            lastChunk.position(0).limit(lastChunk.capacity());
+            try {
+                buffer.doWrite(lastChunk);
+            } finally {
+                lastChunk.position(0).limit(lastChunk.capacity());
+            }
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
 
@@ -178,8 +184,11 @@ public class ChunkedOutputFilter implements OutputFilter {
 
             buffer.doWrite(ByteBuffer.wrap(baos.toByteArray()));
 
-            buffer.doWrite(crlfChunk);
-            crlfChunk.position(0).limit(crlfChunk.capacity());
+            try {
+                buffer.doWrite(crlfChunk);
+            } finally {
+                crlfChunk.position(0).limit(crlfChunk.capacity());
+            }
         }
         buffer.end();
     }

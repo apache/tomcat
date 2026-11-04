@@ -150,11 +150,14 @@ public class ReplicatedMap<K, V> extends AbstractReplicatedMap<K,V> {
             return backup;
         }
 
+        MapMessage msg = createMapMessage(MapMessage.MSG_COPY, false, (Serializable) key, (Serializable) value, null,
+                channel.getLocalMember(false), backup);
+        if (msg == null) {
+            return new Member[0];
+        }
+
         try {
             // publish the data out to all nodes
-            MapMessage msg = new MapMessage(getMapContextName(), MapMessage.MSG_COPY, false, (Serializable) key,
-                    (Serializable) value, null, channel.getLocalMember(false), backup);
-
             getChannel().send(backup, msg, getChannelSendOptions());
         } catch (ChannelException e) {
             FaultyMember[] faultyMembers = e.getFaultyMembers();
@@ -186,14 +189,11 @@ public class ReplicatedMap<K, V> extends AbstractReplicatedMap<K,V> {
     @Override
     public void memberDisappeared(Member member) {
         Log log = getLog();
-        synchronized (mapMembers) {
-            boolean removed = (mapMembers.remove(member) != null);
-            if (!removed) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("replicatedMap.member.disappeared.unknown", member));
-                }
-                return; // the member was not part of our map.
+        if (!removeMapMember(member)) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("replicatedMap.member.disappeared.unknown", member));
             }
+            return; // the member was not part of our map.
         }
         if (log.isInfoEnabled()) {
             log.info(sm.getString("replicatedMap.member.disappeared", member));
@@ -201,16 +201,21 @@ public class ReplicatedMap<K, V> extends AbstractReplicatedMap<K,V> {
         long start = System.currentTimeMillis();
         for (Entry<K,MapEntry<K,V>> e : innerMap.entrySet()) {
             MapEntry<K,V> entry = innerMap.get(e.getKey());
-            if (entry == null) {
+            if (entry == null || !entry.isSerializable()) {
+                // An entry that cannot be serialized is only kept on this node, so there is nothing to relocate
                 continue;
             }
             if (entry.isPrimary()) {
                 try {
                     Member[] backup = getMapMembers();
                     if (backup.length > 0) {
-                        MapMessage msg = new MapMessage(getMapContextName(), MapMessage.MSG_NOTIFY_MAPMEMBER, false,
+                        MapMessage msg = createMapMessage(MapMessage.MSG_NOTIFY_MAPMEMBER, false,
                                 (Serializable) entry.getKey(), null, null, channel.getLocalMember(false), backup);
-                        getChannel().send(backup, msg, getChannelSendOptions());
+                        if (msg != null) {
+                            getChannel().send(backup, msg, getChannelSendOptions());
+                        } else {
+                            backup = new Member[0];
+                        }
                     }
                     entry.setBackupNodes(backup);
                     entry.setPrimary(channel.getLocalMember(false));
@@ -231,9 +236,13 @@ public class ReplicatedMap<K, V> extends AbstractReplicatedMap<K,V> {
                     entry.setCopy(false);
                     Member[] backup = getMapMembers();
                     if (backup.length > 0) {
-                        MapMessage msg = new MapMessage(getMapContextName(), MapMessage.MSG_NOTIFY_MAPMEMBER, false,
+                        MapMessage msg = createMapMessage(MapMessage.MSG_NOTIFY_MAPMEMBER, false,
                                 (Serializable) entry.getKey(), null, null, channel.getLocalMember(false), backup);
-                        getChannel().send(backup, msg, getChannelSendOptions());
+                        if (msg != null) {
+                            getChannel().send(backup, msg, getChannelSendOptions());
+                        } else {
+                            backup = new Member[0];
+                        }
                     }
                     entry.setBackupNodes(backup);
                     if (mapOwner != null) {

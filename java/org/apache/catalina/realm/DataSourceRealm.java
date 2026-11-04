@@ -447,7 +447,7 @@ public class DataSourceRealm extends RealmBase {
                     dbCredentials = rs.getString(1);
                 }
 
-                return (dbCredentials != null) ? dbCredentials.trim() : null;
+                return (dbCredentials != null) ? dbCredentials.strip() : null;
             }
         } catch (SQLException e) {
             containerLog.error(sm.getString("dataSourceRealm.getPassword.exception", username), e);
@@ -537,9 +537,9 @@ public class DataSourceRealm extends RealmBase {
      */
     protected ArrayList<String> getRoles(Connection dbConnection, String username) {
 
-        if (allRolesMode != AllRolesMode.STRICT_MODE && !isRoleStoreDefined()) {
-            // Using an authentication only configuration and no role store has
-            // been defined so don't spend cycles looking
+        if (!isRoleStoreDefined()) {
+            // No role store has been defined so there is nothing to look up.
+            // The all roles mode is interpreted centrally in RealmBase.
             return new ArrayList<>(0);
         }
 
@@ -551,7 +551,7 @@ public class DataSourceRealm extends RealmBase {
                 while (rs.next()) {
                     String role = rs.getString(1);
                     if (role != null) {
-                        list.add(role.trim());
+                        list.add(role.strip());
                     }
                 }
                 return list;
@@ -591,18 +591,23 @@ public class DataSourceRealm extends RealmBase {
             throw new LifecycleException(sm.getString("dataSourceRealm.roleConfigMismatch"));
         }
 
-        // Create the roles PreparedStatement string
-        StringBuilder temp = new StringBuilder("SELECT ");
-        temp.append(roleNameCol);
-        temp.append(" FROM ");
-        temp.append(userRoleTable);
-        temp.append(" WHERE ");
-        temp.append(userNameCol);
-        temp.append(" = ?");
-        preparedRoles = temp.toString();
+        // Create the roles PreparedStatement string. When no role store is
+        // defined there is nothing to query and no statement to build.
+        if (isRoleStoreDefined()) {
+            StringBuilder temp = new StringBuilder("SELECT ");
+            temp.append(roleNameCol);
+            temp.append(" FROM ");
+            temp.append(userRoleTable);
+            temp.append(" WHERE ");
+            temp.append(userNameCol);
+            temp.append(" = ?");
+            preparedRoles = temp.toString();
+        } else {
+            preparedRoles = null;
+        }
 
         // Create the credentials PreparedStatement string
-        temp = new StringBuilder("SELECT ");
+        StringBuilder temp = new StringBuilder("SELECT ");
         temp.append(userCredCol);
         temp.append(" FROM ");
         temp.append(userTable);

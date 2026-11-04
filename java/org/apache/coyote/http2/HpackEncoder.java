@@ -285,11 +285,14 @@ class HpackEncoder {
 
 
     private void preventPositionRollover() {
-        // if the position counter is about to roll over we iterate all the table entries
-        // and set their position to their actual position
+        // if the position counter is about to roll over we iterate all the
+        // table entries and set their position to their position relative to
+        // the start of the dynamic table (i.e. excluding the static table
+        // offset) since that, plus the (reset) counter value plus the static
+        // table length, is the value from which their index is calculated
         for (List<TableEntry> tableEntries : dynamicTable.values()) {
             for (TableEntry t : tableEntries) {
-                t.position = t.getPosition();
+                t.position = t.getPosition() - Hpack.STATIC_TABLE_LENGTH;
             }
         }
         entryPositionCounter = 0;

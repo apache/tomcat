@@ -40,7 +40,6 @@ public class Param implements TagPlugin {
         // define names of all the temp variables
         String nameName = ctxt.getTemporaryVariableName();
         String valueName = ctxt.getTemporaryVariableName();
-        String urlName = ctxt.getTemporaryVariableName();
         String encName = ctxt.getTemporaryVariableName();
         String index = ctxt.getTemporaryVariableName();
 
@@ -52,9 +51,28 @@ public class Param implements TagPlugin {
             return;
         }
 
-        // get the url string before adding this param
-        ctxt.generateJavaSource(
-                "String " + urlName + " = " + "(String)_jspx_page_context.getAttribute(\"url_without_param\");");
+        // Append the parameter to the working URL of the enclosing URL tag.
+        // The Import, Url and Redirect plugins share the name of the local
+        // variable holding that URL through the plugin context, so that
+        // nested URL tags cannot interfere with each other through a shared
+        // page scope attribute. As in the standard handler, which at runtime
+        // adds the parameter to the closest URL tag ancestor, the search
+        // walks up the plugin context chain until a context provides the
+        // working URL, stopping at parents that no plugin handled.
+        TagPluginContext urlContext = parent;
+        while (urlContext != null &&
+                urlContext.getPluginAttribute(Import.URL_VARIABLE_ATTRIBUTE) == null) {
+            urlContext = urlContext.getParentContext();
+        }
+        if (urlContext == null) {
+            // No plugin handled an enclosing URL tag, so there is no working
+            // URL variable to append to. Let the standard tag handler process
+            // the parameter. A standard URL tag then takes it as usual, and
+            // the handler reports the error for a misplaced tag.
+            ctxt.dontUseTagPlugin();
+            return;
+        }
+        String urlTargetName = (String) urlContext.getPluginAttribute(Import.URL_VARIABLE_ATTRIBUTE);
 
         // get the value of "name"
         ctxt.generateJavaSource("String " + nameName + " = ");
@@ -76,17 +94,16 @@ public class Param implements TagPlugin {
         ctxt.generateJavaSource(
                 "    " + valueName + " = java.net.URLEncoder.encode(" + valueName + ", " + encName + ");");
         ctxt.generateJavaSource("    int " + index + ";");
-        ctxt.generateJavaSource("    " + index + " = " + urlName + ".indexOf(\'?\');");
+        ctxt.generateJavaSource("    " + index + " = " + urlTargetName + ".indexOf(\'?\');");
         // if the current param is the first one, add a "?" ahead of it
         // else add a "&" ahead of it
         ctxt.generateJavaSource("    if(" + index + " == -1){");
-        ctxt.generateJavaSource(
-                "        " + urlName + " = " + urlName + " + \"?\" + " + nameName + " + \"=\" + " + valueName + ";");
+        ctxt.generateJavaSource("        " + urlTargetName + " = " + urlTargetName + " + \"?\" + " + nameName +
+                " + \"=\" + " + valueName + ";");
         ctxt.generateJavaSource("    }else{");
-        ctxt.generateJavaSource(
-                "        " + urlName + " = " + urlName + " + \"&\" + " + nameName + " + \"=\" + " + valueName + ";");
+        ctxt.generateJavaSource("        " + urlTargetName + " = " + urlTargetName + " + \"&\" + " + nameName +
+                " + \"=\" + " + valueName + ";");
         ctxt.generateJavaSource("    }");
-        ctxt.generateJavaSource("    _jspx_page_context.setAttribute(\"url_without_param\"," + urlName + ");");
         ctxt.generateJavaSource("}");
     }
 }

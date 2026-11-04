@@ -85,6 +85,7 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
         try {
             // Note: The regular processor uses the socketWrapper lock, but using that here triggers a deadlock
             processLock.lock();
+            // HTTP/2 equivalent of AbstractConnectionHandler#process() without the socket <-> processor mapping
             try {
                 /*
                  * In some scenarios, error handling may trigger multiple ERROR events for the same stream. The first
@@ -95,11 +96,25 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
                 if (!stream.equals(handler.getStream(stream.getIdAsInt()))) {
                     return;
                 }
-                // HTTP/2 equivalent of AbstractConnectionHandler#process() without the
-                // socket <-> processor mapping
+                // Avoid duplicate timeout events
+                if (event == SocketEvent.TIMEOUT && !checkAsyncTimeoutGeneration()) {
+                    return;
+                }
                 SocketState state = SocketState.CLOSED;
+                boolean reuseRequestAndResponse = false;
                 try {
                     state = process(socketWrapper, event);
+                    /*
+                     * The request and response may only be returned to the pool for re-use if the stream ended cleanly.
+                     * If the stream ended with either a timeout or an error that prevents further I/O (e.g. an
+                     * asynchronous timeout or error while an application thread was blocked in a write), a
+                     * non-container thread may still be using the request and/or response. Re-using them in that case
+                     * could result in the remaining data being written to a different stream, possibly on a different
+                     * connection.
+                     */
+                    if (SocketEvent.TIMEOUT != event) {
+                        reuseRequestAndResponse = getErrorState().isIoAllowed();
+                    }
 
                     if (state == SocketState.LONG) {
                         handler.getProtocol().getHttp11Protocol().addWaitingProcessor(this);
@@ -131,8 +146,11 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
                             stream.close(se);
                         } else {
                             if (!stream.isActive()) {
-                                // Close calls replace() so need the same call here
-                                stream.replace();
+                                /*
+                                 * Still need to call close to perform the necessary clean-up but no need to send reset
+                                 * since the stream is not active so pass null.
+                                 */
+                                stream.close(null);
                             }
                         }
                     }
@@ -145,6 +163,7 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
                     ConnectionException ce = new ConnectionException(msg, Http2Error.INTERNAL_ERROR, e);
                     stream.close(ce);
                     state = SocketState.CLOSED;
+                    reuseRequestAndResponse = false;
                 } finally {
                     if (state == SocketState.CLOSED) {
                         /*
@@ -154,7 +173,7 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
                          * response are added to the pool to avoid concurrency issues corrupting the statistics.
                          */
                         recycle();
-                        stream.recycle();
+                        stream.recycle(reuseRequestAndResponse);
                     }
                 }
             } finally {

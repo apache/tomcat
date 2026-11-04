@@ -19,6 +19,7 @@ package org.apache.el.lang;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import jakarta.el.ELContext;
 import jakarta.el.ELResolver;
@@ -40,6 +41,13 @@ public final class EvaluationContext extends ELContext {
     private final VariableMapper varMapper;
 
     private LambdaExpressionNestedState lambdaExpressionNestedState;
+
+    /*
+     * The context object for ELResolver.StandaloneIdentifierMarker, which AstIdentifier sets for every identifier it
+     * resolves. Held here rather than in the wrapped context, so that resolving an identifier does not update the
+     * wrapped context's map. The resolvers are passed this context, so they see it.
+     */
+    private Object standaloneIdentifierMarker;
 
     /**
      * Creates a new EvaluationContext wrapping the given ELContext.
@@ -75,6 +83,9 @@ public final class EvaluationContext extends ELContext {
 
     @Override
     public Object getContext(Class<?> key) {
+        if (key == ELResolver.StandaloneIdentifierMarker.class) {
+            return standaloneIdentifierMarker;
+        }
         return elContext.getContext(key);
     }
 
@@ -90,6 +101,10 @@ public final class EvaluationContext extends ELContext {
 
     @Override
     public void putContext(Class<?> key, Object contextObject) {
+        if (key == ELResolver.StandaloneIdentifierMarker.class) {
+            standaloneIdentifierMarker = Objects.requireNonNull(contextObject);
+            return;
+        }
         elContext.putContext(key, contextObject);
     }
 

@@ -228,6 +228,10 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
      */
     private TldResourcePath generateTldResourcePath(String uri, JspCompilationContext ctxt) throws JasperException {
 
+        if (uri.isEmpty()) {
+            err.jspError("jsp.error.taglibDirective.uriInvalid", uri);
+        }
+
         // TODO: this matches the current implementation but the URL logic looks fishy
         // map URI to location per JSP 7.3.6.2
         if (uri.indexOf(':') != -1) {

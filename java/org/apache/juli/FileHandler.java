@@ -232,9 +232,7 @@ public class FileHandler extends Handler {
 
         final String tsDate;
         if (rotatable.booleanValue()) {
-            // Construct the timestamp we will use
-            Timestamp ts = new Timestamp(System.currentTimeMillis());
-            tsDate = ts.toString().substring(0, 10);
+            tsDate = obtainCurrentDate();
         } else {
             tsDate = "";
         }
@@ -275,6 +273,13 @@ public class FileHandler extends Handler {
                     writer.write(result);
                     if (bufferSize.intValue() < 0) {
                         writer.flush();
+                        // PrintWriter swallows the exceptions from the underlying stream instead of
+                        // propagating them, so the error flag needs to be checked explicitly after the
+                        // flush. Throwing below discards the writer and lets a later record open a new
+                        // one, as the next record will find the date unset and re-open the file.
+                        if (writer.checkError()) {
+                            throw new IOException("Unable to write to the log file");
+                        }
                     }
                 } else {
                     reportError("FileHandler is closed or not yet initialized, unable to log [" + result + "]", null,
@@ -282,6 +287,14 @@ public class FileHandler extends Handler {
                 }
             } catch (Exception e) {
                 reportError(null, e, ErrorManager.WRITE_FAILURE);
+                // Discard the writer, so the next record attempts to reopen the file rather than
+                // remaining attached to a writer that can no longer complete writes
+                writerLock.readLock().unlock();
+                try {
+                    closeWriter();
+                } finally {
+                    writerLock.readLock().lock();
+                }
             }
         } finally {
             writerLock.readLock().unlock();
@@ -310,13 +323,22 @@ public class FileHandler extends Handler {
             if (writer == null) {
                 return;
             }
-            writer.write(getFormatter().getTail(this));
-            writer.flush();
-            writer.close();
-            writer = null;
-            date = null;
-        } catch (Exception e) {
-            reportError(null, e, ErrorManager.CLOSE_FAILURE);
+            try {
+                writer.write(getFormatter().getTail(this));
+                writer.flush();
+            } catch (Exception e) {
+                reportError(null, e, ErrorManager.CLOSE_FAILURE);
+            } finally {
+                // The writer is closed and discarded even when the tail could not be written, so a
+                // failure is not repeated by every later close() for a writer that is never released
+                try {
+                    writer.close();
+                } catch (Exception e) {
+                    reportError(null, e, ErrorManager.CLOSE_FAILURE);
+                }
+                writer = null;
+                date = null;
+            }
         } finally {
             writerLock.writeLock().unlock();
         }
@@ -442,14 +464,15 @@ public class FileHandler extends Handler {
         if (value == null) {
             value = defaultValue;
         } else {
-            value = value.trim();
+            value = value.strip();
         }
         return value;
     }
 
 
     /**
-     * Open the new log file for the date specified by <code>date</code>.
+     * Open the new log file. If the handler is rotatable and no date has been set yet, the log file for the current
+     * date is opened.
      */
     public void open() {
         openWriter();
@@ -473,7 +496,16 @@ public class FileHandler extends Handler {
         FileOutputStream fos = null;
         OutputStream os = null;
         try {
-            File pathname = new File(dir.getAbsoluteFile(), prefix + (rotatable.booleanValue() ? date : "") + suffix);
+            // If no date has been set, typically because the handler has been opened before any record was
+            // published, use the current date, as publish() does when it rotates the log file, so the file
+            // name always matches the pattern used for rotation and cleanup
+            String currentDate = date;
+            boolean dateComputed = rotatable.booleanValue() && currentDate == null;
+            if (dateComputed) {
+                currentDate = obtainCurrentDate();
+            }
+            File pathname = new File(dir.getAbsoluteFile(),
+                    prefix + (rotatable.booleanValue() ? currentDate : "") + suffix);
             File parent = pathname.getParentFile();
             if (!parent.mkdirs() && !parent.isDirectory()) {
                 reportError("Unable to create [" + parent + "]", null, ErrorManager.OPEN_FAILURE);
@@ -486,6 +518,9 @@ public class FileHandler extends Handler {
             writer = new PrintWriter(
                     (encoding != null) ? new OutputStreamWriter(os, encoding) : new OutputStreamWriter(os), false);
             writer.write(getFormatter().getHead(this));
+            if (dateComputed) {
+                date = currentDate;
+            }
         } catch (Exception e) {
             reportError(null, e, ErrorManager.OPEN_FAILURE);
             writer = null;
@@ -506,6 +541,17 @@ public class FileHandler extends Handler {
         } finally {
             writerLock.writeLock().unlock();
         }
+    }
+
+    /**
+     * Obtain the date string used as the date part of the names of the rotatable log files.
+     *
+     * @return The current date, formatted as <code>YYYY-MM-DD</code>
+     */
+    private static String obtainCurrentDate() {
+        // Construct the timestamp we will use
+        Timestamp ts = new Timestamp(System.currentTimeMillis());
+        return ts.toString().substring(0, 10);
     }
 
     private void clean() {

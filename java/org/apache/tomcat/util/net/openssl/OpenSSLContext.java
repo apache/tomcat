@@ -18,6 +18,7 @@ package org.apache.tomcat.util.net.openssl;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.ref.Cleaner;
 import java.lang.ref.Cleaner.Cleanable;
@@ -33,6 +34,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 
@@ -114,6 +116,14 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         this(certificate, negotiableProtocols, false);
     }
 
+    /**
+     * Constructs an OpenSSLContext for the given certificate, protocols and client/server mode.
+     *
+     * @param certificate The SSL host config certificate
+     * @param negotiableProtocols The list of negotiable protocols
+     * @param clientMode {@code true} for client mode, otherwise server mode
+     * @throws SSLException if initialization fails
+     */
     public OpenSSLContext(SSLHostConfigCertificate certificate, List<String> negotiableProtocols, boolean clientMode)
             throws SSLException {
         this.sslHostConfig = certificate.getSSLHostConfig();
@@ -517,6 +527,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 if ((opts & SSL.SSL_OP_NO_TLSv1_2) == 0) {
                     enabled.add(Constants.SSL_PROTO_TLSv1_2);
                 }
+                if ((opts & SSL.SSL_OP_NO_TLSv1_3) == 0) {
+                    enabled.add(Constants.SSL_PROTO_TLSv1_3);
+                }
                 if ((opts & SSL.SSL_OP_NO_SSLv3) == 0) {
                     enabled.add(Constants.SSL_PROTO_SSLv3);
                 }
@@ -536,6 +549,42 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             destroy();
             throw new KeyManagementException(sm.getString("openssl.errorSSLCtxInit"), e);
         }
+    }
+
+
+    /**
+     * Determines if a PEM certificate file holds more than the server certificate, i.e. it also holds the certificate
+     * chain. The certificates are counted without decoding the file. The file may also hold a private key, which may
+     * be encrypted, and the password for that key is not needed to find out if there is a certificate chain.
+     *
+     * @param certificateFile The certificate file
+     *
+     * @return {@code true} if the file holds the server certificate and at least one more certificate
+     */
+    private static boolean hasCertificateChain(String certificateFile) {
+        if (certificateFile.toLowerCase(Locale.ENGLISH).endsWith(".pkcs12")) {
+            // Not a PEM file. Leave the handling of the bundle to the native library.
+            return false;
+        }
+        int certificates = 0;
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(new FileInputStream(certificateFile), StandardCharsets.ISO_8859_1))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // The types of PEM object that OpenSSL reads as a certificate
+                if (line.startsWith("-----BEGIN CERTIFICATE-----") ||
+                        line.startsWith("-----BEGIN X509 CERTIFICATE-----") ||
+                        line.startsWith("-----BEGIN TRUSTED CERTIFICATE-----")) {
+                    certificates++;
+                    if (certificates > 1) {
+                        return true;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            // Leave any problems with the file to the native library.
+        }
+        return false;
     }
 
 
@@ -560,12 +609,23 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             } else {
                 passwordToUse = certificate.getCertificateKeyPassword();
             }
-            SSLContext.setCertificate(state.ctx, SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()),
+            String certificateFile = SSLHostConfig.adjustRelativePath(certificate.getCertificateFile());
+            SSLContext.setCertificate(state.ctx, certificateFile,
                     SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()), passwordToUse,
                     getCertificateIndex(certificate));
-            // Set certificate chain file
-            SSLContext.setCertificateChainFile(state.ctx,
-                    SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()), false);
+            // Set the certificate chain. The chain file is only used if the certificate file holds the server
+            // certificate alone. If the certificate file already contains the certificate chain, the chain is taken
+            // from the certificate file (skipping the server certificate) and the chain file is ignored.
+            if (hasCertificateChain(certificateFile)) {
+                if (log.isDebugEnabled() && certificate.getCertificateChainFile() != null) {
+                    log.debug(sm.getString("openssl.chainFileIgnored", certificate.getCertificateChainFile(),
+                            certificate.getCertificateFile()));
+                }
+                SSLContext.setCertificateChainFile(state.ctx, certificateFile, true);
+            } else {
+                SSLContext.setCertificateChainFile(state.ctx,
+                        SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()), false);
+            }
         } else {
             String alias = certificate.getCertificateKeyAlias();
             X509KeyManager x509KeyManager = certificate.getCertificateKeyManager();

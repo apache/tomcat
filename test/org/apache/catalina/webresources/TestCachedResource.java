@@ -26,6 +26,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.Tomcat;
@@ -95,6 +96,47 @@ public class TestCachedResource extends TomcatBaseTest {
         try (InputStream is = d1.openStream()) {
             Assert.assertNotNull(is);
         }
+    }
+
+
+    @Test
+    public void testCollectionsAreNotSharedBetweenClassLoaderResourceValues()
+            throws Exception {
+
+        // Regression test: a collection cached for a path with
+        // useClassLoaderResources set to false must not be served to a caller
+        // using true (or vice versa). Cache entries are keyed on path only and
+        // each entry is valid for a single value of useClassLoaderResources.
+        // A class loader resource lookup for the class loader root ('' maps
+        // to the path '/WEB-INF/classes' which is also the key used by the
+        // static lookup) hits the same cache entry. The packed WAR provides a
+        // resource set that is only visible to class loader resource lookups
+        // (the JAR in WEB-INF/lib mounted at WEB-INF/classes).
+        Tomcat tomcat = getTomcatInstance();
+        File docBase = new File("test/webresources/war-url-connection.war");
+        Context ctx = tomcat.addWebapp("/test", docBase.getAbsolutePath());
+        ((StandardHost) tomcat.getHost()).setUnpackWARs(false);
+        tomcat.start();
+
+        WebResourceRoot root = ctx.getResources();
+
+        // This populates the cache entry for the path with
+        // useClassLoaderResources set to false.
+        WebResource[] withoutClassLoaderResources = root.getResources("/WEB-INF/classes");
+        // Repeated lookups within the cache TTL are served from the cache.
+        Assert.assertEquals(withoutClassLoaderResources.length,
+                root.getResources("/WEB-INF/classes").length);
+
+        // This previously returned the cached collection created with
+        // useClassLoaderResources set to false, which does not include the
+        // JAR in WEB-INF/lib.
+        WebResource[] withClassLoaderResources = root.getClassLoaderResources("");
+        Assert.assertTrue(withClassLoaderResources.length > withoutClassLoaderResources.length);
+
+        // The collection cached for the class loader resource lookup must not
+        // be served to the static lookup either.
+        Assert.assertEquals(withoutClassLoaderResources.length,
+                root.getResources("/WEB-INF/classes").length);
     }
 
 

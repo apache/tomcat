@@ -40,6 +40,7 @@ import jakarta.websocket.CloseReason;
 import jakarta.websocket.CloseReason.CloseCodes;
 import jakarta.websocket.DeploymentException;
 import jakarta.websocket.Encoder;
+import jakarta.websocket.Endpoint;
 import jakarta.websocket.server.ServerContainer;
 import jakarta.websocket.server.ServerEndpoint;
 import jakarta.websocket.server.ServerEndpointConfig;
@@ -136,7 +137,12 @@ public class WsServerContainer extends WsWebSocketContainer implements ServerCon
             // Add method mapping to user properties
             PojoMethodMapping methodMapping = new PojoMethodMapping(sec.getEndpointClass(), sec.getDecoders(), path,
                     getInstanceManager(Thread.currentThread().getContextClassLoader()));
-            if (methodMapping.getOnClose() != null || methodMapping.getOnOpen() != null ||
+            // The mapping is not used for programmatic endpoints (Endpoint subclasses)
+            // so for those classes it is only stored when it has content (bug 58232).
+            // For POJO endpoints it must always be stored, even when empty, since
+            // PojoEndpointServer expects it to be present.
+            if (!Endpoint.class.isAssignableFrom(sec.getEndpointClass()) ||
+                    methodMapping.getOnClose() != null || methodMapping.getOnOpen() != null ||
                     methodMapping.getOnError() != null || methodMapping.hasMessageHandlers()) {
                 sec.getUserProperties().put(org.apache.tomcat.websocket.pojo.Constants.POJO_METHOD_MAPPING_KEY,
                         methodMapping);
@@ -160,8 +166,9 @@ public class WsServerContainer extends WsWebSocketContainer implements ServerCon
                     // before POJOs in WsSci#onStartup()
                     if (oldMatch.fromAnnotatedPojo() && !newMatch.fromAnnotatedPojo() &&
                             oldMatch.config().getEndpointClass() == newMatch.config().getEndpointClass()) {
-                        // The WebSocket spec says to ignore the new match in this case
-                        templateMatches.put(path, oldMatch);
+                        // The WebSocket spec says to ignore the new match in this case. The old
+                        // match has not been replaced by putIfAbsent() above so, unlike the exact
+                        // match case below, there is no need to restore the old match in the map.
                     } else {
                         // Duplicate uriTemplate;
                         throw new DeploymentException(sm.getString("serverContainer.duplicatePaths", path,

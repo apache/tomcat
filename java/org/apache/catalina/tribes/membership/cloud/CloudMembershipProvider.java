@@ -176,6 +176,10 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
         connectionTimeout = service.getConnectTimeout();
         readTimeout = service.getReadTimeout();
         expirationTime = service.getExpirationTime();
+        if (expirationTime <= 0) {
+            throw new IllegalArgumentException(sm.getString("cloudMembershipProvider.invalidTimingProperty",
+                    "expirationTime", Long.valueOf(expirationTime)));
+        }
 
         localIp = InetAddress.getLocalHost().getHostAddress();
         port = Integer.parseInt(properties.getProperty("tcpListenPort"));

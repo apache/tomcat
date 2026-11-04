@@ -125,6 +125,20 @@ public class TestResponse extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testGetContentLengthIntegerMaxValue() {
+        Response response = new Response();
+
+        Assert.assertEquals(-1, response.getContentLength());
+
+        response.setContentLength(Integer.MAX_VALUE);
+        Assert.assertEquals(Integer.MAX_VALUE, response.getContentLength());
+
+        response.setContentLength(Integer.MAX_VALUE + 1L);
+        Assert.assertEquals(-1, response.getContentLength());
+    }
+
+
     private static class ContentTypeServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;

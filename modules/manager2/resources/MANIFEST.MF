@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Bundle-Vendor: Apache Software Foundation
+Bundle-Version: @VERSION@
+Bundle-Name: Apache Tomcat Manager2
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.apache.tomcat.manager2

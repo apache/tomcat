@@ -19,7 +19,11 @@ package org.apache.tomcat.util.descriptor.web;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -791,5 +795,78 @@ public class TestWebXml {
         String output = webxml.toXml();
 
         Assert.assertEquals(input, output);
+    }
+
+
+    @Test
+    public void testServiceRefMappedNameIsNotAnEndpoint() throws Exception {
+        // The <mapped-name> of a <service-ref> is stored in the generic
+        // properties of ResourceBase. It must not be confused with the
+        // port-component-ref entries which were historically stored in the
+        // same map.
+        String input = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<web-app xmlns=\"https://jakarta.ee/xml/ns/jakartaee\"\n" +
+                "         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+                "         xsi:schemaLocation=\"https://jakarta.ee/xml/ns/jakartaee" +
+                " https://jakarta.ee/xml/ns/jakartaee/web-app_6_2.xsd\"\n" +
+                "         version=\"6.2\"\n" +
+                "         metadata-complete=\"true\">\n" +
+                "\n" +
+                "  <service-ref>\n" +
+                "    <service-ref-name>service/Test</service-ref-name>\n" +
+                "    <service-interface>com.example.TestService</service-interface>\n" +
+                "    <service-qname>test</service-qname>\n" +
+                "    <port-component-ref>\n" +
+                "      <service-endpoint-interface>com.example.Hello</service-endpoint-interface>\n" +
+                "      <port-component-link>HelloLink</port-component-link>\n" +
+                "    </port-component-ref>\n" +
+                "    <mapped-name>service/TestMapped</mapped-name>\n" +
+                "  </service-ref>\n" +
+                "\n" +
+                "</web-app>";
+
+        Digester digester = DigesterFactory.newDigester(true, true, new WebRuleSet(), true);
+        XmlErrorHandler handler = new XmlErrorHandler();
+        digester.setErrorHandler(handler);
+
+        InputSource is = new InputSource(new StringReader(input));
+        WebXml webxml = new WebXml();
+        digester.push(webxml);
+        digester.parse(is);
+
+        Assert.assertEquals(0, handler.getErrors().size());
+        Assert.assertEquals(0, handler.getWarnings().size());
+
+        ContextService service = webxml.getServiceRefs().get("service/Test");
+        Assert.assertNotNull(service);
+
+        // Only the real endpoint must be reported.
+        List<String> endpoints = new ArrayList<>();
+        Iterator<String> iter = service.getServiceendpoints();
+        while (iter.hasNext()) {
+            endpoints.add(iter.next());
+        }
+        Assert.assertEquals(Collections.singletonList("com.example.Hello"), endpoints);
+        Assert.assertEquals("HelloLink", service.getPortlink("com.example.Hello"));
+
+        // The mapped-name remains available as the only generic property.
+        List<String> properties = new ArrayList<>();
+        Iterator<String> propIter = service.listProperties();
+        while (propIter.hasNext()) {
+            properties.add(propIter.next());
+        }
+        Assert.assertEquals(Collections.singletonList("mappedName"), properties);
+        Assert.assertEquals("service/TestMapped", service.getProperty("mappedName"));
+
+        // The effective web.xml serialization must contain exactly the real
+        // port-component-ref and the mapped-name.
+        String output = webxml.toXml();
+        int firstPortComponentRef = output.indexOf("<port-component-ref>");
+        Assert.assertTrue(output, firstPortComponentRef >= 0);
+        Assert.assertTrue(output,
+                output.indexOf("<port-component-ref>", firstPortComponentRef + 1) < 0);
+        Assert.assertFalse(output, output.contains("<service-endpoint-interface>mappedName</service-endpoint-interface>"));
+        Assert.assertTrue(output, output.contains("<port-component-link>HelloLink</port-component-link>"));
+        Assert.assertTrue(output, output.contains("<mapped-name>service/TestMapped</mapped-name>"));
     }
 }

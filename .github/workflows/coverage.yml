@@ -1,0 +1,122 @@
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+
+name: Diff Coverage
+
+on:
+  pull_request:
+    branches:
+      - main
+
+# Only one run of the same workflow per branch or pull request runs at a time. A run that is still queued is
+# cancelled when the workflow is triggered for a newer commit, but a run that is already in progress is left to finish.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  LC_ALL: en_US.UTF-8
+
+jobs:
+  diff-coverage:
+    name: targeted tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v6
+        with:
+          java-version: 21
+          distribution: zulu
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.x'
+
+      - name: Install diff-cover
+        run: pip install diff-cover
+
+      - name: Determine base ref
+        id: base
+        run: echo "ref=origin/${{ github.event.pull_request.base.ref }}" >> "$GITHUB_OUTPUT"
+
+      - name: Select targeted tests
+        id: select
+        run: |
+          includes="$(git diff --name-only --diff-filter=d "${{ steps.base.outputs.ref }}"...HEAD \
+            | bash .github/scripts/select-tests.sh)"
+          {
+            echo "includes<<SELECT_TESTS_EOF"
+            echo "$includes"
+            echo "SELECT_TESTS_EOF"
+          } >> "$GITHUB_OUTPUT"
+          if [ -z "$includes" ]; then
+            echo "No targeted tests for the changed files; skipping coverage." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Targeted tests: \`$includes\`" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Run targeted tests with coverage
+        if: steps.select.outputs.includes != ''
+        env:
+          INCLUDES: ${{ steps.select.outputs.includes }}
+          ANT_OPTS: -Dtest.openssl.exists=false -Dtest.excludePerformance=true
+        run: |
+          ant -noinput deploy test-nio coverage-report \
+            -Dtest.coverage=true \
+            -Dtest.name="$INCLUDES"
+
+      - name: Report diff coverage
+        if: steps.select.outputs.includes != ''
+        run: |
+          diff-cover output/coverage/jacoco.xml \
+            --compare-branch "${{ steps.base.outputs.ref }}" \
+            --src-roots java \
+            --format markdown:diff-cover.md
+          {
+            echo '## Diff coverage (targeted tests)'
+            cat diff-cover.md
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Full-suite coverage of changed files
+        if: always()
+        run: |
+          # Only fetch the (large) nightly report if the PR changed java/ source.
+          changed="$(git diff --name-only --diff-filter=d "${{ steps.base.outputs.ref }}"...HEAD)"
+          java_changed="$(printf '%s\n' "$changed" | grep -E '^java/.*\.java$' || true)"
+          if [ -z "$java_changed" ]; then
+            exit 0
+          fi
+          nightly_url="https://nightlies.apache.org/tomcat/tomcat-12.0.x/coverage/jacoco.xml"
+          if ! curl -fsS --connect-timeout 10 --max-time 60 --retry 2 "$nightly_url" -o nightly-jacoco.xml; then
+            echo "No nightly full-suite coverage data available."
+            echo "_No nightly full-suite coverage data available._" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          table="$(printf '%s\n' "$java_changed" | python3 .github/scripts/coverage-file-level.py nightly-jacoco.xml)"
+          if [ -n "$table" ]; then
+            # Print to the step log (visible when the step is opened) and the run Summary.
+            echo 'Full-suite coverage of changed files (overall, not your diff):'
+            printf '%s\n' "$table"
+            {
+              echo '## Full-suite coverage of changed files (overall, not your diff)'
+              echo "$table"
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi

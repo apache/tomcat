@@ -228,6 +228,14 @@ public class Cache {
                 }
             } else {
                 // Another thread added the entry to the cache
+                if (cacheEntry.usesClassLoaderResources() != useClassLoaderResources) {
+                    // Race condition adding cache entries with the same path
+                    // but differing values for useClassLoaderResources. As per
+                    // getResource(), let the other thread "win" and keep the
+                    // entry in the cache. This thread will use a cache entry
+                    // instance that isn't added to the cache.
+                    cacheEntry = newCacheEntry;
+                }
                 // Make sure it is validated
                 cacheEntry.validateResources(useClassLoaderResources);
             }

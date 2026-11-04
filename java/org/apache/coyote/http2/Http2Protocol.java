@@ -327,7 +327,9 @@ public class Http2Protocol implements UpgradeProtocol {
 
 
     /**
-     * Sets the maximum number of concurrent streams.
+     * Sets the maximum number of concurrent streams. The value must be in the range {@code 0} to {@code 2^32-1} (both
+     * inclusive) as this value is advertised to the client as an unsigned 32-bit integer. Values outside of this range
+     * will cause HTTP/2 connections to be rejected.
      *
      * @param maxConcurrentStreams the maximum concurrent streams
      */
@@ -367,7 +369,9 @@ public class Http2Protocol implements UpgradeProtocol {
 
 
     /**
-     * Sets the initial window size advertised to the client.
+     * Sets the initial window size advertised to the client. The value must be in the range {@code 0} to
+     * {@code 2^31-1} (both inclusive) as defined by the HTTP/2 specification. Values outside of this range will cause
+     * HTTP/2 connections to be rejected.
      *
      * @param initialWindowSize the initial window size
      */

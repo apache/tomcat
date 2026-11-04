@@ -35,8 +35,9 @@ import org.xml.sax.SAXException;
 
 /**
  * This class caches parsed instances of TLD files to remove the need for the same TLD to be parsed for each JSP that
- * references it. It does not protect against multiple threads processing the same new TLD, but it does ensure that
- * all threads will use the same TLD object after parsing.
+ * references it. All parsing is performed by a single, shared, non-thread-safe parser that is serialized on that
+ * parser's monitor. Re-parsing of a specific TLD is additionally protected by a per-entry lock so that all threads
+ * will use the same TLD object after parsing.
  */
 public class TldCache {
 
@@ -144,7 +145,13 @@ public class TldCache {
                     // Re-parse TLD
                     TaglibXml updatedTaglibXml;
                     try {
-                        updatedTaglibXml = tldParser.parse(tldResourcePath);
+                        // The parser is shared for all TLDs of this cache and
+                        // is not thread-safe. Re-parses of different TLDs run
+                        // under the per-entry locks may occur concurrently, so
+                        // the parser itself must be locked as well.
+                        synchronized (tldParser) {
+                            updatedTaglibXml = tldParser.parse(tldResourcePath);
+                        }
                     } catch (IOException | SAXException e) {
                         throw new JasperException(e);
                     }
@@ -168,6 +175,12 @@ public class TldCache {
                 // webappPath will be null for JARs containing TLDs that are on
                 // the class path but not part of the web application
                 URL url = servletContext.getResource(tldResourcePath.getWebappPath());
+                if (url == null) {
+                    // The resource has been removed. Return -1 values so that
+                    // the cached entry is seen as out of date and re-parsing
+                    // reports the failure rather than using stale data
+                    return result;
+                }
                 try (CloseableURLConnection conn = new CloseableURLConnection(url)) {
                     result[0] = conn.getLastModified();
                 }

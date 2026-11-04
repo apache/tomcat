@@ -17,7 +17,13 @@
 package org.apache.catalina.valves;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.RequestDispatcher;
@@ -260,6 +266,60 @@ public class TestErrorReportValve extends TomcatBaseTest {
 
         Assert.assertEquals(res.toString(), "OK");
         Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+    }
+
+
+    @Test
+    public void testAcceptLanguageResourceBundleCacheUsage() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        getProgrammaticRootContext();
+
+        tomcat.start();
+
+        int initial = resourceBundleCacheSize();
+
+        final int requests = 20;
+        final int localesPerRequest = 20;
+        for (int i = 0; i < requests; i++) {
+            StringBuilder acceptLanguage = new StringBuilder();
+            for (int j = 0; j < localesPerRequest; j++) {
+                if (acceptLanguage.length() > 0) {
+                    acceptLanguage.append(',');
+                }
+                acceptLanguage.append(fakeLanguageTag(i * localesPerRequest + j));
+            }
+            Map<String,List<String>> reqHead = new HashMap<>();
+            reqHead.put("Accept-Language", Collections.singletonList(acceptLanguage.toString()));
+            ByteChunk res = new ByteChunk();
+            int rc = getUrl("http://localhost:" + getPort() + "/does-not-exist-" + i, res, reqHead, null);
+            Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
+        }
+
+        int delta = resourceBundleCacheSize() - initial;
+        Assert.assertTrue("ResourceBundle cache grew by " + delta + " entries for " +
+                (requests * localesPerRequest) + " unknown request locales", delta < 50);
+    }
+
+
+    private static String fakeLanguageTag(int i) {
+        StringBuilder tag = new StringBuilder("xxxxx");
+        int v = i;
+        for (int k = 4; k >= 0; k--) {
+            tag.setCharAt(k, (char) ('a' + v % 26));
+            v /= 26;
+        }
+        return tag.toString();
+    }
+
+
+    @SuppressWarnings("unchecked")
+    private static int resourceBundleCacheSize() throws Exception {
+        Field field = ResourceBundle.class.getDeclaredField("cacheList");
+        field.setAccessible(true);
+        Map<Object,Object> cache = (Map<Object,Object>) field.get(null);
+        return cache.size();
     }
 
 

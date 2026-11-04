@@ -953,7 +953,7 @@ public class HTMLManagerServlet extends ManagerServlet {
         List<Session> sessions = getSessionsForName(cn, smClient);
         String sortBy = req.getParameter("sort");
         String orderBy = null;
-        if (null != sortBy && !sortBy.trim().isEmpty()) {
+        if (null != sortBy && !sortBy.strip().isEmpty()) {
             Comparator<Session> comparator = getComparator(sortBy);
             if (comparator != null) {
                 orderBy = req.getParameter("order");

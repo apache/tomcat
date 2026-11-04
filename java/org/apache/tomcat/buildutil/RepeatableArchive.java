@@ -109,9 +109,11 @@ public class RepeatableArchive extends Task {
             for (String file : files) {
                 File archive = new File(basedir, file);
                 File oldArchive = new File(basedir, file + ".old");
+                boolean renamed = false;
 
                 try {
                     Files.move(archive.toPath(), oldArchive.toPath(), StandardCopyOption.ATOMIC_MOVE);
+                    renamed = true;
 
                     try (ZipFile oldZipFile = new ZipFile(oldArchive);
                             ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(archive))) {
@@ -125,11 +127,11 @@ public class RepeatableArchive extends Task {
 
                             zipOut.putNextEntry(entry);
 
-                            InputStream is = oldZipFile.getInputStream(oldEntry);
-
-                            int numRead;
-                            while ((numRead = is.read(buf)) >= 0) {
-                                zipOut.write(buf, 0, numRead);
+                            try (InputStream is = oldZipFile.getInputStream(oldEntry)) {
+                                int numRead;
+                                while ((numRead = is.read(buf)) >= 0) {
+                                    zipOut.write(buf, 0, numRead);
+                                }
                             }
                         }
                     }
@@ -139,6 +141,17 @@ public class RepeatableArchive extends Task {
                     }
                     Files.delete(oldArchive.toPath());
                 } catch (IOException ioe) {
+                    // The task did not run to completion for this archive. If the original was
+                    // renamed, restore it rather than leaving the archive in its current, possibly
+                    // truncated, state together with a stray ".old".
+                    try {
+                        if (renamed) {
+                            Files.move(oldArchive.toPath(), archive.toPath(), StandardCopyOption.REPLACE_EXISTING,
+                                    StandardCopyOption.ATOMIC_MOVE);
+                        }
+                    } catch (IOException restoreException) {
+                        ioe.addSuppressed(restoreException);
+                    }
                     throw new BuildException(ioe);
                 }
             }

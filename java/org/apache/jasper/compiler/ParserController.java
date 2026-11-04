@@ -198,7 +198,8 @@ public class ParserController implements TagConstants {
         try {
             absFileName = resolveFileName(inFileName);
         } catch (URISyntaxException e) {
-            err.jspError("jsp.error.invalid.includeInTagFileJar", inFileName, jar.getJarFileURL().toString());
+            // Note: jar may be null here, so avoid referencing it
+            err.jspError("jsp.error.invalid.include", inFileName);
         }
         if (processingTagInJar && !absFileName.startsWith(TAGS_IN_JAR_LOCATION)) {
             /*
@@ -556,8 +557,12 @@ public class ParserController implements TagConstants {
                 index++;
             } while (index < root.length() && Character.isWhitespace(root.charAt(index)));
             if (index < root.length() && (root.charAt(index) == '"' || root.charAt(index) == '\'')) {
+                char quote = root.charAt(index);
                 index++;
-                return root.regionMatches(index, JSP_URI, 0, JSP_URI.length());
+                int end = root.indexOf(quote, index);
+                if (end > index) {
+                    return JSP_URI.equals(root.substring(index, end));
+                }
             }
         }
 
