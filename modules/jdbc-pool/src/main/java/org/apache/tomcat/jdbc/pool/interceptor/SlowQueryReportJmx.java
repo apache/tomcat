@@ -257,17 +257,24 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
 
     /**
      * Called when the connection pool is closed; releases the JMX registration of the pool's name - the MBean and the
-     * broadcaster its clients' listeners are attached to - only once that pool was the last live pool registered under
-     * the name. Both belong to the name and are shared by every live pool of that name, so taking them down while a
-     * survivor is still running would orphan the survivor's monitoring; releasing them on every close but a decided
-     * last one would unregister a shared registration that other closing or live pools still rely on. Whether this
+     * broadcaster its clients' listeners are attached to - once no live pool is registered under the name any more.
+     * Both belong to the name and are shared by every live pool of that name, so taking them down while a
+     * survivor is still running would orphan the survivor's monitoring; releasing them while a survivor still runs
+     * would unregister a shared registration that other closing or live pools still rely on. Whether this
      * close is the last one is decided atomically by {@link SlowQueryReport#releaseStatistics(ConnectionPool)} on the
      * way through {@code super.poolClosed}, so concurrent closes of same-named pools cannot all see a survivor and
      * leave the name registered for ever.
      * <p>
-     * The decision and the release are separate steps, and a pool that starts under the name between them has taken
-     * the name - and the registration still published under it - back; {@link #releaseJmxRegistration(ConnectionPool)}
-     * therefore re-verifies the name before anything is taken down.
+     * {@code ConnectionPool.close()} delivers this callback to a freshly instantiated interceptor per configured
+     * definition, in declaration order, and {@code releaseStatistics} hands the {@code true} signal to whichever
+     * definition happens to run first - which need not be this one. A chain of a base {@link SlowQueryReport}
+     * definition above this one therefore has the base consume the signal and this definition see {@code false}
+     * although the statistics, and with them the last live pool of the name, are already gone. The statistics being
+     * gone is the same signal seen from the other side, so it releases as well; what remains safe is that the
+     * release only ever takes down a registration no live pool of the name holds, because
+     * {@link #releaseJmxRegistration(ConnectionPool)} re-verifies the name before anything is taken down - a pool
+     * that started under the name between the statistics removal and this check has taken the registration back and
+     * owns it from then on.
      * </p>
      *
      * @param pool the connection pool being closed
@@ -276,12 +283,15 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     public void poolClosed(ConnectionPool pool) {
         this.poolName = pool.getName();
         super.poolClosed(pool);
-        if (lastPoolOfNameClosed) {
-            // The statistics of the name were freed by this very close,
-            // so no live pool is registered under it any more - and the
-            // registered MBean, whose delegate may be an interceptor
-            // instance of an already closed pool, goes with them, unless
-            // a pool has taken the name back in the meantime
+        // Either this instance's releaseStatistics call deregistered the
+        // closing pool as the last live pool of the name, or an earlier
+        // definition of this very close consumed that signal and the name's
+        // statistics are already gone - which means no live pool is
+        // registered under it either. In both cases the registered MBean,
+        // whose delegate may be an interceptor instance of an already closed
+        // pool, goes with them, unless a pool has taken the name back in the
+        // meantime - which releaseJmxRegistration re-verifies.
+        if (lastPoolOfNameClosed || getPoolStats(poolName) == null) {
             releaseJmxRegistration(pool);
         }
     }

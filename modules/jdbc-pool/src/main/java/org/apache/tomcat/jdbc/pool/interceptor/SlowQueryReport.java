@@ -283,7 +283,12 @@ public class SlowQueryReport extends AbstractQueryReport {
      * last live pool under its name, meaning everything else registered for that name - the interceptor's MBean and
      * broadcaster, for instance - can and must now be released with it. The deciding
      * {@link #releaseStatistics(ConnectionPool)} call is atomic, so across concurrent closes of same-named pools and
-     * across the interceptor definitions of one close exactly one caller ever sees {@code true}.
+     * across the interceptor definitions of one close exactly one caller ever sees {@code true}. Which one that is
+     * follows only the declaration order of the definitions: {@code ConnectionPool.close()} delivers the callback to
+     * a freshly instantiated interceptor per definition, and the first one consumes the signal, so the definition
+     * that sees {@code true} need not be the one that can act on it - the holder of the name's JMX state, for
+     * instance, sees {@code false} when a base definition is declared above it and must read the gone statistics as
+     * the same signal (see {@link SlowQueryReportJmx#poolClosed(ConnectionPool)}).
      */
     protected boolean lastPoolOfNameClosed = false;
 
