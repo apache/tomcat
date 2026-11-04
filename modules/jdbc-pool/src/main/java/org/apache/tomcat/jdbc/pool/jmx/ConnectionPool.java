@@ -34,6 +34,7 @@ import javax.management.ObjectName;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.PoolConfiguration;
+import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorDefinition;
 import org.apache.tomcat.jdbc.pool.PoolUtilities;
 import org.apache.tomcat.jdbc.pool.Validator;
@@ -47,9 +48,6 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
 
     private static final Log log = LogFactory.getLog(ConnectionPool.class);
 
-    /**
-     * the connection pool
-     */
     protected org.apache.tomcat.jdbc.pool.ConnectionPool pool = null;
     /**
      * sequence for JMX notifications
@@ -73,12 +71,15 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      * The single thread that pool notifications are delivered on. Delivery goes through here rather than running on the
      * thread that reports the condition, because several of the pool's notifications are raised from the connection
      * lifecycle - some of them while holding the lock of the connection concerned - and a monitoring listener that is
-     * slow or blocked must not stall those paths. One worker keeps the notifications in the order the pool raised them;
-     * the bounded queue and the drop on overflow keep a listener that stops draining from growing the queue without
-     * limit. The thread is a daemon, is started on the first notification and dies when it has been idle, so a pool
-     * that never notifies costs nothing, and it never holds up the JVM on shutdown. Shared by every pool MBean in the
-     * JVM: notifications of one pool can queue behind those of another, but a blocked listener then only starves
-     * delivery - the drop above is what a pool's operations feel, not the block.
+     * slow or blocked must not stall those paths. One worker keeps the notifications one reporting thread raised in
+     * the order that thread raised them: the sequence number is stamped on the reporting thread before the hand-off,
+     * so it records the order the notifications were built in, and two threads reporting at the same time can hand off
+     * - and so be delivered - in either order. The bounded queue and the drop on overflow keep a listener that stops
+     * draining from growing the queue without limit. The thread is a daemon, is started on the first notification and
+     * dies when it has been idle, so a pool that never notifies costs nothing, and it never holds up the JVM on
+     * shutdown. Shared by every pool MBean in the JVM: notifications of one pool can queue behind those of another,
+     * but a blocked listener then only starves delivery - the drop above is what a pool's operations feel, not the
+     * block.
      */
     private static final ThreadPoolExecutor NOTIFIER = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS,
             new LinkedBlockingQueue<>(NOTIFY_QUEUE_CAPACITY), r -> {
@@ -88,10 +89,11 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
             });
 
     /**
-     * the ObjectName of this pool, or {@code null} while this MBean is not registered - before its registration and
-     * after its deregistration. Written by the threads that register and deregister the MBean and read by the pool's
-     * own threads, so it is volatile - as it already is on the {@link org.apache.tomcat.jdbc.pool.DataSource} that
-     * publishes this MBean - to make those writes visible to the threads that raise notifications.
+     * the ObjectName of this pool, or {@code null} while this MBean is not registered - before its registration, after
+     * one the server has refused, and after its deregistration. Written by the threads that register and deregister the
+     * MBean and read by the pool's own threads, so it is volatile - as it already is on the
+     * {@link org.apache.tomcat.jdbc.pool.DataSource} that publishes this MBean - to make those writes visible to the
+     * threads that raise notifications.
      */
     private volatile ObjectName oname = null;
 
@@ -137,8 +139,8 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     /**
      * Returns the JMX ObjectName under which this MBean is registered.
      *
-     * @return the JMX ObjectName, or {@code null} while this MBean is not registered - before its registration and
-     *             after its deregistration
+     * @return the JMX ObjectName, or {@code null} while this MBean is not registered - before its registration, after
+     *             one the server has refused, and after its deregistration
      */
     public ObjectName getObjectName() {
         return oname;
@@ -150,8 +152,34 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         return name;
     }
 
+    /**
+     * Drops the registration name when the MBean server did not complete this MBean's registration.
+     * <p>
+     * The server calls {@link #preRegister(MBeanServer, ObjectName)} before it has looked the requested name up in its
+     * repository, so the name stored there can still be refused - the usual reason being another MBean that already
+     * holds it, most often the leftover of a pool that died without deregistering. After refusing a registration the
+     * server runs no {@link #postDeregister()}: per the {@link MBeanRegistration} contract a {@code false}
+     * {@code registrationDone} reports that the registration phase failed, which leaves this callback as the only
+     * chance to undo what {@code preRegister} wrote.
+     * <p>
+     * A name kept through a refusal is a name this MBean never acquired, and both ways it is used then act on a
+     * publication that never happened. The pool's notifications - the pool keeps running - attribute themselves to the
+     * MBean that does answer for that name, while {@link #getNotificationSource()} names the pool as a string
+     * precisely so that an MBean nobody published points at nobody else's name. And the connections, which publish
+     * themselves below {@link #getObjectName()} as soon as their physical session is up, are offered to the server
+     * below a stranger's name: the publish either collides with the children of the MBean that owns that name - a
+     * stale pool MBean holds the very same child names - or, the child name being free, publishes a connection of this
+     * pool into a subtree this pool has no claim to and no release for, at one error log per connection. The name is
+     * also what {@link org.apache.tomcat.jdbc.pool.ConnectionPool#registerConnectionMBeans()} waits for, so the gate
+     * that keeps the connections of an unpublished pool unpublished opens for a name this MBean was refused. The
+     * {@link org.apache.tomcat.jdbc.pool.DataSource} that publishes this MBean gives up its own side of a refused
+     * registration the same way.
+     */
     @Override
     public void postRegister(Boolean registrationDone) {
+        if (!Boolean.TRUE.equals(registrationDone)) {
+            this.oname = null;
+        }
     }
 
     @Override
@@ -215,9 +243,11 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      * and a monitoring listener - or a filter - that is slow or blocked must not reach those paths. The notification
      * itself is still built on the calling thread, so it carries the time, sequence number and serializable source of
      * the condition it reports - see {@link #getNotificationSource()} - and, since the notifier is a single thread and
-     * delivers a notification to all its listeners in one go, every listener observes the notifications in the order
-     * the pool reported them and a listener registered both through JMX and locally is reached through JMX before it
-     * is reached locally, as it was when delivery was synchronous.
+     * delivers a notification to all its listeners in one go, every listener observes the notifications one reporting
+     * thread raised in the order that thread raised them: the sequence number stamped on the calling thread records
+     * that construction order, and notifications two threads raise at the same time may be delivered in either order.
+     * A listener registered both through JMX and locally is reached through JMX before it is reached locally, as it
+     * was when delivery was synchronous.
      *
      * @param type    The notification type
      * @param message The message
@@ -236,12 +266,9 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
             // then the single gate that accepts or refuses it, so the result
             // and the drop log below stay true to what was scheduled - a
             // refusal never means the notification partly reached its
-            // listeners, it means nothing was queued at all. On the notifier
-            // thread the JMX listeners are reached first - the constructor
-            // runs their hand-offs inline, on this thread - and the local
-            // ones next, so a listener registered on both sides is reached
-            // through JMX before it is reached locally, as it was when
-            // delivery was synchronous.
+            // listeners, it means nothing was queued at all. The order the
+            // two halves of the delivery run in is the one the javadoc above
+            // promises.
             NOTIFIER.execute(() -> {
                 try {
                     sendNotification(n);
@@ -279,7 +306,8 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      * may not kill the notifier thread that every pool in the JVM delivers its notifications on, and it may not
      * suppress the delivery of that notification to the listeners registered behind the thrower either. An
      * {@link Error} is not contained - as it is not on the JMX half of the delivery, where the JDK broadcaster catches
-     * only what a listener throws - and takes the notifier thread down; the next notification starts a new one.
+     * only what a listener throws - and takes the notifier thread down; the pool replaces the worker as soon as the
+     * executor notices it is gone, so the next notification is delivered by a live worker.
      *
      * @param n    the notification to deliver
      * @param type the notification type, for the failure log
@@ -289,13 +317,6 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
             try {
                 listener.handleNotification(n, this);
             } catch (Exception x) {
-                // Contained at the listener that threw: the notification
-                // still reaches the listeners behind it and the notifier
-                // thread goes on to the next notification. An Error is left
-                // alone, as on the JMX half of the delivery - the JDK
-                // broadcaster's hand-off catches only a listener's exceptions
-                // - and takes this thread down, to be replaced when the next
-                // notification arrives
                 if (log.isDebugEnabled()) {
                     log.debug("Local notification listener failed. Type=" + type, x);
                 }
@@ -311,7 +332,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      * serializable. This MBean is not, and neither is the pool it wraps, so the source is the {@link ObjectName} the
      * MBean is registered under, which names the pool and is serializable. A pool MBean that is not registered - one
      * that has never been registered, or one the server has taken back while its pool keeps running - has no such
-     * name: the source is then a string of the shape the name would have had.
+     * name: the source is then a string that names the pool.
      *
      * @return the registered ObjectName, or a string naming the pool if the MBean is not registered
      */
@@ -434,9 +455,15 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     }
 
 
+    /**
+     * Returns the connection properties with any credential they carry masked out, so that a read of this attribute
+     * does not hand back in cleartext the password {@link #getPassword()} exists to withhold. The write is not masked:
+     * {@link #setConnectionProperties(String)} takes the string as it is meant to reach the driver, which is the same
+     * read/write asymmetry the password attribute has. {@inheritDoc}
+     */
     @Override
     public String getConnectionProperties() {
-        return getPoolProperties().getConnectionProperties();
+        return PoolProperties.maskCredentials(getPoolProperties().getConnectionProperties());
     }
 
     /**
@@ -480,9 +507,16 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         return getPoolProperties().getInitSQL();
     }
 
+    /**
+     * Returns the interceptor configuration with any credential its definitions carry masked out, so that a read of
+     * this attribute does not hand back in cleartext the password {@link #getPassword()} exists to withhold - the
+     * parameter list of a definition reaches a third-party interceptor as configured, so it is one of the raw strings
+     * an operator may type a credential into. There is no write to mask: {@link #setJdbcInterceptors(String)} refuses
+     * the change on a running pool at all. {@inheritDoc}
+     */
     @Override
     public String getJdbcInterceptors() {
-        return getPoolProperties().getJdbcInterceptors();
+        return PoolProperties.maskInterceptorCredentials(getPoolProperties().getJdbcInterceptors());
     }
 
     @Override
@@ -544,9 +578,15 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         return getPoolProperties().getTimeBetweenEvictionRunsMillis();
     }
 
+    /**
+     * Returns the JDBC URL with any credential it carries masked out, so that a read of this attribute does not hand
+     * back in cleartext the password {@link #getPassword()} exists to withhold. The write is not masked:
+     * {@link #setUrl(String)} takes the URL as it is meant to reach the driver, which is the same read/write asymmetry
+     * the password attribute has. {@inheritDoc}
+     */
     @Override
     public String getUrl() {
-        return getPoolProperties().getUrl();
+        return PoolProperties.maskCredentials(getPoolProperties().getUrl());
     }
 
     @Override
@@ -736,18 +776,23 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     }
 
 
+    /**
+     * @throws UnsupportedOperationException always - whether borrow waits are queued fairly is decided when the pool
+     *             builds its wait queue; set the property before starting the pool
+     */
     @Override
     public void setFairQueue(boolean fairQueue) {
-        // No-op - this pool is already running
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("fairQueue must be set before the pool is started");
     }
 
 
+    /**
+     * @throws UnsupportedOperationException always - the initial size is what the pool pre-loads with when it is
+     *             created; set the property before starting the pool
+     */
     @Override
     public void setInitialSize(int initialSize) {
-        // No-op - this pool is already running
-        throw new UnsupportedOperationException();
-
+        throw new UnsupportedOperationException("initialSize must be set before the pool is started");
     }
 
 
@@ -758,17 +803,24 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     }
 
 
+    /**
+     * @throws UnsupportedOperationException always - the interceptor chain is built when the pool starts and for
+     *             every connection it establishes; set the property before starting the pool
+     */
     @Override
     public void setJdbcInterceptors(String jdbcInterceptors) {
-        // No-op - this pool is already running
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("jdbcInterceptors must be set before the pool is started");
     }
 
 
+    /**
+     * @throws UnsupportedOperationException always - whether the pool registers this MBean at all is decided when the
+     *             pool is created, and a client reaching this setter has reached an MBean whose registration is that
+     *             decision; set the property before starting the pool
+     */
     @Override
     public void setJmxEnabled(boolean jmxEnabled) {
-        // No-op - this pool is already running and obviously jmx enabled
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("jmxEnabled must be set before the pool is started");
     }
 
 
@@ -822,8 +874,24 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      * Sets the password on the running pool's configuration. The write carries the same meaning as
      * {@link org.apache.tomcat.jdbc.pool.DataSourceProxy#setPassword(String)}: the credential also lives among the
      * database properties the driver is given, and a {@code null} password takes it away from there as well, so that
-     * clearing it here really does stop new connections authenticating with it. Connections the pool had already
-     * established reconnect with the credential they were first established with.
+     * clearing it here really does stop new connections authenticating with it.
+     * <p>
+     * No session is signed on again by the write itself, so what a rotation does to the connections the pool had
+     * already established depends on who takes such a connection up again. A borrowed one takes the new password up:
+     * the borrow compares the identity the session carries with the identity configured now and, finding them
+     * different, re-establishes that same connection under the password written here, which is the identity it keeps
+     * from then on. A connection the pool takes up on its own account - an idle one whose
+     * {@link PoolConfiguration#getMaxAge() maxAge} has expired - signs on again with the credential it cached for
+     * itself at its first sign-on rather than with this one, so wherever the two differ the database may refuse that
+     * reconnect; the pool retires such a connection and the next borrow is served by one established under the
+     * password set here. A rotation therefore converges without the operator doing anything, at the price of a
+     * refused sign-on or two on the renewals the pool runs by itself, and it does not leave sessions in service under
+     * a superseded credential.
+     * <p>
+     * To stop presenting the superseded credential now rather than connection by connection, expire the sessions that
+     * still carry it: {@link #purge()} closes the idle connections at once and the busy ones as they come back, while
+     * {@link #purgeOnReturn()} waits for each connection to come back, an idle one no sooner than it has been borrowed
+     * and returned. Whatever the pool establishes after either authenticates with the password set here.
      *
      * @param password the password, or {@code null} to take the credential away
      */
@@ -892,7 +960,6 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      * task that write armed or leave running a task that write made unnecessary.
      */
     private void poolCleanerAttributeUpdated() {
-        // Make sure pool cleaner starts/stops when it should
         pool.reconcilePoolCleaner(getPoolProperties());
     }
 
@@ -916,8 +983,6 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      * from a reading this writer took, is recorded at poolCleanerAttributeUpdated.
      */
     private void poolConfigurationUpdated() {
-        // Make sure the pool is properly configured, and then start, stop or re-arm
-        // the cleaner to match what that correction left the configuration asking for.
         pool.checkPoolConfiguration(getPoolProperties());
         poolCleanerAttributeUpdated();
     }
@@ -944,6 +1009,13 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      * Sets the user name on the running pool's configuration, with the same meaning as
      * {@link org.apache.tomcat.jdbc.pool.DataSourceProxy#setUsername(String)}: a {@code null} user name takes the
      * credential away from the database properties as well as from the configuration.
+     * <p>
+     * What {@link #setPassword(String)} records about connections the pool had already established holds here in
+     * full, because the identity a session serves under is this user name together with that password: the borrow
+     * compares the pair the session carries with the pair configured now and re-establishes the connection under the
+     * new one, while a connection the pool renews on its own account signs on again with the pair it cached at its
+     * first sign-on and is retired when the database refuses it. {@link #purge()} and {@link #purgeOnReturn()} expire
+     * the sessions that still carry the superseded user name, on demand.
      *
      * @param username the user name, or {@code null} to take the credential away
      */
@@ -1092,10 +1164,13 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         return getPoolProperties().isIgnoreExceptionOnPreLoad();
     }
 
+    /**
+     * @throws UnsupportedOperationException always - the flag governs the preload of initial connections the pool
+     *             runs when it is created; set the property before starting the pool
+     */
     @Override
     public void setIgnoreExceptionOnPreLoad(boolean ignoreExceptionOnPreLoad) {
-        // No-op - this pool is already running
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("ignoreExceptionOnPreLoad must be set before the pool is started");
     }
 
     /**

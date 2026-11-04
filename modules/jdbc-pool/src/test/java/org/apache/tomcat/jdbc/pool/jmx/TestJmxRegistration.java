@@ -734,6 +734,95 @@ class TestJmxRegistration extends JdbcPoolBaseTest {
     }
 
     @Test
+    void aRefusedPoolMBeanRegistrationLeavesThePoolMBeanWithoutAName() throws Exception {
+        MBeanServer server = server();
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setJmxEnabled(true);
+        ds.getPoolProperties().setInitialSize(0);
+        ds.createPool();
+        ConnectionPool jmx = ds.getPool().getJmxPool();
+        Assertions.assertNotNull(jmx, "an enabled pool has a JMX wrapper");
+        Assertions.assertNull(jmx.getObjectName(), "this pool is not registered yet");
+
+        // A stale registration holds the name this pool would be published
+        // under - the leftover of a pool that died without deregistering, or
+        // another pool that picked the same name. It is live and reporting.
+        ObjectName dsName = uniqueName("refused-mbean");
+        ObjectName poolOname = ds.createObjectName(dsName);
+        server.registerMBean(new Probe("foreign"), poolOname);
+        BlockingQueue<Notification> delivered = new LinkedBlockingQueue<>();
+        NotificationListener listener = (n, handback) -> delivered.offer(n);
+        try {
+            // The container registers the DataSource, and the pool MBean the
+            // DataSource publishes from its preRegister() is refused that name.
+            // The MBean server calls the pool MBean's own preRegister() before
+            // it looks the name up in its repository, so the wrapper has taken
+            // the name into its registration handle by the time the refusal
+            // happens, and reports it back through postRegister(FALSE) - the
+            // one callback a refused registration still gets, since the server
+            // runs no postDeregister() for a registration it never made.
+            jmx.addListener(listener);
+            ds.preRegister(server, dsName);
+
+            Assertions.assertNull(jmx.getObjectName(),
+                    "a pool MBean whose registration the server refused must drop the name its own"
+                            + " preRegister() stored: this MBean never became the MBean behind that"
+                            + " name, and every user of the handle - the source its notifications"
+                            + " carry, and the connections that publish themselves below it - acts"
+                            + " on a registration it does not have");
+            Assertions.assertEquals("foreign", server.getAttribute(poolOname, "Marker"),
+                    "a refused registration must have left the MBean that owns the name alone");
+
+            // The harm, on the pool's own lifecycle: a connection publishes
+            // itself below whatever name the pool MBean believes it holds, so
+            // the connections of a pool that was never published turn up in
+            // the subtree of the stranger that owns the name.
+            try (Connection con = ds.getConnection()) {
+                Assertions.assertNotNull(con,
+                        "the pool must keep handing out connections while its own MBean cannot be"
+                                + " published");
+                Set<ObjectName> children = publishedFor(server, dsName);
+                children.remove(poolOname);
+                Assertions.assertTrue(children.isEmpty(),
+                        "a connection must not be published below a name the pool was refused:"
+                                + " that subtree belongs to the MBean that owns the name, and the"
+                                + " registrations are refused or collide with its own children"
+                                + " while the pool that made them is not monitored at all");
+            }
+
+            // And the harm on the notifications: an MBean that is not
+            // registered names itself with the string fallback, so that a
+            // listener is not told that a condition of this pool came from the
+            // MBean that owns the refused name.
+            Assertions.assertTrue(jmx.notify(ConnectionPool.POOL_EMPTY,
+                    "reported by a pool whose publication was refused"),
+                    "the notification must be accepted for delivery");
+            Notification n = delivered.poll(30, TimeUnit.SECONDS);
+            Assertions.assertNotNull(n, "the notification was handed off for delivery");
+            Assertions.assertFalse(poolOname.equals(n.getSource()),
+                    "a notification of a pool MBean whose registration was refused must not"
+                            + " attribute itself to the refused name: listeners take the source as"
+                            + " the address of the MBean that reported the condition, and this MBean"
+                            + " is not the one published there");
+            Assertions.assertInstanceOf(String.class, n.getSource(),
+                    "an unregistered pool MBean reports the condition as the string the name would"
+                            + " have had, which is what an MBean that was never published has");
+        } finally {
+            jmx.removeListener(listener);
+            ds.close();
+            ds.postDeregister();
+            if (server.isRegistered(poolOname)) {
+                server.unregisterMBean(poolOname);
+            }
+            // test hygiene: take away anything a regression would have left
+            // published below the name the foreign MBean holds
+            for (ObjectName stale : publishedFor(server, dsName)) {
+                server.unregisterMBean(stale);
+            }
+        }
+    }
+
+    @Test
     void aPoolThreadRaisesItsNotificationUnderTheNameTheRegistrationPublished() throws Exception {
         MBeanServer server = server();
         DataSource ds = newDataSource();
