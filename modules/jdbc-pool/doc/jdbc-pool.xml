@@ -763,6 +763,12 @@
        instead of closing it, as a <code>StatementCache</code> beneath this
        interceptor does.
     </p>
+    <p>The tracking covers the statements created through the pooled connection
+       handle. A statement created on the driver&#8217;s own connection &#8211; the
+       object <code>Connection.unwrap(Connection.class)</code> hands back &#8211;
+       never reaches this interceptor, so it is neither tracked nor closed when
+       the connection is returned to the pool.
+    </p>
     <attributes>
       <attribute name="trace" required="false">
         <p>(boolean as String) Enable tracing of unclosed statements.
