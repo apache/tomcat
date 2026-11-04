@@ -130,8 +130,12 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
             // The connection return drained the list before this statement
             // could be registered, so the return's renewed close cannot find
             // it; close it here rather than leave it open on a session that
-            // is about to serve the next borrower.
-            entry.close();
+            // is about to serve the next borrower. There is no later
+            // attempt to make, so a failure is what the operator hears.
+            if (!entry.close()) {
+                log.warn(MessageFactory.get("statementFinalizer.unableToCloseStatement"),
+                        entry.getAllocationStack());
+            }
             return tracked;
         }
         try {
@@ -162,8 +166,23 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
         }
         // Closing a statement can block on the database, so it happens
         // outside the lock that guards the list.
+        List<StatementEntry> failed = null;
         for (StatementEntry entry : unclosed) {
-            entry.close();
+            if (!entry.close()) {
+                if (failed == null) {
+                    failed = new ArrayList<>();
+                }
+                failed.add(entry);
+            }
+        }
+        if (failed != null) {
+            // A close the driver refused is retried, the same way a close
+            // that fails through the application's handle is kept for this
+            // return to retry: back on the list, the entries wait for the
+            // next attempt, which the reset at the next borrow makes.
+            synchronized (statementsLock) {
+                statements.addAll(failed);
+            }
         }
     }
 
@@ -179,12 +198,29 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
 
     @Override
     public void reset(ConnectionPool parent, PooledConnection con) {
+        List<StatementEntry> left = null;
         synchronized (statementsLock) {
             // A new borrow starts here (or the instance goes out of
             // service): statements created from now on are accepted into
             // the list again.
             returnDrained = false;
-            statements.clear();
+            if (!statements.isEmpty()) {
+                left = new ArrayList<>(statements);
+                statements.clear();
+            }
+        }
+        // On a teardown (no connection) the physical close that precedes
+        // the reset has already released the statements. On a borrow the
+        // session is about to serve again, so an entry a failed return-time
+        // close left behind gets its last attempt here, before the new
+        // borrower is handed the session.
+        if (left != null && con != null) {
+            for (StatementEntry entry : left) {
+                if (!entry.close()) {
+                    log.warn(MessageFactory.get("statementFinalizer.unableToCloseStatement"),
+                            entry.getAllocationStack());
+                }
+            }
         }
         super.reset(parent, con);
     }
@@ -231,8 +267,11 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
 
         /**
          * Closes the tracked statement, reporting failure the same way the connection return does.
+         *
+         * @return <code>true</code> if the statement is closed - because it was found closed or because the close
+         *         succeeded; <code>false</code> if an attempted close failed and the statement may still be open
          */
-        public void close() {
+        public boolean close() {
             boolean shallClose = false;
             try {
                 shallClose = !statement.isClosed();
@@ -242,9 +281,11 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
                 // may still hold server-side state.
                 shallClose = true;
             }
+            boolean closed = !shallClose;
             if (shallClose) {
                 try {
                     statement.close();
+                    closed = true;
                 } catch (Exception ignore) {
                     if (log.isDebugEnabled()) {
                         log.debug("Unable to close statement upon connection close.", ignore);
@@ -254,6 +295,7 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
             if (logCreationStack && shallClose) {
                 log.warn(MessageFactory.get("statementFinalizer.statementNotClosed"), allocationStack);
             }
+            return closed;
         }
     }
 

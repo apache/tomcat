@@ -467,6 +467,138 @@ class TestStatementFinalizer extends JdbcPoolBaseTest {
         Assertions.assertEquals(0, tracked(finalizer));
     }
 
+    /*
+     * A fake statement whose close is always refused by the driver, while
+     * isClosed() honestly says it never closed.
+     */
+    private static Statement fakedRefusingStatement() {
+        return (Statement) Proxy.newProxyInstance(
+                TestStatementFinalizer.class.getClassLoader(),
+                new Class<?>[] { Statement.class },
+                (p, m, a) -> {
+                    switch (m.getName()) {
+                        case "close":
+                            throw new SQLException("driver refuses to close");
+                        case "isClosed":
+                            return Boolean.FALSE;
+                        case "equals":
+                            return Boolean.valueOf(p == (a == null || a.length == 0 ? null : a[0]));
+                        case "hashCode":
+                            return Integer.valueOf(System.identityHashCode(p));
+                        default:
+                            return null;
+                    }
+                });
+    }
+
+    @Test
+    void aCloseTheDriverRefusedStaysOnTheListForANextAttempt() throws Exception {
+        // A return-time close the driver refused must not be dropped: the
+        // session goes back to the pool and the statement would sit open on
+        // it with no later attempt, contradicting what the proxy does for a
+        // close that fails through the application's handle (keep the entry,
+        // let the return retry).
+        StatementFinalizer finalizer = new StatementFinalizer();
+        Method create = Connection.class.getMethod("createStatement");
+
+        finalizer.reset(null, null);
+        Statement refusing = fakedRefusingStatement();
+        finalizer.createStatement(null, create, null, refusing, 0L);
+
+        finalizer.closeInvoked(); // the return tries, and the driver refuses
+        Assertions.assertEquals(1, tracked(finalizer),
+                "a close that failed must stay on the list - the next borrow's reset makes another attempt");
+
+        // A teardown carries no live session: the physical close that runs
+        // before the teardown reset has released the statement, so the reset
+        // drops the list without another attempt.
+        finalizer.reset(null, null);
+        Assertions.assertEquals(0, tracked(finalizer),
+                "a teardown drops the list; the statements die with the destroyed session");
+    }
+
+    private DataSource finalizerPoolGated() {
+        DataSource ds = finalizerPool();
+        ds.getPoolProperties().setJdbcInterceptors(StatementFinalizer.class.getName() + ';'
+                + StatementGateInterceptor.class.getName());
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setMaxIdle(1);
+        return ds;
+    }
+
+    @Test
+    void aFailedReturnTimeCloseIsRetriedBeforeTheNextBorrowerUsesTheSession() throws Exception {
+        // A driver close that fails once at the return - a transient failure
+        // is the realistic case - is retried when the session is next
+        // borrowed, before that borrower can inherit the open statement.
+        DataSource ds = finalizerPoolGated();
+        ds.createPool();
+
+        Connection first = ds.getConnection();
+        setSessionMarker(first, 21);
+        StatementFinalizer finalizer = interceptorOf(first, StatementFinalizer.class);
+        Assertions.assertNotNull(finalizer);
+
+        StatementGateInterceptor.failFirstClose();
+        first.createStatement(); // its first close is refused
+        Statement rawLeaked = StatementGateInterceptor.lastRaw;
+        StatementGateInterceptor.disarm();
+
+        first.close(); // the return tries the close once; the failure must not fail the return
+        Assertions.assertEquals(1, tracked(finalizer),
+                "the refused close must be kept for another attempt");
+        Assertions.assertFalse(rawLeaked.isClosed(),
+                "precondition: the refused close left the driver statement open");
+
+        Connection second = ds.getConnection();
+        try {
+            Assertions.assertEquals(Integer.valueOf(21), sessionMarker(second),
+                    "precondition: the same physical session, same interceptor instance");
+            Assertions.assertSame(finalizer, interceptorOf(second, StatementFinalizer.class));
+            Assertions.assertTrue(rawLeaked.isClosed(),
+                    "the retry at the borrow must have closed the driver statement before this "
+                            + "borrower runs");
+            Assertions.assertEquals(0, tracked(finalizer),
+                    "the successful retry leaves nothing behind");
+        } finally {
+            second.close();
+        }
+    }
+
+    @Test
+    void aCloseThatNeverSucceedsIsGivenItsLastAttemptAtTheNextBorrow() throws Exception {
+        // A driver that cannot close at all must not grow the list across
+        // borrows: the reset at the next borrow is the last attempt, the
+        // pool says so at warn level, and the pool keeps serving.
+        DataSource ds = finalizerPoolGated();
+        ds.createPool();
+
+        Connection first = ds.getConnection();
+        StatementFinalizer finalizer = interceptorOf(first, StatementFinalizer.class);
+        Assertions.assertNotNull(finalizer);
+
+        StatementGateInterceptor.failCloses();
+        first.createStatement(); // every close of it is refused
+        Statement rawLeaked = StatementGateInterceptor.lastRaw;
+        StatementGateInterceptor.disarm();
+
+        first.close();
+        Assertions.assertEquals(1, tracked(finalizer), "the refused close waits for the retry");
+        Assertions.assertFalse(rawLeaked.isClosed(),
+                "precondition: the refused close left the driver statement open");
+
+        Connection second = ds.getConnection();
+        try {
+            Assertions.assertEquals(0, tracked(finalizer),
+                    "the retry at the borrow is final - a permanently refusing driver must not "
+                            + "accumulate entries across borrows");
+            Assertions.assertFalse(rawLeaked.isClosed(), "precondition: the driver never took the close");
+        } finally {
+            second.close();
+        }
+        Assertions.assertEquals(0, tracked(finalizer), "the next return of an empty list stays empty");
+    }
+
     @Test
     void aCreateStillInFlightWhileTheConnectionIsReturnedDoesNotReachTheNextBorrower() throws Exception {
         // The same interleaving through the whole chain and a real driver:
@@ -526,6 +658,9 @@ class TestStatementFinalizer extends JdbcPoolBaseTest {
         creator.join(AWAIT_TIMEOUT_MS);
         Assertions.assertFalse(creator.isAlive(), "the prepare completed within the timeout");
         Assertions.assertNull(failure.get(), "the in-flight create must not fail: " + failure.get());
+        Assertions.assertNotNull(holder.get(), "precondition: the late create completed");
+        Statement rawLate = StatementGateInterceptor.lastRaw;
+        Assertions.assertNotNull(rawLate, "precondition: the late create reached the driver");
         Assertions.assertEquals(0, tracked(finalizer),
                 "the create that landed behind the drain must not sit on the tracker - no later return "
                         + "will ever read it");
@@ -536,9 +671,7 @@ class TestStatementFinalizer extends JdbcPoolBaseTest {
         Assertions.assertNull(closeFailure.get(), "the return must not fail: " + closeFailure.get());
         StatementGateInterceptor.disarm();
 
-        PreparedStatement inFlight = holder.get();
-        Assertions.assertNotNull(inFlight);
-        Assertions.assertTrue(inFlight.isClosed(),
+        Assertions.assertTrue(rawLate.isClosed(),
                 "the statement that raced the return must be closed where it registers, not left "
                         + "open on the session that goes back to the pool");
         Assertions.assertEquals(0, tracked(finalizer),
@@ -550,10 +683,11 @@ class TestStatementFinalizer extends JdbcPoolBaseTest {
                     "precondition: the same physical session serves the next borrower");
             Assertions.assertEquals(0, tracked(interceptorOf(second, StatementFinalizer.class)),
                     "the next borrow must start with an empty tracker");
-            try (ResultSet rs = inFlight.executeQuery()) {
-                Assertions.fail("the leaked statement still executes: " + (rs.next() ? rs.getInt(1) : "?"));
+            try (ResultSet rs = ((PreparedStatement) rawLate).executeQuery()) {
+                Assertions.fail("the statement that raced the return still executes: "
+                        + (rs.next() ? rs.getInt(1) : "?"));
             } catch (SQLException expected) {
-                // closed statements refuse use - the point of the assertion
+                // a closed statement refuses use - the point of the assertion
             }
         } finally {
             second.close();
@@ -574,13 +708,27 @@ class TestStatementFinalizer extends JdbcPoolBaseTest {
         private static volatile CountDownLatch closeParked;
         private static volatile CountDownLatch closeRelease;
         private static final AtomicBoolean closeHoldTaken = new AtomicBoolean();
+        private static final AtomicBoolean failFirstCloseArmed = new AtomicBoolean();
+        private static final AtomicBoolean firstFailTaken = new AtomicBoolean();
+        private static volatile boolean failClosesArmed;
         private static volatile String createHoldThread;
         private static volatile CountDownLatch createEntered;
         private static volatile CountDownLatch createRelease;
+        /* The driver's own statement behind the most recently wrapped one. */
+        static volatile Statement lastRaw;
 
         static void holdFirstClose() {
             closeHoldTaken.set(false);
             holdFirstCloseArmed.set(true);
+        }
+
+        static void failFirstClose() {
+            firstFailTaken.set(false);
+            failFirstCloseArmed.set(true);
+        }
+
+        static void failCloses() {
+            failClosesArmed = true;
         }
 
         static void parkFirstCloseOnReturn(CountDownLatch parked, CountDownLatch release) {
@@ -602,6 +750,9 @@ class TestStatementFinalizer extends JdbcPoolBaseTest {
             createRelease = null;
             holdFirstCloseArmed.set(false);
             closeHoldTaken.set(false);
+            failFirstCloseArmed.set(false);
+            firstFailTaken.set(false);
+            failClosesArmed = false;
         }
 
         @Override
@@ -625,11 +776,15 @@ class TestStatementFinalizer extends JdbcPoolBaseTest {
             Object result = super.invoke(proxy, method, args);
             if (isCreate && result instanceof Statement) {
                 boolean parkItsClose = holdFirstCloseArmed.get() && closeHoldTaken.compareAndSet(false, true);
+                boolean failItsFirstClose = failFirstCloseArmed.get() && firstFailTaken.compareAndSet(false, true);
+                boolean failItsCloses = failClosesArmed;
                 Statement created = (Statement) result;
+                lastRaw = created;
                 Class<?> iface = created instanceof CallableStatement ? CallableStatement.class
                         : created instanceof PreparedStatement ? PreparedStatement.class : Statement.class;
                 return Proxy.newProxyInstance(StatementGateInterceptor.class.getClassLoader(),
-                        new Class<?>[] { iface }, new StatementGate(created, parkItsClose));
+                        new Class<?>[] { iface },
+                        new StatementGate(created, parkItsClose, failItsFirstClose, failItsCloses));
             }
             return result;
         }
@@ -637,22 +792,35 @@ class TestStatementFinalizer extends JdbcPoolBaseTest {
         static class StatementGate implements InvocationHandler {
             private final Statement delegate;
             private final boolean parkClose;
+            private final boolean failFirstClose;
+            private final boolean failCloses;
             private final AtomicBoolean closeParkedOnce = new AtomicBoolean();
+            private final AtomicBoolean closeFailedOnce = new AtomicBoolean();
 
-            StatementGate(Statement delegate, boolean parkClose) {
+            StatementGate(Statement delegate, boolean parkClose, boolean failFirstClose, boolean failCloses) {
                 this.delegate = delegate;
                 this.parkClose = parkClose;
+                this.failFirstClose = failFirstClose;
+                this.failCloses = failCloses;
             }
 
             @Override
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                if ("close".equals(method.getName()) && parkClose && closeParkedOnce.compareAndSet(false, true)) {
-                    CountDownLatch parked = closeParked;
-                    CountDownLatch release = closeRelease;
-                    if (parked != null) {
-                        parked.countDown();
-                        if (release != null) {
-                            release.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+                if ("close".equals(method.getName())) {
+                    if (failCloses) {
+                        throw new SQLException("gate refuses to close the statement");
+                    }
+                    if (failFirstClose && closeFailedOnce.compareAndSet(false, true)) {
+                        throw new SQLException("gate refuses the first close of the statement");
+                    }
+                    if (parkClose && closeParkedOnce.compareAndSet(false, true)) {
+                        CountDownLatch parked = closeParked;
+                        CountDownLatch release = closeRelease;
+                        if (parked != null) {
+                            parked.countDown();
+                            if (release != null) {
+                                release.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+                            }
                         }
                     }
                 }
