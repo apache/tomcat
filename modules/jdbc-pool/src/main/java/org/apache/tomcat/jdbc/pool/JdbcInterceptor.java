@@ -265,8 +265,12 @@ public abstract class JdbcInterceptor implements InvocationHandler {
      * if they keep static variables or other tracking means around. <b>This method is only invoked on a single instance
      * of the interceptor, and not on every instance created.</b> That instance is a throwaway created solely for this
      * notification: it shares no state with the instances in any connection's chain, so any state this hook needs must
-     * be static or keyed on the pool. An exception thrown here is logged at debug level and otherwise ignored; the pool
-     * close continues.
+     * be static or keyed on the pool. The callback is delivered for every definition the pool told about its
+     * {@link #poolStarted(ConnectionPool) start}, whatever the interceptor configuration lists by the time the pool
+     * closes, and additionally for any definition the configuration has gained since the start. An override that
+     * registers state at the start must therefore find its release delivered even after its definition has been
+     * removed from a live pool's configuration, and must tolerate a delivery it did not pair with its own start. An
+     * exception thrown here is logged at debug level and otherwise ignored; the pool close continues.
      *
      * @param pool - the pool that is being closed.
      */
