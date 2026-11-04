@@ -107,42 +107,36 @@ public class OpenSSLLibrary {
     static final DHParam[] dhParameters = new DHParam[6];
 
     private static void initDHParameters() {
-        var dh = DH_new();
-        var p = BN_get_rfc3526_prime_8192(MemorySegment.NULL);
-        var g = BN_new();
-        BN_set_word(g, 2);
-        DH_set0_pqg(dh, p, MemorySegment.NULL, g);
-        dhParameters[0] = new DHParam(dh, 6145);
-        dh = DH_new();
-        p = BN_get_rfc3526_prime_6144(MemorySegment.NULL);
-        g = BN_new();
-        BN_set_word(g, 2);
-        DH_set0_pqg(dh, p, MemorySegment.NULL, g);
-        dhParameters[1] = new DHParam(dh, 4097);
-        dh = DH_new();
-        p = BN_get_rfc3526_prime_4096(MemorySegment.NULL);
-        g = BN_new();
-        BN_set_word(g, 2);
-        DH_set0_pqg(dh, p, MemorySegment.NULL, g);
-        dhParameters[2] = new DHParam(dh, 3073);
-        dh = DH_new();
-        p = BN_get_rfc3526_prime_3072(MemorySegment.NULL);
-        g = BN_new();
-        BN_set_word(g, 2);
-        DH_set0_pqg(dh, p, MemorySegment.NULL, g);
-        dhParameters[3] = new DHParam(dh, 2049);
-        dh = DH_new();
-        p = BN_get_rfc3526_prime_2048(MemorySegment.NULL);
-        g = BN_new();
-        BN_set_word(g, 2);
-        DH_set0_pqg(dh, p, MemorySegment.NULL, g);
-        dhParameters[4] = new DHParam(dh, 1025);
-        dh = DH_new();
-        p = BN_get_rfc2409_prime_1024(MemorySegment.NULL);
-        g = BN_new();
-        BN_set_word(g, 2);
-        DH_set0_pqg(dh, p, MemorySegment.NULL, g);
-        dhParameters[5] = new DHParam(dh, 0);
+        dhParameters[0] = createDHParam(BN_get_rfc3526_prime_8192(MemorySegment.NULL), 6145);
+        dhParameters[1] = createDHParam(BN_get_rfc3526_prime_6144(MemorySegment.NULL), 4097);
+        dhParameters[2] = createDHParam(BN_get_rfc3526_prime_4096(MemorySegment.NULL), 3073);
+        dhParameters[3] = createDHParam(BN_get_rfc3526_prime_3072(MemorySegment.NULL), 2049);
+        dhParameters[4] = createDHParam(BN_get_rfc3526_prime_2048(MemorySegment.NULL), 1025);
+        dhParameters[5] = createDHParam(BN_get_rfc2409_prime_1024(MemorySegment.NULL), 0);
+    }
+
+    private static DHParam createDHParam(MemorySegment p, int min) {
+        MemorySegment dh = MemorySegment.NULL;
+        MemorySegment g = MemorySegment.NULL;
+        try {
+            dh = DH_new();
+            g = BN_new();
+            if (MemorySegment.NULL.equals(dh) || MemorySegment.NULL.equals(p) || MemorySegment.NULL.equals(g) ||
+                    BN_set_word(g, 2) == 0 || DH_set0_pqg(dh, p, MemorySegment.NULL, g) == 0) {
+                throw new IllegalStateException(sm.getString("openssllibrary.errMakeDHParameters", getLastError()));
+            }
+            // DH_set0_pqg() has taken ownership of both BIGNUMs. From this point, only DH_free() may free them.
+            p = MemorySegment.NULL;
+            g = MemorySegment.NULL;
+            DHParam result = new DHParam(dh, min);
+            dh = MemorySegment.NULL;
+            return result;
+        } finally {
+            // On failure free the values whose ownership was not transferred, including if DHParam creation fails.
+            BN_free(p);
+            BN_free(g);
+            DH_free(dh);
+        }
     }
 
     private static void freeDHParameters() {
