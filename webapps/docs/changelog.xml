@@ -495,6 +495,15 @@
   </subsection>
   <subsection name="Coyote">
     <changelog>
+      <fix>
+        Use the <code>certificateChainFile</code> only if the PEM certificate
+        file (all TLS implementations) or the PKCS#12 bundle (OpenSSL FFM
+        implementation) contains the server certificate alone. If it already
+        contains the certificate chain, the <code>certificateChainFile</code>
+        is ignored. The OpenSSL FFM implementation now sends the intermediate
+        certificates of a PEM certificate file or a PKCS#12 bundle to the
+        client. (markt)
+      </fix>
       <update>
         Change the default value of the <code>cookiesWithoutEquals</code>
         attribute of the <code>Rfc6265CookieProcessor</code> from
@@ -605,6 +614,23 @@
         the stream is closed in the other direction. (remm)
       </fix>
       <fix>
+        The JSON parser now accepts numbers that have an exponent but no
+        fraction, such as <code>1e5</code>, as required by RFC 8259. Note that
+        when the lenient dialect is used, a bare object key that is such a
+        number (for example <code>{1e5:1}</code>) is now a number and the key
+        is the string form of the parsed number (<code>1E+5</code>) rather than
+        the original text, as already happened for bare keys that have both a
+        fraction and an exponent. Quoted keys are not affected. Numbers with an
+        exponent that is too large or too small to be represented are now
+        rejected with a <code>ParseException</code> rather than an unchecked
+        <code>NumberFormatException</code>. (remm)
+      </fix>
+      <fix>
+        With native numbers enabled, the JSON parser now returns integers that
+        do not fit in a <code>long</code> as <code>BigInteger</code> rather than
+        failing with an unchecked <code>NumberFormatException</code>. (remm)
+      </fix>
+      <fix>
         The JSON parser now rejects input with a nesting depth greater than
         1000 with a <code>ParseException</code>. Previously, deeply nested
         input caused a <code>StackOverflowError</code> since the parser
@@ -681,6 +707,10 @@
         a frame size reduction. Check the encoded payload against the peer's
         frame size limit before writing it and close the connection with an
         <code>INTERNAL_ERROR</code> if a header block can not be written. (markt)
+      </fix>
+      <fix>
+        <bug>70305</bug>: Move callback registrations in FFM code to the
+        SSL context. (remm)
       </fix>
     </changelog>
   </subsection>
@@ -824,6 +854,11 @@
         <code>BeanELResolver</code> from resolving bean-style properties (such
         as <code>isValid()</code>) on a <code>Record</code>. (markt)
       </fix>
+      <fix>
+        Fix a JAR file handle leak when a tag file specifies an unsupported
+        <code>pageEncoding</code>. Close the input stream if reader creation
+        fails so that its reference to the JAR is released. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
@@ -894,6 +929,13 @@
         client with UTF-8 by default rather than ISO-8859-1, and reject
         challenges that specify a charset other than UTF-8, the only value
         RFC 7617 allows. (remm)
+      </fix>
+      <fix>
+        Fix the entries returned by
+        <code>CaseInsensitiveKeyMap.entrySet()</code> so they implement the
+        <code>Map.Entry</code> <code>equals()</code> and <code>hashCode()</code>
+        contracts. This map backs the WebSocket handshake request and response
+        header maps. Pull request <pr>1075</pr> provided by breken-ai. (markt)
       </fix>
     </changelog>
   </subsection>

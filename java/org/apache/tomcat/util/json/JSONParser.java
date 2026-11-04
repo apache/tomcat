@@ -448,10 +448,16 @@ public class JSONParser implements JSONParserConstants {
                         }
                     }
                 } else {
-                    {
-                        if ("" != null) {
-                            return new java.math.BigDecimal(t.image);
+                    try {
+                        {
+                            if ("" != null) {
+                                return new java.math.BigDecimal(t.image);
+                            }
                         }
+                    } catch (NumberFormatException nfe) {
+                        // The grammar admits exponents that BigDecimal can't represent. Report them as a parse
+                        // error rather than letting an unchecked exception escape the parser.
+                        throw new ParseException("Exponent out of range in number [" + t.image + "]");
                     }
                 }
                 break;
