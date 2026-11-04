@@ -164,6 +164,14 @@ public class Ranges {
 
         SkipResult skipResult;
         do {
+            // Empty list elements must be ignored (RFC 9110, section 5.6.1.2)
+            while ((skipResult = HttpParser.skipConstant(input, ",")) == SkipResult.FOUND) {
+                // Skip
+            }
+            if (skipResult == SkipResult.EOF) {
+                break;
+            }
+
             long start;
             long end;
             try {
@@ -195,6 +203,11 @@ public class Ranges {
                 return null;
             }
         } while (skipResult == SkipResult.FOUND);
+
+        if (entries.isEmpty()) {
+            // The list contained empty elements only
+            return null;
+        }
 
         return new Ranges(units, entries);
     }
