@@ -840,10 +840,13 @@ public class CoyoteAdapter implements Adapter {
                     }
                 }
             }
-            if (header != null) {
+            if (header == null) {
+                // No header, means no wrapper which means no matching resource so need to return 404.
+                response.sendError(404);
+            } else {
                 res.addHeader("Allow", header.toString());
+                response.sendError(405, sm.getString("coyoteAdapter.trace"));
             }
-            response.sendError(405, sm.getString("coyoteAdapter.trace"));
             // Safe to skip the remainder of this method.
             return true;
         }
