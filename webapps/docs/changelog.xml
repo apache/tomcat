@@ -602,6 +602,11 @@
         keeps the parameters of each tag to itself and never touches page
         scope attributes. (remm)
       </fix>
+      <fix>
+        Fix a JAR file handle leak when a tag file specifies an unsupported
+        <code>pageEncoding</code>. Close the input stream if reader creation
+        fails so that its reference to the JAR is released. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
