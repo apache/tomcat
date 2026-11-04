@@ -31,6 +31,9 @@ import org.junit.runners.Parameterized.Parameter;
 @RunWith(Parameterized.class)
 public class TestUpgrade {
 
+    private static final Integer ZERO = Integer.valueOf(0);
+    private static final Integer ONE = Integer.valueOf(1);
+    private static final Integer TWO = Integer.valueOf(2);
     private static final Integer FOUR = Integer.valueOf(4);
 
     @Parameterized.Parameters(name = "{index}: headers[{0}]")
@@ -57,8 +60,24 @@ public class TestUpgrade {
         // Make final version a non-token
         parameterSets.add(new Object[] { Arrays.asList(new String[] { "HTTP/2.0", "SHTTP/1.3", "IRC/6.9", "RTA/x}11" }), null} );
 
+        // Empty list elements must be ignored (RFC 9110, section 5.6.1.2)
+        parameterSets.add(new Object[] { Arrays.asList(new String[] { "HTTP/2.0,, SHTTP/1.3" }), TWO } );
+        parameterSets.add(new Object[] { Arrays.asList(new String[] { "HTTP/2.0, , SHTTP/1.3" }), TWO } );
+        parameterSets.add(new Object[] { Arrays.asList(new String[] { ", HTTP/2.0, SHTTP/1.3" }), TWO } );
+        parameterSets.add(new Object[] { Arrays.asList(new String[] { "HTTP/2.0, SHTTP/1.3," }), TWO } );
+        parameterSets.add(new Object[] { Arrays.asList(new String[] { "HTTP/2.0, SHTTP/1.3, , " }), TWO } );
+
+        // A separate Upgrade header that reduces to an empty list once empty
+        // list elements are discarded must not invalidate a header that
+        // names a real protocol (RFC 9110, section 5.6.1.2)
+        parameterSets.add(new Object[] { Arrays.asList(new String[] { "websocket", ",," }), ONE } );
+        parameterSets.add(new Object[] { Arrays.asList(new String[] { ",,", "websocket" }), ONE } );
+
         // Empty header isn't valid
         parameterSets.add(new Object[] { Arrays.asList(new String[] { "" }), null } );
+
+        // No Upgrade header at all is not an error; it is simply not present
+        parameterSets.add(new Object[] { Collections.<String>emptyList(), ZERO } );
 
         // Nulls shouldn't happen but check they are treated as invalid to be safe
         parameterSets.add(new Object[] { Arrays.asList(new String[] { null }), null } );
