@@ -284,7 +284,7 @@ public class TestThreadPoolExecutor {
         ThreadPoolExecutor pool = new ThreadPoolExecutor(1, 1, 60, TimeUnit.SECONDS, queue,
                 Executors.defaultThreadFactory());
         queue.setParent(pool);
-        FutureTask<Void> cancelled = new FutureTask<>(() -> null) {
+        FutureTask<Void> cancelled = new FutureTask<Void>(() -> null) {
             @Override
             public boolean isCancelled() {
                 // The worker processes the cancelled future before starting the second task.
