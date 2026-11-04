@@ -856,7 +856,7 @@
     </attributes>
   </subsection>
   <subsection name="org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport">
-    <p>Keeps track of query performance and issues log entries when queries exceed a time threshold of fail.
+    <p>Keeps track of query performance and issues log entries when queries exceed a time threshold or fail.
        The log level used is <code>WARN</code>
     </p>
     <attributes>

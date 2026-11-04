@@ -1305,6 +1305,24 @@
         and every lookup of them resolves through that record, so a rename
         changes what the pool calls itself and nothing else. (remm)
       </fix>
+      <fix>
+        The <code>SlowQueryReportJmx</code> interceptor now publishes a
+        small, pool-independent resource as the MBean for a pool name,
+        instead of publishing the borrowing connection's own interceptor
+        instance. That instance holds the connection, the pool and the
+        pool's properties, so as long as the MBean was registered the JVM
+        could not reclaim a pool that had been abandoned without being
+        closed - a pool leaked this way kept its connections, its
+        statistics and its MBean alive for the life of the JVM, and a
+        pool that was never closed never released the name either. The
+        MBean also showed the name of whichever pool had borrowed first,
+        and its statistics and <code>resetStats()</code> operation acted
+        on that pool's state long after it had been replaced under the
+        name. The published MBean now resolves the pool currently using
+        its name, so it reports that pool, and an abandoned pool is
+        collected once nothing else refers to it, with its name released
+        by the next pool that takes it over. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

@@ -45,12 +45,15 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  * Slow query report interceptor. Tracks timing of query executions.
  * <p>
  * The statistics are published under the pool <em>name</em> (see {@link #getPoolStats(String)}), registered when a pool
- * starts and released when the last live pool registered under that name closes. The name is the one the pool started
- * with - see {@link ConnectionPool#getRegistrationName()} - so renaming a running pool, which the pool's own JMX
- * allows, neither detaches the pool from its statistics nor strands what its start published. Pools configured with
+ * starts and released when the last live pool registered under that name closes. A definition added to a pool that has
+ * already started registers nothing - there is no start left for the registration to happen at - so its instances
+ * resolve no store and record nothing, which is what the warning they write describes. The name is the one the pool
+ * started with - see {@link ConnectionPool#getRegistrationName()} - so renaming a running pool, which the pool's own
+ * JMX allows, neither detaches the pool from its statistics nor strands what its start published. Pools configured with
  * the same name -
- * possible with {@code jmxEnabled=false}, which removes the JMX ObjectName clash that would otherwise catch it -
- * therefore share one statistics map; closing one of them never takes the shared statistics away from the others. The
+ * possible with {@code jmxEnabled=false}, and reachable with JMX enabled as well, since the ObjectName clash that
+ * then arises is reported as a failed MBean registration and does not stop the second pool from starting - therefore
+ * share one statistics map; closing one of them never takes the shared statistics away from the others. The
  * live-pool registration holds the pool weakly: a pool abandoned without closing is never pinned by it and can be
  * collected with its open sessions, leaving only the bounded statistics map under its name until a same-named close
  * releases it.
@@ -69,29 +72,56 @@ public class SlowQueryReport extends AbstractQueryReport {
     private static final Log log = LogFactory.getLog(SlowQueryReport.class);
 
     /**
+     * The name of the property that configures {@link #setThreshold(long)}. The property names are spelled once each,
+     * here: {@link #setProperties(java.util.Map)} applies them and {@link #isKnownProperty(String)} reports the names
+     * it does not read, and the two must not disagree about the spelling.
+     */
+    protected static final String THRESHOLD = "threshold";
+    /**
+     * The name of the property that configures {@link #setMaxQueries(int)}.
+     */
+    protected static final String MAX_QUERIES = "maxQueries";
+    /**
+     * The name of the property that configures {@link #setLogSlow(boolean)}.
+     */
+    protected static final String LOG_SLOW = "logSlow";
+    /**
+     * The name of the property that configures {@link #setLogFailed(boolean)}.
+     */
+    protected static final String LOG_FAILED = "logFailed";
+
+    /**
      * we will be keeping track of query stats on a per pool basis, keyed by pool name; pools registered under one name
      * share the statistics
      */
     protected static final ConcurrentHashMap<String, PoolStatistics> perPoolStats = new ConcurrentHashMap<>();
     /**
-     * the queries that are used for this interceptor.
+     * The statistics store this instance books to: the map published under the registration name of the pool it
+     * serves, handed to the chain by {@link #reset(ConnectionPool, PooledConnection)} at a borrow and taken away
+     * when that chain is released.
      */
     protected volatile ConcurrentHashMap<String, QueryStats> queries = null;
+    /**
+     * Whether this instance has already reported that it cannot resolve a statistics store. One loss of the store is
+     * one fact about the session this instance serves, so it is reported once; see
+     * {@link #getQueryStats(String)} for why the report cannot simply be made on every execution.
+     */
+    private volatile boolean closedOrAbandonedReported;
     /**
      * Maximum number of queries we will be storing statistics for. Eviction keeps the number of stored queries near
      * this amount; while queries are being executed concurrently it can briefly be exceeded. This sizes the statistics
      * store only: the slow and failed query logging is configured by {@link #setLogSlow(boolean)} and
      * {@link #setLogFailed(boolean)} independently of this value.
      */
-    protected int maxQueries = 1000; // Don't store more than this amount of queries
+    protected int maxQueries = 1000;
 
     /**
-     * Flag to enable disable logging of slow queries
+     * Flag to enable or disable slow query logging
      */
     protected boolean logSlow = true;
 
     /**
-     * Flag to enable disable logging of failed queries
+     * Flag to enable or disable failed query logging
      */
     protected boolean logFailed = false;
 
@@ -107,9 +137,16 @@ public class SlowQueryReport extends AbstractQueryReport {
      *
      * @return a hash map containing the statistics of the monitored queries, kept near {@code maxQueries} entries by
      *             eviction, or {@code null} if no live pool is registered under that name. Pools registered under one
-     *             name share the map, and it is published until the last of them has closed
+     *             name share the map, and it is published until the last of them has closed. A {@code null} name is
+     *             answered the same way as a name that holds nothing, since nothing can be registered under it
      */
     public static ConcurrentHashMap<String, QueryStats> getPoolStats(String poolname) {
+        if (poolname == null) {
+            // Nothing is, or can be, registered under no name: the registry
+            // takes no null key and poolStarted refuses a pool that carries
+            // none. Callers read null as "this pool reports nothing here".
+            return null;
+        }
         PoolStatistics stats = perPoolStats.get(poolname);
         return stats == null ? null : stats.getQueryStats();
     }
@@ -136,11 +173,10 @@ public class SlowQueryReport extends AbstractQueryReport {
             Throwable t) {
         String sql = super.reportFailedQuery(query, args, name, start, delta, t);
         // The wall clock is read for the timestamp the failure is recorded
-        // against - a point in time, which is what the statistics keep the
-        // last invocation as. The duration is the monotonic elapsed time the
-        // statement proxy measured, so a step of the wall clock during the
-        // execution cannot make the booked duration negative, as it could
-        // while this hook recomputed it from start.
+        // against, a point in time; the duration is the monotonic elapsed time
+        // the statement proxy measured, so a step of the wall clock during the
+        // execution cannot make the booked duration negative, as it could while
+        // this hook recomputed it from start.
         long now = System.currentTimeMillis();
         if (booksSharedStats()) {
             QueryStats qs = this.getQueryStats(sql);
@@ -148,11 +184,10 @@ public class SlowQueryReport extends AbstractQueryReport {
                 qs.failure(delta, now);
             }
         }
-        // The WARN reports the event, not the statistics booking: the
-        // logFailed flag configures it, and maxQueries only sizes the
-        // statistics store. Keeping the log inside the capacity guard
-        // made maxQueries=0 - "store no per-query statistics" - silence
-        // the log channel while SlowQueryReportJmx kept sending the
+        // The WARN reports the event and logFailed alone configures it;
+        // maxQueries only sizes the statistics store. Keeping the log inside
+        // that guard made maxQueries=0 - "store no per-query statistics" -
+        // silence this channel while SlowQueryReportJmx kept sending the
         // FAILED QUERY notification behind isLogFailed() alone, the two
         // channels disagreeing on the same event.
         if (isLogFailed() && log.isWarnEnabled()) {
@@ -167,12 +202,10 @@ public class SlowQueryReport extends AbstractQueryReport {
         if (booksSharedStats()) {
             QueryStats qs = this.getQueryStats(sql);
             if (qs != null) {
-                // The wall clock is read for the timestamp the execution is
-                // recorded against, like the failure path books its event:
-                // the start time would leave a long query aged by its own
-                // duration against the entries that age by when they
-                // finished. The duration itself is the monotonic elapsed
-                // time the statement proxy measured.
+                // Booked against the time of recording, as the failure path
+                // books its event: the execution start would age a long query
+                // by its own duration against the entries that age by when
+                // they finished.
                 qs.add(delta, System.currentTimeMillis());
             }
         }
@@ -190,19 +223,15 @@ public class SlowQueryReport extends AbstractQueryReport {
                 qs.add(delta, System.currentTimeMillis());
             }
         }
-        // The WARN reports the event, not the statistics booking: the
-        // logSlow flag configures it, and maxQueries only sizes the
-        // statistics store. The log must therefore sit outside the
-        // capacity guard, and outside the statistics lookup altogether:
-        // getQueryStats legitimately hands back no entry - when the
-        // store is disabled, when this instance's statistics reference
-        // was released by a chain release, or when the entry was lost to
-        // the post-putIfAbsent get race against capacity eviction - and
-        // gating the WARN on it would let the log channel fall silent
-        // while SlowQueryReportJmx keeps sending the SLOW QUERY
-        // notification behind isLogSlow() alone, the two channels
-        // disagreeing on the same event. This mirrors how
-        // reportFailedQuery reports its event.
+        // The WARN reports the event and logSlow alone configures it, exactly
+        // as reportFailedQuery gates its own on logFailed: it sits outside the
+        // capacity guard, and outside the statistics lookup, which legitimately
+        // hands back no entry - when the store is disabled, when a chain release
+        // took this instance's reference away, or when the entry was lost to the
+        // post-putIfAbsent get race against eviction. Gating the WARN on that
+        // lookup would let this channel fall silent while SlowQueryReportJmx
+        // keeps sending the SLOW QUERY notification behind isLogSlow() alone,
+        // the two channels disagreeing on the same event.
         if (isLogSlow() && log.isWarnEnabled()) {
             log.warn(MessageFactory.get("slowQueryReport.slowQueryReport", sqlForLog(sql), delta));
         }
@@ -236,7 +265,7 @@ public class SlowQueryReport extends AbstractQueryReport {
     }
 
     /**
-     * invoked when the connection receives the close request Not used for now.
+     * Invoked when the connection receives the close request. Not used for now.
      */
     @Override
     public void closeInvoked() {
@@ -283,8 +312,17 @@ public class SlowQueryReport extends AbstractQueryReport {
      * registered under the name, both pools share one statistics map; that merging is the pre-existing behaviour, but
      * it is a configuration mistake worth a warning, so it is logged.
      * </p>
+     * <p>
+     * A pool that carries no name is refused. The name is not one setting among others here: it is the key of the
+     * statistics map, of the live-pool registration that decides when a name's statistics are released, and of the
+     * MBean the subclass publishes, and the registry cannot key anything under no name. Failing the start with a
+     * message that names the setting is therefore the honest outcome, and it is what the pool reports as the reason
+     * its start failed - where the missing key gave a start failure that said nothing.
+     * </p>
      *
      * @param pool the connection pool that has started
+     *
+     * @throws IllegalStateException if the pool carries no name to register under
      */
     @Override
     public void poolStarted(ConnectionPool pool) {
@@ -294,6 +332,12 @@ public class SlowQueryReport extends AbstractQueryReport {
         // life of the pool, and every later lookup of it comes back through
         // the same record (see ConnectionPool#getRegistrationName()).
         String name = pool.getRegistrationName();
+        if (name == null) {
+            // The mirror of releaseStatistics, which treats a nameless pool as
+            // one that never registered anything: the pair has to agree, and a
+            // ConcurrentHashMap would refuse the key before anything else could
+            throw new IllegalStateException(MessageFactory.get("slowQueryReport.poolNameRequired"));
+        }
         // See if we already created a map for this pool - and register
         // this pool as one of the live pools the map is held for
         PoolStatistics stats = perPoolStats.compute(name, (key, existing) -> {
@@ -343,9 +387,10 @@ public class SlowQueryReport extends AbstractQueryReport {
      * Deregisters a closed pool from the live pools that the per-name statistics are held for, and releases the
      * statistics once no live pool is registered under the name any more.
      * <p>
-     * The decision is taken inside a {@code compute} on the name, which atomises it against the concurrent removals of
-     * other same-named pools: exactly one of any number of concurrent {@code poolClosed} deliveries sees {@code true}
-     * returned, so the per-name entries are never released twice and never left behind.
+     * The decision is taken inside a {@code computeIfPresent} on the name, which atomises it against the concurrent
+     * removals of other same-named pools and is a no-op when the name holds nothing at all: exactly one of any number
+     * of concurrent {@code poolClosed} deliveries sees {@code true} returned, so the per-name entries are never
+     * released twice and never left behind.
      * </p>
      *
      * @param pool the connection pool that has been closed
@@ -409,11 +454,39 @@ public class SlowQueryReport extends AbstractQueryReport {
     }
 
     /**
-     * Retrieves or creates a QueryStats entry for the given SQL string.
+     * Reports that this instance lost the statistics store it booked executions on, once for as long as that store is
+     * gone.
+     * <p>
+     * The condition is a fact about the session this instance serves - it outlived the pool whose statistics it booked
+     * on, or the chain it belongs to has been released - and it stays exactly as true for every execution that follows,
+     * while an application still holding a statement opened on the session can keep executing on it indefinitely.
+     * Writing the line for each of those executions is a WARN per query, forever, and nothing configures it: this is not
+     * one of the query reports the {@code logSlow} and {@code logFailed} flags gate. The flag is cleared by the first
+     * booking this instance makes once it holds a store again - a borrow of the session it belongs to is what hands the
+     * store back - so a loss that follows such a booking is a new event and earns its own report. A store lost again
+     * before anything was booked on the recovered one states the same fact as the loss this line covered, and is not
+     * reported a second time.
+     * </p>
+     *
+     * @return {@code true} when this call is the one that reports the loss, {@code false} when the loss has already been
+     *             reported
+     */
+    private boolean reportClosedOrAbandoned() {
+        if (closedOrAbandonedReported) {
+            return false;
+        }
+        closedOrAbandonedReported = true;
+        return true;
+    }
+
+    /**
+     * Retrieves or creates the statistics entry for the given SQL string in the store this instance books to.
      *
      * @param sql the SQL query string
      *
-     * @return the query statistics, or {@code null} if the pool has been closed
+     * @return the query statistics, or {@code null} when this instance has no store to book to - the session it serves
+     *             outlived the pool it was borrowed from, the chain it belongs to has been released, or its definition
+     *             was added to a pool that had already started and so never registered a store
      */
     protected QueryStats getQueryStats(String sql) {
         if (sql == null) {
@@ -421,10 +494,16 @@ public class SlowQueryReport extends AbstractQueryReport {
         }
         ConcurrentHashMap<String, QueryStats> queries = SlowQueryReport.this.queries;
         if (queries == null) {
-            if (log.isWarnEnabled()) {
+            if (reportClosedOrAbandoned() && log.isWarnEnabled()) {
                 log.warn(MessageFactory.get("slowQueryReport.connectionClosedOrAbandoned"));
             }
             return null;
+        }
+        // This instance books on a store again, so a later loss is a fresh
+        // event - see reportClosedOrAbandoned(). Guarded so that the common,
+        // healthy path stays a plain read of the flag.
+        if (closedOrAbandonedReported) {
+            closedOrAbandonedReported = false;
         }
         QueryStats qs = queries.get(sql);
         if (qs == null) {
@@ -534,34 +613,106 @@ public class SlowQueryReport extends AbstractQueryReport {
     }
 
     /**
-     * Configures this interceptor from the given properties map, supporting threshold, maxQueries, logSlow, and
-     * logFailed settings.
+     * Configures this interceptor from the properties of its definition: the
+     * threshold, the capacity of the statistics store and the two log flags.
+     * <p>
+     * The values arrive as text, and text is where typos live, so a value this
+     * interceptor cannot read is reported and left out rather than read as
+     * something else: the setting keeps the value it already carries, which for
+     * the log flags means the channel the operator meant to configure is not
+     * switched off by the typo, and for the numbers means the default threshold
+     * or capacity stays in force. A name this configuration does not read is
+     * reported the same way. The pool configures an interceptor chain per
+     * physical connection, so one misconfiguration is reported once per
+     * configuration of the bad definition rather than once per JVM.
+     * </p>
      *
      * @param properties the interceptor properties
      */
     @Override
     public void setProperties(Map<String, InterceptorProperty> properties) {
         super.setProperties(properties);
-        final String threshold = "threshold";
-        final String maxqueries = "maxQueries";
-        final String logslow = "logSlow";
-        final String logfailed = "logFailed";
-        InterceptorProperty p1 = properties.get(threshold);
-        InterceptorProperty p2 = properties.get(maxqueries);
-        InterceptorProperty p3 = properties.get(logslow);
-        InterceptorProperty p4 = properties.get(logfailed);
-        if (p1 != null) {
-            setThreshold(Long.parseLong(p1.getValue()));
+        for (String name : properties.keySet()) {
+            if (!isKnownProperty(name)) {
+                log.warn(MessageFactory.get("slowQueryReport.unknownProperty", name));
+            }
         }
-        if (p2 != null) {
-            setMaxQueries(Integer.parseInt(p2.getValue()));
+        InterceptorProperty thresholdProperty = properties.get(THRESHOLD);
+        if (thresholdProperty != null && thresholdProperty.getValue() != null) {
+            try {
+                setThreshold(Long.parseLong(thresholdProperty.getValue()));
+            } catch (NumberFormatException x) {
+                log.warn(MessageFactory.get("slowQueryReport.invalidThreshold", thresholdProperty.getValue(),
+                        Long.toString(getThreshold())));
+            }
         }
-        if (p3 != null) {
-            setLogSlow(Boolean.parseBoolean(p3.getValue()));
+        InterceptorProperty maxQueriesProperty = properties.get(MAX_QUERIES);
+        if (maxQueriesProperty != null && maxQueriesProperty.getValue() != null) {
+            try {
+                setMaxQueries(Integer.parseInt(maxQueriesProperty.getValue()));
+            } catch (NumberFormatException x) {
+                log.warn(MessageFactory.get("slowQueryReport.invalidMaxQueries", maxQueriesProperty.getValue(),
+                        Integer.toString(maxQueries)));
+            }
         }
-        if (p4 != null) {
-            setLogFailed(Boolean.parseBoolean(p4.getValue()));
+        InterceptorProperty logSlowProperty = properties.get(LOG_SLOW);
+        if (logSlowProperty != null && logSlowProperty.getValue() != null) {
+            Boolean logSlowFlag = flagValue(logSlowProperty.getValue());
+            if (logSlowFlag == null) {
+                log.warn(MessageFactory.get("slowQueryReport.invalidLogSlow", logSlowProperty.getValue(),
+                        Boolean.toString(isLogSlow())));
+            } else {
+                setLogSlow(logSlowFlag.booleanValue());
+            }
         }
+        InterceptorProperty logFailedProperty = properties.get(LOG_FAILED);
+        if (logFailedProperty != null && logFailedProperty.getValue() != null) {
+            Boolean logFailedFlag = flagValue(logFailedProperty.getValue());
+            if (logFailedFlag == null) {
+                log.warn(MessageFactory.get("slowQueryReport.invalidLogFailed", logFailedProperty.getValue(),
+                        Boolean.toString(isLogFailed())));
+            } else {
+                setLogFailed(logFailedFlag.booleanValue());
+            }
+        }
+    }
+
+    /**
+     * Whether this interceptor configuration reads the named property.
+     * {@code useEquals} belongs to the {@link org.apache.tomcat.jdbc.pool.JdbcInterceptor}
+     * base and is reported as known beside this class's own names, since the
+     * point of the report is a mistyped name rather than a configuration that
+     * sets more than one thing. A subclass that reads properties of its own -
+     * as {@link SlowQueryReportJmx} does - recognises them in its own override,
+     * so a correct configuration of the subclass is never reported as a typo.
+     *
+     * @param name the property name to test
+     *
+     * @return {@code true} if this configuration applies that name
+     */
+    protected boolean isKnownProperty(String name) {
+        return THRESHOLD.equals(name) || MAX_QUERIES.equals(name) || LOG_SLOW.equals(name)
+                || LOG_FAILED.equals(name) || "useEquals".equals(name);
+    }
+
+    /**
+     * The flag a configured text states, accepting the word in any case as the
+     * parser this reading replaces did.
+     *
+     * @param value the configured text
+     *
+     * @return the stated flag, or {@code null} when the text states neither true
+     *             nor false and is therefore a value to report rather than to
+     *             read as false
+     */
+    protected static Boolean flagValue(String value) {
+        if ("true".equalsIgnoreCase(value)) {
+            return Boolean.TRUE;
+        }
+        if ("false".equalsIgnoreCase(value)) {
+            return Boolean.FALSE;
+        }
+        return null;
     }
 
 
@@ -659,9 +810,9 @@ public class SlowQueryReport extends AbstractQueryReport {
 
         static final String[] FIELD_DESCRIPTIONS = new String[] { "The SQL query",
                 "The number of query invocations, a call to executeXXX",
-                "The longest time for this query in milliseconds",
+                "The longest time for this query in milliseconds, 0 while no execution has been recorded yet",
                 "The time and date for when the longest query took place",
-                "The shortest time for this query in milliseconds",
+                "The shortest time for this query in milliseconds, 0 while no execution has been recorded yet",
                 "The time and date for when the shortest query took place",
                 "The total amount of milliseconds spent executing this query", "The number of failures for this query",
                 "The number of times this query was prepared (prepareStatement/prepareCall)",
@@ -671,6 +822,12 @@ public class SlowQueryReport extends AbstractQueryReport {
         static final OpenType<?>[] FIELD_TYPES = new OpenType[] { SimpleType.STRING, SimpleType.INTEGER,
                 SimpleType.LONG, SimpleType.LONG, SimpleType.LONG, SimpleType.LONG, SimpleType.LONG, SimpleType.LONG,
                 SimpleType.INTEGER, SimpleType.LONG, SimpleType.LONG };
+
+        /**
+         * The order the interceptor evicts by, which {@link #isOlderThan(QueryStats)} answers through so that the two
+         * orderings of this class cannot state opposite things about one pair of entries.
+         */
+        private static final QueryStatsComparator evictionOrder = new QueryStatsComparator();
 
         private final String query;
         private volatile int nrOfInvocations;
@@ -720,23 +877,25 @@ public class SlowQueryReport extends AbstractQueryReport {
             buf.append(", nrOfInvocations:");
             buf.append(nrOfInvocations);
             buf.append(", maxInvocationTime:");
-            buf.append(maxInvocationTime);
+            buf.append(publishedMaxInvocationTime());
             buf.append(", maxInvocationDate:");
             buf.append(sdf.format(new java.util.Date(maxInvocationDate)));
             buf.append(", minInvocationTime:");
-            buf.append(minInvocationTime);
+            buf.append(publishedMinInvocationTime());
             buf.append(", minInvocationDate:");
             buf.append(sdf.format(new java.util.Date(minInvocationDate)));
             buf.append(", totalInvocationTime:");
             buf.append(totalInvocationTime);
             buf.append(", averageInvocationTime:");
-            buf.append((float) totalInvocationTime / (float) nrOfInvocations);
+            buf.append(publishedAverageInvocationTime());
             buf.append(", failures:");
             buf.append(failures);
             buf.append(", prepareCount:");
             buf.append(prepareCount);
             buf.append(", prepareTime:");
             buf.append(prepareTime);
+            buf.append(", lastInvocation:");
+            buf.append(sdf.format(new java.util.Date(lastInvocation)));
             buf.append(']');
             return buf.toString();
         }
@@ -751,11 +910,47 @@ public class SlowQueryReport extends AbstractQueryReport {
          * @throws OpenDataException if the data cannot be converted
          */
         public CompositeDataSupport getCompositeData(final CompositeType type) throws OpenDataException {
-            Object[] values = new Object[] { query, Integer.valueOf(nrOfInvocations), Long.valueOf(maxInvocationTime),
-                    Long.valueOf(maxInvocationDate), Long.valueOf(minInvocationTime), Long.valueOf(minInvocationDate),
+            Object[] values = new Object[] { query, Integer.valueOf(nrOfInvocations),
+                    Long.valueOf(publishedMaxInvocationTime()), Long.valueOf(maxInvocationDate),
+                    Long.valueOf(publishedMinInvocationTime()), Long.valueOf(minInvocationDate),
                     Long.valueOf(totalInvocationTime), Long.valueOf(failures), Integer.valueOf(prepareCount),
                     Long.valueOf(prepareTime), Long.valueOf(lastInvocation) };
             return new CompositeDataSupport(type, FIELD_NAMES, values);
+        }
+
+        /**
+         * The maximum invocation time as the published views report it. A statement that is prepared but has never
+         * executed holds a live entry whose running maximum is still its initial sentinel; publishing that as a
+         * duration would hand consumers {@code Long.MIN_VALUE} milliseconds as if it were a measurement, so until
+         * the first execution is booked the published duration is {@code 0}. The
+         * {@link #getMaxInvocationTime()} getter keeps the sentinel, which is what distinguishes an entry that has
+         * never executed from one whose executions all took no measurable time.
+         *
+         * @return the recorded maximum, or {@code 0} while no execution has been booked
+         */
+        private long publishedMaxInvocationTime() {
+            return nrOfInvocations == 0 ? 0 : maxInvocationTime;
+        }
+
+        /**
+         * The minimum invocation time as the published views report it, guarded against the initial sentinel of a
+         * prepared-but-never-executed entry the way {@link #publishedMaxInvocationTime()} is.
+         *
+         * @return the recorded minimum, or {@code 0} while no execution has been booked
+         */
+        private long publishedMinInvocationTime() {
+            return nrOfInvocations == 0 ? 0 : minInvocationTime;
+        }
+
+        /**
+         * The average invocation time as the published views report it. An entry without executions has no average
+         * to report; the {@code 0}/{@code 0} float division would render it as {@code NaN}, so the published
+         * average is {@code 0} until the first execution is booked.
+         *
+         * @return the average of the booked executions, or {@code 0} while none has been booked
+         */
+        private float publishedAverageInvocationTime() {
+            return nrOfInvocations == 0 ? 0f : (float) totalInvocationTime / (float) nrOfInvocations;
         }
 
         /**
@@ -903,14 +1098,17 @@ public class SlowQueryReport extends AbstractQueryReport {
         }
 
         /**
-         * Returns whether this query was last invoked before the given query stats.
+         * Returns whether this query is the one eviction would take before the given one, that is, whether it was last
+         * invoked or prepared earlier. An entry that has never been invoked or prepared is the newest of all by that
+         * order rather than the oldest, and answers {@code false} here, because the comparison is the very one the
+         * eviction of the statistics map makes.
          *
          * @param other the other query statistics to compare against
          *
          * @return {@code true} if this query's last invocation is older
          */
         public boolean isOlderThan(QueryStats other) {
-            return this.lastInvocation < other.lastInvocation;
+            return evictionOrder.compare(this, other) < 0;
         }
     }
 
