@@ -144,6 +144,30 @@ public class TestRanges {
     }
 
 
+    @Test
+    public void testValid05() throws Exception {
+        // RFC 9110, section 5.6.1.2: empty list elements must be ignored
+        doTestEmptyListElements("bytes=0-9,,10-19");
+        doTestEmptyListElements("bytes=0-9, ,10-19");
+        doTestEmptyListElements("bytes=,0-9,10-19");
+        doTestEmptyListElements("bytes=0-9,10-19,");
+        doTestEmptyListElements("bytes= , 0-9 ,, 10-19 , ");
+    }
+
+
+    @Test
+    public void testInvalid09() throws Exception {
+        // A list that has no elements at all is not a range set
+        doTestInvalid("bytes=,");
+        doTestInvalid("bytes=, ,");
+    }
+
+
+    private void doTestEmptyListElements(String s) throws IOException {
+        compareRanges(parse("bytes=0-9,10-19"), parse(s));
+    }
+
+
     private void doTestInvalid(String s) throws IOException {
         Ranges r = parse(s);
         Assert.assertNull(r);
