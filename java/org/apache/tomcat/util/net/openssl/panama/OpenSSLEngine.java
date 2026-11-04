@@ -675,13 +675,16 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             return new String[0];
         }
         String[] enabled = OpenSSLLibrary.getCiphers(state.ssl);
-        for (int i = 0; i < enabled.length; i++) {
-            String mapped = OpenSSLCipherConfigurationParser.openSSLToJsse(enabled[i]);
-            if (mapped != null) {
-                enabled[i] = mapped;
+        // Only report ciphers with a JSSE equivalent so the enabled ciphers are always a subset of the supported
+        // ciphers
+        List<String> mapped = new ArrayList<>(enabled.length);
+        for (String cipher : enabled) {
+            String jsseName = OpenSSLCipherConfigurationParser.openSSLToJsse(cipher);
+            if (jsseName != null) {
+                mapped.add(jsseName);
             }
         }
-        return enabled;
+        return mapped.toArray(new String[0]);
     }
 
     @Override
