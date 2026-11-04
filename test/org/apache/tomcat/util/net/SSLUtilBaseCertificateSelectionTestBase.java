@@ -52,10 +52,12 @@ import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
 import org.easymock.EasyMock;
 
 /**
- * Shared fixtures for the {@link SSLUtilBase#getKeyManagers()} certificate-selection tests. The two behaviors are
- * split across the concrete subclasses: {@link TestSSLUtilBaseAutomaticCertificateSelection} covers Extended Key
- * Usage based selection when no alias is configured, and {@link TestSSLUtilBaseConfiguredAliasSelection} covers a
- * configured alias, including the SunMSCAPI Windows-MY numbered-duplicate resolution.
+ * Shared fixtures for the {@link SSLUtilBase#getKeyManagers()} certificate-selection tests. The behaviors are split
+ * across the concrete subclasses: {@link TestSSLUtilBaseAutomaticCertificateSelection} covers Extended Key Usage based
+ * selection when no alias is configured, {@link TestSSLUtilBaseConfiguredAliasSelection} covers a configured alias,
+ * including the SunMSCAPI Windows-MY numbered-duplicate resolution, and {@link TestSSLContextServedAlias} covers how
+ * {@link SSLContext#getServedAlias(SSLHostConfigCertificate)} resolves the alias served by key managers that Tomcat did
+ * not wrap.
  * <p>
  * {@link #orderedKeystore(String, KeystoreEntry...)} returns a key store with a controlled alias enumeration order
  * that presents as a SunMSCAPI Windows-MY store; {@link #nonSunMSCAPIKeystore(KeystoreEntry...)} presents as a plain
@@ -381,6 +383,8 @@ public abstract class SSLUtilBaseCertificateSelectionTestBase extends TomcatBase
         spi.engineLoad(null, null);
         EasyMock.expectLastCall().once();
         EasyMock.expect(spi.engineAliases()).andStubAnswer(() -> Collections.enumeration(aliases));
+        EasyMock.expect(spi.engineContainsAlias(EasyMock.anyString()))
+                .andStubAnswer(() -> delegate.containsAlias(EasyMock.getCurrentArgument(0)));
         EasyMock.expect(spi.engineIsKeyEntry(EasyMock.anyString()))
                 .andStubAnswer(() -> delegate.isKeyEntry(EasyMock.getCurrentArgument(0)));
         EasyMock.expect(spi.engineGetCertificate(EasyMock.anyString())).andStubAnswer(() -> {
