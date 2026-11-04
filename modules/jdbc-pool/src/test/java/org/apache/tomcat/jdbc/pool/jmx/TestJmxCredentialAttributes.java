@@ -20,6 +20,7 @@ import java.lang.management.ManagementFactory;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -35,6 +36,7 @@ import org.junit.jupiter.api.Test;
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorDefinition;
+import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
 
 /**
  * The three raw configuration strings of the pool - the JDBC URL, the
@@ -64,7 +66,11 @@ import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorDefinition;
  * a configuration written scrubbed is a pool that cannot connect, while the read
  * gives back the pool's own best-effort masking, so the JMX read, the
  * configuration dump and the log all say the same thing about a configuration
- * that carries its credential inline.
+ * that carries its credential inline. The parsed form of those strings is
+ * published beside them - the interceptor definitions as an array of objects
+ * rather than as the one line they were parsed from - and is pinned to the same
+ * rule, since an attribute that names the same credential in its structured form
+ * is as short a path back to it as the string was.
  * </p>
  */
 class TestJmxCredentialAttributes extends JdbcPoolBaseTest {
@@ -279,6 +285,74 @@ class TestJmxCredentialAttributes extends JdbcPoolBaseTest {
     }
 
     @Test
+    void theJdbcInterceptorsAsArrayAttributeOfThePoolMBeanMasksTheCredentialItsDefinitionsCarry()
+            throws Exception {
+        DataSource ds = newDataSource();
+        // The same live definition the string attribute above is pinned on, with
+        // a second pair added: the credential and the ordinary property are
+        // neighbours of one parameter list, so the pair is what tells the two
+        // apart below - a masking that hid the whole definition would pass a test
+        // that only looked for the secret.
+        ds.setJdbcInterceptors("ResetAbandonedTimer(password=" + INTERCEPTOR_SECRET + ",fast=yes)");
+        ds.getPoolProperties().setJmxEnabled(true);
+        ds.getPoolProperties().setInitialSize(0);
+        ds.createPool();
+        InterceptorDefinition[] live = ds.getPoolProperties().getJdbcInterceptorsAsArray();
+        Assertions.assertEquals(INTERCEPTOR_SECRET, cleartextIn(live, INTERCEPTOR_SECRET),
+                "precondition: the pool's own parsed definitions must still carry the credential - the attribute"
+                        + " under test has one to hide precisely because the parse keeps what the operator typed");
+
+        Registration r = publish(ds, "interceptors-array-attribute");
+        try {
+            InterceptorDefinition[] published =
+                    (InterceptorDefinition[]) server().getAttribute(r.poolOname, "JdbcInterceptorsAsArray");
+
+            Assertions.assertNull(cleartextIn(published, INTERCEPTOR_SECRET),
+                    "a password typed into an interceptor definition must not come back out of the pool's MBean in"
+                            + " cleartext through the parsed form of that very definition either: the array is the"
+                            + " same credential in a shape a monitor can walk programmatically rather than one it"
+                            + " has to read a line of text for, and it is published to the same read-only operator"
+                            + " the masked password attribute exists to serve");
+
+            Assertions.assertArrayEquals(classNamesOf(live), classNamesOf(published),
+                    "the masking is a display copy and not a shorter answer: the same interceptors, in the order the"
+                            + " chain is built in, so the attribute still says what this pool intercepts");
+            InterceptorDefinition publishedDefinition = definitionNamed(published, "ResetAbandonedTimer");
+            Assertions.assertNotNull(publishedDefinition,
+                    "precondition: the configured definition must be the one the array published");
+            Assertions.assertEquals("yes", publishedDefinition.getProperties().get("fast").getValue(),
+                    "a property that is not a credential is published as configured: the attribute is read to see"
+                            + " how a pool is set up, and a mask that swallowed the harmless pairs would leave an"
+                            + " operator reading an empty configuration");
+            Assertions.assertEquals(MASK, publishedDefinition.getProperties().get("password").getValue(),
+                    "and the credential is published under the mask the string attribute and the configuration dump"
+                            + " already use, the pair still named as a password, so the monitor can tell that a"
+                            + " credential is configured without learning which one it is");
+
+            InterceptorDefinition[] cached = ds.getPoolProperties().getJdbcInterceptorsAsArray();
+            Assertions.assertNotSame(cached, published,
+                    "the attribute must answer with a copy of its own: as published it handed out the pool's live"
+                            + " array of definitions, the very objects every new session's chain is built from, so"
+                            + " a reader in the pool's own JVM held the pool's configuration in writable form");
+            publishedDefinition.addProperty(new InterceptorProperty("fast", "rewritten-by-a-reader"));
+            Assertions.assertEquals("yes", definitionNamed(cached, "ResetAbandonedTimer").getProperties().get("fast")
+                    .getValue(),
+                    "and writing to what the attribute handed back must stop at the copy: a configuration an"
+                            + " unprivileged reader can rewrite is a configuration it can break, and here it would"
+                            + " break the interceptors of every connection the pool opens from then on");
+
+            Assertions.assertEquals(INTERCEPTOR_SECRET,
+                    definitionNamed(ds.getPoolProperties().getJdbcInterceptorsAsArray(), "ResetAbandonedTimer")
+                            .getProperties().get("password").getValue(),
+                    "the configuration the interceptor chain is built from must keep the pair as it was written: the"
+                            + " mask belongs to the display copy, and an interceptor that was handed the mask would"
+                            + " authenticate with the mask");
+        } finally {
+            closeAndUnpublish(r);
+        }
+    }
+
+    @Test
     void aCredentialWrittenThroughThePoolMBeanIsStoredRawAndReadBackMasked() throws Exception {
         Registration r = publish(poolWithInlineCredentials(), "write-path");
         try {
@@ -353,5 +427,44 @@ class TestJmxCredentialAttributes extends JdbcPoolBaseTest {
     /* The database URL of this test class' server, with a database name of the caller's own. */
     private static String urlForDatabase(String database) {
         return getUrl().substring(0, getUrl().indexOf("/mem:")) + "/mem:" + database;
+    }
+
+    /*
+     * The first thing a definition array still carries in the clear - every class
+     * name and every property value of every definition is walked, because the
+     * attribute publishes the whole definition rather than only its properties -
+     * or {@code null} when the array holds no cleartext.
+     */
+    private static String cleartextIn(InterceptorDefinition[] definitions, String secret) {
+        for (InterceptorDefinition definition : definitions) {
+            if (definition == null) {
+                continue;
+            }
+            if (definition.getClassName() != null && definition.getClassName().contains(secret)) {
+                return definition.getClassName();
+            }
+            for (InterceptorProperty property : definition.getProperties().values()) {
+                String value = property.getValue();
+                if (value != null && value.contains(secret)) {
+                    return value;
+                }
+            }
+        }
+        return null;
+    }
+
+    /* The class names of a definition array, in the order the array holds them. */
+    private static String[] classNamesOf(InterceptorDefinition[] definitions) {
+        return Arrays.stream(definitions).map(InterceptorDefinition::getClassName).toArray(String[]::new);
+    }
+
+    /* The definition of the named interceptor of an array, or {@code null} when it holds none. */
+    private static InterceptorDefinition definitionNamed(InterceptorDefinition[] definitions, String className) {
+        for (InterceptorDefinition definition : definitions) {
+            if (definition != null && className.equals(definition.getClassName())) {
+                return definition;
+            }
+        }
+        return null;
     }
 }

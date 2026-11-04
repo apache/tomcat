@@ -48,6 +48,11 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
 
     private static final Log log = LogFactory.getLog(ConnectionPool.class);
 
+    /**
+     * The pool this MBean wraps, assigned once by the constructor and never swapped: attribute reads consult the
+     * live configuration the pool shares with its DataSource, the operations run against this pool, and it is the
+     * pool the reported conditions describe. {@link #getPool()} hands out the same reference in-process.
+     */
     protected org.apache.tomcat.jdbc.pool.ConnectionPool pool = null;
     /**
      * sequence for JMX notifications
@@ -471,6 +476,18 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      * plaintext password while {@link #getPassword()} is explicitly masked. A configuration whose database properties
      * are {@code null} - a state {@link PoolConfiguration#setDbProperties(Properties)} accepts - has nothing to mask,
      * so this returns {@code null}. {@inheritDoc}
+     * <p>
+     * The copy is a display value, and it looks complete: nothing in it says that the pool's own set carries a pair
+     * this one withholds. That matters because this attribute is also writable and its write is the whole set -
+     * {@link #setDbProperties(Properties)} replaces the live collection - so the ordinary read-modify-write of the
+     * attribute hands the pool back a set with the credential taken out and takes that credential away from the live
+     * configuration along with it. A configuration whose password travels only among the database properties - the
+     * shape the credential has when a {@link PoolConfiguration#getConnectionProperties() connectionProperties} line
+     * carries it - then establishes its next connections with nothing to authenticate them, and nothing on the read,
+     * the write or in between warns. The credential's owning controls are the {@link #setPassword(String) Password}
+     * and {@link #setUsername(String) Username} attributes: each mirrors its value into the database properties and
+     * takes the entry away when cleared, and while one of them holds the password it, not the entry, is what new
+     * connections are established with however this attribute is written.
      */
     @Override
     public Properties getDbProperties() {
@@ -687,9 +704,21 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         return getPoolProperties().getDefaultReadOnly();
     }
 
+    /**
+     * Returns the parsed interceptor configuration with any credential its
+     * definitions carry masked out, so that a read of this attribute does not
+     * hand back in cleartext the password {@link #getPassword()} exists to
+     * withhold - the pairs of a definition reach a third-party interceptor as
+     * configured, which is why {@link #getJdbcInterceptors()} masks them in the
+     * string this attribute is the parsed form of. There is no write to mask:
+     * {@link #setJdbcInterceptors(String)} refuses the change on a running pool
+     * at all. The array is a copy made for this read, so the configuration the
+     * interceptor chains are built from keeps the raw pairs and this attribute is
+     * no way to reach those definitions either. {@inheritDoc}
+     */
     @Override
     public InterceptorDefinition[] getJdbcInterceptorsAsArray() {
-        return getPoolProperties().getJdbcInterceptorsAsArray();
+        return PoolProperties.maskInterceptorCredentials(getPoolProperties().getJdbcInterceptorsAsArray());
     }
 
     @Override
@@ -722,6 +751,21 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         getPoolProperties().setAccessToUnderlyingConnectionAllowed(accessToUnderlyingConnectionAllowed);
     }
 
+    /**
+     * Replaces the whole set of database properties the pool connects with: the write is a new set rather than a
+     * change applied over the set the pool holds, and the caller owns whatever the written collection holds, as
+     * {@link PoolProperties#setDbProperties(Properties)} records. It re-mirrors nothing - the {@code user} and
+     * {@code password} entries are whatever the set written here carries. The read of this same attribute,
+     * {@link #getDbProperties()}, withholds the password, so writing back what that read returned - the ordinary way
+     * of adding or removing one entry - drops the credential from the live configuration: a pool whose password
+     * travels only among the database properties establishes its next connections with nothing to authenticate them,
+     * while a pool whose credential the {@link #setPassword(String) Password} attribute holds keeps authenticating
+     * with the attribute, the superseded entry going with the replaced set. The Password attribute and its
+     * {@link #setUsername(String) Username} pair are therefore the credential's owning controls: they mirror their
+     * value into the database properties and take the entry away when cleared, whereas this attribute can only be
+     * written with a set the writer itself already holds the credential for - what the read hands back is never that
+     * set.
+     */
     @Override
     public void setDbProperties(Properties dbProperties) {
         getPoolProperties().setDbProperties(dbProperties);
@@ -738,6 +782,22 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         poolConfigurationUpdated();
     }
 
+    /**
+     * Renames the running pool. The write is allowed at any time and changes only what the pool calls itself: the
+     * {@code Name} and {@code PoolName} attributes of this MBean, the name
+     * {@link org.apache.tomcat.jdbc.pool.ConnectionPool#getName()} reports for the pool, and - while this MBean is not
+     * registered, so it has no {@link ObjectName} to name itself by - the string its notifications carry as their
+     * source (see {@link #getNotificationSource()}).
+     * <p>
+     * Nothing that was registered under a name moves with the rename. Every registration made for a pool is keyed by
+     * the name the pool started with, which {@link org.apache.tomcat.jdbc.pool.ConnectionPool#getRegistrationName()}
+     * returns, and not by this property: the statistics the {@code SlowQueryReport} interceptor keeps for this pool
+     * stay reachable under the old name and are released under it when the pool closes, as does the MBean its
+     * {@code SlowQueryReportJmx} subclass publishes for the pool. The ObjectName this MBean is registered under is, in
+     * the same way, the one its registration took, and the per-connection MBeans stay published below that name.
+     *
+     * @param name the name the pool is to call itself by from now on
+     */
     @Override
     public void setName(String name) {
         getPoolProperties().setName(name);
