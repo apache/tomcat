@@ -48,7 +48,9 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  * close meets a statement already closed as a harmless no-op, as they were before. An interceptor placed outside
  * this one could swallow a close in the same way, but the pool's own {@link StatementCache} no longer does: listed
  * above this interceptor it refuses to recycle, because a recycled statement is left open rather than closed and
- * would be reclaimed here alive, out from under the cache.)
+ * would be reclaimed here alive, out from under the cache.) A statement whose driver create was still in flight
+ * while the connection was returned cannot be reclaimed at the return either - it registers after that return has
+ * drained the list - so such a late registration is closed where it arrives instead of being tracked.
  * <p>
  * Tracked statements are handed to the application as proxies implementing the standard JDBC statement interfaces, as
  * is the statement facade the pool always installs in front of this interceptor and as are the proxies of the other
@@ -68,11 +70,23 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
     protected final List<StatementEntry> statements = new LinkedList<>();
 
     /**
-     * Monitor guarding {@link #statements}. The pool's cleaner thread may clear the list (through {@link #reset}) while
-     * a borrower is still creating or closing statements on an abandoned connection, so subclasses that access the list
-     * must hold this lock as well.
+     * Monitor guarding {@link #statements} and {@link #returnDrained}. The pool's cleaner thread may clear the list
+     * (through {@link #reset}) while a borrower is still creating or closing statements on an abandoned connection, so
+     * subclasses that access either must hold this lock as well.
      */
     protected final Object statementsLock = new Object();
+
+    /**
+     * Whether the connection return has already drained {@link #statements}: set by {@link #closeInvoked()}, cleared by
+     * {@link #reset} at the start of the next borrow. Every access is guarded by {@link #statementsLock}.
+     * <p>
+     * A statement creation is not serialized against the connection return: the driver's create has completed and the
+     * statement is open before this interceptor can register it. A creation whose connection is returned inside that
+     * window would register after the drain - not closed by that return, dropped by the next borrow's {@link #reset},
+     * and left open on a session that is about to serve another borrower. A registration that arrives drained
+     * therefore does not enter the list: {@link #createStatement} closes the statement itself.
+     */
+    protected boolean returnDrained = false;
 
     /**
      * Default constructor.
@@ -105,8 +119,20 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
             return tracked;
         }
         StatementEntry entry = new StatementEntry(tracked);
+        boolean drained;
         synchronized (statementsLock) {
-            statements.add(entry);
+            drained = returnDrained;
+            if (!drained) {
+                statements.add(entry);
+            }
+        }
+        if (drained) {
+            // The connection return drained the list before this statement
+            // could be registered, so the return's renewed close cannot find
+            // it; close it here rather than leave it open on a session that
+            // is about to serve the next borrower.
+            entry.close();
+            return tracked;
         }
         try {
             return getConstructor(constructorIndex, statementInterface)
@@ -124,6 +150,10 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
     public void closeInvoked() {
         List<StatementEntry> unclosed;
         synchronized (statementsLock) {
+            // From this point a creation still in flight can no longer be
+            // reclaimed by this drain; it is told to close itself instead
+            // (see returnDrained).
+            returnDrained = true;
             if (statements.isEmpty()) {
                 return;
             }
@@ -150,6 +180,10 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
     @Override
     public void reset(ConnectionPool parent, PooledConnection con) {
         synchronized (statementsLock) {
+            // A new borrow starts here (or the instance goes out of
+            // service): statements created from now on are accepted into
+            // the list again.
+            returnDrained = false;
             statements.clear();
         }
         super.reset(parent, con);
