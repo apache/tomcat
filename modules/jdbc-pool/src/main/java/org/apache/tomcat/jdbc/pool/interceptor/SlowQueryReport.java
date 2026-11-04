@@ -45,7 +45,10 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  * Slow query report interceptor. Tracks timing of query executions.
  * <p>
  * The statistics are published under the pool <em>name</em> (see {@link #getPoolStats(String)}), registered when a pool
- * starts and released when the last live pool registered under that name closes. Pools configured with the same name -
+ * starts and released when the last live pool registered under that name closes. The name is the one the pool started
+ * with - see {@link ConnectionPool#getRegistrationName()} - so renaming a running pool, which the pool's own JMX
+ * allows, neither detaches the pool from its statistics nor strands what its start published. Pools configured with
+ * the same name -
  * possible with {@code jmxEnabled=false}, which removes the JMX ObjectName clash that would otherwise catch it -
  * therefore share one statistics map; closing one of them never takes the shared statistics away from the others. The
  * live-pool registration holds the pool weakly: a pool abandoned without closing is never pinned by it and can be
@@ -286,15 +289,20 @@ public class SlowQueryReport extends AbstractQueryReport {
     @Override
     public void poolStarted(ConnectionPool pool) {
         super.poolStarted(pool);
+        // The name is the one the pool started under, not the live property:
+        // everything this registration publishes is keyed by it for the whole
+        // life of the pool, and every later lookup of it comes back through
+        // the same record (see ConnectionPool#getRegistrationName()).
+        String name = pool.getRegistrationName();
         // See if we already created a map for this pool - and register
         // this pool as one of the live pools the map is held for
-        PoolStatistics stats = perPoolStats.compute(pool.getName(), (name, existing) -> {
+        PoolStatistics stats = perPoolStats.compute(name, (key, existing) -> {
             PoolStatistics registration = (existing == null) ? new PoolStatistics() : existing;
             registration.addLivePool(pool);
             return registration;
         });
         if (stats.hasOtherLivePools() && log.isWarnEnabled()) {
-            log.warn(MessageFactory.get("slowQueryReport.poolNameInUse", pool.getName()));
+            log.warn(MessageFactory.get("slowQueryReport.poolNameInUse", name));
         }
         queries = stats.getQueryStats();
     }
@@ -345,8 +353,18 @@ public class SlowQueryReport extends AbstractQueryReport {
      * @return {@code true} if this call removed the last live pool registered under the name
      */
     protected static boolean releaseStatistics(ConnectionPool pool) {
+        // The name the pool registered under, recorded at its start: a pool
+        // renamed while running - the name property is mutable at runtime -
+        // still releases what its start published, and not whatever it
+        // happens to be called by the time it closes
+        String name = pool.getRegistrationName();
+        if (name == null) {
+            // The pool never got far enough into its start to record a name,
+            // so nothing was ever registered for it to release
+            return false;
+        }
         boolean[] last = new boolean[1];
-        perPoolStats.computeIfPresent(pool.getName(), (name, existing) -> {
+        perPoolStats.computeIfPresent(name, (key, existing) -> {
             last[0] = existing.removeLivePool(pool);
             return last[0] ? null : existing;
         });
@@ -470,7 +488,9 @@ public class SlowQueryReport extends AbstractQueryReport {
     public void reset(ConnectionPool parent, PooledConnection con) {
         super.reset(parent, con);
         if (parent != null) {
-            queries = getPoolStats(parent.getName());
+            // The name the pool's statistics were registered under, recorded
+            // at its start - renaming the pool does not move them
+            queries = getPoolStats(parent.getRegistrationName());
         } else {
             queries = null;
         }

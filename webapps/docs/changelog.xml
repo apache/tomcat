@@ -1287,6 +1287,24 @@
         booked only for the borrow the call started under, while the
         <code>resetTimer()</code> management operation is unchanged. (remm)
       </fix>
+      <fix>
+        Correct a defect where renaming a running connection pool - the pool's
+        own JMX exposes a <code>setName</code> that rewrites the name property
+        of a live pool - silently detached the <code>SlowQueryReport</code>
+        and <code>SlowQueryReportJmx</code> interceptors from the state their
+        pool had registered under its start-time name: connections borrowed
+        after the rename booked their statistics nowhere and logged a false
+        "Connection has already been closed or abandoned" warning on every
+        execution, a <code>SlowQueryReportJmx</code> borrow registered a
+        second MBean under the new name, and the pool's close released the
+        name it carried at close time rather than the one it had registered,
+        leaving the statistics, the interceptor MBean and with them the whole
+        closed pool's object graph registered forever. A nulling rename made
+        the same release throw and be swallowed, leaking the same way. The
+        registrations are now recorded under the name the pool started with
+        and every lookup of them resolves through that record, so a rename
+        changes what the pool calls itself and nothing else. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

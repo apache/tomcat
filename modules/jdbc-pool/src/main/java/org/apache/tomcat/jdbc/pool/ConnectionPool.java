@@ -129,6 +129,19 @@ public class ConnectionPool {
     private volatile boolean closed = false;
 
     /**
+     * The pool name recorded when this pool started, written by {@link #init(PoolConfiguration)} before anything is
+     * registered for the pool and never rewritten. The {@code name} property is mutable at runtime - the pool's own
+     * JMX exposes a {@code setName} that rewrites it on a running pool - while the registrations made for a pool
+     * (the query statistics and, for the reporting interceptors, the MBean and the broadcaster published under the
+     * name) stay keyed by the name the pool ran under when they were made. Resolving one of those registrations
+     * through the live property would move it away from a renamed pool: the renamed pool would book nothing and
+     * report a false "closed or abandoned" warning on every execution while the entry published at start would
+     * outlive every close, pinned by the registration that could no longer be found to release it. Interceptors
+     * that hold per-name state therefore resolve it through this record rather than through {@link #getName()}.
+     */
+    private volatile String registrationName;
+
+    /**
      * Since newProxyInstance performs the same operation, over and over again, it is much more optimized if we simply
      * store the constructor ourselves. One constructor is cached per proxy kind (with and without the XAConnection
      * interface), so that a pool whose backing data source changes kind at runtime keeps proxying each connection
@@ -300,6 +313,20 @@ public class ConnectionPool {
      */
     public String getName() {
         return getPoolProperties().getPoolName();
+    }
+
+    /**
+     * Returns the name this pool was registered under when it started. The registrations made for a pool - its
+     * query statistics and the monitoring MBean the reporting interceptors publish under the name - are keyed by
+     * this name, not by the live {@code name} property, which {@link #getName()} returns and which management can
+     * rewrite on a running pool: a rename then changes what the pool calls itself and moves nothing that was
+     * registered under the old name.
+     *
+     * @return the name recorded at pool start, or {@code null} while the pool has not gotten far enough into its
+     *             start to record one, or if it carried no name when it started
+     */
+    public String getRegistrationName() {
+        return registrationName;
     }
 
     /**
@@ -748,6 +775,12 @@ public class ConnectionPool {
 
         // Make sure the pool is properly configured
         checkPoolConfiguration(properties);
+
+        // Record the name this pool starts under before its MBean or the
+        // interceptors are told about the pool, so that everything the start
+        // registers under the name and everything a later lookup of it
+        // resolves through one record (see the field).
+        registrationName = properties.getPoolName();
 
         // Both queues are unbounded by design: membership is bounded by the
         // maxActive/size bookkeeping, not by queue capacity.
