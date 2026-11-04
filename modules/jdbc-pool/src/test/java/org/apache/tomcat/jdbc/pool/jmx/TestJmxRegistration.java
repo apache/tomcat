@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.MBeanRegistration;
+import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.Notification;
@@ -60,7 +61,10 @@ import org.apache.tomcat.jdbc.pool.interceptor.StatementCache;
  * perfectly well.</p>
  * <p>
  * The contract the first tests pin is that the returned name is this call's own
- * publish, or nothing at all. The last five drive that through a real pool: a
+ * publish, or nothing at all. The unregistration tests pin the mirror: what the
+ * helper reports when it takes a name down, since every holder drops its handle
+ * the moment it calls, and a refusal it cannot see leaves the MBean registered
+ * for the life of the JVM. The pool-level tests drive that through a real pool: a
  * {@code StatementCache} whose name is taken must leave the MBean that owns the
  * name registered when its connection is discarded, and it must publish itself
  * at the next borrow once the obstacle is gone; the {@code DataSource} one
@@ -100,6 +104,47 @@ class TestJmxRegistration extends JdbcPoolBaseTest {
         @Override
         public String getMarker() {
             return marker;
+        }
+    }
+
+    /*
+     * An MBean that refuses to be unregistered until told otherwise: the
+     * MBeanRegistrationException a throwing preDeregister() turns into a
+     * refused unregisterMBean() call, which is how a deregistration fails
+     * besides the name simply being gone.
+     */
+    public interface StubbornMBean {
+        String getMarker();
+    }
+
+    public static class Stubborn implements StubbornMBean, MBeanRegistration {
+        private volatile boolean allowRelease;
+
+        @Override
+        public String getMarker() {
+            return "stubborn";
+        }
+
+        @Override
+        public ObjectName preRegister(MBeanServer server, ObjectName name) {
+            return name;
+        }
+
+        @Override
+        public void postRegister(Boolean registrationDone) {
+            // nothing to do once published
+        }
+
+        @Override
+        public void preDeregister() throws Exception {
+            if (!allowRelease) {
+                throw new MBeanRegistrationException(null, "this MBean gives up its name only once");
+            }
+        }
+
+        @Override
+        public void postDeregister() {
+            // nothing to undo
         }
     }
 
@@ -355,6 +400,62 @@ class TestJmxRegistration extends JdbcPoolBaseTest {
                 "a name that cannot be built must not fall back to registering under the base");
         Assertions.assertEquals(before, new HashSet<>(poolMBeans(server)),
                 "a malformed name must publish nothing");
+    }
+
+    @Test
+    void aSuccessfulUnregistrationComesBackAsReleased() throws Exception {
+        MBeanServer server = server();
+        ObjectName name = uniqueName("released");
+        server.registerMBean(new Probe("released"), name);
+
+        Assertions.assertTrue(JmxUtil.unregisterJmx(name),
+                "an unregistration the server carried out must be reported as done: every"
+                        + " caller of this helper drops its handle the moment it calls, so a"
+                        + " release that silently did not happen is undetectable from the"
+                        + " calling side");
+        Assertions.assertFalse(server.isRegistered(name));
+    }
+
+    @Test
+    void aRefusedUnregistrationComesBackAsNotReleased() throws Exception {
+        MBeanServer server = server();
+        ObjectName name = uniqueName("stubborn");
+        Stubborn mbean = new Stubborn();
+        server.registerMBean(mbean, name);
+        try {
+            Assertions.assertFalse(JmxUtil.unregisterJmx(name),
+                    "an unregistration the MBean refused - a preDeregister() that throws, as a"
+                            + " modeler wrapper's failing postDeregister() also produces - must"
+                            + " come back as not done: the MBean is still registered under a"
+                            + " name its caller is about to forget, which is exactly the"
+                            + " failure the caller cannot see any other way, and it leaves a"
+                            + " live management surface for a dead component holding its"
+                            + " credentials and class loader until the JVM exits");
+            Assertions.assertTrue(server.isRegistered(name),
+                    "a refused unregistration must have left the MBean published - that is"
+                            + " the state the caller has to be warned about");
+        } finally {
+            mbean.allowRelease = true;
+            server.unregisterMBean(name);
+        }
+    }
+
+    @Test
+    void anUnregistrationOfNothingCountsAsDone() throws Exception {
+        MBeanServer server = server();
+        ObjectName gone = uniqueName("already-gone");
+        server.registerMBean(new Probe("gone"), gone);
+        server.unregisterMBean(gone);
+
+        // the MBean is already down - the desired end state, reached without
+        // this call - and no caller has anything left to do differently
+        Assertions.assertTrue(JmxUtil.unregisterJmx(gone),
+                "unregistering a name that is already gone must be reported as done, not as a"
+                        + " failure: an InstanceNotFoundException means the world is already"
+                        + " in the state the caller asked for, and grading it as a refusal"
+                        + " would hide the refusals that are real");
+        Assertions.assertTrue(JmxUtil.unregisterJmx(null),
+                "releasing nothing is the same end state and the same answer");
     }
 
     @Test
