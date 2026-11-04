@@ -43,9 +43,11 @@ import org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport.QueryStats;
  * removals of the other borrower threads: the map can still be over
  * capacity once the eviction has worked through its own snapshot. Running
  * past the end of the snapshot used to throw an
- * {@code IndexOutOfBoundsException} into the reporting code, which reaches
- * the application through the unguarded report call site - for a query that
- * had already been executed successfully.
+ * {@code IndexOutOfBoundsException} into the reporting code, which reached
+ * the application through the report call site of the statement proxy - for
+ * a query that had already been executed successfully. Those call sites are
+ * now guarded as a second line of defense, so what these tests pin is the
+ * first line: that the eviction itself never throws.
  */
 class TestSlowQueryEviction extends JdbcPoolBaseTest {
 
@@ -276,5 +278,44 @@ class TestSlowQueryEviction extends JdbcPoolBaseTest {
         Assertions.assertTrue(lastInvocation >= before && lastInvocation <= after,
                 "preparing a query must record when it happened, was "
                         + lastInvocation);
+    }
+
+    /*
+     * A statement prepared and never executed holds a live statistics
+     * entry whose execution timings were never booked, so they are still
+     * at their initial sentinels. The published views must not hand those
+     * sentinels out as measurements.
+     */
+    @Test
+    void aPreparedButNeverExecutedQueryPublishesNoSentinelTimings() throws Exception {
+        QueryStats stats = new QueryStats("SELECT 1 /* prepared, never executed */");
+        stats.prepare(3);
+
+        CompositeType type = new CompositeType("QueryStats", "QueryStats",
+                QueryStats.getFieldNames(), QueryStats.getFieldDescriptions(),
+                QueryStats.getFieldTypes());
+        CompositeData data = stats.getCompositeData(type);
+        Assertions.assertEquals(0L, ((Number) data.get("maxInvocationTime")).longValue(),
+                "the published maximum duration of an entry without executions must read as none, "
+                        + "not as the sentinel of the running maximum");
+        Assertions.assertEquals(0L, ((Number) data.get("minInvocationTime")).longValue(),
+                "the published minimum duration of an entry without executions must read as none, "
+                        + "not as the sentinel of the running minimum");
+
+        String rendered = stats.toString();
+        Assertions.assertFalse(rendered.contains("NaN"),
+                "the rendered statistics of an entry without executions must not divide by zero: " + rendered);
+        Assertions.assertFalse(rendered.contains(String.valueOf(Long.MIN_VALUE)),
+                "the rendered statistics must not carry the sentinel maximum as a duration: " + rendered);
+        Assertions.assertFalse(rendered.contains(String.valueOf(Long.MAX_VALUE)),
+                "the rendered statistics must not carry the sentinel minimum as a duration: " + rendered);
+
+        // The first execution replaces the zero reading with the booking
+        stats.add(42, System.currentTimeMillis());
+        data = stats.getCompositeData(type);
+        Assertions.assertEquals(42L, ((Number) data.get("maxInvocationTime")).longValue(),
+                "the first execution must publish the booked time");
+        Assertions.assertEquals(42L, ((Number) data.get("minInvocationTime")).longValue(),
+                "the first execution must publish the booked time");
     }
 }

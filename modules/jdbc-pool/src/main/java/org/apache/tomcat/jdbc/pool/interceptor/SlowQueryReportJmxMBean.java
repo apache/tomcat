@@ -21,10 +21,11 @@ import javax.management.openmbean.OpenDataException;
 /**
  * JMX MBean interface for exposing slow query statistics via JMX.
  * <p>
- * {@link SlowQueryReportJmx} is published as a <em>Standard</em> MBean, so this interface is the whole management
- * surface: a public method of the resource that is not declared here stays invisible to a JMX client - only the
- * notification methods contributed by {@link javax.management.NotificationEmitter} come on top. Everything an operator
- * needs, and everything the interceptor's {@code mbeans-descriptors.xml} advertises, therefore has to be declared here.
+ * The resource published for a pool name is {@link SlowQueryReportJmx.Registration}, exposed as a <em>Standard</em>
+ * MBean, so this interface is the whole management surface: a public method of the resource that is not declared here
+ * stays invisible to a JMX client - only the notification methods contributed by
+ * {@link javax.management.NotificationEmitter} come on top. Everything an operator needs, and everything the
+ * interceptor's {@code mbeans-descriptors.xml} advertises, therefore has to be declared here.
  * </p>
  * <p>
  * The MBean is published once per connection pool name - under

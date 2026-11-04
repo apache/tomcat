@@ -42,7 +42,7 @@ import org.apache.tomcat.jdbc.pool.DataSource;
  * pool. Resolving the registration through the <em>current</em> name
  * made a rename silently kill the statistics of a healthy pool: every
  * borrow resolved no statistics map, every execution booked nothing and
- * logged a false "Connection has already been closed or abandoned" WARN,
+ * logged a false "no statistics store to book to" WARN,
  * and the close released the wrong registration (or, with the name nulled
  * out, threw into the close loop's catch), leaving the start-time entry -
  * and for the JMX definition the MBean, its broadcaster and the closed
