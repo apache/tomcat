@@ -1103,7 +1103,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
      * @return the string with every recognised credential replaced by the mask,
      *         or the string unchanged when it holds none
      */
-    static String maskCredentials(String value) {
+    public static String maskCredentials(String value) {
         if (value == null) {
             return null;
         }
@@ -1204,7 +1204,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
      * @return the string with every recognised credential value replaced by
      *         the mask, or the string unchanged when it holds none
      */
-    private static String maskInterceptorCredentials(String value) {
+    public static String maskInterceptorCredentials(String value) {
         if (value == null) {
             return null;
         }
