@@ -33,12 +33,12 @@ import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 import org.apache.tomcat.jdbc.pool.DataSource;
 
 /**
- * Booking of the shared per-pool-name query statistics when more than
- * one reporting definition is configured on one pool.
+ * Booking of a pool's query statistics when more than one reporting
+ * definition is configured on one pool.
  * <p>
  * Every configured reporting definition wraps the statement again, so
  * one logical execution passes through every definition's hooks. The
- * statistics map is shared by all definitions of the pool's name, so it
+ * statistics map is shared by all definitions of the pool, so it
  * must be booked once per execution - by the deepest definition that
  * stores statistics - while the per-definition channels (logging, JMX
  * notifications, pinned by {@link TestSlowQueryJmxNotifications}) keep

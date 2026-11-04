@@ -504,6 +504,11 @@
          leaves the pool with its generated name. Note that this attribute of the pool is spelled with an
          underscore, unlike the <code>objectName</code> attribute of the <code>SlowQueryReportJmx</code>
          interceptor described below, which overrides only that interceptor's registration.</p>
+      <p>When the attribute is left unset on a container-managed JNDI resource whose data source is built
+         by the Tomcat JDBC connection pool factory, the container passes a generated, container-unique
+         name: <code>&lt;domain&gt;/&lt;host&gt;/&lt;context&gt;/&lt;JNDI-name&gt;</code> for a webapp
+         resource and <code>&lt;domain&gt;/&lt;JNDI-name&gt;</code> for a global resource. An explicitly
+         configured value always overrides the container-passed one.</p>
     </attribute>
 
     <attribute name="fairQueue" required="false">
@@ -898,7 +903,9 @@
        This class registers with the JVM's platform MBeanServer, so it works in any JVM, inside or
        outside a Tomcat container. By default, JMX notifications are sent through the ConnectionPool
        mbean if it is enabled; with <code>notifyPool=false</code> the <code>SlowQueryReportJmx</code>
-       instead publishes an MBean of its own, one per pool name, and sends the notifications through it.
+       instead publishes an MBean of its own, one per pool - published on the first
+       connection that pool lends, under the name that pool started with, and given up
+       when that pool closes - and sends the notifications through it.
     </p>
     <attributes>
       <attribute name="notifyPool" required="false">
@@ -914,7 +921,9 @@
            Note this interceptor attribute is spelled <code>objectName</code>, unlike the pool's own
            <code>object_name</code> attribute, which names the pool in the registrations; a
            <code>objectName</code> attribute on the pool itself is not a pool property and will be reported
-           as ignored.
+           as ignored. Registration by the default name is collision-free for container-built pools, since
+           a container-managed pool that does not set <code>object_name</code> carries a container-generated
+           unique pool name.
         </p>
       </attribute>
     </attributes>
