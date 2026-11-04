@@ -20,8 +20,10 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.res.StringManager;
@@ -69,6 +71,28 @@ public class DigestAuthenticator extends Authenticator {
         if (messageQop == null || messageQop.isEmpty()) {
             throw new AuthenticationException(sm.getString("digestAuthenticator.noQop"));
         }
+        // Convert to lower case now to avoid handling case differences later
+        messageQop = messageQop.toLowerCase(Locale.ENGLISH);
+        Set<String> qopValues = new HashSet<>();
+        String qop;
+        if (messageQop.indexOf(',') > -1) {
+            // Multiple values
+            String[] qopValuesArray = messageQop.split(",");
+            for (String q : qopValuesArray) {
+                qopValues.add(q.strip());
+            }
+        } else {
+            // Single value
+            qopValues.add(messageQop.strip());
+        }
+        if (qopValues.contains("auth-int")) {
+            qop = "auth-int";
+        } else if (qopValues.contains("auth")) {
+            qop = "auth";
+        } else {
+            throw new AuthenticationException(sm.getString("digestAuthenticator.unknownQop", messageQop));
+        }
+
         String algorithm = parameterMap.get("algorithm") == null ? "MD5" : parameterMap.get("algorithm");
         String opaque = parameterMap.get("opaque");
         if (cnonceGenerator == null) {
@@ -91,8 +115,8 @@ public class DigestAuthenticator extends Authenticator {
 
         try {
             challenge.append("response=\"");
-            challenge.append(calculateRequestDigest(method, requestUri, userName, userPassword, realm, nonce,
-                    messageQop, algorithm));
+            challenge.append(calculateRequestDigest(method, requestUri, userName, userPassword, realm, nonce, qop,
+                    algorithm));
             challenge.append("\",");
         }
 
@@ -105,9 +129,9 @@ public class DigestAuthenticator extends Authenticator {
             challenge.append("opaque=\"").append(opaque).append("\",");
         }
 
-        challenge.append("qop=\"").append(messageQop).append("\"");
+        challenge.append("qop=\"").append(qop).append("\"");
         challenge.append(",cnonce=\"").append(cNonce).append("\",");
-        challenge.append("nc=").append(String.format("%08X", Integer.valueOf(nonceCount)));
+        challenge.append("nc=").append(String.format("%08x", Integer.valueOf(nonceCount)));
 
         return challenge.toString();
 
@@ -117,7 +141,7 @@ public class DigestAuthenticator extends Authenticator {
             String realm, String nonce, String qop, String algorithm) throws NoSuchAlgorithmException {
 
         boolean session = false;
-        if (algorithm.endsWith("-sess")) {
+        if (algorithm.toLowerCase(Locale.ENGLISH).endsWith("-sess")) {
             algorithm = algorithm.substring(0, algorithm.length() - 5);
             session = true;
         }
@@ -146,14 +170,12 @@ public class DigestAuthenticator extends Authenticator {
         preDigest.append(':');
         preDigest.append(nonce);
 
-        if (qop.toLowerCase(Locale.ENGLISH).contains("auth")) {
-            preDigest.append(':');
-            preDigest.append(String.format("%08X", Integer.valueOf(nonceCount)));
-            preDigest.append(':');
-            preDigest.append(String.valueOf(cNonce));
-            preDigest.append(':');
-            preDigest.append(qop);
-        }
+        preDigest.append(':');
+        preDigest.append(String.format("%08x", Integer.valueOf(nonceCount)));
+        preDigest.append(':');
+        preDigest.append(String.valueOf(cNonce));
+        preDigest.append(':');
+        preDigest.append(qop);
 
         preDigest.append(':');
         preDigest.append(encode(algorithm, A2));
