@@ -210,7 +210,7 @@ public class CaseInsensitiveKeyMap<V> extends AbstractMap<String,V> {
         @Override
         public Entry<String,V> next() {
             Entry<Key,V> entry = iterator.next();
-            return new EntryImpl<>(entry.getKey().getKey(), entry.getValue());
+            return new SimpleImmutableEntry<>(entry.getKey().getKey(), entry.getValue());
         }
 
         @Override
@@ -219,32 +219,6 @@ public class CaseInsensitiveKeyMap<V> extends AbstractMap<String,V> {
         }
     }
 
-
-    private static class EntryImpl<V> implements Entry<String,V> {
-
-        private final String key;
-        private final V value;
-
-        EntryImpl(String key, V value) {
-            this.key = key;
-            this.value = value;
-        }
-
-        @Override
-        public String getKey() {
-            return key;
-        }
-
-        @Override
-        public V getValue() {
-            return value;
-        }
-
-        @Override
-        public V setValue(V value) {
-            throw new UnsupportedOperationException();
-        }
-    }
 
     private static class Key {
 

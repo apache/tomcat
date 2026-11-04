@@ -647,6 +647,13 @@
         use ISO-8859-1, the default used by Tomcat servers of this branch.
        (remm)
       </fix>
+      <fix>
+        Fix the entries returned by
+        <code>CaseInsensitiveKeyMap.entrySet()</code> so they implement the
+        <code>Map.Entry</code> <code>equals()</code> and <code>hashCode()</code>
+        contracts. This map backs the WebSocket handshake request and response
+        header maps. Pull request <pr>1075</pr> provided by breken-ai. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
