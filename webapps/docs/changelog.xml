@@ -622,6 +622,11 @@
         <code>BeanELResolver</code> from resolving bean-style properties (such
         as <code>isValid()</code>) on a <code>Record</code>. (markt)
       </fix>
+      <fix>
+        Fix a JAR file handle leak when a tag file specifies an unsupported
+        <code>pageEncoding</code>. Close the input stream if reader creation
+        fails so that its reference to the JAR is released. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
