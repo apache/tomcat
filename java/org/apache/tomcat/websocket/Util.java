@@ -50,6 +50,7 @@ import javax.websocket.PongMessage;
 import javax.websocket.Session;
 
 import org.apache.tomcat.InstanceManager;
+import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.pojo.PojoMessageHandlerPartialBinary;
 import org.apache.tomcat.websocket.pojo.PojoMessageHandlerWholeBinary;
@@ -541,7 +542,11 @@ public class Util {
                     int len = value.length();
                     if (len > 1) {
                         if (value.charAt(0) == '\"' && value.charAt(len - 1) == '\"') {
-                            value = value.substring(1, value.length() - 1);
+                            String unquoted = HttpParser.unquote(value);
+                            if (unquoted == null) {
+                                throw new IllegalArgumentException(sm.getString("util.invalidValue", value));
+                            }
+                            value = unquoted;
                         }
                     }
                 }

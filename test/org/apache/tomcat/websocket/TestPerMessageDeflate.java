@@ -809,6 +809,22 @@ public class TestPerMessageDeflate {
     }
 
 
+    /*
+     * RFC 7692 section 7.1.2.2: client_max_window_bits may be sent without a value in an offer but a response must
+     * include a value. A client must therefore decline a response without a value.
+     */
+    @Test
+    public void testClientMaxWindowBitsWithoutValueInResponse() {
+        List<Parameter> parameters = new ArrayList<>();
+        parameters.add(new WsExtensionParameter("client_max_window_bits", null));
+        List<List<Parameter>> preferences = new ArrayList<>();
+        preferences.add(parameters);
+
+        Assert.assertNull(PerMessageDeflate.build(preferences, false));
+        Assert.assertNotNull(PerMessageDeflate.build(preferences, true));
+    }
+
+
     private static void assertAccepted(String name, String value) {
         List<Parameter> parameters = new ArrayList<>();
         parameters.add(new WsExtensionParameter(name, value));
