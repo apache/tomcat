@@ -1325,6 +1325,19 @@
         collected once nothing else refers to it, with its name released
         by the next pool that takes it over. (remm)
       </fix>
+      <fix>
+        The <code>SlowQueryReport</code> and <code>SlowQueryReportJmx</code>
+        interceptors now key their statistics and their JMX registration to
+        the connection pool rather than to the pool name. Statistics belong
+        to the pool that records them, are published under the name that
+        pool started with and are given up when that pool closes, so
+        starting, closing or replacing a pool no longer disturbs the
+        statistics or the registration of another pool; reading recorded
+        queries by name remains available as a view. Sharing one name
+        between live pools is no longer supported. The identity hash term in
+        the default pool name, which identified only the class loader and
+        added no uniqueness, has been removed. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

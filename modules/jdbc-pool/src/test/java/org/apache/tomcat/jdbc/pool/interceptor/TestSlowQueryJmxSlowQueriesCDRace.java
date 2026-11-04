@@ -112,14 +112,15 @@ class TestSlowQueryJmxSlowQueriesCDRace {
     }
 
     /*
-     * The statistics of a pool name, registered directly rather than
-     * through a live pool: the map is plain shared state keyed by name, and
-     * the read under test only ever consults it. The unique name keeps the
-     * static registry clean across tests.
+     * The statistics of a pool, published under a name directly rather than
+     * through a live pool: the store is plain state, and the read under test
+     * only ever consults the map behind it. The store belongs to no pool here
+     * - nothing in the scenario reaches the pool an owner reference would
+     * point at - and the unique name keeps the static view clean across tests.
      */
     private static ConcurrentHashMap<String, QueryStats> seedStats(String poolName) {
         assertBinsInvisitOrder();
-        SlowQueryReport.PoolStatistics statistics = new SlowQueryReport.PoolStatistics();
+        SlowQueryReport.PoolStatistics statistics = new SlowQueryReport.PoolStatistics(null, poolName);
         SlowQueryReport.perPoolStats.put(poolName, statistics);
         ConcurrentHashMap<String, QueryStats> live = statistics.getQueryStats();
         live.put(MIDDLE, new QueryStats(MIDDLE));

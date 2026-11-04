@@ -131,14 +131,16 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     /** Whether to log abandoned connections. */
     private volatile boolean logAbandoned = false;
     /**
-     * The pool name. The identity hash of the class object is the same for
-     * every pool in a JVM - it identifies the class loader that loaded this
-     * class, not the pool - so the per-pool uniqueness of the default name
-     * comes from the counter alone. The hash term is upstream's default-name
-     * shape and stays for that reason.
+     * The pool name. This default is the fallback for a pool nobody named: a
+     * container-managed pool is given a name of its own before it starts, so
+     * what is left to name here is a pool built programmatically, once per
+     * {@code PoolProperties} instance. The counter is what makes those names
+     * distinct within this class loader; upstream's default also carried the
+     * identity hash of this class object, which identifies only the class
+     * loader that loaded it - the same value for every pool in a JVM - and so
+     * is not in the name any more.
      */
-    private volatile String name = "Tomcat Connection Pool[" + (poolCounter.addAndGet(1)) + "-" +
-            System.identityHashCode(PoolProperties.class) + "]";
+    private volatile String name = "Tomcat Connection Pool[" + (poolCounter.addAndGet(1)) + "]";
     /** The database password. */
     private volatile String password;
     /** The database username. */

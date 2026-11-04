@@ -158,6 +158,7 @@ class TestInterceptorRemovalBeforePoolClose extends JdbcPoolBaseTest {
             }
             Assertions.assertTrue(server.isRegistered(oname),
                     "the borrow must have published the MBean for the pool name");
+            ConnectionPool pool = ds.getPool();
 
             ds.setJdbcInterceptors("");
             ds.close();
@@ -165,8 +166,8 @@ class TestInterceptorRemovalBeforePoolClose extends JdbcPoolBaseTest {
             Assertions.assertFalse(server.isRegistered(oname),
                     "a definition that published an MBean at its start must take it down at the"
                             + " close, whatever the interceptor list says by then");
-            Assertions.assertFalse(SlowQueryReportJmx.mbeans.containsKey(poolName),
-                    "and the registry of published names must not keep the name either");
+            Assertions.assertNull(SlowQueryReportJmx.jmxStateFor(pool),
+                    "and the JMX state the pool published must not be kept either");
             Assertions.assertNull(SlowQueryReport.getPoolStats(poolName),
                     "nor may the statistics it registered under that name");
         } finally {
@@ -250,6 +251,7 @@ class TestInterceptorRemovalBeforePoolClose extends JdbcPoolBaseTest {
             Assertions.assertTrue(server.isRegistered(oname),
                     "the premise: a borrow through the added definition published the MBean"
                             + " for the pool name");
+            ConnectionPool pool = ds.getPool();
 
             ds.setJdbcInterceptors("");
             ds.close();
@@ -259,8 +261,8 @@ class TestInterceptorRemovalBeforePoolClose extends JdbcPoolBaseTest {
                             + " because the one definition of it was added after the start and"
                             + " removed again before the close - neither list the close works"
                             + " through ever names it, but its chain published the registration");
-            Assertions.assertFalse(SlowQueryReportJmx.mbeans.containsKey(poolName),
-                    "and the registry of published names must not keep the name either");
+            Assertions.assertNull(SlowQueryReportJmx.jmxStateFor(pool),
+                    "and the JMX state that publication hung from must not be kept either");
         } finally {
             ds.close();
         }
