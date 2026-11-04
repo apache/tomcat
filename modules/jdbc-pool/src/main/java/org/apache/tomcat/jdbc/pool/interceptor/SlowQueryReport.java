@@ -24,6 +24,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.management.openmbean.CompositeDataSupport;
@@ -46,7 +47,10 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  * The statistics are published under the pool <em>name</em> (see {@link #getPoolStats(String)}), registered when a pool
  * starts and released when the last live pool registered under that name closes. Pools configured with the same name -
  * possible with {@code jmxEnabled=false}, which removes the JMX ObjectName clash that would otherwise catch it -
- * therefore share one statistics map; closing one of them never takes the shared statistics away from the others.
+ * therefore share one statistics map; closing one of them never takes the shared statistics away from the others. The
+ * live-pool registration holds the pool weakly: a pool abandoned without closing is never pinned by it and can be
+ * collected with its open sessions, leaving only the bounded statistics map under its name until a same-named close
+ * releases it.
  * </p>
  * <p>
  * More than one reporting definition can be configured on one pool - the two-thresholds configuration of
@@ -271,7 +275,8 @@ public class SlowQueryReport extends AbstractQueryReport {
     /**
      * Initializes the query statistics map for the given connection pool.
      * <p>
-     * The map is registered under the pool name together with the pool instance itself. If a live pool is already
+     * The map is registered under the pool name together with a weak registration of the pool as one of the live
+     * pools the name is held for; the registration cannot keep an abandoned pool alive. If a live pool is already
      * registered under the name, both pools share one statistics map; that merging is the pre-existing behaviour, but
      * it is a configuration mistake worth a warning, so it is logged.
      * </p>
@@ -543,8 +548,12 @@ public class SlowQueryReport extends AbstractQueryReport {
     /**
      * The query statistics published under one pool name, together with the live pools registered for that name.
      * ConnectionPool does not override {@code equals} or {@code hashCode}, so pool membership is by instance identity.
-     * Instances are mutated only from within a {@code ConcurrentHashMap.compute} on their name key, which serialises
-     * them against each other.
+     * The live pools are held with weak references: a pool the application abandoned without closing is not pinned by
+     * the registration, and can be collected together with everything it reaches - its queues, pooled connections
+     * and open physical sessions - the way it could before the live-pool bookkeeping existed. What the registration
+     * keeps alive is the bounded statistics map under the name, never the pool. The set is internally synchronised,
+     * which its reads outside the {@code ConcurrentHashMap.compute} on the name key need, and collection drains
+     * registrations through the same lock, so no external serialisation beyond the set's own lock is required.
      */
     protected static class PoolStatistics {
         /**
@@ -553,9 +562,12 @@ public class SlowQueryReport extends AbstractQueryReport {
          */
         private final ConcurrentHashMap<String, QueryStats> stats = new ConcurrentHashMap<>();
         /**
-         * the live pools registered under the name; the statistics are released once this set runs empty
+         * the live pools registered under the name; the statistics are released once this set runs empty. Held
+         * weakly, so a pool that was abandoned without closing drains out when it is garbage collected instead of
+         * being pinned by the static registration.
          */
-        private final Set<ConnectionPool> livePools = ConcurrentHashMap.newKeySet();
+        private final Set<ConnectionPool> livePools = Collections
+                .synchronizedSet(Collections.newSetFromMap(new WeakHashMap<ConnectionPool, Boolean>()));
 
         /**
          * Registers a pool that started under this name.
@@ -567,7 +579,9 @@ public class SlowQueryReport extends AbstractQueryReport {
         }
 
         /**
-         * Deregisters a pool that closed.
+         * Deregisters a pool that closed. A same-named pool that was abandoned without closing has already drained
+         * out of the weakly-held set once it was garbage collected, so it cannot keep the name registered after its
+         * own session graph is gone.
          *
          * @param pool the connection pool that has been closed
          *
@@ -590,10 +604,11 @@ public class SlowQueryReport extends AbstractQueryReport {
         }
 
         /**
-         * Returns whether the given pool is one of the live pools registered under this name. The live-pool set is
-         * concurrent, so this plain membership read is safe outside the {@code ConcurrentHashMap.compute} that mutates
-         * it: it tells a caller, without making a concurrent start wait behind a lock, whether the name is still held
-         * live by the given pool.
+         * Returns whether the given pool is one of the live pools registered under this name. The set is internally
+         * synchronised, so this membership read is safe outside the {@code ConcurrentHashMap.compute} that mutates
+         * it: it tells a caller, without making a concurrent start wait behind the name's compute lock, whether the
+         * name is still held live by the given pool. A registration whose pool has been garbage collected drains on
+         * the next read or write, but a pool a caller still holds is never cleared and reads as live.
          *
          * @param pool the pool to look for
          *
