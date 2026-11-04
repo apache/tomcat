@@ -165,6 +165,11 @@ public class PerMessageDeflate implements Transformation {
                     } else if (CLIENT_MAX_WINDOW_BITS.equals(param.getName())) {
                         if (clientMaxWindowBits == -1) {
                             if (param.getValue() == null) {
+                                if (!isServer) {
+                                    // RFC 7692, section 7.1.2.2: a response must include a value
+                                    throw new IllegalArgumentException(sm.getString(
+                                            "perMessageDeflate.invalidParameterValue", CLIENT_MAX_WINDOW_BITS, null));
+                                }
                                 // Hint to server that the client supports this
                                 // option. Java SE API (as of Java 11) does not
                                 // expose the API to control the Window size. It is
