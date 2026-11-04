@@ -17,15 +17,22 @@
 package org.apache.tomcat.jdbc.pool.interceptor;
 
 import java.lang.management.ManagementFactory;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
+import javax.management.MBeanNotificationInfo;
 import javax.management.MBeanOperationInfo;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -115,6 +122,64 @@ class TestSlowQueryJmxMBeanSurface extends JdbcPoolBaseTest {
             Assertions.assertEquals("void", reset.getReturnType(),
                     "resetStats() is declared without a return value, as the descriptor states");
         }
+    }
+
+    @Test
+    void mBeanInfoAdvertisesTheNotificationTypesTheMBeanSends() throws Exception {
+        // JMX clients discover what an MBean can send through
+        // MBeanInfo.getNotifications() - consoles, monitoring and bridge
+        // agents, tooling that builds a NotificationFilterSupport from the
+        // advertised types. An MBean that sends its queries as the two wire
+        // types of this class but advertises none of them leaves that tooling
+        // blind whatever delivery itself does (the pool's own MBean declares
+        // its types the same way, see TestJmxNotificationTypeContract).
+        String poolName = "JmxNotifInfo-" + System.nanoTime();
+        DataSource ds = reportingPoolNamed(poolName);
+
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        ObjectName oname = objectNameFor(poolName);
+
+        try (@SuppressWarnings("unused") Connection con = ds.getConnection()) {
+            Assertions.assertTrue(server.isRegistered(oname),
+                    "the premise: the interceptor MBean must be registered");
+            MBeanNotificationInfo[] advertisedInfo = server.getMBeanInfo(oname).getNotifications();
+            Set<String> advertised = advertisedInfo == null ? new HashSet<>()
+                    : Arrays.stream(advertisedInfo).flatMap(i -> Arrays.stream(i.getNotifTypes()))
+                            .collect(Collectors.toSet());
+            Assertions.assertEquals(new HashSet<>(Arrays.asList(
+                            SlowQueryReportJmx.SLOW_QUERY_NOTIFICATION,
+                            SlowQueryReportJmx.FAILED_QUERY_NOTIFICATION)), advertised,
+                    "the published MBean must advertise exactly the notification types it sends");
+        }
+    }
+
+    @Test
+    void theDescriptorAdvertisesTheWireTypesTheNotificationsCarry() throws Exception {
+        // mbeans-descriptors.xml is this MBean's legacy metadata, and like the
+        // published MBeanInfo it is material a tool builds its filters from:
+        // a notification type that differs from the wire string makes a filter
+        // built from the metadata match nothing. The constants are the wire
+        // contract (see TestJmxNotificationTypeContract), so the descriptor
+        // must carry exactly them, and no half-written descriptions.
+        Path descriptor = Paths.get("src", "main", "java", "org", "apache", "tomcat",
+                "jdbc", "pool", "interceptor", "mbeans-descriptors.xml");
+        String xml = new String(Files.readAllBytes(descriptor), StandardCharsets.UTF_8);
+
+        Set<String> advertised = new HashSet<>();
+        Matcher types = Pattern.compile("<notification-type>([^<]+)</notification-type>")
+                .matcher(xml);
+        while (types.find()) {
+            advertised.add(types.group(1));
+        }
+        Assertions.assertEquals(new HashSet<>(Arrays.asList(
+                        SlowQueryReportJmx.SLOW_QUERY_NOTIFICATION,
+                        SlowQueryReportJmx.FAILED_QUERY_NOTIFICATION)), advertised,
+                "the descriptor must name the notification types by the exact strings the"
+                        + " notifications carry on the wire - a client building its filter"
+                        + " from the metadata must match what the MBean actually sends");
+
+        Assertions.assertFalse(Pattern.compile("description=\"[^\"]*\\s\"").matcher(xml).find(),
+                "no description may dangle half-written on a trailing space");
     }
 
     @Test

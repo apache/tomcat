@@ -19,6 +19,7 @@ package org.apache.tomcat.jdbc.pool.jmx;
 
 import java.lang.management.ManagementFactory;
 
+import javax.management.InstanceNotFoundException;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
@@ -71,16 +72,33 @@ public class JmxUtil {
     /**
      * Unregister an MBean.
      *
-     * @param oname the object name to unregister
+     * @param oname the object name to unregister, or {@code null} to release
+     *            nothing
+     *
+     * @return {@code true} if the name is no longer registered - either this
+     *             call took it down, or it was already gone, or there was
+     *             nothing to release; {@code false} if the MBean server refused
+     *             to unregister it, which means the MBean is still published
+     *             under that name and, since callers drop their handle
+     *             regardless, held by nothing for the rest of the JVM's life
      */
-    public static void unregisterJmx(ObjectName oname) {
+    public static boolean unregisterJmx(ObjectName oname) {
         if (oname == null) {
-            return;
+            return true;
         }
         try {
             ManagementFactory.getPlatformMBeanServer().unregisterMBean(oname);
+            return true;
+        } catch (InstanceNotFoundException e) {
+            // The MBean is already down - the end state this call was asked to
+            // bring about, not a failure, and no caller can act on it
+            log.debug(MessageFactory.get("jmxUtil.jmxUnregistrationFailed") + " " + oname);
+            return true;
         } catch (Exception e) {
-            log.error(MessageFactory.get("jmxUtil.jmxUnregistrationFailed"), e);
+            // The MBean is still registered, and this name is now owned by
+            // nobody: say so, with the name, so an operator can take it down
+            log.error(MessageFactory.get("jmxUtil.jmxUnregistrationRefused", oname), e);
+            return false;
         }
     }
 

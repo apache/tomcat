@@ -25,15 +25,20 @@ import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.ListenerNotFoundException;
 import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
 import javax.management.Notification;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
@@ -44,6 +49,8 @@ import org.junit.jupiter.api.Test;
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
+import org.apache.tomcat.jdbc.pool.PoolProperties;
+import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
 
 /**
  * JMX notifications of the {@code SlowQueryReportJmx} interceptor in
@@ -77,7 +84,11 @@ import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
  * same-named pool has taken over, nor stop at anything but the ObjectName
  * the registration was published under: the registry records the name its
  * owner registered, and a release that finds a live pool other than the
- * releasing one under the name leaves the whole name with that pool.</p>
+ * releasing one under the name leaves the whole name with that pool. The
+ * publication itself runs as a later step of the slot-taking borrow, so a
+ * publish can also land behind a release of its own slot - and must then
+ * undo itself, leaving the name publishable by the next pool instead of
+ * orphaned forever.</p>
  * <p>
  * The notifications themselves must also be deliverable beyond this
  * JVM: {@code Notification} marshals its source, so the source has to be
@@ -253,6 +264,57 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
         Assertions.assertEquals(customOname, received.get(0).getSource(),
                 "the source must name the MBean by the configured override it was"
                         + " registered under, not by the default shape or the instance");
+    }
+
+    @Test
+    void everyDefinitionOfANameSendsTheNameTheRegistrationWasPublishedUnder() throws Exception {
+        String poolName = "JmxSourceTwoDefinitions-" + System.nanoTime();
+        String customName = "tomcat.jdbc:type=SlowQueryOverride_" + System.nanoTime();
+        DataSource ds = newDataSource();
+        ds.setName(poolName);
+        // Two reporting definitions in one chain - the shape the two-thresholds
+        // configuration documents: the first definition in the chain takes the
+        // registration slot and publishes under its configured name, and the
+        // second definition's instances never publish - yet every instance of
+        // the name reports its slow queries through the name's broadcaster,
+        // which the published MBean answers on.
+        ds.setJdbcInterceptors("org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx"
+                + "(notifyPool=false,threshold=0,objectName=" + customName + ");"
+                + "org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx"
+                + "(notifyPool=false,threshold=0)");
+        ds.getPoolProperties().setInitialSize(0);
+
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        ObjectName customOname = new ObjectName(customName);
+        ObjectName defaultOname = new ObjectName("tomcat.jdbc:type="
+                + SlowQueryReportJmx.class.getName() + ",name=" + poolName);
+        List<Notification> received = new CopyOnWriteArrayList<>();
+        NotificationListener listener = (notification, handback) -> received.add(notification);
+
+        try (Connection con = ds.getConnection()) {
+            Assertions.assertTrue(server.isRegistered(customOname),
+                    "the first definition of the chain wins the name and publishes under"
+                            + " its configured ObjectName");
+            Assertions.assertFalse(server.isRegistered(defaultOname),
+                    "the second definition must not publish a second MBean under the name");
+            interceptorOf(con, SlowQueryReportJmx.class)
+                    .addNotificationListener(listener, null, null);
+            try (Statement st = con.createStatement()) {
+                st.execute(slowSql(1));
+            }
+        }
+
+        Assertions.assertEquals(2, received.size(),
+                "both reporting definitions of the chain see the query and notify");
+        for (Notification notification : received) {
+            Assertions.assertEquals(customOname, notification.getSource(),
+                    "every notification of a pool name must carry the ObjectName the"
+                            + " registration was published under: a non-publishing instance"
+                            + " recomputing the source from its own properties stamps the"
+                            + " notification with a name nothing is registered under, so a"
+                            + " client filtering by source silently misses it, and a client"
+                            + " grouping by source sees a phantom MBean");
+        }
     }
 
     @Test
@@ -645,6 +707,67 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
         }
     }
 
+    /*
+     * A reporting interceptor that counts the ObjectNames its borrows form.
+     * Once a pool name holds its registration, a borrow cannot publish a
+     * second MBean under it - the slot race is already lost to the pool's own
+     * registration - so forming the name and building a Registration for that
+     * losing race is work a healthy pool pays per connection, per borrow.
+     */
+    public static class CountingFormationReport extends SlowQueryReportJmx {
+        @Override
+        public ObjectName getObjectName(Class<?> clazz, String poolName)
+                throws MalformedObjectNameException {
+            NAME_FORMATIONS.computeIfAbsent(String.valueOf(poolName), k -> new AtomicInteger())
+                    .incrementAndGet();
+            return super.getObjectName(clazz, poolName);
+        }
+    }
+
+    private static final Map<String, AtomicInteger> NAME_FORMATIONS = new ConcurrentHashMap<>();
+
+    private static int nameFormations(String poolName) {
+        AtomicInteger count = NAME_FORMATIONS.get(poolName);
+        return count == null ? 0 : count.get();
+    }
+
+    @Test
+    void aRegisteredNameCostsNoFurtherNameFormationPerBorrow() throws Exception {
+        String poolName = "JmxFormation-" + System.nanoTime();
+        DataSource ds = reportingPoolNamed(poolName,
+                CountingFormationReport.class.getName() + "(notifyPool=false,threshold=0)");
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        ObjectName oname = new ObjectName("tomcat.jdbc:type="
+                + CountingFormationReport.class.getName() + ",name=" + poolName);
+        try {
+            try (@SuppressWarnings("unused") Connection first = ds.getConnection()) {
+                Assertions.assertTrue(server.isRegistered(oname),
+                        "the premise: the first borrow published the MBean under the name");
+                int formationsAtRegistration = nameFormations(poolName);
+                Assertions.assertTrue(formationsAtRegistration >= 1,
+                        "the borrow that publishes the name must have formed it");
+
+                try (@SuppressWarnings("unused") Connection second = ds.getConnection()) {
+                    // nothing to do: the borrow itself is the measured step
+                }
+                try (@SuppressWarnings("unused") Connection third = ds.getConnection()) {
+                    // a reused connection exercises the same path again
+                }
+
+                Assertions.assertEquals(formationsAtRegistration, nameFormations(poolName),
+                        "a name that already holds its registration must be noticed before"
+                                + " the name is formed and a Registration built to lose the"
+                                + " slot race: parsing a full ObjectName and allocating a"
+                                + " publication that cannot happen on every borrow of a"
+                                + " perfectly registered pool is cost with no possible use -"
+                                + " and a refused registration still leaves the slot free, so"
+                                + " the retry semantics of a failed publish are untouched");
+            }
+        } finally {
+            ds.close();
+        }
+    }
+
     @Test
     void failedRegistrationFreesTheSlotSoALaterBorrowCanStillPublish() throws Exception {
         String poolName = "JmxRegFail-" + System.nanoTime();
@@ -791,6 +914,40 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
                 // nothing registered left to clean up under this name
             }
         }
+    }
+
+    @Test
+    void aNotificationSentAfterTheNameWasReleasedDoesNotBringTheNameBack() throws Exception {
+        String poolName = "JmxLateNotify-" + System.nanoTime();
+        DataSource ds = reportingPoolNamed(poolName);
+        SlowQueryReportJmx reporter;
+        try (Connection con = ds.getConnection()) {
+            reporter = interceptorOf(con, SlowQueryReportJmx.class);
+            try (Statement st = con.createStatement()) {
+                st.execute(slowSql(1));
+            }
+            Assertions.assertNotNull(SlowQueryReportJmx.notifiers.get(poolName),
+                    "the premise: reporting a query of a live pool reaches the name's"
+                            + " broadcaster, which is created for it");
+        }
+        ds.close();
+        Assertions.assertNull(SlowQueryReportJmx.notifiers.get(poolName),
+                "the premise: closing the last pool of the name released that broadcaster");
+
+        // A query that was already running while the pool came down reports
+        // when it finishes, and the interceptor instance that served it outlives
+        // the close holding the name it reported under.
+        reporter.notifyJmx("SELECT 1", SlowQueryReportJmx.SLOW_QUERY_NOTIFICATION);
+
+        Assertions.assertNull(SlowQueryReportJmx.notifiers.get(poolName),
+                "a notification sent for a name that is released must not put that name back"
+                        + " in the static registry: nothing that runs for the dead name will"
+                        + " take it down again, so the entry - and any listener a client still"
+                        + " holds on the broadcaster it comes with, and the class loader behind"
+                        + " it - outlive the pool by the life of the JVM, until some later pool"
+                        + " happens to use the same name");
+        Assertions.assertNull(SlowQueryReportJmx.mbeans.get(poolName),
+                "and the send must not leave anything else registered under the released name");
     }
 
     @Test
@@ -1025,5 +1182,346 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
                 // the teardown under test may already have dropped the binding
             }
         }
+    }
+
+    @Test
+    void aRegistrationCompletedBehindItsOwnReleaseLeavesNothingPublished() throws Exception {
+        String poolName = "JmxLatePublish-" + System.nanoTime();
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        ObjectName oname = new ObjectName("tomcat.jdbc:type="
+                + SlowQueryReportJmx.class.getName() + ",name=" + poolName);
+
+        // registerJmx takes the per-name registry slot and publishes to the
+        // MBeanServer as two separate steps. The race this test pins is a
+        // release running between them: it takes the slot out and unregisters
+        // the name - which nothing has published under yet, so the
+        // unregistration finds nothing - and the publish then completes
+        // behind it, with no live state left that still knows about it. The
+        // window inside one borrow is a thread race no test can force
+        // deterministically, so - as in the late-release test above - the test
+        // drives the two decided steps apart in the order the race leaves them.
+
+        // The state after registerJmx's first step: the slot holds the
+        // registration the borrow is about to publish.
+        SlowQueryReportJmx.Registration inFlight =
+                new SlowQueryReportJmx.Registration(poolName, oname);
+        Assertions.assertNull(SlowQueryReportJmx.mbeans.putIfAbsent(poolName, inFlight),
+                "the test's premise: the per-name slot must start free");
+
+        // The release that lands inside the window: it takes the slot it read
+        // out of the registry and unregisters the ObjectName that registration
+        // records - a name the MBeanServer has never seen.
+        SlowQueryReportJmx releaser = new SlowQueryReportJmx();
+        releaser.poolName = poolName;
+        releaser.deregisterJmx();
+        Assertions.assertNull(SlowQueryReportJmx.mbeans.get(poolName),
+                "the release must have let go of the slot the in-flight publish held");
+
+        // The stalled publish now completes. The MBeanServer takes it: the
+        // name was never published, so nothing collides with it. A registration
+        // that does not check its own publication against the registry is
+        // published from here on with nothing tracking it: no pool, no
+        // registry entry, no live bookkeeping - an orphan until the JVM exits,
+        // holding the name every later pool under it would register under.
+        server.registerMBean(inFlight, oname);
+        Assertions.assertFalse(server.isRegistered(oname),
+                "a publish that lands behind the release of its own slot must undo"
+                        + " itself - the registration is the only object that can"
+                        + " still tell its publication apart from a taken one");
+        Assertions.assertNull(SlowQueryReportJmx.mbeans.get(poolName),
+                "the undone publish must not leave a registry entry behind");
+
+        // The name must stay usable: a pool started after the undone publish
+        // must be able to register it cleanly, and release it again on close.
+        DataSource revived = reportingPoolNamed(poolName);
+        try (@SuppressWarnings("unused") Connection borrowed = revived.getConnection()) {
+            Assertions.assertTrue(server.isRegistered(oname),
+                    "the first borrow of a pool started after the undone publish must"
+                            + " publish the name - the undone orphan must not poison it");
+        }
+        revived.close();
+        Assertions.assertFalse(server.isRegistered(oname),
+                "closing the pool that took the name after the undone publish must release it");
+        Assertions.assertNull(SlowQueryReportJmx.mbeans.get(poolName),
+                "and release the per-name registry slot with it");
+    }
+
+    @Test
+    void aRegistrationCompletedBehindAReleaseAndATakeoverLeavesTheSuccessorAlone()
+            throws Exception {
+        String poolName = "JmxLatePostRegister-" + System.nanoTime();
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        ObjectName oname = new ObjectName("tomcat.jdbc:type="
+                + SlowQueryReportJmx.class.getName() + ",name=" + poolName);
+
+        // The undo in postRegister is aimed at the name of its own publish -
+        // which is exactly the name a takeover under the same pool name
+        // registers under. The race this test pins has three steps inside the
+        // window between the server taking a registration and calling its
+        // postRegister: the release of the name lands after the commit (so it
+        // takes this publication down), and a new pool then finds the slot and
+        // the name both free and publishes itself. When the stalled
+        // postRegister finally runs, the slot holds the successor - and a
+        // registration that reads "not my slot" as "no slot" takes the
+        // successor's live MBean down under it. As in the test above, the
+        // decided steps are driven apart in the order the race leaves them.
+
+        // The borrow's registration: slot taken, publication committed.
+        SlowQueryReportJmx.Registration inFlight =
+                new SlowQueryReportJmx.Registration(poolName, oname);
+        Assertions.assertNull(SlowQueryReportJmx.mbeans.putIfAbsent(poolName, inFlight));
+        server.registerMBean(inFlight, oname);
+
+        // Step one inside the window: the release, which takes the slot it
+        // read out of the registry and unregisters the name this publication
+        // occupies - the release runs against the recorded name, so it does
+        // take this publication down.
+        SlowQueryReportJmx releaser = new SlowQueryReportJmx();
+        releaser.poolName = poolName;
+        releaser.deregisterJmx();
+        Assertions.assertFalse(server.isRegistered(oname),
+                "the premise of the takeover below: this release ran after the commit, so its"
+                        + " unregistration took this publication down - which is also what made"
+                        + " the name free again");
+
+        // Step two: a new pool under the same name finds the slot and the name
+        // free - freed by that very release - and publishes cleanly.
+        SlowQueryReportJmx.Registration successor =
+                new SlowQueryReportJmx.Registration(poolName, oname);
+        Assertions.assertNull(SlowQueryReportJmx.mbeans.putIfAbsent(poolName, successor),
+                "the release must have left the slot free for the takeover");
+        server.registerMBean(successor, oname);
+        Assertions.assertTrue(server.isRegistered(oname),
+                "the successor's publication must have been accepted");
+
+        // The stalled postRegister of the first registration now runs - what
+        // the server would call at the end of the interrupted registerMBean.
+        inFlight.postRegister(Boolean.TRUE);
+
+        try {
+            Assertions.assertTrue(server.isRegistered(oname),
+                    "a late postRegister must leave the successor's MBean alone: the slot"
+                            + " holding another registration means that release already took"
+                            + " this publication down - there is nothing left of it to undo -"
+                            + " and unregistering the name now destroys the live MBean of the"
+                            + " pool that took the name over, silently and with the registry"
+                            + " still claiming it is published");
+            Assertions.assertSame(successor, SlowQueryReportJmx.mbeans.get(poolName),
+                    "the successor must still hold the registry slot it took");
+        } finally {
+            SlowQueryReportJmx janitor = new SlowQueryReportJmx();
+            janitor.poolName = poolName;
+            janitor.deregisterJmx();
+            if (server.isRegistered(oname)) {
+                server.unregisterMBean(oname);
+            }
+        }
+    }
+
+    @Test
+    void aLatePublishUnderANameTheRegistryNoLongerRecordsUndoesItself() throws Exception {
+        String poolName = "JmxLatePublishOtherName-" + System.nanoTime();
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        ObjectName oname = new ObjectName("tomcat.jdbc:type="
+                + SlowQueryReportJmx.class.getName() + ",name=" + poolName);
+        // Two definitions of one pool name may compute different ObjectNames -
+        // the configured override of one and the default shape of the other is
+        // enough (see registrationObjectName), and that is what separates this
+        // race from the one above.
+        ObjectName successorName = new ObjectName(
+                "tomcat.jdbc:type=LatePublishSuccessor_" + System.nanoTime());
+
+        // Driven in the order the race leaves the steps: the release lands
+        // while this publish is in flight, so its unregistration finds nothing
+        // to take down; a second pool under the same name, configured with a
+        // name of its own, takes the free slot and publishes there; and only
+        // then does the stalled publish commit.
+        SlowQueryReportJmx.Registration inFlight =
+                new SlowQueryReportJmx.Registration(poolName, oname);
+        Assertions.assertNull(SlowQueryReportJmx.mbeans.putIfAbsent(poolName, inFlight));
+
+        SlowQueryReportJmx releaser = new SlowQueryReportJmx();
+        releaser.poolName = poolName;
+        releaser.deregisterJmx();
+
+        SlowQueryReportJmx.Registration successor =
+                new SlowQueryReportJmx.Registration(poolName, successorName);
+        Assertions.assertNull(SlowQueryReportJmx.mbeans.putIfAbsent(poolName, successor),
+                "the release must have left the slot free for the takeover");
+        server.registerMBean(successor, successorName);
+
+        try {
+            // The stalled publish commits last. The server calls its
+            // postRegister at the end of this call, and that is where the undo
+            // has to decide: the slot is held, but by a registration published
+            // under another name, so nothing accounts for this one.
+            server.registerMBean(inFlight, oname);
+
+            Assertions.assertFalse(server.isRegistered(oname),
+                    "a publish that lands behind the release of its slot must undo itself even"
+                            + " when the slot is meanwhile held: the successor publishes under"
+                            + " its own name, so the registry records no name this publication"
+                            + " could ever be given up by - reading the occupied slot as"
+                            + " accounting for it leaves this MBean published for the life of"
+                            + " the JVM, under a name no release of the pool can reach");
+            Assertions.assertTrue(server.isRegistered(successorName),
+                    "and the undo must leave the successor's own publication alone");
+            Assertions.assertSame(successor, SlowQueryReportJmx.mbeans.get(poolName),
+                    "the successor must still hold the registry slot it took");
+        } finally {
+            SlowQueryReportJmx janitor = new SlowQueryReportJmx();
+            janitor.poolName = poolName;
+            janitor.deregisterJmx();
+            for (ObjectName name : new ObjectName[] { oname, successorName }) {
+                if (server.isRegistered(name)) {
+                    server.unregisterMBean(name);
+                }
+            }
+        }
+    }
+
+    @Test
+    void aMalformedObjectNameOverrideFailsOnlyTheRegistration() throws Exception {
+        // An override value that is not an ObjectName at all (no domain
+        // separator) fails the name formation on every borrow, before the
+        // registry slot and its refusal throttle are reachable - the failure
+        // is reported each time (see the acceptability comment in
+        // registerJmx). What must stay true while it is: the failure touches
+        // nothing but the monitoring, never latches the slot, and leaves
+        // nothing under the name behind.
+        String poolName = "JmxMalformedOname-" + System.nanoTime();
+        DataSource ds = reportingPoolNamed(poolName,
+                "org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx"
+                        + "(notifyPool=false,threshold=-1,objectName=value-without-a-domain)");
+
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        Set<ObjectName> registeredBefore = server.queryNames(new ObjectName("tomcat.jdbc:type="
+                + SlowQueryReportJmx.class.getName() + ",*"), null);
+        try (@SuppressWarnings("unused") Connection first = ds.getConnection()) {
+            // the borrow itself served: a failed name formation cannot fail
+            // the pool's operation, only its monitoring
+            Assertions.assertEquals(registeredBefore, server.queryNames(new ObjectName("tomcat.jdbc:type="
+                    + SlowQueryReportJmx.class.getName() + ",*"), null),
+                    "no registration may appear while the name cannot be formed");
+        }
+        try (@SuppressWarnings("unused") Connection second = ds.getConnection()) {
+            Assertions.assertNull(SlowQueryReportJmx.mbeans.get(poolName),
+                    "a name that cannot be formed must never latch the registry slot");
+            Assertions.assertNull(SlowQueryReportJmx.registrationFailuresLogged.get(poolName),
+                    "and nothing may join the per-name bookkeeping through a failure"
+                            + " that cannot form its ObjectName");
+        }
+
+        ds.close();
+        Assertions.assertNull(SlowQueryReportJmx.mbeans.get(poolName),
+                "and closing the pool leaves no registry entry under the name");
+        Assertions.assertEquals(registeredBefore, server.queryNames(new ObjectName("tomcat.jdbc:type="
+                + SlowQueryReportJmx.class.getName() + ",*"), null),
+                "and nothing under the type for this pool");
+    }
+
+    @Test
+    void aNullObjectNamePropertyValueBehavesAsIfAbsent() throws Exception {
+        // The property grammar cannot produce a value-less property, but the
+        // public programmatic API can: InterceptorProperty carries a null
+        // value, and a definition handed through it reaches the chain with
+        // one. A null value names nothing to override - the same reading
+        // every sibling property of this family gives a null value - so the
+        // default name applies and everything else must hold as if the
+        // property were absent. Before the guard the null reached the
+        // ObjectName constructor as an NPE that registerJmx does not catch,
+        // escaping through reset() to fail every borrow of the pool and
+        // discard the physical connection each attempt had just opened.
+        String poolName = "JmxNullOname-" + System.nanoTime();
+        DataSource ds = reportingPoolNamed(poolName);
+        for (PoolProperties.InterceptorDefinition definition
+                : ds.getPoolProperties().getJdbcInterceptorsAsArray()) {
+            if (definition.getClassName().endsWith("SlowQueryReportJmx")) {
+                definition.addProperty("objectName", null);
+            }
+        }
+
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        ObjectName oname = new ObjectName("tomcat.jdbc:type="
+                + SlowQueryReportJmx.class.getName() + ",name=" + poolName);
+        try (@SuppressWarnings("unused") Connection first = ds.getConnection()) {
+            Assertions.assertTrue(server.isRegistered(oname),
+                    "a value-less objectName property must cost no more than any other"
+                            + " unformable override - the borrow itself must be served, and"
+                            + " the registration fall back to the default name of the pool");
+        }
+        ds.close();
+        Assertions.assertFalse(server.isRegistered(oname),
+                "and closing the pool releases the name again");
+        Assertions.assertNull(SlowQueryReportJmx.mbeans.get(poolName),
+                "with no registry entry left behind");
+    }
+
+    @Test
+    void aReleaseThatCannotDeriveTheNameKeepsTheRegistrationReleasable() throws Exception {
+        // The release unregisters the ObjectName that registrationObjectName()
+        // derives for the registry value, and that derivation is the one step
+        // of the release that can throw - for a registration a subclass put
+        // into the open registry, whose own properties no longer form the name
+        // the MBeanServer holds. A release that cannot work out which name to
+        // take down must leave the registry slot held: a registry that has
+        // forgotten the registration while the MBeanServer still publishes it
+        // is the one state no later release can repair. As in the late-publish
+        // test, the test drives the registry state directly and runs the
+        // failing release and the later repairing one apart.
+        String poolName = "JmxBadRelease-" + System.nanoTime();
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+
+        // The registry value and its published MBean, as registration would
+        // have left them: derived name, live registration, live bookkeeping.
+        SlowQueryReportJmx owner = new SlowQueryReportJmx();
+        owner.poolName = poolName;
+        ObjectName oname = owner.getObjectName(SlowQueryReportJmx.class, poolName);
+        server.registerMBean(owner, oname);
+        SlowQueryReportJmx.mbeans.put(poolName, owner);
+        owner.getNotifier();
+        SlowQueryReportJmx.registrationFailuresLogged.put(poolName, oname);
+
+        // Reconfigure the owner so the release's recomputation of its name
+        // fails, as it does whenever the owner's own properties no longer form
+        // the name the MBeanServer holds.
+        Map<String, InterceptorProperty> malformed = new HashMap<>();
+        malformed.put(SlowQueryReportJmx.objectNameAttribute, new InterceptorProperty(
+                SlowQueryReportJmx.objectNameAttribute, "value-without-a-domain"));
+        owner.setProperties(malformed);
+
+        SlowQueryReportJmx releaser = new SlowQueryReportJmx();
+        releaser.poolName = poolName;
+        releaser.deregisterJmx();
+
+        // The release could not name the MBean to take down - the MBean is
+        // still published, so the registry must still be holding the value
+        // that names it. Dropping the slot on the way to the failed
+        // derivation strands the MBean behind a registry that no longer knows
+        // about it: no later release can find the registration to unregister,
+        // and every later pool under the name is refused its own.
+        Assertions.assertSame(owner, SlowQueryReportJmx.mbeans.get(poolName),
+                "a release whose derivation fails must leave the registry slot held");
+        Assertions.assertTrue(server.isRegistered(oname),
+                "the premise: the MBean is still published while the release failed");
+
+        // The broadcaster and the throttle marker belong to the name as much
+        // as the MBean does (see deregisterJmx's javadoc): the release drops
+        // them even when its own unregistration step failed.
+        Assertions.assertNull(SlowQueryReportJmx.notifiers.get(poolName),
+                "the name's broadcaster must be released with the name");
+        Assertions.assertNull(SlowQueryReportJmx.registrationFailuresLogged.get(poolName),
+                "and the registration-failure throttle with it");
+
+        // The name must stay releasable: once the derivation works again -
+        // here, the owner's properties no longer carry the malformed override
+        // - a later release of the name must still find the slot and take the
+        // MBean down with it.
+        owner.setProperties(new HashMap<>());
+        releaser.deregisterJmx();
+        Assertions.assertFalse(server.isRegistered(oname),
+                "a later release with a derivable name must still be able to unregister the MBean");
+        Assertions.assertNull(SlowQueryReportJmx.mbeans.get(poolName),
+                "and take the registry slot with it");
     }
 }

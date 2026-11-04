@@ -16,13 +16,23 @@
  */
 package org.apache.tomcat.jdbc.pool.interceptor;
 
+import java.io.Serializable;
+import java.lang.management.ManagementFactory;
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+
+import javax.management.MBeanServer;
+import javax.management.Notification;
+import javax.management.NotificationListener;
+import javax.management.ObjectName;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -46,11 +56,21 @@ import org.apache.tomcat.jdbc.pool.DataSource;
  * {@code getPoolStats(null)} threw rather than answering the same
  * {@code null} it answers for any other name that holds nothing.
  * <p>
- * The tests pin the two halves of the corrected contract: a lookup of a name
- * that can never be keyed answers {@code null} like any other absent name -
- * which is also the answer the borrow-time reference in {@code reset} resolves,
- * since it comes through this lookup - and a pool that starts without a name is
- * refused by a failure that says which setting is missing.
+ * The tests pin the halves of the corrected contract: a lookup of a name that
+ * can never be keyed answers {@code null} like any other absent name - which is
+ * also the answer the borrow-time reference in {@code reset} resolves, since it
+ * comes through this lookup - and a pool that starts without a name is refused
+ * by a failure that says which setting is missing.
+ * </p>
+ * <p>
+ * The refusal only covers a definition the pool was started with, because a
+ * reporting definition is refused at its start. The interceptor string is
+ * mutable while the pool runs, so a definition the pool gains after its start
+ * never meets that check, and the nameless pool and its unformable name arrive
+ * at the borrow-time registration side by side. A borrow is not the place to
+ * learn that nothing can be registered under no name: what the missing key can
+ * cost there is the monitoring, never the query - so the last tests pin that a
+ * late definition costs a nameless pool neither its borrows nor its statements.
  * </p>
  */
 class TestSlowQueryReportNamelessPool extends JdbcPoolBaseTest {
@@ -107,6 +127,93 @@ class TestSlowQueryReportNamelessPool extends JdbcPoolBaseTest {
             Assertions.assertTrue(logs.reportsExplainTheMissingName(),
                     "the subclass must not fail differently from the interceptor it extends,"
                             + " cause chain: " + causeChain(failure));
+        }
+    }
+
+    @Test
+    void aJmxReportingDefinitionAddedToANamelessPoolAfterTheStartStillServesItsBorrows()
+            throws Exception {
+        // A definition the pool gains after its start never runs poolStarted,
+        // so the refusal above cannot reach it: this pairing exists, and its
+        // borrow-time registration is where the missing key turns up. Nothing
+        // can be registered under no name, and a borrow is not the place where
+        // that is decided - the cost of the missing key is the monitoring.
+        DataSource ds = namelessPoolWith("");
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        try {
+            ds.createPool();
+            ds.setJdbcInterceptors(SlowQueryReportJmx.class.getName()
+                    + "(notifyPool=false,threshold=0)");
+            Assertions.assertDoesNotThrow(() -> {
+                try (@SuppressWarnings("unused") Connection con = ds.getConnection()) {
+                    // the borrow itself is the measured step
+                }
+            }, "a reporting definition the pool took on after its start must not cost a"
+                    + " nameless pool its borrows: the NPE out of the name-keyed registry"
+                    + " escapes the interceptor reset and fails every connection the pool"
+                    + " hands out, discarding the physical connection each attempt opened");
+
+            try (@SuppressWarnings("unused") Connection con = ds.getConnection()) {
+                // borrowed - now make sure the quietly declined registration
+                // declined rather than published under a made-up name
+                Assertions.assertTrue(server.queryNames(new ObjectName("tomcat.jdbc:type="
+                        + SlowQueryReportJmx.class.getName() + ",*"), null).stream()
+                        .noneMatch(name -> "null".equals(name.getKeyProperty("name"))),
+                        "a pool with no name has no name to publish under: declining the"
+                                + " registration must not become a MBean under the literal"
+                                + " text of a null reference");
+            }
+        } finally {
+            ds.close();
+        }
+    }
+
+    @Test
+    void aSlowQueryOfANamelessPoolWithALateReportingDefinitionIsServedAndStillNotified()
+            throws Exception {
+        // Same pairing, met one step later: the slow-query notification names
+        // its source by the registration the pool's name holds, and a name
+        // that does not exist is not a key the registry can be asked about.
+        // The proxy keeps a report from disturbing the application, so the
+        // statement does come back - what the missing key silently takes is
+        // the notification itself, and a monitoring channel that is configured
+        // and quietly sends nothing is the outcome the class refuses everywhere
+        // else for a name it cannot form.
+        DataSource ds = namelessPoolWith("");
+        try {
+            ds.createPool();
+            ds.setJdbcInterceptors(SlowQueryReportJmx.class.getName()
+                    + "(notifyPool=false,threshold=0)");
+            try (Connection admin = adminConnection();
+                    Statement setup = admin.createStatement()) {
+                setup.execute("CREATE ALIAS IF NOT EXISTS SLOW_SLEEP FOR "
+                        + "\"java.lang.Thread.sleep(long)\"");
+            }
+            String slow = "SELECT 1 FROM SYSTEM_RANGE(1,1) WHERE SLOW_SLEEP(25) IS NULL";
+            try (Connection con = ds.getConnection()) {
+                List<Notification> received = new CopyOnWriteArrayList<>();
+                NotificationListener listener = (notification, handback) -> received.add(notification);
+                interceptorOf(con, SlowQueryReportJmx.class).addNotificationListener(listener, null, null);
+                Assertions.assertDoesNotThrow(() -> {
+                    try (Statement st = con.createStatement()) {
+                        st.execute(slow);
+                    }
+                }, "a slow query of a pool that carries no name must still come back as a"
+                        + " executed statement");
+                Assertions.assertEquals(1, received.size(),
+                        "the slow query must still be reported to the listeners the"
+                                + " interceptor has: the source of a notification may lose the"
+                                + " registered name it would rather carry, but a source it"
+                                + " cannot look up must not cost the notification - the"
+                                + " failure rides through as a swallowed warning, so the"
+                                + " monitoring of a nameless pool is simply gone");
+                Assertions.assertInstanceOf(Serializable.class, received.get(0).getSource(),
+                        "the source of a notification is marshalled to listeners outside this"
+                                + " JVM, so even the fallback for a pool that carries no name"
+                                + " must be something that survives that delivery");
+            }
+        } finally {
+            ds.close();
         }
     }
 

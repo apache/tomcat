@@ -39,6 +39,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -159,6 +160,20 @@ public class ConnectionPool {
      * releases, even though the definition never saw the start.
      */
     private volatile PoolProperties.InterceptorDefinition[] startedInterceptors;
+
+    /**
+     * The interceptor definitions a connection chain of this pool was actually built from. The close pairs with
+     * {@link #startedInterceptors} and with the definitions the {@code jdbcInterceptors} property lists at close
+     * time, but neither of those covers a definition the property gained after the start and lost again before the
+     * close: it never saw the start to be recorded there, and by the close it is gone from the list the close reads
+     * - yet a chain was built from it, and what a borrow through that chain registered under the pool's name (the
+     * statistics and, for the reporting interceptors, the published MBean) is only ever taken down by a close.
+     * Recording the definitions at chain construction is what lets the close find that third set. Entries are the
+     * small configuration objects the property parses, one per definition per reconfiguration of a live pool; a
+     * restarted pool is a new instance pairing over its own generation.
+     */
+    private final Set<PoolProperties.InterceptorDefinition> chainDefinitions =
+            ConcurrentHashMap.newKeySet();
 
     /**
      * Since newProxyInstance performs the same operation, over and over again, it is much more optimized if we simply
@@ -474,6 +489,10 @@ public class ConnectionPool {
             // Set up the interceptor chain
             PoolProperties.InterceptorDefinition[] proxies = getPoolProperties().getJdbcInterceptorsAsArray();
             for (int i = proxies.length - 1; i >= 0; i--) {
+                // Record what this chain was built from: the definitions the
+                // close has to pair with are the ones a chain ran, not only
+                // the ones the property lists when the pool comes down
+                chainDefinitions.add(proxies[i]);
                 try {
                     // Create a new instance
                     JdbcInterceptor interceptor = proxies[i].getInterceptorClass().getConstructor().newInstance();
@@ -775,8 +794,13 @@ public class ConnectionPool {
         // gained since the start are told as well, so a definition that never
         // saw a start still takes down - best effort, on a fresh instance that
         // shares no state with the chains that served the borrows - whatever a
-        // borrow through it registered under the pool's name. A definition the
-        // start told is not told twice over its own unchanged configuration.
+        // borrow through it registered under the pool's name. The third set the
+        // close has to reach are the definitions those chains were actually
+        // built from: a definition the property gained after the start and lost
+        // again before the close is named by neither of the lists above, yet it
+        // armed the connections that registered state under the pool's name.
+        // A definition the close already told over its start or its current
+        // configuration is not told twice.
         PoolProperties.InterceptorDefinition[] started = startedInterceptors;
         if (started != null) {
             for (int i = 0; i < started.length; i++) {
@@ -785,8 +809,13 @@ public class ConnectionPool {
         }
         PoolProperties.InterceptorDefinition[] proxies = getPoolProperties().getJdbcInterceptorsAsArray();
         for (int i = 0; i < proxies.length; i++) {
-            if (!isToldAboutTheStart(proxies[i], started)) {
+            if (!isToldAlready(proxies[i], started)) {
                 informInterceptorOfPoolClosure(proxies[i]);
+            }
+        }
+        for (PoolProperties.InterceptorDefinition chainDefinition : chainDefinitions) {
+            if (!isToldAlready(chainDefinition, started) && !isToldAlready(chainDefinition, proxies)) {
+                informInterceptorOfPoolClosure(chainDefinition);
             }
         }
     }
@@ -815,22 +844,23 @@ public class ConnectionPool {
 
 
     /**
-     * Whether the given definition is one the pool told about its start: the very definition object the start
-     * read, or a re-parsed one configured the same way. The parsed list is cached and only re-parsed when the
-     * property is rewritten, so an unchanged list answers by object identity alone.
+     * Whether the close of the given definition is already covered by a set of definitions the close has told (or
+     * is telling): the very definition object in that set, or one configured the same way. The parsed list is cached
+     * and only re-parsed when the property is rewritten, so an unchanged list answers by object identity alone.
      *
      * @param definition the definition to check
-     * @param started    the definitions the start told, or {@code null} when the pool never told any
+     * @param told       the definitions already covered by one set of the close's notifications, or {@code null}
+     *            when that set does not exist - a pool whose start told nothing
      *
-     * @return {@code true} if the close of this definition is already covered by the start-time set
+     * @return {@code true} if the close of this definition is already covered by the given set
      */
-    private static boolean isToldAboutTheStart(PoolProperties.InterceptorDefinition definition,
-            PoolProperties.InterceptorDefinition[] started) {
-        if (started == null) {
+    private static boolean isToldAlready(PoolProperties.InterceptorDefinition definition,
+            PoolProperties.InterceptorDefinition[] told) {
+        if (told == null) {
             return false;
         }
-        for (int i = 0; i < started.length; i++) {
-            if (started[i] == definition || isConfiguredTheSame(started[i], definition)) {
+        for (int i = 0; i < told.length; i++) {
+            if (told[i] == definition || isConfiguredTheSame(told[i], definition)) {
                 return true;
             }
         }

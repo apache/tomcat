@@ -202,4 +202,67 @@ class TestInterceptorRemovalBeforePoolClose extends JdbcPoolBaseTest {
             ds.close();
         }
     }
+
+    @Test
+    void theDefinitionThatBuiltALiveChainIsToldAboutTheCloseEvenIfThePropertyLostItAgain()
+            throws Exception {
+        LifecycleRecordingInterceptor.resetCounts();
+        DataSource ds = poolNamed("AddedThenRemoved-" + System.nanoTime(), "");
+        try {
+            ds.createPool();
+            ds.setJdbcInterceptors(RECORDING + "(marker=transient)");
+            try (@SuppressWarnings("unused") Connection con = ds.getConnection()) {
+                // the chain this connection runs was built from the added
+                // definition - the tie that the started list and the current
+                // list both miss once the property drops it again
+            }
+            ds.setJdbcInterceptors("");
+            ds.close();
+
+            Assertions.assertEquals(0, LifecycleRecordingInterceptor.starts("transient"),
+                    "a definition the pool never started must not be credited with a start");
+            Assertions.assertEquals(1, LifecycleRecordingInterceptor.closes("transient"),
+                    "a definition the property gained after the start and lost again before the"
+                            + " close must still be told about the close: it built the chain a"
+                            + " borrow ran, and whatever that chain registered under the pool's"
+                            + " name only a close takes down - the started list never held it and"
+                            + " the current list no longer does");
+        } finally {
+            ds.close();
+        }
+    }
+
+    @Test
+    void aDefinitionAddedAfterTheStartAndRemovedBeforeTheCloseStillReleasesThePublishedMBean()
+            throws Exception {
+        String poolName = "AddedThenRemovedJmx-" + System.nanoTime();
+        DataSource ds = poolNamed(poolName, "");
+        ObjectName oname = new ObjectName("tomcat.jdbc:type=" + SlowQueryReportJmx.class.getName()
+                + ",name=" + poolName);
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        try {
+            ds.createPool();
+            ds.setJdbcInterceptors(SlowQueryReportJmx.class.getName()
+                    + "(notifyPool=false,threshold=0)");
+            try (Connection con = ds.getConnection(); Statement st = con.createStatement()) {
+                st.execute("SELECT 1 FROM SYSTEM_RANGE(1,1)");
+            }
+            Assertions.assertTrue(server.isRegistered(oname),
+                    "the premise: a borrow through the added definition published the MBean"
+                            + " for the pool name");
+
+            ds.setJdbcInterceptors("");
+            ds.close();
+
+            Assertions.assertFalse(server.isRegistered(oname),
+                    "the published MBean must not outlive the pool by the life of the JVM"
+                            + " because the one definition of it was added after the start and"
+                            + " removed again before the close - neither list the close works"
+                            + " through ever names it, but its chain published the registration");
+            Assertions.assertFalse(SlowQueryReportJmx.mbeans.containsKey(poolName),
+                    "and the registry of published names must not keep the name either");
+        } finally {
+            ds.close();
+        }
+    }
 }
