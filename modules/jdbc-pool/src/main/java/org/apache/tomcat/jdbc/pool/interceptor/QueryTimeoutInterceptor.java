@@ -167,9 +167,9 @@ public class QueryTimeoutInterceptor extends AbstractCreateStatementInterceptor 
 
     /**
      * Whether this interceptor configuration understands the named property. {@code queryTimeout} is this class's
-     * own; {@code useEquals} is read by the {@link JdbcInterceptor} base. A subclass that adds properties should
-     * recognize them here too, so the unrecognized-name report stays a report about a typo rather than becoming a
-     * report about the subclass's own design.
+     * own; {@code useEquals} is read by the {@link org.apache.tomcat.jdbc.pool.JdbcInterceptor} base. A subclass that
+     * adds properties should recognize them here too, so the unrecognized-name report stays a report about a typo
+     * rather than becoming a report about the subclass's own design.
      *
      * @param name the property name as configured
      *
