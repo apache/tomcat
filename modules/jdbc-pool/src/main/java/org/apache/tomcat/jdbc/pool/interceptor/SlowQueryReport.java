@@ -160,7 +160,13 @@ public class SlowQueryReport extends AbstractQueryReport {
         if (booksSharedStats()) {
             QueryStats qs = this.getQueryStats(sql);
             if (qs != null) {
-                qs.add(delta, start);
+                // The wall clock is read for the timestamp the execution is
+                // recorded against, like the failure path books its event:
+                // the start time would leave a long query aged by its own
+                // duration against the entries that age by when they
+                // finished. The duration itself is the monotonic elapsed
+                // time the statement proxy measured.
+                qs.add(delta, System.currentTimeMillis());
             }
         }
         return sql;
@@ -172,7 +178,9 @@ public class SlowQueryReport extends AbstractQueryReport {
         if (booksSharedStats()) {
             QueryStats qs = this.getQueryStats(sql);
             if (qs != null) {
-                qs.add(delta, start);
+                // Booked against the time of recording, not the execution
+                // start, for the same reason as in reportQuery above
+                qs.add(delta, System.currentTimeMillis());
             }
         }
         // The WARN reports the event, not the statistics booking: the
