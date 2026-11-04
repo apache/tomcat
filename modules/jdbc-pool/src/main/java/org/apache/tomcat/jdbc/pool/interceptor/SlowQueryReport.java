@@ -149,7 +149,7 @@ public class SlowQueryReport extends AbstractQueryReport {
         // FAILED QUERY notification behind isLogFailed() alone, the two
         // channels disagreeing on the same event.
         if (isLogFailed() && log.isWarnEnabled()) {
-            log.warn(MessageFactory.get("slowQueryReport.failedQueryReport", sql, delta));
+            log.warn(MessageFactory.get("slowQueryReport.failedQueryReport", sqlForLog(sql), delta));
         }
         return sql;
     }
@@ -197,9 +197,35 @@ public class SlowQueryReport extends AbstractQueryReport {
         // disagreeing on the same event. This mirrors how
         // reportFailedQuery reports its event.
         if (isLogSlow() && log.isWarnEnabled()) {
-            log.warn(MessageFactory.get("slowQueryReport.slowQueryReport", sql, delta));
+            log.warn(MessageFactory.get("slowQueryReport.slowQueryReport", sqlForLog(sql), delta));
         }
         return sql;
+    }
+
+    /**
+     * Renders the SQL text for interpolation into a log message.
+     * <p>
+     * The statement text is application- and, wherever the application concatenates, user-shaped data, and JULI
+     * writes message text out without newline escaping: carriage returns and line feeds embedded in the SQL would
+     * otherwise split the report into additional lines the pool's logger identity carries - forged log entries
+     * shaped by the SQL text itself. They are replaced by spaces, which keeps the statement readable in the one
+     * line the report owns. The length is not bounded here: surfacing the slow statement in full is what this
+     * interceptor is configured for, and the JMX representation of the same statistics - an opt-in channel the
+     * operator reads, not a sequential log to forge - keeps the text exactly as executed.
+     * </p>
+     *
+     * @param sql the SQL text to report, possibly {@code null}
+     *
+     * @return the text as safe to interpolate into a log message
+     */
+    private static String sqlForLog(String sql) {
+        if (sql == null) {
+            return "null";
+        }
+        if (sql.indexOf('\r') < 0 && sql.indexOf('\n') < 0) {
+            return sql;
+        }
+        return sql.replace('\r', ' ').replace('\n', ' ');
     }
 
     /**
@@ -423,7 +449,7 @@ public class SlowQueryReport extends AbstractQueryReport {
             removeIndex++;
             queries.remove(sql);
             if (log.isDebugEnabled()) {
-                log.debug("Removing slow query, capacity reached:" + sql);
+                log.debug("Removing slow query, capacity reached:" + sqlForLog(sql));
             }
         }
     }
