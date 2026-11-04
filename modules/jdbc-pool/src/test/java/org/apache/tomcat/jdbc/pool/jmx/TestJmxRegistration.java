@@ -424,8 +424,8 @@ class TestJmxRegistration extends JdbcPoolBaseTest {
         server.registerMBean(mbean, name);
         try {
             Assertions.assertFalse(JmxUtil.unregisterJmx(name),
-                    "an unregistration the MBean refused - a preDeregister() that throws, as a"
-                            + " modeler wrapper's failing postDeregister() also produces - must"
+                    "an unregistration the MBean refused - a preDeregister() that throws, the"
+                            + " one failure besides the name simply being gone - must"
                             + " come back as not done: the MBean is still registered under a"
                             + " name its caller is about to forget, which is exactly the"
                             + " failure the caller cannot see any other way, and it leaves a"
