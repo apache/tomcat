@@ -424,7 +424,7 @@ public abstract class SSLUtilBase implements SSLUtil {
                     throw new IOException(sm.getString("sslUtilBase.alias_no_key_entry", (Object) null));
                 }
             } else {
-                if (isSunMSCAPIWindowsMY(ks)) {
+                if (isSunMSCAPIWindowsMY(ks) && ks.containsAlias(keyAlias)) {
                     Certificate configuredCert = ks.isKeyEntry(keyAlias) ? ks.getCertificate(keyAlias) : null;
                     if (!(configuredCert instanceof X509Certificate) ||
                             !isServerAuthCapable((X509Certificate) configuredCert)) {
