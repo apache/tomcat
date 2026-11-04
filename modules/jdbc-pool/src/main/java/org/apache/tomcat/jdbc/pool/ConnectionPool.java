@@ -32,6 +32,8 @@ import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -142,6 +144,21 @@ public class ConnectionPool {
      * that hold per-name state therefore resolve it through this record rather than through {@link #getName()}.
      */
     private volatile String registrationName;
+
+    /**
+     * The interceptor definitions that {@link #init(PoolConfiguration)} told about the pool starting, recorded
+     * before the first of them is instantiated so a start that fails partway through still knows what it told.
+     * The close delivers {@link JdbcInterceptor#poolClosed(ConnectionPool)} to these definitions as configured
+     * then, not to whatever the {@code jdbcInterceptors} property happens to list by the time the pool comes down
+     * - that property is mutable at runtime through {@link PoolProperties#setJdbcInterceptors}. Telling the
+     * start-time definitions is what pairs the two lifecycle notifications: a definition removed from the property
+     * while the pool ran released nothing under the close-the-current-list reading, leaving whatever its start
+     * registered - the per-name query statistics and, for the reporting interceptors, the published MBean - behind
+     * for the life of the JVM. Definitions the property gained after the start are told about the close as well:
+     * a borrow served through such a definition may have registered state under the pool's name that only a close
+     * releases, even though the definition never saw the start.
+     */
+    private volatile PoolProperties.InterceptorDefinition[] startedInterceptors;
 
     /**
      * Since newProxyInstance performs the same operation, over and over again, it is much more optimized if we simply
@@ -750,18 +767,104 @@ public class ConnectionPool {
         if (this.getPoolProperties().isJmxEnabled()) {
             this.jmxPool = null;
         }
-        PoolProperties.InterceptorDefinition[] proxies = getPoolProperties().getJdbcInterceptorsAsArray();
-        for (int i = 0; i < proxies.length; i++) {
-            try {
-                JdbcInterceptor interceptor = proxies[i].getInterceptorClass().getConstructor().newInstance();
-                interceptor.setProperties(proxies[i].getProperties());
-                interceptor.poolClosed(this);
-            } catch (Exception x) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Unable to inform interceptor of pool closure.", x);
-                }
+        // Tell the interceptors about the close, each definition once and on a
+        // throwaway instance, as the notification contract describes. The
+        // definitions told about the start come first, as configured then: what
+        // a start registered, the close it is paired with releases - whatever
+        // the mutable property lists by now. The definitions the property has
+        // gained since the start are told as well, so a definition that never
+        // saw a start still takes down - best effort, on a fresh instance that
+        // shares no state with the chains that served the borrows - whatever a
+        // borrow through it registered under the pool's name. A definition the
+        // start told is not told twice over its own unchanged configuration.
+        PoolProperties.InterceptorDefinition[] started = startedInterceptors;
+        if (started != null) {
+            for (int i = 0; i < started.length; i++) {
+                informInterceptorOfPoolClosure(started[i]);
             }
         }
+        PoolProperties.InterceptorDefinition[] proxies = getPoolProperties().getJdbcInterceptorsAsArray();
+        for (int i = 0; i < proxies.length; i++) {
+            if (!isToldAboutTheStart(proxies[i], started)) {
+                informInterceptorOfPoolClosure(proxies[i]);
+            }
+        }
+    }
+
+
+    /**
+     * Delivers {@link JdbcInterceptor#poolClosed(ConnectionPool)} to a throwaway instance of the given
+     * definition: the instance shares no state with the chains the connections run or with the instance the
+     * start told, so what the callback releases has to be reachable from the definition's configuration and the
+     * closing pool. A definition whose class cannot be instantiated, and an interceptor that fails the callback,
+     * is reported at debug level and the close moves on.
+     *
+     * @param definition the interceptor definition to tell about the close
+     */
+    private void informInterceptorOfPoolClosure(PoolProperties.InterceptorDefinition definition) {
+        try {
+            JdbcInterceptor interceptor = definition.getInterceptorClass().getConstructor().newInstance();
+            interceptor.setProperties(definition.getProperties());
+            interceptor.poolClosed(this);
+        } catch (Exception x) {
+            if (log.isDebugEnabled()) {
+                log.debug("Unable to inform interceptor of pool closure.", x);
+            }
+        }
+    }
+
+
+    /**
+     * Whether the given definition is one the pool told about its start: the very definition object the start
+     * read, or a re-parsed one configured the same way. The parsed list is cached and only re-parsed when the
+     * property is rewritten, so an unchanged list answers by object identity alone.
+     *
+     * @param definition the definition to check
+     * @param started    the definitions the start told, or {@code null} when the pool never told any
+     *
+     * @return {@code true} if the close of this definition is already covered by the start-time set
+     */
+    private static boolean isToldAboutTheStart(PoolProperties.InterceptorDefinition definition,
+            PoolProperties.InterceptorDefinition[] started) {
+        if (started == null) {
+            return false;
+        }
+        for (int i = 0; i < started.length; i++) {
+            if (started[i] == definition || isConfiguredTheSame(started[i], definition)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * Whether two definitions name one interceptor class and give it one set of properties: the same property
+     * names carrying the same values. Interceptor properties carry no equality of their own, so the values are
+     * compared directly.
+     *
+     * @param a the first definition
+     * @param b the second definition
+     *
+     * @return {@code true} if the two definitions configure one interceptor the same way
+     */
+    private static boolean isConfiguredTheSame(PoolProperties.InterceptorDefinition a,
+            PoolProperties.InterceptorDefinition b) {
+        if (!a.getClassName().equals(b.getClassName())) {
+            return false;
+        }
+        Map<String, PoolProperties.InterceptorProperty> pa = a.getProperties();
+        Map<String, PoolProperties.InterceptorProperty> pb = b.getProperties();
+        if (pa.size() != pb.size()) {
+            return false;
+        }
+        for (Map.Entry<String, PoolProperties.InterceptorProperty> entry : pa.entrySet()) {
+            PoolProperties.InterceptorProperty other = pb.get(entry.getKey());
+            if (other == null || !Objects.equals(entry.getValue().getValue(), other.getValue())) {
+                return false;
+            }
+        }
+        return true;
     }
 
 
@@ -804,6 +907,10 @@ public class ConnectionPool {
         // Parse and create an initial set of interceptors. Letting them know the pool has started.
         // These interceptors will not get any connection.
         PoolProperties.InterceptorDefinition[] proxies = getPoolProperties().getJdbcInterceptorsAsArray();
+        // Record the definitions this start tells, before telling them: a close
+        // triggered below by a failing start has to deliver the pair of what
+        // the start attempted (see the field).
+        startedInterceptors = proxies;
         for (int i = 0; i < proxies.length; i++) {
             try {
                 if (log.isDebugEnabled()) {

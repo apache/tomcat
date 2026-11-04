@@ -915,6 +915,16 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
      * value. The clear runs under the same lock the parse publishes under, so
      * a parse that started from the previous value of the string can never
      * store its result back after this clear.
+     * <p>
+     * Changing the list on a live pool takes effect for the connections whose
+     * interceptor chains are built after the change; connections that were
+     * built earlier keep their existing chain until they are recycled. The
+     * pool's lifecycle notifications follow the start, not the moment: the
+     * close is delivered for the definitions configured when the pool started,
+     * whatever this property lists by then, so removing a definition from a
+     * live pool does not strand what its registration at the pool's start put
+     * in place.
+     * </p>
      *
      * @param jdbcInterceptors the semicolon separated interceptor configuration,
      *                         may be {@code null} to use none

@@ -16,10 +16,14 @@
  */
 package org.apache.tomcat.jdbc.pool.interceptor;
 
+import java.lang.management.ManagementFactory;
 import java.lang.ref.WeakReference;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -131,5 +135,87 @@ class TestSlowQueryReportAbandonedPool extends JdbcPoolBaseTest {
         Assertions.assertNull(SlowQueryReport.getPoolStats(poolName),
                 "closing the last pool of the name must release the statistics even"
                         + " though an abandoned same-named pool preceded it");
+    }
+
+    /*
+     * The same abandonment against the JMX subclass, whose registration is
+     * published with the MBeanServer - a second JVM-lifetime root next to the
+     * static registry. The published resource must hold no pool reference:
+     * held strongly - as when the registering interceptor instance itself was
+     * the MBean - the abandoned pool and everything it reaches stayed
+     * reachable through the MBeanServer, and, because the pinned pool never
+     * drained from the weak live-pool set, no later close of the name could
+     * release it either (reproducer for finding F2 of the round-2 clean-room
+     * review, probes P16a/P16b/P17).
+     */
+    private static ConnectionPool jmxReportedPoolNamed(String name) throws SQLException {
+        PoolProperties properties = new PoolProperties();
+        properties.setUrl(getUrl());
+        properties.setDriverClassName("org.h2.Driver");
+        properties.setUsername("sa");
+        properties.setPassword("");
+        // JMX off: the pool's own MBean registered with the platform server
+        // would be a second strong root, unrelated to the registration under test
+        properties.setJmxEnabled(false);
+        properties.setName(name);
+        properties.setInitialSize(0);
+        properties.setMinIdle(0);
+        // notifyPool=false is the documented configuration that publishes the
+        // interceptor's own MBean on the first borrow
+        properties.setJdbcInterceptors(
+                "org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx(notifyPool=false,threshold=-1)");
+        return new ConnectionPool(properties);
+    }
+
+    @Test
+    void anAbandonedPoolIsCollectedInsteadOfPinnedByItsJmxRegistration() throws Exception {
+        String poolName = "abandoned-jmx-" + System.nanoTime();
+        ConnectionPool pool = jmxReportedPoolNamed(poolName);
+        use(pool); // the borrow registers the pool name's MBean
+        // abandoned: no close() ever runs for this pool
+        WeakReference<ConnectionPool> probe = new WeakReference<>(pool);
+        pool = null;
+
+        Assertions.assertFalse(stillReachable(probe),
+                "the published MBean registration must not pin a pool that was"
+                        + " abandoned without closing: the registration is a"
+                        + " JVM-lifetime root, and the pool drags its queues, its"
+                        + " pooled connections and their open physical sessions"
+                        + " with it");
+    }
+
+    @Test
+    void aProperlyClosedSuccessorReleasesANameWhoseAbandonedPoolRanJmx() throws Exception {
+        String poolName = "abandoned-jmx-heir-" + System.nanoTime();
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        ObjectName oname = new ObjectName("tomcat.jdbc:type="
+                + SlowQueryReportJmx.class.getName() + ",name=" + poolName);
+        ConnectionPool abandoned = jmxReportedPoolNamed(poolName);
+        use(abandoned);
+        WeakReference<ConnectionPool> probe = new WeakReference<>(abandoned);
+        abandoned = null;
+        Assertions.assertFalse(stillReachable(probe),
+                "precondition: the abandoned pool must be collected - a pool pinned"
+                        + " by the registration can never let the name drain, whatever"
+                        + " its successor does");
+        Assertions.assertTrue(server.isRegistered(oname),
+                "premise: the abandoned pool's MBean is still published under the name");
+
+        DataSource survivor = newDataSource();
+        survivor.getPoolProperties().setName(poolName);
+        survivor.getPoolProperties().setJmxEnabled(false);
+        survivor.getPoolProperties().setJdbcInterceptors(
+                "org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx(notifyPool=false,threshold=-1)");
+        survivor.createPool();
+        use(survivor.getPool());
+        survivor.close();
+
+        Assertions.assertFalse(server.isRegistered(oname),
+                "closing the successor must release the MBean of the name even"
+                        + " though an abandoned pool preceded it");
+        Assertions.assertNull(SlowQueryReportJmx.mbeans.get(poolName),
+                "closing the successor must release the per-name registry slot");
+        Assertions.assertNull(SlowQueryReport.getPoolStats(poolName),
+                "closing the successor must release the statistics of the name");
     }
 }
