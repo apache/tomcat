@@ -63,7 +63,8 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  * first interceptor instance of a pool to borrow a connection publishes them, and every other instance of that pool -
  * its other connections, the second definition of the recommended two-thresholds configuration - reports through them.
  * The pool start callback only records the pool and its registration name; an idle pool is not published, so
- * monitoring begins with the first borrow.
+ * monitoring begins with the first borrow. The publication is attempted once: JMX is a best-effort management channel,
+ * so a refusal is logged for the operator and later borrows leave the server alone.
  * They are published under the name the pool started with - see {@link ConnectionPool#getRegistrationName()} - which
  * identifies the pool and must be unique among the live pools of a class loader: Tomcat gives every pool it manages a
  * name of its own, and a programmatically built pool has a unique default name. A duplicate live name is reported as
@@ -136,8 +137,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
 
     /**
      * Everything this class publishes for one pool: the notification broadcaster its clients attach their listeners to
-     * and, in the {@code notifyPool=false} mode, the ObjectName the pool's MBean occupies together with the marker of a
-     * publication the MBeanServer refused.
+     * and, in the {@code notifyPool=false} mode, the ObjectName the pool's MBean occupies.
      * <p>
      * The state hangs from the pool's statistics store (see {@link PoolStatistics#getJmxState()}), which is 1:1 with
      * the pool, and nothing a pool published can be given up by another pool's close. It is built by the first
@@ -145,9 +145,10 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
      * pool is.
      * </p>
      * <p>
-     * Publication and release are serialised against each other by this object's monitor, and the MBeanServer is
-     * called outside it: a borrow either publishes, or finds the publication already made, already refused and left for
-     * a later borrow to retry, or already superseded by the pool's close - in which case the borrow gives back the
+     * The publication is attempted once per pool: JMX is a best-effort management channel, so a refusal is logged and
+     * not retried by later borrows. Publication and release are serialised against each other by this object's monitor,
+     * and the MBeanServer is called outside it: a borrow either publishes, finds that the attempt has already been
+     * made, or finds the state already superseded by the pool's close - in which case the borrow gives back the
      * publication it just made. A published MBean can therefore never outlive the state that published it, and the
      * ObjectName a release gives up is the one this state recorded when it published, whatever class or
      * {@code objectName} property the interceptor instance running the close happens to carry.
@@ -170,20 +171,10 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
          */
         private ObjectName publishedUnder;
         /**
-         * the ObjectName whose refusal this state has already reported with its exception, so that a persistent
-         * refusal is not reported once per borrow; guarded by this
+         * whether a publication has been attempted for this pool, so that a refusal is logged once and later borrows
+         * leave the management server alone; guarded by this
          */
-        private ObjectName failureLoggedUnder;
-        /**
-         * whether a failure that could not form an ObjectName has been reported, so that a permanent malformed name
-         * is not logged with a stack trace on every borrow; guarded by this
-         */
-        private boolean malformedNameReported;
-        /**
-         * whether a publication attempt is in flight, so that the concurrent borrows of one pool make one attempt
-         * rather than one per thread; guarded by this
-         */
-        private boolean publishing;
+        private boolean attempted;
         /**
          * whether the close of the pool has given this state up; guarded by this
          */
@@ -217,15 +208,6 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
         }
 
         /**
-         * Returns the ObjectName whose refusal this state has already reported loudly.
-         *
-         * @return the reported ObjectName, or {@code null} while no publication for this pool has been refused
-         */
-        protected synchronized ObjectName failureMarker() {
-            return failureLoggedUnder;
-        }
-
-        /**
          * Returns whether the close of this pool has given this state up.
          *
          * @return {@code true} if the pool has closed
@@ -255,23 +237,21 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
         }
 
         /**
-         * Decides whether the calling borrow is to publish this pool's MBean.
+         * Decides whether the calling borrow is to make this pool's one publication attempt.
          *
-         * @return {@code true} if the caller is to publish it now - nothing is published for the pool, no other borrow
-         *             is publishing, and the pool has not closed - and {@code false} when there is nothing to publish
-         *             or someone else is at it
+         * @return {@code true} if the caller is to attempt the publication - none has been made or attempted yet, and
+         *             the pool has not closed - and {@code false} when there is nothing left to do
          */
         protected synchronized boolean beginPublication() {
-            if (released || publishedUnder != null || publishing) {
+            if (released || attempted) {
                 return false;
             }
-            publishing = true;
+            attempted = true;
             return true;
         }
 
         /**
-         * Records a publication the MBeanServer accepted, and clears the refusal marker: a registration under the name
-         * works again, so a later failure cycle reports loudly once more.
+         * Records a publication the MBeanServer accepted.
          *
          * @param oname the ObjectName the MBean was published under
          *
@@ -280,64 +260,11 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
          *             that publication, so the borrow that made it has to give it back
          */
         protected synchronized boolean published(ObjectName oname) {
-            publishing = false;
             if (released) {
                 return false;
             }
             publishedUnder = oname;
-            failureLoggedUnder = null;
             return true;
-        }
-
-        /**
-         * Ends a publication attempt that did not publish, and reports it. The attempt being over, a later borrow
-         * retries.
-         * <p>
-         * The retry is not made cheaper than the attempt it repeats, and that is deliberate: the first borrow that
-         * finds nothing published publishes it, so a clash with a stale or foreign MBean costs monitoring only for as
-         * long as that MBean is there, while a backoff would make every pool that ever clashed wait out a delay before
-         * its monitoring came back. What a persistent refusal therefore costs is one publish attempt per borrow - the
-         * ObjectName formed, a {@link Registration} built, and the MBeanServer's refusal - on a pool whose monitoring is
-         * misconfigured, which is the cost paid for that recovery. Only the first refusal of an ObjectName is reported
-         * with its exception, so a persistent refusal is not reported once per borrow.
-         * </p>
-         *
-         * @param oname the ObjectName whose publication was refused, or {@code null} when no ObjectName could be formed
-         *                  - there is then no name to mark, so this state remembers that the malformed name was
-         *                  reported and later retries stay at debug level
-         * @param x     what the MBeanServer answered
-         */
-        protected synchronized void refused(ObjectName oname, Exception x) {
-            publishing = false;
-            if (oname == null) {
-                if (!malformedNameReported) {
-                    malformedNameReported = true;
-                    log.error(MessageFactory.get("slowQueryReportJmx.jmxRegistrationFailedNoData"), x);
-                } else if (log.isDebugEnabled()) {
-                    log.debug("Jmx registration failed again: " + x);
-                }
-                return;
-            }
-            if (oname.equals(failureLoggedUnder)) {
-                // The loud report went out with the first refusal of this
-                // name; repeats ride along at debug, without a stack trace, so
-                // a persistent refusal stays quiet under borrow load
-                if (log.isDebugEnabled()) {
-                    log.debug("Jmx registration of [" + oname + "] failed again: " + x);
-                }
-                return;
-            }
-            // First refusal for this ObjectName, or a refusal under another
-            // ObjectName than the one already reported: report it loudly and
-            // remember to throttle the repeats
-            failureLoggedUnder = oname;
-            if (x instanceof InstanceAlreadyExistsException) {
-                // Retryable: the name may be held by a stale or foreign MBean
-                // that a later borrow finds gone
-                log.warn(MessageFactory.get("slowQueryReportJmx.jmxRegistrationInUse", oname), x);
-            } else {
-                log.error(MessageFactory.get("slowQueryReportJmx.jmxRegistrationFailed", oname), x);
-            }
         }
 
         /**
@@ -866,11 +793,11 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     /**
      * Registers this pool's MBean with JMX.
      * <p>
-     * The attempt is made by the first borrow that finds nothing published for the pool, and only by that borrow:
-     * {@link PoolJmx#beginPublication()} hands the publication to one thread at a time, and a borrow that finds the
-     * publication made - or refused and waiting for a retry, which is the next borrow's business - is turned away
-     * before the ObjectName is formed. Forming it and building a {@link Registration} for a race that can only be lost
-     * is work a healthy pool would pay per borrow for no possible use.
+     * The publication is attempted once per pool, by the first borrow that needs it:
+     * {@link PoolJmx#beginPublication()} hands the attempt to one thread, and every later borrow is turned away before
+     * the ObjectName is formed. JMX is a best-effort management channel, so a refusal is logged for the operator and
+     * not retried; forming the name and building a {@link Registration} again on every borrow would cost the pool work
+     * for a publication that is not part of its operation.
      * </p>
      * <p>
      * A pool this instance cannot resolve a statistics store for is skipped before any of it: a pool that carries no
@@ -899,38 +826,44 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
         if (state == null || !state.beginPublication()) {
             return;
         }
-        ObjectName oname = null;
+        ObjectName oname;
         try {
             oname = getObjectName(getClass(), state.getPoolName());
-            // The MBeanServer keeps the registration resource, never this
-            // instance: an instance reaches the pool (its own and the inherited
-            // pool fields), so publishing one made the JVM-lifetime registration
-            // pin a pool that was abandoned without closing - the only path that
-            // ever takes a registration down again is a close, which abandonment
-            // never runs
-            Registration registration = new Registration(state.getPoolName(), statistics, state);
-            try {
-                ManagementFactory.getPlatformMBeanServer().registerMBean(registration, oname);
-            } catch (Exception x) {
-                // What the server refused - a name a foreign or stale MBean
-                // occupies, a non-compliant resource, a security restriction. A
-                // later borrow retries.
-                state.refused(oname, x);
-                return;
-            }
-            if (!state.published(oname)) {
-                // The pool's close landed while the server was taking this in,
-                // and has already given up everything the state held; this
-                // publication belongs to nobody now but the thread that made it
-                JmxUtil.unregisterJmx(oname);
-            }
         } catch (MalformedObjectNameException | RuntimeOperationsException x) {
             // A name that cannot be formed - a malformed objectName property, or
-            // a pool name carrying characters the ObjectName grammar reserves -
-            // has no ObjectName to record the refusal against; the state
-            // remembers that it was reported and later retries stay at debug
-            // level (see refused).
-            state.refused(null, x);
+            // a pool name carrying characters the ObjectName grammar reserves.
+            // There is no publication to make, and JMX is best effort, so this
+            // is reported once and not attempted again.
+            log.error(MessageFactory.get("slowQueryReportJmx.jmxRegistrationFailedNoData"), x);
+            return;
+        }
+        // The MBeanServer keeps the registration resource, never this
+        // instance: an instance reaches the pool (its own and the inherited
+        // pool fields), so publishing one made the JVM-lifetime registration
+        // pin a pool that was abandoned without closing - the only path that
+        // ever takes a registration down again is a close, which abandonment
+        // never runs
+        Registration registration = new Registration(state.getPoolName(), statistics, state);
+        try {
+            ManagementFactory.getPlatformMBeanServer().registerMBean(registration, oname);
+        } catch (InstanceAlreadyExistsException x) {
+            // The name is held by a foreign or stale MBean. JMX is best effort
+            // and names are unique under Catalina, so this is reported rather
+            // than retried: by the time a retry ran, the name could describe a
+            // different component.
+            log.warn(MessageFactory.get("slowQueryReportJmx.jmxRegistrationInUse", oname), x);
+            return;
+        } catch (Exception x) {
+            // A non-compliant resource, a security restriction, or another
+            // server-side refusal. Reported once, not retried.
+            log.error(MessageFactory.get("slowQueryReportJmx.jmxRegistrationFailed", oname), x);
+            return;
+        }
+        if (!state.published(oname)) {
+            // The pool's close landed while the server was taking this in,
+            // and has already given up everything the state held; this
+            // publication belongs to nobody now but the thread that made it
+            JmxUtil.unregisterJmx(oname);
         }
     }
 

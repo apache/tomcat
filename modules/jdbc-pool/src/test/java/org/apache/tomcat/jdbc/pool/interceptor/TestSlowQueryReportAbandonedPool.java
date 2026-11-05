@@ -220,9 +220,6 @@ class TestSlowQueryReportAbandonedPool extends JdbcPoolBaseTest {
             Assertions.assertNull(state.publishedUnder(),
                     "and the successor must not report through the abandoned pool's MBean:"
                             + " its own publication is the one the MBeanServer refused");
-            Assertions.assertNotNull(state.failureMarker(),
-                    "the refusal is recorded against the ObjectName, reported once and retried"
-                            + " on the next borrow");
 
             survivor.close();
 
