@@ -312,10 +312,11 @@ public abstract class SSLUtilBaseCertificateSelectionTestBase extends TomcatBase
 
 
     /*
-     * As orderedKeystore(String, KeystoreEntry...) but the private keys report a null format, like a non-exportable
-     * SunMSCAPI key. This routes SSLUtilBase.getKeyManagers() through its production path that keeps the original key
-     * store (ksUsed == ks) and wraps each key manager, rather than the in-memory-copy branch the exportable JKS-backed
-     * mock otherwise takes.
+     * As orderedKeystore(String, KeystoreEntry...) but the private keys report a null format and a null encoding, as
+     * every real SunMSCAPI key does (CPrivateKey.getFormat() and getEncoded() always return null, whether or not the
+     * Windows key is marked exportable). This routes SSLUtilBase.getKeyManagers() through its production path that
+     * keeps the original key store (ksUsed == ks) and wraps each key manager, rather than the in-memory-copy branch the
+     * PKCS#8 reporting JKS-backed mock otherwise takes. OpenSSL cannot load such keys.
      */
     protected static KeyStore nonExportableKeystore(KeystoreEntry... entries) throws Exception {
         return orderedKeystore(sunMSCAPIProvider(), "Windows-MY", KeyMode.NON_EXPORTABLE, null, entries);
@@ -324,9 +325,10 @@ public abstract class SSLUtilBaseCertificateSelectionTestBase extends TomcatBase
 
     /*
      * As nonExportableKeystore(KeystoreEntry...) - the keys report a null format so the original key store is kept and
-     * each key manager is wrapped - but getEncoded() still returns the real key material, so OpenSSL can load it. This
-     * reaches the wrapped path (ksUsed == ks) for the OpenSSL implementations, where a lookup of the configured alias
-     * would otherwise resolve the wrong certificate.
+     * each key manager is wrapped - but getEncoded() still returns the real key material, so OpenSSL can load it. A real
+     * SunMSCAPI key never does this; the mode is synthetic and exists so that the wrapped path (ksUsed == ks) can be
+     * exercised for the OpenSSL implementations, where a lookup of the configured alias would otherwise resolve the
+     * wrong certificate.
      */
     protected static KeyStore wrappedExportableKeystore(KeystoreEntry... entries) throws Exception {
         return orderedKeystore(sunMSCAPIProvider(), "Windows-MY", KeyMode.WRAPPED_EXPORTABLE, null, entries);
@@ -349,9 +351,10 @@ public abstract class SSLUtilBaseCertificateSelectionTestBase extends TomcatBase
 
     /*
      * How the mocked SunMSCAPI private keys present themselves, which selects the branch of
-     * SSLUtilBase.getKeyManagers() under test. EXPORTABLE keys report PKCS#8 (in-memory copy); NON_EXPORTABLE and
-     * WRAPPED_EXPORTABLE report a null format (original key store kept, key managers wrapped). WRAPPED_EXPORTABLE
-     * additionally exposes the key encoding so the OpenSSL implementations can load it.
+     * SSLUtilBase.getKeyManagers() under test. EXPORTABLE keys report PKCS#8 (in-memory copy); this is synthetic for
+     * SunMSCAPI, whose keys never report an encoding. NON_EXPORTABLE keys report a null format and encoding, as all
+     * real SunMSCAPI keys do (original key store kept, key managers wrapped). WRAPPED_EXPORTABLE reports a null format
+     * but is synthetic: it additionally exposes the key encoding so the OpenSSL implementations can load it.
      */
     protected enum KeyMode {
         EXPORTABLE,
@@ -412,7 +415,7 @@ public abstract class SSLUtilBaseCertificateSelectionTestBase extends TomcatBase
 
 
     /*
-     * A view of a private key that reports a null format, as a non-exportable SunMSCAPI key does, while staying usable
+     * A view of a private key that reports a null format, as every SunMSCAPI key does, while staying usable
      * by the key manager. getEncoded() returns null for the same reason; these selection tests never sign, so the key
      * material itself is never needed.
      */
@@ -443,8 +446,8 @@ public abstract class SSLUtilBaseCertificateSelectionTestBase extends TomcatBase
 
 
     /*
-     * As nonExportableView(Key) but getEncoded() returns the real key material, modeling a SunMSCAPI key that keeps
-     * the original key store in use (null format) yet can still be exported into OpenSSL.
+     * As nonExportableView(Key) but getEncoded() returns the real key material. This models a key that keeps the
+     * original key store in use (null format) yet can still be exported into OpenSSL, which no real SunMSCAPI key can.
      */
     private static Key wrappedExportableView(Key key) {
         if (!(key instanceof PrivateKey)) {

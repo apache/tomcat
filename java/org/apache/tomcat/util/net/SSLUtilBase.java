@@ -455,7 +455,8 @@ public abstract class SSLUtilBase implements SSLUtil {
                 ksUsed.load(null, null);
                 ksUsed.setKeyEntry(keyAlias, k, keyPassArray, ks.getCertificateChain(keyAlias));
             }
-            // Non-PKCS#8 key stores will use the original key store
+            // Keys that do not report PKCS#8 will use the original key store. This includes every SunMSCAPI
+            // (Windows-MY) key, which reports neither a format nor an encoding and so can only be used with JSSE.
         }
 
 
