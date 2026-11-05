@@ -395,12 +395,16 @@ public class DataSourceProxy implements PoolConfiguration {
     public ConnectionPool getPool() {
         try {
             return createPool();
-        } catch (SQLException x) {
+        } catch (SQLException | RuntimeException x) {
             if (closed) {
                 // A closed data source legitimately has no pool; this is
                 // a normal lifecycle state, not a creation failure.
                 return null;
             }
+            // A configuration error before the pool is built - a malformed
+            // interceptor value, for example - is a creation failure like any
+            // other to this contract: report it and answer no pool rather than
+            // let it escape from a getter documented to return null.
             log.error(MessageFactory.get("dataSourceProxy.errorCreatingPool"), x);
             return null;
         }
@@ -795,14 +799,18 @@ public class DataSourceProxy implements PoolConfiguration {
     /**
      * Sets whether JMX is enabled, before the pool is created. Whether the pool registers an MBean is decided when
      * the pool is created, so a write after that point is rejected rather than stored without effect, matching the
-     * pool MBean's own setter.
+     * pool MBean's own setter. A closed data source is rejected as well: it can never create a pool again, so a write
+     * there would be stored without any possible effect.
      *
      * @param enabled whether JMX is enabled
      *
-     * @throws UnsupportedOperationException if the pool has already been created
+     * @throws UnsupportedOperationException if the pool has already been created or this data source has been closed
      */
     @Override
     public synchronized void setJmxEnabled(boolean enabled) {
+        if (closed) {
+            throw new UnsupportedOperationException(MessageFactory.get("dataSourceProxy.jmxEnabledAfterClose"));
+        }
         if (pool != null) {
             throw new UnsupportedOperationException(MessageFactory.get("dataSourceProxy.jmxEnabledAfterStart"));
         }
@@ -898,12 +906,13 @@ public class DataSourceProxy implements PoolConfiguration {
     /**
      * The pool's borrow wait timeout, {@link PoolConfiguration#getMaxWait()}, expressed in whole seconds:
      * {@link javax.sql.DataSource#getLoginTimeout()} is mapped onto that property rather than ignored. A
-     * sub-second <code>maxWait</code> therefore reads back as zero.
+     * sub-second <code>maxWait</code> therefore reads back as zero, and so does a negative one, which the pool reads
+     * as "wait indefinitely"; a negative login timeout is not a legal JDBC value.
      *
-     * @return the timeout in whole seconds
+     * @return the timeout in whole seconds, never negative
      */
     public int getLoginTimeout() {
-        return poolProperties.getMaxWait() / 1000;
+        return Math.max(0, poolProperties.getMaxWait() / 1000);
     }
 
     /**
@@ -1425,9 +1434,16 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
 
+    /**
+     * Returns the parsed interceptor definitions with their credential values masked, the display counterpart of
+     * {@link #getJdbcInterceptors()}. This object doubles as its own JMX/bean surface, so the raw definitions - which
+     * carry the pairs the pool builds its interceptor chains from - stay reachable only through
+     * {@link #getPoolProperties()}. The copy is also defensive: it shares no definition, property or array slot with the
+     * live configuration, so a caller cannot mutate the chain a later connection will build. {@inheritDoc}
+     */
     @Override
     public InterceptorDefinition[] getJdbcInterceptorsAsArray() {
-        return getPoolProperties().getJdbcInterceptorsAsArray();
+        return PoolProperties.maskInterceptorCredentials(getPoolProperties().getJdbcInterceptorsAsArray());
     }
 
 
