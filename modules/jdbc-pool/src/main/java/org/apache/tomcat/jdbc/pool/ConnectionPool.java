@@ -1116,6 +1116,14 @@ public class ConnectionPool {
             log.warn(MessageFactory.get("connectionPool.initialSizeTooSmall"));
             properties.setInitialSize(0);
         }
+        if (properties.getMinIdle() < 0) {
+            log.warn(MessageFactory.get("connectionPool.minIdleNegative"));
+            properties.setMinIdle(0);
+        }
+        if (properties.getMaxIdle() < 0) {
+            log.warn(MessageFactory.get("connectionPool.maxIdleNegative"));
+            properties.setMaxIdle(0);
+        }
         if (properties.getMaxActive() < properties.getInitialSize()) {
             log.warn(MessageFactory.get("connectionPool.initialSizeTooLarge", properties.getMaxActive()));
             properties.setInitialSize(properties.getMaxActive());
