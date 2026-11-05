@@ -1269,44 +1269,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             if (segmentEnd < 0) {
                 segmentEnd = value.length();
             }
-            int cursor = segmentStart;
-            int open = value.indexOf('(', cursor);
-            while (open >= 0 && open < segmentEnd) {
-                result.append(value, cursor, open + 1);
-                int close = value.indexOf(')', open + 1);
-                if (close < 0 || close > segmentEnd) {
-                    // Never closed inside this segment (the closing
-                    // parenthesis of a later definition does not close this
-                    // one either): mask whatever was typed as a property to
-                    // the end of the segment.
-                    close = segmentEnd;
-                }
-                int pairStart = open + 1;
-                while (pairStart < close) {
-                    int pairEnd = value.indexOf(',', pairStart);
-                    if (pairEnd < 0 || pairEnd >= close) {
-                        pairEnd = close;
-                    }
-                    int separator = value.indexOf('=', pairStart);
-                    if (separator >= 0 && separator < pairEnd
-                            && isCredentialKey(value.substring(pairStart, separator).trim())) {
-                        result.append(value, pairStart, separator + 1);
-                        result.append(PASSWORD_MASK);
-                    } else {
-                        result.append(value, pairStart, pairEnd);
-                    }
-                    if (pairEnd < close) {
-                        result.append(',');
-                    }
-                    pairStart = pairEnd + 1;
-                }
-                cursor = close;
-                open = value.indexOf('(', cursor);
-            }
-            // What is left of the segment - the class name before the first
-            // parenthesis and the text after the last closed property list -
-            // is outside every property list.
-            result.append(value, cursor, segmentEnd);
+            maskInterceptorSegment(value, segmentStart, segmentEnd, result);
             if (segmentEnd < value.length()) {
                 // Keep the definition separator itself.
                 result.append(';');
@@ -1314,6 +1277,92 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             segmentStart = segmentEnd + 1;
         }
         return result.toString();
+    }
+
+
+    /**
+     * Appends one definition segment, masking a recognised credential pair at
+     * any parenthesis depth. A {@code (} or {@code )} changes the depth and a
+     * comma at a property-list depth starts a new pair; a pair typed inside a
+     * nested list is therefore read the same way as one in the list the
+     * interceptor parser consumes. A list that never closes is read to the end
+     * of the segment.
+     *
+     * @param value the string being masked
+     * @param start the start of the segment
+     * @param end the end of the segment, exclusive
+     * @param result the masked output
+     */
+    private static void maskInterceptorSegment(String value, int start, int end, StringBuilder result) {
+        int depth = 0;
+        int i = start;
+        boolean pairStart = false;
+        while (i < end) {
+            char c = value.charAt(i);
+            if (c == '(') {
+                result.append(c);
+                depth++;
+                i++;
+                pairStart = depth > 0;
+                continue;
+            }
+            if (c == ')') {
+                result.append(c);
+                if (depth > 0) {
+                    depth--;
+                }
+                i++;
+                pairStart = false;
+                continue;
+            }
+            if (c == ',' && depth > 0) {
+                result.append(c);
+                i++;
+                pairStart = true;
+                continue;
+            }
+            if (pairStart) {
+                int separator = -1;
+                int j = i;
+                while (j < end) {
+                    char next = value.charAt(j);
+                    if (next == '=') {
+                        separator = j;
+                        break;
+                    }
+                    if (next == ',' || next == ')') {
+                        break;
+                    }
+                    j++;
+                }
+                if (separator >= 0 && isCredentialKey(value.substring(i, separator).trim())) {
+                    result.append(value, i, separator + 1);
+                    result.append(PASSWORD_MASK);
+                    int valueEnd = separator + 1;
+                    int valueDepth = 0;
+                    while (valueEnd < end) {
+                        char next = value.charAt(valueEnd);
+                        if (next == '(') {
+                            valueDepth++;
+                        } else if (next == ')') {
+                            if (valueDepth == 0) {
+                                break;
+                            }
+                            valueDepth--;
+                        } else if (next == ',' && valueDepth == 0) {
+                            break;
+                        }
+                        valueEnd++;
+                    }
+                    i = valueEnd;
+                    pairStart = false;
+                    continue;
+                }
+                pairStart = false;
+            }
+            result.append(c);
+            i++;
+        }
     }
 
 
