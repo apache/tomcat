@@ -943,7 +943,9 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
      * masked whenever it carries a secret and prints as {@code null} when
      * none is configured, and the {@code url}, {@code connectionProperties}
      * and {@code jdbcInterceptors} strings pass through credential masking,
-     * so the dump can be logged without carrying a cleartext credential. The
+     * and a configured live {@code dataSource} object is printed as its class
+     * and identity rather than through its own {@code toString()}, so the dump
+     * can be logged without carrying a cleartext credential. The
      * masking is best effort in the way {@link #maskCredentials(String)} and
      * {@link #maskInterceptorCredentials(String)} describe, so it removes the
      * credentials an operator normally configures rather than proving the
@@ -971,8 +973,8 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                     }
                     buf.append(field);
                     buf.append('=');
-                    // One bad property - a subclass getter that throws, or a
-                    // dataSource object whose toString() throws - must cost
+                    // One bad property - a subclass getter that throws, or an
+                    // object-valued property whose toString() throws - must cost
                     // only its own field, not the rest of the dump. The
                     // append itself is inside this try because buf.append
                     // calls the object's toString() directly: an Error from a
@@ -999,6 +1001,14 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                             // same way; its pairs live inside parentheses,
                             // which the segment-start walk above cannot see.
                             buf.append(value == null ? "null" : maskInterceptorCredentials((String) value));
+                        } else if (DataSourceFactory.PROP_DATASOURCE.equals(field)) {
+                            // A live data source object prints its identity
+                            // only: its own toString() may carry the URL, the
+                            // user or a password, and this dump promises not
+                            // to hand those back.
+                            buf.append(value == null ? "null"
+                                    : value.getClass().getName() + "@" +
+                                            Integer.toHexString(System.identityHashCode(value)));
                         } else {
                             buf.append(value);
                         }
