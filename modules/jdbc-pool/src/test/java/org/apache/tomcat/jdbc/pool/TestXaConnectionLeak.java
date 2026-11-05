@@ -65,6 +65,8 @@ class TestXaConnectionLeak extends JdbcPoolBaseTest {
         private volatile boolean failNextGetConnection;
         /** Once set, the next handle throws a runtime failure instead. */
         private volatile boolean runtimeFailNextGetConnection;
+        /** Once set, the next handle throws a non-fatal Error instead. */
+        private volatile boolean errorFailNextGetConnection;
         /** Once set, the next handle hands out a null connection. */
         private volatile boolean nullNextGetConnection;
         /** Once set, the next handle fails (after performing) its close. */
@@ -96,6 +98,8 @@ class TestXaConnectionLeak extends JdbcPoolBaseTest {
             failNextGetConnection = false;
             boolean runtimeFailGetConnection = runtimeFailNextGetConnection;
             runtimeFailNextGetConnection = false;
+            boolean errorFailGetConnection = errorFailNextGetConnection;
+            errorFailNextGetConnection = false;
             boolean nullGetConnection = nullNextGetConnection;
             nullNextGetConnection = false;
             boolean failClose = failNextClose;
@@ -105,7 +109,7 @@ class TestXaConnectionLeak extends JdbcPoolBaseTest {
             // the logical connection is exactly the stranding scenario.
             Handle handle = new Handle(delegate.getXAConnection(),
                     failGetConnection, runtimeFailGetConnection,
-                    nullGetConnection, failClose);
+                    errorFailGetConnection, nullGetConnection, failClose);
             handles.add(handle);
             return handle;
         }
@@ -151,6 +155,7 @@ class TestXaConnectionLeak extends JdbcPoolBaseTest {
             private final javax.sql.XAConnection physical;
             private final boolean failGetConnection;
             private final boolean runtimeFailGetConnection;
+            private final boolean errorFailGetConnection;
             private final boolean nullGetConnection;
             private final boolean failClose;
             private final AtomicInteger closeCount = new AtomicInteger();
@@ -158,11 +163,12 @@ class TestXaConnectionLeak extends JdbcPoolBaseTest {
             private final AtomicBoolean logicalClosed = new AtomicBoolean();
 
             Handle(javax.sql.XAConnection physical, boolean failGetConnection,
-                    boolean runtimeFailGetConnection, boolean nullGetConnection,
-                    boolean failClose) {
+                    boolean runtimeFailGetConnection, boolean errorFailGetConnection,
+                    boolean nullGetConnection, boolean failClose) {
                 this.physical = physical;
                 this.failGetConnection = failGetConnection;
                 this.runtimeFailGetConnection = runtimeFailGetConnection;
+                this.errorFailGetConnection = errorFailGetConnection;
                 this.nullGetConnection = nullGetConnection;
                 this.failClose = failClose;
             }
@@ -175,6 +181,10 @@ class TestXaConnectionLeak extends JdbcPoolBaseTest {
                 if (runtimeFailGetConnection) {
                     throw new IllegalStateException(
                             "simulated runtime logical-connection failure");
+                }
+                if (errorFailGetConnection) {
+                    throw new NoClassDefFoundError(
+                            "simulated stopped context in the logical connection");
                 }
                 if (nullGetConnection) {
                     return null;
@@ -367,6 +377,23 @@ class TestXaConnectionLeak extends JdbcPoolBaseTest {
         Assertions.assertEquals(1, xads.handles.get(0).closeCount.get(),
                 "a handle whose logical connection failed must be closed, "
                         + "not stranded");
+        Assertions.assertTrue(xads.handles.get(0).physicalClosed.get());
+        awaitSessions(0);
+    }
+
+    @Test
+    void anErrorFromTheLogicalConnectionDoesNotStrandTheHandle() throws Exception {
+        TestXaDs xads = new TestXaDs(getUrl());
+        DataSource ds = newXaDataSource(xads);
+        ds.getPoolProperties().setInitialSize(0);
+
+        xads.errorFailNextGetConnection = true;
+        Assertions.assertThrows(SQLException.class, ds::getConnection,
+                "the non-fatal Error must reach the borrower as the checked failure a borrow reports");
+
+        Assertions.assertEquals(1, xads.handles.size());
+        Assertions.assertEquals(1, xads.handles.get(0).closeCount.get(),
+                "a handle whose logical connection failed with an Error must be closed");
         Assertions.assertTrue(xads.handles.get(0).physicalClosed.get());
         awaitSessions(0);
     }
