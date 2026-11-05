@@ -202,6 +202,39 @@ class TestJmxCredentialAttributes extends JdbcPoolBaseTest {
     }
 
     @Test
+    void theDataSourceBeanGettersNeverCarryTheInlineCredentials() throws Exception {
+        DataSource ds = poolWithInlineCredentials();
+        ds.setJdbcInterceptors("ResetAbandonedTimer(password=" + INTERCEPTOR_SECRET + ")");
+        try {
+            Assertions.assertFalse(ds.getUrl().contains(URL_SECRET),
+                    "the data source bean getter must mask a credential typed into the URL");
+            Assertions.assertEquals(getUrl() + ";password=" + MASK, ds.getUrl(),
+                    "the bean getter must show the same mask as the pool MBean");
+            Assertions.assertFalse(ds.getConnectionProperties().contains(PROPERTIES_SECRET),
+                    "the data source bean getter must mask a credential in the connection properties");
+            Assertions.assertEquals("password=" + MASK + ";a=b", ds.getConnectionProperties(),
+                    "the bean getter must keep the non-credential pairs readable");
+            Assertions.assertFalse(ds.getJdbcInterceptors().contains(INTERCEPTOR_SECRET),
+                    "the data source bean getter must mask a credential in an interceptor definition");
+            Assertions.assertEquals("ResetAbandonedTimer(password=" + MASK + ")",
+                    ds.getJdbcInterceptors(),
+                    "the bean getter must keep the interceptor name and property readable");
+
+            Assertions.assertEquals(getUrl() + ";password=" + URL_SECRET,
+                    ds.getPoolProperties().getUrl(),
+                    "the programmatic configuration accessor must still return the raw URL");
+            Assertions.assertEquals("password=" + PROPERTIES_SECRET + ";a=b",
+                    ds.getPoolProperties().getConnectionProperties(),
+                    "the programmatic configuration accessor must still return the raw connection properties");
+            Assertions.assertEquals("ResetAbandonedTimer(password=" + INTERCEPTOR_SECRET + ")",
+                    ds.getPoolProperties().getJdbcInterceptors(),
+                    "the programmatic configuration accessor must still return the raw interceptor string");
+        } finally {
+            ds.close();
+        }
+    }
+
+    @Test
     void theConnectionPropertiesAttributeOfThePoolMBeanNeverCarriesTheCredentialTypedIntoThem()
             throws Exception {
         Registration r = publish(poolWithInlineCredentials(), "properties-attribute");
