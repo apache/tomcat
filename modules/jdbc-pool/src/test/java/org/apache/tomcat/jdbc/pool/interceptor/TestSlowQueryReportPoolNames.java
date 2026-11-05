@@ -19,21 +19,28 @@ package org.apache.tomcat.jdbc.pool.interceptor;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 import org.apache.tomcat.jdbc.pool.DataSource;
 
 /**
  * The {@code SlowQueryReport} publishes a pool's statistics under the name the
  * pool started with, and reads them back by that name. The name identifies the
- * pool - a container names every pool it manages uniquely, and the default name
- * of a programmatically built pool is unique as well - so each pool has one
- * store and one close releases only that store.
+ * pool and must be unique among the live pools of a class loader: Tomcat gives
+ * every pool it manages a name of its own, and a programmatically built pool
+ * has a unique default name. A duplicate live name is reported as an error.
  */
 class TestSlowQueryReportPoolNames extends JdbcPoolBaseTest {
 
@@ -107,6 +114,25 @@ class TestSlowQueryReportPoolNames extends JdbcPoolBaseTest {
     }
 
     @Test
+    void aDuplicateLivePoolNameIsReportedAsAnError() throws Exception {
+        String poolName = "duplicate-" + System.nanoTime();
+        try (ReportLogCapture logs = new ReportLogCapture()) {
+            DataSource first = reportedPoolNamed(poolName);
+            first.createPool();
+            run(first, QUERY_FIRST);
+
+            DataSource second = reportedPoolNamed(poolName);
+            second.createPool();
+            run(second, QUERY_SECOND);
+
+            logs.assertDuplicateReported(poolName);
+
+            second.close();
+            first.close();
+        }
+    }
+
+    @Test
     void aPoolStartedUnderAFreedNameCollectsIntoAFreshStore() throws Exception {
         String poolName = "reuse-" + System.nanoTime();
         DataSource first = reportedPoolNamed(poolName);
@@ -128,5 +154,65 @@ class TestSlowQueryReportPoolNames extends JdbcPoolBaseTest {
                         + "not inherit the closed pool's statistics");
 
         second.close();
+    }
+
+    /**
+     * Captures what {@link SlowQueryReport} logs through the JULI logger the
+     * interceptor uses.
+     */
+    private static final class ReportLogCapture implements AutoCloseable {
+        private static final String CANARY = "slow-query-report-handler-wiring-canary";
+
+        private final Logger logger = Logger.getLogger(SlowQueryReport.class.getName());
+        private final Level originalLevel = logger.getLevel();
+        private final List<LogRecord> records = Collections.synchronizedList(new ArrayList<>());
+        private final Handler handler = new Handler() {
+            @Override
+            public void publish(LogRecord record) {
+                records.add(record);
+            }
+
+            @Override
+            public void flush() {
+                // no buffering
+            }
+
+            @Override
+            public void close() {
+                // nothing to release
+            }
+        };
+
+        ReportLogCapture() {
+            logger.addHandler(handler);
+            logger.setLevel(Level.ALL);
+            LogFactory.getLog(SlowQueryReport.class).error(CANARY);
+            if (records.stream().noneMatch(r -> CANARY.equals(r.getMessage()))) {
+                close();
+                throw new AssertionError("the test handler must observe what this class logs");
+            }
+        }
+
+        void assertDuplicateReported(String poolName) {
+            LogRecord[] snapshot;
+            synchronized (records) {
+                snapshot = records.toArray(new LogRecord[0]);
+            }
+            for (LogRecord record : snapshot) {
+                if (record.getLevel().intValue() >= Level.SEVERE.intValue() && record.getMessage() != null
+                        && record.getMessage().contains("Duplicate pool name")
+                        && record.getMessage().contains(poolName)) {
+                    return;
+                }
+            }
+            Assertions.fail("a pool that starts under the name of a live pool must report the"
+                    + " duplicate name as an error, saw no such record for " + poolName);
+        }
+
+        @Override
+        public void close() {
+            logger.removeHandler(handler);
+            logger.setLevel(originalLevel);
+        }
     }
 }
