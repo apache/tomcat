@@ -186,7 +186,12 @@ public class Stream {
                 while (iterator.hasNext()) {
                     list.add(iterator.next());
                 }
-                Collections.sort(list);
+                try {
+                    Collections.sort(list);
+                } catch (ClassCastException cce) {
+                    // The elements are not Comparable or are not Comparable with each other
+                    throw new ELException(MessageFactory.get("stream.compare.sortFailed"), cce);
+                }
                 sorted = list.iterator();
             }
         };
@@ -604,9 +609,16 @@ public class Stream {
         while (iterator.hasNext()) {
             Object obj = iterator.next();
             if ((obj instanceof Comparable)) {
-                if (isMax && ((Comparable) obj).compareTo(result) > 0) {
+                int comparison;
+                try {
+                    comparison = ((Comparable) obj).compareTo(result);
+                } catch (ClassCastException cce) {
+                    // The elements are Comparable but not with each other
+                    throw new ELException(MessageFactory.get("error.compare", obj, result), cce);
+                }
+                if (isMax && comparison > 0) {
                     result = (Comparable) obj;
-                } else if (!isMax && ((Comparable) obj).compareTo(result) < 0) {
+                } else if (!isMax && comparison < 0) {
                     result = (Comparable) obj;
                 }
             } else {
