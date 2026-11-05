@@ -23,7 +23,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -185,6 +187,12 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
     private AtomicInteger cacheSize;
 
     /**
+     * Whether {@link #disconnected(ConnectionPool, PooledConnection, boolean)} is purging this cache. A park that
+     * observes it set refuses to cache; a park that inserted just as the purge started withdraws its own entry.
+     */
+    private volatile boolean draining;
+
+    /**
      * Whether a tracker that closes its tracked statements at the connection return sits beneath this interceptor in
      * the chain. A {@link StatementFinalizer} below the cache tracks the driver's statement - its close-aware proxy is
      * reached only by a close that descends through the cache, and the close that parks a statement stops here - so a
@@ -248,6 +256,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
                 oname = null;
             }
         } else {
+            draining = false;
             cacheSize = cacheSizeMap.get(parent);
             this.pcon = con;
             if (!pcon.getAttributes().containsKey(STATEMENT_CACHE_ATTR)) {
@@ -266,12 +275,31 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
         @SuppressWarnings("unchecked")
         ConcurrentHashMap<CacheKey, CachedStatement> statements = (ConcurrentHashMap<CacheKey, CachedStatement>) con
                 .getAttributes().get(STATEMENT_CACHE_ATTR);
-
+        List<CachedStatement> toClose = null;
+        // Every park is refused from here on. A park that read the flag
+        // before this write and inserted during the walk withdraws its own
+        // entry when it re-reads it, so sweeping until the map is empty closes
+        // exactly the entries the purge owns. Each removal decrements the
+        // counter once; closing runs after the sweep because it reaches the
+        // driver.
+        draining = true;
         if (statements != null) {
-            for (Map.Entry<CacheKey, CachedStatement> p : statements.entrySet()) {
-                closeStatement(p.getValue());
+            do {
+                for (Map.Entry<CacheKey, CachedStatement> entry : statements.entrySet()) {
+                    CachedStatement statement = entry.getValue();
+                    if (statement != null && removeStatementInternal(statement)) {
+                        if (toClose == null) {
+                            toClose = new ArrayList<>();
+                        }
+                        toClose.add(statement);
+                    }
+                }
+            } while (!statements.isEmpty());
+        }
+        if (toClose != null) {
+            for (CachedStatement statement : toClose) {
+                statement.forceClose();
             }
-            statements.clear();
         }
 
         super.disconnected(parent, con, finalizing);
@@ -373,6 +401,20 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
      * @return true if the statement was cached, false otherwise
      */
     public boolean cacheStatement(CachedStatement proxy) {
+        if (draining) {
+            return false;
+        }
+        boolean parked = cacheStatementInternal(proxy);
+        if (parked && draining) {
+            // The purge may have started while this park was in flight. If
+            // the entry is still ours, withdraw it and let the caller close
+            // it; if the purge already removed it, the purge closes it.
+            return !removeStatementInternal(proxy);
+        }
+        return parked;
+    }
+
+    private boolean cacheStatementInternal(CachedStatement proxy) {
         ConcurrentHashMap<CacheKey, CachedStatement> cache = getCache();
         // Read the counter once, like getCacheSize() and closeInvoked() do:
         // a disposal (the reset(null, null) walks) nulls the field, and every
@@ -438,6 +480,10 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
      * @return true if the statement was removed, false otherwise
      */
     public boolean removeStatement(CachedStatement proxy) {
+        return removeStatementInternal(proxy);
+    }
+
+    private boolean removeStatementInternal(CachedStatement proxy) {
         ConcurrentHashMap<CacheKey, CachedStatement> cache = getCache();
         // The counter is read once for the same disposal window as in
         // cacheStatement: a disposal is answered like at the other entry
