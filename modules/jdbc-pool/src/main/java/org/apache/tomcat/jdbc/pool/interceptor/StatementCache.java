@@ -40,6 +40,7 @@ import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
+import org.apache.tomcat.jdbc.pool.util.ExceptionUtils;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
@@ -792,7 +793,10 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
             removeStatement(this);
             try {
                 super.closeInvoked();
-            } catch (SQLException x) {
+            } catch (Throwable x) {
+                // A non-fatal Error from the driver's close is a failed close
+                // here, not a reason to abort the remainder of the purge.
+                ExceptionUtils.handleThrowable(x);
                 log.warn(MessageFactory.get("statementCache.unableToCloseDiscardedStatement", getSql()), x);
             }
         }
