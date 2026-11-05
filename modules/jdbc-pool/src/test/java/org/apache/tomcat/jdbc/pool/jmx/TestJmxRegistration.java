@@ -966,6 +966,14 @@ class TestJmxRegistration extends JdbcPoolBaseTest {
                 () -> ds.setJmxEnabled(false),
                 "a post-start write would otherwise be stored without creating or removing anything");
         Assertions.assertTrue(ds.isJmxEnabled(), "the refused write must not change the configuration");
+
+        ds.close();
+        Assertions.assertThrows(UnsupportedOperationException.class,
+                () -> ds.setJmxEnabled(false),
+                "a closed data source can never create a pool again, so a write there would be"
+                        + " stored without any possible effect");
+        Assertions.assertTrue(ds.isJmxEnabled(),
+                "the refused write on a closed data source must not change the configuration");
     }
 
     @Test
