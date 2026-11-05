@@ -16,6 +16,8 @@
  */
 package org.apache.el;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Function;
 
 import jakarta.el.ELContext;
@@ -844,6 +846,121 @@ public class TestMethodExpressionImpl {
         MethodExpression me2 = factory.createMethodExpression(context, "${beanBB.getName}", String.class,
                 new Class<?>[] {});
 
+        Assert.assertNotEquals(me1, me2);
+    }
+
+
+    @Test
+    public void testNotEqualsDifferentFunctionArguments() throws Exception {
+        ELProcessor elp = new ELProcessor();
+        elp.defineBean("beanB", beanB);
+        elp.defineFunction("fn", "decimal", Integer.class.getMethod("toString", int.class));
+        elp.defineFunction("fn", "hex", Integer.class.getMethod("toHexString", int.class));
+        ELContext elpContext = elp.getELManager().getELContext();
+
+        MethodExpression me1 = factory.createMethodExpression(elpContext, "${beanB.echo(fn:decimal(10))}",
+                String.class, null);
+        MethodExpression me2 = factory.createMethodExpression(elpContext, "${beanB.echo(fn:hex(10))}", String.class,
+                null);
+
+        // Function names must distinguish expressions even when their argument trees are identical.
+        Assert.assertEquals("10", me1.invoke(elpContext, null));
+        Assert.assertEquals("a", me2.invoke(elpContext, null));
+        Assert.assertNotEquals(me1, me2);
+
+        Set<MethodExpression> expressions = new HashSet<>();
+        expressions.add(me1);
+        expressions.add(me2);
+        Assert.assertEquals(2, expressions.size());
+    }
+
+
+    @Test
+    public void testNotEqualsDifferentFunctionPrefixes() throws Exception {
+        ELProcessor elp = new ELProcessor();
+        elp.defineBean("beanB", beanB);
+        elp.defineFunction("decimal", "convert", Integer.class.getMethod("toString", int.class));
+        elp.defineFunction("hex", "convert", Integer.class.getMethod("toHexString", int.class));
+        ELContext elpContext = elp.getELManager().getELContext();
+
+        MethodExpression me1 = factory.createMethodExpression(elpContext, "${beanB.echo(decimal:convert(10))}",
+                String.class, null);
+        MethodExpression me2 = factory.createMethodExpression(elpContext, "${beanB.echo(hex:convert(10))}",
+                String.class, null);
+
+        Assert.assertEquals("10", me1.invoke(elpContext, null));
+        Assert.assertEquals("a", me2.invoke(elpContext, null));
+        Assert.assertNotEquals(me1, me2);
+    }
+
+
+    @Test
+    public void testEqualsHashCodeSameFunctionArgument() throws Exception {
+        ELProcessor elp = new ELProcessor();
+        elp.defineBean("beanB", beanB);
+        elp.defineFunction("fn", "hex", Integer.class.getMethod("toHexString", int.class));
+        ELContext elpContext = elp.getELManager().getELContext();
+
+        MethodExpression me1 = factory.createMethodExpression(elpContext, "${beanB.echo(fn:hex(10))}", String.class,
+                null);
+        MethodExpression me2 = factory.createMethodExpression(elpContext, "${ beanB.echo( fn:hex(10) ) }",
+                String.class, null);
+        MethodExpression me3 = factory.createMethodExpression(elpContext, "${beanB.echo(fn:hex(11))}", String.class,
+                null);
+
+        Assert.assertEquals(me1, me2);
+        Assert.assertEquals(me1.hashCode(), me2.hashCode());
+        Assert.assertNotEquals(me1, me3);
+    }
+
+
+    @Test
+    public void testEqualsHashCodeFunctionAliases() throws Exception {
+        ELProcessor elp = new ELProcessor();
+        elp.defineBean("beanB", beanB);
+        elp.defineFunction("one", "convert", Integer.class.getMethod("toString", int.class));
+        elp.defineFunction("two", "convert", Integer.class.getMethod("toString", int.class));
+        elp.defineFunction("one", "alias", Integer.class.getMethod("toString", int.class));
+        ELContext elpContext = elp.getELManager().getELContext();
+
+        MethodExpression me1 = factory.createMethodExpression(elpContext, "${beanB.echo(one:convert(10))}",
+                String.class, null);
+        MethodExpression me2 = factory.createMethodExpression(elpContext, "${beanB.echo(two:convert(10))}",
+                String.class, null);
+        MethodExpression me3 = factory.createMethodExpression(elpContext, "${beanB.echo(one:alias(10))}",
+                String.class, null);
+
+        Assert.assertEquals("10", me1.invoke(elpContext, null));
+        Assert.assertEquals("10", me2.invoke(elpContext, null));
+        Assert.assertEquals("10", me3.invoke(elpContext, null));
+        Assert.assertEquals(me1, me2);
+        Assert.assertEquals(me1, me3);
+        Assert.assertEquals(me1.hashCode(), me2.hashCode());
+        Assert.assertEquals(me1.hashCode(), me3.hashCode());
+
+        Set<MethodExpression> expressions = new HashSet<>();
+        expressions.add(me1);
+        expressions.add(me2);
+        expressions.add(me3);
+        Assert.assertEquals(1, expressions.size());
+    }
+
+
+    @Test
+    public void testNotEqualsRemappedFunction() throws Exception {
+        ELProcessor elp = new ELProcessor();
+        elp.defineBean("beanB", beanB);
+        elp.defineFunction("fn", "convert", Integer.class.getMethod("toString", int.class));
+        ELContext elpContext = elp.getELManager().getELContext();
+        MethodExpression me1 = factory.createMethodExpression(elpContext, "${beanB.echo(fn:convert(10))}",
+                String.class, null);
+
+        elp.defineFunction("fn", "convert", Integer.class.getMethod("toHexString", int.class));
+        MethodExpression me2 = factory.createMethodExpression(elpContext, "${beanB.echo(fn:convert(10))}",
+                String.class, null);
+
+        Assert.assertEquals("10", me1.invoke(elpContext, null));
+        Assert.assertEquals("a", me2.invoke(elpContext, null));
         Assert.assertNotEquals(me1, me2);
     }
 

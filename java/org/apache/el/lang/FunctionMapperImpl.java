@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.lang.reflect.Method;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -112,9 +113,9 @@ public class FunctionMapperImpl extends FunctionMapper implements Externalizable
         /**
          * Creates a new function mapping for the given method.
          *
-         * @param prefix The namespace prefix
+         * @param prefix    The namespace prefix
          * @param localName The local function name
-         * @param m The method to map
+         * @param m         The method to map
          */
         public Function(String prefix, String localName, Method m) {
             if (localName == null) {
@@ -184,14 +185,15 @@ public class FunctionMapperImpl extends FunctionMapper implements Externalizable
         @Override
         public boolean equals(Object obj) {
             if (obj instanceof Function) {
-                return this.hashCode() == obj.hashCode();
+                return Objects.equals(this.prefix, ((Function) obj).prefix) &&
+                        Objects.equals(this.localName, ((Function) obj).localName);
             }
             return false;
         }
 
         @Override
         public int hashCode() {
-            return (this.prefix + this.localName).hashCode();
+            return Objects.hash(this.prefix, this.localName);
         }
     }
 
