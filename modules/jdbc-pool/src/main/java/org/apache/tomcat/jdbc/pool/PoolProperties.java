@@ -465,6 +465,10 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
      * over interceptor class loading: an {@link InterceptorDefinition} parsed
      * from the string only keeps the class name, and those classes are loaded
      * later by the pool, outside this lock.</p>
+     *
+     * <p>The returned array is a copy, so a caller cannot change the cached
+     * definition array or the chain later connections build. The definitions
+     * it holds are shared and must be treated as read-only.</p>
      */
     @Override
     public synchronized InterceptorDefinition[] getJdbcInterceptorsAsArray() {
@@ -532,13 +536,12 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                 interceptors = definitions.toArray(new InterceptorDefinition[0]);
             }
         }
-        return interceptors;
+        return interceptors.clone();
     }
 
 
     @Override
     public void setAccessToUnderlyingConnectionAllowed(boolean accessToUnderlyingConnectionAllowed) {
-        // NOOP
     }
 
 
@@ -951,7 +954,8 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
      * credentials an operator normally configures rather than proving the
      * configuration holds no other secret. A property whose getter fails is
      * reported as an error in its own field and does not truncate the rest of
-     * the dump.
+     * the dump. {@code object_name} has no getter of its own: the factory
+     * applies it to the pool name, which the dump shows as {@code name}.
      *
      * @return the dump, always bracket-balanced even on internal failure
      */
@@ -1672,11 +1676,14 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         }
 
         /**
-         * Returns the interceptor class, loading it if necessary.
+         * Returns the interceptor class, loading it if necessary. The configured class must extend
+         * {@link JdbcInterceptor}: a class that loads but does not extend it fails the pool start with a
+         * {@link ClassCastException} when this method returns.
          *
          * @return the interceptor class
          *
          * @throws ClassNotFoundException if the class cannot be found
+         * @throws ClassCastException if the class does not extend {@link JdbcInterceptor}
          */
         @SuppressWarnings("unchecked")
         public Class<? extends JdbcInterceptor> getInterceptorClass() throws ClassNotFoundException {
@@ -1700,7 +1707,8 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     }
 
     /**
-     * Represents a property for a JDBC interceptor.
+     * Represents a property for a JDBC interceptor. Equality and hashing use the property name only, because the name
+     * keys the property in the definitions' map; two properties with the same name but different values compare equal.
      */
     public static class InterceptorProperty implements Serializable {
         private static final long serialVersionUID = 1L;
