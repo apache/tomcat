@@ -152,7 +152,8 @@ public class SlowQueryReport extends AbstractQueryReport {
      *
      * @return a hash map containing the statistics of the monitored queries, kept near {@code maxQueries} entries by
      *             eviction, or {@code null} when no store is published under that name. A {@code null} name is answered
-     *             the same way as a name that holds nothing, since nothing can be registered under it
+     *             the same way as a name that holds nothing, since nothing can be registered under it. The map is the
+     *             live store, not a copy: callers must not modify it
      */
     public static ConcurrentHashMap<String, QueryStats> getPoolStats(String poolname) {
         if (poolname == null) {
@@ -922,7 +923,7 @@ public class SlowQueryReport extends AbstractQueryReport {
          * @return the field names
          */
         public static String[] getFieldNames() {
-            return FIELD_NAMES;
+            return FIELD_NAMES.clone();
         }
 
         /**
@@ -931,7 +932,7 @@ public class SlowQueryReport extends AbstractQueryReport {
          * @return the field descriptions
          */
         public static String[] getFieldDescriptions() {
-            return FIELD_DESCRIPTIONS;
+            return FIELD_DESCRIPTIONS.clone();
         }
 
         /**
@@ -940,7 +941,7 @@ public class SlowQueryReport extends AbstractQueryReport {
          * @return the field types
          */
         public static OpenType<?>[] getFieldTypes() {
-            return FIELD_TYPES;
+            return FIELD_TYPES.clone();
         }
 
         @Override
@@ -1114,36 +1115,44 @@ public class SlowQueryReport extends AbstractQueryReport {
         }
 
         /**
-         * Returns the longest time this query took to execute.
+         * Returns the longest time this query took to execute. Until an execution has been booked the value is
+         * {@link Long#MIN_VALUE}; the published views report {@code 0} in that state.
          *
-         * @return the maximum invocation time in milliseconds
+         * @return the maximum invocation time in milliseconds, or {@link Long#MIN_VALUE} while no execution has been
+         *             booked
          */
         public long getMaxInvocationTime() {
             return maxInvocationTime;
         }
 
         /**
-         * Returns the timestamp when the longest query execution occurred.
+         * Returns the timestamp when the longest query execution occurred. Until an execution has been booked the value
+         * is {@code 0}, because no date has been recorded.
          *
-         * @return the timestamp in milliseconds of the maximum invocation
+         * @return the timestamp in milliseconds of the maximum invocation, or {@code 0} while no execution has been
+         *             booked
          */
         public long getMaxInvocationDate() {
             return maxInvocationDate;
         }
 
         /**
-         * Returns the shortest time this query took to execute.
+         * Returns the shortest time this query took to execute. Until an execution has been booked the value is
+         * {@link Long#MAX_VALUE}; the published views report {@code 0} in that state.
          *
-         * @return the minimum invocation time in milliseconds
+         * @return the minimum invocation time in milliseconds, or {@link Long#MAX_VALUE} while no execution has been
+         *             booked
          */
         public long getMinInvocationTime() {
             return minInvocationTime;
         }
 
         /**
-         * Returns the timestamp when the shortest query execution occurred.
+         * Returns the timestamp when the shortest query execution occurred. Until an execution has been booked the value
+         * is {@code 0}, because no date has been recorded.
          *
-         * @return the timestamp in milliseconds of the minimum invocation
+         * @return the timestamp in milliseconds of the minimum invocation, or {@code 0} while no execution has been
+         *             booked
          */
         public long getMinInvocationDate() {
             return minInvocationDate;
