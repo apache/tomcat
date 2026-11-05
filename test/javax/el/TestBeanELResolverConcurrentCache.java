@@ -33,7 +33,7 @@ public class TestBeanELResolverConcurrentCache {
 
     private static Class<?> getCacheClass() {
         try {
-            return Class.forName("jakarta.el.BeanELResolver$ConcurrentCache");
+            return Class.forName("javax.el.BeanELResolver$ConcurrentCache");
         } catch (ClassNotFoundException e) {
             throw new IllegalStateException(e);
         }
