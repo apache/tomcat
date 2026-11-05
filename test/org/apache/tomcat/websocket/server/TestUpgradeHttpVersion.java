@@ -18,8 +18,8 @@ package org.apache.tomcat.websocket.server;
 
 import java.nio.charset.StandardCharsets;
 
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.websocket.CloseReason.CloseCodes;
+import javax.servlet.http.HttpServletResponse;
+import javax.websocket.CloseReason.CloseCodes;
 
 import org.junit.Assert;
 import org.junit.Test;
