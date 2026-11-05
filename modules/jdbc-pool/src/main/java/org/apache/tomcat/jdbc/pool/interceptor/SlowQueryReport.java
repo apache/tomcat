@@ -827,10 +827,11 @@ public class SlowQueryReport extends AbstractQueryReport {
         /**
          * Returns what the reporting subclass has published for this pool with JMX.
          *
-         * @return the pool's JMX state, or {@code null} while no borrow of the pool has needed one
+         * @return the pool's JMX state, or {@code null} while no borrow of the pool has needed one or after the store
+         *             has been released with its pool's close
          */
         protected SlowQueryReportJmx.PoolJmx getJmxState() {
-            return jmxState;
+            return released ? null : jmxState;
         }
 
         /**
