@@ -199,7 +199,7 @@ public class ParserController implements TagConstants {
             absFileName = resolveFileName(inFileName);
         } catch (URISyntaxException e) {
             // Note: jar may be null here, so avoid referencing it
-            err.jspError("jsp.error.invalid.include", inFileName);
+            err.jspError(e, "jsp.error.invalid.include", inFileName);
         }
         if (processingTagInJar && !absFileName.startsWith(TAGS_IN_JAR_LOCATION)) {
             /*
