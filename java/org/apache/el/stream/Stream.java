@@ -314,7 +314,9 @@ public class Stream {
      * is less than or equal to zero.
      *
      * @param start the number of elements to skip
-     * @param end the end position (exclusive)
+     * @param end used to calculate the number of elements to include, which is {@code end - start}. This is the
+     *                exclusive end position only if {@code start} is greater than or equal to zero. If
+     *                {@code end - start} is less than or equal to zero, no elements are included.
      * @return the new substream
      */
     public Stream substream(final Number start, final Number end) {
