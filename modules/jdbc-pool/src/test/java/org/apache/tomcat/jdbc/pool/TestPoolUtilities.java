@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.jdbc.pool;
 
+import java.util.Collections;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Assertions;
@@ -147,6 +148,40 @@ class TestPoolUtilities {
 
         Assertions.assertNull(masked.getProperty(PoolUtilities.PROP_PASSWORD));
         Assertions.assertFalse(masked.containsKey(PoolUtilities.PROP_PASSWORD));
+    }
+
+    @Test
+    void cloneWithoutPasswordMasksEveryCredentialKeySpelling() {
+        Properties source = new Properties();
+        source.setProperty("sslmode", "verify-full");
+        source.setProperty(PoolUtilities.PROP_PASSWORD, "secret1");
+        source.setProperty("pass", "secret2");
+        source.setProperty("pwd", "secret3");
+        source.setProperty("PASSWORD", "secret4");
+        source.setProperty(" Password ", "secret5");
+
+        Properties masked = PoolUtilities.cloneWithoutPassword(source);
+
+        Assertions.assertEquals(Collections.singleton("sslmode"),
+                masked.stringPropertyNames(),
+                "every credential-shaped key must be removed, whatever its spelling");
+    }
+
+    @Test
+    void cloneWithoutPasswordMasksCredentialKeysResolvedFromDefaults() {
+        Properties defaults = new Properties();
+        defaults.setProperty("pass", "secret1");
+        defaults.setProperty("pwd", "secret2");
+        defaults.setProperty("PASSWORD", "secret3");
+        defaults.setProperty("sslmode", "verify-full");
+        Properties source = new Properties(defaults);
+
+        Properties masked = PoolUtilities.cloneWithoutPassword(source);
+
+        Assertions.assertEquals(Collections.singleton("sslmode"),
+                masked.stringPropertyNames(),
+                "a credential the source resolves through its defaults must not survive"
+                        + " into the tableless copy");
     }
 
     @Test

@@ -482,10 +482,11 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     }
 
     /**
-     * Returns a copy of the database properties with the password removed, so the JMX surface does not expose the
-     * plaintext password while {@link #getPassword()} is explicitly masked. A configuration whose database properties
-     * are {@code null} - a state {@link PoolConfiguration#setDbProperties(Properties)} accepts - has nothing to mask,
-     * so this returns {@code null}. {@inheritDoc}
+     * Returns a copy of the database properties with the credential entries removed, so the JMX surface does not
+     * expose the plaintext password while {@link #getPassword()} is explicitly masked. A credential entry is one whose
+     * key is {@code password}, {@code pass} or {@code pwd}, ignoring case and surrounding whitespace. A configuration
+     * whose database properties are {@code null} - a state {@link PoolConfiguration#setDbProperties(Properties)}
+     * accepts - has nothing to mask, so this returns {@code null}. {@inheritDoc}
      * <p>
      * The copy is a display value, and it looks complete: nothing in it says that the pool's own set carries a pair
      * this one withholds. That matters because this attribute is also writable and its write is the whole set -
