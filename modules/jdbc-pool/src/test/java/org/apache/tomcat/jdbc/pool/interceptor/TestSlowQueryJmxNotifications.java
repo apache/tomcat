@@ -32,6 +32,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.management.InstanceNotFoundException;
@@ -1200,11 +1204,9 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
     void aMalformedObjectNameOverrideFailsOnlyTheRegistration() throws Exception {
         // An override value that is not an ObjectName at all (no domain
         // separator) fails the name formation on every borrow, before the
-        // registry slot and its refusal throttle are reachable - the failure
-        // is reported each time (see the acceptability comment in
-        // registerJmx). What must stay true while it is: the failure touches
-        // nothing but the monitoring, never latches the slot, and leaves
-        // nothing under the name behind.
+        // registry slot and its refusal throttle are reachable. The first
+        // failure is reported with its stack trace; later retries stay at
+        // debug level, and the failure touches nothing but monitoring.
         String poolName = "JmxMalformedOname-" + System.nanoTime();
         DataSource ds = reportingPoolNamed(poolName,
                 "org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx"
@@ -1213,21 +1215,53 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
         Set<ObjectName> registeredBefore = server.queryNames(new ObjectName("tomcat.jdbc:type="
                 + SlowQueryReportJmx.class.getName() + ",*"), null);
-        try (@SuppressWarnings("unused") Connection first = ds.getConnection()) {
-            // the borrow itself served: a failed name formation cannot fail
-            // the pool's operation, only its monitoring
-            Assertions.assertEquals(registeredBefore, server.queryNames(new ObjectName("tomcat.jdbc:type="
-                    + SlowQueryReportJmx.class.getName() + ",*"), null),
-                    "no registration may appear while the name cannot be formed");
+        Logger logger = Logger.getLogger(SlowQueryReportJmx.class.getName());
+        Level originalLevel = logger.getLevel();
+        List<LogRecord> records = new CopyOnWriteArrayList<>();
+        Handler handler = new Handler() {
+            @Override
+            public void publish(LogRecord record) {
+                records.add(record);
+            }
+
+            @Override
+            public void flush() {
+                // no buffering
+            }
+
+            @Override
+            public void close() {
+                // nothing to release
+            }
+        };
+        logger.addHandler(handler);
+        logger.setLevel(Level.ALL);
+        try {
+            try (@SuppressWarnings("unused") Connection first = ds.getConnection()) {
+                // the borrow itself served: a failed name formation cannot fail
+                // the pool's operation, only its monitoring
+                Assertions.assertEquals(registeredBefore, server.queryNames(new ObjectName("tomcat.jdbc:type="
+                        + SlowQueryReportJmx.class.getName() + ",*"), null),
+                        "no registration may appear while the name cannot be formed");
+            }
+            try (@SuppressWarnings("unused") Connection second = ds.getConnection()) {
+                SlowQueryReportJmx.PoolJmx state = SlowQueryReportJmx.jmxStateFor(ds.getPool());
+                Assertions.assertNull(state.publishedUnder(),
+                        "a name that cannot be formed must never leave the pool claiming a publication");
+                Assertions.assertNull(state.failureMarker(),
+                        "a failure that cannot form its ObjectName has no name to mark as reported");
+            }
+        } finally {
+            logger.removeHandler(handler);
+            logger.setLevel(originalLevel);
         }
-        try (@SuppressWarnings("unused") Connection second = ds.getConnection()) {
-            SlowQueryReportJmx.PoolJmx state = SlowQueryReportJmx.jmxStateFor(ds.getPool());
-            Assertions.assertNull(state.publishedUnder(),
-                    "a name that cannot be formed must never leave the pool claiming a publication");
-            Assertions.assertNull(state.failureMarker(),
-                    "and a failure that cannot form its ObjectName has no name to mark as"
-                            + " reported, so it is reported on every borrow of such a pool");
-        }
+
+        long noDataErrors = records.stream()
+                .filter(r -> r.getLevel().intValue() >= Level.SEVERE.intValue()
+                        && r.getMessage() != null && r.getMessage().contains("no JMX data will be exposed"))
+                .count();
+        Assertions.assertEquals(1, noDataErrors,
+                "a permanently malformed name must be reported once, not on every borrow");
 
         ConnectionPool pool = ds.getPool();
         ds.close();
