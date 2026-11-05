@@ -158,10 +158,11 @@ public interface ConnectionPoolMBean extends PoolConfiguration {
     /**
      * Runs the idle-eviction pass over the connections that are currently idle. An idle connection the configuration
      * says should be evicted - one that has been idle past {@code minEvictableIdleTimeMillis}, or one a
-     * {@link #purgeOnReturn()} or {@link #purge()} call made stale - is released, and the pass stops at the
-     * {@code minIdle} floor. An idle connection a borrower claims while this runs is left to that borrower. This is
-     * the pass the pool cleaner runs on its own timer, run on demand, and what it releases is counted by
-     * {@link #getReleasedIdleCount()}.
+     * {@link #purgeOnReturn()} or {@link #purge()} call made stale - is released, and the pass normally stops at the
+     * {@code minIdle} floor. A connection a purge made stale is released regardless of that floor, so an explicit
+     * call after a purge can take the pool below it. An idle connection a borrower claims while this runs is left to
+     * that borrower. This is the pass the pool cleaner runs on its own timer, run on demand, and what it releases is
+     * counted by {@link #getReleasedIdleCount()}.
      */
     void checkIdle();
 
