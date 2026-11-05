@@ -777,6 +777,50 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
                 "the default must survive an address with no content");
     }
 
+    @Test
+    void traceLoggingDoesNotIncludeThePropertyValue() throws Exception {
+        Logger logger = Logger.getLogger(
+                GenericNamingResourcesFactory.class.getName());
+        Level originalLevel = logger.getLevel();
+        final List<LogRecord> records = new ArrayList<>();
+        Handler handler = new Handler() {
+            @Override
+            public void publish(LogRecord record) {
+                records.add(record);
+            }
+            @Override
+            public void flush() {
+                // no buffering
+            }
+            @Override
+            public void close() {
+                // nothing to release
+            }
+        };
+        logger.addHandler(handler);
+        logger.setLevel(Level.FINEST);
+        try {
+            Reference ref = new Reference(NamingTarget.class.getName(),
+                    null, null);
+            ref.add(new StringRefAddr("name", "s3cr3t-value"));
+
+            Object result = new GenericNamingResourcesFactory().getObjectInstance(
+                    ref, new CompositeName("test/trace"), null, null);
+            Assertions.assertEquals("s3cr3t-value",
+                    ((NamingTarget) result).getName(),
+                    "the property must still be applied");
+        } finally {
+            logger.removeHandler(handler);
+            logger.setLevel(originalLevel);
+        }
+        for (LogRecord record : records) {
+            Assertions.assertFalse(record.getMessage() != null &&
+                    record.getMessage().contains("s3cr3t-value"),
+                    "the trace line must not log the configured value: "
+                            + record.getMessage());
+        }
+    }
+
     /** Target with the numeric and character setters BeanFactory supports. */
     public static class WideTarget {
         private short small;
