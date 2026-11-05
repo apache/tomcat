@@ -1646,7 +1646,7 @@ public class PooledConnection implements PooledConnectionMBean {
 =======
      * Returns a diagnostic rendering of this pooled connection that is safe to interpolate into a pool log message:
      * the connection's identity and whether it currently holds a physical session, never the driver's own
-     * {@link Connection#toString()}. That text is unmasked and may carry the URL, the user or other session details,
+     * {@link java.sql.Connection}'s own {@code toString()}. That text is unmasked and may carry the URL, the user or other session details,
      * and it may contain newlines, so passing it into a pool warning could expose a credential or forge log lines. A
      * caller that wants the driver's text for an explicit dump can read the physical connection itself.
 >>>>>>> 52871c512d (Reset validation on a new session and make PooledConnection logging safe)
