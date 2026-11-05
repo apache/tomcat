@@ -1623,6 +1623,20 @@
         the default pool name, which identified only the class loader and
         added no uniqueness, has been removed. (remm)
       </fix>
+      <fix>
+        Correct a defect in the JDBC connection pool where a non-fatal
+        <code>Error</code> raised by a driver or a wrapper while a connection
+        was being created, for example a <code>LinkageError</code> from a web
+        application that has stopped, escaped the creation guard. The
+        connection had already claimed one of the pool's
+        <code>maxActive</code> slots, so the slot and the physical session
+        were lost for the life of the pool; a pre-load of
+        <code>initialSize</code> connections that failed the same way also
+        bypassed the pool's start-up failure handling. The creation now treats
+        a non-fatal <code>Error</code> like any other failed creation, releases
+        the connection and reports the failure as an
+        <code>SQLException</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
