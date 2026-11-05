@@ -90,21 +90,46 @@ public class PoolUtilities {
     }
 
     /**
+     * Whether {@code key} names a credential, ignoring case and surrounding whitespace. The drivers accept
+     * {@code pass} and {@code pwd} as aliases of {@code password}, so a masked copy has to remove the same spellings
+     * the string maskers treat as credentials.
+     *
+     * @param key the property key to test, possibly {@code null}
+     *
+     * @return {@code true} when the key is one of the recognised credential keys
+     */
+    static boolean isCredentialKey(String key) {
+        if (key == null) {
+            return false;
+        }
+        String candidate = key.trim();
+        return PROP_PASSWORD.equalsIgnoreCase(candidate) || "pass".equalsIgnoreCase(candidate)
+                || "pwd".equalsIgnoreCase(candidate);
+    }
+
+    /**
      * Creates a copy of the given properties as {@link #clone(Properties)}
-     * does, with the password entry removed. The copy carries no defaults
-     * table, so the removal also reaches a password the source only resolved
-     * through its defaults - a reference copy would let the remove walk past
-     * the defaults table and leave the password resolvable.
+     * does, with every credential entry removed. A credential entry is one
+     * whose key is recognised by {@link #isCredentialKey(String)}:
+     * {@code password}, {@code pass} and {@code pwd}, ignoring case and
+     * surrounding whitespace. The copy carries no defaults table, so the
+     * removal also reaches a credential the source only resolved through its
+     * defaults - a reference copy would let the remove walk past the defaults
+     * table and leave the credential resolvable.
      *
      * @param p the properties to clone, not {@code null}
      *
-     * @return a new Properties instance with all entries except the password
+     * @return a new Properties instance with all entries except the credentials
      *
      * @throws NullPointerException if the source is {@code null}
      */
     public static Properties cloneWithoutPassword(Properties p) {
         Properties result = clone(p);
-        result.remove(PROP_PASSWORD);
+        for (Object key : result.keySet().toArray()) {
+            if (key instanceof String && isCredentialKey((String) key)) {
+                result.remove(key);
+            }
+        }
         return result;
     }
 }
