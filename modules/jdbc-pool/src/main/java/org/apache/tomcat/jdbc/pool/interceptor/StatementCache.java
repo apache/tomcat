@@ -59,7 +59,8 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  * that closes tracked statements at the connection return is affected too: {@link StatementFinalizer} must be listed
  * before this one, because a parked statement is deliberately left open and a tracker beneath the cache would close
  * it out from under a live cache entry; listed after this one, it makes this cache refuse to park at all, and
- * statements are closed normally instead of cached.
+ * statements are closed normally instead of cached. Only {@link StatementFinalizer} and its subclasses are recognised
+ * by that check; a third-party interceptor with the same behaviour is not detected.
  */
 public class StatementCache extends StatementDecoratorInterceptor implements StatementCacheMBean {
     private static final Log log = LogFactory.getLog(StatementCache.class);
@@ -135,7 +136,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
      * A copy is returned because the arrays a cache matches against are shared
      * by every instance in the class loader; mutating the array behind the
      * accessor would change what every pool in the JVM caches, not just this
-     * one.
+     * one. This is an extension accessor: the pool itself does not read it.
      *
      * @return array of statement type strings
      */
@@ -559,6 +560,25 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
     private final AtomicBoolean associationLossLogged = new AtomicBoolean();
 
     /**
+     * Renders SQL text for interpolation into a log message. JULI writes message text without newline escaping, and
+     * SQL is application- and user-shaped data, so embedded CR/LF would forge additional log lines. They are replaced
+     * by spaces, keeping the statement readable in the one line the log entry owns.
+     *
+     * @param sql the SQL text, possibly null
+     *
+     * @return the text safe to interpolate into a log message
+     */
+    private static String sqlForLog(String sql) {
+        if (sql == null) {
+            return "null";
+        }
+        if (sql.indexOf('\r') < 0 && sql.indexOf('\n') < 0) {
+            return sql;
+        }
+        return sql.replace('\r', ' ').replace('\n', ' ');
+    }
+
+    /**
      * Logs, at most once per connection, that a park was refused because the connection recorded for the statement
      * is not the current physical one. The usual cause is benign - a close racing a session replacement - but a
      * wrapper beneath this cache that answers the statement's {@code getConnection()} with a value this cache
@@ -572,7 +592,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
         // not spend the claim, and the compare-and-set runs second, so of the
         // refusals met while debug is on exactly one logs.
         if (log.isDebugEnabled() && associationLossLogged.compareAndSet(false, true)) {
-            log.debug("Not caching statement [" + proxy.getSql() + "]: the connection recorded for it is "
+            log.debug("Not caching statement [" + sqlForLog(proxy.getSql()) + "]: the connection recorded for it is "
                     + "not the current physical connection. Either the session was replaced while the "
                     + "statement was being closed, or an interceptor listed below "
                     + getClass().getSimpleName() + " answers the statement's getConnection() with a value "
@@ -779,7 +799,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
                     ExceptionUtils.handleThrowable(x);
                     removeStatement(proxy);
                     if (log.isDebugEnabled()) {
-                        log.debug("Unable to recycle statement: " + getSql(), x);
+                        log.debug("Unable to recycle statement: " + sqlForLog(getSql()), x);
                     }
                 }
             }
@@ -822,7 +842,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
                 // A non-fatal Error from the driver's close is a failed close
                 // here, not a reason to abort the remainder of the purge.
                 ExceptionUtils.handleThrowable(x);
-                log.warn(MessageFactory.get("statementCache.unableToCloseDiscardedStatement", getSql()), x);
+                log.warn(MessageFactory.get("statementCache.unableToCloseDiscardedStatement", sqlForLog(getSql())), x);
             }
         }
 
