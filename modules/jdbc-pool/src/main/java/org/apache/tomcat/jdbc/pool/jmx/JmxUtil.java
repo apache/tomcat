@@ -18,8 +18,6 @@ package org.apache.tomcat.jdbc.pool.jmx;
 
 
 import java.lang.management.ManagementFactory;
-import java.util.Iterator;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MalformedObjectNameException;
@@ -31,6 +29,17 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
  * Utility class for JMX registration of JDBC pool components.
+ * <p>
+ * JMX is a best-effort management channel, not part of the pool's operation. A registration or an unregistration is
+ * attempted once and a failure is logged; nothing is retried later from this class.
+ * </p>
+ * <p>
+ * Under Catalina the names are unique - the container assigns them, and a name identifies one live component - so a
+ * refused registration is a configuration or server problem that an operator reads from the log, not one the pool
+ * should keep hammering. Retrying a refused unregistration by name would be worse than leaving it: by the time the
+ * retry ran, the name could belong to a replacement MBean, and the retry would silently take down the replacement's
+ * management surface.
+ * </p>
  */
 public class JmxUtil {
 
@@ -39,17 +48,6 @@ public class JmxUtil {
     }
 
     private static final Log log = LogFactory.getLog(JmxUtil.class);
-
-    /** How many refused unregistrations are kept for a later retry. */
-    private static final int MAX_pendingUnregistrations = 64;
-
-    /**
-     * Names whose unregistration the MBean server refused. Every later unregistration retries them, so a transient
-     * refusal does not leave the MBean published - and its component pinned - for the life of the JVM. The queue is
-     * bounded: a permanent refusal cannot grow it without limit.
-     */
-    private static final ConcurrentLinkedQueue<ObjectName> pendingUnregistrations =
-            new ConcurrentLinkedQueue<>();
 
     /**
      * Register an object as an MBean.
@@ -103,10 +101,11 @@ public class JmxUtil {
      *             handle regardless, held by nothing for the rest of the JVM's
      *             life (an MBean whose {@code postDeregister()} throws reports
      *             the same failure although the server already took it down;
-     *             the pool's own MBeans never do)
+     *             the pool's own MBeans never do). A refusal is reported here
+     *             and not remembered for a later retry: see the class
+     *             documentation.
      */
     public static boolean unregisterJmx(ObjectName oname) {
-        retryPendingUnregistrations();
         if (oname == null) {
             return true;
         }
@@ -120,55 +119,12 @@ public class JmxUtil {
             return true;
         } catch (Exception e) {
             // Normally the MBean kept its name and that name is now owned by
-            // nobody, so remember it for a later retry and say so, with the
-            // name, so an operator can take it down if it stays refused.
-            rememberPendingUnregistration(oname);
+            // nobody. Say so, with the name, so an operator can take it down;
+            // this class does not retry it, because the name may already
+            // describe a replacement MBean by the time a retry ran.
             log.error(MessageFactory.get("jmxUtil.jmxUnregistrationRefused", oname), e);
             return false;
         }
-    }
-
-    /**
-     * Retries the unregistrations the server refused earlier. A name that has since become unregistrable is removed
-     * from the pending set; a name that is still refused stays there silently, the first refusal already having been
-     * reported.
-     */
-    private static void retryPendingUnregistrations() {
-        if (pendingUnregistrations.isEmpty()) {
-            return;
-        }
-        for (Iterator<ObjectName> it = pendingUnregistrations.iterator(); it.hasNext();) {
-            ObjectName pending = it.next();
-            try {
-                ManagementFactory.getPlatformMBeanServer().unregisterMBean(pending);
-                pendingUnregistrations.remove(pending);
-            } catch (InstanceNotFoundException e) {
-                // The MBean went down through another path after all
-                pendingUnregistrations.remove(pending);
-            } catch (Exception e) {
-                // Still refused; the first refusal was already reported and a
-                // retry must not flood the log
-                if (log.isDebugEnabled()) {
-                    log.debug("Jmx unregistration of [" + pending + "] still refused: " + e);
-                }
-            }
-        }
-    }
-
-    /**
-     * Remembers a refused name for a later retry, up to the bounded capacity.
-     *
-     * @param oname the name whose unregistration was refused
-     */
-    private static void rememberPendingUnregistration(ObjectName oname) {
-        if (pendingUnregistrations.contains(oname)) {
-            return;
-        }
-        if (pendingUnregistrations.size() >= MAX_pendingUnregistrations) {
-            log.warn(MessageFactory.get("jmxUtil.jmxUnregistrationRetryLimit", oname));
-            return;
-        }
-        pendingUnregistrations.add(oname);
     }
 
     /*
