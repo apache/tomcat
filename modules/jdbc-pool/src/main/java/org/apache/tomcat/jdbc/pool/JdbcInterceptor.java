@@ -144,6 +144,16 @@ public abstract class JdbcInterceptor implements InvocationHandler {
     }
 
     /**
+     * Releases any MBean this interceptor published for the connection it serves, without tearing down the connection
+     * state. The pool calls this when it releases its own MBean while the pool stays live; the connection and its
+     * chain remain usable, and a later borrow can publish the interceptor again. The default does nothing; an
+     * interceptor that publishes an MBean overrides it.
+     */
+    public void unregisterMBean() {
+        // No MBean to release
+    }
+
+    /**
      * Performs a string comparison, using references unless the useEquals property is set to true.
      *
      * @param name1 The first name

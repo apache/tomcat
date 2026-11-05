@@ -1672,6 +1672,32 @@ public class PooledConnection implements PooledConnectionMBean {
     }
 
     /**
+     * Releases the MBeans published for this connection and for the interceptors of its chain, without releasing the
+     * physical session. The pool uses this when its own MBean is released while the pool stays live: the connection
+     * and its chain remain usable, and a later borrow or reconnect can publish them again.
+     */
+    public void unregisterMBean() {
+        synchronized (this) {
+            if (oname != null) {
+                JmxUtil.unregisterJmx(oname);
+                oname = null;
+            }
+        }
+        for (JdbcInterceptor interceptor = getHandler(); interceptor != null; interceptor = interceptor.getNext()) {
+            try {
+                interceptor.unregisterMBean();
+            } catch (Throwable x) {
+                // JMX is best effort: one interceptor that fails to release
+                // its MBean must not keep the others registered
+                ExceptionUtils.handleThrowable(x);
+                if (log.isDebugEnabled()) {
+                    log.debug("Unable to unregister interceptor MBean", x);
+                }
+            }
+        }
+    }
+
+    /**
      * Returns the JMX ObjectName for this pooled connection.
      *
      * @return the JMX ObjectName or null if not registered
