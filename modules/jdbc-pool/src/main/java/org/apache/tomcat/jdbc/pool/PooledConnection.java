@@ -1266,7 +1266,11 @@ public class PooledConnection implements PooledConnectionMBean {
         if (first) {
             try {
                 disconnect(true);
-            } catch (Exception x) {
+            } catch (Throwable x) {
+                // A non-fatal Error from the driver's close is a failed
+                // disconnect, not a reason to skip the first-CAS result the
+                // pool uses to retire the slot and count the release.
+                ExceptionUtils.handleThrowable(x);
                 if (log.isDebugEnabled()) {
                     log.debug("Unable to close SQL connection", x);
                 }
