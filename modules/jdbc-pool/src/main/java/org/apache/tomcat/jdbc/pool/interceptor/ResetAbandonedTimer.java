@@ -231,6 +231,15 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         final long epoch = borrowEpoch;
+        if (compare(ABORT_VAL, method)) {
+            // abort ends the borrow before the driver call and before the
+            // pool's release walk clears this binding. Take the flag down
+            // first, so the JMX resetTimer() operation cannot stamp a
+            // connection whose borrow has already ended.
+            synchronized (this) {
+                this.checkedOut = false;
+            }
+        }
         try {
             return super.invoke(proxy, method, args);
         } finally {
