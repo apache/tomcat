@@ -709,7 +709,9 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     private static Map<String,List<String>> createRequestHeaders(String host, int port, boolean secure,
             ClientEndpointConfig clientEndpointConfiguration) {
 
-        Map<String,List<String>> headers = new HashMap<>();
+        // HTTP header names are case-insensitive. A Configurator may modify these headers in beforeRequest() so the
+        // lookups used to validate the response must not depend on the case it uses.
+        Map<String,List<String>> headers = new CaseInsensitiveKeyMap<>();
         List<Extension> extensions = clientEndpointConfiguration.getExtensions();
         List<String> subProtocols = clientEndpointConfiguration.getPreferredSubprotocols();
         Map<String,Object> userProperties = clientEndpointConfiguration.getUserProperties();
