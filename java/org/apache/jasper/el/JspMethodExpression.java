@@ -35,6 +35,8 @@ import javax.el.PropertyNotFoundException;
  */
 public final class JspMethodExpression extends MethodExpression implements Externalizable {
 
+    private static final long serialVersionUID = 5387881870932678316L;
+
     private String mark;
 
     private MethodExpression target;

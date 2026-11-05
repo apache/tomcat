@@ -33,6 +33,8 @@ import javax.el.ValueExpression;
  */
 public final class JspValueExpression extends ValueExpression implements Externalizable {
 
+    private static final long serialVersionUID = 6003098379712560193L;
+
     private ValueExpression target;
 
     private String mark;

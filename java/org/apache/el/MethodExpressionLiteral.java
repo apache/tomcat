@@ -34,7 +34,7 @@ import org.apache.el.util.ReflectionUtil;
  */
 public class MethodExpressionLiteral extends MethodExpression implements Externalizable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -3475757320946305522L;
 
     private Class<?> expectedType;
 
