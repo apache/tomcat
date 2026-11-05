@@ -171,6 +171,22 @@ class TestPoolProperties {
     }
 
     @Test
+    void getJdbcInterceptorsAsArrayReturnsACopy() {
+        PoolProperties properties = new PoolProperties();
+        properties.setJdbcInterceptors("ResetAbandonedTimer");
+
+        PoolProperties.InterceptorDefinition[] first = properties.getJdbcInterceptorsAsArray();
+        Assertions.assertTrue(first.length > 0, "precondition: the definition must parse");
+        first[0] = null;
+
+        PoolProperties.InterceptorDefinition[] second = properties.getJdbcInterceptorsAsArray();
+        Assertions.assertNotSame(first, second,
+                "each call must return its own array");
+        Assertions.assertNotNull(second[0],
+                "mutating the returned array must not change the cached definitions");
+    }
+
+    @Test
     void setConnectionPropertiesRoundTripsThroughTheFactory() {
         Properties attrs = new Properties();
         attrs.setProperty("connectionProperties", "first=one;second=two");
