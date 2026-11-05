@@ -172,7 +172,7 @@ public class WsServerContainer extends WsWebSocketContainer implements ServerCon
                     } else {
                         // Duplicate uriTemplate;
                         throw new DeploymentException(sm.getString("serverContainer.duplicatePaths", path,
-                                sec.getEndpointClass(), sec.getEndpointClass()));
+                                oldMatch.config.getEndpointClass(), sec.getEndpointClass()));
                     }
                 }
             } else {
