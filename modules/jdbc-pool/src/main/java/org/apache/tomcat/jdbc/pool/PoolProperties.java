@@ -1617,16 +1617,16 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
     /**
      * Whether {@code key} names a credential, ignoring case and surrounding
-     * whitespace.
+     * whitespace. The predicate is shared with the masked property copies
+     * {@link PoolUtilities#cloneWithoutPassword(Properties)} builds, so the
+     * two policies cannot drift apart.
      *
      * @param key the extracted key
      *
      * @return {@code true} when the key is one of the recognised credential keys
      */
     private static boolean isCredentialKey(String key) {
-        return DataSourceFactory.PROP_PASSWORD.equalsIgnoreCase(key)
-                || "pass".equalsIgnoreCase(key)
-                || "pwd".equalsIgnoreCase(key);
+        return PoolUtilities.isCredentialKey(key);
     }
 
     /**
