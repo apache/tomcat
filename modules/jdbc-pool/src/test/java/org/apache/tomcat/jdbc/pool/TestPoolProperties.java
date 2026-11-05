@@ -836,6 +836,23 @@ class TestPoolProperties {
     }
 
     @Test
+    void toStringMasksAnInterceptorCredentialInANestedPropertyList() {
+        PoolProperties properties = new PoolProperties();
+        properties.setJdbcInterceptors(
+                "StatementCache(foo=(password=interceptor-secret),pwd=Shouted-Secret)");
+
+        String asString = properties.toString();
+
+        Assertions.assertFalse(asString.contains("interceptor-secret"),
+                "a credential nested inside another property list must not leak, was: " + asString);
+        Assertions.assertFalse(asString.contains("Shouted-Secret"),
+                "the pair after the nested list must still be masked, was: " + asString);
+        Assertions.assertTrue(asString.contains(
+                        "StatementCache(foo=(password=********),pwd=********)"),
+                "the surrounding structure must stay readable, was: " + asString);
+    }
+
+    @Test
     void toStringMasksAnInterceptorCredentialWrittenAroundSpacesAndLeavesOtherPairsAlone() {
         PoolProperties properties = new PoolProperties();
         properties.setJdbcInterceptors("SlowQueryReport(threshold=1000, Password = spaced-secret );"
