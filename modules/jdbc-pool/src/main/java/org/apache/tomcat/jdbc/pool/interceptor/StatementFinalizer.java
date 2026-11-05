@@ -54,13 +54,15 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  * return cannot reach - it registers after the return drained the list - and is closed where it arrives instead of
  * being tracked.
  * <p>
- * Tracked statements are handed to the application as proxies implementing the standard JDBC statement interfaces, as
- * is the statement facade the pool always installs in front of this interceptor and as are the proxies of the other
- * statement-wrapping interceptors; the driver's own statement class is therefore not reachable by casting. The
- * <code>Wrapper</code> methods are delegated to the driver, and <code>unwrap</code> is the supported way to reach
- * driver-specific statement methods. A statement the application reaches that way is still tracked here and is closed,
- * like any other tracked statement, when the connection is returned - unless an interceptor listed after this one
- * recycles the statement instead of closing it, as a statement cache beneath this interceptor does.
+ * Tracked statements are normally handed to the application as proxies implementing the standard JDBC statement
+ * interfaces, as is the statement facade the pool always installs in front of this interceptor and as are the proxies
+ * of the other statement-wrapping interceptors; the driver's own statement class is then not reachable by casting. If
+ * the tracking proxy cannot be created, the raw driver statement is returned instead and the statement stays tracked
+ * until the connection is returned. The <code>Wrapper</code> methods are delegated to the driver, and
+ * <code>unwrap</code> is the supported way to reach driver-specific statement methods. A statement the application
+ * reaches that way is still tracked here and is closed, like any other tracked statement, when the connection is
+ * returned - unless an interceptor listed after this one recycles the statement instead of closing it, as a statement
+ * cache beneath this interceptor does.
  * <p>
  * Tracking covers the statements created through the pooled connection handle. A statement created on the driver's
  * own connection - the object <code>Connection.unwrap(Connection.class)</code> hands back - never reaches this
