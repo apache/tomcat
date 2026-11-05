@@ -57,6 +57,8 @@ class TestConnectionPoolDataSourceLeak extends JdbcPoolBaseTest {
                 Collections.synchronizedList(new ArrayList<>());
         /** Once set, the next handle refuses to hand out its connection. */
         private volatile boolean failNextGetConnection;
+        /** Once set, the next handle fails to hand out its connection with an Error. */
+        private volatile boolean errorFailNextGetConnection;
         /** Once set, the next handle hands out a null connection. */
         private volatile boolean nullNextGetConnection;
 
@@ -78,13 +80,15 @@ class TestConnectionPoolDataSourceLeak extends JdbcPoolBaseTest {
             // exist only for the pool, not for the database.
             boolean failGetConnection = failNextGetConnection;
             failNextGetConnection = false;
+            boolean errorFailGetConnection = errorFailNextGetConnection;
+            errorFailNextGetConnection = false;
             boolean nullGetConnection = nullNextGetConnection;
             nullNextGetConnection = false;
             // The physical connection is opened even on the failing paths:
             // a provider that opens the session and then fails to hand out
             // the logical connection is exactly the stranding scenario.
             Handle handle = new Handle(DriverManager.getConnection(url, "sa", ""),
-                    failGetConnection, nullGetConnection);
+                    failGetConnection, errorFailGetConnection, nullGetConnection);
             handles.add(handle);
             return handle;
         }
@@ -118,14 +122,16 @@ class TestConnectionPoolDataSourceLeak extends JdbcPoolBaseTest {
 
             private final Connection physical;
             private final boolean failGetConnection;
+            private final boolean errorFailGetConnection;
             private final boolean nullGetConnection;
             private final AtomicBoolean physicalClosed = new AtomicBoolean();
             private final AtomicBoolean logicalClosed = new AtomicBoolean();
 
             Handle(Connection physical, boolean failGetConnection,
-                    boolean nullGetConnection) {
+                    boolean errorFailGetConnection, boolean nullGetConnection) {
                 this.physical = physical;
                 this.failGetConnection = failGetConnection;
+                this.errorFailGetConnection = errorFailGetConnection;
                 this.nullGetConnection = nullGetConnection;
             }
 
@@ -133,6 +139,10 @@ class TestConnectionPoolDataSourceLeak extends JdbcPoolBaseTest {
             public Connection getConnection() throws SQLException {
                 if (failGetConnection) {
                     throw new SQLException("simulated logical-connection failure");
+                }
+                if (errorFailGetConnection) {
+                    throw new NoClassDefFoundError(
+                            "simulated stopped context in the logical connection");
                 }
                 if (nullGetConnection) {
                     return null;
@@ -282,6 +292,23 @@ class TestConnectionPoolDataSourceLeak extends JdbcPoolBaseTest {
             Assertions.assertFalse(cpds.handles.get(1).physicalClosed.get());
             awaitSessions(1);
         }
+    }
+
+    @Test
+    void anErrorFromTheLogicalConnectionDoesNotStrandTheHandle() throws Exception {
+        TestCpds cpds = new TestCpds(getUrl());
+        DataSource ds = newDataSource();
+        ds.setDataSource(cpds);
+        ds.getPoolProperties().setInitialSize(0);
+
+        cpds.errorFailNextGetConnection = true;
+        Assertions.assertThrows(SQLException.class, ds::getConnection,
+                "the non-fatal Error must reach the borrower as the checked failure a borrow reports");
+
+        Assertions.assertEquals(1, cpds.handles.size());
+        Assertions.assertTrue(cpds.handles.get(0).physicalClosed.get(),
+                "the handle must close the physical session when its logical connection fails with an Error");
+        awaitSessions(0);
     }
 
     @Test
