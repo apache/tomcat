@@ -25,6 +25,7 @@ import java.util.Map;
 import javax.el.ELContext;
 import javax.el.ExpressionFactory;
 import javax.el.PropertyNotFoundException;
+import javax.el.StandardELContext;
 import javax.el.ValueExpression;
 import javax.el.ValueReference;
 
@@ -34,6 +35,48 @@ import org.junit.Test;
 import org.apache.jasper.el.ELContextImpl;
 
 public class TestValueExpressionImpl {
+
+    @Test
+    public void testFunctionMappingEquality() throws Exception {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new StandardELContext(factory);
+        context.getFunctionMapper().mapFunction("one", "convert", Integer.class.getMethod("toString", int.class));
+        context.getFunctionMapper().mapFunction("two", "convert", Integer.class.getMethod("toString", int.class));
+        context.getFunctionMapper().mapFunction("one", "alias", Integer.class.getMethod("toString", int.class));
+
+        ValueExpression ve1 = factory.createValueExpression(context, "${one:convert(10)}", String.class);
+        ValueExpression ve2 = factory.createValueExpression(context, "${two:convert(10)}", String.class);
+        ValueExpression ve3 = factory.createValueExpression(context, "${one:alias(10)}", String.class);
+
+        Assert.assertEquals(ve1, ve2);
+        Assert.assertEquals(ve1, ve3);
+        Assert.assertEquals(ve1.hashCode(), ve2.hashCode());
+        Assert.assertEquals(ve1.hashCode(), ve3.hashCode());
+
+        context.getFunctionMapper().mapFunction("one", "convert", Integer.class.getMethod("toHexString", int.class));
+        ValueExpression ve4 = factory.createValueExpression(context, "${one:convert(10)}", String.class);
+
+        Assert.assertEquals("10", ve1.getValue(context));
+        Assert.assertEquals("a", ve4.getValue(context));
+        Assert.assertNotEquals(ve1, ve4);
+    }
+
+
+    @Test
+    public void testImportedFunctionEquality() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new StandardELContext(factory);
+        ValueExpression ve1 = factory.createValueExpression(context, "${Integer(10)}", Object.class);
+        ValueExpression ve2 = factory.createValueExpression(context, "${ Integer(10) }", Object.class);
+        ValueExpression ve3 = factory.createValueExpression(context, "${Long(10)}", Object.class);
+
+        Assert.assertEquals(Integer.valueOf(10), ve1.getValue(context));
+        Assert.assertEquals(Long.valueOf(10), ve3.getValue(context));
+        Assert.assertEquals(ve1, ve2);
+        Assert.assertEquals(ve1.hashCode(), ve2.hashCode());
+        Assert.assertNotEquals(ve1, ve3);
+    }
+
 
     @Test
     public void testGetValueReference() {
