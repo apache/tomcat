@@ -237,6 +237,24 @@ class TestDataSourceFactoryNoOpPropertyWarnings {
     }
 
     @Test
+    void blankNoOpAttributesAreNotReportedAsConfigured() {
+        Properties properties = new Properties();
+        properties.setProperty("accessToUnderlyingConnectionAllowed", "   ");
+        properties.setProperty("numTestsPerEvictionRun", "   ");
+        properties.setProperty("poolPreparedStatements", "");
+        properties.setProperty("maxOpenPreparedStatements", "\t");
+
+        try (FactoryLogCapture logs = new FactoryLogCapture()) {
+            PoolConfiguration parsed = DataSourceFactory.parsePoolProperties(properties);
+            logs.assertNothingReportedAsHavingNoEffect();
+            Assertions.assertEquals(0, parsed.getNumTestsPerEvictionRun(),
+                    "a blank attribute must leave the default in place");
+            Assertions.assertTrue(parsed.isAccessToUnderlyingConnectionAllowed(),
+                    "a blank attribute must leave the default in place");
+        }
+    }
+
+    @Test
     void propertiesThatDoSomethingAreNotReportedAsNoOps() {
         Properties properties = new Properties();
         properties.setProperty("maxActive", "7");

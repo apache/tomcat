@@ -174,6 +174,15 @@ class TestPoolProperties {
                 "an unconfigured attribute must read back null");
         Assertions.assertTrue(without.getDbProperties().isEmpty(),
                 "an unconfigured attribute must leave the driver properties empty");
+
+        Properties blankAttrs = new Properties();
+        blankAttrs.setProperty("connectionProperties", "   ");
+        PoolConfiguration blank =
+                DataSourceFactory.parsePoolProperties(blankAttrs);
+        Assertions.assertNull(blank.getConnectionProperties(),
+                "a blank attribute must read back the default null, not an empty string");
+        Assertions.assertTrue(blank.getDbProperties().isEmpty(),
+                "a blank attribute must leave the driver properties empty");
     }
 
     @Test
