@@ -699,7 +699,7 @@ public class DataSourceFactory implements ObjectFactory {
         }
 
         value = properties.getProperty(PROP_NUMTESTSPEREVICTIONRUN);
-        if (value != null) {
+        if (value != null && !value.trim().isEmpty()) {
             log.warn(MessageFactory.get("dataSourceFactory.invalidSetting", PROP_NUMTESTSPEREVICTIONRUN));
             Integer parsed = parseInteger(PROP_NUMTESTSPEREVICTIONRUN, value);
             if (parsed != null) {
@@ -795,7 +795,7 @@ public class DataSourceFactory implements ObjectFactory {
         }
 
         value = properties.getProperty(PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED);
-        if (value != null) {
+        if (value != null && !value.trim().isEmpty()) {
             log.warn(MessageFactory.get("dataSourceFactory.invalidSetting", PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED));
             Boolean b = parseBoolean(PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED, value);
             if (b != null) {
@@ -828,21 +828,26 @@ public class DataSourceFactory implements ObjectFactory {
         }
 
         value = properties.getProperty(PROP_POOLPREPAREDSTATEMENTS);
-        if (value != null) {
+        if (value != null && !value.trim().isEmpty()) {
             log.warn(MessageFactory.get("dataSourceFactory.invalidSetting", PROP_POOLPREPAREDSTATEMENTS));
         }
 
         value = properties.getProperty(PROP_MAXOPENPREPAREDSTATEMENTS);
-        if (value != null) {
+        if (value != null && !value.trim().isEmpty()) {
             log.warn(MessageFactory.get("dataSourceFactory.invalidSetting", PROP_MAXOPENPREPAREDSTATEMENTS));
         }
 
         value = properties.getProperty(PROP_CONNECTIONPROPERTIES);
-        if (value != null) {
+        if (value != null && !value.trim().isEmpty()) {
             // The canonical setter parses the pairs into the driver
             // properties and keeps the string round-tripping through
             // getConnectionProperties().
             poolProperties.setConnectionProperties(value);
+        } else if (value != null) {
+            // A blank attribute means the default, null: storing "" would
+            // make the configuration dump and the getter report a value that
+            // was never configured.
+            poolProperties.setConnectionProperties(null);
         } else {
             poolProperties.setDbProperties(new Properties());
         }
