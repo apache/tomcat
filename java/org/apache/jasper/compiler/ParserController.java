@@ -536,32 +536,59 @@ public class ParserController implements TagConstants {
         String prefix = reader.getText(start, stop).substring(1);
 
         start = stop;
-        stop = reader.skipUntil(">");
-        if (stop == null) {
-            return false;
+        // The root element ends at the first '>' that is not within a quoted attribute value. The mark is taken
+        // immediately before the '>' so, as with skipUntil(), the text of the element does not include it.
+        int openQuote = -1;
+        while (true) {
+            stop = reader.mark();
+            int ch = reader.nextChar();
+            if (ch == -1) {
+                return false;
+            }
+            if (openQuote != -1) {
+                if (ch == openQuote) {
+                    openQuote = -1;
+                }
+            } else if (ch == '"' || ch == '\'') {
+                openQuote = ch;
+            } else if (ch == '>') {
+                break;
+            }
         }
 
         // Determine namespace associated with <root> element's prefix
         String root = reader.getText(start, stop);
         String xmlnsDecl = "xmlns:" + prefix;
-        int index = root.indexOf(xmlnsDecl);
-        if (index == -1) {
-            return false;
-        }
-        index += xmlnsDecl.length();
-        while (index < root.length() && Character.isWhitespace(root.charAt(index))) {
-            index++;
-        }
-        if (index < root.length() && root.charAt(index) == '=') {
-            do {
-                index++;
-            } while (index < root.length() && Character.isWhitespace(root.charAt(index)));
-            if (index < root.length() && (root.charAt(index) == '"' || root.charAt(index) == '\'')) {
-                char quote = root.charAt(index);
-                index++;
-                int end = root.indexOf(quote, index);
-                if (end > index) {
-                    return JSP_URI.equals(root.substring(index, end));
+        // Skip quoted attribute values so namespace-like text within them cannot be mistaken for a declaration.
+        // Other declarations may use prefixes that start with the root element's prefix.
+        for (int declIndex = 0; declIndex < root.length(); declIndex++) {
+            char ch = root.charAt(declIndex);
+            if (ch == '"' || ch == '\'') {
+                int end = root.indexOf(ch, declIndex + 1);
+                if (end == -1) {
+                    return false;
+                }
+                declIndex = end;
+                continue;
+            }
+            if ((declIndex == 0 || Character.isWhitespace(root.charAt(declIndex - 1))) &&
+                    root.startsWith(xmlnsDecl, declIndex)) {
+                int index = declIndex + xmlnsDecl.length();
+                while (index < root.length() && Character.isWhitespace(root.charAt(index))) {
+                    index++;
+                }
+                if (index < root.length() && root.charAt(index) == '=') {
+                    do {
+                        index++;
+                    } while (index < root.length() && Character.isWhitespace(root.charAt(index)));
+                    if (index < root.length() && (root.charAt(index) == '"' || root.charAt(index) == '\'')) {
+                        char quote = root.charAt(index);
+                        index++;
+                        int end = root.indexOf(quote, index);
+                        if (end > index) {
+                            return JSP_URI.equals(root.substring(index, end));
+                        }
+                    }
                 }
             }
         }
