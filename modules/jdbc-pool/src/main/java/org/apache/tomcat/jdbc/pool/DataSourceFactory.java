@@ -54,7 +54,11 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  * The factory applies a strict reading of the reference: an attribute whose value is
  * blank leaves its property at the {@link PoolProperties} default, and a value the
  * property cannot take fails the lookup with an exception naming the attribute
- * instead of being silently ignored.
+ * instead of being silently ignored. The legacy settings
+ * {@code numTestsPerEvictionRun}, {@code accessToUnderlyingConnectionAllowed},
+ * {@code poolPreparedStatements} and {@code maxOpenPreparedStatements} are the
+ * exception: they are accepted for configuration compatibility but have no effect,
+ * so a non-blank value is reported with a warning rather than failing the lookup.
  * </p>
  */
 public class DataSourceFactory implements ObjectFactory {
@@ -66,229 +70,94 @@ public class DataSourceFactory implements ObjectFactory {
 
     private static final Log log = LogFactory.getLog(DataSourceFactory.class);
 
-    /**
-     * Property name for defaultAutoCommit.
-     */
     protected static final String PROP_DEFAULTAUTOCOMMIT = "defaultAutoCommit";
 
-    /**
-     * Property name for defaultReadOnly.
-     */
     protected static final String PROP_DEFAULTREADONLY = "defaultReadOnly";
 
-    /**
-     * Property name for defaultTransactionIsolation.
-     */
     protected static final String PROP_DEFAULTTRANSACTIONISOLATION = "defaultTransactionIsolation";
 
-    /**
-     * Property name for defaultCatalog.
-     */
     protected static final String PROP_DEFAULTCATALOG = "defaultCatalog";
 
-    /**
-     * Property name for driverClassName.
-     */
     protected static final String PROP_DRIVERCLASSNAME = "driverClassName";
 
-    /**
-     * Property name for password.
-     */
     protected static final String PROP_PASSWORD = "password";
 
-    /**
-     * Property name for url.
-     */
     protected static final String PROP_URL = "url";
 
-    /**
-     * Property name for username.
-     */
     protected static final String PROP_USERNAME = "username";
 
-    /**
-     * Property name for maxActive.
-     */
     protected static final String PROP_MAXACTIVE = "maxActive";
 
-    /**
-     * Property name for maxIdle.
-     */
     protected static final String PROP_MAXIDLE = "maxIdle";
 
-    /**
-     * Property name for minIdle.
-     */
     protected static final String PROP_MINIDLE = "minIdle";
 
-    /**
-     * Property name for initialSize.
-     */
     protected static final String PROP_INITIALSIZE = "initialSize";
 
-    /**
-     * Property name for maxWait.
-     */
     protected static final String PROP_MAXWAIT = "maxWait";
 
-    /**
-     * Property name for maxAge.
-     */
     protected static final String PROP_MAXAGE = "maxAge";
 
-    /**
-     * Property name for testOnBorrow.
-     */
     protected static final String PROP_TESTONBORROW = "testOnBorrow";
 
-    /**
-     * Property name for testOnReturn.
-     */
     protected static final String PROP_TESTONRETURN = "testOnReturn";
 
-    /**
-     * Property name for testWhileIdle.
-     */
     protected static final String PROP_TESTWHILEIDLE = "testWhileIdle";
 
-    /**
-     * Property name for testOnConnect.
-     */
     protected static final String PROP_TESTONCONNECT = "testOnConnect";
 
-    /**
-     * Property name for validationQuery.
-     */
     protected static final String PROP_VALIDATIONQUERY = "validationQuery";
 
-    /**
-     * Property name for validationQueryTimeout.
-     */
     protected static final String PROP_VALIDATIONQUERY_TIMEOUT = "validationQueryTimeout";
 
-    /**
-     * Property name for validatorClassName.
-     */
     protected static final String PROP_VALIDATOR_CLASS_NAME = "validatorClassName";
 
-    /**
-     * Property name for numTestsPerEvictionRun.
-     */
     protected static final String PROP_NUMTESTSPEREVICTIONRUN = "numTestsPerEvictionRun";
 
-    /**
-     * Property name for timeBetweenEvictionRunsMillis.
-     */
     protected static final String PROP_TIMEBETWEENEVICTIONRUNSMILLIS = "timeBetweenEvictionRunsMillis";
 
-    /**
-     * Property name for minEvictableIdleTimeMillis.
-     */
     protected static final String PROP_MINEVICTABLEIDLETIMEMILLIS = "minEvictableIdleTimeMillis";
 
-    /**
-     * Property name for accessToUnderlyingConnectionAllowed.
-     */
     protected static final String PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED = "accessToUnderlyingConnectionAllowed";
 
-    /**
-     * Property name for removeAbandoned.
-     */
     protected static final String PROP_REMOVEABANDONED = "removeAbandoned";
 
-    /**
-     * Property name for removeAbandonedTimeout.
-     */
     protected static final String PROP_REMOVEABANDONEDTIMEOUT = "removeAbandonedTimeout";
 
-    /**
-     * Property name for logAbandoned.
-     */
     protected static final String PROP_LOGABANDONED = "logAbandoned";
 
-    /**
-     * Property name for abandonWhenPercentageFull.
-     */
     protected static final String PROP_ABANDONWHENPERCENTAGEFULL = "abandonWhenPercentageFull";
 
-    /**
-     * Property name for poolPreparedStatements.
-     */
     protected static final String PROP_POOLPREPAREDSTATEMENTS = "poolPreparedStatements";
 
-    /**
-     * Property name for maxOpenPreparedStatements.
-     */
     protected static final String PROP_MAXOPENPREPAREDSTATEMENTS = "maxOpenPreparedStatements";
 
-    /**
-     * Property name for connectionProperties.
-     */
     protected static final String PROP_CONNECTIONPROPERTIES = "connectionProperties";
 
-    /**
-     * Property name for initSQL.
-     */
     protected static final String PROP_INITSQL = "initSQL";
 
-    /**
-     * Property name for jdbcInterceptors.
-     */
     protected static final String PROP_INTERCEPTORS = "jdbcInterceptors";
 
-    /**
-     * Property name for validationInterval.
-     */
     protected static final String PROP_VALIDATIONINTERVAL = "validationInterval";
 
-    /**
-     * Property name for jmxEnabled.
-     */
     protected static final String PROP_JMX_ENABLED = "jmxEnabled";
 
-    /**
-     * Property name for fairQueue.
-     */
     protected static final String PROP_FAIR_QUEUE = "fairQueue";
 
-    /**
-     * Property name for useEquals.
-     */
     protected static final String PROP_USE_EQUALS = "useEquals";
 
-    /**
-     * Property name for useLock.
-     */
     protected static final String PROP_USE_LOCK = "useLock";
 
-    /**
-     * Property name for dataSource.
-     */
     protected static final String PROP_DATASOURCE = "dataSource";
 
-    /**
-     * Property name for dataSourceJNDI.
-     */
     protected static final String PROP_DATASOURCE_JNDI = "dataSourceJNDI";
 
-    /**
-     * Property name for suspectTimeout.
-     */
     protected static final String PROP_SUSPECT_TIMEOUT = "suspectTimeout";
 
-    /**
-     * Property name for alternateUsernameAllowed.
-     */
     protected static final String PROP_ALTERNATE_USERNAME_ALLOWED = "alternateUsernameAllowed";
 
-    /**
-     * Property name for commitOnReturn.
-     */
     protected static final String PROP_COMMITONRETURN = "commitOnReturn";
 
-    /**
-     * Property name for rollbackOnReturn.
-     */
     protected static final String PROP_ROLLBACKONRETURN = "rollbackOnReturn";
 
     /**
@@ -297,19 +166,10 @@ public class DataSourceFactory implements ObjectFactory {
      */
     protected static final String PROP_USEDISPOSABLECONNECTIONFACADE = "useDisposableConnectionFacade";
 
-    /**
-     * Property name for logValidationErrors.
-     */
     protected static final String PROP_LOGVALIDATIONERRORS = "logValidationErrors";
 
-    /**
-     * Property name for propagateInterruptState.
-     */
     protected static final String PROP_PROPAGATEINTERRUPTSTATE = "propagateInterruptState";
 
-    /**
-     * Property name for ignoreExceptionOnPreLoad.
-     */
     protected static final String PROP_IGNOREEXCEPTIONONPRELOAD = "ignoreExceptionOnPreLoad";
 
     /**
