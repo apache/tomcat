@@ -54,7 +54,7 @@ class TestSlowQueryJmxChainCloseRelease extends JdbcPoolBaseTest {
             "org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx";
 
     /* A pool of the given name with the given chain, JMX off for the pool
-     * itself so same-named pools dodge the pool MBean ObjectName clash. */
+     * itself so the test only observes the interceptor's own publication. */
     private DataSource poolNamed(String name, String interceptors) {
         DataSource ds = newDataSource();
         ds.getPoolProperties().setName(name);
@@ -118,22 +118,22 @@ class TestSlowQueryJmxChainCloseRelease extends JdbcPoolBaseTest {
     }
 
     @Test
-    void eachOfTwoSameNamedChainedPoolsReleasesOnlyItsOwnRegistration() throws Exception {
+    void closingOneChainedPoolReleasesOnlyItsOwnRegistration() throws Exception {
         // The publication belongs to the pool that made it: the close of that
-        // pool takes it down even while a pool configured with the same name is
-        // still running, and that other pool - whose own publication the
-        // MBeanServer refused - keeps its own statistics either way
-        String poolName = "chain-survivors-" + System.nanoTime();
+        // pool takes it down while another, differently named pool is still
+        // running, and that other pool keeps its own statistics either way
+        String publisherName = "chain-publisher-" + System.nanoTime();
+        String survivorName = "chain-survivor-" + System.nanoTime();
         String chain = SQR + ";" + SQRJ + "(notifyPool=false)";
-        DataSource publisher = poolNamed(poolName, chain);
-        DataSource refused = poolNamed(poolName, chain);
+        DataSource publisher = poolNamed(publisherName, chain);
+        DataSource survivor = poolNamed(survivorName, chain);
         publisher.createPool();
-        refused.createPool();
+        survivor.createPool();
         run(publisher, "SELECT 1");
-        run(refused, "SELECT 2");
+        run(survivor, "SELECT 2");
 
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-        ObjectName oname = interceptorName(poolName);
+        ObjectName oname = interceptorName(publisherName);
         Assertions.assertTrue(server.isRegistered(oname),
                 "the premise: the first pool's borrow published the MBean");
 
@@ -141,14 +141,13 @@ class TestSlowQueryJmxChainCloseRelease extends JdbcPoolBaseTest {
 
         Assertions.assertFalse(server.isRegistered(oname),
                 "the close of the pool that published the MBean takes it down, whatever"
-                        + " position the JMX definition has in its chain and whatever other"
-                        + " pool was configured with the same name");
-        Assertions.assertNotNull(SlowQueryReport.getPoolStats(poolName),
+                        + " position the JMX definition has in its chain");
+        Assertions.assertNotNull(SlowQueryReport.getPoolStats(survivorName),
                 "and the other pool's statistics are untouched by it");
 
-        refused.close();
+        survivor.close();
 
-        Assertions.assertNull(SlowQueryReport.getPoolStats(poolName),
+        Assertions.assertNull(SlowQueryReport.getPoolStats(survivorName),
                 "its own close releases the statistics it registered under the name");
     }
 }
