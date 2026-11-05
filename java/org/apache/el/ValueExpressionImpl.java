@@ -77,7 +77,7 @@ import org.apache.el.util.ReflectionUtil;
 public final class ValueExpressionImpl extends ValueExpression implements Externalizable {
 
     @Serial
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1534424021831272939L;
 
     private Class<?> expectedType;
 

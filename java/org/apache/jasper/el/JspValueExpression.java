@@ -20,6 +20,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.io.Serial;
 import java.util.Objects;
 
 import jakarta.el.ELContext;
@@ -32,6 +33,9 @@ import jakarta.el.ValueExpression;
  * Wrapper for providing context to ValueExpressions.
  */
 public final class JspValueExpression extends ValueExpression implements Externalizable {
+
+    @Serial
+    private static final long serialVersionUID = 6003098379712560193L;
 
     private ValueExpression target;
 
