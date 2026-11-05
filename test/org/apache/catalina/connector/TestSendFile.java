@@ -22,6 +22,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.net.SocketTimeoutException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +48,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestSendFile extends TomcatBaseTest {
@@ -143,6 +149,113 @@ public class TestSendFile extends TomcatBaseTest {
                             "Server Wrote " + written + " bytes in " + (System.currentTimeMillis() - start) + " ms.");
                 }
             }
+        }
+    }
+
+
+    @Test
+    public void testKeepAliveTimeoutAfterAsyncSendfile() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        Context root = tomcat.addContext("", TEMP_DIR);
+        File file = generateFile(TEMP_DIR, "-keepalive", 32 * 1024 * 1024);
+        Tomcat.addServlet(root, "test", new WritingServlet(file));
+        root.addServletMapping("/", "test");
+
+        AbstractHttp11Protocol<?> protocol = (AbstractHttp11Protocol<?>) tomcat.getConnector().getProtocolHandler();
+        protocol.setConnectionTimeout(2000);
+        protocol.setKeepAliveTimeout(30000);
+
+        tomcat.start();
+
+        try (Socket socket = new Socket("localhost", getPort())) {
+            OutputStream os = socket.getOutputStream();
+            os.write("GET / HTTP/1.1\r\nHost: localhost\r\n\r\n".getBytes(StandardCharsets.ISO_8859_1));
+            os.flush();
+
+            // Do not read yet so that the file does not fit in the socket buffers and
+            // sendfile has to complete asynchronously
+            Thread.sleep(1000);
+
+            InputStream is = socket.getInputStream();
+            skipResponse(is, file.length());
+
+            // The idle connection is governed by keepAliveTimeout, not connectionTimeout
+            Thread.sleep(4000);
+            socket.setSoTimeout(500);
+            try {
+                Assert.assertNotEquals("Connection closed before keepAliveTimeout expired", -1, is.read());
+            } catch (SocketTimeoutException expected) {
+                // The server has not closed the connection
+            }
+        } finally {
+            Assert.assertTrue(file.delete());
+        }
+    }
+
+
+    @Test
+    public void testKeepAliveTimeoutStartsAfterAsyncSendfile() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        Context root = tomcat.addContext("", TEMP_DIR);
+        File file = generateFile(TEMP_DIR, "-keepalive-start", 32 * 1024 * 1024);
+        Tomcat.addServlet(root, "test", new WritingServlet(file));
+        root.addServletMapping("/", "test");
+
+        AbstractHttp11Protocol<?> protocol = (AbstractHttp11Protocol<?>) tomcat.getConnector().getProtocolHandler();
+        protocol.setConnectionTimeout(30000);
+        protocol.setKeepAliveTimeout(4000);
+
+        tomcat.start();
+
+        try (Socket socket = new Socket("localhost", getPort())) {
+            OutputStream os = socket.getOutputStream();
+            os.write("GET / HTTP/1.1\r\nHost: localhost\r\n\r\n".getBytes(StandardCharsets.ISO_8859_1));
+            os.flush();
+
+            // The transfer takes longer than keepAliveTimeout because the client does not read
+            Thread.sleep(5000);
+
+            InputStream is = socket.getInputStream();
+            skipResponse(is, file.length());
+
+            // keepAliveTimeout runs from the end of the transfer so the connection is still open
+            socket.setSoTimeout(2500);
+            try {
+                Assert.assertNotEquals("Connection closed as soon as the transfer completed", -1, is.read());
+            } catch (SocketTimeoutException expected) {
+                // The server has not closed the connection
+            }
+
+            // and then closed when keepAliveTimeout expires
+            socket.setSoTimeout(6000);
+            Assert.assertEquals("Connection not closed by keepAliveTimeout", -1, is.read());
+        } finally {
+            Assert.assertTrue(file.delete());
+        }
+    }
+
+
+    private static void skipResponse(InputStream is, long bodyLength) throws IOException {
+        // Skip the response headers, up to and including the blank line
+        int matched = 0;
+        while (matched < 4) {
+            int b = is.read();
+            Assert.assertNotEquals("Connection closed while reading the response headers", -1, b);
+            if (b == (matched % 2 == 0 ? '\r' : '\n')) {
+                matched++;
+            } else {
+                matched = b == '\r' ? 1 : 0;
+            }
+        }
+        // Skip the response body
+        long remaining = bodyLength;
+        byte[] buffer = new byte[65536];
+        while (remaining > 0) {
+            int read = is.read(buffer, 0, (int) Math.min(buffer.length, remaining));
+            Assert.assertNotEquals("Connection closed while reading the response body", -1, read);
+            remaining -= read;
         }
     }
 
