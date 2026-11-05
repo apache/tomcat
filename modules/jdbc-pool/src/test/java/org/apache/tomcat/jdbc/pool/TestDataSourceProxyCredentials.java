@@ -130,6 +130,57 @@ class TestDataSourceProxyCredentials {
         Assertions.assertNotSame(live, view, "the copy must not be the live store");
     }
 
+    @Test
+    void getLoginTimeoutNeverReturnsANegativeValue() {
+        DataSourceProxy proxy = new DataSourceProxy();
+        proxy.getPoolProperties().setMaxWait(-5000);
+
+        Assertions.assertEquals(0, proxy.getLoginTimeout(),
+                "a negative maxWait means wait indefinitely, and a negative login timeout is"
+                        + " not a legal JDBC value");
+        proxy.setLoginTimeout(5);
+        Assertions.assertEquals(5, proxy.getLoginTimeout(), "a normal timeout must still round-trip");
+    }
+
+    @Test
+    void parsedInterceptorDefinitionsAreMaskedAndAreNotTheLiveDefinitions() {
+        DataSourceProxy proxy = new DataSourceProxy();
+        proxy.setJdbcInterceptors("ResetAbandonedTimer(password=s3cret);StatementCache(pass=s3cret2)");
+
+        PoolProperties.InterceptorDefinition[] view = proxy.getJdbcInterceptorsAsArray();
+        PoolProperties.InterceptorDefinition timer = null;
+        PoolProperties.InterceptorDefinition cache = null;
+        for (PoolProperties.InterceptorDefinition definition : view) {
+            if (definition.getClassName().endsWith("ResetAbandonedTimer")) {
+                timer = definition;
+            } else if (definition.getClassName().endsWith("StatementCache")) {
+                cache = definition;
+            }
+        }
+        Assertions.assertNotNull(timer, "the parsed view must carry the configured timer");
+        Assertions.assertNotNull(cache, "the parsed view must carry the configured cache");
+        Assertions.assertEquals("********", timer.getProperties().get("password").getValue(),
+                "the parsed bean/JMX view must mask a credential exactly like the string getter");
+        Assertions.assertEquals("********", cache.getProperties().get("pass").getValue(),
+                "the parsed bean/JMX view must mask every credential-shaped key");
+
+        // The raw definitions stay reachable through getPoolProperties() for
+        // trusted in-process code, and mutating the display copy cannot change
+        // the chain the pool builds.
+        PoolProperties.InterceptorDefinition liveTimer = null;
+        for (PoolProperties.InterceptorDefinition definition : proxy.getPoolProperties()
+                .getJdbcInterceptorsAsArray()) {
+            if (definition.getClassName().endsWith("ResetAbandonedTimer")) {
+                liveTimer = definition;
+            }
+        }
+        Assertions.assertNotNull(liveTimer);
+        Assertions.assertEquals("s3cret", liveTimer.getProperties().get("password").getValue());
+        timer.getProperties().put("password", new PoolProperties.InterceptorProperty("password", "changed"));
+        Assertions.assertEquals("s3cret", liveTimer.getProperties().get("password").getValue(),
+                "the display copy must share no property map with the live definitions");
+    }
+
     /**
      * Database properties whose {@code password} write, once armed, lets a
      * concurrent credential change run inside it and then completes the write -

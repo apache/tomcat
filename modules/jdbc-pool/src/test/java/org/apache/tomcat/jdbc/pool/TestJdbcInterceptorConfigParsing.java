@@ -154,6 +154,17 @@ class TestJdbcInterceptorConfigParsing {
     }
 
     @Test
+    void getPoolReturnsNullForAnUncheckedConfigurationFailure() {
+        DataSourceProxy proxy = new DataSourceProxy();
+        proxy.setJdbcInterceptors("MalformedParmsInterceptor(a=1,b)");
+
+        Assertions.assertDoesNotThrow(proxy::getPool,
+                "getPool documents null on a creation failure, including an unchecked"
+                        + " configuration error before the pool is built");
+        Assertions.assertNull(proxy.getPool(), "an unchecked creation failure must read as no pool");
+    }
+
+    @Test
     void otherMalformedConfigsOnlyFailLater() {
         String[] noExceptionButInvalidConfigs = {
             "MalformedParmsInterceptor(=   )",
