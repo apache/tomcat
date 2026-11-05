@@ -39,6 +39,7 @@ import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
+import org.apache.tomcat.jdbc.pool.interceptor.ResetAbandonedTimer;
 
 /**
  * {@code Connection.abort(Executor)} ends a borrow. The specification has a
@@ -185,6 +186,51 @@ class TestAbortEndsTheBorrow extends JdbcPoolBaseTest {
         Assertions.assertDoesNotThrow(pooled::close);
         Assertions.assertEquals(1, SpecAbortDriver.ABORTS.get(),
                 "the late close must not reach the driver a second time");
+    }
+
+    @Test
+    void resetTimerStopsStampingAsSoonAsTheAbortStarts() throws Exception {
+        CountDownLatch abortInDriver = new CountDownLatch(1);
+        CountDownLatch releaseDriver = new CountDownLatch(1);
+        SlowAbortDriver.abortInDriver = abortInDriver;
+        SlowAbortDriver.releaseDriver = releaseDriver;
+        DataSource ds = newDataSource();
+        ds.setDriverClassName(SlowAbortDriver.class.getName());
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setJdbcInterceptors(ResetAbandonedTimer.class.getName());
+        ds.createPool();
+
+        Connection held = ds.getConnection();
+        ResetAbandonedTimer timer = interceptorOf(held, ResetAbandonedTimer.class);
+        Assertions.assertNotNull(timer, "precondition: the timer must sit in the chain");
+        Assertions.assertTrue(timer.resetTimer(),
+                "precondition: the connection is checked out before the abort");
+
+        AtomicReference<Throwable> abortFailure = new AtomicReference<>();
+        Thread aborter = new Thread(() -> {
+            try {
+                held.abort(DIRECT_EXECUTOR);
+            } catch (Throwable t) {
+                abortFailure.set(t);
+            }
+        }, "abort-with-reset-timer");
+        aborter.start();
+        try {
+            Assertions.assertTrue(abortInDriver.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
+                    "precondition: the driver must be inside the abort");
+            // The borrow has ended at the pool layer, but the release walk
+            // that clears the timer's binding has not run yet. The management
+            // operation must already treat the connection as not checked out.
+            Assertions.assertFalse(timer.resetTimer(),
+                    "resetTimer() must not stamp a connection whose abort has started");
+        } finally {
+            releaseDriver.countDown();
+            aborter.join(AWAIT_TIMEOUT_MS);
+        }
+        Assertions.assertFalse(aborter.isAlive(), "the abort must finish once the gate opens");
+        Assertions.assertNull(abortFailure.get(), () -> "the abort must not fail: " + abortFailure.get());
+        awaitSessions(0);
     }
 
     @Test
