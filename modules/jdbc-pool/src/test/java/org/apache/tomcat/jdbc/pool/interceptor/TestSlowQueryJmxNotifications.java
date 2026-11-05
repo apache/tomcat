@@ -1201,6 +1201,28 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
 
 
     @Test
+    void aReleasedStoreAnswersNoJmxState() throws Exception {
+        String poolName = "JmxReleasedState-" + System.nanoTime();
+        DataSource ds = reportingPoolNamed(poolName,
+                "org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx"
+                        + "(notifyPool=false,threshold=-1)");
+        ds.createPool();
+        try (Connection ignored = ds.getConnection()) {
+            // the borrow publishes the state
+            Assertions.assertNotNull(SlowQueryReportJmx.jmxStateFor(ds.getPool()),
+                    "precondition: the borrow must have published the pool's state");
+        }
+        SlowQueryReport.PoolStatistics statistics = SlowQueryReport.statisticsFor(ds.getPool());
+        Assertions.assertNotNull(statistics, "precondition: the pool has a statistics store");
+
+        ds.close();
+
+        Assertions.assertTrue(statistics.isReleased(), "the close must release the store");
+        Assertions.assertNull(statistics.getJmxState(),
+                "a released store must not answer the state it gave up");
+    }
+
+    @Test
     void aMalformedObjectNameOverrideFailsOnlyTheRegistration() throws Exception {
         // An override value that is not an ObjectName at all (no domain
         // separator) fails the name formation on every borrow, before the
