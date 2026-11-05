@@ -63,16 +63,10 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  * first interceptor instance of a pool to borrow a connection publishes them, and every other instance of that pool -
  * its other connections, the second definition of the recommended two-thresholds configuration - reports through them.
  * They are published under the name the pool started with - see {@link ConnectionPool#getRegistrationName()} - which
- * is what makes the published MBean and the statistics it exposes read as one identifier; renaming a running pool,
- * which the pool's own JMX allows, moves nothing: the MBean stays published under the name it was registered under and
- * the pool keeps reporting through it. The close of that pool gives both up.
- * </p>
- * <p>
- * What one pool publishes is therefore never read, released, or adopted by another pool, and a pool configured with a
- * name another live pool holds does not report through that other pool's MBean: its own publication is refused by the
- * MBeanServer, which is reported once, retried on later borrows, and leaves the other pool's monitoring alone. A
- * container names every container-managed pool of its own, so a name collision between two live pools is left to
- * programmatic configuration.
+ * identifies the pool, because a container names every pool it manages uniquely and the default name of a
+ * programmatically built pool is unique as well. Renaming a running pool, which the pool's own JMX allows, moves
+ * nothing: the MBean stays published under the name it was registered under and the pool keeps reporting through it.
+ * The close of that pool gives both up.
  * </p>
  * <p>
  * The published resource is a {@link Registration}, not an interceptor instance: it holds the name, the statistics
@@ -143,9 +137,9 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
      * publication the MBeanServer refused.
      * <p>
      * The state hangs from the pool's statistics store (see {@link PoolStatistics#getJmxState()}), which is 1:1 with
-     * the pool, so nothing here has to tell two pools of one name apart and nothing a pool published can be given up by
-     * another pool's close. It is built by the first borrower that needs it and given up by the release of the store it
-     * hangs from, which is what the close of the pool is.
+     * the pool, and nothing a pool published can be given up by another pool's close. It is built by the first
+     * borrower that needs it and given up by the release of the store it hangs from, which is what the close of the
+     * pool is.
      * </p>
      * <p>
      * Publication and release are serialised against each other by this object's monitor, and the MBeanServer is
@@ -724,7 +718,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     /**
      * The names currently holding recorded statistics - the read behind {@link #getPoolNames()} and the registration's
      * own {@code PoolNames} attribute. These are the names of the pools that publish a statistics store, one store per
-     * pool; a name two live pools were configured with appears once, under the pool that started there last.
+     * pool.
      *
      * @return the names of the pools that currently hold a statistics map
      */
