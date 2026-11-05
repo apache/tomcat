@@ -23,7 +23,14 @@ import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -110,6 +117,71 @@ class TestStatementCachePurgeCloseFailure extends JdbcPoolBaseTest {
                     "a statement after the failing one must still be closed");
             Assertions.assertFalse(firstDriver.isClosed(),
                     "the statement whose close failed with an Error could not be closed");
+        } finally {
+            shared.close();
+        }
+    }
+
+    @Test
+    void theDiscardedStatementLogSanitizesNewlines() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setJdbcInterceptors(
+                ErrorCloseStatementCache.class.getName() + "(prepared=true,max=5)");
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(60000);
+        ds.createPool();
+
+        Connection shared = ds.getConnection();
+        try {
+            ErrorCloseStatementCache cache =
+                    interceptorOf(shared, ErrorCloseStatementCache.class);
+            PooledConnection pcon = (PooledConnection) shared.unwrap(PooledConnection.class);
+            FAIL_NEXT_CLOSE.set(true);
+            PreparedStatement statement = shared.prepareStatement(
+                    "SELECT 1\nFROM SYSTEM_RANGE(1,1)\r");
+            statement.close();
+
+            Logger logger = Logger.getLogger(StatementCache.class.getName());
+            Level originalLevel = logger.getLevel();
+            List<LogRecord> records = Collections.synchronizedList(new ArrayList<>());
+            Handler handler = new Handler() {
+                @Override
+                public void publish(LogRecord record) {
+                    records.add(record);
+                }
+
+                @Override
+                public void flush() {
+                    // no buffering
+                }
+
+                @Override
+                public void close() {
+                    // nothing to release
+                }
+            };
+            logger.addHandler(handler);
+            logger.setLevel(Level.ALL);
+            try {
+                cache.disconnected(ds.getPool(), pcon, false);
+            } finally {
+                logger.removeHandler(handler);
+                logger.setLevel(originalLevel);
+            }
+
+            LogRecord reported = null;
+            for (LogRecord record : records) {
+                if (record.getMessage() != null
+                        && record.getMessage().contains("that the statement cache is discarding")) {
+                    reported = record;
+                }
+            }
+            Assertions.assertNotNull(reported, "the failing close must be reported");
+            Assertions.assertFalse(reported.getMessage().contains("\n")
+                            || reported.getMessage().contains("\r"),
+                    "the SQL in the log must not carry newlines: " + reported.getMessage());
+            Assertions.assertTrue(reported.getMessage().contains("SELECT 1 FROM SYSTEM_RANGE(1,1)"),
+                    "the SQL must stay readable in one line: " + reported.getMessage());
         } finally {
             shared.close();
         }
