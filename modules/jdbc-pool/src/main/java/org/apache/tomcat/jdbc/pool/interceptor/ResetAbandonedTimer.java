@@ -161,7 +161,14 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
                     // level, with the exception behind it. A refused name is
                     // not claimed here, so it stays the property of whoever
                     // holds it and the next borrow tries again.
-                    String keyprop = ",JdbcInterceptor=" + getClass().getSimpleName();
+                    String simpleName = getClass().getSimpleName();
+                    if (simpleName.isEmpty()) {
+                        // An anonymous subclass has no simple name; fall back
+                        // to the base class's name so the JMX key is never
+                        // empty.
+                        simpleName = ResetAbandonedTimer.class.getSimpleName();
+                    }
+                    String keyprop = ",JdbcInterceptor=" + simpleName;
                     oname = JmxUtil.registerJmx(pcon.getObjectName(), keyprop, this);
                 }
             }
