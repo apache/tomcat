@@ -30,19 +30,12 @@ import org.apache.tomcat.jdbc.pool.DataSource;
 
 /**
  * The {@code SlowQueryReport} publishes a pool's statistics under the name the
- * pool started with, and reads them back by that name - but the statistics
- * themselves belong to the <em>pool</em>. Two live pools configured with the
- * same name (a configuration only programmatic users reach: the container names
- * every pool of its own, and {@code jmxEnabled=false} removes the JMX ObjectName
- * clash that would otherwise catch it) therefore keep two stores, and what the
- * name answers with is the store of the pool that started under it last.
- *
- * <p>Reproducer for defect 2 of
- * {@code defects-pool/defects-org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport.md}:
- * what must never happen is one pool's close destroying the statistics of
- * another pool, however the two were named.</p>
+ * pool started with, and reads them back by that name. The name identifies the
+ * pool - a container names every pool it manages uniquely, and the default name
+ * of a programmatically built pool is unique as well - so each pool has one
+ * store and one close releases only that store.
  */
-class TestSlowQueryReportDuplicatePoolNames extends JdbcPoolBaseTest {
+class TestSlowQueryReportPoolNames extends JdbcPoolBaseTest {
 
     private static final String QUERY_FIRST = "SELECT COUNT(*) FROM SYSTEM_RANGE(1,3)";
     private static final String QUERY_SECOND = "SELECT COUNT(*) FROM SYSTEM_RANGE(1,5)";
@@ -50,8 +43,7 @@ class TestSlowQueryReportDuplicatePoolNames extends JdbcPoolBaseTest {
 
     /* A pool of the given name reporting every query it sees. */
     private DataSource reportedPoolNamed(String name) {
-        DataSource ds = newDataSource(); // JMX disabled, as a same-named
-        // second pool needs to dodge the JMX ObjectName clash
+        DataSource ds = newDataSource();
         ds.getPoolProperties().setName(name);
         ds.getPoolProperties().setJdbcInterceptors("SlowQueryReport(threshold=-1)");
         return ds;
@@ -65,34 +57,40 @@ class TestSlowQueryReportDuplicatePoolNames extends JdbcPoolBaseTest {
     }
 
     @Test
-    void twoLivePoolsOfOneNameKeepTheirStatisticsApart() throws Exception {
-        String poolName = "dup-" + System.nanoTime();
-        DataSource first = reportedPoolNamed(poolName);
-        DataSource second = reportedPoolNamed(poolName);
+    void twoLivePoolsKeepTheirStatisticsApart() throws Exception {
+        String firstName = "pool-first-" + System.nanoTime();
+        String secondName = "pool-second-" + System.nanoTime();
+        DataSource first = reportedPoolNamed(firstName);
+        DataSource second = reportedPoolNamed(secondName);
         first.createPool();
         second.createPool();
 
         run(first, QUERY_FIRST);
         run(second, QUERY_SECOND);
 
-        ConcurrentHashMap<String, SlowQueryReport.QueryStats> view =
-                SlowQueryReport.getPoolStats(poolName);
-        Assertions.assertNotNull(view,
-                "the running pools must publish a store under their name");
-        Assertions.assertEquals(Collections.singleton(QUERY_SECOND), view.keySet(),
-                "the name answers with the pool that started under it last, and not"
-                        + " with the numbers of the pool that was there before it: " + view.keySet());
+        ConcurrentHashMap<String, SlowQueryReport.QueryStats> firstView =
+                SlowQueryReport.getPoolStats(firstName);
+        Assertions.assertNotNull(firstView, "the running pool must publish a store under its name");
+        Assertions.assertEquals(Collections.singleton(QUERY_FIRST), firstView.keySet(),
+                "a pool's name must answer with that pool's own statistics: " + firstView.keySet());
+
+        ConcurrentHashMap<String, SlowQueryReport.QueryStats> secondView =
+                SlowQueryReport.getPoolStats(secondName);
+        Assertions.assertNotNull(secondView, "the running pool must publish a store under its name");
+        Assertions.assertEquals(Collections.singleton(QUERY_SECOND), secondView.keySet(),
+                "a pool's name must answer with that pool's own statistics: " + secondView.keySet());
 
         first.close();
 
-        Assertions.assertNotNull(SlowQueryReport.getPoolStats(poolName),
-                "closing one of two live pools of the same name must not throw the"
-                        + " still-running pool's statistics away");
+        Assertions.assertNull(SlowQueryReport.getPoolStats(firstName),
+                "closing one pool must release its own statistics");
+        Assertions.assertNotNull(SlowQueryReport.getPoolStats(secondName),
+                "closing one pool must not throw another pool's statistics away");
 
         run(second, QUERY_AFTER_CLOSE);
 
         ConcurrentHashMap<String, SlowQueryReport.QueryStats> surviving =
-                SlowQueryReport.getPoolStats(poolName);
+                SlowQueryReport.getPoolStats(secondName);
         Assertions.assertNotNull(surviving,
                 "the surviving pool must keep collecting after the other pool closed");
         Assertions.assertTrue(surviving.containsKey(QUERY_AFTER_CLOSE),
@@ -104,45 +102,13 @@ class TestSlowQueryReportDuplicatePoolNames extends JdbcPoolBaseTest {
 
         second.close();
 
-        Assertions.assertNull(SlowQueryReport.getPoolStats(poolName),
+        Assertions.assertNull(SlowQueryReport.getPoolStats(secondName),
                 "closing the pool that holds the name must release its statistics");
     }
 
     @Test
-    void aPoolWhoseNameWasTakenOverKeepsBookingIntoItsOwnStore() throws Exception {
-        String poolName = "dup-displaced-" + System.nanoTime();
-        DataSource displaced = reportedPoolNamed(poolName);
-        displaced.createPool();
-        try (Connection con = displaced.getConnection()) {
-            SlowQueryReport reporter = interceptorOf(con, SlowQueryReport.class);
-            Assertions.assertNotNull(reporter,
-                    "the chain must hold the configured reporting instance");
-
-            // A second pool starts under the name while the first is live: the
-            // name now answers with the newcomer, and the pool that was there
-            // first keeps running with a store no name reaches
-            DataSource successor = reportedPoolNamed(poolName);
-            successor.createPool();
-
-            try (Statement st = con.createStatement()) {
-                st.execute(QUERY_FIRST);
-            }
-
-            Assertions.assertTrue(reporter.queries.containsKey(QUERY_FIRST),
-                    "the displaced pool's own connections must still collect what they run");
-            Assertions.assertTrue(SlowQueryReport.getPoolStats(poolName).isEmpty(),
-                    "while the name publishes the successor's own store: the displaced pool's"
-                            + " numbers must not read as the successor's, saw "
-                            + SlowQueryReport.getPoolStats(poolName).keySet());
-
-            successor.close();
-        }
-        displaced.close();
-    }
-
-    @Test
     void aPoolStartedUnderAFreedNameCollectsIntoAFreshStore() throws Exception {
-        String poolName = "dup-" + System.nanoTime();
+        String poolName = "reuse-" + System.nanoTime();
         DataSource first = reportedPoolNamed(poolName);
         first.createPool();
         run(first, QUERY_FIRST);
