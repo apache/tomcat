@@ -35,6 +35,7 @@ import org.apache.el.lang.EvaluationContext;
 import org.apache.el.lang.ExpressionBuilder;
 import org.apache.el.parser.AstLiteralExpression;
 import org.apache.el.parser.Node;
+import org.apache.el.util.ExpressionUtils;
 import org.apache.el.util.ReflectionUtil;
 
 
@@ -122,7 +123,8 @@ public final class ValueExpressionImpl extends ValueExpression implements Extern
             return false;
         }
 
-        return this.getNode().equals(((ValueExpressionImpl) obj).getNode());
+        ValueExpressionImpl other = (ValueExpressionImpl) obj;
+        return ExpressionUtils.equals(getNode(), fnMapper, other.getNode(), other.fnMapper);
     }
 
     /**
@@ -177,7 +179,7 @@ public final class ValueExpressionImpl extends ValueExpression implements Extern
 
     @Override
     public int hashCode() {
-        return this.getNode().hashCode();
+        return ExpressionUtils.hashCode(getNode(), fnMapper);
     }
 
     @Override
