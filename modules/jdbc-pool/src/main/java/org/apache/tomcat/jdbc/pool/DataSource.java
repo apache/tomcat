@@ -33,6 +33,10 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  * A DataSource that can be instantiated through IoC and implements the DataSource interface since the DataSourceProxy
  * is used as a generic proxy. The DataSource simply wraps a {@link ConnectionPool} in order to provide a standard
  * interface to the user.
+ * <p>
+ * A JMX registration made before the pool exists publishes nothing, because there is no pool MBean to publish. Create
+ * the pool before registering the data source, or register it again after the pool has been created, to have the pool
+ * monitored.
  */
 public class DataSource extends DataSourceProxy implements javax.sql.DataSource, MBeanRegistration,
         org.apache.tomcat.jdbc.pool.jmx.ConnectionPoolMBean, javax.sql.ConnectionPoolDataSource {
@@ -85,8 +89,6 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
         closePool(p, all);
     }
 
-    // The JMX operations below register the pool itself under the
-    // tomcat.jdbc domain.
     /**
      * The JMX ObjectName for the connection pool MBean. The handle is checked,
      * cleared and released only under this data source's monitor. It is written
@@ -113,7 +115,7 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
     /**
      * The name derived from the registration currently in flight, set and
      * cleared by {@link #preRegister(MBeanServer, ObjectName)} around its call
-     * into {@link #registerJmx()}, under this data source's monitor. A second
+     * into {@link #publishJmx()}, under this data source's monitor. A second
      * registration must read its publish target from here rather than from the
      * handle slot, so it can never overwrite the handle of a publish that is
      * already held.
@@ -164,7 +166,6 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
      */
     @Override
     public void preDeregister() throws Exception {
-        // NOOP
     }
 
     /**
@@ -174,27 +175,34 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
      * {@inheritDoc}
      */
     @Override
-    public synchronized ObjectName preRegister(MBeanServer server, ObjectName name) throws Exception {
-        // Under the monitor close() takes, so the publication below cannot
-        // overlap a closure: a close that ran completely between registerJmx()
-        // reading the registration name and the server actually accepting the
-        // publish would unregister a name the pool never took and close the
-        // pool, and the publish would then register the dead pool's MBean
-        // under a live name that no later close() or postDeregister() - which
-        // only release a held handle - could ever take back.
+    public ObjectName preRegister(MBeanServer server, ObjectName name) throws Exception {
+        // The publish runs under the monitor close() takes, so it cannot
+        // overlap a closure: a close that ran completely between the name
+        // being derived and the server accepting the publish would unregister
+        // a name the pool never took and close the pool, and the publish would
+        // then register the dead pool's MBean under a live name that no later
+        // close() or postDeregister() - which only release a held handle -
+        // could ever take back. The connection sweep that follows the publish
+        // runs outside the monitor: the sweep takes each connection's lock,
+        // which maintenance holds across validation and reconnect driver
+        // calls, so holding the data source monitor across it would park a
+        // close or a later publication behind a hung database.
+        ConnectionPool sweepPool = null;
         try {
-            if (isJmxEnabled() && oname == null) {
-                final ObjectName derived = createObjectName(name);
-                if (derived != null) {
-                    try {
+            synchronized (this) {
+                if (isJmxEnabled() && oname == null) {
+                    final ObjectName derived = createObjectName(name);
+                    if (derived != null) {
                         pendingName = derived;
-                        registerJmx();
-                    } finally {
-                        pendingName = null;
+                        try {
+                            sweepPool = publishJmx();
+                        } finally {
+                            pendingName = null;
+                        }
                     }
+                } else if (isJmxEnabled() && oname != null) {
+                    log.warn(MessageFactory.get("dataSource.mbeanAlreadyRegistered", oname, name));
                 }
-            } else if (isJmxEnabled() && oname != null) {
-                log.warn(MessageFactory.get("dataSource.mbeanAlreadyRegistered", oname, name));
             }
         } catch (MalformedObjectNameException x) {
             // Nothing has been published and the handle slot was not touched:
@@ -205,11 +213,18 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
             // pool-side state (for instance a pool that has not been
             // created yet); preRegister throwing aborts the whole
             // registration in the MBean server. The handle slot is left as
-            // registerJmx() last wrote it: a RuntimeException after a
+            // publishJmx() last wrote it: a RuntimeException after a
             // completed publish - from a later step than the publish itself -
             // must not lose the handle of a live MBean, whose release then
             // belongs to the close and the deregistration callbacks as ever.
             log.error(MessageFactory.get("dataSource.unableToRegisterMBean"), x);
+        }
+        if (sweepPool != null) {
+            try {
+                sweepPool.registerConnectionMBeans();
+            } catch (RuntimeException x) {
+                log.error(MessageFactory.get("dataSource.unableToRegisterMBean"), x);
+            }
         }
         return name;
     }
@@ -247,10 +262,25 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
      * already holding disturbed: it names a publish that is still in effect, and dropping it here would leave that
      * MBean held by nothing - neither a later close() nor a deregistration could ever take it back.
      */
-    protected synchronized void registerJmx() {
-        // Runs under this data source's monitor - from preRegister() or a
-        // direct call - the monitor close(boolean) also takes, so no closure
-        // can interleave with the publish below.
+    protected void registerJmx() {
+        final ConnectionPool p;
+        synchronized (this) {
+            p = publishJmx();
+        }
+        if (p != null) {
+            p.registerConnectionMBeans();
+        }
+    }
+
+    /**
+     * Publishes the pool MBean under this data source's monitor and returns
+     * the pool whose connections must then be published, or {@code null} when
+     * nothing was published. The caller must hold this monitor; the
+     * connection sweep is the caller's to run outside it.
+     *
+     * @return the pool whose connections need publishing, or {@code null}
+     */
+    protected ConnectionPool publishJmx() {
         final ConnectionPool p = pool;
         // Read the pool's JMX object only once: a pool that was closed before
         // this registration has given it up, and one read that saw it must not
@@ -268,13 +298,13 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
             // Nothing to publish; the handle slot, which this call did not
             // write, is left as it stands.
             log.warn(MessageFactory.get("dataSource.mbeanNotRegistered", name));
-            return;
+            return null;
         }
         final ObjectName published = JmxUtil.registerJmx(name, null, jmx);
         if (published != null) {
-            // Recorded before the connection sweep below: a publish the server
-            // accepted is held from the moment it happened, whatever a later
-            // step makes of it.
+            // Recorded before the caller runs the connection sweep: a publish
+            // the server accepted is held from the moment it happened, whatever
+            // a later step makes of it.
             this.oname = published;
             // Only a registration-driven publish - one made from
             // preRegister(), which sets pendingName around its call - has a
@@ -286,10 +316,12 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
             // A connection publishes itself below this name when its physical
             // connection is established; the connections the pool was already
             // holding could not do that while this name did not exist yet, so
-            // they are published now. A publish the server refused registers
-            // nothing of its own and has no connections to publish either.
-            p.registerConnectionMBeans();
+            // the caller publishes them now. A publish the server refused
+            // registers nothing of its own and has no connections to publish
+            // either.
+            return p;
         }
+        return null;
     }
 
     /**
