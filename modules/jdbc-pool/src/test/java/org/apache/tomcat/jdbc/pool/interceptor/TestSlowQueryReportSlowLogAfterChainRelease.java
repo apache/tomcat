@@ -137,6 +137,31 @@ class TestSlowQueryReportSlowLogAfterChainRelease extends JdbcPoolBaseTest {
     }
 
     @Test
+    void aBorrowedConnectionDoesNotBookIntoAReleasedStore() throws Exception {
+        String poolName = "SlowLogReleasedStore-" + System.nanoTime();
+        DataSource ds = newDataSource();
+        ds.setName(poolName);
+        ds.setJdbcInterceptors(SlowQueryReport.class.getName() + "(threshold=0)");
+        ds.getPoolProperties().setInitialSize(0);
+
+        Connection con = ds.getConnection();
+        SlowQueryReport report = interceptorOf(con, SlowQueryReport.class);
+        Assertions.assertNotNull(report, "the chain must hold the report instance");
+        try {
+            // close(false) leaves this borrowed session alive but releases
+            // the pool's statistics store.
+            ds.close(false);
+            Assertions.assertNull(SlowQueryReport.getPoolStats(poolName),
+                    "precondition: the closed pool has released its store");
+
+            Assertions.assertNull(report.getQueryStats("SELECT released-store"),
+                    "a session left alive by close(false) must not book into the released store");
+        } finally {
+            con.close();
+        }
+    }
+
+    @Test
     void slowQueryWarnsAndNotifiesTogetherWhenTheStatisticsCannotBeResolved() throws Exception {
         String poolName = "SlowLogChannels-" + System.nanoTime();
         DataSource ds = newDataSource();
