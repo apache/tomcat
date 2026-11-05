@@ -153,6 +153,28 @@ class TestPoolProperties {
     }
 
     @Test
+    void theMinIdleDefaultIsFixedAtConstruction() {
+        PoolProperties properties = new PoolProperties();
+        int constructedDefault = properties.getMinIdle();
+
+        properties.setInitialSize(2);
+
+        Assertions.assertEquals(2, properties.getInitialSize());
+        Assertions.assertEquals(constructedDefault, properties.getMinIdle(),
+                "minIdle's default is the initialSize value at construction; changing"
+                        + " initialSize later does not move the floor");
+    }
+
+    @Test
+    void toStringShowsThePoolName() {
+        PoolProperties properties = new PoolProperties();
+        properties.setName("myPool");
+
+        Assertions.assertTrue(properties.toString().startsWith("ConnectionPool[name=myPool;"),
+                "the dump must show the pool name its javadoc promises, was: " + properties);
+    }
+
+    @Test
     void toStringDoesNotPrintTheConfiguredDataSourceObject() {
         PoolProperties properties = new PoolProperties();
         Object dataSource = new Object() {
