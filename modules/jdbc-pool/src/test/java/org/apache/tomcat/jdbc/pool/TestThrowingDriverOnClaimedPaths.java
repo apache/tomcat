@@ -221,6 +221,44 @@ class TestThrowingDriverOnClaimedPaths extends JdbcPoolBaseTest {
     }
 
     @Test
+    void anErrorWhileReconnectingWithOtherCredentialsKeepsTheServedSession() throws Exception {
+        resetDriver();
+        DataSource ds = oneSlotPool();
+        ds.getPoolProperties().setAlternateUsernameAllowed(true);
+
+        // One idle session of the pool's own user for the alternate-credential
+        // borrow below to claim.
+        try (Connection first = ds.getConnection()) {
+            Assertions.assertNotNull(first);
+        }
+        awaitSessions(1);
+
+        FAIL_NEXT_CONNECT.set(true);
+        try {
+            Assertions.assertThrows(SQLException.class,
+                    () -> ds.getConnection("other-user", "other-password"));
+        } finally {
+            FAIL_NEXT_CONNECT.set(false);
+        }
+
+        // The Error did not destroy the session: it was put back into the
+        // pool, so the slot is still accounted for and the next borrow uses
+        // the same physical session instead of leaking it.
+        Assertions.assertEquals(1, ds.getSize(),
+                "the served session must still hold its maxActive slot");
+        Assertions.assertEquals(0, ds.getActive());
+        Assertions.assertEquals(1, poolSessions(),
+                "the served session must still be open after the failed reconnect");
+        try (Connection again = ds.getConnection()) {
+            Assertions.assertNotNull(again);
+        }
+        Assertions.assertEquals(0, ds.getActive());
+
+        ds.close();
+        awaitSessions(0);
+    }
+
+    @Test
     void anErrorFromTheDriverOnInitialCreationFailsTheBorrowAndKeepsTheSlot() throws Exception {
         resetDriver();
         DataSource ds = oneSlotPool();
