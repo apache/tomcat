@@ -25,8 +25,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -183,7 +185,8 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
 
     }
 
-    private static ConcurrentHashMap<ConnectionPool, AtomicInteger> cacheSizeMap = new ConcurrentHashMap<>();
+    private static final Map<ConnectionPool, AtomicInteger> cacheSizeMap =
+            Collections.synchronizedMap(new WeakHashMap<ConnectionPool, AtomicInteger>());
 
     private AtomicInteger cacheSize;
 
@@ -236,13 +239,19 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
 
     @Override
     public void poolStarted(ConnectionPool pool) {
-        cacheSizeMap.putIfAbsent(pool, new AtomicInteger(0));
+        synchronized (cacheSizeMap) {
+            if (!cacheSizeMap.containsKey(pool)) {
+                cacheSizeMap.put(pool, new AtomicInteger(0));
+            }
+        }
         super.poolStarted(pool);
     }
 
     @Override
     public void poolClosed(ConnectionPool pool) {
-        cacheSizeMap.remove(pool);
+        synchronized (cacheSizeMap) {
+            cacheSizeMap.remove(pool);
+        }
         super.poolClosed(pool);
     }
 
@@ -258,7 +267,9 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
             }
         } else {
             draining = false;
-            cacheSize = cacheSizeMap.get(parent);
+            synchronized (cacheSizeMap) {
+                cacheSize = cacheSizeMap.get(parent);
+            }
             this.pcon = con;
             if (!pcon.getAttributes().containsKey(STATEMENT_CACHE_ATTR)) {
                 ConcurrentHashMap<CacheKey, CachedStatement> cache = new ConcurrentHashMap<>();
