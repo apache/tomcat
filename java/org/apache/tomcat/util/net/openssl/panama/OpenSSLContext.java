@@ -24,6 +24,7 @@ import java.lang.ref.Cleaner;
 import java.lang.ref.Cleaner.Cleanable;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
+import java.security.PrivateKey;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -1200,11 +1201,17 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             X509KeyManager x509KeyManager = certificate.getCertificateKeyManager();
             String alias = getServedAlias(certificate);
             X509Certificate[] chain = x509KeyManager.getCertificateChain(alias);
+            PrivateKey javaKey = x509KeyManager.getPrivateKey(alias);
+            if (javaKey == null || javaKey.getEncoded() == null || chain == null || chain.length == 0) {
+                // No native error will have been raised so identify the alias that could not be loaded
+                log.error(sm.getString("openssl.errorLoadingCertificate", alias));
+                return false;
+            }
             // Convert the in-memory key manager entry to native objects with
             // the shared loader (PKCS#8 key via d2i_AutoPrivateKey,
             // certificates via d2i_X509)
             CertificateLoader.CertificateEntry entry =
-                    CertificateLoader.toCertEntry(x509KeyManager.getPrivateKey(alias), chain, localArena);
+                    CertificateLoader.toCertEntry(javaKey, chain, localArena);
             if (entry == null) {
                 logLastError("openssl.errorLoadingCertificate");
                 return false;
