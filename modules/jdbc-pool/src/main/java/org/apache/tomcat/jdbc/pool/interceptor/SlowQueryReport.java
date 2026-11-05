@@ -24,6 +24,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.management.openmbean.CompositeDataSupport;
 import javax.management.openmbean.CompositeType;
@@ -111,9 +112,10 @@ public class SlowQueryReport extends AbstractQueryReport {
     /**
      * Whether this instance has already reported that it cannot resolve a statistics store. One loss of the store is
      * one fact about the session this instance serves, so it is reported once; see
-     * {@link #getQueryStats(String)} for why the report cannot simply be made on every execution.
+     * {@link #getQueryStats(String)} for why the report cannot simply be made on every execution. The atomic compare
+     * and set makes the check and the marking one step, so concurrent executions cannot both report the same loss.
      */
-    private volatile boolean closedOrAbandonedReported;
+    private final AtomicBoolean closedOrAbandonedReported = new AtomicBoolean();
     /**
      * Maximum number of queries we will be storing statistics for. Eviction keeps the number of stored queries near
      * this amount; while queries are being executed concurrently it can briefly be exceeded. This sizes the statistics
@@ -521,11 +523,7 @@ public class SlowQueryReport extends AbstractQueryReport {
      *             reported
      */
     private boolean reportClosedOrAbandoned() {
-        if (closedOrAbandonedReported) {
-            return false;
-        }
-        closedOrAbandonedReported = true;
-        return true;
+        return closedOrAbandonedReported.compareAndSet(false, true);
     }
 
     /**
@@ -557,9 +555,7 @@ public class SlowQueryReport extends AbstractQueryReport {
         // This instance books on a store again, so a later loss is a fresh
         // event - see reportClosedOrAbandoned(). Guarded so that the common,
         // healthy path stays a plain read of the flag.
-        if (closedOrAbandonedReported) {
-            closedOrAbandonedReported = false;
-        }
+        closedOrAbandonedReported.set(false);
         QueryStats qs = queries.get(sql);
         if (qs == null) {
             qs = new QueryStats(sql);
