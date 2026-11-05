@@ -41,6 +41,24 @@ public class TestHttp2Section_3_2 extends Http2TestBase {
     }
 
 
+    /*
+     * RFC 9110, section 7.8: A server that receives an Upgrade header field in an HTTP/1.0 request MUST ignore that
+     * Upgrade field.
+     */
+    @Test
+    public void testConnectionUpgradeHttp10() throws Exception {
+        enableHttp2();
+        configureAndStartWebApplication();
+        openClientConnection();
+        byte[] upgradeRequest = ("GET /simple HTTP/1.0\r\n" + "Host: localhost:" + getPort() + "\r\n" +
+                "Connection: " + DEFAULT_CONNECTION_HEADER_VALUE + "\r\n" + "Upgrade: h2c\r\n" +
+                EMPTY_HTTP2_SETTINGS_HEADER + "\r\n").getBytes(StandardCharsets.ISO_8859_1);
+        os.write(upgradeRequest);
+        os.flush();
+        parseHttp11Response();
+    }
+
+
     @Test
     public void testConnectionUpgradeWrongProtocol() throws Exception {
         enableHttp2();
