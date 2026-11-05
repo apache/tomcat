@@ -66,8 +66,9 @@ public class TestCompressionConfigPartialContent {
         response.setStatus(206);
         response.getMimeHeaders().addValue("Content-Range").setString("bytes 0-99/1000");
 
+        // The response is never compressed so it does not vary with Accept-Encoding
         Assert.assertFalse(useCompression("accept-encoding", response));
-        Assert.assertEquals(1, countVaryAcceptEncoding(response));
+        Assert.assertEquals(0, countVaryAcceptEncoding(response));
     }
 
 
