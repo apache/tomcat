@@ -380,10 +380,11 @@ public interface PoolConfiguration {
     /**
      * The minimum number of established connections that should be kept in the pool at all times. The connection pool
      * can shrink below this number if validation queries fail and connections get closed. Default value is derived from
-     * {@link #getInitialSize()} (also see {@link #setTestWhileIdle(boolean)}). The eviction run never shrinks the
-     * total number of connections in the pool - idle plus busy - below this value, hence the number of actual
+     * {@link #getInitialSize()} (also see {@link #setTestWhileIdle(boolean)}). The eviction run normally keeps the
+     * total number of connections in the pool - idle plus busy - at or above this value, hence the number of actual
      * connections can be between {@link #getMinIdle()} and somewhere between {@link #getMaxIdle()} and
-     * {@link #getMaxActive()}
+     * {@link #getMaxActive()}. A connection left over from an earlier pool generation is released regardless, so an
+     * explicit idle check after a purge can take the pool below the floor.
      *
      * @return the minimum number of idle or established connections
      */
@@ -392,27 +393,30 @@ public interface PoolConfiguration {
     /**
      * The minimum number of established connections that should be kept in the pool at all times. The connection pool
      * can shrink below this number if validation queries fail and connections get closed. Default value is derived from
-     * {@link #getInitialSize()} (also see {@link #setTestWhileIdle(boolean)}). The eviction run never shrinks the
-     * total number of connections in the pool - idle plus busy - below this value, hence the number of actual
+     * {@link #getInitialSize()} (also see {@link #setTestWhileIdle(boolean)}). The eviction run normally keeps the
+     * total number of connections in the pool - idle plus busy - at or above this value, hence the number of actual
      * connections can be between {@link #getMinIdle()} and somewhere between {@link #getMaxIdle()} and
-     * {@link #getMaxActive()}
+     * {@link #getMaxActive()}. A connection left over from an earlier pool generation is released regardless, so an
+     * explicit idle check after a purge can take the pool below the floor.
      *
      * @param minIdle the minimum number of idle or established connections
      */
     void setMinIdle(int minIdle);
 
     /**
-     * Returns the name of the connection pool. By default a name unique within the JVM is assigned; it is a counter
-     * with a JVM-scoped suffix, so it is unique but predictable, not random.
+     * Returns the name of the connection pool. By default a name unique within this class loader is assigned; it is a
+     * counter, so it is unique but predictable, not random. Two class loaders that each load this module can therefore
+     * produce the same default name, which the pool's statistics and JMX registration treat as the same name: give
+     * pools that must coexist a name of their own.
      *
-     * @return the name of the pool, should be unique in a JVM
+     * @return the name of the pool, unique within this class loader by default
      */
     String getName();
 
     /**
      * Sets the name of the connection pool
      *
-     * @param name the name of the pool, should be unique in a runtime JVM
+     * @param name the name of the pool, should be unique among the pools that share its statistics and JMX space
      */
     void setName(String name);
 
