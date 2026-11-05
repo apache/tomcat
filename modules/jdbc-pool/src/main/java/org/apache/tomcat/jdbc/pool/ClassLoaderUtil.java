@@ -51,18 +51,10 @@ public class ClassLoaderUtil {
     /**
      * Attempts to load the specified class using the given class loaders in order.
      * <p>
-     * The chain continues past a loader that cannot see the class at all, and
-     * also past a loader that sees a copy which fails to link or initialize:
-     * the name may still resolve to a working copy further along the chain,
-     * as when a stale jar sits in the container's class path while the
-     * working copy ships elsewhere. A loader that sees a broken copy is
-     * recorded in the failure, and the fallback is logged as a warning, so
-     * loading the name from a later loader never happens silently. The fatal
-     * errors that {@code ExceptionUtils.handleThrowable} propagates - a
-     * dying JVM's {@code VirtualMachineError} - abort the chain unconverted;
-     * every other failure of a visible copy is a dead copy, including the
-     * JVM's standing "Could not initialize class" marker for a class whose
-     * initialization already failed.
+     * A loader that cannot see the class, or that sees a copy which fails to
+     * link or initialize, does not end the search: the next loader is tried
+     * and the fallback is logged. Fatal errors propagated by
+     * {@code ExceptionUtils.handleThrowable} abort the chain.
      *
      * @param className    the fully qualified class name
      * @param classLoaders the class loaders to attempt, in order
@@ -94,22 +86,9 @@ public class ClassLoaderUtil {
                 last = x;
                 errorMsg = appendFailure(errorMsg, cl, null);
             } catch (Throwable x) {
-                // ExceptionUtils.handleThrowable() propagates the fatal
-                // errors - a VirtualMachineError from a dying JVM - and
-                // swallows the recoverable ones; it is the same treatment
-                // the container gives a Throwable before acting on it.
+                // A visible but broken copy does not end the search: record
+                // the failure and try the remaining loaders.
                 ExceptionUtils.handleThrowable(x);
-                // The class is visible to this loader but the copy is broken:
-                // it fails to link (class file version, missing dependency),
-                // its static initializer throws, or a policy refused it. Only
-                // the not-found case used to continue the chain, so a broken
-                // copy in the first loader masked a working copy in a later
-                // one and a raw Error or RuntimeException escaped to callers
-                // that only plan for ClassNotFoundException. Record the
-                // failure and attempt the remaining loaders: the JVM's
-                // standing "Could not initialize class" marker for a class
-                // whose initialization already failed carries no fatal error
-                // to rethrow and is as dead a copy as any.
                 last = x;
                 errorMsg = appendFailure(errorMsg, cl, x);
                 log.warn(MessageFactory.get("classLoaderUtil.classLoadError", className, cl), x);
@@ -123,12 +102,14 @@ public class ClassLoaderUtil {
     }
 
     /**
-     * Record one loader's failure for the summary message of the eventual
-     * ClassNotFoundException. A not-found failure (no reason given) keeps the
-     * historical format, which is just the loader's identity; a broken-copy
-     * failure names it too, so the operator can tell a dead copy from an
-     * absent class in the message alone - the failure's own stack trace,
-     * carried to the log with the warning, shows its cause.
+     * Records one loader's failure for the summary message of the eventual
+     * ClassNotFoundException.
+     *
+     * @param errorMsg The summary built so far, or null
+     * @param cl The loader that failed
+     * @param failure The failure if the class was visible but broken, or null
+     *
+     * @return The updated summary
      */
     private static StringBuilder appendFailure(StringBuilder errorMsg, ClassLoader cl, Throwable failure) {
         if (errorMsg == null) {
@@ -143,6 +124,4 @@ public class ClassLoaderUtil {
         }
         return errorMsg;
     }
-
-
 }
