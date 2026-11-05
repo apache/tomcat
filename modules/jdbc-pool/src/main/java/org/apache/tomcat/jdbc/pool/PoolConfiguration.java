@@ -379,12 +379,13 @@ public interface PoolConfiguration {
 
     /**
      * The minimum number of established connections that should be kept in the pool at all times. The connection pool
-     * can shrink below this number if validation queries fail and connections get closed. Default value is derived from
-     * {@link #getInitialSize()} (also see {@link #setTestWhileIdle(boolean)}). The eviction run normally keeps the
-     * total number of connections in the pool - idle plus busy - at or above this value, hence the number of actual
-     * connections can be between {@link #getMinIdle()} and somewhere between {@link #getMaxIdle()} and
-     * {@link #getMaxActive()}. A connection left over from an earlier pool generation is released regardless, so an
-     * explicit idle check after a purge can take the pool below the floor.
+     * can shrink below this number if validation queries fail and connections get closed. The default is the value
+     * {@link #getInitialSize()} had when this configuration was constructed; changing {@code initialSize} later does
+     * not move it, so set this explicitly to change the floor (also see {@link #setTestWhileIdle(boolean)}). The
+     * eviction run normally keeps the total number of connections in the pool - idle plus busy - at or above this
+     * value, hence the number of actual connections can be between {@link #getMinIdle()} and somewhere between
+     * {@link #getMaxIdle()} and {@link #getMaxActive()}. A connection left over from an earlier pool generation is
+     * released regardless, so an explicit idle check after a purge can take the pool below the floor.
      *
      * @return the minimum number of idle or established connections
      */
@@ -392,12 +393,13 @@ public interface PoolConfiguration {
 
     /**
      * The minimum number of established connections that should be kept in the pool at all times. The connection pool
-     * can shrink below this number if validation queries fail and connections get closed. Default value is derived from
-     * {@link #getInitialSize()} (also see {@link #setTestWhileIdle(boolean)}). The eviction run normally keeps the
-     * total number of connections in the pool - idle plus busy - at or above this value, hence the number of actual
-     * connections can be between {@link #getMinIdle()} and somewhere between {@link #getMaxIdle()} and
-     * {@link #getMaxActive()}. A connection left over from an earlier pool generation is released regardless, so an
-     * explicit idle check after a purge can take the pool below the floor.
+     * can shrink below this number if validation queries fail and connections get closed. The default is the value
+     * {@link #getInitialSize()} had when this configuration was constructed; changing {@code initialSize} later does
+     * not move it, so set this explicitly to change the floor (also see {@link #setTestWhileIdle(boolean)}). The
+     * eviction run normally keeps the total number of connections in the pool - idle plus busy - at or above this
+     * value, hence the number of actual connections can be between {@link #getMinIdle()} and somewhere between
+     * {@link #getMaxIdle()} and {@link #getMaxActive()}. A connection left over from an earlier pool generation is
+     * released regardless, so an explicit idle check after a purge can take the pool below the floor.
      *
      * @param minIdle the minimum number of idle or established connections
      */
