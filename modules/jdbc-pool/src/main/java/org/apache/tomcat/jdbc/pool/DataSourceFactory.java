@@ -70,94 +70,139 @@ public class DataSourceFactory implements ObjectFactory {
 
     private static final Log log = LogFactory.getLog(DataSourceFactory.class);
 
+    /** The {@code defaultAutoCommit} property name. */
     protected static final String PROP_DEFAULTAUTOCOMMIT = "defaultAutoCommit";
 
+    /** The {@code defaultReadOnly} property name. */
     protected static final String PROP_DEFAULTREADONLY = "defaultReadOnly";
 
+    /** The {@code defaultTransactionIsolation} property name. */
     protected static final String PROP_DEFAULTTRANSACTIONISOLATION = "defaultTransactionIsolation";
 
+    /** The {@code defaultCatalog} property name. */
     protected static final String PROP_DEFAULTCATALOG = "defaultCatalog";
 
+    /** The {@code driverClassName} property name. */
     protected static final String PROP_DRIVERCLASSNAME = "driverClassName";
 
+    /** The {@code password} property name. */
     protected static final String PROP_PASSWORD = "password";
 
+    /** The {@code url} property name. */
     protected static final String PROP_URL = "url";
 
+    /** The {@code username} property name. */
     protected static final String PROP_USERNAME = "username";
 
+    /** The {@code maxActive} property name. */
     protected static final String PROP_MAXACTIVE = "maxActive";
 
+    /** The {@code maxIdle} property name. */
     protected static final String PROP_MAXIDLE = "maxIdle";
 
+    /** The {@code minIdle} property name. */
     protected static final String PROP_MINIDLE = "minIdle";
 
+    /** The {@code initialSize} property name. */
     protected static final String PROP_INITIALSIZE = "initialSize";
 
+    /** The {@code maxWait} property name. */
     protected static final String PROP_MAXWAIT = "maxWait";
 
+    /** The {@code maxAge} property name. */
     protected static final String PROP_MAXAGE = "maxAge";
 
+    /** The {@code testOnBorrow} property name. */
     protected static final String PROP_TESTONBORROW = "testOnBorrow";
 
+    /** The {@code testOnReturn} property name. */
     protected static final String PROP_TESTONRETURN = "testOnReturn";
 
+    /** The {@code testWhileIdle} property name. */
     protected static final String PROP_TESTWHILEIDLE = "testWhileIdle";
 
+    /** The {@code testOnConnect} property name. */
     protected static final String PROP_TESTONCONNECT = "testOnConnect";
 
+    /** The {@code validationQuery} property name. */
     protected static final String PROP_VALIDATIONQUERY = "validationQuery";
 
+    /** The {@code validationQueryTimeout} property name. */
     protected static final String PROP_VALIDATIONQUERY_TIMEOUT = "validationQueryTimeout";
 
+    /** The {@code validatorClassName} property name. */
     protected static final String PROP_VALIDATOR_CLASS_NAME = "validatorClassName";
 
+    /** The {@code numTestsPerEvictionRun} property name. */
     protected static final String PROP_NUMTESTSPEREVICTIONRUN = "numTestsPerEvictionRun";
 
+    /** The {@code timeBetweenEvictionRunsMillis} property name. */
     protected static final String PROP_TIMEBETWEENEVICTIONRUNSMILLIS = "timeBetweenEvictionRunsMillis";
 
+    /** The {@code minEvictableIdleTimeMillis} property name. */
     protected static final String PROP_MINEVICTABLEIDLETIMEMILLIS = "minEvictableIdleTimeMillis";
 
+    /** The {@code accessToUnderlyingConnectionAllowed} property name. */
     protected static final String PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED = "accessToUnderlyingConnectionAllowed";
 
+    /** The {@code removeAbandoned} property name. */
     protected static final String PROP_REMOVEABANDONED = "removeAbandoned";
 
+    /** The {@code removeAbandonedTimeout} property name. */
     protected static final String PROP_REMOVEABANDONEDTIMEOUT = "removeAbandonedTimeout";
 
+    /** The {@code logAbandoned} property name. */
     protected static final String PROP_LOGABANDONED = "logAbandoned";
 
+    /** The {@code abandonWhenPercentageFull} property name. */
     protected static final String PROP_ABANDONWHENPERCENTAGEFULL = "abandonWhenPercentageFull";
 
+    /** The {@code poolPreparedStatements} property name. */
     protected static final String PROP_POOLPREPAREDSTATEMENTS = "poolPreparedStatements";
 
+    /** The {@code maxOpenPreparedStatements} property name. */
     protected static final String PROP_MAXOPENPREPAREDSTATEMENTS = "maxOpenPreparedStatements";
 
+    /** The {@code connectionProperties} property name. */
     protected static final String PROP_CONNECTIONPROPERTIES = "connectionProperties";
 
+    /** The {@code initSQL} property name. */
     protected static final String PROP_INITSQL = "initSQL";
 
+    /** The {@code jdbcInterceptors} property name. */
     protected static final String PROP_INTERCEPTORS = "jdbcInterceptors";
 
+    /** The {@code validationInterval} property name. */
     protected static final String PROP_VALIDATIONINTERVAL = "validationInterval";
 
+    /** The {@code jmxEnabled} property name. */
     protected static final String PROP_JMX_ENABLED = "jmxEnabled";
 
+    /** The {@code fairQueue} property name. */
     protected static final String PROP_FAIR_QUEUE = "fairQueue";
 
+    /** The {@code useEquals} property name. */
     protected static final String PROP_USE_EQUALS = "useEquals";
 
+    /** The {@code useLock} property name. */
     protected static final String PROP_USE_LOCK = "useLock";
 
+    /** The {@code dataSource} property name. */
     protected static final String PROP_DATASOURCE = "dataSource";
 
+    /** The {@code dataSourceJNDI} property name. */
     protected static final String PROP_DATASOURCE_JNDI = "dataSourceJNDI";
 
+    /** The {@code suspectTimeout} property name. */
     protected static final String PROP_SUSPECT_TIMEOUT = "suspectTimeout";
 
+    /** The {@code alternateUsernameAllowed} property name. */
     protected static final String PROP_ALTERNATE_USERNAME_ALLOWED = "alternateUsernameAllowed";
 
+    /** The {@code commitOnReturn} property name. */
     protected static final String PROP_COMMITONRETURN = "commitOnReturn";
 
+    /** The {@code rollbackOnReturn} property name. */
     protected static final String PROP_ROLLBACKONRETURN = "rollbackOnReturn";
 
     /**
@@ -166,10 +211,13 @@ public class DataSourceFactory implements ObjectFactory {
      */
     protected static final String PROP_USEDISPOSABLECONNECTIONFACADE = "useDisposableConnectionFacade";
 
+    /** The {@code logValidationErrors} property name. */
     protected static final String PROP_LOGVALIDATIONERRORS = "logValidationErrors";
 
+    /** The {@code propagateInterruptState} property name. */
     protected static final String PROP_PROPAGATEINTERRUPTSTATE = "propagateInterruptState";
 
+    /** The {@code ignoreExceptionOnPreLoad} property name. */
     protected static final String PROP_IGNOREEXCEPTIONONPRELOAD = "ignoreExceptionOnPreLoad";
 
     /**
