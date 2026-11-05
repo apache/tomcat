@@ -269,7 +269,11 @@ public class PooledConnection implements PooledConnectionMBean {
         if (connection != null) {
             try {
                 this.disconnect(false);
-            } catch (Exception x) {
+            } catch (Throwable x) {
+                // A non-fatal Error from the previous session's teardown is
+                // a failed disconnect, not a reason to abort the new
+                // connection attempt.
+                ExceptionUtils.handleThrowable(x);
                 if (log.isDebugEnabled()) {
                     log.debug("Unable to disconnect previous connection.", x);
                 }
@@ -1169,8 +1173,9 @@ public class PooledConnection implements PooledConnectionMBean {
             if (stmt != null) {
                 try {
                     stmt.close();
-                } catch (Exception ignore2) {
-                    /* NOOP */}
+                } catch (Throwable ignore2) {
+                    ExceptionUtils.handleThrowable(ignore2);
+                }
             }
 
         } finally {
@@ -1201,7 +1206,11 @@ public class PooledConnection implements PooledConnectionMBean {
             return true;
         } catch (SQLException e) {
             log.debug("Failed to commit transaction", e);
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
+            // A non-fatal Error is the same failed commit an unchecked
+            // exception is: it must not escape through the caller's finally
+            // block and strand the connection.
+            ExceptionUtils.handleThrowable(e);
             if (getPoolProperties().getLogValidationErrors()) {
                 log.error(MessageFactory.get("pooledConnection.commitFailed"), e);
             } else {
@@ -1225,7 +1234,10 @@ public class PooledConnection implements PooledConnectionMBean {
             return true;
         } catch (SQLException e) {
             log.debug("Failed to rollback transaction", e);
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
+            // A non-fatal Error is handled exactly like the unchecked
+            // failure below.
+            ExceptionUtils.handleThrowable(e);
             // A failure to end the transaction is a failure whether the
             // driver reports it checked or unchecked: the caller reads the
             // false as a failed validation and takes the session out of
@@ -1615,6 +1627,14 @@ public class PooledConnection implements PooledConnectionMBean {
         }
     }
 
+    /**
+     * Returns a diagnostic rendering of this pooled connection: the driver's own {@link Connection#toString()} when a
+     * physical session is present, or {@code null}. The driver's text is not masked and may include the URL, the user
+     * or other session details, so pool warnings that pass a pooled connection should treat it as best-effort
+     * diagnostic output rather than as a credential-safe view.
+     *
+     * @return the diagnostic rendering
+     */
     @Override
     public String toString() {
         return "PooledConnection[" + (connection != null ? connection.toString() : "null") + "]";
