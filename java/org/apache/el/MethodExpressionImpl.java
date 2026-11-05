@@ -70,7 +70,7 @@ import org.apache.el.util.ReflectionUtil;
 public final class MethodExpressionImpl extends MethodExpression implements Externalizable {
 
     @Serial
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 7625836928626978145L;
 
     private Class<?> expectedType;
 
