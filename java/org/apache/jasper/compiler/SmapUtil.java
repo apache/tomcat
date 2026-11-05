@@ -16,6 +16,9 @@
  */
 package org.apache.jasper.compiler;
 
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -27,8 +30,11 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
@@ -49,8 +55,8 @@ public class SmapUtil {
 
     private static final Charset SMAP_ENCODING = StandardCharsets.UTF_8;
 
-    // Marker that begins the SMAP data in the SourceDebugExtension attribute
-    private static final String SMAP_START_MARKER = "SMAP\n";
+    // The SMAP data in the SourceDebugExtension attribute starts with this line
+    private static final String SMAP_HEADER = "SMAP\n";
 
 
     /**
@@ -437,6 +443,188 @@ public class SmapUtil {
     }
 
     /**
+     * Reads the SMAP from the SourceDebugExtension attribute of a class file. This walks the structure of the class
+     * file, as {@link SDEInstaller} does when it installs the attribute, so that exactly the bytes of the attribute are
+     * returned. Searching the class file for the content of the SMAP is not reliable because the same bytes may appear
+     * elsewhere in the class file, such as in a string constant, or within the SMAP itself.
+     * <p>
+     * The constant pool may contain more than one entry with the name of the attribute and other tools may add
+     * SourceDebugExtension attributes that do not contain a SMAP. Only an attribute that contains a SMAP, which starts
+     * with {@link SmapUtil#SMAP_HEADER}, is returned. If there is more than one the last is returned, since that is
+     * where {@link SDEInstaller} adds it.
+     */
+    private static class SDEReader {
+
+        private static final int MAGIC = 0xCAFEBABE;
+
+        private static final byte[] SMAP_HEADER_BYTES = SMAP_HEADER.getBytes(StandardCharsets.ISO_8859_1);
+
+        private final DataInputStream in;
+
+        private SDEReader(InputStream is) {
+            this.in = new DataInputStream(new BufferedInputStream(is));
+        }
+
+        /**
+         * Read the SMAP from a class file.
+         *
+         * @param is The class file
+         *
+         * @return The content of the SourceDebugExtension attribute that contains the SMAP, including the first line,
+         *             or {@code null} if the class file does not have such an attribute
+         *
+         * @throws IOException If the data is not a valid class file or reading it fails
+         */
+        static byte[] read(InputStream is) throws IOException {
+            return new SDEReader(is).readSDE();
+        }
+
+        private byte[] readSDE() throws IOException {
+            if (in.readInt() != MAGIC) {
+                throw new IOException(Localizer.getMessage("jsp.error.invalidClassFile"));
+            }
+            skip(2 + 2); // minor and major version
+
+            Set<Integer> sdeIndexes = readConstantPool();
+            if (sdeIndexes.isEmpty()) {
+                // Without the name in the constant pool there cannot be a SourceDebugExtension attribute
+                return null;
+            }
+
+            skip(2 + 2 + 2); // access, this, super
+            int interfaceCount = in.readUnsignedShort();
+            skip(interfaceCount * 2L);
+            skipMembers(); // fields
+            skipMembers(); // methods
+
+            // Class attributes
+            byte[] smap = null;
+            int attrCount = in.readUnsignedShort();
+            for (int i = 0; i < attrCount; i++) {
+                int nameIndex = in.readUnsignedShort();
+                int len = readLength();
+                if (sdeIndexes.contains(Integer.valueOf(nameIndex))) {
+                    byte[] sde = in.readNBytes(len);
+                    if (sde.length != len) {
+                        throw new EOFException();
+                    }
+                    if (isSmap(sde)) {
+                        smap = sde;
+                    }
+                } else {
+                    skip(len);
+                }
+            }
+            return smap;
+        }
+
+        private static boolean isSmap(byte[] sde) {
+            return sde.length >= SMAP_HEADER_BYTES.length &&
+                    Arrays.equals(sde, 0, SMAP_HEADER_BYTES.length, SMAP_HEADER_BYTES, 0, SMAP_HEADER_BYTES.length);
+        }
+
+        /*
+         * Skips the constant pool and returns the indexes of the Utf8 entries that contain the name of the
+         * SourceDebugExtension attribute. There is normally one but nothing prevents there being several.
+         */
+        private Set<Integer> readConstantPool() throws IOException {
+            Set<Integer> sdeIndexes = new HashSet<>();
+            int constantPoolCount = in.readUnsignedShort();
+            // Constant pool index zero is not in the class file
+            for (int i = 1; i < constantPoolCount; i++) {
+                int tag = in.readUnsignedByte();
+                switch (tag) {
+                    case 7: // Class
+                    case 8: // String
+                    case 16: // MethodType
+                    case 19: // Module
+                    case 20: // Package
+                        skip(2);
+                        break;
+                    case 15: // MethodHandle
+                        skip(3);
+                        break;
+                    case 9: // Field
+                    case 10: // Method
+                    case 11: // InterfaceMethod
+                    case 3: // Integer
+                    case 4: // Float
+                    case 12: // NameAndType
+                    case 17: // Dynamic
+                    case 18: // InvokeDynamic
+                        skip(4);
+                        break;
+                    case 5: // Long
+                    case 6: // Double
+                        skip(8);
+                        // Long and double values take two entries in the constant pool
+                        i++;
+                        break;
+                    case 1: // Utf8
+                        int len = in.readUnsignedShort();
+                        if (len == SDEInstaller.nameSDE.length()) {
+                            byte[] utf8 = in.readNBytes(len);
+                            if (utf8.length != len) {
+                                throw new EOFException();
+                            }
+                            if (SDEInstaller.nameSDE.equals(new String(utf8, StandardCharsets.UTF_8))) {
+                                sdeIndexes.add(Integer.valueOf(i));
+                            }
+                        } else {
+                            skip(len);
+                        }
+                        break;
+                    default:
+                        throw new IOException(Localizer.getMessage("jsp.error.unexpectedTag", Integer.valueOf(tag)));
+                }
+            }
+            return sdeIndexes;
+        }
+
+        /*
+         * Skips exactly the requested number of bytes. InputStream.skipNBytes() is not used as it is not available in
+         * all supported Java versions and InputStream.skip() may skip fewer bytes than requested.
+         */
+        private void skip(long count) throws IOException {
+            long remaining = count;
+            while (remaining > 0) {
+                long skipped = in.skip(remaining);
+                if (skipped <= 0) {
+                    // skip() is allowed to skip nothing. Read a byte to tell the end of the stream from a skip that
+                    // made no progress.
+                    if (in.read() == -1) {
+                        throw new EOFException();
+                    }
+                    skipped = 1;
+                }
+                remaining -= skipped;
+            }
+        }
+
+
+        private void skipMembers() throws IOException {
+            int count = in.readUnsignedShort();
+            for (int i = 0; i < count; i++) {
+                skip(2 + 2 + 2); // access, name, descriptor
+                int attrCount = in.readUnsignedShort();
+                for (int j = 0; j < attrCount; j++) {
+                    skip(2); // name
+                    skip(readLength());
+                }
+            }
+        }
+
+        private int readLength() throws IOException {
+            int len = in.readInt();
+            if (len < 0) {
+                // The length is a u4 but a valid attribute is never larger than the maximum size of an array
+                throw new IOException(Localizer.getMessage("jsp.error.invalidClassFile"));
+            }
+            return len;
+        }
+    }
+
+    /**
      * Traverses the JSP AST nodes and populates the given SmapStratum with line mapping data.
      * @param nodes the root JSP AST nodes
      * @param s the stratum to populate with line mappings
@@ -775,22 +963,12 @@ public class SmapUtil {
 
             is = cl.getResourceAsStream(className.replace(".", "/") + ".class");
             if (is != null) {
-                // The SourceDebugExtension attribute that contains the SMAP
-                // is appended as the last attribute of the class file (see
-                // SDEInstaller) so the SMAP to extract is the one that starts
-                // at the last occurrence of the marker. The first occurrence
-                // cannot be used because the same byte sequence may appear
-                // earlier in the class file, for example in a string constant
-                // in the constant pool created from the template text of the
-                // page. Note that, unlike SmapStratum, the optional JSR-045
-                // terminator line "* END SMAP" also contains the marker. The
-                // SMAP data is installed as ISO-8859-1 (see installSmap())
-                // which preserves every byte of the class file, so the marker
-                // cannot be missed by the search below.
-                String classData = new String(is.readAllBytes(), StandardCharsets.ISO_8859_1);
-                int index = classData.lastIndexOf(SMAP_START_MARKER);
-                if (index >= 0) {
-                    return classData.substring(index + SMAP_START_MARKER.length());
+                // The SMAP is the content of the SourceDebugExtension attribute. It is installed as ISO-8859-1 (see
+                // installSmap()). The first line, "SMAP", is not included in the result.
+                byte[] sde = SDEReader.read(is);
+                if (sde != null) {
+                    return new String(sde, SMAP_HEADER.length(), sde.length - SMAP_HEADER.length(),
+                            StandardCharsets.ISO_8859_1);
                 }
             }
         } catch (IOException ioe) {
