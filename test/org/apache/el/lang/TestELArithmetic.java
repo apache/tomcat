@@ -202,6 +202,25 @@ public class TestELArithmetic {
         assertELException("subtract", () -> ELArithmetic.subtract((Object) extreme, (Object) Long.valueOf(1)));
     }
 
+    @Test
+    public void testBigDecimalMultiplyOverflowThrowsELException() {
+        // BigDecimal.multiply() declares ArithmeticException when the sum of the scales is outside the range of an
+        // int. The failure must surface as ELException.
+        BigDecimal extreme = new BigDecimal(BigInteger.ONE, Integer.MAX_VALUE);
+        assertELException("multiply", () -> ELArithmetic.multiply((Object) extreme, (Object) extreme));
+    }
+
+    @Test
+    public void testBigDecimalMultiplyOverflowFromExpressionThrowsELException() {
+        ELProcessor processor = new ELProcessor();
+        try {
+            processor.eval("1e999999999 * 1e999999999 * 1e999999999");
+            Assert.fail("Expected ELException");
+        } catch (ELException expected) {
+            Assert.assertTrue(expected.getCause() instanceof ArithmeticException);
+        }
+    }
+
     private static class TesterNumberOddToString extends Number {
 
         private static final long serialVersionUID = 1L;
