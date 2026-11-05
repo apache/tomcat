@@ -24,8 +24,8 @@ import java.net.Socket;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.Arrays;
 import java.util.Base64;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -160,7 +160,7 @@ public class TestWsClientHandshakeResponse extends LoggingBaseTest {
             try {
                 ClientEndpointConfig.Builder builder = ClientEndpointConfig.Builder.create();
                 if (subProtocol != null) {
-                    builder.preferredSubprotocols(List.of(subProtocol));
+                    builder.preferredSubprotocols(Arrays.asList(subProtocol));
                 }
                 WebSocketContainer container = ContainerProvider.getWebSocketContainer();
                 URI uri = new URI("ws://localhost:" + serverSocket.getLocalPort() + "/test");
@@ -192,7 +192,7 @@ public class TestWsClientHandshakeResponse extends LoggingBaseTest {
             InputStream is = socket.getInputStream();
             ByteArrayOutputStream request = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
-            while (!request.toString(StandardCharsets.ISO_8859_1).contains("\r\n\r\n")) {
+            while (!request.toString(StandardCharsets.ISO_8859_1.name()).contains("\r\n\r\n")) {
                 int read = is.read(buffer);
                 if (read == -1) {
                     throw new IOException("The client closed the connection before it sent the request");
@@ -200,7 +200,7 @@ public class TestWsClientHandshakeResponse extends LoggingBaseTest {
                 request.write(buffer, 0, read);
             }
 
-            Matcher matcher = KEY_PATTERN.matcher(request.toString(StandardCharsets.ISO_8859_1));
+            Matcher matcher = KEY_PATTERN.matcher(request.toString(StandardCharsets.ISO_8859_1.name()));
             Assert.assertTrue(matcher.find());
             byte[] digest = MessageDigest.getInstance("SHA-1").digest(
                     (matcher.group(1).trim() + WS_ACCEPT_GUID).getBytes(StandardCharsets.ISO_8859_1));
