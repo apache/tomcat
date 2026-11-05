@@ -27,7 +27,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.SmokeTest;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -39,6 +41,7 @@ import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
  * generated using a test CA the files for which are in the Tomcat PMC private
  * repository since not all of them are AL2 licensed.
  */
+@Category(SmokeTest.class)
 @RunWith(Parameterized.class)
 public class TestClientCert extends TomcatBaseTest {
 

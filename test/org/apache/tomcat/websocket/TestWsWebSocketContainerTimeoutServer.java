@@ -35,7 +35,9 @@ import jakarta.websocket.server.ServerEndpointConfig;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.SmokeTest;
 import org.apache.catalina.Context;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
@@ -49,6 +51,7 @@ import org.apache.tomcat.websocket.server.WsContextListener;
  * significantly extends the length of a test run when using multiple test
  * threads.
  */
+@Category(SmokeTest.class)
 public class TestWsWebSocketContainerTimeoutServer extends WsWebSocketContainerBaseTest {
 
     @Test

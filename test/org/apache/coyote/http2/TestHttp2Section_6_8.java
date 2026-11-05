@@ -20,13 +20,16 @@ import java.nio.ByteBuffer;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.SmokeTest;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
 
 /**
  * Unit tests for Section 6.8 of <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>. <br>
  * The order of tests in this class is aligned with the order of the requirements in the RFC.
  */
+@Category(SmokeTest.class)
 public class TestHttp2Section_6_8 extends Http2TestBase {
 
     private static final boolean RELAX_TIMING = Boolean.getBoolean("tomcat.test.relaxTiming");

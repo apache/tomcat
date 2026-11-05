@@ -43,7 +43,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.SmokeTest;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Connector;
@@ -59,6 +61,7 @@ import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 /*
  * Tests compatibility of JSSE and OpenSSL settings.
  */
+@Category(SmokeTest.class)
 @RunWith(Parameterized.class)
 public class TestSSLHostConfigCompat extends TomcatBaseTest {
 

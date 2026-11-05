@@ -32,7 +32,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.SmokeTest;
 import org.apache.catalina.Context;
 import org.apache.catalina.Valve;
 import org.apache.catalina.startup.SimpleHttpClient;
@@ -78,6 +80,7 @@ import org.apache.tomcat.websocket.server.WsContextListener;
  * but it makes no claims to generality).
  *
  */
+@Category(SmokeTest.class)
 public class TestFormAuthenticatorA extends TomcatBaseTest {
 
     // these should really be singletons to be type-safe,

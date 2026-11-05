@@ -32,7 +32,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.SmokeTest;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Constants;
 import org.apache.catalina.startup.ContextConfig;
@@ -42,6 +44,7 @@ import org.apache.catalina.util.IOTools;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.WebXml;
 
+@Category(SmokeTest.class)
 public class TestStandardContextResources extends TomcatBaseTest {
 
     @Override

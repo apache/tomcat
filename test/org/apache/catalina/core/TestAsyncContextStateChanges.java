@@ -40,7 +40,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.SmokeTest;
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
@@ -54,6 +56,7 @@ import org.apache.catalina.startup.TomcatBaseTest;
  * Expanded to cover https://bz.apache.org/bugzilla/show_bug.cgi?id=63817 and
  * additional scenarios.
  */
+@Category(SmokeTest.class)
 @RunWith(Parameterized.class)
 public class TestAsyncContextStateChanges extends TomcatBaseTest {
 
