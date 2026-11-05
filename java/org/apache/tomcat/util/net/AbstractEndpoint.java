@@ -510,10 +510,7 @@ public abstract class AbstractEndpoint<S, U> {
                     certificate.getCertificateFile(), certificate.getCertificateChainFile());
         } else {
             // Keystore based
-            String keyAlias = certificate.getCertificateKeyAlias();
-            if (keyAlias == null) {
-                keyAlias = SSLUtilBase.DEFAULT_KEY_ALIAS;
-            }
+            String keyAlias = certificate.getCertificateKeyAliasOrDefault();
             String keystoreFile;
             if (certificate.getCertificateKeystoreInternal() != null) {
                 // Keystore was set directly. Original location is unknown.
