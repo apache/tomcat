@@ -92,8 +92,7 @@ class SSLContextWrapper implements SSLContext {
      */
     @Override
     public String getServedAlias(SSLHostConfigCertificate certificate) {
-        String configuredAlias = certificate.getCertificateKeyAlias();
-        return configuredAlias == null ? SSLUtilBase.DEFAULT_KEY_ALIAS : configuredAlias;
+        return certificate.getCertificateKeyAliasOrDefault();
     }
 
     @Override
