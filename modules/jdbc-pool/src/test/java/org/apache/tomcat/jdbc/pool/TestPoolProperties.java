@@ -339,6 +339,49 @@ class TestPoolProperties {
     }
 
     @Test
+    void clearingCredentialsReachesValuesSuppliedByADefaultsTable() {
+        Properties defaults = new Properties();
+        defaults.setProperty(PoolUtilities.PROP_USER, DEFAULT_USER);
+        defaults.setProperty(PoolUtilities.PROP_PASSWORD, DEFAULT_PASSWD);
+        PoolProperties properties = new PoolProperties();
+        properties.setDbProperties(new Properties(defaults));
+
+        properties.setPassword(null);
+        properties.setUsername(null);
+
+        Assertions.assertNull(properties.getDbProperties().getProperty(PoolUtilities.PROP_PASSWORD),
+                "clearing the password must remove a value a defaults table supplies");
+        Assertions.assertNull(properties.getDbProperties().getProperty(PoolUtilities.PROP_USER),
+                "clearing the user name must remove a value a defaults table supplies");
+        Assertions.assertNull(
+                PoolUtilities.clone(properties.getDbProperties()).getProperty(PoolUtilities.PROP_PASSWORD),
+                "the copy handed to the driver must not materialize the cleared password");
+        Assertions.assertNull(
+                PoolUtilities.clone(properties.getDbProperties()).getProperty(PoolUtilities.PROP_USER),
+                "the copy handed to the driver must not materialize the cleared user name");
+    }
+
+    @Test
+    void droppingAConnectionPropertyReachesADefaultsTable() {
+        Properties defaults = new Properties();
+        defaults.setProperty("sslmode", "require");
+        PoolProperties properties = new PoolProperties();
+        properties.setDbProperties(new Properties(defaults));
+
+        properties.setConnectionProperties("sslmode=disable");
+        Assertions.assertEquals("disable",
+                PoolUtilities.clone(properties.getDbProperties()).getProperty("sslmode"),
+                "the string's pair must shadow the defaults value");
+
+        properties.setConnectionProperties(null);
+
+        Assertions.assertNull(properties.getDbProperties().getProperty("sslmode"),
+                "clearing the string must remove the pair it contributed");
+        Assertions.assertNull(PoolUtilities.clone(properties.getDbProperties()).getProperty("sslmode"),
+                "the dropped pair must not fall back to the defaults value the driver copy would send");
+    }
+
+    @Test
     void rewritingTheStringAppliesItsCredentialPairAgain() {
         PoolProperties properties = new PoolProperties();
         properties.setConnectionProperties("password=fromstring");
