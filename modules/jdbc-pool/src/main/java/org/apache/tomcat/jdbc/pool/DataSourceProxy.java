@@ -791,8 +791,20 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
 
+    /**
+     * Sets whether JMX is enabled, before the pool is created. Whether the pool registers an MBean is decided when
+     * the pool is created, so a write after that point is rejected rather than stored without effect, matching the
+     * pool MBean's own setter.
+     *
+     * @param enabled whether JMX is enabled
+     *
+     * @throws UnsupportedOperationException if the pool has already been created
+     */
     @Override
-    public void setJmxEnabled(boolean enabled) {
+    public synchronized void setJmxEnabled(boolean enabled) {
+        if (pool != null) {
+            throw new UnsupportedOperationException(MessageFactory.get("dataSourceProxy.jmxEnabledAfterStart"));
+        }
         this.getPoolProperties().setJmxEnabled(enabled);
     }
 
@@ -1452,6 +1464,14 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
 
+    /**
+     * Replaces the live database properties with the given set. The write is not masked, and it replaces the whole
+     * collection: a read-modify-write of the masked {@link #getDbProperties()} view hands back a set with the password
+     * removed and takes that credential away from the live configuration. Use {@link #setPassword(String)} and
+     * {@link #setUsername(String)} to change the credentials, as {@link #getDbProperties()} describes.
+     *
+     * @param dbProperties the replacement database properties
+     */
     @Override
     public void setDbProperties(Properties dbProperties) {
         getPoolProperties().setDbProperties(dbProperties);

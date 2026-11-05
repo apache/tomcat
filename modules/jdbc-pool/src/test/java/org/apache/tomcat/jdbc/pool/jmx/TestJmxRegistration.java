@@ -896,4 +896,22 @@ class TestJmxRegistration extends JdbcPoolBaseTest {
             }
         }
     }
+
+    @Test
+    void setJmxEnabledIsOnlyAcceptedBeforeThePoolIsCreated() throws Exception {
+        DataSource ds = newDataSource();
+        // Before the pool exists the property is ordinary configuration.
+        ds.setJmxEnabled(false);
+        Assertions.assertFalse(ds.isJmxEnabled(), "the pre-start write must be stored");
+
+        ds.setJmxEnabled(true);
+        ds.createPool();
+
+        // After creation the MBean decision has been made; a write through the
+        // data source must be refused like the pool MBean's own setter.
+        Assertions.assertThrows(UnsupportedOperationException.class,
+                () -> ds.setJmxEnabled(false),
+                "a post-start write would otherwise be stored without creating or removing anything");
+        Assertions.assertTrue(ds.isJmxEnabled(), "the refused write must not change the configuration");
+    }
 }
