@@ -82,15 +82,16 @@ public interface PooledConnectionMBean {
     boolean isDiscarded();
 
     /**
-     * Returns the timestamp at which the last successful validation
-     * completed. Until a validation has completed for the first time, this is
-     * the time this pooled connection was created - which on a pool with no
-     * validation configured is the value the attribute keeps, so a
-     * never-validated connection cannot be told apart from one validated at
-     * its creation instant.
+     * Returns the timestamp at which the last successful validation completed
+     * on the current physical session. While that session has not been
+     * validated it reports 0, so a validation inherited from the session a
+     * reconnect replaced cannot be mistaken for one of this session. Before
+     * any session has been established, it reports the time this pooled
+     * connection was created.
      *
      * @return the last validated timestamp as defined by
-     *             {@link System#currentTimeMillis()}
+     *             {@link System#currentTimeMillis()}, or 0 while the current
+     *             session has not been validated
      */
     long getLastValidated();
 
