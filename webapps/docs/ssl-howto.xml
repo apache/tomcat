@@ -508,6 +508,14 @@ or re-read <code>server.xml</code>. See the
 <a href="config/listeners.html">listener documentation</a> for the available
 attributes.</p>
 
+<p>The listener checks the certificate Tomcat expects to be served: the one at
+the configured <strong>certificateKeyAlias</strong>, or the Windows-MY numbered
+duplicate that replaced it. When the key manager is not wrapped by Tomcat, for
+example one supplied by a FIPS provider, the key manager chooses the certificate
+for each handshake and this can differ from the configured alias if the key store
+holds several entries. The listener cannot detect that, so ensure that
+<strong>certificateKeyAlias</strong> identifies the certificate that is served.</p>
+
 </section>
 
 <section name="Using the Windows certificate store">
