@@ -92,7 +92,6 @@
 
     <!-- Modifiers -->
     <module name="ModifierOrder"/>
-    <module name="RedundantModifier"/>
 
     <!-- Whitespace -->
     <module name="GenericWhitespace"/>
