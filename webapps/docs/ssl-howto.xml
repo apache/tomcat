@@ -460,7 +460,9 @@ qualifies if its Extended Key Usage includes
 <code>serverAuth</code> or <code>anyExtendedKeyUsage</code>, or if it has no
 Extended Key Usage extension at all. Certificates whose Extended Key Usage
 excludes both purposes or cannot be parsed are ignored. If no eligible key entry
-is found, connector initialization fails.</p>
+is found, connector initialization fails. This selection does not apply when the
+key manager factory is provided by a FIPS provider. Tomcat does not wrap or alter
+the keys in that case, so the provider chooses which entry is served.</p>
 
 <p>A configured <strong>certificateKeyAlias</strong> is normally used even if its
 certificate is unsuitable for server authentication. The one exception is a
