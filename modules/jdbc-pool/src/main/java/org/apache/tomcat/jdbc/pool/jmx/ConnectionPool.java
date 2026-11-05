@@ -43,6 +43,10 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 /**
  * JMX MBean wrapper for a {@link org.apache.tomcat.jdbc.pool.ConnectionPool}. Provides management and monitoring
  * capabilities for connection pool statistics, operations, and configuration.
+ * <p>
+ * The ObjectName this MBean is registered under is fixed when the registration succeeds. A refused registration leaves
+ * {@link #getObjectName()} null until a later registration succeeds; {@link #getName()} and {@link #getPoolName()}
+ * report the pool's live name and may differ from that registration name after a rename.
  */
 public class ConnectionPool extends NotificationBroadcasterSupport implements ConnectionPoolMBean, MBeanRegistration {
 
@@ -339,7 +343,8 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      * that has never been registered, or one the server has taken back while its pool keeps running - has no such
      * name: the source is then a string that names the pool.
      *
-     * @return the registered ObjectName, or a string naming the pool if the MBean is not registered
+     * @return the registered ObjectName, or a string naming the pool if the MBean is not registered. That fallback is
+     *             a diagnostic label, not necessarily a valid ObjectName
      */
     protected Object getNotificationSource() {
         // The registration handle is written by whichever thread registers or
@@ -464,7 +469,12 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      * Returns the connection properties with any credential they carry masked out, so that a read of this attribute
      * does not hand back in cleartext the password {@link #getPassword()} exists to withhold. The write is not masked:
      * {@link #setConnectionProperties(String)} takes the string as it is meant to reach the driver, which is the same
-     * read/write asymmetry the password attribute has. {@inheritDoc}
+     * read/write asymmetry the password attribute has.
+     * <p>
+     * The masked value is a display value, not a safe value to write back: the ordinary read-modify-write replaces the
+     * credential with the mask and leaves the pool unable to authenticate. Change the credential through
+     * {@link #setPassword(String)} and {@link #setUsername(String)}, or read the raw value from {@link #getPool()}.
+     * {@inheritDoc}
      */
     @Override
     public String getConnectionProperties() {
@@ -566,6 +576,12 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         return getPoolProperties().getMaxAge();
     }
 
+    /**
+     * Returns the pool's current name, as the {@code Name} attribute. This is the live configuration value and may
+     * differ from the ObjectName this MBean was registered under after a rename; see {@link #setName(String)}.
+     *
+     * @return the pool's current name
+     */
     @Override
     public String getName() {
         return this.getPoolName();
@@ -599,7 +615,12 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      * Returns the JDBC URL with any credential it carries masked out, so that a read of this attribute does not hand
      * back in cleartext the password {@link #getPassword()} exists to withhold. The write is not masked:
      * {@link #setUrl(String)} takes the URL as it is meant to reach the driver, which is the same read/write asymmetry
-     * the password attribute has. {@inheritDoc}
+     * the password attribute has.
+     * <p>
+     * The masked value is a display value, not a safe value to write back: the ordinary read-modify-write replaces the
+     * credential with the mask and leaves the pool unable to authenticate. Change the credential through
+     * {@link #setPassword(String)} and {@link #setUsername(String)}, or read the raw value from {@link #getPool()}.
+     * {@inheritDoc}
      */
     @Override
     public String getUrl() {
@@ -803,6 +824,12 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         getPoolProperties().setName(name);
     }
 
+    /**
+     * Returns the pool's current name, as the {@code PoolName} attribute. The MBean's registration name is fixed when
+     * it is registered; a rename changes this value without moving the registration.
+     *
+     * @return the pool's current name
+     */
     @Override
     public String getPoolName() {
         return getPoolProperties().getName();
