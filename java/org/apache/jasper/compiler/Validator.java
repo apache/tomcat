@@ -829,10 +829,8 @@ class Validator {
                     n.setNameAttribute(getJspAttribute(null, attrs.getQName(i), attrs.getURI(i), attrs.getLocalName(i),
                             attrs.getValue(i), n, null, false));
                 } else {
-                    if (jspAttrIndex < jspAttrSize) {
-                        jspAttrs[jspAttrIndex++] = getJspAttribute(null, attrs.getQName(i), attrs.getURI(i),
-                                attrs.getLocalName(i), attrs.getValue(i), n, null, false);
-                    }
+                    jspAttrs[jspAttrIndex++] = getJspAttribute(null, attrs.getQName(i), attrs.getURI(i),
+                            attrs.getLocalName(i), attrs.getValue(i), n, null, false);
                 }
             }
             if (n.getNameAttribute() == null) {
