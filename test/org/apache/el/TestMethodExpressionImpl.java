@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 import jakarta.el.ELContext;
+import jakarta.el.ELException;
 import jakarta.el.ELManager;
 import jakarta.el.ELProcessor;
 import jakarta.el.ExpressionFactory;
@@ -494,15 +495,47 @@ public class TestMethodExpressionImpl {
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testBug60844() {
-        // Fewer parameter values than the minimum required by a varargs
-        // method (here, the fixed parameters only). A single value would be
-        // a valid number of arguments for this method, so the call below
-        // with no values is the too-few-parameters case.
+        // Fewer parameter values than the minimum required by a varargs method. The minimum is the number of fixed
+        // parameters (one here), not the total number of parameters, and that is the minimum that must be reported.
         MethodExpression me2 = factory.createMethodExpression(context, "${beanC.sayHello}", null,
                 new Class[] { TesterBeanA.class });
-        me2.invoke(context, new Object[] { });
+        try {
+            me2.invoke(context, new Object[] {});
+            Assert.fail("No exception");
+        } catch (IllegalArgumentException iae) {
+            String msg = iae.getMessage();
+            Assert.assertTrue(msg, msg.contains("[sayHello]"));
+            // Called with [0] parameter(s), expected at least [1]
+            Assert.assertTrue(msg, msg.contains("[0]"));
+            Assert.assertTrue(msg, msg.contains("[1]"));
+            Assert.assertFalse(msg, msg.contains("[2]"));
+        }
+    }
+
+
+    @Test
+    public void testBug60844NullParameters() {
+        MethodExpression me2 = factory.createMethodExpression(context, "${beanC.sayHello}", null,
+                new Class[] { TesterBeanA.class, TesterBeanB.class });
+        try {
+            me2.invoke(context, null);
+            Assert.fail("No exception");
+        } catch (IllegalArgumentException iae) {
+            String msg = iae.getMessage();
+            Assert.assertTrue(msg, msg.contains("[sayHello]"));
+        }
+    }
+
+
+    @Test(expected = ELException.class)
+    public void testBug60844WrongType() {
+        // The original bug 60844 call: a single value of the wrong type. A single value is a valid number of
+        // arguments for the varargs method so the failure is now reported when the argument is coerced.
+        MethodExpression me2 = factory.createMethodExpression(context, "${beanC.sayHello}", null,
+                new Class[] { TesterBeanA.class, TesterBeanB.class });
+        me2.invoke(context, new Object[] { new Object() });
     }
 
 
