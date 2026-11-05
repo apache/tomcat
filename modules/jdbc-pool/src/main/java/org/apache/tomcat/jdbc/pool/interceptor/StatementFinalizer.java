@@ -46,8 +46,12 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  * <p>
  * A close that reaches the statement by another route cannot be observed by that removal, so its entry is reclaimed at
  * the connection return: there the renewed close is a no-op on a statement the application had already closed, and the
- * close it still owed on one it had not. A creation still in flight while the connection is returned is the one case
- * that return cannot reach - it registers after the return drained the list - and is closed where it arrives instead of
+ * close it still owed on one it had not. That assumes the swallowed close did not itself recycle the statement into a
+ * cache: a recycling interceptor below this one would have parked it open, and the return-time close would then close
+ * a statement a live cache entry still holds. {@link StatementCache} is the module's recycling interceptor and refuses
+ * to park while it sits below this finalizer, so the ordering is safe for it; a third-party recycling interceptor is
+ * not covered by that guarantee. A creation still in flight while the connection is returned is the one case that
+ * return cannot reach - it registers after the return drained the list - and is closed where it arrives instead of
  * being tracked.
  * <p>
  * Tracked statements are handed to the application as proxies implementing the standard JDBC statement interfaces, as
@@ -213,10 +217,23 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
         // again, so what a failed return-time close left behind gets its
         // last attempt here, before the new borrower runs.
         if (left != null && con != null) {
+            List<StatementEntry> failed = null;
             for (StatementEntry entry : left) {
                 if (!entry.close()) {
+                    if (failed == null) {
+                        failed = new ArrayList<>();
+                    }
+                    failed.add(entry);
                     log.warn(MessageFactory.get("statementFinalizer.unableToCloseStatement"),
                             entry.getAllocationStack());
+                }
+            }
+            if (failed != null) {
+                // The statement may still be open on the session now being
+                // served to the new borrower: keep it for the next attempt,
+                // as the return-time drain does.
+                synchronized (statementsLock) {
+                    statements.addAll(failed);
                 }
             }
         }
