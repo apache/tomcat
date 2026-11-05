@@ -55,6 +55,11 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  * {@link org.apache.tomcat.jdbc.pool.PoolConfiguration#setRemoveAbandonedTimeout(int)} that is fairly low, and you
  * want to reset the abandoned time each time any operation on the connection is performed. This is useful for batch
  * processing programs that use connections for extensive amount of times.
+ * <p>
+ * With JMX enabled, the interceptor publishes an MBean below its connection's MBean. It is released when the
+ * connection is recycled, when the pool closes, or when the pool MBean is deregistered. A pool that is abandoned
+ * without being closed keeps its registrations - and through them the pool, its sessions and its driver class loader -
+ * reachable, so a JMX-enabled pool must be closed before it is dropped.
  */
 public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAbandonedTimerMBean {
 
