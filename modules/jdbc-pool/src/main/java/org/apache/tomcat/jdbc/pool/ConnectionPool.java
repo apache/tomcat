@@ -2667,6 +2667,31 @@ public class ConnectionPool {
         registerConnectionMBeans(busy);
     }
 
+    /**
+     * Releases the MBeans published for the connections this pool currently holds and for the interceptors of their
+     * chains, when the pool's own MBean is released while the pool stays live. The connections and their sessions are
+     * untouched; a later borrow or reconnect can publish them again.
+     */
+    public void unregisterConnectionMBeans() {
+        unregisterConnectionMBeans(idle);
+        unregisterConnectionMBeans(busy);
+    }
+
+    private void unregisterConnectionMBeans(BlockingQueue<PooledConnection> pool) {
+        for (PooledConnection con : pool) {
+            try {
+                con.unregisterMBean();
+            } catch (Throwable x) {
+                // JMX is best effort: one connection that fails to release
+                // its MBeans must not keep the others registered
+                ExceptionUtils.handleThrowable(x);
+                if (log.isDebugEnabled()) {
+                    log.debug("Unable to unregister connection MBean", x);
+                }
+            }
+        }
+    }
+
     private void registerConnectionMBeans(BlockingQueue<PooledConnection> pool) {
         // The fair queue iterates a snapshot taken under its lock, the default
         // queue a view that tolerates concurrent modification: either way, a

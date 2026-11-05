@@ -262,9 +262,11 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
         if (parent == null) {
             cacheSize = null;
             this.pcon = null;
-            if (oname != null) {
-                JmxUtil.unregisterJmx(oname);
-                oname = null;
+            synchronized (this) {
+                if (oname != null) {
+                    JmxUtil.unregisterJmx(oname);
+                    oname = null;
+                }
             }
         } else {
             draining = false;
@@ -283,9 +285,21 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
                 ConcurrentHashMap<CacheKey, CachedStatement> cache = new ConcurrentHashMap<>();
                 pcon.getAttributes().put(STATEMENT_CACHE_ATTR, cache);
             }
-            if (oname == null) {
-                String keyprop = ",JdbcInterceptor=" + getClass().getSimpleName();
-                oname = JmxUtil.registerJmx(pcon.getObjectName(), keyprop, this);
+            synchronized (this) {
+                if (oname == null) {
+                    String keyprop = ",JdbcInterceptor=" + getClass().getSimpleName();
+                    oname = JmxUtil.registerJmx(pcon.getObjectName(), keyprop, this);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void unregisterMBean() {
+        synchronized (this) {
+            if (oname != null) {
+                JmxUtil.unregisterJmx(oname);
+                oname = null;
             }
         }
     }
