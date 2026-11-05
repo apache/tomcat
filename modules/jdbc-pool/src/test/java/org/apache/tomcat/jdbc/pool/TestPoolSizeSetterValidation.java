@@ -144,6 +144,22 @@ class TestPoolSizeSetterValidation extends JdbcPoolBaseTest {
                 "the floor has to stay at or below the ceiling it is bounded by");
     }
 
+    @Test
+    void negativeIdleCountsAreCorrectedAtPoolCreation() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setMaxActive(4);
+        ds.getPoolProperties().setMinIdle(-3);
+        ds.getPoolProperties().setMaxIdle(-1);
+
+        ds.createPool();
+
+        Assertions.assertEquals(0, ds.getPoolProperties().getMinIdle(),
+                "a negative idle floor has to be corrected like a negative initial size");
+        Assertions.assertEquals(0, ds.getPoolProperties().getMaxIdle(),
+                "a negative idle ceiling has to be corrected like a negative initial size");
+    }
+
     /*
      * The control, and the reason this is treated as a gap rather than a choice:
      * the pool's own MBean takes the same three writes and corrects them, so the
