@@ -768,27 +768,34 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
                             shouldClose = false;
                         }
                     }
-                } catch (RuntimeException | ReflectiveOperationException | SQLException x) {
+                } catch (Throwable x) {
                     // The throw always precedes the park attempt in the try
                     // above, so this proxy is not in the cache; the
                     // identity-aware removal is a no-op for it and leaves any
-                    // other statement parked under the same key alone.
+                    // other statement parked under the same key alone. A
+                    // non-fatal Error is the same failed recycle as an
+                    // unchecked exception: close the handle through the normal
+                    // path instead of leaving it open and unretired.
+                    ExceptionUtils.handleThrowable(x);
                     removeStatement(proxy);
                     if (log.isDebugEnabled()) {
                         log.debug("Unable to recycle statement: " + getSql(), x);
                     }
                 }
             }
-            if (shouldClose) {
-                // The physical close belongs to the superclass, and so does the
-                // retirement of this handle: a driver that refuses the close
-                // throws from there and the application hears about it. The
-                // statement never reached the cache in this branch, so nothing
-                // here has to be unwound for it.
-                super.closeInvoked();
+            try {
+                if (shouldClose) {
+                    // The physical close belongs to the superclass, and so does the
+                    // retirement of this handle: a driver that refuses the close
+                    // throws from there and the application hears about it. The
+                    // statement never reached the cache in this branch, so nothing
+                    // here has to be unwound for it.
+                    super.closeInvoked();
+                }
+            } finally {
+                closed = true;
+                delegate = null;
             }
-            closed = true;
-            delegate = null;
         }
 
         @Override
