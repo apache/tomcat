@@ -172,6 +172,11 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
          */
         private ObjectName failureLoggedUnder;
         /**
+         * whether a failure that could not form an ObjectName has been reported, so that a permanent malformed name
+         * is not logged with a stack trace on every borrow; guarded by this
+         */
+        private boolean malformedNameReported;
+        /**
          * whether a publication attempt is in flight, so that the concurrent borrows of one pool make one attempt
          * rather than one per thread; guarded by this
          */
@@ -295,16 +300,19 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
          * </p>
          *
          * @param oname the ObjectName whose publication was refused, or {@code null} when no ObjectName could be formed
-         *                  - there is then no name to mark as reported, and the failure is reported on every borrow of
-         *                  such a pool: the condition is a permanent misconfiguration, the stack trace is the signal
-         *                  that makes the operator fix it, and a busy pool with a misnamed monitoring MBean is rarer -
-         *                  and less costly - than a suppressed error nobody ever acts on
+         *                  - there is then no name to mark, so this state remembers that the malformed name was
+         *                  reported and later retries stay at debug level
          * @param x     what the MBeanServer answered
          */
         protected synchronized void refused(ObjectName oname, Exception x) {
             publishing = false;
             if (oname == null) {
-                log.error(MessageFactory.get("slowQueryReportJmx.jmxRegistrationFailedNoData"), x);
+                if (!malformedNameReported) {
+                    malformedNameReported = true;
+                    log.error(MessageFactory.get("slowQueryReportJmx.jmxRegistrationFailedNoData"), x);
+                } else if (log.isDebugEnabled()) {
+                    log.debug("Jmx registration failed again: " + x);
+                }
                 return;
             }
             if (oname.equals(failureLoggedUnder)) {
@@ -914,8 +922,9 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
         } catch (MalformedObjectNameException | RuntimeOperationsException x) {
             // A name that cannot be formed - a malformed objectName property, or
             // a pool name carrying characters the ObjectName grammar reserves -
-            // has no ObjectName to record the refusal against, and so is reported
-            // on every borrow of such a pool (see refused).
+            // has no ObjectName to record the refusal against; the state
+            // remembers that it was reported and later retries stay at debug
+            // level (see refused).
             state.refused(null, x);
         }
     }
