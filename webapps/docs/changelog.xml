@@ -1380,6 +1380,15 @@
         name is documented as having to be unique among live pools, and a
         duplicate is reported at error level. (remm)
       </fix>
+      <fix>
+        Remove the retry of refused JMX unregistrations from the JDBC pool's
+        JMX helper. JMX is a best-effort management channel and Catalina gives
+        every pool component a name of its own, so a refusal is logged for the
+        operator rather than remembered and retried later. A retry by name
+        could unregister a replacement MBean that had taken the name in the
+        meantime, silently removing the replacement's management surface.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
