@@ -705,29 +705,49 @@ public class PooledConnection implements PooledConnectionMBean {
         lastConnected = -1;
         try {
             connect();
-        } catch (SQLException | RuntimeException x) {
+        } catch (Throwable x) {
             // A connect can fail after it established the session - the
-            // default state it applies to a new session can be refused - so
+            // default state it applies to a new session can be refused, or a
+            // driver wrapper can fail with a non-fatal LinkageError - so
             // whatever is in the fields is closed here rather than dropped.
             // The interceptor chain is told nothing: this session never
             // served anyone, and the state the chain holds belongs to the
             // session that is about to be back in service.
-            closeSession(connection, xaConnection, cpdsConnection);
-            connection = served;
-            xaConnection = servedXa;
-            cpdsConnection = servedCpds;
-            lastConnected = servedLastConnected;
-            if (hadUser) {
-                sessionAttributes.put(PROP_USER, servedUser);
-            } else {
-                sessionAttributes.remove(PROP_USER);
+            ExceptionUtils.handleThrowable(x);
+            try {
+                closeSession(connection, xaConnection, cpdsConnection);
+            } catch (Throwable closeFailure) {
+                ExceptionUtils.handleThrowable(closeFailure);
+                x.addSuppressed(closeFailure);
+            } finally {
+                // Restore even if the partial session could not be closed:
+                // the served session is what the pool still owns, and a null
+                // field would leave it open but unreachable.
+                connection = served;
+                xaConnection = servedXa;
+                cpdsConnection = servedCpds;
+                lastConnected = servedLastConnected;
+                if (hadUser) {
+                    sessionAttributes.put(PROP_USER, servedUser);
+                } else {
+                    sessionAttributes.remove(PROP_USER);
+                }
+                if (hadPassword) {
+                    sessionAttributes.put(PROP_PASSWORD, servedPassword);
+                } else {
+                    sessionAttributes.remove(PROP_PASSWORD);
+                }
             }
-            if (hadPassword) {
-                sessionAttributes.put(PROP_PASSWORD, servedPassword);
-            } else {
-                sessionAttributes.remove(PROP_PASSWORD);
+            if (x instanceof SQLException) {
+                throw (SQLException) x;
+            } else if (x instanceof RuntimeException) {
+                throw (RuntimeException) x;
+            } else if (x instanceof Error) {
+                throw (Error) x;
             }
-            throw x;
+            SQLException ex = new SQLException(x.getMessage());
+            ex.initCause(x);
+            throw ex;
         }
 
         if (served == null) {
