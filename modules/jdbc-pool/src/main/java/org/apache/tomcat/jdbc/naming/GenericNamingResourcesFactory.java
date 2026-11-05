@@ -76,12 +76,16 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  * {@code false}, ignoring case and surrounding whitespace - not the
  * anything-but-{@code true}-is-{@code false} coercion of
  * {@code org.apache.naming.factory.BeanFactory} - and an address carrying no
- * content is applied to nothing: missing content is not a configured value.
+ * content is applied to nothing: missing content is not a configured value
+ * and, like any other property that cannot be applied, it fails the lookup.
  * When no {@code setFoo} setter exists at all, a two-argument
  * {@code setProperty(name, value)} property bag is consulted; when one
  * exists but its type cannot be built from the configured value, the bag is
  * not consulted - what the bean's own setter rejects must not be silently
- * absorbed there.
+ * absorbed there. If the bean has both a boolean-returning and a
+ * void-returning bag, the boolean one is tried first and a {@code false}
+ * answer means the property was not applied; the void bag is not consulted
+ * in that case.
  * <p>
  * A property that cannot be applied - no usable setter, a value the setter
  * type cannot be built from, or a setter that throws - fails the lookup with
@@ -197,7 +201,8 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
 
     private static SetResult setProperty(Object o, String name, String value) {
         if (log.isTraceEnabled()) {
-            log.trace("setProperty(" + o.getClass() + " " + name + "=" + value + ")");
+            // Do not log the value: it may be a credential.
+            log.trace("setProperty(" + o.getClass() + " " + name + ")");
         }
 
         // Missing content is not a configured value: no setter - String or
@@ -214,7 +219,6 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
             Method setPropertyMethodVoid = null;
             Method setPropertyMethodBool = null;
 
-            // First, the ideal case - a setFoo( String ) method
             for (int i = 0; i < methods.length; i++) {
                 Class<?>[] paramT = methods[i].getParameterTypes();
                 if (setter.equals(methods[i].getName()) && paramT.length == 1 &&
@@ -281,7 +285,6 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
                 }
             }
 
-            // Ok, no setXXX found, try a setProperty("name", "value")
             // A setXXX matched but no supported overload converted the value:
             // consulting the bag here would silently absorb the value the
             // bean's own setter rejected and report success, leaving the real
