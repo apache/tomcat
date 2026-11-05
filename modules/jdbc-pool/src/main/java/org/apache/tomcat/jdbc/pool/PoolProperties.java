@@ -584,16 +584,27 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             connectionPropertyKeys = Collections.emptySet();
             return;
         }
+        // Removing a key only reaches a directly present entry, so when the
+        // collection is defaults-backed the removal can uncover the defaults
+        // value instead of dropping the key. Detect that on each removal and,
+        // if it happens, continue on a defaults-free copy that is published
+        // instead of the live collection.
+        Properties writable = dbProps;
         // A configuration serialized before this field existed deserializes
         // with it null, as field initializers do not run on deserialization.
         if (connectionPropertyKeys != null) {
             for (String key : connectionPropertyKeys) {
-                dbProps.remove(key);
+                writable.remove(key);
+                if (writable.getProperty(key) != null) {
+                    Properties copy = PoolUtilities.clone(writable);
+                    copy.remove(key);
+                    writable = copy;
+                }
             }
         }
         Set<String> keys = new HashSet<>(parsed.size());
         for (String key : parsed.stringPropertyNames()) {
-            dbProps.setProperty(key, parsed.getProperty(key));
+            writable.setProperty(key, parsed.getProperty(key));
             keys.add(key);
         }
         // The credential setters' rule outlives the string: while a credential
@@ -608,11 +619,12 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         // contributed it; this parse hands the pair back - writing the string
         // is a fresh declaration of what it contributes.
         if (username != null) {
-            dbProps.setProperty(PoolUtilities.PROP_USER, username);
+            writable.setProperty(PoolUtilities.PROP_USER, username);
         }
         if (password != null) {
-            dbProps.setProperty(PoolUtilities.PROP_PASSWORD, password);
+            writable.setProperty(PoolUtilities.PROP_PASSWORD, password);
         }
+        dbProperties = writable;
         connectionPropertyKeys = keys;
     }
 
@@ -745,7 +757,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         this.password = password;
         if (this.dbProperties != null) {
             if (password == null) {
-                this.dbProperties.remove(PoolUtilities.PROP_PASSWORD);
+                removeDbProperty(PoolUtilities.PROP_PASSWORD);
                 warnStringStillNamesCredential(PoolUtilities.PROP_PASSWORD);
             } else {
                 this.dbProperties.setProperty(PoolUtilities.PROP_PASSWORD, password);
@@ -808,11 +820,37 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         this.username = username;
         if (this.dbProperties != null) {
             if (username == null) {
-                this.dbProperties.remove(PoolUtilities.PROP_USER);
+                removeDbProperty(PoolUtilities.PROP_USER);
                 warnStringStillNamesCredential(PoolUtilities.PROP_USER);
             } else {
                 this.dbProperties.setProperty(PoolUtilities.PROP_USER, username);
             }
+        }
+    }
+
+
+    /**
+     * Removes an entry from the database properties, including a value that
+     * the collection only resolves through a defaults table. A plain
+     * {@link Properties#remove(Object)} reaches only a directly present entry,
+     * so it would leave such a value in place - and the connect path
+     * materializes it into the copy handed to the driver. The direct entry is
+     * removed in place, and only when that uncovers a defaults value is the
+     * result materialized into a defaults-free copy and published instead.
+     * Called with the monitor held.
+     *
+     * @param key the property key to remove
+     */
+    private void removeDbProperty(String key) {
+        Properties props = this.dbProperties;
+        if (props == null) {
+            return;
+        }
+        props.remove(key);
+        if (props.getProperty(key) != null) {
+            Properties copy = PoolUtilities.clone(props);
+            copy.remove(key);
+            this.dbProperties = copy;
         }
     }
 
