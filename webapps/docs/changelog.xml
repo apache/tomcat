@@ -1371,6 +1371,15 @@
         the connection and reports the failure as an
         <code>SQLException</code>. (remm)
       </fix>
+      <fix>
+        Report a duplicate live pool name as an error from the JDBC pool's slow
+        query reporting interceptors. Tomcat gives every pool it manages a name
+        of its own, but a pool built programmatically can be given the name of a
+        live pool, and the statistics and the JMX registration are keyed by that
+        name: the two pools then displaced each other's statistics store. The
+        name is documented as having to be unique among live pools, and a
+        duplicate is reported at error level. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

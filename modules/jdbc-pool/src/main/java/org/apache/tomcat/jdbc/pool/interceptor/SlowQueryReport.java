@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.jdbc.pool.interceptor;
 
+import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,9 +47,12 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  * The statistics belong to the pool the interceptor serves: a pool registers its store when it starts and releases it
  * when it closes, and every connection of that pool books its executions into that one store. The store is read by the
  * name the pool started with - see {@link ConnectionPool#getRegistrationName()} and {@link #getPoolStats(String)}.
- * The name identifies the pool: a container names every pool it manages uniquely, and the default name of a
- * programmatically built pool is unique as well. Renaming a running pool, which the pool's own JMX allows, neither
- * detaches the pool from its statistics nor strands what its start published.
+ * The name identifies the pool, so it must be unique among the live pools of this class loader: Tomcat gives every
+ * pool it manages a name of its own, and a programmatically built pool has a unique default name. A pool that starts
+ * under a name a live pool already holds is a configuration error, reported as such, and its statistics displace the
+ * other pool's store under the shared name.
+ * Renaming a running pool, which the pool's own JMX allows, neither detaches the pool from its statistics nor strands
+ * what its start published.
  * </p>
  * <p>
  * A reporting definition the interceptor list gains after the start is not stranded either: the list is mutable at
@@ -56,8 +60,8 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  * the close that releases the store is told about that definition as well.
  * </p>
  * <p>
- * The registrations hold no reference to the pool, so a pool abandoned without closing is never pinned by them and can
- * be collected with its open sessions, leaving only the bounded statistics store published under its name until a pool
+ * The registrations hold the pool only weakly, so a pool abandoned without closing is never pinned by them and can be
+ * collected with its open sessions, leaving only the bounded statistics store published under its name until a pool
  * starting under that name takes the name over.
  * </p>
  * <p>
@@ -370,10 +374,34 @@ public class SlowQueryReport extends AbstractQueryReport {
             // ConcurrentHashMap would refuse the key before anything else could
             throw new IllegalStateException(MessageFactory.get("slowQueryReport.poolNameRequired"));
         }
-        PoolStatistics own = new PoolStatistics(name);
-        perPoolStats.put(name, own);
+        PoolStatistics own = new PoolStatistics(pool, name);
+        synchronized (perPoolStats) {
+            reportDuplicateName(perPoolStats.put(name, own), pool, name);
+        }
         this.poolStatistics = own;
         this.queries = own.getQueryStats();
+    }
+
+    /**
+     * Reports a pool that takes a name a live pool already holds. The name is the key both the statistics and the JMX
+     * registration are published under, so two live pools sharing it cannot be told apart: the registry, like the
+     * MBeanServer, keeps one of them. That is a configuration error rather than a supported way to share reporting -
+     * Tomcat gives every pool it manages a name of its own - so it is reported at error level. A store whose pool has
+     * been collected is not a live duplicate: a pool that starts under the name an abandoned pool left behind takes
+     * the name over without a report.
+     *
+     * @param previous the store the name held before, or {@code null} when it held none
+     * @param pool     the pool that registered the store now
+     * @param name     the name both pools carry
+     */
+    private static void reportDuplicateName(PoolStatistics previous, ConnectionPool pool, String name) {
+        if (previous == null) {
+            return;
+        }
+        ConnectionPool owner = previous.getPool();
+        if (owner != null && owner != pool) {
+            log.error(MessageFactory.get("slowQueryReport.duplicatePoolName", name));
+        }
     }
 
     /**
@@ -415,8 +443,8 @@ public class SlowQueryReport extends AbstractQueryReport {
             }
             own = perPoolStats.get(name);
             if (own == null) {
-                own = new PoolStatistics(name);
-                perPoolStats.put(name, own);
+                own = new PoolStatistics(parent, name);
+                reportDuplicateName(perPoolStats.put(name, own), parent, name);
             }
             return own;
         }
@@ -770,13 +798,19 @@ public class SlowQueryReport extends AbstractQueryReport {
     /**
      * The query statistics of one pool: the map its connections book into and the name the map is published under.
      * <p>
-     * The store holds no reference to the pool. The name identifies the pool - a container names its pools uniquely,
-     * and the default name of a programmatic pool is unique as well - so the store can outlive a pool abandoned without
-     * closing without pinning that pool, together with everything it reaches: its queues, its pooled connections and
-     * their open physical sessions.
+     * The store refers to the pool only weakly. The name identifies the pool and must be unique among live pools -
+     * Tomcat names every pool it manages, and the default name of a programmatic pool is unique as well - so the store
+     * can outlive a pool abandoned without closing without pinning that pool, together with everything it reaches: its
+     * queues, its pooled connections and their open physical sessions. The weak reference is what tells a live holder
+     * of the name from an abandoned pool's leftover store.
      * </p>
      */
     protected static class PoolStatistics {
+        /**
+         * the pool this store belongs to, held weakly so that the store never pins a pool abandoned without closing;
+         * used to tell a live pool holding the name from one whose store is all that is left of it
+         */
+        private final WeakReference<ConnectionPool> pool;
         /**
          * the name this store is published under - the registration name of the pool at its start
          */
@@ -800,10 +834,21 @@ public class SlowQueryReport extends AbstractQueryReport {
         /**
          * Creates the statistics store of one pool.
          *
+         * @param pool the pool the store belongs to
          * @param name the name the store is published under
          */
-        protected PoolStatistics(String name) {
+        protected PoolStatistics(ConnectionPool pool, String name) {
+            this.pool = new WeakReference<>(pool);
             this.name = name;
+        }
+
+        /**
+         * Returns the pool this store belongs to while it is still reachable.
+         *
+         * @return the owning pool, or {@code null} once it has been collected
+         */
+        protected ConnectionPool getPool() {
+            return pool.get();
         }
 
         /**
