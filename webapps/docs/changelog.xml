@@ -1708,6 +1708,14 @@
       <update>
         Update Tomcat Native to 2.0.17. (markt)
       </update>
+      <add>
+        Introduce JUnit <code>@Category</code>-based smoke test suite as a
+        proof of concept. Annotate smoke tests with
+        <code>@Category(SmokeTest.class)</code> and provide
+        <code>SmokeSuite</code> as a compile-checked alternative to the
+        property file list. Add <code>ant test-smoke-category</code> target.
+        (vgosain)
+      </add>
     </changelog>
   </subsection>
 </section>

@@ -41,7 +41,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.SmokeTest;
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
@@ -53,6 +55,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.ErrorPage;
 import org.apache.tomcat.websocket.server.WsContextListener;
 
+@Category(SmokeTest.class)
 public class TestDefaultServlet extends TomcatBaseTest {
 
     /*

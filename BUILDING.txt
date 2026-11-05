@@ -603,7 +603,49 @@ NOTE: Cobertura is licensed under GPL v2 with parts of it being under
 
         test.verbose=false
 
-(7.5) Running httpd integration tests
+(7.5) Running tests by profile
+
+Tomcat provides named test profiles for running curated subsets of tests
+without specifying file patterns manually.
+
+Available profiles:
+
+  smoke        - Core smoke tests covering key subsystems
+  catalina     - All Catalina servlet container tests
+  coyote       - All Coyote protocol/connector tests
+  tribes       - All Tribes clustering tests
+  performance  - Performance benchmark tests (excluded by default)
+  buildutil    - Build utility tests (excluded by default)
+  integration  - httpd integration tests (excluded by default)
+
+Usage:
+
+    ant test -Dtest.profile=smoke
+    ant test -Dtest.profile=catalina
+
+Profile patterns are defined in test-profiles.properties.default and can
+be overridden by creating a test-profiles.properties file at the project root.
+
+(7.5.1) Running smoke tests via JUnit @Category (proof of concept)
+
+As an alternative to the property-based smoke profile, smoke tests can be
+executed through the JUnit @Category mechanism:
+
+    ant test-smoke-category
+
+This runs org.apache.tomcat.categories.SmokeSuite, which uses JUnit's
+Categories runner to select tests annotated with
+@Category(SmokeTest.class). The suite class (SmokeSuite.java) contains a
+compile-checked list of smoke test classes, which catches class renames or
+deletions at build time rather than silently skipping the missing test.
+
+To add a new test to the smoke suite:
+  1. Annotate the test class:
+         @Category(SmokeTest.class)
+         public class MyNewTest { ... }
+  2. Add the class to the @SuiteClasses list in SmokeSuite.java.
+
+(7.6) Running httpd integration tests
 
   Tomcat includes integration tests that verify Tomcat's behavior when
   running behind an Apache HTTP Server (httpd) reverse proxy. These tests

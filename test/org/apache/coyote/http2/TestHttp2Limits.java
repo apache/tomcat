@@ -28,7 +28,9 @@ import org.hamcrest.TypeSafeMatcher;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.SmokeTest;
 import org.apache.catalina.connector.Connector;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.coyote.http2.HpackEncoder.State;
@@ -36,6 +38,7 @@ import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.res.StringManager;
 
+@Category(SmokeTest.class)
 public class TestHttp2Limits extends Http2TestBase {
 
     private static final StringManager sm = StringManager.getManager(TestHttp2Limits.class);

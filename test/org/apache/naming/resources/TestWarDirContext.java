@@ -20,7 +20,9 @@ import java.io.File;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.SmokeTest;
 import org.apache.catalina.core.JreMemoryLeakPreventionListener;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
@@ -28,6 +30,7 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.webresources.StandardRoot;
 import org.apache.tomcat.util.buf.ByteChunk;
 
+@Category(SmokeTest.class)
 public class TestWarDirContext extends TomcatBaseTest {
 
     @Override

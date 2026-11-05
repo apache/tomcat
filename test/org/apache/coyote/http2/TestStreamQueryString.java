@@ -36,7 +36,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.SmokeTest;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.tomcat.util.buf.HexUtils;
@@ -44,6 +46,7 @@ import org.apache.tomcat.util.buf.HexUtils;
 /*
  * See https://bz.apache.org/bugzilla/show_bug.cgi?id=60482
  */
+@Category(SmokeTest.class)
 @RunWith(Parameterized.class)
 public class TestStreamQueryString extends Http2TestBase {
 

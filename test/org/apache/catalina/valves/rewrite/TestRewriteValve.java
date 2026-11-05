@@ -39,7 +39,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.SmokeTest;
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
@@ -61,6 +63,7 @@ import org.apache.tomcat.util.http.Method;
  * test. The tests expect the client to be configured with UTF-8 as the default
  * encoding. Use of any other encoding is likely to lead to test failures.
  */
+@Category(SmokeTest.class)
 public class TestRewriteValve extends TomcatBaseTest {
 
     @Test

@@ -2090,6 +2090,60 @@
 
   <!-- ==================== End of Test Profile System ==================== -->
 
+  <!--
+    Category-based smoke test target (proof of concept).
+
+    Runs org.apache.tomcat.categories.SmokeSuite, which uses JUnit @Category
+    to select tests annotated with @Category(SmokeTest.class). This is an
+    alternative to the property-based smoke profile and produces identical
+    test coverage while keeping the test list compile-checked in SmokeSuite.java.
+
+    Usage: ant test-smoke-category
+  -->
+  <target name="test-smoke-category"
+          description="Runs smoke tests via JUnit @Category (see SmokeSuite.java)"
+          depends="test-compile,deploy">
+    <mkdir dir="${test.reports}" />
+    <junit printsummary="${junit.printsummary}" fork="yes" dir="." showoutput="${junit.showoutput}"
+        errorproperty="test.result.error"
+        failureproperty="test.result.failure"
+        haltonfailure="${test.haltonfailure}">
+      <jvmarg value="${test.jvmarg.egd}"/>
+      <jvmarg value="-Dfile.encoding=UTF-8"/>
+      <jvmarg value="${test.xmx}"/>
+      <jvmarg value="${runtests.librarypath}"/>
+      <jvmarg value="${test.formatter}"/>
+      <jvmarg value="-Djava.net.preferIPv4Stack=${java.net.preferIPv4Stack}"/>
+      <jvmarg value="${opens.javalang}"/>
+      <jvmarg value="${opens.javaio}"/>
+      <jvmarg value="${opens.sunrmi}"/>
+      <jvmarg value="${opens.javautil}"/>
+      <jvmarg value="${opens.javautilconcurrent}"/>
+      <jvmarg value="${native.nativeaccess}"/>
+      <jvmarg value="${openssl.ffm.1}"/>
+      <jvmarg value="${openssl.ffm.2}"/>
+      <jvmarg value="${openssl.ffm.3}"/>
+      <classpath refid="tomcat.test.classpath" />
+      <sysproperty key="tomcat.test.temp" value="${test.temp}" />
+      <sysproperty key="tomcat.test.basedir" value="${test.basedir}" />
+      <sysproperty key="tomcat.test.tomcatbuild" value="${tomcat.build}" />
+      <sysproperty key="tomcat.test.protocol" value="org.apache.coyote.http11.Http11NioProtocol" />
+      <sysproperty key="tomcat.test.accesslog" value="${test.accesslog}" />
+      <sysproperty key="tomcat.test.reports" value="${test.reports}" />
+      <sysproperty key="tomcat.test.openssl.path" value="${test.openssl.path}" />
+      <sysproperty key="tomcat.test.httpd.path" value="${test.httpd.path}" />
+      <sysproperty key="tomcat.test.openssl.unimplemented" value="${test.openssl.unimplemented}" />
+      <sysproperty key="tomcat.test.relaxTiming" value="${test.relaxTiming}" />
+      <sysproperty key="tomcat.test.sslImplementation" value="${test.sslImplementation}" />
+      <sysproperty key="tomcat.test.http2.loopCount" value="${test.http2.loopCount}" />
+      <formatter type="${junit.formatter.type}"
+                 usefile="${junit.formatter.usefile}"
+                 extension=".NIO${junit.formatter.extension}" />
+      <test todir="${test.reports}" name="org.apache.tomcat.categories.SmokeSuite" />
+    </junit>
+    <antcall target="test-status"/>
+  </target>
+
   <target name="test" description="Runs the JUnit test cases"
           depends="-test-name-default,test-nio,coverage-report,test-status" />
 
