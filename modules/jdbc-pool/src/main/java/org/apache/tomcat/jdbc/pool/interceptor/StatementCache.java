@@ -269,6 +269,13 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
             draining = false;
             synchronized (cacheSizeMap) {
                 cacheSize = cacheSizeMap.get(parent);
+                if (cacheSize == null) {
+                    // A definition added to a running pool did not exist when
+                    // its start registered the counter; create it on the first
+                    // borrow that builds a chain for the definition.
+                    cacheSize = new AtomicInteger(0);
+                    cacheSizeMap.put(parent, cacheSize);
+                }
             }
             this.pcon = con;
             if (!pcon.getAttributes().containsKey(STATEMENT_CACHE_ATTR)) {
