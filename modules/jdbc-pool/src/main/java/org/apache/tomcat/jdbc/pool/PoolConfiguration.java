@@ -404,10 +404,11 @@ public interface PoolConfiguration {
     void setMinIdle(int minIdle);
 
     /**
-     * Returns the name of the connection pool. By default a name unique within this class loader is assigned; it is a
-     * counter, so it is unique but predictable, not random. Two class loaders that each load this module can therefore
-     * produce the same default name, which the pool's statistics and JMX registration treat as the same name: give
-     * pools that must coexist a name of their own.
+     * Returns the name of the connection pool. Tomcat gives every pool it manages a name of its own. By default a
+     * name unique within this class loader is assigned; it is a counter, so it is unique but predictable, not random.
+     * Two class loaders that each load this module can therefore produce the same default name, which the pool's
+     * statistics and JMX registration treat as the same name: give pools that must coexist a name of their own. A
+     * duplicate name among live pools is reported as an error by the query reporting interceptors.
      *
      * @return the name of the pool, unique within this class loader by default
      */
@@ -416,7 +417,7 @@ public interface PoolConfiguration {
     /**
      * Sets the name of the connection pool
      *
-     * @param name the name of the pool, should be unique among the pools that share its statistics and JMX space
+     * @param name the name of the pool, unique among the live pools that share its statistics and JMX space
      */
     void setName(String name);
 

@@ -118,7 +118,7 @@ class TestSlowQueryJmxSlowQueriesCDRace {
      */
     private static ConcurrentHashMap<String, QueryStats> seedStats(String poolName) {
         assertBinsInvisitOrder();
-        SlowQueryReport.PoolStatistics statistics = new SlowQueryReport.PoolStatistics(poolName);
+        SlowQueryReport.PoolStatistics statistics = new SlowQueryReport.PoolStatistics(null, poolName);
         SlowQueryReport.perPoolStats.put(poolName, statistics);
         ConcurrentHashMap<String, QueryStats> live = statistics.getQueryStats();
         live.put(MIDDLE, new QueryStats(MIDDLE));
