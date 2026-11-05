@@ -368,38 +368,33 @@ public class PooledConnection implements PooledConnectionMBean {
             // physical connection is only closed when the handle is closed,
             // so losing the handle here would leak the physical connection.
             xaConnection = pooled;
-            SQLException failure = null;
-            RuntimeException failureRuntime = null;
+            Throwable failure = null;
             try {
                 connection = pooled.getConnection();
-            } catch (SQLException e) {
-                failure = e;
-            } catch (RuntimeException e) {
-                failureRuntime = e;
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                failure = t;
             }
-            if (connection == null && failure == null && failureRuntime == null) {
+            if (connection == null && failure == null) {
                 // Contract-violating provider: a handle without a logical
                 // connection is of no use either.
                 failure = new SQLException(
                         MessageFactory.get("pooledConnection.xaDataSourceNullConnection", xds));
             }
-            if (failure != null || failureRuntime != null) {
+            if (failure != null) {
                 // Do not strand the handle if the logical connection
-                // could not be obtained.
-                Exception origin = failure != null ? failure : failureRuntime;
+                // could not be obtained, whatever the provider failed with.
                 try {
                     pooled.close();
-                } catch (SQLException | RuntimeException closeX) {
-                    if (closeX != origin) {
-                        origin.addSuppressed(closeX);
+                } catch (Throwable closeX) {
+                    ExceptionUtils.handleThrowable(closeX);
+                    if (closeX != failure) {
+                        failure.addSuppressed(closeX);
                     }
                 }
                 xaConnection = null;
                 connection = null;
-                if (failureRuntime != null) {
-                    throw failureRuntime;
-                }
-                throw failure;
+                throw wrapConnectFailure(failure);
             }
             // Once the session is fully established, hand out the pool's
             // wrapper rather than the driver's handle: it tracks the
@@ -431,38 +426,33 @@ public class PooledConnection implements PooledConnectionMBean {
             // physical connection is only closed when the handle is closed,
             // so losing the handle here would leak the physical connection.
             cpdsConnection = pooled;
-            SQLException failure = null;
-            RuntimeException failureRuntime = null;
+            Throwable failure = null;
             try {
                 connection = pooled.getConnection();
-            } catch (SQLException e) {
-                failure = e;
-            } catch (RuntimeException e) {
-                failureRuntime = e;
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                failure = t;
             }
-            if (connection == null && failure == null && failureRuntime == null) {
+            if (connection == null && failure == null) {
                 // Contract-violating provider: a handle without a logical
                 // connection is of no use either.
                 failure = new SQLException(
                         MessageFactory.get("pooledConnection.connectionPoolDataSourceNullConnection", ds));
             }
-            if (failure != null || failureRuntime != null) {
+            if (failure != null) {
                 // Do not strand the handle if the logical connection
-                // could not be obtained.
-                Exception origin = failure != null ? failure : failureRuntime;
+                // could not be obtained, whatever the provider failed with.
                 try {
                     pooled.close();
-                } catch (SQLException | RuntimeException closeX) {
-                    if (closeX != origin) {
-                        origin.addSuppressed(closeX);
+                } catch (Throwable closeX) {
+                    ExceptionUtils.handleThrowable(closeX);
+                    if (closeX != failure) {
+                        failure.addSuppressed(closeX);
                     }
                 }
                 cpdsConnection = null;
                 connection = null;
-                if (failureRuntime != null) {
-                    throw failureRuntime;
-                }
-                throw failure;
+                throw wrapConnectFailure(failure);
             }
         } else {
             throw new SQLException(MessageFactory.get("pooledConnection.unknownDataSource",
@@ -785,8 +775,12 @@ public class PooledConnection implements PooledConnectionMBean {
             return;
         }
         setDiscarded(true);
-        if (connection != null) {
-            notifyDisconnected(finalize);
+        if (connection != null || xaConnection != null || cpdsConnection != null) {
+            if (connection != null) {
+                notifyDisconnected(finalize);
+            }
+            // Close any handle too: an XA/CPDS handle owns the physical
+            // session even when obtaining its logical connection failed.
             closeSession(connection, xaConnection, cpdsConnection);
         }
         connection = null;
@@ -814,6 +808,31 @@ public class PooledConnection implements PooledConnectionMBean {
             // connection from being closed
             log.warn(MessageFactory.get("pooledConnection.interceptorDisconnectedFailed"), x);
         }
+    }
+
+    /**
+     * Turns a failure while acquiring a logical connection into the exception a connect reports, preserving
+     * SQLException, RuntimeException and Error, and wrapping any other Throwable.
+     *
+     * @param failure the failure to rethrow
+     *
+     * @return a wrapper for a checked failure that is not an SQLException
+     *
+     * @throws SQLException the original SQLException
+     * @throws RuntimeException the original RuntimeException
+     * @throws Error the original Error
+     */
+    private static SQLException wrapConnectFailure(Throwable failure) throws SQLException {
+        if (failure instanceof SQLException) {
+            throw (SQLException) failure;
+        } else if (failure instanceof RuntimeException) {
+            throw (RuntimeException) failure;
+        } else if (failure instanceof Error) {
+            throw (Error) failure;
+        }
+        SQLException ex = new SQLException(failure.getMessage());
+        ex.initCause(failure);
+        return ex;
     }
 
     /**
@@ -848,7 +867,11 @@ public class PooledConnection implements PooledConnectionMBean {
             } else {
                 session.close();
             }
-        } catch (Exception ignore) {
+        } catch (Throwable ignore) {
+            // A non-fatal Error from the driver's close is a failed close,
+            // not a reason to let the pool lose the slot or leave the chain
+            // installed: the caller has already settled the release.
+            ExceptionUtils.handleThrowable(ignore);
             if (log.isDebugEnabled()) {
                 log.debug("Unable to close underlying SQL connection", ignore);
             }
