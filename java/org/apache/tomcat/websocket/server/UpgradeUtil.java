@@ -124,6 +124,10 @@ public class UpgradeUtil {
         String version = req.getHeader(Constants.WS_VERSION_HEADER_NAME);
         if (version == null || !Constants.WS_VERSION_HEADER_VALUE.equals(version.trim())) {
             resp.setStatus(426);
+            // RFC 9110, sections 7.8 and 15.5.22: a 426 response must include the Upgrade header field and the
+            // associated Connection option
+            resp.setHeader(Constants.UPGRADE_HEADER_NAME, Constants.UPGRADE_HEADER_VALUE);
+            resp.setHeader(Constants.CONNECTION_HEADER_NAME, Constants.CONNECTION_HEADER_VALUE);
             resp.setHeader(Constants.WS_VERSION_HEADER_NAME, Constants.WS_VERSION_HEADER_VALUE);
             return;
         }
