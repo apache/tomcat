@@ -60,7 +60,7 @@ import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
  * returned, and the work - the close, the borrow, the sweep - reporting the
  * failure rather than being broken by it.
  */
-class TestThrowingDriverOnClaimedPaths extends JdbcPoolBaseTest {
+public class TestThrowingDriverOnClaimedPaths extends JdbcPoolBaseTest {
 
     /*
      * The physical method the connection should fail from with an Error, or

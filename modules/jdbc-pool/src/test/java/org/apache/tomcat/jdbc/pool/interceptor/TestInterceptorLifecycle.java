@@ -45,7 +45,7 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
  * driver: the interceptor leaves evidence in the database work it sees and
  * in the statistics it publishes.</p>
  */
-class TestInterceptorLifecycle extends JdbcPoolBaseTest {
+public class TestInterceptorLifecycle extends JdbcPoolBaseTest {
 
     private static final String REPORT_SQL = "SELECT COUNT(*) FROM SYSTEM_RANGE(1,10)";
 
