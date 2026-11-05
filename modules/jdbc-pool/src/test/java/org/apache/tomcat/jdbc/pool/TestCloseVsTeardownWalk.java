@@ -49,7 +49,8 @@ import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
  * either. This class pins that contract at each position the close can meet
  * the walk - mid-walk, after it, and from inside it - and pins that the
  * teardown walk ends the borrow exactly once whichever position the close
- * took.
+ * took. The pool's release path delivers that walk once, through
+ * {@code finalize()}.
  */
 class TestCloseVsTeardownWalk extends JdbcPoolBaseTest {
 
@@ -57,9 +58,9 @@ class TestCloseVsTeardownWalk extends JdbcPoolBaseTest {
      * A pool whose borrow the abandoned-connection check claims on demand:
      * the timeout is one second and the tests push the borrow past it with
      * setTimestamp(0) rather than sleeping, so every run drives a real
-     * release - disconnect(true), the ConnectionPool.finalize walk and the
-     * setHandler(null) walk, each resetting every cached interceptor to
-     * (null, null) - without depending on a timer thread.
+     * release - disconnect(true) and the release's finalize walk, which
+     * resets every cached interceptor to (null, null) - without depending on
+     * a timer thread.
      */
     private DataSource abandonedCheckPool() throws SQLException {
         DataSource ds = newDataSource();

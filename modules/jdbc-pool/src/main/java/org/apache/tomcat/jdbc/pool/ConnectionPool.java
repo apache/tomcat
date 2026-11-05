@@ -565,7 +565,7 @@ public class ConnectionPool {
             // no close() will ever travel that chain - the handle was never handed out - while the return path does
             // not walk the chain either. The connection itself is healthy; it is the borrow state that is unusable,
             // and there is no chain-wide unwind that is safe for arbitrary interceptors, as each keys its disposal
-            // on the reset(null, null) call the release's setHandler(null) makes (StatementCache.reset is one).
+            // on the reset(null, null) call the release's teardown walk makes (StatementCache.reset is one).
             // So the half-armed chain goes out of service with the connection, the posture the two catches above
             // take, rather than being parked idle armed for a borrow that never started.
             abandonSetup(con, s, true);
@@ -1330,7 +1330,11 @@ public class ConnectionPool {
             if (destroyed) {
                 // Counter only decremented once
                 size.addAndGet(-1);
-                con.setHandler(null);
+                // The one teardown reset, delivered after the slot has been
+                // freed and before the wake-up placeholder is offered; the
+                // handler is then dropped without resetting it again
+                finalize(con);
+                con.clearHandler();
                 // Counted with the destruction, not with the call: a
                 // connection the abandon path already released can reach
                 // this method once more - a return whose busy.remove lost

@@ -164,7 +164,10 @@ class TestCloseVsConcurrentRelease {
         PooledConnection con = connectedTo(pool, rec);
 
         AtomicBoolean firstResult = new AtomicBoolean();
-        Thread releaser = new Thread(() -> firstResult.set(con.release()), "first-releaser");
+        Thread releaser = new Thread(() -> {
+            pool.release(con);
+            firstResult.set(con.isReleased());
+        }, "first-releaser");
         releaser.start();
         Assertions.assertTrue(pool.insideFinalizing.await(10, TimeUnit.SECONDS),
                 "the first release must have reached the chain's terminal notice");
@@ -173,7 +176,8 @@ class TestCloseVsConcurrentRelease {
         // first hand is inside the notice, the session is marked discarded
         // but still visibly open. This hand must claim nothing and touch
         // nothing.
-        Assertions.assertFalse(con.release(),
+        pool.release(con);
+        Assertions.assertTrue(con.isReleased(),
                 "a release that arrives during the terminal sequence loses the claim");
         Assertions.assertEquals(1, pool.disconnectEvents.get(),
                 "the terminal notice must have gone through the chain once, not once per hand");
@@ -195,7 +199,7 @@ class TestCloseVsConcurrentRelease {
         CountingPool pool = countingPool(rec);
         PooledConnection con = connectedTo(pool, rec);
 
-        Thread releaser = new Thread(con::release, "first-releaser");
+        Thread releaser = new Thread(() -> pool.release(con), "first-releaser");
         releaser.start();
         Assertions.assertTrue(pool.insideFinalizing.await(10, TimeUnit.SECONDS),
                 "the first release must have reached the chain's terminal notice");
@@ -225,8 +229,9 @@ class TestCloseVsConcurrentRelease {
         // first one, so the notice does not need to park anyone.
         pool.proceed.countDown();
 
-        Assertions.assertTrue(con.release(), "the first release wins");
-        Assertions.assertFalse(con.release(), "every later release loses");
+        pool.release(con);
+        Assertions.assertTrue(con.isReleased(), "the first release wins");
+        pool.release(con);
         Assertions.assertEquals(1, pool.disconnectEvents.get(), "the terminal notice ran once, though two hands came");
         Assertions.assertEquals(1, pool.finalizations.get());
         Assertions.assertEquals(1, rec.closeCalls.get(), "the session was closed once, though two hands came");
