@@ -1067,12 +1067,14 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      * for the same attributes, and what the pool's creation does when it publishes a
      * pool.
      * <p>
-     * Which half is taken under the pool's monitor, and why neither half is decided
-     * from a reading this writer took, is recorded at poolCleanerAttributeUpdated.
+     * Both halves are taken under the pool's monitor, in
+     * {@link org.apache.tomcat.jdbc.pool.ConnectionPool#applyConfigurationChange(PoolConfiguration)},
+     * so a write through the data source cannot land between them. Why neither half
+     * is decided from a reading this writer took is recorded at
+     * poolCleanerAttributeUpdated.
      */
     private void poolConfigurationUpdated() {
-        pool.checkPoolConfiguration(getPoolProperties());
-        poolCleanerAttributeUpdated();
+        pool.applyConfigurationChange(getPoolProperties());
     }
 
     @Override

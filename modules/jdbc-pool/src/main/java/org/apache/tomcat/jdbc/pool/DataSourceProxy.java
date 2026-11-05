@@ -650,11 +650,12 @@ public class DataSourceProxy implements PoolConfiguration {
         if (p == null) {
             return;
         }
-        // Make sure the pool is properly configured, on the configuration the
-        // calling setter wrote, and then start, stop or re-arm the cleaner to match
-        // what that correction left the configuration asking for.
-        p.checkPoolConfiguration(poolProperties);
-        p.reconcilePoolCleaner(poolProperties);
+        // Validate the configuration the calling setter wrote and bring the
+        // cleaner in line with what that correction left it asking for, as one
+        // step under the pool's monitor: the MBean writes the same configuration
+        // without a monitor, so validating and reconciling in separate calls
+        // would let its write land between them.
+        p.applyConfigurationChange(poolProperties);
     }
 
 
