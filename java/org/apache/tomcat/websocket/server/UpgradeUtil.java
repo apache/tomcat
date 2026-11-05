@@ -85,7 +85,7 @@ public class UpgradeUtil {
                 headerContainsToken((HttpServletRequest) request, Constants.UPGRADE_HEADER_NAME,
                         Constants.UPGRADE_HEADER_VALUE) &&
                 Method.GET.equals(((HttpServletRequest) request).getMethod()) &&
-                !"HTTP/1.0".equals(request.getProtocol()));
+                "HTTP/1.1".equals(request.getProtocol()));
     }
 
 
@@ -107,6 +107,10 @@ public class UpgradeUtil {
         // validation fails
         String key;
         String subProtocol;
+        if (!"HTTP/1.1".equals(req.getProtocol())) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
         if (!headerContainsToken(req, Constants.CONNECTION_HEADER_NAME, Constants.CONNECTION_HEADER_VALUE)) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
