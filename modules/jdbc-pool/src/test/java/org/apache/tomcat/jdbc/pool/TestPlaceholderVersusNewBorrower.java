@@ -61,12 +61,11 @@ class TestPlaceholderVersusNewBorrower extends JdbcPoolBaseTest {
 
         @Override
         public void reset(ConnectionPool parent, PooledConnection con) {
-            // A retiring connection's chain is reset with no parent twice:
-            // once while the session is disconnected, before the release
-            // frees the pool slot, and once when the release clears the
-            // chain, after it. The second firing sits exactly between the
-            // slot's release and the wake-up placeholder.
-            if (parent == null && ARMED.get() && PARENTLESS_RESETS.incrementAndGet() == 2) {
+            // A retiring connection's chain is reset with no parent once,
+            // when the release clears it after freeing the pool slot. That
+            // firing sits exactly between the slot's release and the wake-up
+            // placeholder.
+            if (parent == null && ARMED.get() && PARENTLESS_RESETS.incrementAndGet() == 1) {
                 PARKED.countDown();
                 try {
                     GO.await(5, TimeUnit.SECONDS);

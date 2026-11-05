@@ -49,9 +49,8 @@ import org.apache.tomcat.jdbc.pool.DataSource;
  * filled the log with it.
  * <p>
  * The tests drive the release the way the pool itself delivers it -
- * {@code reset(null, null)} on the interceptor link, the call
- * {@code PooledConnection.setHandler(null)} walks a released chain with -
- * onto the live interceptor instance of a connection that is still borrowed,
+ * {@code reset(null, null)} on the interceptor link, which the teardown walk
+ * calls - onto the live interceptor instance of a connection that is still borrowed,
  * which is also the state a borrow racing the close of the pool's last live
  * same-named pool lands in. One loss of the store now earns one WARN per
  * interceptor instance; a booking made on a recovered store re-arms the
