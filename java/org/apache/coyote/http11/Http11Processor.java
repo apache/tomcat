@@ -330,8 +330,9 @@ public class Http11Processor extends AbstractProcessor {
                 setErrorState(ErrorState.CLOSE_CLEAN, t);
             }
 
-            // Has an upgrade been requested?
-            if (isConnectionToken(request.getMimeHeaders(), "upgrade")) {
+            // Has an upgrade been requested? An Upgrade header field in an HTTP/1.0 request must be ignored
+            // (RFC 9110, section 7.8)
+            if (http11 && isConnectionToken(request.getMimeHeaders(), "upgrade")) {
                 // Check the protocol
                 String requestedProtocol = request.getHeader("Upgrade");
 
