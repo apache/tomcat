@@ -1190,6 +1190,55 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
     }
 
     @Test
+    void convertibleSetterOverloadsAreChosenDeterministically() throws Exception {
+        Reference ref = new Reference(AmbiguousOverloadTarget.class.getName(),
+                null, null);
+        ref.add(new StringRefAddr("port", "1527"));
+        ref.add(new StringRefAddr("ratio", "1.5"));
+
+        AmbiguousOverloadTarget.last = null;
+        Object result = new GenericNamingResourcesFactory().getObjectInstance(
+                ref, new CompositeName("test/ambiguous"), null, null);
+
+        Assertions.assertInstanceOf(AmbiguousOverloadTarget.class, result);
+        AmbiguousOverloadTarget target = (AmbiguousOverloadTarget) result;
+        Assertions.assertEquals("int", target.getPortSetter(),
+                "the int overload must win over the long one for an integral value");
+        Assertions.assertEquals("double", target.getRatioSetter(),
+                "the double overload must win over the float one for a decimal value");
+    }
+
+    /** Target with several convertible setters for the same property. */
+    public static class AmbiguousOverloadTarget {
+        static AmbiguousOverloadTarget last;
+        private String portSetter;
+        private String ratioSetter;
+
+        public AmbiguousOverloadTarget() {
+            last = this;
+        }
+
+        public void setPort(int port) {
+            portSetter = "int";
+        }
+        public void setPort(long port) {
+            portSetter = "long";
+        }
+        public String getPortSetter() {
+            return portSetter;
+        }
+        public void setRatio(float ratio) {
+            ratioSetter = "float";
+        }
+        public void setRatio(double ratio) {
+            ratioSetter = "double";
+        }
+        public String getRatioSetter() {
+            return ratioSetter;
+        }
+    }
+
+    @Test
     void reservedReferenceAddressesAreNotAppliedAsProperties()
             throws Exception {
         Reference ref = new Reference(BagTarget.class.getName(), null, null);
