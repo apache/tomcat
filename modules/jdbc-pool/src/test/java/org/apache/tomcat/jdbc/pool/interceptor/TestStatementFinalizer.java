@@ -501,6 +501,46 @@ class TestStatementFinalizer extends JdbcPoolBaseTest {
                 });
     }
 
+    /* A fake statement whose close fails with a non-fatal Error. */
+    private static Statement fakedErrorStatement() {
+        return (Statement) Proxy.newProxyInstance(
+                TestStatementFinalizer.class.getClassLoader(),
+                new Class<?>[] { Statement.class },
+                (p, m, a) -> {
+                    switch (m.getName()) {
+                        case "close":
+                            throw new NoClassDefFoundError("simulated stopped context in close()");
+                        case "isClosed":
+                            return Boolean.FALSE;
+                        case "equals":
+                            return Boolean.valueOf(p == (a == null || a.length == 0 ? null : a[0]));
+                        case "hashCode":
+                            return Integer.valueOf(System.identityHashCode(p));
+                        default:
+                            return null;
+                    }
+                });
+    }
+
+    @Test
+    void anErrorFromOneCloseDoesNotAbortTheDrain() throws Exception {
+        StatementFinalizer finalizer = new StatementFinalizer();
+        Method create = Connection.class.getMethod("createStatement");
+        finalizer.reset(null, null);
+
+        Statement failing = fakedErrorStatement();
+        Statement following = fakedStatement();
+        finalizer.createStatement(null, create, null, failing, 0L);
+        finalizer.createStatement(null, create, null, following, 0L);
+
+        Assertions.assertDoesNotThrow(finalizer::closeInvoked,
+                "a non-fatal Error from one statement close must not escape the drain");
+        Assertions.assertTrue(closeWasAsked(following),
+                "the statement after the failing one must still be closed");
+        Assertions.assertEquals(1, tracked(finalizer),
+                "the entry whose close failed must stay on the list for the next attempt");
+    }
+
     @Test
     void aCloseTheDriverRefusedStaysOnTheListForANextAttempt() throws Exception {
         // A return-time close the driver refused must not be dropped: the
