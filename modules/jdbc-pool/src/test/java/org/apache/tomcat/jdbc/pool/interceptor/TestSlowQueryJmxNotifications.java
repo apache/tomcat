@@ -565,51 +565,49 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
     }
 
     @Test
-    void aSameNamedPoolReportsThroughItsOwnPublicationAndNotTheOtherS() throws Exception {
-        String poolName = "JmxDuplicate-" + System.nanoTime();
-        DataSource ownerPool = reportingPoolNamed(poolName);
-        DataSource otherPool = reportingPoolNamed(poolName);
+    void eachPoolReportsThroughItsOwnPublicationAndNotTheOtherS() throws Exception {
+        String ownerName = "JmxOwner-" + System.nanoTime();
+        String otherName = "JmxOther-" + System.nanoTime();
+        DataSource ownerPool = reportingPoolNamed(ownerName);
+        DataSource otherPool = reportingPoolNamed(otherName);
 
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-        ObjectName oname = new ObjectName("tomcat.jdbc:type="
-                + SlowQueryReportJmx.class.getName() + ",name=" + poolName);
+        ObjectName ownerOn = new ObjectName("tomcat.jdbc:type="
+                + SlowQueryReportJmx.class.getName() + ",name=" + ownerName);
+        ObjectName otherOn = new ObjectName("tomcat.jdbc:type="
+                + SlowQueryReportJmx.class.getName() + ",name=" + otherName);
         List<Notification> published = new CopyOnWriteArrayList<>();
-        List<Notification> refused = new CopyOnWriteArrayList<>();
+        List<Notification> otherPublished = new CopyOnWriteArrayList<>();
         NotificationListener publishedListener = (notification, handback) -> published.add(notification);
-        NotificationListener refusedListener = (notification, handback) -> refused.add(notification);
+        NotificationListener otherListener = (notification, handback) -> otherPublished.add(notification);
 
-        // The first pool's borrow publishes the MBean under the name; the
-        // second pool, configured with the same name, cannot publish its own
-        // and is refused by the MBeanServer. It keeps running, and it keeps
-        // reporting - through a broadcaster of its own, because the MBean it
-        // was refused is not its own to report on
+        // Each pool publishes its own MBean under its own name, and its
+        // queries reach only the listeners of that publication.
         Connection ownerConnection = ownerPool.getConnection();
         Connection otherConnection = otherPool.getConnection();
         try {
-            server.addNotificationListener(oname, publishedListener, null, null);
-            interceptorOf(otherConnection, SlowQueryReportJmx.class)
-                    .addNotificationListener(refusedListener, null, null);
+            server.addNotificationListener(ownerOn, publishedListener, null, null);
+            server.addNotificationListener(otherOn, otherListener, null, null);
 
             try (Statement st = ownerConnection.createStatement()) {
                 st.execute(slowSql(1));
             }
             Assertions.assertTrue(published.stream().anyMatch(n -> n.getMessage().contains("SELECT 1")),
-                    "the publishing pool's queries reach the listeners of its MBean, received: "
+                    "the pool's queries reach the listeners of its MBean, received: "
                             + published);
 
             try (Statement st = otherConnection.createStatement()) {
                 st.execute(slowSql(2));
             }
-            Assertions.assertTrue(refused.stream().anyMatch(n -> n.getMessage().contains("SELECT 2")),
-                    "the refused pool must still notify its own listeners, received: " + refused);
+            Assertions.assertTrue(otherPublished.stream().anyMatch(n -> n.getMessage().contains("SELECT 2")),
+                    "the other pool must notify its own listeners, received: " + otherPublished);
             Assertions.assertFalse(published.stream().anyMatch(n -> n.getMessage().contains("SELECT 2")),
                     "and it must not report into the other pool's MBean: a client listening to the"
                             + " name would otherwise read another pool's queries as its own,"
                             + " received: " + published);
 
-            // Close the pool that was refused. It published nothing, so it has
-            // nothing to give up, and it must not take the other pool's
-            // publication down on its way out
+            // Closing one pool gives up its own publication and leaves the
+            // other pool's publication alone.
             otherConnection.close();
             otherConnection = null;
             otherPool.close();
@@ -617,9 +615,10 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
             try (Statement st = ownerConnection.createStatement()) {
                 st.execute(slowSql(3));
             }
-            Assertions.assertTrue(server.isRegistered(oname),
-                    "closing a pool that was refused the name must leave the pool that holds it"
-                            + " published");
+            Assertions.assertFalse(server.isRegistered(otherOn),
+                    "closing a pool gives up its own publication");
+            Assertions.assertTrue(server.isRegistered(ownerOn),
+                    "closing one pool must leave the other pool's publication standing");
             Assertions.assertTrue(published.stream().anyMatch(n -> n.getMessage().contains("SELECT 3")),
                     "and its clients' listeners must still be served, received: " + published);
         } finally {
@@ -639,11 +638,16 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
             }
             ownerPool.close();
             try {
-                server.removeNotificationListener(oname, publishedListener);
+                server.removeNotificationListener(ownerOn, publishedListener);
             } catch (ListenerNotFoundException | InstanceNotFoundException ignore) {
                 // the teardown under test may already have dropped the binding
             }
-            Assertions.assertFalse(server.isRegistered(oname),
+            try {
+                server.removeNotificationListener(otherOn, otherListener);
+            } catch (ListenerNotFoundException | InstanceNotFoundException ignore) {
+                // the teardown under test may already have dropped the binding
+            }
+            Assertions.assertFalse(server.isRegistered(ownerOn),
                     "closing the pool that published the MBean gives it up");
         }
     }
@@ -989,39 +993,37 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
     }
 
     @Test
-    void concurrentClosesOfSameNamedPoolsLeaveNothingBehind() throws Exception {
-        String poolName = "JmxRace-" + System.nanoTime();
-        DataSource first = reportingPoolNamed(poolName);
-        DataSource second = reportingPoolNamed(poolName);
-        DataSource third = reportingPoolNamed(poolName);
+    void concurrentClosesOfDistinctPoolsLeaveNothingBehind() throws Exception {
+        String[] names = { "JmxRace0-" + System.nanoTime(), "JmxRace1-" + System.nanoTime(),
+                "JmxRace2-" + System.nanoTime() };
+        DataSource[] sources = new DataSource[names.length];
+        ObjectName[] onames = new ObjectName[names.length];
 
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-        ObjectName oname = new ObjectName("tomcat.jdbc:type="
-                + SlowQueryReportJmx.class.getName() + ",name=" + poolName);
-
-        Connection one = first.getConnection();
-        Connection two = second.getConnection();
-        Connection three = third.getConnection();
-        Assertions.assertTrue(server.isRegistered(oname),
-                "the MBean must be registered while the same-named pools run - published by the"
-                        + " first of them to borrow");
-        ConnectionPool[] pools = { first.getPool(), second.getPool(), third.getPool() };
+        Connection[] connections = new Connection[names.length];
+        for (int i = 0; i < names.length; i++) {
+            sources[i] = reportingPoolNamed(names[i]);
+            onames[i] = new ObjectName("tomcat.jdbc:type="
+                    + SlowQueryReportJmx.class.getName() + ",name=" + names[i]);
+            connections[i] = sources[i].getConnection();
+            Assertions.assertTrue(server.isRegistered(onames[i]),
+                    "the MBean must be registered while the pool runs");
+        }
+        ConnectionPool[] pools = { sources[0].getPool(), sources[1].getPool(), sources[2].getPool() };
         // return every connection first, so the concurrent closes race only
         // on the registries, not on pooled connections
-        one.close();
-        two.close();
-        three.close();
+        for (Connection connection : connections) {
+            connection.close();
+        }
 
         // a start gate releases all three closes together: each of them gives
-        // up its own pool's store and its own publication, and the name view
-        // is freed by the close that still holds it - none of which may block
-        // on, fail because of, or miss what one of the others is doing
+        // up its own pool's store and its own publication - none of which may
+        // block on, fail because of, or miss what one of the others is doing
         CountDownLatch startGate = new CountDownLatch(1);
-        final DataSource[] closing = {first, second, third};
-        Throwable[] failures = new Throwable[closing.length];
-        Thread[] closers = new Thread[closing.length];
-        for (int i = 0; i < closing.length; i++) {
-            final DataSource pool = closing[i];
+        Throwable[] failures = new Throwable[sources.length];
+        Thread[] closers = new Thread[sources.length];
+        for (int i = 0; i < sources.length; i++) {
+            final DataSource pool = sources[i];
             final int slot = i;
             closers[i] = new Thread(() -> {
                 try {
@@ -1030,7 +1032,7 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
                 } catch (Throwable x) {
                     failures[slot] = x;
                 }
-            }, "same-named-pool-closer-" + i);
+            }, "pool-closer-" + i);
             closers[i].start();
         }
         startGate.countDown();
@@ -1046,26 +1048,25 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
         }
 
         awaitSessions(0); // every physical session of every pool is really gone
-        Assertions.assertFalse(server.isRegistered(oname),
-                "the close of the pool that published the MBean must release it, whatever the"
-                        + " other same-named closes were doing at the time");
-        for (ConnectionPool pool : pools) {
-            Assertions.assertNull(SlowQueryReportJmx.jmxStateFor(pool),
+        for (int i = 0; i < names.length; i++) {
+            Assertions.assertFalse(server.isRegistered(onames[i]),
+                    "every close must release its own pool's MBean");
+            Assertions.assertNull(SlowQueryReportJmx.jmxStateFor(pools[i]),
                     "and every one of the closes must have given up its own pool's JMX state");
+            Assertions.assertNull(SlowQueryReport.getPoolStats(names[i]),
+                    "the statistics of every name must be freed with its pool's close");
         }
-        Assertions.assertNull(SlowQueryReport.getPoolStats(poolName),
-                "the statistics view of the name must be freed with the closes");
 
         // the name was really freed, not merely flagged: a pool restarted under
         // it must be able to publish, and must release the publication again
         // when it closes
-        DataSource restarted = reportingPoolNamed(poolName);
+        DataSource restarted = reportingPoolNamed(names[0]);
         try (@SuppressWarnings("unused") Connection borrowed = restarted.getConnection()) {
-            Assertions.assertTrue(server.isRegistered(oname),
+            Assertions.assertTrue(server.isRegistered(onames[0]),
                     "a pool started under the concurrently freed name must publish its MBean");
         }
         restarted.close();
-        Assertions.assertFalse(server.isRegistered(oname),
+        Assertions.assertFalse(server.isRegistered(onames[0]),
                 "closing the restarted pool must release the publication again");
     }
 
