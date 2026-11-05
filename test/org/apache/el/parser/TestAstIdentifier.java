@@ -19,6 +19,7 @@ package org.apache.el.parser;
 import java.util.HashMap;
 import java.util.Map;
 
+import jakarta.el.CompositeELResolver;
 import jakarta.el.ELClass;
 import jakarta.el.ELContext;
 import jakarta.el.ELException;
@@ -163,7 +164,7 @@ public class TestAstIdentifier {
     @Test(expected = PropertyNotWritableException.class)
     public void testImportSetValueClass() {
         // ELProcessor's resolvers would create a bean with this name so use a context without them
-        ELContext context = new ELContextImpl();
+        ELContext context = new ELContextImpl(new CompositeELResolver());
         ExpressionFactory factory = ExpressionFactory.newInstance();
         ValueExpression ve = factory.createValueExpression(context,
                 "${Integer}", Object.class);
@@ -174,7 +175,7 @@ public class TestAstIdentifier {
     @Test(expected = PropertyNotWritableException.class)
     public void testImportSetValueStaticField() {
         // ELProcessor's resolvers would create a bean with this name so use a context without them
-        ELContext context = new ELContextImpl();
+        ELContext context = new ELContextImpl(new CompositeELResolver());
         ExpressionFactory factory = ExpressionFactory.newInstance();
         context.getImportHandler().importStatic("java.lang.Integer.MAX_VALUE");
         ValueExpression ve = factory.createValueExpression(context,
@@ -196,7 +197,7 @@ public class TestAstIdentifier {
     @Test(expected = PropertyNotFoundException.class)
     public void testUnresolvedSetValue() {
         // ELProcessor's resolvers would create a bean with this name so use a context without them
-        ELContext context = new ELContextImpl();
+        ELContext context = new ELContextImpl(new CompositeELResolver());
         ExpressionFactory factory = ExpressionFactory.newInstance();
         ValueExpression ve = factory.createValueExpression(context,
                 "${unresolvedName}", Object.class);

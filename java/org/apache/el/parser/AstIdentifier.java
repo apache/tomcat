@@ -68,9 +68,9 @@ public final class AstIdentifier extends SimpleNode {
         if (imported instanceof ELClass) {
             // getValue() returns an ELClass for an imported class
             return ELClass.class;
-        } else if (imported instanceof Field field) {
+        } else if (imported instanceof Field) {
             // getValue() returns the value of a statically imported field
-            return field.getType();
+            return ((Field) imported).getType();
         }
 
         throw new PropertyNotFoundException(MessageFactory.get("error.resolver.unhandled.null", this.image));
@@ -123,9 +123,9 @@ public final class AstIdentifier extends SimpleNode {
         Object imported = resolveImport(ctx);
         if (imported instanceof ELClass) {
             return imported;
-        } else if (imported instanceof Field field) {
+        } else if (imported instanceof Field) {
             try {
-                return field.get(null);
+                return ((Field) imported).get(null);
             } catch (IllegalArgumentException | IllegalAccessException e) {
                 throw new ELException(e);
             }
