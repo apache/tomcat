@@ -798,9 +798,10 @@ public class PooledConnection implements PooledConnectionMBean {
         xaConnection = null;
         cpdsConnection = null;
         lastConnected = -1;
-        if (finalize) {
-            parent.finalize(this);
-        }
+        // The chain's teardown reset is delivered once, by the release that
+        // clears the handler after it has freed the pool slot - see
+        // ConnectionPool.release(). The disconnect event above is a separate
+        // notification and does not replace it.
     }
 
     /**
@@ -1602,6 +1603,14 @@ public class PooledConnection implements PooledConnectionMBean {
      */
     public JdbcInterceptor getHandler() {
         return handler;
+    }
+
+    /**
+     * Drops the cached interceptor chain after the release has delivered its teardown reset, without walking it a
+     * second time.
+     */
+    void clearHandler() {
+        this.handler = null;
     }
 
     /**

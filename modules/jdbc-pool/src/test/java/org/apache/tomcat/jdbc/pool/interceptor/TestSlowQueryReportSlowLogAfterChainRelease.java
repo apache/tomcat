@@ -94,9 +94,9 @@ class TestSlowQueryReportSlowLogAfterChainRelease extends JdbcPoolBaseTest {
 
     /*
      * Releases the statistics reference the way the pool's own chain
-     * release does - reset(null, null) on the interceptor link, the call
-     * PooledConnection.setHandler(null) walks the chain with - while the
-     * borrow, the session and the application's statement all stay live,
+     * release does - reset(null, null) on the interceptor link, which the
+     * teardown walk calls - while the borrow, the session and the
+     * application's statement all stay live,
      * and pins that the window really opened: the instance can no longer
      * resolve any statistics entry.
      */

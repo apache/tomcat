@@ -48,9 +48,9 @@ class TestUnwrapVsMidGuardSeal extends JdbcPoolBaseTest {
      * A pool whose borrow the abandoned-connection check claims on demand:
      * the timeout is one second and the tests push the borrow past it with
      * setTimestamp(0) rather than sleeping, so every run drives a real
-     * release - disconnect(true) and the setHandler(null) walk that resets
-     * every cached interceptor to (null, null) - without depending on a
-     * timer thread.
+     * release - disconnect(true) and the teardown walk that resets every
+     * cached interceptor to (null, null) - without depending on a timer
+     * thread.
      */
     private DataSource abandonedCheckPool() throws SQLException {
         DataSource ds = newDataSource();
