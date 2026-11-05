@@ -416,7 +416,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     }
 
     @Override
-    public void setValidator(Validator validator) {
+    public synchronized void setValidator(Validator validator) {
         this.validator = validator;
         if (validator != null) {
             this.validatorClassName = validator.getClass().getName();
@@ -894,7 +894,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
 
     @Override
-    public void setValidatorClassName(String className) {
+    public synchronized void setValidatorClassName(String className) {
         this.validatorClassName = className;
 
         validator = null;
@@ -1057,7 +1057,15 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                     } catch (ReflectiveOperationException | RuntimeException | Error x) {
                         Throwable cause = ExceptionUtils.unwrapInvocationTargetException(x);
                         ExceptionUtils.handleThrowable(cause);
-                        buf.append("<error: ").append(cause).append('>');
+                        try {
+                            buf.append("<error: ").append(cause).append('>');
+                        } catch (Throwable hostile) {
+                            // A Throwable whose own toString() throws must
+                            // cost only its own field, not every field after
+                            // it: fall back to its class name.
+                            ExceptionUtils.handleThrowable(hostile);
+                            buf.append("<error: ").append(cause.getClass().getName()).append('>');
+                        }
                     }
                     buf.append("; ");
                     break;

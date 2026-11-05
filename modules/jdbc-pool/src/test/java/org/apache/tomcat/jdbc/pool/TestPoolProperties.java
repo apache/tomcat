@@ -20,6 +20,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.Modifier;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
@@ -168,6 +169,33 @@ class TestPoolProperties {
                 "the dump must not call the configured data source object's toString()");
         Assertions.assertTrue(dump.contains("dataSource=" + dataSource.getClass().getName()),
                 "the dump must still identify the configured data source by class");
+    }
+
+    @Test
+    void aHostileThrowableToStringCostsOnlyItsOwnField() {
+        PoolProperties properties = new PoolProperties() {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public String getUrl() {
+                throw new RuntimeException() {
+                    private static final long serialVersionUID = 1L;
+
+                    @Override
+                    public String toString() {
+                        throw new IllegalStateException("hostile toString");
+                    }
+                };
+            }
+        };
+
+        String dump = properties.toString();
+
+        Assertions.assertTrue(dump.contains("url=<error: "),
+                "the failing field must be reported, was: " + dump);
+        Assertions.assertTrue(dump.contains("useStatementFacade="),
+                "a hostile toString() must not truncate the fields that follow it");
+        Assertions.assertTrue(dump.endsWith("]"), "the dump must stay bracket-balanced");
     }
 
     @Test
@@ -988,6 +1016,18 @@ class TestPoolProperties {
 
         Assertions.assertTrue(none.toString().contains("jdbcInterceptors=null"),
                 "a null string must print as null, was: " + none);
+    }
+
+    @Test
+    void validatorSettersPublishThePairUnderTheInstanceMonitor() throws Exception {
+        Assertions.assertTrue(Modifier.isSynchronized(PoolProperties.class
+                .getMethod("setValidator", Validator.class).getModifiers()),
+                "the validator and its class name are one configuration and must be"
+                        + " published together");
+        Assertions.assertTrue(Modifier.isSynchronized(PoolProperties.class
+                .getMethod("setValidatorClassName", String.class).getModifiers()),
+                "the validator and its class name are one configuration and must be"
+                        + " published together");
     }
 
     /** The implementation a configured validator must be rebuilt to. */
