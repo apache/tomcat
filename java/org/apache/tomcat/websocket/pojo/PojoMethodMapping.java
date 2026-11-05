@@ -223,14 +223,12 @@ public class PojoMethodMapping {
 
 
     private boolean isMethodOverride(Method method1, Method method2) {
-        // An overriding method may use a covariant return type so the return
-        // types do not have to be equal. They do need to be compatible. The
-        // methods may be passed in either order so both directions are
-        // checked.
-        Class<?> returnType1 = method1.getReturnType();
-        Class<?> returnType2 = method2.getReturnType();
+        // The return type is deliberately not compared. An overriding method may
+        // use a covariant return type and, within a single class hierarchy, two
+        // methods with the same name and parameter types are override
+        // equivalent since the compiler does not permit them to differ only in
+        // return type unless one overrides the other.
         return method1.getName().equals(method2.getName()) &&
-                (returnType1.isAssignableFrom(returnType2) || returnType2.isAssignableFrom(returnType1)) &&
                 Arrays.equals(method1.getParameterTypes(), method2.getParameterTypes());
     }
 
