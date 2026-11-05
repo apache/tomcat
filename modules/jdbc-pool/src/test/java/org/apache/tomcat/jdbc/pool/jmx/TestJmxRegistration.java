@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.management.InstanceAlreadyExistsException;
@@ -913,5 +914,58 @@ class TestJmxRegistration extends JdbcPoolBaseTest {
                 () -> ds.setJmxEnabled(false),
                 "a post-start write would otherwise be stored without creating or removing anything");
         Assertions.assertTrue(ds.isJmxEnabled(), "the refused write must not change the configuration");
+    }
+
+    @Test
+    void aRefusedUnregistrationIsRetriedOnALaterCall() throws Exception {
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        ObjectName name = uniqueName("retry-unregister");
+        RefusingUnregister.REFUSALS.set(1);
+        server.registerMBean(new RefusingUnregister(), name);
+        try {
+            Assertions.assertFalse(JmxUtil.unregisterJmx(name),
+                    "the first refusal must be reported to the caller");
+            Assertions.assertTrue(server.isRegistered(name),
+                    "precondition: the refused unregistration leaves the MBean registered");
+
+            Assertions.assertTrue(JmxUtil.unregisterJmx(name),
+                    "a later unregistration must retry the pending name");
+            Assertions.assertFalse(server.isRegistered(name),
+                    "the retried unregistration must take the MBean down");
+        } finally {
+            if (server.isRegistered(name)) {
+                server.unregisterMBean(name);
+            }
+        }
+    }
+
+    /** Standard MBean interface for {@link RefusingUnregister}. */
+    public interface RefusingUnregisterMBean {
+    }
+
+    /** MBean whose preDeregister refuses the first unregistration. */
+    public static class RefusingUnregister implements RefusingUnregisterMBean, MBeanRegistration {
+
+        static final AtomicInteger REFUSALS = new AtomicInteger();
+
+        @Override
+        public ObjectName preRegister(MBeanServer server, ObjectName name) {
+            return name;
+        }
+
+        @Override
+        public void postRegister(Boolean registrationDone) {
+        }
+
+        @Override
+        public void preDeregister() throws Exception {
+            if (REFUSALS.compareAndSet(1, 0)) {
+                throw new IllegalStateException("simulated unregistration refusal");
+            }
+        }
+
+        @Override
+        public void postDeregister() {
+        }
     }
 }
