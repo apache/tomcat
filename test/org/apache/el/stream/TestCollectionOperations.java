@@ -17,6 +17,7 @@
 package org.apache.el.stream;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -495,6 +496,130 @@ public class TestCollectionOperations {
         processor.getValue(
                 "beans.stream().max()",
                 Object.class);
+    }
+
+
+    private static boolean hasCause(Throwable t, Class<? extends Throwable> cause) {
+        while (t != null) {
+            if (cause.isInstance(t)) {
+                return true;
+            }
+            t = t.getCause();
+        }
+        return false;
+    }
+
+
+    @SuppressWarnings("unchecked")
+    private static Stream streamOf(Object... elements) {
+        return new Stream((java.util.Iterator<Object>) Arrays.asList(elements).iterator());
+    }
+
+
+    /*
+     * The following tests use the Stream directly so the exception is seen before any wrapping by the expression
+     * evaluation. The failure must be an ELException with the ClassCastException as the cause.
+     */
+    @Test
+    public void testMaxDirectNotMutuallyComparable() {
+        try {
+            streamOf(Integer.valueOf(1), "a").max();
+            Assert.fail("An ELException was expected");
+        } catch (ELException e) {
+            Assert.assertTrue("Unexpected cause: " + e.getCause(), e.getCause() instanceof ClassCastException);
+        }
+    }
+
+
+    @Test
+    public void testMinDirectNotMutuallyComparable() {
+        try {
+            streamOf("a", Integer.valueOf(1)).min();
+            Assert.fail("An ELException was expected");
+        } catch (ELException e) {
+            Assert.assertTrue("Unexpected cause: " + e.getCause(), e.getCause() instanceof ClassCastException);
+        }
+    }
+
+
+    @Test
+    public void testSortedDirectNotMutuallyComparable() {
+        Stream sorted = streamOf(Integer.valueOf(1), "a").sorted();
+        try {
+            sorted.toList();
+            Assert.fail("An ELException was expected");
+        } catch (ELException e) {
+            Assert.assertTrue("Unexpected cause: " + e.getCause(), e.getCause() instanceof ClassCastException);
+        }
+    }
+
+
+    @Test
+    public void testSortedDirectNotComparable() {
+        Stream sorted = streamOf(new Object(), new Object()).sorted();
+        try {
+            sorted.toList();
+            Assert.fail("An ELException was expected");
+        } catch (ELException e) {
+            Assert.assertTrue("Unexpected cause: " + e.getCause(), e.getCause() instanceof ClassCastException);
+        }
+    }
+
+
+    @Test
+    public void testMax05() {
+        // The elements are Comparable but not with each other. This must be reported as an ELException rather than
+        // as the ClassCastException from compareTo()
+        ELProcessor processor = new ELProcessor();
+
+        try {
+            processor.getValue("[1,'a'].stream().max()", Object.class);
+            Assert.fail("An ELException was expected");
+        } catch (ELException e) {
+            Assert.assertTrue("Unexpected cause: " + e, hasCause(e, ClassCastException.class));
+        }
+    }
+
+
+    @Test
+    public void testMin05() {
+        ELProcessor processor = new ELProcessor();
+
+        try {
+            processor.getValue("['a',1].stream().min()", Object.class);
+            Assert.fail("An ELException was expected");
+        } catch (ELException e) {
+            Assert.assertTrue("Unexpected cause: " + e, hasCause(e, ClassCastException.class));
+        }
+    }
+
+
+    @Test
+    public void testSorted03() {
+        // Elements that are Comparable but not with each other
+        ELProcessor processor = new ELProcessor();
+
+        try {
+            processor.getValue("[1,'a'].stream().sorted().toList()", Object.class);
+            Assert.fail("An ELException was expected");
+        } catch (ELException e) {
+            Assert.assertTrue("Unexpected cause: " + e, hasCause(e, ClassCastException.class));
+        }
+    }
+
+
+    @Test
+    public void testSorted04() {
+        // Elements that are not Comparable at all
+        ELProcessor processor = new ELProcessor();
+        processor.defineBean("beans", beans);
+
+        try {
+            processor.getValue("beans.stream().sorted().toList()", Object.class);
+            Assert.fail("An ELException was expected");
+        } catch (ELException e) {
+            Assert.assertTrue("Unexpected cause: " + e, hasCause(e, ClassCastException.class));
+        }
     }
 
 
