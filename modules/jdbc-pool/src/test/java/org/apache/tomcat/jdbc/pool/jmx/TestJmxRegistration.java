@@ -917,7 +917,7 @@ class TestJmxRegistration extends JdbcPoolBaseTest {
     }
 
     @Test
-    void aRefusedUnregistrationIsRetriedOnALaterCall() throws Exception {
+    void aRefusedUnregistrationSucceedsWhenTheCallerAsksAgain() throws Exception {
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
         ObjectName name = uniqueName("retry-unregister");
         RefusingUnregister.REFUSALS.set(1);
@@ -929,9 +929,35 @@ class TestJmxRegistration extends JdbcPoolBaseTest {
                     "precondition: the refused unregistration leaves the MBean registered");
 
             Assertions.assertTrue(JmxUtil.unregisterJmx(name),
-                    "a later unregistration must retry the pending name");
+                    "a later call for the same name must try again");
             Assertions.assertFalse(server.isRegistered(name),
-                    "the retried unregistration must take the MBean down");
+                    "the second call must take the MBean down");
+        } finally {
+            if (server.isRegistered(name)) {
+                server.unregisterMBean(name);
+            }
+        }
+    }
+
+    @Test
+    void aRefusedUnregistrationIsNotRetriedByAnUnrelatedCall() throws Exception {
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        ObjectName name = uniqueName("no-retry-unregister");
+        RefusingUnregister.REFUSALS.set(1);
+        server.registerMBean(new RefusingUnregister(), name);
+        try {
+            Assertions.assertFalse(JmxUtil.unregisterJmx(name),
+                    "precondition: the first refusal is reported");
+            Assertions.assertTrue(server.isRegistered(name),
+                    "precondition: the refused MBean stays registered");
+
+            // JMX is a best-effort management channel. A refusal is logged for
+            // the operator and is not remembered: a later retry by name could
+            // belong to a replacement MBean that took the name in the meantime.
+            Assertions.assertTrue(JmxUtil.unregisterJmx(null),
+                    "releasing nothing is still the requested end state");
+            Assertions.assertTrue(server.isRegistered(name),
+                    "an unrelated unregistration must not retry the refused name");
         } finally {
             if (server.isRegistered(name)) {
                 server.unregisterMBean(name);
