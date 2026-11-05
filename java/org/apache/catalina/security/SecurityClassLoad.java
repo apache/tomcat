@@ -167,7 +167,6 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage + "util.buf.UriUtil");
         // collections
         loader.loadClass(basePackage + "util.collections.CaseInsensitiveKeyMap");
-        loader.loadClass(basePackage + "util.collections.CaseInsensitiveKeyMap$EntryImpl");
         loader.loadClass(basePackage + "util.collections.CaseInsensitiveKeyMap$EntryIterator");
         loader.loadClass(basePackage + "util.collections.CaseInsensitiveKeyMap$EntrySet");
         loader.loadClass(basePackage + "util.collections.CaseInsensitiveKeyMap$Key");
