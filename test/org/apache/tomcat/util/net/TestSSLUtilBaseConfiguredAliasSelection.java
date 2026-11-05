@@ -163,8 +163,9 @@ public class TestSSLUtilBaseConfiguredAliasSelection extends SSLUtilBaseCertific
     /*
      * After the SunMSCAPI numbered-duplicate swap, the certificate served to clients is a numbered duplicate of the
      * configured alias. The TLS certificate reload listener (via SSLHostConfig.certificatesExpiringBefore()) must
-     * monitor that served certificate, not the certificate at the configured alias. Non-exportable keys route
-     * getKeyManagers() through the production ksUsed == ks path a real SunMSCAPI store uses. Scoped to JSSE: for
+     * monitor that served certificate, not the certificate at the configured alias. Keys with a null format and
+     * encoding route getKeyManagers() through the production ksUsed == ks path a real SunMSCAPI store uses. Scoped to
+     * JSSE: for
      * OpenSSL the served certificate is held in the native layer and resolved by a separate code path.
      */
     @Test
@@ -207,10 +208,10 @@ public class TestSSLUtilBaseConfiguredAliasSelection extends SSLUtilBaseCertific
 
     /*
      * For an OpenSSL connector the served certificate is loaded into the native layer, but the reload check must still
-     * report it. With exportable keys getKeyManagers() copies only the resolved key into an in-memory store, so
+     * report it. With keys that report PKCS#8 getKeyManagers() copies only the resolved key into an in-memory store, so
      * OpenSSLContext.getCertificateChain() finds nothing under the configured alias and already falls back to the served
-     * alias - no OpenSSL-specific change is needed. (Non-exportable SunMSCAPI keys cannot be loaded by OpenSSL at all,
-     * so this exportable case is the only one that runs.)
+     * alias - no OpenSSL-specific change is needed. (Real SunMSCAPI keys never report an encoding and cannot be loaded
+     * by OpenSSL at all, so this synthetic PKCS#8 case exercises the OpenSSL path.)
      */
     @Test
     public void testReloadResolvesServedCertificateWithOpenSSL() throws Exception {
@@ -229,8 +230,8 @@ public class TestSSLUtilBaseConfiguredAliasSelection extends SSLUtilBaseCertific
 
     /*
      * After the SunMSCAPI numbered-duplicate swap the served alias is the numbered duplicate, not the configured alias.
-     * This is the alias that logCertificate reports and the reload check resolves. Non-exportable keys route
-     * getKeyManagers() through the production ksUsed == ks path.
+     * This is the alias that logCertificate reports and the reload check resolves. Keys with a null format and
+     * encoding route getKeyManagers() through the production ksUsed == ks path.
      */
     @Test
     public void testServedAliasIsTheNumberedDuplicate() throws Exception {
@@ -241,8 +242,9 @@ public class TestSSLUtilBaseConfiguredAliasSelection extends SSLUtilBaseCertific
 
 
     /*
-     * A SunMSCAPI key that reports a null format but is still exportable keeps the original key store in use
-     * (ksUsed == ks) and wraps each key manager, like a real non-exportable key, while remaining loadable by OpenSSL.
+     * A synthetic key that reports a null format but still exposes its encoding keeps the original key store in use
+     * (ksUsed == ks) and wraps each key manager, like a real SunMSCAPI key, while remaining loadable by OpenSSL (which
+     * a real SunMSCAPI key is not).
      * In that wrapped path a lookup of the configured alias still resolves its own (clientAuth) chain, so the served
      * alias - not that lookup - must drive what OpenSSL installs.
      */
