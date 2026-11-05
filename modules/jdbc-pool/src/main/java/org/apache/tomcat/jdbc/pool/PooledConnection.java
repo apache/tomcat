@@ -123,8 +123,8 @@ public class PooledConnection implements PooledConnectionMBean {
     private volatile long lastConnected = -1;
     /**
      * Timestamp of the last completed successful validation, used to keep track of validation intervals. Seeded with
-     * the time this pooled connection was created, so on a pool that runs no validation it never moves and cannot be
-     * told apart from a real validation at that instant.
+     * the time this pooled connection was created, and reset to 0 when a new physical session is established: a
+     * validation that completed on the session just replaced says nothing about the new one.
      */
     private volatile long lastValidated = System.currentTimeMillis();
     /**
@@ -298,6 +298,11 @@ public class PooledConnection implements PooledConnectionMBean {
         }
         this.discarded = false;
         this.lastConnected = System.currentTimeMillis();
+        // The validation timestamp belongs to the session that was just given
+        // up: a new physical session must be due for its own validation, or a
+        // recently validated predecessor lets the configured testOnBorrow /
+        // testOnReturn policy skip the check on this one.
+        this.lastValidated = 0;
 
         // The physical session is up: this is the point at which the
         // connection can publish itself below the pool's MBean. Tying that to
@@ -661,7 +666,8 @@ public class PooledConnection implements PooledConnectionMBean {
         javax.sql.XAConnection servedXa = xaConnection;
         javax.sql.PooledConnection servedCpds = cpdsConnection;
         long servedLastConnected = lastConnected;
-        HashMap<Object,Object> sessionAttributes = getAttributes();
+        long servedLastValidated = lastValidated;
+        HashMap<Object, Object> sessionAttributes = getAttributes();
         boolean hadUser = sessionAttributes.containsKey(PROP_USER);
         Object servedUser = sessionAttributes.get(PROP_USER);
         boolean hadPassword = sessionAttributes.containsKey(PROP_PASSWORD);
@@ -716,6 +722,7 @@ public class PooledConnection implements PooledConnectionMBean {
                 xaConnection = servedXa;
                 cpdsConnection = servedCpds;
                 lastConnected = servedLastConnected;
+                lastValidated = servedLastValidated;
                 if (hadUser) {
                     sessionAttributes.put(PROP_USER, servedUser);
                 } else {
@@ -1474,12 +1481,19 @@ public class PooledConnection implements PooledConnectionMBean {
     }
 
     /**
+<<<<<<< HEAD
      * Returns the timestamp at which the last successful validation completed. Until a validation has completed for the
      * first time, this is the time this pooled connection was created - which on a pool with no validation configured
      * is the value the attribute keeps.
+=======
+     * Returns the timestamp at which the last successful validation completed on the current physical session. While
+     * the session has not been validated it reports 0, so a validation inherited from the session a reconnect replaced
+     * cannot be mistaken for one of this session. Before any session has been established, it reports the time this
+     * pooled connection was created.
+>>>>>>> 52871c512d (Reset validation on a new session and make PooledConnection logging safe)
      *
      * @return the timestamp at which the last successful validation completed as defined by
-     *             {@link System#currentTimeMillis()}
+     *             {@link System#currentTimeMillis()}, or 0 while the current session has not been validated
      */
     @Override
     public long getLastValidated() {
@@ -1615,16 +1629,25 @@ public class PooledConnection implements PooledConnectionMBean {
     }
 
     /**
+<<<<<<< HEAD
      * Returns a diagnostic rendering of this pooled connection: the driver's own {@link java.sql.Connection#toString()}
      * when a physical session is present, or {@code null}. The driver's text is not masked and may include the URL, the
      * user or other session details, so pool warnings that pass a pooled connection should treat it as best-effort
      * diagnostic output rather than as a credential-safe view.
+=======
+     * Returns a diagnostic rendering of this pooled connection that is safe to interpolate into a pool log message:
+     * the connection's identity and whether it currently holds a physical session, never the driver's own
+     * {@link Connection#toString()}. That text is unmasked and may carry the URL, the user or other session details,
+     * and it may contain newlines, so passing it into a pool warning could expose a credential or forge log lines. A
+     * caller that wants the driver's text for an explicit dump can read the physical connection itself.
+>>>>>>> 52871c512d (Reset validation on a new session and make PooledConnection logging safe)
      *
-     * @return the diagnostic rendering
+     * @return the credential-safe diagnostic rendering
      */
     @Override
     public String toString() {
-        return "PooledConnection[" + (connection != null ? connection.toString() : "null") + "]";
+        return "PooledConnection@" + Integer.toHexString(System.identityHashCode(this))
+                + (connection != null ? "[connected]" : "[null]");
     }
 
     /**
