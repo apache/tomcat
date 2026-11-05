@@ -65,10 +65,11 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  * The pool start callback only records the pool and its registration name; an idle pool is not published, so
  * monitoring begins with the first borrow.
  * They are published under the name the pool started with - see {@link ConnectionPool#getRegistrationName()} - which
- * identifies the pool, because a container names every pool it manages uniquely and the default name of a
- * programmatically built pool is unique as well. Renaming a running pool, which the pool's own JMX allows, moves
- * nothing: the MBean stays published under the name it was registered under and the pool keeps reporting through it.
- * The close of that pool gives both up.
+ * identifies the pool and must be unique among the live pools of a class loader: Tomcat gives every pool it manages a
+ * name of its own, and a programmatically built pool has a unique default name. A duplicate live name is reported as
+ * an error by the pool start, and only one of the pools can hold the ObjectName. Renaming a running pool, which the
+ * pool's own JMX allows, moves nothing: the MBean stays published under the name it was registered under and the pool
+ * keeps reporting through it. The close of that pool gives both up.
  * </p>
  * <p>
  * The published resource is a {@link Registration}, not an interceptor instance: it holds the name, the statistics
