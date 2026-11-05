@@ -1101,6 +1101,10 @@ public class ConnectionPool {
     /**
      * Validates and corrects pool configuration values. Ensures that maxActive, initialSize, minIdle, maxIdle, and
      * related values are consistent.
+     * <p>
+     * A running pool's writers must not call this alone: the correction can change the eviction interval the cleaner
+     * runs on, and a change made outside this object's monitor can interleave with another surface's write between
+     * the correction and the cleaner reconciliation. See {@link #applyConfigurationChange(PoolConfiguration)}.
      *
      * @param properties the pool configuration to validate and correct
      */
@@ -1145,6 +1149,24 @@ public class ConnectionPool {
             log.warn(MessageFactory.get("connectionPool.timeBetweenEvictionRunsTooLarge", properties.getMaxAge()));
             properties.setTimeBetweenEvictionRunsMillis((int) properties.getMaxAge());
         }
+    }
+
+    /**
+     * Validates a running pool's configuration and brings the pool cleaner in line with the result as one step under
+     * this pool's monitor.
+     * <p>
+     * The two halves belong together: the validation corrects values the caller did not write - the eviction interval
+     * among them - and the cleaner's period is fixed when its task is built, so validating without then looking the
+     * cleaner over leaves a task on the interval the correction replaced. Running them under one monitor is what makes
+     * the pair atomic against the other management surface: the data source holds its own monitor while it writes the
+     * shared configuration, and the pool's MBean holds none, so this object's monitor is the only thing both writers
+     * are certain to serialise on.
+     *
+     * @param properties the pool configuration to validate and reconcile the cleaner with
+     */
+    public synchronized void applyConfigurationChange(PoolConfiguration properties) {
+        checkPoolConfiguration(properties);
+        reconcilePoolCleaner(properties);
     }
 
     /**

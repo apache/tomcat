@@ -17,8 +17,12 @@
 package org.apache.tomcat.jdbc.pool;
 
 import java.sql.Connection;
+import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -88,6 +92,50 @@ class TestPoolSizeSetterValidation extends JdbcPoolBaseTest {
             for (int i = 1; i < frames.length - 1; i++) {
                 if ("checkPoolConfiguration".equals(frames[i].getMethodName())
                         && "pCreatePool".equals(frames[i + 1].getMethodName())) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    /*
+     * Reports whether two configuration checks run at the same time. getMaxAge()
+     * is called once by checkPoolConfiguration when maxAge is zero, so a barrier
+     * of two parked in that read is reached only if both writers are inside the
+     * check together; a serialised pair leaves the first one waiting alone.
+     */
+    private static final class OverlapDetectingProperties extends PoolProperties {
+
+        private static final long serialVersionUID = 1L;
+
+        volatile boolean armed;
+        final CyclicBarrier barrier = new CyclicBarrier(2);
+        final AtomicInteger inCheck = new AtomicInteger();
+        final AtomicInteger maxConcurrent = new AtomicInteger();
+
+        @Override
+        public long getMaxAge() {
+            if (armed && fromCheck()) {
+                int now = inCheck.incrementAndGet();
+                maxConcurrent.accumulateAndGet(now, Math::max);
+                try {
+                    barrier.await(500, TimeUnit.MILLISECONDS);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                } catch (BrokenBarrierException | TimeoutException e) {
+                    // The other writer did not reach the check: serialised
+                } finally {
+                    inCheck.decrementAndGet();
+                }
+            }
+            return super.getMaxAge();
+        }
+
+        private boolean fromCheck() {
+            StackTraceElement[] frames = new Throwable().getStackTrace();
+            for (StackTraceElement frame : frames) {
+                if ("checkPoolConfiguration".equals(frame.getMethodName())) {
                     return true;
                 }
             }
@@ -184,6 +232,66 @@ class TestPoolSizeSetterValidation extends JdbcPoolBaseTest {
         jmx.setMaxIdle(100);
         Assertions.assertEquals(4, ds.getPoolProperties().getMaxIdle(),
                 "precondition: and already bounds the idle count on the active limit");
+    }
+
+    /*
+     * The two management surfaces write the same configuration: the data source
+     * holds its own monitor, the MBean holds none, so a check that is not
+     * serialised with the other writer's check can decide from a state the other
+     * writer has already left. Both must reach the pool's monitor for the check
+     * and the cleaner reconciliation, or the repair of one writer is undone by
+     * the other's reading of an intermediate state.
+     */
+    @Test
+    void configurationChecksThroughBothSurfacesAreSerialised() throws Exception {
+        DataSource ds = new DataSource();
+        OverlapDetectingProperties properties = new OverlapDetectingProperties();
+        properties.setUrl(getUrl());
+        properties.setDriverClassName("org.h2.Driver");
+        properties.setUsername("sa");
+        properties.setPassword("");
+        properties.setJmxEnabled(true);
+        properties.setInitialSize(0);
+        properties.setMaxActive(4);
+        properties.setMinIdle(0);
+        properties.setMaxIdle(4);
+        ds.setPoolProperties(properties);
+        manage(ds);
+        ds.createPool();
+        org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = ds.getPool().getJmxPool();
+        Assertions.assertNotNull(jmx, "precondition: a pool created with JMX enabled exposes its MBean");
+
+        properties.armed = true;
+        CountDownLatch start = new CountDownLatch(1);
+        Thread dataSourceWriter = new Thread(() -> {
+            try {
+                start.await();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+            ds.setMaxActive(4);
+        }, "data-source-writer");
+        Thread mbeanWriter = new Thread(() -> {
+            try {
+                start.await();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+            jmx.setMaxIdle(5);
+        }, "mbean-writer");
+        dataSourceWriter.start();
+        mbeanWriter.start();
+        start.countDown();
+        dataSourceWriter.join(TimeUnit.SECONDS.toMillis(10));
+        mbeanWriter.join(TimeUnit.SECONDS.toMillis(10));
+        properties.armed = false;
+
+        Assertions.assertEquals(1, properties.maxConcurrent.get(),
+                "a configuration check on one management surface must not run inside the"
+                        + " check of the other: the validation and the cleaner reconciliation"
+                        + " are one step under the pool's monitor");
     }
 
     /*
