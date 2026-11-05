@@ -1650,10 +1650,10 @@ public class PooledConnection implements PooledConnectionMBean {
      * Creates and registers an MBean for this pooled connection with JMX. The pool's own MBean is the registration
      * base; once close() has given it up - which a borrow can race - there is no base to register under, and the
      * registration is skipped. It is skipped as well for a connection that is already registered - the pool reaches a
-     * live connection from the connect path, from the first-borrow path and from the sweep it runs when its own MBean
-     * is published - and for a released one, which would leave a registration of a dead connection behind with nothing
-     * left to unregister it. The check and the publish are one synchronized step because those paths can meet on the
-     * same connection and must never publish it twice: only one of the registrations would ever be unregistered. The
+     * live connection from the connect path and from the sweep it runs when its own MBean is published - and for a
+     * released one, which would leave a registration of a dead connection behind with nothing left to unregister it.
+     * The check and the publish are one synchronized step because those paths can meet on the same connection and must
+     * never publish it twice: only one of the registrations would ever be unregistered. The
      * release of a connection settles its unregistration and its released flag under this same monitor (see
      * {@link #release()}), so whichever of the two passes first settles the outcome: a registration after a release
      * sees the released flag and publishes nothing, and a release after a registration finds the name and takes it

@@ -447,44 +447,13 @@ public class ConnectionPool {
         // Fetch previously cached interceptor proxy - one per connection
         JdbcInterceptor handler = con.getHandler();
         if (handler == null) {
-            // The registration reads the pool's own JMX object itself and does
-            // nothing once close() has given it up; it is not gated on jmxPool
-            // here because checking the field and then calling into the
-            // connection would let close() take it away between the two, and
-            // the resulting failure must not strand the connection - it is
-            // already in busy, so a throw that skips abandonSetup() costs a
-            // physical connection and a maxActive slot until the pool restarts.
-            // A connection that connected while the pool's MBean was already
-            // published registered itself as part of connect() and is a no-op
-            // here; this call is the retry for one that could not - because the
-            // pool's MBean was published only after it connected, or because the
-            // server refused the name, and a refused publish must be retried
-            // once the obstacle is gone rather than count as a registration.
-            try {
-                // Under the connection's own lock, as every connection MBean
-                // registration is (see registerConnectionMBeans). The check
-                // and the publish inside run as one synchronized step, and
-                // the release of the same connection unregisters under that
-                // same monitor - the only lock every configuration shares,
-                // the connection lock being a deliberate no-op unless the
-                // sweeper or useLock is on - so a registration can never slip
-                // in beside a release that had already found no name to take
-                // back and leave an MBean of a dead connection, and the class
-                // loader it pins, registered for the life of the JVM.
-                con.lock();
-                try {
-                    con.createMBean();
-                } finally {
-                    con.unlock();
-                }
-            } catch (Throwable x) {
-                ExceptionUtils.handleThrowable(x);
-                SQLException sx = new SQLException(MessageFactory.get("connectionPool.unableToRegisterMBean"));
-                sx.initCause(x);
-                // Nothing has been done to the connection, it can go back to the pool
-                abandonSetup(con, sx, false);
-                throw sx;
-            }
+            // A connection registers its MBean when its physical session is
+            // established, and the pool sweeps the connections it already
+            // holds when its own MBean is published. JMX is best effort, so a
+            // registration that neither path made is not retried on the borrow:
+            // a borrow has no business failing, or doing extra work, because a
+            // management channel is unavailable.
+            //
             // Build the proxy handler
             handler = new ProxyConnection(this, con, getPoolProperties().isUseEquals());
             // Set up the interceptor chain
@@ -2697,8 +2666,9 @@ public class ConnectionPool {
         // The fair queue iterates a snapshot taken under its lock, the default
         // queue a view that tolerates concurrent modification: either way, a
         // connection that is concurrently taken out of or added to the queue
-        // may or may not be seen, and both answers are correct - the one this
-        // pass misses registers itself on the borrow that hands it out.
+        // may or may not be seen. JMX is best effort, so a connection this pass
+        // misses stays unregistered until it reconnects; it does not fail or
+        // delay a borrow.
         for (PooledConnection con : pool) {
             try {
                 // Under the connection's own lock, as every operation acting
