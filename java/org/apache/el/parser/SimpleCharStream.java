@@ -3,8 +3,8 @@
 package org.apache.el.parser;
 
 /**
- * A simple character stream implementation used by the EL parser. The stream is char[]-based and fully supports
- * 16-bit characters.
+ * A simple character stream implementation used by the EL parser. The stream is char[]-based and fully supports 16-bit
+ * characters.
  */
 
 @SuppressWarnings("all") // Ignore warnings in generated code
@@ -58,10 +58,13 @@ public class SimpleCharStream {
 
 
     protected void ExpandBuff(boolean wrapAround) {
-        // Grow the buffer geometrically. Growing by a fixed amount, as was
-        // done previously, makes the total cost of reading a single token
-        // that is larger than the initial buffer quadratic, since the entire
-        // contents of the buffer are copied on every expansion.
+        /*
+         * Grow the buffer geometrically. Growing by a fixed amount, as was done previously, makes the total cost of
+         * reading a single token that is larger than the initial buffer quadratic, since the entire contents of the
+         * buffer are copied on every expansion.
+         *
+         * Restore this fix after code regeneration.
+         */
         int newbufsize = (int) Math.min((long) bufsize * 2, Integer.MAX_VALUE);
 
         char[] newbuffer = new char[newbufsize];
