@@ -69,9 +69,12 @@ public class Constants {
     public static final String SSL_PROTO_SSLv2Hello = "SSLv2Hello";
 
     /**
-     * EKU OIDs.
+     * Server authentication EKU OID.
      */
     public static final String SERVER_AUTH_EXTENDED_KEY_USAGE_OID = "1.3.6.1.5.5.7.3.1";
+    /**
+     * Any extended key usage OID.
+     */
     public static final String ANY_EXTENDED_KEY_USAGE_OID = "2.5.29.37.0";
 
     /**
@@ -80,10 +83,16 @@ public class Constants {
     public static final String SUNMSCAPI_PROVIDER_NAME = "SunMSCAPI";
 
     /**
-     * Windows-MY key store types.
+     * Windows-MY key store type.
      */
     public static final String WINDOWS_MY_KEYSTORE_TYPE = "WINDOWS-MY";
+    /**
+     * Windows-MY key store type for the current user.
+     */
     public static final String WINDOWS_MY_CURRENTUSER_KEYSTORE_TYPE = "WINDOWS-MY-CURRENTUSER";
+    /**
+     * Windows-MY key store type for the local machine.
+     */
     public static final String WINDOWS_MY_LOCALMACHINE_KEYSTORE_TYPE = "WINDOWS-MY-LOCALMACHINE";
 
     /**
