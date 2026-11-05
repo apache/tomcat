@@ -1110,7 +1110,8 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
      *             position does not allow a stable unique name to be generated
      */
     protected String generatePoolName(ContextResource resource) {
-        if (container instanceof Context ctx) {
+        if (container instanceof Context) {
+            Context ctx = (Context) container;
             Container host = ctx.getParent();
             if (!(host instanceof Host)) {
                 // Without a Host above it, this context's position is not
