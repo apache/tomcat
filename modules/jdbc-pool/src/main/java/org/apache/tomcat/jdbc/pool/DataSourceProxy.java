@@ -1140,9 +1140,15 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
 
+    /**
+     * Returns the connection properties with any credential they carry masked out, so the data source's own bean/JMX
+     * surface does not expose a password in cleartext. The write is not masked: {@link #setConnectionProperties(String)}
+     * takes the string as it is meant to reach the driver. Use {@link #getPoolProperties()} for the raw value.
+     * {@inheritDoc}
+     */
     @Override
     public String getConnectionProperties() {
-        return getPoolProperties().getConnectionProperties();
+        return PoolProperties.maskCredentials(getPoolProperties().getConnectionProperties());
     }
 
 
@@ -1195,9 +1201,14 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
 
+    /**
+     * Returns the interceptor configuration with any credential its definitions carry masked out, so the data source's
+     * own bean/JMX surface does not expose a password in cleartext. Use {@link #getPoolProperties()} for the raw value.
+     * {@inheritDoc}
+     */
     @Override
     public String getJdbcInterceptors() {
-        return getPoolProperties().getJdbcInterceptors();
+        return PoolProperties.maskInterceptorCredentials(getPoolProperties().getJdbcInterceptors());
     }
 
 
@@ -1269,9 +1280,14 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
 
+    /**
+     * Returns the JDBC URL with any credential it carries masked out, so the data source's own bean/JMX surface does
+     * not expose a password in cleartext. The write is not masked: {@link #setUrl(String)} takes the URL as it is meant
+     * to reach the driver. Use {@link #getPoolProperties()} for the raw value. {@inheritDoc}
+     */
     @Override
     public String getUrl() {
-        return getPoolProperties().getUrl();
+        return PoolProperties.maskCredentials(getPoolProperties().getUrl());
     }
 
 
