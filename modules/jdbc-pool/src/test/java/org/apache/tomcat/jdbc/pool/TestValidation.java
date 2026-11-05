@@ -62,6 +62,35 @@ class TestValidation extends JdbcPoolBaseTest {
     }
 
     @Test
+    void aReconnectedSessionIsDueForItsOwnValidation() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setTestOnBorrow(true);
+        ds.getPoolProperties().setValidationInterval(60000);
+        ds.getPoolProperties().setInitialSize(0);
+        CountingValidator validator = new CountingValidator();
+        ds.getPoolProperties().setValidator(validator);
+        ds.createPool();
+
+        try (Connection pooled = ds.getConnection()) {
+            PooledConnection pc = pooled.unwrap(PooledConnection.class);
+            pc.setLastValidated(System.currentTimeMillis());
+            int before = validator.actions.size();
+            Assertions.assertTrue(pc.validate(PooledConnection.VALIDATE_BORROW, null),
+                    "precondition: a recent validation must gate the check");
+            Assertions.assertEquals(before, validator.actions.size(),
+                    "precondition: the validation interval must skip the check");
+
+            pc.reconnect();
+
+            Assertions.assertTrue(pc.validate(PooledConnection.VALIDATE_BORROW, null),
+                    "the new physical session must be validated");
+            Assertions.assertTrue(validator.actions.size() > before,
+                    "a validation recorded on the replaced session must not be inherited by"
+                            + " the session the reconnect established");
+        }
+    }
+
+    @Test
     void aFailingValidationQueryFailsTheBorrowAndLeaksNothing() throws Exception {
         DataSource ds = validatingDataSource(BROKEN_SQL);
         ds.getPoolProperties().setTestOnBorrow(true);
@@ -291,16 +320,18 @@ class TestValidation extends JdbcPoolBaseTest {
                 c.createStatement().execute("SELECT 1");
             }
         }
-        // The interval is measured from the last successful validation,
-        // which for a fresh physical connection is its creation.
-        Assertions.assertEquals(0, validator.actions.size(),
-                "within the validation interval no borrow may validate");
+        // A new physical session is due for its first validation; the
+        // interval is measured from that successful check, so the two
+        // borrows that follow are suppressed.
+        Assertions.assertEquals(1, validator.actions.size(),
+                "the first borrow of a new session must validate, and the interval must"
+                        + " suppress the repeated checks that follow");
 
         ds.getPoolProperties().setValidationInterval(0);
         try (Connection c = ds.getConnection()) {
             c.createStatement().execute("SELECT 1");
         }
-        Assertions.assertEquals(1, validator.actions.size(),
+        Assertions.assertEquals(2, validator.actions.size(),
                 "with the interval switched off the borrow must validate");
     }
 
