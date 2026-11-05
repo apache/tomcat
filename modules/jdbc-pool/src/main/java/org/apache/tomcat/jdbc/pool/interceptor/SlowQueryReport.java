@@ -542,6 +542,12 @@ public class SlowQueryReport extends AbstractQueryReport {
             sql = "";
         }
         ConcurrentHashMap<String, QueryStats> queries = SlowQueryReport.this.queries;
+        PoolStatistics own = SlowQueryReport.this.poolStatistics;
+        if (own != null && own.isReleased()) {
+            // The pool closed while this session was still borrowed, so the
+            // store is no longer observable: do not book into it.
+            queries = null;
+        }
         if (queries == null) {
             if (reportClosedOrAbandoned() && log.isWarnEnabled()) {
                 log.warn(MessageFactory.get("slowQueryReport.connectionClosedOrAbandoned"));
