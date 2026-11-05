@@ -69,7 +69,9 @@ public class UpgradeUtil {
      * Checks to see if this is an HTTP request that includes a valid upgrade request to web socket.
      * <p>
      * Note: RFC 2616 does not limit HTTP upgrade to GET requests but the Java WebSocket spec 1.0, section 8.2 implies
-     * such a limitation and RFC 6455 section 4.1 requires that a WebSocket Upgrade uses GET.
+     * such a limitation and RFC 6455 section 4.1 requires that a WebSocket Upgrade uses GET. RFC 6455 section 4.2.1
+     * requires HTTP/1.1 or later and RFC 9110 section 7.8 requires an Upgrade header field in an HTTP/1.0 request to be
+     * ignored.
      *
      * @param request  The request to check if it is an HTTP upgrade request for a WebSocket connection
      * @param response The response associated with the request
@@ -82,7 +84,8 @@ public class UpgradeUtil {
         return ((request instanceof HttpServletRequest) && (response instanceof HttpServletResponse) &&
                 headerContainsToken((HttpServletRequest) request, Constants.UPGRADE_HEADER_NAME,
                         Constants.UPGRADE_HEADER_VALUE) &&
-                Method.GET.equals(((HttpServletRequest) request).getMethod()));
+                Method.GET.equals(((HttpServletRequest) request).getMethod()) &&
+                "HTTP/1.1".equals(request.getProtocol()));
     }
 
 
@@ -104,11 +107,22 @@ public class UpgradeUtil {
         // validation fails
         String key;
         String subProtocol;
+        if (!"HTTP/1.1".equals(req.getProtocol())) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
         if (!headerContainsToken(req, Constants.CONNECTION_HEADER_NAME, Constants.CONNECTION_HEADER_VALUE)) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        if (!headerContainsToken(req, Constants.WS_VERSION_HEADER_NAME, Constants.WS_VERSION_HEADER_VALUE)) {
+        // RFC 6455, sections 11.3.1 and 11.3.5: these header fields must not appear more than once in a request
+        if (countHeaders(req, Constants.WS_VERSION_HEADER_NAME) > 1 ||
+                countHeaders(req, Constants.WS_KEY_HEADER_NAME) > 1) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+        String version = req.getHeader(Constants.WS_VERSION_HEADER_NAME);
+        if (version == null || !Constants.WS_VERSION_HEADER_VALUE.equals(version.trim())) {
             resp.setStatus(HttpServletResponse.SC_UPGRADE_REQUIRED);
             resp.setHeader(Constants.WS_VERSION_HEADER_NAME, Constants.WS_VERSION_HEADER_VALUE);
             return;
@@ -320,6 +334,11 @@ public class UpgradeUtil {
                 sb.append(p.getValue());
             }
         }
+    }
+
+
+    private static int countHeaders(HttpServletRequest req, String headerName) {
+        return Collections.list(req.getHeaders(headerName)).size();
     }
 
 

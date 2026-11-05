@@ -17,7 +17,9 @@
 package org.apache.el.parser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import jakarta.el.ELClass;
 import jakarta.el.ELContext;
@@ -27,12 +29,15 @@ import jakarta.el.ELProcessor;
 import jakarta.el.ELResolver;
 import jakarta.el.ExpressionFactory;
 import jakarta.el.PropertyNotFoundException;
+import jakarta.el.PropertyNotWritableException;
 import jakarta.el.ValueExpression;
 
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
 
+import org.apache.el.lang.EvaluationContext;
+import org.apache.el.lang.ExpressionBuilder;
 import org.apache.jasper.el.ELContextImpl;
 
 public class TestAstIdentifier {
@@ -176,6 +181,115 @@ public class TestAstIdentifier {
                 "${Integer}", Object.class);
         Assert.assertEquals("resolved", ve.getValue(context));
         Assert.assertEquals(String.class, ve.getType(context));
+    }
+
+
+    @Test
+    public void testImportIsReadOnlyClass() {
+        // An imported class can not be set so it must be reported as read-only, just as getValue() and getType()
+        // resolve it
+        ELProcessor processor = new ELProcessor();
+        ELContext context = processor.getELManager().getELContext();
+        ValueExpression ve = processor.getELManager().getExpressionFactory().createValueExpression(context,
+                "${Integer}", Object.class);
+        Assert.assertTrue(ve.isReadOnly(context));
+    }
+
+
+    @Test
+    public void testImportIsReadOnlyStaticField() {
+        ELProcessor processor = new ELProcessor();
+        processor.getELManager().getELContext().getImportHandler().importStatic("java.lang.Integer.MAX_VALUE");
+        ELContext context = processor.getELManager().getELContext();
+        ValueExpression ve = processor.getELManager().getExpressionFactory().createValueExpression(context,
+                "${MAX_VALUE}", Object.class);
+        Assert.assertTrue(ve.isReadOnly(context));
+    }
+
+
+    @Test(expected = PropertyNotWritableException.class)
+    public void testImportSetValueClass() {
+        // ELProcessor's resolvers would create a bean with this name so use a context without them
+        ELContext context = new ELContextImpl();
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ValueExpression ve = factory.createValueExpression(context,
+                "${Integer}", Object.class);
+        ve.setValue(context, "x");
+    }
+
+
+    @Test(expected = PropertyNotWritableException.class)
+    public void testImportSetValueStaticField() {
+        // ELProcessor's resolvers would create a bean with this name so use a context without them
+        ELContext context = new ELContextImpl();
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        context.getImportHandler().importStatic("java.lang.Integer.MAX_VALUE");
+        ValueExpression ve = factory.createValueExpression(context,
+                "${MAX_VALUE}", Object.class);
+        ve.setValue(context, Integer.valueOf(1));
+    }
+
+
+    @Test(expected = PropertyNotFoundException.class)
+    public void testUnresolvedIsReadOnly() {
+        ELProcessor processor = new ELProcessor();
+        ELContext context = processor.getELManager().getELContext();
+        ValueExpression ve = processor.getELManager().getExpressionFactory().createValueExpression(context,
+                "${unresolvedName}", Object.class);
+        ve.isReadOnly(context);
+    }
+
+
+    @Test(expected = PropertyNotFoundException.class)
+    public void testUnresolvedSetValue() {
+        // ELProcessor's resolvers would create a bean with this name so use a context without them
+        ELContext context = new ELContextImpl();
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ValueExpression ve = factory.createValueExpression(context,
+                "${unresolvedName}", Object.class);
+        ve.setValue(context, "x");
+    }
+
+
+    @Test
+    public void testLambdaArgumentGetType() {
+        // A lambda argument takes precedence over an imported class of the same name for getType(), just as it does
+        // for getValue()
+        ELProcessor processor = new ELProcessor();
+        ELContext context = processor.getELManager().getELContext();
+        EvaluationContext ctx = new EvaluationContext(context, null, null);
+        Node node = ExpressionBuilder.createNode("${Integer}");
+
+        Map<String,Object> arguments = new HashMap<>();
+        arguments.put("Integer", "text");
+        ctx.enterLambdaScope(arguments);
+        try {
+            Assert.assertEquals("text", node.getValue(ctx));
+            Assert.assertEquals(String.class, node.getType(ctx));
+        } finally {
+            ctx.exitLambdaScope();
+        }
+        // Outside the lambda the import applies
+        Assert.assertEquals(ELClass.class, node.getType(ctx));
+    }
+
+
+    @Test
+    public void testLambdaArgumentGetTypeNull() {
+        ELProcessor processor = new ELProcessor();
+        ELContext context = processor.getELManager().getELContext();
+        EvaluationContext ctx = new EvaluationContext(context, null, null);
+        Node node = ExpressionBuilder.createNode("${Integer}");
+
+        Map<String,Object> arguments = new HashMap<>();
+        arguments.put("Integer", null);
+        ctx.enterLambdaScope(arguments);
+        try {
+            Assert.assertNull(node.getValue(ctx));
+            Assert.assertNull(node.getType(ctx));
+        } finally {
+            ctx.exitLambdaScope();
+        }
     }
 
 
