@@ -113,8 +113,8 @@ public class ConnectionPool {
     private PoolConfiguration poolProperties;
 
     /**
-     * Contains all the connections that are in use TODO - this shouldn't be a blocking queue, simply a list to hold our
-     * objects
+     * Contains all the connections that are in use. Unbounded: membership is bounded by the maxActive/size
+     * bookkeeping, not by the queue capacity.
      */
     private BlockingQueue<PooledConnection> busy;
 
@@ -1634,7 +1634,7 @@ public class ConnectionPool {
     /**
      * Creates a JDBC connection and tries to connect to the database.
      *
-     * @param notUsed  Argument not used
+     * @param notUsed  Not used; retained for API compatibility
      * @param username The user name to use for the connection
      * @param password The password for the connection
      *
@@ -1661,7 +1661,6 @@ public class ConnectionPool {
         }
         boolean error = false;
         try {
-            // Connect and validate the connection
             con.lock();
             con.connect();
             if (isClosed()) {
@@ -1719,7 +1718,6 @@ public class ConnectionPool {
                 throw ex;
             }
         } finally {
-            // con can never be null here
             if (error) {
                 release(con);
             }
