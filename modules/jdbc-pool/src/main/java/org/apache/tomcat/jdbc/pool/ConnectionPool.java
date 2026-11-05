@@ -477,7 +477,8 @@ public class ConnectionPool {
                 } finally {
                     con.unlock();
                 }
-            } catch (Exception x) {
+            } catch (Throwable x) {
+                ExceptionUtils.handleThrowable(x);
                 SQLException sx = new SQLException(MessageFactory.get("connectionPool.unableToRegisterMBean"));
                 sx.initCause(x);
                 // Nothing has been done to the connection, it can go back to the pool
@@ -502,7 +503,8 @@ public class ConnectionPool {
                     interceptor.setNext(handler);
                     // Configure the last one to be held by the connection
                     handler = interceptor;
-                } catch (Exception x) {
+                } catch (Throwable x) {
+                    ExceptionUtils.handleThrowable(x);
                     SQLException sx = new SQLException(MessageFactory.get("connectionPool.unableToInstantiateInterceptorChain"));
                     sx.initCause(x);
                     // Nothing has been done to the connection, it can go back to the pool
@@ -528,7 +530,8 @@ public class ConnectionPool {
                 next.reset(this, con);
                 next = next.getNext();
             }
-        } catch (Exception x) {
+        } catch (Throwable x) {
+            ExceptionUtils.handleThrowable(x);
             SQLException sx = new SQLException(MessageFactory.get("connectionPool.unableToResetInterceptor",
                     (next != null ? next.getClass().getName() : "unknown")));
             sx.initCause(x);
@@ -585,7 +588,8 @@ public class ConnectionPool {
             invokeRequestHint(BEGIN_REQUEST, con.getConnection());
             // Return the connection
             return connection;
-        } catch (Exception x) {
+        } catch (Throwable x) {
+            ExceptionUtils.handleThrowable(x);
             SQLException s = new SQLException();
             s.initCause(x);
             // The reset walk above has already armed every interceptor of the chain for this borrow, and from here
@@ -830,7 +834,8 @@ public class ConnectionPool {
             JdbcInterceptor interceptor = definition.getInterceptorClass().getConstructor().newInstance();
             interceptor.setProperties(definition.getProperties());
             interceptor.poolClosed(this);
-        } catch (Exception x) {
+        } catch (Throwable x) {
+            ExceptionUtils.handleThrowable(x);
             if (log.isDebugEnabled()) {
                 log.debug("Unable to inform interceptor of pool closure.", x);
             }
@@ -974,7 +979,8 @@ public class ConnectionPool {
                 initialPool[i] = this.borrowConnection(0, null, null); // Don't wait, should be no contention
             }
 
-        } catch (SQLException x) {
+        } catch (Throwable x) {
+            ExceptionUtils.handleThrowable(x);
             log.error(MessageFactory.get("connectionPool.unableToCreateInitialConnections"), x);
             if (!poolProperties.isIgnoreExceptionOnPreLoad()) {
                 org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = jmxPool;
@@ -982,7 +988,12 @@ public class ConnectionPool {
                     jmx.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.NOTIFY_INIT, getStackTrace(x));
                 }
                 close(true);
-                throw x;
+                if (x instanceof SQLException) {
+                    throw (SQLException) x;
+                }
+                SQLException ex = new SQLException(x.getMessage());
+                ex.initCause(x);
+                throw ex;
             }
         } finally {
             // Return the members as idle to the pool. These hand-backs are
@@ -1676,7 +1687,13 @@ public class ConnectionPool {
                 // and clean up
                 throw new SQLException(MessageFactory.get("connectionPool.validationQueryFailed"));
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
+            // A non-fatal Error from a driver or wrapper (typically a
+            // LinkageError from a stopped web application) is an ordinary
+            // failed creation here. Guarding only Exception would skip the
+            // error flag and the finally block's release, stranding the
+            // connection and the maxActive slot it already owns.
+            ExceptionUtils.handleThrowable(e);
             error = true;
             if (log.isDebugEnabled()) {
                 log.debug("Unable to create a new JDBC connection.", e);

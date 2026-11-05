@@ -70,11 +70,13 @@ class TestThrowingDriverOnClaimedPaths extends JdbcPoolBaseTest {
      */
     private static final AtomicReference<String> THROW_FROM = new AtomicReference<>();
     private static final AtomicBoolean FAIL_NEXT_CONNECT = new AtomicBoolean();
+    private static final AtomicBoolean FAIL_NEXT_RESET = new AtomicBoolean();
     private static final AtomicInteger CONNECTS = new AtomicInteger();
 
     private static void resetDriver() {
         THROW_FROM.set(null);
         FAIL_NEXT_CONNECT.set(false);
+        FAIL_NEXT_RESET.set(false);
         CONNECTS.set(0);
     }
 
@@ -194,6 +196,120 @@ class TestThrowingDriverOnClaimedPaths extends JdbcPoolBaseTest {
         }
 
         assertNothingStranded(ds);
+    }
+
+    @Test
+    void anErrorFromTheDriverOnThePhysicalCloseDoesNotLoseTheSlot() throws Exception {
+        resetDriver();
+        DataSource ds = oneSlotPool();
+        // No idle retention: the return destroys the connection, so the
+        // driver's close runs on the release path.
+        ds.getPoolProperties().setMaxIdle(0);
+
+        Connection first = ds.getConnection();
+        awaitSessions(1);
+        THROW_FROM.set("close");
+        try {
+            // The driver's Error from the physical close must not escape the
+            // return and leave the destroyed connection counted in the pool.
+            Assertions.assertDoesNotThrow(first::close);
+        } finally {
+            THROW_FROM.set(null);
+        }
+
+        assertNothingStranded(ds);
+    }
+
+    @Test
+    void anErrorFromTheDriverOnInitialCreationFailsTheBorrowAndKeepsTheSlot() throws Exception {
+        resetDriver();
+        DataSource ds = oneSlotPool();
+
+        FAIL_NEXT_CONNECT.set(true);
+        try {
+            // The first borrow takes a maxActive slot before the driver is
+            // called. The Error from connect() must fail the borrow as a
+            // checked exception and give the slot back.
+            Assertions.assertThrows(SQLException.class, ds::getConnection);
+        } finally {
+            FAIL_NEXT_CONNECT.set(false);
+        }
+
+        Assertions.assertEquals(1, CONNECTS.get(),
+                "the borrow must have reached the driver's connect()");
+        assertNothingStranded(ds);
+    }
+
+    @Test
+    void anErrorFromTheDriverDuringTheInitialPreloadFailsPoolCreation() throws Exception {
+        resetDriver();
+        DataSource ds = newDataSource();
+        ds.setDriverClassName(ThrowingDriver.class.getName());
+        ds.getPoolProperties().setInitialSize(1);
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(0);
+        ds.getPoolProperties().setMaxWait(15000);
+
+        FAIL_NEXT_CONNECT.set(true);
+        try {
+            Assertions.assertThrows(SQLException.class, ds::createPool);
+        } finally {
+            FAIL_NEXT_CONNECT.set(false);
+        }
+
+        awaitSessions(0);
+    }
+
+    @Test
+    void anErrorFromAnInterceptorDuringSetupDoesNotStrandTheConnection() throws Exception {
+        resetDriver();
+        DataSource ds = newDataSource();
+        ds.setDriverClassName(ThrowingDriver.class.getName());
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(0);
+        ds.getPoolProperties().setMaxWait(15000);
+        ds.getPoolProperties().setJdbcInterceptors(ErrorOnResetInterceptor.class.getName());
+        ds.createPool();
+
+        FAIL_NEXT_RESET.set(true);
+        try {
+            // setupConnection() has already claimed the connection into
+            // busy. The Error from the interceptor reset must be reported
+            // as a failed borrow and the connection taken out of service.
+            Assertions.assertThrows(SQLException.class, ds::getConnection);
+        } finally {
+            FAIL_NEXT_RESET.set(false);
+        }
+
+        Assertions.assertEquals(0, ds.getPool().getIdle());
+        Assertions.assertEquals(0, ds.getPool().getActive());
+        Assertions.assertEquals(0, ds.getPool().getSize());
+        awaitSessions(0);
+        try (Connection again = ds.getConnection()) {
+            Assertions.assertNotNull(again);
+        }
+        ds.close();
+        awaitSessions(0);
+    }
+
+    /**
+     * Interceptor failing the borrow-time reset once with an Error. Must be
+     * public with a no-argument constructor because it is instantiated by
+     * class name from {@code jdbcInterceptors}.
+     */
+    public static class ErrorOnResetInterceptor extends JdbcInterceptor {
+
+        public ErrorOnResetInterceptor() {
+        }
+
+        @Override
+        public void reset(ConnectionPool parent, PooledConnection con) {
+            if (parent != null && FAIL_NEXT_RESET.compareAndSet(true, false)) {
+                throw new NoClassDefFoundError(
+                        "the context that loaded this interceptor has stopped");
+            }
+        }
     }
 
     /**
