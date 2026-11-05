@@ -23,6 +23,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -231,149 +232,50 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
             // property bag below knows the bean has its own opinion about
             // this property.
             boolean typedSetterMatched = false;
-            for (int i = 0; i < methods.length; i++) {
-                boolean ok = true;
-                if (setter.equals(methods[i].getName()) && methods[i].getParameterTypes().length == 1) {
-
-                    // Match - find the type and invoke it
+            List<Method> typedSetters = new ArrayList<>();
+            for (Method method : methods) {
+                if (setter.equals(method.getName()) && method.getParameterTypes().length == 1) {
                     typedSetterMatched = true;
-                    Class<?> paramType = methods[i].getParameterTypes()[0];
-                    Object[] params = new Object[1];
-
-                    // Try a setFoo ( int )
-                    if ("java.lang.Integer".equals(paramType.getName()) || "int".equals(paramType.getName())) {
-                        try {
-                            params[0] = Integer.valueOf(value);
-                        } catch (NumberFormatException ex) {
-                            ok = false;
-                        }
-                        // Try a setFoo ( long )
-                    } else if ("java.lang.Long".equals(paramType.getName()) || "long".equals(paramType.getName())) {
-                        try {
-                            params[0] = Long.valueOf(value);
-                        } catch (NumberFormatException ex) {
-                            ok = false;
-                        }
-                        // Try a setFoo ( short )
-                    } else if ("java.lang.Short".equals(paramType.getName()) ||
-                            "short".equals(paramType.getName())) {
-                        try {
-                            params[0] = Short.valueOf(value);
-                        } catch (NumberFormatException ex) {
-                            ok = false;
-                        }
-                        // Try a setFoo ( byte )
-                    } else if ("java.lang.Byte".equals(paramType.getName()) ||
-                            "byte".equals(paramType.getName())) {
-                        try {
-                            params[0] = Byte.valueOf(value);
-                        } catch (NumberFormatException ex) {
-                            ok = false;
-                        }
-                        // Try a setFoo ( float )
-                    } else if ("java.lang.Float".equals(paramType.getName()) ||
-                            "float".equals(paramType.getName())) {
-                        try {
-                            params[0] = Float.valueOf(value);
-                        } catch (NumberFormatException ex) {
-                            ok = false;
-                        }
-                        // Try a setFoo ( double )
-                    } else if ("java.lang.Double".equals(paramType.getName()) ||
-                            "double".equals(paramType.getName())) {
-                        try {
-                            params[0] = Double.valueOf(value);
-                        } catch (NumberFormatException ex) {
-                            ok = false;
-                        }
-                        // Try a setFoo ( char or Character )
-                    } else if ("java.lang.Character".equals(paramType.getName()) ||
-                            "char".equals(paramType.getName())) {
-                        // Take the first character of the value, like
-                        // BeanFactory. Empty content has no first
-                        // character: do not fabricate one.
-                        if (value.isEmpty()) {
-                            ok = false;
-                        } else {
-                            params[0] = Character.valueOf(value.charAt(0));
-                        }
-
-                        // Try a setFoo ( boolean )
-                    } else if ("java.lang.Boolean".equals(paramType.getName()) ||
-                            "boolean".equals(paramType.getName())) {
-                        // Boolean.valueOf() reports everything it does not
-                        // recognise, empty content included, as false.
-                        // Anything that does not spell a boolean - empty
-                        // content, whitespace-padded or misspelled values -
-                        // is not a configured value: let the caller report
-                        // the property as not applied instead of silently
-                        // applying false. Same policy as the pool's own
-                        // DataSourceFactory.parseBoolean().
-                        String trimmed = value.trim();
-                        if ("true".equalsIgnoreCase(trimmed)) {
-                            params[0] = Boolean.TRUE;
-                        } else if ("false".equalsIgnoreCase(trimmed)) {
-                            params[0] = Boolean.FALSE;
-                        } else {
-                            ok = false;
-                        }
-
-                        // Try a setFoo ( InetAddress )
-                    } else if ("java.net.InetAddress".equals(paramType.getName())) {
-                        // getByName() documents the empty string as the
-                        // loopback address instead of failing, and an empty
-                        // host is not a request for loopback: do not invoke
-                        // the setter with a fabricated address.
-                        if (value.isEmpty()) {
-                            ok = false;
-                        } else {
-                            try {
-                                params[0] = InetAddress.getByName(value);
-                            } catch (UnknownHostException exc) {
-                                if (log.isDebugEnabled()) {
-                                    log.debug("Unable to resolve host name: " + value);
-                                }
-                                ok = false;
-                            }
-                        }
-
-                        // Unknown type
-                    } else {
-                        // Unsupported parameter type: the value cannot be
-                        // built for it, so the setter is not invoked with a
-                        // fabricated null and the property is reported as not
-                        // applied.
-                        ok = false;
-                        if (log.isDebugEnabled()) {
-                            log.debug("Unknown type " + paramType.getName());
-                        }
-                    }
-
-                    if (ok) {
-                        methods[i].invoke(o, params);
-                        return SetResult.APPLIED;
+                    if (setterTypeRank(method.getParameterTypes()[0]) >= 0) {
+                        typedSetters.add(method);
                     }
                 }
+            }
+            // getMethods() returns the overloads in an unspecified order.
+            // Sort them by parameter type so a bean with several convertible
+            // setters (for example setPort(int) and setPort(long)) always
+            // receives the value through the same one.
+            typedSetters.sort(Comparator
+                    .comparingInt((Method m) -> setterTypeRank(m.getParameterTypes()[0]))
+                    .thenComparing(m -> m.getParameterTypes()[0].getName()));
+            for (Method method : typedSetters) {
+                Object converted = convertSetterValue(method.getParameterTypes()[0], value);
+                if (converted != CONVERSION_FAILED) {
+                    method.invoke(o, new Object[] { converted });
+                    return SetResult.APPLIED;
+                }
+            }
 
-                // Save "setProperty" for later, but only one that the two
-                // string arguments below can actually be passed to: a
-                // setProperty of any other signature is not a (name, value)
-                // property bag, and invoking it reflectively with those
-                // arguments would only fail with an IllegalArgumentException
-                // that masks the "property was not applied" report.
-                if ("setProperty".equals(methods[i].getName())) {
-                    Class<?>[] paramT = methods[i].getParameterTypes();
+            // Save "setProperty" for later, but only one that the two
+            // string arguments below can actually be passed to: a
+            // setProperty of any other signature is not a (name, value)
+            // property bag, and invoking it reflectively with those
+            // arguments would only fail with an IllegalArgumentException
+            // that masks the "property was not applied" report.
+            for (Method method : methods) {
+                if ("setProperty".equals(method.getName())) {
+                    Class<?>[] paramT = method.getParameterTypes();
                     if (paramT.length == 2 && paramT[0].isAssignableFrom(String.class)
                             && paramT[1].isAssignableFrom(String.class)) {
                         // A boxed Boolean bag refuses a property the same
                         // way a primitive boolean one does: it belongs in
                         // the bucket whose return value is evaluated, not
                         // in the fire-and-forget bucket.
-                        if (methods[i].getReturnType() == Boolean.TYPE
-                                || methods[i].getReturnType() == Boolean.class) {
-                            setPropertyMethodBool = methods[i];
+                        if (method.getReturnType() == Boolean.TYPE
+                                || method.getReturnType() == Boolean.class) {
+                            setPropertyMethodBool = method;
                         } else {
-                            setPropertyMethodVoid = methods[i];
+                            setPropertyMethodVoid = method;
                         }
                     }
                 }
@@ -417,6 +319,103 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
             return SetResult.REPORTED;
         }
         return SetResult.UNREPORTED;
+    }
+
+    /** Sentinel returned by {@link #convertSetterValue} when the value does not fit the type. */
+    private static final Object CONVERSION_FAILED = new Object();
+
+    /**
+     * The supported typed-setter parameter types, ordered so that a bean with
+     * several convertible {@code setFoo} overloads always receives a value
+     * through the same (most specific) setter. The order follows Java's
+     * preference for the canonical type of a literal: {@code int} before the
+     * other integral types, {@code double} before {@code float}.
+     *
+     * @param paramType The setter parameter type
+     *
+     * @return The rank of a supported type, or -1 if the type is not supported
+     */
+    private static int setterTypeRank(Class<?> paramType) {
+        String name = paramType.getName();
+        if ("java.lang.Integer".equals(name) || "int".equals(name)) {
+            return 0;
+        } else if ("java.lang.Long".equals(name) || "long".equals(name)) {
+            return 1;
+        } else if ("java.lang.Double".equals(name) || "double".equals(name)) {
+            return 2;
+        } else if ("java.lang.Float".equals(name) || "float".equals(name)) {
+            return 3;
+        } else if ("java.lang.Short".equals(name) || "short".equals(name)) {
+            return 4;
+        } else if ("java.lang.Byte".equals(name) || "byte".equals(name)) {
+            return 5;
+        } else if ("java.lang.Boolean".equals(name) || "boolean".equals(name)) {
+            return 6;
+        } else if ("java.lang.Character".equals(name) || "char".equals(name)) {
+            return 7;
+        } else if ("java.net.InetAddress".equals(name)) {
+            return 8;
+        }
+        return -1;
+    }
+
+    /**
+     * Builds a setter argument from the configured value.
+     *
+     * @param paramType The setter parameter type
+     * @param value The configured value
+     *
+     * @return The converted value, or {@link #CONVERSION_FAILED} when the
+     *         value cannot be built for the type
+     */
+    private static Object convertSetterValue(Class<?> paramType, String value) {
+        String name = paramType.getName();
+        try {
+            if ("java.lang.Integer".equals(name) || "int".equals(name)) {
+                return Integer.valueOf(value);
+            } else if ("java.lang.Long".equals(name) || "long".equals(name)) {
+                return Long.valueOf(value);
+            } else if ("java.lang.Double".equals(name) || "double".equals(name)) {
+                return Double.valueOf(value);
+            } else if ("java.lang.Float".equals(name) || "float".equals(name)) {
+                return Float.valueOf(value);
+            } else if ("java.lang.Short".equals(name) || "short".equals(name)) {
+                return Short.valueOf(value);
+            } else if ("java.lang.Byte".equals(name) || "byte".equals(name)) {
+                return Byte.valueOf(value);
+            } else if ("java.lang.Boolean".equals(name) || "boolean".equals(name)) {
+                // Boolean.valueOf() reports everything it does not recognise,
+                // empty content included, as false. Only a spelled-out boolean
+                // is a configured value.
+                String trimmed = value.trim();
+                if ("true".equalsIgnoreCase(trimmed)) {
+                    return Boolean.TRUE;
+                } else if ("false".equalsIgnoreCase(trimmed)) {
+                    return Boolean.FALSE;
+                }
+            } else if ("java.lang.Character".equals(name) || "char".equals(name)) {
+                // Empty content has no first character: do not fabricate one.
+                if (!value.isEmpty()) {
+                    return Character.valueOf(value.charAt(0));
+                }
+            } else if ("java.net.InetAddress".equals(name)) {
+                // getByName() documents the empty string as the loopback
+                // address instead of failing, and an empty host is not a
+                // request for loopback.
+                if (!value.isEmpty()) {
+                    try {
+                        return InetAddress.getByName(value);
+                    } catch (UnknownHostException exc) {
+                        if (log.isDebugEnabled()) {
+                            log.debug("Unable to resolve host name: " + value);
+                        }
+                    }
+                }
+            }
+        } catch (NumberFormatException ex) {
+            // The value is not a number this type can represent.
+        }
+        return CONVERSION_FAILED;
     }
 
     /**
