@@ -152,6 +152,25 @@ class TestPoolProperties {
     }
 
     @Test
+    void toStringDoesNotPrintTheConfiguredDataSourceObject() {
+        PoolProperties properties = new PoolProperties();
+        Object dataSource = new Object() {
+            @Override
+            public String toString() {
+                return "jdbc:vendor://host/db?user=sa&password=datasource-secret";
+            }
+        };
+        properties.setDataSource(dataSource);
+
+        String dump = properties.toString();
+
+        Assertions.assertFalse(dump.contains("datasource-secret"),
+                "the dump must not call the configured data source object's toString()");
+        Assertions.assertTrue(dump.contains("dataSource=" + dataSource.getClass().getName()),
+                "the dump must still identify the configured data source by class");
+    }
+
+    @Test
     void setConnectionPropertiesRoundTripsThroughTheFactory() {
         Properties attrs = new Properties();
         attrs.setProperty("connectionProperties", "first=one;second=two");
@@ -363,41 +382,6 @@ class TestPoolProperties {
     }
 
     @Test
-    void anErrorFromAPropertyObjectToStringStillProducesADump() {
-        // buf.append(Object) calls the object's toString() directly, so an
-        // Error from the arbitrary dataSource object arrives unwrapped, unlike
-        // one from inside a getter. The dump must not throw over it.
-        PoolProperties properties = new PoolProperties();
-        properties.setDataSource(new Object() {
-            @Override
-            public String toString() {
-                throw new StackOverflowError("boom");
-            }
-        });
-
-        String asString = Assertions.assertDoesNotThrow(properties::toString);
-
-        Assertions.assertTrue(asString.endsWith("]"),
-                "the dump must stay bracket-balanced, was: " + asString);
-        Assertions.assertTrue(asString.contains("dataSource=<error:"),
-                "the failing property must be reported in its own field, was: " + asString);
-    }
-
-    @Test
-    void aFatalErrorFromAPropertyObjectToStringIsPropagated() {
-        PoolProperties properties = new PoolProperties();
-        properties.setDataSource(new Object() {
-            @Override
-            public String toString() {
-                throw new OutOfMemoryError("pretend");
-            }
-        });
-
-        Assertions.assertThrows(OutOfMemoryError.class, properties::toString,
-                "fatal errors are propagated, per the module's handleThrowable convention");
-    }
-
-    @Test
     void aNamelessInterceptorPropertyIsRefusedAtOnce() {
         NullPointerException npe = Assertions.assertThrows(NullPointerException.class,
                 () -> new PoolProperties.InterceptorProperty(null, "value"),
@@ -450,23 +434,24 @@ class TestPoolProperties {
 
     @Test
     void aThrowingPropertyFailsOnlyItsOwnFieldOfTheDump() {
-        PoolProperties properties = new PoolProperties();
-        properties.setUrl("jdbc:h2:mem:shown");
-        properties.setDataSource(new Object() {
+        PoolProperties properties = new PoolProperties() {
+            private static final long serialVersionUID = 1L;
+
             @Override
-            public String toString() {
-                throw new IllegalStateException("hostile dataSource");
+            public String getUrl() {
+                throw new IllegalStateException("hostile getter");
             }
-        });
+        };
+        properties.setDataSourceJNDI("java:comp/env/jdbc/test");
 
         String asString = properties.toString();
 
         Assertions.assertTrue(asString.endsWith("]"),
                 "one throwing property must not truncate the dump, was: " + asString);
-        Assertions.assertTrue(asString.contains("dataSource=<error:"),
+        Assertions.assertTrue(asString.contains("url=<error:"),
                 "the failing property must be reported in its own field, was: " + asString);
-        // dataSourceJNDI is listed after dataSource, so it is lost if the
-        // failure still truncates the dump.
+        // dataSourceJNDI is listed after url, so it is lost if the failure
+        // still truncates the dump.
         Assertions.assertTrue(asString.contains("dataSourceJNDI"),
                 "the properties must keep being listed after the failing one, was: " + asString);
     }
