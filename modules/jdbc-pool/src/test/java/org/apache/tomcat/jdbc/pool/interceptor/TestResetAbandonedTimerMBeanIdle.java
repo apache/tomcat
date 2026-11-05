@@ -280,4 +280,38 @@ class TestResetAbandonedTimerMBeanIdle extends JdbcPoolBaseTest {
                 "the release must be the idle check's own, which is the bookkeeping the pokes defeated");
         awaitSessions(0);
     }
+
+    @Test
+    void anAnonymousSubclassPublishesUnderTheBaseClassKey() throws Exception {
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        String uid = Long.toString(System.nanoTime());
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setJmxEnabled(true);
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(0);
+        ds.createPool();
+        ds.preRegister(server, new ObjectName(
+                "tomcat:type=ResetAbandonedTimerMBeanTest,role=anonymous,uid=" + uid));
+        pool = ds;
+
+        try (Connection connection = ds.getConnection()) {
+            PooledConnection pc = connection.unwrap(PooledConnection.class);
+            ResetAbandonedTimer anonymous = new ResetAbandonedTimer() {
+            };
+            anonymous.reset(ds.getPool(), pc);
+            try {
+                ObjectName timerName = null;
+                for (ObjectName name : server.queryNames(new ObjectName("tomcat.jdbc:*"), null)) {
+                    if (ResetAbandonedTimer.class.getSimpleName().equals(name.getKeyProperty("JdbcInterceptor"))
+                            && uid.equals(name.getKeyProperty("uid"))) {
+                        timerName = name;
+                    }
+                }
+                Assertions.assertNotNull(timerName,
+                        "an anonymous timer has no simple name and must publish under the base class key");
+            } finally {
+                anonymous.reset(null, null);
+            }
+        }
+    }
 }
