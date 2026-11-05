@@ -32,6 +32,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
+import org.apache.tomcat.jdbc.pool.util.ExceptionUtils;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
@@ -278,10 +279,12 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
             try {
                 shallClose = !statement.isClosed();
                 answered = true;
-            } catch (Exception ignore) {
+            } catch (Throwable ignore) {
                 // A driver that cannot say whether the statement is closed
                 // must not get to skip the close attempt - the statement
-                // may still hold server-side state.
+                // may still hold server-side state. A non-fatal Error is the
+                // same refused answer as an exception.
+                ExceptionUtils.handleThrowable(ignore);
                 shallClose = true;
                 answered = false;
             }
@@ -290,7 +293,11 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
                 try {
                     statement.close();
                     closed = true;
-                } catch (Exception ignore) {
+                } catch (Throwable ignore) {
+                    // The failed close is reported as false so closeInvoked
+                    // keeps the entry for the next attempt; an Error must not
+                    // abort the rest of the drain.
+                    ExceptionUtils.handleThrowable(ignore);
                     if (log.isDebugEnabled()) {
                         log.debug("Unable to close statement upon connection close.", ignore);
                     }
