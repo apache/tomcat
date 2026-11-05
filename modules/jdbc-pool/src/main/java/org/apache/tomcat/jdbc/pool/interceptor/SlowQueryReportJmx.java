@@ -62,6 +62,8 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  * The MBean and the notification broadcaster belong to a <em>pool</em>, exactly like the statistics they publish: the
  * first interceptor instance of a pool to borrow a connection publishes them, and every other instance of that pool -
  * its other connections, the second definition of the recommended two-thresholds configuration - reports through them.
+ * The pool start callback only records the pool and its registration name; an idle pool is not published, so
+ * monitoring begins with the first borrow.
  * They are published under the name the pool started with - see {@link ConnectionPool#getRegistrationName()} - which
  * identifies the pool, because a container names every pool it manages uniquely and the default name of a
  * programmatically built pool is unique as well. Renaming a running pool, which the pool's own JMX allows, moves
@@ -735,9 +737,11 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     }
 
     /**
-     * JMX operation - return the name of the pool
+     * JMX operation - return the name of the pool.
      *
-     * @return the name of the pool, unique within the JVM, or {@code null} before this instance is bound to a pool
+     * @return the registration name recorded when this instance was bound to its pool, or {@code null} before binding.
+     *             The value is retained when the chain is released with {@code reset(null, null)}, so it can remain
+     *             non-null after that release
      */
     @Override
     public String getPoolName() {
