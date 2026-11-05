@@ -61,6 +61,11 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  * it out from under a live cache entry; listed after this one, it makes this cache refuse to park at all, and
  * statements are closed normally instead of cached. Only {@link StatementFinalizer} and its subclasses are recognised
  * by that check; a third-party interceptor with the same behaviour is not detected.
+ * <p>
+ * With JMX enabled, a cache publishes an MBean below its connection's MBean. It is released when the connection is
+ * recycled, when the pool closes, or when the pool MBean is deregistered. A pool that is abandoned without being
+ * closed keeps its registrations - and through them the pool, its sessions and its driver class loader - reachable, so
+ * a JMX-enabled pool must be closed before it is dropped.
  */
 public class StatementCache extends StatementDecoratorInterceptor implements StatementCacheMBean {
     private static final Log log = LogFactory.getLog(StatementCache.class);
