@@ -175,6 +175,16 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
         }
     }
 
+    @Override
+    public void unregisterMBean() {
+        synchronized (this) {
+            if (oname != null) {
+                JmxUtil.unregisterJmx(oname);
+                oname = null;
+            }
+        }
+    }
+
     /**
      * Resets the abandoned timer of the pooled connection this interceptor is bound to, and only while that connection
      * is checked out. This is the implementation of the MBean operation; the activity hooks below stamp through

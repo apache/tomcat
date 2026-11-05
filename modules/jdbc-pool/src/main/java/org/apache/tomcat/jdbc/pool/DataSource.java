@@ -26,6 +26,7 @@ import javax.management.ObjectName;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
+import org.apache.tomcat.jdbc.pool.util.ExceptionUtils;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 
@@ -339,6 +340,25 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
     }
 
     /**
+     * Releases the MBeans published below the pool MBean - the connections the pool holds and the interceptors of their
+     * chains - so that deregistering this data source does not leave them pinning a pool that stays live. The pool and
+     * its sessions are untouched, and a later registration publishes the children again. The release is best effort:
+     * JMX is a management channel, so a failure here is logged and does not stop the pool MBean from being released.
+     */
+    private void releaseConnectionMBeans() {
+        ConnectionPool p = pool;
+        if (p == null) {
+            return;
+        }
+        try {
+            p.unregisterConnectionMBeans();
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            log.error(MessageFactory.get("dataSource.unableToUnregisterConnectionMBeans"), t);
+        }
+    }
+
+    /**
      * Releases the registration handle and unregisters the pool MBean
      * published under the name it points to, as one step under this data
      * source's monitor. Every path that gives the handle up runs through
@@ -358,6 +378,7 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
         oname = null;
         publishedByRegistration = false;
         if (name != null) {
+            releaseConnectionMBeans();
             try {
                 unregisterJmx(name);
             } catch (Throwable t) {

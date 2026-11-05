@@ -318,6 +318,58 @@ class TestJmxRegistration extends JdbcPoolBaseTest {
     }
 
     @Test
+    void releasingThePoolMBeanReleasesTheConnectionAndInterceptorMBeans() throws Exception {
+        MBeanServer server = server();
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setJmxEnabled(true);
+        ds.setJdbcInterceptors(StatementCache.class.getName() + "(prepared=true,max=5)");
+        ds.getPoolProperties().setInitialSize(0);
+        ds.createPool();
+        ds.preRegister(server, uniqueName("children-released"));
+        ObjectName poolOname = ds.getPool().getJmxPool().getObjectName();
+        Assertions.assertNotNull(poolOname, "precondition: the pool MBean is published");
+
+        ObjectName connectionName;
+        ObjectName cacheName;
+        try (Connection borrowed = ds.getConnection()) {
+            connectionName = connectionMBeanUnder(server, poolOname);
+            cacheName = new ObjectName(connectionName.toString() + ",JdbcInterceptor=StatementCache");
+            Assertions.assertTrue(server.isRegistered(cacheName),
+                    "precondition: the cache of the borrowed connection publishes its MBean");
+        }
+
+        try {
+            ds.postDeregister();
+
+            Assertions.assertFalse(server.isRegistered(poolOname),
+                    "postDeregister must unregister the pool MBean");
+            Assertions.assertFalse(server.isRegistered(connectionName),
+                    "postDeregister must unregister the connection MBean below it");
+            Assertions.assertFalse(server.isRegistered(cacheName),
+                    "postDeregister must unregister the interceptor MBeans below the connection");
+
+            // The pool stays live; registering the DataSource again must
+            // republish the children whose handles the release cleared.
+            ds.preRegister(server, uniqueName("children-republished"));
+            ObjectName republishedPool = ds.getPool().getJmxPool().getObjectName();
+            Assertions.assertNotNull(republishedPool,
+                    "precondition: the DataSource can be registered again");
+            ObjectName republishedConnection = connectionMBeanUnder(server, republishedPool);
+            Assertions.assertNotNull(republishedConnection,
+                    "a connection released by the deregistration must republish itself");
+            try (Connection borrowed = ds.getConnection()) {
+                ObjectName republishedCache = new ObjectName(
+                        republishedConnection.toString() + ",JdbcInterceptor=StatementCache");
+                Assertions.assertTrue(server.isRegistered(republishedCache),
+                        "an interceptor released by the deregistration must republish on the next borrow");
+            }
+        } finally {
+            ds.close();
+            ds.postDeregister();
+        }
+    }
+
+    @Test
     void aPublishedMBeanComesBackAsItsOwnNameAndStaysReleasable() throws Exception {
         MBeanServer server = server();
         ObjectName base = uniqueName("published");
