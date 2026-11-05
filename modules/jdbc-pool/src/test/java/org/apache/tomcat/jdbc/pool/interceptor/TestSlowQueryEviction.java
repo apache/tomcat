@@ -318,4 +318,22 @@ class TestSlowQueryEviction extends JdbcPoolBaseTest {
         Assertions.assertEquals(42L, ((Number) data.get("minInvocationTime")).longValue(),
                 "the first execution must publish the booked time");
     }
+
+    @Test
+    void theCompositeSchemaAccessorsReturnCopies() {
+        String[] names = SlowQueryReport.QueryStats.getFieldNames();
+        names[0] = "mutated";
+        Assertions.assertNotEquals("mutated", SlowQueryReport.QueryStats.getFieldNames()[0],
+                "mutating the returned field names must not change the JMX schema");
+
+        String[] descriptions = SlowQueryReport.QueryStats.getFieldDescriptions();
+        descriptions[0] = "mutated";
+        Assertions.assertNotEquals("mutated", SlowQueryReport.QueryStats.getFieldDescriptions()[0],
+                "mutating the returned field descriptions must not change the JMX schema");
+
+        javax.management.openmbean.OpenType<?>[] types = SlowQueryReport.QueryStats.getFieldTypes();
+        types[0] = null;
+        Assertions.assertNotNull(SlowQueryReport.QueryStats.getFieldTypes()[0],
+                "mutating the returned field types must not change the JMX schema");
+    }
 }
