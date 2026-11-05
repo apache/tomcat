@@ -16,8 +16,8 @@
  */
 package org.apache.jasper.compiler;
 
-import java.io.ByteArrayOutputStream;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.File;
@@ -31,7 +31,6 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -459,6 +458,8 @@ public class SmapUtil {
 
         private static final int MAGIC = 0xCAFEBABE;
 
+        private static final int READ_CHUNK_SIZE = 8192;
+
         private static final byte[] SMAP_HEADER_BYTES = SMAP_HEADER.getBytes(StandardCharsets.ISO_8859_1);
 
         private final DataInputStream in;
@@ -506,10 +507,7 @@ public class SmapUtil {
                 int nameIndex = in.readUnsignedShort();
                 int len = readLength();
                 if (sdeIndexes.contains(Integer.valueOf(nameIndex))) {
-                    byte[] sde = in.readNBytes(len);
-                    if (sde.length != len) {
-                        throw new EOFException();
-                    }
+                    byte[] sde = readBytes(len);
                     if (isSmap(sde)) {
                         smap = sde;
                     }
@@ -521,8 +519,16 @@ public class SmapUtil {
         }
 
         private static boolean isSmap(byte[] sde) {
-            return sde.length >= SMAP_HEADER_BYTES.length &&
-                    Arrays.equals(sde, 0, SMAP_HEADER_BYTES.length, SMAP_HEADER_BYTES, 0, SMAP_HEADER_BYTES.length);
+            if (sde.length < SMAP_HEADER_BYTES.length) {
+                return false;
+            }
+            // Arrays.equals() with ranges is not available in all supported Java versions
+            for (int i = 0; i < SMAP_HEADER_BYTES.length; i++) {
+                if (sde[i] != SMAP_HEADER_BYTES[i]) {
+                    return false;
+                }
+            }
+            return true;
         }
 
         /*
@@ -565,10 +571,7 @@ public class SmapUtil {
                     case 1: // Utf8
                         int len = in.readUnsignedShort();
                         if (len == SDEInstaller.nameSDE.length()) {
-                            byte[] utf8 = in.readNBytes(len);
-                            if (utf8.length != len) {
-                                throw new EOFException();
-                            }
+                            byte[] utf8 = readBytes(len);
                             if (SDEInstaller.nameSDE.equals(new String(utf8, StandardCharsets.UTF_8))) {
                                 sdeIndexes.add(Integer.valueOf(i));
                             }
@@ -581,6 +584,25 @@ public class SmapUtil {
                 }
             }
             return sdeIndexes;
+        }
+
+        /*
+         * Reads exactly the requested number of bytes or throws an EOFException if the end of the stream is reached
+         * first. InputStream.readNBytes() is not used as it is not available in all supported Java versions. The length
+         * comes from the class file so the data is read in chunks rather than allocating an array of that size up
+         * front, which a corrupt length could make very large.
+         */
+        private byte[] readBytes(int count) throws IOException {
+            byte[] chunk = new byte[Math.min(count, READ_CHUNK_SIZE)];
+            ByteArrayOutputStream out = new ByteArrayOutputStream(chunk.length);
+            int remaining = count;
+            while (remaining > 0) {
+                int toRead = Math.min(remaining, chunk.length);
+                in.readFully(chunk, 0, toRead);
+                out.write(chunk, 0, toRead);
+                remaining -= toRead;
+            }
+            return out.toByteArray();
         }
 
         /*

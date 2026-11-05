@@ -26,8 +26,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -185,7 +185,8 @@ public class TestSmapUtil extends TomcatBaseTest {
     @Test
     public void testLoadSmapNotAClassFile() throws Exception {
         File dir = createDir();
-        Files.writeString(new File(dir, "Test.class").toPath(), "CAFEBABE junk\n" + SMAP, StandardCharsets.ISO_8859_1);
+        Files.write(new File(dir, "Test.class").toPath(),
+                ("CAFEBABE junk\n" + SMAP).getBytes(StandardCharsets.ISO_8859_1));
 
         Assert.assertNull(SmapUtil.loadSmap("Test", loader(dir)));
     }
@@ -215,7 +216,7 @@ public class TestSmapUtil extends TomcatBaseTest {
         stratum.setClassFileName(file.getAbsolutePath());
         stratum.addFile("ERRORS.SMAP");
         stratum.addLineData(1, "ERRORS.SMAP", 4, 120, 1);
-        SmapUtil.installSmap(Map.of("Test", stratum));
+        SmapUtil.installSmap(Collections.singletonMap("Test", stratum));
 
         SmapStratum loaded = SmapUtil.loadSmap("Test", loader(dir));
 
