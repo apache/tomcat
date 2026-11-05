@@ -22,6 +22,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.Serial;
 import java.lang.reflect.Method;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -185,15 +186,15 @@ public class FunctionMapperImpl extends FunctionMapper implements Externalizable
 
         @Override
         public boolean equals(Object obj) {
-            if (obj instanceof Function) {
-                return this.hashCode() == obj.hashCode();
+            if (obj instanceof Function other) {
+                return Objects.equals(this.prefix, other.prefix) && Objects.equals(this.localName, other.localName);
             }
             return false;
         }
 
         @Override
         public int hashCode() {
-            return (this.prefix + this.localName).hashCode();
+            return Objects.hash(this.prefix, this.localName);
         }
     }
 
