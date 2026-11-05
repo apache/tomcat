@@ -234,4 +234,64 @@ class TestStatementCacheRecycleFailure extends JdbcPoolBaseTest {
             pooled.close();
         }
     }
+
+    @Test
+    void anErrorDuringRecycleClosesTheStatementAndDoesNotEscape() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setJdbcInterceptors(
+                ErrorRecycleStatementCache.class.getName() + "(prepared=true,max=5)");
+        ds.createPool();
+
+        try (Connection pooled = ds.getConnection()) {
+            ErrorRecycleStatementCache cache =
+                    interceptorOf(pooled, ErrorRecycleStatementCache.class);
+            cache.failNextRecycleReset();
+            PreparedStatement failing = pooled.prepareStatement("SELECT 1");
+            Statement physical = driverStatement(failing);
+
+            Assertions.assertDoesNotThrow(failing::close,
+                    "a non-fatal Error during the recycle reset must not escape the close");
+            Assertions.assertTrue(physical.isClosed(),
+                    "the statement must still be closed through the normal path");
+            Assertions.assertEquals(0, cache.getCacheSizePerConnection(),
+                    "the failed recycle must not have parked anything");
+        }
+    }
+
+    /** A cache whose next recycle reset fails with a non-fatal Error. */
+    public static class ErrorRecycleStatementCache extends StatementCache {
+
+        private boolean errorNextRecycleReset;
+
+        void failNextRecycleReset() {
+            errorNextRecycleReset = true;
+        }
+
+        @Override
+        protected Object createDecorator(Object proxy, Method method, Object[] args,
+                Object statement, Constructor<?> constructor, String sql)
+                throws InstantiationException, IllegalAccessException, InvocationTargetException {
+            if (errorNextRecycleReset && compare(PREPARE_STATEMENT, method.getName())) {
+                errorNextRecycleReset = false;
+                statement = errorClearParameters((PreparedStatement) statement);
+            }
+            return super.createDecorator(proxy, method, args, statement, constructor, sql);
+        }
+    }
+
+    private static PreparedStatement errorClearParameters(PreparedStatement delegate) {
+        return (PreparedStatement) Proxy.newProxyInstance(
+                TestStatementCacheRecycleFailure.class.getClassLoader(),
+                new Class<?>[] { PreparedStatement.class },
+                (proxy, method, args) -> {
+                    if ("clearParameters".equals(method.getName())) {
+                        throw new NoClassDefFoundError("simulated stopped context in clearParameters()");
+                    }
+                    try {
+                        return args == null ? method.invoke(delegate) : method.invoke(delegate, args);
+                    } catch (InvocationTargetException x) {
+                        throw x.getCause();
+                    }
+                });
+    }
 }
