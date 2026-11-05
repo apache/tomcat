@@ -38,6 +38,12 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  * A JMX registration made before the pool exists publishes nothing, because there is no pool MBean to publish. Create
  * the pool before registering the data source, or register it again after the pool has been created, to have the pool
  * monitored.
+ * <p>
+ * Deregistering a published data source releases the pool MBean and the connection and interceptor MBeans published
+ * below it, but it does not close the pool. A JMX-enabled pool that is no longer wanted must therefore be closed
+ * before the data source is dropped: while the pool MBean is registered it holds the pool, and the connection MBeans
+ * hold the pooled connections. Abandoning a registered pool without {@link #close(boolean)} keeps the pool, its
+ * pooled sessions and its JDBC driver class loader reachable for the life of the JVM.
  */
 public class DataSource extends DataSourceProxy implements javax.sql.DataSource, MBeanRegistration,
         org.apache.tomcat.jdbc.pool.jmx.ConnectionPoolMBean, javax.sql.ConnectionPoolDataSource {
