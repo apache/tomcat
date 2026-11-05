@@ -30,7 +30,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
+import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.DataSource;
+import org.apache.tomcat.jdbc.pool.PooledConnection;
 
 /**
  * The {@code DataSource}'s JMX lifecycle - {@code preRegister()},
@@ -88,6 +90,7 @@ class TestDataSourceRegistrationVsClose extends JdbcPoolBaseTest {
         private final AtomicInteger releases = new AtomicInteger();
         private volatile CountDownLatch publicationEntered;
         private volatile CountDownLatch publicationGate = new CountDownLatch(0);
+        private volatile CountDownLatch publicationDone;
         private volatile boolean publicationUnderMonitor;
         private volatile CountDownLatch releaseEntered;
         private volatile CountDownLatch releaseGate = new CountDownLatch(0);
@@ -99,7 +102,7 @@ class TestDataSourceRegistrationVsClose extends JdbcPoolBaseTest {
         }
 
         @Override
-        protected void registerJmx() {
+        protected ConnectionPool publishJmx() {
             publicationUnderMonitor = Thread.holdsLock(this);
             CountDownLatch entered = publicationEntered;
             if (entered != null) {
@@ -107,7 +110,13 @@ class TestDataSourceRegistrationVsClose extends JdbcPoolBaseTest {
                 entered.countDown();
                 awaitGate(publicationGate);
             }
-            super.registerJmx();
+            ConnectionPool published = super.publishJmx();
+            CountDownLatch done = publicationDone;
+            if (done != null) {
+                publicationDone = null;
+                done.countDown();
+            }
+            return published;
         }
 
         @Override
@@ -284,6 +293,70 @@ class TestDataSourceRegistrationVsClose extends JdbcPoolBaseTest {
             ds.close();
             sweep(server, dsName);
         }
+    }
+
+    @Test
+    void theConnectionSweepDoesNotHoldTheDataSourceMonitor() throws Exception {
+        MBeanServer server = server();
+        SeamDataSource ds = newSeamDataSource();
+        ds.createPool();
+        ObjectName dsName = uniqueName("sweep-vs-monitor");
+
+        PooledConnection held;
+        try (java.sql.Connection connection = ds.getConnection()) {
+            held = connection.unwrap(PooledConnection.class);
+        }
+        // The connection is idle now; hold its lock so the registration's
+        // connection sweep parks on it.
+        held.lock();
+        ds.publicationDone = new CountDownLatch(1);
+        AtomicReference<Throwable> registrationFailure = new AtomicReference<>();
+        Thread registrar = new Thread(() -> {
+            try {
+                server.registerMBean(new TestJmxRegistration.Container(ds), dsName);
+            } catch (Throwable x) {
+                registrationFailure.set(x);
+            }
+        }, "registration parked in sweep");
+        registrar.setDaemon(true);
+        try {
+            registrar.start();
+            Assertions.assertTrue(ds.publicationDone.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
+                    "the registration must have published the pool MBean");
+
+            // The publication is done and the sweep is now stuck on the
+            // connection lock. A lifecycle callback that touches no connection
+            // must not be behind that sweep.
+            AtomicBoolean callbackDone = new AtomicBoolean();
+            AtomicReference<Throwable> callbackFailure = new AtomicReference<>();
+            Thread callback = new Thread(() -> {
+                try {
+                    ds.postRegister(Boolean.TRUE);
+                } catch (Throwable x) {
+                    callbackFailure.set(x);
+                } finally {
+                    callbackDone.set(true);
+                }
+            }, "lifecycle during sweep");
+            callback.setDaemon(true);
+            callback.start();
+            callback.join(2000);
+            Assertions.assertTrue(callbackDone.get(),
+                    "the connection sweep must run outside the data source monitor: a "
+                            + "lifecycle callback was parked behind a sweep waiting on a "
+                            + "connection lock");
+            Assertions.assertNull(callbackFailure.get(), "the lifecycle callback must not fail");
+        } finally {
+            held.unlock();
+            registrar.join(AWAIT_TIMEOUT_MS);
+            if (server.isRegistered(dsName)) {
+                server.unregisterMBean(dsName);
+            }
+            ds.close();
+            sweep(server, dsName);
+        }
+        Assertions.assertFalse(registrar.isAlive(), "the registration must complete once the connection is released");
+        Assertions.assertNull(registrationFailure.get(), "the registration must not fail");
     }
 
     @Test
