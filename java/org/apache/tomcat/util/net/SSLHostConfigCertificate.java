@@ -336,6 +336,16 @@ public class SSLHostConfigCertificate implements Serializable {
 
 
     /**
+     * Returns the configured key alias or, if none is configured, {@link SSLUtilBase#DEFAULT_KEY_ALIAS}.
+     *
+     * @return the configured or default key alias, never {@code null}
+     */
+    public String getCertificateKeyAliasOrDefault() {
+        return certificateKeyAlias == null ? SSLUtilBase.DEFAULT_KEY_ALIAS : certificateKeyAlias;
+    }
+
+
+    /**
      * Sets the path to the keystore file.
      *
      * @param certificateKeystoreFile the keystore file path

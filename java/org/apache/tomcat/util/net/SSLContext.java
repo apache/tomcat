@@ -137,8 +137,7 @@ public interface SSLContext {
      * @return The served alias, never {@code null}
      */
     default String getServedAlias(SSLHostConfigCertificate certificate) {
-        String configuredAlias = certificate.getCertificateKeyAlias();
-        String alias = configuredAlias == null ? SSLUtilBase.DEFAULT_KEY_ALIAS : configuredAlias;
+        String alias = certificate.getCertificateKeyAliasOrDefault();
         for (X509KeyManager keyManager : getServerKeyManagers(certificate)) {
             if (keyManager == null) {
                 continue;
