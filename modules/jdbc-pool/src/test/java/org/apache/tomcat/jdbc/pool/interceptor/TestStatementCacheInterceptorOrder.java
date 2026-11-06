@@ -211,7 +211,7 @@ class TestStatementCacheInterceptorOrder extends JdbcPoolBaseTest {
         String racingSql = "INSERT INTO " + racingTable + " VALUES (?)";
 
         Connection first = ds.getConnection();
-        PooledConnection pcon = (PooledConnection) internalOf(first);
+        PooledConnection pcon = internalOf(first);
         TestStatementCacheRacingClose.RacingCloseStatementCache cache =
                 interceptorOf(first, TestStatementCacheRacingClose.RacingCloseStatementCache.class);
         setSessionMarker(first, 43);

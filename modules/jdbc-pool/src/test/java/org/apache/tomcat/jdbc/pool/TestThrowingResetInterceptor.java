@@ -63,10 +63,8 @@ class TestThrowingResetInterceptor extends JdbcPoolBaseTest {
         // test: an abandoned, unclosed physical connection is otherwise
         // reclaimed by the JDK's socket cleaner and the leaked database
         // sessions would disappear with GC timing instead of staying open
-        PooledConnection pooledFirst =
-                (PooledConnection) internalOf(first);
-        PooledConnection pooledSecond =
-                (PooledConnection) internalOf(second);
+        PooledConnection pooledFirst = internalOf(first);
+        PooledConnection pooledSecond = internalOf(second);
         java.sql.Connection physicalFirst = pooledFirst.getConnection();
         java.sql.Connection physicalSecond = pooledSecond.getConnection();
         awaitSessions(2);
