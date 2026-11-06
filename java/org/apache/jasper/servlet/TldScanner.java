@@ -194,9 +194,7 @@ public class TldScanner {
                 TaglibXml tld = tldParser.parse(tldResourcePath);
                 uriTldResourcePathMap.put(taglibURI, tldResourcePath);
                 tldResourcePathTaglibXmlMap.put(tldResourcePath, tld);
-                if (tld.getListeners() != null) {
-                    listeners.addAll(tld.getListeners());
-                }
+                addListeners(tld);
             } else {
                 log.warn(Localizer.getMessage(MSG + ".webxmlFailPathDoesNotExist", resourcePath, taglibURI));
             }
@@ -309,14 +307,8 @@ public class TldScanner {
             tld = tldParser.parse(path);
         }
         String uri = tld.getUri();
-        // JSP.7.3.6.1: the first mapping for a taglib URI wins. A TLD with a
-        // previously seen URI found via a different resource path (for
-        // example, an unpacked JAR in WEB-INF/classes/META-INF or the same
-        // TLD shipped in two JARs) is a duplicate.
-        boolean duplicateUri = false;
         if (uri != null) {
-            duplicateUri = uriTldResourcePathMap.containsKey(uri);
-            if (!duplicateUri) {
+            if (!uriTldResourcePathMap.containsKey(uri)) {
                 uriTldResourcePathMap.put(uri, path);
             }
         }
@@ -327,10 +319,23 @@ public class TldScanner {
         }
 
         tldResourcePathTaglibXmlMap.put(path, tld);
-        if (tld.getListeners() != null && !duplicateUri) {
-            // The listeners of a duplicate tag library have already been
-            // registered when the tag library was first discovered.
-            listeners.addAll(tld.getListeners());
+        addListeners(tld);
+    }
+
+    /*
+     * Registers the listeners declared by the TLD, ignoring any listener class that has already been registered. The
+     * same TLD may be found via more than one resource path and under more than one URI (for example, a taglib-uri in
+     * web.xml that differs from the URI declared in the TLD itself) and a listener class must only be instantiated
+     * once.
+     */
+    private void addListeners(TaglibXml tld) {
+        if (tld.getListeners() == null) {
+            return;
+        }
+        for (String listener : tld.getListeners()) {
+            if (!listeners.contains(listener)) {
+                listeners.add(listener);
+            }
         }
     }
 
