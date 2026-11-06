@@ -1425,6 +1425,9 @@
       <update>
         Update JSign to 7.6. (markt)
       </update>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
