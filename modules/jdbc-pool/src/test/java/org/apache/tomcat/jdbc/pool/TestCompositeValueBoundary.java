@@ -170,13 +170,11 @@ class TestCompositeValueBoundary extends JdbcPoolBaseTest {
 
                 assertDriversOwnCursor(fromGetObject.getResultSet(), "Array.getResultSet()");
                 assertDriversOwnCursor(
-                        fromGetObject.getResultSet(new HashMap<String, Class<?>>()),
-                        "Array.getResultSet(Map)");
+                        fromGetObject.getResultSet(new HashMap<>()), "Array.getResultSet(Map)");
                 assertDriversOwnCursor(fromGetObject.getResultSet(1, ARRAY_VALUES.length),
                         "Array.getResultSet(long, int)");
                 assertDriversOwnCursor(fromGetObject.getResultSet(1, ARRAY_VALUES.length,
-                                new HashMap<String, Class<?>>()),
-                        "Array.getResultSet(long, int, Map)");
+                                new HashMap<>()), "Array.getResultSet(long, int, Map)");
 
                 try (ResultSet rows = fromGetObject.getResultSet()) {
                     readArrayRows(rows);

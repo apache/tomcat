@@ -672,8 +672,8 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
         ObjectName oname2 = new ObjectName("tomcat.jdbc:type="
                 + SlowQueryReportJmx.class.getName() + ",name=" + stored2);
 
-        try (java.sql.Connection c1 = ds1.getConnection();
-                java.sql.Connection c2 = ds2.getConnection()) {
+        try (@SuppressWarnings("unused") java.sql.Connection c1 = ds1.getConnection();
+                @SuppressWarnings("unused") java.sql.Connection c2 = ds2.getConnection()) {
             Assertions.assertTrue(server.isRegistered(oname1),
                     "the first pool must publish its interceptor MBean under its own name");
             Assertions.assertTrue(server.isRegistered(oname2),
@@ -1262,19 +1262,19 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
             last = this;
         }
 
-        public void setPort(int port) {
+        public void setPort(@SuppressWarnings("unused") int port) {
             portSetter = "int";
         }
-        public void setPort(long port) {
+        public void setPort(@SuppressWarnings("unused") long port) {
             portSetter = "long";
         }
         public String getPortSetter() {
             return portSetter;
         }
-        public void setRatio(float ratio) {
+        public void setRatio(@SuppressWarnings("unused") float ratio) {
             ratioSetter = "float";
         }
-        public void setRatio(double ratio) {
+        public void setRatio(@SuppressWarnings("unused") double ratio) {
             ratioSetter = "double";
         }
         public String getRatioSetter() {
@@ -1397,11 +1397,11 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
         public boolean isInvoked() {
             return invoked;
         }
-        public boolean setProperty(String name) {
+        public boolean setProperty(@SuppressWarnings("unused") String name) {
             invoked = true;
             return true;
         }
-        public void setProperty(int index) {
+        public void setProperty(@SuppressWarnings("unused") int index) {
             invoked = true;
         }
     }
@@ -1443,7 +1443,7 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
         public java.util.Map<String, String> getBag() {
             return bag;
         }
-        public void setProperty(int index) {
+        public void setProperty(@SuppressWarnings("unused") int index) {
             indexInvoked = true;
         }
         public boolean isIndexInvoked() {

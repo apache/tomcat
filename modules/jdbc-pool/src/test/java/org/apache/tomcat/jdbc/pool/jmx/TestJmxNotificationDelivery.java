@@ -131,6 +131,7 @@ class TestJmxNotificationDelivery extends JdbcPoolBaseTest {
      * thread stalls notify() for that bound and no further.
      */
     private static final class StuckFilter implements NotificationFilter {
+        private static final long serialVersionUID = 1L;
         private final CountDownLatch entered = new CountDownLatch(1);
         private final CountDownLatch release = new CountDownLatch(1);
         private final CountDownLatch completed = new CountDownLatch(1);
@@ -579,7 +580,7 @@ class TestJmxNotificationDelivery extends JdbcPoolBaseTest {
                 Assertions.assertTrue(jmxOne.entered.await(5, TimeUnit.SECONDS),
                         "the notifier thread must be stuck on the gate notification");
                 for (int i = 0; i < SPLIT_FLOOD_SIZE; i++) {
-                    accepted.add(jmxPool.notify(ConnectionPool.POOL_EMPTY, "split-" + i));
+                    accepted.add(Boolean.valueOf(jmxPool.notify(ConnectionPool.POOL_EMPTY, "split-" + i)));
                 }
             } finally {
                 gate.countDown();
@@ -638,7 +639,7 @@ class TestJmxNotificationDelivery extends JdbcPoolBaseTest {
             Set<String> byLocal = new HashSet<>(messages(local.received));
             for (int i = 0; i < accepted.size(); i++) {
                 String message = "[" + ConnectionPool.POOL_EMPTY + "] split-" + i;
-                if (accepted.get(i)) {
+                if (accepted.get(i).booleanValue()) {
                     Assertions.assertTrue(byJmxOne.contains(message),
                             "the notification reported as sent must reach every JMX listener: split-" + i
                                     + " was accepted but the first JMX listener did not receive it");

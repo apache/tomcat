@@ -247,6 +247,7 @@ class TestThrowingValidator extends JdbcPoolBaseTest {
      * next read is answered the replacement - here, none.
      */
     private static final class SwapOnSecondRead extends PoolProperties {
+        private static final long serialVersionUID = 1L;
         private Validator real;
         private int reads;
 

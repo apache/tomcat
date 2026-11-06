@@ -31,6 +31,7 @@ public class TestInlineExecutorService {
      */
     @Test
     public void testTerminationWaitsForAllRunningTasks() throws Exception {
+        @SuppressWarnings("resource")
         InlineExecutorService executor = new InlineExecutorService();
         try {
             CountDownLatch tasksStarted = new CountDownLatch(2);
@@ -92,6 +93,7 @@ public class TestInlineExecutorService {
      */
     @Test
     public void testReentrantExecute() throws Exception {
+        @SuppressWarnings("resource")
         InlineExecutorService executor = new InlineExecutorService();
         try {
             executor.execute(() -> executor.execute(() -> {
@@ -112,6 +114,7 @@ public class TestInlineExecutorService {
      */
     @Test
     public void testAwaitTerminationWakesOnShutdown() throws Exception {
+        @SuppressWarnings("resource")
         InlineExecutorService executor = new InlineExecutorService();
         try {
             CountDownLatch waiterReturned = new CountDownLatch(1);
@@ -145,6 +148,7 @@ public class TestInlineExecutorService {
      */
     @Test
     public void testRejectAfterShutdown() throws Exception {
+        @SuppressWarnings("resource")
         InlineExecutorService executor = new InlineExecutorService();
         executor.shutdown();
 

@@ -545,7 +545,7 @@ class TestFairBlockingQueue {
             } catch (InterruptedException e) {
                 thrown.set(e);
             } finally {
-                flagAfterPoll.set(Thread.currentThread().isInterrupted());
+                flagAfterPoll.set(Boolean.valueOf(Thread.currentThread().isInterrupted()));
                 done.countDown();
             }
         });

@@ -299,7 +299,7 @@ class TestAsyncBorrowCancelRace extends JdbcPoolBaseTest {
         Assertions.assertEquals(0, ds.getActive());
 
         // and it is still there for the next borrower
-        try (Connection c = ds.getConnection()) {
+        try (@SuppressWarnings("unused") Connection c = ds.getConnection()) {
             Assertions.assertEquals(1, ds.getActive());
         }
         ds.close();
@@ -367,7 +367,7 @@ class TestAsyncBorrowCancelRace extends JdbcPoolBaseTest {
                 "a completed cancellation must keep being reported");
 
         // and the connection is still there for the next borrower
-        try (Connection c = ds.getConnection()) {
+        try (@SuppressWarnings("unused") Connection c = ds.getConnection()) {
             Assertions.assertEquals(1, ds.getActive());
         }
         ds.close();

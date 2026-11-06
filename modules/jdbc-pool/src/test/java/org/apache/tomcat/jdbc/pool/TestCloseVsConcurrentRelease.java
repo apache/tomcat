@@ -102,7 +102,7 @@ class TestCloseVsConcurrentRelease {
                         case "getAutoCommit" :
                             return Boolean.TRUE;
                         case "equals" :
-                            return proxy == args[0];
+                            return Boolean.valueOf(proxy == args[0]);
                         case "hashCode" :
                             return Integer.valueOf(System.identityHashCode(proxy));
                         case "toString" :
@@ -127,7 +127,7 @@ class TestCloseVsConcurrentRelease {
     }
 
     /** A connected session whose physical close is counted, on a counting pool. */
-    private static PooledConnection connectedTo(CountingPool pool, Recording rec) throws SQLException {
+    private static PooledConnection connectedTo(CountingPool pool) throws SQLException {
         PooledConnection con = new PooledConnection(pool.props, pool);
         con.connect();
         return con;
@@ -145,7 +145,7 @@ class TestCloseVsConcurrentRelease {
                         case "getConnection" :
                             return recordingConnection(rec);
                         case "equals" :
-                            return proxy == args[0];
+                            return Boolean.valueOf(proxy == args[0]);
                         case "hashCode" :
                             return Integer.valueOf(System.identityHashCode(proxy));
                         case "toString" :
@@ -161,7 +161,7 @@ class TestCloseVsConcurrentRelease {
     void aSecondReleaseDuringTheTerminalSequenceActsOnNothing() throws Exception {
         Recording rec = new Recording();
         CountingPool pool = countingPool(rec);
-        PooledConnection con = connectedTo(pool, rec);
+        PooledConnection con = connectedTo(pool);
 
         AtomicBoolean firstResult = new AtomicBoolean();
         Thread releaser = new Thread(() -> {
@@ -197,7 +197,7 @@ class TestCloseVsConcurrentRelease {
     void aReconnectCannotResurrectASessionBeingTornDown() throws Exception {
         Recording rec = new Recording();
         CountingPool pool = countingPool(rec);
-        PooledConnection con = connectedTo(pool, rec);
+        PooledConnection con = connectedTo(pool);
 
         Thread releaser = new Thread(() -> pool.release(con), "first-releaser");
         releaser.start();
@@ -223,7 +223,7 @@ class TestCloseVsConcurrentRelease {
     void aReleaseAfterTheFirstStaysALossWithoutTouchingAnything() throws Exception {
         Recording rec = new Recording();
         CountingPool pool = countingPool(rec);
-        PooledConnection con = connectedTo(pool, rec);
+        PooledConnection con = connectedTo(pool);
 
         // This test is about the sequential second hand, not the held-up
         // first one, so the notice does not need to park anyone.

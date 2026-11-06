@@ -112,7 +112,7 @@ class TestMessageFactory {
         MessageFactory factory = factoryFor(new PatternBundle());
         Assertions.assertEquals("no.such.key", factory.getInternal("no.such.key"));
         // The formatted path reuses the same fallback and cannot throw on it.
-        Assertions.assertEquals("no.such.key", factory.getInternal("no.such.key", "x", 1));
+        Assertions.assertEquals("no.such.key", factory.getInternal("no.such.key", "x", Integer.valueOf(1)));
     }
 
     @Test

@@ -511,9 +511,8 @@ public class TestCollectionOperations extends ELBaseTest {
     }
 
 
-    @SuppressWarnings("unchecked")
     private static Stream streamOf(Object... elements) {
-        return new Stream((java.util.Iterator<Object>) Arrays.asList(elements).iterator());
+        return new Stream(Arrays.asList(elements).iterator());
     }
 
 

@@ -72,7 +72,7 @@ class TestBlankValidationQuery {
                         case "isClosed" :
                             return Boolean.FALSE;
                         case "equals" :
-                            return proxy == args[0];
+                            return Boolean.valueOf(proxy == args[0]);
                         case "hashCode" :
                             return Integer.valueOf(System.identityHashCode(proxy));
                         case "toString" :
@@ -92,7 +92,7 @@ class TestBlankValidationQuery {
                             rec.lastExecuted = args == null || args.length == 0 ? null : (String) args[0];
                             return Boolean.TRUE;
                         case "equals" :
-                            return proxy == args[0];
+                            return Boolean.valueOf(proxy == args[0]);
                         case "hashCode" :
                             return Integer.valueOf(System.identityHashCode(proxy));
                         case "toString" :
@@ -133,6 +133,7 @@ class TestBlankValidationQuery {
 
     /** A configuration handing out statements that never passed through the collapsing setters. */
     private static final class BypassedConfiguration extends PoolProperties {
+        private static final long serialVersionUID = 1L;
         private final String rawQuery;
         private final String rawInitSql;
 
@@ -164,7 +165,7 @@ class TestBlankValidationQuery {
                         case "getConnection" :
                             return recordingConnection(rec);
                         case "equals" :
-                            return proxy == args[0];
+                            return Boolean.valueOf(proxy == args[0]);
                         case "hashCode" :
                             return Integer.valueOf(System.identityHashCode(proxy));
                         case "toString" :
