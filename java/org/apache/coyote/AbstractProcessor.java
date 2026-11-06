@@ -225,7 +225,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     @Override
-    public SocketState asyncPostProcess() {
+    public SocketState asyncPostProcess() throws IOException {
         return asyncStateMachine.asyncPostProcess();
     }
 
@@ -648,7 +648,11 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
                 break;
             }
             case ASYNC_POST_PROCESS: {
-                asyncStateMachine.asyncPostProcess();
+                try {
+                    asyncStateMachine.asyncPostProcess();
+                } catch (IOException ioe) {
+                    handleIOException(ioe);
+                }
                 break;
             }
 
