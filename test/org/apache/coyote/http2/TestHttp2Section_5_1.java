@@ -164,8 +164,9 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
         buildSimpleGetRequest(frameHeader, headersPayload, null, 3);
 
-        // Remove the end of stream and end of headers flags
-        frameHeader[4] = 0;
+        // Remove the end of stream flag but keep the end of headers flag. The header block must be complete else the
+        // RST below is a connection error (RFC 9113, section 6.2)
+        frameHeader[4] = 0x04;
 
         // Process the request
         writeFrame(frameHeader, headersPayload);
