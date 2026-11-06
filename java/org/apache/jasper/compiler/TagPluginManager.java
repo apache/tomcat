@@ -209,6 +209,24 @@ public class TagPluginManager {
         }
 
         @Override
+        public TagPluginContext getParentContext(boolean crossTagHandlers) {
+            if (!crossTagHandlers) {
+                return getParentContext();
+            }
+            Node parent = node.getParent();
+            while (parent != null) {
+                if (parent instanceof Node.CustomTag) {
+                    TagPluginContext parentContext = ((Node.CustomTag) parent).getTagPluginContext();
+                    if (parentContext != null) {
+                        return parentContext;
+                    }
+                }
+                parent = parent.getParent();
+            }
+            return null;
+        }
+
+        @Override
         public void setPluginAttribute(String key, Object value) {
             pluginAttributes.put(key, value);
         }
