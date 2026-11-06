@@ -61,12 +61,15 @@ public class EntityTag {
 
         while (true) {
             boolean strong = false;
-            HttpParser.skipWhitespace(input);
+            // Empty list elements must be ignored (RFC 9110, section 5.6.1.2)
+            while (HttpParser.skipConstant(input, ",") == SkipResult.FOUND) {
+                // Skip
+            }
 
             switch (HttpParser.skipConstant(input, "W/")) {
                 case EOF:
-                    // Empty values are invalid
-                    return null;
+                    // A list that contains no entity-tag is valid but nothing in it can match
+                    return result;
                 case NOT_FOUND:
                     strong = true;
                     break;
