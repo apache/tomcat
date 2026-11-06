@@ -1419,6 +1419,9 @@
       <update>
         Update Byte Buddy to 1.18.17. (markt)
       </update>
+      <update>
+        Update JaCoCo to 0.8.16. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
