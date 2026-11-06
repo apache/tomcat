@@ -22,6 +22,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Properties;
@@ -57,12 +60,27 @@ public class Utils {
     }
 
 
+    /**
+     * Loads a properties file that is encoded as UTF-8.
+     *
+     * @param f The file to load
+     *
+     * @return The properties in the file
+     *
+     * @throws IOException if the file cannot be read, is not valid UTF-8 or contains a malformed escape sequence. The
+     *                         message of the exception includes the name of the file.
+     */
     static Properties load(File f) throws IOException {
         Properties props = new Properties();
 
-        try (FileInputStream fis = new FileInputStream(f);
-                Reader r = new InputStreamReader(fis, StandardCharsets.UTF_8)) {
+        // Report invalid UTF-8 rather than silently replacing it
+        CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder().onMalformedInput(CodingErrorAction.REPORT)
+                .onUnmappableCharacter(CodingErrorAction.REPORT);
+
+        try (FileInputStream fis = new FileInputStream(f); Reader r = new InputStreamReader(fis, decoder)) {
             props.load(r);
+        } catch (CharacterCodingException | IllegalArgumentException e) {
+            throw new IOException("Unable to load [" + f.getPath() + "]: " + e, e);
         }
         return props;
     }
