@@ -18,6 +18,7 @@ package org.apache.naming.factory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -51,6 +52,7 @@ import org.apache.tomcat.util.descriptor.web.ContextEjb;
 public class TestLookupFactory extends TomcatBaseTest {
 
     private static final String MARKER_CLASS = "tester.Marker";
+    private static final String MARKER_HOME = "tester.MarkerHome";
 
     private ClassLoader originalContextClassLoader;
 
@@ -64,6 +66,37 @@ public class TestLookupFactory extends TomcatBaseTest {
 
         Object found = new javax.naming.InitialContext().lookup("java:comp/env/ref");
         Assert.assertSame(webapp.marker(), found);
+    }
+
+
+    @Test
+    public void testReferenceArrayTypeIsLoaded() throws Exception {
+        startWebapp();
+        checkArrayLookup(new String[] { "value" });
+    }
+
+
+    @Test
+    public void testPrimitiveArrayTypeIsLoaded() throws Exception {
+        startWebapp();
+        checkArrayLookup(new int[] { 1 });
+    }
+
+
+    @Test
+    public void testWebappLocalArrayTypeIsLoaded() throws Exception {
+        TesterWebapp webapp = startWebapp();
+        checkArrayLookup(Array.newInstance(webapp.marker().getClass(), 1));
+    }
+
+
+    private void checkArrayLookup(Object array) throws Exception {
+        Context container = ContextBindings.getClassLoader();
+        container.bind("comp/env/array", array);
+        container.bind("comp/env/ref", new LookupRef(array.getClass().getName(), "java:comp/env/array"));
+
+        Object found = new javax.naming.InitialContext().lookup("java:comp/env/ref");
+        Assert.assertSame(array, found);
     }
 
 
@@ -83,6 +116,47 @@ public class TestLookupFactory extends TomcatBaseTest {
 
         Object found = new javax.naming.InitialContext().lookup("java:comp/env/ejb");
         Assert.assertSame(webapp.marker(), found);
+    }
+
+
+    @Test
+    public void testEjbLookupRefPrefersHomeInterface() throws Exception {
+        TesterWebapp webapp = startWebapp();
+
+        ContextEjb ejb = new ContextEjb();
+        ejb.setName("ejb");
+        ejb.setType("Session");
+        ejb.setLookupName("java:comp/env/target");
+        ejb.setHome(MARKER_HOME);
+        // A home object implements the home interface, not the remote component interface.
+        ejb.setRemote(CharSequence.class.getName());
+        webapp.listener().addEjb(ejb);
+
+        Object found = new javax.naming.InitialContext().lookup("java:comp/env/ejb");
+        Assert.assertSame(webapp.marker(), found);
+    }
+
+
+    @Test
+    public void testEjbLookupRefRejectsWrongHomeInterface() throws Exception {
+        TesterWebapp webapp = startWebapp();
+
+        ContextEjb ejb = new ContextEjb();
+        ejb.setName("ejb");
+        ejb.setType("Session");
+        ejb.setLookupName("java:comp/env/target");
+        ejb.setHome(CharSequence.class.getName());
+        // Matching the remote type must not bypass a mismatched home type.
+        ejb.setRemote(MARKER_CLASS);
+        webapp.listener().addEjb(ejb);
+
+        try {
+            Object found = new javax.naming.InitialContext().lookup("java:comp/env/ejb");
+            Assert.fail("The reference of the wrong home type was returned: " + found);
+        } catch (javax.naming.NamingException e) {
+            Assert.assertTrue("The wrong failure was reported: " + e.getMessage(),
+                    e.getMessage().contains("expected to be of type"));
+        }
     }
 
 
@@ -172,11 +246,14 @@ public class TestLookupFactory extends TomcatBaseTest {
         Files.createDirectories(classes);
         Path source = new File(docBase, "tester/Marker.java").toPath();
         Files.createDirectories(source.getParent());
-        Files.write(source, ("package tester;\npublic class Marker {\n}\n".getBytes(StandardCharsets.UTF_8)));
+        Files.writeString(source, "package tester;\npublic class Marker implements MarkerHome {\n}\n",
+                StandardCharsets.UTF_8);
+        Path homeSource = source.resolveSibling("MarkerHome.java");
+        Files.writeString(homeSource, "package tester;\npublic interface MarkerHome {\n}\n", StandardCharsets.UTF_8);
         ByteArrayOutputStream compilerOutput = new ByteArrayOutputStream();
         @SuppressWarnings("null")
         int result = compiler.run(null, compilerOutput, compilerOutput, "-d", classes.toString(),
-                source.toString());
+                source.toString(), homeSource.toString());
         Assert.assertEquals("The class of the web application could not be compiled: " + compilerOutput, 0, result);
 
         Tomcat tomcat = getTomcatInstance();
