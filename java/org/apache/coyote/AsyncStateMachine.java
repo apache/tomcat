@@ -313,7 +313,13 @@ class AsyncStateMachine {
             // call to dispatch() from AsyncListener.onError()) can no longer be
             // performed. Complete the async processing here so that
             // onComplete() is called and the in-progress async count is
-            // balanced, rather than leaving the request in MUST_DISPATCH.
+            // balanced, rather than leaving the request in MUST_DISPATCH. If IO
+            // is still allowed (CLOSE_CLEAN) the current response can still be
+            // completed before the connection is closed so write any buffered
+            // output first.
+            if (processor.getErrorState().isIoAllowed() && processor.flushBufferedWrite()) {
+                return SocketState.LONG;
+            }
             asyncCtxt.fireOnComplete();
             updateState(AsyncState.DISPATCHED);
             asyncCtxt.decrementInProgressAsyncCount();

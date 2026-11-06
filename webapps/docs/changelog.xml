@@ -531,7 +531,9 @@
         <code>AsyncContext.dispatch()</code>), the request could be recycled
         while still in the <code>MUST_DISPATCH</code> state so that
         <code>onComplete()</code> was not called and the in-progress async
-        count was not decremented. (markt)
+        count was not decremented. In addition, when the error state still
+        permits I/O, output buffered before the request was completed is now
+        written rather than being discarded. (markt)
       </fix>
     </changelog>
   </subsection>

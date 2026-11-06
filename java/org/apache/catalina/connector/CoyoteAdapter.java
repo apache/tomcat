@@ -258,6 +258,7 @@ public class CoyoteAdapter implements Adapter {
                 if (request.isAsyncCompleting() || request.isAsyncDispatching()) {
                     // Connection will be forcibly closed which will prevent completion/dispatch happening at the usual
                     // point. Trigger post-processing here.
+                    finishResponseIfIoAllowed(request, response, res);
                     res.action(ActionCode.ASYNC_POST_PROCESS, null);
                 }
                 success = false;
@@ -387,6 +388,7 @@ public class CoyoteAdapter implements Adapter {
                 // completion or the dispatch requested during error handling
                 // from happening at the usual point. Need to trigger the call
                 // to onComplete() here.
+                finishResponseIfIoAllowed(request, response, res);
                 res.action(ActionCode.ASYNC_POST_PROCESS, null);
                 async = false;
             }
@@ -425,6 +427,26 @@ public class CoyoteAdapter implements Adapter {
                 updateWrapperErrorCount(request, response);
                 request.recycle();
                 response.recycle();
+            }
+        }
+    }
+
+
+    /*
+     * Called when the processor is in an error state and the connection will be closed before an async complete or
+     * dispatch can take place at the usual point. If the error state still permits IO (e.g. CLOSE_CLEAN) the current
+     * response can be completed before the connection is closed. Output that is still held in the response buffer
+     * would be discarded when the response is recycled so write it now, as the normal completion path would have done.
+     */
+    private void finishResponseIfIoAllowed(Request request, Response response, org.apache.coyote.Response res) {
+        AtomicBoolean ioAllowed = new AtomicBoolean(false);
+        res.action(ActionCode.IS_IO_ALLOWED, ioAllowed);
+        if (ioAllowed.get()) {
+            try {
+                request.finishRequest();
+                response.finishResponse();
+            } catch (IOException ignore) {
+                // Issues that should be logged will have already been logged
             }
         }
     }
