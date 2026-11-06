@@ -37,78 +37,40 @@ import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
- * Class that resets the abandoned timer on any activity on the Connection, on any query execution and on any read of a
- * {@link java.sql.ResultSet} returned by a statement obtained from the pooled connection, whether the operation
- * completed successfully or failed. Iterating a large result set therefore keeps the connection alive through the fetch
- * phase, not only until the query returns. Each reset happens when an individual call completes, so a single call that
- * itself blocks on the database for longer than
- * {@link org.apache.tomcat.jdbc.pool.PoolConfiguration#setRemoveAbandonedTimeout(int)} still gets the connection
- * abandoned. The statement facade is always used, so a result set handle that outlives its borrow is sealed off before
- * it can go on refreshing the abandoned timer of whoever holds that physical connection next, and because every stamp
- * from a call counts only for the borrow that call was started under, a call that was still in flight when its borrow
- * ended cannot refresh that timer either. The handles this interceptor hands out release what they wrap - the
- * statement layer, the physical result set - once a close has been forwarded to them, and answer any later call from
- * the closed contract, as the statement facade's own handles do; a handle the application keeps beyond its close
- * therefore stops keeping the physical objects it wrapped reachable, though it continues to keep the interceptor
- * beneath it, and through it the pooled connection, reachable - as the facade's own inner-class handles do. This
- * interceptor is useful for when you have a
- * {@link org.apache.tomcat.jdbc.pool.PoolConfiguration#setRemoveAbandonedTimeout(int)} that is fairly low, and you
- * want to reset the abandoned time each time any operation on the connection is performed. This is useful for batch
- * processing programs that use connections for extensive amount of times.
+ * Resets the abandoned timer on any activity on the connection, on query execution and on every read of a
+ * {@link java.sql.ResultSet} obtained from the pooled connection. Each stamp is taken when the individual call
+ * completes, so a single call that blocks longer than the configured abandoned timeout can still be abandoned. Stamps
+ * are tied to the borrow that started the call, so a late call from an earlier borrow cannot keep a newer borrower's
+ * connection alive. The interceptor is useful when the abandoned timeout is fairly low and long-running batch work
+ * must stay alive.
  * <p>
- * With JMX enabled, the interceptor publishes an MBean below its connection's MBean. It is released when the
- * connection is recycled, when the pool closes, or when the pool MBean is deregistered. A pool that is abandoned
- * without being closed keeps its registrations - and through them the pool, its sessions and its driver class loader -
- * reachable, so a JMX-enabled pool must be closed before it is dropped.
+ * With JMX enabled, it publishes an MBean below its connection's MBean. It is released when the connection goes out of
+ * service (the chain teardown {@code reset(null, null)}), when the pool closes, or when the pool MBean is deregistered -
+ * not on an ordinary return and re-borrow.
  */
 public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAbandonedTimerMBean {
 
     private static final Log log = LogFactory.getLog(ResetAbandonedTimer.class);
 
     /**
-     * The pooled connection this instance is bound to. It is written by the
-     * borrow that binds the chain and by the disposal that releases it, which
-     * are the borrower's thread and the pool's own, and it is read by the
-     * activity hooks and by whichever thread invokes the JMX operation, so, as
-     * in the proxies below, volatile in order to reach those readers at all.
+     * The pooled connection this instance is bound to; written by the borrow and by the chain disposal, and read by the
+     * activity hooks and JMX thread.
      */
     private volatile PooledConnection pcon;
 
     /**
-     * Whether the pooled connection this instance is bound to is currently
-     * checked out. It is written by the paths that settle that binding - the
-     * borrow that arms the chain, the close that ends the borrow and the
-     * disposal of the chain - which are the borrower's thread and the pool's
-     * own, and it is read by the activity hooks and by whichever thread invokes
-     * the JMX operation, so, as in the proxies below, volatile in order to reach
-     * those readers at all.
+     * Whether the bound pooled connection is currently checked out; written by the borrow, close and disposal paths.
      */
     private volatile boolean checkedOut;
 
     /**
-     * Identifies the borrow that armed this instance. It is bumped by the
-     * walk that arms the chain, so a value taken from this field names one
-     * particular borrow for as long as that borrow, and no other, is the
-     * armed one. It exists because the flag beside it identifies only the
-     * pooled connection, and a connection is borrowed again after it is
-     * handed back: the call of a past borrow that was still in flight when
-     * that borrow ended finds the flag up again, raised for the newer
-     * borrow it has nothing to do with. A frame that stamps from a call
-     * therefore carries the value captured when the call entered the chain,
-     * and stamps only while it is still the current one; the value is
-     * bumped, never reused, so a past borrow's value can never answer for a
-     * later one. As in the fields beside it, volatile in order to reach the
-     * stamping threads at all.
+     * Identifies the borrow that armed this instance. A call captures it on entry and stamps only while it is still
+     * current, so a late call from an earlier borrow cannot refresh a newer borrower's timer.
      */
     private volatile long borrowEpoch;
 
     /**
-     * The name this instance is registered under as an MBean, or {@code null}
-     * while it is not registered. The borrow that registers it and the disposal
-     * that unregisters it are different threads, and a disposal reading a
-     * stale null would skip the unregistration and leave the MBean published,
-     * pinning this instance and everything it reaches, so volatile like the
-     * fields beside it.
+     * The name this instance is registered under as an MBean, or {@code null} while it is not registered.
      */
     private volatile ObjectName oname = null;
 
