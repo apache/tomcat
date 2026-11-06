@@ -70,7 +70,7 @@ public class TestImport extends AbstractTestTag {
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
 
         String body = res.toString();
-        Assert.assertTrue(body, body.contains("QS=[a=b&sp=x+y&u=%26%3D]"));
+        Assert.assertTrue(body, body.contains("QS=[sp=x+y&u=%26%3D&a=b]"));
     }
 
 

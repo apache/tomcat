@@ -73,7 +73,7 @@ public class TestUrl extends AbstractTestTag {
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
 
         String body = res.toString();
-        Assert.assertTrue(body, body.contains("U=[/test/a.jsp?x=1&sp=x+y&u2=%26%3D]"));
+        Assert.assertTrue(body, body.contains("U=[/test/a.jsp?sp=x+y&u2=%26%3D&x=1]"));
     }
 
 
@@ -153,9 +153,11 @@ public class TestUrl extends AbstractTestTag {
      * A <c:param> nested in a tag whose plugin falls back to the standard
      * handler, as <c:forEach> with a varStatus, is generated into the tag
      * method of that handler, where the working URL variable of an enclosing
-     * plugin URL tag is out of scope. The page must still translate; the
-     * standard parameter handler then reports that no standard URL tag
-     * encloses it.
+     * plugin URL tag is out of scope. The enclosing URL tag, and the
+     * parameters of that tag already generated inline, must then use the
+     * standard handlers, which exchange the parameters at runtime. The
+     * parameters precede the existing query string, as in the standard
+     * handler.
      */
     @Test
     public void testParamNestedInPluginFallback() throws Exception {
@@ -165,8 +167,14 @@ public class TestUrl extends AbstractTestTag {
                 "/test/jstl/url-param-fallback-nested.jsp", res, null);
 
         String body = res.toString();
-        // The page must not fail at translation time
-        Assert.assertFalse(body, body.contains("Unable to compile"));
-        Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+        Assert.assertEquals(body, HttpServletResponse.SC_OK, rc);
+        Assert.assertTrue(body, body.contains("U=[/test/a.jsp?p=q]"));
+        // Parameters before, within and after the fallen back tag
+        Assert.assertTrue(body, body.contains("MIXED=[/test/a.jsp?a=1&b=2&c=3&q=1]"));
+        // Only the closest URL tag returns to the standard handler
+        Assert.assertTrue(body, body.contains("OUTER=[/test/o.jsp?x=1&z=3]"));
+        Assert.assertTrue(body, body.contains("INNER=[/test/i.jsp?y=2]"));
+        // Several parameters keep their order ahead of the query string
+        Assert.assertTrue(body, body.contains("ORDERED=[/test/a.jsp?a=1&b=2&q=1&r=2]"));
     }
 }
