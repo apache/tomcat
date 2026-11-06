@@ -116,6 +116,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update the OWB module to Apache OpenWebBeans 4.1.1. (remm)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.29 (markt)" rtext="release in progress">
   <subsection name="Coyote">
