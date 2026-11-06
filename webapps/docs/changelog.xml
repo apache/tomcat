@@ -1717,6 +1717,13 @@
   </subsection>
   <subsection name="Other">
     <changelog>
+      <fix>
+        <bug>70296</bug>
+        Change the type of the <code>accessCount</code> and
+        <code>hitCount</code> fields in <code>StringCache</code> from
+        <code>int</code> to <code>long</code> to prevent integer overflow
+        after 2,147,483,647 cache lookups. (abernal)
+      </fix>
       <update>
         Update the OWB module to Apache OpenWebBeans 4.1.1. (remm)
       </update>
