@@ -51,39 +51,14 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  * JMX-enabled slow query report interceptor. Publishes slow and failed query statistics to JMX and provides
  * notifications when slow or failed queries are detected.
  * <p>
- * All of the publication described below belongs to the interceptor's own MBean, which exists only when the
- * interceptor is configured with {@code notifyPool=false}. In the default {@code notifyPool=true} mode this class
- * registers nothing of its own: the notifications are raised on the pool's own MBean instead, through
- * {@link org.apache.tomcat.jdbc.pool.jmx.ConnectionPool#notify(String, String)}, and that MBean is registered by the
- * pool itself when its {@code jmxEnabled} property is on - so a pool that is neither JMX-enabled nor configured with
- * {@code notifyPool=false} reports its slow and failed queries to its log alone.
- * </p>
+ * With {@code notifyPool=false} this interceptor registers its own MBean and broadcaster. In the default
+ * {@code notifyPool=true} mode it registers nothing and raises notifications on the pool's own MBean instead. The MBean
+ * belongs to a pool and is published by the first borrow under the name the pool started with; the publication is
+ * attempted once and given up by the pool's close. Names must be unique among live pools.
  * <p>
- * The MBean and the notification broadcaster belong to a <em>pool</em>, exactly like the statistics they publish: the
- * first interceptor instance of a pool to borrow a connection publishes them, and every other instance of that pool -
- * its other connections, the second definition of the recommended two-thresholds configuration - reports through them.
- * The pool start callback only records the pool and its registration name; an idle pool is not published, so
- * monitoring begins with the first borrow. The publication is attempted once: JMX is a best-effort management channel,
- * so a refusal is logged for the operator and later borrows leave the server alone.
- * They are published under the name the pool started with - see {@link ConnectionPool#getRegistrationName()} - which
- * identifies the pool and must be unique among the live pools of a class loader: Tomcat gives every pool it manages a
- * name of its own, and a programmatically built pool has a unique default name. A duplicate live name is reported as
- * an error by the pool start, and only one of the pools can hold the ObjectName. Renaming a running pool, which the
- * pool's own JMX allows, moves nothing: the MBean stays published under the name it was registered under and the pool
- * keeps reporting through it. The close of that pool gives both up.
- * </p>
- * <p>
- * The published resource is a {@link Registration}, not an interceptor instance: it holds the name, the statistics
- * store of the pool it reports for, and that pool's JMX state; it reaches neither the pool nor the ObjectName it was
- * published under, which its state records and gives up. The registration is therefore a harmless, releasable entry
- * when the pool that published it was abandoned without closing, instead of a JVM-lifetime root pinning the abandoned
- * pool through the MBeanServer.
- * </p>
- * <p>
- * A JMX client's listener subscription belongs to the registration it was added through. JMX cannot carry a
- * subscription across an unregistration, so once a pool has closed, a client must attach its listeners again to receive
- * notifications from the pool that takes the name afterwards.
- * </p>
+ * The published resource is a {@link Registration} holding the pool name, the statistics store and the pool's JMX
+ * state, but not the pool itself, so an abandoned pool is not pinned by the MBean server. Listener subscriptions
+ * belong to the registration they were added through and must be re-attached after a pool closes.
  */
 public class SlowQueryReportJmx extends SlowQueryReport implements NotificationEmitter, SlowQueryReportJmxMBean {
     /**
@@ -126,6 +101,12 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
      * Composite type used for JMX query statistics data.
      */
     protected static volatile CompositeType SLOW_QUERY_TYPE;
+
+    /**
+     * Whether the one attempt to build {@link #SLOW_QUERY_TYPE} failed. The type is static, so a failure is permanent for
+     * the class loader; recording it keeps every later borrow from retrying and logging the same warning.
+     */
+    private static volatile boolean compositeTypeInitializationFailed;
 
     private static final Log log = LogFactory.getLog(SlowQueryReportJmx.class);
 
@@ -385,13 +366,18 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
      * @return the composite type, or {@code null} if initialization failed
      */
     protected static CompositeType getCompositeType() {
-        if (SLOW_QUERY_TYPE == null) {
-            try {
-                SLOW_QUERY_TYPE = new CompositeType(SlowQueryReportJmx.class.getName(),
-                        "Composite data type for query statistics", QueryStats.getFieldNames(),
-                        QueryStats.getFieldDescriptions(), QueryStats.getFieldTypes());
-            } catch (OpenDataException x) {
-                log.warn(MessageFactory.get("slowQueryReportJmx.unableToInitCompositeType"), x);
+        if (SLOW_QUERY_TYPE == null && !compositeTypeInitializationFailed) {
+            synchronized (SlowQueryReportJmx.class) {
+                if (SLOW_QUERY_TYPE == null && !compositeTypeInitializationFailed) {
+                    try {
+                        SLOW_QUERY_TYPE = new CompositeType(SlowQueryReportJmx.class.getName(),
+                                "Composite data type for query statistics", QueryStats.getFieldNames(),
+                                QueryStats.getFieldDescriptions(), QueryStats.getFieldTypes());
+                    } catch (OpenDataException x) {
+                        compositeTypeInitializationFailed = true;
+                        log.warn(MessageFactory.get("slowQueryReportJmx.unableToInitCompositeType"), x);
+                    }
+                }
             }
         }
         return SLOW_QUERY_TYPE;
@@ -762,50 +748,35 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
      * @throws OpenDataException if the composite data cannot be created
      */
     private static CompositeData[] slowQueriesCDFor(PoolStatistics statistics) throws OpenDataException {
-        // Default to the empty array, never null: the descriptor advertises
-        // the attribute as a CompositeData array, getPoolNames() beside it
-        // already degrades to an empty String array, and the pool's statistics
-        // store can be released while a client still reaches this registration -
-        // reading between the release of the store and the unregistration the
-        // pool's close completes, or permanently when the unregistration of the
-        // closed pool's MBean was refused and JmxUtil swallowed the failure. A
-        // client that trusts the advertised type must not find null in its
-        // hands.
+        // Default to the empty array, never null: the attribute is advertised
+        // as a CompositeData array and the store can be released while a
+        // client still reaches this registration.
         CompositeDataSupport[] result = new CompositeDataSupport[0];
         ConcurrentHashMap<String, QueryStats> queries = statistics == null ? null : statistics.getQueryStats();
         if (queries != null) {
-            // Materialise a point-in-time snapshot before sizing the array:
-            // the map is shared with every interceptor instance of the pool,
-            // which keep adding entries on every query and removing them on
-            // capacity eviction, so sizing from the live map and then filling
-            // from its weakly consistent entry set could run past the end of
-            // the array or leave nulls in it
+            // Materialise a point-in-time snapshot before sizing the array: the
+            // map is shared and can change while the array is filled.
             Map<String, QueryStats> snapshot = new HashMap<>(queries);
+            CompositeType type = getCompositeType();
+            if (type == null) {
+                // The type could not be built for this class loader; the
+                // documented degradation is an empty array, not a null type
+                // passed to CompositeDataSupport.
+                return new CompositeDataSupport[0];
+            }
             result = new CompositeDataSupport[snapshot.size()];
             int pos = 0;
             for (QueryStats qs : snapshot.values()) {
-                result[pos++] = qs.getCompositeData(getCompositeType());
+                result[pos++] = qs.getCompositeData(type);
             }
         }
         return result;
     }
 
     /**
-     * Registers this pool's MBean with JMX.
-     * <p>
-     * The publication is attempted once per pool, by the first borrow that needs it:
-     * {@link PoolJmx#beginPublication()} hands the attempt to one thread, and every later borrow is turned away before
-     * the ObjectName is formed. JMX is a best-effort management channel, so a refusal is logged for the operator and
-     * not retried; forming the name and building a {@link Registration} again on every borrow would cost the pool work
-     * for a publication that is not part of its operation.
-     * </p>
-     * <p>
-     * A pool this instance cannot resolve a statistics store for is skipped before any of it: a pool that carries no
-     * name has no name to form an ObjectName from - and the start-time refusal of such a pool (see
-     * {@link SlowQueryReport#poolStarted}) does not reach a definition the mutable interceptor property hands over
-     * later, so this is where that pairing is met - and a pool whose store has been released has come down, and
-     * nothing published for it any more would ever be given up. Declining costs the monitoring, never the borrow.
-     * </p>
+     * Registers this pool's MBean with JMX. The publication is attempted once per pool by the first borrow that needs
+     * it; a refusal is logged and not retried. A pool with no statistics store, or whose store has been released, has
+     * nothing to publish.
      */
     protected void registerJmx() {
         // With the pool notified, the notifications go to the pool's own
@@ -814,8 +785,9 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
             return;
         }
         if (getCompositeType() == null) {
-            log.warn(MessageFactory.get("slowQueryReportJmx.noJmxSupport",
-                    SlowQueryReport.class.getName()));
+            // The one-time failure was reported by getCompositeType(); the
+            // type is static, so retrying or logging it again on every borrow
+            // would only repeat the same permanent diagnostic.
             return;
         }
         PoolStatistics statistics = this.poolStatistics;
@@ -868,19 +840,9 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     }
 
     /**
-     * The management interface of a published {@link Registration} resource.
-     * <p>
-     * The MBeanServer's implicit Standard-MBean detection identifies a resource's management interface by the naming
-     * convention: the interface of a class {@code X} is the one named {@code X}{@code MBean}. That held for the
-     * interceptor instance itself only because its class and interface names happened to pair up
-     * ({@code SlowQueryReportJmx}/{@link SlowQueryReportJmxMBean}); a separate resource class therefore needs its own
-     * interface under its own name. The surface is unchanged - this interface declares nothing beyond
-     * {@link SlowQueryReportJmxMBean}, it just carries it under the name the resource is found by.
-     * </p>
-     * <p>
-     * Renaming this interface or {@link Registration} breaks that convention and with it the publication of every
-     * pool's MBean, so the two names are part of the registration mechanism, not just its vocabulary.
-     * </p>
+     * The management interface of a published {@link Registration} resource. The naming convention pairs a class
+     * {@code X} with its interface {@code XMBean}; the resource therefore needs its own interface carrying
+     * {@link SlowQueryReportJmxMBean}. Renaming this interface or {@link Registration} breaks that convention.
      */
     public interface RegistrationMBean extends SlowQueryReportJmxMBean {
     }
