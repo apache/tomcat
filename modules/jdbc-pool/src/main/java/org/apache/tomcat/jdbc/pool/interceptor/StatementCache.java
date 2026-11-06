@@ -48,24 +48,16 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 /**
  * Interceptor that caches {@code PreparedStatement} and/or {@code CallableStatement} instances on a connection.
  * <p>
- * A cache hit is answered by this interceptor alone: the rest of the interceptor chain is not invoked for it, and a
- * statement recycled into the cache is reset to driver defaults (its query timeout goes back to zero). Interceptors
- * listed <em>after</em> this one in {@link org.apache.tomcat.jdbc.pool.PoolConfiguration#setJdbcInterceptors(String)
- * jdbcInterceptors} therefore do not see reused statements - relevant to any interceptor whose {@code createStatement}
- * hook performs an action rather than only wrapping the statement: {@link QueryTimeoutInterceptor} must be listed
- * before this one to keep its timeout on cached statements, while wrapping-only interceptors are unaffected: their
- * wrapper is carried inside the cached proxy, and the cache binds a cached statement to the physical session the
- * prepare ran on rather than to whatever connection a wrapper beneath it reports for the statement. An interceptor
- * that closes tracked statements at the connection return is affected too: {@link StatementFinalizer} must be listed
- * before this one, because a parked statement is deliberately left open and a tracker beneath the cache would close
- * it out from under a live cache entry; listed after this one, it makes this cache refuse to park at all, and
- * statements are closed normally instead of cached. Only {@link StatementFinalizer} and its subclasses are recognised
- * by that check; a third-party interceptor with the same behaviour is not detected.
+ * A cache hit is answered by this interceptor alone: the rest of the chain is not invoked for it, and a recycled
+ * statement is reset to driver defaults. Interceptors listed after this one therefore do not see reused statements, so
+ * {@link QueryTimeoutInterceptor} and {@link StatementFinalizer} must be listed before the cache. A tracker such as
+ * {@link StatementFinalizer} beneath the cache would close a parked statement at connection return, so the cache then
+ * refuses to park at all.
  * <p>
- * With JMX enabled, a cache publishes an MBean below its connection's MBean. It is released when the connection is
- * recycled, when the pool closes, or when the pool MBean is deregistered. A pool that is abandoned without being
- * closed keeps its registrations - and through them the pool, its sessions and its driver class loader - reachable, so
- * a JMX-enabled pool must be closed before it is dropped.
+ * With JMX enabled, a cache publishes an MBean below its connection's MBean. It is released when the connection goes
+ * out of service (the chain teardown {@code reset(null, null)}), when the pool closes, or when the pool MBean is
+ * deregistered - not on an ordinary return and re-borrow. A pool abandoned without closing keeps its registrations,
+ * and through them the pool, its sessions and its driver class loader reachable.
  */
 public class StatementCache extends StatementDecoratorInterceptor implements StatementCacheMBean {
     private static final Log log = LogFactory.getLog(StatementCache.class);
@@ -112,11 +104,14 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
     public StatementCache() {
     }
 
+    // Written during chain construction, before the connection publishes the
+    // handler, and never changed afterwards.
     private boolean cachePrepared = true;
     private boolean cacheCallable = false;
     private int maxCacheSize = 50;
-    private PooledConnection pcon;
-    private String[] types;
+    // Re-armed on every borrow and read from management/close threads.
+    private volatile PooledConnection pcon;
+    private volatile String[] types;
 
     private ObjectName oname = null;
 
@@ -194,7 +189,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
     private static final Map<ConnectionPool, AtomicInteger> cacheSizeMap =
             Collections.synchronizedMap(new WeakHashMap<ConnectionPool, AtomicInteger>());
 
-    private AtomicInteger cacheSize;
+    private volatile AtomicInteger cacheSize;
 
     /**
      * Whether {@link #disconnected(ConnectionPool, PooledConnection, boolean)} is purging this cache. A park that
