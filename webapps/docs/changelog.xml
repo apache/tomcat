@@ -510,6 +510,12 @@
         <code>serverAuthContext.secureResponse()</code> should result in an
         internal server error (500) response. (markt)
       </fix>
+      <fix>
+        Accept one or more space characters between the authentication scheme
+        and the credentials in a <code>Basic</code> <code>Authorization</code>
+        header field, as allowed by RFC 9110, section 11.4. Previously exactly
+        one space was required. (abernal)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
