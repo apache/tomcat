@@ -58,7 +58,9 @@ class TestDriverConnectDiagnostics extends JdbcPoolBaseTest {
         private static final String CANARY = "pooledconnection-handler-wiring-canary";
 
         private final Logger logger = Logger.getLogger(PooledConnection.class.getName());
+        private final Logger poolLogger = Logger.getLogger(ConnectionPool.class.getName());
         private final Level originalLevel = logger.getLevel();
+        private final Level originalPoolLevel = poolLogger.getLevel();
         private final List<LogRecord> records = Collections.synchronizedList(new ArrayList<>());
         private final Handler handler = new Handler() {
             @Override
@@ -80,6 +82,8 @@ class TestDriverConnectDiagnostics extends JdbcPoolBaseTest {
         ConnectionLogCapture() {
             logger.addHandler(handler);
             logger.setLevel(Level.ALL);
+            poolLogger.addHandler(handler);
+            poolLogger.setLevel(Level.ALL);
             LogFactory.getLog(PooledConnection.class).error(CANARY);
             if (records.stream().noneMatch(r -> CANARY.equals(r.getMessage()))) {
                 close();
@@ -121,6 +125,8 @@ class TestDriverConnectDiagnostics extends JdbcPoolBaseTest {
         public void close() {
             logger.removeHandler(handler);
             logger.setLevel(originalLevel);
+            poolLogger.removeHandler(handler);
+            poolLogger.setLevel(originalPoolLevel);
         }
     }
 
@@ -207,6 +213,62 @@ class TestDriverConnectDiagnostics extends JdbcPoolBaseTest {
         @Override
         public Logger getParentLogger() throws java.sql.SQLFeatureNotSupportedException {
             throw new java.sql.SQLFeatureNotSupportedException();
+        }
+    }
+
+    public static class FailingDriver implements java.sql.Driver {
+        @Override
+        public Connection connect(String url, java.util.Properties info) throws SQLException {
+            throw new SQLException("unable to connect to " + url);
+        }
+
+        @Override
+        public boolean acceptsURL(String url) {
+            return true;
+        }
+
+        @Override
+        public java.sql.DriverPropertyInfo[] getPropertyInfo(String url, java.util.Properties info) {
+            return new java.sql.DriverPropertyInfo[0];
+        }
+
+        @Override
+        public int getMajorVersion() {
+            return 0;
+        }
+
+        @Override
+        public int getMinorVersion() {
+            return 0;
+        }
+
+        @Override
+        public boolean jdbcCompliant() {
+            return false;
+        }
+
+        @Override
+        public Logger getParentLogger() throws java.sql.SQLFeatureNotSupportedException {
+            throw new java.sql.SQLFeatureNotSupportedException();
+        }
+    }
+
+    @Test
+    void aDriverFailureMessageIsNotLoggedWithItsCredential() throws Exception {
+        String secret = "S3cret-In-The-Driver-Failure";
+        String url = "jdbc:failing:thin:@dbhost:1521:sid?user=appuser;PASSWORD=" + secret;
+        PoolProperties properties = new PoolProperties();
+        properties.setUrl(url);
+        properties.setDriverClassName(FailingDriver.class.getName());
+        properties.setJmxEnabled(false);
+        properties.setInitialSize(0);
+        properties.setTimeBetweenEvictionRunsMillis(-1);
+        DataSource ds = manage(new DataSource(properties));
+
+        try (ConnectionLogCapture log = new ConnectionLogCapture()) {
+            Assertions.assertThrows(SQLException.class, ds::getConnection,
+                    "the driver failure must be reported");
+            log.assertNothingLoggedCarries(secret);
         }
     }
 
