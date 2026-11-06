@@ -25,6 +25,7 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
@@ -203,6 +204,18 @@ public class Utils {
         // Renaming here is less work than renaming terms in POEditor
         prefix = prefix.replace(Constants.JAKARTA_EE_SUBSTRING, Constants.JAVA_EE_SUBSTRING);
         return prefix;
+    }
+
+
+    /**
+     * Creates the given directory, and any missing parent, if it does not already exist.
+     *
+     * @param directory The directory to create
+     *
+     * @throws IOException if the directory cannot be created
+     */
+    static void createDirectory(File directory) throws IOException {
+        Files.createDirectories(directory.toPath());
     }
 
 
