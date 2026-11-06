@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 import org.apache.tomcat.jdbc.pool.DataSource;
-import org.apache.tomcat.jdbc.pool.PooledConnection;
 
 /**
  * A cached statement belongs to the physical session it was prepared on, so
