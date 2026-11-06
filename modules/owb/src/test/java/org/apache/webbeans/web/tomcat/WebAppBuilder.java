@@ -23,9 +23,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -45,6 +47,7 @@ final class WebAppBuilder {
     private final Path destination;
     private final Path template;
     private final Set<Path> sourceRoots = new LinkedHashSet<>();
+    private final Map<String, String> openWebBeansProperties = new LinkedHashMap<>();
     private boolean includeBeansXml = true;
     private boolean includeWebXml = true;
     private boolean beansXmlInClasses;
@@ -78,6 +81,11 @@ final class WebAppBuilder {
         return this;
     }
 
+    WebAppBuilder openWebBeansProperty(String name, String value) {
+        openWebBeansProperties.put(name, value);
+        return this;
+    }
+
     Path build(Path shadedJar) throws IOException {
         Path webInf = template.resolve("WEB-INF");
         if (Files.isDirectory(webInf)) {
@@ -104,6 +112,16 @@ final class WebAppBuilder {
             Path target = classes.resolve("META-INF/beans.xml");
             Files.createDirectories(target.getParent());
             Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        if (!openWebBeansProperties.isEmpty()) {
+            Path target = classes.resolve("META-INF/openwebbeans/openwebbeans.properties");
+            Files.createDirectories(target.getParent());
+            StringBuilder properties = new StringBuilder();
+            for (Map.Entry<String, String> entry : openWebBeansProperties.entrySet()) {
+                properties.append(entry.getKey()).append('=').append(entry.getValue()).append('\n');
+            }
+            Files.writeString(target, properties.toString(), StandardCharsets.UTF_8);
         }
 
         return destination;

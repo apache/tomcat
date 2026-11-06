@@ -25,7 +25,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet(urlPatterns = { "/hello", "/request", "/session", "/matching", "/matching-event", "/contexts",
-        "/interceptor", "/invoker" })
+        "/interceptor", "/invoker", "/injection-status" })
 public class Cdi41Servlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -72,6 +72,9 @@ public class Cdi41Servlet extends HttpServlet {
                 break;
             case "/invoker":
                 result = InvokerExtension.invoke();
+                break;
+            case "/injection-status":
+                result = greeting == null ? "not-injected" : "injected";
                 break;
             default:
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);

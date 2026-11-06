@@ -17,7 +17,10 @@
 package org.apache.webbeans.web.tomcat.testapp;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
+import jakarta.annotation.PreDestroy;
 import jakarta.inject.Inject;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -41,5 +44,21 @@ public class LifecycleFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         httpRequest.setAttribute("owb.filter.greeting", greeting.message());
         chain.doFilter(request, response);
+    }
+
+    @PreDestroy
+    void preDestroy() {
+        writeMarker("filterPreDestroy.marker");
+    }
+
+    private static void writeMarker(String name) {
+        String markerDirectory = System.getProperty("owb.test.marker.dir");
+        if (markerDirectory != null) {
+            try {
+                Files.writeString(Path.of(markerDirectory).resolve(name), "marker");
+            } catch (IOException e) {
+                throw new IllegalStateException("Unable to write lifecycle marker " + name, e);
+            }
+        }
     }
 }

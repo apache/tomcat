@@ -19,7 +19,6 @@ package org.apache.webbeans.web.tomcat;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,11 +44,20 @@ final class OwbTestServer implements AutoCloseable {
     private final Tomcat tomcat;
     private final Map<String, Context> contexts;
     private final Map<String, URI> baseUris;
+    private final ListenerMode listenerMode;
+    private final boolean startWithoutBeansXml;
+    private final boolean addSecurityValve;
+    private final int port;
 
-    private OwbTestServer(Tomcat tomcat, Map<String, Context> contexts, Map<String, URI> baseUris) {
+    private OwbTestServer(Tomcat tomcat, Map<String, Context> contexts, Map<String, URI> baseUris,
+            ListenerMode listenerMode, boolean startWithoutBeansXml, boolean addSecurityValve, int port) {
         this.tomcat = tomcat;
         this.contexts = contexts;
         this.baseUris = baseUris;
+        this.listenerMode = listenerMode;
+        this.startWithoutBeansXml = startWithoutBeansXml;
+        this.addSecurityValve = addSecurityValve;
+        this.port = port;
     }
 
     static OwbTestServer start(Path webapp, ListenerMode mode, boolean startWithoutBeansXml,
@@ -92,19 +100,8 @@ final class OwbTestServer implements AutoCloseable {
         Map<String, Context> contexts = new LinkedHashMap<>();
         for (Deployment deployment : deployments) {
             Context context = tomcat.addWebapp(deployment.contextPath(), deployment.webapp().toString());
-            if (context instanceof StandardContext standardContext) {
-                // These checks require --add-opens for java.lang and java.rmi.
-                // They are not relevant to the module integration tests.
-                standardContext.setClearReferencesThreadLocals(false);
-                standardContext.setClearReferencesRmiTargets(false);
-            }
+            configureContext(context, mode, startWithoutBeansXml, addSecurityValve);
             contexts.put(deployment.contextPath(), context);
-            if (mode == ListenerMode.CONTEXT) {
-                OpenWebBeansContextLifecycleListener listener = new OpenWebBeansContextLifecycleListener();
-                listener.setStartWithoutBeansXml(startWithoutBeansXml);
-                listener.setAddSecurityValve(addSecurityValve);
-                context.addLifecycleListener(listener);
-            }
         }
 
         if (mode == ListenerMode.SERVER) {
@@ -126,7 +123,18 @@ final class OwbTestServer implements AutoCloseable {
         for (String contextPath : contexts.keySet()) {
             baseUris.put(contextPath, URI.create("http://127.0.0.1:" + port + contextPath + "/"));
         }
-        return new OwbTestServer(tomcat, Collections.unmodifiableMap(contexts), Collections.unmodifiableMap(baseUris));
+        return new OwbTestServer(tomcat, contexts, baseUris, mode, startWithoutBeansXml, addSecurityValve, port);
+    }
+
+    Context deploy(String contextPath, Path webapp) throws Exception {
+        Context context = tomcat.addWebapp(contextPath, webapp.toString());
+        configureContext(context, listenerMode, startWithoutBeansXml, addSecurityValve);
+        if (!context.getState().isAvailable()) {
+            context.start();
+        }
+        contexts.put(contextPath, context);
+        baseUris.put(contextPath, URI.create("http://127.0.0.1:" + port + contextPath + "/"));
+        return context;
     }
 
     Context context() {
@@ -163,6 +171,22 @@ final class OwbTestServer implements AutoCloseable {
             tomcat.stop();
         } finally {
             tomcat.destroy();
+        }
+    }
+
+    private static void configureContext(Context context, ListenerMode mode, boolean startWithoutBeansXml,
+            boolean addSecurityValve) {
+        if (context instanceof StandardContext standardContext) {
+            // These checks require --add-opens for java.lang and java.rmi.
+            // They are not relevant to the module integration tests.
+            standardContext.setClearReferencesThreadLocals(false);
+            standardContext.setClearReferencesRmiTargets(false);
+        }
+        if (mode == ListenerMode.CONTEXT) {
+            OpenWebBeansContextLifecycleListener listener = new OpenWebBeansContextLifecycleListener();
+            listener.setStartWithoutBeansXml(startWithoutBeansXml);
+            listener.setAddSecurityValve(addSecurityValve);
+            context.addLifecycleListener(listener);
         }
     }
 

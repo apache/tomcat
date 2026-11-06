@@ -18,7 +18,6 @@ package org.apache.webbeans.web.tomcat.testapp;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.Objects;
 
 import jakarta.inject.Inject;
 import jakarta.servlet.annotation.WebServlet;
@@ -26,9 +25,11 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.webbeans.config.WebBeansContext;
+import org.apache.webbeans.spi.SecurityService;
 import org.apache.webbeans.web.tomcat.OpenWebBeansSecurityValve;
 
-@WebServlet("/whoami")
+@WebServlet(urlPatterns = { "/whoami", "/security-service-principal-type", "/security-service-principal-custom" })
 public class WhoAmIServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -38,9 +39,26 @@ public class WhoAmIServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String path = request.getServletPath();
+        response.setContentType("text/plain");
+
+        if ("/security-service-principal-type".equals(path)) {
+            Principal current = securityService().getCurrentPrincipal();
+            response.getWriter().println(current.getClass().getName());
+            return;
+        }
+        if ("/security-service-principal-custom".equals(path)) {
+            Principal current = securityService().getCurrentPrincipal();
+            response.getWriter().println(current instanceof CustomPrincipal ? "custom" : "not-custom");
+            return;
+        }
+
         Principal valvePrincipal = OpenWebBeansSecurityValve.getPrincipal();
         String valveName = valvePrincipal == null ? "null" : valvePrincipal.getName();
-        response.setContentType("text/plain");
-        response.getWriter().println(Objects.requireNonNull(principal).getName() + "|" + valveName);
+        response.getWriter().println(principal.getName() + "|" + valveName);
+    }
+
+    private static SecurityService securityService() {
+        return WebBeansContext.currentInstance().getSecurityService();
     }
 }

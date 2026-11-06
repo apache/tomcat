@@ -53,11 +53,19 @@ target/tomcat-owb-<owb-version>.jar
 
 Run the full integration test suite:
 
+Run the unit tests:
+
+```bash
+mvn test
+```
+
+Run the unit and integration tests:
+
 ```bash
 mvn clean verify
 ```
 
-Run a single test class:
+Run a single integration test class:
 
 ```bash
 mvn -Dit.test=OpenWebBeansSecurityIT verify
@@ -129,9 +137,11 @@ provided through the test/common classpath, matching the production
 
 | Test class | Coverage |
 |---|---|
+| `TomcatPluginTest` | Servlet spec class handling, managed-bean rejection, injection support and security service registration |
+| `OpenWebBeansInstanceManagerTest` | Delegation for all `InstanceManager` creation variants and destruction fallback |
 | `OpenWebBeansCdi41IT` | CDI injection, request/session scope, `isMatchingBean`, `isMatchingEvent`, `getContexts`, interceptor bindings, method invoker |
-| `OpenWebBeansTomcatIntegrationIT` | Server/context listener modes, `startWithoutBeansXml`, alternate `beans.xml` location, security valve configuration, filter/servlet injection, lifecycle callbacks |
-| `OpenWebBeansSecurityIT` | BASIC authentication, `@Inject Principal`, security valve principal |
+| `OpenWebBeansTomcatIntegrationIT` | Server/context listener modes, `startWithoutBeansXml` positive and negative behavior, alternate `beans.xml` location, security valve configuration, dynamic deployment, filter/listener/servlet injection and lifecycle callbacks |
+| `OpenWebBeansSecurityIT` | BASIC authentication, `@Inject Principal`, security valve principal, principal proxy modes and custom proxy APIs |
 | `OpenWebBeansSecurityFilterIT` | Webapp-level `OpenWebBeansSecurityFilter` |
 | `OpenWebBeansJspIT` | JSP/EL resolution through OWB |
 | `OpenWebBeansRedeployIT` | Multiple webapps, classloader isolation, context restart, `@PreDestroy`, listener registration |
