@@ -66,7 +66,7 @@ class TestPoolExhaustionSqlState extends JdbcPoolBaseTest {
         ds.getPoolProperties().setMaxActive(1);
         ds.getPoolProperties().setMaxWait(250);
         ds.createPool();
-        try (Connection held = ds.getConnection()) {
+        try (@SuppressWarnings("unused") Connection held = ds.getConnection()) {
             PoolExhaustedException exhausted = Assertions.assertThrows(
                     PoolExhaustedException.class, ds::getConnection,
                     "a timing-out borrow on an exhausted pool must fail "

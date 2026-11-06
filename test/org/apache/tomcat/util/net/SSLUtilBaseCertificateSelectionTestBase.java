@@ -278,7 +278,9 @@ public abstract class SSLUtilBaseCertificateSelectionTestBase extends TomcatBase
         Map<CertType,Integer> used = new EnumMap<>(CertType.class);
         for (KeystoreEntry entry : entries) {
             List<CertAndKey> options = certificatePool().get(entry.certType());
-            CertAndKey chosen = options.get((used.merge(entry.certType(), 1, Integer::sum) - 1) % options.size());
+            CertAndKey chosen =
+                    options.get((used.merge(entry.certType(), Integer.valueOf(1), Integer::sum).intValue() - 1) %
+                            options.size());
             if (entry.keyEntry()) {
                 keystore.setKeyEntry(entry.alias(), chosen.key(), TesterSupport.JKS_PASS.toCharArray(),
                         new X509Certificate[] { chosen.certificate() });
@@ -380,10 +382,10 @@ public abstract class SSLUtilBaseCertificateSelectionTestBase extends TomcatBase
         spi.engineLoad(null, null);
         EasyMock.expectLastCall().once();
         EasyMock.expect(spi.engineAliases()).andStubAnswer(() -> Collections.enumeration(aliases));
-        EasyMock.expect(spi.engineContainsAlias(EasyMock.anyString()))
-                .andStubAnswer(() -> delegate.containsAlias(EasyMock.getCurrentArgument(0)));
-        EasyMock.expect(spi.engineIsKeyEntry(EasyMock.anyString()))
-                .andStubAnswer(() -> delegate.isKeyEntry(EasyMock.getCurrentArgument(0)));
+        EasyMock.expect(Boolean.valueOf(spi.engineContainsAlias(EasyMock.anyString())))
+                .andStubAnswer(() -> Boolean.valueOf(delegate.containsAlias(EasyMock.getCurrentArgument(0))));
+        EasyMock.expect(Boolean.valueOf(spi.engineIsKeyEntry(EasyMock.anyString())))
+                .andStubAnswer(() -> Boolean.valueOf(delegate.isKeyEntry(EasyMock.getCurrentArgument(0))));
         EasyMock.expect(spi.engineGetCertificate(EasyMock.anyString())).andStubAnswer(() -> {
             String alias = EasyMock.getCurrentArgument(0);
             return alias.equals(malformedAlias) ? malformed : delegate.getCertificate(alias);

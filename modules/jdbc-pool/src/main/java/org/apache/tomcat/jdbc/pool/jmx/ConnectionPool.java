@@ -298,7 +298,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
             // point of the bound, and must not fail the pool operation that
             // reported the condition
             log.warn(MessageFactory.get("jmxConnectionPool.droppingNotification",
-                    type, getNotificationSource(), NOTIFY_QUEUE_CAPACITY));
+                    type, getNotificationSource(), Integer.valueOf(NOTIFY_QUEUE_CAPACITY)));
             return false;
         } catch (Exception x) {
             if (log.isDebugEnabled()) {

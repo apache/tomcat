@@ -77,7 +77,7 @@ class TestAbandonedTrace extends JdbcPoolBaseTest {
             Assertions.assertTrue(site instanceof StackTraceElement[],
                     "a borrow with logAbandoned must record the borrow site as unformatted frames, "
                             + "not a thread dump up front, but the slot held: "
-                            + (site == null ? "null" : site.getClass().getName()));
+                            + site.getClass().getName());
             Assertions.assertTrue(((StackTraceElement[]) site).length > 0,
                     "the borrow must record a borrow site");
 

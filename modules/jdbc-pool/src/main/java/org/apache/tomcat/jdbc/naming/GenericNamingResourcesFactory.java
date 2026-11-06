@@ -429,7 +429,6 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
      * failed property, instead of escaping unconverted from within a catch
      * block the outer handlers cannot guard.
      */
-    @SuppressWarnings("null") // voidBag can't be null where it is used
     private static SetResult applyPropertyBag(Object o, String name,
             String value, Method boolBag, Method voidBag)
             throws IllegalAccessException, InvocationTargetException {

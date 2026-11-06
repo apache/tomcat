@@ -1798,7 +1798,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     }
 
 
-    @SuppressWarnings("deprecation") // thread.stop()
     private void clearReferencesThreads() {
         Thread[] threads = getThreads();
         List<Thread> threadsToStop = new ArrayList<>();

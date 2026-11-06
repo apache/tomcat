@@ -226,7 +226,7 @@ public class SlowQueryReport extends AbstractQueryReport {
         // FAILED QUERY notification behind isLogFailed() alone, the two
         // channels disagreeing on the same event.
         if (isLogFailed() && log.isWarnEnabled()) {
-            log.warn(MessageFactory.get("slowQueryReport.failedQueryReport", sqlForLog(sql), delta));
+            log.warn(MessageFactory.get("slowQueryReport.failedQueryReport", sqlForLog(sql), Long.valueOf(delta)));
         }
         return sql;
     }
@@ -268,7 +268,7 @@ public class SlowQueryReport extends AbstractQueryReport {
         // keeps sending the SLOW QUERY notification behind isLogSlow() alone,
         // the two channels disagreeing on the same event.
         if (isLogSlow() && log.isWarnEnabled()) {
-            log.warn(MessageFactory.get("slowQueryReport.slowQueryReport", sqlForLog(sql), delta));
+            log.warn(MessageFactory.get("slowQueryReport.slowQueryReport", sqlForLog(sql), Long.valueOf(delta)));
         }
         return sql;
     }

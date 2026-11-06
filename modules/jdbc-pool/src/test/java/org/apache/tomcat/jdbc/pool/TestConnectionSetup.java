@@ -692,11 +692,11 @@ class TestConnectionSetup extends JdbcPoolBaseTest {
     private static void assertConfiguredDefault(Connection c, String method, String value) throws SQLException {
         switch (method) {
             case "setReadOnly":
-                Assertions.assertEquals(Boolean.parseBoolean(value), c.isReadOnly(),
+                Assertions.assertEquals(Boolean.valueOf(value), Boolean.valueOf(c.isReadOnly()),
                         "the restored read-only state must be the configured one");
                 break;
             case "setAutoCommit":
-                Assertions.assertEquals(Boolean.parseBoolean(value), c.getAutoCommit(),
+                Assertions.assertEquals(Boolean.valueOf(value), Boolean.valueOf(c.getAutoCommit()),
                         "the restored auto-commit state must be the configured one");
                 break;
             case "setCatalog":

@@ -223,7 +223,7 @@ public abstract class AbstractCreateStatementInterceptor extends JdbcInterceptor
             // An exception escaping the class initializer would surface as an
             // ExceptionInInitializerError at every use of every subclass.
             log.warn(MessageFactory.get("abstractCreateStatementInterceptor.unableToCreateConstructorCacheEntry",
-                    idx, clazz.getName()), e);
+                    Integer.valueOf(idx), clazz.getName()), e);
         }
     }
 
@@ -345,8 +345,8 @@ public abstract class AbstractCreateStatementInterceptor extends JdbcInterceptor
         }
         if (!clazz.isAssignableFrom(cached.getDeclaringClass())) {
             throw new IllegalStateException(MessageFactory.get(
-                    "abstractCreateStatementInterceptor.constructorCacheIndexPopulated",
-                    idx, Arrays.toString(cached.getDeclaringClass().getInterfaces()), clazz.getName()));
+                    "abstractCreateStatementInterceptor.constructorCacheIndexPopulated", Integer.valueOf(idx),
+                    Arrays.toString(cached.getDeclaringClass().getInterfaces()), clazz.getName()));
         }
         return cached;
     }

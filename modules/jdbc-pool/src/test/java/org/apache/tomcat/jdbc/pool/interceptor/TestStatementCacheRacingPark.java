@@ -303,7 +303,7 @@ class TestStatementCacheRacingPark extends JdbcPoolBaseTest {
             // must have closed it. Pre-fix both closes believed they had
             // parked, neither closed its delegate, and the overwritten one
             // stayed open with nothing left that could ever reach it.
-            Assertions.assertNotEquals(aClosed, bClosed,
+            Assertions.assertNotEquals(Boolean.valueOf(aClosed), Boolean.valueOf(bClosed),
                     "exactly one of the two racing statements may stay open: "
                             + "the winner of the park, not the loser (pre-fix "
                             + "both stayed open and the loser leaked); " + observed);

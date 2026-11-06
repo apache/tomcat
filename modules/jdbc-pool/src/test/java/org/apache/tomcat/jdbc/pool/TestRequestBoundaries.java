@@ -136,7 +136,7 @@ class TestRequestBoundaries extends JdbcPoolBaseTest {
                 "the refused hint must not strand the return of the connection");
 
         // the connection stayed poolable across the refused hints
-        try (Connection con = ds.getConnection()) {
+        try (@SuppressWarnings("unused") Connection con = ds.getConnection()) {
             Assertions.assertEquals(2, BEGIN_REQUEST_COUNT.get());
         }
         Assertions.assertEquals(1, poolSessions(),

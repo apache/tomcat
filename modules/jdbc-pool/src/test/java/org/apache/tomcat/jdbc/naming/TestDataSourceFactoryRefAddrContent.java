@@ -373,9 +373,9 @@ class TestDataSourceFactoryRefAddrContent extends JdbcPoolBaseTest {
                         case "toString":
                             return "SingleInterfaceDataSource";
                         case "hashCode":
-                            return System.identityHashCode(proxy);
+                            return Integer.valueOf(System.identityHashCode(proxy));
                         case "equals":
-                            return proxy == args[0];
+                            return Boolean.valueOf(proxy == args[0]);
                         default:
                             try {
                                 return method.invoke(delegate, args);
@@ -402,9 +402,9 @@ class TestDataSourceFactoryRefAddrContent extends JdbcPoolBaseTest {
                             case "lookup":
                                 return bound;
                             case "hashCode":
-                                return System.identityHashCode(proxy);
+                                return Integer.valueOf(System.identityHashCode(proxy));
                             case "equals":
-                                return proxy == args[0];
+                                return Boolean.valueOf(proxy == args[0]);
                             case "toString":
                                 return "ContextStub";
                             case "close":

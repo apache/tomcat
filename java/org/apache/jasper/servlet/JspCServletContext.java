@@ -328,7 +328,7 @@ public class JspCServletContext implements ServletContext {
             // they are by the runtime container.
             URI uri = new URI(myResourceBaseURL.toExternalForm() + encodePath(path));
             url = uri.toURL();
-            try (InputStream is = url.openStream()) {
+            try (@SuppressWarnings("unused") InputStream is = url.openStream()) {
             }
         } catch (IOException | URISyntaxException e) {
             // The resource does not exist or the URL could not be built.

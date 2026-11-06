@@ -74,6 +74,7 @@ class TestStatementDecoratorIdentity extends JdbcPoolBaseTest {
     }
 
     /* The contract of an open statement handle, for one layer. */
+    @SuppressWarnings("unlikely-arg-type") // Use of unlikely arg-type is deliberate
     private static void assertOpenStatementHandle(Statement handle,
             Statement other, Connection pooled, String layer) {
         Assertions.assertTrue(handle.equals(handle),
@@ -96,6 +97,7 @@ class TestStatementDecoratorIdentity extends JdbcPoolBaseTest {
     }
 
     /* The contract of a closed statement handle, for one layer. */
+    @SuppressWarnings("unlikely-arg-type") // Use of unlikely arg-type is deliberate
     private static void assertClosedStatementHandle(Statement handle,
             int hashBeforeClose, Connection pooled, String layer) {
         // Neither method declares a checked exception, so a throwing handler
@@ -117,7 +119,6 @@ class TestStatementDecoratorIdentity extends JdbcPoolBaseTest {
         }
     }
 
-    @SuppressWarnings("unlikely-arg-type") // Use of unlikely arg-type is deliberate
     @Test
     void aStatementHandleIsEqualOnlyToItselfWhileOpen() throws Exception {
         DataSource ds = decoratorPool();
@@ -132,7 +133,6 @@ class TestStatementDecoratorIdentity extends JdbcPoolBaseTest {
         }
     }
 
-    @SuppressWarnings("unlikely-arg-type") // Use of unlikely arg-type is deliberate
     @Test
     void aClosedStatementHandleKeepsAnsweringWithItsOwnIdentity() throws Exception {
         DataSource ds = decoratorPool();
