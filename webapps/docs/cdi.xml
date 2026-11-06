@@ -57,10 +57,10 @@
   <section name="Building">
 
   <p>
-    Building the module requires Java 21 or later, Apache Maven and the Tomcat
-    artifacts for the Tomcat version used by the module in the local Maven
-    repository. The default configuration uses the Tomcat version from the
-    current source tree.
+    Building the module requires Apache Maven, a JDK supported by the Tomcat
+    version used by the module, and the Tomcat artifacts for that version in
+    the local Maven repository. Tomcat 12 requires Java 21; Tomcat 11 requires
+    Java 17. The CDI APIs used by the module require Java 17.
   </p>
 
   <p>
