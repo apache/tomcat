@@ -36,33 +36,14 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 /**
  * Facade that creates statement and result set proxies.
  * <p>
- * The handles this facade hands out implement only the standard JDBC interfaces, as do the proxies of the interceptors
- * that wrap statements beneath it, so the driver's own statement and result set classes are never visible to the
- * application through a cast. Every result set a pooled statement hands back, and every result set that one of those
- * handles hands back in turn, reaches the application as one of these handles, whatever the method that returned it was
- * called: a cursor that arrives as a plain object - a REF cursor OUT-parameter read through
- * {@link java.sql.CallableStatement#getObject(int)}, or the nested cursor a {@link java.sql.ResultSet#getObject(int)}
- * column value hands out - is sealed to the borrow like the ones the standard result set methods return. The
- * <code>Wrapper</code> methods are delegated to the driver, and <code>unwrap</code> is the supported way to reach
- * driver-specific methods through every layer. An unwrapped driver object, however, is a driver object rather than a
- * pooled handle: retiring these handles at the end of the borrow does not retire what was already unwrapped, and only
- * tracking the statements with {@link org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer} (or the application
- * closing them) keeps the statements underneath from outliving the borrow - unless an interceptor recycles them for the
- * next borrow, as a statement cache does.
+ * The handles implement only the standard JDBC interfaces, so the driver's own classes are never visible through a cast.
+ * Every result set handed back - including cursors returned through {@code getObject(...)} - is sealed to the borrow.
+ * The {@code Wrapper} methods are delegated to the driver; an unwrapped driver object is not retired when the borrow
+ * ends, so statements underneath are kept alive only by {@link org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer}
+ * or by the application closing them.
  * <p>
- * The rule that decides what is sealed is a type rule, and its boundary is the type. A value a handle hands back
- * that is not itself a result set is passed through as it came (what a statement handle reports as its connection
- * is the pool's own handle, not the driver's), and a cursor that rides inside such a value reaches the application
- * over that same unsealed path: the {@link java.sql.Array} read for an ARRAY column or an ARRAY OUT-parameter
- * hands out its cursors through {@link java.sql.Array#getResultSet()}, a {@link java.sql.Struct} through its
- * attributes, and the deprecated {@link java.sql.Ref} a <code>getRef</code> call hands back is itself the
- * driver's object; the {@link java.sql.Blob}, {@link java.sql.Clob} and {@link java.sql.SQLXML} locators are the
- * same shape without a cursor in them. None of that is sealed to the borrow, just as what <code>unwrap()</code>
- * hands back is not: this facade seals the result sets a pooled statement hands out and the result sets those
- * handles hand out in turn, not cursors that arrive inside values of another type - the REF cursor OUT-parameter
- * and the nested cursor named above are themselves result sets, which is why they are sealed and these composites
- * are not. Whether a driver object kept past the borrow still reads, and over what session, is the driver's affair;
- * no handle of this facade retires it.
+ * Sealing follows the declared type: a value that is not itself a result set is passed through unchanged, so cursors
+ * carried inside an {@link java.sql.Array}, {@link java.sql.Struct} or {@link java.sql.Ref} are not sealed.
  */
 public class StatementFacade extends AbstractCreateStatementInterceptor {
 
@@ -103,11 +84,13 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
     }
 
     /**
-     * Marks the borrow as ended, which closes every statement and result set handle this facade handed out. Called
-     * before the connection leaves the application - on close and, through {@link #invoke}, on abort - so a handle
-     * cannot outlive the borrow and end up driving the session of the next borrower. A borrow that is abandoned
-     * instead never runs this method, but the pool destroys an abandoned session rather than lending it again, so
-     * those handles only fail at the driver.
+     * Marks the borrow as ended, sealing every statement and result set handle this facade handed out so later calls are
+     * refused. Called before the connection leaves the application - on close and, through {@link #invoke}, on abort -
+     * so a handle cannot outlive the borrow and end up driving the session of the next borrower. This method does not
+     * physically close the driver statements; that is done by the driver's connection close, or by
+     * {@link org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer} when configured. A borrow that is abandoned
+     * instead never runs this method, but the pool destroys an abandoned session rather than lending it again, so those
+     * handles only fail at the driver.
      */
     @Override
     public void closeInvoked() {
