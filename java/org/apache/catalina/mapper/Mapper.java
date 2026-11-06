@@ -738,7 +738,7 @@ public final class Mapper {
         boolean trailingPeriodRemoved = false;
         MappedHost mappedHost = null;
         try {
-            if (host.charAt(host.length() - 1)  == '.') {
+            if (host.length() > 0 && host.charAt(host.length() - 1)  == '.') {
                 host.setEnd(host.getEnd() - 1);
                 trailingPeriodRemoved = true;
             }
