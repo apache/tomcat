@@ -18,6 +18,7 @@ package org.apache.juli.logging;
 
 import java.lang.reflect.Constructor;
 import java.nio.file.FileSystems;
+import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.logging.LogManager;
 
@@ -198,6 +199,7 @@ public class LogFactory {
      * @param classLoader ClassLoader for which to release the LogFactory. Must not be null.
      */
     public static void release(ClassLoader classLoader) {
+        Objects.requireNonNull(classLoader);
         // JULI's log manager looks at the current classLoader so the
         // classLoader to release has to be the current one, the default
         // implementation does not so calling reset in that case would reset
