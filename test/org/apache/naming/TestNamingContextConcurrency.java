@@ -18,11 +18,13 @@ package org.apache.naming;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.naming.Binding;
+import javax.naming.NameAlreadyBoundException;
 import javax.naming.NameClassPair;
 import javax.naming.NamingEnumeration;
 
@@ -133,5 +135,48 @@ public class TestNamingContextConcurrency {
         }
         Assert.assertEquals(stableEntries, stableCount);
         Assert.assertEquals("Leftover dynamic entries", 0, dynamicCount);
+    }
+
+    /*
+     * Binding a name that is already bound must fail, also when several threads bind the same
+     * name at once. The check and the update used to be separate steps, so more than one of the
+     * threads could succeed and the last one silently replaced the others.
+     */
+    @Test
+    public void testConcurrentBindOfSameNameSucceedsOnce() throws Exception {
+        int threads = 8;
+        for (int round = 0; round < 50; round++) {
+            NamingContext context = new NamingContext(null, "test");
+            CyclicBarrier barrier = new CyclicBarrier(threads);
+            AtomicInteger successes = new AtomicInteger();
+            AtomicInteger duplicates = new AtomicInteger();
+            AtomicReference<Throwable> failure = new AtomicReference<>();
+
+            List<Thread> workers = new ArrayList<>();
+            for (int t = 0; t < threads; t++) {
+                String value = "value" + t;
+                workers.add(new Thread(() -> {
+                    try {
+                        barrier.await();
+                        context.bind("contested", value);
+                        successes.incrementAndGet();
+                    } catch (NameAlreadyBoundException e) {
+                        duplicates.incrementAndGet();
+                    } catch (Throwable e) {
+                        failure.compareAndSet(null, e);
+                    }
+                }));
+            }
+            for (Thread worker : workers) {
+                worker.start();
+            }
+            for (Thread worker : workers) {
+                worker.join();
+            }
+
+            Assert.assertNull(failure.get());
+            Assert.assertEquals("Round " + round, 1, successes.get());
+            Assert.assertEquals("Round " + round, threads - 1, duplicates.get());
+        }
     }
 }
