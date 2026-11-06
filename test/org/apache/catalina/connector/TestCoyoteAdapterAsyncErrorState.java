@@ -218,6 +218,113 @@ public class TestCoyoteAdapterAsyncErrorState extends TomcatBaseTest {
     }
 
 
+    /*
+     * BZ 70290: The response has been committed (the output was flushed to the client) before the connection went into
+     * an error state that permits IO and dispatch() was called. The dispatch can not be performed so onComplete() has
+     * to be called once, the in-progress async count has to be balanced and the output already sent has to have been
+     * delivered.
+     */
+    @Test
+    public void testBz70290DispatchAfterCloseCleanWithCommittedResponse() throws Exception {
+        TestServlet servlet =
+                new TestServlet(ActionCode.DISABLE_SWALLOW_INPUT).withOutput("FLUSHED-OUTPUT").withFlush();
+        startTomcat(servlet);
+
+        String response = sendRequest();
+
+        Assert.assertTrue(response, response.contains("FLUSHED-OUTPUT"));
+        assertCompletedOnce(servlet);
+        Assert.assertEquals("onError() must be called once", 1, servlet.errors.get());
+    }
+
+
+    /*
+     * BZ 70290: As above but complete() is called rather than dispatch().
+     */
+    @Test
+    public void testBz70290CompleteAfterCloseCleanWithCommittedResponse() throws Exception {
+        TestServlet servlet =
+                new TestServlet(ActionCode.DISABLE_SWALLOW_INPUT, true).withOutput("FLUSHED-OUTPUT").withFlush();
+        startTomcat(servlet);
+
+        String response = sendRequest();
+
+        Assert.assertTrue(response, response.contains("FLUSHED-OUTPUT"));
+        assertCompletedOnce(servlet);
+        Assert.assertEquals("onError() must be called once", 1, servlet.errors.get());
+    }
+
+
+    /*
+     * BZ 70290: As above but the connection is closed (CLOSE_NOW) rather than closed cleanly.
+     */
+    @Test
+    public void testBz70290DispatchAfterCloseNowWithCommittedResponse() throws Exception {
+        TestServlet servlet = new TestServlet(ActionCode.CLOSE_NOW).withOutput("FLUSHED-OUTPUT").withFlush();
+        startTomcat(servlet);
+
+        sendRequest();
+
+        assertCompletedOnce(servlet);
+    }
+
+
+    /*
+     * BZ 70290: When an error occurs after the response has been committed onError() must always be called and
+     * whatever onError() does (nothing, dispatch() or complete()) has to be handled the way ErrorReportValve handles
+     * errors for a committed response: the response that was sent is left as it is and the connection is closed. In all
+     * cases onComplete() has to be called once and the in-progress async count has to be balanced.
+     */
+    private void doCommittedResponseOnError(ActionCode errorAction, String onErrorOperation) throws Exception {
+        TestServlet servlet = new TestServlet(errorAction).withOutput("FLUSHED-OUTPUT").withFlush()
+                .withoutInitialOperation().withOnErrorOperation(onErrorOperation);
+        startTomcat(servlet);
+
+        String response = sendRequest();
+
+        Assert.assertTrue(response, response.contains("FLUSHED-OUTPUT"));
+        Assert.assertEquals("onError() must be called once", 1, servlet.errors.get());
+        Assert.assertEquals("The dispatch can not be performed", 0, servlet.dispatches.get());
+        assertCompletedOnce(servlet);
+    }
+
+
+    @Test
+    public void testBz70290CommittedCloseCleanOnErrorDoesNothing() throws Exception {
+        doCommittedResponseOnError(ActionCode.DISABLE_SWALLOW_INPUT, null);
+    }
+
+
+    @Test
+    public void testBz70290CommittedCloseCleanOnErrorDispatches() throws Exception {
+        doCommittedResponseOnError(ActionCode.DISABLE_SWALLOW_INPUT, "dispatch");
+    }
+
+
+    @Test
+    public void testBz70290CommittedCloseCleanOnErrorCompletes() throws Exception {
+        doCommittedResponseOnError(ActionCode.DISABLE_SWALLOW_INPUT, "complete");
+    }
+
+
+    @Test
+    public void testBz70290CommittedCloseNowOnErrorDoesNothing() throws Exception {
+        doCommittedResponseOnError(ActionCode.CLOSE_NOW, null);
+    }
+
+
+    @Test
+    public void testBz70290CommittedCloseNowOnErrorDispatches() throws Exception {
+        doCommittedResponseOnError(ActionCode.CLOSE_NOW, "dispatch");
+    }
+
+
+    @Test
+    public void testBz70290CommittedCloseNowOnErrorCompletes() throws Exception {
+        doCommittedResponseOnError(ActionCode.CLOSE_NOW, "complete");
+    }
+
+
     private void startTomcat(TestServlet servlet) throws Exception {
         Tomcat tomcat = getTomcatInstance();
         Context ctx = getProgrammaticRootContext();
@@ -288,14 +395,39 @@ public class TestCoyoteAdapterAsyncErrorState extends TomcatBaseTest {
         private final ActionCode errorAction;
         private final boolean complete;
         private volatile String output;
+        private volatile boolean flush;
+        private volatile boolean noInitialOperation;
+        private volatile String onErrorOperation;
         private volatile boolean completeFromTimeout;
 
         final AtomicInteger dispatches = new AtomicInteger();
         final AtomicInteger completions = new AtomicInteger();
+        final AtomicInteger errors = new AtomicInteger();
         final CountDownLatch completed = new CountDownLatch(1);
 
         TestServlet(ActionCode errorAction) {
             this(errorAction, false);
+        }
+
+        /*
+         * Do not call dispatch() or complete() from service(). The container is left to report the error.
+         */
+        TestServlet withoutInitialOperation() {
+            this.noInitialOperation = true;
+            return this;
+        }
+
+        /*
+         * Call dispatch() ("dispatch") or complete() ("complete") from AsyncListener.onError()
+         */
+        TestServlet withOnErrorOperation(String operation) {
+            this.onErrorOperation = operation;
+            return this;
+        }
+
+        TestServlet withFlush() {
+            this.flush = true;
+            return this;
         }
 
         /*
@@ -348,7 +480,12 @@ public class TestCoyoteAdapterAsyncErrorState extends TomcatBaseTest {
 
                 @Override
                 public void onError(AsyncEvent event) {
-                    // NO-OP
+                    errors.incrementAndGet();
+                    if ("dispatch".equals(onErrorOperation)) {
+                        event.getAsyncContext().dispatch();
+                    } else if ("complete".equals(onErrorOperation)) {
+                        event.getAsyncContext().complete();
+                    }
                 }
 
                 @Override
@@ -364,6 +501,10 @@ public class TestCoyoteAdapterAsyncErrorState extends TomcatBaseTest {
 
             writeOutputAndFail(req, resp);
 
+            if (noInitialOperation) {
+                return;
+            }
+
             // Request the dispatch (or completion) on the container thread during the initial service call
             if (complete) {
                 ac.complete();
@@ -376,6 +517,10 @@ public class TestCoyoteAdapterAsyncErrorState extends TomcatBaseTest {
             if (output != null) {
                 resp.setContentType("text/plain");
                 resp.getWriter().print(output);
+                if (flush) {
+                    // Commits the response so the status and headers have been sent to the client
+                    resp.flushBuffer();
+                }
             }
 
             if (errorAction != null) {

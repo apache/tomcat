@@ -368,9 +368,16 @@ public class CoyoteAdapter implements Adapter {
 
                 // If an async request was started, is not going to end once
                 // this container thread finishes and an error occurred, trigger
-                // the async error process
-                if (!request.isAsyncCompleting() && throwable != null) {
-                    request.getAsyncContextInternal().setErrorState(throwable, true);
+                // the async error process. The error may have been reported
+                // without an exception (e.g. the connection being closed after
+                // the response had been committed) in which case the async
+                // state machine is already in the error state.
+                if (!request.isAsyncCompleting()) {
+                    AtomicBoolean asyncError = new AtomicBoolean(false);
+                    res.action(ActionCode.ASYNC_IS_ERROR, asyncError);
+                    if (throwable != null || asyncError.get()) {
+                        request.getAsyncContextInternal().setErrorState(throwable, true);
+                    }
                 }
             } else {
                 request.finishRequest();
