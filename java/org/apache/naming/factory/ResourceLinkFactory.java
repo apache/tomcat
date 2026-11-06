@@ -181,11 +181,13 @@ public class ResourceLinkFactory implements ObjectFactory {
             // The global context may be missing if the web application was
             // registered before the server created its naming context, which
             // can happen with embedded start-up ordering
-            if (globalContext == null) {
+            // Read the field once so that a concurrent change cannot lead to a null being dereferenced
+            Context global = globalContext;
+            if (global == null) {
                 log.warn(sm.getString("resourceLinkFactory.noGlobalContext", globalName));
                 return null;
             }
-            Object result = globalContext.lookup(globalName);
+            Object result = global.lookup(globalName);
             if (result == null) {
                 return null;
             }
