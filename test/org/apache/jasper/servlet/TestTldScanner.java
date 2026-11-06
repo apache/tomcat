@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.logging.Level;
 
 import jakarta.servlet.ServletContext;
+import jakarta.servlet.descriptor.JspConfigDescriptor;
+import jakarta.servlet.descriptor.TaglibDescriptor;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -177,6 +179,74 @@ public class TestTldScanner extends TomcatBaseTest {
         // Both parsed TLDs remain cached since they may also be referenced
         // directly by resource path.
         Assert.assertEquals(2, scanner.getTldResourcePathTaglibXmlMap().size());
+    }
+
+
+    @Test
+    public void testListenersNotDuplicatedForDifferentTaglibUris() throws Exception {
+        // Two TLDs with different URIs that declare the same listener class
+        // must not cause that class to be registered, and therefore
+        // instantiated, twice.
+        ServletContext mockContext = EasyMock.createMock(ServletContext.class);
+        EasyMock.replay(mockContext);
+
+        TldScanner scanner = new TldScanner(mockContext, true, true, true);
+
+        File appDir = new File(getTemporaryDirectory(), "different-uri-listeners");
+        TldResourcePath first = createTld(appDir, "one",
+                "<uri>http://tomcat.apache.org/first</uri>\n" +
+                "  <listener>\n" +
+                "    <listener-class>com.example.SharedListener</listener-class>\n" +
+                "  </listener>");
+        TldResourcePath second = createTld(appDir, "two",
+                "<uri>http://tomcat.apache.org/second</uri>\n" +
+                "  <listener>\n" +
+                "    <listener-class>com.example.SharedListener</listener-class>\n" +
+                "  </listener>");
+
+        scanner.parseTld(first);
+        scanner.parseTld(second);
+
+        EasyMock.verify(mockContext);
+        Assert.assertEquals(2, scanner.getUriTldResourcePathMap().size());
+        Assert.assertEquals(1, scanner.getListeners().size());
+        Assert.assertEquals("com.example.SharedListener", scanner.getListeners().get(0));
+    }
+
+
+    @Test
+    public void testListenersNotDuplicatedForWebXmlTaglibUriMismatch() throws Exception {
+        // The taglib-uri in web.xml differs from the URI declared in the TLD
+        // itself. The same TLD found again by the scan has a URI that is not
+        // yet mapped, so the duplicate can only be detected by listener class.
+        File appDir = new File(getTemporaryDirectory(), "webxml-uri-mismatch-listeners");
+        TldResourcePath declared = createTld(appDir, "one",
+                "<uri>http://tomcat.apache.org/mismatch</uri>\n" +
+                "  <listener>\n" +
+                "    <listener-class>com.example.MismatchListener</listener-class>\n" +
+                "  </listener>");
+        TldResourcePath found = createTld(appDir, "two",
+                "<uri>http://tomcat.apache.org/mismatch</uri>\n" +
+                "  <listener>\n" +
+                "    <listener-class>com.example.MismatchListener</listener-class>\n" +
+                "  </listener>");
+
+        TaglibDescriptor taglib = EasyMock.createMock(TaglibDescriptor.class);
+        EasyMock.expect(taglib.getTaglibURI()).andReturn("urn:mismatch").anyTimes();
+        EasyMock.expect(taglib.getTaglibLocation()).andReturn("/one/example.tld").anyTimes();
+        JspConfigDescriptor jspConfig = EasyMock.createMock(JspConfigDescriptor.class);
+        EasyMock.expect(jspConfig.getTaglibs()).andReturn(Collections.singleton(taglib)).anyTimes();
+        ServletContext mockContext = EasyMock.createMock(ServletContext.class);
+        EasyMock.expect(mockContext.getJspConfigDescriptor()).andReturn(jspConfig).anyTimes();
+        EasyMock.expect(mockContext.getResource("/one/example.tld")).andReturn(declared.getUrl()).anyTimes();
+        EasyMock.replay(taglib, jspConfig, mockContext);
+
+        TldScanner scanner = new TldScanner(mockContext, true, true, true);
+        scanner.scanJspConfig();
+        scanner.parseTld(found);
+
+        Assert.assertEquals(1, scanner.getListeners().size());
+        Assert.assertEquals("com.example.MismatchListener", scanner.getListeners().get(0));
     }
 
 
