@@ -246,10 +246,10 @@ public class TestLookupFactory extends TomcatBaseTest {
         Files.createDirectories(classes);
         Path source = new File(docBase, "tester/Marker.java").toPath();
         Files.createDirectories(source.getParent());
-        Files.writeString(source, "package tester;\npublic class Marker implements MarkerHome {\n}\n",
-                StandardCharsets.UTF_8);
+        Files.write(source, "package tester;\npublic class Marker implements MarkerHome {\n}\n".getBytes(
+                StandardCharsets.UTF_8));
         Path homeSource = source.resolveSibling("MarkerHome.java");
-        Files.writeString(homeSource, "package tester;\npublic interface MarkerHome {\n}\n", StandardCharsets.UTF_8);
+        Files.write(homeSource, "package tester;\npublic interface MarkerHome {\n}\n".getBytes(StandardCharsets.UTF_8));
         ByteArrayOutputStream compilerOutput = new ByteArrayOutputStream();
         @SuppressWarnings("null")
         int result = compiler.run(null, compilerOutput, compilerOutput, "-d", classes.toString(),
