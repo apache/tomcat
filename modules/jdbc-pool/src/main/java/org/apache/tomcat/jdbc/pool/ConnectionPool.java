@@ -454,8 +454,21 @@ public class ConnectionPool {
             //
             // Build the proxy handler
             handler = new ProxyConnection(this, con, getPoolProperties().isUseEquals());
-            // Set up the interceptor chain
-            PoolProperties.InterceptorDefinition[] proxies = getPoolProperties().getJdbcInterceptorsAsArray();
+            // Set up the interceptor chain. The property is mutable on a live
+            // pool and its parse can fail, so a malformed value must fail this
+            // borrow with the connection returned to the pool rather than
+            // leave it counted as busy with no handle a caller can return.
+            PoolProperties.InterceptorDefinition[] proxies;
+            try {
+                proxies = getPoolProperties().getJdbcInterceptorsAsArray();
+            } catch (Throwable x) {
+                ExceptionUtils.handleThrowable(x);
+                SQLException sx = new SQLException(MessageFactory.get("connectionPool.unableToParseInterceptorChain"));
+                sx.initCause(x);
+                // Nothing has been done to the connection, it can go back to the pool
+                abandonSetup(con, sx, false);
+                throw sx;
+            }
             for (int i = proxies.length - 1; i >= 0; i--) {
                 // Record what this chain was built from: the definitions the
                 // close has to pair with are the ones a chain ran, not only
@@ -778,7 +791,17 @@ public class ConnectionPool {
                 informInterceptorOfPoolClosure(started[i]);
             }
         }
-        PoolProperties.InterceptorDefinition[] proxies = getPoolProperties().getJdbcInterceptorsAsArray();
+        PoolProperties.InterceptorDefinition[] proxies;
+        try {
+            proxies = getPoolProperties().getJdbcInterceptorsAsArray();
+        } catch (Throwable x) {
+            // A malformed list that was installed on the live pool must not
+            // abort the close: the definitions already recorded still have
+            // to receive their notification.
+            ExceptionUtils.handleThrowable(x);
+            log.warn(MessageFactory.get("connectionPool.unableToParseInterceptorChain"), x);
+            proxies = new PoolProperties.InterceptorDefinition[0];
+        }
         for (int i = 0; i < proxies.length; i++) {
             if (!isToldAlready(proxies[i], started)) {
                 informInterceptorOfPoolClosure(proxies[i]);
@@ -921,7 +944,8 @@ public class ConnectionPool {
                 JdbcInterceptor interceptor = proxies[i].getInterceptorClass().getConstructor().newInstance();
                 interceptor.setProperties(proxies[i].getProperties());
                 interceptor.poolStarted(this);
-            } catch (Exception x) {
+            } catch (Throwable x) {
+                ExceptionUtils.handleThrowable(x);
                 log.error(MessageFactory.get("connectionPool.unableToInformInterceptorOfPoolStart"), x);
                 org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = jmxPool;
                 if (jmx != null) {
@@ -990,7 +1014,20 @@ public class ConnectionPool {
         // earlier configuration called for, and a trigger turned on during
         // startup then leaves the getters promising maintenance that no thread
         // ever performs for the life of the pool.
-        initializePoolCleaner(properties);
+        try {
+            initializePoolCleaner(properties);
+        } catch (Throwable x) {
+            // The construction has already acquired resources - the MBean,
+            // the interceptors told about the start, and the pre-loaded
+            // sessions - that no caller can reach once this constructor
+            // fails, so they are torn down here.
+            ExceptionUtils.handleThrowable(x);
+            log.error(MessageFactory.get("connectionPool.unableToInitializePoolCleaner"), x);
+            close(true);
+            SQLException ex = new SQLException(x.getMessage());
+            ex.initCause(x);
+            throw ex;
+        }
 
         closed = false;
     }
