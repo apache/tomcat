@@ -85,4 +85,19 @@ class TestLoginTimeoutMapping {
                 "Integer.MAX_VALUE seconds multiplied by 1000 wraps to minus one second in int "
                         + "arithmetic, which the pool reads as no timeout at all");
     }
+
+    @Test
+    void aNegativeLoginTimeoutIsRejectedAndLeavesThePreviousValueInPlace() {
+        DataSource ds = new DataSource();
+        ds.setLoginTimeout(30);
+        int previousWait = ds.getPoolProperties().getMaxWait();
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> ds.setLoginTimeout(-1),
+                "a negative login timeout is not legal and must not become an unbounded wait");
+
+        Assertions.assertEquals(previousWait, ds.getPoolProperties().getMaxWait(),
+                "a rejected value must not change the configured timeout");
+        Assertions.assertEquals(30, ds.getLoginTimeout(),
+                "the data source must keep reporting the timeout that is still configured");
+    }
 }
