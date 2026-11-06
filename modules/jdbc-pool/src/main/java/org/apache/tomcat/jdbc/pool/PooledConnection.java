@@ -393,15 +393,19 @@ public class PooledConnection implements PooledConnectionMBean {
             if (failure != null) {
                 // Do not strand the handle if the logical connection
                 // could not be obtained, whatever the provider failed with.
+                boolean closed = false;
                 try {
                     pooled.close();
+                    closed = true;
                 } catch (Throwable closeX) {
                     ExceptionUtils.handleThrowable(closeX);
                     if (closeX != failure) {
                         failure.addSuppressed(closeX);
                     }
                 }
-                xaConnection = null;
+                if (closed) {
+                    xaConnection = null;
+                }
                 connection = null;
                 throw wrapConnectFailure(failure);
             }
@@ -451,15 +455,19 @@ public class PooledConnection implements PooledConnectionMBean {
             if (failure != null) {
                 // Do not strand the handle if the logical connection
                 // could not be obtained, whatever the provider failed with.
+                boolean closed = false;
                 try {
                     pooled.close();
+                    closed = true;
                 } catch (Throwable closeX) {
                     ExceptionUtils.handleThrowable(closeX);
                     if (closeX != failure) {
                         failure.addSuppressed(closeX);
                     }
                 }
-                cpdsConnection = null;
+                if (closed) {
+                    cpdsConnection = null;
+                }
                 connection = null;
                 throw wrapConnectFailure(failure);
             }
@@ -782,7 +790,7 @@ public class PooledConnection implements PooledConnectionMBean {
      * @param finalize if set to true, a call to {@link ConnectionPool#finalize(PooledConnection)} is called.
      */
     private void disconnect(boolean finalize) {
-        if (isDiscarded() && connection == null) {
+        if (isDiscarded() && connection == null && xaConnection == null && cpdsConnection == null) {
             return;
         }
         setDiscarded(true);
@@ -884,7 +892,9 @@ public class PooledConnection implements PooledConnectionMBean {
             // not a reason to let the pool lose the slot or leave the chain
             // installed: the caller has already settled the release.
             ExceptionUtils.handleThrowable(ignore);
-            if (log.isDebugEnabled()) {
+            if (cpdsHandle != null || xaHandle != null) {
+                log.warn(MessageFactory.get("pooledConnection.unableToCloseUnderlyingConnection"), ignore);
+            } else if (log.isDebugEnabled()) {
                 log.debug("Unable to close underlying SQL connection", ignore);
             }
         }
