@@ -24,8 +24,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet(urlPatterns = { "/hello", "/request", "/matching", "/matching-event", "/contexts", "/interceptor",
-        "/invoker" })
+@WebServlet(urlPatterns = { "/hello", "/request", "/session", "/matching", "/matching-event", "/contexts",
+        "/interceptor", "/invoker" })
 public class Cdi41Servlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -35,6 +35,9 @@ public class Cdi41Servlet extends HttpServlet {
 
     @Inject
     private RequestScopedBean requestScopedBean;
+
+    @Inject
+    private SessionScopedBean sessionScopedBean;
 
     @Inject
     private Cdi41Features cdi41Features;
@@ -51,6 +54,9 @@ public class Cdi41Servlet extends HttpServlet {
                 break;
             case "/request":
                 result = requestScopedBean.getId();
+                break;
+            case "/session":
+                result = sessionScopedBean.getId();
                 break;
             case "/matching":
                 result = Boolean.toString(cdi41Features.matching());

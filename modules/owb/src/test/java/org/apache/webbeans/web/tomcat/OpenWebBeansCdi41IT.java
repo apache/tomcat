@@ -53,6 +53,13 @@ class OpenWebBeansCdi41IT {
             assertFalse(firstRequest.isEmpty());
             assertFalse(secondRequest.isEmpty());
 
+            HttpClient sessionClient = OwbTestSupport.newCookieClient();
+            String firstSession = OwbTestSupport.get(sessionClient, baseUri.resolve("session"));
+            String secondSession = OwbTestSupport.get(sessionClient, baseUri.resolve("session"));
+            assertEquals(firstSession, secondSession);
+            String differentSession = OwbTestSupport.get(OwbTestSupport.newCookieClient(), baseUri.resolve("session"));
+            assertNotEquals(firstSession, differentSession);
+
             assertEquals("true", OwbTestSupport.get(client, baseUri.resolve("matching")));
             assertEquals("true", OwbTestSupport.get(client, baseUri.resolve("matching-event")));
             assertEquals("true", OwbTestSupport.get(client, baseUri.resolve("contexts")));

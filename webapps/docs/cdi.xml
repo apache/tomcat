@@ -45,34 +45,117 @@
   <section name="CDI support">
 
   <p>
-    CDI 4.1 support is provided by the <code>modules/owb</code> optional module.
-    It packages the Apache OpenWebBeans project and allows adding CDI 4.1
-    support to the Tomcat container. The build process of the module uses
-    Apache Maven, and is not available as a binary bundle as it is built using
-    a number of publicly available JARs.
+    CDI support is provided by the <code>modules/owb</code> optional module.
+    It packages Apache OpenWebBeans and allows adding CDI support
+    to the Tomcat container. The build process of the module uses Apache
+    Maven, and is not available as a binary bundle as it is built using a
+    number of publicly available JARs.
+  </p>
+
+  </section>
+
+  <section name="Building">
+
+  <p>
+    Building the module requires Java 21 or later, Apache Maven and the Tomcat
+    artifacts for the Tomcat version used by the module in the local Maven
+    repository. The default configuration uses the Tomcat version from the
+    current source tree.
   </p>
 
   <p>
     The process to build CDI support is the following.
     <source><![CDATA[cd $TOMCAT_SRC/modules/owb
 mvn clean && mvn package]]></source>
-    The module integration tests can be run with <code>mvn clean verify</code>.
     The resulting JAR at
     <code>target/tomcat-owb-x.y.z.jar</code> (where x.y.z depends on the
-    Apache OpenWebBeans version used during the build)
-    should be processed by the Tomcat migration tool for Jakarta EE, and
-    then be placed into the <code>lib</code> folder of the Tomcat
-    installation.<br/>
-    CDI support can then be enabled for all webapps in the container by adding
+    Apache OpenWebBeans version used during the build) can be placed directly
+    into the <code>lib</code> folder of the Tomcat installation. The JAR is
+    built against Jakarta EE APIs. The Tomcat migration tool for Jakarta EE is
+    only required for applications that still use <code>javax</code> APIs.
+  </p>
+
+  </section>
+
+  <section name="Testing">
+
+  <p>
+    The module integration tests use an embedded Tomcat server and run
+    against the shaded module JAR. They are Failsafe integration tests and
+    are not run by <code>mvn package</code>.
+  </p>
+
+  <p>
+    To build the module and run all integration tests:
+    <source><![CDATA[cd $TOMCAT_SRC/modules/owb
+mvn clean verify]]></source>
+    A single integration test can be run with:
+    <source><![CDATA[mvn -Dit.test=OpenWebBeansSecurityIT verify]]></source>
+  </p>
+
+  <p>
+    The tests cover CDI APIs, both supported listener configuration modes,
+    <code>beans.xml</code> discovery, security integration, lifecycle
+    callbacks and JSP/EL integration. See
+    <code>modules/owb/README.md</code> for the test architecture and for the
+    prerequisites needed when Tomcat snapshot artifacts are used.
+  </p>
+
+  </section>
+
+  <section name="Enabling CDI support">
+
+  <p>
+    CDI support can be enabled for all webapps in the container by adding
     the following listener in <code>server.xml</code> nested inside the
     <code>Server</code> element:
     <source><![CDATA[<Listener className="org.apache.webbeans.web.tomcat.OpenWebBeansListener" optional="true" startWithoutBeansXml="false" />]]></source>
     The listener will produce a non fatal error if the CDI container loading
     fails.<br/>
+    The listener supports the following properties:
+  </p>
+
+  <ul>
+    <li><code>startWithoutBeansXml</code> - if <code>true</code>, CDI is
+    started even when no <code>beans.xml</code> is present. The default is
+    <code>true</code>.</li>
+    <li><code>addSecurityValve</code> - if <code>true</code>, the
+    <code>OpenWebBeansSecurityValve</code> is added to each context pipeline.
+    The default is <code>true</code>.</li>
+  </ul>
+
+  <p>
     CDI support can also be enabled at the individual webapp level by adding
     the following listener to the webapp <code>context.xml</code> file nested
-    inside the <code>Server</code> element:
+    inside the <code>Context</code> element:
     <source><![CDATA[<Listener className="org.apache.webbeans.web.tomcat.OpenWebBeansContextLifecycleListener" />]]></source>
+    The context-level listener supports the same properties as the server-level
+    listener.
+  </p>
+
+  <p>
+    When security integration is required, the listener can add the
+    <code>OpenWebBeansSecurityValve</code> automatically. Alternatively, the
+    <code>OpenWebBeansSecurityFilter</code> can be configured in the webapp
+    <code>WEB-INF/web.xml</code> file.
+  </p>
+
+  </section>
+
+  <section name="Known limitations">
+
+  <p>
+    Servlet and filter injection are supported. A
+    <code>ServletContextListener</code> is instantiated before the CDI
+    container starts, so field injection into a listener is not available.
+    Use programmatic lookup with <code>CDI.current().select(...)</code> inside
+    a listener instead.
+  </p>
+
+  <p>
+    Support for features that depend on optional CDI EL APIs or on CDI
+    features not implemented by OpenWebBeans may vary. See
+    <code>modules/owb/README.md</code> for the currently tested feature set.
   </p>
 
   </section>

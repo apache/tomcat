@@ -84,6 +84,17 @@ final class WebAppBuilder {
             copyTree(webInf, destination.resolve("WEB-INF"));
         }
 
+        // Copy root-level web resources such as JSP pages.
+        try (Stream<Path> stream = Files.list(template)) {
+            for (Path child : stream.toList()) {
+                String name = child.getFileName().toString();
+                if ("WEB-INF".equals(name) || "src".equals(name)) {
+                    continue;
+                }
+                copyTree(child, destination.resolve(name));
+            }
+        }
+
         Path classes = destination.resolve("WEB-INF/classes");
         Files.createDirectories(classes);
         compile(classes, shadedJar);
