@@ -19,6 +19,7 @@ package org.apache.tomcat.jdbc.pool;
 import java.util.Hashtable;
 
 import javax.management.MBeanRegistration;
+import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
@@ -75,19 +76,9 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
      */
     @Override
     public void close(boolean all) {
-        // This monitor serializes the registration lifecycle against the
-        // closure: preRegister(), postRegister() and postDeregister() take it
-        // too, and the flag-and-take step of DataSourceProxy.close(boolean)
-        // and the publication step of pCreatePool() run under the same lock -
-        // why a close therefore cannot slip in beside an in-flight publication
-        // is told at preRegister().
-        // The monitor is held for these steps only: the pool teardown below
-        // disconnects every pooled session, an unbounded and uninterruptible
-        // wait against a hung database, and a parked teardown must not park
-        // the later borrows' publication step or the container's callbacks -
-        // the same reason pool construction already runs outside it. A close
-        // concurrent with this one finds the pool already taken and returns
-        // instead of waiting for the in-flight teardown.
+        // The monitor serializes the registration lifecycle against the
+        // closure. It is not held across the pool teardown, which can block on
+        // a driver call.
         final ConnectionPool p;
         synchronized (this) {
             releasePoolMBean();
@@ -97,35 +88,24 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
     }
 
     /**
-     * The JMX ObjectName for the connection pool MBean. The handle is checked,
-     * cleared and released only under this data source's monitor. It is written
-     * only by a publish that completed - it always names an MBean this data
-     * source registered and still holds - and cleared only when that MBean is
-     * unregistered, so no failure or skip of a (re-)registration can drop or
-     * replace the handle the close and the deregistration callbacks release.
+     * The JMX ObjectName for the connection pool MBean. Written only by a
+     * completed publish, cleared only when that MBean is released, and
+     * accessed under this data source's monitor.
      */
     protected volatile ObjectName oname = null;
 
     /**
-     * Whether the publish that the handle names was made by the registration
-     * currently in flight - the {@link #preRegister(MBeanServer, ObjectName)}
-     * whose {@link #postRegister(Boolean)} completion is still pending. Set by
-     * {@link #registerJmx()} when a registration-driven publish is accepted,
-     * and cleared with the handle and when a registration completes. The
-     * server reports a failed registration to {@link #postRegister(Boolean)}
-     * without saying what that registration published; a registration that
-     * published nothing - because an earlier registration's handle was held -
-     * has nothing of its own to undo, and this is how that is known.
+     * Whether the publish named by {@link #oname} was made by the registration
+     * currently in flight. Set by {@link #registerJmx()} when a
+     * registration-driven publish is accepted and cleared when that
+     * registration completes.
      */
     private volatile boolean publishedByRegistration = false;
 
     /**
-     * The name derived from the registration currently in flight, set and
-     * cleared by {@link #preRegister(MBeanServer, ObjectName)} around its call
-     * into {@link #publishJmx()}, under this data source's monitor. A second
-     * registration must read its publish target from here rather than from the
-     * handle slot, so it can never overwrite the handle of a publish that is
-     * already held.
+     * The name derived by the registration currently in flight, used by
+     * {@link #preRegister(MBeanServer, ObjectName)} so a publish cannot
+     * overwrite the handle of a registration that is already held.
      */
     private volatile ObjectName pendingName = null;
 
@@ -135,24 +115,13 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
      */
     @Override
     public synchronized void postDeregister() {
-        // Under the monitor that close() and the registration callbacks take,
-        // so the container's deregistration and a concurrent close release the
-        // pool MBean exactly once: whichever of them runs second finds the
-        // handle already gone and unregisters nothing - not even a name some
-        // third component has published in the meantime.
         releasePoolMBean();
     }
 
     /**
-     * Releases the pool MBean that {@link #preRegister(MBeanServer, ObjectName)} published when the MBean server did
-     * not complete this DataSource's own registration. Per the {@link MBeanRegistration} contract a {@code false}
-     * {@code registrationDone} means that the registration phase failed, and after a failed registration the server
-     * does not call {@link #postDeregister()}: this callback is the only chance to undo that side effect. Leaving the
-     * pool MBean registered would keep a pool nobody manages reporting statistics and notifications, and would pin the
-     * pool - with its properties, its credentials and its JDBC driver class loader - in the MBean server. Only a
-     * publish this registration made is undone: a registration that published nothing - because an earlier
-     * registration still held the handle, or because it derived no name at all - releases nothing, since the handle it
-     * finds in place belongs to that earlier registration and is that registration's to give back.<br>
+     * Releases the pool MBean published by this registration when the MBean server did not complete it. A failed
+     * registration does not run {@link #postDeregister()}, so this is the only chance to undo a publish this
+     * registration made. A registration that published nothing releases nothing.<br>
      * {@inheritDoc}
      */
     @Override
@@ -176,28 +145,26 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
     }
 
     /**
-     * If the connection pool MBean exists, it will be registered during this operation. A pool MBean this data source
-     * already published under an earlier registration is kept, and this registration then publishes nothing (see
-     * {@link #registerJmx()}).<br>
+     * If the connection pool MBean exists, it is registered during this operation. A second registration is refused
+     * while this data source already holds a publication.<br>
      * {@inheritDoc}
      */
     @Override
     public ObjectName preRegister(MBeanServer server, ObjectName name) throws Exception {
-        // The publish runs under the monitor close() takes, so it cannot
-        // overlap a closure: a close that ran completely between the name
-        // being derived and the server accepting the publish would unregister
-        // a name the pool never took and close the pool, and the publish would
-        // then register the dead pool's MBean under a live name that no later
-        // close() or postDeregister() - which only release a held handle -
-        // could ever take back. The connection sweep that follows the publish
-        // runs outside the monitor: the sweep takes each connection's lock,
-        // which maintenance holds across validation and reconnect driver
-        // calls, so holding the data source monitor across it would park a
-        // close or a later publication behind a hung database.
+        // The publish runs under the monitor close() takes. The connection
+        // sweep runs outside it, since it can block on a connection lock.
         ConnectionPool sweepPool = null;
         try {
             synchronized (this) {
-                if (isJmxEnabled() && oname == null) {
+                if (oname != null) {
+                    // A second registration has no handle of its own, and
+                    // postDeregister() cannot tell which registration it is
+                    // ending. Refuse it rather than let its deregistration
+                    // release the live registration's MBean.
+                    String message = MessageFactory.get("dataSource.mbeanAlreadyRegistered", oname, name);
+                    throw new MBeanRegistrationException(new IllegalStateException(message), message);
+                }
+                if (isJmxEnabled()) {
                     final ObjectName derived = createObjectName(name);
                     if (derived != null) {
                         pendingName = derived;
@@ -207,14 +174,16 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
                             pendingName = null;
                         }
                     }
-                } else if (isJmxEnabled() && oname != null) {
-                    log.warn(MessageFactory.get("dataSource.mbeanAlreadyRegistered", oname, name));
                 }
             }
         } catch (MalformedObjectNameException x) {
             // Nothing has been published and the handle slot was not touched:
             // there is nothing here to take back.
             log.error(MessageFactory.get("dataSource.unableToCreateObjectName"), x);
+        } catch (MBeanRegistrationException x) {
+            // The second registration is refused; the first registration's
+            // publish is left exactly as it stands.
+            throw x;
         } catch (RuntimeException x) {
             // Never break the caller's MBean registration because of
             // pool-side state (for instance a pool that has not been
@@ -261,13 +230,9 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
     }
 
     /**
-     * Registers the ConnectionPoolMBean under a unique name based on the ObjectName for the DataSource. A pool that has
-     * not been created yet (or was already closed) has no MBean to publish; the registration is then skipped rather
-     * than failing, since the caller of {@link #preRegister(MBeanServer, ObjectName)} must not see an exception over
-     * pool-side lifecycle state. A publish the MBean server refused - because the name is already in use by another
-     * MBean, for instance - is likewise not this pool's registration. In neither case is a handle this data source
-     * already holding disturbed: it names a publish that is still in effect, and dropping it here would leave that
-     * MBean held by nothing - neither a later close() nor a deregistration could ever take it back.
+     * Registers the ConnectionPoolMBean under a unique name derived from the DataSource's ObjectName. A pool that has
+     * not been created, or a publish the server refused, is skipped without disturbing a handle this data source
+     * already holds.
      */
     protected void registerJmx() {
         final ConnectionPool p;
@@ -289,43 +254,23 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
      */
     protected ConnectionPool publishJmx() {
         final ConnectionPool p = pool;
-        // Read the pool's JMX object only once: a pool that was closed before
-        // this registration has given it up, and one read that saw it must not
-        // be followed by another that observes the null - a registration
-        // attempt against that null would only fail inside the helper, with a
-        // spurious error log
+        // Read the pool's JMX object once: a pool closed in the meantime has
+        // given it up.
         final org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = p == null ? null : p.getJmxPool();
-        // The name to publish: the one the registration in flight derived, or,
-        // for a direct call outside a registration, the handle this data
-        // source holds. A direct call that still holds a live publish then
-        // aims at the name that publish took, which the server refuses as a
-        // duplicate - and the handle survives the refusal, as it must.
+        // A registration in flight publishes the name it derived. A direct
+        // call publishes the handle it already holds, so a duplicate attempt
+        // is refused and the handle survives.
         final ObjectName name = pendingName == null ? oname : pendingName;
         if (jmx == null) {
-            // Nothing to publish; the handle slot, which this call did not
-            // write, is left as it stands.
             log.warn(MessageFactory.get("dataSource.mbeanNotRegistered", name));
             return null;
         }
         final ObjectName published = JmxUtil.registerJmx(name, null, jmx);
         if (published != null) {
-            // Recorded before the caller runs the connection sweep: a publish
-            // the server accepted is held from the moment it happened, whatever
-            // a later step makes of it.
             this.oname = published;
-            // Only a registration-driven publish - one made from
-            // preRegister(), which sets pendingName around its call - has a
-            // registration that can fail and undo it in postRegister(false);
-            // a publish from a direct call belongs to no registration, and
-            // releasing it on a later registration failure would tear down a
-            // publication that registration never made.
+            // Only a publish made from preRegister() can be undone by a
+            // failed registration in postRegister(false).
             publishedByRegistration = pendingName != null;
-            // A connection publishes itself below this name when its physical
-            // connection is established; the connections the pool was already
-            // holding could not do that while this name did not exist yet, so
-            // the caller publishes them now. A publish the server refused
-            // registers nothing of its own and has no connections to publish
-            // either.
             return p;
         }
         return null;
@@ -365,19 +310,9 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
     }
 
     /**
-     * Releases the registration handle and unregisters the pool MBean
-     * published under the name it points to, as one step under this data
-     * source's monitor. Every path that gives the handle up runs through
-     * here - {@link #close(boolean)}, the {@link #postRegister(Boolean)} of a
-     * failed registration and the container's {@link #postDeregister()} - so
-     * of all of them the release is performed at most once: whichever runs
-     * second finds the handle gone and unregisters nothing. The unregistration
-     * is then best-effort and cannot break the caller: the handle is already
-     * taken, so a failure of the unregistration - a subclass that throws from
-     * {@link #unregisterJmx(ObjectName)}, or an {@code Error} surfacing
-     * through it - may cost a registered MBean, but the close that asked for
-     * this release still closes, and no later path re-attempts a name this
-     * data source has given up.
+     * Releases the registration handle and unregisters the pool MBean it names, under this data source's monitor. Every
+     * release path goes through here, so the handle is given up at most once. The unregistration itself is best effort
+     * and never breaks the caller.
      */
     private void releasePoolMBean() {
         final ObjectName name = oname;
@@ -388,11 +323,6 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
             try {
                 unregisterJmx(name);
             } catch (Throwable t) {
-                // Logged, never propagated: an escaping exception here would
-                // abort the caller between taking the handle and setting the
-                // terminal flag, leaving a pool still running under a caller
-                // that believes it closed - with the handle already gone, so
-                // no later path could ever take the MBean back either.
                 log.error(MessageFactory.get("dataSource.unableToUnregisterMBean", name), t);
             }
         }
