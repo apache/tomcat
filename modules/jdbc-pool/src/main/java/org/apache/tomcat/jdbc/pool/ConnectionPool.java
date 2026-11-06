@@ -230,7 +230,6 @@ public class ConnectionPool {
      * @throws SQLException Pool initialization error
      */
     public ConnectionPool(PoolConfiguration prop) throws SQLException {
-        // Setup quick access variables and pools
         init(prop);
     }
 
@@ -455,9 +454,8 @@ public class ConnectionPool {
             // Build the proxy handler
             handler = new ProxyConnection(this, con, getPoolProperties().isUseEquals());
             // Set up the interceptor chain. The property is mutable on a live
-            // pool and its parse can fail, so a malformed value must fail this
-            // borrow with the connection returned to the pool rather than
-            // leave it counted as busy with no handle a caller can return.
+            // pool, so a malformed value is a failure of this borrow that must
+            // still give the connection back.
             PoolProperties.InterceptorDefinition[] proxies;
             try {
                 proxies = getPoolProperties().getJdbcInterceptorsAsArray();
@@ -465,7 +463,6 @@ public class ConnectionPool {
                 ExceptionUtils.handleThrowable(x);
                 SQLException sx = new SQLException(MessageFactory.get("connectionPool.unableToParseInterceptorChain"));
                 sx.initCause(x);
-                // Nothing has been done to the connection, it can go back to the pool
                 abandonSetup(con, sx, false);
                 throw sx;
             }
@@ -475,13 +472,9 @@ public class ConnectionPool {
                 // the ones the property lists when the pool comes down
                 chainDefinitions.add(proxies[i]);
                 try {
-                    // Create a new instance
                     JdbcInterceptor interceptor = proxies[i].getInterceptorClass().getConstructor().newInstance();
-                    // Configure properties
                     interceptor.setProperties(proxies[i].getProperties());
-                    // Setup the chain
                     interceptor.setNext(handler);
-                    // Configure the last one to be held by the connection
                     handler = interceptor;
                 } catch (Throwable x) {
                     ExceptionUtils.handleThrowable(x);
@@ -492,7 +485,6 @@ public class ConnectionPool {
                     throw sx;
                 }
             }
-            // Cache handler for the next iteration
             con.setHandler(handler);
         }
         // Reset the chain in the order the interceptors are declared, for new and cached handlers alike,
@@ -541,7 +533,6 @@ public class ConnectionPool {
         handler = new StatementFacade(handler);
         try {
             Constructor<?> proxyConstructor = getProxyConstructor(con.getXAConnection() != null);
-            // Create the proxy
             // TODO possible optimization, keep track if this connection was returned properly, and don't generate a new
             // handle and facade
             // The disposable connection facade is always used; a handle that
@@ -566,7 +557,6 @@ public class ConnectionPool {
             // begins here. The matching endRequest() is sent at the return,
             // in returnConnection().
             invokeRequestHint(BEGIN_REQUEST, con.getConnection());
-            // Return the connection
             return connection;
         } catch (Throwable x) {
             ExceptionUtils.handleThrowable(x);
@@ -698,17 +688,9 @@ public class ConnectionPool {
         // Stop background thread
         terminatePoolCleaner();
 
-        // An asynchronous borrow waits on the idle queue, where a thread cannot
-        // observe the closed flag: this pool never offers a connection to that
-        // queue once it is closed, so a caller parked in the Future.get() of
-        // getConnectionAsync() would stay parked forever. The same holds for a
-        // synchronous borrower whose wait has no timeout to run out. Fail the
-        // waiters that are registered on the queue, so that the futures handed
-        // out terminate and the parked synchronous waits return empty-handed to
-        // the borrow loop, which turns the closure into a failure. A plain
-        // queue has no such lever; there, long waits are taken in slices
-        // instead, so the borrow loop observes the closure on its own within
-        // a slice.
+        // Fail the waiters registered on a fair idle queue. A plain queue has
+        // no such lever; its long waits are taken in slices instead, so the
+        // borrow loop observes the closure on its own.
         if (idle instanceof FairBlockingQueue<?>) {
             ((FairBlockingQueue<PooledConnection>) idle).cancelWaiters();
         }
@@ -718,25 +700,10 @@ public class ConnectionPool {
         boolean interrupted = false;
         while (!pool.isEmpty()) {
             try {
-                // Retrieve the next connection
                 PooledConnection con = pool.poll(1000, TimeUnit.MILLISECONDS);
-                // Close it and retrieve the next one, if one is available
                 while (con != null) {
-                    // Close the connection. A forced shutdown tears a busy
-                    // connection away from a borrower that is legitimately
-                    // using it, so the drain releases it the way it releases
-                    // an idle one: disconnecting the session and running the
-                    // interceptors' disconnect events. It does not abandon it.
-                    // The abandonment counter, the WARN log and the JMX
-                    // abandon notification record an application that leaked
-                    // a connection - checkAbandoned()'s bookkeeping - and a
-                    // shutdown the operator ordered is no such leak, so
-                    // recording it there inflates the monitoring counter and
-                    // fires one bogus leak notification per connection in
-                    // use. The borrower's handle is left equally unusable
-                    // either way: an abandon disconnected it through this
-                    // same release, and a later close on the handle finds the
-                    // pool closed and the connection already released.
+                    // A forced shutdown releases busy connections the same way
+                    // as idle ones; it does not record an abandonment.
                     try {
                         release(con);
                     } catch (Throwable x) {
@@ -770,21 +737,10 @@ public class ConnectionPool {
         if (this.getPoolProperties().isJmxEnabled()) {
             this.jmxPool = null;
         }
-        // Tell the interceptors about the close, each definition once and on a
-        // throwaway instance, as the notification contract describes. The
-        // definitions told about the start come first, as configured then: what
-        // a start registered, the close it is paired with releases - whatever
-        // the mutable property lists by now. The definitions the property has
-        // gained since the start are told as well, so a definition that never
-        // saw a start still takes down - best effort, on a fresh instance that
-        // shares no state with the chains that served the borrows - whatever a
-        // borrow through it registered under the pool's name. The third set the
-        // close has to reach are the definitions those chains were actually
-        // built from: a definition the property gained after the start and lost
-        // again before the close is named by neither of the lists above, yet it
-        // armed the connections that registered state under the pool's name.
-        // A definition the close already told over its start or its current
-        // configuration is not told twice.
+        // Tell the interceptors about the close, once per definition. The
+        // definitions from the start come first, then the current list, then
+        // the definitions the connection chains were actually built from, so a
+        // definition added or removed after the start is still covered.
         PoolProperties.InterceptorDefinition[] started = startedInterceptors;
         if (started != null) {
             for (int i = 0; i < started.length; i++) {
@@ -795,9 +751,8 @@ public class ConnectionPool {
         try {
             proxies = getPoolProperties().getJdbcInterceptorsAsArray();
         } catch (Throwable x) {
-            // A malformed list that was installed on the live pool must not
-            // abort the close: the definitions already recorded still have
-            // to receive their notification.
+            // A malformed list must not abort the close or skip the
+            // notifications already recorded.
             ExceptionUtils.handleThrowable(x);
             log.warn(MessageFactory.get("connectionPool.unableToParseInterceptorChain"), x);
             proxies = new PoolProperties.InterceptorDefinition[0];
@@ -915,26 +870,19 @@ public class ConnectionPool {
         // Both queues are unbounded by design: membership is bounded by the
         // maxActive/size bookkeeping, not by queue capacity.
         busy = new LinkedBlockingQueue<>();
-        // busy = new FairBlockingQueue<PooledConnection>();
         if (properties.isFairQueue()) {
             idle = new FairBlockingQueue<>();
-            // idle = new LinkedTransferQueue<PooledConnection>();
-            // idle = new ArrayBlockingQueue<PooledConnection>(properties.getMaxActive(),false);
         } else {
             idle = new LinkedBlockingQueue<>();
         }
 
-        // Create JMX MBean
         if (this.getPoolProperties().isJmxEnabled()) {
             createMBean();
         }
 
-        // Parse and create an initial set of interceptors. Letting them know the pool has started.
-        // These interceptors will not get any connection.
+        // Parse the interceptor definitions and tell a throwaway instance of
+        // each that the pool has started. These instances get no connection.
         PoolProperties.InterceptorDefinition[] proxies = getPoolProperties().getJdbcInterceptorsAsArray();
-        // Record the definitions this start tells, before telling them: a close
-        // triggered below by a failing start has to deliver the pair of what
-        // the start attempted (see the field).
         startedInterceptors = proxies;
         for (int i = 0; i < proxies.length; i++) {
             try {
@@ -1006,21 +954,14 @@ public class ConnectionPool {
             }
         }
 
-        // Arm the sweeper last. Everything below the point where it used to be
-        // armed can still change the sweeper configuration: an interceptor's
-        // poolStarted() callback, and the initial pre-load, which is where a
-        // management write can land while the pool is still being built and not
-        // yet published. Arming before them hands the pool the cleaner that the
-        // earlier configuration called for, and a trigger turned on during
-        // startup then leaves the getters promising maintenance that no thread
-        // ever performs for the life of the pool.
+        // Arm the sweeper last: an interceptor's poolStarted() callback and the
+        // initial pre-load can still change its configuration while the pool is
+        // being built and is not yet published.
         try {
             initializePoolCleaner(properties);
         } catch (Throwable x) {
-            // The construction has already acquired resources - the MBean,
-            // the interceptors told about the start, and the pre-loaded
-            // sessions - that no caller can reach once this constructor
-            // fails, so they are torn down here.
+            // The constructor has already acquired resources that no caller can
+            // reach once it fails, so close the partially built pool first.
             ExceptionUtils.handleThrowable(x);
             log.error(MessageFactory.get("connectionPool.unableToInitializePoolCleaner"), x);
             close(true);
