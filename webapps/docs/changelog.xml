@@ -501,7 +501,6 @@
         pools to share the same name. (remm)
       </fix>
       <fix>
-<<<<<<< HEAD
         Use RequestDispatcher target rather than source when looking up
         <code>security-role-ref</code>s for the current Servlet. (markt)
       </fix>
@@ -518,10 +517,10 @@
       <fix>
         Align LockoutRealm with some Realm implementations and ignore leading
         and trailing space in user names by default. (markt)
-=======
+      </fix>
+      <fix>
         <code>ExpiresFilter</code> now takes account of headers set by a
         previous filter in the filter chain. (markt)
->>>>>>> 4908896a8e (Take account of headers set in a previous filter)
       </fix>
     </changelog>
   </subsection>
