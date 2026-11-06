@@ -64,9 +64,9 @@ class TestThrowingResetInterceptor extends JdbcPoolBaseTest {
         // reclaimed by the JDK's socket cleaner and the leaked database
         // sessions would disappear with GC timing instead of staying open
         PooledConnection pooledFirst =
-                (PooledConnection) first.unwrap(PooledConnection.class);
+                (PooledConnection) internalOf(first);
         PooledConnection pooledSecond =
-                (PooledConnection) second.unwrap(PooledConnection.class);
+                (PooledConnection) internalOf(second);
         java.sql.Connection physicalFirst = pooledFirst.getConnection();
         java.sql.Connection physicalSecond = pooledSecond.getConnection();
         awaitSessions(2);
@@ -95,7 +95,7 @@ class TestThrowingResetInterceptor extends JdbcPoolBaseTest {
                 ThrowResetInterceptor.class.getName() + ";" + RecordingInterceptor.class.getName());
         Connection con = ds.getConnection();
         // keep the physical connection strongly reachable (see above)
-        java.sql.Connection physical = con.unwrap(PooledConnection.class).getConnection();
+        java.sql.Connection physical = internalOf(con).getConnection();
         con.close();
         ds.close();
         // the shutdown reset walks the chain once, through finalize()

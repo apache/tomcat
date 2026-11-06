@@ -108,8 +108,8 @@ class TestIdleValidationHeadOfLine extends JdbcPoolBaseTest {
         Connection second = ds.getConnection();
         setSessionMarker(head, 11);
         setSessionMarker(second, 22);
-        PooledConnection headPc = head.unwrap(PooledConnection.class);
-        PooledConnection secondPc = second.unwrap(PooledConnection.class);
+        PooledConnection headPc = internalOf(head);
+        PooledConnection secondPc = internalOf(second);
         long now = System.currentTimeMillis();
         // Gate both connections' idle validation for the next minute: no
         // sweep can touch either with its validation while the test sets

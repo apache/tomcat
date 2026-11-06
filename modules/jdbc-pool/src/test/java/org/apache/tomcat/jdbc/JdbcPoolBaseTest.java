@@ -37,6 +37,7 @@ import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
+import org.apache.tomcat.jdbc.pool.ProxyConnection;
 import org.h2.tools.Server;
 
 /**
@@ -164,6 +165,15 @@ public abstract class JdbcPoolBaseTest {
             interceptor = interceptor.getNext();
         }
         return null;
+    }
+
+    /*
+     * The pool-internal PooledConnection behind a borrowed handle. It is no
+     * longer reachable through the public Wrapper contract, so tests that need
+     * it reach it through the ProxyConnection at the bottom of the chain.
+     */
+    protected static PooledConnection internalOf(Connection pooled) {
+        return interceptorOf(pooled, ProxyConnection.class).getConnection();
     }
 
     /*

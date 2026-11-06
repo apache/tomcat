@@ -126,20 +126,19 @@ class TestWrapperContract extends JdbcPoolBaseTest {
     }
 
     @Test
-    void theInternalPooledConnectionUnwrapIdiomIsUnchanged() throws Exception {
+    void theInternalPooledConnectionIsNotExposedThroughWrapper() throws Exception {
         DataSource ds = newDataSource();
         ds.createPool();
 
         try (Connection pooled = ds.getConnection()) {
-            // The pool's own introspection idiom (used in tests and by
-            // interceptors): unwrap to the internal pooled connection.
-            org.apache.tomcat.jdbc.pool.PooledConnection internal =
-                    pooled.unwrap(org.apache.tomcat.jdbc.pool.PooledConnection.class);
-            Assertions.assertSame(
-                    interceptorOf(pooled, ProxyConnection.class).getConnection(),
-                    internal,
-                    "unwrapping to the internal pooled connection must keep "
-                    + "returning the pool's own object");
+            Assertions.assertFalse(
+                    pooled.isWrapperFor(org.apache.tomcat.jdbc.pool.PooledConnection.class),
+                    "the pool-internal connection must not be advertised as wrapped");
+            SQLException thrown = Assertions.assertThrows(SQLException.class,
+                    () -> pooled.unwrap(org.apache.tomcat.jdbc.pool.PooledConnection.class),
+                    "the pool-internal connection must not be reachable through the public Wrapper contract");
+            Assertions.assertTrue(thrown.getMessage().contains("Not a wrapper"),
+                    "the failure must say it is a not-a-wrapper case: " + thrown.getMessage());
         }
     }
 
@@ -161,35 +160,28 @@ class TestWrapperContract extends JdbcPoolBaseTest {
     }
 
     @Test
-    void theInternalPooledConnectionIsAnsweredIdenticallyByBothEntryPoints()
+    void theInternalPooledConnectionIsRefusedByBothEntryPoints()
             throws Exception {
         DataSource ds = newDataSource();
         ds.createPool();
 
         try (Connection pooled = ds.getConnection()) {
             ProxyConnection interceptor = interceptorOf(pooled, ProxyConnection.class);
-            // What the handle's dispatch answers for the pool's own pooled
-            // connection, the bottom interceptor's public method answers
-            // too - one object on both entry points, pinning the
-            // consistency the two entry points of the chain must keep.
-            Object viaHandle = pooled.unwrap(
-                    org.apache.tomcat.jdbc.pool.PooledConnection.class);
-            Object viaInterceptor = interceptor.unwrap(
-                    org.apache.tomcat.jdbc.pool.PooledConnection.class);
-            Assertions.assertSame(viaInterceptor, viaHandle,
-                    "the handle and the interceptor must answer the same object");
-            Assertions.assertSame(interceptor.getConnection(), viaHandle,
-                    "the answer both entry points give is the pool's own pooled connection");
-            // The Wrapper contract: isWrapperFor must tell the truth about
-            // what unwrap hands out. Both objects sit on - are indirectly a
-            // wrapper of - the pooled connection their unwrap returns, so
-            // both must answer true, not the false that contradicted unwrap.
-            Assertions.assertTrue(
+            // Neither entry point advertises or hands out the pool-internal
+            // object: the public Wrapper contract exposes only the standard
+            // interfaces the handle itself implements.
+            Assertions.assertFalse(
                     pooled.isWrapperFor(org.apache.tomcat.jdbc.pool.PooledConnection.class),
-                    "isWrapperFor must agree with the unwrap the handle answers");
-            Assertions.assertTrue(
+                    "the handle must not advertise the pool-internal connection");
+            Assertions.assertFalse(
                     interceptor.isWrapperFor(org.apache.tomcat.jdbc.pool.PooledConnection.class),
-                    "isWrapperFor must agree with the unwrap the interceptor answers");
+                    "the interceptor must not advertise the pool-internal connection");
+            Assertions.assertThrows(SQLException.class,
+                    () -> pooled.unwrap(org.apache.tomcat.jdbc.pool.PooledConnection.class),
+                    "the handle must not hand out the pool-internal connection");
+            Assertions.assertThrows(SQLException.class,
+                    () -> interceptor.unwrap(org.apache.tomcat.jdbc.pool.PooledConnection.class),
+                    "the interceptor must not hand out the pool-internal connection");
         }
     }
 
