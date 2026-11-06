@@ -37,7 +37,9 @@
         <jakarta-interceptor.version>2.2.0</jakarta-interceptor.version>
         <jakarta-enterprise-cdi.version>4.1.0</jakarta-enterprise-cdi.version>
         <jakarta-annotation-api.version>3.0.0</jakarta-annotation-api.version>
+        <jakarta-el.version>6.0.1</jakarta-el.version>
         <tomcat.version>11.0.27</tomcat.version>
+        <junit.version>5.11.4</junit.version>
     </properties>
 
     <dependencies>
@@ -90,6 +92,19 @@
             <version>${tomcat.version}</version>
             <scope>provided</scope>
         </dependency>
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>jakarta.el</groupId>
+            <artifactId>jakarta.el-api</artifactId>
+            <version>${jakarta-el.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -100,6 +115,25 @@
                 <configuration>
                     <release>17</release>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>create-empty-classes-dir</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <mkdir dir="${project.build.directory}/empty-classes"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -142,6 +176,43 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.5.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!-- Test the shaded JAR rather than the unshaded classes -->
+                    <classesDirectory>${project.build.directory}/empty-classes</classesDirectory>
+                    <additionalClasspathElements>
+                        <additionalClasspathElement>${project.build.directory}/${project.build.finalName}.jar</additionalClasspathElement>
+                    </additionalClasspathElements>
+                    <classpathDependencyExcludes>
+                        <classpathDependencyExclude>org.apache.openwebbeans:openwebbeans-spi</classpathDependencyExclude>
+                        <classpathDependencyExclude>org.apache.openwebbeans:openwebbeans-impl</classpathDependencyExclude>
+                        <classpathDependencyExclude>org.apache.openwebbeans:openwebbeans-web</classpathDependencyExclude>
+                        <classpathDependencyExclude>org.apache.openwebbeans:openwebbeans-el22</classpathDependencyExclude>
+                        <classpathDependencyExclude>org.apache.xbean:xbean-finder-shaded</classpathDependencyExclude>
+                        <classpathDependencyExclude>org.apache.xbean:xbean-asm9-shaded</classpathDependencyExclude>
+                        <classpathDependencyExclude>jakarta.enterprise:jakarta.enterprise.cdi-api</classpathDependencyExclude>
+                        <classpathDependencyExclude>jakarta.enterprise:jakarta.enterprise.lang-model</classpathDependencyExclude>
+                        <classpathDependencyExclude>jakarta.inject:jakarta.inject-api</classpathDependencyExclude>
+                        <classpathDependencyExclude>jakarta.interceptor:jakarta.interceptor-api</classpathDependencyExclude>
+                        <classpathDependencyExclude>jakarta.annotation:jakarta.annotation-api</classpathDependencyExclude>
+                    </classpathDependencyExcludes>
+                    <systemPropertyVariables>
+                        <owb.test.webapp>${project.basedir}/src/test/webapp</owb.test.webapp>
+                        <owb.test.jar>${project.build.directory}/${project.build.finalName}.jar</owb.test.jar>
+                    </systemPropertyVariables>
+                </configuration>
             </plugin>
         </plugins>
     </build>
