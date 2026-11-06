@@ -154,6 +154,25 @@ class TestJdbcInterceptorConfigParsing {
     }
 
     @Test
+    void aMalformedInterceptorPropertyMasksTheRestOfTheDefinition() {
+        String badConfig = "StatementCache(password=secret,bad)";
+        PoolProperties props = new PoolProperties();
+        props.setJdbcInterceptors(badConfig);
+
+        IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class,
+                props::getJdbcInterceptorsAsArray);
+
+        Assertions.assertFalse(thrown.getMessage().contains("secret"),
+                "the credential in the same definition must not leak: " + thrown.getMessage());
+        Assertions.assertTrue(thrown.getMessage().contains("password=********"),
+                "the credential must be shown masked: " + thrown.getMessage());
+        Assertions.assertTrue(thrown.getMessage().contains("StatementCache"),
+                "the definition must remain identifiable: " + thrown.getMessage());
+        Assertions.assertTrue(thrown.getMessage().contains("bad"),
+                "the invalid property must remain identifiable: " + thrown.getMessage());
+    }
+
+    @Test
     void getPoolReturnsNullForAnUncheckedConfigurationFailure() {
         DataSourceProxy proxy = new DataSourceProxy();
         proxy.setJdbcInterceptors("MalformedParmsInterceptor(a=1,b)");
