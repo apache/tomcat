@@ -19,7 +19,7 @@ package org.apache.tomcat.jdbc.pool.jmx;
 import java.lang.management.ManagementFactory;
 import java.util.Set;
 
-import javax.management.InstanceAlreadyExistsException;
+import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
@@ -155,33 +155,25 @@ class TestDataSourceReregistration extends JdbcPoolBaseTest {
             Assertions.assertTrue(server.isRegistered(firstPoolOname));
             Assertions.assertEquals(firstPoolOname, ds.heldHandle());
 
-            // The state before the fix's guard was a second registration of
-            // the same data source under another name: it overwrote the slot
-            // with its own derived name and republished the pool under it, so
-            // the first pool MBean was held by nothing and stayed registered
-            // for the life of the JVM, and the later deregistrations released
-            // only the second name.
-            server.registerMBean(new TestJmxRegistration.Container(ds), second);
+            // A second registration of the same data source has no handle of
+            // its own, and postDeregister() cannot tell which registration it
+            // is ending. It is refused so that its deregistration cannot
+            // release the publish of the still-live first registration.
+            Assertions.assertThrows(MBeanRegistrationException.class,
+                    () -> server.registerMBean(new TestJmxRegistration.Container(ds), second),
+                    "a second registration must be refused while the first publish is held");
             Assertions.assertFalse(server.isRegistered(secondPoolOname),
-                    "while the first registration's publish is held, a second "
-                            + "registration must publish nothing of the pool "
-                            + "instead of taking over the handle");
+                    "a refused second registration must publish nothing of the pool");
             Assertions.assertEquals(firstPoolOname, ds.heldHandle(),
-                    "the held handle must survive a second registration");
+                    "the held handle must survive a refused second registration");
 
-            // The single handle is released once, by the first lifecycle path
-            // that runs: the second registration's deregistration finds the
-            // handle in place and takes it (nothing of its own was ever
-            // published under the second name), and the first registration's
-            // then finds nothing left to release.
-            server.unregisterMBean(second);
-            Assertions.assertFalse(server.isRegistered(firstPoolOname),
-                    "the pool MBean of the first registration must not stay "
-                            + "registered once the held handle has been "
-                            + "released - it was the leak before the fix");
-            Assertions.assertNull(ds.heldHandle(), "the release must clear the handle");
+            // The surviving handle still works: deregistering the first
+            // registration takes the MBean back exactly once.
             server.unregisterMBean(first);
-            Assertions.assertFalse(server.isRegistered(firstPoolOname));
+            Assertions.assertFalse(server.isRegistered(firstPoolOname),
+                    "the deregistration of the surviving registration must take "
+                            + "the pool MBean back");
+            Assertions.assertNull(ds.heldHandle(), "the release must clear the handle");
         } finally {
             if (server.isRegistered(second)) {
                 server.unregisterMBean(second);
@@ -204,24 +196,20 @@ class TestDataSourceReregistration extends JdbcPoolBaseTest {
         ProbeDataSource ds = newProbeDataSource();
         ds.createPool();
         ObjectName first = uniqueName("alive");
-        ObjectName blocked = uniqueName("failed-second");
+        ObjectName second = uniqueName("failed-second");
         ObjectName firstPoolOname = ds.createObjectName(first);
-        server.registerMBean(new TestJmxRegistration.Probe("owner"), blocked);
         try {
             server.registerMBean(new TestJmxRegistration.Container(ds), first);
             Assertions.assertTrue(server.isRegistered(firstPoolOname),
                     "the first registration must have published the pool MBean");
 
-            // The second registration of the same data source fails against
-            // the name the Probe above occupies. Its preRegister() published
-            // nothing - the first registration's handle was held - and the
-            // server then fails the registration itself, running
-            // postRegister(false) without any postDeregister(). That callback
-            // has nothing of this registration to undo: what it must not do
-            // is take back the publish a different, still-live registration
-            // made.
-            Assertions.assertThrows(InstanceAlreadyExistsException.class,
-                    () -> server.registerMBean(new TestJmxRegistration.Container(ds), blocked));
+            // The second registration of the same data source is refused
+            // before the server gets a chance to fail it against another
+            // name. A failed registration runs no postDeregister(), but it
+            // must not take back the publish of the still-live first one.
+            Assertions.assertThrows(MBeanRegistrationException.class,
+                    () -> server.registerMBean(new TestJmxRegistration.Container(ds), second),
+                    "the second registration must be refused");
             Assertions.assertTrue(server.isRegistered(firstPoolOname),
                     "a failed second registration must leave the pool MBean of "
                             + "the live first registration published");
@@ -240,12 +228,12 @@ class TestDataSourceReregistration extends JdbcPoolBaseTest {
             if (server.isRegistered(first)) {
                 server.unregisterMBean(first);
             }
-            if (server.isRegistered(blocked)) {
-                server.unregisterMBean(blocked);
+            if (server.isRegistered(second)) {
+                server.unregisterMBean(second);
             }
             ds.close();
             sweep(server, first);
-            sweep(server, blocked);
+            sweep(server, second);
         }
     }
 }
