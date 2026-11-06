@@ -528,7 +528,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                             if (pidx < 0) {
                                 throw new IllegalArgumentException(MessageFactory.get(
                                         "poolProperties.invalidInterceptorProperty", prop.trim(),
-                                        interceptorValues[i]));
+                                        maskInterceptorCredentials(interceptorValues[i])));
                             }
                             String propName = prop.substring(0, pidx).trim();
                             String propValue = prop.substring(pidx + 1).trim();
@@ -762,10 +762,27 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         this.password = password;
         if (this.dbProperties != null) {
             if (password == null) {
-                removeDbProperty(PoolUtilities.PROP_PASSWORD);
-                warnStringStillNamesCredential(PoolUtilities.PROP_PASSWORD);
+                removeCredentialDbProperties();
             } else {
                 this.dbProperties.setProperty(PoolUtilities.PROP_PASSWORD, password);
+            }
+        }
+    }
+
+
+    /**
+     * Removes every database property whose key is recognized as a password alias, so clearing the password also
+     * stops a value configured as {@code pass} or {@code pwd} from still authenticating connections.
+     */
+    private void removeCredentialDbProperties() {
+        Properties props = this.dbProperties;
+        if (props == null) {
+            return;
+        }
+        for (String key : props.stringPropertyNames()) {
+            if (PoolUtilities.isCredentialKey(key)) {
+                removeDbProperty(key);
+                warnStringStillNamesCredential(key);
             }
         }
     }
