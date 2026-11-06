@@ -163,7 +163,9 @@ public class Util {
                 end = input.length();
             }
         }
-        return JreCompat.getInstance().strip(input.substring(begin, end));
+        String value = JreCompat.getInstance().strip(input.substring(begin, end));
+        // An empty value (e.g. charset="" or charset=;foo=bar) is treated the same as an absent attribute
+        return value.isEmpty() ? null : value;
     }
 
     /**
