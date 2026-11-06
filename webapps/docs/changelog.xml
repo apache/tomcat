@@ -346,6 +346,17 @@
         <code>ExpiresFilter</code> now takes account of headers set by a
         previous filter in the filter chain. (markt)
       </fix>
+      <fix>
+        <bug>70290</bug>: Fix a leak of the in-progress async request count
+        that could prevent a clean shutdown. If the connection was in an error
+        state when the initial async service call completed (for example, a
+        client dropped the connection and an
+        <code>AsyncListener.onError()</code> handler then called
+        <code>AsyncContext.dispatch()</code>), the request could be recycled
+        while still in the <code>MUST_DISPATCH</code> state so that
+        <code>onComplete()</code> was not called and the in-progress async
+        count was not decremented. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
