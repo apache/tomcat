@@ -140,8 +140,9 @@ public class RepeatableArchive extends Task {
                         throw new BuildException("setLastModified failed for [" + archive.getAbsolutePath() + "]");
                     }
                     Files.delete(oldArchive.toPath());
-                } catch (IOException ioe) {
-                    // The task did not run to completion for this archive. If the original was
+                } catch (IOException | RuntimeException e) {
+                    // The task did not run to completion for this archive. This includes the
+                    // BuildException thrown when the timestamp cannot be set. If the original was
                     // renamed, restore it rather than leaving the archive in its current, possibly
                     // truncated, state together with a stray ".old".
                     try {
@@ -150,9 +151,12 @@ public class RepeatableArchive extends Task {
                                     StandardCopyOption.ATOMIC_MOVE);
                         }
                     } catch (IOException restoreException) {
-                        ioe.addSuppressed(restoreException);
+                        e.addSuppressed(restoreException);
                     }
-                    throw new BuildException(ioe);
+                    if (e instanceof RuntimeException) {
+                        throw (RuntimeException) e;
+                    }
+                    throw new BuildException(e);
                 }
             }
         }
