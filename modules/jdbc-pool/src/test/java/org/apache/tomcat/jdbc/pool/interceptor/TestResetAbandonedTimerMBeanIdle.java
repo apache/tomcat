@@ -295,7 +295,7 @@ class TestResetAbandonedTimerMBeanIdle extends JdbcPoolBaseTest {
         pool = ds;
 
         try (Connection connection = ds.getConnection()) {
-            PooledConnection pc = connection.unwrap(PooledConnection.class);
+            PooledConnection pc = internalOf(connection);
             ResetAbandonedTimer anonymous = new ResetAbandonedTimer() {
             };
             anonymous.reset(ds.getPool(), pc);

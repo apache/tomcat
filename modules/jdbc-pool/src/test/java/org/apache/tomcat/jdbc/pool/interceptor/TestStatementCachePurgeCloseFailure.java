@@ -95,7 +95,7 @@ class TestStatementCachePurgeCloseFailure extends JdbcPoolBaseTest {
         try {
             ErrorCloseStatementCache cache =
                     interceptorOf(shared, ErrorCloseStatementCache.class);
-            PooledConnection pcon = (PooledConnection) shared.unwrap(PooledConnection.class);
+            PooledConnection pcon = (PooledConnection) internalOf(shared);
 
             FAIL_NEXT_CLOSE.set(true);
             PreparedStatement first = shared.prepareStatement("SELECT 1");
@@ -135,7 +135,7 @@ class TestStatementCachePurgeCloseFailure extends JdbcPoolBaseTest {
         try {
             ErrorCloseStatementCache cache =
                     interceptorOf(shared, ErrorCloseStatementCache.class);
-            PooledConnection pcon = (PooledConnection) shared.unwrap(PooledConnection.class);
+            PooledConnection pcon = (PooledConnection) internalOf(shared);
             FAIL_NEXT_CLOSE.set(true);
             PreparedStatement statement = shared.prepareStatement(
                     "SELECT 1\nFROM SYSTEM_RANGE(1,1)\r");

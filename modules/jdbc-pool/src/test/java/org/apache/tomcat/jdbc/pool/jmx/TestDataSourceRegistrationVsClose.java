@@ -304,7 +304,7 @@ class TestDataSourceRegistrationVsClose extends JdbcPoolBaseTest {
 
         PooledConnection held;
         try (java.sql.Connection connection = ds.getConnection()) {
-            held = connection.unwrap(PooledConnection.class);
+            held = internalOf(connection);
         }
         // The connection is idle now; hold its lock so the registration's
         // connection sweep parks on it.
