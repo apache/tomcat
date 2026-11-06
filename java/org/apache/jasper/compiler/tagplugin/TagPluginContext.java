@@ -31,6 +31,17 @@ public interface TagPluginContext {
     boolean isScriptless();
 
     /**
+     * Checks whether the current tag has a body. A tag whose only children are <code>jsp:attribute</code> actions, or
+     * whose <code>jsp:body</code> is empty, has no body. A body that contains only whitespace is still a body.
+     *
+     * @return true if the tag has a body, false if the body is empty. The default implementation returns true, which
+     *             is always safe for a plugin that uses the query to skip work that is only needed for a body.
+     */
+    default boolean hasBody() {
+        return true;
+    }
+
+    /**
      * Checks whether the specified attribute is present in the current tag.
      *
      * @param attribute Name of the attribute
