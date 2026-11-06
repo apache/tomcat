@@ -111,7 +111,7 @@ class TestStatementCacheRacingClose extends JdbcPoolBaseTest {
         String racingSql = "INSERT INTO " + racingTable + " VALUES (?)";
 
         Connection first = ds.getConnection();
-        PooledConnection pcon = (PooledConnection) first.unwrap(PooledConnection.class);
+        PooledConnection pcon = (PooledConnection) internalOf(first);
         RacingCloseStatementCache cache =
                 interceptorOf(first, RacingCloseStatementCache.class);
         setSessionMarker(first, 31);

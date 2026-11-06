@@ -72,7 +72,7 @@ class TestValidation extends JdbcPoolBaseTest {
         ds.createPool();
 
         try (Connection pooled = ds.getConnection()) {
-            PooledConnection pc = pooled.unwrap(PooledConnection.class);
+            PooledConnection pc = internalOf(pooled);
             pc.setLastValidated(System.currentTimeMillis());
             int before = validator.actions.size();
             Assertions.assertTrue(pc.validate(PooledConnection.VALIDATE_BORROW, null),

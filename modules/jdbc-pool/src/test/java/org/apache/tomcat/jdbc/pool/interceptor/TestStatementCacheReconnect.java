@@ -140,7 +140,7 @@ class TestStatementCacheReconnect extends JdbcPoolBaseTest {
         String insert = "INSERT INTO " + table + " VALUES (?)";
 
         Connection first = ds.getConnection();
-        java.sql.Connection oldPhysical = first.unwrap(PooledConnection.class).getConnection();
+        java.sql.Connection oldPhysical = internalOf(first).getConnection();
         setSessionMarker(first, 11);
         PreparedStatement prepared = first.prepareStatement(insert);
         Statement oldStatement = driverStatement(prepared);
@@ -181,7 +181,7 @@ class TestStatementCacheReconnect extends JdbcPoolBaseTest {
         String insert = "INSERT INTO " + table + " VALUES (?)";
 
         Connection first = ds.getConnection();
-        java.sql.Connection oldPhysical = first.unwrap(PooledConnection.class).getConnection();
+        java.sql.Connection oldPhysical = internalOf(first).getConnection();
         setSessionMarker(first, 12);
         PreparedStatement prepared = first.prepareStatement(insert);
         Statement oldStatement = driverStatement(prepared);
@@ -226,7 +226,7 @@ class TestStatementCacheReconnect extends JdbcPoolBaseTest {
         String insert = "INSERT INTO " + table + " VALUES (?)";
 
         Connection first = ds.getConnection();
-        java.sql.Connection oldPhysical = first.unwrap(PooledConnection.class).getConnection();
+        java.sql.Connection oldPhysical = internalOf(first).getConnection();
         setSessionMarker(first, 13);
         PreparedStatement prepared = first.prepareStatement(insert);
         Statement oldStatement = driverStatement(prepared);

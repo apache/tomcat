@@ -154,7 +154,7 @@ public class TestThrowingDriverOnClaimedPaths extends JdbcPoolBaseTest {
         DataSource ds = oneSlotPool();
         Connection first = ds.getConnection();
         awaitSessions(1);
-        PooledConnection pc = (PooledConnection) first.unwrap(PooledConnection.class);
+        PooledConnection pc = (PooledConnection) internalOf(first);
         first.close();
         forceExpired(pc);
 
@@ -180,7 +180,7 @@ public class TestThrowingDriverOnClaimedPaths extends JdbcPoolBaseTest {
         DataSource ds = oneSlotPool();
         Connection first = ds.getConnection();
         awaitSessions(1);
-        PooledConnection pc = (PooledConnection) first.unwrap(PooledConnection.class);
+        PooledConnection pc = (PooledConnection) internalOf(first);
         first.close();
         forceExpired(pc);
 

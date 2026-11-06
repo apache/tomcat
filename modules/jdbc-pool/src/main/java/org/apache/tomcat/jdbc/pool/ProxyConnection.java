@@ -26,86 +26,34 @@ import javax.sql.XAConnection;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
- * A ProxyConnection object is the bottom most interceptor that wraps an object of type {@link PooledConnection}. The
- * ProxyConnection intercepts, among the calls it forwards, the following methods:
- * <ul>
- * <li>{@link java.sql.Connection#close()} - returns the connection to the pool. May be called multiple times.</li>
- * <li>{@link java.sql.Connection#abort(java.util.concurrent.Executor)} - delegates the abort to the physical
- * connection and then ends the borrow: the session is taken out of service and the slot is freed. On a released
- * handle it is the specification's no-op; on a handle whose session the pool discarded while borrowed it skips the
- * driver and ends the borrow quietly.</li>
- * <li>{@link java.lang.Object#toString()} - returns a custom string for this object</li>
- * <li>{@link javax.sql.PooledConnection#getConnection()} - while the borrow is live, returns the underlying
- * connection; a handle that reports itself closed - one whose session the pool discarded while it was still
- * borrowed, which its borrower has already closed, or whose borrow ended before a call parked in the interceptor
- * chain reached this interceptor while the session meanwhile went to the next borrower - answers it with the
- * closed-connection failure rather than handing out the session the pool is retiring or re-served, or the null
- * that session's field holds once disconnected.</li>
- * <li>{@link java.lang.Object#equals(Object)} and {@link java.lang.Object#hashCode()} - answered with the identity of
- * the connection handle, so that the {@code Object} contract holds even when no facade sits in front of this
- * interceptor</li>
- * </ul>
- * By default method names are compared with {@link String#equals(Object)};
- * {@link PoolConfiguration#setUseEquals(boolean)} called with a <code>false</code> argument switches to
- * reference comparison.
+ * The bottom-most interceptor, wrapping a {@link PooledConnection}. It intercepts {@link java.sql.Connection#close()},
+ * {@link java.sql.Connection#abort(java.util.concurrent.Executor)}, {@link Object#toString()},
+ * {@link javax.sql.PooledConnection#getConnection()}, {@link Object#equals(Object)} and {@link Object#hashCode()}.
+ * Method names are compared with {@link String#equals(Object)} unless {@link PoolConfiguration#setUseEquals(boolean)}
+ * selects reference comparison.
  * <p>
- * The connection handle the pool hands out implements {@link javax.sql.PooledConnection} (and
- * {@link javax.sql.XAConnection} when the pool is backed by an {@link javax.sql.XADataSource}). The pool keeps no
- * connection or statement event listeners of its own, so the four listener methods of
- * {@code javax.sql.PooledConnection} - {@code addConnectionEventListener}, {@code removeConnectionEventListener},
- * {@code addStatementEventListener} and {@code removeStatementEventListener} - are answered by the XA-family
- * dispatch in {@link #invoke(Object, Method, Object[])}: where the handle is itself an {@code XAConnection} they
- * reach the XA connection the driver created, whose implementation decides what registering them means; where it
- * is not, the call has no dispatch target and each of the four fails with an {@link SQLException} naming the
- * method. That refusal is deliberate: the specification has the pool manager register through these methods to be
- * told to deactivate the handle and reuse or retire the physical session - decisions this pool makes and carries
- * out itself, with a new handle per borrow - and accepting a registration it could not notify faithfully would
- * only hide from the caller that no notification will ever arrive. The refusal also stands on a pool backed by a
- * {@link javax.sql.ConnectionPoolDataSource}, which holds the driver's own pooled connection for its session
- * management and does not route these calls to it. A handle that reports itself closed answers these calls with the closed-connection
- * failure every dispatched call meets in that state; the two boolean liveness probes are the exception, reporting
- * the state rather than failing - {@code isClosed} true and {@code isValid} false. Since the interface declares no
- * checked exception, either failure reaches the caller as an {@link java.lang.reflect.UndeclaredThrowableException}
- * carrying it.
+ * The connection handle implements {@link javax.sql.PooledConnection} (and {@link javax.sql.XAConnection} for an XA
+ * pool). The pool manages session reuse itself, so the four listener methods are delegated to the driver's XA
+ * connection where one exists, and otherwise fail with an {@link SQLException} naming the method rather than accepting
+ * a notification the pool could never deliver faithfully.
  */
 public class ProxyConnection extends JdbcInterceptor {
 
     /**
-     * The underlying pooled connection. Volatile because the writes that end or re-arm a borrow - the seal a
-     * concurrent {@link java.sql.Connection#close() close} or
-     * {@link java.sql.Connection#abort(java.util.concurrent.Executor) abort} makes from another thread, and the
-     * {@link #reset(ConnectionPool, PooledConnection)} of a pool walk - have no synchronization on the reader's
-     * side, and the guard in {@link #invoke(Object, Method, Object[])} consults this field to decide whether the
-     * handle can still serve. A seal seen here ends a borrow that was in progress; what it cannot show is a borrow
-     * that already ended and was followed by a clean recycle, which re-arms this field with the very same pooled
-     * connection object - the fence for that state is the borrow handle, documented on {@link #borrowHandle}.
+     * The underlying pooled connection. Volatile because writes that end or re-arm a borrow have no synchronization on
+     * the reader's side.
      */
     protected volatile PooledConnection connection = null;
 
     /**
-     * The connection handle the pool handed to the borrow this interceptor is currently armed for, or
-     * <code>null</code> once the borrow has ended: the close and abort branches of
-     * {@link #invoke(Object, Method, Object[])} seal it where they end a borrow, and
-     * {@link #reset(ConnectionPool, PooledConnection)} clears it and holds it clear until
-     * {@link ConnectionPool#setupConnection(PooledConnection)} records the next borrow's handle. This interceptor is
-     * cached on the pooled connection and a clean recycle re-arms it with the same {@link PooledConnection} object
-     * the ended borrow held, so neither the session field nor the discarded flag can tell a call of the current
-     * borrow from one that entered the interceptor chain before the borrow ended and descends only after the
-     * session went to the next borrower - every state those reads see then is the next borrow's live state. The
-     * handle is the per-borrow identity the call still carries: the pool builds a new handle for every borrow and
-     * the receiver travels down the chain unchanged, so a call arriving on any other handle belongs to a borrow
-     * that is over, and {@link #invoke(Object, Method, Object[])} answers it the way an ended borrow answers,
-     * whatever state the session itself is in.
+     * The connection handle the current borrow was served under, or {@code null} once the borrow has ended. It is the
+     * per-borrow identity that distinguishes a call of the current borrow from a late call of an earlier one.
      */
     protected volatile Object borrowHandle = null;
 
     /**
-     * The parent connection pool. Volatile for the same reason and by the same lock-free readers as the session
-     * field above: the close and abort branches of {@link #invoke(Object, Method, Object[])} read it into a local
-     * the whole branch acts on, and {@link #reset(ConnectionPool, PooledConnection)} nulls it on a teardown walk.
-     * Volatile also makes the ordering that walk relies on hold: the reset writes the session before the pool, so
-     * those branches - which read the pool first and the session second - never see a nulled pool with a live
-     * session behind it, the state a late close could otherwise pass its guard on and then dereference.
+     * The parent connection pool. Volatile because the close and abort branches read it without synchronization; reset
+     * writes the session before the pool so a reader never sees a null pool with a live session behind it.
      */
     protected volatile ConnectionPool pool = null;
 
@@ -218,39 +166,14 @@ public class ProxyConnection extends JdbcInterceptor {
      * @return true if this interceptor wraps the given interface
      */
     public boolean isWrapperFor(Class<?> iface) {
-        // The pooled connection is read once, into a snapshot, the way the
-        // dispatch in invoke() reads it, so the whole answer is about one
-        // state of the handle.
-        //
-        // No receiver is passed down: this entry point answers about the
-        // interceptor itself, which is a handle to nobody - a direct call
-        // carries no borrow identity for the fence's handle leg to consult,
-        // and the interfaces a dispatched call's handle implements are the
-        // dispatch's answer to give, not this one's (TestWrapperContract
-        // pins the two entry points' per-object pair for
-        // javax.sql.PooledConnection).
+        // Answer about one snapshot of the handle, with no borrow receiver.
         return isWrapperFor(iface, connection, null);
     }
 
     /*
-     * The isWrapperFor answer for one snapshot of the session field. The
-     * dispatch in invoke() calls this with the snapshot its guard and its
-     * re-check approved; the public method above takes its own single read
-     * and answers through here as well, with no receiver.
-     *
-     * The fence is the guard's closed test re-run immediately before the
-     * answer is read off the snapshot, the way every handout branch of
-     * invoke() re-checks before the handout: a snapshot outlives the check
-     * made on it, and a discard marking changes the state under one without
-     * touching the field - the abandon, the forced close and an
-     * interceptor's setDiscarded(true) all write that flag first and reach
-     * the seal of the field only later. A handle that reports itself closed
-     * answers false - a boolean cannot carry the closed failure, and false
-     * keeps the pair agreed with the failure unwrap() raises from the same
-     * fence. The receiver joins the fence as the guard's own handle test,
-     * for the clean recycle that re-armed the tail with the same session
-     * after the caller's re-check; a call with no receiver has no borrow
-     * identity to consult and skips that leg.
+     * The isWrapperFor answer for one snapshot of the session field. The fence re-checks that the snapshot still
+     * describes this borrow before answering, because a discard marking can move the state without touching the
+     * field. A closed handle answers false, matching the closed failure unwrap() raises.
      */
     private boolean isWrapperFor(Class<?> iface, PooledConnection pc, Object proxy) {
         if (pc != null && (connection != pc || pc.isDiscarded()
@@ -264,13 +187,6 @@ public class ProxyConnection extends JdbcInterceptor {
             // vouched for, and it then predicts the proxy the unwrap of the
             // same interface hands back from that same state.
             return true;
-        }
-        if (iface == PooledConnection.class) {
-            // The Wrapper answer must agree with what unwrap() hands out:
-            // for this class unwrap() returns the pooled connection this
-            // interceptor sits on, so the honest answer is whether one is
-            // still held. That object is pool-internal - see unwrap().
-            return pc != null;
         }
         if (pc == null) {
             // The borrow has ended and nothing is held, so no interface is
@@ -315,90 +231,38 @@ public class ProxyConnection extends JdbcInterceptor {
      *
      * @param iface the interface to unwrap to
      *
-     * @return the unwrapped connection. For {@link PooledConnection} this is
-     *         the pool's own pooled connection - a pool-internal object meant
-     *         for trusted callers such as interceptors, not for application
-     *         code, as it can close and discard the connection behind the
-     *         pool's own accounting.
+     * @return the unwrapped connection. The pool-internal {@link PooledConnection} type is not exposed through the
+     *             public Wrapper contract.
      *
      * @throws SQLException if the connection does not wrap the given interface
      */
     public Object unwrap(Class<?> iface) throws SQLException {
-        // The pooled connection is read once, into a snapshot, the way
-        // isWrapperFor() above and the dispatch in invoke() read it, so the
-        // whole answer is about one state of the handle. As in
-        // isWrapperFor(), no receiver is passed down: the direct answer is
-        // the interceptor's own, and it has no borrow identity for the
-        // fence's handle leg to run on.
+        // Answer about one snapshot of the handle, with no borrow receiver.
         return unwrap(iface, connection, null);
     }
 
     /*
-     * The unwrap answer for one snapshot of the session field, taken like
-     * the one isWrapperFor() above answers from.
-     *
-     * The fence is the guard's closed test re-run immediately before this
-     * method reads anything off the snapshot - the way every handout branch
-     * of invoke() re-checks before the handout. The discard marking is the
-     * writer that moves that state without touching the field: it is
-     * written before the seal the field checks can show. The receiver joins
-     * the fence as the guard's handle test; a call without a receiver skips
-     * that leg. The refusal is the closed failure every use of such a
-     * handle gets, not the not-a-wrapper failure: the interface asked is
-     * not the problem, the borrow is, and a caller told "not a wrapper"
-     * would be invited to ask again for another interface of the same gone
-     * session. It is also the answer isWrapperFor() gives false for from
-     * the same fence, so the pair stays agreed on this state.
+     * The unwrap answer for one snapshot of the session field. The fence re-checks the snapshot before anything is
+     * read off it; a sealed handle gets the closed failure rather than not-a-wrapper, since the borrow is the problem.
      */
     private Object unwrap(Class<?> iface, PooledConnection pc, Object proxy) throws SQLException {
         if (pc != null && (connection != pc || pc.isDiscarded()
                 || (proxy != null && !servesHandle(proxy)))) {
             throw new SQLException(MessageFactory.get("proxyConnection.connectionClosed"));
         }
-        if (iface == PooledConnection.class) {
-            if (pc == null) {
-                // The same not-a-wrapper failure the XA case below gives for
-                // a missing XA connection: with none held there is nothing to
-                // hand out, and a silent null would contradict what
-                // isWrapperFor() says and surface as an unrelated
-                // NullPointerException at the caller's first use.
-                throw new SQLException(MessageFactory.get("proxyConnection.notAWrapper", iface.getName()));
-            }
-            return pc;
-        }
         if (pc == null) {
-            // Nothing is held, so no interface is provided - the XA
-            // connection and the physical connection among them - and the
-            // contract's answer is this failure, the refusal isWrapperFor()
-            // predicts for this state, so the pair stays agreed on a
-            // released interceptor.
             throw new SQLException(MessageFactory.get("proxyConnection.notAWrapper", iface.getName()));
         }
         if (proxy != null && iface != XAConnection.class && iface.isInstance(proxy)
                 && !iface.isInstance(pc.getConnection())) {
-            // The Wrapper contract: the handle is a wrapper of every
-            // interface it implements itself. Interfaces the physical
-            // connection behind it also provides - java.sql.Connection
-            // first of all - keep resolving to the physical connection;
-            // javax.sql.XAConnection is excluded because unwrapping to it
-            // has always yielded the XA connection object the pooled
-            // connection holds - the driver's handle, wrapped by the pool's
-            // branch tracker on an XA session - and the failure below where
-            // none does. This answer
-            // runs below the fence like every other handout here: above it,
-            // a marking or a seal landing with the caller's re-check left
-            // could hand the handle out on a borrow the pool was already
-            // retiring, disagreeing with the closed failure the fenced
-            // answers gave. The proxy handed back is the caller's own
-            // handle, inert once the borrow is over.
+            // The handle is a wrapper of every interface it implements itself. Interfaces the physical connection
+            // also provides keep resolving below; XAConnection is excluded because unwrapping to it yields the
+            // driver's XA connection. The returned proxy is the caller's own handle, inert once the borrow is over.
             return proxy;
         }
         if (iface == XAConnection.class) {
             javax.sql.XAConnection xa = pc.getXAConnection();
             if (xa == null) {
-                // The Wrapper contract asks for a failure, not for a silent
-                // null that turns into an unrelated NullPointerException at
-                // the caller's first use of the "unwrapped" value.
                 throw new SQLException(MessageFactory.get("proxyConnection.notAWrapper", iface.getName()));
             }
             return xa;
@@ -408,15 +272,6 @@ public class ProxyConnection extends JdbcInterceptor {
             return physical;
         }
         if (physical != null && isWrapperFor(iface, pc, null)) {
-            // The driver's connection is a wrapper further down, and
-            // unwrapping that far is its answer to give, not ours. The
-            // question is asked of the same physical connection that was
-            // just tested - not of a fresh read of the field - so the answer
-            // never describes a state later than this method's fence, and it
-            // is asked with no receiver: it is about the driver's connection,
-            // not about this handle's own interfaces. Where the snapshot
-            // holds no session there is nothing below to ask, and the
-            // failure below is the honest answer for that state.
             return physical.unwrap(iface);
         }
         throw new SQLException(MessageFactory.get("proxyConnection.notAWrapper", iface.getName()));
