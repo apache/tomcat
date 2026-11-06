@@ -16,8 +16,13 @@
  */
 package org.apache.juli.logging;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
+import java.net.URL;
 import java.nio.file.FileSystems;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
@@ -75,23 +80,67 @@ public class LogFactory {
         // constructor taking the String name. Providers that cannot be
         // loaded or that do not expose the required constructor are
         // ignored, so a malformed provider does not prevent the discovery
-        // of a usable one, nor the fall back to DirectJDKLog. Note that,
-        // as the ServiceLoader requires, a provider also needs a public
-        // no-argument constructor to be considered at all.
-        ServiceLoader<Log> logLoader = ServiceLoader.load(Log.class);
+        // of a usable one, nor the fall back to DirectJDKLog. Class-path
+        // providers need a public no-argument constructor; named-module
+        // providers may instead use a factory method.
+        ServiceLoader<Log> logLoader = ServiceLoader.load(Log.class,
+                new ServiceLoaderClassLoader(Thread.currentThread().getContextClassLoader()));
         Constructor<? extends Log> m = null;
         Iterator<ServiceLoader.Provider<Log>> providers = logLoader.stream().iterator();
         while (m == null) {
+            ServiceLoader.Provider<Log> provider;
             try {
                 if (!providers.hasNext()) {
                     break;
                 }
-                m = providers.next().type().getConstructor(String.class);
-            } catch (ReflectiveOperationException | SecurityException | ServiceConfigurationError e) {
-                // Not a usable provider. Ignore it and look at the next one.
+                provider = providers.next();
+            } catch (ServiceConfigurationError | SecurityException | LinkageError e) {
+                // An individual service file or provider may be unusable. The resource enumeration has already
+                // advanced past it, so continue with the next file or provider.
+                continue;
+            }
+            try {
+                Class<? extends Log> type = provider.type();
+                if (type.getModule().isNamed()) {
+                    // For a factory-method provider, type() is the method's declared return type, which may be
+                    // the Log interface or a base class rather than the implementation whose constructor we need.
+                    type = provider.get().getClass();
+                }
+                Constructor<? extends Log> candidate = type.getConstructor(String.class);
+                // Instances are created later, by reflection from this class. A provider that is not accessible
+                // to it would fail every call of getInstance(), so treat it as unusable now.
+                if (Modifier.isPublic(type.getModifiers()) &&
+                        type.getModule().isExported(type.getPackageName(), LogFactory.class.getModule())) {
+                    m = candidate;
+                }
+            } catch (ReflectiveOperationException | SecurityException | ServiceConfigurationError | LinkageError e) {
+                // Not a usable provider, for example because a type it refers to is not available. Ignore it and
+                // look at the next one.
             }
         }
         discoveredLogConstructor = m;
+    }
+
+
+    /**
+     * Delegate service discovery to the context class loader, but turn a failed resource lookup into an empty
+     * enumeration. Unlike a failure reading an individual service file, a failure obtaining the enumeration leaves
+     * ServiceLoader unable to advance, so retrying its iterator would repeat the same lookup indefinitely.
+     */
+    private static class ServiceLoaderClassLoader extends ClassLoader {
+
+        private ServiceLoaderClassLoader(ClassLoader parent) {
+            super(parent == null ? ClassLoader.getSystemClassLoader() : parent);
+        }
+
+        @Override
+        public Enumeration<URL> getResources(String name) {
+            try {
+                return super.getResources(name);
+            } catch (IOException | SecurityException | LinkageError e) {
+                return Collections.emptyEnumeration();
+            }
+        }
     }
 
 
