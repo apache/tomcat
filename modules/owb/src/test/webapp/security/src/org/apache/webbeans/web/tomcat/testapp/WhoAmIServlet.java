@@ -17,6 +17,8 @@
 package org.apache.webbeans.web.tomcat.testapp;
 
 import java.io.IOException;
+import java.security.Principal;
+import java.util.Objects;
 
 import jakarta.inject.Inject;
 import jakarta.servlet.annotation.WebServlet;
@@ -24,44 +26,21 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet(urlPatterns = { "/hello", "/request", "/matching", "/interceptor" })
-public class Cdi41Servlet extends HttpServlet {
+import org.apache.webbeans.web.tomcat.OpenWebBeansSecurityValve;
+
+@WebServlet("/whoami")
+public class WhoAmIServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
     @Inject
-    private Greeting greeting;
-
-    @Inject
-    private RequestScopedBean requestScopedBean;
-
-    @Inject
-    private Cdi41Features cdi41Features;
-
-    @Inject
-    private TracedService tracedService;
+    private Principal principal;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String result;
-        switch (request.getServletPath()) {
-            case "/hello":
-                result = greeting.message();
-                break;
-            case "/request":
-                result = requestScopedBean.getId();
-                break;
-            case "/matching":
-                result = Boolean.toString(cdi41Features.matching());
-                break;
-            case "/interceptor":
-                result = tracedService.hello();
-                break;
-            default:
-                response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                return;
-        }
+        Principal valvePrincipal = OpenWebBeansSecurityValve.getPrincipal();
+        String valveName = valvePrincipal == null ? "null" : valvePrincipal.getName();
         response.setContentType("text/plain");
-        response.getWriter().println(result);
+        response.getWriter().println(Objects.requireNonNull(principal).getName() + "|" + valveName);
     }
 }

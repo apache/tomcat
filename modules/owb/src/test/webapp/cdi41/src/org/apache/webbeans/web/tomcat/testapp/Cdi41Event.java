@@ -16,20 +16,5 @@
  */
 package org.apache.webbeans.web.tomcat.testapp;
 
-import jakarta.annotation.Priority;
-import jakarta.interceptor.AroundInvoke;
-import jakarta.interceptor.Interceptor;
-import jakarta.interceptor.InvocationContext;
-
-@Traced
-@Interceptor
-@Priority(Interceptor.Priority.APPLICATION)
-public class TracingInterceptor {
-
-    @AroundInvoke
-    public Object aroundInvoke(InvocationContext context) throws Exception {
-        boolean found = context.getInterceptorBindings().stream()
-                .anyMatch(annotation -> annotation.annotationType() == Traced.class);
-        return (found ? "bound:" : "missing:") + context.proceed();
-    }
+public class Cdi41Event {
 }

@@ -16,27 +16,19 @@
  */
 package org.apache.webbeans.web.tomcat.testapp;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import java.util.Set;
-
-import jakarta.enterprise.context.Dependent;
-import jakarta.enterprise.inject.Default;
-import jakarta.enterprise.inject.spi.BeanContainer;
 import jakarta.enterprise.inject.spi.CDI;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
+import jakarta.servlet.annotation.WebListener;
 
-@Dependent
-public class Cdi41Features {
+@WebListener
+public class LifecycleContextListener implements ServletContextListener {
 
-    public boolean matching() {
-        BeanContainer container = CDI.current().getBeanContainer();
-
-        Set<Type> beanTypes = Set.of(MatchingTarget.class, Object.class);
-        Set<Annotation> qualifiers = Set.of(Default.Literal.INSTANCE);
-
-        boolean match = container.isMatchingBean(beanTypes, qualifiers, MatchingTarget.class, qualifiers);
-        boolean noMatch = container.isMatchingBean(beanTypes, qualifiers, String.class, qualifiers);
-
-        return match && !noMatch;
+    @Override
+    public void contextInitialized(ServletContextEvent event) {
+        // Listeners are instantiated before the CDI container is started, so
+        // use programmatic lookup rather than field injection here.
+        LifecycleGreeting greeting = CDI.current().select(LifecycleGreeting.class).get();
+        event.getServletContext().setAttribute("owb.listener.greeting", greeting.message());
     }
 }

@@ -209,7 +209,7 @@
                         <classpathDependencyExclude>jakarta.annotation:jakarta.annotation-api</classpathDependencyExclude>
                     </classpathDependencyExcludes>
                     <systemPropertyVariables>
-                        <owb.test.webapp>${project.basedir}/src/test/webapp</owb.test.webapp>
+                        <owb.test.webapp.root>${project.basedir}/src/test/webapp</owb.test.webapp.root>
                         <owb.test.jar>${project.build.directory}/${project.build.finalName}.jar</owb.test.jar>
                     </systemPropertyVariables>
                 </configuration>
