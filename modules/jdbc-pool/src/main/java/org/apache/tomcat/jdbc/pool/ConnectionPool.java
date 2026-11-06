@@ -1682,7 +1682,10 @@ public class ConnectionPool {
             ExceptionUtils.handleThrowable(e);
             error = true;
             if (log.isDebugEnabled()) {
-                log.debug("Unable to create a new JDBC connection.", e);
+                // The driver's message can carry the URL and its credential,
+                // so log it masked and without the raw exception.
+                log.debug("Unable to create a new JDBC connection. " + e.getClass().getName() + ": " +
+                        PoolProperties.maskCredentials(e.getMessage()));
             }
             if (e instanceof SQLException) {
                 throw (SQLException) e;

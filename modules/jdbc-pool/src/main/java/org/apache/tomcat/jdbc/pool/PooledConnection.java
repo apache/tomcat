@@ -92,20 +92,8 @@ public class PooledConnection implements PooledConnectionMBean {
      */
     private volatile javax.sql.PooledConnection cpdsConnection;
     /**
-     * When we track abandon traces, the borrow site of this connection, in one
-     * of three shapes: a {@link StackTraceElement} array as captured at the
-     * borrow and not yet formatted, the formatted trace (a String) that such an
-     * array was turned into, or {@code null} for no site recorded. The formatting
-     * is deferred to {@link #getStackTrace()} because a pool with logAbandoned
-     * borrows constantly and reports rarely, so the cost is only paid when the
-     * trace is actually read - and it is one slot rather than two fields, with
-     * the formatting published by compare-and-set on the very array it read,
-     * because the read-modify-write has no lock to sit in: the abandoned check
-     * that reads it can be JMX-invoked, and con.lock() is a no-op unless the
-     * sweeper or useLock is on. A formatting of an older borrow's frames then
-     * loses the slot to any re-borrow that swapped its own site in meanwhile,
-     * so a live session always carries its own borrow site rather than a
-     * previous borrower's.
+     * When abandon traces are tracked, the borrow site of this connection: either a {@link StackTraceElement} array, the
+     * formatted String it was turned into, or {@code null}. Formatting is deferred to {@link #getStackTrace()}.
      */
     private final AtomicReference<Object> abandonTrace = new AtomicReference<>();
     /**
@@ -197,18 +185,8 @@ public class PooledConnection implements PooledConnectionMBean {
 
     /**
      * Returns true if we must force reconnect based on credentials passed in. Returns false if the
-     * username/password has not changed since this connection was connected
-     *
-     * <p>This is a comparison only. It records nothing: the identity a session is established with is written by the
-     * reconnect that follows this decision (see {@link #reconnectWith(String, String)}), so that a reconnect the
-     * database refused cannot leave this connection carrying credentials that were never accepted.</p>
-     *
-     * <p>Where {@link PoolConfiguration#isAlternateUsernameAllowed()} is false the passed credentials carry no
-     * weight - the pool ignores them at the borrow, as it does at every other surface - but the comparison is not
-     * skipped: with alternate identities disallowed the identity every session must serve under is the pool's own
-     * configured one, and a session carrying any other identity, however it came to carry it - the flag was turned
-     * at runtime over a session a borrower had re-established under its own credentials - is re-established rather
-     * than served.</p>
+     * username/password has not changed since this connection was connected. This is a comparison only; the identity a
+     * session is established with is written by the reconnect that follows the decision.
      *
      * @param username the username you wish to connect with, pass in null to accept the default username from
      *                     {@link PoolConfiguration#getUsername()}
@@ -220,13 +198,8 @@ public class PooledConnection implements PooledConnectionMBean {
     public boolean shouldForceReconnect(String username, String password) {
 
         if (!getPoolProperties().isAlternateUsernameAllowed()) {
-            // Not the pool's answer to skip the comparison here: this is the
-            // gate that keeps a session's authenticated identity matched to
-            // the identity it is served under, and with alternates disallowed
-            // that identity is always the pool's configured one. Comparing
-            // against the configured credentials rather than against what the
-            // borrower asked for is what keeps a session that carries another
-            // identity from being served to a borrower that never claimed it.
+            // With alternate identities disallowed, the identity every session
+            // must serve under is the pool's configured one.
             username = poolProperties.getUsername();
             password = poolProperties.getPassword();
         }
@@ -529,24 +502,10 @@ public class PooledConnection implements PooledConnectionMBean {
             pwd = poolProperties.getPassword();
             getAttributes().put(PROP_PASSWORD, pwd);
         }
-        // A configuration whose database properties are null - a state
-        // PoolConfiguration#setDbProperties accepts, and that the credential
-        // setters and setConnectionProperties already tolerate - carries no
-        // driver properties. That is not a configuration that cannot connect:
-        // the URL and the credential below are enough for the driver, so the
-        // absent collection becomes an empty one rather than a failed connect.
-        // The copy is taken under the configuration's monitor, for the same
-        // torn-snapshot reason PoolProperties#clone() synchronizes for:
-        // setConnectionProperties and the credential setters mutate the live
-        // collection in place under that monitor, while its reads of the
-        // collection are not atomic against such mutation. A copy taken
-        // outside the monitor can therefore mix two published generations:
-        // the driver then sees a key a concurrent reconfigure has just
-        // removed next to the keys that replaced it, or - when the credential
-        // travels in the connection-properties string rather than in the
-        // credential fields that are overlaid below - a user/password pair no
-        // generation ever published together. The configuration monitor is a
-        // leaf, so taking it here orders against no other lock.
+        // A null database-properties collection becomes an empty one: the URL
+        // and credentials are enough for the driver. The copy is taken under
+        // the configuration's monitor so a concurrent reconfigure cannot hand
+        // the driver a torn mix of two generations.
         Properties properties;
         synchronized (poolProperties) {
             Properties dbProperties = poolProperties.getDbProperties();
@@ -568,7 +527,11 @@ public class PooledConnection implements PooledConnectionMBean {
             }
         } catch (Exception x) {
             if (log.isDebugEnabled()) {
-                log.debug("Unable to connect to database.", x);
+                // The driver's message is credential-bearing on the very
+                // failure this line exists to diagnose, so it is masked and
+                // logged without the raw exception.
+                log.debug("Unable to connect to database. " + x.getClass().getName() + ": " +
+                        PoolProperties.maskCredentials(x.getMessage()));
             }
             // Read the pool's JMX object only once: close() gives it up
             // concurrently, and a second read can observe the null the first
@@ -637,23 +600,9 @@ public class PooledConnection implements PooledConnectionMBean {
 
     /**
      * Re-establishes this connection under the credentials handed in, giving up the session it currently holds only
-     * once a session established under those credentials has been opened.
-     *
-     * <p>
-     * {@link #reconnect()} closes the session in hand before it asks for another one, which is the right order for a
-     * session the pool is retiring on its own account - because it reached {@link PoolConfiguration#getMaxAge() maxAge}
-     * or failed a validation. It is the wrong order for a session that is being handed to a borrower under different
-     * credentials: the database decides whether those credentials are acceptable, and a database that refuses them
-     * would, with that order, have taken a healthy session out of the pool - a session every other borrower of the
-     * pool can still use, and one the refused borrower never had a claim on. Here the order is reversed: the
-     * credentials are put to the database while the session in hand stays in place, and only a session the database
-     * has accepted replaces it.</p>
-     *
-     * <p>
-     * The credentials themselves are written into {@link #getAttributes()} for the attempt, because that is where the
-     * connect reads them from, and are put back as they were if the attempt fails. So neither a refusal nor a
-     * connection that could not be established leaves this connection carrying credentials the database never
-     * accepted - which matters because those attributes decide the identity of every later reconnect.</p>
+     * once a session established under those credentials has been opened. Unlike {@link #reconnect()}, a refused
+     * credential change therefore leaves the healthy session in place. The staged credentials are restored if the
+     * attempt fails.
      *
      * @param username the username to re-establish the connection with, pass in null to accept the default username
      *                     from {@link PoolConfiguration#getUsername()}
@@ -785,9 +734,10 @@ public class PooledConnection implements PooledConnectionMBean {
     }
 
     /**
-     * Disconnects the connection. All exceptions are logged using debug level.
+     * Disconnects the connection. A failure of the physical close is logged and the connection is still retired.
      *
-     * @param finalize if set to true, a call to {@link ConnectionPool#finalize(PooledConnection)} is called.
+     * @param finalize if set to true, the interceptors receive {@code disconnected(finalizing=true)}; the chain's
+     *                     teardown reset is performed once by {@link ConnectionPool#release(PooledConnection)}
      */
     private void disconnect(boolean finalize) {
         if (isDiscarded() && connection == null && xaConnection == null && cpdsConnection == null) {
@@ -1291,43 +1241,20 @@ public class PooledConnection implements PooledConnectionMBean {
     }
 
     /**
-     * This method is called if (Now - timeCheckedIn &gt; getReleaseTime()). It disconnects the connection - a failure of
-     * the disconnect itself is logged at debug level - and then sets the {@link #released} flag to true, so any attempt
-     * to connect this cached object again fails per {@link #connect()}. Only the call that settles the flag drives the
-     * disconnection; later calls return without touching the session. The connection pool uses the atomic return value
-     * to decrement the pool size counter.
+     * This method is called if (Now - timeCheckedIn &gt; getReleaseTime()). It claims the {@link #released} flag first,
+     * so any attempt to connect this cached object again fails per {@link #connect()}, and then disconnects the
+     * connection; a failure of the disconnect itself is logged. Only the call that settles the flag drives the
+     * disconnection, and later calls return without touching the session. The connection pool uses the atomic return
+     * value to decrement the pool size counter.
      *
      * @return true if this is the first time this method has been called. false if this method has been called before.
      */
     public boolean release() {
-        // The claim precedes the acting. release() reaches a connection from
-        // several hands at once - the abandon check and a losing return both
-        // call it on the same connection - and the terminal sequence it
-        // drives (the chain's disconnected(finalizing=true), the physical
-        // close, the chain teardown at parent.finalize) is not a sequence a
-        // session can be taken through twice: an interceptor would meet its
-        // own disposal, then the same close again. So the winner is settled
-        // first, under this connection's monitor, and only that winner acts.
-        //
-        // Under this connection's monitor - the one lock every registration
-        // holds from its released-check through its name assignment (see
-        // createMBean()), and the only lock that every configuration shares,
-        // the per-connection lock being a deliberate no-op unless the sweeper
-        // or useLock is on. Without this pairing a close could read the name
-        // while a registration still runs: it would find null, unregister
-        // nothing, and the registration would then publish an MBean of this
-        // now-dead connection that nothing is left ever to take back. The
-        // flag that tells a registration this connection is gone is settled
-        // inside the same step: set only after leaving the monitor, it would
-        // leave a registration that wins the monitor in between seeing
-        // neither the name nor the flag, and publishing the orphan anyway.
-        // With both settled here, either the registration completes first and
-        // this unregisters it, or this passes first and the registration
-        // sees the released flag and publishes nothing. Settling the flag
-        // before the disconnect rather than after it is what stops a racing
-        // connect() from passing that check on a session already being torn
-        // down, and the MBean going before the session is what stops a JMX
-        // reader from watching the teardown as a live connection.
+        // The claim precedes the acting: the terminal sequence must not be
+        // driven twice. The flag and the MBean name are settled together under
+        // this connection's monitor, so a racing registration either completes
+        // first and is unregistered here, or sees the released flag and
+        // publishes nothing.
         boolean first;
         synchronized (this) {
             if (oname != null) {
@@ -1466,9 +1393,9 @@ public class PooledConnection implements PooledConnectionMBean {
      * <p>Every connection of a pool reads the same configuration object, and the pool builds each connection against
      * the one it was created with; replacing the reference here therefore changes what this single connection sees
      * while the rest of the pool keeps reading the old configuration. That makes the setter a surface for tests and
-     * for an embedder that owns the wiring, not a way to reconfigure a running pool - which is what
-     * {@link DataSourceProxy#setPoolProperties(PoolConfiguration)} is, since it rebuilds the pool on the
-     * configuration it is given.</p>
+     * for an embedder that owns the wiring, not a way to reconfigure a running pool.
+     * {@link DataSourceProxy#setPoolProperties(PoolConfiguration)} likewise affects only a pool created afterwards; a
+     * live pool keeps the configuration it was built from.</p>
      *
      * @param poolProperties The pool properties
      */
