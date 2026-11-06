@@ -155,6 +155,52 @@ public class TestAsyncStateMachine {
 
 
     /*
+     * BZ 70290: CLOSE_CLEAN permits IO so the current response can be completed before the connection is closed. Any
+     * buffered output must be written before onComplete() is called, as it is for MUST_COMPLETE and DISPATCHING. While
+     * output remains the state machine must stay in the long poll without completing.
+     */
+    @Test
+    public void testBz70290DispatchWithCloseCleanFlushesBufferedOutputBeforeCompleting() throws IOException {
+        processor.setErrorState(ErrorState.CLOSE_CLEAN, null);
+        processor.action(ActionCode.ASYNC_DISPATCH, null);
+        processor.setPendingFlushes(2);
+
+        // Output remains so processing must not end yet
+        Assert.assertEquals(SocketState.LONG, processor.asyncPostProcess());
+        Assert.assertTrue("Async processing must not have ended", isAsync());
+        Assert.assertEquals(0, asyncCtxt.getCompleteCount());
+        Assert.assertEquals(0, asyncCtxt.getDecrementCount());
+
+        // Still output remaining
+        Assert.assertEquals(SocketState.LONG, processor.asyncPostProcess());
+        Assert.assertEquals(0, asyncCtxt.getCompleteCount());
+        Assert.assertEquals(0, asyncCtxt.getDecrementCount());
+
+        // Output has been written in full so processing can now end
+        Assert.assertEquals(SocketState.ASYNC_END, processor.asyncPostProcess());
+        assertCompleted();
+        Assert.assertEquals(3, processor.getFlushCalls());
+    }
+
+
+    /*
+     * BZ 70290: When IO is not allowed buffered output can not be written so it must not be attempted and processing
+     * must end immediately.
+     */
+    @Test
+    public void testBz70290DispatchWithCloseNowDoesNotFlushBufferedOutput() throws IOException {
+        processor.setErrorState(ErrorState.CLOSE_NOW, new IOException());
+        processor.action(ActionCode.ASYNC_DISPATCH, null);
+        processor.setPendingFlushes(2);
+
+        Assert.assertEquals(SocketState.ASYNC_END, processor.asyncPostProcess());
+
+        assertCompleted();
+        Assert.assertEquals("No flush must be attempted", 0, processor.getFlushCalls());
+    }
+
+
+    /*
      * BZ 70290: Control. The equivalent complete() handling (MUST_COMPLETE) in an error state already balanced the
      * count. Confirm the dispatch and complete cases behave consistently.
      */
@@ -246,10 +292,26 @@ public class TestAsyncStateMachine {
             // NO-OP. Tests drive the state machine directly rather than via a socket.
         }
 
+        private int pendingFlushes;
+        private int flushCalls;
+
+        /**
+         * Simulate buffered output that needs the given number of calls to {@link #flushBufferedWrite()} before it has
+         * been written in full.
+         */
+        void setPendingFlushes(int pendingFlushes) {
+            this.pendingFlushes = pendingFlushes;
+        }
+
+        int getFlushCalls() {
+            return flushCalls;
+        }
+
         @Override
         protected boolean flushBufferedWrite() throws IOException {
-            // There is no socket so there is never any buffered data to flush
-            return false;
+            // There is no socket so there is only buffered data if the test has asked for it
+            flushCalls++;
+            return pendingFlushes-- > 0;
         }
 
         @Override
