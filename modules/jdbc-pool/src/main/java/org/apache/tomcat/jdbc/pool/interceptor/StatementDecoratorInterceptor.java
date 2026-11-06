@@ -44,9 +44,10 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  * an {@link SQLException}, and the driver's answer to a close that failed is passed to the caller - the handle is
  * retired whichever way the driver answered. The connection the proxy reports is a snapshot of the borrow that
  * created it, so a component that reuses a statement across borrows - {@link StatementCache} - must re-bind the
- * handle first, as {@link StatementProxy#setConnection(Object)} documents. The result set proxy answers only
- * {@link ResultSet#getStatement()} itself; everything else, {@link java.sql.Wrapper#unwrap(Class)} included,
- * reaches the driver object unchanged.
+ * handle first, as {@link StatementProxy#setConnection(Object)} documents. The result set proxy answers
+ * {@link ResultSet#getStatement()} and the {@link Object} identity methods ({@code toString}, {@code equals},
+ * {@code hashCode}) itself; every other call, the {@link java.sql.Wrapper} methods included, reaches the driver object
+ * unchanged.
  */
 public class StatementDecoratorInterceptor extends AbstractCreateStatementInterceptor {
 
