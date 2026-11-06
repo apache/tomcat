@@ -132,8 +132,12 @@ public class Import implements TagPlugin {
         ctxt.generateJavaSource("    if(!" + urlName + ".startsWith(\"/\")){");
         ctxt.generateJavaSource("        String " + servletPathName + " = " +
                 "((HttpServletRequest)_jspx_page_context.getRequest()).getServletPath();");
-        ctxt.generateJavaSource("        " + urlName + " = " + servletPathName + ".substring(0," + servletPathName +
-                ".lastIndexOf('/')) + '/' + " + urlName + ";");
+        // The servlet path may contain no '/' (e.g. the empty string for the empty url-pattern)
+        ctxt.generateJavaSource("        if(" + servletPathName + ".lastIndexOf('/') >= 0){");
+        ctxt.generateJavaSource("            " + servletPathName + " = " + servletPathName + ".substring(0," +
+                servletPathName + ".lastIndexOf('/'));");
+        ctxt.generateJavaSource("        }");
+        ctxt.generateJavaSource("        " + urlName + " = " + servletPathName + " + '/' + " + urlName + ";");
         ctxt.generateJavaSource("    }");
         ctxt.generateJavaSource("}");
 
