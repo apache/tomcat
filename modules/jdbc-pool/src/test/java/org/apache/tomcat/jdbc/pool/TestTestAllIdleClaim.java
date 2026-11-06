@@ -119,7 +119,7 @@ class TestTestAllIdleClaim extends JdbcPoolBaseTest {
         Connection first = ds.getConnection();
         awaitSessions(1);
         setSessionMarker(first, 7);
-        PooledConnection pc = (PooledConnection) internalOf(first);
+        PooledConnection pc = internalOf(first);
         first.close();
         forceExpired(pc);
 
@@ -218,7 +218,7 @@ class TestTestAllIdleClaim extends JdbcPoolBaseTest {
 
         Connection first = ds.getConnection();
         awaitSessions(1);
-        PooledConnection pc = (PooledConnection) internalOf(first);
+        PooledConnection pc = internalOf(first);
         first.close();
         forceExpired(pc);
 
@@ -273,7 +273,7 @@ class TestTestAllIdleClaim extends JdbcPoolBaseTest {
 
         Connection first = ds.getConnection();
         awaitSessions(1);
-        PooledConnection pc = (PooledConnection) internalOf(first);
+        PooledConnection pc = internalOf(first);
         first.close();
         forceExpired(pc);
 

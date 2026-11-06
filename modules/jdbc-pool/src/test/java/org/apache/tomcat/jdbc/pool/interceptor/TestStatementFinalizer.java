@@ -598,7 +598,7 @@ class TestStatementFinalizer extends JdbcPoolBaseTest {
         ds.createPool();
         try (Connection pooled = ds.getConnection()) {
             StatementFinalizer finalizer = interceptorOf(pooled, StatementFinalizer.class);
-            PooledConnection pcon = (PooledConnection) internalOf(pooled);
+            PooledConnection pcon = internalOf(pooled);
             Method create = Connection.class.getMethod("createStatement");
 
             finalizer.reset(ds.getPool(), pcon);
