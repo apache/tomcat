@@ -441,23 +441,6 @@ public class PageContextImpl extends PageContext {
         return servlet;
     }
 
-    private String getAbsolutePathRelativeToContext(String relativeUrlPath) {
-        String path = relativeUrlPath;
-
-        if (!path.startsWith("/")) {
-            String uri = (String) request.getAttribute(RequestDispatcher.INCLUDE_SERVLET_PATH);
-            if (uri == null) {
-                uri = ((HttpServletRequest) request).getServletPath();
-            }
-            if (uri.lastIndexOf('/') >= 0) {
-                uri = uri.substring(0, uri.lastIndexOf('/'));
-            }
-            path = uri + '/' + path;
-        }
-
-        return path;
-    }
-
     @Override
     public void include(String relativeUrlPath) throws ServletException, IOException {
         JspRuntimeLibrary.include(request, response, relativeUrlPath, out, true);
@@ -489,7 +472,7 @@ public class PageContextImpl extends PageContext {
             response = ((ServletResponseWrapperInclude) response).getResponse();
         }
 
-        final String path = getAbsolutePathRelativeToContext(relativeUrlPath);
+        final String path = JspRuntimeLibrary.getContextRelativePath(request, relativeUrlPath);
         String includeUri = (String) request.getAttribute(RequestDispatcher.INCLUDE_SERVLET_PATH);
 
         if (includeUri != null) {
