@@ -323,7 +323,7 @@ public interface PoolConfiguration {
      * The maximum number of connections that should be kept in the idle pool if {@link #isPoolSweeperEnabled()} returns
      * false. If {@link #isPoolSweeperEnabled()} returns true, then the idle pool can grow up to
      * {@link #getMaxActive} and will be shrunk according to {@link #getMinEvictableIdleTimeMillis()} setting. Default
-     * value is maxActive:100
+     * value is {@link #getMaxActive} (100 with the default configuration)
      *
      * @return the maximum number of idle connections.
      */
@@ -333,7 +333,7 @@ public interface PoolConfiguration {
      * The maximum number of connections that should be kept in the idle pool if {@link #isPoolSweeperEnabled()} returns
      * false. If {@link #isPoolSweeperEnabled()} returns true, then the idle pool can grow up to
      * {@link #getMaxActive} and will be shrunk according to {@link #getMinEvictableIdleTimeMillis()} setting. Default
-     * value is maxActive:100
+     * value is {@link #getMaxActive} (100 with the default configuration)
      *
      * @param maxIdle the maximum size of the idle pool
      */
@@ -944,7 +944,10 @@ public interface PoolConfiguration {
      * values are set, the method {@link javax.sql.DataSource#getConnection(String, String)} method will be called
      * instead of the {@link javax.sql.DataSource#getConnection()} method. If the data source implements
      * {@link javax.sql.XADataSource} the methods {@link javax.sql.XADataSource#getXAConnection()} and
-     * {@link javax.sql.XADataSource#getXAConnection(String,String)} will be invoked.
+     * {@link javax.sql.XADataSource#getXAConnection(String,String)} will be invoked. If it implements
+     * {@link javax.sql.ConnectionPoolDataSource} the methods
+     * {@link javax.sql.ConnectionPoolDataSource#getPooledConnection()} and
+     * {@link javax.sql.ConnectionPoolDataSource#getPooledConnection(String,String)} will be invoked instead.
      *
      * @param ds the {@link javax.sql.DataSource} to be used for creating connections to be pooled.
      */
@@ -954,8 +957,9 @@ public interface PoolConfiguration {
      * Returns a datasource, if one exists that is being used to create connections. This method will return null if the
      * pool is using a {@link java.sql.Driver}
      *
-     * @return the {@link javax.sql.DataSource} to be used for creating connections to be pooled or null if a Driver is
-     *             used.
+     * @return the backing object - a {@link javax.sql.DataSource}, {@link javax.sql.XADataSource} or
+     *             {@link javax.sql.ConnectionPoolDataSource} - used for creating connections to be pooled, or null if a
+     *             Driver is used.
      */
     Object getDataSource();
 
