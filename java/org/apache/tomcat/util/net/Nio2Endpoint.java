@@ -81,7 +81,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
      */
     private AsynchronousChannelGroup threadGroup = null;
 
-    private volatile boolean allClosed;
+    private volatile boolean allClosed = true;
 
     /**
      * Bytebuffer cache, each channel holds a set of buffers (two, except for SSL holds four)
