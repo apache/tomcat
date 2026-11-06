@@ -28,8 +28,9 @@ public interface Validator {
      * Validate a connection and return a boolean to indicate if it's valid.
      * <p>
      * The pool calls this method with the underlying JDBC connection, outside any interceptor chain, and treats any
-     * runtime exception or non-fatal {@link Error} thrown by an implementation as a validation failure; only a
-     * {@link VirtualMachineError} is re-thrown. Implementations that invoke JDBC APIs must catch
+     * runtime exception or non-fatal {@link Error} thrown by an implementation as a validation failure. A
+     * {@link StackOverflowError} is swallowed like a non-fatal error; the other {@link VirtualMachineError} types are
+     * re-thrown. Implementations that invoke JDBC APIs must catch
      * {@link java.sql.SQLException} and return {@code false} themselves, since this method does not declare a checked
      * exception. A {@code false} result (or a thrown runtime exception or error) causes the pool to discard the
      * connection; on a borrow that discard happens within the same {@code getConnection()} call, as the pool
