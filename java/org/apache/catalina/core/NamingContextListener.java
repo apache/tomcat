@@ -1201,6 +1201,12 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
      */
     public void addResourceLink(ContextResourceLink resourceLink) {
 
+        // Reject a link which cannot be registered before anything is bound
+        if (resourceLink.getName() == null || resourceLink.getGlobal() == null) {
+            throw new IllegalArgumentException(
+                    sm.getString("naming.invalidResourceLink", resourceLink.getName(), resourceLink.getGlobal()));
+        }
+
         // Create a reference to the resource.
         Reference ref =
                 new ResourceLinkRef(resourceLink.getType(), resourceLink.getGlobal(), resourceLink.getFactory(), null);
