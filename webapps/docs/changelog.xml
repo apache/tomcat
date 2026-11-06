@@ -1732,6 +1732,9 @@
       <update>
         Update Checkstyle to 14.4.0. (markt)
       </update>
+      <update>
+        Update JaCoCo to 0.8.16. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
