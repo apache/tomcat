@@ -127,7 +127,7 @@ public class QueryTimeoutInterceptor extends AbstractCreateStatementInterceptor 
             timeout = Integer.parseInt(p.getValue());
         } catch (NumberFormatException x) {
             log.warn(MessageFactory.get("queryTimeoutInterceptor.invalidQueryTimeout",
-                    p.getValue(), timeout));
+                    p.getValue(), Integer.valueOf(timeout)));
         }
     }
 
@@ -161,7 +161,7 @@ public class QueryTimeoutInterceptor extends AbstractCreateStatementInterceptor 
         // warning could report.
         if (pool != null && timeout > 0
                 && pool.getPoolProperties().getDataSource() instanceof javax.sql.XADataSource) {
-            log.warn(MessageFactory.get("queryTimeoutInterceptor.xaBypass", timeout));
+            log.warn(MessageFactory.get("queryTimeoutInterceptor.xaBypass", Integer.valueOf(timeout)));
         }
     }
 
@@ -238,7 +238,8 @@ public class QueryTimeoutInterceptor extends AbstractCreateStatementInterceptor 
             return;
         }
         timeoutRefusalReported = true;
-        log.warn(MessageFactory.get("queryTimeoutInterceptor.queryTimeoutRefused", timeout, reasonOf(x)), x);
+        log.warn(MessageFactory.get("queryTimeoutInterceptor.queryTimeoutRefused", Integer.valueOf(timeout),
+                reasonOf(x)), x);
     }
 
     /*
@@ -252,7 +253,8 @@ public class QueryTimeoutInterceptor extends AbstractCreateStatementInterceptor 
             return;
         }
         timeoutFailureReported = true;
-        log.warn(MessageFactory.get("queryTimeoutInterceptor.queryTimeoutSetupFailed", timeout, reasonOf(x)), x);
+        log.warn(MessageFactory.get("queryTimeoutInterceptor.queryTimeoutSetupFailed", Integer.valueOf(timeout),
+                reasonOf(x)), x);
     }
 
     /*

@@ -129,7 +129,7 @@ class TestBorrowReturnStatistics extends JdbcPoolBaseTest {
         Assertions.assertFalse(queued.isDone(),
                 "the poll must wait for a connection the pool cannot spare");
         holder.close();
-        try (Connection served = queued.get(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
+        try (@SuppressWarnings("unused") Connection served = queued.get(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
             Assertions.assertEquals(4, pool.getBorrowedCount(),
                     "the connection the queue handed to the waiting poll is "
                             + "one borrow, counted once it is set up for "

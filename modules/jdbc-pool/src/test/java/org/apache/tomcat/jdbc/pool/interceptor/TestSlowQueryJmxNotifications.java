@@ -1185,7 +1185,7 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
                 "org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx"
                         + "(notifyPool=false,threshold=-1)");
         ds.createPool();
-        try (Connection ignored = ds.getConnection()) {
+        try (@SuppressWarnings("unused") Connection ignored = ds.getConnection()) {
             // the borrow publishes the state
             Assertions.assertNotNull(SlowQueryReportJmx.jmxStateFor(ds.getPool()),
                     "precondition: the borrow must have published the pool's state");
@@ -1317,7 +1317,7 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
         ObjectName oname = new ObjectName("tomcat.jdbc:type="
                 + SlowQueryReportJmx.class.getName() + ",name=" + poolName);
-        try (Connection con = ds.getConnection()) {
+        try (@SuppressWarnings("unused") Connection con = ds.getConnection()) {
             Assertions.assertTrue(server.isRegistered(oname),
                     "the premise: the borrow published the pool under the default name");
             // The interceptor property is mutable at runtime, so the close is

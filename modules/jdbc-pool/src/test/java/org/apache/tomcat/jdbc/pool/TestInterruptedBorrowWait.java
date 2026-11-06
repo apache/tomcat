@@ -118,8 +118,8 @@ class TestInterruptedBorrowWait extends JdbcPoolBaseTest {
                         + "as its cause");
 
         // The property governs only the thread's flag, never the failure.
-        Assertions.assertEquals(propagateInterruptState,
-                outcome.interruptedAfterFailure,
+        Assertions.assertEquals(Boolean.valueOf(propagateInterruptState),
+                Boolean.valueOf(outcome.interruptedAfterFailure),
                 "propagateInterruptState=" + propagateInterruptState
                         + " must decide whether the interrupt flag stays set");
 

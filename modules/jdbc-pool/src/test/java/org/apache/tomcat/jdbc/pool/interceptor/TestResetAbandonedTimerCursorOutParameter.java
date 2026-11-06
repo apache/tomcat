@@ -260,6 +260,7 @@ class TestResetAbandonedTimerCursorOutParameter extends JdbcPoolBaseTest {
                         return OUT_VALUE;
                     }
                 } else if ("unwrap".equals(name)) {
+                    @SuppressWarnings("null")
                     Class<?> iface = (Class<?>) args[0];
                     if (DriverCursor.class.equals(iface)) {
                         // A driver's own cursor method hands back its cursor
@@ -271,6 +272,7 @@ class TestResetAbandonedTimerCursorOutParameter extends JdbcPoolBaseTest {
                     }
                     return delegate.unwrap(iface);
                 } else if ("isWrapperFor".equals(name)) {
+                    @SuppressWarnings("null")
                     Class<?> iface = (Class<?>) args[0];
                     return Boolean.valueOf(DriverCursor.class.equals(iface) || delegate.isWrapperFor(iface));
                 }

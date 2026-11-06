@@ -343,12 +343,14 @@ class TestResetAbandonedTimerNestedCursor extends JdbcPoolBaseTest {
                         return nestedCursor();
                     }
                 } else if ("unwrap".equals(name)) {
+                    @SuppressWarnings("null")
                     Class<?> iface = (Class<?>) args[0];
                     if (DriverCursor.class.equals(iface)) {
                         return nestedCursor();
                     }
                     return delegate.unwrap(iface);
                 } else if ("isWrapperFor".equals(name)) {
+                    @SuppressWarnings("null")
                     Class<?> iface = (Class<?>) args[0];
                     return Boolean.valueOf(DriverCursor.class.equals(iface) || delegate.isWrapperFor(iface));
                 }
@@ -556,8 +558,8 @@ class TestResetAbandonedTimerNestedCursor extends JdbcPoolBaseTest {
                 assertTimerHandleBeneathTheFacade(
                         (ResultSet) outer.getObject(CURSOR_COLUMN_NAME), driverNested, "getObject(String)");
                 assertTimerHandleBeneathTheFacade(
-                        (ResultSet) outer.getObject(CURSOR_COLUMN, new HashMap<String, Class<?>>()),
-                        driverNested, "getObject(int, Map)");
+                        (ResultSet) outer.getObject(CURSOR_COLUMN, new HashMap<>()), driverNested,
+                        "getObject(int, Map)");
                 assertTimerHandleBeneathTheFacade(
                         outer.getObject(CURSOR_COLUMN, ResultSet.class), driverNested, "getObject(int, Class)");
             }

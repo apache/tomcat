@@ -782,9 +782,13 @@ class TestAbortEndsTheBorrow extends JdbcPoolBaseTest {
             return false;
         }
 
-        /* Where a subclass may hold up the abort once the call is already
-           inside the driver, the way a real driver's abort may run long; the
-           specification allows it. The base driver's abort is not slowed. */
+        /**
+         *  Where a subclass may hold up the abort once the call is already
+         *  inside the driver, the way a real driver's abort may run long; the
+         *  specification allows it. The base driver's abort is not slowed.
+         *
+         *  @throws InterruptedException If the abort is interrupted
+         */
         protected void parkInAbort() throws InterruptedException {
             // NOOP
         }

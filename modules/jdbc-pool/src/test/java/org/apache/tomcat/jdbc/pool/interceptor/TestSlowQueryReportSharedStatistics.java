@@ -129,7 +129,7 @@ public class TestSlowQueryReportSharedStatistics extends JdbcPoolBaseTest {
         Assertions.assertNotNull(qs, "the executed query must be booked, saw " + stats.keySet());
         Assertions.assertEquals(1, qs.getNrOfInvocations(),
                 "two report definitions must book the shared statistics once per execution, not multiply them");
-        Assertions.assertEquals(1, compositeValue(qs, "prepareCount"),
+        Assertions.assertEquals(Integer.valueOf(1), compositeValue(qs, "prepareCount"),
                 "the single preparation must be booked once, not once per definition");
 
         ds.close();
@@ -158,7 +158,7 @@ public class TestSlowQueryReportSharedStatistics extends JdbcPoolBaseTest {
         Assertions.assertNotNull(qs, "the executed query must be booked, saw " + stats.keySet());
         Assertions.assertEquals(2, qs.getNrOfInvocations(),
                 "the two executions must book two invocations through the cache, one each");
-        Assertions.assertEquals(1, compositeValue(qs, "prepareCount"),
+        Assertions.assertEquals(Integer.valueOf(1), compositeValue(qs, "prepareCount"),
                 "the cache must book its single real preparation exactly once");
 
         ds.close();

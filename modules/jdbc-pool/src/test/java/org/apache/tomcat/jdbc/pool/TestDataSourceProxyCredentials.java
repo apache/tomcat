@@ -195,7 +195,7 @@ class TestDataSourceProxyCredentials {
         volatile Runnable onMirrorWrite;
 
         @Override
-        public Object setProperty(String key, String value) {
+        public synchronized Object setProperty(String key, String value) {
             if (PoolUtilities.PROP_PASSWORD.equals(key) && armed.compareAndSet(true, false)) {
                 onMirrorWrite.run();
             }

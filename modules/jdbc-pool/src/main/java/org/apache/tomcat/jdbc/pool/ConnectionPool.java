@@ -1077,7 +1077,8 @@ public class ConnectionPool {
      */
     public void checkPoolConfiguration(PoolConfiguration properties) {
         if (properties.getMaxActive() < 1) {
-            log.warn(MessageFactory.get("connectionPool.maxActiveTooSmall", PoolProperties.DEFAULT_MAX_ACTIVE));
+            log.warn(MessageFactory.get("connectionPool.maxActiveTooSmall",
+                    Integer.valueOf(PoolProperties.DEFAULT_MAX_ACTIVE)));
             properties.setMaxActive(PoolProperties.DEFAULT_MAX_ACTIVE);
         }
         if (properties.getInitialSize() < 0) {
@@ -1096,24 +1097,26 @@ public class ConnectionPool {
             properties.setMaxIdle(0);
         }
         if (properties.getMaxActive() < properties.getInitialSize()) {
-            log.warn(MessageFactory.get("connectionPool.initialSizeTooLarge", properties.getMaxActive()));
+            log.warn(MessageFactory.get("connectionPool.initialSizeTooLarge",
+                    Integer.valueOf(properties.getMaxActive())));
             properties.setInitialSize(properties.getMaxActive());
         }
         if (properties.getMinIdle() > properties.getMaxActive()) {
-            log.warn(MessageFactory.get("connectionPool.minIdleTooLarge", properties.getMaxActive()));
+            log.warn(MessageFactory.get("connectionPool.minIdleTooLarge", Integer.valueOf(properties.getMaxActive())));
             properties.setMinIdle(properties.getMaxActive());
         }
         if (properties.getMaxIdle() > properties.getMaxActive()) {
-            log.warn(MessageFactory.get("connectionPool.maxIdleTooLarge", properties.getMaxActive()));
+            log.warn(MessageFactory.get("connectionPool.maxIdleTooLarge", Integer.valueOf(properties.getMaxActive())));
             properties.setMaxIdle(properties.getMaxActive());
         }
         if (properties.getMaxIdle() < properties.getMinIdle()) {
-            log.warn(MessageFactory.get("connectionPool.maxIdleTooSmall", properties.getMinIdle()));
+            log.warn(MessageFactory.get("connectionPool.maxIdleTooSmall", Integer.valueOf(properties.getMinIdle())));
             properties.setMaxIdle(properties.getMinIdle());
         }
         if (properties.getMaxAge() > 0 && properties.isPoolSweeperEnabled() &&
                 properties.getTimeBetweenEvictionRunsMillis() > properties.getMaxAge()) {
-            log.warn(MessageFactory.get("connectionPool.timeBetweenEvictionRunsTooLarge", properties.getMaxAge()));
+            log.warn(MessageFactory.get("connectionPool.timeBetweenEvictionRunsTooLarge",
+                    Long.valueOf(properties.getMaxAge())));
             properties.setTimeBetweenEvictionRunsMillis((int) properties.getMaxAge());
         }
     }
@@ -1300,7 +1303,7 @@ public class ConnectionPool {
             String trace = con.getStackTrace();
             if (getPoolProperties().isLogAbandoned()) {
                 log.warn(MessageFactory.get("connectionPool.connectionSuspect",
-                        con, (System.currentTimeMillis() - con.getTimestamp()), trace));
+                        con, Long.valueOf(System.currentTimeMillis() - con.getTimestamp()), trace));
             }
             org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = jmxPool;
             if (jmx != null) {
@@ -1592,7 +1595,7 @@ public class ConnectionPool {
                     jmx.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.POOL_EMPTY, "Pool empty - no wait.");
                 }
                 throw new PoolExhaustedException(MessageFactory.get("connectionPool.poolEmptyNoWait",
-                        Thread.currentThread().getName(), busy.size()));
+                        Thread.currentThread().getName(), Integer.valueOf(busy.size())));
             }
             // We didn't get a connection, lets see if we timed out
             if (con == null) {
@@ -1614,8 +1617,8 @@ public class ConnectionPool {
                                 "Pool empty - timeout.");
                     }
                     throw new PoolExhaustedException(MessageFactory.get("connectionPool.poolEmptyTimeout",
-                            Thread.currentThread().getName(), (maxWait / 1000), size.get(), busy.size(),
-                            idle.size(), timetowait));
+                            Thread.currentThread().getName(), Long.valueOf(maxWait / 1000), Integer.valueOf(size.get()),
+                            Integer.valueOf(busy.size()), Integer.valueOf(idle.size()), Long.valueOf(timetowait)));
                 } else {
                     // No timeout, lets try again
                     continue;
@@ -2108,7 +2111,7 @@ public class ConnectionPool {
                 if (con.isSuspect()) {
                     if (poolProperties.isLogAbandoned() && log.isInfoEnabled()) {
                         log.info(MessageFactory.get("connectionPool.suspectConnectionReturned",
-                                con, (System.currentTimeMillis() - con.getTimestamp())));
+                                con, Long.valueOf(System.currentTimeMillis() - con.getTimestamp())));
                     }
                     org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = jmxPool;
                     if (jmx != null) {
