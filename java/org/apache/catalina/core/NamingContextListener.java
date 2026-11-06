@@ -665,10 +665,12 @@ public class NamingContextListener implements LifecycleListener, ContainerListen
         // interface which the application expects is used as the type of a
         // lookup reference. No type is given when the descriptor names no
         // interface, which leaves the type of the looked up object unchecked.
+        // An EJB 2.x reference looks up a home object, so prefer its home
+        // interface when present. Otherwise use the EJB 3.x business interface.
         String lookupName = ejb.getLookupName();
         Reference ref = null;
         if (lookupName != null && !lookupName.isEmpty()) {
-            String beanType = ejb.getRemote() != null ? ejb.getRemote() : ejb.getHome();
+            String beanType = ejb.getHome() != null ? ejb.getHome() : ejb.getRemote();
             ref = new LookupRef(beanType, lookupName);
         }
 

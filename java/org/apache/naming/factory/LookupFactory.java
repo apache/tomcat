@@ -139,7 +139,8 @@ public class LookupFactory implements ObjectFactory {
                     ClassLoader tcl = Thread.currentThread().getContextClassLoader();
                     try {
                         if (tcl != null) {
-                            clazz = tcl.loadClass(className);
+                            // Class.forName also accepts array class names, unlike ClassLoader.loadClass.
+                            clazz = Class.forName(className, false, tcl);
                         } else {
                             clazz = Class.forName(className);
                         }
