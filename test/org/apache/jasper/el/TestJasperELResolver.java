@@ -138,6 +138,36 @@ public class TestJasperELResolver {
         }
     }
 
+    @Test
+    public void testGraalResolverNullOverloadedSetter() {
+        ELResolver resolver = new JasperELResolver.GraalBeanELResolver();
+        ELContext context = new ELContextImpl(resolver);
+        TestBeanWithOverloadedSetter bean = new TestBeanWithOverloadedSetter();
+        bean.setBla("initial value");
+
+        // The primitive overload cannot accept null. The inherited Object
+        // setter must be used regardless of the order of reflected methods.
+        resolver.setValue(context, bean, "bla", null);
+        Assert.assertNull(bean.getLastBla());
+        Assert.assertTrue(context.isPropertyResolved());
+    }
+
+    @Test
+    public void testGraalResolverNullPrimitiveSetter() {
+        ELResolver resolver = new JasperELResolver.GraalBeanELResolver();
+        ELContext context = new ELContextImpl(resolver);
+
+        // Leave the property unresolved when no setter can accept null.
+        resolver.setValue(context, new TestBean(), "foo2", null);
+        Assert.assertFalse(context.isPropertyResolved());
+    }
+
+    public static class TestBeanWithOverloadedSetter extends TestBean {
+        public void setBla(@SuppressWarnings("unused") int bla) {
+            Assert.fail("A null value must not use the primitive setter");
+        }
+    }
+
     public static class TestBean {
         public String getFoo() {
             return "foo";
