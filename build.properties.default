@@ -342,10 +342,10 @@ migration-lib.loc=${base-maven.loc}/org/apache/tomcat/jakartaee-migration/${migr
 
 # ----- JSign, version 4.1 or later -----
 # Note: There are known issues with Tomcat and Jsign 7.0 and 7.1
-jsign.version=7.5
+jsign.version=7.6
 jsign.checksum.enabled=true
 jsign.checksum.algorithm=MD5|SHA-1
-jsign.checksum.value=1fcae59d4ede6b1313ac34c9139a0d80|f71ce8b6df19371c5cbf084223f142f9f678a7bb
+jsign.checksum.value=3ec328bf83d621f374643ffd22214579|843c90ab50bc0da16fc1aac9e2c6bba986dc4a36
 
 jsign.home=${base.path}/jsign-${jsign.version}
 jsign.jar=${jsign.home}/jsign-${jsign.version}.jar
