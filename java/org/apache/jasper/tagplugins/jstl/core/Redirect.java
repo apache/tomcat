@@ -60,15 +60,8 @@ public class Redirect implements TagPlugin {
         ctxt.generateJavaSource("String " + baseUrlName + " = " + "org.apache.jasper.tagplugins.jstl.Util.resolveUrl(" +
                 urlName + ", " + contextName + ", _jspx_page_context);");
 
-        // Share the working URL with the <c:param> tags in the body by
-        // handing them the name of the local variable that holds it.
-        // Appending to the variable directly is re-entrant: a nested URL tag
-        // in the body of this tag must not be able to overwrite or remove it,
-        // which a page scope attribute with a fixed name would allow.
-        ctxt.setPluginAttribute(Import.URL_VARIABLE_ATTRIBUTE, baseUrlName);
-
         // add params
-        ctxt.generateBody();
+        UrlParameters.generateBody(ctxt, baseUrlName);
 
         // get the response object
         ctxt.generateJavaSource("HttpServletResponse " + responseName + " = " +
