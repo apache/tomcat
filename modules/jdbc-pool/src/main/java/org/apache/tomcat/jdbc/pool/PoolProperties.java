@@ -44,12 +44,10 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 /**
  * Implementation of {@link PoolConfiguration} that holds the configuration properties for a connection pool.
  * <p>
- * The reconfiguring setters publish their changes under this instance's monitor, which makes that monitor the
- * snapshot boundary of the configuration: {@link #clone()} takes its copy under it, and so does the connect path
- * when it copies the live {@link #getDbProperties()} collection for the driver. A copy taken under the monitor
- * therefore always shows one state some setter published, never a mix of two. Setters that reconfigure in place
- * must keep acquiring this monitor, and a reader that needs a consistent snapshot rather than the momentary view
- * the unsynchronized getters hand out must take the monitor too.
+ * The setters that maintain the database properties, the credentials, the validator and the interceptor list publish
+ * their changes under this instance's monitor, which is also the monitor {@link #clone()} and serialization take.
+ * Those setters are the snapshot boundary for the state they own. Setters that assign a single plain field do not take
+ * the monitor, so a copy taken under it is not a consistent snapshot of those fields against a concurrent write.
  */
 public class PoolProperties implements PoolConfiguration, Cloneable, Serializable {
 
@@ -981,14 +979,12 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
      * a parse that started from the previous value of the string can never
      * store its result back after this clear.
      * <p>
-     * Changing the list on a live pool takes effect for the connections whose
-     * interceptor chains are built after the change; connections that were
-     * built earlier keep their existing chain until they are recycled. The
-     * pool's lifecycle notifications follow the start, not the moment: the
-     * close is delivered for the definitions configured when the pool started,
-     * whatever this property lists by then, so removing a definition from a
-     * live pool does not strand what its registration at the pool's start put
-     * in place.
+     * Changing the list on a live pool takes effect only for connections whose interceptor chains are built after the
+     * change. A pooled connection that already has a chain keeps it until that connection is destroyed; an ordinary
+     * return and re-borrow does not rebuild it. The pool's lifecycle notifications follow the start, not the moment: the
+     * close is delivered for the definitions configured when the pool started, whatever this property lists by then,
+     * so removing a definition from a live pool does not strand what its registration at the pool's start put in
+     * place.
      * </p>
      *
      * @param jdbcInterceptors the semicolon separated interceptor configuration,
@@ -1112,26 +1108,13 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
 
     /**
-     * Returns the statement an SQL setting of the configuration carries, or
-     * {@code null} when it carries none.
-     *
-     * <p>A blank is not a statement. A configuration surface that cannot
-     * express the unset value - a JNDI attribute, a connection-properties
-     * line - is written blank to mean exactly what the unset value means, and
-     * no statement can be blank. Both SQL settings the configuration keeps,
-     * {@link #setValidationQuery(String)} and {@link #setInitSQL(String)},
-     * store through this rule, and everything that later reads them reads them
-     * through it as well: the statements a validation may execute, and the
-     * pool's decision whether a newly established session has an init
-     * statement to run at all. A blank that reaches the pool around a setter
-     * - from a {@link PoolConfiguration} implementation of the caller's own,
-     * or a caller's explicit validation argument - is therefore never executed
-     * as SQL and never counted as a configured statement.</p>
+     * Returns the statement an SQL setting carries, or {@code null} when it carries none. A blank is not a statement:
+     * a configuration surface that cannot express the unset value writes blank to mean exactly that. Both
+     * {@link #setValidationQuery(String)} and {@link #setInitSQL(String)} store and read through this rule.
      *
      * @param sql the configured or passed statement, may be {@code null}
      *
-     * @return the statement itself if it carries anything, {@code null} if it
-     *         is null or blank
+     * @return the statement itself if it carries anything, {@code null} if it is null or blank
      */
     static String configuredStatement(String sql) {
         return sql != null && sql.trim().length() > 0 ? sql : null;
@@ -1139,56 +1122,17 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
 
     /**
-     * Masks the credentials embedded in a raw configuration string so that a
-     * password typed into the JDBC URL or the connection properties is not
-     * printed in cleartext the way the dedicated password field is masked in
-     * {@link #toString()}. Beyond that dump, the pool applies this masking
-     * wherever it logs diagnostics about these configuration strings - the
-     * driver-instantiation debug line of
-     * {@link PooledConnection#connectUsingDriver()} is one - so the log and
-     * the dump agree on what a masked configuration looks like. Two shapes
-     * are scrubbed.
-     * <p>
-     * The value of a pair whose key - at the start of a segment, ignoring
-     * case - is one of {@code password}, {@code pass} and {@code pwd}. A
-     * segment starts at the beginning of the string or at {@code ;}, a new
-     * line, {@code &amp;} or {@code ?}. Only the first two are boundaries to
-     * the properties parser that applies a configuration string, and the
-     * pairs behind them are the pairs a driver receives: their value runs to
-     * the next such boundary, because an {@code &amp;} or {@code ?} is an
-     * ordinary character inside a delivered value and masking up to one
-     * would print the tail of the password the driver really receives, while
-     * a new line the reader deletes as a backslash continuation is no
-     * boundary at all and the mask runs across it into the next line. A pair
-     * that only appears to start behind {@code &amp;} or {@code ?} was
-     * folded into another pair's value by the parser, and it is masked to the
-     * end of its segment all the same - a secret typed there was typed as a
-     * credential. The key runs to the first value separator the parser
-     * accepts - {@code =}, {@code :} or white space - so a key such as
-     * {@code compass}, a credential-shaped word inside a longer value, and
-     * the colons of a JDBC URL scheme, host or port are all left alone.
-     * Either way a masked value cannot hide a later pair. A pair with an
-     * empty value is masked like any other, so a masked pair in the dump does
-     * not by itself say that a non-empty secret was configured.
-     * <p>
-     * The password of a URL {@code user:password@host} userinfo section, and
-     * of the equivalent {@code user/password@host} form used by the legacy
-     * Oracle driver URLs, wherever they appear in the string. The user name is
-     * kept visible for diagnostics.
-     * <p>
-     * The pass is best effort rather than a guarantee: colon-separated
-     * dialects that put a pair behind the colon rather than at the segment
-     * start, like DB2's {@code :user=x:password=y}, and driver-specific
-     * secrets that use a key other than the three above are not recognised,
-     * and recognising them would require a full parse of each driver's URL
-     * dialect. What a masked result says is that no credential of the
-     * recognised shapes remains in the string, not that the string carries no
-     * secret at all.
+     * Masks the credentials embedded in a raw configuration string so that a password typed into the JDBC URL or the
+     * connection properties is not printed in cleartext. The pool applies this wherever it logs diagnostics about these
+     * strings, so the log and the configuration dump agree on what a masked configuration looks like. Two shapes are
+     * scrubbed: the value of a pair whose key is {@code password}, {@code pass} or {@code pwd}, and the password of a
+     * URL {@code user:password@host} or {@code user/password@host} userinfo section. The pass is best effort: secrets
+     * carried under another key or in a driver-specific dialect are not recognised.
      *
      * @param value the raw configuration string, may be {@code null}
      *
-     * @return the string with every recognised credential replaced by the mask,
-     *         or the string unchanged when it holds none
+     * @return the string with every recognised credential replaced by the mask, or the string unchanged when it holds
+     *             none
      */
     public static String maskCredentials(String value) {
         if (value == null) {
@@ -1268,28 +1212,16 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
 
     /**
-     * Masks the credential values carried in an interceptor definition
-     * string, as a best-effort reading of that syntax rather than a parse of
-     * it. The pair reading mirrors what {@link
-     * #getJdbcInterceptorsAsArray()} delivers to an interceptor: the
-     * comma-separated pairs inside a definition's parentheses, with a pair's
-     * name being the text before its first {@code =}, trimmed. Every
-     * parenthesised list of a definition is read, not just the one the parse
-     * consumes, and a list that never closes is read to the end of the
-     * definition: a pair typed in either place was typed as a credential,
-     * even though a malformed definition hides it from the interceptor. A
-     * pair whose name is one of the keys {@link #isCredentialKey recognises}
-     * has its value replaced by the mask; everything else - the class names,
-     * the property names and the non-credential values - is copied verbatim,
-     * so the dump still shows which interceptors and properties are
-     * configured. Like {@link #maskCredentials(String)} this rules out the
-     * names this class treats as credentials, not any secret an interceptor
-     * may hold under another name.
+     * Masks the credential values carried in an interceptor definition string, as a best-effort reading of that syntax
+     * rather than a parse of it. Pairs at any parenthesis depth whose name is a key {@link #isCredentialKey recognises}
+     * have their value replaced by the mask; class names, property names and non-credential values are copied verbatim.
+     * Like {@link #maskCredentials(String)} this rules out the names this class treats as credentials, not any secret
+     * an interceptor may hold under another name.
      *
      * @param value the raw interceptor definition string, may be {@code null}
      *
-     * @return the string with every recognised credential value replaced by
-     *         the mask, or the string unchanged when it holds none
+     * @return the string with every recognised credential value replaced by the mask, or the string unchanged when it
+     *             holds none
      */
     public static String maskInterceptorCredentials(String value) {
         if (value == null) {
@@ -2239,27 +2171,12 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     }
 
     /**
-     * Returns a copy of the configuration. Beyond the field-by-field copy,
-     * the driver-properties collection is copied too, through
-     * {@link PoolUtilities#clone(Properties)} - the same copy the connect
-     * path makes - so a defaults-backed property that resolves on the
-     * original also resolves on the copy.
-     * {@link #setConnectionProperties(String)} removes the keys the previous
-     * value of the string contributed, so a clone sharing the live collection
-     * would have a reconfigure on either copy strip the other one's pairs. The
-     * tracked key set is never mutated after publication, so both copies may
-     * share it, and it stays consistent with the copied entries.
-     * <p>
-     * The copy is taken under the monitor the reconfiguring setters hold, so
-     * a reconfiguration concurrent with the clone cannot appear in the copy
-     * as a state no setter ever published: a stale driver-property entry the
-     * copy's tracked key set would never remove again, or a fresh interceptor
-     * string whose published parse cache still holds the previous chain -
-     * which the cached read would then never re-parse.
+     * Returns a copy of the configuration, including a copy of the driver-properties collection so a defaults-backed
+     * property resolves on the copy too. The copy is taken under the monitor the reconfiguring setters hold, so a
+     * concurrent reconfiguration cannot appear in the copy as a state no setter ever published.
      *
      * @return the copy
-     * @throws CloneNotSupportedException if cloning of this class is ever
-     *                                    refused
+     * @throws CloneNotSupportedException if cloning of this class is ever refused
      */
     @Override
     protected synchronized Object clone() throws CloneNotSupportedException {
@@ -2273,13 +2190,8 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
 
     /**
-     * Serializes the configuration under the monitor the reconfiguring
-     * setters hold, for the same torn-snapshot reason {@link #clone()}
-     * synchronizes for: the setters publish a reconfiguration over several
-     * field writes, and a field-by-field serialization that lands between
-     * them would hand the stream a state no setter ever published. The
-     * monitor is a leaf, so holding it across the write cannot order against
-     * any other lock.
+     * Serializes the configuration under the monitor the reconfiguring setters hold, so the stream cannot capture a
+     * state between two writes of one reconfiguration.
      *
      * @param oos the stream to write the object graph to
      *
