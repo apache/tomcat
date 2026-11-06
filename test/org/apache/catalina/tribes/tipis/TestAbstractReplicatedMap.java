@@ -548,7 +548,7 @@ public class TestAbstractReplicatedMap {
 
         private static final long serialVersionUID = 1L;
 
-        private void writeObject(ObjectOutputStream out) throws IOException {
+        private void writeObject(@SuppressWarnings("unused") ObjectOutputStream out) throws IOException {
             throw new IOException("Cannot be serialized");
         }
     }

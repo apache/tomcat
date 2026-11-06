@@ -149,7 +149,7 @@ class TestWrapperDelegation extends JdbcPoolBaseTest {
     public interface MarkerDataSource extends javax.sql.DataSource {
     }
 
-    /** Another marker, claimed by {@link #MarkerDataSource} as a layer. */
+    /** Another marker, claimed by {@link TestWrapperDelegation.MarkerDataSource} as a layer. */
     public interface UnderlyingDataSource {
     }
 

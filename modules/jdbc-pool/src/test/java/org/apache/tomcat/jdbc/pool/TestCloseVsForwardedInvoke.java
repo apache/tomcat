@@ -296,7 +296,7 @@ class TestCloseVsForwardedInvoke extends JdbcPoolBaseTest {
         AtomicReference<Throwable> readFailure = new AtomicReference<>();
         Thread reader = new Thread(() -> {
             try {
-                answered.set(held.getAutoCommit());
+                answered.set(Boolean.valueOf(held.getAutoCommit()));
             } catch (Throwable t) {
                 readFailure.set(t);
             }
@@ -446,7 +446,7 @@ class TestCloseVsForwardedInvoke extends JdbcPoolBaseTest {
         AtomicReference<Throwable> readFailure = new AtomicReference<>();
         Thread reader = new Thread(() -> {
             try {
-                answered.set(held.getAutoCommit());
+                answered.set(Boolean.valueOf(held.getAutoCommit()));
             } catch (Throwable t) {
                 readFailure.set(t);
             }
@@ -539,7 +539,7 @@ class TestCloseVsForwardedInvoke extends JdbcPoolBaseTest {
         AtomicReference<Throwable> readFailure = new AtomicReference<>();
         Thread reader = new Thread(() -> {
             try {
-                answered.set(held.getAutoCommit());
+                answered.set(Boolean.valueOf(held.getAutoCommit()));
             } catch (Throwable t) {
                 readFailure.set(t);
             }

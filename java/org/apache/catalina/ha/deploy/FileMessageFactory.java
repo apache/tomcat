@@ -360,7 +360,6 @@ public class FileMessageFactory {
         System.out.println("Actually wrote " + cnt + " messages.");
     }
 
-    /// main
 
     public File getFile() {
         return file;

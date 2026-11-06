@@ -315,7 +315,7 @@ class TestAsyncBorrowFailureDiagnostics extends JdbcPoolBaseTest {
             logs.assertNoCancelErrorLogged();
 
             // and the reclaimed connection is there for the next borrower
-            try (Connection c = ds.getConnection()) {
+            try (@SuppressWarnings("unused") Connection c = ds.getConnection()) {
                 Assertions.assertEquals(1, ds.getActive());
             }
             ds.close();

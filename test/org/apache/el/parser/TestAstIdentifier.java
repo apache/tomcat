@@ -152,7 +152,7 @@ public class TestAstIdentifier {
         // resolve it
         ELProcessor processor = new ELProcessor();
         ELContext context = processor.getELManager().getELContext();
-        ValueExpression ve = processor.getELManager().getExpressionFactory().createValueExpression(context,
+        ValueExpression ve = ELManager.getExpressionFactory().createValueExpression(context,
                 "${Integer}", Object.class);
         Assert.assertTrue(ve.isReadOnly(context));
     }
@@ -163,7 +163,7 @@ public class TestAstIdentifier {
         ELProcessor processor = new ELProcessor();
         processor.getELManager().getELContext().getImportHandler().importStatic("java.lang.Integer.MAX_VALUE");
         ELContext context = processor.getELManager().getELContext();
-        ValueExpression ve = processor.getELManager().getExpressionFactory().createValueExpression(context,
+        ValueExpression ve = ELManager.getExpressionFactory().createValueExpression(context,
                 "${MAX_VALUE}", Object.class);
         Assert.assertTrue(ve.isReadOnly(context));
     }
@@ -196,7 +196,7 @@ public class TestAstIdentifier {
     public void testUnresolvedIsReadOnly() {
         ELProcessor processor = new ELProcessor();
         ELContext context = processor.getELManager().getELContext();
-        ValueExpression ve = processor.getELManager().getExpressionFactory().createValueExpression(context,
+        ValueExpression ve = ELManager.getExpressionFactory().createValueExpression(context,
                 "${unresolvedName}", Object.class);
         ve.isReadOnly(context);
     }

@@ -606,6 +606,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                 }
             }
         }
+        @SuppressWarnings("null")
         Set<String> keys = new HashSet<>(parsed.size());
         for (String key : parsed.stringPropertyNames()) {
             writable.setProperty(key, parsed.getProperty(key));

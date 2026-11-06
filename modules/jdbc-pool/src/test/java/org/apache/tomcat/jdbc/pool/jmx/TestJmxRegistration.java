@@ -331,7 +331,7 @@ class TestJmxRegistration extends JdbcPoolBaseTest {
 
         ObjectName connectionName;
         ObjectName cacheName;
-        try (Connection borrowed = ds.getConnection()) {
+        try (@SuppressWarnings("unused") Connection borrowed = ds.getConnection()) {
             connectionName = connectionMBeanUnder(server, poolOname);
             cacheName = new ObjectName(connectionName.toString() + ",JdbcInterceptor=StatementCache");
             Assertions.assertTrue(server.isRegistered(cacheName),
@@ -357,7 +357,7 @@ class TestJmxRegistration extends JdbcPoolBaseTest {
             ObjectName republishedConnection = connectionMBeanUnder(server, republishedPool);
             Assertions.assertNotNull(republishedConnection,
                     "a connection released by the deregistration must republish itself");
-            try (Connection borrowed = ds.getConnection()) {
+            try (@SuppressWarnings("unused") Connection borrowed = ds.getConnection()) {
                 ObjectName republishedCache = new ObjectName(
                         republishedConnection.toString() + ",JdbcInterceptor=StatementCache");
                 Assertions.assertTrue(server.isRegistered(republishedCache),

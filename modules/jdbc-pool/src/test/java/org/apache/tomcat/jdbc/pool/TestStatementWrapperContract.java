@@ -74,8 +74,6 @@ class TestStatementWrapperContract extends JdbcPoolBaseTest {
                         + handle.getClass().getName());
         Assertions.assertTrue(standardInterface.isInstance(handle),
                 what + ": the handle must implement its standard JDBC interface");
-        Assertions.assertTrue(handle instanceof java.sql.Wrapper,
-                what + ": the handle must be a Wrapper, as java.sql.Statement demands");
         // Pinning the exact interface list: the documented contract is the
         // standard interface and nothing else. Should the pool ever decide to
         // mirror driver interfaces onto its handles, this is the pin that

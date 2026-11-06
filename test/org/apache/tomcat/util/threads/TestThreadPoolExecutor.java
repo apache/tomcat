@@ -376,6 +376,7 @@ public class TestThreadPoolExecutor {
 
         ShutdownAfterOfferQueue queue = new ShutdownAfterOfferQueue();
         // No core threads so there is no worker to terminate the pool once the queue has been emptied
+        @SuppressWarnings("resource")
         ThreadPoolExecutor pool = new ThreadPoolExecutor(0, 1, 60, TimeUnit.SECONDS, queue,
                 Executors.defaultThreadFactory(), new ThreadPoolExecutor.AbortPolicy());
         queue.pool = pool;

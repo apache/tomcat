@@ -299,6 +299,7 @@ class TestCursorOutParameterSealing extends JdbcPoolBaseTest {
                         }
                     }
                 } else if ("unwrap".equals(name)) {
+                    @SuppressWarnings("null")
                     Class<?> iface = (Class<?>) args[0];
                     if (DriverCursor.class.equals(iface)) {
                         // A driver's own cursor method hands back its
@@ -310,6 +311,7 @@ class TestCursorOutParameterSealing extends JdbcPoolBaseTest {
                     }
                     return delegate.unwrap(iface);
                 } else if ("isWrapperFor".equals(name)) {
+                    @SuppressWarnings("null")
                     Class<?> iface = (Class<?>) args[0];
                     return Boolean.valueOf(DriverCursor.class.equals(iface)
                             || delegate.isWrapperFor(iface));
@@ -380,12 +382,14 @@ class TestCursorOutParameterSealing extends JdbcPoolBaseTest {
                         return nestedCursor();
                     }
                 } else if ("unwrap".equals(name)) {
+                    @SuppressWarnings("null")
                     Class<?> iface = (Class<?>) args[0];
                     if (DriverCursor.class.equals(iface)) {
                         return nestedCursor();
                     }
                     return delegate.unwrap(iface);
                 } else if ("isWrapperFor".equals(name)) {
+                    @SuppressWarnings("null")
                     Class<?> iface = (Class<?>) args[0];
                     return Boolean.valueOf(DriverCursor.class.equals(iface)
                             || delegate.isWrapperFor(iface));

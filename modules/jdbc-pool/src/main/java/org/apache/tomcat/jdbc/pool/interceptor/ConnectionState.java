@@ -223,7 +223,7 @@ public class ConnectionState extends JdbcInterceptor {
                 } else {
                     refusedIsolationLevel = defaultTransactionIsolation;
                     log.error(MessageFactory.get("connectionState.unableToResetTransactionIsolation",
-                            defaultTransactionIsolation), confirmed);
+                            Integer.valueOf(defaultTransactionIsolation)), confirmed);
                 }
             }
         }
