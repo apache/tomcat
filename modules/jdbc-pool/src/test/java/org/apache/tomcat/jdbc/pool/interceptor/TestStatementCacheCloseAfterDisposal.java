@@ -141,7 +141,7 @@ class TestStatementCacheCloseAfterDisposal extends JdbcPoolBaseTest {
 
         Connection first = ds.getConnection();
         StatementCache cache = interceptorOf(first, StatementCache.class);
-        PooledConnection pooled = (PooledConnection) internalOf(first);
+        PooledConnection pooled = internalOf(first);
         DisposalAtParkMap parkPoint = new DisposalAtParkMap();
         parkPoint.disposal = () -> cache.reset(null, null);
         pooled.getAttributes().put(StatementCache.STATEMENT_CACHE_ATTR, parkPoint);

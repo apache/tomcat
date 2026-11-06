@@ -36,6 +36,8 @@ class TestDataSourceProxyPublicationCleanup extends JdbcPoolBaseTest {
      */
     public static class FailingPublicationProperties extends PoolProperties {
 
+        private static final long serialVersionUID = 1L;
+
         @Override
         public int getMaxActive() {
             StackTraceElement[] stack = Thread.currentThread().getStackTrace();

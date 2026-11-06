@@ -167,7 +167,7 @@ class TestStatementCacheRacingPark extends JdbcPoolBaseTest {
         Connection shared = ds.getConnection();
         try {
             StatementCache cache = interceptorOf(shared, StatementCache.class);
-            PooledConnection pcon = (PooledConnection) internalOf(shared);
+            PooledConnection pcon = internalOf(shared);
             GatedParkMap gated = new GatedParkMap();
             pcon.getAttributes().put(StatementCache.STATEMENT_CACHE_ATTR, gated);
 
@@ -230,7 +230,7 @@ class TestStatementCacheRacingPark extends JdbcPoolBaseTest {
             StatementCache cache = interceptorOf(shared, StatementCache.class);
             // getCache() re-reads the map from the attributes on every
             // call, so this swap is what the next closes will meet
-            PooledConnection pcon = (PooledConnection) internalOf(shared);
+            PooledConnection pcon = internalOf(shared);
             ParkRendezvousMap parkPoint = new ParkRendezvousMap();
             pcon.getAttributes().put(StatementCache.STATEMENT_CACHE_ATTR, parkPoint);
 

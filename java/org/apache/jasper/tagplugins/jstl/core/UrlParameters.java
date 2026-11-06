@@ -59,7 +59,7 @@ final class UrlParameters {
             ctxt.generateJavaSource("int " + paramEnd + " = -1;");
             ctxt.setPluginAttribute(URL_VARIABLE_ATTRIBUTE, urlName);
             ctxt.setPluginAttribute(PARAM_END_ATTRIBUTE, paramEnd);
-            ctxt.setPluginAttribute(PARAMS_ATTRIBUTE, new ArrayList<TagPluginContext>());
+            ctxt.setPluginAttribute(PARAMS_ATTRIBUTE, new ArrayList<>());
         }
         ctxt.generateBody();
     }
