@@ -89,12 +89,15 @@ public class JspFactoryImpl extends JspFactory {
 
     private PageContext internalGetPageContext(Servlet servlet, ServletRequest request, ServletResponse response,
             String errorPageURL, boolean needsSession, int bufferSize, boolean autoflush) {
+        // Read the volatile field once. It may be changed concurrently by the
+        // start of another web application.
+        int currentPoolSize = poolSize;
 
         PageContext pc;
-        if (poolSize > 0) {
+        if (currentPoolSize > 0) {
             PageContextPool pool = localPool.get();
             if (pool == null) {
-                pool = new PageContextPool(poolSize);
+                pool = new PageContextPool(currentPoolSize);
                 localPool.set(pool);
             }
             pc = pool.get();
