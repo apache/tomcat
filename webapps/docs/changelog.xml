@@ -750,6 +750,11 @@
         When validating HTTP/2 frames, make sure more serious errors take
         priority over less serious errors. (markt)
       </fix>
+      <fix>
+        Do not send a 103 (Early Hints) response to an HTTP/1.0 client as a
+        server must not send a 1xx response to an HTTP/1.0 client. (RFC 9110,
+        section 15.2) (abernal)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
