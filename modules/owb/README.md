@@ -140,7 +140,7 @@ provided through the test/common classpath, matching the production
 | `TomcatPluginTest` | Servlet spec class handling, managed-bean rejection, injection support and security service registration |
 | `OpenWebBeansInstanceManagerTest` | Delegation for all `InstanceManager` creation variants and destruction fallback |
 | `OpenWebBeansCdi41IT` | CDI injection, request/session scope, `isMatchingBean`, `isMatchingEvent`, `getContexts`, interceptor bindings, method invoker |
-| `OpenWebBeansTomcatIntegrationIT` | Server/context listener modes, `startWithoutBeansXml` positive and negative behavior, alternate `beans.xml` location, security valve configuration, dynamic deployment, filter/listener/servlet injection and lifecycle callbacks |
+| `OpenWebBeansTomcatIntegrationIT` | Server/context listener modes, `startWithoutBeansXml` positive and negative behavior, alternate `beans.xml` location, security valve configuration, dynamic deployment, filter/listener/servlet field injection and lifecycle callbacks |
 | `OpenWebBeansSecurityIT` | BASIC authentication, `@Inject Principal`, security valve principal, principal proxy modes and custom proxy APIs |
 | `OpenWebBeansSecurityFilterIT` | Webapp-level `OpenWebBeansSecurityFilter` |
 | `OpenWebBeansJspIT` | JSP/EL resolution through OWB |
@@ -172,9 +172,6 @@ try (OwbTestServer server = OwbTestServer.start(webapp,
 
 ## Known limitations
 
-- Field injection into `ServletContextListener` is not supported because
-  Tomcat instantiates listeners before the CDI container starts. Use
-  `CDI.current().select(...)` inside the listener instead.
 - Producer-level `@Priority` on competing alternative producers is not
   covered. OpenWebBeans reports an ambiguous resolution for that scenario,
   so no failing gate test is included.

@@ -176,8 +176,11 @@ class OpenWebBeansTomcatIntegrationIT {
     }
 
     private static void assertWebBeansListener(OwbTestServer server, boolean expected) {
-        boolean found = Arrays.asList(server.context().findApplicationListeners())
+        boolean classListener = Arrays.asList(server.context().findApplicationListeners())
                 .contains(WebBeansConfigurationListener.class.getName());
-        assertEquals(expected, found, "Unexpected WebBeansConfigurationListener presence");
+        boolean instanceListener = Arrays.stream(server.context().getApplicationLifecycleListeners())
+                .anyMatch(WebBeansConfigurationListener.class::isInstance);
+        assertEquals(expected, classListener || instanceListener,
+                "Unexpected WebBeansConfigurationListener presence");
     }
 }
