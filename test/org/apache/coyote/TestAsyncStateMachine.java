@@ -201,6 +201,68 @@ public class TestAsyncStateMachine {
 
 
     /*
+     * BZ 70290: An error that prevents further IO is raised (e.g. by ErrorReportValve closing a committed response)
+     * after dispatch() has been requested but before the container thread has left the initial service call
+     * (MUST_DISPATCH). The error must be recorded (so that onError() can be called) rather than ignored. A
+     * subsequent call to dispatch() from onError() is valid but, as the connection is going to be closed, can not be
+     * performed so the async processing must end.
+     */
+    @Test
+    public void testBz70290ErrorAfterDispatchRequestedThenDispatchFromOnError() throws IOException {
+        processor.action(ActionCode.ASYNC_DISPATCH, null);
+
+        processor.setErrorState(ErrorState.CLOSE_NOW, new IOException());
+
+        Assert.assertTrue("The error must be recorded so onError() is called", isAsyncError());
+
+        // AsyncListener.onError() calls dispatch()
+        processor.action(ActionCode.ASYNC_DISPATCH, null);
+        Assert.assertTrue(isAsyncDispatching());
+
+        Assert.assertEquals(SocketState.ASYNC_END, processor.asyncPostProcess());
+        assertCompleted();
+    }
+
+
+    /*
+     * BZ 70290: As above but onError() calls complete().
+     */
+    @Test
+    public void testBz70290ErrorAfterDispatchRequestedThenCompleteFromOnError() throws IOException {
+        processor.action(ActionCode.ASYNC_DISPATCH, null);
+
+        processor.setErrorState(ErrorState.CLOSE_NOW, new IOException());
+
+        Assert.assertTrue("The error must be recorded so onError() is called", isAsyncError());
+
+        // AsyncListener.onError() calls complete()
+        processor.action(ActionCode.ASYNC_COMPLETE, null);
+
+        Assert.assertEquals(SocketState.ASYNC_END, processor.asyncPostProcess());
+        assertCompleted();
+    }
+
+
+    /*
+     * BZ 70290: As above for an error raised after complete() has been requested (MUST_COMPLETE) and onError() then
+     * calls dispatch().
+     */
+    @Test
+    public void testBz70290ErrorAfterCompleteRequestedThenDispatchFromOnError() throws IOException {
+        processor.action(ActionCode.ASYNC_COMPLETE, null);
+
+        processor.setErrorState(ErrorState.CLOSE_NOW, new IOException());
+
+        Assert.assertTrue("The error must be recorded so onError() is called", isAsyncError());
+
+        processor.action(ActionCode.ASYNC_DISPATCH, null);
+
+        Assert.assertEquals(SocketState.ASYNC_END, processor.asyncPostProcess());
+        assertCompleted();
+    }
+
+
+    /*
      * BZ 70290: Control. The equivalent complete() handling (MUST_COMPLETE) in an error state already balanced the
      * count. Confirm the dispatch and complete cases behave consistently.
      */
