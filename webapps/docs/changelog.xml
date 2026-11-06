@@ -342,7 +342,12 @@
         <code>onComplete()</code> was not called and the in-progress async
         count was not decremented. In addition, when the error state still
         permits I/O, output buffered before the request was completed is now
-        written rather than being discarded. (markt)
+        written rather than being discarded. Also fix a case where the async
+        processing never ended if the response had been committed and the
+        connection was then closed after the application had requested a
+        dispatch or completion, and ensure
+        <code>AsyncListener.onError()</code> is called when the container
+        reports an error without an exception. (markt)
       </fix>
     </changelog>
   </subsection>
