@@ -249,10 +249,10 @@ objenesis.jar=${objenesis.home}/objenesis-${objenesis.version}.jar
 objenesis.loc=${base-maven.loc}/org/objenesis/objenesis/${objenesis.version}/objenesis-${objenesis.version}.jar
 
 # ----- byte-buddy, used by EasyMock, version 1.12.18 or later -----
-bytebuddy.version=1.18.14
+bytebuddy.version=1.18.17
 bytebuddy.checksum.enabled=true
 bytebuddy.checksum.algorithm=SHA-512
-bytebuddy.checksum.value=252f57ee0a99f81a6795484e4712966de9f0b7229a3bf8e818cf20a8ff3de6b3745f91ad6a85421696a14e6d528f6d25fa2b0550e37500c5907be3781c6504e2
+bytebuddy.checksum.value=3844f65c7f30332fcc860877f7efec88ea30635c7a81e143f757d5648e8f1cd066653539938f6024a7f324f0cb811daeeda266219ef713d7c01a054ed52f3e75
 bytebuddy.home=${base.path}/byte-buddy-${bytebuddy.version}
 bytebuddy.jar=${bytebuddy.home}/byte-buddy-${bytebuddy.version}.jar
 bytebuddy.loc=${base-maven.loc}/net/bytebuddy/byte-buddy/${bytebuddy.version}/byte-buddy-${bytebuddy.version}.jar
@@ -267,19 +267,19 @@ unboundid.jar=${unboundid.home}/unboundid-ldapsdk-${unboundid.version}.jar
 unboundid.loc=${base-maven.loc}/com/unboundid/unboundid-ldapsdk/${unboundid.version}/unboundid-ldapsdk-${unboundid.version}.jar
 
 # ----- Checkstyle, version 6.16 or later -----
-checkstyle.version=14.3.0
+checkstyle.version=14.4.0
 checkstyle.checksum.enabled=true
 checkstyle.checksum.algorithm=SHA-512
-checkstyle.checksum.value=8ced49f3a009def84d3f6089c4d9987461abf6024f81940398335db910c0bc75b9e69989f4a559eb1dc1f78cf2af12d6f7d362416bb43306911e9d310b99777a
+checkstyle.checksum.value=436c8523015f25c54daaa5fc2899541fa3c97fe4f93a2351a7b6304e40f5681199c19aa208f6ba6a99c672c7d543915b3720f371e4c18f1820b748181dc0759c
 checkstyle.home=${base.path}/checkstyle-${checkstyle.version}
 checkstyle.jar=${checkstyle.home}/checkstyle-${checkstyle.version}-all.jar
 checkstyle.loc=${base-gh.loc}/checkstyle/checkstyle/releases/download/checkstyle-${checkstyle.version}/checkstyle-${checkstyle.version}-all.jar
 
 # ----- JaCoCo code coverage tool -----
-jacoco.version=0.8.15
+jacoco.version=0.8.16
 jacoco.checksum.enabled=true
 jacoco.checksum.algorithm=MD5|SHA-1
-jacoco.checksum.value=4cb568c4d94e5571d6f3a3f548c44198|e8943bd0c24c700cdda471c2f327682e74a8908a
+jacoco.checksum.value=eda0368891b979a8fddaa70047a9af56|abd615d11b2adef760a3c67735c34c39f1983022
 jacoco.home=${base.path}/jacoco-${jacoco.version}
 jacoco.jar=${jacoco.home}/lib/jacocoant.jar
 jacoco.loc=${base-maven.loc}/org/jacoco/jacoco/${jacoco.version}/jacoco-${jacoco.version}.zip
@@ -324,10 +324,10 @@ migration-lib.loc=${base-maven.loc}/org/apache/tomcat/jakartaee-migration/${migr
 
 # ----- JSign, version 4.1 or later -----
 # Note: There are known issues with Tomcat and Jsign 7.0 and 7.1
-jsign.version=7.5
+jsign.version=7.6
 jsign.checksum.enabled=true
 jsign.checksum.algorithm=MD5|SHA-1
-jsign.checksum.value=1fcae59d4ede6b1313ac34c9139a0d80|f71ce8b6df19371c5cbf084223f142f9f678a7bb
+jsign.checksum.value=3ec328bf83d621f374643ffd22214579|843c90ab50bc0da16fc1aac9e2c6bba986dc4a36
 
 jsign.home=${base.path}/jsign-${jsign.version}
 jsign.jar=${jsign.home}/jsign-${jsign.version}.jar

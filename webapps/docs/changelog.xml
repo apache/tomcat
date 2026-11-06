@@ -1726,6 +1726,18 @@
       <update>
         Update Tomcat Native to 2.0.17. (markt)
       </update>
+      <update>
+        Update Byte Buddy to 1.18.17. (markt)
+      </update>
+      <update>
+        Update Checkstyle to 14.4.0. (markt)
+      </update>
+      <update>
+        Update JaCoCo to 0.8.16. (markt)
+      </update>
+      <update>
+        Update JSign to 7.6. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
