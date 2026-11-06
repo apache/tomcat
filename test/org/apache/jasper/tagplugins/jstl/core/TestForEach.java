@@ -74,6 +74,22 @@ public class TestForEach extends AbstractTestTag {
     }
 
 
+    @Test
+    public void testCollectionBeginAfterEnd() throws Exception {
+        ByteChunk res = new ByteChunk();
+
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/test/jstl/foreach-begin-after-end.jsp", res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        String body = res.toString();
+        Assert.assertFalse(body, body.contains("FAIL"));
+        Assert.assertTrue(body, body.contains("iteratorNext=a"));
+        Assert.assertTrue(body, body.contains("equal=b"));
+        Assert.assertTrue(body, body.contains("zero=a"));
+    }
+
+
     /*
      * The reference implementation validates the begin, end and step
      * attributes in their setters, throwing a JspTagException. The plugin
