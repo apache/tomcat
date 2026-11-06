@@ -380,9 +380,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
         boolean process = process(this.types, method, false);
         if (process && args.length > 0 && args[0] instanceof String) {
             CachedStatement statement = isCached(method, args);
-            if (statement != null) {
-                // Remove it from the cache since it is used
-                removeStatement(statement);
+            if (statement != null && removeStatement(statement)) {
                 if (statement.getAssociatedConnection() != currentPhysicalConnection()) {
                     // The entry belongs to a connection that has been
                     // replaced (a statement close that raced a reconnect
@@ -399,9 +397,11 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
                 // reports a live handle instead of the previous borrower's.
                 statement.setConnection(proxy);
                 return statement.getActualProxy();
-            } else {
-                return super.invoke(proxy, method, args);
             }
+            // No entry, or another thread won the removal (a disconnect purge
+            // closed it): prepare a fresh statement rather than hand out an
+            // entry this call does not own.
+            return super.invoke(proxy, method, args);
         } else {
             return super.invoke(proxy, method, args);
         }
@@ -759,6 +759,12 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
             // same way rather than dereference the field.
             AtomicInteger size = cacheSize;
             boolean shouldClose = true;
+            PreparedStatement delegate = getDelegate();
+            if (delegate == null) {
+                // A concurrent forceClose() already retired this handle; there
+                // is nothing left to reset or park.
+                return;
+            }
             if (size != null && size.get() < maxCacheSize && !trackerBelow()) {
                 // A tracker beneath this cache (see trackerBelow) would close a
                 // parked statement at the connection return, so the park is
@@ -770,34 +776,34 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
                 // that second question too, while the prepare-time binding
                 // still names the session the statement was prepared on for
                 // the session check in cacheStatement.
-                CachedStatement proxy = new CachedStatement(getDelegate(), getSql(), associatedConnection);
+                CachedStatement proxy = new CachedStatement(delegate, getSql(), associatedConnection);
                 proxy.setCacheKey(getCacheKey());
                 try {
                     // Only cache if statement has been marked as poolable and not close on completion
-                    if (poolable && !getDelegate().isCloseOnCompletion()) {
+                    if (poolable && !delegate.isCloseOnCompletion()) {
                         // Clear Resultset
-                        ResultSet result = getDelegate().getResultSet();
+                        ResultSet result = delegate.getResultSet();
                         if (result != null && !result.isClosed()) {
                             result.close();
                         }
                         // Clear parameter
-                        getDelegate().clearParameters();
+                        delegate.clearParameters();
                         // Clear batch
-                        getDelegate().clearBatch();
+                        delegate.clearBatch();
                         // Clear warnings
-                        getDelegate().clearWarnings();
+                        delegate.clearWarnings();
                         // Reset the timeout
-                        getDelegate().setQueryTimeout(0);
+                        delegate.setQueryTimeout(0);
                         // Reset fetch direction
-                        getDelegate().setFetchDirection(ResultSet.FETCH_FORWARD);
+                        delegate.setFetchDirection(ResultSet.FETCH_FORWARD);
                         // Reset max field size
-                        getDelegate().setMaxFieldSize(0);
+                        delegate.setMaxFieldSize(0);
                         // Reset max rows
-                        getDelegate().setMaxRows(0);
+                        delegate.setMaxRows(0);
                         // Reset fetchsize
-                        getDelegate().setFetchSize(0);
+                        delegate.setFetchSize(0);
                         // Reset the escape processing
-                        getDelegate().setEscapeProcessing(true);
+                        delegate.setEscapeProcessing(true);
                         // Create a new facade
                         Object actualProxy = getConstructor().newInstance(new Object[] { proxy });
                         proxy.setActualProxy(actualProxy);
