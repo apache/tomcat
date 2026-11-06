@@ -389,6 +389,46 @@ class TestPoolProperties {
     }
 
     @Test
+    void clearingThePasswordAlsoStripsCredentialAliases() {
+        PoolProperties properties = new PoolProperties();
+        properties.setConnectionProperties("pass=one;pwd=two;password=three;user=u");
+
+        properties.setPassword(null);
+
+        Assertions.assertNull(properties.getDbProperties().getProperty("password"),
+                "the password entry must be cleared");
+        Assertions.assertNull(properties.getDbProperties().getProperty("pass"),
+                "the pass alias must not keep authenticating connections");
+        Assertions.assertNull(properties.getDbProperties().getProperty("pwd"),
+                "the pwd alias must not keep authenticating connections");
+        Assertions.assertEquals("u", properties.getDbProperties().getProperty("user"),
+                "non-credential entries must be left alone");
+        Assertions.assertEquals("pass=one;pwd=two;password=three;user=u", properties.getConnectionProperties(),
+                "the configured string is not rewritten by a credential clear");
+    }
+
+    @Test
+    void clearingThePasswordStripsCredentialAliasesSuppliedByADefaultsTable() {
+        Properties defaults = new Properties();
+        defaults.setProperty("pass", "one");
+        defaults.setProperty("pwd", "two");
+        defaults.setProperty(PoolUtilities.PROP_PASSWORD, "three");
+        PoolProperties properties = new PoolProperties();
+        properties.setDbProperties(new Properties(defaults));
+
+        properties.setPassword(null);
+
+        Assertions.assertNull(properties.getDbProperties().getProperty("pass"),
+                "a defaults-supplied pass alias must be cleared");
+        Assertions.assertNull(properties.getDbProperties().getProperty("pwd"),
+                "a defaults-supplied pwd alias must be cleared");
+        Assertions.assertNull(properties.getDbProperties().getProperty(PoolUtilities.PROP_PASSWORD),
+                "a defaults-supplied password must be cleared");
+        Assertions.assertNull(PoolUtilities.clone(properties.getDbProperties()).getProperty("pass"),
+                "the copy handed to the driver must not materialize a cleared alias");
+    }
+
+    @Test
     void clearingCredentialsReachesValuesSuppliedByADefaultsTable() {
         Properties defaults = new Properties();
         defaults.setProperty(PoolUtilities.PROP_USER, DEFAULT_USER);
