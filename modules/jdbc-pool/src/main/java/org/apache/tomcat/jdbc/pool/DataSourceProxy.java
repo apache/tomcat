@@ -30,6 +30,7 @@ import javax.sql.XAConnection;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorDefinition;
+import org.apache.tomcat.jdbc.pool.util.ExceptionUtils;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
@@ -242,36 +243,45 @@ public class DataSourceProxy implements PoolConfiguration {
             // anything tears its pool down itself before throwing.
             final ConnectionPool fresh = new ConnectionPool(poolProperties);
             final boolean rejected;
-            synchronized (this) {
-                // Check-and-publish against the closure, which sets the flag
-                // and takes the field in one step under this same monitor:
-                // whichever of the two runs first wins, so the close either
-                // finds this pool published and closes it, or it found the
-                // field empty and this thread takes the pool down below. It
-                // is never neither - that was the leak - and never both.
-                rejected = closed;
-                if (!rejected) {
-                    // Finish the configuration before the pool can be read from.
-                    // A write of one of the attributes the check corrects - the
-                    // eviction interval is brought down to the max age - lands its
-                    // value in the shared configuration but skips that correction,
-                    // because the setters run it only once a pool is reachable. The
-                    // publication is where such a write has to be picked up, and it
-                    // has to come before the cleaner is looked over: the check is
-                    // what decides the interval the cleaner should be running on.
-                    fresh.checkPoolConfiguration(poolProperties);
-                    pool = fresh;
-                    // Look the cleaner over now that the pool is reachable.
-                    // It was armed while this pool was still under
-                    // construction, and a sweeper write that landed between
-                    // that arming's reading and this publication found no
-                    // pool to report itself to: the setters take this same
-                    // monitor, so a write is either fully before this point,
-                    // where the arming had not read it yet and this does, or
-                    // fully after it, where the setter finds the pool and
-                    // re-arms itself. Nothing is left in between.
-                    fresh.reconcilePoolCleaner(poolProperties);
+            try {
+                synchronized (this) {
+                    // Check-and-publish against the closure, which sets the flag
+                    // and takes the field in one step under this same monitor:
+                    // whichever of the two runs first wins, so the close either
+                    // finds this pool published and closes it, or it found the
+                    // field empty and this thread takes the pool down below. It
+                    // is never neither - that was the leak - and never both.
+                    rejected = closed;
+                    if (!rejected) {
+                        // Finish the configuration before the pool can be read
+                        // from. A write of one of the attributes the check
+                        // corrects lands its value in the shared configuration
+                        // but skips that correction, because the setters run it
+                        // only once a pool is reachable. The check has to come
+                        // before the cleaner is looked over: it decides the
+                        // interval the cleaner should be running on.
+                        fresh.checkPoolConfiguration(poolProperties);
+                        fresh.reconcilePoolCleaner(poolProperties);
+                        pool = fresh;
+                    }
                 }
+            } catch (Throwable x) {
+                // What handleThrowable lets through is not recoverable, so
+                // check that first. Otherwise the constructor has already
+                // pre-loaded sessions and may have armed the cleaner, so close
+                // the fresh pool before reporting the publication failure.
+                ExceptionUtils.handleThrowable(x);
+                try {
+                    fresh.close(true);
+                } catch (Exception y) {
+                    log.warn(MessageFactory.get("dataSourceProxy.errorClosingPool"), y);
+                }
+                if (x instanceof SQLException) {
+                    throw (SQLException) x;
+                }
+                SQLException sx = new SQLException(x.getMessage());
+                sx.initCause(x);
+                throw sx;
             }
             if (rejected) {
                 // close(boolean) completed while this pool was being built
