@@ -44,34 +44,14 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 /**
  * Slow query report interceptor. Tracks timing of query executions.
  * <p>
- * The statistics belong to the pool the interceptor serves: a pool registers its store when it starts and releases it
- * when it closes, and every connection of that pool books its executions into that one store. The store is read by the
- * name the pool started with - see {@link ConnectionPool#getRegistrationName()} and {@link #getPoolStats(String)}.
- * The name identifies the pool, so it must be unique among the live pools of this class loader: Tomcat gives every
- * pool it manages a name of its own, and a programmatically built pool has a unique default name. A pool that starts
- * under a name a live pool already holds is a configuration error, reported as such, and its statistics displace the
- * other pool's store under the shared name.
- * Renaming a running pool, which the pool's own JMX allows, neither detaches the pool from its statistics nor strands
- * what its start published.
- * </p>
+ * Statistics belong to the pool the interceptor serves: the pool registers a store when it starts, every connection
+ * books into it, and the close releases it. The store is read by the name the pool started with. Names must be unique
+ * among live pools; a pool starting under a live pool's name is a configuration error and displaces the other pool's
+ * store. Registrations hold the pool only weakly, so an abandoned pool is not pinned by its statistics.
  * <p>
- * A reporting definition the interceptor list gains after the start is not stranded either: the list is mutable at
- * runtime through the pool's own MBean, so its first borrow registers the store its start would have registered, and
- * the close that releases the store is told about that definition as well.
- * </p>
- * <p>
- * The registrations hold the pool only weakly, so a pool abandoned without closing is never pinned by them and can be
- * collected with its open sessions, leaving only the bounded statistics store published under its name until a pool
- * starting under that name takes the name over.
- * </p>
- * <p>
- * More than one reporting definition can be configured on one pool - the two-thresholds configuration of
- * {@link SlowQueryReportJmx} is documented as a supported use - and every definition sees every execution, so the
- * shared statistics are booked by one definition only: the deepest one in the interceptor chain that stores statistics
- * (see {@link #booksSharedStats()}). A configuration of several definitions books each execution once, like a single
- * definition does; the per-definition channels - this definition's slow and failed query logging - keep firing for
- * every definition that configures them.
- * </p>
+ * A reporting definition added after the pool started registers its store on first borrow. Several reporting
+ * definitions may be configured on one pool; the deepest definition that stores statistics books each execution once,
+ * while each definition's own slow and failed query logging still fires.
  */
 public class SlowQueryReport extends AbstractQueryReport {
 
@@ -340,21 +320,8 @@ public class SlowQueryReport extends AbstractQueryReport {
     }
 
     /**
-     * Registers the statistics store of a pool that has started.
-     * <p>
-     * The store is published under the name the pool started with, which is what {@link #getPoolStats(String)} and
-     * the JMX read surface answer from. The name identifies the pool, so a start always begins a fresh store: a pool
-     * that starts under a name an abandoned pool left behind does not inherit the abandoned pool's numbers.
-     * </p>
-     * <p>
-     * A pool that carries no name is refused. The name is not one setting among others here: it is the key of the
-     * registry the store is published in and of the ObjectName the JMX subclass publishes its MBean under, and
-     * neither can be keyed under no name. Failing the start with a message that names the setting is therefore the
-     * honest outcome, and it is what the pool reports as the reason its start failed - where the missing key gave a
-     * start failure that said nothing. A container names every pool it starts, so reaching this is a programmatic pool
-     * configured without a name; the check stays as the library's own guarantee that what it registers always has a
-     * key.
-     * </p>
+     * Registers the statistics store of a pool that has started, under the name the pool started with. A start always
+     * begins a fresh store rather than inheriting numbers from an abandoned pool's leftover.
      *
      * @param pool the connection pool that has started
      *
@@ -375,8 +342,18 @@ public class SlowQueryReport extends AbstractQueryReport {
             throw new IllegalStateException(MessageFactory.get("slowQueryReport.poolNameRequired"));
         }
         PoolStatistics own = new PoolStatistics(pool, name);
+        PoolStatistics previous;
         synchronized (perPoolStats) {
-            reportDuplicateName(perPoolStats.put(name, own), pool, name);
+            previous = perPoolStats.put(name, own);
+        }
+        reportDuplicateName(previous, pool, name);
+        if (previous != null && previous.getPool() != pool) {
+            // Defensive only: pool names must be unique, and a live store is
+            // released by its own close, so a live duplicate should never
+            // happen. This also covers the leftover of a pool abandoned without
+            // closing, keeping it from blocking the new publication under the
+            // name.
+            previous.release();
         }
         this.poolStatistics = own;
         this.queries = own.getQueryStats();
@@ -406,21 +383,8 @@ public class SlowQueryReport extends AbstractQueryReport {
 
     /**
      * Resolves the store the borrow this instance serves is to book into, registering the pool's store when this
-     * instance is the first component of that pool to need one.
-     * <p>
-     * The read comes first, and it is the whole cost for a healthy pool. Only a borrow that finds nothing looks
-     * further, and only for a pool that is still live and carries a name to publish under. That second case is a
-     * reporting definition the interceptor list gained after the start: the definition has no start left to register
-     * with, but it still monitors the pool it was added to, and every borrow of it resolves the one store of that pool.
-     * </p>
-     * <p>
-     * The liveness check is read under the registry's monitor, which is the monitor the close of the store's release
-     * runs under, and that ordering is the point: {@link ConnectionPool} sets its closed flag before it tells the
-     * interceptors about the close, so a registration that gets the monitor first is met by the close's removal, while
-     * a close that got there first is not followed by a store nothing will ever give up. A session that outlived its
-     * pool therefore still resolves nothing, which is the state the borrow reports once
-     * (see {@link #getQueryStats(String)}).
-     * </p>
+     * instance is the first component of that pool to need one. The registration is checked against the pool's closed
+     * flag under the registry's monitor, so a close and a registration cannot leave a store nothing will release.
      *
      * @param parent the pool the borrow belongs to, possibly {@code null} for the release of a chain
      *
@@ -437,6 +401,7 @@ public class SlowQueryReport extends AbstractQueryReport {
             // else; poolStarted says so when the pool has a start to say it at
             return null;
         }
+        PoolStatistics previous = null;
         synchronized (perPoolStats) {
             if (parent.isClosed()) {
                 return null;
@@ -444,10 +409,21 @@ public class SlowQueryReport extends AbstractQueryReport {
             own = perPoolStats.get(name);
             if (own == null) {
                 own = new PoolStatistics(parent, name);
-                reportDuplicateName(perPoolStats.put(name, own), parent, name);
+                previous = perPoolStats.put(name, own);
             }
-            return own;
         }
+        if (previous != null) {
+            reportDuplicateName(previous, parent, name);
+            if (previous.getPool() != parent) {
+                // Defensive only: pool names must be unique, and a live store is
+                // released by its own close, so a live duplicate should never
+                // happen. This also covers the leftover of a pool abandoned
+                // without closing, keeping it from blocking the new publication
+                // under the name.
+                previous.release();
+            }
+        }
+        return own;
     }
 
     /**
@@ -487,9 +463,15 @@ public class SlowQueryReport extends AbstractQueryReport {
             // release
             return null;
         }
-        PoolStatistics own;
+        PoolStatistics own = null;
         synchronized (perPoolStats) {
-            own = perPoolStats.remove(name);
+            PoolStatistics current = perPoolStats.get(name);
+            // Defensive: with unique pool names the store under this name is
+            // this pool's own. The ownership check keeps a store another live
+            // pool has taken over from being removed by the displaced pool.
+            if (current != null && current.getPool() == pool) {
+                own = perPoolStats.remove(name);
+            }
         }
         if (own != null) {
             own.release();
@@ -498,23 +480,9 @@ public class SlowQueryReport extends AbstractQueryReport {
     }
 
     /**
-     * Whether this instance is the one to book the statistics of its pool for the executions its chain reports.
-     * <p>
-     * Every configured reporting definition wraps the statement again, so one logical execution passes through every
-     * definition's hooks; booking the pool's map from each of them would multiply its invocation counts, totals and
-     * prepare counters by the number of definitions. The booking therefore belongs to the deepest definition in the
-     * chain that stores statistics: it sees every execution the layers above it see, so no booking is lost, and its
-     * measurement is the one closest to the driver. The layers above it report only their own channels - logging and,
-     * for {@link SlowQueryReportJmx}, notifications. A definition that stores no statistics (a {@code maxQueries} of
-     * zero) never claims the booking, so it cannot hold the statistics silent for the definitions above it.
-     * </p>
-     * <p>
-     * The decision reads only the chain below this instance and the configured capacity of each layer found there.
-     * Both are fixed when the chain is built (properties are set before the link, and the chain is published through
-     * the connection's volatile handler reference), and nothing is remembered across executions, so a re-entered
-     * execution - a report hook that itself runs a query on this pool - books on its own chain's merits, whatever the
-     * enclosing execution's layers have already booked or passed on.
-     * </p>
+     * Whether this instance books the shared statistics for its pool. Every reporting definition sees every execution,
+     * so only the deepest definition that stores statistics books; a definition with no capacity never claims the
+     * booking. The decision reads the fixed chain below this instance and nothing is remembered across executions.
      *
      * @return {@code true} if this instance must book the statistics of its pool for the executions it reports
      */
@@ -535,21 +503,10 @@ public class SlowQueryReport extends AbstractQueryReport {
 
     /**
      * Reports that this instance lost the statistics store it booked executions on, once for as long as that store is
-     * gone.
-     * <p>
-     * The condition is a fact about the session this instance serves - it outlived the pool whose statistics it booked
-     * on, or the chain it belongs to has been released - and it stays exactly as true for every execution that follows,
-     * while an application still holding a statement opened on the session can keep executing on it indefinitely.
-     * Writing the line for each of those executions is a WARN per query, forever, and nothing configures it: this is not
-     * one of the query reports the {@code logSlow} and {@code logFailed} flags gate. The flag is cleared by the first
-     * booking this instance makes once it holds a store again - a borrow of the session it belongs to is what hands the
-     * store back - so a loss that follows such a booking is a new event and earns its own report. A store lost again
-     * before anything was booked on the recovered one states the same fact as the loss this line covered, and is not
-     * reported a second time.
-     * </p>
+     * gone. The flag is cleared by the first booking made after a store is resolved again, so a later loss is a new
+     * event.
      *
-     * @return {@code true} when this call is the one that reports the loss, {@code false} when the loss has already been
-     *             reported
+     * @return {@code true} when this call is the one that reports the loss, {@code false} when it was already reported
      */
     private boolean reportClosedOrAbandoned() {
         return closedOrAbandonedReported.compareAndSet(false, true);
