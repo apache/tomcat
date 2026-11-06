@@ -21,7 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import jakarta.annotation.PreDestroy;
-import jakarta.enterprise.inject.spi.CDI;
+import jakarta.inject.Inject;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
@@ -29,11 +29,11 @@ import jakarta.servlet.annotation.WebListener;
 @WebListener
 public class LifecycleContextListener implements ServletContextListener {
 
+    @Inject
+    private LifecycleGreeting greeting;
+
     @Override
     public void contextInitialized(ServletContextEvent event) {
-        // Listeners are instantiated before the CDI container is started, so
-        // use programmatic lookup rather than field injection here.
-        LifecycleGreeting greeting = CDI.current().select(LifecycleGreeting.class).get();
         event.getServletContext().setAttribute("owb.listener.greeting", greeting.message());
     }
 

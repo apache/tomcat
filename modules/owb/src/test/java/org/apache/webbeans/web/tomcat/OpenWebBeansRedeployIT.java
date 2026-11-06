@@ -98,8 +98,12 @@ class OpenWebBeansRedeployIT {
     }
 
     private static int listenerCount(OwbTestServer server) {
-        return (int) Arrays.stream(server.context("/owb-redeploy").findApplicationListeners())
+        int classCount = (int) Arrays.stream(server.context("/owb-redeploy").findApplicationListeners())
                 .filter(WebBeansConfigurationListener.class.getName()::equals)
                 .count();
+        int instanceCount = (int) Arrays.stream(server.context("/owb-redeploy").getApplicationLifecycleListeners())
+                .filter(WebBeansConfigurationListener.class::isInstance)
+                .count();
+        return classCount + instanceCount;
     }
 }

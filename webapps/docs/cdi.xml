@@ -145,11 +145,8 @@ mvn clean verify]]></source>
   <section name="Known limitations">
 
   <p>
-    Servlet and filter injection are supported. A
-    <code>ServletContextListener</code> is instantiated before the CDI
-    container starts, so field injection into a listener is not available.
-    Use programmatic lookup with <code>CDI.current().select(...)</code> inside
-    a listener instead.
+    Servlet, filter and <code>ServletContextListener</code> field injection
+    are supported when CDI support is enabled.
   </p>
 
   <p>
