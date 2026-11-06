@@ -64,6 +64,7 @@ class OpenWebBeansTomcatIntegrationIT {
                 .build(shadedJar);
         try (OwbTestServer server = OwbTestServer.start(webapp, ListenerMode.SERVER, true, true)) {
             assertHello(server);
+            assertEquals("injected", status(server));
             assertWebBeansListener(server, true);
         }
     }
@@ -75,6 +76,7 @@ class OpenWebBeansTomcatIntegrationIT {
                 .includeBeansXml(false)
                 .build(shadedJar);
         try (OwbTestServer server = OwbTestServer.start(webapp, ListenerMode.SERVER, false, true)) {
+            assertEquals("not-injected", status(server));
             assertWebBeansListener(server, false);
         }
     }
@@ -102,6 +104,32 @@ class OpenWebBeansTomcatIntegrationIT {
     }
 
     @Test
+    void contextSecurityValveDisabled() throws Exception {
+        Path shadedJar = OwbTestSupport.shadedJar();
+        Path webapp = new WebAppBuilder(tempDir.resolve("context-no-security-valve"), "cdi41").build(shadedJar);
+        try (OwbTestServer server = OwbTestServer.start(webapp, ListenerMode.CONTEXT, false, false)) {
+            assertHello(server);
+            assertSecurityValve(server, false);
+        }
+    }
+
+    @Test
+    void dynamicContextDeployment() throws Exception {
+        Path shadedJar = OwbTestSupport.shadedJar();
+        Path initial = new WebAppBuilder(tempDir.resolve("dynamic-initial"), "cdi41").build(shadedJar);
+        Path dynamic = new WebAppBuilder(tempDir.resolve("dynamic-app"), "multi/one").build(shadedJar);
+        try (OwbTestServer server = OwbTestServer.start(initial, ListenerMode.SERVER, false, true)) {
+            assertHello(server);
+
+            server.deploy("/owb-dynamic", dynamic);
+
+            HttpClient client = OwbTestSupport.newClient();
+            assertEquals("one", OwbTestSupport.get(client, server.baseUri("/owb-dynamic").resolve("value")));
+            assertHello(server);
+        }
+    }
+
+    @Test
     void filterListenerAndServletInjection() throws Exception {
         Path markerDirectory = tempDir.resolve("markers");
         Files.createDirectories(markerDirectory);
@@ -120,6 +148,8 @@ class OpenWebBeansTomcatIntegrationIT {
                 OwbTestSupport.assertMarker(markerDirectory, "postConstruct.marker");
             }
             OwbTestSupport.assertMarker(markerDirectory, "preDestroy.marker");
+            OwbTestSupport.assertMarker(markerDirectory, "filterPreDestroy.marker");
+            OwbTestSupport.assertMarker(markerDirectory, "listenerPreDestroy.marker");
         } finally {
             if (previousMarkerDirectory == null) {
                 System.clearProperty("owb.test.marker.dir");
@@ -132,6 +162,11 @@ class OpenWebBeansTomcatIntegrationIT {
     private static void assertHello(OwbTestServer server) throws Exception {
         HttpClient client = OwbTestSupport.newClient();
         assertEquals("hello-owb-4.1.1", OwbTestSupport.get(client, server.baseUri().resolve("hello")));
+    }
+
+    private static String status(OwbTestServer server) throws Exception {
+        HttpClient client = OwbTestSupport.newClient();
+        return OwbTestSupport.get(client, server.baseUri().resolve("injection-status"));
     }
 
     private static void assertSecurityValve(OwbTestServer server, boolean expected) {

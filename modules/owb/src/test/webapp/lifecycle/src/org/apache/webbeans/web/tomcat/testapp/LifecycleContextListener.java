@@ -16,6 +16,11 @@
  */
 package org.apache.webbeans.web.tomcat.testapp;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.inject.spi.CDI;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
@@ -30,5 +35,17 @@ public class LifecycleContextListener implements ServletContextListener {
         // use programmatic lookup rather than field injection here.
         LifecycleGreeting greeting = CDI.current().select(LifecycleGreeting.class).get();
         event.getServletContext().setAttribute("owb.listener.greeting", greeting.message());
+    }
+
+    @PreDestroy
+    void preDestroy() {
+        String markerDirectory = System.getProperty("owb.test.marker.dir");
+        if (markerDirectory != null) {
+            try {
+                Files.writeString(Path.of(markerDirectory).resolve("listenerPreDestroy.marker"), "marker");
+            } catch (IOException e) {
+                throw new IllegalStateException("Unable to write listener lifecycle marker", e);
+            }
+        }
     }
 }
