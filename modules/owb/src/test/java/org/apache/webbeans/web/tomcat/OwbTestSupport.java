@@ -19,6 +19,7 @@ package org.apache.webbeans.web.tomcat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.net.CookieManager;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -53,6 +54,11 @@ final class OwbTestSupport {
 
     static HttpClient newClient() {
         return HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
+    }
+
+    static HttpClient newCookieClient() {
+        return HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5))
+                .cookieHandler(new CookieManager()).build();
     }
 
     static HttpResponse<String> getResponse(HttpClient client, URI uri) throws Exception {

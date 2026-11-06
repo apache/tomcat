@@ -19,6 +19,10 @@ package org.apache.webbeans.web.tomcat;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import org.apache.catalina.Context;
@@ -34,26 +38,48 @@ final class OwbTestServer implements AutoCloseable {
         CONTEXT
     }
 
-    private final Tomcat tomcat;
-    private final Context context;
-    private final URI baseUri;
+    record Deployment(String contextPath, Path webapp) {
+    }
 
-    private OwbTestServer(Tomcat tomcat, Context context, URI baseUri) {
+    private final Tomcat tomcat;
+    private final Map<String, Context> contexts;
+    private final Map<String, URI> baseUris;
+
+    private OwbTestServer(Tomcat tomcat, Map<String, Context> contexts, Map<String, URI> baseUris) {
         this.tomcat = tomcat;
-        this.context = context;
-        this.baseUri = baseUri;
+        this.contexts = contexts;
+        this.baseUris = baseUris;
+    }
+
+    static OwbTestServer start(Path webapp, ListenerMode mode, boolean startWithoutBeansXml,
+            boolean addSecurityValve) throws Exception {
+        return start(List.of(new Deployment("/owb-test", webapp)), mode, startWithoutBeansXml, addSecurityValve,
+                false, null);
     }
 
     static OwbTestServer start(Path webapp, ListenerMode mode, boolean startWithoutBeansXml,
             boolean addSecurityValve, String contextPath, Consumer<Tomcat> configurer) throws Exception {
-        Path base = Files.createTempDirectory(webapp.getParent(), "tomcat-");
+        return start(List.of(new Deployment(contextPath, webapp)), mode, startWithoutBeansXml, addSecurityValve,
+                false, configurer);
+    }
+
+    static OwbTestServer start(Path webapp, ListenerMode mode, boolean startWithoutBeansXml,
+            boolean addSecurityValve, String contextPath, boolean useDefaultWebXml,
+            Consumer<Tomcat> configurer) throws Exception {
+        return start(List.of(new Deployment(contextPath, webapp)), mode, startWithoutBeansXml, addSecurityValve,
+                useDefaultWebXml, configurer);
+    }
+
+    static OwbTestServer start(List<Deployment> deployments, ListenerMode mode, boolean startWithoutBeansXml,
+            boolean addSecurityValve, boolean useDefaultWebXml, Consumer<Tomcat> configurer) throws Exception {
+        Path base = Files.createTempDirectory(deployments.get(0).webapp().getParent(), "tomcat-");
 
         Tomcat tomcat = new Tomcat();
         tomcat.setBaseDir(base.toString());
         tomcat.setPort(0);
         tomcat.getConnector();
         tomcat.getServer().setPort(-1);
-        tomcat.setAddDefaultWebXmlToWebapp(false);
+        tomcat.setAddDefaultWebXmlToWebapp(useDefaultWebXml);
         // Enable naming so that Tomcat's DefaultInstanceManager invokes
         // @PostConstruct and @PreDestroy callbacks.
         tomcat.enableNaming();
@@ -62,17 +88,23 @@ final class OwbTestServer implements AutoCloseable {
             configurer.accept(tomcat);
         }
 
-        Context context = tomcat.addWebapp(contextPath, webapp.toString());
+        Map<String, Context> contexts = new LinkedHashMap<>();
+        for (Deployment deployment : deployments) {
+            Context context = tomcat.addWebapp(deployment.contextPath(), deployment.webapp().toString());
+            contexts.put(deployment.contextPath(), context);
+            if (mode == ListenerMode.CONTEXT) {
+                OpenWebBeansContextLifecycleListener listener = new OpenWebBeansContextLifecycleListener();
+                listener.setStartWithoutBeansXml(startWithoutBeansXml);
+                listener.setAddSecurityValve(addSecurityValve);
+                context.addLifecycleListener(listener);
+            }
+        }
+
         if (mode == ListenerMode.SERVER) {
             OpenWebBeansListener listener = new OpenWebBeansListener();
             listener.setStartWithoutBeansXml(startWithoutBeansXml);
             listener.setAddSecurityValve(addSecurityValve);
             tomcat.getServer().addLifecycleListener(listener);
-        } else {
-            OpenWebBeansContextLifecycleListener listener = new OpenWebBeansContextLifecycleListener();
-            listener.setStartWithoutBeansXml(startWithoutBeansXml);
-            listener.setAddSecurityValve(addSecurityValve);
-            context.addLifecycleListener(listener);
         }
 
         try {
@@ -83,25 +115,39 @@ final class OwbTestServer implements AutoCloseable {
         }
 
         int port = tomcat.getConnector().getLocalPort();
-        URI baseUri = URI.create("http://127.0.0.1:" + port + contextPath + "/");
-        return new OwbTestServer(tomcat, context, baseUri);
-    }
-
-    static OwbTestServer start(Path webapp, ListenerMode mode, boolean startWithoutBeansXml,
-            boolean addSecurityValve) throws Exception {
-        return start(webapp, mode, startWithoutBeansXml, addSecurityValve, "/owb-test", null);
+        Map<String, URI> baseUris = new LinkedHashMap<>();
+        for (String contextPath : contexts.keySet()) {
+            baseUris.put(contextPath, URI.create("http://127.0.0.1:" + port + contextPath + "/"));
+        }
+        return new OwbTestServer(tomcat, Collections.unmodifiableMap(contexts), Collections.unmodifiableMap(baseUris));
     }
 
     Context context() {
-        return context;
+        return contexts.values().iterator().next();
+    }
+
+    Context context(String contextPath) {
+        return contexts.get(contextPath);
     }
 
     URI baseUri() {
-        return baseUri;
+        return baseUris.values().iterator().next();
+    }
+
+    URI baseUri(String contextPath) {
+        return baseUris.get(contextPath);
     }
 
     Tomcat tomcat() {
         return tomcat;
+    }
+
+    void stopContext(String contextPath) throws Exception {
+        context(contextPath).stop();
+    }
+
+    void startContext(String contextPath) throws Exception {
+        context(contextPath).start();
     }
 
     @Override

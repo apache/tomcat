@@ -40,6 +40,7 @@
         <jakarta-el.version>6.0.1</jakarta-el.version>
         <tomcat.version>12.0.0-SNAPSHOT</tomcat.version>
         <junit.version>5.11.4</junit.version>
+        <ecj.version>3.41.0</ecj.version>
     </properties>
 
     <dependencies>
@@ -105,6 +106,24 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-el</artifactId>
+            <version>${tomcat.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-jasper</artifactId>
+            <version>${tomcat.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jdt</groupId>
+            <artifactId>ecj</artifactId>
+            <version>${ecj.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -116,6 +135,9 @@
                     <release>21</release>
                 </configuration>
             </plugin>
+            <!-- Create an empty directory used to keep target/classes off the
+                 integration test runtime classpath. The tests must run against
+                 the shaded JAR. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -177,6 +199,8 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- Integration tests use embedded Tomcat. They run after the
+                 shade plugin has produced the deployable JAR. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
@@ -195,6 +219,8 @@
                     <additionalClasspathElements>
                         <additionalClasspathElement>${project.build.directory}/${project.build.finalName}.jar</additionalClasspathElement>
                     </additionalClasspathElements>
+                    <!-- Remove unshaded copies of the classes contained in the
+                         shaded JAR so the test validates the deployable JAR. -->
                     <classpathDependencyExcludes>
                         <classpathDependencyExclude>org.apache.openwebbeans:openwebbeans-spi</classpathDependencyExclude>
                         <classpathDependencyExclude>org.apache.openwebbeans:openwebbeans-impl</classpathDependencyExclude>
@@ -208,6 +234,8 @@
                         <classpathDependencyExclude>jakarta.interceptor:jakarta.interceptor-api</classpathDependencyExclude>
                         <classpathDependencyExclude>jakarta.annotation:jakarta.annotation-api</classpathDependencyExclude>
                     </classpathDependencyExcludes>
+                    <!-- Test webapp templates and the shaded JAR are passed to
+                         the test JVM explicitly; target/classes is not used. -->
                     <systemPropertyVariables>
                         <owb.test.webapp.root>${project.basedir}/src/test/webapp</owb.test.webapp.root>
                         <owb.test.jar>${project.build.directory}/${project.build.finalName}.jar</owb.test.jar>
