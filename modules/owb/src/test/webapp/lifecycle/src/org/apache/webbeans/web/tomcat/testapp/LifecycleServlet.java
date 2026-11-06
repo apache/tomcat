@@ -48,10 +48,14 @@ public class LifecycleServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        request.getSession();
         String listener = (String) getServletContext().getAttribute("owb.listener.greeting");
         String filter = (String) request.getAttribute("owb.filter.greeting");
+        String requestListener = (String) request.getAttribute("owb.request.listener.greeting");
+        String sessionListener = (String) request.getSession().getAttribute("owb.session.listener.greeting");
         response.setContentType("text/plain");
-        response.getWriter().println(greeting.message() + "|" + listener + "|" + filter);
+        response.getWriter().println(greeting.message() + "|" + listener + "|" + filter + "|" + requestListener
+                + "|" + sessionListener);
     }
 
     private static void writeMarker(String name) {

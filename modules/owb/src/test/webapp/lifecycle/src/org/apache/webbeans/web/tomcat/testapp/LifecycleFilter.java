@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.inject.Inject;
 import jakarta.servlet.Filter;
@@ -44,6 +45,11 @@ public class LifecycleFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         httpRequest.setAttribute("owb.filter.greeting", greeting.message());
         chain.doFilter(request, response);
+    }
+
+    @PostConstruct
+    void postConstruct() {
+        writeMarker("filterPostConstruct.marker");
     }
 
     @PreDestroy

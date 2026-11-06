@@ -25,7 +25,10 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Lifecycle;
+import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.Tomcat;
 
 /**
@@ -47,16 +50,19 @@ final class OwbTestServer implements AutoCloseable {
     private final ListenerMode listenerMode;
     private final boolean startWithoutBeansXml;
     private final boolean addSecurityValve;
+    private final boolean enableLeakChecks;
     private final int port;
 
     private OwbTestServer(Tomcat tomcat, Map<String, Context> contexts, Map<String, URI> baseUris,
-            ListenerMode listenerMode, boolean startWithoutBeansXml, boolean addSecurityValve, int port) {
+            ListenerMode listenerMode, boolean startWithoutBeansXml, boolean addSecurityValve,
+            boolean enableLeakChecks, int port) {
         this.tomcat = tomcat;
         this.contexts = contexts;
         this.baseUris = baseUris;
         this.listenerMode = listenerMode;
         this.startWithoutBeansXml = startWithoutBeansXml;
         this.addSecurityValve = addSecurityValve;
+        this.enableLeakChecks = enableLeakChecks;
         this.port = port;
     }
 
@@ -81,6 +87,13 @@ final class OwbTestServer implements AutoCloseable {
 
     static OwbTestServer start(List<Deployment> deployments, ListenerMode mode, boolean startWithoutBeansXml,
             boolean addSecurityValve, boolean useDefaultWebXml, Consumer<Tomcat> configurer) throws Exception {
+        return start(deployments, mode, startWithoutBeansXml, addSecurityValve, useDefaultWebXml, false,
+                configurer);
+    }
+
+    static OwbTestServer start(List<Deployment> deployments, ListenerMode mode, boolean startWithoutBeansXml,
+            boolean addSecurityValve, boolean useDefaultWebXml, boolean enableLeakChecks,
+            Consumer<Tomcat> configurer) throws Exception {
         Path base = Files.createTempDirectory(deployments.get(0).webapp().getParent(), "tomcat-");
 
         Tomcat tomcat = new Tomcat();
@@ -99,8 +112,8 @@ final class OwbTestServer implements AutoCloseable {
 
         Map<String, Context> contexts = new LinkedHashMap<>();
         for (Deployment deployment : deployments) {
-            Context context = tomcat.addWebapp(deployment.contextPath(), deployment.webapp().toString());
-            configureContext(context, mode, startWithoutBeansXml, addSecurityValve);
+            Context context = addWebapp(tomcat, deployment.contextPath(), deployment.webapp(), mode,
+                    startWithoutBeansXml, addSecurityValve, enableLeakChecks);
             contexts.put(deployment.contextPath(), context);
         }
 
@@ -123,12 +136,13 @@ final class OwbTestServer implements AutoCloseable {
         for (String contextPath : contexts.keySet()) {
             baseUris.put(contextPath, URI.create("http://127.0.0.1:" + port + contextPath + "/"));
         }
-        return new OwbTestServer(tomcat, contexts, baseUris, mode, startWithoutBeansXml, addSecurityValve, port);
+        return new OwbTestServer(tomcat, contexts, baseUris, mode, startWithoutBeansXml, addSecurityValve,
+                enableLeakChecks, port);
     }
 
     Context deploy(String contextPath, Path webapp) throws Exception {
-        Context context = tomcat.addWebapp(contextPath, webapp.toString());
-        configureContext(context, listenerMode, startWithoutBeansXml, addSecurityValve);
+        Context context = addWebapp(tomcat, contextPath, webapp, listenerMode, startWithoutBeansXml,
+                addSecurityValve, enableLeakChecks);
         if (!context.getState().isAvailable()) {
             context.start();
         }
@@ -174,19 +188,43 @@ final class OwbTestServer implements AutoCloseable {
         }
     }
 
-    private static void configureContext(Context context, ListenerMode mode, boolean startWithoutBeansXml,
-            boolean addSecurityValve) {
-        if (context instanceof StandardContext standardContext) {
-            // These checks require --add-opens for java.lang and java.rmi.
-            // They are not relevant to the module integration tests.
-            standardContext.setClearReferencesThreadLocals(false);
-            standardContext.setClearReferencesRmiTargets(false);
-        }
+    private static Context addWebapp(Tomcat tomcat, String contextPath, Path webapp, ListenerMode mode,
+            boolean startWithoutBeansXml, boolean addSecurityValve, boolean enableLeakChecks) {
+        Context context;
         if (mode == ListenerMode.CONTEXT) {
             OpenWebBeansContextLifecycleListener listener = new OpenWebBeansContextLifecycleListener();
             listener.setStartWithoutBeansXml(startWithoutBeansXml);
             listener.setAddSecurityValve(addSecurityValve);
-            context.addLifecycleListener(listener);
+            // Register the listener before the context starts so dynamic
+            // deployments also receive the CONFIGURE_START event.
+            context = tomcat.addWebapp(tomcat.getHost(), contextPath, webapp.toString(),
+                    new OwbContextConfig(listener));
+        } else {
+            context = tomcat.addWebapp(contextPath, webapp.toString());
+        }
+        if (!enableLeakChecks && context instanceof StandardContext standardContext) {
+            // These checks require --add-opens for java.lang and java.rmi.
+            // They are only enabled by the dedicated leak test.
+            standardContext.setClearReferencesThreadLocals(false);
+            standardContext.setClearReferencesRmiTargets(false);
+        }
+        return context;
+    }
+
+    private static final class OwbContextConfig extends ContextConfig {
+
+        private final OpenWebBeansContextLifecycleListener listener;
+
+        private OwbContextConfig(OpenWebBeansContextLifecycleListener listener) {
+            this.listener = listener;
+        }
+
+        @Override
+        public void lifecycleEvent(LifecycleEvent event) {
+            super.lifecycleEvent(event);
+            if (Lifecycle.CONFIGURE_START_EVENT.equals(event.getType())) {
+                listener.lifecycleEvent(event);
+            }
         }
     }
 

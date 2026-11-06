@@ -150,6 +150,11 @@ mvn clean verify]]></source>
   </p>
 
   <p>
+    EL method invocation against a normal-scoped CDI proxy bean is not
+    supported; use property access or a dependent bean instead.
+  </p>
+
+  <p>
     Support for features that depend on optional CDI EL APIs or on CDI
     features not implemented by OpenWebBeans may vary. See
     <code>modules/owb/README.md</code> for the currently tested feature set.

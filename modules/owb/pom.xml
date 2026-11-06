@@ -223,6 +223,8 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <!-- Required by the optional classloader leak checks. -->
+                    <argLine>--add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED</argLine>
                     <!-- Test the shaded JAR rather than the unshaded classes -->
                     <classesDirectory>${project.build.directory}/empty-classes</classesDirectory>
                     <additionalClasspathElements>

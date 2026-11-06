@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.inject.Inject;
 import jakarta.servlet.ServletContextEvent;
@@ -37,14 +38,23 @@ public class LifecycleContextListener implements ServletContextListener {
         event.getServletContext().setAttribute("owb.listener.greeting", greeting.message());
     }
 
+    @PostConstruct
+    void postConstruct() {
+        writeMarker("listenerPostConstruct.marker");
+    }
+
     @PreDestroy
     void preDestroy() {
+        writeMarker("listenerPreDestroy.marker");
+    }
+
+    private static void writeMarker(String name) {
         String markerDirectory = System.getProperty("owb.test.marker.dir");
         if (markerDirectory != null) {
             try {
-                Files.writeString(Path.of(markerDirectory).resolve("listenerPreDestroy.marker"), "marker");
+                Files.writeString(Path.of(markerDirectory).resolve(name), "marker");
             } catch (IOException e) {
-                throw new IllegalStateException("Unable to write listener lifecycle marker", e);
+                throw new IllegalStateException("Unable to write listener lifecycle marker " + name, e);
             }
         }
     }
