@@ -24,6 +24,8 @@ import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarOutputStream;
 
 import jakarta.servlet.descriptor.JspConfigDescriptor;
 import jakarta.servlet.descriptor.JspPropertyGroupDescriptor;
@@ -180,6 +182,52 @@ public class TestJspCServletContext {
                         new String(is.readAllBytes(), StandardCharsets.UTF_8));
             }
             Assert.assertNotNull(context.getResource("/unicode-\u00fc.jsp"));
+        } finally {
+            deleteRecursively(docBase);
+        }
+    }
+
+
+    @Test
+    public void testGetResourceFromResourceJarWithUriIllegalCharacters() throws Exception {
+        // Resources in a resource JAR whose entry name contains characters
+        // that are not permitted in a URI must also be resolved.
+        File docBase = Files.createTempDirectory("jspc-illegal-chars-jar").toFile();
+        try {
+            File webInf = new File(docBase, "WEB-INF");
+            File lib = new File(webInf, "lib");
+            Files.createDirectories(lib.toPath());
+            Files.writeString(new File(webInf, "web.xml").toPath(),
+                    "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                    "<web-app xmlns=\"https://jakarta.ee/xml/ns/jakartaee\" version=\"6.0\"/>\n",
+                    StandardCharsets.UTF_8);
+            try (JarOutputStream jos = new JarOutputStream(
+                    Files.newOutputStream(new File(lib, "resources.jar").toPath()))) {
+                jos.putNextEntry(new JarEntry("META-INF/web-fragment.xml"));
+                jos.write(("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                        "<web-fragment xmlns=\"https://jakarta.ee/xml/ns/jakartaee\" version=\"6.0\"/>\n")
+                        .getBytes(StandardCharsets.UTF_8));
+                jos.closeEntry();
+                // The directory entry is what identifies this as a resource JAR
+                jos.putNextEntry(new JarEntry("META-INF/resources/"));
+                jos.closeEntry();
+                jos.putNextEntry(new JarEntry("META-INF/resources/my file.jsp"));
+                jos.write("<jsp/>".getBytes(StandardCharsets.UTF_8));
+                jos.closeEntry();
+                jos.putNextEntry(new JarEntry("META-INF/resources/unicode-ü.jsp"));
+                jos.write("<jsp/>".getBytes(StandardCharsets.UTF_8));
+                jos.closeEntry();
+            }
+            JspCServletContext context = new JspCServletContext(
+                    null, docBase.toURI().toURL(), null, false, false);
+
+            URL url = context.getResource("/my file.jsp");
+            Assert.assertNotNull(url);
+            try (InputStream is = url.openStream()) {
+                Assert.assertEquals("<jsp/>",
+                        new String(is.readAllBytes(), StandardCharsets.UTF_8));
+            }
+            Assert.assertNotNull(context.getResource("/unicode-ü.jsp"));
         } finally {
             deleteRecursively(docBase);
         }

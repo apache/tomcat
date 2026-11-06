@@ -342,7 +342,11 @@ public class JspCServletContext implements ServletContext {
             for (URL jarUrl : resourceJARs) {
                 try (Jar jar = JarFactory.newInstance(jarUrl)) {
                     if (jar.exists(jarPath)) {
-                        return new URI(jar.getURL(jarPath)).toURL();
+                        // The entry name is a decoded path. Encode it so
+                        // that names containing characters that are not
+                        // permitted in a URI, such as a space, can be used
+                        // to build the URL.
+                        return new URI(jar.getURL(encodePath(jarPath))).toURL();
                     }
                 } catch (IOException | URISyntaxException ioe) {
                     // Ignore
