@@ -521,8 +521,10 @@ class TestXaConnectionLeak extends JdbcPoolBaseTest {
                 e.getSuppressed()[0].getMessage());
 
         Assertions.assertEquals(1, xads.handles.size());
-        Assertions.assertEquals(1, xads.handles.get(0).closeCount.get(),
-                "the cleanup must attempt the close exactly once");
+        Assertions.assertEquals(2, xads.handles.get(0).closeCount.get(),
+                "the failed close must be retried when the pooled connection is released");
+        Assertions.assertTrue(xads.handles.get(0).physicalClosed.get(),
+                "the retried close must release the physical session");
         awaitSessions(0);
     }
 
