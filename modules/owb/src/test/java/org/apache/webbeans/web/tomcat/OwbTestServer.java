@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 
 /**
@@ -91,6 +92,12 @@ final class OwbTestServer implements AutoCloseable {
         Map<String, Context> contexts = new LinkedHashMap<>();
         for (Deployment deployment : deployments) {
             Context context = tomcat.addWebapp(deployment.contextPath(), deployment.webapp().toString());
+            if (context instanceof StandardContext standardContext) {
+                // These checks require --add-opens for java.lang and java.rmi.
+                // They are not relevant to the module integration tests.
+                standardContext.setClearReferencesThreadLocals(false);
+                standardContext.setClearReferencesRmiTargets(false);
+            }
             contexts.put(deployment.contextPath(), context);
             if (mode == ListenerMode.CONTEXT) {
                 OpenWebBeansContextLifecycleListener listener = new OpenWebBeansContextLifecycleListener();

@@ -135,6 +135,15 @@
                     <release>21</release>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <!-- Always rebuild the unshaded JAR before shading so that
+                         repeated builds do not shade the previously shaded JAR. -->
+                    <forceCreation>true</forceCreation>
+                </configuration>
+            </plugin>
             <!-- Create an empty directory used to keep target/classes off the
                  integration test runtime classpath. The tests must run against
                  the shaded JAR. -->
