@@ -16,6 +16,7 @@
  */
 package org.apache.coyote;
 
+import java.io.IOException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.concurrent.atomic.AtomicLong;
@@ -285,7 +286,7 @@ class AsyncStateMachine {
      * Async has been processed. Whether or not to enter a long poll depends on current state. For example, as per
      * SRV.2.3.3.3 can now process calls to complete() or dispatch().
      */
-    synchronized SocketState asyncPostProcess() {
+    synchronized SocketState asyncPostProcess() throws IOException {
         if (state == AsyncState.COMPLETE_PENDING) {
             clearNonBlockingListeners();
             updateState(AsyncState.COMPLETING);
