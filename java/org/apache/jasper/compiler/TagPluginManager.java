@@ -205,6 +205,11 @@ public class TagPluginManager {
         }
 
         @Override
+        public boolean hasBody() {
+            return !node.hasEmptyBody();
+        }
+
+        @Override
         public boolean isConstantAttribute(String attribute) {
             Node.JspAttribute attr = getNodeAttribute(attribute);
             if (attr == null) {
