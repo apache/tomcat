@@ -17,6 +17,7 @@
 package org.apache.tomcat.jdbc.pool.interceptor;
 
 import java.lang.management.ManagementFactory;
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -307,6 +308,38 @@ class TestSlowQueryJmxMBeanSurface extends JdbcPoolBaseTest {
                 Assertions.assertFalse(cleared.containsKey("SELECT 1"),
                         "the displaced pool's statistics must not be reachable under the name");
             }
+        }
+    }
+
+    @Test
+    void aFailedCompositeTypeDegradesReadsToAnEmptyArray() throws Exception {
+        Field typeField = SlowQueryReportJmx.class.getDeclaredField("SLOW_QUERY_TYPE");
+        typeField.setAccessible(true);
+        Field failedField = SlowQueryReportJmx.class.getDeclaredField("compositeTypeInitializationFailed");
+        failedField.setAccessible(true);
+        Object savedType = typeField.get(null);
+        boolean savedFailed = failedField.getBoolean(null);
+
+        String poolName = "JmxFailedCompositeType-" + System.nanoTime();
+        DataSource ds = reportingPoolNamed(poolName);
+        try {
+            typeField.set(null, null);
+            failedField.setBoolean(null, true);
+            ds.createPool();
+
+            try (Connection con = ds.getConnection();
+                    Statement st = con.createStatement()) {
+                st.execute("SELECT 1");
+                SlowQueryReportJmx interceptor = interceptorOf(con, SlowQueryReportJmx.class);
+                Assertions.assertNotNull(interceptor,
+                        "precondition: the pool must run the reporting interceptor");
+                Assertions.assertEquals(0, interceptor.getSlowQueriesCD().length,
+                        "a failed composite type must degrade to the documented empty array");
+            }
+        } finally {
+            typeField.set(null, savedType);
+            failedField.setBoolean(null, savedFailed);
+            ds.close();
         }
     }
 
