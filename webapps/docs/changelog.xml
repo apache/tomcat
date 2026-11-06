@@ -527,6 +527,13 @@
   <subsection name="Coyote">
     <changelog>
       <fix>
+        <bug>70287</bug>
+        Apply the <code>keepAliveTimeout</code> rather than the
+        <code>connectionTimeout</code> when waiting for the next request on a
+        connection after a <code>sendfile</code> transfer that did not
+        complete inline. (abernal)
+      </fix>
+      <fix>
         Use the <code>certificateChainFile</code> only if the PEM certificate
         file (all TLS implementations) or the PKCS#12 bundle (OpenSSL FFM
         implementation) contains the server certificate alone. If it already

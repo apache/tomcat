@@ -1286,6 +1286,9 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
                                 if (log.isTraceEnabled()) {
                                     log.trace("Connection is keep alive, registering back for OP_READ");
                                 }
+                                // Wait for the next request using the keep-alive timeout, measured from now
+                                socketWrapper.setReadTimeout(getKeepAliveTimeout());
+                                socketWrapper.updateLastRead();
                                 reg(sk, socketWrapper, SelectionKey.OP_READ);
                                 break;
                             }
