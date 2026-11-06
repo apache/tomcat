@@ -153,6 +153,71 @@ public class TestCoyoteAdapterAsyncErrorState extends TomcatBaseTest {
     }
 
 
+    /*
+     * BZ 70290: Output written to the response, but not yet flushed, before complete() was called must still be
+     * delivered to the client when the error state (CLOSE_CLEAN) permits IO. It must not be discarded when the request
+     * is recycled.
+     */
+    @Test
+    public void testBz70290CompleteAfterCloseCleanDeliversBufferedOutput() throws Exception {
+        TestServlet servlet = new TestServlet(ActionCode.DISABLE_SWALLOW_INPUT, true).withOutput("BUFFERED-OUTPUT");
+        startTomcat(servlet);
+
+        String response = sendRequest();
+
+        Assert.assertTrue(response, response.contains("BUFFERED-OUTPUT"));
+        assertCompletedOnce(servlet);
+    }
+
+
+    /*
+     * BZ 70290: As above but the dispatch requested by the application can not be performed because the connection is
+     * going to be closed. The output already written must still be delivered.
+     */
+    @Test
+    public void testBz70290DispatchAfterCloseCleanDeliversBufferedOutput() throws Exception {
+        TestServlet servlet = new TestServlet(ActionCode.DISABLE_SWALLOW_INPUT).withOutput("BUFFERED-OUTPUT");
+        startTomcat(servlet);
+
+        String response = sendRequest();
+
+        Assert.assertTrue(response, response.contains("BUFFERED-OUTPUT"));
+        assertCompletedOnce(servlet);
+    }
+
+
+    /*
+     * BZ 70290: Control. With no error the buffered output is delivered when complete() is called.
+     */
+    @Test
+    public void testBz70290CompleteWithoutErrorDeliversBufferedOutput() throws Exception {
+        TestServlet servlet = new TestServlet(null, true).withOutput("BUFFERED-OUTPUT");
+        startTomcat(servlet);
+
+        String response = sendRequest();
+
+        Assert.assertTrue(response, response.contains("BUFFERED-OUTPUT"));
+        assertCompletedOnce(servlet);
+    }
+
+
+    /*
+     * BZ 70290: As above but complete() is called from AsyncListener.onTimeout() so the request is processed by
+     * CoyoteAdapter.asyncDispatch() rather than by the container thread that made the initial service call.
+     */
+    @Test
+    public void testBz70290CompleteFromTimeoutAfterCloseCleanDeliversBufferedOutput() throws Exception {
+        TestServlet servlet = new TestServlet(ActionCode.DISABLE_SWALLOW_INPUT, true).withOutput("BUFFERED-OUTPUT")
+                .completeFromTimeout();
+        startTomcat(servlet);
+
+        String response = sendRequest();
+
+        Assert.assertTrue(response, response.contains("BUFFERED-OUTPUT"));
+        assertCompletedOnce(servlet);
+    }
+
+
     private void startTomcat(TestServlet servlet) throws Exception {
         Tomcat tomcat = getTomcatInstance();
         Context ctx = getProgrammaticRootContext();
@@ -222,6 +287,8 @@ public class TestCoyoteAdapterAsyncErrorState extends TomcatBaseTest {
 
         private final ActionCode errorAction;
         private final boolean complete;
+        private volatile String output;
+        private volatile boolean completeFromTimeout;
 
         final AtomicInteger dispatches = new AtomicInteger();
         final AtomicInteger completions = new AtomicInteger();
@@ -229,6 +296,24 @@ public class TestCoyoteAdapterAsyncErrorState extends TomcatBaseTest {
 
         TestServlet(ActionCode errorAction) {
             this(errorAction, false);
+        }
+
+        /*
+         * Write the given output to the response before the error occurs. It is deliberately not flushed so it is
+         * still held in the Catalina response buffer when the error occurs.
+         */
+        TestServlet withOutput(String output) {
+            this.output = output;
+            return this;
+        }
+
+        /*
+         * Defer the output, the error and the call to complete() to AsyncListener.onTimeout() so they happen after the
+         * initial service call has finished and are processed via CoyoteAdapter.asyncDispatch().
+         */
+        TestServlet completeFromTimeout() {
+            this.completeFromTimeout = true;
+            return this;
         }
 
         TestServlet(ActionCode errorAction, boolean complete) {
@@ -254,8 +339,11 @@ public class TestCoyoteAdapterAsyncErrorState extends TomcatBaseTest {
                 }
 
                 @Override
-                public void onTimeout(AsyncEvent event) {
-                    // NO-OP
+                public void onTimeout(AsyncEvent event) throws IOException {
+                    if (completeFromTimeout) {
+                        writeOutputAndFail(req, resp);
+                        ac.complete();
+                    }
                 }
 
                 @Override
@@ -269,17 +357,31 @@ public class TestCoyoteAdapterAsyncErrorState extends TomcatBaseTest {
                 }
             });
 
-            if (errorAction != null) {
-                // The connection fails
-                Request request = (Request) req.getAttribute(REQUEST_ATTRIBUTE);
-                request.getCoyoteRequest().action(errorAction, null);
+            if (completeFromTimeout) {
+                ac.setTimeout(100);
+                return;
             }
+
+            writeOutputAndFail(req, resp);
 
             // Request the dispatch (or completion) on the container thread during the initial service call
             if (complete) {
                 ac.complete();
             } else {
                 ac.dispatch();
+            }
+        }
+
+        private void writeOutputAndFail(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+            if (output != null) {
+                resp.setContentType("text/plain");
+                resp.getWriter().print(output);
+            }
+
+            if (errorAction != null) {
+                // The connection fails
+                Request request = (Request) req.getAttribute(REQUEST_ATTRIBUTE);
+                request.getCoyoteRequest().action(errorAction, null);
             }
         }
     }
