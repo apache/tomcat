@@ -17,6 +17,7 @@
 package org.apache.webbeans.web.tomcat;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.http.HttpClient;
@@ -42,7 +43,17 @@ class OpenWebBeansJspIT {
             HttpResponse<String> response = OwbTestSupport.getResponse(client, server.baseUri().resolve("index.jsp"));
             assertEquals(200, response.statusCode(), response.body());
             assertTrue(response.headers().firstValue("Content-Type").orElse("").startsWith("text/html"));
-            assertTrue(response.body().contains("hello-owb-4.1.1"), response.body());
+            String first = response.body();
+            assertTrue(first.contains("property:hello-owb-4.1.1"), first);
+            assertTrue(first.contains("method:hello-owb-4.1.1"), first);
+            assertTrue(first.contains("included:hello-owb-4.1.1"), first);
+            assertTrue(first.contains("tag:hello-owb-4.1.1"), first);
+            assertTrue(first.contains("request:request:"), first);
+
+            String second = OwbTestSupport.get(client, server.baseUri().resolve("index.jsp"));
+            assertNotEquals(first, second, "Request scoped EL value was not recreated");
+
+            assertEquals("hello-owb-4.1.1", OwbTestSupport.get(client, server.baseUri().resolve("el")));
         }
     }
 }

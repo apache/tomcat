@@ -130,6 +130,23 @@ class OpenWebBeansTomcatIntegrationIT {
     }
 
     @Test
+    void dynamicContextDeploymentWithContextListener() throws Exception {
+        Path shadedJar = OwbTestSupport.shadedJar();
+        Path initial = new WebAppBuilder(tempDir.resolve("dynamic-context-initial"), "cdi41").build(shadedJar);
+        Path dynamic = new WebAppBuilder(tempDir.resolve("dynamic-context-app"), "multi/one").build(shadedJar);
+        try (OwbTestServer server = OwbTestServer.start(initial, ListenerMode.CONTEXT, false, true)) {
+            assertHello(server);
+
+            server.deploy("/owb-dynamic-context", dynamic);
+
+            HttpClient client = OwbTestSupport.newClient();
+            assertEquals("one", OwbTestSupport.get(client,
+                    server.baseUri("/owb-dynamic-context").resolve("value")));
+            assertHello(server);
+        }
+    }
+
+    @Test
     void filterListenerAndServletInjection() throws Exception {
         Path markerDirectory = tempDir.resolve("markers");
         Files.createDirectories(markerDirectory);
@@ -142,14 +159,20 @@ class OpenWebBeansTomcatIntegrationIT {
                 HttpClient client = OwbTestSupport.newClient();
                 HttpResponse<String> response = OwbTestSupport.getResponse(client, server.baseUri().resolve("lifecycle"));
                 assertEquals(200, response.statusCode(), response.body());
-                assertEquals("lifecycle-owb-4.1.1|lifecycle-owb-4.1.1|lifecycle-owb-4.1.1",
-                        response.body().strip());
+                assertEquals("lifecycle-owb-4.1.1|lifecycle-owb-4.1.1|lifecycle-owb-4.1.1|lifecycle-owb-4.1.1|"
+                        + "lifecycle-owb-4.1.1", response.body().strip());
                 assertEquals("lifecycle-owb-4.1.1", response.headers().firstValue("X-Owb-Greeting").orElse(null));
                 OwbTestSupport.assertMarker(markerDirectory, "postConstruct.marker");
+                OwbTestSupport.assertMarker(markerDirectory, "filterPostConstruct.marker");
+                OwbTestSupport.assertMarker(markerDirectory, "listenerPostConstruct.marker");
+                OwbTestSupport.assertMarker(markerDirectory, "requestListenerPostConstruct.marker");
+                OwbTestSupport.assertMarker(markerDirectory, "sessionListenerPostConstruct.marker");
             }
             OwbTestSupport.assertMarker(markerDirectory, "preDestroy.marker");
             OwbTestSupport.assertMarker(markerDirectory, "filterPreDestroy.marker");
             OwbTestSupport.assertMarker(markerDirectory, "listenerPreDestroy.marker");
+            OwbTestSupport.assertMarker(markerDirectory, "requestListenerPreDestroy.marker");
+            OwbTestSupport.assertMarker(markerDirectory, "sessionListenerPreDestroy.marker");
         } finally {
             if (previousMarkerDirectory == null) {
                 System.clearProperty("owb.test.marker.dir");

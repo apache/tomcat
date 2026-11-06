@@ -139,12 +139,16 @@ provided through the test/common classpath, matching the production
 |---|---|
 | `TomcatPluginTest` | Servlet spec class handling, managed-bean rejection, injection support and security service registration |
 | `OpenWebBeansInstanceManagerTest` | Delegation for all `InstanceManager` creation variants and destruction fallback |
+| `OpenWebBeansSecurityFilterTest` | Filter principal visibility and ThreadLocal cleanup |
+| `OpenWebBeansSecurityValveTest` | Valve principal visibility and ThreadLocal cleanup |
 | `OpenWebBeansCdi41IT` | CDI injection, request/session scope, `isMatchingBean`, `isMatchingEvent`, `getContexts`, interceptor bindings, method invoker |
-| `OpenWebBeansTomcatIntegrationIT` | Server/context listener modes, `startWithoutBeansXml` positive and negative behavior, alternate `beans.xml` location, security valve configuration, dynamic deployment, filter/listener/servlet field injection and lifecycle callbacks |
+| `OpenWebBeansTomcatIntegrationIT` | Server/context listener modes, `startWithoutBeansXml` positive and negative behavior, alternate `beans.xml` location, security valve configuration, dynamic deployment with both listener modes, filter/listener/servlet field injection and lifecycle callbacks |
 | `OpenWebBeansSecurityIT` | BASIC authentication, `@Inject Principal`, security valve principal, principal proxy modes and custom proxy APIs |
 | `OpenWebBeansSecurityFilterIT` | Webapp-level `OpenWebBeansSecurityFilter` |
-| `OpenWebBeansJspIT` | JSP/EL resolution through OWB |
+| `OpenWebBeansInstanceManagerIT` | End-to-end injection through all `InstanceManager` creation paths and context classloader restoration |
+| `OpenWebBeansJspIT` | JSP property/method/include/tag-file EL, request-scoped EL and programmatic EL resolver access |
 | `OpenWebBeansRedeployIT` | Multiple webapps, classloader isolation, context restart, `@PreDestroy`, listener registration |
+| `OpenWebBeansClassLoaderLeakIT` | Enabled leak checks, no reported ThreadLocal/RMI leaks, context restart |
 
 ## Adding a test
 
@@ -177,9 +181,13 @@ try (OwbTestServer server = OwbTestServer.start(webapp,
   so no failing gate test is included.
 - `ELAwareBeanManager` is not covered. OpenWebBeans provides the core
   `BeanManager`, and the supplemental CDI EL API is not part of this module.
-- Classloader garbage-collection leak detection is not asserted. The redeploy
-  tests verify deterministic behavior: pre-destroy callbacks, separate
-  contexts, no duplicate listener registration and successful restart.
+- EL method invocation against a normal-scoped CDI proxy bean is not covered
+  because OpenWebBeans reports `MethodNotFoundException` for that case. Use
+  property access or a dependent bean for method invocation.
+- Classloader garbage-collection leak detection is not asserted. The
+  redeploy tests verify deterministic behavior, and
+  `OpenWebBeansClassLoaderLeakIT` enables Tomcat's leak checks and asserts
+  that no ThreadLocal/RMI leak warnings are reported during context shutdown.
 
 ## Troubleshooting
 
@@ -190,5 +198,8 @@ try (OwbTestServer server = OwbTestServer.start(webapp,
 - **Tests run against the wrong classes**: check the Failsafe
   `classesDirectory`, `additionalClasspathElements` and
   `classpathDependencyExcludes` settings.
+- **Classloader leak checks**: `OpenWebBeansClassLoaderLeakIT` enables the
+  Tomcat leak checks and relies on the `--add-opens` options in the Failsafe
+  `argLine`.
 - **Port or directory conflicts**: the tests use port `0` and JUnit temporary
   directories; do not hard-code either in new tests.

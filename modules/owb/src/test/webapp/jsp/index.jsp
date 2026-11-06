@@ -15,6 +15,13 @@
   limitations under the License.
 --%>
 <%@ page contentType="text/html; charset=UTF-8" %>
+<%@ taglib prefix="owb" tagdir="/WEB-INF/tags" %>
 <html>
-<body>${greeting.message}</body>
+<body>
+<p>property:${greeting.message}</p>
+<p>method:${methodGreeting.message()}</p>
+<p>include:<jsp:include page="included.jsp"/></p>
+<p>tag:<owb:greeting/></p>
+<p>request:${requestGreeting.message}</p>
+</body>
 </html>
