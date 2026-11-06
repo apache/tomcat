@@ -45,11 +45,11 @@
   <section name="CDI support">
 
   <p>
-    CDI support is provided by the <code>modules/owb</code> optional module.
-    It packages the Apache OpenWebBeans project and allows adding CDI support
-    to the Tomcat container. The build process of the module uses Apache Maven,
-    and is not available as a binary bundle as it is built using a number of
-    publicly available JARs.
+    CDI 4.1 support is provided by the <code>modules/owb</code> optional module.
+    It packages the Apache OpenWebBeans project and allows adding CDI 4.1
+    support to the Tomcat container. The build process of the module uses
+    Apache Maven, and is not available as a binary bundle as it is built using
+    a number of publicly available JARs.
   </p>
 
   <p>

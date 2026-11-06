@@ -1679,6 +1679,9 @@
   <subsection name="Other">
     <changelog>
       <update>
+        Update the OWB module to Apache OpenWebBeans 4.1.1. (remm)
+      </update>
+      <update>
         Remove the <code>modules/cxf</code> optional module and the JAX-RS
         support it provided. (remm)
       </update>
