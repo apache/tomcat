@@ -184,7 +184,7 @@ class TestSlowQueryReportAbandonedPool extends JdbcPoolBaseTest {
     }
 
     @Test
-    void anAbandonedPoolKeepsTheNameItPublishedAndRefusesItsSuccessor() throws Exception {
+    void anAbandonedPoolNameIsTakenOverByItsSuccessor() throws Exception {
         String poolName = "abandoned-jmx-heir-" + System.nanoTime();
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
         ObjectName oname = new ObjectName("tomcat.jdbc:type="
@@ -209,31 +209,28 @@ class TestSlowQueryReportAbandonedPool extends JdbcPoolBaseTest {
                     "org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx(notifyPool=false,threshold=-1)");
             survivor.createPool();
             ConnectionPool successor = survivor.getPool();
+            Assertions.assertFalse(server.isRegistered(oname),
+                    "taking over the name must release the abandoned pool's publication");
+
             use(successor);
 
             Assertions.assertTrue(server.isRegistered(oname),
-                    "the borrow of the successor must not have taken the abandoned pool's"
-                            + " MBean down: what one pool published is another pool's to keep");
+                    "the successor's borrow must publish its own MBean under the name");
             SlowQueryReportJmx.PoolJmx state = SlowQueryReportJmx.jmxStateFor(successor);
             Assertions.assertNotNull(state,
                     "the borrow must have built the successor's own JMX state");
-            Assertions.assertNull(state.publishedUnder(),
-                    "and the successor must not report through the abandoned pool's MBean:"
-                            + " its own publication is the one the MBeanServer refused");
+            Assertions.assertEquals(oname, state.publishedUnder(),
+                    "the successor must report through its own publication under the name");
 
             survivor.close();
 
-            Assertions.assertTrue(server.isRegistered(oname),
-                    "the close of the successor releases what the successor published, which is"
-                            + " nothing - it leaves the abandoned pool's publication alone");
+            Assertions.assertFalse(server.isRegistered(oname),
+                    "the successor's close must release the publication it made");
             Assertions.assertNull(SlowQueryReportJmx.jmxStateFor(successor),
                     "the successor's own JMX state is given up with its store");
             Assertions.assertNull(SlowQueryReport.getPoolStats(poolName),
                     "and so is the statistics map it held under the name");
         } finally {
-            // The abandoned pool's registration is nobody's to release but its
-            // own close, which by the design under test never runs: take it down
-            // here, so the name this test invented is not left occupied.
             try {
                 server.unregisterMBean(oname);
             } catch (Exception x) {

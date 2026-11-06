@@ -26,6 +26,7 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -258,41 +259,39 @@ class TestSlowQueryJmxMBeanSurface extends JdbcPoolBaseTest {
     }
 
     @Test
-    void resetStatsClearsThePublishingPoolSStatisticsAndNoOtherPoolS() throws Exception {
+    void resetStatsClearsTheOwningPoolSStatistics() throws Exception {
         String poolName = "JmxResetPerPool-" + System.nanoTime();
-        DataSource publisher = reportingPoolNamed(poolName);
+        DataSource displaced = reportingPoolNamed(poolName);
         // A second live pool under the same name: an unsupported configuration
-        // the pool only reaches programmatically, and the one that tells the
-        // two stores apart - the name view answers with the pool that started
-        // under the name last, while the published MBean reports for the pool
-        // that got there first
-        DataSource displacer = reportingPoolNamed(poolName);
+        // the pool only reaches programmatically. It takes the name over, so
+        // the published MBean reports for it and the displaced pool's store is
+        // released.
+        DataSource owner = reportingPoolNamed(poolName);
 
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
         ObjectName oname = objectNameFor(poolName);
 
-        try (Connection ownerCon = publisher.getConnection()) {
-            try (Statement st = ownerCon.createStatement()) {
+        try (Connection displacedCon = displaced.getConnection()) {
+            try (Statement st = displacedCon.createStatement()) {
                 st.execute("SELECT 1");
             }
             Assertions.assertTrue(server.isRegistered(oname),
                     "the premise: the first borrow published the MBean of the pool");
 
-            try (Connection sharerCon = displacer.getConnection();
-                    Statement st = sharerCon.createStatement()) {
+            try (Connection ownerCon = owner.getConnection();
+                    Statement st = ownerCon.createStatement()) {
                 st.execute("SELECT 2");
 
                 CompositeData[] published = (CompositeData[]) server.getAttribute(oname,
                         "SlowQueriesCD");
                 Assertions.assertEquals(1, published.length,
-                        "the MBean reports the statistics of the pool that published it,"
-                                + " not the numbers a same-named pool collected");
-                Assertions.assertEquals("SELECT 1", published[0].get("query"),
+                        "the MBean reports the statistics of the pool that now owns the name");
+                Assertions.assertEquals("SELECT 2", published[0].get("query"),
                         "and what it reports is that pool's own query");
 
                 Assertions.assertEquals(new HashSet<>(Arrays.asList("SELECT 2")),
                         SlowQueryReport.getPoolStats(poolName).keySet(),
-                        "the read by name answers with the pool that started under the name last");
+                        "the read by name answers with the pool that owns the name");
 
                 server.invoke(oname, "resetStats", null, null);
 
@@ -300,9 +299,13 @@ class TestSlowQueryJmxMBeanSurface extends JdbcPoolBaseTest {
                                 "SlowQueriesCD")).length,
                         "resetStats() through the published MBean clears the store that"
                                 + " registration reports for");
-                Assertions.assertTrue(SlowQueryReport.getPoolStats(poolName).containsKey("SELECT 2"),
-                        "and it must not reach into another pool's statistics, whatever the"
-                                + " name the two were configured with");
+                ConcurrentHashMap<String, SlowQueryReport.QueryStats> cleared =
+                        SlowQueryReport.getPoolStats(poolName);
+                Assertions.assertNotNull(cleared, "the owning pool must keep its store");
+                Assertions.assertFalse(cleared.containsKey("SELECT 2"),
+                        "and the reset must clear that store");
+                Assertions.assertFalse(cleared.containsKey("SELECT 1"),
+                        "the displaced pool's statistics must not be reachable under the name");
             }
         }
     }

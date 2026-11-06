@@ -133,6 +133,39 @@ class TestSlowQueryReportPoolNames extends JdbcPoolBaseTest {
     }
 
     @Test
+    void closingADisplacedPoolDoesNotReleaseTheLivePoolsStore() throws Exception {
+        String poolName = "displaced-" + System.nanoTime();
+        DataSource first = reportedPoolNamed(poolName);
+        first.createPool();
+        run(first, QUERY_FIRST);
+
+        DataSource second = reportedPoolNamed(poolName);
+        second.createPool();
+        run(second, QUERY_SECOND);
+
+        // The second pool displaced the first pool's store under the shared
+        // name. Closing the displaced pool must not remove the live pool's
+        // store, statistics or JMX state.
+        first.close();
+
+        ConcurrentHashMap<String, SlowQueryReport.QueryStats> surviving =
+                SlowQueryReport.getPoolStats(poolName);
+        Assertions.assertNotNull(surviving,
+                "the live pool that holds the name must keep its store");
+        Assertions.assertTrue(surviving.containsKey(QUERY_SECOND),
+                "the live pool's statistics must survive the displaced pool's close: "
+                        + surviving.keySet());
+
+        run(second, QUERY_AFTER_CLOSE);
+        Assertions.assertTrue(SlowQueryReport.getPoolStats(poolName).containsKey(QUERY_AFTER_CLOSE),
+                "the live pool must keep collecting after the displaced pool closed");
+
+        second.close();
+        Assertions.assertNull(SlowQueryReport.getPoolStats(poolName),
+                "closing the pool that holds the name must release its statistics");
+    }
+
+    @Test
     void aPoolStartedUnderAFreedNameCollectsIntoAFreshStore() throws Exception {
         String poolName = "reuse-" + System.nanoTime();
         DataSource first = reportedPoolNamed(poolName);
