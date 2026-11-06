@@ -1735,6 +1735,9 @@
       <update>
         Update JaCoCo to 0.8.16. (markt)
       </update>
+      <update>
+        Update JSign to 7.6. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
