@@ -40,7 +40,7 @@ import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
  */
 class TestPooledConnectionHandleLeak extends JdbcPoolBaseTest {
 
-    private static abstract class FailingHandle {
+    private abstract static class FailingHandle {
 
         int closeAttempts;
         boolean closed;
@@ -100,7 +100,7 @@ class TestPooledConnectionHandleLeak extends JdbcPoolBaseTest {
 
         private final XAConnection connection;
 
-        public FailingXaDataSource(XAConnection connection) {
+        FailingXaDataSource(XAConnection connection) {
             this.connection = connection;
         }
 
@@ -177,7 +177,7 @@ class TestPooledConnectionHandleLeak extends JdbcPoolBaseTest {
 
         private final javax.sql.PooledConnection connection;
 
-        public FailingConnectionPoolDataSource(javax.sql.PooledConnection connection) {
+        FailingConnectionPoolDataSource(javax.sql.PooledConnection connection) {
             this.connection = connection;
         }
 

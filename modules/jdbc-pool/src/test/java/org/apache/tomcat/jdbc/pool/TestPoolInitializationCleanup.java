@@ -90,7 +90,7 @@ class TestPoolInitializationCleanup extends JdbcPoolBaseTest {
      */
     public static class CleanerFailingPool extends ConnectionPool {
 
-        public CleanerFailingPool(PoolConfiguration properties) throws SQLException {
+        CleanerFailingPool(PoolConfiguration properties) throws SQLException {
             super(properties);
         }
 
