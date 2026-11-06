@@ -264,10 +264,7 @@ public class NamingContext implements Context {
             return new NamingContextEnumeration(entries.iterator());
         }
 
-        NamingEntry entry;
-        synchronized (bindings) {
-            entry = bindings.get(name.get(0));
-        }
+        NamingEntry entry = getEntry(name.get(0));
 
         if (entry == null) {
             throw new NameNotFoundException(sm.getString("namingContext.nameNotBound", name, name.get(0)));
@@ -300,10 +297,7 @@ public class NamingContext implements Context {
             return new NamingContextBindingsEnumeration(entries.iterator(), this);
         }
 
-        NamingEntry entry;
-        synchronized (bindings) {
-            entry = bindings.get(name.get(0));
-        }
+        NamingEntry entry = getEntry(name.get(0));
 
         if (entry == null) {
             throw new NameNotFoundException(sm.getString("namingContext.nameNotBound", name, name.get(0)));
@@ -336,10 +330,7 @@ public class NamingContext implements Context {
             throw new NamingException(sm.getString("namingContext.invalidName"));
         }
 
-        NamingEntry entry;
-        synchronized (bindings) {
-            entry = bindings.get(name.get(0));
-        }
+        NamingEntry entry = getEntry(name.get(0));
 
         if (entry == null) {
             throw new NameNotFoundException(sm.getString("namingContext.nameNotBound", name, name.get(0)));
@@ -414,10 +405,7 @@ public class NamingContext implements Context {
             return nameParser;
         }
 
-        NamingEntry entry;
-        synchronized (bindings) {
-            entry = bindings.get(name.get(0));
-        }
+        NamingEntry entry = getEntry(name.get(0));
         if (entry == null) {
             throw new NameNotFoundException(sm.getString("namingContext.nameNotBound", name, name.get(0)));
         }
@@ -526,10 +514,7 @@ public class NamingContext implements Context {
             return new NamingContext(env, this.name, bindings);
         }
 
-        NamingEntry entry;
-        synchronized (bindings) {
-            entry = bindings.get(name.get(0));
-        }
+        NamingEntry entry = getEntry(name.get(0));
 
         if (entry == null) {
             throw new NameNotFoundException(sm.getString("namingContext.nameNotBound", name, name.get(0)));
@@ -640,10 +625,7 @@ public class NamingContext implements Context {
             throw new NamingException(sm.getString("namingContext.invalidName"));
         }
 
-        NamingEntry entry;
-        synchronized (bindings) {
-            entry = bindings.get(name.get(0));
-        }
+        NamingEntry entry = getEntry(name.get(0));
 
         if (name.size() > 1) {
             if (entry == null) {
@@ -678,12 +660,32 @@ public class NamingContext implements Context {
                     }
                     case null, default -> entry = new NamingEntry(name.get(0), toBind, NamingEntry.ENTRY);
                 }
+                // The check above only avoids needless work. The authoritative check is made together with the
+                // update, so two threads binding the same name cannot both succeed.
                 synchronized (bindings) {
+                    if (!rebind && bindings.containsKey(name.get(0))) {
+                        throw new NameAlreadyBoundException(sm.getString("namingContext.alreadyBound", name.get(0)));
+                    }
                     bindings.put(name.get(0), entry);
                 }
             }
         }
 
+    }
+
+
+    /**
+     * Obtain the entry bound to the given name in this context. The lookup is made under the lock of the bindings, as
+     * required for every access to them. Callers use the result outside of the lock.
+     *
+     * @param name The name of the binding, relative to this context
+     *
+     * @return the entry or <code>null</code> if there is no such binding
+     */
+    private NamingEntry getEntry(String name) {
+        synchronized (bindings) {
+            return bindings.get(name);
+        }
     }
 
 

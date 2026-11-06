@@ -26,18 +26,6 @@ import org.apache.jasper.tagplugins.jstl.Util;
 public class Import implements TagPlugin {
 
     /**
-     * Key of the plugin attribute through which a URL tag shares its working
-     * URL with the {@link Param} tags in its body. The value is the name of
-     * the generated local variable that holds the URL and to which the
-     * parameters are appended. Sharing the variable rather than a page scope
-     * attribute with a fixed name makes the protocol re-entrant: a nested URL
-     * tag in the body cannot overwrite or remove the outer tag's URL. The
-     * Param plugin walks up the parent context chain, so a parameter nested
-     * in an intermediate tag finds the closest URL tag ancestor.
-     */
-    static final String URL_VARIABLE_ATTRIBUTE = "urlVariable";
-
-    /**
      * Creates a new instance of the Import tag plugin.
      */
     public Import() {
@@ -295,14 +283,8 @@ public class Import implements TagPlugin {
         // if the varReader is not specified
         else {
 
-            // Share the working URL with the <c:param> tags in the body by
-            // handing them the name of the local variable that holds it.
-            // Appending to the variable directly is re-entrant: a nested URL
-            // tag in the body of this tag must not be able to overwrite or
-            // remove it, which a page scope attribute with a fixed name
-            // would allow.
-            ctxt.setPluginAttribute(URL_VARIABLE_ATTRIBUTE, urlName);
-            ctxt.generateBody();
+            // add params
+            UrlParameters.generateBody(ctxt, urlName);
 
             String strScope = "page";
             if (hasScope) {
