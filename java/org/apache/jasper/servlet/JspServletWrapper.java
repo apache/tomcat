@@ -86,6 +86,8 @@ public class JspServletWrapper {
     private volatile long servletClassLastModifiedTime;
     private long lastModificationTest = 0L;
     private long lastUsageTime = System.currentTimeMillis();
+    // Background unload cycle last observed by this wrapper's queue entry.
+    private long lastJspQueueUpdate;
     private FastRemovalDequeue<JspServletWrapper>.Entry unloadHandle;
     private final boolean unloadAllowed;
     private final boolean unloadByCount;
@@ -480,13 +482,15 @@ public class JspServletWrapper {
             if (unloadAllowed) {
                 synchronized (this) {
                     if (unloadByCount) {
+                        long jspQueueUpdate = ctxt.getRuntimeContext().getLastJspQueueUpdate();
                         if (unloadHandle == null) {
                             unloadHandle = ctxt.getRuntimeContext().push(this);
-                        } else if (lastUsageTime < ctxt.getRuntimeContext().getLastJspQueueUpdate()) {
+                        } else if (lastJspQueueUpdate != jspQueueUpdate) {
                             // Limit queue re-ordering to a single move per
                             // background checkUnload() cycle.
                             ctxt.getRuntimeContext().makeYoungest(unloadHandle);
                         }
+                        lastJspQueueUpdate = jspQueueUpdate;
                     }
                     // Always record the usage time, so an actively used JSP is
                     // never seen as idle by checkUnload(), independent of how
