@@ -55,6 +55,9 @@ public class TestDefaultServletPut extends TomcatBaseTest {
                 "Content-Range: bytes 0-" + (PATCH_LEN-1) + "/" + START_LEN + CRLF, Boolean.TRUE, END_TEXT, Boolean.TRUE });
         parameterSets.add(new Object[] {
                 "Content-Range: ByTeS 0-" + (PATCH_LEN-1) + "/" + START_LEN + CRLF, Boolean.TRUE, END_TEXT, Boolean.TRUE });
+        // Valid partial PUT, complete length unknown (RFC 9110, section 14.4)
+        parameterSets.add(new Object[] {
+                "Content-Range: bytes 0-" + (PATCH_LEN-1) + "/*" + CRLF, Boolean.TRUE, END_TEXT, Boolean.TRUE });
         // Full PUT
         parameterSets.add(new Object[] {
                 "", null, PATCH_TEXT, Boolean.TRUE });
