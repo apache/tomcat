@@ -74,6 +74,20 @@ class Util {
 
     private static final ExpressionFactoryCache factoryCache = new ExpressionFactoryCache();
 
+    /*
+     * Class.getMethods() returns a new copy of every public method each time it is called. A ClassValue rather than a
+     * Map is used to cache the result so that the cache does not prevent a class, and its class loader, from being
+     * garbage collected. The arrays are shared so they must not be modified.
+     *
+     * This cache is duplicated in org.apache.el.util.ReflectionUtil. When making changes keep the code in sync.
+     */
+    private static final ClassValue<Method[]> publicMethodsCache = new ClassValue<>() {
+        @Override
+        protected Method[] computeValue(Class<?> type) {
+            return type.getMethods();
+        }
+    };
+
     /**
      * Provides a per class loader cache of ExpressionFactory instances without pinning any in memory as that could
      * trigger a memory leak.
@@ -111,7 +125,7 @@ class Util {
             }
         }
 
-        Method[] methods = clazz.getMethods();
+        Method[] methods = publicMethodsCache.get(clazz);
 
         List<Wrapper<Method>> wrappers = Wrapper.wrap(methods, methodName);
 
