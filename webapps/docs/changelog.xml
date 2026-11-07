@@ -1145,6 +1145,11 @@
         configured address, while the unresolvable host was advertised to the
         other cluster members. (remm)
       </fix>
+      <docs>
+        Add documentation for multicast, static and cloud membership in Apache
+        Tribes, including failure detection, security and troubleshooting
+        guidance. (sainadh777)
+      </docs>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
