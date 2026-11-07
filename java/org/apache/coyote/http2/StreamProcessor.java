@@ -227,6 +227,11 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
         // Add the pseudo header for status
         headers.addValue(":status").setString(Integer.toString(statusCode));
 
+        // RFC 9113, section 8.2.2: HTTP/2 messages must not contain connection-specific header fields. The application
+        // may have set them, or copied them from an HTTP/1.x response.
+        for (String name : Constants.CONNECTION_SPECIFIC_HEADERS) {
+            headers.removeHeader(name);
+        }
 
         // Compression can't be used with sendfile
         // Need to check for compression (and set headers appropriately) before

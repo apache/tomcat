@@ -21,9 +21,7 @@ import java.io.StringReader;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -70,19 +68,11 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
     private static final Integer HTTP_UPGRADE_STREAM = Integer.valueOf(1);
 
-    private static final Set<String> HTTP_CONNECTION_SPECIFIC_HEADERS = new HashSet<>();
-
     static {
         Response response = new Response();
         response.setStatus(100);
         StreamProcessor.prepareHeaders(null, response, true, null, null);
         ACK_HEADERS = response.getMimeHeaders();
-
-        HTTP_CONNECTION_SPECIFIC_HEADERS.add("connection");
-        HTTP_CONNECTION_SPECIFIC_HEADERS.add("proxy-connection");
-        HTTP_CONNECTION_SPECIFIC_HEADERS.add("keep-alive");
-        HTTP_CONNECTION_SPECIFIC_HEADERS.add("transfer-encoding");
-        HTTP_CONNECTION_SPECIFIC_HEADERS.add("upgrade");
     }
 
     private volatile long contentLengthReceived = 0;
@@ -385,7 +375,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         }
 
 
-        if (HTTP_CONNECTION_SPECIFIC_HEADERS.contains(name)) {
+        if (Constants.CONNECTION_SPECIFIC_HEADERS.contains(name)) {
             headerException = new StreamException(
                     sm.getString("stream.header.connection", getConnectionId(), getIdAsString(), name),
                     Http2Error.PROTOCOL_ERROR, getIdAsInt());
