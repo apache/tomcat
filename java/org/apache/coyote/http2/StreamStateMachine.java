@@ -136,6 +136,11 @@ class StreamStateMachine {
     }
 
 
+    final synchronized boolean canReset() {
+        return state.canReset();
+    }
+
+
     final synchronized boolean isActive() {
         return state.isActive();
     }
