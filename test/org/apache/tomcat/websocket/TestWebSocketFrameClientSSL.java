@@ -218,8 +218,9 @@ public class TestWebSocketFrameClientSSL extends WebSocketBaseTest {
             Assert.fail("There are [" + openConnectionCount + "] connections still open");
         }
 
-        // Close the client session.
-        wsSession.close();
+        // Cast so we can force the session to be closed quickly.
+        CloseReason cr = new CloseReason(CloseCodes.CLOSED_ABNORMALLY, "");
+        ((WsSession) wsSession).doClose(cr, cr, true);
     }
 
 
