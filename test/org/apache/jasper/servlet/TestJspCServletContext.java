@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.JarURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -28,6 +29,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 
 import javax.servlet.descriptor.JspConfigDescriptor;
@@ -219,7 +221,12 @@ public class TestJspCServletContext {
 
             URL url = context.getResource("/my file.jsp");
             Assert.assertNotNull(url);
-            try (InputStream is = url.openStream(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            // The JarURLConnection caches the JarFile. Close it once finished else, on Windows, the open file prevents
+            // the JAR being deleted during clean-up.
+            JarURLConnection connection = (JarURLConnection) url.openConnection();
+            try (JarFile jarFile = connection.getJarFile(); InputStream is = connection.getInputStream();
+                    ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+                Assert.assertNotNull(jarFile);
                 int read;
                 byte[] buf = new byte[1024];
                 while ((read = is.read(buf)) >= 0) {
