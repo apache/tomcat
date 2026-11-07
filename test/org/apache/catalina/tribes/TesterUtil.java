@@ -18,7 +18,6 @@ package org.apache.catalina.tribes;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
@@ -39,12 +38,13 @@ public class TesterUtil {
 
 
     /*
-     * Returns a UDP port that was free on the loopback interface when it was checked. Only for ports, such as a
+     * Returns a UDP port that was free on the wildcard address (the address McastService binds to) when it was
+     * checked. Only for ports, such as a
      * multicast group port, that cannot be left to the operating system because every member needs to know it in
      * advance. There is a small window in which another process may take the port before the caller binds it.
      */
     public static int getFreeUdpPort() throws IOException {
-        try (DatagramSocket socket = new DatagramSocket(0, InetAddress.getLoopbackAddress())) {
+        try (MulticastSocket socket = new MulticastSocket(0)) {
             return socket.getLocalPort();
         }
     }
