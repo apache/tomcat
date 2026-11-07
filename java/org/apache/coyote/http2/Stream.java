@@ -985,6 +985,11 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     }
 
 
+    boolean canReset() {
+        return state.canReset();
+    }
+
+
     StreamException getResetException() {
         return streamOutputBuffer.reset;
     }
