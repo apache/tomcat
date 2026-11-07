@@ -16,6 +16,7 @@
  */
 package org.apache.coyote.http2;
 
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
 import org.junit.Assert;
@@ -48,12 +49,20 @@ public class TestHttp2Section_6_5 extends Http2TestBase {
         readSimpleGetResponse();
         output.clearTrace();
 
-        // Unsolicited, empty SETTINGS ACK frames
-        for (int i = 0; i < 100; i++) {
-            sendSettings(0, true);
-        }
+        /*
+         * Unsolicited, empty SETTINGS ACK frames. The server may close the connection before all of the frames (or the
+         * following GET request) have been written so a write failure is not an error. The GOAWAY check below is what
+         * determines the test result.
+         */
+        try {
+            for (int i = 0; i < 100; i++) {
+                sendSettings(0, true);
+            }
 
-        sendSimpleGetRequest(5);
+            sendSimpleGetRequest(5);
+        } catch (SocketException se) {
+            // Expected if the server closed the connection early
+        }
 
         /*
          * Expect the server to close the connection with ENHANCE_YOUR_CALM. The response to the second GET request may
