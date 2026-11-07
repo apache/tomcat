@@ -22,6 +22,7 @@ import java.nio.channels.AsynchronousByteChannel;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.CompletionHandler;
+import java.nio.channels.NotYetConnectedException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -77,7 +78,28 @@ public class Nio2Channel implements AsynchronousByteChannel {
      */
     @Override
     public void close() throws IOException {
-        sc.close();
+        closeChannel();
+    }
+
+
+    /**
+     * Close the underlying channel, sending a FIN to the client before the channel is closed. On some platforms
+     * (Windows) closing an asynchronous channel with a read pending aborts the connection (the client sees a reset
+     * rather than the end of the stream) and any data not yet read by the client may be lost. Shutting down output first
+     * ensures that the client sees a graceful close.
+     *
+     * @throws IOException If an I/O error occurs
+     */
+    protected void closeChannel() throws IOException {
+        try {
+            if (sc.isOpen()) {
+                sc.shutdownOutput();
+            }
+        } catch (IOException | NotYetConnectedException ignore) {
+            // Ignore. The channel is about to be closed and the graceful close is on a best efforts basis.
+        } finally {
+            sc.close();
+        }
     }
 
 

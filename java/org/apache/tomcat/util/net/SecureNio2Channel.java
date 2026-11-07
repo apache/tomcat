@@ -720,7 +720,7 @@ public class SecureNio2Channel extends Nio2Channel {
         } finally {
             if (force || closed) {
                 closed = true;
-                sc.close();
+                closeChannel();
             }
         }
     }

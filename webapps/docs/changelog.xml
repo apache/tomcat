@@ -583,6 +583,12 @@
         When validating HTTP/2 frames, make sure more serious errors take
         priority over less serious errors. (markt)
       </fix>
+      <fix>
+        Ensure that NIO2 connections are closed gracefully. On Windows, closing
+        an NIO2 connection with a read pending previously aborted the
+        connection, so the client saw a connection reset rather than the end of
+        the stream and could lose response data it had not yet read. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
