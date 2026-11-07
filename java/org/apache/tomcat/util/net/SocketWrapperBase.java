@@ -1699,14 +1699,22 @@ public abstract class SocketWrapperBase<E> {
                             timeoutMillis = (timeoutExpiry - System.nanoTime()) / 1_000_000;
                         }
                         if (state.state == CompletionState.PENDING) {
-                            if (handler != null && state.callHandler.compareAndSet(true, false)) {
-                                handler.failed(new SocketTimeoutException(getTimeoutMsg(read)), attachment);
+                            if (handler != null) {
+                                if (state.callHandler.compareAndSet(true, false)) {
+                                    handler.failed(new SocketTimeoutException(getTimeoutMsg(read)), attachment);
+                                } else {
+                                    awaitHandlerCompletion(state);
+                                }
                             }
                             return CompletionState.ERROR;
                         }
                     } catch (InterruptedException e) {
-                        if (handler != null && state.callHandler.compareAndSet(true, false)) {
-                            handler.failed(new SocketTimeoutException(getTimeoutMsg(read)), attachment);
+                        if (handler != null) {
+                            if (state.callHandler.compareAndSet(true, false)) {
+                                handler.failed(new SocketTimeoutException(getTimeoutMsg(read)), attachment);
+                            } else {
+                                awaitHandlerCompletion(state);
+                            }
                         }
                         return CompletionState.ERROR;
                     }
@@ -1714,6 +1722,26 @@ public abstract class SocketWrapperBase<E> {
             }
         }
         return state.state;
+    }
+
+
+    /**
+     * The completion thread has claimed the right to call the handler but has not yet finished doing so. Wait for it to
+     * finish (it updates the state and notifies once the handler has returned) so that the caller does not return
+     * before the handler has been called. The caller must hold the monitor for the state.
+     */
+    private void awaitHandlerCompletion(OperationState<?> state) {
+        boolean interrupted = false;
+        while (state.state == CompletionState.PENDING) {
+            try {
+                state.wait();
+            } catch (InterruptedException e) {
+                interrupted = true;
+            }
+        }
+        if (interrupted) {
+            Thread.currentThread().interrupt();
+        }
     }
 
 
