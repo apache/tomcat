@@ -17,6 +17,8 @@
 package org.apache.tomcat.util.net;
 
 import java.io.File;
+import java.net.Inet6Address;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -305,7 +307,19 @@ public class TestPQC extends TomcatBaseTest {
         cmd.add(openSSLPath);
         cmd.add("s_client");
         cmd.add("-connect");
-        cmd.add("localhost:" + getPort());
+        /*
+         * Connect using the address the connector is listening on rather than "localhost". If "localhost" resolves
+         * to multiple addresses, s_client may try one the connector isn't listening on first and, on some platforms
+         * (e.g. Windows), a refused connection takes ~2s.
+         */
+        InetAddress address = InetAddress.getByName("localhost");
+        String host = address.getHostAddress();
+        if (address instanceof Inet6Address) {
+            host = "[" + host + "]";
+        }
+        cmd.add(host + ":" + getPort());
+        cmd.add("-servername");
+        cmd.add("localhost");
         cmd.add("-CAfile");
         cmd.add(caFile);
         cmd.add("-tls1_3");
