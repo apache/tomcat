@@ -39,6 +39,7 @@ public class TestMcastService {
      * between finding a free port and the service binding it in which something else may take it. If that happens,
      * pick another port and try again.
      */
+    @SuppressWarnings("null")
     private static McastService startService(Properties props) throws Exception {
         BindException lastFailure = null;
         for (int attempt = 0; attempt < MAX_START_ATTEMPTS; attempt++) {
