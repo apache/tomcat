@@ -37,7 +37,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Session;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.concurrent.KeyedReentrantReadWriteLock;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -71,8 +71,6 @@ public final class FileStore extends StoreBase {
      * A File representing the directory in which Sessions are stored.
      */
     private File directoryFile = null;
-
-    private KeyedReentrantReadWriteLock sessionLocksById = new KeyedReentrantReadWriteLock();
 
     /**
      * Name to register for this Store, used for logging.
@@ -210,7 +208,7 @@ public final class FileStore extends StoreBase {
 
         ClassLoader oldThreadContextCL = context.bind(null);
         try {
-            Lock readLock = sessionLocksById.getLock(id).readLock();
+            Lock readLock = getSessionStoreLock(id).readLock();
             readLock.lock();
             try {
                 if (!file.exists()) {
@@ -248,7 +246,7 @@ public final class FileStore extends StoreBase {
                     .trace(sm.getString(getStoreName() + ".removing", id, file.getAbsolutePath()));
         }
 
-        Lock writeLock = sessionLocksById.getLock(id).writeLock();
+        Lock writeLock = getSessionStoreLock(id).writeLock();
         writeLock.lock();
         try {
             if (file.exists() && !file.delete()) {
@@ -263,29 +261,57 @@ public final class FileStore extends StoreBase {
     @Override
     public void save(Session session) throws IOException {
         // Open an output stream to the specified pathname, if any
-        File file = file(session.getIdInternal());
+        String sessionId = session.getIdInternal();
+        File file = file(sessionId);
         if (file == null) {
             return;
         }
         if (manager.getContext().getLogger().isTraceEnabled()) {
             manager.getContext().getLogger()
-                    .trace(sm.getString(getStoreName() + ".saving", session.getIdInternal(), file.getAbsolutePath()));
+                    .trace(sm.getString(getStoreName() + ".saving", sessionId, file.getAbsolutePath()));
         }
 
         File tempFile = new File(file.getAbsolutePath() + ".tmp");
 
-        Lock writeLock = sessionLocksById.getLock(session.getIdInternal()).writeLock();
+        Lock writeLock = getSessionStoreLock(sessionId).writeLock();
         writeLock.lock();
         try {
+            if (!sessionId.equals(session.getIdInternal())) {
+                throw new IOException(sm.getString("store.inconsistentSessionID", sessionId, session.getIdInternal()));
+            }
             try (FileOutputStream fos = new FileOutputStream(tempFile);
                     ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(fos))) {
                 ((StandardSession) session).writeObjectData(oos);
             }
-            try {
-                Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING,
-                        StandardCopyOption.ATOMIC_MOVE);
-            } catch (AtomicMoveNotSupportedException e) {
-                Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            /*
+             * Failures have been observed with the move when under load in testing. The re-try mechanism is an attempt
+             * to mitigate against those failures.
+             */
+            int attempts = 0;
+            int maxAttempts = 2;
+            while (attempts < maxAttempts) {
+                attempts++;
+                try {
+                    try {
+                        Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING,
+                                StandardCopyOption.ATOMIC_MOVE);
+                    } catch (AtomicMoveNotSupportedException e) {
+                        Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    }
+                    break;
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                    if (attempts < maxAttempts) {
+                        // Brief delay before re-try
+                        try {
+                            Thread.sleep(50);
+                        } catch (InterruptedException e) {
+                            // Ignore. The delay will just be shorter than expected.
+                        }
+                    } else {
+                        throw t;
+                    }
+                }
             }
         } finally {
             try {
@@ -303,7 +329,7 @@ public final class FileStore extends StoreBase {
 
     /**
      * Return a File object representing the pathname to our session persistence directory, if any. The directory will
-     * be created if it does not already exist.
+     * be created if it does not already exist. If a non-directory file exists at the pathname, it is deleted first.
      */
     private synchronized File directory() throws IOException {
         // Synchronised to avoid concurrent attempts to create the directory.

@@ -37,7 +37,7 @@ public interface InstanceManager {
      *         an interface, an array class, a primitive type, or void
      * @throws IllegalArgumentException if this method is invoked with illegal arguments
      * @throws NoSuchMethodException if the nullary method cannot be found
-     * @throws SecurityException if a security manager, s, is present
+     * @throws SecurityException if a security manager is present
      */
     Object newInstance(Class<?> clazz) throws IllegalAccessException, InvocationTargetException, NamingException,
             InstantiationException, IllegalArgumentException, NoSuchMethodException, SecurityException;
@@ -55,7 +55,7 @@ public interface InstanceManager {
      * @throws ClassNotFoundException if the class cannot be found
      * @throws IllegalArgumentException if this method is invoked with illegal arguments
      * @throws NoSuchMethodException if the nullary method cannot be found
-     * @throws SecurityException if a security manager, s, is present
+     * @throws SecurityException if a security manager is present
      */
     Object newInstance(String className)
             throws IllegalAccessException, InvocationTargetException, NamingException, InstantiationException,
@@ -75,7 +75,7 @@ public interface InstanceManager {
      * @throws ClassNotFoundException if the class cannot be found
      * @throws IllegalArgumentException if this method is invoked with illegal arguments
      * @throws NoSuchMethodException if the nullary method cannot be found
-     * @throws SecurityException if a security manager, s, is present
+     * @throws SecurityException if a security manager is present
      */
     Object newInstance(String fqcn, ClassLoader classLoader)
             throws IllegalAccessException, InvocationTargetException, NamingException, InstantiationException,
@@ -85,8 +85,8 @@ public interface InstanceManager {
      * Perform dependency injection on the given object.
      *
      * @param o The object to inject dependencies into
-     * @throws IllegalAccessException if the class or its nullary constructor is not accessible
-     * @throws InvocationTargetException if the nullary constructor throws an exception
+     * @throws IllegalAccessException if the injection or lifecycle targets are not accessible
+     * @throws InvocationTargetException if the injected setter or {@code @PostConstruct} throws an exception
      * @throws NamingException if a naming exception is encountered
      */
     void newInstance(Object o) throws IllegalAccessException, InvocationTargetException, NamingException;
@@ -95,8 +95,8 @@ public interface InstanceManager {
      * Destroy the given instance, performing pre-destroy callbacks.
      *
      * @param o The object to destroy
-     * @throws IllegalAccessException if the class or its nullary constructor is not accessible
-     * @throws InvocationTargetException if the nullary constructor throws an exception
+     * @throws IllegalAccessException if the injection or lifecycle targets are not accessible
+     * @throws InvocationTargetException if {@code @PreDestroy} throws an exception
      */
     void destroyInstance(Object o) throws IllegalAccessException, InvocationTargetException;
 

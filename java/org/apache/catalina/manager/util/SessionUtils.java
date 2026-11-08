@@ -29,7 +29,7 @@ import jakarta.servlet.http.HttpSession;
 import org.apache.catalina.Session;
 
 /**
- * Utility methods on HttpSessions.
+ * Utility methods on {@link Session} and {@link HttpSession} objects.
  */
 public class SessionUtils {
 
@@ -38,7 +38,7 @@ public class SessionUtils {
     }
 
     /**
-     * The session attributes key under which the user's selected <code>java.util.Locale</code> is stored, if any.
+     * The session attribute keys under which the user's selected <code>java.util.Locale</code> is stored, if any.
      */
     // org.apache.struts.Globals.LOCALE_KEY
     private static final String STRUTS_LOCALE_KEY = "org.apache.struts.action.LOCALE";//$NON-NLS-1$
@@ -66,6 +66,9 @@ public class SessionUtils {
      * @return the locale, or {@code null} if it cannot be determined
      */
     public static Locale guessLocaleFromSession(final Session in_session) {
+        if (null == in_session) {
+            return null;
+        }
         return guessLocaleFromSession(in_session.getSession());
     }
 
@@ -134,7 +137,8 @@ public class SessionUtils {
      *
      * @param in_session The session
      *
-     * @return the user
+     * @return the user, that is the name of the session principal if the session has one, otherwise a value guessed
+     *         from the session attributes, or {@code null} if it cannot be determined
      */
     public static Object guessUserFromSession(final Session in_session) {
         if (null == in_session) {
@@ -196,13 +200,18 @@ public class SessionUtils {
 
 
     /**
-     * Returns the time in milliseconds that the session has been active.
+     * Returns the time in milliseconds between session creation and the session's last access.
      *
      * @param in_session The session
-     * @return the active time in milliseconds, or -1 if the session is invalidated
+     * @return the time in milliseconds between session creation and the last access, or -1 if the session is
+     *         invalidated or its times are unknown (proxy sessions of a cluster member)
      */
     public static long getUsedTimeForSession(Session in_session) {
         try {
+            if (in_session.getCreationTime() <= 0) {
+                // Unknown times, e.g. a proxy session of a cluster member
+                return -1;
+            }
             return in_session.getThisAccessedTime() - in_session.getCreationTime();
         } catch (IllegalStateException ise) {
             // ignore: invalidated session
@@ -214,11 +223,21 @@ public class SessionUtils {
      * Returns the remaining time-to-live for the session in milliseconds.
      *
      * @param in_session The session
-     * @return the remaining TTL in milliseconds, or -1 if the session is invalidated
+     * @return the remaining TTL in milliseconds, {@link Long#MAX_VALUE} if the session never times out, or -1 if the
+     *         session is invalidated or its times are unknown (proxy sessions of a cluster member)
      */
     public static long getTTLForSession(Session in_session) {
         try {
-            return 1000L * in_session.getMaxInactiveInterval() -
+            if (in_session.getCreationTime() <= 0) {
+                // Unknown times, e.g. a proxy session of a cluster member
+                return -1;
+            }
+            int maxInactiveInterval = in_session.getMaxInactiveInterval();
+            if (maxInactiveInterval <= 0) {
+                // A non-positive interval means the session never times out
+                return Long.MAX_VALUE;
+            }
+            return 1000L * maxInactiveInterval -
                     (System.currentTimeMillis() - in_session.getThisAccessedTime());
         } catch (IllegalStateException ise) {
             // ignore: invalidated session
@@ -230,10 +249,15 @@ public class SessionUtils {
      * Returns the time in milliseconds since the session was last accessed.
      *
      * @param in_session The session
-     * @return the inactive time in milliseconds, or -1 if the session is invalidated
+     * @return the inactive time in milliseconds, or -1 if the session is invalidated or its times are unknown (proxy
+     *         sessions of a cluster member)
      */
     public static long getInactiveTimeForSession(Session in_session) {
         try {
+            if (in_session.getCreationTime() <= 0) {
+                // Unknown times, e.g. a proxy session of a cluster member
+                return -1;
+            }
             return System.currentTimeMillis() - in_session.getThisAccessedTime();
         } catch (IllegalStateException ise) {
             // ignore: invalidated session

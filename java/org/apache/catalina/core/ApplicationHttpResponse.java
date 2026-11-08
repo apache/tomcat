@@ -25,10 +25,9 @@ import jakarta.servlet.http.HttpServletResponseWrapper;
 
 
 /**
- * Wrapper around a <code>jakarta.servlet.http.HttpServletResponse</code> that transforms an application response object
- * (which might be the original one passed to a servlet, or might be based on the 2.3
- * <code>jakarta.servlet.http.HttpServletResponseWrapper</code> class) back into an internal
- * <code>org.apache.catalina.connector.Response</code>.
+ * Wrapper around a <code>jakarta.servlet.http.HttpServletResponse</code> that is used by the
+ * <code>RequestDispatcher</code> implementation to suppress the response operations that are not permitted on an
+ * included response (e.g. changing the status code, headers or content length).
  * <p>
  * <strong>WARNING</strong>: Due to Java's lack of support for multiple inheritance, all of the logic in
  * <code>ApplicationResponse</code> is duplicated in <code>ApplicationHttpResponse</code>. Make sure that you keep these

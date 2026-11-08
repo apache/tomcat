@@ -55,7 +55,7 @@ public class TestClientReadTimeout extends TomcatBaseTest {
         ((StandardHost) tomcat.getHost()).setErrorReportValveClass(null);
 
         Tomcat.addServlet(ctx, "TestServlet", new SyncServlet());
-        ctx.addServletMappingDecoded("/*", "TestServlet");
+        ctx.addServletMapping("/*", "TestServlet");
 
         tomcat.start();
 

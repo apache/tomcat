@@ -21,6 +21,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
@@ -128,6 +129,10 @@ public abstract class AbstractEndpoint<S, U> {
              * The connection has been upgraded.
              */
             UPGRADED,
+            /**
+             * The connection has been closed for reads from the client but writes to the client may continue.
+             */
+            UPGRADED_HALF_CLOSED,
             /**
              * Asynchronous I/O is in progress.
              */
@@ -498,7 +503,12 @@ public abstract class AbstractEndpoint<S, U> {
         // internally because they are used as keys in a ConcurrentMap where
         // keys are compared in a case-sensitive manner.
         String hostNameLower = hostName.toLowerCase(Locale.ENGLISH);
-        if (hostNameLower.equals(getDefaultSSLHostConfigName())) {
+        // The default host configuration is the fallback for handshakes
+        // without a matching SNI name, so it cannot be removed while the
+        // endpoint is still serving TLS. Once TLS is switched off (for
+        // example to remove the last remaining host configuration) the
+        // guard no longer applies.
+        if (isSSLEnabled() && hostNameLower.equals(getDefaultSSLHostConfigName())) {
             throw new IllegalArgumentException(sm.getString("endpoint.removeDefaultSslHostConfig", hostName));
         }
         SSLHostConfig sslHostConfig = sslHostConfigs.remove(hostNameLower);
@@ -592,7 +602,9 @@ public abstract class AbstractEndpoint<S, U> {
                 certificate.setSslContextGenerated(sslContext);
             }
 
-            logCertificate(certificate);
+            if (!sslHostConfig.isPreSharedKeyOnly()) {
+                logCertificate(certificate);
+            }
         }
 
     }
@@ -605,6 +617,7 @@ public abstract class AbstractEndpoint<S, U> {
      */
     protected void logCertificate(SSLHostConfigCertificate certificate) {
         SSLHostConfig sslHostConfig = certificate.getSSLHostConfig();
+        SSLContext sslContext = certificate.getSslContext();
 
         String certificateInfo;
 
@@ -614,10 +627,7 @@ public abstract class AbstractEndpoint<S, U> {
                     certificate.getCertificateFile(), certificate.getCertificateChainFile());
         } else {
             // Keystore based
-            String keyAlias = certificate.getCertificateKeyAlias();
-            if (keyAlias == null) {
-                keyAlias = SSLUtilBase.DEFAULT_KEY_ALIAS;
-            }
+            String keyAlias = certificate.getCertificateKeyAliasOrDefault();
             String keystoreFile;
             if (certificate.getCertificateKeystoreInternal() != null) {
                 // Keystore was set directly. Original location is unknown.
@@ -639,16 +649,24 @@ public abstract class AbstractEndpoint<S, U> {
         getLogCertificate().info(sm.getString("endpoint.tls.info", getName(), sslHostConfig.getHostName(),
                 certificate.getType(), certificateInfo, trustStoreSource));
 
-        if (getLogCertificate().isDebugEnabled()) {
-            String alias = certificate.getCertificateKeyAlias();
-            if (alias == null) {
-                alias = SSLUtilBase.DEFAULT_KEY_ALIAS;
+        if (sslContext != null) {
+            String servedAlias = sslContext.getServedAlias(certificate);
+
+            // Only a SunMSCAPI Windows-MY numbered duplicate ("alias (1)" etc., see SSLUtilBase) replaces a configured
+            // alias. Report it so the alias logged above is not mistaken for the one in use.
+            String configuredAlias = certificate.getCertificateKeyAlias();
+            if (configuredAlias != null && servedAlias.startsWith(configuredAlias + " (")) {
+                getLogCertificate()
+                        .info(sm.getString("endpoint.tls.info.cert.aliasResolved", configuredAlias, servedAlias));
             }
-            X509Certificate[] x509Certificates = certificate.getSslContext().getCertificateChain(alias);
-            if (x509Certificates != null && x509Certificates.length > 0) {
-                getLogCertificate().debug(generateCertificateDebug(x509Certificates[0]));
-            } else {
-                getLogCertificate().debug(sm.getString("endpoint.tls.cert.noCerts"));
+
+            if (getLogCertificate().isDebugEnabled()) {
+                X509Certificate[] x509Certificates = sslContext.getCertificateChain(servedAlias);
+                if (x509Certificates != null && x509Certificates.length > 0) {
+                    getLogCertificate().debug(generateCertificateDebug(x509Certificates[0]));
+                } else {
+                    getLogCertificate().debug(sm.getString("endpoint.tls.cert.noCerts"));
+                }
             }
         }
     }
@@ -821,11 +839,15 @@ public abstract class AbstractEndpoint<S, U> {
 
 
     /**
-     * Initialise the SSL configuration.
+     * Initialize the SSL implementation and (re-)create the SSL context
+     * of every SSL host configuration. Called from {@code bind()} but
+     * also made available to components that switch an already bound,
+     * running endpoint to TLS after the initial bind (which is when the
+     * SSL implementation and contexts are validated and created).
      *
      * @throws Exception If an error occurs while initializing SSL
      */
-    protected void initialiseSsl() throws Exception {
+    public void initialiseSsl() throws Exception {
         if (isSSLEnabled()) {
             sslImplementation = SSLImplementation.getInstance(getSslImplementationName());
 
@@ -925,6 +947,9 @@ public abstract class AbstractEndpoint<S, U> {
      *    protocol host name uses the default SSLHostConfig configuration, and false otherwise
      */
     public boolean checkSni(String sniHostName, String protocolHostName) {
+        if (protocolHostName != null && protocolHostName.endsWith(".")) {
+            protocolHostName = protocolHostName.substring(0, protocolHostName.length() - 1);
+        }
         return (!strictSni || !isSSLEnabled()
                 || (sniHostName != null && sniHostName.equalsIgnoreCase(protocolHostName))
                 || getSSLHostConfig(sniHostName) == getSSLHostConfig(
@@ -1108,9 +1133,19 @@ public abstract class AbstractEndpoint<S, U> {
 
 
     /**
-     * External Executor based thread pool for utility tasks.
+     * External Executor based thread pool for utility tasks. Lazily created
+     * when none was set. The race between concurrent creators is benign: the
+     * executor is only requested from the protocol lifecycle and the
+     * scheduled async-timeout task, both serialised per endpoint, and a
+     * duplicated pool would at worst replicate the pre-existing behaviour.
      */
-    private ScheduledExecutorService utilityExecutor = null;
+    private volatile ScheduledExecutorService utilityExecutor = null;
+
+    /**
+     * The utility executor created by this endpoint, if any. It is tracked so
+     * that it can be shut down when the endpoint is destroyed.
+     */
+    private volatile ScheduledExecutorService createdUtilityExecutor = null;
 
     /**
      * Set the utility executor.
@@ -1122,16 +1157,19 @@ public abstract class AbstractEndpoint<S, U> {
     }
 
     /**
-     * Get the utility executor.
+     * Get the utility executor, creating one if none has been set.
      *
      * @return The utility executor
      */
     public ScheduledExecutorService getUtilityExecutor() {
-        if (utilityExecutor == null) {
+        ScheduledExecutorService result = utilityExecutor;
+        if (result == null) {
             getLog().warn(sm.getString("endpoint.warn.noUtilityExecutor"));
-            utilityExecutor = new ScheduledThreadPoolExecutor(1);
+            result = new ScheduledThreadPoolExecutor(1);
+            utilityExecutor = result;
+            createdUtilityExecutor = result;
         }
-        return utilityExecutor;
+        return result;
     }
 
 
@@ -1741,6 +1779,9 @@ public abstract class AbstractEndpoint<S, U> {
      * @param negotiableProtocol The protocol to add
      */
     public void addNegotiatedProtocol(String negotiableProtocol) {
+        if (negotiableProtocol.getBytes(StandardCharsets.UTF_8).length > 255) {
+            throw new IllegalArgumentException(sm.getString("abstractEndpoint.alpn.tooLong", negotiableProtocol));
+        }
         negotiableProtocols.add(negotiableProtocol);
     }
 
@@ -1896,6 +1937,15 @@ public abstract class AbstractEndpoint<S, U> {
     }
 
     /**
+     * Number of keep-alive sockets.
+     *
+     * @return the default implementation returns 0
+     */
+    public int getKeepAliveCount() {
+        return 0;
+    }
+
+    /**
      * Check if the endpoint is running.
      *
      * @return True if the endpoint is running
@@ -1954,6 +2004,12 @@ public abstract class AbstractEndpoint<S, U> {
                 }
                 TaskQueue queue = (TaskQueue) tpe.getQueue();
                 queue.setParent(null);
+            } else if (executor instanceof VirtualThreadExecutor virtualThreadExecutor) {
+                // The virtual thread executor accepts new tasks until it is shut
+                // down. Shut it down, so tasks submitted via a reference captured
+                // before this point are rejected, as they are with the thread
+                // pool executor.
+                virtualThreadExecutor.shutdownNow();
             }
         }
     }
@@ -2307,6 +2363,7 @@ public abstract class AbstractEndpoint<S, U> {
      */
     public void resume() {
         if (running) {
+            initializeConnectionLatch();
             paused = false;
         }
     }
@@ -2330,6 +2387,14 @@ public abstract class AbstractEndpoint<S, U> {
      * @throws java.lang.Exception If an error occurs while destroying the endpoint
      */
     public final void destroy() throws Exception {
+        ScheduledExecutorService created = createdUtilityExecutor;
+        if (created != null) {
+            createdUtilityExecutor = null;
+            created.shutdown();
+        }
+        // Deliberately leave utilityExecutor set: later calls to
+        // getUtilityExecutor() then return the shut-down executor instead of
+        // creating a new pool that would never be destroyed
         if (bindState == BindState.BOUND_ON_INIT) {
             unbind();
             bindState = BindState.UNBOUND;
@@ -2518,4 +2583,3 @@ public abstract class AbstractEndpoint<S, U> {
      */
     protected abstract void destroySocket(U socket);
 }
-

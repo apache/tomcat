@@ -29,6 +29,7 @@ import org.junit.Test;
 import org.apache.tomcat.util.net.openssl.OpenSSLConf;
 import org.apache.tomcat.util.net.openssl.OpenSSLConfCmd;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
+import org.apache.tomcat.util.net.openssl.ciphers.MessageDigest;
 
 public class TestSSLHostConfig {
 
@@ -147,6 +148,102 @@ public class TestSSLHostConfig {
 
 
     @Test
+    public void testCiphersuite04() {
+        SSLHostConfig hc = new SSLHostConfig();
+        Cipher c1 = Cipher.TLS_AES_128_CCM_SHA256;
+        Cipher c2 = Cipher.TLS_AES_256_GCM_SHA384;
+
+        // JSSE format (comma separated) list of JSSE names. The result should be
+        // an OpenSSL format (colon separated) list of OpenSSL names.
+        hc.setCipherSuites(c1.getJsseNames().iterator().next() + "," +
+                c2.getJsseNames().iterator().next());
+        Assert.assertEquals(c1.getOpenSSLAlias() + ":" + c2.getOpenSSLAlias(), hc.getCipherSuites());
+    }
+
+
+    @Test
+    public void testCiphersuite05() {
+        SSLHostConfig hc = new SSLHostConfig();
+
+        // Null restores the default, as it does for setCiphers()
+        hc.setCipherSuites(Cipher.TLS_AES_128_CCM_SHA256.getOpenSSLAlias());
+        hc.setCipherSuites(null);
+        Assert.assertEquals(SSLHostConfig.DEFAULT_TLS_CIPHERS_13, hc.getCipherSuites());
+        // and the derived values must be usable
+        Assert.assertFalse(hc.getJsseCipherNames().isEmpty());
+    }
+
+
+    @Test
+    public void testCiphersNull() {
+        SSLHostConfig hc = new SSLHostConfig();
+
+        // Null restores the default
+        hc.setCiphers(Cipher.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256.getOpenSSLAlias());
+        hc.setCiphers(null);
+        Assert.assertEquals(SSLHostConfig.DEFAULT_TLS_CIPHERS_12, hc.getCiphers());
+        // and the derived values must be usable
+        Assert.assertFalse(hc.getCipherList().isEmpty());
+        Assert.assertFalse(hc.getJsseCipherNames().isEmpty());
+    }
+
+
+    @Test
+    public void testPreSharedKey() {
+        SSLHostConfig sslHostConfig = new SSLHostConfig();
+        SSLHostConfigPreSharedKey preSharedKey = new SSLHostConfigPreSharedKey(sslHostConfig);
+        Assert.assertEquals("SHA256", preSharedKey.getDigest());
+        Assert.assertEquals(MessageDigest.SHA256, preSharedKey.getDigestInternal());
+        preSharedKey.setIdentity("test");
+        preSharedKey.setKey("00010203");
+        preSharedKey.setDigest("SHA256");
+        sslHostConfig.addPreSharedKey(preSharedKey);
+
+        Assert.assertSame(sslHostConfig, preSharedKey.getSSLHostConfig());
+        Assert.assertEquals("test", preSharedKey.getIdentity());
+        Assert.assertEquals("00010203", preSharedKey.getKey());
+        Assert.assertArrayEquals(new byte[] { 0, 1, 2, 3 }, preSharedKey.getKeyInternal());
+        Assert.assertEquals("SHA256", preSharedKey.getDigest());
+        Assert.assertEquals(MessageDigest.SHA256, preSharedKey.getDigestInternal());
+        Assert.assertSame(preSharedKey, sslHostConfig.getPreSharedKeys().iterator().next());
+    }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testPreSharedKeyInvalidKey() {
+        SSLHostConfigPreSharedKey preSharedKey = new SSLHostConfigPreSharedKey(null);
+        preSharedKey.setKey("invalid");
+    }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testPreSharedKeyInvalidDigest() {
+        SSLHostConfigPreSharedKey preSharedKey = new SSLHostConfigPreSharedKey(null);
+        preSharedKey.setDigest("invalid");
+    }
+
+
+    @Test
+    public void testPreSharedKeyOnly() {
+        SSLHostConfig sslHostConfig = new SSLHostConfig();
+        SSLHostConfigPreSharedKey preSharedKey = new SSLHostConfigPreSharedKey(sslHostConfig);
+        sslHostConfig.addPreSharedKey(preSharedKey);
+
+        Assert.assertTrue(sslHostConfig.isPreSharedKeyOnly());
+
+        // Creating the default certificate used to hold the SSLContext must not change the result.
+        sslHostConfig.getCertificates(true);
+        Assert.assertTrue(sslHostConfig.isPreSharedKeyOnly());
+
+        SSLHostConfig withCertificate = new SSLHostConfig();
+        withCertificate.addPreSharedKey(new SSLHostConfigPreSharedKey(withCertificate));
+        withCertificate.addCertificate(
+                new SSLHostConfigCertificate(withCertificate, SSLHostConfigCertificate.Type.UNDEFINED));
+        Assert.assertFalse(withCertificate.isPreSharedKeyOnly());
+    }
+
+
+    @Test
     public void testSerialization() throws IOException, ClassNotFoundException {
         // Dummy OpenSSL command name/value pair
         String name = "foo";
@@ -160,6 +257,11 @@ public class TestSSLHostConfig {
         openSSLConfCmd.setValue(value);
         openSSLConf.addCmd(openSSLConfCmd);
         sslHostConfig.setOpenSslConf(openSSLConf);
+        SSLHostConfigPreSharedKey preSharedKey = new SSLHostConfigPreSharedKey(sslHostConfig);
+        preSharedKey.setIdentity("test");
+        preSharedKey.setKey("00010203");
+        preSharedKey.setDigest("SHA256");
+        sslHostConfig.addPreSharedKey(preSharedKey);
 
         // Serialize
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -178,5 +280,12 @@ public class TestSSLHostConfig {
         OpenSSLConfCmd command = commands.get(0);
         Assert.assertEquals(name, command.getName());
         Assert.assertEquals(value, command.getValue());
+        SSLHostConfigPreSharedKey outputPreSharedKey = output.getPreSharedKeys().iterator().next();
+        Assert.assertSame(output, outputPreSharedKey.getSSLHostConfig());
+        Assert.assertEquals("test", outputPreSharedKey.getIdentity());
+        Assert.assertEquals("00010203", outputPreSharedKey.getKey());
+        Assert.assertEquals("SHA256", outputPreSharedKey.getDigest());
+        Assert.assertArrayEquals(new byte[] { 0, 1, 2, 3 }, outputPreSharedKey.getKeyInternal());
+        Assert.assertEquals(MessageDigest.SHA256, outputPreSharedKey.getDigestInternal());
     }
 }

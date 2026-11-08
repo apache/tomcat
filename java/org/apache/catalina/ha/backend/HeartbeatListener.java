@@ -25,7 +25,7 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Lifecycle listener that provides heartbeat information to mod_heartbeat for Apache HTTP Server.
- * Message format: "v=%u&amp;ready=%u&amp;busy=%u"
+ * Message format: "v=1&amp;ready=%u&amp;busy=%u&amp;port=%u"
  */
 public class HeartbeatListener implements LifecycleListener {
 
@@ -157,8 +157,13 @@ public class HeartbeatListener implements LifecycleListener {
      * Set the TTL for Multicast packets.
      *
      * @param ttl value for TTL.
+     *
+     * @throws IllegalArgumentException if the value is outside the valid range of 0 to 255
      */
     public void setTtl(int ttl) {
+        if (ttl < 0 || ttl > 255) {
+            throw new IllegalArgumentException(sm.getString("heartbeatListener.invalidTtl", Integer.valueOf(ttl)));
+        }
         this.ttl = ttl;
     }
 
@@ -177,10 +182,11 @@ public class HeartbeatListener implements LifecycleListener {
     }
 
     /**
-     * Set the list of Proxies that send is requests, when not empty it toggles the multi to off. A SetHandler heartbeat
-     * must be existing in httpd.conf.
+     * Set the list of Proxies that heartbeat requests are sent to. When set, the TCP sender is used instead of the
+     * multicast sender, starting with the first heartbeat sent; the choice is not re-evaluated if the list is
+     * changed later. A SetHandler heartbeat must exist in httpd.conf.
      *
-     * @param proxyList the list of proxy, format "address:port,address:port".
+     * @param proxyList the list of proxies, format "address:port,address:port".
      */
     public void setProxyList(String proxyList) {
         this.proxyList = proxyList;

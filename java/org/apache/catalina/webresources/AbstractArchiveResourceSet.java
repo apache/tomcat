@@ -67,9 +67,11 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
      */
     protected long archiveUseCount = 0;
     /**
-     * The JAR contents.
+     * The JAR contents. Written under {@code archiveLock} but read without
+     * locking in {@code getResource()}, so the field is volatile to ensure a
+     * fully constructed instance is published to readers.
      */
-    protected JarContents jarContents;
+    protected volatile JarContents jarContents;
     /**
      * Whether to retain the bloom filter for archives.
      */
@@ -116,21 +118,24 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
             if (!pathInJar.isEmpty() && pathInJar.charAt(0) == '/') {
                 pathInJar = pathInJar.substring(1);
             }
-            for (String name : getArchiveEntries(false).keySet()) {
-                if (name.length() > pathInJar.length() && name.startsWith(pathInJar)) {
-                    if (name.charAt(name.length() - 1) == '/') {
-                        name = name.substring(pathInJar.length(), name.length() - 1);
-                    } else {
-                        name = name.substring(pathInJar.length());
-                    }
-                    if (name.isEmpty()) {
-                        continue;
-                    }
-                    if (name.charAt(0) == '/') {
-                        name = name.substring(1);
-                    }
-                    if (!name.isEmpty() && name.lastIndexOf('/') == -1) {
-                        result.add(name);
+            Map<String, JarEntry> archiveEntries = getArchiveEntries(false);
+            if (archiveEntries != null) {
+                for (String name : archiveEntries.keySet()) {
+                    if (name.length() > pathInJar.length() && name.startsWith(pathInJar)) {
+                        if (name.charAt(name.length() - 1) == '/') {
+                            name = name.substring(pathInJar.length(), name.length() - 1);
+                        } else {
+                            name = name.substring(pathInJar.length());
+                        }
+                        if (name.isEmpty()) {
+                            continue;
+                        }
+                        if (name.charAt(0) == '/') {
+                            name = name.substring(1);
+                        }
+                        if (!name.isEmpty() && name.lastIndexOf('/') == -1) {
+                            result.add(name);
+                        }
                     }
                 }
             }
@@ -170,13 +175,16 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
                 }
             }
 
-            for (String name : getArchiveEntries(false).keySet()) {
-                if (name.length() > pathInJar.length() && name.startsWith(pathInJar)) {
-                    int nextSlash = name.indexOf('/', pathInJar.length());
-                    if (nextSlash != -1 && nextSlash != name.length() - 1) {
-                        name = name.substring(0, nextSlash + 1);
+            Map<String, JarEntry> archiveEntries = getArchiveEntries(false);
+            if (archiveEntries != null) {
+                for (String name : archiveEntries.keySet()) {
+                    if (name.length() > pathInJar.length() && name.startsWith(pathInJar)) {
+                        int nextSlash = name.indexOf('/', pathInJar.length());
+                        if (nextSlash != -1 && nextSlash != name.length() - 1) {
+                            name = name.substring(0, nextSlash + 1);
+                        }
+                        result.add(webAppMount + '/' + name.substring(getInternalPath().length()));
                     }
-                    result.add(webAppMount + '/' + name.substring(getInternalPath().length()));
                 }
             }
         } else {
@@ -245,15 +253,6 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
         WebResourceRoot root = getRoot();
 
         /*
-         * If jarContents reports that this resource definitely does not contain the path, we can end this method and
-         * move on to the next jar.
-         */
-        if (jarContents != null && !jarContents
-                .mightContainResource(getInternalPath().isEmpty() ? path : getInternalPath() + path, webAppMount)) {
-            return new EmptyResource(root, path);
-        }
-
-        /*
          * Implementation notes
          *
          * The path parameter passed into this method always starts with '/'.
@@ -269,48 +268,66 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
         // an empty resource for requests outside of the mount point.
 
         if (isPathMounted(path, webAppMount)) {
-            String pathInJar = getInternalPath() + path.substring(webAppMount.length());
-            // Always strip off the leading '/' to get the JAR path
-            if (!pathInJar.isEmpty() && pathInJar.charAt(0) == '/') {
-                pathInJar = pathInJar.substring(1);
-            }
-            if (pathInJar.isEmpty()) {
-                // Special case
+            String pathSuffix = path.substring(webAppMount.length());
+
+            // If the requested path is the mount point itself, the requested
+            // resource is the root of the path in the archive that this set
+            // maps to the mount point. Always treat it as a directory
+            // resource, represented by the archive root rather than by a
+            // (possibly absent) directory entry in the archive.
+            if (pathSuffix.isEmpty() || pathSuffix.equals("/")) {
                 // This is a directory resource so the path must end with /
                 if (!path.endsWith("/")) {
                     path = path + "/";
                 }
-                return new JarResourceRoot(root, new File(getBase()), baseUrlString, path);
+                return new JarResourceRoot(root, new File(getBase()), baseUrlString, path, getInternalPath());
+            }
+
+            String pathInJar = getInternalPath() + pathSuffix;
+            // Always strip off the leading '/' to get the JAR path
+            if (!pathInJar.isEmpty() && pathInJar.charAt(0) == '/') {
+                pathInJar = pathInJar.substring(1);
+            }
+
+            /*
+             * If jarContents reports that this resource definitely does not contain the path, we can end this method
+             * and move on to the next jar. The bloom filter is keyed on the entry names in the archive, so the
+             * pre-check must use the JAR relative path. Hashing the web application path (with the mount point
+             * embedded in it) would result in false negatives.
+             */
+            JarContents contents = jarContents;
+            if (contents != null && !contents.mightContainResource(pathInJar)) {
+                return new EmptyResource(root, path);
+            }
+
+            JarEntry jarEntry = null;
+            if (isMultiRelease()) {
+                // Calls JarFile.getJarEntry() which is multi-release aware
+                jarEntry = getArchiveEntry(pathInJar);
             } else {
-                JarEntry jarEntry = null;
-                if (isMultiRelease()) {
-                    // Calls JarFile.getJarEntry() which is multi-release aware
-                    jarEntry = getArchiveEntry(pathInJar);
-                } else {
-                    Map<String,JarEntry> jarEntries = getArchiveEntries(true);
-                    if (!(pathInJar.charAt(pathInJar.length() - 1) == '/')) {
-                        if (jarEntries == null) {
-                            jarEntry = getArchiveEntry(pathInJar + '/');
-                        } else {
-                            jarEntry = jarEntries.get(pathInJar + '/');
-                        }
-                        if (jarEntry != null) {
-                            path = path + '/';
-                        }
+                Map<String,JarEntry> jarEntries = getArchiveEntries(true);
+                if (!(pathInJar.charAt(pathInJar.length() - 1) == '/')) {
+                    if (jarEntries == null) {
+                        jarEntry = getArchiveEntry(pathInJar + '/');
+                    } else {
+                        jarEntry = jarEntries.get(pathInJar + '/');
                     }
-                    if (jarEntry == null) {
-                        if (jarEntries == null) {
-                            jarEntry = getArchiveEntry(pathInJar);
-                        } else {
-                            jarEntry = jarEntries.get(pathInJar);
-                        }
+                    if (jarEntry != null) {
+                        path = path + '/';
                     }
                 }
                 if (jarEntry == null) {
-                    return new EmptyResource(root, path);
-                } else {
-                    return createArchiveResource(jarEntry, path, getManifest());
+                    if (jarEntries == null) {
+                        jarEntry = getArchiveEntry(pathInJar);
+                    } else {
+                        jarEntry = jarEntries.get(pathInJar);
+                    }
                 }
+            }
+            if (jarEntry == null) {
+                return new EmptyResource(root, path);
+            } else {
+                return createArchiveResource(jarEntry, path, getManifest());
             }
         } else {
             return new EmptyResource(root, path);
@@ -356,6 +373,7 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
      */
     @Override
     public void setAllowLinking(boolean allowLinking) {
+        // NO-OP
     }
 
     /**

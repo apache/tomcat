@@ -80,7 +80,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(ProgrammaticServerEndpointConfig.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
 
@@ -126,7 +126,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(ServerConfigListener.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
 
@@ -183,7 +183,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(ServerConfigListener.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
 
@@ -231,7 +231,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(ServerConfigListener.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
 
@@ -277,7 +277,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(ServerConfigListener.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
 
@@ -763,7 +763,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(ProgrammaticServerEndpointConfig.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
 

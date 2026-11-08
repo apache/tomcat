@@ -17,14 +17,11 @@
 package org.apache.catalina.users;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.URI;
-import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -40,6 +37,7 @@ import org.apache.catalina.User;
 import org.apache.catalina.UserDatabase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.CloseableURLConnection;
 import org.apache.tomcat.util.digester.AbstractObjectCreationFactory;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.file.ConfigFileLoader;
@@ -393,6 +391,9 @@ public class MemoryUserDatabase implements UserDatabase {
                 // Parse the XML input to load this database
                 digester.parse(resource.getInputStream());
             } catch (IOException ioe) {
+                // The file doesn't exist / isn't accessible
+                // Set the last modified time to avoid repeated log messages
+                this.lastModified = 0;
                 log.error(sm.getString("memoryUserDatabase.fileNotFound", pathName));
             } catch (Exception e) {
                 // Fail safe on error
@@ -544,9 +545,15 @@ public class MemoryUserDatabase implements UserDatabase {
                     User user = (User) values.next();
                     writer.print("  <user username=\"");
                     writer.print(Escape.xml(user.getUsername()));
-                    writer.print("\" password=\"");
-                    writer.print(Escape.xml(user.getPassword()));
                     writer.print("\"");
+                    // Local copy to avoid TOCTOU inconsistency
+                    // No password is not the same as a password of ""
+                    String pwd = user.getPassword();
+                    if (pwd != null) {
+                        writer.print(" password=\"");
+                        writer.print(Escape.xml(pwd));
+                        writer.print("\"");
+                    }
                     if (null != user.getFullName()) {
                         writer.print(" fullName=\"");
                         writer.print(Escape.xml(user.getFullName()));
@@ -627,43 +634,29 @@ public class MemoryUserDatabase implements UserDatabase {
         }
 
         URI uri = ConfigFileLoader.getSource().getURI(getPathname());
-        URLConnection uConn = null;
         try {
-            URL url = uri.toURL();
-            uConn = url.openConnection();
-
-            if (this.lastModified != uConn.getLastModified()) {
-                writeLock.lock();
-                try {
-                    long detectedLastModified = uConn.getLastModified();
-                    // Last modified as a resolution of 1s. Ensure that a write
-                    // to the file is not in progress by ensuring that the last
-                    // modified time is at least 2 seconds ago.
-                    if (this.lastModified != detectedLastModified &&
-                            detectedLastModified + 2000 < System.currentTimeMillis()) {
-                        log.info(sm.getString("memoryUserDatabase.reload", id, uri));
-                        open();
+            try (CloseableURLConnection uConn = new CloseableURLConnection(uri.toURL())) {
+                if (this.lastModified != uConn.getLastModified()) {
+                    writeLock.lock();
+                    try {
+                        long detectedLastModified = uConn.getLastModified();
+                        // Last modified as a resolution of 1s. Ensure that a write
+                        // to the file is not in progress by ensuring that the last
+                        // modified time is at least 2 seconds ago.
+                        if (this.lastModified != detectedLastModified &&
+                                detectedLastModified + 2000 < System.currentTimeMillis()) {
+                            log.info(sm.getString("memoryUserDatabase.reload", id, uri));
+                            open();
+                        }
+                    } finally {
+                        writeLock.unlock();
                     }
-                } finally {
-                    writeLock.unlock();
                 }
+            } catch (IOException ioe) {
+                log.warn(sm.getString("memoryUserDatabase.fileClose", pathname), ioe);
             }
         } catch (Exception e) {
             log.error(sm.getString("memoryUserDatabase.reloadError", id, uri), e);
-        } finally {
-            if (uConn != null) {
-                try {
-                    // Can't close a uConn directly. Have to do it like this.
-                    uConn.getInputStream().close();
-                } catch (FileNotFoundException fnfe) {
-                    // The file doesn't exist.
-                    // This has been logged above. No need to log again.
-                    // Set the last modified time to avoid repeated log messages
-                    this.lastModified = 0;
-                } catch (IOException ioe) {
-                    log.warn(sm.getString("memoryUserDatabase.fileClose", pathname), ioe);
-                }
-            }
         }
     }
 
@@ -707,10 +700,10 @@ class MemoryGroupCreationFactory extends AbstractObjectCreationFactory {
                 String rolename;
                 int comma = roles.indexOf(',');
                 if (comma >= 0) {
-                    rolename = roles.substring(0, comma).trim();
+                    rolename = roles.substring(0, comma).strip();
                     roles = roles.substring(comma + 1);
                 } else {
-                    rolename = roles.trim();
+                    rolename = roles.strip();
                     roles = "";
                 }
                 if (!rolename.isEmpty()) {
@@ -796,10 +789,10 @@ class MemoryUserCreationFactory extends AbstractObjectCreationFactory {
                 String groupname;
                 int comma = groups.indexOf(',');
                 if (comma >= 0) {
-                    groupname = groups.substring(0, comma).trim();
+                    groupname = groups.substring(0, comma).strip();
                     groups = groups.substring(comma + 1);
                 } else {
-                    groupname = groups.trim();
+                    groupname = groups.strip();
                     groups = "";
                 }
                 if (!groupname.isEmpty()) {
@@ -816,10 +809,10 @@ class MemoryUserCreationFactory extends AbstractObjectCreationFactory {
                 String rolename;
                 int comma = roles.indexOf(',');
                 if (comma >= 0) {
-                    rolename = roles.substring(0, comma).trim();
+                    rolename = roles.substring(0, comma).strip();
                     roles = roles.substring(comma + 1);
                 } else {
-                    rolename = roles.trim();
+                    rolename = roles.strip();
                     roles = "";
                 }
                 if (!rolename.isEmpty()) {

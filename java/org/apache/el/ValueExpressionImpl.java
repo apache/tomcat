@@ -20,6 +20,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.io.Serial;
 
 import jakarta.el.ELContext;
 import jakarta.el.ELException;
@@ -34,6 +35,7 @@ import org.apache.el.lang.EvaluationContext;
 import org.apache.el.lang.ExpressionBuilder;
 import org.apache.el.parser.AstLiteralExpression;
 import org.apache.el.parser.Node;
+import org.apache.el.util.ExpressionUtils;
 import org.apache.el.util.ReflectionUtil;
 
 
@@ -50,8 +52,9 @@ import org.apache.el.util.ReflectionUtil;
  * <p>
  * The {@link jakarta.el.ExpressionFactory#createValueExpression} method can be used to parse an expression string and
  * return a concrete instance of <code>ValueExpression</code> that encapsulates the parsed expression. The
- * {@link FunctionMapper} is used at parse time, not evaluation time, so one is not needed to evaluate an expression
- * using this class. However, the {@link ELContext} is needed at evaluation time.
+ * {@link FunctionMapper} is used at parse time. This class retains the {@link FunctionMapper} used at parse time and
+ * uses it to resolve functions at evaluation time, so the {@link ELContext} used for evaluation does not need to have
+ * a {@link FunctionMapper} configured. However, the {@link ELContext} is needed at evaluation time.
  * </p>
  * <p>
  * The {@link #getValue}, {@link #setValue}, {@link #isReadOnly} and {@link #getType} methods will evaluate the
@@ -72,6 +75,9 @@ import org.apache.el.util.ReflectionUtil;
  * @see jakarta.el.ValueExpression
  */
 public final class ValueExpressionImpl extends ValueExpression implements Externalizable {
+
+    @Serial
+    private static final long serialVersionUID = 1534424021831272939L;
 
     private Class<?> expectedType;
 
@@ -117,12 +123,8 @@ public final class ValueExpressionImpl extends ValueExpression implements Extern
             return false;
         }
 
-        return this.getNode().equals(((ValueExpressionImpl) obj).getNode());
-    }
-
-    @Override
-    public Class<?> getExpectedType() {
-        return this.expectedType;
+        ValueExpressionImpl other = (ValueExpressionImpl) obj;
+        return ExpressionUtils.equals(getNode(), fnMapper, other.getNode(), other.fnMapper);
     }
 
     /**
@@ -130,8 +132,16 @@ public final class ValueExpressionImpl extends ValueExpression implements Extern
      *
      * @return the <code>expectedType</code> passed to the <code>ExpressionFactory.createValueExpression</code> method
      *             that created this <code>ValueExpression</code>.
+     */
+    @Override
+    public Class<?> getExpectedType() {
+        return this.expectedType;
+    }
+
+    /**
+     * Returns the expression string.
      *
-     * @see jakarta.el.Expression#getExpressionString()
+     * @return the expression string
      */
     @Override
     public String getExpressionString() {
@@ -169,7 +179,7 @@ public final class ValueExpressionImpl extends ValueExpression implements Extern
 
     @Override
     public int hashCode() {
-        return this.getNode().hashCode();
+        return ExpressionUtils.hashCode(getNode(), fnMapper);
     }
 
     @Override

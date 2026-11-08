@@ -67,7 +67,7 @@ public class StoreContextAppender extends StoreAppender {
     @Override
     public boolean isPrintValue(Object bean, Object bean2, String attrName, StoreDescription desc) {
         boolean isPrint = super.isPrintValue(bean, bean2, attrName, desc);
-        if (isPrint) {
+        if (isPrint && bean instanceof StandardContext) {
             StandardContext context = ((StandardContext) bean);
             if ("workDir".equals(attrName)) {
                 String defaultWorkDir = getDefaultWorkDir(context);
@@ -75,7 +75,7 @@ public class StoreContextAppender extends StoreAppender {
                     isPrint = !defaultWorkDir.equals(context.getWorkDir());
                 }
             } else if ("path".equals(attrName)) {
-                isPrint = desc.isStoreSeparate() && desc.isExternalAllowed() && context.getConfigFile() == null;
+                isPrint = !desc.isStoreSeparate() || !desc.isExternalAllowed() || context.getConfigFile() == null;
             } else if ("docBase".equals(attrName)) {
                 Container host = context.getParent();
                 if (host instanceof StandardHost) {

@@ -18,6 +18,8 @@ package org.apache.catalina.tribes.transport.nio;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
+import java.nio.ByteBuffer;
 import java.nio.channels.CancelledKeyException;
 import java.nio.channels.ClosedSelectorException;
 import java.nio.channels.DatagramChannel;
@@ -29,13 +31,22 @@ import java.nio.channels.SocketChannel;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.catalina.tribes.ChannelMessage;
+import org.apache.catalina.tribes.group.GroupChannel;
+import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.ObjectReader;
 import org.apache.catalina.tribes.transport.AbstractRxTask;
+import org.apache.catalina.tribes.transport.Constants;
 import org.apache.catalina.tribes.transport.ReceiverBase;
 import org.apache.catalina.tribes.transport.RxTaskPool;
+import org.apache.catalina.tribes.transport.TribesSslContext;
 import org.apache.catalina.tribes.util.ExceptionUtils;
 import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
@@ -53,11 +64,17 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
      */
     protected static final StringManager sm = StringManager.getManager(NioReceiver.class);
 
-    private volatile boolean running = false;
+    // Number of listener threads in run(). A counter rather than a flag so that a stale thread of an earlier start
+    // that exits late cannot hide a live listener of a later start.
+    private final AtomicInteger runningListeners = new AtomicInteger();
 
+    private final Object channelLock = new Object();
     private final AtomicReference<Selector> selector = new AtomicReference<>();
     private ServerSocketChannel serverChannel = null;
+    private volatile ServerSocketChannel secureServerChannel = null;
     private DatagramChannel datagramChannel = null;
+    private final Set<SocketChannel> secureSockets = ConcurrentHashMap.newKeySet();
+    private volatile Semaphore secureConnectionSlots;
 
     /**
      * Queue of events to be processed by the selector thread.
@@ -70,28 +87,187 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
     public NioReceiver() {
     }
 
+    private void startSecureListener() throws IOException {
+        if (getSecurePort() < 0) {
+            return;
+        }
+        if (!(getChannel() instanceof GroupChannel groupChannel)) {
+            return;
+        }
+        if (groupChannel.getSslContext() == null) {
+            if (groupChannel.getSecure()) {
+                throw new IOException(sm.getString("nioReceiver.tlsUnavailable"));
+            }
+            // TLS is not available so nothing is bound to the secure port
+            return;
+        }
+        secureServerChannel = ServerSocketChannel.open();
+        bind(secureServerChannel.socket(), getSecurePort(), getAutoBind(), true);
+        secureConnectionSlots = new Semaphore(Math.max(1, getMaxTasks()));
+        Thread thread = new Thread(() -> runSecureListener(groupChannel.getSslContext()), "NioReceiver-TLS");
+        thread.setDaemon(true);
+        thread.start();
+    }
+
+    private void runSecureListener(TribesSslContext sslContext) {
+        ServerSocketChannel server = secureServerChannel;
+        while (server != null && server.isOpen()) {
+            try {
+                SocketChannel socket = server.accept();
+                try {
+                    socket.configureBlocking(true);
+                    socket.socket().setSoTimeout(getTimeout());
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                    try {
+                        socket.close();
+                    } catch (IOException ioe) {
+                        t.addSuppressed(ioe);
+                    }
+                    throw t;
+                }
+                Semaphore connectionSlots = secureConnectionSlots;
+                if (connectionSlots == null || !connectionSlots.tryAcquire()) {
+                    socket.close();
+                    continue;
+                }
+                secureSockets.add(socket);
+                try {
+                    getExecutor().execute(() -> {
+                        try {
+                            processSecureConnection(socket, sslContext);
+                        } finally {
+                            secureSockets.remove(socket);
+                            connectionSlots.release();
+                        }
+                    });
+                } catch (RuntimeException re) {
+                    secureSockets.remove(socket);
+                    connectionSlots.release();
+                    socket.close();
+                    log.warn(sm.getString("nioReceiver.requestError"), re);
+                }
+            } catch (IOException ioe) {
+                if (isListening()) {
+                    log.warn(sm.getString("nioReceiver.requestError"), ioe);
+                }
+            }
+        }
+    }
+
+    private void processSecureConnection(SocketChannel socketChannel, TribesSslContext sslContext) {
+        try (Socket socket = socketChannel.socket()) {
+            try (TlsChannel channel = new TlsChannel(socket, sslContext.createServerEngine())) {
+                ObjectReader reader = new ObjectReader(getRxBufSize());
+                ByteBuffer buffer = ByteBuffer.allocate(getRxBufSize());
+                while (channel.isOpen()) {
+                    int read = channel.read(buffer);
+                    if (read < 0) {
+                        return;
+                    }
+                    buffer.flip();
+                    reader.append(buffer, read, false);
+                    buffer.clear();
+                    for (ChannelMessage message : reader.execute()) {
+                        if (ChannelData.sendAckAsync(message.getOptions())) {
+                            channel.write(ByteBuffer.wrap(Constants.ACK_COMMAND));
+                        }
+                        try {
+                            messageDataReceived(message);
+                            if (ChannelData.sendAckSync(message.getOptions())) {
+                                channel.write(ByteBuffer.wrap(Constants.ACK_COMMAND));
+                            }
+                        } catch (RuntimeException re) {
+                            if (ChannelData.sendAckSync(message.getOptions())) {
+                                channel.write(ByteBuffer.wrap(Constants.FAIL_ACK_COMMAND));
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (IOException ioe) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("nioReceiver.requestError"), ioe);
+            }
+        } catch (RuntimeException re) {
+            log.warn(sm.getString("nioReceiver.requestError"), re);
+        }
+    }
+
     @Override
     public void stop() {
+        RxTaskPool taskPool = getTaskPool();
+        if (taskPool != null) {
+            // Wake the listener if it is waiting for a receive task before waiting for it to stop
+            taskPool.stop();
+        }
         this.stopListening();
+        synchronized (channelLock) {
+            // Startup may fail before the channels are registered with the selector or the listener thread is started.
+            if (serverChannel != null) {
+                try {
+                    serverChannel.close();
+                } catch (IOException ioe) {
+                    log.debug(sm.getString("nioReceiver.closeError"), ioe);
+                }
+                serverChannel = null;
+            }
+            if (datagramChannel != null) {
+                try {
+                    datagramChannel.close();
+                } catch (IOException ioe) {
+                    log.debug(sm.getString("nioReceiver.closeError"), ioe);
+                }
+                datagramChannel = null;
+            }
+        }
+        if (secureServerChannel != null) {
+            try {
+                secureServerChannel.close();
+            } catch (IOException ioe) {
+                log.debug(sm.getString("nioReceiver.closeError"), ioe);
+            }
+            secureServerChannel = null;
+        }
+        for (SocketChannel socket : secureSockets) {
+            try {
+                socket.close();
+            } catch (IOException ioe) {
+                log.debug(sm.getString("nioReceiver.closeError"), ioe);
+            }
+        }
+        secureSockets.clear();
+        secureConnectionSlots = null;
         super.stop();
+        if ((getChannel() instanceof GroupChannel groupChannel) && groupChannel.getSecure()) {
+            try {
+                // Should stop a lot faster than this as all the sockets have been closed.
+                if (!getExecutor().awaitTermination(60, TimeUnit.SECONDS)) {
+                    log.warn(sm.getString("nioReceiver.stop.executor.timeout"));
+                }
+            } catch (InterruptedException e) {
+                log.warn(sm.getString("nioReceiver.stop.executor.interrupted"));
+                Thread.currentThread().interrupt();
+            }
+        }
     }
 
     @Override
     public void start() throws IOException {
-        super.start();
         try {
+            super.start();
             setPool(new RxTaskPool(getMaxThreads(), getMinThreads(), this));
-        } catch (Exception e) {
-            log.fatal(sm.getString("nioReceiver.threadpool.fail"), e);
-            if (e instanceof IOException) {
-                throw (IOException) e;
-            } else {
-                throw new IOException(e.getMessage());
+            resolveBind();
+            boolean tlsOnly = getChannel() instanceof GroupChannel groupChannel && groupChannel.getSecure();
+            if (!tlsOnly) {
+                bind();
             }
-        }
-        try {
-            getBind();
-            bind();
+            startSecureListener();
+            if (tlsOnly) {
+                // Non-secure port is disabled so nothing is bound to it
+                setListen(true);
+                return;
+            }
             String channelName = "";
             if (getChannel().getName() != null) {
                 channelName = "[" + getChannel().getName() + "]";
@@ -100,11 +276,16 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
             t.setDaemon(true);
             t.start();
         } catch (Exception e) {
+            try {
+                stop();
+            } catch (Exception cleanupException) {
+                e.addSuppressed(cleanupException);
+            }
             log.fatal(sm.getString("nioReceiver.start.fail"), e);
             if (e instanceof IOException) {
                 throw (IOException) e;
             } else {
-                throw new IOException(e.getMessage());
+                throw new IOException(e.getMessage(), e);
             }
         }
     }
@@ -125,26 +306,58 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
      * @throws IOException If binding fails
      */
     protected void bind() throws IOException {
-        // allocate an unbound server socket channel
-        serverChannel = ServerSocketChannel.open();
-        // Get the associated ServerSocket to bind it with
-        ServerSocket serverSocket = serverChannel.socket();
-        // create a new Selector for use below
-        this.selector.set(Selector.open());
-        // set the port the server channel will listen to
-        // serverSocket.bind(new InetSocketAddress(getBind(), getTcpListenPort()));
-        bind(serverSocket, getPort(), getAutoBind());
-        // set non-blocking mode for the listening socket
-        serverChannel.configureBlocking(false);
-        // register the ServerSocketChannel with the Selector
-        serverChannel.register(this.selector.get(), SelectionKey.OP_ACCEPT);
+        synchronized (channelLock) {
+            try {
+                // allocate an unbound server socket channel
+                serverChannel = ServerSocketChannel.open();
+                // Get the associated ServerSocket to bind it with
+                ServerSocket serverSocket = serverChannel.socket();
+                // create a new Selector for use below
+                this.selector.set(Selector.open());
+                // set the port the server channel will listen to
+                // serverSocket.bind(new InetSocketAddress(getBind(), getTcpListenPort()));
+                bind(serverSocket, getPort(), getAutoBind(), false);
+                // set non-blocking mode for the listening socket
+                serverChannel.configureBlocking(false);
+                // register the ServerSocketChannel with the Selector
+                serverChannel.register(this.selector.get(), SelectionKey.OP_ACCEPT);
 
-        // set up the datagram channel
-        if (this.getUdpPort() > 0) {
-            datagramChannel = DatagramChannel.open();
-            configureDatagramChannel();
-            // bind to the address to avoid security checks
-            bindUdp(datagramChannel.socket(), getUdpPort(), getAutoBind());
+                // set up the datagram channel
+                if (this.getUdpPort() >= 0) {
+                    datagramChannel = DatagramChannel.open();
+                    configureDatagramChannel();
+                    // bind to the address to avoid security checks
+                    bindUdp(datagramChannel.socket(), getUdpPort(), getAutoBind());
+                }
+            } catch (IOException | RuntimeException e) {
+                // The caller of start() only sees the exception, so release
+                // everything that was opened up to the failure point. Without
+                // this, every failed start leaks the server channel descriptor,
+                // the selector and, when the UDP bind is what failed, a bound
+                // datagram channel that nothing will ever listen on.
+                if (datagramChannel != null) {
+                    try {
+                        datagramChannel.close();
+                    } catch (IOException ioe) {
+                        e.addSuppressed(ioe);
+                    }
+                    datagramChannel = null;
+                }
+                if (serverChannel != null) {
+                    try {
+                        serverChannel.close();
+                    } catch (IOException ioe) {
+                        e.addSuppressed(ioe);
+                    }
+                    serverChannel = null;
+                }
+                try {
+                    closeSelector();
+                } catch (IOException ioe) {
+                    e.addSuppressed(ioe);
+                }
+                throw e;
+            }
         }
     }
 
@@ -170,7 +383,11 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
                 log.trace("Adding event to selector:" + event);
             }
             if (isListening()) {
-                selector.wakeup();
+                try {
+                    selector.wakeup();
+                } catch (ClosedSelectorException ignore) {
+                    // Selector already closed during shutdown
+                }
             }
         }
     }
@@ -298,93 +515,184 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
      * @throws IOException IO error
      */
     protected void listen() throws Exception {
-        if (doListen()) {
+        if (isListening()) {
             log.warn(sm.getString("nioReceiver.alreadyStarted"));
+            // The flag belongs to the listener that is running, do not clear
+            // it here
             return;
         }
 
-        setListen(true);
-
-        // Avoid NPEs if selector is set to null on stop.
-        Selector selector = this.selector.get();
-
-        if (selector != null && datagramChannel != null) {
-            ObjectReader oreader = new ObjectReader(MAX_UDP_SIZE); // max size for a datagram packet
-            registerChannel(selector, datagramChannel, SelectionKey.OP_READ, oreader);
+        Selector selector;
+        ServerSocketChannel serverChannel;
+        DatagramChannel datagramChannel;
+        synchronized (channelLock) {
+            // Capture one receiver generation so a delayed listener cannot clean up resources created by a later start.
+            selector = this.selector.get();
+            serverChannel = this.serverChannel;
+            datagramChannel = this.datagramChannel;
         }
 
-        while (doListen() && selector != null) {
-            // this may block for a long time, upon return the
-            // selected set contains keys of the ready channels
-            try {
-                events();
-                socketTimeouts();
-                int n = selector.select(getSelectorTimeout());
-                if (n == 0) {
-                    // there is a good chance that we got here
-                    // because the TcpReplicationThread called
-                    // selector wakeup().
-                    // if that happens, we must ensure that that
-                    // thread has enough time to call interestOps
-                    // synchronized (interestOpsMutex) {
-                    // if we got the lock, means there are no
-                    // keys trying to register for the
-                    // interestOps method
-                    // }
-                    continue; // nothing to do
-                }
-                // get an iterator over the set of selected keys
-                Iterator<SelectionKey> it = selector.selectedKeys().iterator();
-                // look at each key in the selected set
-                while (it.hasNext()) {
-                    SelectionKey key = it.next();
-                    // Is a new connection coming in?
-                    if (key.isAcceptable()) {
-                        ServerSocketChannel server = (ServerSocketChannel) key.channel();
-                        SocketChannel channel = server.accept();
-                        channel.socket().setReceiveBufferSize(getRxBufSize());
-                        channel.socket().setSendBufferSize(getTxBufSize());
-                        channel.socket().setTcpNoDelay(getTcpNoDelay());
-                        channel.socket().setKeepAlive(getSoKeepAlive());
-                        channel.socket().setOOBInline(getOoBInline());
-                        channel.socket().setReuseAddress(getSoReuseAddress());
-                        channel.socket().setSoLinger(getSoLingerOn(), getSoLingerTime());
-                        channel.socket().setSoTimeout(getTimeout());
-                        Object attach = new ObjectReader(channel);
-                        registerChannel(selector, channel, SelectionKey.OP_READ, attach);
-                    }
-                    // is there data to read on this channel?
-                    if (key.isReadable()) {
-                        readDataFromSocket(key);
-                    } else {
-                        key.interestOps(key.interestOps() & (~SelectionKey.OP_WRITE));
-                    }
+        // Set the flag only if this thread gets to select. A receiver that
+        // was stopped before this thread got here must not end up marked as
+        // listening, so that a later start is not blocked by the "already
+        // started" guard above.
+        boolean ownsListenFlag = selector != null;
+        if (ownsListenFlag) {
+            setListen(true);
+        }
 
-                    // remove key from selected set, it's been handled
-                    it.remove();
-                }
-            } catch (ClosedSelectorException cse) {
-                // ignore is normal at shutdown or stop listen socket
-            } catch (CancelledKeyException nx) {
-                log.warn(sm.getString("nioReceiver.clientDisconnect"));
-            } catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
-                log.error(sm.getString("nioReceiver.requestError"), t);
+        Exception exception = null;
+        Error error = null;
+        try {
+            if (ownsListenFlag && datagramChannel != null) {
+                ObjectReader oreader = new ObjectReader(MAX_UDP_SIZE); // max size for a datagram packet
+                registerChannel(selector, datagramChannel, SelectionKey.OP_READ, oreader);
             }
 
-        }
-        serverChannel.close();
-        if (datagramChannel != null) {
-            try {
-                datagramChannel.close();
-            } catch (Exception e) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("nioReceiver.closeError"), e);
+            // Test the field, not only the local reference, so that a stop
+            // which closes and nulls the selector while this thread is in the
+            // select also ends this loop even if the thread had re-set the
+            // listening flag in the meantime
+            while (ownsListenFlag && isListening() && this.selector.get() == selector) {
+                // this may block for a long time, upon return the
+                // selected set contains keys of the ready channels
+                try {
+                    events();
+                    socketTimeouts();
+                    @SuppressWarnings("null") // Suppress IDE false positive for selector
+                    int n = selector.select(getSelectorTimeout());
+                    if (n == 0) {
+                        // there is a good chance that we got here
+                        // because the TcpReplicationThread called
+                        // selector wakeup().
+                        // if that happens, we must ensure that that
+                        // thread has enough time to call interestOps
+                        // synchronized (interestOpsMutex) {
+                        // if we got the lock, means there are no
+                        // keys trying to register for the
+                        // interestOps method
+                        // }
+                        continue; // nothing to do
+                    }
+                    // get an iterator over the set of selected keys
+                    Iterator<SelectionKey> it = selector.selectedKeys().iterator();
+                    // look at each key in the selected set
+                    while (it.hasNext()) {
+                        SelectionKey key = it.next();
+                        // Is a new connection coming in?
+                        if (key.isAcceptable()) {
+                            ServerSocketChannel server = (ServerSocketChannel) key.channel();
+                            SocketChannel channel = server.accept();
+                            try {
+                                channel.socket().setReceiveBufferSize(getRxBufSize());
+                                channel.socket().setSendBufferSize(getTxBufSize());
+                                channel.socket().setTcpNoDelay(getTcpNoDelay());
+                                channel.socket().setKeepAlive(getSoKeepAlive());
+                                channel.socket().setOOBInline(getOoBInline());
+                                channel.socket().setReuseAddress(getSoReuseAddress());
+                                channel.socket().setSoLinger(getSoLingerOn(), getSoLingerTime());
+                                channel.socket().setSoTimeout(getTimeout());
+                                Object attach = new ObjectReader(channel);
+                                registerChannel(selector, channel, SelectionKey.OP_READ, attach);
+                            } catch (Throwable t) {
+                                ExceptionUtils.handleThrowable(t);
+                                try {
+                                    channel.close();
+                                } catch (IOException ioe) {
+                                    t.addSuppressed(ioe);
+                                }
+                                throw t;
+                            }
+                        }
+                        // is there data to read on this channel?
+                        if (key.isReadable()) {
+                            readDataFromSocket(key);
+                        } else {
+                            key.interestOps(key.interestOps() & (~SelectionKey.OP_WRITE));
+                        }
+
+                        // remove key from selected set, it's been handled
+                        it.remove();
+                    }
+                } catch (ClosedSelectorException cse) {
+                    // ignore is normal at shutdown or stop listen socket
+                } catch (CancelledKeyException nx) {
+                    log.warn(sm.getString("nioReceiver.clientDisconnect"));
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                    log.error(sm.getString("nioReceiver.requestError"), t);
+                }
+
+            }
+        } catch (Exception e) {
+            exception = e;
+            throw e;
+        } catch (Error e) {
+            error = e;
+            throw e;
+        } finally {
+            if (ownsListenFlag) {
+                synchronized (channelLock) {
+                    Selector currentSelector = this.selector.get();
+                    if (currentSelector == selector || currentSelector == null) {
+                        // Do not clear the flag of a listener for a newer selector generation.
+                        setListen(false);
+                    }
                 }
             }
-            datagramChannel = null;
+            try {
+                closeListenerResources(selector, serverChannel, datagramChannel);
+            } catch (IOException ioe) {
+                if (exception != null) {
+                    exception.addSuppressed(ioe);
+                } else if (error != null) {
+                    error.addSuppressed(ioe);
+                } else {
+                    throw ioe;
+                }
+            }
         }
-        closeSelector();
+    }
+
+    void closeListenerResources(Selector selector, ServerSocketChannel serverChannel, DatagramChannel datagramChannel)
+            throws IOException {
+        synchronized (channelLock) {
+            IOException failure = null;
+            if (serverChannel != null) {
+                try {
+                    serverChannel.close();
+                } catch (IOException ioe) {
+                    failure = ioe;
+                }
+                if (this.serverChannel == serverChannel) {
+                    this.serverChannel = null;
+                }
+            }
+            if (datagramChannel != null) {
+                try {
+                    datagramChannel.close();
+                } catch (Exception e) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("nioReceiver.closeError"), e);
+                    }
+                }
+                if (this.datagramChannel == datagramChannel) {
+                    this.datagramChannel = null;
+                }
+            }
+            try {
+                closeSelector(selector);
+            } catch (IOException ioe) {
+                if (failure == null) {
+                    failure = ioe;
+                } else {
+                    failure.addSuppressed(ioe);
+                }
+            }
+            if (failure != null) {
+                throw failure;
+            }
+        }
     }
 
 
@@ -402,25 +710,36 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
                 selector.wakeup();
                 // Wait for the receiver thread to finish
                 int count = 0;
-                while (running && count < 50) {
+                while (runningListeners.get() > 0 && count < 50) {
                     Thread.sleep(100);
                     count++;
                 }
-                if (running) {
+                if (runningListeners.get() > 0) {
                     log.warn(sm.getString("nioReceiver.stop.threadRunning"));
                 }
-                closeSelector();
+                closeSelector(selector);
             } catch (Exception e) {
                 log.error(sm.getString("nioReceiver.stop.fail"), e);
             } finally {
-                this.selector.set(null);
+                this.selector.compareAndSet(selector, null);
             }
         }
     }
 
     private void closeSelector() throws IOException {
         Selector selector = this.selector.getAndSet(null);
+        closeSelector(selector, false);
+    }
+
+    private void closeSelector(Selector selector) throws IOException {
+        closeSelector(selector, true);
+    }
+
+    private void closeSelector(Selector selector, boolean claim) throws IOException {
         if (selector == null) {
+            return;
+        }
+        if (claim && !this.selector.compareAndSet(selector, null)) {
             return;
         }
         try {
@@ -474,13 +793,13 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
      */
     @Override
     public void run() {
-        running = true;
+        runningListeners.incrementAndGet();
         try {
             listen();
         } catch (Exception e) {
             log.error(sm.getString("nioReceiver.run.fail"), e);
         } finally {
-            running = false;
+            runningListeners.decrementAndGet();
         }
     }
 
@@ -499,17 +818,28 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         NioReplicationTask task = (NioReplicationTask) getTaskPool().getRxTask();
         if (task == null) {
             // No threads/tasks available, do nothing, the selection
-            // loop will keep calling this method until a
-            // thread becomes available, the thread pool itself has a waiting mechanism
-            // so we will not wait here.
+            // loop will keep calling this method. getRxTask() blocks until a task
+            // is released, so it only returns null after the pool has been stopped
+            // or the calling thread has been interrupted.
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("nioReceiver.noThread"));
             }
         } else {
             // invoking this wakes up the worker thread then returns
             // add task to thread pool
-            task.serviceChannel(key);
-            getExecutor().execute(task);
+            try {
+                task.serviceChannel(key);
+                getExecutor().execute(task);
+            } catch (RuntimeException | Error e) {
+                // The task will never run so cancel its key and hand it back, otherwise the connection and task are
+                // lost
+                try {
+                    task.cancel();
+                } catch (RuntimeException | Error cleanup) {
+                    e.addSuppressed(cleanup);
+                }
+                throw e;
+            }
         }
     }
 

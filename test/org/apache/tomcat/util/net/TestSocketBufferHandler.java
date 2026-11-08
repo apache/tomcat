@@ -124,6 +124,36 @@ public class TestSocketBufferHandler {
     }
 
 
+    @Test
+    public void testReturnWhenWritableOverlap() {
+        SocketBufferHandler sbh = new SocketBufferHandler(16, 16, direct);
+
+        sbh.configureReadBufferForWrite();
+        sbh.getReadBuffer().put(getBytes("ABCDEFGH"));
+
+        sbh.unReadReadBuffer(ByteBuffer.wrap(getBytes("XY")));
+
+        validate(sbh, "XYABCDEFGH");
+    }
+
+
+    @Test
+    public void testReturnWhenReadableOverlap() {
+        SocketBufferHandler sbh = new SocketBufferHandler(16, 16, direct);
+
+        sbh.configureReadBufferForWrite();
+        sbh.getReadBuffer().put(getBytes("ABCDEFGH"));
+        sbh.configureReadBufferForRead();
+        for (int i = 0; i < 2; i++) {
+            sbh.getReadBuffer().get();
+        }
+
+        sbh.unReadReadBuffer(ByteBuffer.wrap(getBytes("123456")));
+
+        validate(sbh, "123456CDEFGH");
+    }
+
+
     private void validate(SocketBufferHandler sbh, String expected) {
         sbh.configureReadBufferForRead();
         for (byte b : getBytes(expected)) {

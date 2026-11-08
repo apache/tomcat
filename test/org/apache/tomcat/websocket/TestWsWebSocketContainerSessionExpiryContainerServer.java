@@ -49,7 +49,7 @@ public class TestWsWebSocketContainerSessionExpiryContainerServer extends WsWebS
         Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         ctx.addApplicationListener(WebSocketServerTimeoutConfig.class.getName());
 

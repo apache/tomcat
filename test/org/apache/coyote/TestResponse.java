@@ -48,7 +48,7 @@ public class TestResponse extends TomcatBaseTest {
 
         // Add  servlet
         Tomcat.addServlet(ctx, "CharsetServlet", new CharsetServlet());
-        ctx.addServletMappingDecoded("/*", "CharsetServlet");
+        ctx.addServletMapping("/*", "CharsetServlet");
 
         tomcat.start();
 
@@ -99,7 +99,7 @@ public class TestResponse extends TomcatBaseTest {
 
         // Add  servlet
         Tomcat.addServlet(ctx, "ContentTypeServlet", new ContentTypeServlet());
-        ctx.addServletMappingDecoded("/*", "ContentTypeServlet");
+        ctx.addServletMapping("/*", "ContentTypeServlet");
 
         tomcat.start();
 
@@ -122,6 +122,20 @@ public class TestResponse extends TomcatBaseTest {
         }
         expected.append("v=1;charset=UTF-8");
         Assert.assertEquals(expected.toString() , contentType);
+    }
+
+
+    @Test
+    public void testGetContentLengthIntegerMaxValue() {
+        Response response = new Response();
+
+        Assert.assertEquals(-1, response.getContentLength());
+
+        response.setContentLength(Integer.MAX_VALUE);
+        Assert.assertEquals(Integer.MAX_VALUE, response.getContentLength());
+
+        response.setContentLength(Integer.MAX_VALUE + 1L);
+        Assert.assertEquals(-1, response.getContentLength());
     }
 
 

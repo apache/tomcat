@@ -32,7 +32,7 @@ import org.apache.juli.logging.LogFactory;
  * primary and one node is always the backup. This map is synchronized across a cluster, and only has one backup
  * member.<br>
  * A perfect usage for this map would be a session map for a session manager in a clustered environment.<br>
- * The only way to modify this list is to use the <code>put, putAll, remove</code> methods. entrySet, entrySetFull,
+ * The only way to modify this map is to use the <code>put, putAll, remove</code> methods. entrySet, entrySetFull,
  * keySet, keySetFull, returns all non modifiable sets.<br>
  * <br>
  * If objects (values) in the map change without invoking <code>put()</code> or <code>remove()</code> the data can be
@@ -59,8 +59,6 @@ import org.apache.juli.logging.LogFactory;
  * node as primary. <br>
  * <br>
  * <b>REMEMBER TO CALL</b> <code>breakdown()</code> when you are done with the map to avoid memory leaks.<br>
- * <br>
- * TODO implement periodic sync/transfer thread
  *
  * @param <K> The type of Key
  * @param <V> The type of Value
@@ -159,14 +157,14 @@ public class LazyReplicatedMap<K, V> extends AbstractReplicatedMap<K,V> {
             return new Member[0];
         }
         Member[] members = getMapMembers();
-        int firstIdx = getNextBackupIndex();
-        int nextIdx = firstIdx;
+        int firstIdx = getNextBackupIndex(members.length);
         Member[] backup = new Member[0];
 
         // there are no backups
-        if (members.length == 0 || firstIdx == -1) {
+        if (firstIdx == -1) {
             return backup;
         }
+        int nextIdx = firstIdx;
 
         boolean success = false;
         do {
@@ -183,11 +181,14 @@ public class LazyReplicatedMap<K, V> extends AbstractReplicatedMap<K,V> {
                 continue;
             }
             MapMessage msg;
+            Member[] tmpBackup = wrap(next);
+            msg = createMapMessage(MapMessage.MSG_BACKUP, false, (Serializable) key, (Serializable) value, null,
+                    channel.getLocalMember(false), tmpBackup);
+            if (msg == null) {
+                return new Member[0];
+            }
             try {
-                Member[] tmpBackup = wrap(next);
                 // publish the backup data to one node
-                msg = new MapMessage(getMapContextName(), MapMessage.MSG_BACKUP, false, (Serializable) key,
-                        (Serializable) value, null, channel.getLocalMember(false), tmpBackup);
                 if (log.isTraceEnabled()) {
                     log.trace("Publishing backup data:" + msg + " to: " + next.getName());
                 }
@@ -206,8 +207,11 @@ public class LazyReplicatedMap<K, V> extends AbstractReplicatedMap<K,V> {
                 // publish the data out to all nodes
                 Member[] proxies = excludeFromSet(backup, getMapMembers());
                 if (proxies.length > 0) {
-                    msg = new MapMessage(getMapContextName(), MapMessage.MSG_PROXY, false, (Serializable) key, null,
-                            null, channel.getLocalMember(false), backup);
+                    msg = createMapMessage(MapMessage.MSG_PROXY, false, (Serializable) key, null, null,
+                            channel.getLocalMember(false), backup);
+                    if (msg == null) {
+                        return backup;
+                    }
                     if (log.isTraceEnabled()) {
                         log.trace("Publishing proxy data:" + msg + " to: " + Arrays.toNameString(proxies));
                     }

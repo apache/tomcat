@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.WebConnection;
 import jakarta.websocket.CloseReason;
 import jakarta.websocket.CloseReason.CloseCodes;
@@ -90,14 +89,14 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
     /**
      * Performs initialization before the WebSocket handshake is completed.
      *
-     * @param serverEndpointConfig the endpoint configuration
-     * @param wsc the WebSocket server container
-     * @param handshakeRequest the handshake request
+     * @param serverEndpointConfig       the endpoint configuration
+     * @param wsc                        the WebSocket server container
+     * @param handshakeRequest           the handshake request
      * @param negotiatedExtensionsPhase2 negotiated extensions
-     * @param subProtocol the negotiated sub-protocol
-     * @param transformation the data transformation
-     * @param pathParameters the path parameters
-     * @param secure whether the connection is secure
+     * @param subProtocol                the negotiated sub-protocol
+     * @param transformation             the data transformation
+     * @param pathParameters             the path parameters
+     * @param secure                     whether the connection is secure
      */
     public void preInit(ServerEndpointConfig serverEndpointConfig, WsServerContainer wsc,
             WsHandshakeRequest handshakeRequest, List<Extension> negotiatedExtensionsPhase2, String subProtocol,
@@ -120,11 +119,7 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
             throw new IllegalStateException(sm.getString("wsHttpUpgradeHandler.noPreInit"));
         }
 
-        String httpSessionId = null;
         Object session = handshakeRequest.getHttpSession();
-        if (session != null) {
-            httpSessionId = ((HttpSession) session).getId();
-        }
 
         // Need to call onOpen using the web application's class loader
         // Create the frame using the application's class loader so it can pick
@@ -137,7 +132,7 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
                     new WsRemoteEndpointImplServer(socketWrapper, upgradeInfo, webSocketContainer, connection);
             wsSession = new WsSession(wsRemoteEndpointServer, webSocketContainer, handshakeRequest.getRequestURI(),
                     handshakeRequest.getParameterMap(), handshakeRequest.getQueryString(),
-                    handshakeRequest.getUserPrincipal(), httpSessionId, negotiatedExtensions, subProtocol,
+                    handshakeRequest.getUserPrincipal(), negotiatedExtensions, subProtocol,
                     pathParameters, secure, serverEndpointConfig);
             ep = wsSession.getLocal();
             wsFrame = new WsFrameServer(socketWrapper, upgradeInfo, wsSession, transformation, applicationClassLoader);
@@ -149,20 +144,50 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
             } catch (Throwable t) {
                 // If this really is fatal re-thrown
                 ExceptionUtils.handleThrowable(t);
-                ep.onError(wsSession, t);
                 try {
-                    CloseReason cr = new CloseReason(CloseCodes.CLOSED_ABNORMALLY, t.getMessage());
-                    wsSession.close(cr);
-                } catch (IOException ioe) {
-                    log.warn(sm.getString("wsHttpUpgradeHandler.closeSessionFail"), ioe);
+                    ep.onError(wsSession, t);
+                } catch (Throwable t2) {
+                    // If this really is fatal re-thrown
+                    ExceptionUtils.handleThrowable(t2);
+                    log.warn(sm.getString("wsHttpUpgradeHandler.errorHandlerFail"), t2);
                 }
+                closeSessionAfterError(new CloseReason(CloseCodes.CLOSED_ABNORMALLY, t.getMessage()));
                 throw new IllegalArgumentException(t);
             }
-            webSocketContainer.registerSession(serverEndpointConfig.getPath(), wsSession);
+            webSocketContainer.registerSession(serverEndpointConfig.getPath(), wsSession, session);
         } catch (DeploymentException e) {
             throw new IllegalArgumentException(e);
+        } catch (RuntimeException e) {
+            /*
+             * Something went wrong after the session was created. The session is not registered with the container, so
+             * the session close timeout processing will never see it and destroy() below does not use it. Close the
+             * session here, so that the instance manager releases the end point instance and the encoders. Note: the
+             * session may already be closing or closed, for example if the end point's onOpen method threw the
+             * exception handled above, in which case this completes that close process rather than starting a new one.
+             */
+            closeSessionAfterError(
+                    new CloseReason(CloseCodes.CLOSED_ABNORMALLY, sm.getString("wsHttpUpgradeHandler.initFailed")));
+            throw e;
         } finally {
             currentThread.setContextClassLoader(cl);
+        }
+    }
+
+
+    /*
+     * Closes the session, if it was created, when the connection could not be established. Failures during the close
+     * are logged rather than propagated since they must not replace the exception that is being propagated.
+     */
+    private void closeSessionAfterError(CloseReason closeReason) {
+        if (wsSession == null) {
+            // The session was never created, so there is nothing to close.
+            return;
+        }
+        try {
+            wsSession.closeImmediately(closeReason);
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            log.warn(sm.getString("wsHttpUpgradeHandler.closeSessionFail"), t);
         }
     }
 

@@ -18,10 +18,19 @@ package org.apache.catalina.util;
 
 import java.util.concurrent.ScheduledExecutorService;
 
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * A fast counter that optimizes efficiency at the expense of approximate bucket indexing.
  */
 public class TimeBucketCounter extends TimeBucketCounterBase {
+
+    private static final StringManager sm = StringManager.getManager(TimeBucketCounter.class);
+
+    // The largest configured duration, in seconds, for which the actual duration in milliseconds rounded up to the
+    // next power of 2 still fits in an int, as required by the int based bit shift arithmetic of this
+    // implementation. Longer durations should use ExactTimeBucketCounter, which divides exactly.
+    private static final int MAX_DURATION_SECONDS = (int) ((1L << 30) / 1000);
 
     // Milliseconds bucket size as a Power of 2 for bit shift math, e.g. 16 for 65_536ms which is about 1:05 minute.
     private final int numBits;
@@ -35,6 +44,10 @@ public class TimeBucketCounter extends TimeBucketCounterBase {
      *
      * @param bucketDuration the bucket duration in seconds
      * @param executorService the executor service for maintenance tasks
+     *
+     * @throws IllegalArgumentException if bucketDuration is not positive, or is larger than the maximum supported
+     *                                      duration of the shift based arithmetic (see
+     *                                      {@link #determineShiftBitsOfDuration(int)})
      */
     public TimeBucketCounter(int bucketDuration, ScheduledExecutorService executorService) {
         super(getActualDuration(bucketDuration), executorService);
@@ -83,8 +96,21 @@ public class TimeBucketCounter extends TimeBucketCounterBase {
      * @param duration bucket duration in seconds
      *
      * @return bits to be shifted
+     *
+     * @throws IllegalArgumentException if the duration is not positive, or if the duration in milliseconds, rounded up
+     *                                      to the next power of 2, would not fit in an int
      */
     protected static int determineShiftBitsOfDuration(int duration) {
+        if (duration <= 0) {
+            throw new IllegalArgumentException(
+                    sm.getString("timebucket.invalidDuration", Integer.valueOf(duration)));
+        }
+        if (duration > MAX_DURATION_SECONDS) {
+            // duration * 1000, rounded up to the next power of 2, would overflow int. Reject it with a clear
+            // message rather than computing a meaningless number of bits.
+            throw new IllegalArgumentException(sm.getString("timebucket.durationTooLarge", Integer.valueOf(duration),
+                    Integer.valueOf(MAX_DURATION_SECONDS)));
+        }
         int bits = 0;
         int pof2 = nextPowerOf2(duration * 1000);
         int bitCheck = pof2;
@@ -126,7 +152,7 @@ public class TimeBucketCounter extends TimeBucketCounterBase {
     /**
      * Returns the ratio to the next power of 2 so that we can adjust the value.
      *
-     * @param value of target duration in seconds
+     * @param value of target duration in milliseconds
      *
      * @return the ratio to the next power of 2 so that we can adjust the value
      */

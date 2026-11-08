@@ -18,8 +18,10 @@ package org.apache.catalina.webresources;
 
 import java.io.File;
 
+import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.WebResourceSet;
 
@@ -50,6 +52,19 @@ public class TestJarResourceSet extends AbstractTestResourceSet {
     public void testNoArgConstructor() {
         @SuppressWarnings("unused")
         Object obj = new JarResourceSet();
+    }
+
+    @Test
+    public void testGetResourceRootAfterBloomFilterBuilt() {
+        // Regression test: the archive root must still be found once the
+        // archive (and therefore the bloom filter) has been opened by a
+        // previous lookup.
+        WebResource file = resourceRoot.getResource("/d1/d1-f1.txt");
+        Assert.assertTrue(file.isFile());
+        WebResource webResource = resourceRoot.getResource("/");
+        Assert.assertTrue(webResource.isDirectory());
+        Assert.assertEquals("", webResource.getName());
+        Assert.assertEquals("/", webResource.getWebappPath());
     }
 
     @Override

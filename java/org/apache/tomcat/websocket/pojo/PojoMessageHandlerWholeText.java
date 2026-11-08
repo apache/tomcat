@@ -105,7 +105,13 @@ public class PojoMessageHandlerWholeText extends PojoMessageHandlerWholeBase<Str
     protected Object decode(String message) throws DecodeException {
         // Handle primitives
         if (primitiveType != null) {
-            return Util.coerceToType(primitiveType, message);
+            try {
+                return Util.coerceToType(primitiveType, message);
+            } catch (Exception e) {
+                throw new DecodeException(message,
+                        sm.getString("pojoMessageHandlerWhole.decodePrimitiveFail", message,
+                                primitiveType.getName()), e);
+            }
         }
         // Handle full decoders
         for (Decoder decoder : decoders) {

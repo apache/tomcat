@@ -27,6 +27,7 @@ import jakarta.el.ELBaseTest;
 import jakarta.el.ELContext;
 import jakarta.el.ExpressionFactory;
 import jakarta.el.PropertyNotFoundException;
+import jakarta.el.StandardELContext;
 import jakarta.el.ValueExpression;
 import jakarta.el.ValueReference;
 
@@ -36,6 +37,48 @@ import org.junit.Test;
 import org.apache.jasper.el.ELContextImpl;
 
 public class TestValueExpressionImpl extends ELBaseTest {
+
+    @Test
+    public void testFunctionMappingEquality() throws Exception {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new StandardELContext(factory);
+        context.getFunctionMapper().mapFunction("one", "convert", Integer.class.getMethod("toString", int.class));
+        context.getFunctionMapper().mapFunction("two", "convert", Integer.class.getMethod("toString", int.class));
+        context.getFunctionMapper().mapFunction("one", "alias", Integer.class.getMethod("toString", int.class));
+
+        ValueExpression ve1 = factory.createValueExpression(context, "${one:convert(10)}", String.class);
+        ValueExpression ve2 = factory.createValueExpression(context, "${two:convert(10)}", String.class);
+        ValueExpression ve3 = factory.createValueExpression(context, "${one:alias(10)}", String.class);
+
+        Assert.assertEquals(ve1, ve2);
+        Assert.assertEquals(ve1, ve3);
+        Assert.assertEquals(ve1.hashCode(), ve2.hashCode());
+        Assert.assertEquals(ve1.hashCode(), ve3.hashCode());
+
+        context.getFunctionMapper().mapFunction("one", "convert", Integer.class.getMethod("toHexString", int.class));
+        ValueExpression ve4 = factory.createValueExpression(context, "${one:convert(10)}", String.class);
+
+        Assert.assertEquals("10", ve1.getValue(context));
+        Assert.assertEquals("a", ve4.getValue(context));
+        Assert.assertNotEquals(ve1, ve4);
+    }
+
+
+    @Test
+    public void testImportedFunctionEquality() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new StandardELContext(factory);
+        ValueExpression ve1 = factory.createValueExpression(context, "${Integer(10)}", Object.class);
+        ValueExpression ve2 = factory.createValueExpression(context, "${ Integer(10) }", Object.class);
+        ValueExpression ve3 = factory.createValueExpression(context, "${Long(10)}", Object.class);
+
+        Assert.assertEquals(Integer.valueOf(10), ve1.getValue(context));
+        Assert.assertEquals(Long.valueOf(10), ve3.getValue(context));
+        Assert.assertEquals(ve1, ve2);
+        Assert.assertEquals(ve1.hashCode(), ve2.hashCode());
+        Assert.assertNotEquals(ve1, ve3);
+    }
+
 
     @Test
     public void testGetValueReference() {
@@ -84,6 +127,59 @@ public class TestValueExpressionImpl extends ELBaseTest {
 
         Assert.assertEquals(beanB, vr.getBase());
         Assert.assertEquals("name", vr.getProperty());
+    }
+
+    @Test
+    public void testGetValueReferenceMethodCall() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new ELContextImpl();
+
+        TesterBeanM beanM = new TesterBeanM();
+        ValueExpression var = factory.createValueExpression(beanM, TesterBeanM.class);
+        context.getVariableMapper().setVariable("beanM", var);
+
+        ValueExpression ve = factory.createValueExpression(context, "${beanM.select('Tomcat')}", String.class);
+
+        // A method call is not a reference to a base and a property
+        ValueReference vr = ve.getValueReference(context);
+        Assert.assertNull(vr);
+    }
+
+    @Test
+    public void testGetValueReferenceMethodCallResult() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new ELContextImpl();
+
+        TesterBeanM beanM = new TesterBeanM();
+        ValueExpression var = factory.createValueExpression(beanM, TesterBeanM.class);
+        context.getVariableMapper().setVariable("beanM", var);
+
+        ValueExpression ve = factory.createValueExpression(context, "${beanM.select('Tomcat').name}", String.class);
+
+        // The result of the method call is the base of the property
+        // reference, so this is a reference to a base and a property
+        ValueReference vr = ve.getValueReference(context);
+        Assert.assertNotNull(vr);
+
+        Assert.assertEquals(beanM.getTarget(), vr.getBase());
+        Assert.assertEquals("name", vr.getProperty());
+    }
+
+    @Test
+    public void testGetValueReferencePropertyThenMethodCall() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new ELContextImpl();
+
+        TesterBeanM beanM = new TesterBeanM();
+        ValueExpression var = factory.createValueExpression(beanM, TesterBeanM.class);
+        context.getVariableMapper().setVariable("beanM", var);
+
+        ValueExpression ve = factory.createValueExpression(context, "${beanM.target.select('Tomcat')}", String.class);
+
+        // A method call is not a reference to a base and a property, even
+        // when the base of the method call is itself a property
+        ValueReference vr = ve.getValueReference(context);
+        Assert.assertNull(vr);
     }
 
     @Test

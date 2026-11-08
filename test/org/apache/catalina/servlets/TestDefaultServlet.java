@@ -16,12 +16,18 @@
  */
 package org.apache.catalina.servlets;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +35,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.WriteListener;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
@@ -100,7 +108,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
         Wrapper defaultServlet = Tomcat.addServlet(ctxt, "default",
                 "org.apache.catalina.servlets.DefaultServlet");
         defaultServlet.addInitParameter("fileEncoding", "ISO-8859-1");
-        ctxt.addServletMappingDecoded("/", "default");
+        ctxt.addServletMapping("/", "default");
 
         ctxt.addMimeMapping("html", "text/html");
 
@@ -146,7 +154,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
                 "org.apache.catalina.servlets.DefaultServlet");
         defaultServlet.addInitParameter("gzip", "true");
         defaultServlet.addInitParameter("fileEncoding", "ISO-8859-1");
-        ctxt.addServletMappingDecoded("/", "default");
+        ctxt.addServletMapping("/", "default");
 
         ctxt.addMimeMapping("html", "text/html");
 
@@ -203,7 +211,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
         defaultServlet.addInitParameter("precompressed", "true");
         defaultServlet.addInitParameter("fileEncoding", "ISO-8859-1");
 
-        ctxt.addServletMappingDecoded("/", "default");
+        ctxt.addServletMapping("/", "default");
         ctxt.addMimeMapping("html", "text/html");
 
         tomcat.start();
@@ -266,7 +274,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
                 DefaultServlet.class.getName());
         defaultServlet.addInitParameter("precompressed", "gzip=.gz,custom=.br");
 
-        ctxt.addServletMappingDecoded("/", "default");
+        ctxt.addServletMapping("/", "default");
         ctxt.addMimeMapping("html", "text/html");
 
         tomcat.start();
@@ -329,7 +337,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
         defaultServlet.addInitParameter("precompressed", "br=.br,gzip=.gz");
         defaultServlet.addInitParameter("fileEncoding", "ISO-8859-1");
 
-        ctxt.addServletMappingDecoded("/", "default");
+        ctxt.addServletMapping("/", "default");
         ctxt.addMimeMapping("html", "text/html");
 
         tomcat.start();
@@ -374,6 +382,170 @@ public class TestDefaultServlet extends TomcatBaseTest {
     }
 
     /*
+     * Verify that a malformed q-value in Accept-Encoding does not fail the
+     * request and only causes the affected preference to be ignored.
+     */
+    @Test
+    public void testMalformedPrecompressedQValue() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+
+        long gzSize = new File(appDir, "index.html.gz").length();
+        long indexSize = new File(appDir, "index.html").length();
+
+        // app dir is relative to server home
+        Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
+        Wrapper defaultServlet = Tomcat.addServlet(ctxt, "default",
+                DefaultServlet.class.getName());
+        defaultServlet.addInitParameter("precompressed", "br=.br,gzip=.gz");
+        defaultServlet.addInitParameter("fileEncoding", "ISO-8859-1");
+
+        ctxt.addServletMapping("/", "default");
+        ctxt.addMimeMapping("html", "text/html");
+
+        tomcat.start();
+
+        TestCompressedClient client = new TestCompressedClient(getPort());
+
+        client.reset();
+        // @formatter:off
+        client.setRequest(new String[] {
+                "GET /index.html HTTP/1.1" + CRLF +
+                    "Host: localhost" + CRLF +
+                    "Connection: Close" + CRLF +
+                    "Accept-Encoding: br;q=abc" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
+        client.connect();
+        client.processRequest();
+        Assert.assertTrue(client.isResponse200());
+        List<String> responseHeaders = client.getResponseHeaders();
+        for (String responseHeader : responseHeaders) {
+            Assert.assertFalse(responseHeader.startsWith("Content-Encoding"));
+        }
+        Assert.assertTrue(responseHeaders.contains("Content-Length: " + indexSize));
+        Assert.assertTrue(responseHeaders.contains("vary: accept-encoding"));
+
+        client.reset();
+        // @formatter:off
+        client.setRequest(new String[] {
+                "GET /index.html HTTP/1.1" + CRLF +
+                    "Host: localhost" + CRLF +
+                    "Connection: Close" + CRLF +
+                    "Accept-Encoding: br;q=abc,gzip" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
+        client.connect();
+        client.processRequest();
+        Assert.assertTrue(client.isResponse200());
+        responseHeaders = client.getResponseHeaders();
+        Assert.assertTrue(responseHeaders.contains("Content-Encoding: gzip"));
+        Assert.assertTrue(responseHeaders.contains("Content-Length: " + gzSize));
+        Assert.assertTrue(responseHeaders.contains("vary: accept-encoding"));
+    }
+
+    /*
+     * Verify how the Accept-Encoding header is processed when selecting a precompressed resource. The server
+     * preference is br followed by gzip.
+     */
+    @Test
+    public void testPrecompressedAcceptEncodingProcessing() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+
+        long gzSize = new File(appDir, "index.html.gz").length();
+        long brSize = new File(appDir, "index.html.br").length();
+        long indexSize = new File(appDir, "index.html").length();
+
+        // app dir is relative to server home
+        Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
+        Wrapper defaultServlet = Tomcat.addServlet(ctxt, "default", DefaultServlet.class.getName());
+        defaultServlet.addInitParameter("precompressed", "br=.br,gzip=.gz");
+        defaultServlet.addInitParameter("fileEncoding", "ISO-8859-1");
+
+        ctxt.addServletMapping("/", "default");
+        ctxt.addMimeMapping("html", "text/html");
+
+        tomcat.start();
+
+        TestCompressedClient client = new TestCompressedClient(getPort());
+
+        // Content coding names are case insensitive
+        assertPrecompressedResponse(client, "GZIP", "gzip", gzSize);
+        assertPrecompressedResponse(client, "Br", "br", brSize);
+
+        // q=0 means not acceptable
+        assertPrecompressedResponse(client, "gzip;q=0", null, indexSize);
+        assertPrecompressedResponse(client, "br;q=0,gzip", "gzip", gzSize);
+
+        // Weights that do not follow the RFC grammar are ignored
+        assertPrecompressedResponse(client, "br;q=Infinity,gzip", "gzip", gzSize);
+        assertPrecompressedResponse(client, "br;q=5,gzip;q=0.5", "gzip", gzSize);
+        assertPrecompressedResponse(client, "br;q=1e0,gzip;q=0.5", "gzip", gzSize);
+        assertPrecompressedResponse(client, "br;q=NaN,gzip;q=0.5", "gzip", gzSize);
+        assertPrecompressedResponse(client, "br;q=1d,gzip;q=0.5", "gzip", gzSize);
+        assertPrecompressedResponse(client, "br;foo=bar,gzip;q=0.5", "gzip", gzSize);
+
+        // Equal weights, so the server preference decides
+        assertPrecompressedResponse(client, "gzip, br", "br", brSize);
+        assertPrecompressedResponse(client, "gzip;q=1, br;q=1.0", "br", brSize);
+
+        // Weights take precedence over server preference
+        assertPrecompressedResponse(client, "gzip, br;q=0.5", "gzip", gzSize);
+
+        // identity is case insensitive
+        assertPrecompressedResponse(client, "gzip;q=0.9, identity", null, indexSize);
+        assertPrecompressedResponse(client, "gzip;q=0.9, Identity", null, indexSize);
+
+        // Explicitly excluded encodings are not selected by "*"
+        assertPrecompressedResponse(client, "*;q=0.5, br;q=0", "gzip", gzSize);
+
+        // An explicit weight of zero is authoritative even if the same coding is also listed with a positive weight
+        assertPrecompressedResponse(client, "gzip, gzip;q=0", null, indexSize);
+        assertPrecompressedResponse(client, "gzip;q=0, gzip", null, indexSize);
+        assertPrecompressedResponse(client, "GZIP, gzip;q=0", null, indexSize);
+        assertPrecompressedResponse(client, "br, br;q=0, gzip", "gzip", gzSize);
+        assertPrecompressedResponse(client, "br;q=0, gzip, br", "gzip", gzSize);
+        assertPrecompressedResponse(client, "br, gzip, br;q=0, gzip;q=0", null, indexSize);
+        assertPrecompressedResponse(client, "*, gzip;q=0, br;q=0", null, indexSize);
+    }
+
+
+    private void assertPrecompressedResponse(TestCompressedClient client, String acceptEncoding,
+            String expectedEncoding, long expectedLength) throws Exception {
+        client.reset();
+        // @formatter:off
+        client.setRequest(new String[] {
+                "GET /index.html HTTP/1.1" + CRLF +
+                    "Host: localhost" + CRLF +
+                    "Connection: Close" + CRLF +
+                    "Accept-Encoding: " + acceptEncoding + CRLF +
+                    CRLF
+                });
+        // @formatter:on
+        client.connect();
+        client.processRequest();
+        String message = "Accept-Encoding: " + acceptEncoding;
+        Assert.assertTrue(message, client.isResponse200());
+        List<String> responseHeaders = client.getResponseHeaders();
+        if (expectedEncoding == null) {
+            for (String responseHeader : responseHeaders) {
+                Assert.assertFalse(message, responseHeader.toLowerCase(Locale.ROOT).startsWith("content-encoding"));
+            }
+        } else {
+            Assert.assertTrue(message, responseHeaders.contains("Content-Encoding: " + expectedEncoding));
+        }
+        Assert.assertTrue(message, responseHeaders.contains("Content-Length: " + expectedLength));
+        Assert.assertTrue(message, responseHeaders.contains("vary: accept-encoding"));
+    }
+
+    /*
      * Verify preferring of brotli in default configuration for actual Firefox and Chrome requests.
      */
     @Test
@@ -391,7 +563,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
                 DefaultServlet.class.getName());
         defaultServlet.addInitParameter("precompressed", "true");
 
-        ctxt.addServletMappingDecoded("/", "default");
+        ctxt.addServletMapping("/", "default");
         ctxt.addMimeMapping("html", "text/html");
 
         tomcat.start();
@@ -454,9 +626,9 @@ public class TestDefaultServlet extends TomcatBaseTest {
 
         // Override the default servlet with our own mappings
         Tomcat.addServlet(ctx, "default2", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default2");
-        ctx.addServletMappingDecoded("/servlets/*", "default2");
-        ctx.addServletMappingDecoded("/static/*", "default2");
+        ctx.addServletMapping("/", "default2");
+        ctx.addServletMapping("/servlets/*", "default2");
+        ctx.addServletMapping("/static/*", "default2");
 
         tomcat.start();
 
@@ -524,7 +696,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
                 DefaultServlet.class.getName());
         defaultServlet.addInitParameter("fileEncoding", "ISO-8859-1");
 
-        ctxt.addServletMappingDecoded("/", "default");
+        ctxt.addServletMapping("/", "default");
         ctxt.addMimeMapping("html", "text/html");
         ErrorPage ep = new ErrorPage();
         ep.setErrorCode(404);
@@ -709,7 +881,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
         defaultServlet.addInitParameter("listings", "true");
         defaultServlet.addInitParameter("localXsltFile", "_listing.xslt");
 
-        ctxt.addServletMappingDecoded("/", "default");
+        ctxt.addServletMapping("/", "default");
 
         tomcat.start();
 
@@ -742,7 +914,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
         defaultServlet.addInitParameter("sortListings", "true");
         defaultServlet.addInitParameter("sortDirectoriesFirst", "true");
 
-        ctxt.addServletMappingDecoded("/", "default");
+        ctxt.addServletMapping("/", "default");
 
         tomcat.start();
 
@@ -775,5 +947,165 @@ public class TestDefaultServlet extends TomcatBaseTest {
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+    }
+
+    @Test
+    public void testCopyRangeContinuesAfterShortRead() throws IOException {
+        byte[] source = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7 };
+        TesterServletOutputStream output = new TesterServletOutputStream();
+
+        IOException exception = copy(new ShortReadingInputStream(source), output, 0, 7);
+
+        Assert.assertNull(exception);
+        Assert.assertArrayEquals(source, output.toByteArray());
+    }
+
+
+    @Test
+    public void testCopyRangeReturnsEofExceptionAfterShortRead() throws IOException {
+        byte[] source = new byte[] { 0, 1, 2 };
+        TesterServletOutputStream output = new TesterServletOutputStream();
+
+        IOException exception = copy(new ShortReadingInputStream(source), output, 0, 7);
+
+        Assert.assertTrue(exception instanceof EOFException);
+        Assert.assertArrayEquals(source, output.toByteArray());
+    }
+
+
+    @Test
+    public void testCopyRangeReturnsEofExceptionForEmptyStream() throws IOException {
+        TesterServletOutputStream output = new TesterServletOutputStream();
+
+        IOException exception = copy(new ByteArrayInputStream(new byte[0]), output, 0, 7);
+
+        Assert.assertTrue(exception instanceof EOFException);
+        Assert.assertEquals(0, output.size());
+    }
+
+
+    @Test
+    public void testCopyRangeAtBufferBoundaries() throws IOException {
+        int bufferSize = new DefaultServlet().input;
+        int[] sourceLengths = new int[] { bufferSize - 1, bufferSize, bufferSize + 1 };
+
+        for (int sourceLength : sourceLengths) {
+            byte[] source = new byte[sourceLength];
+            for (int i = 0; i < source.length; i++) {
+                source[i] = (byte) i;
+            }
+            TesterServletOutputStream output = new TesterServletOutputStream();
+
+            IOException exception = copy(new ByteArrayInputStream(source), output, 0, sourceLength - 1);
+
+            Assert.assertNull(exception);
+            Assert.assertArrayEquals(source, output.toByteArray());
+        }
+    }
+
+
+    @Test
+    public void testCopyRangeWithNonZeroStart() throws IOException {
+        byte[] source = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+        TesterServletOutputStream output = new TesterServletOutputStream();
+
+        IOException exception = copy(new ShortReadingInputStream(source), output, 2, 9);
+
+        Assert.assertNull(exception);
+        Assert.assertArrayEquals(Arrays.copyOfRange(source, 2, 10), output.toByteArray());
+    }
+
+
+    @Test
+    public void testCopyRangeReturnsInputIOException() throws IOException {
+        IOException expected = new IOException();
+        InputStream input = new InputStream() {
+
+            @Override
+            public int read() throws IOException {
+                throw expected;
+            }
+
+            @Override
+            public int read(byte[] target, int offset, int length) throws IOException {
+                throw expected;
+            }
+        };
+
+        IOException actual = copy(input, new TesterServletOutputStream(), 0, 7);
+
+        Assert.assertSame(expected, actual);
+    }
+
+
+    private static IOException copy(InputStream input, ServletOutputStream output, long start, long end)
+            throws IOException {
+        DefaultServlet servlet = new DefaultServlet();
+        try (InputStream bufferedInput = new BufferedInputStream(input, servlet.input)) {
+            return servlet.copyNoThrow(bufferedInput, output, start, end);
+        }
+    }
+
+
+    private static class ShortReadingInputStream extends InputStream {
+
+        private static final int MAX_READ_SIZE = 3;
+
+        private final byte[] bytes;
+        private int position;
+
+        private ShortReadingInputStream(byte[] bytes) {
+            this.bytes = bytes;
+        }
+
+        @Override
+        public int read() {
+            return position < bytes.length ? bytes[position++] & 0xFF : -1;
+        }
+
+        @Override
+        public int read(byte[] target, int offset, int length) {
+            if (position == bytes.length) {
+                return -1;
+            }
+            int count = Math.min(Math.min(length, MAX_READ_SIZE), bytes.length - position);
+            System.arraycopy(bytes, position, target, offset, count);
+            position += count;
+            return count;
+        }
+    }
+
+
+    private static class TesterServletOutputStream extends ServletOutputStream {
+
+        private final ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+        @Override
+        public void write(int value) {
+            output.write(value);
+        }
+
+        @Override
+        public void write(byte[] bytes, int offset, int length) {
+            output.write(bytes, offset, length);
+        }
+
+        @Override
+        public boolean isReady() {
+            return true;
+        }
+
+        @Override
+        public void setWriteListener(WriteListener writeListener) {
+            // NO-OP
+        }
+
+        private int size() {
+            return output.size();
+        }
+
+        private byte[] toByteArray() {
+            return output.toByteArray();
+        }
     }
 }

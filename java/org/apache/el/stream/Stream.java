@@ -186,7 +186,12 @@ public class Stream {
                 while (iterator.hasNext()) {
                     list.add(iterator.next());
                 }
-                Collections.sort(list);
+                try {
+                    Collections.sort(list);
+                } catch (ClassCastException cce) {
+                    // The elements are not Comparable or are not Comparable with each other
+                    throw new ELException(MessageFactory.get("stream.compare.sortFailed"), cce);
+                }
                 sorted = list.iterator();
             }
         };
@@ -291,10 +296,11 @@ public class Stream {
 
 
     /**
-     * Returns a stream consisting of the elements of this stream from the
-     * specified start position to the end.
+     * Returns a stream consisting of the elements of this stream after
+     * skipping the first {@code start} elements. No elements are skipped if
+     * {@code start} is less than or equal to zero.
      *
-     * @param start the start position (inclusive)
+     * @param start the number of elements to skip
      * @return the new substream
      */
     public Stream substream(final Number start) {
@@ -302,29 +308,40 @@ public class Stream {
     }
 
     /**
-     * Returns a stream consisting of the elements of this stream from the
-     * specified start position up to, but not including, the specified end position.
+     * Returns a stream consisting of the elements of this stream, skipping
+     * the first {@code start} elements and including the next
+     * {@code end - start} elements. No elements are skipped if {@code start}
+     * is less than or equal to zero.
      *
-     * @param start the start position (inclusive)
-     * @param end the end position (exclusive)
+     * @param start the number of elements to skip
+     * @param end used to calculate the number of elements to include, which is {@code end - start}. This is the
+     *                exclusive end position only if {@code start} is greater than or equal to zero. If
+     *                {@code end - start} is less than or equal to zero, no elements are included.
      * @return the new substream
      */
     public Stream substream(final Number start, final Number end) {
 
         Iterator<Object> downStream = new OpIterator() {
 
-            private final int startPos = start.intValue();
-            private final int endPos = end.intValue();
-            private int itemCount = 0;
+            // The specification counts the elements to include from the
+            // position at which the start elements were skipped, so a start
+            // that is less than or equal to zero, which skips no elements,
+            // includes end minus start elements. The count is calculated as
+            // a long because the single argument form passes an end of
+            // Integer.MAX_VALUE.
+            private final int skipCount = Math.max(start.intValue(), 0);
+            private final long includeCount = (long) end.intValue() - start.intValue();
+            private int skipped = 0;
+            private long included = 0;
 
             @Override
             protected void findNext() {
-                while (itemCount < startPos && iterator.hasNext()) {
+                while (skipped < skipCount && iterator.hasNext()) {
                     iterator.next();
-                    itemCount++;
+                    skipped++;
                 }
-                if (itemCount < endPos && iterator.hasNext()) {
-                    itemCount++;
+                if (skipped == skipCount && included < includeCount && iterator.hasNext()) {
+                    included++;
                     next = iterator.next();
                     foundNext = true;
                 }
@@ -444,7 +461,8 @@ public class Stream {
 
 
     /**
-     * Calculates the average of all numeric elements in the stream.
+     * Calculates the average of all elements in the stream. Elements are coerced to a numeric type; a non-convertible
+     * element results in an {@code ELException}.
      *
      * @return an Optional containing the average, or empty if the stream is empty
      */
@@ -466,7 +484,8 @@ public class Stream {
 
 
     /**
-     * Returns the sum of all numeric elements in the stream.
+     * Returns the sum of all elements in the stream. Elements are coerced to a numeric type; a non-convertible
+     * element results in an {@code ELException}.
      *
      * @return the sum of all elements
      */
@@ -512,7 +531,7 @@ public class Stream {
         Boolean match = Boolean.FALSE;
 
         while (!match.booleanValue() && iterator.hasNext()) {
-            match = (Boolean) le.invoke(iterator.next());
+            match = ELSupport.coerceToBoolean(null, le.invoke(iterator.next()), true);
         }
 
         return new Optional(match);
@@ -533,7 +552,7 @@ public class Stream {
         Boolean match = Boolean.TRUE;
 
         while (match.booleanValue() && iterator.hasNext()) {
-            match = (Boolean) le.invoke(iterator.next());
+            match = ELSupport.coerceToBoolean(null, le.invoke(iterator.next()), true);
         }
 
         return new Optional(match);
@@ -554,7 +573,7 @@ public class Stream {
         Boolean match = Boolean.FALSE;
 
         while (!match.booleanValue() && iterator.hasNext()) {
-            match = (Boolean) le.invoke(iterator.next());
+            match = ELSupport.coerceToBoolean(null, le.invoke(iterator.next()), true);
         }
 
         return new Optional(Boolean.valueOf(!match.booleanValue()));
@@ -592,9 +611,16 @@ public class Stream {
         while (iterator.hasNext()) {
             Object obj = iterator.next();
             if ((obj instanceof Comparable)) {
-                if (isMax && ((Comparable) obj).compareTo(result) > 0) {
+                int comparison;
+                try {
+                    comparison = ((Comparable) obj).compareTo(result);
+                } catch (ClassCastException cce) {
+                    // The elements are Comparable but not with each other
+                    throw new ELException(MessageFactory.get("error.compare", obj, result), cce);
+                }
+                if (isMax && comparison > 0) {
                     result = (Comparable) obj;
-                } else if (!isMax && ((Comparable) obj).compareTo(result) < 0) {
+                } else if (!isMax && comparison < 0) {
                     result = (Comparable) obj;
                 }
             } else {
@@ -619,9 +645,11 @@ public class Stream {
 
         while (iterator.hasNext()) {
             Object obj = iterator.next();
-            if (isMax && ELSupport.coerceToNumber(null, le.invoke(obj, result), Integer.class).intValue() > 0) {
+            // Coerce to the primitive type so that a null comparator result
+            // coerces to zero rather than producing a NullPointerException
+            if (isMax && ELSupport.coerceToNumber(null, le.invoke(obj, result), Integer.TYPE).intValue() > 0) {
                 result = obj;
-            } else if (!isMax && ELSupport.coerceToNumber(null, le.invoke(obj, result), Integer.class).intValue() < 0) {
+            } else if (!isMax && ELSupport.coerceToNumber(null, le.invoke(obj, result), Integer.TYPE).intValue() < 0) {
                 result = obj;
             }
         }
@@ -637,7 +665,9 @@ public class Stream {
     private record LambdaExpressionComparator(LambdaExpression le) implements Comparator<Object> {
         @Override
         public int compare(Object o1, Object o2) {
-            return ELSupport.coerceToNumber(null, le.invoke(o1, o2), Integer.class).intValue();
+            // Coerce to the primitive type so that a null comparator result
+            // coerces to zero rather than producing a NullPointerException
+            return ELSupport.coerceToNumber(null, le.invoke(o1, o2), Integer.TYPE).intValue();
         }
     }
 

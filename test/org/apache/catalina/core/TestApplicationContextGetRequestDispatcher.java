@@ -361,11 +361,11 @@ public class TestApplicationContextGetRequestDispatcher extends TomcatBaseTest {
 
         // Add a default servlet to return 404 for not found resources
         Tomcat.addServlet(ctx, "Default", new Default404Servlet());
-        ctx.addServletMappingDecoded("/", "Default");
+        ctx.addServletMapping("/", "Default");
 
         // Add a target servlet to dispatch to
         Tomcat.addServlet(ctx, "target", new TargetServlet());
-        ctx.addServletMappingDecoded(UDecoder.URLDecode(targetPath, StandardCharsets.UTF_8), "target");
+        ctx.addServletMapping(UDecoder.URLDecode(targetPath, StandardCharsets.UTF_8), "target");
 
         if (useAsync) {
             Wrapper w = Tomcat.addServlet(ctx, "rd", new AsyncDispatcherServlet(dispatchPath, useEncodedDispatchPaths));
@@ -373,7 +373,7 @@ public class TestApplicationContextGetRequestDispatcher extends TomcatBaseTest {
         } else {
             Tomcat.addServlet(ctx, "rd", new DispatcherServlet(dispatchPath));
         }
-        ctx.addServletMappingDecoded(UDecoder.URLDecode(startPath, StandardCharsets.UTF_8), "rd");
+        ctx.addServletMapping(UDecoder.URLDecode(startPath, StandardCharsets.UTF_8), "rd");
 
         tomcat.start();
 

@@ -43,6 +43,7 @@ public class ChatAnnotation {
     private static final String GUEST_PREFIX = "Guest";
     private static final AtomicInteger connectionIds = new AtomicInteger(0);
     private static final Set<ChatAnnotation> connections = new CopyOnWriteArraySet<>();
+    private static final int BACKLOG_LIMIT = 10;
 
     private final String nickname;
     private Session session;
@@ -52,6 +53,7 @@ public class ChatAnnotation {
      */
     private Queue<String> messageBacklog = new ArrayDeque<>();
     private boolean messageInProgress = false;
+    private long skippedMessageCount = 0;
 
     public ChatAnnotation() {
         nickname = GUEST_PREFIX + connectionIds.getAndIncrement();
@@ -97,9 +99,25 @@ public class ChatAnnotation {
 
         synchronized (this) {
             if (messageInProgress) {
+                if (skippedMessageCount > 0) {
+                    skippedMessageCount++;
+                    return;
+                } else if (messageBacklog.size() >= BACKLOG_LIMIT) {
+                    // Clear the backlog
+                    skippedMessageCount = messageBacklog.size();
+                    messageBacklog.clear();
+                    // And skip the current message
+                    skippedMessageCount++;
+                    return;
+                }
                 messageBacklog.add(msg);
                 return;
             } else {
+                if (skippedMessageCount > 0) {
+                    messageBacklog.add(msg);
+                    msg = "Skipped [" + skippedMessageCount + "] messages due to slow client";
+                    skippedMessageCount = 0;
+                }
                 messageInProgress = true;
             }
         }

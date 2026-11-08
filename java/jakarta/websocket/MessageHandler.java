@@ -39,7 +39,7 @@ public interface MessageHandler {
         void onMessage(T messagePart, boolean last);
     }
 
-   /**
+    /**
      * A message handler that receives whole (complete) messages. The handler is called once
      * per WebSocket message.
      *

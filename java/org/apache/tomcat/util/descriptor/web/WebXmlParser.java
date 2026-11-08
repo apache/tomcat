@@ -53,13 +53,12 @@ public class WebXmlParser {
     private final Digester webFragmentDigester;
     private final WebRuleSet webFragmentRuleSet;
 
-
     /**
      * Constructs a new WebXmlParser.
      *
-     * @param namespaceAware  Whether the parser is namespace aware
-     * @param validation      Whether validation is enabled
-     * @param blockExternal   Whether external entities are blocked
+     * @param namespaceAware Whether the parser is namespace aware
+     * @param validation     Whether validation is enabled
+     * @param blockExternal  Whether external entities are blocked
      */
     public WebXmlParser(boolean namespaceAware, boolean validation, boolean blockExternal) {
         webRuleSet = new WebRuleSet(false);

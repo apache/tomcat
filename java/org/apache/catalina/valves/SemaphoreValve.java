@@ -18,7 +18,10 @@ package org.apache.catalina.valves;
 
 import java.io.IOException;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import jakarta.servlet.AsyncEvent;
+import jakarta.servlet.AsyncListener;
 import jakarta.servlet.ServletException;
 
 import org.apache.catalina.LifecycleException;
@@ -33,7 +36,9 @@ import org.apache.catalina.connector.Response;
  * <p>
  * This Valve may be attached to any Container, depending on the granularity of the concurrency control you wish to
  * perform. Note that internally, some async requests may require multiple serial requests to complete what - to the
- * user - appears as a single request.
+ * user - appears as a single request. The permit acquired for a request that enters asynchronous mode is held until
+ * the asynchronous processing is complete. Subsequent dispatch cycles of the same asynchronous exchange are not
+ * separately controlled, since the exchange already holds a permit.
  * </p>
  */
 public class SemaphoreValve extends ValveBase {
@@ -60,7 +65,9 @@ public class SemaphoreValve extends ValveBase {
 
 
     /**
-     * Concurrency level of the semaphore.
+     * Concurrency level of the semaphore. The value must be at least one,
+     * since a semaphore without permits combined with blocking would make
+     * every request wait forever.
      */
     protected int concurrency = 10;
 
@@ -76,9 +83,13 @@ public class SemaphoreValve extends ValveBase {
     /**
      * Set the concurrency level of the semaphore.
      *
-     * @param concurrency the concurrency level
+     * @param concurrency the concurrency level, at least one
      */
     public void setConcurrency(int concurrency) {
+        if (concurrency < 1) {
+            throw new IllegalArgumentException(
+                    sm.getString("semaphoreValve.invalidConcurrency", Integer.valueOf(concurrency)));
+        }
         this.concurrency = concurrency;
     }
 
@@ -175,6 +186,10 @@ public class SemaphoreValve extends ValveBase {
      * @param highConcurrencyStatus the status code to return
      */
     public void setHighConcurrencyStatus(int highConcurrencyStatus) {
+        if (highConcurrencyStatus != -1 && (highConcurrencyStatus < 100 || highConcurrencyStatus >= 600)) {
+            throw new IllegalArgumentException(
+                    sm.getString("semaphoreValve.invalidStatus", Integer.valueOf(highConcurrencyStatus)));
+        }
         this.highConcurrencyStatus = highConcurrencyStatus;
     }
 
@@ -222,31 +237,46 @@ public class SemaphoreValve extends ValveBase {
     public void invoke(Request request, Response response) throws IOException, ServletException {
 
         if (controlConcurrency(request, response)) {
-            boolean shouldRelease = true;
-            try {
-                if (block) {
-                    if (interruptible) {
-                        try {
-                            semaphore.acquire();
-                        } catch (InterruptedException e) {
+            if (request.isAsync()) {
+                // Asynchronous dispatch of an exchange that is already holding a permit from the cycle that started
+                // the asynchronous processing. Acquiring a second permit for the same exchange could block this
+                // dispatch waiting for a permit held by the exchange itself, so concurrency control for the exchange
+                // is handled entirely by the cycle that started the asynchronous processing.
+                getNext().invoke(request, response);
+            } else {
+                boolean shouldRelease = true;
+                try {
+                    if (block) {
+                        if (interruptible) {
+                            try {
+                                semaphore.acquire();
+                            } catch (InterruptedException e) {
+                                shouldRelease = false;
+                                permitDenied(request, response);
+                                return;
+                            }
+                        } else {
+                            semaphore.acquireUninterruptibly();
+                        }
+                    } else {
+                        if (!semaphore.tryAcquire()) {
                             shouldRelease = false;
                             permitDenied(request, response);
                             return;
                         }
-                    } else {
-                        semaphore.acquireUninterruptibly();
                     }
-                } else {
-                    if (!semaphore.tryAcquire()) {
-                        shouldRelease = false;
-                        permitDenied(request, response);
-                        return;
+                    getNext().invoke(request, response);
+                } finally {
+                    if (shouldRelease) {
+                        if (request.isAsync()) {
+                            // The request entered asynchronous mode during this call. Asynchronous processing is
+                            // still in progress when invoke returns. Hold the permit and register a listener that
+                            // releases it once the asynchronous processing is complete.
+                            request.getAsyncContext().addListener(new ReleasePermitAsyncListener(semaphore));
+                        } else {
+                            semaphore.release();
+                        }
                     }
-                }
-                getNext().invoke(request, response);
-            } finally {
-                if (shouldRelease) {
-                    semaphore.release();
                 }
             }
         } else {
@@ -285,4 +315,46 @@ public class SemaphoreValve extends ValveBase {
     }
 
 
+    /**
+     * Async listener that releases the permit held for a request that entered asynchronous mode, exactly once, when
+     * the asynchronous processing completes or fails.
+     */
+    private static class ReleasePermitAsyncListener implements AsyncListener {
+
+        private final Semaphore semaphore;
+        private final AtomicBoolean released = new AtomicBoolean(false);
+
+        ReleasePermitAsyncListener(Semaphore semaphore) {
+            this.semaphore = semaphore;
+        }
+
+        @Override
+        public void onComplete(AsyncEvent event) throws IOException {
+            releaseOnce();
+        }
+
+        @Override
+        public void onTimeout(AsyncEvent event) throws IOException {
+            // NO-OP. Asynchronous processing continues via a dispatch and the
+            // request will eventually complete, triggering onComplete.
+        }
+
+        @Override
+        public void onError(AsyncEvent event) throws IOException {
+            // Asynchronous processing terminated with an error and will not complete.
+            releaseOnce();
+        }
+
+        @Override
+        public void onStartAsync(AsyncEvent event) throws IOException {
+            // Keep holding the permit across subsequent asynchronous cycles.
+            event.getAsyncContext().addListener(this);
+        }
+
+        private void releaseOnce() {
+            if (released.compareAndSet(false, true)) {
+                semaphore.release();
+            }
+        }
+    }
 }

@@ -48,7 +48,7 @@ public final class UriUtil {
         } else {
             WAR_SEPARATOR = custom + "/";
             PATTERN_CUSTOM = Pattern.compile(Pattern.quote(WAR_SEPARATOR));
-            StringBuilder sb = new StringBuilder(custom.length() * 3);
+            StringBuilder sb = new StringBuilder(custom.length() * 3 + 1);
             // Deliberately use the platform's default encoding
             byte[] ba = custom.getBytes();
             for (byte toEncode : ba) {
@@ -59,6 +59,10 @@ public final class UriUtil {
                 sb.append(HEX[high]);
                 sb.append(HEX[low]);
             }
+            // The pattern matches custom + "/" so the trailing '/' has to be
+            // preserved by the replacement. This is consistent with the
+            // default handling of "*/" which is replaced with "%2a/".
+            sb.append('/');
             REPLACE_CUSTOM = sb.toString();
         }
     }
@@ -70,7 +74,8 @@ public final class UriUtil {
 
 
     /**
-     * Determine if the character is allowed in the scheme of a URI. See RFC 2396, Section 3.1
+     * Determine if the character is allowed in the scheme of a URI. See RFC 2396, Section 3.1. Note that this method
+     * is more permissive than RFC 2396 which requires the first scheme character to be an alpha.
      *
      * @param c The character to test
      *

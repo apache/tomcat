@@ -26,13 +26,13 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpSessionBindingEvent;
 import jakarta.servlet.http.HttpSessionBindingListener;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.Session;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.juli.logging.Log;
@@ -74,7 +74,7 @@ public class CrawlerSessionManagerValve extends ValveBase {
 
     /**
      * Specify the regular expression (using {@link Pattern}) that will be used to identify crawlers based in the
-     * User-Agent header provided. The default is ".*GoogleBot.*|.*bingbot.*|.*Yahoo! Slurp.*"
+     * User-Agent header provided. The default is ".*[bB]ot.*|.*Yahoo! Slurp.*|.*Feedfetcher-Google.*"
      *
      * @param crawlerUserAgents The regular expression using {@link Pattern}
      */
@@ -89,6 +89,7 @@ public class CrawlerSessionManagerValve extends ValveBase {
 
     /**
      * Get the regular expression used to identify crawlers based on the User-Agent header.
+     *
      * @see #setCrawlerUserAgents(String)
      *
      * @return The current regular expression being used to match user agents
@@ -115,6 +116,7 @@ public class CrawlerSessionManagerValve extends ValveBase {
 
     /**
      * Get the regular expression used to identify crawlers based on their IP address.
+     *
      * @see #setCrawlerIps(String)
      *
      * @return The current regular expression being used to match IP addresses
@@ -136,6 +138,7 @@ public class CrawlerSessionManagerValve extends ValveBase {
 
     /**
      * Get the session timeout for a crawler's session.
+     *
      * @see #setSessionInactiveInterval(int)
      *
      * @return The current timeout in seconds
@@ -281,24 +284,36 @@ public class CrawlerSessionManagerValve extends ValveBase {
         getNext().invoke(request, response);
 
         if (isBot) {
-            if (sessionId == null) {
-                // Has bot just created a session, if so make a note of it
-                HttpSession s = request.getSession(false);
-                if (s != null) {
-                    clientIdSessionId.put(clientIdentifier, s.getId());
-                    // #valueUnbound() will be called on session expiration
-                    s.setAttribute(this.getClass().getName(),
-                            new CrawlerHttpSessionBindingListener(clientIdSessionId, clientIdentifier));
-                    s.setMaxInactiveInterval(sessionInactiveInterval);
+            Session s = request.getSessionInternal(false);
+            if (s == null || s.getPrincipal() == null) {
+                if (sessionId == null) {
+                    // Has bot just created a session, if so make a note of it
+                    if (s != null) {
+                        clientIdSessionId.put(clientIdentifier, s.getId());
+                        // #valueUnbound() will be called on session expiration
+                        s.getSession().setAttribute(this.getClass().getName(),
+                                new CrawlerHttpSessionBindingListener(clientIdSessionId, clientIdentifier));
+                        s.setMaxInactiveInterval(sessionInactiveInterval);
 
+                        if (log.isTraceEnabled()) {
+                            log.trace(request.hashCode() + ": New bot session. SessionID=" + s.getId());
+                        }
+                    }
+                } else {
                     if (log.isTraceEnabled()) {
-                        log.trace(request.hashCode() + ": New bot session. SessionID=" + s.getId());
+                        log.trace(request.hashCode() + ": Bot session accessed. SessionID=" + sessionId);
                     }
                 }
             } else {
-                if (log.isTraceEnabled()) {
-                    log.trace(request.hashCode() + ": Bot session accessed. SessionID=" + sessionId);
-                }
+                /*
+                 * The session is authenticated. That shouldn't happen and indicates some form of mis-configuration.
+                 * Make a best efforts (i.e. this is hardening against mis-configuration, NOT vulnerability mitigation)
+                 * attempt to protect against the authenticated session being shared.
+                 */
+                s.expire();
+                clientIdSessionId.remove(clientIdentifier, s.getIdInternal());
+                log.warn(sm.getString("crawlerSessionManagerValve.principal", clientIdentifier,
+                        request.getHeader("User-Agent"), s.getPrincipal()));
             }
         }
     }

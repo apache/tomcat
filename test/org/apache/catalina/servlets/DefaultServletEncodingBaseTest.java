@@ -190,12 +190,12 @@ public abstract class DefaultServletEncodingBaseTest extends TomcatBaseTest {
         defaultServlet.addInitParameter("fileEncoding", fileEncoding);
         defaultServlet.addInitParameter("useBomIfPresent", getUseBom().configurationValue);
 
-        ctxt.addServletMappingDecoded("/", "default");
+        ctxt.addServletMapping("/", "default");
 
         if (useInclude) {
             Tomcat.addServlet(ctxt, "include", new EncodingServlet(
                     outputEncoding, callSetCharacterEncoding, targetFile, useWriter));
-            ctxt.addServletMappingDecoded("/include", "include");
+            ctxt.addServletMapping("/include", "include");
         }
 
         tomcat.start();

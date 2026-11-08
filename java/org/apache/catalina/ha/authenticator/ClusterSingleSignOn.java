@@ -36,7 +36,8 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * A <strong>Valve</strong> that supports a "single sign on" user experience on each node of a cluster, where the
  * security identity of a user who successfully authenticates to one web application is propagated to other web
- * applications and to other nodes cluster in the same security domain. For successful use, the following requirements
+ * applications and to other nodes in the cluster in the same security domain. For successful use, the following
+ * requirements
  * must be met:
  * <ul>
  * <li>This Valve must be configured on the Container that represents a virtual host (typically an implementation of
@@ -175,6 +176,26 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve, M
     }
 
     @Override
+    protected void removeSession(String ssoId, Session session) {
+        super.removeSession(ssoId, session);
+        // If the entry still exists, replicate the updated session key set so
+        // the other nodes can also detect when the set becomes empty
+        if (cache.containsKey(ssoId)) {
+            ((ReplicatedMap<String,SingleSignOnEntry>) cache).replicate(ssoId, true);
+        }
+    }
+
+    @Override
+    protected void sessionChangedId(String ssoId, Session session, String oldSessionId) {
+        super.sessionChangedId(ssoId, session, oldSessionId);
+        // Replicate the updated session key set so stale session IDs do not
+        // remain on the other nodes
+        if (cache.containsKey(ssoId)) {
+            ((ReplicatedMap<String,SingleSignOnEntry>) cache).replicate(ssoId, true);
+        }
+    }
+
+    @Override
     protected SessionListener getSessionListener(String ssoId) {
         return new ClusterSingleSignOnListener(ssoId);
     }
@@ -242,8 +263,11 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve, M
 
         super.stopInternal();
 
-        if (getCluster() != null) {
-            ((ReplicatedMap<?,?>) cache).breakdown();
+        // The cache is only a ReplicatedMap if start completed successfully.
+        // If the ReplicatedMap creation failed, the base class ConcurrentHashMap
+        // is still in place.
+        if (cache instanceof ReplicatedMap<?,?> map) {
+            map.breakdown();
         }
     }
 }

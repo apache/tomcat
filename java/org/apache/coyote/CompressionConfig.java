@@ -38,8 +38,8 @@ import org.apache.tomcat.util.http.parser.TokenList;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
-     * Configuration for HTTP response compression settings.
-     */
+ * Configuration for HTTP response compression settings.
+ */
 public class CompressionConfig {
 
     /**
@@ -63,6 +63,8 @@ public class CompressionConfig {
 
     /**
      * Returns the list of content encodings that indicate already-compressed content.
+     * <p>
+     * The order of the encodings in the returned list is not guaranteed.
      *
      * @return comma-separated list of encoding names
      */
@@ -72,19 +74,18 @@ public class CompressionConfig {
 
 
     /**
-     * Set the list of content encodings that indicate already-compressed content.
-     * When content is already encoded with one of these encodings, compression will not be applied
-     * to prevent double compression.
+     * Set the list of content encodings that indicate already-compressed content. When content is already encoded with
+     * one of these encodings, compression will not be applied to prevent double compression.
      *
-     * @param encodings Comma-separated list of encoding names (e.g., "gzip,br.dflate")
+     * @param encodings Comma-separated list of encoding names (e.g., "gzip,br,deflate")
      */
     public void setNoCompressionEncodings(String encodings) {
         Set<String> newEncodings = new HashSet<>();
         if (encodings != null && !encodings.isEmpty()) {
             StringTokenizer tokens = new StringTokenizer(encodings, ",");
             while (tokens.hasMoreTokens()) {
-                String token = tokens.nextToken().trim();
-                if(!token.isEmpty()) {
+                String token = tokens.nextToken().strip();
+                if (!token.isEmpty()) {
                     newEncodings.add(token);
                 }
             }
@@ -97,10 +98,14 @@ public class CompressionConfig {
      * Set compression level.
      *
      * @param compression One of <code>on</code>, <code>force</code>, <code>off</code> or the minimum compression size
-     *                        in bytes which implies <code>on</code>
+     *                        in bytes which implies <code>on</code>. Surrounding whitespace is ignored. An invalid
+     *                        value is logged and disables compression.
      */
     public void setCompression(String compression) {
-        switch (compression) {
+        // Trim the value so that surrounding whitespace in the configuration
+        // does not silently disable compression
+        String value = compression == null ? "" : compression.strip();
+        switch (value) {
             case "on" -> this.compressionLevel = 1;
             case "force" -> this.compressionLevel = 2;
             case "off" -> this.compressionLevel = 0;
@@ -108,9 +113,10 @@ public class CompressionConfig {
                 try {
                     // Try to parse compression as an int, which would give the
                     // minimum compression size
-                    setCompressionMinSize(Integer.parseInt(compression));
+                    setCompressionMinSize(Integer.parseInt(value));
                     this.compressionLevel = 1;
-                } catch (Exception e) {
+                } catch (NumberFormatException e) {
+                    log.warn(sm.getString("compressionConfig.invalidCompressionValue", value));
                     this.compressionLevel = 0;
                 }
             }
@@ -157,8 +163,7 @@ public class CompressionConfig {
 
 
     /**
-     * Returns the compiled regular expression pattern for user agents that should not
-     * receive compressed responses.
+     * Returns the compiled regular expression pattern for user agents that should not receive compressed responses.
      *
      * @return the compiled pattern, or {@code null} if not configured
      */
@@ -168,8 +173,7 @@ public class CompressionConfig {
 
 
     /**
-     * Set no compression user agent pattern. Regular expression as supported by {@link Pattern}. e.g.:
-     * <code>gorilla|desesplorer|tigrus</code>.
+     * Set no compression user agent pattern. Regular expression as supported by {@link Pattern}.
      *
      * @param noCompressionUserAgents The regular expression for user agent strings for which compression should not be
      *                                    applied
@@ -197,8 +201,13 @@ public class CompressionConfig {
      * Sets the comma-separated list of MIME types eligible for compression.
      *
      * @param valueS comma-separated MIME type string
+     *
+     * @throws IllegalArgumentException If the provided value is null
      */
     public void setCompressibleMimeType(String valueS) {
+        if (valueS == null) {
+            throw new IllegalArgumentException(sm.getString("compressionConfig.compressibleMimeTypeNull"));
+        }
         compressibleMimeType = valueS;
         compressibleMimeTypes = null;
     }
@@ -217,7 +226,7 @@ public class CompressionConfig {
         List<String> values = new ArrayList<>();
         StringTokenizer tokens = new StringTokenizer(compressibleMimeType, ",");
         while (tokens.hasMoreTokens()) {
-            String token = tokens.nextToken().trim();
+            String token = tokens.nextToken().strip();
             if (!token.isEmpty()) {
                 values.add(token);
             }
@@ -337,15 +346,22 @@ public class CompressionConfig {
         }
 
         if (useContentEncoding && !useTransferEncoding) {
+            // The ranges of a partial response refer to the bytes of the representation so it must not be content
+            // encoded. The Content-Range header is not present at the top level of a multipart/byteranges response.
+            if (response.getStatus() == 206 || responseHeaders.getHeader("Content-Range") != null) {
+                return false;
+            }
+
             // If processing reaches this far, the response might be compressed.
             // Therefore, set the Vary header to keep proxies happy
             ResponseUtil.addVaryFieldName(responseHeaders, "accept-encoding");
 
-            // Check if user-agent supports gzip encoding
-            // Only interested in whether gzip encoding is supported. Other
-            // encodings and weights can be ignored.
+            /*
+             * Check if user-agent supports gzip encoding. Only interested in whether gzip encoding is supported. Other
+             * encodings can be ignored.
+             */
             headerValues = request.getMimeHeaders().values("accept-encoding");
-            while (!foundGzip && headerValues.hasMoreElements()) {
+            while (headerValues.hasMoreElements()) {
                 List<AcceptEncoding> acceptEncodings;
                 try {
                     acceptEncodings = AcceptEncoding.parse(new StringReader(headerValues.nextElement()));
@@ -355,9 +371,13 @@ public class CompressionConfig {
                 }
 
                 for (AcceptEncoding acceptEncoding : acceptEncodings) {
-                    if ("gzip".equalsIgnoreCase(acceptEncoding.getEncoding())) {
+                    if (("gzip".equalsIgnoreCase(acceptEncoding.getEncoding()) ||
+                            "*".equals(acceptEncoding.getEncoding())) && acceptEncoding.getQuality() > 0) {
                         foundGzip = true;
-                        break;
+                    }
+                    if ("gzip".equalsIgnoreCase(acceptEncoding.getEncoding()) && acceptEncoding.getQuality() == 0) {
+                        // gzip is explicitly disabled
+                        return false;
                     }
                 }
             }

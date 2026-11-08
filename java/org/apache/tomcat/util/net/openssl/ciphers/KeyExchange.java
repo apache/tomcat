@@ -41,7 +41,7 @@ public enum KeyExchange {
      */
     EDH,
     /**
-     * Pre-shared key (SSK_kPSK).
+     * Pre-shared key (SSL_kPSK).
      */
     PSK,
     /**

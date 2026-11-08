@@ -164,7 +164,7 @@ public class OperationInfo extends FeatureInfo {
 
 
     /**
-     * Create and return a <code>ModelMBeanOperationInfo</code> object that corresponds to the attribute described by
+     * Create and return a <code>ModelMBeanOperationInfo</code> object that corresponds to the operation described by
      * this instance.
      *
      * @return the operation info

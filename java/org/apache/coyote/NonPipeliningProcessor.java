@@ -17,8 +17,8 @@
 package org.apache.coyote;
 
 /**
- * Marker interface used to indicate that the {@link Processor} does not implement pipe-lining of requests (e.g.
- * HTTP/1.1 supports pipe-lining whereas HTTP/2 does not) which may enable some components to clear references sooner to
+ * Marker interface used to indicate that the {@link Processor} does not implement pipelining of requests (e.g.
+ * HTTP/1.1 supports pipelining whereas HTTP/2 does not) which may enable some components to clear references sooner to
  * aid GC.
  */
 public interface NonPipeliningProcessor extends Processor {

@@ -276,6 +276,16 @@ public class Tomcat {
 
         try (InputStream is = uConn.getInputStream(); OutputStream os = new FileOutputStream(targetWar)) {
             IOTools.flow(is, os);
+        } catch (IOException e) {
+            // An incomplete WAR left in the appBase would block any subsequent attempt to deploy
+            // to this context path via the conflict checks above, so remove it before rethrowing.
+            if (targetWar.exists() && !targetWar.delete()) {
+                Logger.getLogger(getLoggerName(getHost(), contextPath)).log(Level.WARNING,
+                        sm.getString("tomcat.addWebapp.copyCleanupFailed", source, contextPath,
+                                targetWar.getAbsolutePath()),
+                        e);
+            }
+            throw e;
         }
 
         return addWebapp(contextPath, targetWar.getAbsolutePath());
@@ -311,7 +321,7 @@ public class Tomcat {
      * TODO: add the rest
      *
      * @param contextPath The context mapping to use, "" for root context.
-     * @param docBase     Base directory for the context, for static files. Must exist, relative to the server home
+     * @param docBase     Base directory for the context, for static files
      *
      * @return the deployed context
      */
@@ -398,8 +408,11 @@ public class Tomcat {
 
     /**
      * Initialize the server given the specified configuration source. The server will be loaded according to the Tomcat
-     * configuration files contained in the source (server.xml, web.xml, context.xml, SSL certificates, etc). If no
-     * configuration source is specified, it will use the default locations for these files.
+     * configuration files contained in the source (server.xml, web.xml, context.xml, SSL certificates, etc). The
+     * configuration source is global to the JVM. Once a source has been configured, by this instance or by any earlier
+     * use in the same JVM, it will be used for all subsequent configuration and cannot be replaced: neither a later
+     * call specifying a different source nor a call specifying no source has any effect. If no source is specified and
+     * none has been configured previously, the default locations for these files are used.
      *
      * @param source The configuration source
      */
@@ -409,8 +422,11 @@ public class Tomcat {
 
     /**
      * Initialize the server given the specified configuration source. The server will be loaded according to the Tomcat
-     * configuration files contained in the source (server.xml, web.xml, context.xml, SSL certificates, etc). If no
-     * configuration source is specified, it will use the default locations for these files.
+     * configuration files contained in the source (server.xml, web.xml, context.xml, SSL certificates, etc). The
+     * configuration source is global to the JVM. Once a source has been configured, by this instance or by any earlier
+     * use in the same JVM, it will be used for all subsequent configuration and cannot be replaced: neither a later
+     * call specifying a different source nor a call specifying no source has any effect. If no source is specified and
+     * none has been configured previously, the default locations for these files are used.
      *
      * @param source            The configuration source
      * @param catalinaArguments The arguments that should be passed to Catalina
@@ -635,7 +651,7 @@ public class Tomcat {
      *
      * @param host        The host in which the context will be deployed
      * @param contextPath The context mapping to use, "" for root context
-     * @param dir         Base directory for the context, for static files. Must exist, relative to the server home
+     * @param dir         Base directory for the context, for static files
      * @return the deployed context
      * @see #addContext(String, String)
      */
@@ -649,7 +665,7 @@ public class Tomcat {
      * @param host        The host in which the context will be deployed
      * @param contextPath The context mapping to use, "" for root context
      * @param contextName The context name
-     * @param dir         Base directory for the context, for static files. Must exist, relative to the server home
+     * @param dir         Base directory for the context, for static files
      *
      * @return the deployed context
      *
@@ -691,7 +707,7 @@ public class Tomcat {
         try {
             Class<?> clazz = Class.forName((host != null ? host : getHost()).getConfigClass());
             listener = (LifecycleListener) clazz.getConstructor().newInstance();
-        } catch (ReflectiveOperationException e) {
+        } catch (ReflectiveOperationException | ClassCastException e) {
             // Wrap in IAE since we can't easily change the method signature
             // to throw the specific checked exceptions
             throw new IllegalArgumentException(e);
@@ -863,7 +879,7 @@ public class Tomcat {
         System.setProperty(Globals.CATALINA_HOME_PROP, server.getCatalinaHome().getPath());
     }
 
-    static final String[] silences = new String[] { "org.apache.coyote.http11.Http11NioProtocol",
+    private static final String[] silences = new String[] { "org.apache.coyote.http11.Http11NioProtocol",
             "org.apache.catalina.core.StandardService", "org.apache.catalina.core.StandardEngine",
             "org.apache.catalina.startup.ContextConfig", "org.apache.catalina.core.ApplicationContext",
             "org.apache.catalina.core.AprLifecycleListener", "org.apache.catalina.core.OpenSSLLifecycleListener" };
@@ -955,7 +971,8 @@ public class Tomcat {
      *
      * @param host host for which the {@link Context} should be created, or <code>null</code> if default host should be
      *                 used
-     * @param url  path of the webapp which should get the {@link Context}
+     * @param url  context path of the {@link Context} to be created (used only in the error message if the context
+     *                 class cannot be instantiated)
      *
      * @return newly created {@link Context}
      */
@@ -975,7 +992,8 @@ public class Tomcat {
                 return (Context) Class.forName(contextClass).getConstructor().newInstance();
             }
 
-        } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException e) {
+        } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException |
+                ClassCastException e) {
             throw new IllegalArgumentException(sm.getString("tomcat.noContextClass", contextClass, host, url), e);
         }
     }
@@ -1048,9 +1066,9 @@ public class Tomcat {
         servlet.setOverridable(true);
 
         // Servlet mappings
-        ctx.addServletMappingDecoded("/", "default");
-        ctx.addServletMappingDecoded("*.jsp", "jsp");
-        ctx.addServletMappingDecoded("*.jspx", "jsp");
+        ctx.addServletMapping("/", "default");
+        ctx.addServletMapping("*.jsp", "jsp");
+        ctx.addServletMapping("*.jspx", "jsp");
 
         // Sessions
         ctx.setSessionTimeout(30);

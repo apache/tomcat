@@ -427,8 +427,9 @@ public class ErrorReportValve extends ValveBase {
 
 
     /**
-     * Sets a property for error page configuration. Properties starting with
-     * "errorCode." or "exceptionType." are used to configure error pages.
+     * Sets a property for error page configuration. Properties starting with "errorCode." or "exceptionType." are used
+     * to configure error pages. Note that subclasses that do not generate HTML error pages (e.g.
+     * {@link JsonErrorReportValve}) ignore the configured error pages.
      *
      * @param name  The property name
      * @param value The property value
@@ -437,7 +438,12 @@ public class ErrorReportValve extends ValveBase {
      */
     public boolean setProperty(String name, String value) {
         if (name.startsWith("errorCode.")) {
-            int code = Integer.parseInt(name.substring(10));
+            int code;
+            try {
+                code = Integer.parseInt(name.substring(10));
+            } catch (NumberFormatException e) {
+                return false;
+            }
             ErrorPage ep = new ErrorPage();
             ep.setErrorCode(code);
             ep.setLocation(value);
@@ -464,7 +470,12 @@ public class ErrorReportValve extends ValveBase {
     public String getProperty(String name) {
         String result;
         if (name.startsWith("errorCode.")) {
-            int code = Integer.parseInt(name.substring(10));
+            int code;
+            try {
+                code = Integer.parseInt(name.substring(10));
+            } catch (NumberFormatException e) {
+                return null;
+            }
             ErrorPage ep = errorPageSupport.find(code);
             if (ep == null) {
                 result = null;

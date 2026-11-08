@@ -67,13 +67,13 @@ public class TestStatusTransformer extends TomcatBaseTest {
         ctxt.setPrivileged(true);
         Wrapper defaultServlet = Tomcat.addServlet(ctxt, "default", "org.apache.catalina.servlets.DefaultServlet");
         defaultServlet.addInitParameter("fileEncoding", "ISO-8859-1");
-        ctxt.addServletMappingDecoded("/", "default");
+        ctxt.addServletMapping("/", "default");
         Tomcat.addServlet(ctxt, "status", "org.apache.catalina.manager.StatusManagerServlet");
-        ctxt.addServletMappingDecoded("/status/*", "status");
+        ctxt.addServletMapping("/status/*", "status");
         ctxt.addMimeMapping("html", "text/html");
         Context ctxt2 = tomcat.addContext("/test", null);
         Tomcat.addServlet(ctxt2, "status", "org.apache.catalina.manager.StatusManagerServlet");
-        ctxt.addServletMappingDecoded("/somepath/*", "status");
+        ctxt.addServletMapping("/somepath/*", "status");
         tomcat.start();
 
         SimpleHttpClient client = new SimpleHttpClient() {

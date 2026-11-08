@@ -16,6 +16,8 @@
  */
 package org.apache.jasper.tagplugins.jstl.core;
 
+import jakarta.servlet.jsp.PageContext;
+
 import org.apache.jasper.compiler.tagplugin.TagPlugin;
 import org.apache.jasper.compiler.tagplugin.TagPluginContext;
 import org.apache.jasper.tagplugins.jstl.Util;
@@ -63,6 +65,13 @@ public class Set implements TagPlugin {
             ctxt.generateJavaSource(resultName + " = ");
             ctxt.generateAttribute("value");
             ctxt.generateJavaSource(";");
+            // Without a var or a target, nothing receives the value. The
+            // standard handler fails this use on the missing target, so let
+            // it handle the tag.
+            if (!hasVar && !hasTarget) {
+                ctxt.dontUseTagPlugin();
+                return;
+            }
         } else {
             ctxt.dontUseTagPlugin();
             return;
@@ -87,10 +96,32 @@ public class Set implements TagPlugin {
         // if the attribute var has been specified then assign the result to the var;
         if (hasVar) {
             String strVar = ctxt.getConstantAttribute("var");
-            ctxt.generateJavaSource("if(null != " + resultName + "){");
-            ctxt.generateJavaSource(
-                    "    " + jspCtxt + ".setAttribute(\"" + strVar + "\"," + resultName + "," + iScope + ");");
+            String varMapper = jspCtxt + ".getELContext().getVariableMapper()";
+            // A deferred value is passed as a value expression and is then
+            // exported as a mapping in the variable mapper, as the standard
+            // handler does; only the page scope can hold such a mapping.
+            ctxt.generateJavaSource("if(" + resultName +
+                    " instanceof jakarta.el.ValueExpression) {");
+            if (iScope == PageContext.PAGE_SCOPE) {
+                ctxt.generateJavaSource("    " + varMapper + ".setVariable(\"" + strVar +
+                        "\", (jakarta.el.ValueExpression) " + resultName + ");");
+            } else {
+                ctxt.generateJavaSource("    throw new JspTagException(\"Invalid scope for ValueExpression in " +
+                        "&lt;set&gt;. \\\"page\\\" scope is required but was \\\"" + strScope + "\\\"\");");
+            }
+            ctxt.generateJavaSource("} else if(null != " + resultName + "){");
+            // A mapping in the variable mapper would shadow the attribute
+            if (iScope == PageContext.PAGE_SCOPE) {
+                ctxt.generateJavaSource("    if(" + varMapper + ".resolveVariable(\"" + strVar + "\") != null) {");
+                ctxt.generateJavaSource("        " + varMapper + ".setVariable(\"" + strVar + "\", null);");
+                ctxt.generateJavaSource("    }");
+            }
+            ctxt.generateJavaSource("    " + jspCtxt + ".setAttribute(\"" + strVar + "\"," + resultName + "," +
+                    iScope + ");");
             ctxt.generateJavaSource("} else {");
+            ctxt.generateJavaSource("    if(" + varMapper + ".resolveVariable(\"" + strVar + "\") != null) {");
+            ctxt.generateJavaSource("        " + varMapper + ".setVariable(\"" + strVar + "\", null);");
+            ctxt.generateJavaSource("    }");
             if (hasScope) {
                 ctxt.generateJavaSource("    " + jspCtxt + ".removeAttribute(\"" + strVar + "\"," + iScope + ");");
             } else {

@@ -16,7 +16,11 @@
  */
 package jakarta.servlet.http;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
@@ -57,7 +61,7 @@ public class TestHttpServlet extends TomcatBaseTest {
         // Map the test Servlet
         LargeBodyServlet largeBodyServlet = new LargeBodyServlet();
         Tomcat.addServlet(ctx, "largeBodyServlet", largeBodyServlet);
-        ctx.addServletMappingDecoded("/", "largeBodyServlet");
+        ctx.addServletMapping("/", "largeBodyServlet");
 
         tomcat.start();
 
@@ -94,11 +98,11 @@ public class TestHttpServlet extends TomcatBaseTest {
 
         Bug57602ServletOuter outer = new Bug57602ServletOuter();
         Tomcat.addServlet(ctx, "Bug57602ServletOuter", outer);
-        ctx.addServletMappingDecoded("/outer", "Bug57602ServletOuter");
+        ctx.addServletMapping("/outer", "Bug57602ServletOuter");
 
         Bug57602ServletInner inner = new Bug57602ServletInner();
         Tomcat.addServlet(ctx, "Bug57602ServletInner", inner);
-        ctx.addServletMappingDecoded("/inner", "Bug57602ServletInner");
+        ctx.addServletMapping("/inner", "Bug57602ServletInner");
 
         tomcat.start();
 
@@ -167,7 +171,7 @@ public class TestHttpServlet extends TomcatBaseTest {
         Wrapper w = Tomcat.addServlet(ctx, "TestServlet", servlet);
         // Not all need/use this but it is simpler to set it for all
         w.setAsyncSupported(true);
-        ctx.addServletMappingDecoded("/test", "TestServlet");
+        ctx.addServletMapping("/test", "TestServlet");
 
         tomcat.start();
 
@@ -220,8 +224,163 @@ public class TestHttpServlet extends TomcatBaseTest {
 
 
     @Test
+    public void testDoOptionsAfterDeserialization() throws Exception {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        // Serialize before the Allow header cache has been initialized.
+        try (ObjectOutputStream stream = new ObjectOutputStream(bytes)) {
+            stream.writeObject(new OptionsServlet());
+        }
+
+        OptionsServlet servlet;
+        try (ObjectInputStream stream = new ObjectInputStream(new ByteArrayInputStream(bytes.toByteArray()))) {
+            servlet = (OptionsServlet) stream.readObject();
+        }
+
+        doTestDoOptions(servlet, "GET, HEAD, OPTIONS");
+    }
+
+
+    @Test
     public void testDoOptionsSub() throws Exception {
         doTestDoOptions(new OptionsServletSub(), "GET, HEAD, POST, OPTIONS");
+    }
+
+
+    @Test
+    public void testDoOptionsQuery() throws Exception {
+        doTestDoOptions(new OptionsServletQuery(), "GET, HEAD, QUERY, OPTIONS");
+    }
+
+
+    @Test
+    public void testMethodNotAllowed() throws Exception {
+        doTestMethodNotAllowed(new OptionsServlet(), "GET, HEAD, OPTIONS");
+    }
+
+
+    @Test
+    public void testMethodNotAllowedSub() throws Exception {
+        doTestMethodNotAllowed(new OptionsServletSub(), "GET, HEAD, POST, OPTIONS");
+    }
+
+
+    /*
+     * An Allow header set by the application before the default doPut() implementation is called must not be replaced.
+     */
+    @Test
+    public void testMethodNotAllowedExistingAllow() throws Exception {
+        doTestMethodNotAllowed(new AllowServlet(), "FOO");
+    }
+
+
+    @Test
+    public void testQueryMethod() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
+
+        // Map the test Servlet
+        OptionsServletQuery servlet = new OptionsServletQuery();
+        Tomcat.addServlet(ctx, "servlet", servlet);
+        ctx.addServletMapping("/", "servlet");
+
+        tomcat.start();
+
+        SimpleHttpClient client = new SimpleHttpClient() {
+            @Override
+            public boolean isResponseBodyOK() {
+                return true;
+            }
+        };
+        client.setPort(getPort());
+        client.setRequest(new String[] {
+                "QUERY / HTTP/1.1" + CRLF +
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Type: text/plain" + CRLF +
+                    "Connection: close" + CRLF +
+                    CRLF
+        });
+        client.connect();
+        client.sendRequest();
+        client.readResponse(true);
+
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertEquals("OK", client.getResponseBody());
+    }
+
+
+    @Test
+    public void testQueryMethodWithoutContentType() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
+
+        // Map the test Servlet
+        OptionsServletQuery servlet = new OptionsServletQuery();
+        Tomcat.addServlet(ctx, "servlet", servlet);
+        ctx.addServletMapping("/", "servlet");
+
+        tomcat.start();
+
+        SimpleHttpClient client = new SimpleHttpClient() {
+            @Override
+            public boolean isResponseBodyOK() {
+                return true;
+            }
+        };
+        client.setPort(getPort());
+        client.setRequest(new String[] {
+                "QUERY / HTTP/1.1" + CRLF +
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Connection: close" + CRLF +
+                    CRLF
+        });
+        client.connect();
+        client.sendRequest();
+        client.readResponse(true);
+
+        Assert.assertTrue(client.isResponse400());
+    }
+
+
+    @Test
+    public void testQueryParameters() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
+
+        // Map the test Servlet
+        ParamsServlet servlet = new ParamsServlet();
+        Tomcat.addServlet(ctx, "servlet", servlet);
+        ctx.addServletMapping("/", "servlet");
+
+        tomcat.start();
+
+        SimpleHttpClient client = new SimpleHttpClient() {
+            @Override
+            public boolean isResponseBodyOK() {
+                return true;
+            }
+        };
+        client.setPort(getPort());
+        client.setRequest(new String[] {
+                "QUERY /?baz=123 HTTP/1.1" + CRLF +
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Type: application/x-www-form-urlencoded" + CRLF +
+                    "Content-Length: 15" + CRLF +
+                    "Connection: close" + CRLF +
+                    CRLF +
+                    "foo=abc&bar=xyz"
+        });
+        client.connect();
+        client.sendRequest();
+        client.readResponse(true);
+
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertEquals("abc,xyz,123", client.getResponseBody());
     }
 
 
@@ -233,7 +392,7 @@ public class TestHttpServlet extends TomcatBaseTest {
 
         // Map the test Servlet
         Tomcat.addServlet(ctx, "servlet", servlet);
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         tomcat.start();
 
@@ -243,6 +402,33 @@ public class TestHttpServlet extends TomcatBaseTest {
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
         Assert.assertEquals(expectedAllow, resHeaders.get("Allow").get(0));
+    }
+
+
+    /*
+     * RFC 9110, section 15.5.6: a 405 response must contain an Allow header field that lists the methods supported by
+     * the target resource.
+     */
+    private void doTestMethodNotAllowed(Servlet servlet, String expectedAllow) throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
+
+        // Map the test Servlet
+        Tomcat.addServlet(ctx, "servlet", servlet);
+        ctx.addServletMapping("/", "servlet");
+
+        tomcat.start();
+
+        Map<String,List<String>> resHeaders = new HashMap<>();
+        int rc = methodUrl("http://localhost:" + getPort() + "/", new ByteChunk(), DEFAULT_CLIENT_TIMEOUT_MS, null,
+                resHeaders, Method.PUT);
+
+        Assert.assertEquals(HttpServletResponse.SC_METHOD_NOT_ALLOWED, rc);
+        List<String> allow = resHeaders.get("Allow");
+        Assert.assertNotNull(allow);
+        Assert.assertEquals(expectedAllow, allow.get(0));
     }
 
 
@@ -262,8 +448,6 @@ public class TestHttpServlet extends TomcatBaseTest {
      * See org.apache.coyote.http2.TestHttpServlet for the HTTP/2 version of this test. It was placed in that package
      * because it needed access to package private classes.
      */
-
-
     private void doTestUnimplementedMethod(String httpVersion) {
         StringBuilder request = new StringBuilder("PUT /test");
         boolean isHttp09 = "0.9".equals(httpVersion);
@@ -307,7 +491,7 @@ public class TestHttpServlet extends TomcatBaseTest {
 
         // Map the test Servlet
         Tomcat.addServlet(ctx, "servlet", new SimpleServlet());
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         tomcat.start();
 
@@ -370,7 +554,7 @@ public class TestHttpServlet extends TomcatBaseTest {
 
             Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "TesterServlet", new TesterServlet());
-            root.addServletMappingDecoded("/test", "TesterServlet");
+            root.addServletMapping("/test", "TesterServlet");
 
             try {
                 tomcat.start();
@@ -581,6 +765,43 @@ public class TestHttpServlet extends TomcatBaseTest {
         @Override
         protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             doGet(req, resp);
+        }
+    }
+
+
+    private static class AllowServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.setHeader("Allow", "FOO");
+            super.doPut(req, resp);
+        }
+    }
+
+
+    private static class OptionsServletQuery extends OptionsServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doQuery(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            doGet(req, resp);
+        }
+    }
+
+
+    private static class ParamsServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doQuery(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding("UTF-8");
+            PrintWriter pw = resp.getWriter();
+            pw.print(req.getParameter("foo") + "," + req.getParameter("bar") + "," + req.getParameter("baz"));
         }
     }
 }

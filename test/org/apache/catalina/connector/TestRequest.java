@@ -147,7 +147,7 @@ public class TestRequest extends TomcatBaseTest {
             Tomcat tomcat = getTomcatInstance();
             Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "Bug37794", new Bug37794Servlet());
-            root.addServletMappingDecoded("/test", "Bug37794");
+            root.addServletMapping("/test", "Bug37794");
 
             tomcat.start();
 
@@ -241,7 +241,7 @@ public class TestRequest extends TomcatBaseTest {
 
         // Add the Servlet
         Tomcat.addServlet(ctx, "servlet", new EchoQueryStringServlet());
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         tomcat.start();
 
@@ -287,7 +287,7 @@ public class TestRequest extends TomcatBaseTest {
         ctx.getPipeline().addValve(new BasicAuthenticator());
 
         Tomcat.addServlet(ctx, "servlet", new LoginLogoutServlet());
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         TesterMapRealm realm = new TesterMapRealm();
         realm.addUser(LoginLogoutServlet.USER, LoginLogoutServlet.PWD);
@@ -336,7 +336,7 @@ public class TestRequest extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         Context root = tomcat.addContext("", System.getProperty("java.io.tmpdir"));
         Tomcat.addServlet(root, "Bug37794", new Bug37794Servlet());
-        root.addServletMappingDecoded("/", "Bug37794");
+        root.addServletMapping("/", "Bug37794");
         tomcat.start();
 
         HttpURLConnection conn = getConnection("http://localhost:" + getPort() + "/");
@@ -349,7 +349,7 @@ public class TestRequest extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         Context root = tomcat.addContext("", System.getProperty("java.io.tmpdir"));
         Tomcat.addServlet(root, "Bug37794", new Bug37794Servlet());
-        root.addServletMappingDecoded("/", "Bug37794");
+        root.addServletMapping("/", "Bug37794");
         tomcat.start();
 
         HttpURLConnection conn = getConnection("http://localhost:" + getPort() + "/");
@@ -418,7 +418,7 @@ public class TestRequest extends TomcatBaseTest {
         Context root = tomcat.addContext("", System.getProperty("java.io.tmpdir"));
         root.setAllowCasualMultipartParsing(true);
         Tomcat.addServlet(root, "Bug54984", new Bug54984Servlet());
-        root.addServletMappingDecoded("/", "Bug54984");
+        root.addServletMapping("/", "Bug54984");
         tomcat.start();
 
         HttpURLConnection conn = getConnection("http://localhost:" + getPort() + "/parseParametersBeforeParseParts");
@@ -493,7 +493,7 @@ public class TestRequest extends TomcatBaseTest {
             Tomcat tomcat = getTomcatInstance();
             Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "EchoParameters", new EchoParametersServlet());
-            root.addServletMappingDecoded("/echo", "EchoParameters");
+            root.addServletMapping("/echo", "EchoParameters");
             tomcat.start();
 
             setPort(tomcat.getConnector().getLocalPort());
@@ -767,7 +767,7 @@ public class TestRequest extends TomcatBaseTest {
         ctx.setAllowMultipleLeadingForwardSlashInPath(true);
 
         Tomcat.addServlet(ctx, "servlet", new Bug56501Servlet());
-        ctx.addServletMappingDecoded("/*", "servlet");
+        ctx.addServletMapping("/*", "servlet");
 
         tomcat.start();
 
@@ -788,6 +788,85 @@ public class TestRequest extends TomcatBaseTest {
             resp.setContentType("text/plain");
             resp.getWriter().print(req.getContextPath());
         }
+    }
+
+    /*
+     * The locale limit is configurable via the maxLocaleCount attribute
+     * of the Connector associated with the request.
+     */
+    @Test
+    public void testAcceptLanguageLocaleLimitConfigurable() throws Exception {
+        // Connector default of 10 permits exactly 10 locales
+        Assert.assertEquals(10, localeCount(new Connector(), buildAcceptLanguage(10)));
+
+        // Explicit limit is enforced
+        Connector connector = new Connector();
+        connector.setMaxLocaleCount(5);
+        Assert.assertEquals(5, localeCount(connector, buildAcceptLanguage(5)));
+
+        Assert.assertEquals(5, localeCount(connector, buildAcceptLanguage(6)));
+
+        // No limit
+        connector = new Connector();
+        connector.setMaxLocaleCount(-1);
+        Assert.assertEquals(20, localeCount(connector, buildAcceptLanguage(20)));
+    }
+
+    private static String buildAcceptLanguage(int localeCount) {
+        StringBuilder acceptLanguage = new StringBuilder();
+        for (int i = 0; i < localeCount; i++) {
+            if (i > 0) {
+                acceptLanguage.append(',');
+            }
+            acceptLanguage.append(String.format("aa-%03d", Integer.valueOf(i)));
+        }
+        return acceptLanguage.toString();
+    }
+
+    private static int localeCount(Connector connector, String acceptLanguage) {
+        org.apache.coyote.Request coyoteRequest = new org.apache.coyote.Request();
+        coyoteRequest.getMimeHeaders().addValue("accept-language").setString(acceptLanguage);
+        Request request = new Request(connector, coyoteRequest);
+
+        Enumeration<Locale> locales = request.getLocales();
+        int count = 0;
+        while (locales.hasMoreElements()) {
+            locales.nextElement();
+            count++;
+        }
+        return count;
+    }
+
+    /*
+     * When multiple Accept-Language headers are present the limit
+     * applies to the combined set of locales and parsing stops
+     * early on the header in which the limit is exceeded.
+     */
+    @Test
+    public void testAcceptLanguageLocaleLimitMultipleHeaders() throws Exception {
+        // 5 + 5 = 10, within the default limit
+        Assert.assertEquals(10, localeCount(new Connector(), "aa-000,aa-001,aa-002,aa-003,aa-004",
+                "aa-005,aa-006,aa-007,aa-008,aa-009"));
+
+        // 5 + 6 = 11, exceeds the default limit
+        Assert.assertEquals(10, localeCount(new Connector(), "aa-000,aa-001,aa-002,aa-003,aa-004",
+                    "aa-005,aa-006,aa-007,aa-008,aa-009,aa-010"));
+    }
+
+    private static int localeCount(Connector connector, String... acceptLanguages) {
+        org.apache.coyote.Request coyoteRequest = new org.apache.coyote.Request();
+        for (String acceptLanguage : acceptLanguages) {
+            coyoteRequest.getMimeHeaders().addValue("accept-language").setString(acceptLanguage);
+        }
+        Request request = new Request(connector, coyoteRequest);
+
+        Enumeration<Locale> locales = request.getLocales();
+        int count = 0;
+        while (locales.hasMoreElements()) {
+            locales.nextElement();
+            count++;
+        }
+        return count;
     }
 
     @Test
@@ -819,6 +898,31 @@ public class TestRequest extends TomcatBaseTest {
         Assert.assertEquals(expected, actual);
     }
 
+    /*
+     * A script subtag in the Accept-Language header must not end up in the
+     * Locale variant, which made the Locale report the language tag
+     * zh-CN-x-lvariant-HANS for the tag the client sent as zh-Hans-CN. The
+     * default parser cannot represent the script at all and drops it, the
+     * standard parser keeps it.
+     */
+    @Test
+    public void getLocaleScript() throws Exception {
+        TesterRequest req = new TesterRequest();
+
+        req.addHeader("accept-language", "zh-Hans-CN;q=1.0");
+
+        Locale actual = req.getLocale();
+
+        boolean standardParser = Boolean
+                .getBoolean("org.apache.tomcat.util.http.parser.StandardAcceptLanguageParser");
+        Locale expected = Locale.forLanguageTag(standardParser ? "zh-Hans-CN" : "zh-CN");
+
+        Assert.assertEquals(expected, actual);
+        Assert.assertEquals("CN", actual.getCountry());
+        Assert.assertEquals("", actual.getVariant());
+        Assert.assertEquals(expected.toLanguageTag(), actual.toLanguageTag());
+    }
+
 
     @Test
     public void testGetReaderValidEncoding() throws Exception {
@@ -841,7 +945,7 @@ public class TestRequest extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "servlet", new Bug61264GetReaderServlet());
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         tomcat.start();
 
@@ -912,7 +1016,7 @@ public class TestRequest extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "servlet", new Bug69442Servlet());
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         tomcat.start();
 
@@ -953,7 +1057,7 @@ public class TestRequest extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         Context ctx = getProgrammaticRootContext();
         Tomcat.addServlet(ctx, "Bug69690", new Bug69690Servlet());
-        ctx.addServletMappingDecoded("/", "Bug69690");
+        ctx.addServletMapping("/", "Bug69690");
         tomcat.start();
 
         HttpURLConnection conn = getConnection("http://localhost:" + getPort() + "/parameter?a=b");
@@ -987,7 +1091,7 @@ public class TestRequest extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         Context ctx = getProgrammaticRootContext();
         Tomcat.addServlet(ctx, "Bug69690", new Bug69690Servlet());
-        ctx.addServletMappingDecoded("/", "Bug69690");
+        ctx.addServletMapping("/", "Bug69690");
         tomcat.start();
 
         HttpURLConnection conn = getConnection("http://localhost:" + getPort() + "/part?a=b");

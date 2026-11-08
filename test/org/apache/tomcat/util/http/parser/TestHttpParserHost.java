@@ -228,6 +228,15 @@ public class TestHttpParserHost {
         // IPv6 - invalid port
         result.add(new Object[] { TestType.IPv4, "[::1]:x", Integer.valueOf(-1), IAE} );
         result.add(new Object[] { TestType.IPv4, "[::1]:-1", Integer.valueOf(-1), IAE} );
+        // Domain name - empty port (permitted, treated as no port)
+        result.add(new Object[] { TestType.IPv4, "localhost:", Integer.valueOf(9), null} );
+        result.add(new Object[] { TestType.IPv4, "foo.bar.:", Integer.valueOf(8), null} );
+        // IPv4 - empty port (permitted, treated as no port)
+        result.add(new Object[] { TestType.IPv4, "127.0.0.1:", Integer.valueOf(9), null} );
+        // IPv6 - empty port (permitted, treated as no port). Only the IPv6
+        // test type is valid here: readHostIPv4() rejects the brackets before
+        // the empty port is reached.
+        result.add(new Object[] { TestType.IPv6, "[::1]:", Integer.valueOf(5), null} );
         return result;
     }
 

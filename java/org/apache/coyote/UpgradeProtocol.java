@@ -97,7 +97,7 @@ public interface UpgradeProtocol {
 
 
     /**
-     * Configure the HTTP/1.1 protocol that this UpgradeProcotol is nested under. Connections passed to this
+     * Configure the HTTP/1.1 protocol that this UpgradeProtocol is nested under. Connections passed to this
      * UpgradeProtocol via HTTP upgrade will have been initially handled by this HTTP/1.1 protocol implementation.
      * <p>
      * The default implementation is a NO-OP.

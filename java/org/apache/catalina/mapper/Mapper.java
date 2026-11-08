@@ -93,7 +93,7 @@ public final class Mapper {
     // --------------------------------------------------------- Public Methods
 
     /**
-     * Set default host.
+     * Set default host. The host name is resolved case-sensitively against the registered host names and aliases.
      *
      * @param defaultHostName Default host name
      */
@@ -165,6 +165,12 @@ public final class Mapper {
         MappedHost host = exactFind(hosts, name);
         if (host == null || host.isAlias()) {
             return;
+        }
+        // Requests must not keep going to a removed host, even if it was the
+        // default host. A new default host is resolved again if the
+        // configuration still refers to a host that exists.
+        if (defaultHost != null && defaultHost.getRealHost() == host) {
+            defaultHost = null;
         }
         MappedHost[] newHosts = hosts.clone();
         // Remove real host and all its aliases
@@ -239,10 +245,12 @@ public final class Mapper {
         }
         MappedHost[] newHosts = new MappedHost[hosts.length - 1];
         if (removeMap(hosts, newHosts, alias)) {
-            hosts = newHosts;
             hostMapping.getRealHost().removeAlias(hostMapping);
+            if (defaultHost == hostMapping) {
+                defaultHost = null;
+            }
+            hosts = newHosts;
         }
-
     }
 
     /**
@@ -739,30 +747,43 @@ public final class Mapper {
         }
 
         // Virtual host mapping
-        MappedHost[] hosts = this.hosts;
-        MappedHost mappedHost = exactFindIgnoreCase(hosts, host);
-        if (mappedHost == null) {
-            // Note: Internally, the Mapper does not use the leading * on a
-            // wildcard host. This is to allow this shortcut.
-            int firstDot = host.indexOf('.');
-            if (firstDot > -1) {
-                int start = host.getStart();
-                try {
-                    host.setStart(firstDot + start);
-                    mappedHost = exactFindIgnoreCase(hosts, host);
-                } finally {
-                    // Make absolutely sure this gets reset
-                    host.setStart(start);
+        boolean trailingPeriodRemoved = false;
+        MappedHost mappedHost = null;
+        try {
+            if (host.length() > 0 && host.charAt(host.length() - 1)  == '.') {
+                host.setEnd(host.getEnd() - 1);
+                trailingPeriodRemoved = true;
+            }
+            MappedHost[] hosts = this.hosts;
+            mappedHost = exactFindIgnoreCase(hosts, host);
+            if (mappedHost == null) {
+                // Note: Internally, the Mapper does not use the leading * on a
+                // wildcard host. This is to allow this shortcut.
+                int firstDot = host.indexOf('.');
+                if (firstDot > -1) {
+                    int start = host.getStart();
+                    try {
+                        host.setStart(firstDot + start);
+                        mappedHost = exactFindIgnoreCase(hosts, host);
+                    } finally {
+                        // Make absolutely sure this gets reset
+                        host.setStart(start);
+                    }
+                }
+                if (mappedHost == null) {
+                    mappedHost = defaultHost;
+                    if (mappedHost == null) {
+                        return;
+                    }
                 }
             }
-            if (mappedHost == null) {
-                mappedHost = defaultHost;
-                if (mappedHost == null) {
-                    return;
-                }
+            mappingData.host = mappedHost.object;
+        } finally {
+            // Make absolutely sure this gets reset if required
+            if (trailingPeriodRemoved) {
+                host.setEnd(host.getEnd() + 1);
             }
         }
-        mappingData.host = mappedHost.object;
 
         if (uri.isNull()) {
             // Can't map context or wrapper without a uri

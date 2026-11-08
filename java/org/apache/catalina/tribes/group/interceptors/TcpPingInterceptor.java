@@ -180,11 +180,7 @@ public class TcpPingInterceptor extends ChannelInterceptorBase implements TcpPin
         return useThread;
     }
 
-    /**
-     * Returns whether static-only mode is enabled.
-     *
-     * @return true if only static members are pinged
-     */
+    @Override
     public boolean getStaticOnly() {
         return staticOnly;
     }
@@ -263,9 +259,7 @@ public class TcpPingInterceptor extends ChannelInterceptorBase implements TcpPin
                     sleep(interval);
                     sendPing();
                 } catch (InterruptedException ix) {
-                    // Ignore. Probably triggered by a call to stop().
-                    // In the highly unlikely event it was a different trigger,
-                    // simply ignore it and continue.
+                    // Expected during shutdown. The running flag is already set to false, so the loop will exit.
                 } catch (Exception e) {
                     log.warn(sm.getString("tcpPingInterceptor.pingFailed.pingThread"), e);
                 }

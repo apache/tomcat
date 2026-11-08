@@ -18,6 +18,9 @@ package org.apache.catalina.tribes.group.interceptors;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 
 import org.apache.catalina.tribes.Channel;
@@ -61,6 +64,11 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase implemen
      */
     protected final ArrayList<Member> members = new ArrayList<>();
     /**
+     * Static members that have been replaced by the dynamically discovered member for the same node, keyed by the
+     * member that replaced them. Guarded by {@link #members}.
+     */
+    private final Map<Member,Member> replaced = new HashMap<>();
+    /**
      * The local member for this interceptor.
      */
     protected Member localMember = null;
@@ -74,28 +82,67 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase implemen
 
     /**
      * Adds a static member to the membership list.
+     *
      * @param member the member to add
      */
     public void addStaticMember(Member member) {
+        List<Member> withdrawn = new ArrayList<>();
         synchronized (members) {
-            if (!members.contains(member)) {
+            if (!members.contains(member) && !isDuplicateStaticMember(member)) {
                 members.add(member);
+                if (getNext() != null) {
+                    // the node may already have been discovered dynamically
+                    for (Member dynamic : super.getMembers()) {
+                        withdrawn.addAll(replaceConfiguredMember(dynamic));
+                    }
+                }
             }
         }
+        // outside of the lock, as the failure detector notifies the interceptors above
+        withdrawConfiguredMembers(withdrawn);
+    }
+
+    /**
+     * Checks if the static member to be added is for the same node as a static member that has been configured before,
+     * including the ones that are currently replaced by a dynamically discovered member. The same host and enabled
+     * ports with a different unique ID is a configuration error, and the later entry is ignored since the node would
+     * otherwise receive every message twice. The same host with only some of the same enabled ports is also reported as
+     * a configuration error, but both entries are kept. Must be called while holding the lock on {@link #members}.
+     *
+     * @param member the static member to be added
+     *
+     * @return {@code true} if a static member for the same node has been configured
+     */
+    private boolean isDuplicateStaticMember(Member member) {
+        List<Member> configured = new ArrayList<>(members);
+        configured.addAll(replaced.values());
+        for (Member other : configured) {
+            MemberMatch match = match(other, member);
+            if (match == MemberMatch.SAME_NODE) {
+                log.error(sm.getString("staticMembershipInterceptor.duplicateStaticMember", member, other));
+                return true;
+            } else if (match == MemberMatch.PORT_MISMATCH) {
+                log.error(sm.getString("staticMembershipInterceptor.staticMemberPortMismatch", member, other));
+            }
+        }
+        return false;
     }
 
     /**
      * Removes a static member from the membership list.
+     *
      * @param member the member to remove
      */
     public void removeStaticMember(Member member) {
         synchronized (members) {
             members.remove(member);
+            replaced.values().remove(member);
         }
     }
 
     /**
      * Sets the local member for this interceptor.
+     *
      * @param member the local member
      */
     public void setLocalMember(Member member) {
@@ -152,13 +199,183 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase implemen
         } // end if
     }
 
+    /**
+     * Replaces the statically configured member for a node with the member for the same node that was discovered
+     * dynamically. The two represent the same node when the host and all of the enabled ports (TCP, secure and UDP) are
+     * the same. The unique ID of a dynamically discovered member is generated when the node starts, so it can not be
+     * known by the static configuration, and without the replacement the node would be present twice. If the host and
+     * only some of the enabled ports match, the static configuration is not consistent with the node and is reported as
+     * a configuration error.
+     *
+     * @param dynamic the member that was discovered dynamically
+     *
+     * @return the replaced configured members, which have to be withdrawn by the caller, outside of the lock on
+     *             {@link #members}
+     */
+    private List<Member> replaceConfiguredMember(Member dynamic) {
+        List<Member> withdrawn = new ArrayList<>();
+        synchronized (members) {
+            // The node may have been replaced earlier by a member that is no longer current, for example when the
+            // node was restarted and now announces a new unique ID
+            Member previous = null;
+            Member previousConfigured = null;
+            for (Map.Entry<Member,Member> entry : replaced.entrySet()) {
+                MemberMatch match = match(entry.getValue(), dynamic);
+                if (match == MemberMatch.SAME_NODE) {
+                    previous = entry.getKey();
+                    previousConfigured = entry.getValue();
+                } else if (match == MemberMatch.PORT_MISMATCH) {
+                    log.error(
+                            sm.getString("staticMembershipInterceptor.memberPortMismatch", entry.getValue(), dynamic));
+                }
+            }
+            if (previous != null) {
+                replaced.remove(previous);
+                replaced.put(dynamic, previousConfigured);
+            }
+            for (int i = 0; i < members.size();) {
+                Member configured = members.get(i);
+                MemberMatch match = match(configured, dynamic);
+                if (match == MemberMatch.SAME_NODE) {
+                    members.remove(i);
+                    replaced.put(dynamic, configured);
+                    withdrawn.add(configured);
+                } else {
+                    if (match == MemberMatch.PORT_MISMATCH) {
+                        log.error(sm.getString("staticMembershipInterceptor.memberPortMismatch", configured, dynamic));
+                    }
+                    i++;
+                }
+            }
+        }
+        return withdrawn;
+    }
+
+    /**
+     * Withdraws configured members that have been replaced by a dynamically discovered member from the failure detector
+     * above this interceptor. The failure detector has to forget them, as it would otherwise keep them as suspects and
+     * add them again next to the discovered member, and it tells the interceptors above it that they disappeared.
+     * Without a failure detector the configured members are not withdrawn.
+     *
+     * @param withdrawn the configured members to withdraw
+     */
+    private void withdrawConfiguredMembers(List<Member> withdrawn) {
+        if (withdrawn.isEmpty()) {
+            return;
+        }
+        TcpFailureDetector failureDetector = getFailureDetector();
+        if (failureDetector != null) {
+            for (Member configured : withdrawn) {
+                failureDetector.forgetMember(configured);
+            }
+        }
+    }
+
+    /**
+     * Finds the closest failure detector above this interceptor.
+     *
+     * @return the failure detector, or {@code null} if there is none
+     */
+    private TcpFailureDetector getFailureDetector() {
+        ChannelInterceptor prev = getPrevious();
+        while (prev != null) {
+            if (prev instanceof TcpFailureDetector failureDetector) {
+                return failureDetector;
+            }
+            prev = prev.getPrevious();
+        }
+        return null;
+    }
+
+    private enum MemberMatch {
+        /** Different nodes. */
+        DIFFERENT_NODE,
+        /** The host and all ports match. */
+        SAME_NODE,
+        /** The host matches and some, but not all, of the ports match. */
+        PORT_MISMATCH
+    }
+
+    /*
+     * Only ports that are used by at least one of the members are compared. A port that neither member uses is -1 on
+     * both, and must not make two nodes with different TCP ports on the same host look partially identical.
+     */
+    private static MemberMatch match(Member configured, Member dynamic) {
+        if (!Arrays.equals(configured.getHost(), dynamic.getHost())) {
+            return MemberMatch.DIFFERENT_NODE;
+        }
+        int used = 0;
+        int matching = 0;
+        int[][] ports =
+                { { configured.getPort(), dynamic.getPort() }, { configured.getSecurePort(), dynamic.getSecurePort() },
+                        { configured.getUdpPort(), dynamic.getUdpPort() } };
+        for (int[] pair : ports) {
+            if (pair[0] >= 0 || pair[1] >= 0) {
+                used++;
+                if (pair[0] == pair[1]) {
+                    matching++;
+                }
+            }
+        }
+        if (used == 0 || matching == 0) {
+            return MemberMatch.DIFFERENT_NODE;
+        } else if (matching == used) {
+            return MemberMatch.SAME_NODE;
+        } else {
+            return MemberMatch.PORT_MISMATCH;
+        }
+    }
+
+    @Override
+    public void memberAdded(Member member) {
+        // The lock on members is only held to update the state. The failure detector verifies the member over the
+        // network and notifies the interceptors above, which must not happen while holding the lock.
+        List<Member> withdrawn;
+        boolean replacing;
+        synchronized (members) {
+            withdrawn = replaceConfiguredMember(member);
+            replacing = !withdrawn.isEmpty() || replaced.containsKey(member);
+        }
+        // the configured member is withdrawn before the member replacing it is announced
+        withdrawConfiguredMembers(withdrawn);
+        super.memberAdded(member);
+        if (replacing) {
+            // The member may have disappeared while it was being announced, and the disappearance may have been
+            // handled before the announcement. The failure detector would then keep a member that is gone.
+            boolean stale;
+            synchronized (members) {
+                stale = !replaced.containsKey(member);
+            }
+            if (stale) {
+                TcpFailureDetector failureDetector = getFailureDetector();
+                if (failureDetector != null) {
+                    failureDetector.forgetMember(member);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void memberDisappeared(Member member) {
+        synchronized (members) {
+            // the dynamic member is gone, the node stays a member as it was configured
+            Member configured = replaced.remove(member);
+            if (configured != null && !members.contains(configured)) {
+                members.add(configured);
+            }
+        }
+        super.memberDisappeared(member);
+    }
+
     @Override
     public Member getMember(Member mbr) {
-        if (members.contains(mbr)) {
-            return members.get(members.indexOf(mbr));
-        } else {
-            return super.getMember(mbr);
+        synchronized (members) {
+            int index = members.indexOf(mbr);
+            if (index >= 0) {
+                return members.get(index);
+            }
         }
+        return super.getMember(mbr);
     }
 
     @Override
@@ -183,11 +400,21 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase implemen
         if ((Channel.SND_TX_SEQ & svc) == Channel.SND_TX_SEQ) {
             super.start(Channel.SND_TX_SEQ);
         }
-        final ChannelInterceptorBase base = this;
         ScheduledExecutorService executor = getChannel().getUtilityExecutor();
-        for (final Member member : members) {
+        Member[] configured;
+        synchronized (members) {
+            configured = members.toArray(new Member[0]);
+        }
+        for (final Member member : configured) {
             Runnable r = () -> {
-                base.memberAdded(member);
+                synchronized (members) {
+                    if (!members.contains(member)) {
+                        // replaced by the dynamically discovered member in the meantime
+                        return;
+                    }
+                }
+                // the configured member is not a dynamically discovered member
+                StaticMembershipInterceptor.super.memberAdded(member);
                 if (getfirstInterceptor().getMember(member) != null) {
                     sendLocalMember(new Member[] { member });
                 }
@@ -197,13 +424,10 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase implemen
         super.start(svc & (~Channel.SND_RX_SEQ) & (~Channel.SND_TX_SEQ));
 
         // check required interceptors
-        TcpFailureDetector failureDetector = null;
+        TcpFailureDetector failureDetector = getFailureDetector();
         TcpPingInterceptor pingInterceptor = null;
         ChannelInterceptor prev = getPrevious();
         while (prev != null) {
-            if (prev instanceof TcpFailureDetector) {
-                failureDetector = (TcpFailureDetector) prev;
-            }
             if (prev instanceof TcpPingInterceptor) {
                 pingInterceptor = (TcpPingInterceptor) prev;
             }
@@ -232,6 +456,7 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase implemen
 
     /**
      * Sends a local member start message to the given members.
+     *
      * @param members the members to notify
      */
     protected void sendLocalMember(Member[] members) {
@@ -244,6 +469,7 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase implemen
 
     /**
      * Sends a shutdown message to the given members.
+     *
      * @param members the members to notify
      */
     protected void sendShutdown(Member[] members) {
@@ -256,6 +482,7 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase implemen
 
     /**
      * Returns the first (bottom-most) interceptor in the chain.
+     *
      * @return the first channel interceptor
      */
     protected ChannelInterceptor getfirstInterceptor() {
@@ -270,8 +497,10 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase implemen
 
     /**
      * Sends a member message to the given members.
+     *
      * @param members the members to send to
      * @param message the message payload
+     *
      * @throws ChannelException if sending fails
      */
     protected void sendMemberMessage(Member[] members, byte[] message) throws ChannelException {

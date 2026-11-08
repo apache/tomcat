@@ -18,9 +18,12 @@ package org.apache.catalina.storeconfig;
 
 import java.io.PrintWriter;
 
+import org.apache.catalina.Globals;
 import org.apache.catalina.Manager;
 import org.apache.catalina.SessionIdGenerator;
 import org.apache.catalina.session.StandardManager;
+import org.apache.catalina.util.SessionIdGeneratorBase;
+import org.apache.catalina.util.StandardSessionIdGenerator;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -52,9 +55,7 @@ public class ManagerSF extends StoreFactoryBase {
                 super.store(aWriter, indent, aElement);
             }
         } else {
-            if (log.isWarnEnabled()) {
-                log.warn(sm.getString("factory.storeNoDescriptor", aElement.getClass()));
-            }
+            log.warn(sm.getString("factory.storeNoDescriptor", aElement.getClass()));
         }
     }
 
@@ -67,7 +68,94 @@ public class ManagerSF extends StoreFactoryBase {
      */
     protected boolean isDefaultManager(StandardManager smanager) {
 
-        return smanager.getPathname() == null && (smanager.getMaxActiveSessions() == -1);
+        // A custom sub-class is configured through its className attribute
+        if (!StandardManager.class.equals(smanager.getClass())) {
+            return false;
+        }
+
+        // StandardManager-specific property
+        if (smanager.getPathname() != null) {
+            return false;
+        }
+
+        // LifecycleBase property
+        if (!smanager.getThrowOnFailure()) {
+            return false;
+        }
+
+        // ManagerBase properties
+        if (smanager.getMaxActiveSessions() != -1) {
+            return false;
+        }
+        if (smanager.getSecureRandomClass() != null) {
+            return false;
+        }
+        if (!SessionIdGeneratorBase.DEFAULT_SECURE_RANDOM_ALGORITHM.equals(smanager.getSecureRandomAlgorithm())) {
+            return false;
+        }
+        if (smanager.getSecureRandomProvider() != null) {
+            return false;
+        }
+        if (smanager.getProcessExpiresFrequency() != 6) {
+            return false;
+        }
+        if (smanager.getSessionAttributeNameFilter() != null) {
+            return false;
+        }
+        if (smanager.getSessionAttributeValueClassNameFilter() != null) {
+            return false;
+        }
+        if (smanager.getWarnOnSessionAttributeFilterFailure()) {
+            return false;
+        }
+        if (smanager.getNotifyBindingListenerOnUnchangedValue()) {
+            return false;
+        }
+        if (!smanager.getNotifyAttributeListenerOnUnchangedValue()) {
+            return false;
+        }
+        if (smanager.getPersistAuthentication()) {
+            return false;
+        }
+        if (smanager.getSessionActivityCheck() != Globals.STRICT_SERVLET_COMPLIANCE) {
+            return false;
+        }
+        if (smanager.getSessionLastAccessAtStart() != Globals.STRICT_SERVLET_COMPLIANCE) {
+            return false;
+        }
+        // A generator that has not been created yet is the default: the manager
+        // creates one when it starts
+        SessionIdGenerator sessionIdGenerator = smanager.getSessionIdGenerator();
+        if (sessionIdGenerator != null &&
+                !StandardSessionIdGenerator.class.equals(sessionIdGenerator.getClass())) {
+            return false;
+        }
+        if (sessionIdGenerator instanceof SessionIdGeneratorBase sigBase) {
+            // The manager propagates its jvmRoute to the generator when it starts,
+            // so a value matching the manager's is runtime state, not configuration
+            String sigJvmRoute = sigBase.getJvmRoute();
+            if (sigJvmRoute != null && !sigJvmRoute.isEmpty() &&
+                    !sigJvmRoute.equals(smanager.getJvmRoute())) {
+                return false;
+            }
+            if (!sigBase.getThrowOnFailure()) {
+                return false;
+            }
+            if (sigBase.getSecureRandomClass() != null) {
+                return false;
+            }
+            if (!SessionIdGeneratorBase.DEFAULT_SECURE_RANDOM_ALGORITHM.equals(sigBase.getSecureRandomAlgorithm())) {
+                return false;
+            }
+            if (sigBase.getSecureRandomProvider() != null) {
+                return false;
+            }
+            if (sigBase.getSessionIdLength() != 16) {
+                return false;
+            }
+        }
+
+        return true;
 
     }
 

@@ -104,7 +104,7 @@ gpg.exec=/path/to/gpg
 gpg.sign.files=true
 
 # Code signing of Windows installer
-# See https://infra.apache.org/digicert-use.html for setup instructions
+# See https://infra.apache.org/code-signing-use.html for setup instructions
 do.codesigning=false
 codesigning.alias=d97c5110-c66a-4c0c-ac0c-1cd6af812ee6
 codesigning.digest=SHA256
@@ -143,11 +143,11 @@ base-maven.loc=https://repo.maven.apache.org/maven2
 # ----- Eclipse JDT, version 4.7 or later -----#
 # See https://cwiki.apache.org/confluence/display/TOMCAT/Managing+Tomcat%27s+Dependency+on+the+Eclipse+JDT+Core+Batch+Compiler
 #
-jdt.version=4.39
-jdt.release=R-4.39-202602260420
+jdt.version=4.41
+jdt.release=R-4.41-202608281142
 jdt.checksum.enabled=true
 jdt.checksum.algorithm=SHA-512
-jdt.checksum.value=af25493d4a429fd24256f69a085a618afffe23bb09b284976fb9e82f651715a0455b704ee800432b43dd409f74874765089cd65fc148e2175d251f9ef830ce0a
+jdt.checksum.value=080bb403adb3b88b5b5f382388922425de5274f7729f0a94702f0e2a516c7d13c6740faab1cb20786b1dda0c5da933aa9b842f7c64867414ff75fa668ea06b09
 jdt.home=${base.path}/ecj-${jdt.version}
 jdt.jar=${jdt.home}/ecj-${jdt.version}.jar
 # The download will be moved to the archive area eventually. We are taking care of that in advance.
@@ -155,14 +155,14 @@ jdt.loc.1=https://archive.eclipse.org/eclipse/downloads/drops4/${jdt.release}/ec
 jdt.loc.2=https://download.eclipse.org/eclipse/downloads/drops4/${jdt.release}/ecj-${jdt.version}.jar
 
 # ----- Tomcat native library -----
-tomcat-native.version=2.0.15
-tomcat-native-openssl.version=3.5.7
+tomcat-native.version=2.0.17
+tomcat-native-openssl.version=3.5.9
 tomcat-native.src.checksum.enabled=true
 tomcat-native.src.checksum.algorithm=SHA-512
-tomcat-native.src.checksum.value=a0b53890c36c3409e764895cfc521cdbbc49af4d03968f5d3ed72ba686524a05bd15c3f7ab8259fbab091547ecbc2fb7aae8f47d8bc38027db0f6a5dbda65004
+tomcat-native.src.checksum.value=7a9afa05a0d203d6db0f931666d951b79fc1f1706cec078571ee9c75e30ceb68f595c0db389a19ca8e09cc1318916198834df94792465698b5aa8bef8277dc91
 tomcat-native.win.checksum.enabled=true
 tomcat-native.win.checksum.algorithm=SHA-512
-tomcat-native.win.checksum.value=18d63b4850514454eecf7b4341ad19e4029f60320c136ac2f2e6ad5e0f579cb39ed74e799e659325647f9beefbe5e1cd6972fcfafac29b15d6a9e6f5b96c8a1e
+tomcat-native.win.checksum.value=c717c80167409a82dc94d4200082af21dffaa499ba90929e5c691a47a3d5ff95201d33af649078a8738ad2f05093be38e6b8f22cac690523a10aff7152846264
 tomcat-native.home=${base.path}/tomcat-native-${tomcat-native.version}
 tomcat-native.tar.gz=${tomcat-native.home}/tomcat-native.tar.gz
 tomcat-native.loc.1=${base-tomcat.loc.1}/tomcat-connectors/native/${tomcat-native.version}/source/tomcat-native-${tomcat-native.version}-src.tar.gz
@@ -171,15 +171,15 @@ tomcat-native.win.1=${base-tomcat.loc.1}/tomcat-connectors/native/${tomcat-nativ
 tomcat-native.win.2=${base-tomcat.loc.2}/tomcat-connectors/native/${tomcat-native.version}/binaries/tomcat-native-${tomcat-native.version}-openssl-${tomcat-native-openssl.version}-win32-bin.zip
 
 # ----- NSIS, version 3.0 or later -----
-nsis.version=3.12
+nsis.version=3.13
 nsis.checksum.enabled=true
 nsis.bin.checksum.algorithm=MD5|SHA-1
-nsis.bin.checksum.value=757c22153dd8b90f5e297310d9966997|364fd795b0cafc1fbff3e966f103a8f8fc8fb7f1
+nsis.bin.checksum.value=530e3623c077cba879ed2ae6e13be362|db14f8af2ea346b786c6ae19343f61aaf5e09b8e
 nsis.bin.home=${base.path}/nsis-${nsis.version}
 nsis.executable.windows=${nsis.bin.home}/makensis.exe
 nsis.bin.loc=${base-sf.loc}/nsis/nsis-${nsis.version}.zip
 nsis.src.checksum.algorithm=MD5|SHA-1
-nsis.src.checksum.value=8ec7c3e1228ac4eb96e5e421610b4aae|432e99150881c061c7e313eb1aac45763d951572
+nsis.src.checksum.value=3f992d176c50fb653cf0230eed38cfea|e0bd42648bea7bd933b32b9f1459cdb29ed41709
 nsis.src.home=${base.path}/nsis-${nsis.version}-src
 nsis.src.loc=${base-sf.loc}/nsis/nsis-${nsis.version}-src.tar.bz2
 
@@ -231,84 +231,92 @@ hamcrest.jar=${hamcrest.home}/hamcrest-${hamcrest.version}.jar
 hamcrest.loc=${base-maven.loc}/org/hamcrest/hamcrest/${hamcrest.version}/hamcrest-${hamcrest.version}.jar
 
 # ----- EasyMock, version 5.0.0 or later -----
-easymock.version=5.6.0
+easymock.version=5.7.0
 easymock.checksum.enabled=true
 easymock.checksum.algorithm=MD5|SHA-1
-easymock.checksum.value=2be7351f227b2022faf4230ceb576e0a|f8e15a47aac9838ee36be6c3eddc50bb78a06191
+easymock.checksum.value=64b422082731e9180c24af344c88bca0|5548371328219126f9e539edd0d6fb7cd429c066
 easymock.home=${base.path}/easymock-${easymock.version}
 easymock.jar=${easymock.home}/easymock-${easymock.version}.jar
 easymock.loc=${base-maven.loc}/org/easymock/easymock/${easymock.version}/easymock-${easymock.version}.jar
 
 # ----- objenesis, used by EasyMock, version 3.3 or later -----
-objenesis.version=3.5
+objenesis.version=3.6
 objenesis.checksum.enabled=true
 objenesis.checksum.algorithm=SHA-512
-objenesis.checksum.value=7587fabe1dd4a639e869e4478a097665d34686de8c1ec5794356a5ebc27501fdad42a365e0f000bdf30b0b0f73d6c02523346fc6cfb9109239e5b2f7876e981e
+objenesis.checksum.value=7902fa1b3fc522c2dd1e5541f670b96ade3e4cb5c94ff0ae8946ae0c34f630deeb7741d364b29719b340dd7d3965987024c99663240b2820b02589233a441e3b
 objenesis.home=${base.path}/objenesis-${objenesis.version}
 objenesis.jar=${objenesis.home}/objenesis-${objenesis.version}.jar
 objenesis.loc=${base-maven.loc}/org/objenesis/objenesis/${objenesis.version}/objenesis-${objenesis.version}.jar
 
 # ----- byte-buddy, used by EasyMock, version 1.12.18 or later -----
-bytebuddy.version=1.18.8
+bytebuddy.version=1.18.17
 bytebuddy.checksum.enabled=true
 bytebuddy.checksum.algorithm=SHA-512
-bytebuddy.checksum.value=0e50f1c029c91831fada246eb57a3898e327aed0e9b8b5052c1d66ff58b0d1a8b9a1c255b60da286a30cca60c1a964377c40e5fb7988bf4839f8c8ab1289b5f6
+bytebuddy.checksum.value=3844f65c7f30332fcc860877f7efec88ea30635c7a81e143f757d5648e8f1cd066653539938f6024a7f324f0cb811daeeda266219ef713d7c01a054ed52f3e75
 bytebuddy.home=${base.path}/byte-buddy-${bytebuddy.version}
 bytebuddy.jar=${bytebuddy.home}/byte-buddy-${bytebuddy.version}.jar
 bytebuddy.loc=${base-maven.loc}/net/bytebuddy/byte-buddy/${bytebuddy.version}/byte-buddy-${bytebuddy.version}.jar
 
 # ----- UnboundID, used by unit tests, version 5.1.4 or later -----
-unboundid.version=7.0.4
+unboundid.version=7.0.5
 unboundid.checksum.enabled=true
 unboundid.checksum.algorithm=MD5|SHA-1
-unboundid.checksum.value=7006a217741934517b1cdd6aa12c6d9f|2fe2d5461a87a58aee97f836e3af63ef8ce7b29e
+unboundid.checksum.value=ddb876e766af6e41b0d4db7392538ff9|398b875694b82dd80a78aad88c065b455e4b90d9
 unboundid.home=${base.path}/unboundid-${unboundid.version}
 unboundid.jar=${unboundid.home}/unboundid-ldapsdk-${unboundid.version}.jar
 unboundid.loc=${base-maven.loc}/com/unboundid/unboundid-ldapsdk/${unboundid.version}/unboundid-ldapsdk-${unboundid.version}.jar
 
 # ----- Checkstyle, version 6.16 or later -----
-checkstyle.version=13.4.2
+checkstyle.version=14.4.0
 checkstyle.checksum.enabled=true
 checkstyle.checksum.algorithm=SHA-512
-checkstyle.checksum.value=3888a319c6f0ad2042d1d0b4810575c551a4196d03d131873ba79b1d2293be8d5c7dd3ed86ddbe78ac1edc1f905c946befbd4403c8c6537304424735be9e50ac
+checkstyle.checksum.value=436c8523015f25c54daaa5fc2899541fa3c97fe4f93a2351a7b6304e40f5681199c19aa208f6ba6a99c672c7d543915b3720f371e4c18f1820b748181dc0759c
 checkstyle.home=${base.path}/checkstyle-${checkstyle.version}
 checkstyle.jar=${checkstyle.home}/checkstyle-${checkstyle.version}-all.jar
 checkstyle.loc=${base-gh.loc}/checkstyle/checkstyle/releases/download/checkstyle-${checkstyle.version}/checkstyle-${checkstyle.version}-all.jar
 
 # ----- JaCoCo code coverage tool -----
-jacoco.version=0.8.14
+jacoco.version=0.8.16
 jacoco.checksum.enabled=true
 jacoco.checksum.algorithm=MD5|SHA-1
-jacoco.checksum.value=1da00355854e56fe99b6c5b31224ea79|93f2e83229e20e02c556e412b041eff31132e60b
+jacoco.checksum.value=eda0368891b979a8fddaa70047a9af56|abd615d11b2adef760a3c67735c34c39f1983022
 jacoco.home=${base.path}/jacoco-${jacoco.version}
 jacoco.jar=${jacoco.home}/lib/jacocoant.jar
 jacoco.loc=${base-maven.loc}/org/jacoco/jacoco/${jacoco.version}/jacoco-${jacoco.version}.zip
 
 # ----- SpotBugs (originally FindBugs) -----
-spotbugs.version=4.9.8
+spotbugs.version=4.10.4
 spotbugs.checksum.enabled=true
 spotbugs.checksum.algorithm=SHA-512
-spotbugs.checksum.value=9d0dde900b3e1330ca23b81ad9aaf292d2d9d144ff1db9d397bcbe58c5ebd86dcb36e3d83ba7c3043039d2557a9bd3af35f9dd14297fc5e908745924b9c51678
+spotbugs.checksum.value=e0720c7d51825353f4f6724757f97b5ca1eb169a3579497c2e00002bb36595a7c9f2ab70f53be4f5bba9a44bda2016d1784690cb6e766655be6c43179b42fcb5
 spotbugs.home=${base.path}/spotbugs-${spotbugs.version}
 spotbugs.jar=${spotbugs.home}/lib/spotbugs-ant.jar
 spotbugs.loc=${base-maven.loc}/com/github/spotbugs/spotbugs/${spotbugs.version}/spotbugs-${spotbugs.version}.tgz
 
+findsecbugs.version=1.14.0
+findsecbugs.loc=${base-maven.loc}/com/h3xstream/findsecbugs/findsecbugs-plugin/${findsecbugs.version}/findsecbugs-plugin-${findsecbugs.version}.jar
+findsecbugs.jar=${findsecbugs.home}/findsecbugs-plugin-${findsecbugs.version}.jar
+findsecbugs.checksum.enabled=true
+findsecbugs.checksum.algorithm=SHA-512
+findsecbugs.checksum.value=9eb87ea65584d6ab9e79cfcc9a2ffe3519adab9356084c74aaead8b3c7ca1e025ae2c2ba1aa70fab701fcd2f960e044ab467da6199d3a7feb64da5db42bc7991
+findsecbugs.home=${base.path}/spotbugs-${spotbugs.version}/plugin
+
 # ----- bnd, version 6.3.0 or later  -----
 # ----- provides OSGI metadata for JARs       -----
-bnd.version=7.2.3
+bnd.version=7.4.0
 bnd.checksum.enabled=true
 bnd.checksum.algorithm=MD5|SHA-1
-bnd.checksum.value=56f0d8c7d872b88cfc5411f6caa96379|8eaec893e3ed1058acf5b780ce354db5b8226ade
+bnd.checksum.value=50b9f54131937462e0733b5819a2a6be|db23fe628928bfee11a86151e8a5140d1bda38a9
 
 bnd.home=${base.path}/bnd-${bnd.version}
 bnd.jar=${bnd.home}/biz.aQute.bnd-${bnd.version}.jar
 bnd.loc=${base-maven.loc}/biz/aQute/bnd/biz.aQute.bnd/${bnd.version}/biz.aQute.bnd-${bnd.version}.jar
 
 # ----- Tomcat Migration Tool for Jakarta EE -----
-migration-lib.version=1.0.12
+migration-lib.version=1.0.13
 migration-lib.checksum.enabled=true
 migration-lib.checksum.algorithm=MD5|SHA-1
-migration-lib.checksum.value=b34fa233f5d88f7e6aff914495c8820d|b3576140e7a72ed743f3a5c6d06bf04fed83531f
+migration-lib.checksum.value=2f44b3898d7a1a56ed14bad28a11569a|0df690324834c7d943501ae70a645e3a2f5bba35
 
 migration-lib.home=${base.path}/migration-${migration-lib.version}
 migration-lib.jar=${migration-lib.home}/jakartaee-migration-${migration-lib.version}-shaded.jar
@@ -316,10 +324,10 @@ migration-lib.loc=${base-maven.loc}/org/apache/tomcat/jakartaee-migration/${migr
 
 # ----- JSign, version 4.1 or later -----
 # Note: There are known issues with Tomcat and Jsign 7.0 and 7.1
-jsign.version=7.4
+jsign.version=7.6
 jsign.checksum.enabled=true
 jsign.checksum.algorithm=MD5|SHA-1
-jsign.checksum.value=18b96a09ba9e1f0bdba58775810550f5|09705503ca76807141398ded4b35ce3f987a6903
+jsign.checksum.value=3ec328bf83d621f374643ffd22214579|843c90ab50bc0da16fc1aac9e2c6bba986dc4a36
 
 jsign.home=${base.path}/jsign-${jsign.version}
 jsign.jar=${jsign.home}/jsign-${jsign.version}.jar
@@ -346,16 +354,16 @@ derby-tools.jar=${derby.home}/derby-tools-${derby.version}.jar
 derby-tools.loc=${base-maven.loc}/org/apache/derby/derbytools/${derby.version}/derbytools-${derby.version}.jar
 
 # ----- Bouncy Castle, used by unit tests ----
-bouncycastle.version=1.84
+bouncycastle.version=1.86
 bouncycastle-provider.checksum.enabled=true
 bouncycastle-provider.checksum.algorithm=SHA-512
-bouncycastle-provider.checksum.value=4b7e5696830023bad1594d9f9766898f78018ec7d6ec34de23f2a6683b02803b92ffe8ab5d21f1a717eb4fafa8e22dcf3a4b6dd275bd86c7cb02609987fe92f5
+bouncycastle-provider.checksum.value=4502851281929ef645316ae96ad7d6db6a54d11ce024a66bec654c2eef62b80f174b67a2a15de86b2698f33b696459e21ecfec4a846350f4297394e9a331c43b
 bouncycastle-pkix.checksum.enabled=true
 bouncycastle-pkix.checksum.algorithm=SHA-512
-bouncycastle-pkix.checksum.value=01644d7e0c6041ea8c8629f6ad73f7206efa2797d954da1507dd43c5d262a161194ed84e960234cf5c53787033f1181aa4965e0d6ebfe82ca040de13ca307565
+bouncycastle-pkix.checksum.value=2923c0da3848b47d1953bdba3ae50441f3a3416f3646a26244c080414f31fbde875e4e50619a0ef34670c877367a45438a346260fc8b047e753b553debd40b37
 bouncycastle-util.checksum.enabled=true
 bouncycastle-util.checksum.algorithm=SHA-512
-bouncycastle-util.checksum.value=e001b244723fb3c4d1e06862bb857512015a92d7e18650ae3447a3d258274ec8ed37b8cba958397b00f8dd73463943e9a9489dd5dbddbe24b24cd6fae5ca8a62
+bouncycastle-util.checksum.value=aeb9138f96d5c48491974974534bb3b07931a18d36ccbed828940ae0361f5ef8f5b0ad6c776a1aebb4d2c0416edf8b7d143d821bfe7136d7948c4e5807b1c426
 
 bouncycastle.home=${base.path}/bouncycastle-${bouncycastle.version}
 bouncycastle-provider.jar=${bouncycastle.home}/bouncycastle-provider-${bouncycastle.version}.jar

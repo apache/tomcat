@@ -86,7 +86,7 @@ public class OpenSSLCipherConfigurationParser {
      */
     private static final String eNULL = "eNULL";
     /**
-     * The cipher suites offering no authentication. This is currently the anonymous DH algorithms. T These cipher
+     * The cipher suites offering no authentication. This is currently the anonymous DH algorithms. These cipher
      * suites are vulnerable to a 'man in the middle' attack and so their use is normally discouraged.
      */
     private static final String aNULL = "aNULL";
@@ -541,8 +541,32 @@ public class OpenSSLCipherConfigurationParser {
         ciphers.addAll(originalCiphers);
     }
 
-    static void add(final LinkedHashSet<Cipher> ciphers, final String alias) {
-        ciphers.addAll(aliases.get(alias));
+    static void add(final LinkedHashSet<Cipher> ciphers, final String alias,
+            final LinkedHashSet<Cipher> orderedAllAddedCiphers) {
+        List<Cipher> toAddForAlias = aliases.get(alias);
+        add(ciphers, toAddForAlias, orderedAllAddedCiphers);
+    }
+
+    static void add(final LinkedHashSet<Cipher> ciphers, List<Cipher> toAdd,
+            final LinkedHashSet<Cipher> orderedAllAddedCiphers) {
+        /*
+         * Ensure that ciphers are added in the same order as they would be by OpenSSL.
+         *
+         * Once a cipher has been added to the results, if it is removed and re-added then, at the point it is re-added,
+         * all the ciphers in that addition that are being re-added are added to the results first in the order they
+         * were originally added to the results followed by the ciphers in the current addition that are being added to
+         * the results for the first time.
+         *
+         * Practically, this only becomes a factor if ciphers are added, removed and then re-added.
+         */
+        List<Cipher> toAddFirst = new ArrayList<>(orderedAllAddedCiphers);
+        toAddFirst.retainAll(toAdd);
+
+        ciphers.addAll(toAddFirst);
+        // Then re-add the whole alias to add ciphers that weren't previously removed
+        ciphers.addAll(toAdd);
+
+        orderedAllAddedCiphers.addAll(toAdd);
     }
 
     static void remove(final Set<Cipher> ciphers, final String alias) {
@@ -757,17 +781,21 @@ public class OpenSSLCipherConfigurationParser {
             }
         }
         LinkedHashSet<Cipher> ciphers = new LinkedHashSet<>();
-        Set<Cipher> removedCiphers = new HashSet<>();
+        Set<Cipher> excludedCiphers = new HashSet<>();
+        // Need to track the order in which ciphers were first added
+        LinkedHashSet<Cipher> orderedAllAddedCiphers = new LinkedHashSet<>();
         for (String element : elements) {
             if (element.startsWith(DELETE)) {
                 String alias = element.substring(1);
                 if (aliases.containsKey(alias)) {
                     remove(ciphers, alias);
+                } else {
+                    log.warn(sm.getString("opensslCipherConfigurationParser.unknownElement", alias));
                 }
             } else if (element.startsWith(EXCLUDE)) {
                 String alias = element.substring(1);
                 if (aliases.containsKey(alias)) {
-                    removedCiphers.addAll(aliases.get(alias));
+                    excludedCiphers.addAll(aliases.get(alias));
                 } else {
                     log.warn(sm.getString("opensslCipherConfigurationParser.unknownElement", alias));
                 }
@@ -775,25 +803,42 @@ public class OpenSSLCipherConfigurationParser {
                 String alias = element.substring(1);
                 if (aliases.containsKey(alias)) {
                     moveToEnd(ciphers, alias);
+                    moveToEnd(orderedAllAddedCiphers, alias);
+                } else {
+                    log.warn(sm.getString("opensslCipherConfigurationParser.unknownElement", alias));
                 }
             } else if ("@STRENGTH".equals(element)) {
                 ciphers = strengthSort(ciphers);
+                orderedAllAddedCiphers = strengthSort(orderedAllAddedCiphers);
             } else if (aliases.containsKey(element)) {
-                add(ciphers, element);
+                add(ciphers, element, orderedAllAddedCiphers);
             } else if (element.contains(AND)) {
                 String[] intersections = element.split("\\" + AND);
-                if (intersections.length > 0 && aliases.containsKey(intersections[0])) {
-                    List<Cipher> result = new ArrayList<>(aliases.get(intersections[0]));
-                    for (int i = 1; i < intersections.length; i++) {
-                        if (aliases.containsKey(intersections[i])) {
-                            result.retainAll(aliases.get(intersections[i]));
-                        }
+                List<Cipher> result = null;
+                for (String intersection : intersections) {
+                    // As in OpenSSL, any unknown term makes the whole AND
+                    // element match nothing
+                    if (!aliases.containsKey(intersection)) {
+                        log.warn(sm.getString("opensslCipherConfigurationParser.unknownElement", intersection));
+                        result = null;
+                        break;
                     }
-                    ciphers.addAll(result);
+                    if (result == null) {
+                        result = new ArrayList<>(aliases.get(intersection));
+                    } else {
+                        result.retainAll(aliases.get(intersection));
+                    }
                 }
+                if (result != null) {
+                    add(ciphers, result, orderedAllAddedCiphers);
+                }
+            } else if (!element.isEmpty() && !element.startsWith("PROFILE=") && !element.startsWith("@SECLEVEL=")) {
+                // OpenSSL ignores unknown elements. Do the same but, since it is most likely a typo, warn about it.
+                // PROFILE= is reported separately above and @SECLEVEL= is valid for OpenSSL but is not used here.
+                log.warn(sm.getString("opensslCipherConfigurationParser.unknownElement", element));
             }
         }
-        ciphers.removeAll(removedCiphers);
+        ciphers.removeAll(excludedCiphers);
         return ciphers;
     }
 
@@ -861,21 +906,40 @@ public class OpenSSLCipherConfigurationParser {
      *
      * @param opensslCipherName The OpenSSL name for a cipher
      *
-     * @return The JSSE name for the specified OpenSSL cipher. If none is known, the IANA standard name will be returned
-     *             instead
+     * @return The first JSSE name for the specified OpenSSL cipher, or {@code null} if the name is not a known
+     *             OpenSSL cipher name, if it remains ambiguous once unimplemented SSLv2 ciphers are excluded or if
+     *             only SSLv2 ciphers match
      */
     public static String openSSLToJsse(String opensslCipherName) {
         if (!initialized) {
             init();
         }
         List<Cipher> ciphers = aliases.get(opensslCipherName);
-        if (ciphers == null || ciphers.size() != 1) {
+        if (ciphers == null) {
             // Not an OpenSSL cipher name
             return null;
         }
-        Cipher cipher = ciphers.getFirst();
+        // OpenSSL has not supported SSLv2 for many years and the SSLv2
+        // ciphers here are unimplemented. Excluding them resolves the
+        // ambiguity for the OpenSSL names that an SSLv2 cipher shares with
+        // the equivalent modern cipher.
+        Cipher candidate = null;
+        for (Cipher cipher : ciphers) {
+            if (cipher.getProtocol() == Protocol.SSLv2) {
+                continue;
+            }
+            if (candidate != null) {
+                // Ambiguous name
+                return null;
+            }
+            candidate = cipher;
+        }
+        if (candidate == null) {
+            // Only SSLv2 ciphers matched
+            return null;
+        }
         // Each Cipher always has at least one JSSE name
-        return cipher.getJsseNames().iterator().next();
+        return candidate.getJsseNames().iterator().next();
     }
 
 

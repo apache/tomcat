@@ -23,8 +23,8 @@ import org.apache.catalina.Service;
 import org.apache.catalina.connector.Connector;
 
 /**
- * JMX MBean wrapper for a {@link Service} instance. Provides operations to
- * add connectors and executors, and to query connectors and executors.
+ * JMX MBean wrapper for a {@link Service} instance. Provides operations to add connectors and executors, and to query
+ * connectors and executors.
  */
 public class ServiceMBean extends BaseCatalinaMBean<Service> {
 

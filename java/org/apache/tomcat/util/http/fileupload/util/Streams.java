@@ -64,7 +64,7 @@ public final class Streams {
         return fileName;
     }
 
-     /**
+    /**
      * Copies the contents of the given {@link InputStream}
      * to the given {@link OutputStream}. Shortcut for
      * <pre>
@@ -139,7 +139,7 @@ public final class Streams {
         }
     }
 
-   /**
+    /**
      * Private constructor, to prevent instantiation.
      * This class has only static methods.
      */

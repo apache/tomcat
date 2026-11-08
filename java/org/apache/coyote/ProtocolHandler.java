@@ -220,6 +220,18 @@ public interface ProtocolHandler {
 
 
     /**
+     * Indicates whether or not the transport used by this protocol is UDP based. This is used to disambiguate the JMX
+     * ObjectName of a connector that may share its port number with a TCP based connector (for example, a UDP based
+     * connector and a TCP based connector both listening on port 443).
+     *
+     * @return <code>true</code> if the transport is UDP based, otherwise <code>false</code>
+     */
+    default boolean isUdp() {
+        return false;
+    }
+
+
+    /**
      * Create a new ProtocolHandler for the given protocol.
      *
      * @param protocol the protocol
@@ -233,6 +245,7 @@ public interface ProtocolHandler {
      * @throws InvocationTargetException Exception occurred
      * @throws NoSuchMethodException     Exception occurred
      * @throws SecurityException         Exception occurred
+     * @throws ClassCastException        Specified protocol does not implement {@link ProtocolHandler}
      */
     static ProtocolHandler create(String protocol)
             throws ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException,

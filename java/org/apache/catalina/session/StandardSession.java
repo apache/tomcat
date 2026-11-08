@@ -165,7 +165,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
     /**
      * The maximum time interval, in seconds, between client requests before the servlet container may invalidate this
-     * session. A negative time indicates that the session should never time out.
+     * session. A zero or negative time indicates that the session should never time out.
      */
     protected volatile int maxInactiveInterval = -1;
 
@@ -660,12 +660,17 @@ public class StandardSession implements HttpSession, Session, Serializable {
                 }
             }
 
-            // We have completed expire of this session
-            setValid(false);
-            expiring = false;
+            String[] keys;
+            synchronized (attributes) {
+                // We have completed expire of this session
+                setValid(false);
+                expiring = false;
+
+                // Snapshot the attributes before permitting any racing setAttribute() call to observe the invalid state
+                keys = keys();
+            }
 
             // Unbind any objects associated with this session
-            String[] keys = keys();
             ClassLoader oldContextClassLoader = null;
             try {
                 oldContextClassLoader = context.bind(null);
@@ -999,11 +1004,13 @@ public class StandardSession implements HttpSession, Session, Serializable {
         HttpSessionBindingEvent event = null;
 
         // Call the valueBound() method if necessary
+        boolean valueBoundHasBeenCalled = false;
         if (notify && value instanceof HttpSessionBindingListener) {
             // Don't call any notification if replacing with the same value
             // unless configured to do so
             Object oldValue = attributes.get(name);
             if (value != oldValue || manager.getNotifyBindingListenerOnUnchangedValue()) {
+                valueBoundHasBeenCalled = true;
                 event = new HttpSessionBindingEvent(getSession(), name, value);
                 try {
                     ((HttpSessionBindingListener) value).valueBound(event);
@@ -1014,20 +1021,35 @@ public class StandardSession implements HttpSession, Session, Serializable {
         }
 
         // Replace or add this attribute
-        Object unbound = attributes.put(name, value);
+        Object unbound = null;
+        boolean valid;
+        synchronized (attributes) {
+            valid = isValidInternal();
+            if (valid) {
+                unbound = attributes.put(name, value);
+            }
+        }
+
+        if (!valid) {
+            if (notify && value instanceof HttpSessionBindingListener) {
+                /*
+                 * The session has expired since setAttribute() started. Although the attribute never made it as far as
+                 * being added to the session, call valueUnbound() if valueBound() was called.
+                 */
+                if (valueBoundHasBeenCalled) {
+                    notifyAttributeUnbound(name, value);
+                }
+                return;
+            }
+            throw new IllegalStateException(sm.getString("standardSession.setAttribute.ise", getIdInternal()));
+        }
 
         // Call the valueUnbound() method if necessary
         if (notify && unbound instanceof HttpSessionBindingListener) {
             // Don't call any notification if replacing with the same value
             // unless configured to do so
             if (unbound != value || manager.getNotifyBindingListenerOnUnchangedValue()) {
-                try {
-                    ((HttpSessionBindingListener) unbound)
-                            .valueUnbound(new HttpSessionBindingEvent(getSession(), name));
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                    manager.getContext().getLogger().error(sm.getString("standardSession.bindingEvent"), t);
-                }
+                notifyAttributeUnbound(name, unbound);
             }
         }
 
@@ -1077,6 +1099,16 @@ public class StandardSession implements HttpSession, Session, Serializable {
                 }
                 manager.getContext().getLogger().error(sm.getString("standardSession.attributeEvent"), t);
             }
+        }
+    }
+
+
+    private void notifyAttributeUnbound(String name, Object value) {
+        try {
+            ((HttpSessionBindingListener) value).valueUnbound(new HttpSessionBindingEvent(getSession(), name));
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            manager.getContext().getLogger().error(sm.getString("standardSession.bindingEvent"), t);
         }
     }
 
@@ -1149,6 +1181,16 @@ public class StandardSession implements HttpSession, Session, Serializable {
             setAuthType((String) nextObject);
             try {
                 setPrincipal((Principal) stream.readObject());
+            } catch (WriteAbortedException wae) {
+                if (!(wae.getCause() instanceof NotSerializableException)) {
+                    throw wae;
+                }
+                String msg = sm.getString("standardSession.principalNotDeserializable", id);
+                if (manager.getContext().getLogger().isDebugEnabled()) {
+                    manager.getContext().getLogger().debug(msg, wae);
+                } else {
+                    manager.getContext().getLogger().warn(msg);
+                }
             } catch (ClassNotFoundException | ObjectStreamException e) {
                 String msg = sm.getString("standardSession.principalNotDeserializable", id);
                 if (manager.getContext().getLogger().isDebugEnabled()) {
@@ -1268,6 +1310,26 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
         // Write authentication information (may be null values)
         stream.writeObject(sessionAuthType);
+        /*
+         * The instanceof check above only covers the principal itself, not the full object graph so serialization
+         * could still fail. If serialization fails it will trigger a WriteAbortedException on read that also needs to
+         * be handled.
+         *
+         * There is a broader issue here. The serialization failure is recoverable assuming that default object
+         * serialization is being used. If custom object serialization is used and it fails then it is likely that the
+         * recovery will fail also. This situation can be detected but only by attempting a separate serialization in
+         * a temporary byte stream which is relatively expensive since the temporary stream is then thrown away.
+         *
+         * However, it is considered unlikely that serialization (standard or custom) will fail and would be a bug in
+         * the Principal if it did since the Javadoc for Serializable states that "It is an error to declare a class
+         * Serializable if this is not the case."
+         *
+         * Therefore, the "instanceof Serializable" test with handling of the exceptions in the unlikely event that
+         * serialization does fail is considered sufficient.
+         *
+         * Note: session attributes use the the recovery mechanism and have the same risk with respect to custom
+         * serialization.
+         */
         try {
             stream.writeObject(sessionPrincipal);
         } catch (NotSerializableException e) {

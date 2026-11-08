@@ -51,7 +51,7 @@ public class LookupFactory implements ObjectFactory {
     /**
      * Create a new Resource env instance.
      *
-     * @param obj         The reference object describing the DataSource
+     * @param obj         The reference object describing the LookupRef
      * @param name        the bound name
      * @param nameCtx     unused
      * @param environment unused
@@ -128,21 +128,42 @@ public class LookupFactory implements ObjectFactory {
                     }
                 }
 
-                Class<?> clazz = Class.forName(ref.getClassName());
-                if (result != null && !clazz.isAssignableFrom(result.getClass())) {
-                    String msg = sm.getString("lookupFactory.typeMismatch", name, ref.getClassName(), lookupName,
-                            result.getClass().getName());
-                    NamingException ne = new NamingException(msg);
-                    log.warn(msg, ne);
-                    // Close the resource we no longer need if we know how to do so
-                    if (result instanceof AutoCloseable) {
-                        try {
-                            ((AutoCloseable) result).close();
-                        } catch (Exception e) {
-                            // Ignore
+                String className = ref.getClassName();
+                if (className != null && !className.isEmpty()) {
+                    // The type is the type of the object the application
+                    // expects, so it is loaded with the class loader of the
+                    // application rather than with the one which loaded this
+                    // factory.
+                    Class<?> clazz;
+                    ClassLoader tcl = Thread.currentThread().getContextClassLoader();
+                    try {
+                        if (tcl != null) {
+                            // Class.forName also accepts array class names, unlike ClassLoader.loadClass.
+                            clazz = Class.forName(className, false, tcl);
+                        } else {
+                            clazz = Class.forName(className);
                         }
+                    } catch (ClassNotFoundException e) {
+                        NamingException ex = new NamingException(
+                                sm.getString("lookupFactory.classNotFound", className, name));
+                        ex.initCause(e);
+                        throw ex;
                     }
-                    throw ne;
+                    if (result != null && !clazz.isAssignableFrom(result.getClass())) {
+                        String msg = sm.getString("lookupFactory.typeMismatch", name, className, lookupName,
+                                result.getClass().getName());
+                        NamingException ne = new NamingException(msg);
+                        log.warn(msg, ne);
+                        // Close the resource we no longer need if we know how to do so
+                        if (result instanceof AutoCloseable) {
+                            try {
+                                ((AutoCloseable) result).close();
+                            } catch (Exception e) {
+                                // Ignore
+                            }
+                        }
+                        throw ne;
+                    }
                 }
             } finally {
                 names.get().remove(lookupName);

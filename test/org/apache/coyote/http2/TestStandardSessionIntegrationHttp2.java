@@ -48,10 +48,10 @@ public class TestStandardSessionIntegrationHttp2 extends Http2TestBase {
         Context ctxt = getProgrammaticRootContext();
         // Need simple servlet for the HTTP upgrade
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
-        ctxt.addServletMappingDecoded("/simple", "simple");
+        ctxt.addServletMapping("/simple", "simple");
         // Servlet for this test
         Tomcat.addServlet(ctxt, "session", new SessionServlet());
-        ctxt.addServletMappingDecoded("/session", "session");
+        ctxt.addServletMapping("/session", "session");
         tomcat.start();
 
         openClientConnection();

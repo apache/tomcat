@@ -516,7 +516,7 @@ public class JspUtil {
         }
     }
 
-   /**
+    /**
      * Generates code to coerce a string to a Double object.
      *
      * @param s The string expression
@@ -902,7 +902,7 @@ public class JspUtil {
      *
      * @param key The name
      *
-     * @return <code>true</code> if the name is a java identifier
+     * @return <code>true</code> if the name is a java keyword
      */
     public static boolean isJavaKeyword(String key) {
         int i = 0;
@@ -937,18 +937,17 @@ public class JspUtil {
             for (int i = 0; i < skip; i++) {
                 in.read();
             }
-        } catch (IOException ioe) {
-            try {
-                in.close();
-            } catch (IOException ignore) {
-                // Ignore
-            }
-            throw ioe;
-        }
-        try {
             reader = new InputStreamReader(in, encoding);
         } catch (UnsupportedEncodingException ex) {
             err.jspError("jsp.error.unsupported.encoding", encoding);
+        } finally {
+            if (reader == null) {
+                try {
+                    in.close();
+                } catch (IOException ignore) {
+                    // Ignore
+                }
+            }
         }
 
         return reader;

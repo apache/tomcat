@@ -36,12 +36,8 @@ import org.apache.tomcat.util.file.ConfigurationSource.Resource;
  *             default="true"
  *             tagClass="org.apache.catalina.core.StandardServer"
  *             storeFactoryClass="org.apache.catalina.storeconfig.StandardServerSF">
- *           <TransientAttributes>
- *             <Attribute></Attribute>
- *           </TransientAttributes>
- *           <TransientChildren>
- *             <Child></Child>
- *           </TransientChildren>
+ *           <TransientAttribute>domain</TransientAttribute>
+ *           <TransientChild>org.apache.catalina.core.StandardContext</TransientChild>
  *         </Description>
  *   ...
  *       </Registry>
@@ -50,18 +46,10 @@ import org.apache.tomcat.util.file.ConfigurationSource.Resource;
  *
  * Convention:
  * <ul>
- * <li>Factories at subpackage <i>org.apache.catalina.core.storeconfig.xxxSF </i>.</li>
+ * <li>Factories at subpackage <i>org.apache.catalina.storeconfig.xxxSF</i>.</li>
  * <li>Element name are the unique Class name</li>
  * <li>SF for StoreFactory</li>
- * <li>standard implementation is false</li>
- * </ul>
- * other things:
- * <ul>
- * <li>Registry XML format is a very good option</li>
- * <li>Store format is not fix</li>
- * <li>We hope with the parent declaration we can build recursive child store operation //dream</li>
- * <li>Problem is to access child data from array,collections or normal detail object</li>
- * <li>Default definitions for Listener, Valve Resource? - Based on interface type!</li>
+ * <li>standard implementation is true</li>
  * </ul>
  */
 public class StoreLoader {

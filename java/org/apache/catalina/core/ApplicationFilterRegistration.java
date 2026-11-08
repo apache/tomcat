@@ -108,7 +108,6 @@ public class ApplicationFilterRegistration implements FilterRegistration.Dynamic
                 if (urlPattern == null) {
                     throw new IllegalArgumentException(sm.getString("applicationFilterRegistration.nullUrlPattern"));
                 }
-                // URL decoded using UTF-8 in addURLPattern
                 filterMap.addURLPattern(urlPattern);
             }
 

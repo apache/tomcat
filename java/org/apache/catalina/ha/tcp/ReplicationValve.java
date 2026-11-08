@@ -86,7 +86,7 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
      */
     protected LongAdder totalSendTime = new LongAdder();
     /**
-     * Total number of requests.
+     * Time (in milliseconds) of the last replication send.
      */
     protected AtomicLong lastSendTime = new AtomicLong();
     /**
@@ -584,11 +584,14 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
         if (!isAsync) {
             nrOfRequests.increment();
             if (log.isDebugEnabled()) {
-                if ((nrOfRequests.longValue() % 100) == 0) {
+                // Snapshot the counter to avoid a division by zero if
+                // resetStatistics() runs concurrently (JMX operation)
+                long requests = nrOfRequests.longValue();
+                if (requests > 0 && (requests % 100) == 0) {
                     log.debug(sm.getString("ReplicationValve.stats",
-                            Long.valueOf(totalRequestTime.longValue() / nrOfRequests.longValue()),
-                            Long.valueOf(totalSendTime.longValue() / nrOfRequests.longValue()),
-                            Long.valueOf(nrOfRequests.longValue()), Long.valueOf(nrOfSendRequests.longValue()),
+                            Long.valueOf(totalRequestTime.longValue() / requests),
+                            Long.valueOf(totalSendTime.longValue() / requests),
+                            Long.valueOf(requests), Long.valueOf(nrOfSendRequests.longValue()),
                             Long.valueOf(nrOfCrossContextSendRequests.longValue()),
                             Long.valueOf(nrOfFilterRequests.longValue()), Long.valueOf(totalRequestTime.longValue()),
                             Long.valueOf(totalSendTime.longValue())));
@@ -605,6 +608,7 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
      *
      * @throws IOException IO error finding session
      */
+    @SuppressWarnings("null") // ctx can't be null
     protected void createPrimaryIndicator(Request request) throws IOException {
         String id = request.getRequestedSessionId();
         if ((id != null) && (!id.isEmpty())) {
@@ -618,16 +622,14 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
             }
             if (session instanceof ClusterSession cses) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("ReplicationValve.session.indicator",
-                            ctx == null ? "null Context" : ctx.getPath(), id, primaryIndicatorName,
+                    log.debug(sm.getString("ReplicationValve.session.indicator", ctx.getPath(), id, primaryIndicatorName,
                             Boolean.valueOf(cses.isPrimarySession())));
                 }
                 request.setAttribute(primaryIndicatorName, cses.isPrimarySession() ? Boolean.TRUE : Boolean.FALSE);
             } else {
                 if (log.isDebugEnabled()) {
                     if (session != null) {
-                        log.debug(sm.getString("ReplicationValve.session.found",
-                                ctx == null ? "null Context" : ctx.getPath(), id));
+                        log.debug(sm.getString("ReplicationValve.session.found", ctx.getPath(), id));
                     } else {
                         log.debug(sm.getString("ReplicationValve.session.invalid",
                                 ctx == null ? "null Context" : ctx.getPath(), id));

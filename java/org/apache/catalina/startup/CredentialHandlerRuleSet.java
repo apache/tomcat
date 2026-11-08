@@ -21,12 +21,17 @@ import org.apache.tomcat.util.digester.RuleSet;
 
 /**
  * <strong>RuleSet</strong> for processing the contents of a CredentialHandler definition element. This
- * <code>RuleSet</code> supports CredentialHandler such as the <code>NestedCredentialHandler</code> that used nested
+ * <code>RuleSet</code> supports CredentialHandler such as the <code>NestedCredentialHandler</code> that uses nested
  * CredentialHandlers.
  */
 public class CredentialHandlerRuleSet implements RuleSet {
 
 
+    /**
+     * The maximum number of nested <code>CredentialHandler</code> levels to support. The default value of 3 can be
+     * overridden using the <code>org.apache.catalina.startup.CredentialHandlerRuleSet.MAX_NESTED_LEVELS</code> system
+     * property.
+     */
     private static final int MAX_NESTED_LEVELS =
             Integer.getInteger("org.apache.catalina.startup.CredentialHandlerRuleSet.MAX_NESTED_LEVELS", 3).intValue();
 

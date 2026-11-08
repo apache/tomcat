@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -412,7 +413,14 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     @Override
     public String[] getServletMethods() throws ServletException {
 
-        instance = loadServlet();
+        // Synchronise the check and the assignment of the instance to avoid a
+        // race with other threads loading the servlet which could otherwise
+        // result in a second, uninitialised instance being retained
+        synchronized (this) {
+            if (instance == null) {
+                instance = loadServlet();
+            }
+        }
 
         Class<? extends Servlet> servletClazz = instance.getClass();
         if (!jakarta.servlet.http.HttpServlet.class.isAssignableFrom(servletClazz)) {
@@ -667,15 +675,6 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
             referencesLock.readLock().unlock();
         }
 
-        // If not specified on the Wrapper, check the Context
-        if (getParent() instanceof Context context) {
-            if (reference != null) {
-                reference = context.findRoleMapping(reference);
-            } else {
-                reference = context.findRoleMapping(name);
-            }
-        }
-
         return reference;
     }
 
@@ -754,7 +753,7 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
 
         Servlet servlet;
         try {
-            long t1 = System.currentTimeMillis();
+            long t1 = System.nanoTime();
             // Complain if no servlet class has been specified
             if (servletClass == null) {
                 unavailable(null);
@@ -797,13 +796,13 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
                 ((ContainerServlet) servlet).setWrapper(this);
             }
 
-            classLoadTime = (int) (System.currentTimeMillis() - t1);
+            classLoadTime = (int) TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t1);
 
             initServlet(servlet);
 
             fireContainerEvent("load", this);
 
-            loadTime = System.currentTimeMillis() - t1;
+            loadTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t1);
         } finally {
             if (swallowOutput) {
                 String log = SystemLogHandler.stopCapture();
@@ -918,7 +917,7 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
         }
         unloading = true;
 
-        // Loaf a while if the current instance is allocated. Use wait() to
+        // Wait a while if the current instance is allocated. Use wait() to
         // release the lock while waiting to avoid blocking other threads.
         if (countAllocated.get() > 0) {
             int nRetries = 0;
@@ -1321,15 +1320,13 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     public MBeanNotificationInfo[] getNotificationInfo() {
         if (notificationInfo == null) {
             notificationInfo = new MBeanNotificationInfo[] {
-                    new MBeanNotificationInfo(new String[] { "j2ee.object.created" }, Notification.class.getName(),
-                            "servlet is created"),
                     new MBeanNotificationInfo(new String[] { "j2ee.state.starting" }, Notification.class.getName(),
                             "servlet is starting"),
                     new MBeanNotificationInfo(new String[] { "j2ee.state.running" }, Notification.class.getName(),
                             "servlet is running"),
-                    new MBeanNotificationInfo(new String[] { "j2ee.state.stopped" }, Notification.class.getName(),
+                    new MBeanNotificationInfo(new String[] { "j2ee.state.stopping" }, Notification.class.getName(),
                             "servlet is stopping"),
-                    new MBeanNotificationInfo(new String[] { "j2ee.object.stopped" }, Notification.class.getName(),
+                    new MBeanNotificationInfo(new String[] { "j2ee.state.stopped" }, Notification.class.getName(),
                             "servlet is stopped"),
                     new MBeanNotificationInfo(new String[] { "j2ee.object.deleted" }, Notification.class.getName(),
                             "servlet is deleted") };

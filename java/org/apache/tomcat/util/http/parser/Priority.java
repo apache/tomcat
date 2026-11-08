@@ -88,7 +88,7 @@ public class Priority {
 
 
     /**
-     * Parsers an HTTP header as a Priority header as defined by RFC 9218.
+     * Parses an HTTP header as a Priority header as defined by RFC 9218.
      *
      * @param input The header to parse
      *

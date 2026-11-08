@@ -18,10 +18,9 @@ package org.apache.catalina.session;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
 
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
@@ -29,6 +28,7 @@ import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Session;
 import org.apache.catalina.Store;
 import org.apache.catalina.StoreManager;
+import org.apache.catalina.util.SessionComparators;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -85,9 +85,10 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
 
 
     /**
-     * The minimum time in seconds a session must be idle before it is eligible to be swapped to disk to keep the active
-     * session count below maxActiveSessions. Setting to {@code -1} means sessions will not be swapped out to keep the
-     * active session count down.
+     * The minimum time in seconds a session must be idle before it is eligible to be swapped to disk. This is enforced
+     * both when swapping out to keep the active session count below maxActiveSessions and, as a lower bound in addition
+     * to maxIdleSwap, when swapping out due to inactivity. Setting to {@code -1} means sessions will not be swapped
+     * out to keep the active session count down.
      */
     protected int minIdleSwap = -1;
 
@@ -99,11 +100,6 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
     protected int maxIdleSwap = -1;
 
 
-    /**
-     * Sessions currently being swapped in and the associated locks
-     */
-    private final Map<String,Object> sessionSwapInLocks = new HashMap<>();
-
     /*
      * Session that is currently getting swapped in to prevent loading it more than once concurrently
      */
@@ -111,7 +107,6 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
 
 
     // ------------------------------------------------------------- Properties
-
 
     /**
      * Indicates how many seconds old a session can get, after its last use in a request, before it should be backed up
@@ -185,12 +180,12 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
 
 
     /**
-     * Returns the minimum time in seconds a session must be idle before it is eligible to be swapped to disk to keep
-     * the active session count below maxActiveSessions.
+     * Returns the minimum time in seconds a session must be idle before it is eligible to be swapped to disk. This is
+     * enforced both when swapping out to keep the active session count below maxActiveSessions and, as a lower bound in
+     * addition to maxIdleSwap, when swapping out due to inactivity.
      *
-     * @return The minimum time in seconds a session must be idle before it is eligible to be swapped to disk to keep
-     *             the active session count below maxActiveSessions. A value of {@code -1} means sessions will not be
-     *             swapped out to keep the active session count down.
+     * @return The minimum time in seconds a session must be idle before it is eligible to be swapped to disk. A value
+     *             of {@code -1} means sessions will not be swapped out to keep the active session count down.
      */
     public int getMinIdleSwap() {
         return minIdleSwap;
@@ -198,9 +193,10 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
 
 
     /**
-     * Sets the minimum time in seconds a session must be idle before it is eligible to be swapped to disk to keep the
-     * active session count below maxActiveSessions. Setting to {@code -1} means sessions will not be swapped out to
-     * keep the active session count down.
+     * Sets the minimum time in seconds a session must be idle before it is eligible to be swapped to disk. This is
+     * enforced both when swapping out to keep the active session count below maxActiveSessions and, as a lower bound in
+     * addition to maxIdleSwap, when swapping out due to inactivity. Setting to {@code -1} means sessions will not be
+     * swapped out to keep the active session count down.
      *
      * @param min time in seconds before a possible swap out
      */
@@ -292,8 +288,13 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
     }
 
 
-    // --------------------------------------------------------- Public Methods
+    @Override
+    public boolean getSessionActivityCheck() {
+        return super.getSessionActivityCheck() || minIdleSwap > -1 || maxIdleSwap > -1;
+    }
 
+
+    // --------------------------------------------------------- Public Methods
 
     /**
      * Clear all sessions from the Store.
@@ -540,6 +541,34 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
 
     // ------------------------------------------------------ Protected Methods
 
+    @Override
+    protected void changeSessionId(Session session, String newId, boolean notifySessionListeners,
+            boolean notifyContainerListeners) {
+
+        Store store = getStore();
+        if (store == null) {
+            super.changeSessionId(session, newId, notifySessionListeners, notifyContainerListeners);
+            return;
+        }
+
+        String oldId = session.getIdInternal();
+
+        Lock oldWriteLock = store.getSessionStoreLock(oldId).writeLock();
+        oldWriteLock.lock();
+        try {
+            Lock newWriteLock = store.getSessionStoreLock(newId).writeLock();
+            newWriteLock.lock();
+            try {
+                super.changeSessionId(session, newId, notifySessionListeners, notifyContainerListeners);
+            } finally {
+                newWriteLock.unlock();
+            }
+        } finally {
+            oldWriteLock.unlock();
+        }
+    }
+
+
     /**
      * Look for a session in the Store and, if found, restore it in the Manager's list of active sessions if
      * appropriate. The session will be removed from the Store after swapping in, but will not be added to the active
@@ -557,21 +586,12 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
             return null;
         }
 
-        Object swapInLock;
-
-        /*
-         * The purpose of this sync and these locks is to make sure that a session is only loaded once. It doesn't
-         * matter if the lock is removed and then another thread enters this method and tries to load the same session.
-         * That thread will re-create a swapIn lock for that session, quickly find that the session is already in
-         * sessions, use it and carry on.
-         */
-        synchronized (this) {
-            swapInLock = sessionSwapInLocks.computeIfAbsent(id, k -> new Object());
-        }
-
         Session session;
 
-        synchronized (swapInLock) {
+        Lock writeLock = getStore().getSessionStoreLock(id).writeLock();
+        writeLock.lock();
+        try {
+
             // First check to see if another thread has loaded the session into
             // the manager
             session = sessions.get(id);
@@ -583,11 +603,17 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
                         session = loadSessionFromStore(id);
                         sessionToSwapIn.set(session);
 
-                        if (session != null && !session.isValid()) {
-                            log.error(sm.getString("persistentManager.swapInInvalid", id));
-                            session.expire();
-                            removeSession(id);
-                            session = null;
+                        if (session != null) {
+                            if (!session.isValid()) {
+                                log.error(sm.getString("persistentManager.swapInInvalid", id));
+                                session.expire();
+                                removeSession(id);
+                                session = null;
+                            } else if (!session.getIdInternal().equals(id)) {
+                                log.error(sm.getString("persistentManager.swapInInvalid", id));
+                                removeSession(id);
+                                session = null;
+                            }
                         }
 
                         if (session != null) {
@@ -598,11 +624,8 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
                     sessionToSwapIn.remove();
                 }
             }
-        }
-
-        // Make sure the lock is removed
-        synchronized (this) {
-            sessionSwapInLocks.remove(id);
+        } finally {
+            writeLock.unlock();
         }
 
         return session;
@@ -767,8 +790,8 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
                 }
                 int timeIdle = (int) (session.getIdleTimeInternal() / 1000L);
                 if (timeIdle >= maxIdleSwap && timeIdle >= minIdleSwap) {
-                    if (session.accessCount != null && session.accessCount.get() > 0) {
-                        // Session is currently being accessed - skip it
+                    if (session.accessCount == null || session.accessCount.get() > 0) {
+                        // Session access is not tracked or session is currently being accessed - skip it
                         continue;
                     }
                     if (log.isTraceEnabled()) {
@@ -797,7 +820,6 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
 
         Session[] sessions = findSessions();
 
-        // FIXME: Smarter algorithm (LRU)
         int limit = (int) (getMaxActiveSessions() * 0.9);
 
         if (limit >= sessions.length) {
@@ -809,14 +831,15 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
         }
 
         int toswap = sessions.length - limit;
+        Arrays.sort(sessions, SessionComparators.comparingLongSnapshot(Session::getLastAccessedTimeInternal));
 
         for (int i = 0; i < sessions.length && toswap > 0; i++) {
             StandardSession session = (StandardSession) sessions[i];
             synchronized (session) {
                 int timeIdle = (int) (session.getIdleTimeInternal() / 1000L);
                 if (timeIdle >= minIdleSwap) {
-                    if (session.accessCount != null && session.accessCount.get() > 0) {
-                        // Session is currently being accessed - skip it
+                    if (session.accessCount == null || session.accessCount.get() > 0) {
+                        // Session access is not tracked or session is currently being accessed - skip it
                         continue;
                     }
                     if (log.isTraceEnabled()) {
@@ -832,7 +855,6 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
                 }
             }
         }
-
     }
 
 
@@ -876,6 +898,5 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
             }
         }
     }
-
 }
 

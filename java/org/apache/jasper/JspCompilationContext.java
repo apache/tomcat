@@ -23,7 +23,6 @@ import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.net.URLConnection;
 import java.util.Set;
 import java.util.jar.JarEntry;
 
@@ -40,6 +39,7 @@ import org.apache.jasper.servlet.JspServletWrapper;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.Jar;
+import org.apache.tomcat.util.buf.CloseableURLConnection;
 import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
 
 /**
@@ -276,7 +276,7 @@ public class JspCompilationContext {
             if (log.isDebugEnabled()) {
                 log.debug(Localizer.getMessage("jsp.error.compiler"), e);
             }
-        } catch (ReflectiveOperationException e) {
+        } catch (ReflectiveOperationException | ClassCastException e) {
             log.warn(Localizer.getMessage("jsp.error.compiler"), e);
         }
         return compiler;
@@ -448,7 +448,6 @@ public class JspCompilationContext {
      */
     public Long getLastModified(String resource, Jar tagJar) {
         long result = -1;
-        URLConnection uc = null;
         try {
             if (tagJar != null) {
                 if (resource.startsWith("/")) {
@@ -461,32 +460,22 @@ public class JspCompilationContext {
                     incrementRemoved();
                     return Long.valueOf(result);
                 }
-                uc = jspUrl.openConnection();
-                if (uc instanceof JarURLConnection) {
-                    JarEntry jarEntry = ((JarURLConnection) uc).getJarEntry();
-                    if (jarEntry != null) {
-                        result = jarEntry.getTime();
+                try (CloseableURLConnection uc = new CloseableURLConnection(jspUrl)) {
+                    if (uc.getConnection() instanceof JarURLConnection) {
+                        JarEntry jarEntry = ((JarURLConnection) uc.getConnection()).getJarEntry();
+                        if (jarEntry != null) {
+                            result = jarEntry.getTime();
+                        } else {
+                            result = uc.getLastModified();
+                        }
                     } else {
                         result = uc.getLastModified();
                     }
-                } else {
-                    result = uc.getLastModified();
                 }
             }
         } catch (IOException ioe) {
             if (log.isDebugEnabled()) {
                 log.debug(Localizer.getMessage("jsp.error.lastModified", getJspFile()), ioe);
-            }
-        } finally {
-            if (uc != null) {
-                try {
-                    uc.getInputStream().close();
-                } catch (IOException ioe) {
-                    if (log.isDebugEnabled()) {
-                        log.debug(Localizer.getMessage("jsp.error.lastModified", getJspFile()), ioe);
-                    }
-                    result = -1;
-                }
             }
         }
         return Long.valueOf(result);

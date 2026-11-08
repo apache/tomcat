@@ -26,7 +26,7 @@ import org.apache.jasper.TrimSpacesOption;
 public class TextOptimizer {
 
     /**
-     * Constructs a new TextOptimizer. This utility class should not be instantiated.
+     * Constructs a new TextOptimizer.
      */
     public TextOptimizer() {
     }

@@ -117,7 +117,7 @@ public class TestAuthenticatorBaseCorsPreflight extends TomcatBaseTest {
         Context ctx = tomcat.addContext("", appDir.getAbsolutePath());
 
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         LoginConfig loginConfig = new LoginConfig();
         loginConfig.setAuthMethod("BASIC");
@@ -143,7 +143,7 @@ public class TestAuthenticatorBaseCorsPreflight extends TomcatBaseTest {
         otherFilter.setFilterClass(AddDefaultCharsetFilter.class.getName());
         FilterMap otherMap = new FilterMap();
         otherMap.setFilterName("other");
-        otherMap.addURLPatternDecoded("/other");
+        otherMap.addURLPattern("/other");
         ctx.addFilterDef(otherFilter);
         ctx.addFilterMap(otherMap);
 
@@ -154,7 +154,7 @@ public class TestAuthenticatorBaseCorsPreflight extends TomcatBaseTest {
         corsFilter.addInitParameter(CorsFilter.PARAM_CORS_ALLOWED_METHODS, ALLOWED_METHOD);
         FilterMap corsFilterMap = new FilterMap();
         corsFilterMap.setFilterName("cors");
-        corsFilterMap.addURLPatternDecoded(filterMapping);
+        corsFilterMap.addURLPattern(filterMapping);
         ctx.addFilterDef(corsFilter);
         ctx.addFilterMap(corsFilterMap);
 

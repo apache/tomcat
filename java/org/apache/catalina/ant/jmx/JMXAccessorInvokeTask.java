@@ -78,7 +78,7 @@ import org.apache.tools.ant.BuildException;
  * </li>
  * </ul>
  * <p>
- * First call to a remote MBeanserver save the JMXConnection a referenz <em>jmx.server</em>
+ * First call to a remote MBeanserver save the JMXConnection a reference <em>jmx.server</em>
  * </p>
  * These tasks require Ant 1.6 or later interface.
  *

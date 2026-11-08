@@ -65,6 +65,24 @@ public class TestCharChunk {
 
 
     @Test
+    public void testIndexOf_Char() {
+        char[] chars = "xx=yy=zz".toCharArray();
+
+        CharChunk cc = new CharChunk();
+        cc.setChars(chars, 0, chars.length);
+        Assert.assertEquals(2, cc.indexOf('='));
+        Assert.assertEquals(5, cc.indexOf('=', 3));
+
+        // Chunk that does not start at the beginning of the buffer
+        cc.setChars(chars, 3, 5);
+        Assert.assertEquals(2, cc.indexOf('='));
+        Assert.assertEquals(2, cc.indexOf('=', 0));
+        Assert.assertEquals(0, cc.indexOf('y'));
+        Assert.assertEquals(-1, cc.indexOf('x'));
+    }
+
+
+    @Test
     public void testToString() {
         CharChunk cc = new CharChunk();
         Assert.assertNull(cc.toString());

@@ -70,11 +70,12 @@ public final class CustomObjectInputStream extends ObjectInputStream {
      *
      * @param stream                  The input stream we will read from
      * @param classLoader             The class loader used to instantiate objects
-     * @param log                     The logger to use to report any issues. It may only be null if the filterMode does
-     *                                    not require logging
+     * @param log                     The logger to use to report any issues. It may only be null if
+     *                                    <code>warnOnFailure</code> is <code>false</code> or
+     *                                    <code>allowedClassNamePattern</code> is <code>null</code>
      * @param allowedClassNamePattern The regular expression to use to filter deserialized classes. The fully qualified
-     *                                    class name must match this pattern for deserialization to be allowed if
-     *                                    filtering is enabled.
+     *                                    class name must match this pattern for deserialization to be allowed.
+     *                                    If null, filtering will be disabled.
      * @param warnOnFailure           Should any failures be logged?
      *
      * @exception IOException if an input/output error occurs
@@ -128,19 +129,7 @@ public final class CustomObjectInputStream extends ObjectInputStream {
     public Class<?> resolveClass(ObjectStreamClass classDesc) throws ClassNotFoundException, IOException {
 
         String name = classDesc.getName();
-        if (allowedClassNamePattern != null) {
-            boolean allowed = allowedClassNamePattern.matcher(name).matches();
-            if (!allowed) {
-                boolean doLog = warnOnFailure && reportedClasses.add(name);
-                String msg = sm.getString("customObjectInputStream.nomatch", name, allowedClassNameFilter);
-                if (doLog) {
-                    log.warn(msg);
-                } else if (log.isDebugEnabled()) {
-                    log.debug(msg);
-                }
-                throw new InvalidClassException(msg);
-            }
-        }
+        checkAllowed(name);
 
         try {
             return Class.forName(name, false, classLoader);
@@ -166,6 +155,7 @@ public final class CustomObjectInputStream extends ObjectInputStream {
 
         Class<?>[] cinterfaces = new Class[interfaces.length];
         for (int i = 0; i < interfaces.length; i++) {
+            checkAllowed(interfaces[i]);
             cinterfaces[i] = classLoader.loadClass(interfaces[i]);
         }
 
@@ -176,6 +166,29 @@ public final class CustomObjectInputStream extends ObjectInputStream {
             return proxyClass;
         } catch (IllegalArgumentException e) {
             throw new ClassNotFoundException(null, e);
+        }
+    }
+
+
+    /**
+     * Check the given class name against the configured filter, throwing an exception if it is not permitted. If no
+     * filter has been configured, all class names are permitted.
+     *
+     * @param name The fully qualified class name to check
+     *
+     * @throws InvalidClassException if the class name is not permitted by the configured filter
+     */
+    private void checkAllowed(String name) throws InvalidClassException {
+        if (allowedClassNamePattern != null && !allowedClassNamePattern.matcher(name).matches()) {
+            boolean doLog = warnOnFailure && reportedClasses.add(name);
+            String msg = sm.getString("customObjectInputStream.nomatch", name, allowedClassNameFilter);
+            if (doLog) {
+                log.warn(msg);
+            } else if (log != null && log.isDebugEnabled()) {
+                // A null log is permitted by the constructor when warnOnFailure is false
+                log.debug(msg);
+            }
+            throw new InvalidClassException(msg);
         }
     }
 }

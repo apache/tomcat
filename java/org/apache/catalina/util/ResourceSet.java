@@ -89,15 +89,15 @@ public final class ResourceSet<T> extends HashSet<T> {
 
 
     /**
-     * The current lock state of this parameter map.
+     * The current lock state of this set.
      */
     private boolean locked = false;
 
 
     /**
-     * Return the locked state of this parameter map.
+     * Return the locked state of this set.
      *
-     * @return the locked state of this parameter map
+     * @return the locked state of this set
      */
     public boolean isLocked() {
         return this.locked;
@@ -105,7 +105,7 @@ public final class ResourceSet<T> extends HashSet<T> {
 
 
     /**
-     * Set the locked state of this parameter map.
+     * Set the locked state of this set.
      *
      * @param locked The new locked state
      */

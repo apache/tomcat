@@ -41,10 +41,11 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpUpgradeHandler;
 import jakarta.servlet.http.Part;
 
+import org.apache.catalina.Wrapper;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Facade class that wraps a Coyote request object. All methods are delegated to the wrapped request.
+ * Facade class that wraps a {@link Request} object. All methods are delegated to the wrapped request.
  */
 public class RequestFacade implements HttpServletRequest {
 
@@ -612,6 +613,18 @@ public class RequestFacade implements HttpServletRequest {
     public ServletConnection getServletConnection() {
         checkFacade();
         return request.getServletConnection();
+    }
+
+
+    public Wrapper getRequestDispatcherWrapper() {
+        checkFacade();
+        return request.getMappingData().requestDispatcherWrapper;
+    }
+
+
+    public void setRequestDispatcherWrapper(Wrapper wrapper) {
+        checkFacade();
+        request.getMappingData().requestDispatcherWrapper = wrapper;
     }
 
 

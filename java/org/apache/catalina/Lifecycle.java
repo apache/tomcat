@@ -69,11 +69,13 @@ package org.apache.catalina;
  * does not start all its sub-components. When the component is stopped, it will
  * try to stop all sub-components - even those it didn't start.
  *
- * Attempting any other transition will throw {@link LifecycleException}.
+ * Attempting any other transition will throw {@link LifecycleException},
+ * except calling stop() while a component is in state INITIALIZED which has
+ * no effect.
  *
  * </pre>
  *
- * The {@link LifecycleEvent}s fired during state changes are defined in the methods that trigger the changed. No
+ * The {@link LifecycleEvent}s fired during state changes are defined in the methods that trigger the change. No
  * {@link LifecycleEvent}s are fired if the attempted transition is not valid.
  */
 public interface Lifecycle {

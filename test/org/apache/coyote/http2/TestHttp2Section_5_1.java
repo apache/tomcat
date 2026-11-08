@@ -17,11 +17,16 @@
 package org.apache.coyote.http2;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import org.apache.tomcat.util.http.Method;
+import org.apache.tomcat.util.http.MimeHeaders;
 
 /**
  * Unit tests for Section 5.§ of <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>. <br>
@@ -54,7 +59,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
 
     @Test
-    public void halfClosedRemoteInvalidFrame() throws Exception {
+    public void testHalfClosedRemoteInvalidFrame() throws Exception {
         http2Connect();
 
         // This half-closes the stream since it includes the end of stream flag
@@ -71,20 +76,93 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
 
     @Test
+    public void testHalfClosedRemoteHeadersFrameMaintainsHpackState() throws Exception {
+        doTestHalfClosedRemoteHeadersMaintainsHpackState(false);
+    }
+
+
+    @Test
+    public void testHalfClosedRemoteContinuationFrameMaintainsHpackState() throws Exception {
+        doTestHalfClosedRemoteHeadersMaintainsHpackState(true);
+    }
+
+
+    private void doTestHalfClosedRemoteHeadersMaintainsHpackState(boolean useContinuation) throws Exception {
+        http2Connect();
+
+        // This test may trigger overhead protection so disable it.
+        http2Protocol.setOverheadResetFactor(0);
+
+        // Prevent the response body from completing so stream 3 remains half-closed (remote).
+        sendSettings(0, false, new SettingValue(4, 0));
+        parser.readFrame();
+        output.clearTrace();
+
+        // Send a request on stream 3
+        sendSimpleGetRequest(3);
+
+        /*
+         * Send another (invalid) request on stream 3 (will cause HEADERS to be received in the "half-closed (remote)"
+         * state). This request create a dynamic table entry for the 'x-hpack-test' header.
+         */
+        String headerName = "x-hpack-test";
+        String headerValue = "value";
+        byte[] frameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+
+        if (useContinuation) {
+            buildSimpleGetRequestPart1(frameHeader, headersPayload, 3);
+            writeFrame(frameHeader, headersPayload);
+
+            frameHeader = new byte[9];
+            headersPayload = ByteBuffer.allocate(128);
+            List<Header> continuationHeaders = new ArrayList<>(1);
+            continuationHeaders.add(new Header(headerName, headerValue));
+            buildSimpleGetRequestPart2(frameHeader, headersPayload, continuationHeaders, 3);
+            writeFrame(frameHeader, headersPayload);
+        } else {
+            List<Header> invalidHeaders = new ArrayList<>(1);
+            invalidHeaders.add(new Header(headerName, headerValue));
+            buildGetRequest(frameHeader, headersPayload, null, invalidHeaders, 3);
+            writeFrame(frameHeader, headersPayload);
+        }
+
+        /*
+         * Create a valid request on Stream 5. This request uses the dynamic table entry for the 'x-hpack-test' header
+         * created by the invalid field block above.
+         */
+        frameHeader = new byte[9];
+        headersPayload = ByteBuffer.allocate(128);
+        List<Header> validHeaders = new ArrayList<>(5);
+        validHeaders.add(new Header(":method", Method.GET));
+        validHeaders.add(new Header(":scheme", "http"));
+        validHeaders.add(new Header(":path", "/empty"));
+        validHeaders.add(new Header(":authority", "localhost:" + getPort()));
+        validHeaders.add(new Header(headerName, headerValue));
+        buildGetRequest(frameHeader, headersPayload, null, validHeaders, 5);
+        writeFrame(frameHeader, headersPayload);
+
+        while (!output.getTrace().contains("5-EndOfStream") && !output.getTrace().contains("5-RST-")) {
+            parser.readFrame();
+        }
+
+        String trace = output.getTrace();
+        Assert.assertTrue(trace, trace.contains("3-RST-[" + Http2Error.STREAM_CLOSED.getCode() + "]"));
+        // Remove trace entries for stream 3 as they may be interleaved with those for stream 5
+        trace = trace.replaceAll("(?m)^3-.*(\\r?\\n)?", "");
+        Assert.assertTrue(trace, trace.contains(getEmptyResponseTrace(5)));
+    }
+
+
+    @Test
     public void testClosedInvalidFrame01() throws Exception {
         // HTTP2 upgrade
         http2Connect();
 
-        // Build the simple request
-        byte[] frameHeader = new byte[9];
-        ByteBuffer headersPayload = ByteBuffer.allocate(128);
-        buildSimpleGetRequest(frameHeader, headersPayload, null, 3);
-
-        // Remove the end of stream and end of headers flags
-        frameHeader[4] = 0;
-
-        // Process the request
-        writeFrame(frameHeader, headersPayload);
+        // Send the headers for a POST (END_HEADERS set, END_STREAM not set) that promises a body but does not send it.
+        // The servlet blocks reading the body so no response is generated before the reset below. The header block
+        // must be complete else the RST is a connection error (RFC 9113, section 6.2)
+        sendParameterPostRequest(3, null, null, 10, false);
 
         // Send a rst
         sendRst(3, Http2Error.INTERNAL_ERROR.getCode());
@@ -429,5 +507,47 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         parser.readFrame();
         Assert.assertTrue(output.getTrace(),
                 output.getTrace().contains("0-Goaway-[5]-[" + Http2Error.FLOW_CONTROL_ERROR.getCode() + "]"));
+    }
+
+
+    @Test
+    public void testReuseAfterReset() throws Exception {
+        http2Connect();
+
+        // Create an invalid request
+        // Generate headers
+        byte[] headersFrameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+
+        MimeHeaders headers = new MimeHeaders();
+        headers.addValue(":method").setString(Method.GET);
+        headers.addValue(":scheme").setString("http");
+        headers.addValue(":path").setString("/simple");
+        headers.addValue(":authority").setString("localhost:" + getPort());
+        headers.addValue("Connection").setString("close");
+
+        hpackEncoder.encode(headers, headersPayload);
+
+        headersPayload.flip();
+
+        ByteUtil.setThreeBytes(headersFrameHeader, 0, headersPayload.limit());
+        headersFrameHeader[3] = FrameType.HEADERS.getIdByte();
+        // Flags. end of headers (0x04)
+        headersFrameHeader[4] = 0x04;
+        // Stream id
+        ByteUtil.set31Bits(headersFrameHeader, 5, 3);
+
+        writeFrame(headersFrameHeader, headersPayload);
+
+        parser.readFrame();
+        Assert.assertEquals("Reset expected due to invalid header", "3-RST-[1]\n", output.getTrace());
+        output.clearTrace();
+
+        // Re-use stream 3 for a valid request
+        sendSimpleGetRequest(3);
+        parser.readFrame();
+        String trace = output.getTrace();
+        Assert.assertTrue("Goaway expected due to stream reuse [" + trace + "]",
+                trace.startsWith("0-Goaway-[3]-[1]-["));
     }
 }

@@ -232,7 +232,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
 
     @Override
     protected HeaderFrameBuffers getHeaderFrameBuffers(int initialPayloadSize) {
-        return new AsyncHeaderFrameBuffers(initialPayloadSize);
+        return new AsyncHeaderFrameBuffers(initialPayloadSize, getHeaderWorkspaceLimit());
     }
 
 
@@ -312,6 +312,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
             if (!localSettings.ack()) {
                 // Ack was unexpected
                 log.warn(sm.getString("upgradeHandler.unexpectedAck", connectionId, getIdAsString()));
+                increaseOverheadCount(FrameType.SETTINGS);
             }
         } else {
             socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(), TimeUnit.MILLISECONDS, null,
@@ -545,14 +546,16 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     private static class AsyncHeaderFrameBuffers implements HeaderFrameBuffers {
 
         int payloadSize;
+        private final int workspaceLimit;
 
         private byte[] header;
         private ByteBuffer payload;
 
         private final List<ByteBuffer> bufs = new ArrayList<>();
 
-        AsyncHeaderFrameBuffers(int initialPayloadSize) {
+        AsyncHeaderFrameBuffers(int initialPayloadSize, int workspaceLimit) {
             this.payloadSize = initialPayloadSize;
+            this.workspaceLimit = workspaceLimit;
         }
 
         @Override
@@ -583,7 +586,13 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
 
         @Override
         public void expandPayload() {
-            payloadSize = payloadSize * 2;
+            // Use the same workspace ceiling as the synchronous writer. The shared header encoding path checks
+            // the actual payload size before this frame can be queued for writing.
+            if (payloadSize >= workspaceLimit) {
+                throw new IllegalStateException(
+                        sm.getString("upgradeHandler.headerWorkspaceTooBig", Integer.toString(workspaceLimit)));
+            }
+            payloadSize = Integer.min(payloadSize * 2, workspaceLimit);
             payload = ByteBuffer.allocate(payloadSize);
         }
     }

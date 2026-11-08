@@ -32,7 +32,8 @@ public class TokenMgrError extends Error {
     public static final int INVALID_LEXICAL_STATE = 2;
 
     /**
-     * Detected (and bailed out of) an infinite loop in the token manager.
+     * Boilerplate reason code from the JavaCC token manager template. This generated token manager performs no loop
+     * detection and never throws with this reason.
      */
     public static final int LOOP_DETECTED = 3;
 

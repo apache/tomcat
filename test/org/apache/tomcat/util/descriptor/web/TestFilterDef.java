@@ -42,4 +42,42 @@ public class TestFilterDef {
                 "test", filterDef.getFilterName());
     }
 
+    @Test
+    public void testAsyncSupportedDefaultsToFalse() {
+        // The specification default is that a filter does not support async
+        // processing and every other async-supported default in the container
+        // is false. This matters in particular for filters registered
+        // dynamically via ServletContext.addFilter() which do not pass through
+        // the ContextConfig normalisation of the descriptor value.
+        FilterDef filterDef = new FilterDef();
+        Assert.assertNull(filterDef.getAsyncSupported());
+        Assert.assertFalse(filterDef.getAsyncSupportedBoolean());
+    }
+
+    @Test
+    public void testSetAsyncSupported() {
+        FilterDef filterDef = new FilterDef();
+
+        filterDef.setAsyncSupported("true");
+        Assert.assertTrue(filterDef.getAsyncSupportedBoolean());
+
+        filterDef.setAsyncSupported("TRUE");
+        Assert.assertTrue(filterDef.getAsyncSupportedBoolean());
+
+        filterDef.setAsyncSupported("false");
+        Assert.assertFalse(filterDef.getAsyncSupportedBoolean());
+
+        // Only "true" enables async support. Anything else, including null
+        // and invalid values such as "yes", is not supported which matches
+        // the handling by ServletDef and by Boolean. The string value is
+        // stored as-is since WebXml.mergeFilter() and the ContextConfig
+        // normalisation of the descriptor value operate on it.
+        filterDef.setAsyncSupported("yes");
+        Assert.assertEquals("yes", filterDef.getAsyncSupported());
+        Assert.assertFalse(filterDef.getAsyncSupportedBoolean());
+
+        filterDef.setAsyncSupported(null);
+        Assert.assertFalse(filterDef.getAsyncSupportedBoolean());
+    }
+
 }

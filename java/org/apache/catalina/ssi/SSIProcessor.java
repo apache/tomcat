@@ -23,7 +23,6 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.StringTokenizer;
 
 import org.apache.catalina.util.IOTools;
 
@@ -182,7 +181,12 @@ public class SSIProcessor {
                 }
             }
         } catch (SSIStopProcessingException e) {
-            // If we are here, then we have already stopped processing, so all is good
+            // If we are here, then processing has already been stopped by a command that
+            // reported its own error. Log any wrapped cause so nothing can fail silently,
+            // and log everything when debugging is enabled.
+            if (debug > 0 || e.getCause() != null) {
+                ssiExternalResolver.log("SSI processing stopped", e);
+            }
         }
         return lastModifiedDate;
     }
@@ -197,47 +201,65 @@ public class SSIProcessor {
      * @return an array with the parameter names
      */
     protected String[] parseParamNames(StringBuilder cmd, int start) {
+        // Count parameters first
+        int count = 0;
         int bIdx = start;
-        int i = 0;
-        int quotes;
-        boolean inside = false;
-        StringBuilder retBuf = new StringBuilder();
+        // Tracks the quote character that will close any currently quoted text. 0 means not currently quoted.
+        char endQuote = 0;
+        boolean escaped = false;
         while (bIdx < cmd.length()) {
-            if (!inside) {
-                while (bIdx < cmd.length() && isSpace(cmd.charAt(bIdx))) {
-                    bIdx++;
-                }
-                if (bIdx >= cmd.length()) {
-                    break;
-                }
-                inside = true;
-            } else {
-                while (bIdx < cmd.length() && cmd.charAt(bIdx) != '=') {
-                    retBuf.append(cmd.charAt(bIdx));
-                    bIdx++;
-                }
-                retBuf.append('=');
-                inside = false;
-                quotes = 0;
-                boolean escaped = false;
-                for (; bIdx < cmd.length() && quotes != 2; bIdx++) {
-                    char c = cmd.charAt(bIdx);
-                    // Need to skip escaped characters
-                    if (c == '\\' && !escaped) {
-                        escaped = true;
-                        continue;
-                    }
-                    if (c == '"' && !escaped) {
-                        quotes++;
-                    }
-                    escaped = false;
-                }
+            char c = cmd.charAt(bIdx);
+            if (escaped) {
+                escaped = false;
+            } else if (c == '\\') {
+                escaped = true;
+            } else if (endQuote == 0 && (c == '"' || c == '\'' || c == '`')) {
+                endQuote = c;
+            } else if (endQuote == c) {
+                endQuote = 0;
+            } else if (c == '=' && endQuote == 0) {
+                count++;
             }
+            bIdx++;
         }
-        StringTokenizer str = new StringTokenizer(retBuf.toString(), "=");
-        String[] retString = new String[str.countTokens()];
-        while (str.hasMoreTokens()) {
-            retString[i++] = str.nextToken().trim();
+        String[] retString = new String[count];
+        // Extract parameter names (characters between spaces and the first unquoted '=')
+        bIdx = start;
+        int idx = 0;
+        StringBuilder nameBuf = new StringBuilder();
+        boolean collectingName = false;
+        endQuote = 0;
+        escaped = false;
+        while (bIdx < cmd.length() && idx < count) {
+            char c = cmd.charAt(bIdx);
+            if (escaped) {
+                escaped = false;
+                if (collectingName && endQuote == 0) {
+                    nameBuf.append(c);
+                }
+            } else if (c == '\\') {
+                escaped = true;
+                if (collectingName && endQuote == 0) {
+                    nameBuf.append(c);
+                }
+            } else if (endQuote == 0 && (c == '"' || c == '\'' || c == '`')) {
+                endQuote = c;
+            } else if (endQuote == c) {
+                endQuote = 0;
+            } else if (endQuote == 0 && isSpace(c)) {
+                if (collectingName) {
+                    nameBuf.setLength(0);
+                    collectingName = false;
+                }
+            } else if (endQuote == 0 && c == '=') {
+                retString[idx++] = nameBuf.toString().strip();
+                nameBuf.setLength(0);
+                collectingName = false;
+            } else if (endQuote == 0) {
+                collectingName = true;
+                nameBuf.append(c);
+            }
+            bIdx++;
         }
         return retString;
     }

@@ -37,24 +37,35 @@ public class Param implements TagPlugin {
 
         // don't support the body content
 
+        // Append the parameter to the working URL of the enclosing URL tag.
+        // The URL plugins share the names of the local variables holding
+        // that URL with the Param plugins in their bodies, so that nested URL
+        // tags cannot interfere with each other. As in the standard handler,
+        // which at runtime adds the parameter to the closest URL tag
+        // ancestor, the search walks up the plugin context chain until a
+        // context provides the working URL. It stops at tags that no plugin
+        // handled, since their bodies are generated in separate methods where
+        // the local variables are out of scope.
+        TagPluginContext urlContext = UrlParameters.findUrlContext(ctxt);
+        if (urlContext == null) {
+            // The parameter cannot be appended inline. Let the standard tag
+            // handler process it, and return the enclosing URL tag to its
+            // standard handler as well, since only that can receive it. If
+            // there is no URL tag, the standard handler reports the misplaced
+            // tag.
+            UrlParameters.fallBack(ctxt);
+            return;
+        }
+        UrlParameters.register(urlContext, ctxt);
+        String urlTargetName = UrlParameters.getUrlVariable(urlContext);
+        String paramEnd = UrlParameters.getParamEndVariable(urlContext);
+
         // define names of all the temp variables
         String nameName = ctxt.getTemporaryVariableName();
         String valueName = ctxt.getTemporaryVariableName();
-        String urlName = ctxt.getTemporaryVariableName();
         String encName = ctxt.getTemporaryVariableName();
         String index = ctxt.getTemporaryVariableName();
-
-        // if the param tag has no parents, throw an exception
-        TagPluginContext parent = ctxt.getParentContext();
-        if (parent == null) {
-            ctxt.generateJavaSource(
-                    " throw new JspTagException" + "(\"&lt;param&gt; outside &lt;import&gt; or &lt;urlEncode&gt;\");");
-            return;
-        }
-
-        // get the url string before adding this param
-        ctxt.generateJavaSource(
-                "String " + urlName + " = " + "(String)pageContext.getAttribute(\"url_without_param\");");
+        String paramName = ctxt.getTemporaryVariableName();
 
         // get the value of "name"
         ctxt.generateJavaSource("String " + nameName + " = ");
@@ -69,23 +80,29 @@ public class Param implements TagPlugin {
         ctxt.generateAttribute("value");
         ctxt.generateJavaSource(";");
         ctxt.generateJavaSource("    if(" + valueName + " == null) " + valueName + " = \"\";");
-        ctxt.generateJavaSource("    String " + encName + " = pageContext.getResponse().getCharacterEncoding();");
         ctxt.generateJavaSource(
-                "    " + nameName + " = java.net.URLEncoder.encode(" + nameName + ", " + encName + ");");
-        ctxt.generateJavaSource(
-                "    " + valueName + " = java.net.URLEncoder.encode(" + valueName + ", " + encName + ");");
-        ctxt.generateJavaSource("    int " + index + ";");
-        ctxt.generateJavaSource("    " + index + " = " + urlName + ".indexOf(\'?\');");
-        // if the current param is the first one, add a "?" ahead of it
-        // else add a "&" ahead of it
-        ctxt.generateJavaSource("    if(" + index + " == -1){");
-        ctxt.generateJavaSource(
-                "        " + urlName + " = " + urlName + " + \"?\" + " + nameName + " + \"=\" + " + valueName + ";");
+                "    String " + encName + " = _jspx_page_context.getResponse().getCharacterEncoding();");
+        ctxt.generateJavaSource("    String " + paramName + " = java.net.URLEncoder.encode(" + nameName + ", " +
+                encName + ") + \"=\" + java.net.URLEncoder.encode(" + valueName + ", " + encName + ");");
+        // The parameters precede any query string already in the URL. The
+        // first one is inserted after the "?", or appended with a new "?" if
+        // there is no query string. Later ones follow the previous parameter.
+        ctxt.generateJavaSource("    if(" + paramEnd + " < 0){");
+        ctxt.generateJavaSource("        int " + index + " = " + urlTargetName + ".indexOf('?');");
+        ctxt.generateJavaSource("        if(" + index + " == -1){");
+        ctxt.generateJavaSource("            " + urlTargetName + " = " + urlTargetName + " + \"?\" + " + paramName +
+                ";");
+        ctxt.generateJavaSource("            " + paramEnd + " = " + urlTargetName + ".length();");
+        ctxt.generateJavaSource("        }else{");
+        ctxt.generateJavaSource("            " + urlTargetName + " = " + urlTargetName + ".substring(0, " + index +
+                " + 1) + " + paramName + " + \"&\" + " + urlTargetName + ".substring(" + index + " + 1);");
+        ctxt.generateJavaSource("            " + paramEnd + " = " + index + " + 1 + " + paramName + ".length();");
+        ctxt.generateJavaSource("        }");
         ctxt.generateJavaSource("    }else{");
-        ctxt.generateJavaSource(
-                "        " + urlName + " = " + urlName + " + \"&\" + " + nameName + " + \"=\" + " + valueName + ";");
+        ctxt.generateJavaSource("        " + urlTargetName + " = " + urlTargetName + ".substring(0, " + paramEnd +
+                ") + \"&\" + " + paramName + " + " + urlTargetName + ".substring(" + paramEnd + ");");
+        ctxt.generateJavaSource("        " + paramEnd + " += 1 + " + paramName + ".length();");
         ctxt.generateJavaSource("    }");
-        ctxt.generateJavaSource("    pageContext.setAttribute(\"url_without_param\"," + urlName + ");");
         ctxt.generateJavaSource("}");
     }
 }

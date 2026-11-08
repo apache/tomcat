@@ -54,7 +54,7 @@ public class Constants {
 
     // Internal OP Codes
     // RFC 6455 limits OP Codes to 4 bits so these should never clash
-    // Always set bit 4 so these will be treated as control codes
+    // Always set the 0x08 bit so these will be treated as control codes
     static final byte INTERNAL_OPCODE_FLUSH = 0x18;
 
     // Buffers
@@ -71,6 +71,17 @@ public class Constants {
      * Default I/O timeout in milliseconds for WebSocket client connections.
      */
     public static final long IO_TIMEOUT_MS_DEFAULT = 5000;
+    /**
+     * Property name to set to configure the maximum number of bytes that will be allowed for the HTTP response to a
+     * WebSocket handshake request. The default is {@link #MAX_HTTP_RESPONSE_HEADER_BYTES_DEFAULT}.
+     */
+    public static final String MAX_HTTP_RESPONSE_HEADER_BYTES_PROPERTY =
+            "org.apache.tomcat.websocket.MAX_HTTP_RESPONSE_HEADER_BYTES";
+    /**
+     * Default maximum number of bytes that will be allowed for the HTTP response to a
+     * WebSocket handshake request.
+     */
+    public static final long MAX_HTTP_RESPONSE_HEADER_BYTES_DEFAULT = 8192;
 
     // RFC 2068 recommended a limit of 5
     // Most browsers have a default limit of 20
@@ -136,6 +147,14 @@ public class Constants {
      * Sec-WebSocket-Version header value.
      */
     public static final String WS_VERSION_HEADER_VALUE = "13";
+    /**
+     * Sec-WebSocket-Accept header name.
+     */
+    public static final String WS_ACCEPT_HEADER_NAME = "Sec-WebSocket-Accept";
+    /**
+     * GUID that is appended to the Sec-WebSocket-Key header value to compute the Sec-WebSocket-Accept header value.
+     */
+    public static final String WS_ACCEPT_GUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
     /**
      * Sec-WebSocket-Key HTTP header name.
      */

@@ -42,17 +42,21 @@ public class JspFactoryImpl extends JspFactory {
     }
 
     private final ThreadLocal<PageContextPool> localPool = new ThreadLocal<>();
-    private int poolSize = -1;
+    private volatile int poolSize = -1;
 
     @Override
     public PageContext getPageContext(Servlet servlet, ServletRequest request, ServletResponse response,
             String errorPageURL, boolean needsSession, int bufferSize, boolean autoflush) {
 
+        // Read the volatile field once. It may be changed concurrently by the
+        // start of another web application.
+        int currentPoolSize = poolSize;
+
         PageContext pc;
-        if (poolSize > 0) {
+        if (currentPoolSize > 0) {
             PageContextPool pool = localPool.get();
             if (pool == null) {
-                pool = new PageContextPool(poolSize);
+                pool = new PageContextPool(currentPoolSize);
                 localPool.set(pool);
             }
             pc = pool.get();
@@ -81,7 +85,14 @@ public class JspFactoryImpl extends JspFactory {
 
         pc.release();
         if (poolSize > 0 && (pc instanceof PageContextImpl)) {
-            localPool.get().put(pc);
+            // The thread local pool is only created by getPageContext() when
+            // pooling is enabled at that moment. The pool size may be changed
+            // (by the start of another web application) after this context was
+            // obtained on this thread, leaving the pool null here.
+            PageContextPool pool = localPool.get();
+            if (pool != null) {
+                pool.put(pc);
+            }
         }
     }
 

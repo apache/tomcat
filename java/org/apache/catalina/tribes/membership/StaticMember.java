@@ -69,7 +69,7 @@ public class StaticMember extends MemberImpl {
             try {
                 setHostname(host);
             } catch (IOException ioe) {
-                throw new RuntimeException(ioe);
+                throw new IllegalArgumentException(sm.getString("staticMember.invalid.host", host), ioe);
             }
         }
 

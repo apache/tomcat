@@ -127,32 +127,6 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
         }
     }
 
-    /**
-     * This attribute is now hard-coded to {@code false} as the work-around this attribute enabled is no longer
-     * required.
-     *
-     * @return Always {@code false}
-     *
-     * @deprecated This method will be removed from Tomcat 12 onwards.
-     */
-    @Deprecated
-    public boolean getApplyJava8u40Fix() {
-        return false;
-    }
-
-    /**
-     * This method is now a NO-OP as the work-around this attribute enabled is no longer required.
-     *
-     * @param applyJava8u40Fix Ignored
-     *
-     * @deprecated This method will be removed from Tomcat 12 onwards.
-     */
-    @Deprecated
-    public void setApplyJava8u40Fix(boolean applyJava8u40Fix) {
-        // NO-OP
-    }
-
-
     @Override
     protected String getAuthMethod() {
         return Constants.SPNEGO_METHOD;
@@ -166,17 +140,25 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
         // Kerberos configuration file location
         String krb5Conf = System.getProperty(Constants.KRB5_CONF_PROPERTY);
         if (krb5Conf == null) {
-            // System property not set, use the Tomcat default
+            // System property not set, use the Tomcat default if the file exists. If it does not, leave the JVM
+            // defaults in place. Pointing the property at a file that does not exist breaks Kerberos/JAAS for the
+            // whole JVM.
             File krb5ConfFile = new File(container.getCatalinaBase(), Constants.DEFAULT_KRB5_CONF);
-            System.setProperty(Constants.KRB5_CONF_PROPERTY, krb5ConfFile.getAbsolutePath());
+            if (krb5ConfFile.isFile()) {
+                System.setProperty(Constants.KRB5_CONF_PROPERTY, krb5ConfFile.getAbsolutePath());
+            }
         }
 
         // JAAS configuration file location
         String jaasConf = System.getProperty(Constants.JAAS_CONF_PROPERTY);
         if (jaasConf == null) {
-            // System property not set, use the Tomcat default
+            // System property not set, use the Tomcat default if the file exists. If it does not, leave the JVM
+            // defaults in place. Pointing the property at a file that does not exist causes the LoginContext
+            // constructor to throw an unchecked SecurityException for the whole JVM.
             File jaasConfFile = new File(container.getCatalinaBase(), Constants.DEFAULT_JAAS_CONF);
-            System.setProperty(Constants.JAAS_CONF_PROPERTY, jaasConfFile.getAbsolutePath());
+            if (jaasConfFile.isFile()) {
+                System.setProperty(Constants.JAAS_CONF_PROPERTY, jaasConfFile.getAbsolutePath());
+            }
         }
     }
 
@@ -255,7 +237,10 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
             try {
                 lc = new LoginContext(getLoginConfigName());
                 lc.login();
-            } catch (LoginException e) {
+            } catch (LoginException | SecurityException e) {
+                // SecurityException may be thrown (wrapping an IOException) by the LoginContext constructor if the
+                // JAAS configuration file referenced by the java.security.auth.login.config system property does not
+                // exist.
                 log.error(sm.getString("spnegoAuthenticator.serviceLoginFail"), e);
                 response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return false;
@@ -263,8 +248,8 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
 
             Subject subject = lc.getSubject();
 
-            // Assume the GSSContext is stateless
-            // TODO: Confirm this assumption
+            // The GSSContext is stateless: a new GSSContext is created for each request and the server response token
+            // is sent back even when a 401 response is returned
             final GSSManager manager = GSSManager.getInstance();
             // IBM JDK only understands indefinite lifetime
             final int credentialLifetime;
@@ -299,13 +284,16 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         } catch (CompletionException e) {
+            // Subject.callAs() wraps any exception thrown by the action in a CompletionException, so GSS failures
+            // (e.g. an invalid or expired client ticket) arrive here rather than in the GSSException catch block
+            // above.
             Throwable cause = e.getCause();
             if (cause instanceof GSSException) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("spnegoAuthenticator.serviceLoginFail"), e);
+                    log.debug(sm.getString("spnegoAuthenticator.ticketValidateFail"), e);
                 }
             } else {
-                log.error(sm.getString("spnegoAuthenticator.serviceLoginFail"), e);
+                log.error(sm.getString("spnegoAuthenticator.clientLoginFail"), e);
             }
             response.setHeader(AUTH_HEADER_NAME, AUTH_HEADER_VALUE_NEGOTIATE);
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);

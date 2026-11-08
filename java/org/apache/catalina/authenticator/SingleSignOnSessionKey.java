@@ -60,7 +60,7 @@ public class SingleSignOnSessionKey implements Serializable {
     /**
      * Creates a session key using the given session context and an explicit session ID.
      *
-     * @param session the session from which to extract context and host information
+     * @param session   the session from which to extract context and host information
      * @param sessionId the session ID to use for this key
      */
     public SingleSignOnSessionKey(Session session, String sessionId) {
@@ -142,9 +142,6 @@ public class SingleSignOnSessionKey implements Serializable {
 
     @Override
     public String toString() {
-        // Session ID is 32. Standard text is 36. Host could easily be 20+.
-        // Context could be anything from 0 upwards. 128 seems like a reasonable
-        // size to accommodate most cases without being too big.
         return "Host: [" + hostName + "], Context: [" + contextName + "], SessionID: [" + sessionId + ']';
     }
 }

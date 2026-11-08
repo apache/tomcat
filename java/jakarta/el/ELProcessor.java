@@ -283,10 +283,10 @@ public class ELProcessor {
             int paramIndex = methodName.indexOf('(');
 
             if (paramIndex == -1) {
-                name = methodName.trim();
+                name = methodName.strip();
                 parameterTypeNames = null;
             } else {
-                String returnTypeAndName = methodName.substring(0, paramIndex).trim();
+                String returnTypeAndName = methodName.substring(0, paramIndex).strip();
                 // Assume that the return type and the name are separated by
                 // whitespace. Given the use of trim() above, there should only
                 // be one sequence of whitespace characters.
@@ -300,27 +300,27 @@ public class ELProcessor {
                 if (wsPos == -1) {
                     throw new NoSuchMethodException();
                 }
-                name = returnTypeAndName.substring(wsPos).trim();
+                name = returnTypeAndName.substring(wsPos).strip();
 
-                String paramString = methodName.substring(paramIndex).trim();
+                String paramString = methodName.substring(paramIndex).strip();
                 // We know the params start with '(', check they end with ')'
                 if (!paramString.endsWith(")")) {
                     throw new NoSuchMethodException(Util.message(context,
                             "elProcessor.defineFunctionInvalidParameterList", paramString, methodName, className));
                 }
                 // Trim '(' and ')'
-                paramString = paramString.substring(1, paramString.length() - 1).trim();
+                paramString = paramString.substring(1, paramString.length() - 1).strip();
                 if (paramString.isEmpty()) {
                     parameterTypeNames = EMPTY_STRING_ARRAY;
                 } else {
                     parameterTypeNames = paramString.split(",");
                     ImportHandler importHandler = context.getImportHandler();
                     for (int i = 0; i < parameterTypeNames.length; i++) {
-                        String parameterTypeName = parameterTypeNames[i].trim();
+                        String parameterTypeName = parameterTypeNames[i].strip();
                         int dimension = 0;
                         int bracketPos = parameterTypeName.indexOf('[');
                         if (bracketPos > -1) {
-                            String parameterTypeNameOnly = parameterTypeName.substring(0, bracketPos).trim();
+                            String parameterTypeNameOnly = parameterTypeName.substring(0, bracketPos).strip();
                             while (bracketPos > -1) {
                                 dimension++;
                                 bracketPos = parameterTypeName.indexOf('[', bracketPos + 1);
@@ -331,7 +331,7 @@ public class ELProcessor {
                         if (parameterTypeName.endsWith("...")) {
                             varArgs = true;
                             dimension = 1;
-                            parameterTypeName = parameterTypeName.substring(0, parameterTypeName.length() - 3).trim();
+                            parameterTypeName = parameterTypeName.substring(0, parameterTypeName.length() - 3).strip();
                         }
                         boolean isPrimitive = PRIMITIVES.contains(parameterTypeName);
                         if (isPrimitive && dimension > 0) {

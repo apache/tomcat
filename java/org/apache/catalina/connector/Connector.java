@@ -245,6 +245,12 @@ public class Connector extends LifecycleMBeanBase {
     private int maxCookieCount = 200;
 
     /**
+     * The maximum number of locales that will be parsed for a request.
+     * Use a value less than zero for no limit. Defaults to 10.
+     */
+    private int maxLocaleCount = 10;
+
+    /**
      * The maximum number of parameters (GET plus POST) which will be automatically parsed by the container. 1000 by
      * default. A value of less than 0 means no limit.
      */
@@ -269,7 +275,7 @@ public class Connector extends LifecycleMBeanBase {
      * Comma-separated list of HTTP methods that will be parsed according to POST-style rules for
      * application/x-www-form-urlencoded request bodies.
      */
-    protected String parseBodyMethods = Method.POST;
+    protected String parseBodyMethods = StringUtils.join(Method.POST, Method.QUERY);
 
     /**
      * A Set of methods determined by {@link #parseBodyMethods}.
@@ -482,7 +488,7 @@ public class Connector extends LifecycleMBeanBase {
     }
 
 
-   /**
+    /**
      * Returns whether the encoding must be enforced when calling getWriter().
      * @return {@code true} if the encoding must be enforced when calling getWriter()
      */
@@ -516,6 +522,27 @@ public class Connector extends LifecycleMBeanBase {
      */
     public void setMaxCookieCount(int maxCookieCount) {
         this.maxCookieCount = maxCookieCount;
+    }
+
+
+    /**
+     * Returns the maximum number of locales that are permitted for a request. Requests that exceed this limit will be
+     * rejected when the locales are parsed. A value of less than zero means no limit.
+     * @return the maximum locale count
+     */
+    public int getMaxLocaleCount() {
+        return maxLocaleCount;
+    }
+
+
+    /**
+     * Sets the maximum number of locales that are permitted for a request. Requests that exceed this limit will be
+     * rejected when the locales are parsed. A value of less than zero means no limit.
+     *
+     * @param maxLocaleCount the new maximum locale count
+     */
+    public void setMaxLocaleCount(int maxLocaleCount) {
+        this.maxLocaleCount = maxLocaleCount;
     }
 
 
@@ -626,7 +653,7 @@ public class Connector extends LifecycleMBeanBase {
 
 
     /**
-     * Set list of HTTP methods which should allow body parameter parsing. This defaults to <code>POST</code>.
+     * Set list of HTTP methods which should allow body parameter parsing. This defaults to <code>POST,QUERY</code>.
      *
      * @param methods Comma separated list of HTTP method names
      */
@@ -1031,6 +1058,13 @@ public class Connector extends LifecycleMBeanBase {
     public void addSslHostConfig(SSLHostConfig sslHostConfig) {
         if (protocolHandler != null) {
             protocolHandler.addSslHostConfig(sslHostConfig);
+            // A connector with at least one SSL host configuration is an
+            // SSL connector, whatever the path used to configure it
+            // (server.xml, the Manager or the embedded API).
+            if (protocolHandler instanceof AbstractHttp11Protocol http11
+                    && !http11.isSSLEnabled()) {
+                http11.setSSLEnabled(true);
+            }
         }
     }
 
@@ -1218,6 +1252,9 @@ public class Connector extends LifecycleMBeanBase {
                 sb.append(",address=");
                 sb.append(ObjectName.quote(address));
             }
+        }
+        if (protocolHandler != null && protocolHandler.isUdp()) {
+            sb.append(",transport=UDP");
         }
         return sb.toString();
     }

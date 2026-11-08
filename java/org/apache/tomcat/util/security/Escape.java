@@ -90,7 +90,7 @@ public class Escape {
      *
      * @param content The content to escape
      *
-     * @return The escaped content converted to String or {@code &#63;} if the content was {@code null}
+     * @return The escaped content converted to String or <code>&amp;#63;</code> if the content was {@code null}
      */
     public static String xml(Object content) {
         if (content == null) {

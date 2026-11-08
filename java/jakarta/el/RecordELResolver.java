@@ -43,11 +43,17 @@ public class RecordELResolver extends ELResolver {
     }
 
     /**
-     * If the base object is an instance of {@link Record}, returns the value of the given field of this {@link Record}.
+     * If the base object is an instance of {@link Record} and a no-arg method exists with the name of the property,
+     * returns the value of the given property of this {@link Record}.
      * <p>
-     * If the base object is an instance of {@link Record}, the {@code propertyResolved} property of the provided
-     * {@link ELContext} must be set to {@code true} by this resolver before returning. If this property is not {@code
-     * true} after this method is called, the caller should ignore the return value.
+     * If the base object is an instance of {@link Record} and no-arg method exists with the name of the property, the
+     * {@code propertyResolved} property of the provided {@link ELContext} must be set to {@code true} by this resolver
+     * before returning. If this property is not {@code true} after this method is called, the caller should ignore the
+     * return value.
+     * <p>
+     * The {@link Record} may include properties using JavaBean naming conventions for which no-arg methods do not
+     * exist. Such properties will not be discovered by this resolver. In typical usage, such properties would be
+     * resolved by the next resolver in the chain, the {@code BeanELResolver}.
      *
      * @param context  The context of this evaluation.
      * @param base     The {@link Record} on which to get the property.
@@ -57,8 +63,6 @@ public class RecordELResolver extends ELResolver {
      *             the value of the given property. Otherwise, undefined.
      *
      * @throws NullPointerException      if the provided {@link ELContext} is {@code null}.
-     * @throws PropertyNotFoundException if the {@code base} is an instance of {@link Record} and the specified property
-     *                                       does not exist.
      * @throws ELException               if an exception was throws while performing the property resolution. The thrown
      *                                       exception must be included as the cause of this exception, if available.
      */
@@ -67,17 +71,16 @@ public class RecordELResolver extends ELResolver {
         Objects.requireNonNull(context);
 
         if (base instanceof Record && property != null) {
-            context.setPropertyResolved(base, property);
-
             String propertyName = property.toString();
 
             Method method;
             try {
                 method = base.getClass().getMethod(propertyName);
             } catch (NoSuchMethodException nsme) {
-                throw new PropertyNotFoundException(
-                        Util.message(context, "propertyNotFound", base.getClass().getName(), propertyName), nsme);
+                return null;
             }
+
+            context.setPropertyResolved(base, property);
 
             try {
                 return method.invoke(base);
@@ -91,12 +94,17 @@ public class RecordELResolver extends ELResolver {
 
 
     /**
-     * If the base object is an instance of {@link Record}, always returns {@code null} since {@link Record}s are always
-     * read-only.
+     * If the base object is an instance of {@link Record} and a no-arg method exists with the name of the property,
+     * returns {@code null} since {@link Record}s are always read-only.
      * <p>
-     * If the base object is an instance of {@link Record}, the {@code propertyResolved} property of the provided
-     * {@link ELContext} must be set to {@code true} by this resolver before returning. If this property is not {@code
-     * true} after this method is called, the caller should ignore the return value.
+     * If the base object is an instance of {@link Record} and no-arg method exists with the name of the property, the
+     * {@code propertyResolved} property of the provided {@link ELContext} must be set to {@code true} by this resolver
+     * before returning. If this property is not {@code true} after this method is called, the caller should ignore the
+     * return value.
+     * <p>
+     * The {@link Record} may include properties using JavaBean naming conventions for which no-arg methods do not
+     * exist. Such properties will not be discovered by this resolver. In typical usage, such properties would be
+     * resolved by the next resolver in the chain, the {@code BeanELResolver}.
      *
      * @param context  The context of this evaluation.
      * @param base     The {@link Record} to analyze.
@@ -105,43 +113,43 @@ public class RecordELResolver extends ELResolver {
      * @return Always {@code null}
      *
      * @throws NullPointerException      if the provided {@link ELContext} is {@code null}.
-     * @throws PropertyNotFoundException if the {@code base} is an instance of {@link Record} and the specified property
-     *                                       does not exist.
      */
     @Override
     public Class<?> getType(ELContext context, Object base, Object property) {
         Objects.requireNonNull(context);
         if (base instanceof Record && property != null) {
-            context.setPropertyResolved(base, property);
-
             String propertyName = property.toString();
 
             try {
                 base.getClass().getMethod(propertyName);
             } catch (NoSuchMethodException nsme) {
-                throw new PropertyNotFoundException(
-                        Util.message(context, "propertyNotFound", base.getClass().getName(), propertyName), nsme);
+                return null;
             }
+
+            context.setPropertyResolved(base, property);
         }
         return null;
     }
 
 
     /**
-     * If the base object is an instance of {@link Record}, always throws an exception since {@link Record}s are
-     * read-only.
+     * If the base object is an instance of {@link Record} and a no-arg method exists with the name of the property,
+     * throws an exception since {@link Record}s are read-only.
      * <p>
-     * If the base object is an instance of {@link Record}, the {@code propertyResolved} property of the provided
-     * {@link ELContext} must be set to {@code true} by this resolver before returning. If this property is not {@code
-     * true} after this method is called, the caller should ignore the return value.
+     * If the base object is an instance of {@link Record} and no-arg method exists with the name of the property, the
+     * {@code propertyResolved} property of the provided {@link ELContext} must be set to {@code true} by this resolver
+     * before returning. If this property is not {@code true} after this method is called, the caller should ignore the
+     * return value.
+     * <p>
+     * The {@link Record} may include properties using JavaBean naming conventions for which no-arg methods do not
+     * exist. Such properties will not be discovered by this resolver. In typical usage, such properties would be
+     * resolved by the next resolver in the chain, the {@code BeanELResolver}.
      *
      * @param context  The context of this evaluation.
      * @param base     The {@link Record} on which to set the property.
      * @param property The name of the property to set. Will be coerced to a String.
      *
      * @throws NullPointerException         if the provided {@link ELContext} is {@code null}.
-     * @throws PropertyNotFoundException    if the {@code base} is an instance of {@link Record} and the specified
-     *                                          property does not exist.
      * @throws PropertyNotWritableException if the {@code base} is an instance of {@link Record} and the specified
      *                                          property exists.
      */
@@ -149,16 +157,15 @@ public class RecordELResolver extends ELResolver {
     public void setValue(ELContext context, Object base, Object property, Object value) {
         Objects.requireNonNull(context);
         if (base instanceof Record && property != null) {
-            context.setPropertyResolved(base, property);
-
             String propertyName = property.toString();
 
             try {
                 base.getClass().getMethod(propertyName);
             } catch (NoSuchMethodException nsme) {
-                throw new PropertyNotFoundException(
-                        Util.message(context, "propertyNotFound", base.getClass().getName(), propertyName), nsme);
+                return;
             }
+
+            context.setPropertyResolved(base, property);
 
             throw new PropertyNotWritableException(
                     Util.message(context, "resolverNotWritable", base.getClass().getName()));
@@ -167,35 +174,37 @@ public class RecordELResolver extends ELResolver {
 
 
     /**
-     * If the base object is an instance of {@link Record}, always returns {@code true}.
+     * If the base object is an instance of {@link Record} and a no-arg method exists with the name of the property,
+     * returns {@code true}.
      * <p>
-     * If the base object is an instance of {@link Record}, the {@code propertyResolved} property of the provided
-     * {@link ELContext} must be set to {@code true} by this resolver before returning. If this property is not {@code
-     * true} after this method is called, the caller should ignore the return value.
+     * If the base object is an instance of {@link Record} and no-arg method exists with the name of the property, the
+     * {@code propertyResolved} property of the provided {@link ELContext} must be set to {@code true} by this resolver
+     * before returning. If this property is not {@code true} after this method is called, the caller should ignore the
+     * return value.
+     * <p>
+     * The {@link Record} may include properties using JavaBean naming conventions for which no-arg methods do not
+     * exist. Such properties will not be discovered by this resolver. In typical usage, such properties would be
+     * resolved by the next resolver in the chain, the {@code BeanELResolver}.
      *
      * @param context  The context of this evaluation.
      * @param base     The {@link Record} to analyze.
      * @param property The name of the property to analyze. Will be coerced to a String.
      *
      * @throws NullPointerException      if the provided {@link ELContext} is {@code null}.
-     * @throws PropertyNotFoundException if the {@code base} is an instance of {@link Record} and the specified property
-     *                                       does not exist.
      */
     @Override
     public boolean isReadOnly(ELContext context, Object base, Object property) {
         Objects.requireNonNull(context);
         if (base instanceof Record && property != null) {
-            context.setPropertyResolved(base, property);
-
             String propertyName = property.toString();
 
             try {
                 base.getClass().getMethod(propertyName);
             } catch (NoSuchMethodException nsme) {
-                throw new PropertyNotFoundException(
-                        Util.message(context, "propertyNotFound", base.getClass().getName(), propertyName), nsme);
+                return false;
             }
 
+            context.setPropertyResolved(base, property);
             return true;
         }
         return false;

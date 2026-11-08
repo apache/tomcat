@@ -19,6 +19,7 @@ package org.apache.el.lang;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import jakarta.el.ELContext;
 import jakarta.el.ELResolver;
@@ -26,8 +27,6 @@ import jakarta.el.EvaluationListener;
 import jakarta.el.FunctionMapper;
 import jakarta.el.ImportHandler;
 import jakarta.el.VariableMapper;
-
-import org.apache.el.util.MessageFactory;
 
 /**
  * Extended EL context that wraps an existing ELContext and provides additional
@@ -42,6 +41,13 @@ public final class EvaluationContext extends ELContext {
     private final VariableMapper varMapper;
 
     private LambdaExpressionNestedState lambdaExpressionNestedState;
+
+    /*
+     * The context object for ELResolver.StandaloneIdentifierMarker, which AstIdentifier sets for every identifier it
+     * resolves. Held here rather than in the wrapped context, so that resolving an identifier does not update the
+     * wrapped context's map. The resolvers are passed this context, so they see it.
+     */
+    private Object standaloneIdentifierMarker;
 
     /**
      * Creates a new EvaluationContext wrapping the given ELContext.
@@ -77,6 +83,9 @@ public final class EvaluationContext extends ELContext {
 
     @Override
     public Object getContext(Class<?> key) {
+        if (key == ELResolver.StandaloneIdentifierMarker.class) {
+            return standaloneIdentifierMarker;
+        }
         return elContext.getContext(key);
     }
 
@@ -92,6 +101,10 @@ public final class EvaluationContext extends ELContext {
 
     @Override
     public void putContext(Class<?> key, Object contextObject) {
+        if (key == ELResolver.StandaloneIdentifierMarker.class) {
+            standaloneIdentifierMarker = Objects.requireNonNull(contextObject);
+            return;
+        }
         elContext.putContext(key, contextObject);
     }
 
@@ -199,18 +212,13 @@ public final class EvaluationContext extends ELContext {
 
 
     /**
-     * Sets the lambda expression nested state for this context.
+     * Sets the lambda expression nested state for this context. Any existing state is replaced. This happens when a
+     * sibling lambda expression (one that is not nested inside the lambda expression that created the existing state)
+     * is evaluated during the same evaluation.
      *
      * @param lambdaExpressionNestedState The lambda expression nested state
-     *
-     * @throws IllegalStateException if a nested state has already been set
      */
     public void setLambdaExpressionNestedState(LambdaExpressionNestedState lambdaExpressionNestedState) {
-        if (this.lambdaExpressionNestedState != null) {
-            // Should never happen
-            throw new IllegalStateException(MessageFactory.get("error.lambda.wrongNestedState"));
-        }
-
         this.lambdaExpressionNestedState = lambdaExpressionNestedState;
     }
 }

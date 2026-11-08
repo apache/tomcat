@@ -16,7 +16,6 @@
  */
 package org.apache.tomcat.util.descriptor.web;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -44,11 +43,7 @@ import jakarta.servlet.descriptor.TaglibDescriptor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.B2CConverter;
-import org.apache.tomcat.util.buf.UDecoder;
-import org.apache.tomcat.util.buf.UEncoder;
-import org.apache.tomcat.util.buf.UEncoder.SafeCharsSet;
 import org.apache.tomcat.util.descriptor.XmlIdentifiers;
-import org.apache.tomcat.util.digester.DocumentProperties;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.Escape;
 
@@ -58,7 +53,7 @@ import org.apache.tomcat.util.security.Escape;
  * (e.g. single login-config) This class checks for invalid duplicates (e.g. filter/servlet names) StandardContext will
  * check validity of values (e.g. URL formats etc)
  */
-public class WebXml extends XmlEncodingBase implements DocumentProperties.Charset {
+public class WebXml {
 
     /**
      * Constructs a new WebXml.
@@ -75,7 +70,6 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
 
     private final Log log = LogFactory.getLog(WebXml.class); // must not be static
 
-    private final UEncoder urlEncoder = new UEncoder(SafeCharsSet.WITH_SLASH);
 
     /**
      * Global defaults are overridable but Servlets and Servlet mappings need to be unique. Duplicates normally trigger
@@ -258,9 +252,10 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     }
 
     /**
-     * Set the version for this web.xml file
+     * Set the version for this web.xml file. Values of <code>null</code> are ignored. Unrecognised version strings
+     * only log a warning and the version is left unchanged (defaulting to 6.2 if not previously set).
      *
-     * @param version Values of <code>null</code> will be ignored
+     * @param version the version
      */
     public void setVersion(String version) {
         if (version == null) {
@@ -492,8 +487,8 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     /**
      * Adds a context parameter.
      *
-     * @param param  The parameter name
-     * @param value  The parameter value
+     * @param param The parameter name
+     * @param value The parameter value
      */
     public void addContextParam(String param, String value) {
         contextParams.put(param, value);
@@ -549,7 +544,6 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
      * @param filterMap The filter mapping
      */
     public void addFilterMapping(FilterMap filterMap) {
-        filterMap.setCharset(getCharset());
         filterMaps.add(filterMap);
         filterMappingNames.add(filterMap.getFilterName());
     }
@@ -616,31 +610,22 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         return servlets;
     }
 
-    // servlet-mapping
-    // Note: URLPatterns from web.xml may be URL encoded
-    // (https://svn.apache.org/r285186)
+    /*
+     * The Servlet specification states that URLs and URL patterns provided in web.xml (and by extension annotations
+     * and the programmatic equivalents to web.xml) must be in URL-decoded form.
+     */
     private final Map<String,String> servletMappings = new HashMap<>();
     private final Set<String> servletMappingNames = new HashSet<>();
 
     /**
      * Adds a servlet URL mapping.
      *
-     * @param urlPattern   The URL pattern
-     * @param servletName  The servlet name
-     */
-    public void addServletMapping(String urlPattern, String servletName) {
-        addServletMappingDecoded(UDecoder.URLDecode(urlPattern, getCharset()), servletName);
-    }
-
-    /**
-     * Adds a servlet URL mapping (already decoded).
-     *
-     * @param urlPattern   The URL pattern
-     * @param servletName  The servlet name
+     * @param urlPattern  The URL pattern
+     * @param servletName The servlet name
      *
      * @throws IllegalArgumentException If a duplicate mapping exists
      */
-    public void addServletMappingDecoded(String urlPattern, String servletName) {
+    public void addServletMapping(String urlPattern, String servletName) {
         String oldServletName = servletMappings.put(urlPattern, servletName);
         if (oldServletName != null) {
             // Duplicate mapping. As per clarification from the Servlet EG,
@@ -688,8 +673,8 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     /**
      * Adds a MIME mapping.
      *
-     * @param extension  The file extension
-     * @param mimeType   The MIME type
+     * @param extension The file extension
+     * @param mimeType  The MIME type
      */
     public void addMimeMapping(String extension, String mimeType) {
         mimeMappings.put(extension, mimeType);
@@ -761,7 +746,6 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
      * @param errorPage The error page
      */
     public void addErrorPage(ErrorPage errorPage) {
-        errorPage.setCharset(getCharset());
         errorPages.put(errorPage.getName(), errorPage);
     }
 
@@ -810,7 +794,6 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
      * @param propertyGroup The JSP property group
      */
     public void addJspPropertyGroup(JspPropertyGroup propertyGroup) {
-        propertyGroup.setCharset(getCharset());
         jspPropertyGroups.add(propertyGroup);
     }
 
@@ -834,7 +817,6 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
      * @param securityConstraint The security constraint
      */
     public void addSecurityConstraint(SecurityConstraint securityConstraint) {
-        securityConstraint.setCharset(getCharset());
         securityConstraints.add(securityConstraint);
     }
 
@@ -857,7 +839,6 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
      * @param loginConfig The login configuration
      */
     public void setLoginConfig(LoginConfig loginConfig) {
-        loginConfig.setCharset(getCharset());
         this.loginConfig = loginConfig;
     }
 
@@ -1368,13 +1349,13 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         // TODO - Various, icon, description etc elements are skipped - mainly
         // because they are ignored when web.xml is parsed - see above
 
-        // NOTE - Elements need to be written in the order defined in the 2.3
-        // DTD else validation of the merged web.xml will fail
+        // NOTE - Elements need to be written in the order defined in the
+        // schema for the version in use else validation of the merged web.xml
+        // will fail
 
         // NOTE - Some elements need to be skipped based on the version of the
-        // specification being used. Version is validated and starts at
-        // 2.2. The version tests used in this method take advantage of
-        // this.
+        // specification being used. The version tests used in this method take
+        // advantage of this.
 
         // Declaration
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
@@ -1500,7 +1481,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                     sb.append("    <url-pattern>*</url-pattern>\n");
                 } else {
                     for (String urlPattern : filterMap.getURLPatterns()) {
-                        appendElement(sb, INDENT4, "url-pattern", encodeUrl(urlPattern));
+                        appendElement(sb, INDENT4, "url-pattern", urlPattern);
                     }
                 }
                 // dispatcher was added in Servlet 2.4
@@ -1586,7 +1567,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         for (Map.Entry<String,String> entry : servletMappings.entrySet()) {
             sb.append("  <servlet-mapping>\n");
             appendElement(sb, INDENT4, "servlet-name", entry.getValue());
-            appendElement(sb, INDENT4, "url-pattern", encodeUrl(entry.getKey()));
+            appendElement(sb, INDENT4, "url-pattern", entry.getKey());
             sb.append("  </servlet-mapping>\n");
         }
         if (!servletMappings.isEmpty()) {
@@ -1666,7 +1647,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             } else if (errorPage.getErrorCode() > 0) {
                 appendElement(sb, INDENT4, "error-code", Integer.toString(errorCode));
             }
-            appendElement(sb, INDENT4, "location", errorPage.getLocation(), true);
+            appendElement(sb, INDENT4, "location", errorPage.getLocation());
             sb.append("  </error-page>\n");
         }
         if (!errorPages.isEmpty()) {
@@ -1689,7 +1670,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                 for (JspPropertyGroup jpg : jspPropertyGroups) {
                     sb.append("    <jsp-property-group>\n");
                     for (String urlPattern : jpg.getUrlPatterns()) {
-                        appendElement(sb, INDENT6, "url-pattern", encodeUrl(urlPattern));
+                        appendElement(sb, INDENT6, "url-pattern", urlPattern);
                     }
                     appendElement(sb, INDENT6, "el-ignored", jpg.getElIgnored());
                     appendElement(sb, INDENT6, "page-encoding", jpg.getPageEncoding());
@@ -1769,7 +1750,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                 appendElement(sb, INDENT6, "web-resource-name", collection.getName());
                 appendElement(sb, INDENT6, "description", collection.getDescription());
                 for (String urlPattern : collection.findPatterns()) {
-                    appendElement(sb, INDENT6, "url-pattern", encodeUrl(urlPattern));
+                    appendElement(sb, INDENT6, "url-pattern", urlPattern);
                 }
                 for (String method : collection.findMethods()) {
                     appendElement(sb, INDENT6, "http-method", method);
@@ -1779,7 +1760,8 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                 }
                 sb.append("    </web-resource-collection>\n");
             }
-            if (constraint.findAuthRoles().length > 0 || constraint.getAllRoles() || constraint.getAuthenticatedUsers()) {
+            if (constraint.findAuthRoles().length > 0 || constraint.getAllRoles() ||
+                    constraint.getAuthenticatedUsers()) {
                 sb.append("    <auth-constraint>\n");
                 for (String role : constraint.findAuthRoles()) {
                     appendElement(sb, INDENT6, "role-name", role);
@@ -1811,8 +1793,8 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             appendElement(sb, INDENT4, "realm-name", loginConfig.getRealmName());
             if (loginConfig.getErrorPage() != null || loginConfig.getLoginPage() != null) {
                 sb.append("    <form-login-config>\n");
-                appendElement(sb, INDENT6, "form-login-page", loginConfig.getLoginPage(), true);
-                appendElement(sb, INDENT6, "form-error-page", loginConfig.getErrorPage(), true);
+                appendElement(sb, INDENT6, "form-login-page", loginConfig.getLoginPage());
+                appendElement(sb, INDENT6, "form-error-page", loginConfig.getErrorPage());
                 sb.append("    </form-login-config>\n");
             }
             sb.append("  </login-config>\n\n");
@@ -1913,7 +1895,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                     String endpoint = endpointIter.next();
                     sb.append("    <port-component-ref>\n");
                     appendElement(sb, INDENT6, "service-endpoint-interface", endpoint);
-                    appendElement(sb, INDENT6, "port-component-link", serviceRef.getProperty(endpoint));
+                    appendElement(sb, INDENT6, "port-component-link", serviceRef.getPortlink(endpoint));
                     sb.append("    </port-component-ref>\n");
                 }
                 Iterator<String> handlerIter = serviceRef.getHandlers();
@@ -2032,21 +2014,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     }
 
 
-    private synchronized String encodeUrl(String input) {
-        try {
-            return urlEncoder.encodeURL(input, 0, input.length()).toString();
-        } catch (IOException e) {
-            throw new IllegalArgumentException(input, e);
-        }
-    }
-
-
     private void appendElement(StringBuilder sb, String indent, String elementName, String value) {
-        appendElement(sb, indent, elementName, value, false);
-    }
-
-    private void appendElement(StringBuilder sb, String indent, String elementName, String value, boolean encodeValue) {
-
         if (value == null) {
             return;
         }
@@ -2060,11 +2028,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             sb.append('<');
             sb.append(elementName);
             sb.append('>');
-            if (encodeValue) {
-                sb.append(Escape.xml(encodeUrl(value)));
-            } else {
-                sb.append(Escape.xml(value));
-            }
+            sb.append(Escape.xml(value));
             sb.append("</");
             sb.append(elementName);
             sb.append(">\n");
@@ -2248,6 +2212,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                     } else {
                         log.error(
                                 sm.getString("webXml.mergeConflictLoginConfig", fragment.getName(), fragment.getURL()));
+                        return false;
                     }
                 }
             }
@@ -2330,7 +2295,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
 
         // Add fragment mappings
         for (Map.Entry<String,String> mapping : servletMappingsToAdd) {
-            addServletMappingDecoded(mapping.getKey(), mapping.getValue());
+            addServletMapping(mapping.getKey(), mapping.getValue());
         }
 
         for (WebXml fragment : fragments) {

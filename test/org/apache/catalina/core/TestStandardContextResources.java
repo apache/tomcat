@@ -119,7 +119,7 @@ public class TestStandardContextResources extends TomcatBaseTest {
                 (StandardContext) tomcat.addWebapp(null, "/test", appDir.getAbsolutePath(), absoluteOrderConfig);
 
         Tomcat.addServlet(ctx, "getresource", new GetResourceServlet());
-        ctx.addServletMappingDecoded("/getresource", "getresource");
+        ctx.addServletMapping("/getresource", "getresource");
 
         tomcat.start();
         assertPageContains("/test/getresource?path=/resourceF.jsp", "<p>resourceF.jsp in resources2.jar</p>");
@@ -137,7 +137,7 @@ public class TestStandardContextResources extends TomcatBaseTest {
 
         ctx = (StandardContext) tomcat.addWebapp(null, "/test", appDir.getAbsolutePath(), absoluteOrderConfig);
         Tomcat.addServlet(ctx, "getresource", new GetResourceServlet());
-        ctx.addServletMappingDecoded("/getresource", "getresource");
+        ctx.addServletMapping("/getresource", "getresource");
 
         tomcat.getHost().start();
 
@@ -189,7 +189,7 @@ public class TestStandardContextResources extends TomcatBaseTest {
         skipTldsForResourceJars(ctx);
 
         Tomcat.addServlet(ctx, "getresource", new GetResourceServlet());
-        ctx.addServletMappingDecoded("/getresource", "getresource");
+        ctx.addServletMapping("/getresource", "getresource");
 
         tomcat.start();
 

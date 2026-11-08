@@ -141,7 +141,7 @@ public class SingleSignOn extends ValveBase {
      * @param cookieDomain cookie domain name
      */
     public void setCookieDomain(String cookieDomain) {
-        if (cookieDomain != null && cookieDomain.trim().isEmpty()) {
+        if (cookieDomain != null && cookieDomain.strip().isEmpty()) {
             this.cookieDomain = null;
         } else {
             this.cookieDomain = cookieDomain;
@@ -516,7 +516,7 @@ public class SingleSignOn extends ValveBase {
      * Populates the request with the authentication data from the SSO entry.
      *
      * @param request the request to populate
-     * @param ssoId the SSO identifier
+     * @param ssoId   the SSO identifier
      */
     protected void populateRequestFromSsoEntry(Request request, String ssoId) {
         SingleSignOnEntry entry = cache.get(ssoId);
@@ -672,8 +672,8 @@ public class SingleSignOn extends ValveBase {
     /**
      * Handles a session ID change by updating the SSO entry to track the new session ID.
      *
-     * @param ssoId the SSO identifier
-     * @param session the session with the new ID
+     * @param ssoId        the SSO identifier
+     * @param session      the session with the new ID
      * @param oldSessionId the previous session ID
      */
     protected void sessionChangedId(String ssoId, Session session, String oldSessionId) {
@@ -687,10 +687,13 @@ public class SingleSignOn extends ValveBase {
         }
 
         /*
-         * Associate the new sessionId with this SingleSignOnEntry. A SessionListener will be registered for the new
-         * sessionID. If not, then we would not notice any subsequent Session.SESSION_DESTROYED_EVENT for the session.
+         * Associate the new sessionId with this SingleSignOnEntry. No additional SessionListener is registered. The
+         * SessionListener is registered against the Session object, not the session ID, so the listener that
+         * triggered this method remains registered and will notice any subsequent
+         * Session.SESSION_CHANGED_ID_EVENT or Session.SESSION_DESTROYED_EVENT for the session. Registering a new
+         * listener on every ID change would leave the previous listener(s) orphaned on the session.
          */
-        entry.addSession(this, ssoId, session);
+        entry.reassociateSession(session);
 
         /*
          * Remove the obsolete sessionId from the SingleSignOnEntry. The sessionId part of the SingleSignOnSessionKey is

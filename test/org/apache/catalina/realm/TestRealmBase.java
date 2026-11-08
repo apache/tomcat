@@ -661,7 +661,7 @@ public class TestRealmBase {
         deleteConstraint.addAuthRole(ROLE1);
         SecurityCollection deleteCollection = new SecurityCollection();
         deleteCollection.addMethod(Method.DELETE);
-        deleteCollection.addPatternDecoded("/*");
+        deleteCollection.addPattern("/*");
         deleteConstraint.addCollection(deleteCollection);
 
         TesterMapRealm mapRealm = new TesterMapRealm();
@@ -800,12 +800,12 @@ public class TestRealmBase {
         // Add a collection for GET
         SecurityCollection getCollection = new SecurityCollection();
         getCollection.addMethod(Method.GET);
-        getCollection.addPatternDecoded("*.html");
+        getCollection.addPattern("*.html");
         constraint.addCollection(getCollection);
         // Add a collection for POST
         SecurityCollection postCollection = new SecurityCollection();
         postCollection.addMethod(Method.POST);
-        postCollection.addPatternDecoded("*.html");
+        postCollection.addPattern("*.html");
         constraint.addCollection(postCollection);
 
         TesterMapRealm mapRealm = new TesterMapRealm();
@@ -880,13 +880,13 @@ public class TestRealmBase {
         SecurityConstraint allowConstraint = new SecurityConstraint();
         SecurityCollection allowCollection = new SecurityCollection();
         allowCollection.addMethod(Method.GET);
-        allowCollection.addPatternDecoded("/");
+        allowCollection.addPattern("/");
         allowConstraint.addCollection(allowCollection);
         // Create a constraint that disallows everything but GET
         SecurityConstraint blockConstraint = new SecurityConstraint();
         SecurityCollection blockCollection = new SecurityCollection();
         blockCollection.addOmittedMethod(Method.GET);
-        blockCollection.addPatternDecoded("/");
+        blockCollection.addPattern("/");
         blockConstraint.addCollection(blockCollection);
         blockConstraint.addAuthRole(ROLE1);
 
@@ -938,5 +938,51 @@ public class TestRealmBase {
         request.setUserPrincipal(gp2);
         Assert.assertFalse(mapRealm.hasResourcePermission(
                 request, response, constraints, null));
+    }
+
+
+    @Test
+    public void testOverlappingConstraints() throws Exception {
+        // Deny access to levels 1 & 3
+        SecurityConstraint outerConstraint = new SecurityConstraint();
+        SecurityCollection outerCollection = new SecurityCollection();
+        outerCollection.addPattern("/level1/level2/level3/*");
+        outerCollection.addPattern("/level1/*");
+        outerConstraint.addCollection(outerCollection);
+        // Empty auth -> deny
+        outerConstraint.setAuthConstraint(true);
+
+        // Allow access to level 2
+        SecurityConstraint innerConstraint = new SecurityConstraint();
+        SecurityCollection innerCollection = new SecurityCollection();
+        innerCollection.addPattern("/level1/level2/*");
+        innerConstraint.addCollection(innerCollection);
+        // No auth -> allow
+
+        TesterMapRealm mapRealm = new TesterMapRealm();
+
+        // Set up the mock request and response
+        TesterRequest request = new TesterRequest("/level1/index.jsp");
+        Response response = new TesterResponse();
+        Context context = request.getContext();
+        request.getMappingData().context = context;
+
+        // Add the constraints to the context
+        context.addConstraint(outerConstraint);
+        context.addConstraint(innerConstraint);
+
+        // Level 1 should be blocked
+        SecurityConstraint[] constraints = mapRealm.findSecurityConstraints(request, context);
+        Assert.assertFalse(mapRealm.hasResourcePermission(request, response, constraints, null));
+
+        // Level 2 should be blocked
+        request = new TesterRequest("/level1/level2/index.jsp");
+        constraints = mapRealm.findSecurityConstraints(request, context);
+        Assert.assertTrue(mapRealm.hasResourcePermission(request, response, constraints, null));
+
+        // Level 3 should be blocked
+        request = new TesterRequest("/level1/level2/level3/index.jsp");
+        constraints = mapRealm.findSecurityConstraints(request, context);
+        Assert.assertFalse(mapRealm.hasResourcePermission(request, response, constraints, null));
     }
 }

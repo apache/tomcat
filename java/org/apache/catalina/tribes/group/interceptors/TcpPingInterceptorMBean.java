@@ -42,4 +42,11 @@ public interface TcpPingInterceptorMBean {
      */
     boolean getUseThread();
 
+    /**
+     * Returns whether static-only mode is enabled.
+     *
+     * @return true if only static members are pinged
+     */
+    boolean getStaticOnly();
+
 }

@@ -223,7 +223,7 @@ public class ServletDef implements Serializable {
     private final Map<String,String> parameters = new HashMap<>();
 
     /**
-     * Returns the set of initialization parameters for this servlet, keyed by parameter name.
+     * Returns the map of initialization parameters for this servlet, keyed by parameter name.
      *
      * @return the parameter map
      */

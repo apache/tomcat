@@ -31,7 +31,7 @@ import org.apache.tomcat.util.res.StringManager;
 import org.xml.sax.ext.EntityResolver2;
 
 /**
- * Wrapper class around the Digester that hide Digester's initialization details.
+ * Wrapper class around the Digester that hides Digester's initialization details.
  */
 public class DigesterFactory {
 
@@ -59,7 +59,8 @@ public class DigesterFactory {
 
 
     /**
-     * Mapping of well-known public IDs used by the Servlet API to the matching local resource.
+     * Mapping of well-known public IDs used by the Servlet API and the W3C XML
+     * schemas to the matching local resource.
      */
     public static final Map<String,String> SERVLET_API_PUBLIC_IDS;
 

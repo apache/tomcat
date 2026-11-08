@@ -18,6 +18,10 @@ package org.apache.catalina.webresources;
 
 import java.io.File;
 
+import org.junit.Assert;
+import org.junit.Test;
+
+import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.WebResourceSet;
 
@@ -56,5 +60,18 @@ public class TestJarResourceSetMount extends AbstractTestResourceSetMount {
     @Override
     protected String getNewFileName() {
         return "test-file-10";
+    }
+
+    @Test
+    public void testGetResourceRootAfterBloomFilterBuilt() {
+        // Regression test: the mount root must still be found, without
+        // throwing, once the archive (and therefore the bloom filter) has
+        // been opened by a previous lookup.
+        WebResource file = resourceRoot.getResource(getMount() + "/d1/d1-f1.txt");
+        Assert.assertTrue(file.isFile());
+        WebResource webResource = resourceRoot.getResource(getMount());
+        Assert.assertTrue(webResource.isDirectory());
+        Assert.assertEquals("mount", webResource.getName());
+        Assert.assertEquals(getMountPath() + "/", webResource.getWebappPath());
     }
 }

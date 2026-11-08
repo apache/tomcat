@@ -159,13 +159,16 @@ public class BufferedInputFilter implements InputFilter, ApplicationBufferHandle
 
     @Override
     public int available() {
-        int available = buffered.getLength();
-        if (available == 0) {
-            // No data buffered here. Try the next filter in the chain.
-            return buffer.available();
-        } else {
-            return available;
+        if (isFinished()) {
+            // The whole body has been delivered to the caller or there was no
+            // body. Nothing is available from this filter and the next filter
+            // in the chain must not be consulted since any data there does not
+            // belong to the body.
+            return 0;
         }
+        // The whole body is buffered at this point, so its length is the
+        // number of bytes that remain to be delivered.
+        return buffered.getLength();
     }
 
 

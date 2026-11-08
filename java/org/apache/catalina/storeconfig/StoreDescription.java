@@ -29,6 +29,7 @@ import java.util.List;
  *  standard=&quot;true&quot;
  *  default=&quot;true&quot;
  *  externalAllowed=&quot;true&quot;
+ *  externalOnly=&quot;true&quot;
  *  storeSeparate=&quot;true&quot;
  *  backup=&quot;true&quot;
  *  children=&quot;true&quot;
@@ -41,14 +42,17 @@ import java.util.List;
  *     &lt;TransientAttribute&gt;displayName&lt;/TransientAttribute&gt;
  *     &lt;TransientAttribute&gt;distributable&lt;/TransientAttribute&gt;
  *     &lt;TransientAttribute&gt;domain&lt;/TransientAttribute&gt;
- *     &lt;TransientAttribute&gt;engineName&lt;/TransientAttribute&gt;
  *     &lt;TransientAttribute&gt;name&lt;/TransientAttribute&gt;
  *     &lt;TransientAttribute&gt;publicId&lt;/TransientAttribute&gt;
+ *     &lt;TransientAttribute&gt;originalDocBase&lt;/TransientAttribute&gt;
  *     &lt;TransientAttribute&gt;replaceWelcomeFiles&lt;/TransientAttribute&gt;
- *     &lt;TransientAttribute&gt;saveConfig&lt;/TransientAttribute&gt;
  *     &lt;TransientAttribute&gt;sessionTimeout&lt;/TransientAttribute&gt;
  *     &lt;TransientAttribute&gt;startupTime&lt;/TransientAttribute&gt;
  *     &lt;TransientAttribute&gt;tldScanTime&lt;/TransientAttribute&gt;
+ *     &lt;TransientAttribute&gt;effectiveMajorVersion&lt;/TransientAttribute&gt;
+ *     &lt;TransientAttribute&gt;effectiveMinorVersion&lt;/TransientAttribute&gt;
+ *     &lt;TransientAttribute&gt;webappVersion&lt;/TransientAttribute&gt;
+ *     &lt;TransientAttribute&gt;metadataComplete&lt;/TransientAttribute&gt;
  *  &lt;/Description&gt;
  * </pre>
  */
@@ -81,8 +85,6 @@ public class StoreDescription {
     private String storeFactoryClass;
 
     private IStoreFactory storeFactory;
-
-    private String storeWriterClass;
 
     private boolean children = false;
 
@@ -219,24 +221,6 @@ public class StoreDescription {
     }
 
     /**
-     * Returns the fully qualified class name of the StoreWriter implementation.
-     *
-     * @return the StoreWriter class name
-     */
-    public String getStoreWriterClass() {
-        return storeWriterClass;
-    }
-
-    /**
-     * Sets the fully qualified class name of the StoreWriter implementation.
-     *
-     * @param storeWriterClass the StoreWriter class name
-     */
-    public void setStoreWriterClass(String storeWriterClass) {
-        this.storeWriterClass = storeWriterClass;
-    }
-
-    /**
      * Returns the XML tag name for this description.
      *
      * @return the XML tag name
@@ -273,24 +257,6 @@ public class StoreDescription {
     }
 
     /**
-     * Returns the list of attribute names that should not be persisted.
-     *
-     * @return the list of transient attribute names
-     */
-    public List<String> getTransientAttributes() {
-        return transientAttributes;
-    }
-
-    /**
-     * Sets the list of attribute names that should not be persisted.
-     *
-     * @param transientAttributes the list of transient attribute names
-     */
-    public void setTransientAttributes(List<String> transientAttributes) {
-        this.transientAttributes = transientAttributes;
-    }
-
-    /**
      * Adds an attribute name to the list of transient attributes that should not be persisted.
      *
      * @param attribute the attribute name to add
@@ -311,24 +277,6 @@ public class StoreDescription {
         if (transientAttributes != null) {
             transientAttributes.remove(attribute);
         }
-    }
-
-    /**
-     * Returns the list of child class names that should not be persisted.
-     *
-     * @return the list of transient child class names
-     */
-    public List<String> getTransientChildren() {
-        return transientChildren;
-    }
-
-    /**
-     * Sets the list of child class names that should not be persisted.
-     *
-     * @param transientChildren the list of transient child class names
-     */
-    public void setTransientChildren(List<String> transientChildren) {
-        this.transientChildren = transientChildren;
     }
 
     /**

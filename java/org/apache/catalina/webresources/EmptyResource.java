@@ -139,7 +139,7 @@ public class EmptyResource implements WebResource {
 
     @Override
     public void setMimeType(String mimeType) {
-        // NOOP
+        // NO-OP
     }
 
     @Override

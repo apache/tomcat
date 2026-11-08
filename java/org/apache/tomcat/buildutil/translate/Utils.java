@@ -24,7 +24,11 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
@@ -61,14 +65,27 @@ public class Utils {
     }
 
 
-    static Properties load(File f) {
+    /**
+     * Loads a properties file that is encoded as UTF-8.
+     *
+     * @param f The file to load
+     *
+     * @return The properties in the file
+     *
+     * @throws IOException if the file cannot be read, is not valid UTF-8 or contains a malformed escape sequence. The
+     *                         message of the exception includes the name of the file.
+     */
+    static Properties load(File f) throws IOException {
         Properties props = new Properties();
 
-        try (FileInputStream fis = new FileInputStream(f);
-                Reader r = new InputStreamReader(fis, StandardCharsets.UTF_8)) {
+        // Report invalid UTF-8 rather than silently replacing it
+        CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder().onMalformedInput(CodingErrorAction.REPORT)
+                .onUnmappableCharacter(CodingErrorAction.REPORT);
+
+        try (FileInputStream fis = new FileInputStream(f); Reader r = new InputStreamReader(fis, decoder)) {
             props.load(r);
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
+        } catch (CharacterCodingException | IllegalArgumentException e) {
+            throw new IOException("Unable to load [" + f.getPath() + "]: " + e, e);
         }
         return props;
     }
@@ -133,10 +150,7 @@ public class Utils {
      * Common formatting to convert a String value for storage as a value in a property file. Values that contain
      * line-breaks need the line-break in the value to be replaced with the correct representation of a line-break in a
      * property file. Leading space needs to be escaped with a '\' and horizontal tabs need to be converted to "\t".
-     *
-     * Note that a single '\' needs to be escaped both in a Java string and in a property file so if a property value
-     * needs to contain a single `\` (e.g. to escape white space at the start of a line) that will appear as "\\\\" in
-     * the Java code.
+     * Backslashes are passed through unchanged.
      */
     static String formatValueCommon(String in) {
         String result = in.replace("\n", "\\n\\\n");
@@ -211,7 +225,19 @@ public class Utils {
     }
 
 
-    static void export(String language, Properties translation, File storageDir) {
+    /**
+     * Creates the given directory, and any missing parent, if it does not already exist.
+     *
+     * @param directory The directory to create
+     *
+     * @throws IOException if the directory cannot be created
+     */
+    static void createDirectory(File directory) throws IOException {
+        Files.createDirectories(directory.toPath());
+    }
+
+
+    static void export(String language, Properties translation, File storageDir) throws IOException {
         File out = new File(storageDir, Constants.L10N_PREFIX + language + Constants.L10N_SUFFIX);
         try (FileOutputStream fos = new FileOutputStream(out);
                 Writer w = new OutputStreamWriter(fos, StandardCharsets.UTF_8)) {
@@ -220,8 +246,6 @@ public class Utils {
             for (String key : keys) {
                 w.write(key + "=" + formatValueExport(translation.getProperty(key)) + "\n");
             }
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
         }
     }
 

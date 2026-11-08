@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -33,9 +35,12 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.Session;
 import org.apache.catalina.authenticator.TestBasicAuthParser.BasicAuthHeader;
+import org.apache.catalina.filters.Constants;
 import org.apache.catalina.realm.MemoryRealm;
 import org.apache.catalina.realm.MessageDigestCredentialHandler;
+import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.startup.Catalina;
 import org.apache.catalina.startup.HostConfig;
 import org.apache.catalina.startup.SimpleHttpClient;
@@ -612,6 +617,179 @@ public class TestManagerWebapp extends TomcatBaseTest {
 
             tomcat.stop();
         }
+    }
+
+    /*
+     * A session with an unlimited timeout (maxInactiveInterval == -1) must
+     * be counted in the "Unlimited time" bucket of the text interface
+     * session histogram rather than in an idle-time bucket.
+     */
+    @Test
+    public void testSessionsUnlimitedTimeout() throws Exception {
+        ignoreTearDown = true;
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.setAddDefaultWebXmlToWebapp(false);
+        tomcat.addUser("admin", "sekr3t");
+        tomcat.addRole("admin", "manager-script");
+
+        File webappDir = new File(getBuildDirectory(), "webapps");
+        File appDir = new File(webappDir, "manager");
+        tomcat.addWebapp(null, "/manager", appDir.getAbsolutePath());
+
+        Context ctx = tomcat.addContext("/testsession", null);
+        // A session timeout of zero means sessions never time out. It is
+        // stored as -1 minutes which becomes -60 seconds on the session.
+        Context zeroCtx = tomcat.addContext("/testsession0", null);
+        zeroCtx.setSessionTimeout(0);
+
+        tomcat.start();
+
+        ManagerBase manager = (ManagerBase) ctx.getManager();
+        Session unlimited = manager.createSession(null);
+        unlimited.setMaxInactiveInterval(-1);
+        manager.add(unlimited);
+
+        // An interval of zero also means the session never times out
+        Session zeroInterval = manager.createSession(null);
+        zeroInterval.setMaxInactiveInterval(0);
+        manager.add(zeroInterval);
+
+        Session limited = manager.createSession(null);
+        manager.add(limited);
+
+        ManagerBase zeroManager = (ManagerBase) zeroCtx.getManager();
+        Session zeroTimeout = zeroManager.createSession(null);
+        Assert.assertEquals(-60, zeroTimeout.getMaxInactiveInterval());
+        zeroManager.add(zeroTimeout);
+
+        SimpleHttpClient client = new SimpleHttpClient() {
+            @Override
+            public boolean isResponseBodyOK() {
+                return true;
+            }
+        };
+        client.setPort(getPort());
+        String basicHeader =
+                (new BasicAuthHeader("Basic", "admin", "sekr3t")).getHeader().toString();
+
+        // @formatter:off
+        client.setRequest(new String[] {
+                "GET /manager/text/sessions?path=/testsession HTTP/1.1" + CRLF +
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+        Assert.assertTrue(client.getResponseBody(),
+                client.getResponseBody().contains("Unlimited time: [2] sessions"));
+        // The unlimited session must not also appear in an idle bucket
+        Assert.assertTrue(client.getResponseBody(),
+                client.getResponseBody().contains("Inactive for [<1] minutes: [1] sessions"));
+
+        // @formatter:off
+        client.setRequest(new String[] {
+                "GET /manager/text/sessions?path=/testsession0 HTTP/1.1" + CRLF +
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+        Assert.assertTrue(client.getResponseBody(),
+                client.getResponseBody().contains("Unlimited time: [1] sessions"));
+
+        tomcat.stop();
+    }
+
+
+    /*
+     * Verify that manager JSPs compile and render correctly.
+     */
+    @Test
+    public void testJsps() throws Exception {
+        ignoreTearDown = true;
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.addUser("admin", "sekr3t");
+        tomcat.addRole("admin", "manager-gui");
+
+        File webappDir = new File(getBuildDirectory(), "webapps");
+        File appDir = new File(webappDir, "manager");
+        tomcat.addWebapp(null, "/manager", appDir.getAbsolutePath());
+
+        Context ctx = tomcat.addContext("/testapp", null);
+        Tomcat.addServlet(ctx, "default", new org.apache.catalina.servlets.DefaultServlet());
+        ctx.addServletMapping("/", "default");
+
+        tomcat.start();
+
+        SimpleHttpClient client = new SimpleHttpClient() {
+            @Override
+            public boolean isResponseBodyOK() {
+                return true;
+            }
+        };
+        client.setPort(getPort());
+        String basicHeader =
+                (new BasicAuthHeader("Basic", "admin", "sekr3t")).getHeader().toString();
+
+        // Hit the HTML manager entry point to get a session and CSRF nonce
+        // @formatter:off
+        client.setRequest(new String[] {
+                "GET /manager/html HTTP/1.1" + CRLF +
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+
+        String body = client.getResponseBody();
+        Pattern noncePattern = Pattern.compile(
+                Pattern.quote(Constants.CSRF_NONCE_REQUEST_PARAM) + "=([A-F0-9]+)");
+        Matcher m = noncePattern.matcher(body);
+        Assert.assertTrue("CSRF nonce not found in manager HTML response", m.find());
+        String nonce = m.group(1);
+
+        String sessionCookie = null;
+        for (String header : client.getResponseHeaders()) {
+            if (header.startsWith("Set-Cookie:")) {
+                String cookieValue = header.substring("Set-Cookie:".length()).trim();
+                sessionCookie = cookieValue.split(";")[0];
+                break;
+            }
+        }
+        Assert.assertNotNull("Session cookie not found", sessionCookie);
+
+        // Access sessions list page with the CSRF nonce
+        // @formatter:off
+        client.setRequest(new String[] {
+                "GET /manager/html/sessions?path=/testapp&" +
+                    Constants.CSRF_NONCE_REQUEST_PARAM + "=" + nonce +
+                    " HTTP/1.1" + CRLF +
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Cookie: " + sessionCookie + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+        Assert.assertTrue(client.getResponseBody().contains("Sessions Administration"));
+        Assert.assertTrue(client.getResponseBody().contains("active Sessions"));
+
+        tomcat.stop();
     }
 
     private static class FailOnceListener implements LifecycleListener {

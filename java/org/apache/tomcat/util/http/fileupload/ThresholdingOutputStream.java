@@ -170,7 +170,7 @@ public abstract class ThresholdingOutputStream
      * Determines whether or not the configured threshold has been exceeded for
      * this output stream.
      *
-     * @return {@code true} if the threshold has been reached;
+     * @return {@code true} if the threshold has been exceeded;
      *         {@code false} otherwise.
      */
     public boolean isThresholdExceeded()

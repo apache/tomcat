@@ -21,8 +21,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * An input stream, which limits its data size. This stream is
- * used, if the content length is unknown.
+ * An input stream, which limits its data size. This stream is used to enforce
+ * a configured maximum size on the underlying stream.
  */
 public abstract class LimitedInputStream extends FilterInputStream implements Closeable {
 
@@ -111,8 +111,8 @@ public abstract class LimitedInputStream extends FilterInputStream implements Cl
      * is available, the end of the stream is detected, or an exception
      * is thrown.
      * <p>
-     * This method
-     * simply performs {@code in.read()} and returns the result.
+     * This method performs {@code in.read()}, increments the internal byte
+     * counter and may raise the limit-exceeded error.
      *
      * @return     the next byte of data, or {@code -1} if the end of the
      *             stream is reached.
@@ -135,8 +135,8 @@ public abstract class LimitedInputStream extends FilterInputStream implements Cl
      * blocks until some input is available; otherwise, no
      * bytes are read and {@code 0} is returned.
      * <p>
-     * This method simply performs {@code in.read(b, off, len)}
-     * and returns the result.
+     * This method performs {@code in.read(b, off, len)}, increments the
+     * internal byte counter and may raise the limit-exceeded error.
      *
      * @param      b     the buffer into which the data is read.
      * @param      off   The start offset in the destination array

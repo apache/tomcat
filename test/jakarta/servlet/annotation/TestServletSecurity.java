@@ -53,10 +53,10 @@ public class TestServletSecurity extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "Foo", Foo.class.getName());
-        ctx.addServletMappingDecoded("/foo/*", "Foo");
+        ctx.addServletMapping("/foo/*", "Foo");
 
         Tomcat.addServlet(ctx, "FooBar", FooBar.class.getName());
-        ctx.addServletMappingDecoded("/foo/bar/*", "FooBar");
+        ctx.addServletMapping("/foo/bar/*", "FooBar");
 
         tomcat.start();
 

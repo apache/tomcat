@@ -19,7 +19,7 @@ package org.apache.catalina.tribes.membership;
 import org.apache.catalina.tribes.util.Arrays;
 
 /**
- * Manifest constants for the <code>org.apache.catalina.tribes.membership</code> package.
+ * Constants for the <code>org.apache.catalina.tribes.membership</code> package.
  */
 public class Constants {
 

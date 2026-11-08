@@ -28,6 +28,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -66,8 +67,6 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
             return;
         }
 
-        super.start(level);
-
         // Set up Kubernetes API parameters
         String namespace = getNamespace();
 
@@ -76,6 +75,9 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
         }
 
         String protocol = getEnv(CUSTOM_ENV_PREFIX + "MASTER_PROTOCOL", "KUBERNETES_MASTER_PROTOCOL");
+        if (protocol == null) {
+            protocol = "https";
+        }
         String masterHost = getEnv(CUSTOM_ENV_PREFIX + "MASTER_HOST", "KUBERNETES_SERVICE_HOST");
         String masterPort = getEnv(CUSTOM_ENV_PREFIX + "MASTER_PORT", "KUBERNETES_SERVICE_PORT");
 
@@ -87,9 +89,6 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
         }
 
         if (clientCertificateFile == null) {
-            if (protocol == null) {
-                protocol = "https";
-            }
             String saTokenFile = getEnv(CUSTOM_ENV_PREFIX + "SA_TOKEN_FILE", "SA_TOKEN_FILE");
             if (saTokenFile == null) {
                 saTokenFile = "/var/run/secrets/kubernetes.io/serviceaccount/token";
@@ -100,16 +99,19 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                 streamProvider = new TokenStreamProvider(new String(bytes, StandardCharsets.US_ASCII), caCertFile);
                 saTokenLastModifiedTime = Files.getLastModifiedTime(saTokenPath);
             } catch (IOException ioe) {
-                log.error(sm.getString("kubernetesMembershipProvider.streamError"), ioe);
+                // Without the token, the Kubernetes API cannot be accessed and a provider without a
+                // stream provider never recovers, keeping this node out of the membership for its
+                // whole lifetime while the other nodes keep replicating to it. Fail the start
+                // instead, as the client certificate branch does for its own errors.
+                throw new IllegalStateException(sm.getString(
+                        "kubernetesMembershipProvider.serviceAccountTokenReadFailed", saTokenFile), ioe);
             }
         } else {
-            if (protocol == null) {
-                protocol = "http";
-            }
             String clientKeyFile = getEnv("KUBERNETES_CLIENT_KEY_FILE");
             if (clientKeyFile == null) {
-                log.error(sm.getString("kubernetesMembershipProvider.noKey"));
-                return;
+                // Without the key, the Kubernetes API cannot be accessed and a provider without a stream provider
+                // never recovers. Fail the start, as is done when the service account token cannot be read.
+                throw new IllegalStateException(sm.getString("kubernetesMembershipProvider.noKey"));
             }
             String clientKeyPassword = getEnv("KUBERNETES_CLIENT_KEY_PASSWORD");
             String clientKeyAlgo = getEnv("KUBERNETES_CLIENT_KEY_ALGO");
@@ -140,6 +142,10 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
             url = url + "?labelSelector=" + labels;
         }
 
+        // Everything that can reject the configuration is done. Only now create the membership and register as a
+        // channel listener so that a failed start does not leave the listener registered.
+        super.start(level);
+
         // Fetch initial members
         heartbeat();
     }
@@ -158,7 +164,7 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
     @Override
     protected Member[] fetchMembers() {
         if (streamProvider == null) {
-            return new Member[0];
+            return null;
         }
 
         reloadSaTokenIfChanged();
@@ -167,9 +173,12 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
 
         try (InputStream stream = streamProvider.openStream(url, headers, connectionTimeout, readTimeout);
                 InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
-            parsePods(reader, members);
+            if (!parsePods(reader, members)) {
+                return null;
+            }
         } catch (IOException ioe) {
             log.error(sm.getString("kubernetesMembershipProvider.streamError"), ioe);
+            return null;
         }
 
         return members.toArray(new Member[0]);
@@ -205,16 +214,17 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
      *
      * @param reader The reader with pod data
      * @param members The list to populate with members
+     * @return {@code true} if no error occurred
      */
     @SuppressWarnings("unchecked")
-    protected void parsePods(Reader reader, List<MemberImpl> members) {
+    protected boolean parsePods(Reader reader, List<MemberImpl> members) {
         JSONParser parser = new JSONParser(reader);
         try {
             LinkedHashMap<String,Object> json = parser.object();
             Object itemsObject = json.get("items");
             if (!(itemsObject instanceof List<?>)) {
                 log.error(sm.getString("kubernetesMembershipProvider.invalidPodsList", "no items"));
-                return;
+                return false;
             }
             List<Object> items = (List<Object>) itemsObject;
             for (Object podObject : items) {
@@ -243,7 +253,7 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                 Object objectUid = metadata.get("uid");
                 Object creationTimestampObject = metadata.get("creationTimestamp");
                 if (creationTimestampObject == null) {
-                    log.warn(sm.getString("kubernetesMembershipProvider.invalidPod", "uid"));
+                    log.warn(sm.getString("kubernetesMembershipProvider.invalidPod", "creationTimestamp"));
                     continue;
                 }
                 // "status" contains "phase" (which must be "Running") and "podIP"
@@ -276,8 +286,13 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                     continue;
                 }
 
-                long aliveTime =
-                        Duration.between(Instant.parse(creationTimestampObject.toString()), startTime).toMillis();
+                long aliveTime;
+                try {
+                    aliveTime = Duration.between(Instant.parse(creationTimestampObject.toString()), startTime).toMillis();
+                } catch (DateTimeParseException e) {
+                    log.warn(sm.getString("kubernetesMembershipProvider.invalidPod", "creationTimestamp"), e);
+                    continue;
+                }
 
                 MemberImpl member;
                 try {
@@ -294,6 +309,8 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
             }
         } catch (Exception e) {
             log.error(sm.getString("kubernetesMembershipProvider.jsonError"), e);
+            return false;
         }
+        return true;
     }
 }

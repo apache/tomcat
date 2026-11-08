@@ -78,7 +78,7 @@ public class TestPersistentManagerIntegration extends TomcatBaseTest {
         ctx.setDistributable(true);
 
         Tomcat.addServlet(ctx, "DummyServlet", new DummyServlet());
-        ctx.addServletMappingDecoded("/dummy", "DummyServlet");
+        ctx.addServletMapping("/dummy", "DummyServlet");
 
         PersistentManager manager = new PersistentManager();
         TesterStore store = new TesterStore();
@@ -111,7 +111,7 @@ public class TestPersistentManagerIntegration extends TomcatBaseTest {
         ctx.setDistributable(true);
 
         Tomcat.addServlet(ctx, "DummyServlet", new DummyServlet());
-        ctx.addServletMappingDecoded("/dummy", "DummyServlet");
+        ctx.addServletMapping("/dummy", "DummyServlet");
 
         PersistentManager manager = new PersistentManager();
         TesterStore store = new TesterStore();
@@ -144,7 +144,7 @@ public class TestPersistentManagerIntegration extends TomcatBaseTest {
         ctx.setDistributable(true);
 
         Tomcat.addServlet(ctx, "DummyServlet", new DummyServlet());
-        ctx.addServletMappingDecoded("/dummy", "DummyServlet");
+        ctx.addServletMapping("/dummy", "DummyServlet");
 
         PersistentManager manager = new PersistentManager();
         TesterStore store = new TesterStore();

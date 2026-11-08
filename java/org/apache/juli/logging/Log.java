@@ -148,7 +148,7 @@ public interface Log {
 
     /**
      * <p>
-     * Log an error with trace log level.
+     * Log a message and its cause with trace log level.
      * </p>
      *
      * @param message log this message
@@ -169,7 +169,7 @@ public interface Log {
 
     /**
      * <p>
-     * Log an error with debug log level.
+     * Log a message and its cause with debug log level.
      * </p>
      *
      * @param message log this message
@@ -190,7 +190,7 @@ public interface Log {
 
     /**
      * <p>
-     * Log an error with info log level.
+     * Log a message and its cause with info log level.
      * </p>
      *
      * @param message log this message
@@ -211,7 +211,7 @@ public interface Log {
 
     /**
      * <p>
-     * Log an error with warn log level.
+     * Log a message and its cause with warn log level.
      * </p>
      *
      * @param message log this message
@@ -232,7 +232,7 @@ public interface Log {
 
     /**
      * <p>
-     * Log an error with error log level.
+     * Log a message and its cause with error log level.
      * </p>
      *
      * @param message log this message
@@ -253,7 +253,7 @@ public interface Log {
 
     /**
      * <p>
-     * Log an error with fatal log level.
+     * Log a message and its cause with fatal log level.
      * </p>
      *
      * @param message log this message

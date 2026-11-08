@@ -62,14 +62,14 @@ public interface User extends Principal {
      * Returns the logon password of this user.
      *
      * @return the logon password of this user, optionally prefixed with the identifier of an encoding scheme surrounded
-     *             by curly braces, such as <code>{md5}xxxxx</code>.
+     *             by curly braces, such as <code>{MD5}xxxxx</code>.
      */
     String getPassword();
 
 
     /**
      * Set the logon password of this user, optionally prefixed with the identifier of an encoding scheme surrounded by
-     * curly braces, such as <code>{md5}xxxxx</code>.
+     * curly braces, such as <code>{MD5}xxxxx</code>.
      *
      * @param password The new logon password
      */
@@ -101,7 +101,9 @@ public interface User extends Principal {
 
 
     /**
-     * Set the logon username of this user, which must be unique within the scope of a {@link UserDatabase}.
+     * Set the logon username of this user, which must be unique within the scope of a {@link UserDatabase}. The
+     * standard implementations treat the username as immutable and ignore this method; to change a user's username
+     * the user must be removed from, and then re-added to, the database.
      *
      * @param username The new logon username
      */

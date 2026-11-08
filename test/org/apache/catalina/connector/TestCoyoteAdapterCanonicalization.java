@@ -170,7 +170,7 @@ public class TestCoyoteAdapterCanonicalization extends TomcatBaseTest {
         // Map as default servlet so servlet path should be URI less context
         // path. Since the content path is "" the servlet path should be the
         // URI.
-        root.addServletMappingDecoded("/", "EchoServletPath");
+        root.addServletMapping("/", "EchoServletPath");
 
         if (specCompliant) {
             // Enabled options for stricter checking

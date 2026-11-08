@@ -27,7 +27,7 @@ import java.io.Writer;
  * Contains commonly needed I/O-related methods.
  */
 public class IOTools {
-     /**
+    /**
      * The default buffer size (4 KiB) used for I/O operations.
      */
     protected static final int DEFAULT_BUFFER_SIZE = 4 * 1024; // 4k
@@ -94,7 +94,7 @@ public class IOTools {
      * @param is  The source to read from
      * @param buf The buffer to write to
      *
-     * @return The number of bytes read
+     * @return The number of bytes actually read
      *
      * @throws IOException If an I/O error occurs during the read
      */

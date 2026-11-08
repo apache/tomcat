@@ -169,6 +169,14 @@
       will be used.</p>
     </attribute>
 
+    <attribute name="maxLocaleCount" required="false">
+      <p>The maximum number of locales (obtained from the
+      <code>Accept-Language</code> header(s)) that are permitted for a request.
+      Locales above this limit will be ignored when the locales are
+      parsed and an info will be logged. A value of less than 0 means no
+      limit. If not specified, a default of 10 is used.</p>
+    </attribute>
+
     <attribute name="maxParameterCount" required="false">
       <p>The maximum total number of request parameters (including uploaded
       files) obtained from the query string and, for POST requests, the request
@@ -245,7 +253,7 @@
       specification.
       The HTTP method TRACE is specifically forbidden here in accordance
       with the HTTP specification.
-      The default is <code>POST</code></p>
+      The default is <code>POST,QUERY</code></p>
     </attribute>
 
     <attribute name="port" required="true">
@@ -407,6 +415,34 @@
       <p>By default Tomcat will ignore all trailer headers when processing
       chunked input. For a header to be processed, it must be added to this
       comma-separated list of header names.</p>
+    </attribute>
+
+    <attribute name="altService" required="false">
+      <p>The protocol identifier of an alternative service that is announced
+      to clients in the <code>Alt-Svc</code> response header as described by
+      <a href="https://tools.ietf.org/rfc/rfc9239.txt">RFC 9239</a>. This
+      allows clients to discover the alternative service from the first
+      response without any client-side configuration.
+      The value is used as the alternative service protocol identifier and
+      must therefore be a valid HTTP token as defined by
+      <a href="https://tools.ietf.org/rfc/rfc7230.txt">RFC 7230</a>, for
+      example <code>h2</code>. If the value is not valid,
+      the connector fails to start.</p>
+
+      <p>The alternative service is assumed to be reachable at the same host
+      and port as this connector. The header value is generated from the
+      protocol identifier and the port on which the request was received and
+      takes a form such as <code>Alt-Svc: h2=":8443"</code>.</p>
+
+      <p>If this attribute is not set, no <code>Alt-Svc</code> header is
+      added by Tomcat. If a web application sets its own
+      <code>Alt-Svc</code> header for a response, the application provided
+      value is used and this attribute is ignored for that response.</p>
+
+      <p>The header is added to HTTP/1.1 responses and to HTTP/2 responses
+      served via the HTTP/2
+      <a href="http2.html">UpgradeProtocol</a> associated with this
+      connector.</p>
     </attribute>
 
     <attribute name="bindOnInit" required="false">
@@ -588,9 +624,11 @@
       attribute.</p>
       <p>If you see "Request header is too large" errors you can increase this,
       but be aware that Tomcat will allocate the full amount you specify for
-      every request. For example, if you specify a maxHttpRequestHeaderSize of
-      1 MB and your application handles 100 concurrent requests, you will see
-      100 MB of heap consumed by request headers.</p>
+      every request and that those requests are not garbage collected after use
+      but are recycled and re-used (see <code>processorCache</code>). For
+      example, if you specify a maxHttpRequestHeaderSize of 1 MB and your
+      application handles 100 concurrent requests, you will see 100 MB of heap
+      consumed by request headers.</p>
     </attribute>
 
     <attribute name="maxHttpResponseHeaderSize" required="false">
@@ -679,15 +717,15 @@
 
     <attribute name="noCompressionUserAgents" required="false">
       <p>The value is a regular expression (using <code>java.util.regex</code>)
-      matching the <code>user-agent</code> header of HTTP clients for which
-      compression should not be used,
-      because these clients, although they do advertise support for the
-      feature, have a broken implementation.
-      The default value is an empty String (regexp matching disabled).</p>
+      matching the entire <code>user-agent</code> header of HTTP clients for
+      which compression should not be used, because these clients, although they
+      do advertise support for the feature, have a broken implementation. The
+      default value is an empty String (regexp matching disabled).</p>
     </attribute>
 
     <attribute name="processorCache" required="false">
-      <p>The protocol handler caches Processor objects to speed up performance.
+      <p>The protocol handler caches Processor objects (and related internal
+      objects such as the request and response) to speed up performance.
       This setting dictates how many of these objects get cached.
       <code>-1</code> means unlimited, default is <code>200</code>.
       <code>0</code> means no request processor reuse. This has a very
@@ -729,10 +767,10 @@
 
     <attribute name="restrictedUserAgents" required="false">
       <p>The value is a regular expression (using <code>java.util.regex</code>)
-      matching the <code>user-agent</code> header of HTTP clients for which
-      HTTP/1.1 or HTTP/1.0 keep alive should not be used, even if the clients
-      advertise support for these features.
-      The default value is an empty String (regexp matching disabled).</p>
+      matching the entire <code>user-agent</code> header of HTTP clients for
+      which HTTP/1.1 or HTTP/1.0 keep alive should not be used, even if the
+      clients advertise support for these features. The default value is an
+      empty String (regexp matching disabled).</p>
     </attribute>
 
     <attribute name="server" required="false">
@@ -1031,12 +1069,44 @@
 
       <attribute name="unixDomainSocketPathPermissions" required="false">
         <p>Where supported, the posix permissions that will be applied to the
-        to the Unix Domain Socket specified with
-        <code>unixDomainSocketPath</code> above. The
-        permissions are specified as a string of nine characters, in three sets
-        of three: (r)ead, (w)rite and e(x)ecute for owner, group and others
-        respectively. If a permission is not granted, a hyphen is used. If
-        unspecified, the permissions default to <code>rw-rw-rw-</code>.</p>
+        Unix Domain Socket specified with <code>unixDomainSocketPath</code>
+        above.  If the Unix Domain Socket is required to be created securely,
+        these permissions should be selected as to limit access to trusted
+        users.</p>
+        <p>The permissions are specified as a string of nine characters, in
+        three sets of three: (r)ead, (w)rite and e(x)ecute for owner, group and
+        others respectively. If a permission is not granted, a hyphen is
+        used.</p>
+        <p>If unspecified, no permissions are explicitly set meaning that the
+        resulting permissions will be determined by the current umask.</p>
+      </attribute>
+
+      <attribute name="unixDomainSocketParentOwner" required="false">
+        <p>The expected ownership of the directory where the Unix Domain Socket
+        will be created. The directory must be owned either by this user or the
+        current user associated with the Tomcat process.</p>
+        <p>This attribute is ignored if
+        <code>unixDomainSocketParentPermissions</code> are skipped. If not
+        ignored, the ownership checks on the parent directory, can be skipped by
+        setting this attribute to the empty string.</p>
+        <p>If unspecified, the default value is unset.</p>
+      </attribute>
+
+      <attribute name="unixDomainSocketParentPermissions" required="false">
+        <p>Where supported, the posix permissions that will be checked on /
+        applied to the directory where the Unix Domain Socket will be created.
+        If the Unix Domain Socket is required to be created securely, these
+        permissions should be selected as to limit access to trusted users.</p>
+        <p>To skip the permission checks on the parent directory, set this
+        attribute to the empty string.</p>
+        <p>The permissions are specified as a string of nine characters, in
+        three sets of three: (r)ead, (w)rite and e(x)ecute for owner, group and
+        others respectively. If a permission is not granted, a hyphen is used.
+        If unspecified, the value of
+        <code>unixDomainSocketPathPermissions</code> is used with the addition
+        of the appropriate execute permission for every read and/or write
+        permission that is specified and the removal of group and other write
+        permissions if present.</p>
       </attribute>
 
       <attribute name="useInheritedChannel" required="false">
@@ -1069,6 +1139,14 @@
   in a <strong>Certificate</strong> element within an
   <strong>SSLHostConfig</strong>. For further information, see the SSL Support
   section below.</p>
+
+  <p>Using name-based virtual hosts on a secured connection requires careful
+  configuration of the names specified in a single certificate or the use of
+  SNI. SNI allows multiple certificates with different names to be associated
+  with a single TLS connector. Administrators should be aware that virtual host
+  matching using the HTTP host name header and TLS configuration (including
+  certificate) matching using SNI are completely separate processes and that it
+  is likely that they will want to keep the two configurations synchronized.</p>
 
   <p>When OpenSSL is providing the TLS implementation, one or more
   <strong>OpenSSLConfCmd</strong> elements may be nested inside a
@@ -1143,16 +1221,14 @@
   that support Unix Domain Sockets will bind to the socket at the given path.
   </p>
 
-  <p>For users of Java 16 and higher, support is provided within the NIO
-  connectors.
-  </p>
+  <p>Support is provided within the NIO connector.</p>
 
-  <p>The socket path is created with read and write permissions for all
-  users. To protect this socket, place it in a directory with suitable
-  permissions appropriately configured to restrict access as required.
-  Alternatively, on platforms that support posix permissions, the
-  permissions on the socket can be set directly with the
-  <code>unixDomainSocketPathPermissions</code> option.
+  <p>By default, the socket path is created with the current umask. To protect
+  this socket, place it in a directory with suitable permissions appropriately
+  configured to restrict access as required. Alternatively, on platforms that
+  support posix permissions, the permissions for the containing folder can be
+  set with <code>unixDomainSocketParentPermissions</code> and the permissions
+  for the socket can be set with <code>unixDomainSocketPathPermissions</code>.
   </p>
 
   <p>Tomcat will automatically remove the socket on server shutdown. If the
@@ -1204,8 +1280,9 @@
   <strong>Connector</strong>.</p>
 
   <p>Each <strong>SSLHostConfig</strong> must in turn define at least one
-  <strong>Certificate</strong>. The types of the <strong>Certificate</strong>s
-  must be unique.</p>
+  <strong>Certificate</strong> or <strong>PreSharedKey</strong>. A configuration
+  with no <strong>Certificate</strong> requires an OpenSSL-based implementation.
+  The types of the <strong>Certificate</strong>s must be unique.</p>
 
   <p>In addition to the standard TLS related request attributes defined in
   section 3.10 of the Servlet specification, Tomcat supports a number of
@@ -1387,13 +1464,15 @@
     </attribute>
 
     <attribute name="ocspSoftFail" required="false">
-      <p>If an OCSP responder returns an error, the TLS handshake will always
-      fail and a TLS connection will not be established. If the OCSP responder
-      is unreachable or otherwise unavailable, this setting determines whether
-      the handshake completes or fails. If <code>true</code>, the handskahe will
-      complete and a TLS connection will be established when the OCSP responder
-      is unavailable. If <code>false</code>, the handshake will fail and no TLS
-      connection will be established.</p>
+      <p>If an OCSP responder reports that the certificate is invalid, the TLS
+      handshake will always fail and a TLS connection will not be established.
+      If Tomcat is unable to create the OCSP request, the OCSP responder is
+      unreachable (network timeout or non HTTP 200 response), the OCSP
+      responder is unavailable (try later response) or the OCSP responder
+      reports an internal error this setting determines whether the handshake
+      completes or fails. If <code>true</code>, the handshake will complete and
+      a TLS connection will be established. If <code>false</code>, the handshake
+      will fail and no TLS connection will be established.</p>
       <p>If not specified, the default value of <code>true</code> will be
       used.</p>
     </attribute>
@@ -1534,6 +1613,32 @@
 
   </subsection>
 
+  <subsection name="SSL Support - PreSharedKey">
+
+  <p>A <strong>PreSharedKey</strong> element represents a pre-shared key that
+  may be used by an OpenSSL-based connector. It must be nested in an
+  <strong>SSLHostConfig</strong> element.</p>
+
+  <attributes>
+
+    <attribute name="identity" required="true">
+      <p>The identity associated with this pre-shared key.</p>
+    </attribute>
+
+    <attribute name="key" required="true">
+      <p>The pre-shared key encoded as hexadecimal characters.</p>
+    </attribute>
+
+    <attribute name="digest" required="false">
+      <p>The message digest algorithm associated with this pre-shared key for
+      TLS 1.3, for example <code>SHA256</code> or <code>SHA384</code>. If not
+      specified, the default is <code>SHA256</code>.</p>
+    </attribute>
+
+  </attributes>
+
+  </subsection>
+
   <subsection name="SSL Support - Certificate">
 
   <p></p>
@@ -1549,6 +1654,16 @@
       generated by <code>openssl dhparam</code> and <code>openssl ecparam</code>,
       respectively. The output of the respective OpenSSL command can simply
       be concatenated to the certificate file.</p>
+      <p>The file may also contain the certificate chain, that is the
+      intermediate certificates, after the server certificate. If it does, the
+      <strong>certificateChainFile</strong> is ignored.</p>
+      <p>When using the OpenSSL FFM implementation, a file with a name that ends
+      with <code>.pkcs12</code> is read as a PKCS#12 bundle containing the
+      server key and certificate. The password of the bundle is the
+      <strong>certificateKeyPassword</strong> or, if that is not set, the
+      <strong>certificateKeystorePassword</strong> (or the equivalent password
+      files). The bundle may also contain the certificate chain. If it does, the
+      <strong>certificateChainFile</strong> is ignored.</p>
       <p>This attribute is required unless
       <strong>certificateKeystoreFile</strong> is specified.</p>
     </attribute>
@@ -1560,6 +1675,10 @@
       <code>$CATALINA_BASE</code>.</p>
       <p>The certificate chain used for Tomcat should not include the server
       certificate as its first element.</p>
+      <p>The chain file is only used if the
+      <strong>certificateFile</strong> (a PEM file or a PKCS#12 bundle) contains
+      the server certificate alone. If the <strong>certificateFile</strong>
+      already contains the certificate chain, the chain file is ignored.</p>
       <p>Note that when using more than one certificate for different types,
       they all must use the same certificate chain.</p>
     </attribute>
@@ -1567,12 +1686,36 @@
     <attribute name="certificateKeyAlias" required="false">
       <p>JSSE only.</p>
       <p>The alias used for the server key and certificate in the keystore. If
-      not specified, the first key read from the keystore will be used. The
+      not specified, the first eligible key read from the keystore will be used. The
       order in which keys are read from the keystore is implementation
       dependent. It may not be the case that keys are read from the keystore in
       the same order as they were added. If more than one key is present in the
       keystore it is strongly recommended that a keyAlias is configured to
       ensure that the correct key is used.</p>
+      <p>If no alias is specified, key entries whose certificate has a malformed
+      Extended Key Usage extension, or one that includes neither
+      <code>serverAuth</code> nor <code>anyExtendedKeyUsage</code>, are ignored
+      when selecting the key to use. Certificates with no Extended Key Usage
+      extension remain eligible. If no eligible key entry is found, connector
+      initialization fails. This selection does not apply when the key manager
+      factory is provided by a FIPS provider. Tomcat does not wrap or alter the
+      keys in that case, so the provider chooses which entry is served.</p>
+      <p>A configured alias is used even if its certificate is not valid for TLS
+      server authentication. The exception is a Windows-MY store accessed through
+      the SunMSCAPI provider (key store type <code>Windows-MY</code>,
+      <code>Windows-MY-CURRENTUSER</code> or <code>Windows-MY-LOCALMACHINE</code>):
+      if the certificate at the configured alias is
+      not valid there, but the store also contains a key entry whose alias is the
+      configured alias with <code>" (1)"</code>, <code>" (2)"</code>, etc. appended
+      and whose certificate is valid, that certificate is used instead. That store
+      exposes such duplicates because the key store API requires aliases to be
+      unique even when several certificates share a name. If none of those numbered
+      duplicates is valid, or the key store is of any other type, the configured
+      alias is used unchanged.</p>
+      <p>The SunMSCAPI provider does not expose a certificate's original Windows
+      friendly name through the key store API, so the match is a heuristic based
+      on the appended suffix alone (see
+      <a href="https://bugs.openjdk.org/browse/JDK-8395755">JDK-8395755</a>).</p>
     </attribute>
 
     <attribute name="certificateKeyFile" required="false">
@@ -1677,7 +1820,7 @@
 
   <p>When OpenSSL FFM support is enabled, the connectors will default to using
   OpenSSL through JSSE, which is equivalent but uses the Java FFM API from
-  Java 22 to access OpenSSL.</p>
+  Java 25 to access OpenSSL.</p>
 
   <p>The following NIO SSL configuration attributes are not specific to
   a virtual host and, therefore, must be configured on the connector.</p>
@@ -1708,7 +1851,7 @@
       will automatically enable it and the default value of this attribute
       becomes
       <code>org.apache.tomcat.util.net.openssl.OpenSSLImplementation</code>.
-      The FFM API from Java 22 may also be used to enable OpenSSL support, in
+      The FFM API from Java 25 may also be used to enable OpenSSL support, in
       which case the default value of the attribute becomes
       <code>org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation</code>.
       In that case, the attributes from either JSSE and OpenSSL
@@ -1762,9 +1905,13 @@
   <subsection name="Key store types">
 
     <p>In addition to the standard key store types (JKS and PKCS12), most Java
-    runtimes support additional key store types such as Windows-ROOT,
-    Windows-My, DKS as well as hardware security modules. Generally, to use
-    these additional keystore types with a TLS Connector in Tomcat:</p>
+    runtimes support additional key store types such as Windows-MY, Windows-ROOT,
+    DKS as well as hardware security modules. On Windows, Windows-MY and
+    Windows-ROOT access the current user's certificate store, while
+    Windows-MY-LOCALMACHINE and Windows-ROOT-LOCALMACHINE access the local machine
+    store (reading the local machine store from a non-elevated process requires
+    Java 17.0.17, 21.0.9, 24 or later). Generally, to use these additional key
+    store types with a TLS Connector in Tomcat:</p>
 
     <ul>
       <li>Set the certificateKeystoreType and/or truststoreType Connector

@@ -109,7 +109,7 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
 
         Context root = tomcat.addContext("", TEMP_DIR);
         Tomcat.addServlet(root, "testServlet", new TestServlet());
-        root.addServletMappingDecoded("/", "testServlet");
+        root.addServletMapping("/", "testServlet");
 
         tomcat.start();
 
@@ -133,10 +133,10 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
         Wrapper w = Tomcat.addServlet(root, "nbWrite",
                 new NonBlockingWriteServlet(asyncWriteTarget, useContainerThreadToSetListener));
         w.setAsyncSupported(true);
-        root.addServletMappingDecoded("/nbWrite", "nbWrite");
+        root.addServletMapping("/nbWrite", "nbWrite");
         Tomcat.addServlet(root, "write", new BlockingWriteServlet(asyncWriteTarget, syncWriteTarget));
         w.setAsyncSupported(true);
-        root.addServletMappingDecoded("/write", "write");
+        root.addServletMapping("/write", "write");
 
         tomcat.start();
 
@@ -288,7 +288,7 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
 
         Context root = tomcat.addContext("", TEMP_DIR);
         Tomcat.addServlet(root, "servlet", new WriteAfterBodyCompleteServlet());
-        root.addServletMappingDecoded("/", "servlet");
+        root.addServletMapping("/", "servlet");
 
         tomcat.start();
 

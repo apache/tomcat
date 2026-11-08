@@ -228,7 +228,7 @@ public class TestRemoteCIDRFilter extends TomcatBaseTest {
 
         FilterMap filterMap = new FilterMap();
         filterMap.setFilterName(testFilterClass.getName());
-        filterMap.addURLPatternDecoded(urlPattern);
+        filterMap.addURLPattern(urlPattern);
         root.addFilterMap(filterMap);
 
         FilterConfig filterConfig = TesterFilterConfigs.generateFilterConfig(filterDef);

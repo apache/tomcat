@@ -32,6 +32,7 @@ import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.TesterUtil;
 import org.apache.catalina.tribes.group.GroupChannel;
 import org.apache.catalina.tribes.group.interceptors.MessageDispatchInterceptor;
+import org.apache.catalina.tribes.transport.ReceiverBase;
 
 public class TestDataIntegrity {
     private int msgCount = 500;
@@ -43,8 +44,10 @@ public class TestDataIntegrity {
     @Before
     public void setUp() throws Exception {
         channel1 = new GroupChannel();
+        ((ReceiverBase) channel1.getChannelReceiver()).setPort(0);
         channel1.addInterceptor(new MessageDispatchInterceptor());
         channel2 = new GroupChannel();
+        ((ReceiverBase) channel2.getChannelReceiver()).setPort(0);
         channel2.addInterceptor(new MessageDispatchInterceptor());
         listener1 = new Listener();
         channel2.addChannelListener(listener1);

@@ -133,7 +133,7 @@ public class ManagedBean implements java.io.Serializable {
 
     /**
      * The fully qualified name of the Java class of the MBean described by this descriptor. If not specified, the
-     * standard JMX class (<code>javax.management.modelmbean.RequiredModeLMBean</code>) will be utilized.
+     * default class (<code>org.apache.tomcat.util.modeler.BaseModelMBean</code>) will be utilized.
      *
      * @return the class name
      */
@@ -302,7 +302,13 @@ public class ManagedBean implements java.io.Serializable {
      * @param attribute The new attribute descriptor
      */
     public void addAttribute(AttributeInfo attribute) {
-        attributes.put(attribute.getName(), attribute);
+        mBeanInfoLock.writeLock().lock();
+        try {
+            attributes.put(attribute.getName(), attribute);
+            this.info = null;
+        } finally {
+            mBeanInfoLock.writeLock().unlock();
+        }
     }
 
 
@@ -331,7 +337,13 @@ public class ManagedBean implements java.io.Serializable {
      * @param operation The new operation descriptor
      */
     public void addOperation(OperationInfo operation) {
-        operations.put(createOperationKey(operation), operation);
+        mBeanInfoLock.writeLock().lock();
+        try {
+            operations.put(createOperationKey(operation), operation);
+            this.info = null;
+        } finally {
+            mBeanInfoLock.writeLock().unlock();
+        }
     }
 
 

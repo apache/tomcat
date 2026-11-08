@@ -49,7 +49,7 @@ public class RpcChannel implements ChannelListener {
     public static final int FIRST_REPLY = 1;
 
     /**
-     * Return replies from a majority of members.
+     * Return replies from at least half of the destination members.
      */
     public static final int MAJORITY_REPLY = 2;
 
@@ -92,7 +92,8 @@ public class RpcChannel implements ChannelListener {
      * @param message        Serializable - the message you are sending out
      * @param rpcOptions     int - FIRST_REPLY, MAJORITY_REPLY or ALL_REPLY
      * @param channelOptions channel sender options
-     * @param timeout        long - timeout in milliseconds, if no reply is received within this time null is returned
+     * @param timeout        long - timeout in milliseconds, if the requested replies are not received within this time
+     *                         the replies received so far (possibly none) are returned
      *
      * @return Response[] - an array of response objects.
      *
@@ -169,6 +170,48 @@ public class RpcChannel implements ChannelListener {
             boolean asyncReply =
                     ((replyMessageOptions & Channel.SEND_OPTIONS_ASYNCHRONOUS) == Channel.SEND_OPTIONS_ASYNCHRONOUS);
             Serializable reply = callback.replyRequest(rmsg.message, sender);
+            if (reply == null) {
+                // The callback is documented to return null when no reply should be sent. Tell the requester so that
+                // it stops waiting for this member rather than running into its timeout.
+                boolean noReplySent = false;
+                RpcMessage noReply = new RpcMessage.NoRpcChannelReply(rmsg.rpcId, rmsg.uuid);
+                ErrorHandler handler = null;
+                if (excallback != null && asyncReply) {
+                    final Serializable request = msg;
+                    final Member fsender = sender;
+                    handler = new ErrorHandler() {
+                        @Override
+                        public void handleError(ChannelException x, UniqueId id) {
+                            excallback.replyFailed(request, null, fsender, x);
+                        }
+
+                        @Override
+                        public void handleCompletion(UniqueId id) {
+                            excallback.replySucceeded(request, null, fsender);
+                        }
+                    };
+                }
+                try {
+                    if (handler != null) {
+                        channel.send(new Member[] { sender }, noReply,
+                                replyMessageOptions & ~Channel.SEND_OPTIONS_SYNCHRONIZED_ACK, handler);
+                    } else {
+                        channel.send(new Member[] { sender }, noReply,
+                                replyMessageOptions & ~Channel.SEND_OPTIONS_SYNCHRONIZED_ACK);
+                    }
+                    noReplySent = true;
+                } catch (Exception e) {
+                    if (excallback != null && !asyncReply) {
+                        excallback.replyFailed(msg, null, sender, e);
+                    } else {
+                        log.error(sm.getString("rpcChannel.replyFailed"), e);
+                    }
+                }
+                if (noReplySent && excallback != null && !asyncReply) {
+                    excallback.replySucceeded(msg, null, sender);
+                }
+                return;
+            }
             ErrorHandler handler = null;
             final Serializable request = msg;
             final Serializable response = reply;
@@ -299,7 +342,7 @@ public class RpcChannel implements ChannelListener {
     }
 
     /**
-     * Class that holds all response.
+     * Class that holds all responses.
      */
     public static class RpcCollector {
         /**
@@ -410,7 +453,7 @@ public class RpcChannel implements ChannelListener {
 
         @Override
         public int hashCode() {
-            return id[0] + id[1] + id[2] + id[3];
+            return java.util.Arrays.hashCode(id);
         }
 
         @Override

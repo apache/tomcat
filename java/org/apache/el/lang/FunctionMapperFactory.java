@@ -24,7 +24,7 @@ import org.apache.el.util.MessageFactory;
 
 /**
  * Factory that wraps a target FunctionMapper, capturing all function mappings
- * so that an immutable snapshot can be created.
+ * so that a point-in-time snapshot can be created.
  */
 public class FunctionMapperFactory extends FunctionMapper {
 
@@ -73,7 +73,9 @@ public class FunctionMapperFactory extends FunctionMapper {
 
 
     /**
-     * Creates an immutable snapshot of all function mappings captured so far.
+     * Creates a snapshot of all function mappings captured so far.
+     * <p>
+     * The returned mapper is a point-in-time capture; it is mutable and may be modified after it is returned.
      *
      * @return The captured function mappings as a FunctionMapper
      */

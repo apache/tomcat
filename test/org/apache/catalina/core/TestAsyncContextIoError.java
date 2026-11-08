@@ -56,11 +56,11 @@ public class TestAsyncContextIoError extends TomcatBaseTest {
         AsyncServlet asyncServlet = new AsyncServlet();
         Wrapper asyncWrapper = Tomcat.addServlet(ctx, "async", asyncServlet);
         asyncWrapper.setAsyncSupported(true);
-        ctx.addServletMappingDecoded("/async", "async");
+        ctx.addServletMapping("/async", "async");
 
         ErrorServlet errorServlet = new ErrorServlet();
         Tomcat.addServlet(ctx, "error", errorServlet);
-        ctx.addServletMappingDecoded("/error", "error");
+        ctx.addServletMapping("/error", "error");
 
         tomcat.start();
 

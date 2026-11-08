@@ -53,6 +53,7 @@ import org.apache.catalina.tribes.io.BufferPool;
 import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.XByteBuffer;
 import org.apache.catalina.tribes.jmx.JmxRegistry;
+import org.apache.catalina.tribes.transport.TribesSslContext;
 import org.apache.catalina.tribes.util.Arrays;
 import org.apache.catalina.tribes.util.Logs;
 import org.apache.catalina.tribes.util.StringManager;
@@ -123,6 +124,13 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      * are using the same option flag.
      */
     protected boolean optionCheck = false;
+
+    private boolean secure;
+    private String pskDigest = "SHA256";
+    private String pskIdentity;
+    private String pskKey;
+    private String pskProtocol = "TLSv1.3";
+    private volatile TribesSslContext sslContext;
 
     /**
      * the name of this channel.
@@ -218,6 +226,16 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
         }
         XByteBuffer buffer = null;
         try {
+            if (secure) {
+                options |= SEND_OPTIONS_SECURE;
+            }
+            if ((options & SEND_OPTIONS_SECURE) != 0 &&
+                    (options & (SEND_OPTIONS_UDP | SEND_OPTIONS_MULTICAST)) != 0) {
+                throw new ChannelException(sm.getString("groupChannel.tlsDatagramUnsupported"));
+            }
+            if ((options & SEND_OPTIONS_SECURE) != 0 && sslContext == null) {
+                throw new ChannelException(sm.getString("groupChannel.tlsUnavailable"));
+            }
             if (destination == null || destination.length == 0) {
                 throw new ChannelException(sm.getString("groupChannel.noDestination"));
             }
@@ -443,6 +461,25 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
     @Override
     public synchronized void start(int svc) throws ChannelException {
         setupDefaultStack();
+        if (sslContext == null) {
+            if (pskKey != null && pskIdentity != null) {
+                try {
+                    sslContext = new TribesSslContext(pskIdentity, pskKey, pskDigest, pskProtocol);
+                } catch (Exception e) {
+                    if (secure) {
+                        throw new ChannelException(sm.getString("groupChannel.tlsUnavailable"), e);
+                    }
+                    log.warn(sm.getString("groupChannel.tlsUnavailable"), e);
+                }
+            } else if (secure && pskKey == null) {
+                throw new ChannelException(sm.getString("groupChannel.tlsKeyMissing"));
+            } else if (secure && pskIdentity == null) {
+                throw new ChannelException(sm.getString("groupChannel.tlsIdentityMissing"));
+            }
+        }
+        if (secure && getChannelReceiver().getSecurePort() < 0) {
+            throw new ChannelException(sm.getString("groupChannel.tlsPortMissing"));
+        }
         if (optionCheck) {
             checkOptionFlags();
         }
@@ -457,7 +494,9 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
             ownExecutor = true;
         }
         super.start(svc);
-        monitorFuture = utilityExecutor.scheduleWithFixedDelay(this::startHeartbeat, 0, 60, TimeUnit.SECONDS);
+        if (monitorFuture == null || monitorFuture.isDone()) {
+            monitorFuture = utilityExecutor.scheduleWithFixedDelay(this::startHeartbeat, 0, 60, TimeUnit.SECONDS);
+        }
     }
 
     /**
@@ -469,7 +508,10 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
                 // There was an error executing the scheduled task, get it and log it
                 try {
                     heartbeatFuture.get();
-                } catch (InterruptedException | ExecutionException e) {
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    log.error(sm.getString("groupChannel.unable.sendHeartbeat"), e);
+                } catch (ExecutionException e) {
                     log.error(sm.getString("groupChannel.unable.sendHeartbeat"), e);
                 }
             }
@@ -480,23 +522,37 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
 
     @Override
     public synchronized void stop(int svc) throws ChannelException {
-        if (monitorFuture != null) {
-            monitorFuture.cancel(true);
-            monitorFuture = null;
-        }
-        if (heartbeatFuture != null) {
-            heartbeatFuture.cancel(true);
-            heartbeatFuture = null;
-        }
         super.stop(svc);
-        if (ownExecutor) {
-            utilityExecutor.shutdown();
-            utilityExecutor = null;
-            ownExecutor = false;
-        }
-        if (oname != null) {
-            JmxRegistry.getRegistry(this).unregisterJmx(oname);
-            oname = null;
+        if (coordinator.getStartLevel() == 0) {
+            // The monitor and the heartbeat only make sense while services
+            // are running. Cancel them, and release an executor that this
+            // channel owns, only once all services have been stopped. A
+            // partial stop must not tear down what the started services
+            // still rely on.
+            if (monitorFuture != null) {
+                monitorFuture.cancel(true);
+                monitorFuture = null;
+            }
+            if (heartbeatFuture != null) {
+                heartbeatFuture.cancel(true);
+                heartbeatFuture = null;
+            }
+            if (sslContext != null) {
+                sslContext.close();
+                sslContext = null;
+            }
+            if (ownExecutor && utilityExecutor != null) {
+                utilityExecutor.shutdown();
+                utilityExecutor = null;
+                ownExecutor = false;
+            }
+            if (oname != null) {
+                JmxRegistry jmxRegistry = JmxRegistry.getRegistry(this);
+                if (jmxRegistry != null) {
+                    jmxRegistry.unregisterJmx(oname);
+                }
+                oname = null;
+            }
         }
     }
 
@@ -619,6 +675,82 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
     }
 
     @Override
+    public boolean getSecure() {
+        return secure;
+    }
+
+    /**
+     * Enables or disables the use of TLS to secure channel communication using a pre-shared key.
+     *
+     * @param secure boolean
+     */
+    public void setSecure(boolean secure) {
+        this.secure = secure;
+    }
+
+    @Override
+    public String getPskDigest() {
+        return pskDigest;
+    }
+
+    /**
+     * Sets the name of the message digest algorithm used to derive the pre-shared key.
+     *
+     * @param pskDigest the digest algorithm name, for example <code>SHA256</code>
+     */
+    public void setPskDigest(String pskDigest) {
+        this.pskDigest = pskDigest;
+    }
+
+    @Override
+    public String getPskIdentity() {
+        return pskIdentity;
+    }
+
+    /**
+     * Sets the identity associated with the pre-shared key. Both the identity and the key must be set for the channel
+     * to use a pre-shared key.
+     *
+     * @param pskIdentity the pre-shared key identity
+     */
+    public void setPskIdentity(String pskIdentity) {
+        this.pskIdentity = pskIdentity;
+    }
+
+    /**
+     * Sets the pre-shared key as a hex encoded string. Both the identity and the key must be set for the channel to
+     * use a pre-shared key.
+     *
+     * @param pskKey the hex encoded pre-shared key
+     */
+    public void setPskKey(String pskKey) {
+        this.pskKey = pskKey;
+    }
+
+    @Override
+    public String getPskProtocol() {
+        return pskProtocol;
+    }
+
+    /**
+     * Sets the TLS protocol name used for secure channel communication.
+     *
+     * @param pskProtocol the TLS protocol name, for example <code>TLSv1.3</code>
+     */
+    public void setPskProtocol(String pskProtocol) {
+        this.pskProtocol = pskProtocol;
+    }
+
+    /**
+     * Returns the SSL context used to secure the channel with TLS.
+     *
+     * @return the SSL context, or <code>null</code> if the channel is not secure
+     */
+    public TribesSslContext getSslContext() {
+        return sslContext;
+    }
+
+    @Override
     public boolean getHeartbeat() {
         return heartbeat;
     }
@@ -701,11 +833,11 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
         private ChannelInterceptor start;
 
         /**
-     * Creates an InterceptorIterator.
-     *
-     * @param start The first interceptor to iterate from
-     * @param end   The end marker interceptor (not included in iteration)
-     */
+         * Creates an InterceptorIterator.
+         *
+         * @param start The first interceptor to iterate from
+         * @param end   The end marker interceptor (not included in iteration)
+         */
         public InterceptorIterator(ChannelInterceptor start, ChannelInterceptor end) {
             this.end = end;
             this.start = start;

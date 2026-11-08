@@ -18,7 +18,6 @@ package org.apache.catalina.core;
 
 import java.io.IOException;
 import java.io.Serial;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -42,7 +41,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Host;
 import org.apache.catalina.Valve;
 import org.apache.catalina.connector.Request;
-import org.apache.catalina.util.URLEncoder;
+import org.apache.catalina.util.RequestUtil;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.AsyncContextCallback;
 import org.apache.coyote.RequestInfo;
@@ -113,7 +112,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
      */
     private final List<AsyncListenerWrapper> listeners = new CopyOnWriteArrayList<>();
     private volatile Runnable dispatch = null;
-    // Default of 30000 (30s) is set by the connector
+    // Set to the connector's async timeout when async processing starts
     private long timeout = -1;
 
     /*
@@ -128,6 +127,10 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     private final AtomicBoolean hasErrorProcessingStarted = new AtomicBoolean(false);
     private final AtomicBoolean hasOnErrorReturned = new AtomicBoolean(false);
 
+    /*
+     * ThreadLocal for passing over-ridden URL encoding state when dispatching.
+     */
+    static ThreadLocal<Boolean> uriEncoded = ThreadLocal.withInitial(() -> Boolean.FALSE);
 
     /**
      * Constructs an AsyncContextImpl for the given request.
@@ -216,26 +219,25 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
     @Override
     public void dispatch() {
-        String path;
-        String pathInfo;
         Request request = this.request;
-        Context context = this.context;
         // Calls check() so local copies are validated
-        ServletRequest servletRequest = getRequest();
-        if (servletRequest instanceof HttpServletRequest sr) {
-            path = sr.getServletPath();
-            pathInfo = sr.getPathInfo();
-        } else {
-            path = request.getServletPath();
-            pathInfo = request.getPathInfo();
+        HttpServletRequest hsr = getRequest() instanceof HttpServletRequest h ? h : request;
+        String path = hsr.getRequestURI();
+        String cpath = RequestUtil.getContextPathEncoded(request.getConnector(), hsr);
+        if (cpath.length() > 1) {
+            path = path.substring(cpath.length());
         }
-        if (pathInfo != null && !pathInfo.isEmpty()) {
-            path = path + pathInfo;
+        /*
+         * This is a dispatch of the original request path. That path (obtained from request.getRequestURI()) will
+         * always be URL-encoded. Therefore, ignore context.getDispatchersUseEncodedPaths() here and mark as always
+         * encoded so it is handled correctly in ServletContext.getRequestDispatcher().
+         */
+        try {
+            uriEncoded.set(Boolean.TRUE);
+            dispatch(path);
+        } finally {
+            uriEncoded.set(Boolean.FALSE);
         }
-        if (context.getDispatchersUseEncodedPaths()) {
-            path = URLEncoder.DEFAULT.encode(path, StandardCharsets.UTF_8);
-        }
-        dispatch(path);
     }
 
     @Override

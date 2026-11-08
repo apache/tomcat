@@ -72,11 +72,12 @@ public class CatalinaProperties {
         try {
             String configUrl = System.getProperty("catalina.config");
             if (configUrl != null) {
-                if (configUrl.indexOf('/') == -1) {
-                    // No '/'. Must be a file name rather than a URL
-                    fileName = configUrl;
-                } else {
+                boolean isAbsoluteUri = isAbsoluteURI(configUrl);
+                if (isAbsoluteUri) {
                     is = new URI(configUrl).toURL().openStream();
+                } else {
+                    // Not an absolute URI. Must be a file name.
+                    fileName = configUrl;
                 }
             }
         } catch (Throwable t) {
@@ -94,32 +95,24 @@ public class CatalinaProperties {
             }
         }
 
-        if (is == null) {
+        if (is != null) {
+            properties = load(is);
+        }
+
+        if (properties == null) {
+            // The configured file could not be opened or could not be parsed.
+            // Fall back to the defaults from the class path.
             try {
                 is = CatalinaProperties.class.getResourceAsStream("/org/apache/catalina/startup/catalina.properties");
             } catch (Throwable t) {
                 handleThrowable(t);
             }
-        }
-
-        if (is != null) {
-            try {
-                properties = new Properties();
-                properties.load(is);
-            } catch (Throwable t) {
-                handleThrowable(t);
-                log.warn(t.getMessage(), t);
-            } finally {
-                try {
-                    is.close();
-                } catch (IOException ioe) {
-                    log.warn("Could not close catalina properties file", ioe);
-                }
+            if (is != null) {
+                properties = load(is);
             }
         }
 
-        if ((is == null)) {
-            // Do something
+        if (properties == null) {
             log.warn("Failed to load catalina properties file");
             // That's fine - we have reasonable defaults.
             properties = new Properties();
@@ -134,6 +127,64 @@ public class CatalinaProperties {
                 System.setProperty(name, value);
             }
         }
+    }
+
+
+    /**
+     * Loads properties from the specified stream, closing the stream when done.
+     *
+     * @param is The stream to read
+     *
+     * @return the loaded properties, or {@code null} if the stream could not
+     *         be parsed completely
+     */
+    private static Properties load(InputStream is) {
+        try {
+            Properties loaded = new Properties();
+            loaded.load(is);
+            // Publish the properties only once the whole stream has been
+            // parsed, so a corrupt file cannot silently replace the defaults
+            // with partially parsed values.
+            return loaded;
+        } catch (Throwable t) {
+            handleThrowable(t);
+            log.warn(t.getMessage(), t);
+            return null;
+        } finally {
+            try {
+                is.close();
+            } catch (IOException ioe) {
+                log.warn("Could not close catalina properties file", ioe);
+            }
+        }
+    }
+
+
+    private static boolean isSchemeChar(char c) {
+        return Character.isLetterOrDigit(c) || c == '+' || c == '-' || c == '.';
+    }
+
+
+    private static boolean isAbsoluteURI(String path) {
+        // Special case as only a single /
+        if (path.startsWith("file:/")) {
+            return true;
+        }
+
+        // Start at the beginning of the path and skip over any valid protocol
+        // characters
+        int i = 0;
+        while (i < path.length() && isSchemeChar(path.charAt(i))) {
+            i++;
+        }
+        // Need at least one protocol character. False positives with Windows
+        // drives such as C:/... will be caught by the later test for "://"
+        if (i == 0) {
+            return false;
+        }
+        // path starts with something that might be a protocol. Look for a
+        // following "://"
+        return i + 2 < path.length() && path.charAt(i++) == ':' && path.charAt(i++) == '/' && path.charAt(i) == '/';
     }
 
 

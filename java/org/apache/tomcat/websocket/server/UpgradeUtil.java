@@ -69,7 +69,9 @@ public class UpgradeUtil {
      * Checks to see if this is an HTTP request that includes a valid upgrade request to web socket.
      * <p>
      * Note: RFC 2616 does not limit HTTP upgrade to GET requests but the Java WebSocket spec 1.0, section 8.2 implies
-     * such a limitation and RFC 6455 section 4.1 requires that a WebSocket Upgrade uses GET.
+     * such a limitation and RFC 6455 section 4.1 requires that a WebSocket Upgrade uses GET. RFC 6455 section 4.2.1
+     * requires HTTP/1.1 or later and RFC 9110 section 7.8 requires an Upgrade header field in an HTTP/1.0 request to be
+     * ignored.
      *
      * @param request  The request to check if it is an HTTP upgrade request for a WebSocket connection
      * @param response The response associated with the request
@@ -82,7 +84,8 @@ public class UpgradeUtil {
         return ((request instanceof HttpServletRequest) && (response instanceof HttpServletResponse) &&
                 headerContainsToken((HttpServletRequest) request, Constants.UPGRADE_HEADER_NAME,
                         Constants.UPGRADE_HEADER_VALUE) &&
-                Method.GET.equals(((HttpServletRequest) request).getMethod()));
+                Method.GET.equals(((HttpServletRequest) request).getMethod()) &&
+                "HTTP/1.1".equals(request.getProtocol()));
     }
 
 
@@ -104,12 +107,27 @@ public class UpgradeUtil {
         // validation fails
         String key;
         String subProtocol;
+        if (!"HTTP/1.1".equals(req.getProtocol())) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
         if (!headerContainsToken(req, Constants.CONNECTION_HEADER_NAME, Constants.CONNECTION_HEADER_VALUE)) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        if (!headerContainsToken(req, Constants.WS_VERSION_HEADER_NAME, Constants.WS_VERSION_HEADER_VALUE)) {
+        // RFC 6455, sections 11.3.1 and 11.3.5: these header fields must not appear more than once in a request
+        if (countHeaders(req, Constants.WS_VERSION_HEADER_NAME) > 1 ||
+                countHeaders(req, Constants.WS_KEY_HEADER_NAME) > 1) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+        String version = req.getHeader(Constants.WS_VERSION_HEADER_NAME);
+        if (version == null || !Constants.WS_VERSION_HEADER_VALUE.equals(version.trim())) {
             resp.setStatus(HttpServletResponse.SC_UPGRADE_REQUIRED);
+            // RFC 9110, sections 7.8 and 15.5.22: a 426 response must include the Upgrade header field and the
+            // associated Connection option
+            resp.setHeader(Constants.UPGRADE_HEADER_NAME, Constants.UPGRADE_HEADER_VALUE);
+            resp.setHeader(Constants.CONNECTION_HEADER_NAME, Constants.CONNECTION_HEADER_VALUE);
             resp.setHeader(Constants.WS_VERSION_HEADER_NAME, Constants.WS_VERSION_HEADER_VALUE);
             return;
         }
@@ -136,7 +154,12 @@ public class UpgradeUtil {
         List<Extension> extensionsRequested = new ArrayList<>();
         Enumeration<String> extHeaders = req.getHeaders(Constants.WS_EXTENSIONS_HEADER_NAME);
         while (extHeaders.hasMoreElements()) {
-            Util.parseExtensionHeader(extensionsRequested, extHeaders.nextElement());
+            try {
+                Util.parseExtensionHeader(extensionsRequested, extHeaders.nextElement());
+            } catch (IllegalArgumentException iae) {
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                return;
+            }
         }
         // Negotiation phase 1. By default, this simply filters out the
         // extensions that the server does not support but applications could
@@ -211,11 +234,8 @@ public class UpgradeUtil {
             try {
                 PojoMethodMapping methodMapping = new PojoMethodMapping(sec.getEndpointClass(), sec.getDecoders(),
                         sec.getPath(), sc.getInstanceManager(Thread.currentThread().getContextClassLoader()));
-                if (methodMapping.getOnClose() != null || methodMapping.getOnOpen() != null ||
-                        methodMapping.getOnError() != null || methodMapping.hasMessageHandlers()) {
-                    sec.getUserProperties().put(org.apache.tomcat.websocket.pojo.Constants.POJO_METHOD_MAPPING_KEY,
-                            methodMapping);
-                }
+                sec.getUserProperties().put(org.apache.tomcat.websocket.pojo.Constants.POJO_METHOD_MAPPING_KEY,
+                        methodMapping);
             } catch (DeploymentException e) {
                 throw new ServletException(sm.getString("upgradeUtil.pojoMapFail", sec.getEndpointClass().getName()),
                         e);
@@ -224,7 +244,18 @@ public class UpgradeUtil {
 
         WsPerSessionServerEndpointConfig perSessionServerEndpointConfig = new WsPerSessionServerEndpointConfig(sec);
 
-        WsHandshakeRequest wsRequest = new WsHandshakeRequest(req, pathParams);
+        WsHandshakeRequest wsRequest;
+        try {
+            wsRequest = new WsHandshakeRequest(req, pathParams);
+        } catch (IllegalArgumentException iae) {
+            // The request target could not be represented as a URI, for example because the query
+            // string contains an invalid percent-escape sequence. Reject the handshake. The
+            // response is reset first so the rejection is not sent with headers that would
+            // indicate a successful handshake.
+            resp.reset();
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
         WsHandshakeResponse wsResponse = new WsHandshakeResponse();
         sec.getConfigurator().modifyHandshake(perSessionServerEndpointConfig, wsRequest, wsResponse);
         wsRequest.finished();
@@ -307,6 +338,11 @@ public class UpgradeUtil {
                 sb.append(p.getValue());
             }
         }
+    }
+
+
+    private static int countHeaders(HttpServletRequest req, String headerName) {
+        return Collections.list(req.getHeaders(headerName)).size();
     }
 
 

@@ -140,8 +140,8 @@ public final class ClassParser {
     /**
      * Reads information about the class and its super class.
      *
-     * @throws IOException if an I/O error occurs.
-     * @throws ClassFormatException if a class is malformed or cannot be interpreted as a class file.
+     * @throws IOException Thrown if an I/O error occurs.
+     * @throws ClassFormatException Thrown if a class is malformed or cannot be interpreted as a class file.
      */
     private void readClassInfo() throws IOException, ClassFormatException {
         accessFlags = dataInputStream.readUnsignedShort();

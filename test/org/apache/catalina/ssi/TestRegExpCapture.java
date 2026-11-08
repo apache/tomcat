@@ -76,7 +76,7 @@ public class TestRegExpCapture extends TomcatBaseTest {
         ssiFilter.setFilterClass(SSIFilter.class.getName());
         FilterMap ssiFilterMap = new FilterMap();
         ssiFilterMap.setFilterName("ssiFilter");
-        ssiFilterMap.addURLPatternDecoded("*.shtml");
+        ssiFilterMap.addURLPattern("*.shtml");
         ctx.addFilterDef(ssiFilter);
         ctx.addFilterMap(ssiFilterMap);
 

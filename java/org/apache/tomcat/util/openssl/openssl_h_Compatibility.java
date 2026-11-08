@@ -18,6 +18,7 @@
 package org.apache.tomcat.util.openssl;
 
 import java.lang.invoke.MethodHandle;
+
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
 import static org.apache.tomcat.util.openssl.openssl_h.OpenSSL_version;
@@ -32,17 +33,28 @@ public class openssl_h_Compatibility {
     public static final boolean OPENSSL;
     public static final boolean OPENSSL1;
     public static final boolean OPENSSL3;
+    public static final boolean OPENSSL4;
     public static final boolean BORINGSSL;
     public static final boolean LIBRESSL;
 
     public static final int MAJOR;
     public static final int MINOR;
 
+    /*
+     * A simple, QUIC specific function (const SSL_METHOD *OSSL_QUIC_method(void)) that is only present in OpenSSL
+     * builds that include the QUIC implementation. Its absence, even on a 4.0+ version number, means the QUIC API is
+     * not available. Note: OSSL_QUIC_server_method and the other symbols used by QuicBindings are deliberately not
+     * referenced here so this check is independent of the HTTP/3 bindings.
+     */
+    private static final String QUIC_PROBE_SYMBOL = "OSSL_QUIC_method";
+
     static {
         String versionString = OpenSSL_version(0).getString(0);
         OPENSSL = versionString.contains("OpenSSL");
-        OPENSSL1 = OPENSSL && OpenSSL_version_num() < 0x3000000fL;
-        OPENSSL3 = OPENSSL && OpenSSL_version_num() >= 0x3000000fL;
+        OPENSSL1 = OPENSSL && OpenSSL_version_num() < 0x30000000L;
+        OPENSSL3 = OPENSSL && OpenSSL_version_num() >= 0x30000000L;
+        OPENSSL4 = OPENSSL && OpenSSL_version_num() >= 0x40000000L &&
+                openssl_h.SYMBOL_LOOKUP.find(QUIC_PROBE_SYMBOL).isPresent();
         BORINGSSL = versionString.contains("BoringSSL");
         LIBRESSL = versionString.contains("LibreSSL");
         int majorVersion = 0;
@@ -472,4 +484,47 @@ public class openssl_h_Compatibility {
         return ENGINE_METHOD_ALL;
     }
 
+    /**
+     * Function descriptor for:
+     * {@snippet lang = c : * int SSL_in_init(const SSL *s)
+     * }
+     */
+    public static int SSL_in_init(MemorySegment e) {
+        if (OPENSSL3 || BORINGSSL) {
+            class Holder {
+                static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER);
+
+                static final MethodHandle MH = Linker.nativeLinker()
+                        .downcallHandle(openssl_h.findOrThrow("SSL_in_init"), DESC);
+            }
+            var mh$ = Holder.MH;
+            try {
+                return (int) mh$.invokeExact(e);
+            } catch (Throwable ex$) {
+                throw new AssertionError("should not reach here", ex$);
+            }
+        } else if (LIBRESSL) {
+            // Here it is a macro:
+            // #define SSL_ST_CONNECT 0x1000
+            // #define SSL_ST_ACCEPT 0x2000
+            // #define SSL_ST_INIT (SSL_ST_CONNECT|SSL_ST_ACCEPT)
+            // #define SSL_in_init (SSL_state((a))&SSL_ST_INIT)
+            final int SSL_ST_CONNECT = 0x1000;
+            final int SSL_ST_ACCEPT = 0x2000;
+            class Holder {
+                static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER);
+
+                static final MethodHandle MH = Linker.nativeLinker()
+                        .downcallHandle(openssl_h.findOrThrow("SSL_state"), DESC);
+            }
+            var mh$ = Holder.MH;
+            try {
+                return ((int) mh$.invokeExact(e) & ((SSL_ST_CONNECT | SSL_ST_ACCEPT)));
+            } catch (Throwable ex$) {
+                throw new AssertionError("should not reach here", ex$);
+            }
+        } else {
+            return 0;
+        }
+    }
 }

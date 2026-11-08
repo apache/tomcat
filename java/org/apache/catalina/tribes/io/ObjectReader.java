@@ -122,7 +122,7 @@ public class ObjectReader {
      * @param len   length in buffer
      * @param count whether to return the count
      *
-     * @return number of messages that was sent to callback (or -1 if count == false)
+     * @return the number of complete packages currently in the buffer (or -1 if count == false)
      */
     public int append(ByteBuffer data, int len, boolean count) {
         buffer.append(data, len);
@@ -140,7 +140,7 @@ public class ObjectReader {
      * @param off The offset in the array
      * @param len The length of data
      * @param count Whether to count packages
-     * @return Number of messages sent to callback, or -1 if count is false
+     * @return The number of complete packages currently in the buffer, or -1 if count is false
      */
     public int append(byte[] data, int off, int len, boolean count) {
         buffer.append(data, off, len);

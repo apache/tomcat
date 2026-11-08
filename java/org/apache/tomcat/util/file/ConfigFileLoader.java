@@ -28,7 +28,7 @@ public class ConfigFileLoader {
     private static ConfigurationSource source;
 
     /**
-     * Get the configured configuration source. If none has been configured, a default source based on the calling
+     * Get the configured configuration source. If none has been configured, a default source based on the JVM working
      * directory will be used.
      *
      * @return the configuration source in use
@@ -41,7 +41,8 @@ public class ConfigFileLoader {
     }
 
     /**
-     * Set the configuration source used by Tomcat to locate various configuration resources.
+     * Set the configuration source used by Tomcat to locate various configuration resources. Only the first call has
+     * an effect; subsequent calls are ignored.
      *
      * @param source The source
      */

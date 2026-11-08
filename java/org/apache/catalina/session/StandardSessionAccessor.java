@@ -44,7 +44,7 @@ public class StandardSessionAccessor implements HttpSession.Accessor {
      * Construct a new session accessor.
      *
      * @param manager The manager that owns the session
-     * @param id The session identifier
+     * @param id      The session identifier
      */
     public StandardSessionAccessor(Manager manager, String id) {
         if (manager == null) {

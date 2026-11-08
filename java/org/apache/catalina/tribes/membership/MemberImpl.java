@@ -28,8 +28,7 @@ import org.apache.catalina.tribes.transport.SenderState;
 import org.apache.catalina.tribes.util.StringManager;
 
 /**
- * A <b>membership</b> implementation using simple multicast. This is the representation of a multicast member. Carries
- * the host, and port of the this or other cluster nodes.
+ * This is the representation of a multicast member. Carries the host, and port of the this or other cluster nodes.
  */
 public class MemberImpl implements Member, java.io.Externalizable {
 
@@ -57,7 +56,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
     /**
      * The tcp listen port for this member
      */
-    protected volatile int port;
+    protected volatile int port = -1;
     /**
      * The udp listen port for this member
      */
@@ -175,7 +174,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
     /**
      * Create a data package to send over the wire representing this member. This is faster than serialization.
      *
-     * @return - the bytes for this member deserialized
+     * @return the serialized bytes for this member
      */
     public byte[] getData() {
         return getData(true);
@@ -272,6 +271,10 @@ public class MemberImpl implements Member, java.io.Externalizable {
         XByteBuffer.toBytes(udpPort, data, pos);
         pos += 4;
         // host length
+        if (host.length > 127) {
+            throw new IllegalArgumentException(sm.getString("memberImpl.invalid.hostLength",
+                    Integer.toString(host.length)));
+        }
         data[pos++] = (byte) host.length;
         // host
         System.arraycopy(host, 0, data, pos, host.length);
@@ -390,6 +393,10 @@ public class MemberImpl implements Member, java.io.Externalizable {
 
 
         byte hl = data[pos++];
+        if (hl < 0) {
+            throw new IllegalArgumentException(sm.getString("memberImpl.invalid.hostLength",
+                    Integer.toString(hl)));
+        }
         byte[] addr = new byte[hl];
         System.arraycopy(data, pos, addr, 0, hl);
         pos += hl;
@@ -420,12 +427,12 @@ public class MemberImpl implements Member, java.io.Externalizable {
         pos += payload.length;
 
         synchronized (member) {
-            member.setHost(addr);
+            member.host = addr;
             member.setPort(XByteBuffer.toInt(portd, 0));
             member.setSecurePort(XByteBuffer.toInt(sportd, 0));
             member.setUdpPort(XByteBuffer.toInt(uportd, 0));
             member.setMemberAliveTime(XByteBuffer.toLong(alived, 0));
-            member.setUniqueId(uniqueId);
+            member.uniqueId = uniqueId;
             member.payload = payload;
             member.domain = domain;
             member.command = command;
@@ -594,7 +601,10 @@ public class MemberImpl implements Member, java.io.Externalizable {
 
     @Override
     public int hashCode() {
-        return getHost()[0] + getHost()[1] + getHost()[2] + getHost()[3];
+        int result = Arrays.hashCode(getHost());
+        result = 31 * result + getPort();
+        result = 31 * result + Arrays.hashCode(getUniqueId());
+        return result;
     }
 
     /**
@@ -618,7 +628,9 @@ public class MemberImpl implements Member, java.io.Externalizable {
      * @param host the host
      */
     public synchronized void setHost(byte[] host) {
+        checkSize(this.host.length, host != null ? host.length : 0, "memberImpl.large.host");
         this.host = host;
+        this.dataPkg = null;
     }
 
     /**
@@ -627,9 +639,12 @@ public class MemberImpl implements Member, java.io.Externalizable {
      * @throws IOException if there is an error converting the host name to an IP address
      */
     public void setHostname(String host) throws IOException {
-        hostname = host;
+        byte[] address = java.net.InetAddress.getByName(host).getAddress();
         synchronized (this) {
-            this.host = java.net.InetAddress.getByName(host).getAddress();
+            checkSize(this.host.length, address.length, "memberImpl.large.host");
+            hostname = host;
+            this.host = address;
+            this.dataPkg = null;
         }
     }
 
@@ -663,31 +678,40 @@ public class MemberImpl implements Member, java.io.Externalizable {
      * @param uniqueId the unique ID
      */
     public synchronized void setUniqueId(byte[] uniqueId) {
+        checkSize(this.uniqueId.length, uniqueId != null ? uniqueId.length : 16, "memberImpl.large.uniqueId");
         this.uniqueId = uniqueId != null ? uniqueId : new byte[16];
         getData(true, true);
     }
 
     @Override
     public synchronized void setPayload(byte[] payload) {
-        // longs to avoid any possibility of overflow
-        long oldPayloadLength = this.payload.length;
-        long newPayloadLength = 0;
-        if (payload != null) {
-            newPayloadLength = payload.length;
-        }
-        if (newPayloadLength > oldPayloadLength) {
-            // It is possible that the max packet size will be exceeded
-            if ((newPayloadLength - oldPayloadLength +
-                    getData(false, false).length) > McastServiceImpl.MAX_PACKET_SIZE) {
-                throw new IllegalArgumentException(sm.getString("memberImpl.large.payload"));
-            }
-        }
+        checkSize(this.payload.length, payload != null ? payload.length : 0, "memberImpl.large.payload");
         this.payload = payload != null ? payload : new byte[0];
         getData(true, true);
     }
 
+    /**
+     * Check that replacing a variable length component of this member will not take the member ping above the maximum
+     * size that can be sent. Must be called before the component is changed so that a rejected change leaves the member
+     * unmodified.
+     *
+     * @param oldLength The length of the component being replaced
+     * @param newLength The length of the replacement component
+     * @param msgKey    The key of the message for the exception thrown if the size is exceeded
+     */
+    private void checkSize(int oldLength, int newLength, String msgKey) {
+        // longs to avoid any possibility of overflow
+        if (newLength > oldLength) {
+            // It is possible that the max packet size will be exceeded
+            if (((long) newLength - oldLength + getData(false, false).length) > McastServiceImpl.MAX_SEND_SIZE) {
+                throw new IllegalArgumentException(sm.getString(msgKey));
+            }
+        }
+    }
+
     @Override
     public synchronized void setCommand(byte[] command) {
+        checkSize(this.command.length, command != null ? command.length : 0, "memberImpl.large.command");
         this.command = command != null ? command : new byte[0];
         getData(true, true);
     }
@@ -697,6 +721,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
      * @param domain the domain
      */
     public synchronized void setDomain(byte[] domain) {
+        checkSize(this.domain.length, domain != null ? domain.length : 0, "memberImpl.large.domain");
         this.domain = domain != null ? domain : new byte[0];
         getData(true, true);
     }

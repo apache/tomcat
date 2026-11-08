@@ -48,6 +48,7 @@ public class TestGroupChannelSenderConnections extends LoggingBaseTest {
         for (int i = 0; i < channels.length; i++) {
             channels[i] = new GroupChannel();
             ((ReceiverBase) channels[i].getChannelReceiver()).setHost("localhost");
+            ((ReceiverBase) channels[i].getChannelReceiver()).setPort(0);
             channels[i].getMembershipService().setPayload( ("Channel-" + (i + 1)).getBytes("ASCII"));
             listeners[i] = new TestMsgListener( ("Listener-" + (i + 1)));
             channels[i].addChannelListener(listeners[i]);

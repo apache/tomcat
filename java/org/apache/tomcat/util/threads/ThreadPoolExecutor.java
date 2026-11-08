@@ -26,7 +26,6 @@ package org.apache.tomcat.util.threads;
 
 import java.io.Serial;
 import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.AbstractExecutorService;
@@ -213,8 +212,6 @@ import org.apache.tomcat.util.res.StringManager;
  *     }
  *   }
  * }}</pre>
- *
- * @since 1.5
  */
 public class ThreadPoolExecutor extends AbstractExecutorService {
 
@@ -368,6 +365,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * equal to {@link #getActiveCount()}.
      */
     private final AtomicInteger submittedCount = new AtomicInteger(0);
+    private final ThreadLocal<RejectedTask> rejectedTask = new ThreadLocal<>();
     private final AtomicLong lastContextStoppedTime = new AtomicLong(0L);
 
     /**
@@ -662,7 +660,47 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * ScheduledThreadPoolExecutor.
      */
     final void reject(Runnable command) {
-        handler.rejectedExecution(command, this);
+        RejectedTask previous = rejectedTask.get();
+        RejectedTask current = new RejectedTask(command);
+        rejectedTask.set(current);
+        try {
+            try {
+                handler.rejectedExecution(command, this);
+            } catch (RejectedExecutionException rx) {
+                // execute() releases the count, or re-queues the task for a retryable queue.
+                throw rx;
+            } catch (RuntimeException | Error e) {
+                submittedCount.decrementAndGet();
+                throw e;
+            }
+            // A custom handler may enqueue the task directly. Only release its count if a policy reports that it
+            // was discarded, run directly or resubmitted through execute() with a separate count.
+            if (current.handled) {
+                submittedCount.decrementAndGet();
+            }
+        } finally {
+            if (previous == null) {
+                rejectedTask.remove();
+            } else {
+                rejectedTask.set(previous);
+            }
+        }
+    }
+
+    private void markRejectedTaskHandled(Runnable command) {
+        RejectedTask current = rejectedTask.get();
+        if (current != null && current.command == command) {
+            current.handled = true;
+        }
+    }
+
+    private static class RejectedTask {
+        private final Runnable command;
+        private boolean handled;
+
+        RejectedTask(Runnable command) {
+            this.command = command;
+        }
     }
 
     /**
@@ -944,7 +982,15 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
                     wt.interrupt();
                 }
                 try {
-                    beforeExecute(wt, task);
+                    try {
+                        beforeExecute(wt, task);
+                    } catch (Throwable ex) {
+                        // beforeExecute() threw. The task will not be executed
+                        // and afterExecute() will not be called, so decrement
+                        // the submitted count here.
+                        submittedCount.decrementAndGet();
+                        throw ex;
+                    }
                     try {
                         task.run();
                         afterExecute(task, null);
@@ -1092,6 +1138,11 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
 
     @Override
     public void execute(Runnable command) {
+        // Check for null before counting the task, so a rejected null
+        // argument does not leave the submitted count inflated.
+        if (command == null) {
+            throw new NullPointerException();
+        }
         submittedCount.incrementAndGet();
         try {
             executeInternal(command);
@@ -1152,7 +1203,12 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
         }
         if (isRunning(c) && workQueue.offer(command)) {
             int recheck = ctl.get();
-            if (!isRunning(recheck) && remove(command)) {
+            // Remove directly from the queue here. The public remove(Runnable)
+            // method also adjusts the submitted count, which would double the
+            // adjustment for this task, since the reject() call below and the
+            // catch block in execute() take care of that.
+            if (!isRunning(recheck) && workQueue.remove(command)) {
+                tryTerminate(); // In case SHUTDOWN and now empty
                 reject(command);
             } else if (workerCountOf(recheck) == 0) {
                 addWorker(null, false);
@@ -1168,7 +1224,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * <p>
      * This method does not wait for previously submitted tasks to complete execution. Use {@link #awaitTermination
      * awaitTermination} to do that.
-      */
+     */
     @Override
     public void shutdown() {
         final ReentrantLock mainLock = this.mainLock;
@@ -1194,7 +1250,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * There are no guarantees beyond best-effort attempts to stop processing actively executing tasks. This
      * implementation interrupts tasks via {@link Thread#interrupt}; any task that fails to respond to interrupts may
      * never terminate.
-      */
+     */
     @Override
     public List<Runnable> shutdownNow() {
         List<Runnable> tasks;
@@ -1525,7 +1581,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
     /**
      * Sets the delay in milliseconds after which threads should be renewed.
      *
-     * @param threadRenewalDelay the renewal delay
+     * @param threadRenewalDelay the renewal delay (a negative value disables thread renewal)
      */
     public void setThreadRenewalDelay(long threadRenewalDelay) {
         this.threadRenewalDelay = threadRenewalDelay;
@@ -1560,6 +1616,10 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      */
     public boolean remove(Runnable task) {
         boolean removed = workQueue.remove(task);
+        if (removed) {
+            // The removed task will never be executed, so afterExecute() will not decrement the submitted count.
+            submittedCount.decrementAndGet();
+        }
         tryTerminate(); // In case SHUTDOWN and now empty
         return removed;
     }
@@ -1573,16 +1633,11 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      */
     public void purge() {
         final BlockingQueue<Runnable> q = workQueue;
-        try {
-            q.removeIf(r -> r instanceof Future<?> && ((Future<?>) r).isCancelled());
-        } catch (ConcurrentModificationException fallThrough) {
-            // Take slow path if we encounter interference during traversal.
-            // Make copy for traversal and call remove for cancelled entries.
-            // The slow path is more likely to be O(N*N).
-            for (Object r : q.toArray()) {
-                if (r instanceof Future<?> && ((Future<?>) r).isCancelled()) {
-                    q.remove(r);
-                }
+        // A worker or another purge() may remove a task after it is selected. Only release its count if this call
+        // actually removes it. A removeIf() predicate may run even when the task is not subsequently removed.
+        for (Object r : q.toArray()) {
+            if (r instanceof Future<?> future && future.isCancelled() && q.remove(r)) {
+                submittedCount.decrementAndGet();
             }
         }
 
@@ -1723,7 +1778,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
 
 
     /**
-     * Returns the total number of tasks that have been submitted to this pool.
+     * Returns the number of tasks that have been submitted to this pool and not yet completed.
      *
      * @return the submitted task count
      */
@@ -1899,8 +1954,12 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
          */
         @Override
         public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
-            if (!e.isShutdown()) {
-                r.run();
+            try {
+                if (!e.isShutdown()) {
+                    r.run();
+                }
+            } finally {
+                e.markRejectedTaskHandled(r);
             }
         }
     }
@@ -1948,6 +2007,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
          */
         @Override
         public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+            e.markRejectedTaskHandled(r);
         }
     }
 
@@ -1987,9 +2047,15 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
          */
         @Override
         public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
-            if (!e.isShutdown()) {
-                e.getQueue().poll();
-                e.execute(r);
+            try {
+                if (!e.isShutdown()) {
+                    if (e.getQueue().poll() != null) {
+                        e.submittedCount.decrementAndGet();
+                    }
+                    e.execute(r);
+                }
+            } finally {
+                e.markRejectedTaskHandled(r);
             }
         }
     }
@@ -2014,6 +2080,10 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
          * <p>
          * In the absence of other alternatives, the method may throw an unchecked {@link RejectedExecutionException},
          * which will be propagated to the caller of {@code execute}.
+         * <p>
+         * Handlers that discard tasks or run them directly should delegate to {@link DiscardPolicy} or
+         * {@link CallerRunsPolicy}, respectively, so the submitted task count is adjusted. Handlers that enqueue tasks
+         * directly leave their counts to be released when the tasks complete.
          *
          * @param r        the runnable task requested to be executed
          * @param executor the executor attempting to execute this task

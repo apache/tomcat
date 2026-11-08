@@ -192,10 +192,10 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
         } else {
             Tomcat.addServlet(ctx, "forward", new ForwardServlet("/display?" + forwardQueryString));
         }
-        ctx.addServletMappingDecoded("/forward", "forward");
+        ctx.addServletMapping("/forward", "forward");
 
         Tomcat.addServlet(ctx, "display", new DisplayParameterServlet(expected));
-        ctx.addServletMappingDecoded("/display", "display");
+        ctx.addServletMapping("/display", "display");
 
         tomcat.start();
 
@@ -224,7 +224,7 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
             request.getMappingData().context = ctxt;
             return request;
         }
-        return new ApplicationHttpRequest(getNestedRequest(depth - 1), null, false);
+        return new ApplicationHttpRequest(getNestedRequest(depth - 1), null, false, null);
     }
 
 
@@ -247,10 +247,10 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "forward", new ForwardServlet("/modify"));
-        ctx.addServletMappingDecoded("/forward", "forward");
+        ctx.addServletMapping("/forward", "forward");
 
         Tomcat.addServlet(ctx, "modify", new ModifyParameterServlet());
-        ctx.addServletMappingDecoded("/modify", "modify");
+        ctx.addServletMapping("/modify", "modify");
 
         tomcat.start();
 

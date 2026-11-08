@@ -16,9 +16,11 @@
  */
 package org.apache.naming;
 
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 
 import javax.naming.Binding;
 import javax.naming.CompositeName;
@@ -113,7 +115,10 @@ public class NamingContext implements Context {
 
 
     /**
-     * Bindings in this Context.
+     * Bindings in this Context. The map is shared with the views of this context that a lookup of the empty name
+     * returns and it is read by the threads performing lookups while resources are bound and unbound on admin
+     * threads, so every access to the map itself must be synchronized on it. The {@link NamingEntry} values carry
+     * their own lock for the creation of singleton objects.
      */
     protected final HashMap<String,NamingEntry> bindings;
 
@@ -200,20 +205,26 @@ public class NamingContext implements Context {
             throw new NamingException(sm.getString("namingContext.invalidName"));
         }
 
-        NamingEntry entry = bindings.get(name.get(0));
+        NamingEntry entry;
+        boolean leaf;
+        synchronized (bindings) {
+            entry = bindings.get(name.get(0));
+            leaf = name.size() == 1;
+            if (leaf) {
+                bindings.remove(name.get(0));
+            }
+        }
 
         if (entry == null) {
             throw new NameNotFoundException(sm.getString("namingContext.nameNotBound", name, name.get(0)));
         }
 
-        if (name.size() > 1) {
+        if (!leaf) {
             if (entry.type == NamingEntry.CONTEXT) {
                 ((Context) entry.value).unbind(name.getSuffix(1));
             } else {
                 throw new NamingException(sm.getString("namingContext.contextExpected", name.get(0)));
             }
-        } else {
-            bindings.remove(name.get(0));
         }
 
     }
@@ -246,10 +257,14 @@ public class NamingContext implements Context {
             name = name.getSuffix(1);
         }
         if (name.isEmpty()) {
-            return new NamingContextEnumeration(bindings.values().iterator());
+            List<NamingEntry> entries;
+            synchronized (bindings) {
+                entries = new ArrayList<>(bindings.values());
+            }
+            return new NamingContextEnumeration(entries.iterator());
         }
 
-        NamingEntry entry = bindings.get(name.get(0));
+        NamingEntry entry = getEntry(name.get(0));
 
         if (entry == null) {
             throw new NameNotFoundException(sm.getString("namingContext.nameNotBound", name, name.get(0)));
@@ -275,10 +290,14 @@ public class NamingContext implements Context {
             name = name.getSuffix(1);
         }
         if (name.isEmpty()) {
-            return new NamingContextBindingsEnumeration(bindings.values().iterator(), this);
+            List<NamingEntry> entries;
+            synchronized (bindings) {
+                entries = new ArrayList<>(bindings.values());
+            }
+            return new NamingContextBindingsEnumeration(entries.iterator(), this);
         }
 
-        NamingEntry entry = bindings.get(name.get(0));
+        NamingEntry entry = getEntry(name.get(0));
 
         if (entry == null) {
             throw new NameNotFoundException(sm.getString("namingContext.nameNotBound", name, name.get(0)));
@@ -311,7 +330,7 @@ public class NamingContext implements Context {
             throw new NamingException(sm.getString("namingContext.invalidName"));
         }
 
-        NamingEntry entry = bindings.get(name.get(0));
+        NamingEntry entry = getEntry(name.get(0));
 
         if (entry == null) {
             throw new NameNotFoundException(sm.getString("namingContext.nameNotBound", name, name.get(0)));
@@ -326,7 +345,9 @@ public class NamingContext implements Context {
         } else {
             if (entry.type == NamingEntry.CONTEXT) {
                 ((Context) entry.value).close();
-                bindings.remove(name.get(0));
+                synchronized (bindings) {
+                    bindings.remove(name.get(0));
+                }
             } else {
                 throw new NotContextException(sm.getString("namingContext.contextExpected", name.get(0)));
             }
@@ -384,7 +405,7 @@ public class NamingContext implements Context {
             return nameParser;
         }
 
-        NamingEntry entry = bindings.get(name.get(0));
+        NamingEntry entry = getEntry(name.get(0));
         if (entry == null) {
             throw new NameNotFoundException(sm.getString("namingContext.nameNotBound", name, name.get(0)));
         }
@@ -493,7 +514,7 @@ public class NamingContext implements Context {
             return new NamingContext(env, this.name, bindings);
         }
 
-        NamingEntry entry = bindings.get(name.get(0));
+        NamingEntry entry = getEntry(name.get(0));
 
         if (entry == null) {
             throw new NameNotFoundException(sm.getString("namingContext.nameNotBound", name, name.get(0)));
@@ -604,7 +625,7 @@ public class NamingContext implements Context {
             throw new NamingException(sm.getString("namingContext.invalidName"));
         }
 
-        NamingEntry entry = bindings.get(name.get(0));
+        NamingEntry entry = getEntry(name.get(0));
 
         if (name.size() > 1) {
             if (entry == null) {
@@ -639,10 +660,32 @@ public class NamingContext implements Context {
                     }
                     case null, default -> entry = new NamingEntry(name.get(0), toBind, NamingEntry.ENTRY);
                 }
-                bindings.put(name.get(0), entry);
+                // The check above only avoids needless work. The authoritative check is made together with the
+                // update, so two threads binding the same name cannot both succeed.
+                synchronized (bindings) {
+                    if (!rebind && bindings.containsKey(name.get(0))) {
+                        throw new NameAlreadyBoundException(sm.getString("namingContext.alreadyBound", name.get(0)));
+                    }
+                    bindings.put(name.get(0), entry);
+                }
             }
         }
 
+    }
+
+
+    /**
+     * Obtain the entry bound to the given name in this context. The lookup is made under the lock of the bindings, as
+     * required for every access to them. Callers use the result outside of the lock.
+     *
+     * @param name The name of the binding, relative to this context
+     *
+     * @return the entry or <code>null</code> if there is no such binding
+     */
+    private NamingEntry getEntry(String name) {
+        synchronized (bindings) {
+            return bindings.get(name);
+        }
     }
 
 
@@ -657,7 +700,7 @@ public class NamingContext implements Context {
 
 
     /**
-     * Throws a naming exception is Context is not writable.
+     * Throws a naming exception if Context is not writable.
      *
      * @return <code>true</code> if the Context is writable
      *

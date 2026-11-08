@@ -137,7 +137,6 @@ public class WsSci implements ServletContainerInitializer {
 
         servletContext.setAttribute(Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE, sc);
 
-        servletContext.addListener(new WsSessionListener(sc));
         // Can't register the ContextListener again if the ContextListener is
         // calling this method
         if (initBySciMechanism) {

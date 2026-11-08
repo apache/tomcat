@@ -99,7 +99,7 @@ public class TestPropertySources extends LoggingBaseTest {
         Context ctx = tomcat.addContext("", null);
 
         Tomcat.addServlet(ctx, "myServlet", new HelloWorld());
-        ctx.addServletMappingDecoded("/", "myServlet");
+        ctx.addServletMapping("/", "myServlet");
 
         tomcat.start();
 

@@ -24,8 +24,8 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLConnection;
 
+import org.apache.tomcat.util.buf.CloseableURLConnection;
 import org.apache.tomcat.util.buf.UriUtil;
 
 /**
@@ -79,6 +79,16 @@ public interface ConfigurationSource {
                 if (f.isFile()) {
                     return f.toURI();
                 }
+                try {
+                    return userDirUri.resolve(name);
+                } catch (IllegalArgumentException e) {
+                    // URI.resolve() rejects names that contain characters
+                    // which are not valid in a URI, such as a space. The
+                    // contract requires a URI to be returned even when no
+                    // resource exists, so fall back to the file based form
+                    // which encodes the name correctly.
+                    return f.toURI();
+                }
             }
             return userDirUri.resolve(name);
         }
@@ -92,50 +102,44 @@ public interface ConfigurationSource {
         private final URI uri;
 
         /**
-     * Creates a new resource with the given input stream and URI.
-     *
-     * @param inputStream the input stream for the resource content
-     * @param uri the URI identifying the resource location
-     */
+         * Creates a new resource with the given input stream and URI.
+         *
+         * @param inputStream the input stream for the resource content
+         * @param uri the URI identifying the resource location
+         */
         public Resource(InputStream inputStream, URI uri) {
             this.inputStream = inputStream;
             this.uri = uri;
         }
 
         /**
-     * Returns the input stream for reading the resource content.
-     *
-     * @return the input stream
-     */
+         * Returns the input stream for reading the resource content.
+         *
+         * @return the input stream
+         */
         public InputStream getInputStream() {
             return inputStream;
         }
 
         /**
-     * Returns the URI that identifies the resource location.
-     *
-     * @return the resource URI
-     */
+         * Returns the URI that identifies the resource location.
+         *
+         * @return the resource URI
+         */
         public URI getURI() {
             return uri;
         }
 
         /**
-     * Returns the last modified time of the resource in milliseconds since the epoch.
-     *
-     * @return the last modified time in milliseconds
-     * @throws MalformedURLException if the resource URI cannot be converted to a URL
-     * @throws IOException if an I/O error occurs while fetching the last modified time
-     */
+         * Returns the last modified time of the resource in milliseconds since the epoch.
+         *
+         * @return the last modified time in milliseconds
+         * @throws MalformedURLException if the resource URI cannot be converted to a URL
+         * @throws IOException if an I/O error occurs while fetching the last modified time
+         */
         public long getLastModified() throws MalformedURLException, IOException {
-            URLConnection connection = null;
-            try {
-                connection = uri.toURL().openConnection();
+            try (CloseableURLConnection connection = new CloseableURLConnection(uri.toURL())) {
                 return connection.getLastModified();
-            } finally {
-                if (connection != null) {
-                    connection.getInputStream().close();
-                }
             }
         }
 

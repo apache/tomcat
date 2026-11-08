@@ -141,9 +141,9 @@ public class TestAuthInfoResponseHeaders extends TomcatBaseTest {
 
         // Add protected servlet
         Tomcat.addServlet(ctxt, "TesterServlet", new TesterServlet());
-        ctxt.addServletMappingDecoded(URI, "TesterServlet");
+        ctxt.addServletMapping(URI, "TesterServlet");
         SecurityCollection collection = new SecurityCollection();
-        collection.addPatternDecoded(URI);
+        collection.addPattern(URI);
         SecurityConstraint sc = new SecurityConstraint();
         sc.addAuthRole(ROLE);
         sc.addCollection(collection);

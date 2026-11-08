@@ -52,7 +52,7 @@ public enum Encryption {
     DES,
     /** IDEA encryption. */
     IDEA,
-    /** GOST 28147-89 with_CNT keyed hash. */
+    /** GOST 28147-89 encryption with CNT keyed hash. */
     eGOST2814789CNT,
     /** SEED encryption. */
     SEED,

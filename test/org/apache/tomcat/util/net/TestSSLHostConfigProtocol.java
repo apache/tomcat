@@ -108,7 +108,7 @@ public class TestSSLHostConfigProtocol extends TomcatBaseTest {
 
         Context ctx = getProgrammaticRootContext();
         Tomcat.addServlet(ctx, "hello", new HelloWorldServlet());
-        ctx.addServletMappingDecoded("/", "hello");
+        ctx.addServletMapping("/", "hello");
 
         Tomcat tomcat = getTomcatInstance();
         tomcat.start();
@@ -129,7 +129,7 @@ public class TestSSLHostConfigProtocol extends TomcatBaseTest {
 
         Context ctx = getProgrammaticRootContext();
         Tomcat.addServlet(ctx, "hello", new HelloWorldServlet());
-        ctx.addServletMappingDecoded("/", "hello");
+        ctx.addServletMapping("/", "hello");
 
         Tomcat tomcat = getTomcatInstance();
         tomcat.start();

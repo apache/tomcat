@@ -28,11 +28,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v7
-    - uses: actions/setup-java@v5
+    - uses: actions/setup-java@v6
       with:
         java-version: 21
         distribution: temurin
-    - uses: vapier/coverity-scan-action@2068473c7bdf8c2fb984a6a40ae76ee7facd7a85
+    - uses: vapier/coverity-scan-action@8fe7b0af23cbbd4eced5f63dcd2384640eaa5d49
       with:
         project: 'Apache Tomcat'
         version: 12.0.x - ${{ github.sha }}

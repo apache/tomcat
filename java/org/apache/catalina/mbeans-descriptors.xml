@@ -33,7 +33,8 @@
 
     <attribute   name="groupname"
           description="Group name of this group"
-                 type="java.lang.String"/>
+                 type="java.lang.String"
+            writeable="false"/>
 
     <attribute   name="roles"
           description="MBean Names of roles for this group"
@@ -116,7 +117,8 @@
 
     <attribute   name="username"
           description="User name of this user"
-                 type="java.lang.String"/>
+                 type="java.lang.String"
+            writeable="false"/>
 
     <operation   name="addGroup"
           description="Add a new group membership for this user"

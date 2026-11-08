@@ -198,6 +198,67 @@ public class TestCaseInsensitiveKeyMap {
 
 
     @Test
+    public void testKeySetRemoveObjectCaseInsensitive() {
+        Object o1 = new Object();
+
+        CaseInsensitiveKeyMap<Object> map = new CaseInsensitiveKeyMap<>();
+        map.put("a", o1);
+
+        // contains() is case-insensitive, so remove() must be too, even for
+        // a stored value of null
+        Set<String> keys = map.keySet();
+        Assert.assertTrue(keys.contains("A"));
+        map.put("b", null);
+        Assert.assertTrue(keys.remove("B"));
+        Assert.assertFalse(map.containsKey("b"));
+
+        Assert.assertTrue(keys.remove("A"));
+        Assert.assertFalse(map.containsKey("a"));
+        Assert.assertTrue(map.isEmpty());
+
+        // Removing an absent key must not report success
+        Assert.assertFalse(keys.remove("A"));
+    }
+
+
+    @SuppressWarnings("unlikely-arg-type")
+    @Test
+    public void testKeySetContainsAndRemoveInvalidKeys() {
+        CaseInsensitiveKeyMap<Object> map = new CaseInsensitiveKeyMap<>();
+        map.put("a", new Object());
+
+        Set<String> keys = map.keySet();
+        Assert.assertFalse(keys.contains(null));
+        Assert.assertFalse(keys.remove(null));
+        Assert.assertFalse(keys.contains(new StringBuilder("a")));
+        Assert.assertFalse(keys.remove(new StringBuilder("a")));
+        Assert.assertEquals(1, map.size());
+    }
+
+
+    @Test
+    public void testKeySetIteratorCase() {
+        CaseInsensitiveKeyMap<Object> map = new CaseInsensitiveKeyMap<>();
+        map.put("Content-Type", new Object());
+
+        // The keys are reported with their original case
+        Assert.assertTrue(map.keySet().contains("Content-Type"));
+        Assert.assertEquals("Content-Type", map.keySet().iterator().next());
+    }
+
+
+    @Test
+    public void testKeySetClear() {
+        CaseInsensitiveKeyMap<Object> map = new CaseInsensitiveKeyMap<>();
+        map.put("a", new Object());
+        map.put("b", new Object());
+
+        map.keySet().clear();
+        Assert.assertTrue(map.isEmpty());
+    }
+
+
+    @Test
     public void testEntrySetRemove() {
         Object o1 = new Object();
 
@@ -211,5 +272,30 @@ public class TestCaseInsensitiveKeyMap {
         Assert.assertEquals(o1, entry.getValue());
         iter.remove();
         Assert.assertTrue(map.isEmpty());
+    }
+
+
+    @Test
+    public void testEntryEqualsAndHashCode() {
+        Object o1 = new Object();
+
+        CaseInsensitiveKeyMap<Object> map = new CaseInsensitiveKeyMap<>();
+        map.put("a", o1);
+
+        Map<String,Object> expected = new HashMap<>();
+        expected.put("a", o1);
+
+        Entry<String,Object> entry = map.entrySet().iterator().next();
+        Entry<String,Object> expectedEntry = expected.entrySet().iterator().next();
+
+        // Map.Entry contract
+        Assert.assertTrue(entry.equals(expectedEntry));
+        Assert.assertTrue(expectedEntry.equals(entry));
+        Assert.assertEquals(expectedEntry.hashCode(), entry.hashCode());
+
+        // Map contract: equal maps must have equal hash codes
+        Assert.assertEquals(expected, map);
+        Assert.assertEquals(map, expected);
+        Assert.assertEquals(expected.hashCode(), map.hashCode());
     }
 }

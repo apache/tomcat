@@ -181,7 +181,9 @@ public class WsHandshakeRequest implements HandshakeRequest {
         try {
             return new URI(uri.toString());
         } catch (URISyntaxException e) {
-            // Should never happen
+            // This can happen with a client-supplied query string that contains an invalid
+            // percent-escape sequence. Upgrade rejects the handshake with a 400 response in
+            // this case.
             throw new IllegalArgumentException(sm.getString("wsHandshakeRequest.invalidUri", uri.toString()), e);
         }
     }

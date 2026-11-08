@@ -109,24 +109,14 @@ public abstract class ElementValue {
      *
      * @param input Raw data input.
      * @param cpool Constant pool.
-     * @return a new ElementValue.
-     * @throws IOException if an I/O error occurs.
+     * @return A new ElementValue.
+     * @throws IOException Thrown if an I/O error occurs.
      */
     public static ElementValue readElementValue(final DataInput input, final ConstantPool cpool) throws IOException {
         return readElementValue(input, cpool, 0);
     }
 
-    /**
-     * Reads an {@code element_value} as an {@code ElementValue}.
-     *
-     * @param input Raw data input.
-     * @param cpool Constant pool.
-     * @param arrayNesting level of current array nesting.
-     * @return a new ElementValue.
-     * @throws IOException if an I/O error occurs.
-     * @since 6.7.0
-     */
-    public static ElementValue readElementValue(final DataInput input, final ConstantPool cpool, int arrayNesting)
+    static ElementValue readElementValue(final DataInput input, final ConstantPool cpool, int arrayNesting)
             throws IOException {
         final byte tag = input.readByte();
         switch (tag) {

@@ -23,6 +23,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.naming.Context;
 import javax.sql.DataSource;
@@ -242,9 +243,9 @@ public class DataSourceRealm extends RealmBase {
     /**
      * {@inheritDoc}
      * <p>
-     * If there are any errors with the JDBC connection, executing the query or anything this method returns null
-     * (doesn't authenticate). This event is also logged, and the connection will be closed so that a subsequent request
-     * will automatically re-open it.
+     * If there are any errors with the JDBC connection or executing the query, this method returns null (doesn't
+     * authenticate). Such errors are also logged. A fresh database connection is opened for each call and closed again
+     * before the method returns.
      */
     @Override
     public Principal authenticate(String username, String credentials) {
@@ -317,9 +318,20 @@ public class DataSourceRealm extends RealmBase {
         }
 
         // Validate the user's credentials
-        boolean validated = getCredentialHandler().matches(credentials, dbCredentials);
+        boolean authenticationSuccess = getCredentialHandler().matches(credentials, dbCredentials);
 
-        if (validated) {
+        ArrayList<String> list = null;
+
+        if (authenticationSuccess) {
+            // Obtain the roles
+            list = getRoles(dbConnection, username);
+            if (list == null) {
+                // Role lookup failed so fail authentication
+                authenticationSuccess = false;
+            }
+        }
+
+        if (authenticationSuccess) {
             if (containerLog.isTraceEnabled()) {
                 containerLog.trace(sm.getString("dataSourceRealm.authenticateSuccess", username));
             }
@@ -329,8 +341,6 @@ public class DataSourceRealm extends RealmBase {
             }
             return null;
         }
-
-        ArrayList<String> list = getRoles(dbConnection, username);
 
         // Create and return a suitable Principal for this user
         return new GenericPrincipal(username, list);
@@ -437,7 +447,7 @@ public class DataSourceRealm extends RealmBase {
                     dbCredentials = rs.getString(1);
                 }
 
-                return (dbCredentials != null) ? dbCredentials.trim() : null;
+                return (dbCredentials != null) ? dbCredentials.strip() : null;
             }
         } catch (SQLException e) {
             containerLog.error(sm.getString("dataSourceRealm.getPassword.exception", username), e);
@@ -447,26 +457,59 @@ public class DataSourceRealm extends RealmBase {
     }
 
 
+    /**
+     * Confirms if the given user exists in the database.
+     *
+     * @param dbConnection The database connection to be used
+     * @param username     Username to check
+     *
+     * @return {@code true} if the user exists, otherwise {@code false}
+     */
+    protected boolean validateUser(Connection dbConnection, String username) {
+        // Use the credentials lookup as a proxy for whether the user exists
+        try (PreparedStatement stmt = dbConnection.prepareStatement(preparedCredentials)) {
+            stmt.setString(1, username);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return true;
+                }
+            }
+        } catch (SQLException e) {
+            containerLog.error(sm.getString("dataSourceRealm.validateUser.exception", username), e);
+        }
+
+        return false;
+    }
+
+
     @Override
     protected Principal getPrincipal(String username) {
         Connection dbConnection = open();
         if (dbConnection == null) {
-            return new GenericPrincipal(username, null);
+            return null;
         }
         try {
-            return new GenericPrincipal(username, getRoles(dbConnection, username));
+            if (!validateUser(dbConnection, username)) {
+                return null;
+            }
+            List<String> roles = getRoles(dbConnection, username);
+            if (roles == null) {
+                return null;
+            }
+            return new GenericPrincipal(username, roles);
         } finally {
             close(dbConnection);
         }
-
     }
+
 
     /**
      * Return the roles associated with the given username.
      *
      * @param username Username for which roles should be retrieved
      *
-     * @return an array list of the role names
+     * @return an array list of the role names or {@code null} if the lookup fails
      */
     protected ArrayList<String> getRoles(String username) {
 
@@ -490,14 +533,14 @@ public class DataSourceRealm extends RealmBase {
      * @param dbConnection The database connection to be used
      * @param username     Username for which roles should be retrieved
      *
-     * @return an array list of the role names
+     * @return an array list of the role names or {@code null} if the lookup fails
      */
     protected ArrayList<String> getRoles(Connection dbConnection, String username) {
 
-        if (allRolesMode != AllRolesMode.STRICT_MODE && !isRoleStoreDefined()) {
-            // Using an authentication only configuration and no role store has
-            // been defined so don't spend cycles looking
-            return null;
+        if (!isRoleStoreDefined()) {
+            // No role store has been defined so there is nothing to look up.
+            // The all roles mode is interpreted centrally in RealmBase.
+            return new ArrayList<>(0);
         }
 
         try (PreparedStatement stmt = dbConnection.prepareStatement(preparedRoles)) {
@@ -508,7 +551,7 @@ public class DataSourceRealm extends RealmBase {
                 while (rs.next()) {
                     String role = rs.getString(1);
                     if (role != null) {
-                        list.add(role.trim());
+                        list.add(role.strip());
                     }
                 }
                 return list;
@@ -548,18 +591,23 @@ public class DataSourceRealm extends RealmBase {
             throw new LifecycleException(sm.getString("dataSourceRealm.roleConfigMismatch"));
         }
 
-        // Create the roles PreparedStatement string
-        StringBuilder temp = new StringBuilder("SELECT ");
-        temp.append(roleNameCol);
-        temp.append(" FROM ");
-        temp.append(userRoleTable);
-        temp.append(" WHERE ");
-        temp.append(userNameCol);
-        temp.append(" = ?");
-        preparedRoles = temp.toString();
+        // Create the roles PreparedStatement string. When no role store is
+        // defined there is nothing to query and no statement to build.
+        if (isRoleStoreDefined()) {
+            StringBuilder temp = new StringBuilder("SELECT ");
+            temp.append(roleNameCol);
+            temp.append(" FROM ");
+            temp.append(userRoleTable);
+            temp.append(" WHERE ");
+            temp.append(userNameCol);
+            temp.append(" = ?");
+            preparedRoles = temp.toString();
+        } else {
+            preparedRoles = null;
+        }
 
         // Create the credentials PreparedStatement string
-        temp = new StringBuilder("SELECT ");
+        StringBuilder temp = new StringBuilder("SELECT ");
         temp.append(userCredCol);
         temp.append(" FROM ");
         temp.append(userTable);

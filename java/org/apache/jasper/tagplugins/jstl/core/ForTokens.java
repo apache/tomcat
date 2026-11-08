@@ -78,6 +78,7 @@ public class ForTokens implements TagPlugin {
             ctxt.generateJavaSource("int " + beginName + " = ");
             ctxt.generateAttribute("begin");
             ctxt.generateJavaSource(";");
+            LoopAttributeChecks.generateBeginCheck(ctxt, beginName);
             ctxt.generateJavaSource("for(int " + index + " = 0; " + index + " < " + beginName + " && " + stName +
                     ".hasMoreTokens(); " + index + "++, " + stName + ".nextToken()){}");
         } else {
@@ -88,15 +89,13 @@ public class ForTokens implements TagPlugin {
         // record the end place as the last index, otherwise, record it as "end";
         // default end place is the last index
         if (hasEnd) {
-            ctxt.generateJavaSource("int " + endName + " = 0;");
-            ctxt.generateJavaSource("if((" + tokensCountName + " - 1) < ");
+            String endSpecifiedName = ctxt.getTemporaryVariableName();
+            ctxt.generateJavaSource("int " + endSpecifiedName + " = ");
             ctxt.generateAttribute("end");
-            ctxt.generateJavaSource("){");
-            ctxt.generateJavaSource("    " + endName + " = " + tokensCountName + " - 1;");
-            ctxt.generateJavaSource("}else{");
-            ctxt.generateJavaSource("    " + endName + " = ");
-            ctxt.generateAttribute("end");
-            ctxt.generateJavaSource(";}");
+            ctxt.generateJavaSource(";");
+            LoopAttributeChecks.generateEndCheck(ctxt, endSpecifiedName);
+            ctxt.generateJavaSource("int " + endName + " = (" + tokensCountName + " - 1) < " + endSpecifiedName +
+                    " ? " + tokensCountName + " - 1 : " + endSpecifiedName + ";");
         } else {
             ctxt.generateJavaSource("int " + endName + " = " + tokensCountName + " - 1;");
         }
@@ -107,6 +106,7 @@ public class ForTokens implements TagPlugin {
             ctxt.generateJavaSource("int " + stepName + " = ");
             ctxt.generateAttribute("step");
             ctxt.generateJavaSource(";");
+            LoopAttributeChecks.generateStepCheck(ctxt, stepName);
         } else {
             ctxt.generateJavaSource("int " + stepName + " = 1;");
         }
@@ -119,7 +119,7 @@ public class ForTokens implements TagPlugin {
         // if var specified, put the current token into the attribute "var" defines.
         if (hasVar) {
             String strVar = ctxt.getConstantAttribute("var");
-            ctxt.generateJavaSource("        pageContext.setAttribute(\"" + strVar + "\", " + temp + ");");
+            ctxt.generateJavaSource("        _jspx_page_context.setAttribute(\"" + strVar + "\", " + temp + ");");
         }
         ctxt.generateBody();
         ctxt.generateJavaSource("    }");

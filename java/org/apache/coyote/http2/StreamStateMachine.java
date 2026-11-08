@@ -25,10 +25,12 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * See <a href="https://tools.ietf.org/html/rfc7540#section-5.1">state diagram</a> in RFC 7540. <br>
+ * See <a href="https://www.rfc-editor.org/rfc/rfc9113#section-5.1">section 5.1</a> of RFC 9113 for the state
+ * diagram. <br>
  * The following additions are supported by this state machine:
  * <ul>
- * <li>differentiate between closed (normal) and closed caused by reset</li>
+ * <li>the closed state is split into separate states that differentiate between a normal close and a close caused by
+ * a reset, and between which direction sent the final frame</li>
  * </ul>
  */
 class StreamStateMachine {
@@ -129,6 +131,11 @@ class StreamStateMachine {
     }
 
 
+    final synchronized boolean canReset() {
+        return state.canReset();
+    }
+
+
     final synchronized boolean isActive() {
         return state.isActive();
     }
@@ -183,12 +190,14 @@ class StreamStateMachine {
                                                        FrameType.RST,
                                                        FrameType.PUSH_PROMISE,
                                                        FrameType.WINDOW_UPDATE),
-        HALF_CLOSED_REMOTE (false, true,  true,  true,
+        HALF_CLOSED_REMOTE (false, true,  true,  false,
                             Http2Error.STREAM_CLOSED,  FrameType.PRIORITY,
                                                        FrameType.RST,
                                                        FrameType.WINDOW_UPDATE),
         CLOSED_RX          (false, false, false, true,
-                            Http2Error.STREAM_CLOSED,  FrameType.PRIORITY),
+                            Http2Error.STREAM_CLOSED,  FrameType.PRIORITY,
+                                                       FrameType.RST,
+                                                       FrameType.WINDOW_UPDATE),
         CLOSED_TX          (false, false, false, true,
                             Http2Error.STREAM_CLOSED,  FrameType.PRIORITY,
                                                        FrameType.RST,

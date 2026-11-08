@@ -44,9 +44,9 @@ public class Remove implements TagPlugin {
         // default scope is "page".
         if (hasScope) {
             int iScope = Util.getScope(ctxt.getConstantAttribute("scope"));
-            ctxt.generateJavaSource("pageContext.removeAttribute(\"" + strVar + "\"," + iScope + ");");
+            ctxt.generateJavaSource("_jspx_page_context.removeAttribute(\"" + strVar + "\"," + iScope + ");");
         } else {
-            ctxt.generateJavaSource("pageContext.removeAttribute(\"" + strVar + "\");");
+            ctxt.generateJavaSource("_jspx_page_context.removeAttribute(\"" + strVar + "\");");
         }
     }
 

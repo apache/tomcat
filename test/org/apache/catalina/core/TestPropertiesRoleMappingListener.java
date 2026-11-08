@@ -119,7 +119,7 @@ public class TestPropertiesRoleMappingListener extends TomcatBaseTest {
         ctx.addLifecycleListener(listener);
 
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         LoginConfig loginConfig = new LoginConfig();
         loginConfig.setAuthMethod(HttpServletRequest.BASIC_AUTH);

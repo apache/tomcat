@@ -24,7 +24,8 @@ import java.util.Locale;
 public class JrePlatform {
 
     /**
-     * Constructs a new JrePlatform instance. This class cannot be instantiated.
+     * Constructs a new JrePlatform instance. The platform flags are static;
+     * instances carry no state.
      */
     public JrePlatform() {
     }

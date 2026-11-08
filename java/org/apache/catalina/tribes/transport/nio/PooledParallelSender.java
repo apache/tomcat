@@ -24,11 +24,14 @@ import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.transport.DataSender;
 import org.apache.catalina.tribes.transport.PooledSender;
 import org.apache.catalina.tribes.util.StringManager;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * A pooled sender that uses {@link ParallelNioSender} instances for parallel message delivery.
  */
 public class PooledParallelSender extends PooledSender implements PooledParallelSenderMBean {
+    private static final Log log = LogFactory.getLog(PooledParallelSender.class);
     /** StringManager for internationalized log messages. */
     protected static final StringManager sm = StringManager.getManager(PooledParallelSender.class);
 
@@ -46,11 +49,16 @@ public class PooledParallelSender extends PooledSender implements PooledParallel
         }
         ParallelNioSender sender = (ParallelNioSender) getSender();
         if (sender == null) {
-            ChannelException cx = new ChannelException(
+            // A null sender means either that the wait timed out or that the thread was interrupted while waiting
+            boolean interrupted = Thread.currentThread().isInterrupted();
+            ChannelException cx = new ChannelException(interrupted ?
+                    sm.getString("pooledParallelSender.unable.retrieveSender.interrupted") :
                     sm.getString("pooledParallelSender.unable.retrieveSender.timeout", Long.toString(getMaxWait())));
-            for (Member member : destination) {
-                cx.addFaultyMember(member,
-                        new NullPointerException(sm.getString("pooledParallelSender.unable.retrieveSender")));
+            if (!interrupted) {
+                for (Member member : destination) {
+                    cx.addFaultyMember(member,
+                            new NullPointerException(sm.getString("pooledParallelSender.unable.retrieveSender")));
+                }
             }
             throw cx;
         } else {
@@ -61,6 +69,9 @@ public class PooledParallelSender extends PooledSender implements PooledParallel
                 sender.sendMessage(destination, message);
                 sender.keepalive();
             } catch (ChannelException x) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("pooledParallelSender.disconnectOnError"), x);
+                }
                 sender.disconnect();
                 throw x;
             } finally {

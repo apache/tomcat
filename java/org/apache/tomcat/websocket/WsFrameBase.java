@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.websocket;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -37,8 +38,8 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Takes the ServletInputStream, processes the WebSocket frames it contains and extracts the messages. WebSocket Pings
- * received will be responded to automatically without any action required by the application.
+ * Processes the WebSocket frames read from the connection and extracts the messages. WebSocket Pings received will be
+ * responded to automatically without any action required by the application.
  */
 public abstract class WsFrameBase {
 
@@ -221,7 +222,7 @@ public abstract class WsFrameBase {
             // Client data must be masked
             throw new WsIOException(new CloseReason(CloseCodes.PROTOCOL_ERROR, sm.getString("wsFrame.notMasked")));
         } else if ((b & 0x80) != 0 && !isMasked()) {
-            // Server data must not masked
+            // Server data must not be masked
             throw new WsIOException(new CloseReason(CloseCodes.PROTOCOL_ERROR, sm.getString("wsFrame.masked")));
         }
         payloadLength = b & 0x7F;
@@ -377,7 +378,16 @@ public abstract class WsFrameBase {
             wsSession.onClose(new CloseReason(Util.getCloseCode(code), reason));
         } else if (opCode == Constants.OPCODE_PING) {
             if (wsSession.isOpen()) {
-                wsSession.getBasicRemote().sendPong(controlBufferBinary);
+                try {
+                    wsSession.getBasicRemote().sendPong(controlBufferBinary);
+                } catch (IllegalStateException | EOFException e) {
+                    // IllegalStateException - wsSession started to close while pong was being prepared
+                    // EOFException - wsSession closed while pong was being prepared
+                    // Either way, ignore the error
+                    if (!wsSession.isClosing()) {
+                        throw e;
+                    }
+                }
             }
         } else if (opCode == Constants.OPCODE_PONG) {
             MessageHandler.Whole<PongMessage> mhPong = wsSession.getPongMessageHandler();
@@ -402,7 +412,7 @@ public abstract class WsFrameBase {
     }
 
 
-     /**
+    /**
      * Sends a text message to the remote endpoint.
      *
      * @param last Whether this is the last fragment of the message
@@ -586,7 +596,7 @@ public abstract class WsFrameBase {
     }
 
 
-     /**
+    /**
      * Sends a binary message to the remote endpoint.
      *
      * @param msg  The message data

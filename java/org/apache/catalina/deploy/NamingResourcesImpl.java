@@ -61,7 +61,8 @@ import org.apache.tomcat.util.res.StringManager;
 
 
 /**
- * Holds and manages the naming resources defined in the Jakarta EE Naming Context and their associated JNDI context.
+ * Holds and manages the naming resource descriptors. The associated JNDI context is created and maintained by
+ * NamingContextListener.
  */
 public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializable, NamingResources {
 
@@ -98,7 +99,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
 
     /**
-     * Set of naming entries, keyed by name.
+     * Set of naming entry names.
      */
     private final Set<String> entries = ConcurrentHashMap.newKeySet();
 
@@ -217,10 +218,9 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
             throw new IllegalArgumentException(sm.getString("namingResources.ejbLookupLink", ejb.getName()));
         }
 
-        if (entries.contains(ejb.getName())) {
+        if (!entries.add(ejb.getName())) {
+            // The name is already claimed, possibly by a concurrent add
             return;
-        } else {
-            entries.add(ejb.getName());
         }
 
         synchronized (ejbs) {
@@ -235,38 +235,13 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
     @Override
     public void addEnvironment(ContextEnvironment environment) {
 
-        if (entries.contains(environment.getName())) {
-            ContextEnvironment ce = findEnvironment(environment.getName());
-            ContextResourceLink rl = findResourceLink(environment.getName());
-            if (ce != null) {
-                if (ce.getOverride()) {
-                    removeEnvironment(environment.getName());
-                } else {
-                    return;
-                }
-            } else if (rl != null) {
-                // Link. Need to look at the global resources
-                Server server = getServer();
-                if (server == null) {
-                    return;
-                }
-                NamingResourcesImpl global = server.getGlobalNamingResources();
-                if (global.findEnvironment(rl.getGlobal()) != null) {
-                    if (global.findEnvironment(rl.getGlobal()).getOverride()) {
-                        removeResourceLink(environment.getName());
-                    } else {
-                        return;
-                    }
-                }
-            } else {
-                // It exists but it isn't an env or a res link...
-                return;
-            }
-        }
-
         List<InjectionTarget> injectionTargets = environment.getInjectionTargets();
         String value = environment.getValue();
         String lookupName = environment.getLookupName();
+
+        // Validate the new entry before any existing entry is removed below.
+        // Otherwise, an invalid new entry would silently destroy a valid
+        // existing one.
 
         // Entries with injection targets but no value are effectively ignored
         if (injectionTargets != null && !injectionTargets.isEmpty() && (value == null || value.isEmpty())) {
@@ -284,7 +259,44 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
                     sm.getString("namingResources.resourceTypeFail", environment.getName(), environment.getType()));
         }
 
-        entries.add(environment.getName());
+        if (entries.contains(environment.getName())) {
+            ContextEnvironment ce = findEnvironment(environment.getName());
+            ContextResourceLink rl = findResourceLink(environment.getName());
+            if (ce != null) {
+                if (ce.getOverride()) {
+                    removeEnvironment(environment.getName());
+                } else {
+                    return;
+                }
+            } else if (rl != null) {
+                // Link. Need to look at the global resources
+                Server server = getServer();
+                if (server == null) {
+                    return;
+                }
+                NamingResourcesImpl global = server.getGlobalNamingResources();
+                ContextEnvironment globalEnv = global.findEnvironment(rl.getGlobal());
+                if (globalEnv != null && globalEnv.getOverride()) {
+                    removeResourceLink(environment.getName());
+                } else {
+                    // The link targets a global entry that may not be
+                    // overridden, or something that is not a global
+                    // environment at all (or is missing). In those cases the
+                    // existing link is retained. Adding the environment entry
+                    // as well would result in two entries sharing one JNDI
+                    // name.
+                    return;
+                }
+            } else {
+                // It exists but it isn't an env or a res link...
+                return;
+            }
+        }
+
+        if (!entries.add(environment.getName())) {
+            // The name is already claimed, possibly by a concurrent add
+            return;
+        }
 
         synchronized (envs) {
             environment.setNamingResources(this);
@@ -324,10 +336,9 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
      */
     public void addLocalEjb(ContextLocalEjb ejb) {
 
-        if (entries.contains(ejb.getName())) {
+        if (!entries.add(ejb.getName())) {
+            // The name is already claimed, possibly by a concurrent add
             return;
-        } else {
-            entries.add(ejb.getName());
         }
 
         synchronized (localEjbs) {
@@ -348,12 +359,16 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
         if (entries.contains(mdr.getName())) {
             return;
-        } else {
-            if (!checkResourceType(mdr)) {
-                throw new IllegalArgumentException(
-                        sm.getString("namingResources.resourceTypeFail", mdr.getName(), mdr.getType()));
-            }
-            entries.add(mdr.getName());
+        }
+
+        if (!checkResourceType(mdr)) {
+            throw new IllegalArgumentException(
+                    sm.getString("namingResources.resourceTypeFail", mdr.getName(), mdr.getType()));
+        }
+
+        if (!entries.add(mdr.getName())) {
+            // The name is already claimed, possibly by a concurrent add
+            return;
         }
 
         synchronized (mdrs) {
@@ -382,12 +397,16 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
         if (entries.contains(resource.getName())) {
             return;
-        } else {
-            if (!checkResourceType(resource)) {
-                throw new IllegalArgumentException(
-                        sm.getString("namingResources.resourceTypeFail", resource.getName(), resource.getType()));
-            }
-            entries.add(resource.getName());
+        }
+
+        if (!checkResourceType(resource)) {
+            throw new IllegalArgumentException(
+                    sm.getString("namingResources.resourceTypeFail", resource.getName(), resource.getType()));
+        }
+
+        if (!entries.add(resource.getName())) {
+            // The name is already claimed, possibly by a concurrent add
+            return;
         }
 
         synchronized (resources) {
@@ -416,12 +435,16 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
         if (entries.contains(resource.getName())) {
             return;
-        } else {
-            if (!checkResourceType(resource)) {
-                throw new IllegalArgumentException(
-                        sm.getString("namingResources.resourceTypeFail", resource.getName(), resource.getType()));
-            }
-            entries.add(resource.getName());
+        }
+
+        if (!checkResourceType(resource)) {
+            throw new IllegalArgumentException(
+                    sm.getString("namingResources.resourceTypeFail", resource.getName(), resource.getType()));
+        }
+
+        if (!entries.add(resource.getName())) {
+            // The name is already claimed, possibly by a concurrent add
+            return;
         }
 
         synchronized (resourceEnvRefs) {
@@ -436,10 +459,9 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
     @Override
     public void addResourceLink(ContextResourceLink resourceLink) {
 
-        if (entries.contains(resourceLink.getName())) {
+        if (!entries.add(resourceLink.getName())) {
+            // The name is already claimed, possibly by a concurrent add
             return;
-        } else {
-            entries.add(resourceLink.getName());
         }
 
         synchronized (resourceLinks) {
@@ -466,10 +488,9 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
      */
     public void addService(ContextService service) {
 
-        if (entries.contains(service.getName())) {
+        if (!entries.add(service.getName())) {
+            // The name is already claimed, possibly by a concurrent add
             return;
-        } else {
-            entries.add(service.getName());
         }
 
         synchronized (services) {
@@ -671,7 +692,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
 
     /**
-     * Return the array of resource environment reference names for this web application.
+     * Return the array of resource environment references for this web application.
      *
      * @return the resource environment references, or a zero-length array if none
      */
@@ -720,11 +741,12 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
      */
     public void removeEjb(String name) {
 
-        entries.remove(name);
-
         ContextEjb ejb;
         synchronized (ejbs) {
             ejb = ejbs.remove(name);
+            if (ejb != null) {
+                entries.remove(name);
+            }
         }
         if (ejb != null) {
             support.firePropertyChange("ejb", ejb, null);
@@ -737,11 +759,12 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
     @Override
     public void removeEnvironment(String name) {
 
-        entries.remove(name);
-
         ContextEnvironment environment;
         synchronized (envs) {
             environment = envs.remove(name);
+            if (environment != null) {
+                entries.remove(name);
+            }
         }
         if (environment != null) {
             support.firePropertyChange("environment", environment, null);
@@ -765,11 +788,12 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
      */
     public void removeLocalEjb(String name) {
 
-        entries.remove(name);
-
         ContextLocalEjb localEjb;
         synchronized (localEjbs) {
             localEjb = localEjbs.remove(name);
+            if (localEjb != null) {
+                entries.remove(name);
+            }
         }
         if (localEjb != null) {
             support.firePropertyChange("localEjb", localEjb, null);
@@ -786,11 +810,12 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
      */
     public void removeMessageDestinationRef(String name) {
 
-        entries.remove(name);
-
         MessageDestinationRef mdr;
         synchronized (mdrs) {
             mdr = mdrs.remove(name);
+            if (mdr != null) {
+                entries.remove(name);
+            }
         }
         if (mdr != null) {
             support.firePropertyChange("messageDestinationRef", mdr, null);
@@ -815,11 +840,12 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
     @Override
     public void removeResource(String name) {
 
-        entries.remove(name);
-
         ContextResource resource;
         synchronized (resources) {
             resource = resources.remove(name);
+            if (resource != null) {
+                entries.remove(name);
+            }
         }
         if (resource != null) {
             support.firePropertyChange("resource", resource, null);
@@ -843,11 +869,12 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
      */
     public void removeResourceEnvRef(String name) {
 
-        entries.remove(name);
-
         ContextResourceEnvRef resourceEnvRef;
         synchronized (resourceEnvRefs) {
             resourceEnvRef = resourceEnvRefs.remove(name);
+            if (resourceEnvRef != null) {
+                entries.remove(name);
+            }
         }
         if (resourceEnvRef != null) {
             support.firePropertyChange("resourceEnvRef", resourceEnvRef, null);
@@ -860,11 +887,12 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
     @Override
     public void removeResourceLink(String name) {
 
-        entries.remove(name);
-
         ContextResourceLink resourceLink;
         synchronized (resourceLinks) {
             resourceLink = resourceLinks.remove(name);
+            if (resourceLink != null) {
+                entries.remove(name);
+            }
         }
         if (resourceLink != null) {
             support.firePropertyChange("resourceLink", resourceLink, null);
@@ -888,11 +916,12 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
      */
     public void removeService(String name) {
 
-        entries.remove(name);
-
         ContextService service;
         synchronized (services) {
             service = services.remove(name);
+            if (service != null) {
+                entries.remove(name);
+            }
         }
         if (service != null) {
             support.firePropertyChange("service", service, null);
@@ -992,7 +1021,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
     /**
      * Clean up a resource by calling the defined close method. For example, closing a database connection pool will
-     * close it's open connections. This will happen on GC but that leaves db connections open that may cause issues.
+     * close its open connections. This will happen on GC but that leaves db connections open that may cause issues.
      *
      * @param resource The resource to close.
      */
@@ -1174,18 +1203,25 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
     }
 
     private Class<?> getSetterType(Class<?> clazz, String name) {
-        for (Method method : clazz.getDeclaredMethods()) {
-            if (Introspection.isValidSetter(method) && Introspection.getPropertyName(method).equals(name)) {
-                return method.getParameterTypes()[0];
+        // The runtime injection engine (DefaultInstanceManager) matches
+        // injection targets across the whole class hierarchy, so the checks
+        // here must do the same
+        for (Class<?> c = clazz; c != null; c = c.getSuperclass()) {
+            for (Method method : c.getDeclaredMethods()) {
+                if (Introspection.isValidSetter(method) && Introspection.getPropertyName(method).equals(name)) {
+                    return method.getParameterTypes()[0];
+                }
             }
         }
         return null;
     }
 
     private Class<?> getFieldType(Class<?> clazz, String name) {
-        for (Field field : clazz.getDeclaredFields()) {
-            if (field.getName().equals(name)) {
-                return field.getType();
+        for (Class<?> c = clazz; c != null; c = c.getSuperclass()) {
+            for (Field field : c.getDeclaredFields()) {
+                if (field.getName().equals(name)) {
+                    return field.getType();
+                }
             }
         }
         return null;

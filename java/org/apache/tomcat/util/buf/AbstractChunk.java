@@ -82,7 +82,7 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
 
 
     /**
-     * Maximum amount of data in this buffer. If -1 or not set, the buffer will grow to {{@link #ARRAY_MAX_SIZE}. Can be
+     * Maximum amount of data in this buffer. If -1 or not set, the buffer will grow to {@link #ARRAY_MAX_SIZE}. Can be
      * smaller than the current buffer size ( which will not shrink ). When the limit is reached, the buffer will be
      * flushed (if out is set) or throw exception.
      *

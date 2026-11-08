@@ -60,8 +60,8 @@ public class TestPerWebappJuliIntegration extends TomcatBaseTest {
         tomcat.start();
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/juli" + APP_ID_A + "/log_level");
         ByteChunk res2 = getUrl("http://localhost:" + getPort() + "/juli" + APP_ID_B + "/log_level");
-        Assert.assertEquals(Level.FINE.toString(), res.toString().trim());
-        Assert.assertEquals(Level.INFO.toString(), res2.toString().trim());
+        Assert.assertEquals(Level.FINE.toString(), res.toString().strip());
+        Assert.assertEquals(Level.INFO.toString(), res2.toString().strip());
         tomcat.stop();
     }
     @Test
@@ -109,7 +109,7 @@ public class TestPerWebappJuliIntegration extends TomcatBaseTest {
                 resp.getWriter().print(Logger.getLogger("").getLevel());
             }
         });
-        context.addServletMappingDecoded("/log_level", "log_level");
+        context.addServletMapping("/log_level", "log_level");
     }
     private ConstructAppResult constructAppForHandlerIsolationTest(Tomcat tomcat, String appId, Level logLevel) throws FileNotFoundException {
         File appDir = new File(getTemporaryDirectory(), "juliHandler" + appId);
@@ -139,7 +139,7 @@ public class TestPerWebappJuliIntegration extends TomcatBaseTest {
                 root.info("JULI-" + appId + "-INFO");
             }
         });
-        context.addServletMappingDecoded("/test", "test");
+        context.addServletMapping("/test", "test");
         return new ConstructAppResult(logsDir, context);
     }
     private record ConstructAppResult(File logsDir, Context context) {}

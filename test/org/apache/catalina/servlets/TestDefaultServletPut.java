@@ -130,7 +130,7 @@ public class TestDefaultServletPut extends TomcatBaseTest {
         Wrapper w = Tomcat.addServlet(ctxt, "default", DefaultServlet.class.getName());
         w.addInitParameter("readonly", "false");
         w.addInitParameter("allowPartialPut", Boolean.toString(allowPartialPut));
-        ctxt.addServletMappingDecoded("/", "default");
+        ctxt.addServletMapping("/", "default");
 
         tomcat.start();
 

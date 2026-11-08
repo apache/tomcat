@@ -72,8 +72,9 @@ public class Cache {
     /**
      * Retrieves a single resource from the cache.
      *
-     * @param path resource path
+     * @param path                    resource path
      * @param useClassLoaderResources whether to use class loader resources
+     *
      * @return the web resource
      */
     protected WebResource getResource(String path, boolean useClassLoaderResources) {
@@ -170,8 +171,9 @@ public class Cache {
     /**
      * Retrieves multiple resources from the cache.
      *
-     * @param path resource path
+     * @param path                    resource path
      * @param useClassLoaderResources whether to use class loader resources
+     *
      * @return the web resources
      */
     protected WebResource[] getResources(String path, boolean useClassLoaderResources) {
@@ -226,6 +228,14 @@ public class Cache {
                 }
             } else {
                 // Another thread added the entry to the cache
+                if (cacheEntry.usesClassLoaderResources() != useClassLoaderResources) {
+                    // Race condition adding cache entries with the same path
+                    // but differing values for useClassLoaderResources. As per
+                    // getResource(), let the other thread "win" and keep the
+                    // entry in the cache. This thread will use a cache entry
+                    // instance that isn't added to the cache.
+                    cacheEntry = newCacheEntry;
+                }
                 // Make sure it is validated
                 cacheEntry.validateResources(useClassLoaderResources);
             }
@@ -243,8 +253,8 @@ public class Cache {
         // Create an ordered set of all cached resources with the least recently
         // used first. This is a background process so we can afford to take the
         // time to order the elements first
-        TreeSet<CachedResource> orderedResources =
-                new TreeSet<>(Comparator.comparingLong(CachedResource::getNextCheck));
+        TreeSet<CachedResource> orderedResources = new TreeSet<>(
+                Comparator.comparingLong(CachedResource::getNextCheck).thenComparingLong(CachedResource::getUniqueId));
         orderedResources.addAll(resourceCache.values());
 
         Iterator<CachedResource> iter = orderedResources.iterator();

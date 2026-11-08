@@ -19,6 +19,7 @@ package org.apache.catalina.util;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -185,7 +186,7 @@ public final class NetMask {
      * @param addr The {@link java.net.InetAddress} to test
      * @param port The port to test
      *
-     * @return true on match, false otherwise
+     * @return true on match, false otherwise. Always returns false if this netmask does not contain a port pattern
      */
     public boolean matches(final InetAddress addr, int port) {
         if (!foundPort) {
@@ -296,13 +297,27 @@ public final class NetMask {
             return false;
         }
         NetMask other = (NetMask) o;
-        return nrBytes == other.nrBytes && lastByteShift == other.lastByteShift &&
-                Arrays.equals(netaddr, other.netaddr);
+        if (foundPort != other.foundPort) {
+            return false;
+        }
+        if (nrBytes != other.nrBytes || lastByteShift != other.lastByteShift) {
+            return false;
+        }
+        if (!Arrays.equals(netaddr, other.netaddr)) {
+            return false;
+        }
+        if (foundPort) {
+            return Objects.equals(portPattern.pattern(), other.portPattern.pattern());
+        }
+        return true;
     }
 
     @Override
     public int hashCode() {
-        return 31 * Arrays.hashCode(netaddr) + lastByteShift;
+        int result = 31 * (31 * Arrays.hashCode(netaddr) + nrBytes) + lastByteShift;
+        if (foundPort) {
+            result = 31 * result + portPattern.pattern().hashCode();
+        }
+        return result;
     }
-
 }

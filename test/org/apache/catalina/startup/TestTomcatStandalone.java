@@ -170,7 +170,7 @@ public class TestTomcatStandalone extends LoggingBaseTest {
             Context ctx = tomcat.addContext("", null);
 
             Tomcat.addServlet(ctx, "myServlet", new HelloWorld());
-            ctx.addServletMappingDecoded("/", "myServlet");
+            ctx.addServletMapping("/", "myServlet");
 
             tomcat.start();
             // Emulate Tomcat main thread

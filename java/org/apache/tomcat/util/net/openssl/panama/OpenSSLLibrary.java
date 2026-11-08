@@ -78,12 +78,12 @@ public class OpenSSLLibrary {
 
     static MemorySegment enginePointer = MemorySegment.NULL;
 
-    static void initLibrary() {
+    public static void initLibrary() {
         synchronized (lock) {
             if (OpenSSLStatus.isLibraryInitialized()) {
                 return;
             }
-            long initParam = (OpenSSL_version_num() >= 0x3000000fL) ? 0 : OPENSSL_INIT_ENGINE_ALL_BUILTIN();
+            long initParam = (OpenSSL_version_num() >= 0x30000000L) ? 0 : OPENSSL_INIT_ENGINE_ALL_BUILTIN();
             OPENSSL_init_ssl(initParam, MemorySegment.NULL);
             OpenSSLStatus.setLibraryInitialized(true);
         }
@@ -107,42 +107,36 @@ public class OpenSSLLibrary {
     static final DHParam[] dhParameters = new DHParam[6];
 
     private static void initDHParameters() {
-        var dh = DH_new();
-        var p = BN_get_rfc3526_prime_8192(MemorySegment.NULL);
-        var g = BN_new();
-        BN_set_word(g, 2);
-        DH_set0_pqg(dh, p, MemorySegment.NULL, g);
-        dhParameters[0] = new DHParam(dh, 6145);
-        dh = DH_new();
-        p = BN_get_rfc3526_prime_6144(MemorySegment.NULL);
-        g = BN_new();
-        BN_set_word(g, 2);
-        DH_set0_pqg(dh, p, MemorySegment.NULL, g);
-        dhParameters[1] = new DHParam(dh, 4097);
-        dh = DH_new();
-        p = BN_get_rfc3526_prime_4096(MemorySegment.NULL);
-        g = BN_new();
-        BN_set_word(g, 2);
-        DH_set0_pqg(dh, p, MemorySegment.NULL, g);
-        dhParameters[2] = new DHParam(dh, 3073);
-        dh = DH_new();
-        p = BN_get_rfc3526_prime_3072(MemorySegment.NULL);
-        g = BN_new();
-        BN_set_word(g, 2);
-        DH_set0_pqg(dh, p, MemorySegment.NULL, g);
-        dhParameters[3] = new DHParam(dh, 2049);
-        dh = DH_new();
-        p = BN_get_rfc3526_prime_2048(MemorySegment.NULL);
-        g = BN_new();
-        BN_set_word(g, 2);
-        DH_set0_pqg(dh, p, MemorySegment.NULL, g);
-        dhParameters[4] = new DHParam(dh, 1025);
-        dh = DH_new();
-        p = BN_get_rfc2409_prime_1024(MemorySegment.NULL);
-        g = BN_new();
-        BN_set_word(g, 2);
-        DH_set0_pqg(dh, p, MemorySegment.NULL, g);
-        dhParameters[5] = new DHParam(dh, 0);
+        dhParameters[0] = createDHParam(BN_get_rfc3526_prime_8192(MemorySegment.NULL), 6145);
+        dhParameters[1] = createDHParam(BN_get_rfc3526_prime_6144(MemorySegment.NULL), 4097);
+        dhParameters[2] = createDHParam(BN_get_rfc3526_prime_4096(MemorySegment.NULL), 3073);
+        dhParameters[3] = createDHParam(BN_get_rfc3526_prime_3072(MemorySegment.NULL), 2049);
+        dhParameters[4] = createDHParam(BN_get_rfc3526_prime_2048(MemorySegment.NULL), 1025);
+        dhParameters[5] = createDHParam(BN_get_rfc2409_prime_1024(MemorySegment.NULL), 0);
+    }
+
+    private static DHParam createDHParam(MemorySegment p, int min) {
+        MemorySegment dh = MemorySegment.NULL;
+        MemorySegment g = MemorySegment.NULL;
+        try {
+            dh = DH_new();
+            g = BN_new();
+            if (MemorySegment.NULL.equals(dh) || MemorySegment.NULL.equals(p) || MemorySegment.NULL.equals(g) ||
+                    BN_set_word(g, 2) == 0 || DH_set0_pqg(dh, p, MemorySegment.NULL, g) == 0) {
+                throw new IllegalStateException(sm.getString("openssllibrary.errMakeDHParameters", getLastError()));
+            }
+            // DH_set0_pqg() has taken ownership of both BIGNUMs. From this point, only DH_free() may free them.
+            p = MemorySegment.NULL;
+            g = MemorySegment.NULL;
+            DHParam result = new DHParam(dh, min);
+            dh = MemorySegment.NULL;
+            return result;
+        } finally {
+            // On failure free the values whose ownership was not transferred, including if DHParam creation fails.
+            BN_free(p);
+            BN_free(g);
+            DH_free(dh);
+        }
     }
 
     private static void freeDHParameters() {
@@ -181,7 +175,9 @@ public class OpenSSLLibrary {
                 OpenSSLStatus.setVersion(OpenSSL_version_num());
                 OpenSSLStatus.setMajorVersion(openssl_h_Compatibility.MAJOR);
                 OpenSSLStatus.setMinorVersion(openssl_h_Compatibility.MINOR);
-                if (openssl_h_Compatibility.OPENSSL3) {
+                if (openssl_h_Compatibility.OPENSSL4) {
+                    OpenSSLStatus.setName(OpenSSLStatus.Name.OPENSSL4);
+                } else if (openssl_h_Compatibility.OPENSSL3) {
                     OpenSSLStatus.setName(OpenSSLStatus.Name.OPENSSL3);
                 } else if (openssl_h_Compatibility.OPENSSL) {
                     OpenSSLStatus.setName(OpenSSLStatus.Name.OPENSSL);
@@ -362,7 +358,7 @@ public class OpenSSLLibrary {
             OpenSSLStatus.setAvailable(false);
 
             try {
-                if (OpenSSL_version_num() < 0x3000000fL) {
+                if (OpenSSL_version_num() < 0x30000000L) {
                     // There could be unreferenced SSL_CTX still waiting for GC
                     System.gc();
                     freeDHParameters();
@@ -445,10 +441,16 @@ public class OpenSSLLibrary {
         try (var localArena = Arena.ofConfined()) {
             initLibrary();
             var sslCtx = SSL_CTX_new(TLS_server_method());
+            if (MemorySegment.NULL.equals(sslCtx)) {
+                throw new IllegalStateException(sm.getString("openssl.errMakeContext", getLastError()));
+            }
             try {
                 openssl_h_Compatibility.SSL_CTX_set_options(sslCtx, SSL_OP_ALL());
                 SSL_CTX_set_cipher_list(sslCtx, localArena.allocateFrom(ciphers));
                 var ssl = SSL_new(sslCtx);
+                if (MemorySegment.NULL.equals(ssl)) {
+                    throw new IllegalStateException(sm.getString("engine.noSSL", getLastError()));
+                }
                 SSL_set_accept_state(ssl);
                 try {
                     for (String c : getCiphers(ssl)) {
@@ -456,7 +458,12 @@ public class OpenSSLLibrary {
                         if (c == null || c.isEmpty() || ciphersList.contains(c)) {
                             continue;
                         }
-                        ciphersList.add(OpenSSLCipherConfigurationParser.openSSLToJsse(c));
+                        String jsseName = OpenSSLCipherConfigurationParser.openSSLToJsse(c);
+                        // Ignore ciphers with no JSSE equivalent.
+                        if (jsseName == null) {
+                            continue;
+                        }
+                        ciphersList.add(jsseName);
                     }
                 } finally {
                     SSL_free(ssl);
@@ -517,19 +524,25 @@ public class OpenSSLLibrary {
         return sslError;
     }
 
-    static void populateCertificateChain(Arena localArena, MemorySegment /* STACK_OF(X509) */ sk,
+    static boolean populateCertificateChain(Arena localArena, MemorySegment /* STACK_OF(X509) */ sk,
             byte[][] certificateChain) {
         for (int i = 0; i < certificateChain.length; i++) {
             MemorySegment/* (X509*) */ x509 = openssl_h_Compatibility.OPENSSL_sk_value(sk, i);
             MemorySegment bufPointer = localArena.allocateFrom(ValueLayout.ADDRESS, MemorySegment.NULL);
             int length = i2d_X509(x509, bufPointer);
-            if (length <= 0) {
-                certificateChain[i] = new byte[0];
-                continue;
-            }
             MemorySegment buf = bufPointer.get(ValueLayout.ADDRESS, 0);
-            certificateChain[i] = buf.reinterpret(length, localArena, null).toArray(ValueLayout.JAVA_BYTE);
-            OPENSSL_free(buf);
+            if (length <= 0) {
+                if (!MemorySegment.NULL.equals(buf)) {
+                    OPENSSL_free(buf);
+                }
+                return false;
+            }
+            try {
+                certificateChain[i] = buf.reinterpret(length, localArena, null).toArray(ValueLayout.JAVA_BYTE);
+            } finally {
+                OPENSSL_free(buf);
+            }
         }
+        return true;
     }
 }

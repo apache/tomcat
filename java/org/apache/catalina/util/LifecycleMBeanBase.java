@@ -112,7 +112,7 @@ public abstract class LifecycleMBeanBase extends LifecycleBase implements JmxEna
      * Note: This method should only be used once {@link #initInternal()} has been called and before
      * {@link #destroyInternal()} has been called.
      *
-     * @param obj                     The object the register
+     * @param obj                     The object to register
      * @param objectNameKeyProperties The key properties component of the object name to use to register the object
      *
      * @return The name used to register the object

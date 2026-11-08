@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -50,7 +51,7 @@ import org.apache.tomcat.util.res.StringManager;
  * <ul>
  * <li>watchDir - the directory where we watch for changes</li>
  * <li>deployDir - the directory where we install applications</li>
- * <li>tempDir - a temporaryDirectory to store binary data when downloading a war from the cluster</li>
+ * <li>tempDir - a temporary directory to store binary data when downloading a war from the cluster</li>
  * </ul>
  * Currently we only support deployment of WAR files since they are easier to send across the wire.
  */
@@ -63,7 +64,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
     /**
      * Whether the deployer has been started.
      */
-    protected boolean started = false;
+    protected volatile boolean started = false;
 
     /**
      * Map of file name to factory for in-progress file transfers.
@@ -96,12 +97,12 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
     /**
      * The watcher for monitoring the watch directory.
      */
-    protected WarWatcher watcher = null;
+    protected volatile WarWatcher watcher = null;
 
     /**
      * Iteration count for background processing.
      */
-    private int count = 0;
+    private volatile int count = 0;
 
     /**
      * Frequency of the Farm watchDir check. Cluster wide deployment will be done once for the specified amount of
@@ -166,6 +167,10 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
         } catch (Exception e) {
             log.error(sm.getString("farmWarDeployer.mbeanNameFail", engine.getName(), hostname), e);
             return;
+        }
+        if (watchEnabled && getWatchDir() == null) {
+            log.error(sm.getString("farmWarDeployer.noWatchDir"));
+            watchEnabled = false;
         }
         if (watchEnabled) {
             watcher = new WarWatcher(this, getWatchDirFile());
@@ -235,9 +240,15 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
                         String contextName = fmsg.getContextName();
                         if (tryAddServiced(contextName)) {
                             try {
-                                remove(contextName);
+                                Context context = (Context) host.findChild(contextName);
+                                if (context != null) {
+                                    remove(contextName);
+                                }
 
-                                Files.move(factory.getFile().toPath(), deployable.toPath());
+                                // Replace an existing file since the delete of
+                                // an old WAR may have failed earlier
+                                Files.move(factory.getFile().toPath(), deployable.toPath(),
+                                        StandardCopyOption.REPLACE_EXISTING);
                             } catch (IOException ioe) {
                                 log.error(sm.getString("farmWarDeployer.renameFail", factory.getFile(), deployable),
                                         ioe);
@@ -254,7 +265,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
                     } catch (Exception e) {
                         log.error(sm.getString("farmWarDeployer.fileMessageError"), e);
                     } finally {
-                        removeFactory(fmsg);
+                        removeFactory(fmsg, factory);
                     }
                 }
             } else if (msg instanceof UndeployMessage) {
@@ -309,10 +320,13 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
     /**
      * Remove file (war) from messages
      *
-     * @param msg The file
+     * @param msg     The file
+     * @param factory The factory for which the transfer completed
      */
-    public void removeFactory(FileMessage msg) {
-        fileFactories.remove(msg.getFileName());
+    public void removeFactory(FileMessage msg, FileMessageFactory factory) {
+        // Remove with the factory instance to avoid evicting a newer factory
+        // created for a new transfer of the same file
+        fileFactories.remove(msg.getFileName(), factory);
     }
 
     /**
@@ -336,7 +350,6 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
      * @param webapp      A WAR file or unpacked directory structure containing the web application to be installed
      *
      * @exception IllegalArgumentException if the specified context name is malformed
-     * @exception IllegalStateException    if the specified context name is already deployed
      * @exception IOException              if an input/output error was encountered during installation
      */
     @Override
@@ -418,6 +431,9 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
 
     @Override
     public void fileModified(File newWar) {
+        if (!started) {
+            return;
+        }
         try {
             ContextName cn = new ContextName(newWar.getName(), true);
             // Ensure deployed war uses lower case ".war" extension
@@ -450,6 +466,9 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
 
     @Override
     public void fileRemoved(File removeWar) {
+        if (!started) {
+            return;
+        }
         try {
             ContextName cn = new ContextName(removeWar.getName(), true);
             if (log.isInfoEnabled()) {
@@ -470,27 +489,31 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
      */
     protected void remove(String contextName) throws Exception {
         // TODO Handle remove also work dir content !
-        // Stop the context first to be nicer
         Context context = (Context) host.findChild(contextName);
-        if (context != null) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("farmWarDeployer.undeployLocal", contextName));
+        if (context == null) {
+            if (log.isWarnEnabled()) {
+                log.warn(sm.getString("farmWarDeployer.contextNotFound", contextName));
             }
-            context.stop();
-            String baseName = context.getBaseName();
-            File war = new File(host.getAppBaseFile(), baseName + ".war");
-            File dir = new File(host.getAppBaseFile(), baseName);
-            File xml = new File(configBase, baseName + ".xml");
-            if (war.exists()) {
-                if (!war.delete()) {
-                    log.error(sm.getString("farmWarDeployer.deleteFail", war));
-                }
-            } else if (dir.exists()) {
-                undeployDir(dir);
-            } else {
-                if (!xml.delete()) {
-                    log.error(sm.getString("farmWarDeployer.deleteFail", xml));
-                }
+            return;
+        }
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("farmWarDeployer.undeployLocal", contextName));
+        }
+        // Stop the context first to be nicer
+        context.stop();
+        String baseName = context.getBaseName();
+        File war = new File(host.getAppBaseFile(), baseName + ".war");
+        File dir = new File(host.getAppBaseFile(), baseName);
+        File xml = new File(configBase, baseName + ".xml");
+        if (war.exists()) {
+            if (!war.delete()) {
+                log.error(sm.getString("farmWarDeployer.deleteFail", war));
+            }
+        } else if (dir.exists()) {
+            undeployDir(dir);
+        } else {
+            if (xml.exists() && !xml.delete()) {
+                log.error(sm.getString("farmWarDeployer.deleteFail", xml));
             }
         }
     }
@@ -528,6 +551,8 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
      */
     @Override
     public void backgroundProcess() {
+        // Need to handle a concurrent call to stop() which nulls this.watcher
+        WarWatcher watcher = this.watcher;
         if (started) {
             if (watchEnabled) {
                 count = (count + 1) % processDeployFrequency;
@@ -727,7 +752,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
     /**
      * Set the watcher checks frequency.
      *
-     * @param processExpiresFrequency the new manager checks frequency
+     * @param processExpiresFrequency the new watcher checks frequency
      */
     public void setProcessDeployFrequency(int processExpiresFrequency) {
 
@@ -804,8 +829,10 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
         String[] fileNames = fileFactories.keySet().toArray(new String[0]);
         for (String fileName : fileNames) {
             FileMessageFactory factory = fileFactories.get(fileName);
-            if (!factory.isValid()) {
-                fileFactories.remove(fileName);
+            if (factory != null && !factory.isValid()) {
+                // Remove with the factory instance to avoid evicting a newer
+                // factory created for a new transfer of the same file
+                fileFactories.remove(fileName, factory);
             }
         }
     }

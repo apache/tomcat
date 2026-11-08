@@ -53,7 +53,7 @@ public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
      */
     private final ReferenceQueue<T> refQueue = new ReferenceQueue<>();
 
-    /** Count of instances that have been checkout out to pool clients */
+    /** Count of instances that have been checked out to pool clients */
     private int numActive; // @GuardedBy("this")
 
     /** Total number of instances that have been destroyed */
@@ -125,7 +125,7 @@ public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
         final boolean shouldDestroy = !success;
         if (success) {
             idleReferences.add(ref);
-            notifyAll(); // numActive has changed
+            notifyAll();
         }
 
         if (shouldDestroy) {
@@ -313,7 +313,7 @@ public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
     }
 
     /**
-     * Gets an approximation not less than the of the number of idle
+     * Gets an approximation not less than the number of idle
      * instances in the pool.
      *
      * @return estimated number of idle instances in the pool

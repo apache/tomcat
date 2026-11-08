@@ -34,7 +34,8 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
     static final int MAX_WINDOW_SIZE = (1 << 31) - 1;
     static final int MIN_MAX_FRAME_SIZE = 1 << 14;
     static final int MAX_MAX_FRAME_SIZE = (1 << 24) - 1;
-    static final long UNLIMITED = ((long) 1 << 32); // Use the maximum possible
+    static final long UNLIMITED = ((long) 1 << 32); // Internal "no limit" sentinel; not a valid 32-bit SETTINGS value
+    static final long MAX_SETTING_VALUE = 0xFFFFFFFFL; // Largest value that can be serialized in a SETTINGS frame
     static final int MAX_HEADER_TABLE_SIZE = 1 << 16;
 
     // Defaults (defined by the specification)
@@ -76,11 +77,16 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
         }
 
         switch (setting) {
-            case HEADER_TABLE_SIZE -> validateHeaderTableSize(value);
-            case ENABLE_PUSH -> validateEnablePush(value);
-            case MAX_CONCURRENT_STREAMS, MAX_HEADER_LIST_SIZE -> {
-                // No further validation required
+            case HEADER_TABLE_SIZE -> {
+                // RFC 9113, section 6.5.2: no protocol-defined upper bound exists for
+                // SETTINGS_HEADER_TABLE_SIZE; any value up to 2^32-1 is valid. Cap the
+                // stored value at the implementation limit rather than treating a large
+                // value as a protocol error.
+                set(setting, Long.valueOf(Math.min(value, MAX_HEADER_TABLE_SIZE)), force);
+                return;
             }
+            case ENABLE_PUSH -> validateEnablePush(value);
+            case MAX_CONCURRENT_STREAMS, MAX_HEADER_LIST_SIZE -> validateUnsigned32BitSetting(setting, value);
             case INITIAL_WINDOW_SIZE -> validateInitialWindowSize(value);
             case MAX_FRAME_SIZE -> validateMaxFrameSize(value);
             case NO_RFC7540_PRIORITIES -> validateNoRfc7540Priorities(value);
@@ -102,6 +108,9 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
     /**
      * Specify a new value for setting with the option to force the change to take effect immediately rather than
      * waiting until an {@code ACK} is received.
+     * <p>
+     * The default implementation applies the value to the current settings and ignores {@code force}. The
+     * {@link ConnectionSettingsLocal} override honors {@code force}.
      *
      * @param setting The setting to update
      * @param value   The new value for the setting
@@ -187,15 +196,6 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
     }
 
 
-    private void validateHeaderTableSize(long headerTableSize) throws T {
-        if (headerTableSize > MAX_HEADER_TABLE_SIZE) {
-            String msg = sm.getString("connectionSettings.headerTableSizeLimit", connectionId,
-                    Long.toString(headerTableSize));
-            throwException(msg, Http2Error.PROTOCOL_ERROR);
-        }
-    }
-
-
     private void validateEnablePush(long enablePush) throws T {
         // Can't be less than zero since the result of the byte->long conversion
         // will never be negative
@@ -207,6 +207,11 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
 
 
     private void validateInitialWindowSize(long initialWindowSize) throws T {
+        if (initialWindowSize < 0) {
+            String msg = sm.getString("connectionSettings.windowSizeTooSmall", connectionId,
+                    Long.toString(initialWindowSize));
+            throwException(msg, Http2Error.FLOW_CONTROL_ERROR);
+        }
         if (initialWindowSize > MAX_WINDOW_SIZE) {
             String msg = sm.getString("connectionSettings.windowSizeTooBig", connectionId,
                     Long.toString(initialWindowSize), Long.toString(MAX_WINDOW_SIZE));
@@ -229,6 +234,20 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
         if (noRfc7540Priorities < 0 || noRfc7540Priorities > 1) {
             String msg = sm.getString("connectionSettings.noRfc7540PrioritiesInvalid", connectionId,
                     Long.toString(noRfc7540Priorities));
+            throwException(msg, Http2Error.PROTOCOL_ERROR);
+        }
+    }
+
+
+    private void validateUnsigned32BitSetting(Setting setting, long value) throws T {
+        // Values are serialized in a SETTINGS frame as an unsigned 32-bit
+        // integer so anything outside that range can not be used. Values
+        // received from a peer via Http2Parser are always in range since they
+        // are read as unsigned 32-bit integers. This validation is primarily
+        // to guard against invalid values provided via local configuration.
+        if (value < 0 || value > MAX_SETTING_VALUE) {
+            String msg = sm.getString("connectionSettings.settingValueInvalid", connectionId, setting.name(),
+                    Long.toString(value), "0", Long.toString(MAX_SETTING_VALUE));
             throwException(msg, Http2Error.PROTOCOL_ERROR);
         }
     }

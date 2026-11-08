@@ -119,6 +119,10 @@ public class TestSSLValve {
             EasyMock.replay(connector);
             mockRequest = new MockRequest(connector);
         }
+        // A single MockRequest instance is shared between tests. Remove any
+        // headers and attributes left over by a previous test.
+        mockRequest.getCoyoteRequest().getMimeHeaders().recycle();
+        mockRequest.getCoyoteRequest().getAttributes().clear();
         mockNext.invoke(mockRequest, null);
         EasyMock.replay(mockNext);
     }
@@ -260,6 +264,42 @@ public class TestSSLValve {
         String begin = certificateSingleLine(linesBegin, " ");
         mockRequest.setHeader(valve.getSslClientCertHeader(), begin);
 
+        TesterLogValidationFilter f = TesterLogValidationFilter.add(Level.WARNING, null, null,
+                "org.apache.catalina.valves.SSLValve");
+
+        valve.invoke(mockRequest, null);
+
+        EasyMock.verify(mockNext);
+        // A value that does not start with the BEGIN marker is not a PEM
+        // encoded certificate. The header is ignored.
+        Assert.assertNull(mockRequest.getAttribute(Globals.CERTIFICATES_ATTR));
+        Assert.assertEquals(0, f.getMessageCount());
+    }
+
+
+    @Test
+    public void testSslClientCertHeaderEscapedInvalidEncoding() throws Exception {
+        setUp();
+        // Percent-escaping that is not followed by two hex digits
+        mockRequest.setHeader(valve.getSslClientEscapedCertHeader(), "%zz%0a-----BEGIN%20CERTIFICATE-----%0a");
+
+        TesterLogValidationFilter f = TesterLogValidationFilter.add(Level.WARNING, null, null,
+                "org.apache.catalina.valves.SSLValve");
+
+        valve.invoke(mockRequest, null);
+
+        EasyMock.verify(mockNext);
+        Assert.assertNull(mockRequest.getAttribute(Globals.CERTIFICATES_ATTR));
+        Assert.assertEquals(0, f.getMessageCount());
+    }
+
+
+    @Test
+    public void testSslClientCertHeaderEscapedInvalidEncodingFallsBackToPlain() throws Exception {
+        setUp();
+        mockRequest.setHeader(valve.getSslClientEscapedCertHeader(), "%zz%0a-----BEGIN%20CERTIFICATE-----%0a");
+        mockRequest.setHeader(valve.getSslClientCertHeader(), certificateSingleLine(" "));
+
         valve.invoke(mockRequest, null);
 
         assertCertificateParsed();
@@ -350,13 +390,19 @@ public class TestSSLValve {
     }
 
 
+    @Test
     public void testSslCipherUserKeySizeHeaderBadFormat() throws Exception {
         setUp();
         mockRequest.setHeader(valve.getSslCipherUserKeySizeHeader(), "not-an-integer");
 
+        TesterLogValidationFilter f = TesterLogValidationFilter.add(Level.WARNING, null, null,
+                "org.apache.catalina.valves.SSLValve");
+
         valve.invoke(mockRequest, null);
 
+        EasyMock.verify(mockNext);
         Assert.assertNull(mockRequest.getAttribute(Globals.KEY_SIZE_ATTR));
+        Assert.assertEquals(1, f.getMessageCount());
     }
 
 

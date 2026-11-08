@@ -33,7 +33,7 @@ public class JarScannerSF extends StoreFactoryBase {
     }
 
     /**
-     * Store the specified JarScanner properties and children (JarScannerFilter)
+     * Store the specified JarScanner properties and children (JarScanFilter)
      * <p>
      * {@inheritDoc}
      */

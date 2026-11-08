@@ -17,12 +17,10 @@
 package org.apache.catalina.tribes.transport;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
- * A very simple thread pool class. The pool size is set at construction time and remains fixed. Threads are cycled
- * through a FIFO idle queue.
+ * A very simple thread pool class. Threads are cycled through a FIFO idle queue.
  */
 public class RxTaskPool {
 
@@ -30,7 +28,7 @@ public class RxTaskPool {
     final List<AbstractRxTask> used = new ArrayList<>();
 
     final Object mutex = new Object();
-    boolean running = true;
+    volatile boolean running = true;
 
     private int maxTasks;
     private int minTasks;
@@ -43,11 +41,11 @@ public class RxTaskPool {
      *
      * @param maxTasks maximum number of tasks in the pool
      * @param minTasks minimum number of tasks in the pool
-     * @param creator factory for creating new receive tasks
+     * @param creator  factory for creating new receive tasks
+     *
      * @throws Exception if initialization fails
      */
     public RxTaskPool(int maxTasks, int minTasks, TaskCreator creator) throws Exception {
-        // fill up the pool with worker threads
         this.maxTasks = maxTasks;
         this.minTasks = minTasks;
         this.creator = creator;
@@ -65,9 +63,9 @@ public class RxTaskPool {
     }
 
     /**
-     * Find an idle worker thread, if any. Could return null.
+     * Find an idle worker thread, creating a new one if needed. Blocks until a worker is available.
      *
-     * @return a worker
+     * @return a worker, or null if the pool has been stopped or the calling thread was interrupted
      */
     public AbstractRxTask getRxTask() {
         AbstractRxTask worker = null;
@@ -86,7 +84,10 @@ public class RxTaskPool {
                     try {
                         mutex.wait();
                     } catch (InterruptedException x) {
+                        // Restore the interrupt status and stop waiting rather than spin on a wait that would throw
+                        // again immediately
                         Thread.currentThread().interrupt();
+                        return null;
                     }
                 }
             }
@@ -114,18 +115,14 @@ public class RxTaskPool {
      * @param worker The worker
      */
     public void returnWorker(AbstractRxTask worker) {
-        if (running) {
-            synchronized (mutex) {
-                used.remove(worker);
-                if (idle.size() < maxTasks && !idle.contains(worker)) {
-                    idle.add(worker); // let max be the upper limit
-                } else {
-                    worker.close();
-                }
-                mutex.notifyAll();
+        synchronized (mutex) {
+            used.remove(worker);
+            if (running && idle.size() < maxTasks && !idle.contains(worker)) {
+                idle.add(worker); // let max be the upper limit
+            } else {
+                worker.close();
             }
-        } else {
-            worker.close();
+            mutex.notifyAll();
         }
     }
 
@@ -151,14 +148,15 @@ public class RxTaskPool {
      * Stop the pool, closing all idle tasks and preventing new tasks from being acquired.
      */
     public void stop() {
-        running = false;
         synchronized (mutex) {
-            Iterator<AbstractRxTask> i = idle.iterator();
-            while (i.hasNext()) {
-                AbstractRxTask worker = i.next();
-                returnWorker(worker);
-                i.remove();
+            running = false;
+            for (AbstractRxTask worker : idle) {
+                worker.close();
             }
+            idle.clear();
+            // Wake up any thread parked in getRxTask() so that it sees that
+            // running is false and returns rather than waiting forever
+            mutex.notifyAll();
         }
     }
 

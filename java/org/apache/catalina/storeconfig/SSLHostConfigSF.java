@@ -23,8 +23,9 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
-import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
+import org.apache.tomcat.util.net.SSLHostConfigPreSharedKey;
 import org.apache.tomcat.util.net.openssl.OpenSSLConf;
+import org.apache.tomcat.util.net.openssl.OpenSSLConfCmd;
 
 /**
  * Store SSLHostConfig
@@ -84,23 +85,68 @@ public class SSLHostConfigSF extends StoreFactoryBase {
             throws Exception {
         if (aSSLHostConfig instanceof SSLHostConfig sslHostConfig) {
             // Store nested <SSLHostConfigCertificate> elements
-            SSLHostConfigCertificate[] hostConfigsCertificates =
-                    sslHostConfig.getCertificates().toArray(new SSLHostConfigCertificate[0]);
-            // Remove a possible default UNDEFINED certificate
-            if (hostConfigsCertificates.length > 1) {
+            SSLHostConfigCertificate[] hostConfigsCertificates;
+            if (sslHostConfig.isPreSharedKeyOnly()) {
+                hostConfigsCertificates = new SSLHostConfigCertificate[0];
+            } else {
+                hostConfigsCertificates =
+                        sslHostConfig.getCertificates().toArray(new SSLHostConfigCertificate[0]);
+            }
+            // Remove the runtime placeholder certificate that was created when
+            // no certificate was configured
+            SSLHostConfigCertificate defaultCertificate = sslHostConfig.getDefaultCertificate();
+            if (defaultCertificate != null) {
                 ArrayList<SSLHostConfigCertificate> certificates = new ArrayList<>();
                 for (SSLHostConfigCertificate certificate : hostConfigsCertificates) {
-                    if (Type.UNDEFINED != certificate.getType()) {
+                    if (certificate != defaultCertificate) {
                         certificates.add(certificate);
                     }
                 }
                 hostConfigsCertificates = certificates.toArray(new SSLHostConfigCertificate[0]);
             }
             storeElementArray(aWriter, indent, hostConfigsCertificates);
+            // Store nested <PreSharedKey> elements
+            SSLHostConfigPreSharedKey[] preSharedKeys =
+                    sslHostConfig.getPreSharedKeys().toArray(new SSLHostConfigPreSharedKey[0]);
+            storeElementArray(aWriter, indent, preSharedKeys);
             // Store nested <OpenSSLConf> element
             OpenSSLConf openSslConf = sslHostConfig.getOpenSslConf();
+            openSslConf = removeRuntimeCommands(openSslConf, sslHostConfig);
             storeElement(aWriter, indent, openSslConf);
         }
+    }
+
+    /*
+     * When the SSL context is created, the OpenSSL implementation adds a runtime "groups" command derived from the
+     * SSLHostConfig "groups" attribute if no other groups command has been specified. Store a copy of the configuration
+     * without such a command, since it duplicates the attribute and a stored command would shadow later changes of the
+     * attribute. A command whose value differs from the derived one was written by the user and is kept.
+     */
+    private OpenSSLConf removeRuntimeCommands(OpenSSLConf openSslConf, SSLHostConfig sslHostConfig) {
+        if (openSslConf == null || sslHostConfig.getGroups() == null) {
+            return openSslConf;
+        }
+        String derivedValue = sslHostConfig.getGroups().replace(',', ':');
+        OpenSSLConfCmd runtimeCommand = null;
+        int groupCommandCount = 0;
+        for (OpenSSLConfCmd command : openSslConf.getCommands()) {
+            if (OpenSSLConfCmd.GROUPS.equals(command.getName())) {
+                groupCommandCount++;
+                if (derivedValue.equals(command.getValue())) {
+                    runtimeCommand = command;
+                }
+            }
+        }
+        if (groupCommandCount != 1 || runtimeCommand == null) {
+            return openSslConf;
+        }
+        OpenSSLConf filteredCommands = new OpenSSLConf();
+        for (OpenSSLConfCmd command : openSslConf.getCommands()) {
+            if (command != runtimeCommand) {
+                filteredCommands.addCmd(command);
+            }
+        }
+        return filteredCommands;
     }
 
 }

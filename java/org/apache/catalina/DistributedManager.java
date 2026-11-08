@@ -39,9 +39,9 @@ public interface DistributedManager {
     int getActiveSessionsFull();
 
     /**
-     * Returns the list of all sessions IDS (primary, backup and proxy).
+     * Returns the set of all session IDs (primary, backup and proxy).
      *
-     * @return The complete set of sessions IDs across the cluster.
+     * @return The complete set of session IDs across the cluster.
      */
     Set<String> getSessionIdsFull();
 }

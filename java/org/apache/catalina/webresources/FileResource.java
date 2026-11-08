@@ -26,8 +26,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.security.cert.Certificate;
 import java.util.concurrent.locks.Lock;
 import java.util.jar.Manifest;
@@ -67,7 +65,7 @@ public class FileResource extends AbstractResource {
     private final WebResourceLockSet lockSet;
     private final String lockPath;
 
-   /**
+    /**
      * Creates a FileResource without locking support.
      *
      * @param root The web resource root
@@ -260,6 +258,10 @@ public class FileResource extends AbstractResource {
                 }
                 pos += n;
             }
+            if (pos < size) {
+                // Stream ended before expected size — return null to avoid partial data
+                return null;
+            }
         } catch (IOException ioe) {
             if (getLog().isDebugEnabled()) {
                 getLog().debug(sm.getString("abstractResource.getContentFail", getWebappPath()), ioe);
@@ -276,7 +278,7 @@ public class FileResource extends AbstractResource {
             try {
                 result = str.getBytes(StandardCharsets.UTF_8);
             } catch (Exception e) {
-                result = null;
+                return null;
             }
         }
         return result;
@@ -285,15 +287,7 @@ public class FileResource extends AbstractResource {
 
     @Override
     public long getCreation() {
-        try {
-            BasicFileAttributes attrs = Files.readAttributes(resource.toPath(), BasicFileAttributes.class);
-            return attrs.creationTime().toMillis();
-        } catch (IOException ioe) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("fileResource.getCreationFail", resource.getPath()), ioe);
-            }
-            return 0;
-        }
+        return getCreation(resource);
     }
 
     @Override

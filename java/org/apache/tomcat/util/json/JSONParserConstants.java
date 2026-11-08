@@ -68,19 +68,23 @@ public interface JSONParserConstants {
     /** RegularExpression Id. */
     int QUOTE_SINGLE = 21;
     /** RegularExpression Id. */
-    int STRING_SINGLE_EMPTY = 22;
+    int HEX_DIGIT = 22;
     /** RegularExpression Id. */
-    int STRING_DOUBLE_EMPTY = 23;
+    int UNICODE_ESCAPE = 23;
     /** RegularExpression Id. */
-    int STRING_SINGLE_BODY = 24;
+    int STRING_SINGLE_EMPTY = 24;
     /** RegularExpression Id. */
-    int STRING_DOUBLE_BODY = 25;
+    int STRING_DOUBLE_EMPTY = 25;
     /** RegularExpression Id. */
-    int STRING_SINGLE_NONEMPTY = 26;
+    int STRING_SINGLE_BODY = 26;
     /** RegularExpression Id. */
-    int STRING_DOUBLE_NONEMPTY = 27;
+    int STRING_DOUBLE_BODY = 27;
     /** RegularExpression Id. */
-    int SYMBOL = 28;
+    int STRING_SINGLE_NONEMPTY = 28;
+    /** RegularExpression Id. */
+    int STRING_DOUBLE_NONEMPTY = 29;
+    /** RegularExpression Id. */
+    int SYMBOL = 30;
 
     /** Lexical state. */
     int DEFAULT = 0;
@@ -89,7 +93,7 @@ public interface JSONParserConstants {
     String[] tokenImage = { "<EOF>", "<C_SINGLE_COMMENT>", "<C_MULTILINE_COMMENT>", "<SH_SINGLE_COMMENT>",
             "<WHITESPACE>", "<EOL>", "\",\"", "\"{\"", "\"}\"", "\":\"", "\"[\"", "\"]\"", "\"0\"", "<DIGIT_NONZERO>",
             "<DIGIT>", "<NUMBER_INTEGER>", "<NUMBER_DECIMAL>", "\"true\"", "\"false\"", "\"null\"", "\"\\\"\"",
-            "\"\\\'\"", "\"\\\'\\\'\"", "\"\\\"\\\"\"", "<STRING_SINGLE_BODY>", "<STRING_DOUBLE_BODY>",
-            "<STRING_SINGLE_NONEMPTY>", "<STRING_DOUBLE_NONEMPTY>", "<SYMBOL>", };
+            "\"\\\'\"", "<HEX_DIGIT>", "<UNICODE_ESCAPE>", "\"\\\'\\\'\"", "\"\\\"\\\"\"", "<STRING_SINGLE_BODY>",
+            "<STRING_DOUBLE_BODY>", "<STRING_SINGLE_NONEMPTY>", "<STRING_DOUBLE_NONEMPTY>", "<SYMBOL>", };
 
 }

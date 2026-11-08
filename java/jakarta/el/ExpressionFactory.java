@@ -160,7 +160,7 @@ public abstract class ExpressionFactory {
             Throwable cause = e.getCause();
             Util.handleThrowable(cause);
             throw new ELException(Util.message(null, "expressionFactory.cannotCreate", clazz.getName()), e);
-        } catch (ReflectiveOperationException | IllegalArgumentException e) {
+        } catch (ReflectiveOperationException | IllegalArgumentException | ClassCastException e) {
             throw new ELException(Util.message(null, "expressionFactory.cannotCreate", clazz.getName()), e);
         }
 
@@ -360,8 +360,8 @@ public abstract class ExpressionFactory {
                 Properties props = new Properties();
                 props.load(is);
                 String value = props.getProperty(PROPERTY_NAME);
-                if (value != null && !value.trim().isEmpty()) {
-                    return value.trim();
+                if (value != null && !value.strip().isEmpty()) {
+                    return value.strip();
                 }
             } catch (FileNotFoundException e) {
                 // Should not happen - ignore it if it does
@@ -374,8 +374,8 @@ public abstract class ExpressionFactory {
 
     private static String getClassNameSysProp() {
         String value = System.getProperty(PROPERTY_NAME);
-        if (value != null && !value.trim().isEmpty()) {
-            return value.trim();
+        if (value != null && !value.strip().isEmpty()) {
+            return value.strip();
         }
         return null;
     }

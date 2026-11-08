@@ -17,6 +17,7 @@
 package jakarta.servlet.http;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Serial;
@@ -80,6 +81,7 @@ public abstract class HttpServlet extends GenericServlet {
     private static final String METHOD_POST = "POST";
     private static final String METHOD_PUT = "PUT";
     private static final String METHOD_TRACE = "TRACE";
+    private static final String METHOD_QUERY = "QUERY";
 
     private static final String HEADER_IFMODSINCE = "If-Modified-Since";
     private static final String HEADER_LASTMOD = "Last-Modified";
@@ -98,12 +100,15 @@ public abstract class HttpServlet extends GenericServlet {
     @Deprecated(forRemoval = true, since = "Servlet 6.0")
     public static final String LEGACY_DO_HEAD = "jakarta.servlet.http.legacyDoHead";
 
-    private final transient Object cachedAllowHeaderValueLock = new Object();
+    // Non-final so it can be recreated on deserialization
+    private transient Object cachedAllowHeaderValueLock = new Object();
 
     /**
      * Cached value of the HTTP {@code Allow} header for this servlet.
+     * <p>
+     * Derived cache that is recomputed lazily.
      */
-    private volatile String cachedAllowHeaderValue = null;
+    private transient volatile String cachedAllowHeaderValue = null;
 
     /**
      * Cached value read from {@link HttpServlet#LEGACY_DO_HEAD} system property.
@@ -267,6 +272,32 @@ public abstract class HttpServlet extends GenericServlet {
 
 
     /**
+     * Called by the server (via the <code>service</code> method) to allow a servlet to handle a QUERY request.
+     * The HTTP QUERY method is safe and idempotent and is used to query the target resource.
+     * <p>
+     * Unlike <code>doGet</code>, the container does not perform automatic conditional header processing
+     * (e.g. checking <code>If-Modified-Since</code> using <code>getLastModified</code>). Because a QUERY request
+     * contains a request body, reading the body to determine the modification time would consume the input stream,
+     * preventing the servlet from reading the query. Therefore, if conditional requests (RFC 10008, Section 2.6)
+     * are supported, the servlet must handle them manually inside this method.
+     *
+     * @param req  an {@link HttpServletRequest} object that contains the request the client has made of the servlet
+     * @param resp an {@link HttpServletResponse} object that contains the response the servlet sends to the client
+     *
+     * @exception IOException      if an input or output error is detected when the servlet handles the request
+     * @exception ServletException if the request for the QUERY could not be handled
+     *
+     * @see jakarta.servlet.ServletResponse#setContentType
+     *
+     * @since Servlet 6.2
+     */
+    protected void doQuery(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String msg = lStrings.getString("http.method_query_not_supported");
+        sendMethodNotAllowed(req, resp, msg);
+    }
+
+
+    /**
      * Called by the server (via the <code>service</code> method) to allow a servlet to handle a POST request. The HTTP
      * POST method allows the client to send data of unlimited length to the Web server a single time and is useful when
      * posting information such as credit card numbers.
@@ -367,6 +398,11 @@ public abstract class HttpServlet extends GenericServlet {
         if (protocol.isEmpty() || protocol.endsWith("0.9") || protocol.endsWith("1.0")) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
         } else {
+            // RFC 9110, section 15.5.6: a 405 response must include an Allow header field
+            // Don't override an Allow header field the application may have set
+            if (!resp.containsHeader("Allow")) {
+                resp.setHeader("Allow", getAllowHeaderValue(req));
+            }
             resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, msg);
         }
     }
@@ -391,6 +427,7 @@ public abstract class HttpServlet extends GenericServlet {
                     boolean allowPost = false;
                     boolean allowPut = false;
                     boolean allowDelete = false;
+                    boolean allowQuery = false;
 
                     for (Method method : methods) {
                         switch (method.getName()) {
@@ -415,10 +452,13 @@ public abstract class HttpServlet extends GenericServlet {
                                 allowDelete = true;
                                 break;
                             }
+                            case "doQuery": {
+                                allowQuery = true;
+                                break;
+                            }
                             default:
                                 // NO-OP
                         }
-
                     }
 
                     StringBuilder allow = new StringBuilder();
@@ -450,6 +490,11 @@ public abstract class HttpServlet extends GenericServlet {
 
                     if (allowDelete) {
                         allow.append(METHOD_DELETE);
+                        allow.append(", ");
+                    }
+
+                    if (allowQuery) {
+                        allow.append(METHOD_QUERY);
                         allow.append(", ");
                     }
 
@@ -490,7 +535,9 @@ public abstract class HttpServlet extends GenericServlet {
      * OPTIONS request determines which HTTP methods the server supports and returns an appropriate header. For example,
      * if a servlet overrides <code>doGet</code>, this method returns the following header:
      * <p>
-     * <code>Allow: GET, HEAD, TRACE, OPTIONS</code>
+     * <code>Allow: GET, HEAD, OPTIONS</code>
+     * <p>
+     * The TRACE method may also be present depending on container configuration.
      * <p>
      * There's no need to override this method unless the servlet implements new HTTP methods, beyond those implemented
      * by HTTP 1.1.
@@ -502,7 +549,11 @@ public abstract class HttpServlet extends GenericServlet {
      * @exception ServletException if the request for the OPTIONS cannot be handled
      */
     protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setHeader("Allow", getAllowHeaderValue(req));
+    }
 
+
+    private String getAllowHeaderValue(HttpServletRequest req) {
         String allow = getCachedAllowHeaderValue();
 
         // Tomcat specific hack to see if TRACE is allowed
@@ -514,7 +565,7 @@ public abstract class HttpServlet extends GenericServlet {
             }
         }
 
-        resp.setHeader("Allow", allow);
+        return allow;
     }
 
 
@@ -652,6 +703,7 @@ public abstract class HttpServlet extends GenericServlet {
             case METHOD_OPTIONS -> doOptions(req, resp);
             case METHOD_TRACE -> doTrace(req, resp);
             case METHOD_PATCH -> doPatch(req, resp);
+            case METHOD_QUERY -> doQuery(req, resp);
             default -> {
                 //
                 // Note that this means NO servlet supports whatever
@@ -708,6 +760,21 @@ public abstract class HttpServlet extends GenericServlet {
             throw new ServletException(lStrings.getString("http.non_http"));
         }
         service(request, response);
+    }
+
+
+    /**
+     * Restores the transient lock object used to guard the cached Allow header after deserialization. The cached
+     * header is recomputed lazily so it isn't restored here.
+     *
+     * @param stream the object input stream
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if a serialized class cannot be found
+     */
+    @Serial
+    private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+        stream.defaultReadObject();
+        cachedAllowHeaderValueLock = new Object();
     }
 
 

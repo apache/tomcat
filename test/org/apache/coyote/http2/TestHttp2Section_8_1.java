@@ -301,7 +301,7 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         parser.readFrame();
 
         String trace = output.getTrace();
-        Assert.assertTrue(trace, trace.contains("3-Header-[:status]-[400]"));
+        Assert.assertTrue(trace, trace.contains("3-RST-[1]"));
     }
 
 
@@ -325,7 +325,7 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         parser.readFrame();
 
         String trace = output.getTrace();
-        Assert.assertTrue(trace, trace.contains("3-Header-[:status]-[400]"));
+        Assert.assertTrue(trace, trace.contains("3-RST-[1]"));
     }
 
 

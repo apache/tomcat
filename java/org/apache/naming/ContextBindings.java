@@ -106,6 +106,33 @@ public class ContextBindings {
 
 
     /**
+     * Binds an object and a naming context, unless a naming context is already bound to that object, and returns the
+     * naming context which is in use for that object. The read and the binding are done in a single step, so that a
+     * caller which finds that another thread bound a context in the meantime uses the context which that thread bound
+     * rather than the one it created itself. The returned context is never <code>null</code>: it is the context which
+     * is bound to the object, or the given one when nothing is bound, which happens when the caller may not bind
+     * anything under that name.
+     *
+     * @param obj     Object to bind with naming context
+     * @param context Associated naming context instance
+     * @param token   Security token
+     *
+     * @return the naming context which is in use for the object
+     */
+    static Context bindContextIfAbsent(Object obj, Context context, Object token) {
+        if (!ContextAccessController.checkSecurityToken(obj, token)) {
+            // Nothing may be bound under that name by this caller, so the
+            // context which is in use is the one which is already bound, if
+            // there is one, and the given one otherwise.
+            Context bound = getContext(obj);
+            return bound == null ? context : bound;
+        }
+        Context bound = objectBindings.putIfAbsent(obj, context);
+        return bound == null ? context : bound;
+    }
+
+
+    /**
      * Unbinds an object and a naming context.
      *
      * @param obj   Object to unbind

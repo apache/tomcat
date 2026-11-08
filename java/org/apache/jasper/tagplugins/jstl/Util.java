@@ -43,7 +43,7 @@ import org.apache.jasper.compiler.Localizer;
 public class Util {
 
     /**
-     * Constructs a new Util instance.
+     * Constructs a new Util instance. This class consists only of static methods and instances hold no state.
      */
     public Util() {
     }
@@ -139,7 +139,12 @@ public class Util {
             return null;
         }
         index += 1; // positioned after the '='
-        input = input.substring(index).trim();
+        input = input.substring(index).strip();
+        if (input.isEmpty()) {
+            // Empty or whitespace-only parameter value, e.g. a malformed
+            // "Content-Type: text/html;charset=" header from a remote server.
+            return null;
+        }
 
         if (input.charAt(0) == '"') {
             // attribute value is a quoted string
@@ -158,7 +163,9 @@ public class Util {
                 end = input.length();
             }
         }
-        return input.substring(begin, end).trim();
+        String value = input.substring(begin, end).strip();
+        // An empty value (e.g. charset="" or charset=;foo=bar) is treated the same as an absent attribute
+        return value.isEmpty() ? null : value;
     }
 
     /**
@@ -174,7 +181,7 @@ public class Util {
     public static String stripSession(String url) {
         StringBuilder u = new StringBuilder(url);
         int sessionStart;
-        while ((sessionStart = u.toString().indexOf(";" + "jsessionid" /* FIXME */ + "=")) != -1) {
+        while ((sessionStart = u.toString().indexOf(";" + "jsessionid" + "=")) != -1) {
             int sessionEnd = u.toString().indexOf(';', sessionStart + 1);
             if (sessionEnd == -1) {
                 sessionEnd = u.toString().indexOf('?', sessionStart + 1);
@@ -190,7 +197,7 @@ public class Util {
     /**
      * Performs the following substring replacements (to facilitate output to XML/HTML pages):
      * <ul>
-     * <li>{@code &} -&gt; {@code &amp}</li>
+     * <li>{@code &} -&gt; {@code &amp;}</li>
      * <li>{@code <} -&gt; {@code &lt;}</li>
      * <li>{@code >} -&gt; {@code &gt;}</li>
      * <li>{@code "} -&gt; {@code &#034;}</li>
@@ -215,7 +222,7 @@ public class Util {
      *
      * @return The escaped string, or {@code null} if no escaping was necessary
      */
-    @SuppressWarnings("null") // escapedBuffer cannot be null
+    @SuppressWarnings("null") // escapedBuffer is non-null once a special character has been found
     public static String escapeXml(char[] arrayBuffer, int length) {
         int start = 0;
         StringBuilder escapedBuffer = null;
@@ -259,7 +266,8 @@ public class Util {
      *
      * @return the absolute URL
      *
-     * @throws JspException If the URL doesn't start with '/'
+     * @throws JspException If the context is non-{@code null} and either the context or the URL doesn't start with
+     *             '/'
      */
     public static String resolveUrl(String url, String context, PageContext pageContext) throws JspException {
         // don't touch absolute URLs
@@ -279,11 +287,14 @@ public class Util {
             if (!context.startsWith("/") || !url.startsWith("/")) {
                 throw new JspTagException(Localizer.getMessage("jstl.urlMustStartWithSlash"));
             }
-            if (context.equals("/")) {
-                // Don't produce string starting with '//', many
-                // browsers interpret this as host name, not as
-                // path on same host.
-                return url;
+            if (context.endsWith("/")) {
+                // Strip the trailing slash of the context, as the standard
+                // handler does, so that the joined path does not carry a
+                // doubled slash. For the root context this reduces to the
+                // URL itself, which also avoids producing a string starting
+                // with '//', as many browsers interpret this as host name,
+                // not as path on same host.
+                return context.substring(0, context.length() - 1) + url;
             } else {
                 return context + url;
             }

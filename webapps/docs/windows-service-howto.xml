@@ -467,7 +467,7 @@ C:\> service.bat install MyService</source>
 <p>When installing the service with a non-default name,
 tomcat<version-major/>.exe and tomcat<version-major/>w.exe may be renamed to
 match the chosen service name. To do this, use the <code>--rename</code>
-option.</p>
+option. The install will fail if either renamed file already exists.</p>
 
 <source>Install the service named 'MyService' with renaming
 C:\> service.bat install MyService --rename</source>
@@ -513,6 +513,9 @@ C:\> tomcat<version-major/> //DS//Tomcat<version-major/></source>
 
 <source>Remove the service named 'MyService'
 C:\> tomcat<version-major/> //DS//MyService</source>
+
+<p>If a renamed service is removed with <code>service.bat remove</code>, the
+executables are restored to their default names on remove.</p>
 
 </section>
 <section name="Debugging services">

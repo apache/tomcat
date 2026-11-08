@@ -50,7 +50,7 @@ public class TestCloseBug58624 extends WebSocketBaseTest {
         Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(Bug58624ServerConfig.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
 

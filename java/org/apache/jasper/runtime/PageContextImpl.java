@@ -52,7 +52,7 @@ import org.apache.jasper.el.ELContextImpl;
 import org.apache.jasper.runtime.JspContextWrapper.ELContextWrapper;
 
 /**
- * Implementation of the PageContext class from the JSP spec. Also doubles as a VariableResolver for the EL.
+ * Implementation of the PageContext class from the JSP spec.
  */
 public class PageContextImpl extends PageContext {
 
@@ -438,21 +438,6 @@ public class PageContextImpl extends PageContext {
         return servlet;
     }
 
-    private String getAbsolutePathRelativeToContext(String relativeUrlPath) {
-        String path = relativeUrlPath;
-
-        if (!path.startsWith("/")) {
-            String uri = (String) request.getAttribute(RequestDispatcher.INCLUDE_SERVLET_PATH);
-            if (uri == null) {
-                uri = ((HttpServletRequest) request).getServletPath();
-            }
-            String baseURI = uri.substring(0, uri.lastIndexOf('/'));
-            path = baseURI + '/' + path;
-        }
-
-        return path;
-    }
-
     @Override
     public void include(String relativeUrlPath) throws ServletException, IOException {
         JspRuntimeLibrary.include(request, response, relativeUrlPath, out, true);
@@ -478,7 +463,7 @@ public class PageContextImpl extends PageContext {
             response = ((ServletResponseWrapperInclude) response).getResponse();
         }
 
-        final String path = getAbsolutePathRelativeToContext(relativeUrlPath);
+        final String path = JspRuntimeLibrary.getContextRelativePath(request, relativeUrlPath);
         String includeUri = (String) request.getAttribute(RequestDispatcher.INCLUDE_SERVLET_PATH);
 
         if (includeUri != null) {

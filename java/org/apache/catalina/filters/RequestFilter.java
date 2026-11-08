@@ -43,7 +43,8 @@ import jakarta.servlet.http.HttpServletResponse;
  * this request will be allowed to pass through to the next filter in the current pipeline.</li>
  * <li>If a deny expression was specified but no allow expression, allow this request to pass through (because none of
  * the deny expressions matched it).</li>
- * <li>The request will be rejected with a "Forbidden" HTTP response.</li>
+ * <li>Otherwise (an allow expression was configured but did not match, or no expressions were configured at all), the
+ * request will be rejected with a "Forbidden" HTTP response.</li>
  * </ul>
  */
 public abstract class RequestFilter extends FilterBase {

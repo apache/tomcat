@@ -55,9 +55,9 @@ import org.apache.tomcat.util.res.StringManager;
  * should be aligned with that of the associated {@link Context}.
  * </p>
  * <p>
- * This implementation assumes that the base attribute supplied to
+ * The base attribute supplied to
  * {@link StandardRoot#createWebResourceSet( org.apache.catalina.WebResourceRoot.ResourceSetType, String, String, String, String)}
- * represents the absolute path to a file.
+ * must represent the absolute path to a file or a directory.
  * </p>
  */
 public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot {
@@ -315,6 +315,13 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
         }
 
         // Default is empty resource in main resources
+        if (mainEmpty == null) {
+            // The main resources are removed from allResources while the root
+            // is stopping, but requests that are still in progress during that
+            // window need a non-existent resource rather than null.
+            return new EmptyResource(this, path);
+        }
+
         return mainEmpty;
     }
 
@@ -413,8 +420,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
             default -> throw new IllegalArgumentException(sm.getString("standardRoot.createUnknownType", type));
         };
 
-        // This implementation assumes that the base for all resources will be a
-        // file.
+        // The base for a resource set can be either a file or a directory.
         File file = new File(base);
 
         if (file.isFile()) {
@@ -807,7 +813,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
             if (f.isDirectory()) {
                 mainResourceSet = new DirResourceSet(this, "/", f.getAbsolutePath(), "/");
                 mainResourceSet.setReadOnly(readOnly);
-            } else if (f.isFile() && docBase.endsWith(".war")) {
+            } else if (f.isFile() && docBase.toLowerCase(Locale.ENGLISH).endsWith(".war")) {
                 mainResourceSet = new WarResourceSet(this, "/", f.getAbsolutePath());
             } else {
                 throw new IllegalArgumentException(sm.getString("standardRoot.startInvalidMain", f.getAbsolutePath()));
@@ -885,13 +891,22 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
                 } else {
                     endOfFileUrl = jarUrl.indexOf(UriUtil.getWarSeparator());
                 }
+                if (endOfFileUrl == -1) {
+                    throw new IllegalArgumentException(sm.getString("standardRoot.missingSeparator", jarUrl));
+                }
                 String fileUrl = jarUrl.substring(4, endOfFileUrl);
                 try {
                     f = new File(new URI(fileUrl));
                 } catch (URISyntaxException e) {
-                    throw new IllegalArgumentException(e);
+                    throw new IllegalArgumentException(
+                            sm.getString("standardRoot.invalidJarUrl", fileUrl), e);
                 }
-                int startOfArchivePath = endOfFileUrl + 2;
+                int startOfArchivePath;
+                if ("jar".equals(url.getProtocol())) {
+                    startOfArchivePath = endOfFileUrl + 2;  // "!/" is always 2 chars
+                } else {
+                    startOfArchivePath = endOfFileUrl + UriUtil.getWarSeparator().length();
+                }
                 if (jarUrl.length() > startOfArchivePath) {
                     archivePath = jarUrl.substring(startOfArchivePath);
                 } else {
@@ -901,7 +916,8 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
                 try {
                     f = new File(url.toURI());
                 } catch (URISyntaxException e) {
-                    throw new IllegalArgumentException(e);
+                    throw new IllegalArgumentException(
+                            sm.getString("standardRoot.invalidFileUrl", url.toExternalForm()), e);
                 }
                 archivePath = null;
             } else {

@@ -16,8 +16,13 @@
  */
 package org.apache.tomcat.util.net.openssl.ciphers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -440,7 +445,42 @@ public class TestOpenSSLCipherConfigurationParser {
     }
 
 
-    // TODO: Add tests for the individual operators
+    @Test
+    public void testOperatorExclude() throws Exception {
+        testSpecification("AES128:!SHA256:SHA256");
+    }
+
+
+    @Test
+    public void testOperatorDelete() throws Exception {
+        testSpecification("AES128:-SHA256:SHA256");
+    }
+
+
+    @Test
+    public void testOperatorMoveToEnd() throws Exception {
+        testSpecification("AES128:AES256:+AES128");
+    }
+
+
+    @Test
+    public void testOperatorIntersection() throws Exception {
+        testSpecification("AES128+SHA256");
+    }
+
+
+    @Test
+    public void testOperatorStrengthSort() throws Exception {
+        testSpecification("AES128:AES256:@STRENGTH");
+    }
+
+
+    @Test
+    public void testSeparators() throws Exception {
+        testSpecification("AES128:AES256");
+        testSpecification("AES128,AES256");
+        testSpecification("AES128 AES256");
+    }
 
     @Test
     public void testSpecification01() throws Exception {
@@ -502,10 +542,146 @@ public class TestOpenSSLCipherConfigurationParser {
     }
 
 
+    @Test
+    public void testIntersectionWithUnknownTermIsEmpty() throws Exception {
+        // OpenSSL treats an AND element that contains an unknown term as
+        // matching no ciphers, regardless of the position of the unknown term
+        testSpecificationIsEmpty("SHA1+Nonsense");
+        Assert.assertEquals(0, OpenSSLCipherConfigurationParser.parse("SHA1+Nonsense").size());
+        Assert.assertEquals(0, OpenSSLCipherConfigurationParser.parse("Nonsense+SHA1").size());
+    }
+
+
+    @Test
+    public void testIntersectionWithUnknownTermIsDiscarded() throws Exception {
+        // OpenSSL discards the whole AND element if any term is unknown, wherever the unknown term is. The other
+        // elements are not affected.
+        testSpecification("AES128:SHA1+Nonsense");
+        testSpecification("AES128:Nonsense+SHA1");
+        testSpecification("AES128:SHA1+Nonsense+AES128");
+
+        List<String> expected = OpenSSLCipherConfigurationParser.parseExpression("AES128");
+        Assert.assertEquals(expected, OpenSSLCipherConfigurationParser.parseExpression("AES128:SHA1+Nonsense"));
+        Assert.assertEquals(expected, OpenSSLCipherConfigurationParser.parseExpression("AES128:Nonsense+SHA1"));
+        Assert.assertEquals(expected,
+                OpenSSLCipherConfigurationParser.parseExpression("AES128:SHA1+Nonsense+AES128"));
+    }
+
+
+    @Test
+    public void testUnknownElementsAreIgnored() throws Exception {
+        // OpenSSL ignores unknown elements, whatever the operator
+        testSpecification("AES128:Nonsense");
+        testSpecification("AES128:!Nonsense");
+
+        List<String> expected = OpenSSLCipherConfigurationParser.parseExpression("AES128");
+        for (String unknown : new String[] { "Nonsense", "!Nonsense", "-Nonsense", "+Nonsense" }) {
+            Assert.assertEquals(unknown, expected,
+                    OpenSSLCipherConfigurationParser.parseExpression("AES128:" + unknown));
+        }
+    }
+
+
+    @Test
+    public void testUnknownElementsAreLogged() {
+        String[] specifications = { "AES128:Nonsense", "AES128:!Nonsense", "AES128:-Nonsense", "AES128:+Nonsense",
+                "AES128:SHA1+Nonsense", "AES128:Nonsense+SHA1" };
+
+        for (String specification : specifications) {
+            List<String> warnings = parseAndCaptureWarnings(specification);
+            Assert.assertEquals(specification + " logged " + warnings, 1, warnings.size());
+            Assert.assertTrue(specification + " logged " + warnings, warnings.get(0).contains("Nonsense"));
+        }
+    }
+
+
+    @Test
+    public void testKnownAndOtherValidElementsAreNotLogged() {
+        // Known elements, an empty element and the valid OpenSSL @SECLEVEL element must not trigger a warning
+        String[] specifications = { "AES128:SHA1+AES128", "AES128:!aNULL:-AES256:+SHA1:@STRENGTH", "AES128::SHA1",
+                "AES128:@SECLEVEL=1" };
+
+        for (String specification : specifications) {
+            List<String> warnings = parseAndCaptureWarnings(specification);
+            Assert.assertTrue(specification + " logged " + warnings, warnings.isEmpty());
+        }
+    }
+
+
+    private List<String> parseAndCaptureWarnings(String specification) {
+        List<String> warnings = new ArrayList<>();
+        Logger logger = Logger.getLogger(OpenSSLCipherConfigurationParser.class.getName());
+        Handler handler = new Handler() {
+            @Override
+            public void publish(LogRecord record) {
+                if (record.getLevel().intValue() >= Level.WARNING.intValue()) {
+                    warnings.add(record.getMessage() + " " + String.join(" ",
+                            record.getParameters() == null ? new String[0] :
+                                    java.util.Arrays.stream(record.getParameters()).map(String::valueOf)
+                                            .toArray(String[]::new)));
+                }
+            }
+
+            @Override
+            public void flush() {
+                // NO-OP
+            }
+
+            @Override
+            public void close() {
+                // NO-OP
+            }
+        };
+        logger.addHandler(handler);
+        try {
+            OpenSSLCipherConfigurationParser.parseExpression(specification);
+        } finally {
+            logger.removeHandler(handler);
+        }
+        return warnings;
+    }
+
+
     private void testSpecificationIsEmpty(String specification) throws Exception {
         String openSSLCipherList = TesterOpenSSL.getOpenSSLCiphersAsExpression(specification);
-        Assert.assertEquals("Specification [" + specification + "] returned [" + openSSLCipherList +
-                "] rather than the expected empty list", "", openSSLCipherList);
+        Assert.assertEquals(TesterOpenSSL.VERSION_STRING + " with specification [" + specification + "] returned [" +
+                openSSLCipherList + "] rather than the expected empty list", "", openSSLCipherList);
+    }
+
+
+    @Test
+    public void testReAddAfterRemove() throws Exception {
+        testSpecification("AES256:AES128:-AES256:AES");
+    }
+
+
+    @Test
+    public void testReAddMultipleRemovalsOrder() throws Exception {
+        testSpecification("AES128:AES256:-AES256:-AES128:AES");
+    }
+
+
+    @Test
+    public void testExcludeBeatsReAdd() throws Exception {
+        testSpecification("AES:-AES256:!AES256:AES");
+    }
+
+
+    @Test
+    public void testReAddViaIntersection() throws Exception {
+        testSpecification("AES256:AES128:-AES256:AES+AESGCM");
+    }
+
+
+    @Test
+    public void testReAddAfterMoveToEnd01() throws Exception {
+        testSpecification("AES128-SHA:AES256-SHA:+AES128-SHA:-AES:AES");
+    }
+
+
+    @Test
+    public void testReAddAfterMoveToEnd02() throws Exception {
+        testSpecification("AES128-SHA:AES256-SHA:-AES128-SHA:+AES128-SHA:AES");
     }
 
 
@@ -522,16 +698,9 @@ public class TestOpenSSLCipherConfigurationParser {
         // First check the lists have the same entries
         // Order is NOT important at this point. It is checked below.
         Assert.assertEquals(
-                "Expected " + jsseCipherListFromOpenSSL.size() + " ciphers but got "
-                        + jsseCipherListFromParser.size() + " for the specification '"
-                        + specification + "'",
+                TesterOpenSSL.VERSION_STRING + " with specification [" + specification + "] expected " +
+                        jsseCipherListFromOpenSSL.size() + " ciphers but got " + jsseCipherListFromParser.size(),
                 new TreeSet<>(jsseCipherListFromOpenSSL), new TreeSet<>(jsseCipherListFromParser));
-
-        Assert.assertEquals(
-                "Expected " + jsseCipherListFromParser.size() + " ciphers but got "
-                        + jsseCipherListFromOpenSSL.size() + " for the specification '"
-                        + specification + "'",
-                new TreeSet<>(jsseCipherListFromParser), new TreeSet<>(jsseCipherListFromOpenSSL));
 
         /*
          * The parser generated cipher list is checked for an exact match with the list generated by OpenSSL.
@@ -545,8 +714,8 @@ public class TestOpenSSLCipherConfigurationParser {
          * be caught by CI and the test can be adjusted.
          */
         if (TesterOpenSSL.VERSION > 30299) {
-            Assert.assertEquals(specification, listToString(jsseCipherListFromOpenSSL, ','),
-                    listToString(jsseCipherListFromParser, ','));
+            Assert.assertEquals(TesterOpenSSL.VERSION_STRING + " with specification [" + specification + "]",
+                    listToString(jsseCipherListFromOpenSSL, ','), listToString(jsseCipherListFromParser, ','));
         }
     }
 

@@ -45,6 +45,17 @@ public class TestConcurrentDateFormat {
         Assert.assertTrue(formattedDate.endsWith("GMT"));
     }
 
+    @Test
+    public void testParseTwoDigitYearStart() throws Exception {
+        ConcurrentDateFormat format = new ConcurrentDateFormat("dd-MMM-yy", Locale.US, tz);
+        Date start = format.parse("01-Jan-2000");
+
+        Assert.assertEquals(format.parse("01-Jan-2070"), format.parse("01-Jan-70", start));
+        // The start of the period applies to that call only
+        ConcurrentDateFormat unused = new ConcurrentDateFormat("dd-MMM-yy", Locale.US, tz);
+        Assert.assertEquals(unused.parse("01-Jan-70"), format.parse("01-Jan-70"));
+    }
+
     private ConcurrentDateFormat createConcurrentDateFormat() {
         return new ConcurrentDateFormat(DATE_RFC5322, Locale.US, tz);
     }

@@ -25,7 +25,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.JarURLConnection;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -37,11 +36,12 @@ import org.apache.jasper.servlet.JspServletWrapper;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.Jar;
+import org.apache.tomcat.util.buf.CloseableURLConnection;
 import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
 import org.apache.tomcat.util.scan.JarFactory;
 
 /**
- * Main JSP compiler class. This class uses Ant for compiling.
+ * Main JSP compiler class. Subclasses provide the actual compilation of the generated servlet source.
  */
 public abstract class Compiler {
 
@@ -134,7 +134,8 @@ public abstract class Compiler {
 
 
     /**
-     * Compile the jsp file into equivalent servlet in .java file
+     * Compile the jsp file into equivalent servlet in .java file. The translation unit is parsed and validated, page
+     * info is collected, referenced tag files are processed and the JSR 045 source maps are generated.
      *
      * @return A map of class names to JSR 045 source maps
      *
@@ -559,13 +560,13 @@ public abstract class Compiler {
                     if (includeUrl == null) {
                         return true;
                     }
-                    URLConnection iuc = includeUrl.openConnection();
-                    if (iuc instanceof JarURLConnection) {
-                        includeLastModified = ((JarURLConnection) iuc).getJarEntry().getTime();
-                    } else {
-                        includeLastModified = iuc.getLastModified();
+                    try (CloseableURLConnection iuc = new CloseableURLConnection(includeUrl)) {
+                        if (iuc.getConnection() instanceof JarURLConnection) {
+                            includeLastModified = ((JarURLConnection) iuc.getConnection()).getJarEntry().getTime();
+                        } else {
+                            includeLastModified = iuc.getLastModified();
+                        }
                     }
-                    iuc.getInputStream().close();
                 }
 
                 if (includeLastModified != include.getValue().longValue()) {

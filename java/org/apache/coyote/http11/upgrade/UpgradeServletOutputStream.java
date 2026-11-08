@@ -17,6 +17,7 @@
 package org.apache.coyote.http11.upgrade;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.WriteListener;
@@ -78,6 +79,12 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
      * Whether the stream has been closed.
      */
     private volatile boolean closed = false;
+
+    /**
+     * Whether an error has been reported to the listener. No further
+     * call-backs are permitted once the error has been reported.
+     */
+    private final AtomicBoolean errorReported = new AtomicBoolean();
 
     // Start in blocking-mode
     /**
@@ -149,10 +156,10 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
             throw new IllegalStateException(sm.getString("upgrade.sos.write.closed"));
         }
         this.listener = listener;
-        // Container is responsible for first call to onWritePossible().
+        // The first call to onWritePossible() will be triggered by the poller
+        // once write interest is registered.
         synchronized (registeredLock) {
             registered = true;
-            // Container is responsible for first call to onDataAvailable().
             Request request = processor.getRequest();
             if (request != null && request.isRequestThread()) {
                 processor.addDispatch(DispatchType.NON_BLOCKING_WRITE);
@@ -248,6 +255,11 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
 
 
     final void onWritePossible() {
+        if (errorReported.get()) {
+            // No further call-backs are permitted once an error has been
+            // reported.
+            return;
+        }
         try {
             if (flushing) {
                 flushInternal(false, true);
@@ -292,8 +304,8 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
     }
 
 
-    private void onError(Throwable t) {
-        if (listener == null) {
+    final void onError(Throwable t) {
+        if (listener == null || !errorReported.compareAndSet(false, true)) {
             return;
         }
         ClassLoader oldCL = processor.getUpgradeToken().contextBind().bind(null);

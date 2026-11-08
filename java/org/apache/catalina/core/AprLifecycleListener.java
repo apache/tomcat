@@ -65,20 +65,20 @@ public class AprLifecycleListener implements LifecycleListener {
     // ---------------------------------------------- Constants
 
     private static final int TCN_1_REQUIRED_MINOR = 3;
-    private static final int TCN_1_REQUIRED_PATCH = 8;
+    private static final int TCN_1_REQUIRED_PATCH = 9;
 
     /** Required major version of Tomcat Native. */
     protected static final int TCN_REQUIRED_MAJOR = 2;
     /** Required minor version of Tomcat Native. */
     protected static final int TCN_REQUIRED_MINOR = 0;
     /** Required patch version of Tomcat Native. */
-    protected static final int TCN_REQUIRED_PATCH = 15;
+    protected static final int TCN_REQUIRED_PATCH = 16;
     /** Recommended major version of Tomcat Native. */
     protected static final int TCN_RECOMMENDED_MAJOR = 2;
     /** Recommended minor version of Tomcat Native. */
     protected static final int TCN_RECOMMENDED_MINOR = 0;
     /** Recommended patch version of Tomcat Native. */
-    protected static final int TCN_RECOMMENDED_PV = 15;
+    protected static final int TCN_RECOMMENDED_PV = 17;
 
 
     // ---------------------------------------------- Properties
@@ -199,7 +199,8 @@ public class AprLifecycleListener implements LifecycleListener {
 
     /**
      * Get a warning message if the installed Tomcat Native version is older than recommended.
-     * This performs the same version check used during Tomcat startup.
+     * Unlike the version check performed during Tomcat startup, this only compares the installed version against the
+     * recommended version and does not enforce the required minimum version.
      *
      * @return a warning message if the installed version is outdated, or null if the version
      *         is acceptable or APR is not available

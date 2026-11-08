@@ -52,12 +52,10 @@ public class Export {
     }
 
 
-    private static void outputTranslations() {
+    private static void outputTranslations() throws IOException {
 
         File storageDir = new File(Constants.STORAGE_DIR);
-        if (!storageDir.exists()) {
-            storageDir.mkdirs();
-        }
+        Utils.createDirectory(storageDir);
 
         for (Map.Entry<String,Properties> translationEntry : translations.entrySet()) {
             Utils.export(translationEntry.getKey(), translationEntry.getValue(), storageDir);

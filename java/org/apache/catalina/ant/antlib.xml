@@ -53,6 +53,9 @@
   <typedef
         name="sslConnectorCiphers"
         classname="org.apache.catalina.ant.SslConnectorCiphersTask" />
+  <typedef
+        name="serverinfo"
+        classname="org.apache.catalina.ant.ServerinfoTask" />
   <!-- Jk Task -->
   <typedef
         name="jkupdate"

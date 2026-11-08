@@ -109,7 +109,11 @@ class HpackEncoder {
     private final HpackHeaderFunction hpackHeaderFunction;
 
     HpackEncoder() {
-        this.hpackHeaderFunction = DEFAULT_HEADER_FUNCTION;
+        this(DEFAULT_HEADER_FUNCTION);
+    }
+
+    HpackEncoder(HpackHeaderFunction hpackHeaderFunction) {
+        this.hpackHeaderFunction = hpackHeaderFunction;
     }
 
     /**
@@ -173,6 +177,7 @@ class HpackEncoder {
 
                 // We use 11 to make sure we have enough room for the
                 // variable length integers
+                // 12 is the maximum in theory but it cannot happen in practice
                 int required = 11 + headerName.length() + 1 + val.length();
 
                 if (target.remaining() < required) {
@@ -280,11 +285,14 @@ class HpackEncoder {
 
 
     private void preventPositionRollover() {
-        // if the position counter is about to roll over we iterate all the table entries
-        // and set their position to their actual position
+        // if the position counter is about to roll over we iterate all the
+        // table entries and set their position to their position relative to
+        // the start of the dynamic table (i.e. excluding the static table
+        // offset) since that, plus the (reset) counter value plus the static
+        // table length, is the value from which their index is calculated
         for (List<TableEntry> tableEntries : dynamicTable.values()) {
             for (TableEntry t : tableEntries) {
-                t.position = t.getPosition();
+                t.position = t.getPosition() - Hpack.STATIC_TABLE_LENGTH;
             }
         }
         entryPositionCounter = 0;
@@ -398,7 +406,7 @@ class HpackEncoder {
         }
     }
 
-    private interface HpackHeaderFunction {
+    interface HpackHeaderFunction {
         boolean shouldUseIndexing(String header, String value);
 
         /**

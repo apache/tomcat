@@ -38,7 +38,7 @@ interface PooledConnectionManager {
      */
     void closePool(String userName) throws SQLException;
 
-     /**
+    /**
      * Closes the PooledConnection and remove it from the connection pool to which it belongs, adjusting pool counters.
      *
      * @param pc

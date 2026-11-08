@@ -44,6 +44,7 @@ import org.apache.tomcat.Jar;
 import org.apache.tomcat.JarScanType;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.JarScannerCallback;
+import org.apache.tomcat.util.descriptor.tld.ImplicitTldRuleSet;
 import org.apache.tomcat.util.descriptor.tld.TaglibXml;
 import org.apache.tomcat.util.descriptor.tld.TldParser;
 import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
@@ -57,8 +58,11 @@ public class TldScanner {
     private static final String MSG = "org.apache.jasper.servlet.TldScanner";
     private static final String TLD_EXT = ".tld";
     private static final String WEB_INF = "/WEB-INF/";
+    private static final String WEB_INF_TAGS = "/WEB-INF/tags/";
+    private static final String IMPLICIT_TLD = "/implicit.tld";
     private final ServletContext context;
     private final TldParser tldParser;
+    private final TldParser implicitTldParser;
     private final Map<String,TldResourcePath> uriTldResourcePathMap = new HashMap<>();
     private final Map<TldResourcePath,TaglibXml> tldResourcePathTaglibXmlMap = new HashMap<>();
     private final List<String> listeners = new ArrayList<>();
@@ -76,6 +80,8 @@ public class TldScanner {
         this.context = context;
 
         this.tldParser = new TldParser(namespaceAware, validation, blockExternal);
+        this.implicitTldParser =
+                new TldParser(namespaceAware, validation, new ImplicitTldRuleSet(), blockExternal);
     }
 
     /**
@@ -133,6 +139,7 @@ public class TldScanner {
      */
     public void setClassLoader(ClassLoader classLoader) {
         tldParser.setClassLoader(classLoader);
+        implicitTldParser.setClassLoader(classLoader);
     }
 
     /**
@@ -187,9 +194,7 @@ public class TldScanner {
                 TaglibXml tld = tldParser.parse(tldResourcePath);
                 uriTldResourcePathMap.put(taglibURI, tldResourcePath);
                 tldResourcePathTaglibXmlMap.put(tldResourcePath, tld);
-                if (tld.getListeners() != null) {
-                    listeners.addAll(tld.getListeners());
-                }
+                addListeners(tld);
             } else {
                 log.warn(Localizer.getMessage(MSG + ".webxmlFailPathDoesNotExist", resourcePath, taglibURI));
             }
@@ -216,11 +221,21 @@ public class TldScanner {
                     // Skip: JSP.7.3.1
                 } else if (path.endsWith("/")) {
                     scanResourcePaths(path);
-                } else if (path.startsWith("/WEB-INF/tags/")) {
+                } else if (path.startsWith(WEB_INF_TAGS)) {
                     // JSP 7.3.1: in /WEB-INF/tags only consider implicit.tld
-                    if (path.endsWith("/implicit.tld")) {
+                    if (path.endsWith(IMPLICIT_TLD)) {
                         found = true;
-                        parseTld(path);
+                        try {
+                            parseTld(path);
+                        } catch (SAXException e) {
+                            // An implicit TLD that is not specification
+                            // compliant must not prevent the web application
+                            // from starting. It is parsed again when a tag
+                            // from the tag file is used and the error will
+                            // be reported to the developer at that point.
+                            log.warn(Localizer.getMessage(
+                                    MSG + ".implicitTldInvalid", path, e.getMessage()));
+                        }
                     }
                 } else if (path.endsWith(TLD_EXT)) {
                     found = true;
@@ -252,15 +267,25 @@ public class TldScanner {
     }
 
     /**
-     * Parses a TLD from the given resource path string.
+     * Parses a TLD from the given resource path string. If the resource no
+     * longer exists - it may have been removed since it was listed by
+     * {@link ServletContext#getResourcePaths(String)} - the TLD is skipped and
+     * a warning is logged.
      *
      * @param resourcePath the resource path
      * @throws IOException if an I/O error occurs
      * @throws SAXException if a parsing error occurs
      */
     protected void parseTld(String resourcePath) throws IOException, SAXException {
-        TldResourcePath tldResourcePath = new TldResourcePath(context.getResource(resourcePath), resourcePath);
-        parseTld(tldResourcePath);
+        URL url = context.getResource(resourcePath);
+        if (url == null) {
+            // The resource may have been removed after it was discovered by
+            // getResourcePaths(). Skip it rather than aborting the scan, as is
+            // done for a missing resource referenced by web.xml.
+            log.warn(Localizer.getMessage(MSG + ".resourcePathDoesNotExist", resourcePath));
+            return;
+        }
+        parseTld(new TldResourcePath(url, resourcePath));
     }
 
     /**
@@ -271,7 +296,16 @@ public class TldScanner {
      * @throws SAXException if a parsing error occurs
      */
     protected void parseTld(TldResourcePath path) throws IOException, SAXException {
-        TaglibXml tld = tldParser.parse(path);
+        TaglibXml tld;
+        if (isImplicitTld(path.getWebappPath())) {
+            // JSP.7.3.2: an implicit TLD only allows version information and
+            // a short name. The strict rule set rejects everything else, so
+            // that such a TLD is rejected here just as it is when the tag
+            // file is translated.
+            tld = implicitTldParser.parse(path);
+        } else {
+            tld = tldParser.parse(path);
+        }
         String uri = tld.getUri();
         if (uri != null) {
             if (!uriTldResourcePathMap.containsKey(uri)) {
@@ -285,9 +319,29 @@ public class TldScanner {
         }
 
         tldResourcePathTaglibXmlMap.put(path, tld);
-        if (tld.getListeners() != null) {
-            listeners.addAll(tld.getListeners());
+        addListeners(tld);
+    }
+
+    /*
+     * Registers the listeners declared by the TLD, ignoring any listener class that has already been registered. The
+     * same TLD may be found via more than one resource path and under more than one URI (for example, a taglib-uri in
+     * web.xml that differs from the URI declared in the TLD itself) and a listener class must only be instantiated
+     * once.
+     */
+    private void addListeners(TaglibXml tld) {
+        if (tld.getListeners() == null) {
+            return;
         }
+        for (String listener : tld.getListeners()) {
+            if (!listeners.contains(listener)) {
+                listeners.add(listener);
+            }
+        }
+    }
+
+    private static boolean isImplicitTld(String webappPath) {
+        return webappPath != null && webappPath.startsWith(WEB_INF_TAGS) &&
+                webappPath.endsWith(IMPLICIT_TLD);
     }
 
     class TldScannerCallback implements JarScannerCallback {

@@ -16,7 +16,11 @@
  */
 package org.apache.catalina.webresources;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 
 import org.apache.catalina.WebResource;
@@ -138,15 +142,19 @@ public abstract class AbstractResource implements WebResource {
                         } else {
                             byte[] buf = new byte[4096];
                             try (InputStream is = getInputStream()) {
-                                MessageDigest digest = MessageDigest.getInstance("SHA-256");
-                                while (true) {
-                                    int n = is.read(buf);
-                                    if (n <= 0) {
-                                        break;
+                                if (is == null) {
+                                    strongETag = getETag();
+                                } else {
+                                    MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                                    while (true) {
+                                        int n = is.read(buf);
+                                        if (n <= 0) {
+                                            break;
+                                        }
+                                        digest.update(buf, 0, n);
                                     }
-                                    digest.update(buf, 0, n);
+                                    strongETag = "\"" + HexUtils.toHexString(digest.digest()) + "\"";
                                 }
-                                strongETag = "\"" + HexUtils.toHexString(digest.digest()) + "\"";
                             } catch (Exception e) {
                                 strongETag = getETag();
                             }
@@ -220,4 +228,24 @@ public abstract class AbstractResource implements WebResource {
      * @return the logger
      */
     protected abstract Log getLog();
+
+
+    /**
+     * Gets the creation time for the given file
+     *
+     * @param file The file for which the creation time is required
+     *
+     * @return The creation time or, if not available the value of {@link File#lastModified()}
+     */
+    protected long getCreation(File file) {
+        try {
+            BasicFileAttributes attrs = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+            return attrs.creationTime().toMillis();
+        } catch (IOException ioe) {
+            if (getLog().isDebugEnabled()) {
+                getLog().debug(sm.getString("abstractResource.getCreationFail", file.getPath()), ioe);
+            }
+            return file.lastModified();
+        }
+    }
 }

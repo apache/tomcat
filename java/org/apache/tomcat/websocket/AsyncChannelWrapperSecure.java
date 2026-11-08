@@ -44,8 +44,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Wraps the {@link AsynchronousSocketChannel} with SSL/TLS. This needs a lot more testing before it can be considered
- * robust.
+ * Wraps the {@link AsynchronousSocketChannel} with SSL/TLS.
  */
 public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
 
@@ -132,7 +131,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
             throw new IllegalStateException(sm.getString("asyncChannelWrapperSecure.concurrentWrite"));
         }
 
-        WriteTask writeTask = new WriteTask(srcs, offset, length, future);
+        WriteTask writeTask = new WriteTask(srcs, offset, length, timeout, unit, future);
 
         executor.execute(writeTask);
     }
@@ -174,13 +173,24 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
         private final ByteBuffer[] srcs;
         private final int offset;
         private final int length;
+        // The time by which the write must complete (a System.nanoTime()
+        // based deadline) or -1 if no timeout was requested
+        private final long deadline;
         private final WrapperFuture<Long,?> future;
 
         WriteTask(ByteBuffer[] srcs, int offset, int length, WrapperFuture<Long,?> future) {
+            this(srcs, offset, length, 0, null, future);
+        }
+
+        WriteTask(ByteBuffer[] srcs, int offset, int length, long timeout, TimeUnit unit,
+                WrapperFuture<Long,?> future) {
             this.srcs = srcs;
             this.future = future;
             this.offset = offset;
             this.length = length;
+            // Match the AsynchronousSocketChannel semantics: a timeout of
+            // zero or less means wait indefinitely
+            this.deadline = unit == null || timeout <= 0 ? -1 : System.nanoTime() + unit.toNanos(timeout);
         }
 
         @Override
@@ -222,8 +232,14 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                         int toWrite = r.bytesProduced();
                         while (toWrite > 0) {
                             Future<Integer> f = socketChannel.write(socketWriteBuffer);
-                            Integer socketWrite = f.get();
-                            toWrite -= socketWrite.intValue();
+                            try {
+                                toWrite -= awaitWrite(f).intValue();
+                            } catch (TimeoutException te) {
+                                // Ensure the pending write is not left
+                                // outstanding on the channel
+                                f.cancel(true);
+                                throw te;
+                            }
                         }
                     }
                 }
@@ -238,6 +254,18 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                 writing.set(false);
                 future.fail(e);
             }
+        }
+
+        private Integer awaitWrite(Future<Integer> f)
+                throws InterruptedException, ExecutionException, TimeoutException {
+            if (deadline == -1) {
+                return f.get();
+            }
+            long remaining = deadline - System.nanoTime();
+            if (remaining <= 0) {
+                throw new TimeoutException();
+            }
+            return f.get(remaining, TimeUnit.NANOSECONDS);
         }
     }
 
@@ -265,10 +293,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                     if (forceRead) {
                         forceRead = false;
                         Future<Integer> f = socketChannel.read(socketReadBuffer);
-                        Integer socketRead = f.get();
-                        if (socketRead.intValue() == -1) {
-                            throw new EOFException(sm.getString("asyncChannelWrapperSecure.eof"));
-                        }
+                        checkFutureRead(f);
                     }
 
                     socketReadBuffer.flip();
@@ -339,6 +364,14 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
     }
 
 
+    private static void checkFutureRead(Future<Integer> future) throws EOFException, ExecutionException,
+            InterruptedException {
+        Integer bytesRead = future.get();
+        if (bytesRead.intValue() < 0) {
+            throw new EOFException(sm.getString("asyncChannelWrapperSecure.eof"));
+        }
+    }
+
     private class WebSocketSslHandshakeThread extends Thread {
 
         private final WrapperFuture<Void,Void> hFuture;
@@ -369,15 +402,17 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                             SSLEngineResult r = sslEngine.wrap(DUMMY, socketWriteBuffer);
                             checkResult(r, true);
                             socketWriteBuffer.flip();
-                            Future<Integer> fWrite = socketChannel.write(socketWriteBuffer);
-                            fWrite.get();
+                            while (socketWriteBuffer.hasRemaining()) {
+                                Future<Integer> fWrite = socketChannel.write(socketWriteBuffer);
+                                fWrite.get();
+                            }
                             break;
                         }
                         case NEED_UNWRAP: {
                             socketReadBuffer.compact();
                             if (socketReadBuffer.position() == 0 || resultStatus == Status.BUFFER_UNDERFLOW) {
                                 Future<Integer> fRead = socketChannel.read(socketReadBuffer);
-                                fRead.get();
+                                checkFutureRead(fRead);
                             }
                             socketReadBuffer.flip();
                             SSLEngineResult r = sslEngine.unwrap(socketReadBuffer, DUMMY);

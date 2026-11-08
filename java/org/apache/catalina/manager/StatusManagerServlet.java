@@ -44,7 +44,9 @@ import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * This servlet will display a complete status of the HTTP/1.1 connector.
+ * This servlet will display the status of the server, including JVM memory pools, connector thread pools and, for the
+ * <code>/all</code> path, the status of each deployed web application. The status is rendered in HTML, XML (when the
+ * <code>XML</code> request parameter is set) or JSON (when the <code>JSON</code> request parameter is set).
  */
 public class StatusManagerServlet extends HttpServlet implements NotificationListener {
 
@@ -284,8 +286,12 @@ public class StatusManagerServlet extends HttpServlet implements NotificationLis
             args[16] = smClient.getString("htmlManagerServlet.connectorStateTableTitleVHost");
             args[17] = smClient.getString("htmlManagerServlet.connectorStateTableTitleRequest");
             args[18] = smClient.getString("htmlManagerServlet.connectorStateHint");
-            StatusTransformer.writeConnectorsState(writer, mBeanServer, threadPools, globalRequestProcessors,
-                    requestProcessors, mode, args);
+            // Take snapshots of the lists. They may be modified concurrently
+            // by handleNotification() when connectors are registered or
+            // unregistered and StatusTransformer iterates them without
+            // holding the lists' monitor.
+            StatusTransformer.writeConnectorsState(writer, mBeanServer, copyOf(threadPools),
+                    copyOf(globalRequestProcessors), copyOf(requestProcessors), mode, args);
 
             if (request.getPathInfo() != null && request.getPathInfo().equals("/all")) {
                 // Note: Retrieving the full status is much slower
@@ -299,6 +305,16 @@ public class StatusManagerServlet extends HttpServlet implements NotificationLis
 
         // use StatusTransformer to output status
         StatusTransformer.writeFooter(writer, mode);
+    }
+
+
+    // Takes a snapshot of a list created with Collections.synchronizedList().
+    // The wrapper instance is its own lock, which is also acquired by the
+    // add() and remove() calls in handleNotification().
+    private static <T> List<T> copyOf(List<T> list) {
+        synchronized (list) {
+            return new ArrayList<>(list);
+        }
     }
 
 

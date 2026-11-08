@@ -310,7 +310,7 @@ public class TestELInJsp extends TomcatBaseTest {
         ctxt.addServletContainerInitializer(new JasperInitializer(), null);
 
         // Configure the defaults and then tweak the JSP servlet settings
-        // Note: Min value for maxLoadedJsps is 2
+        // Note: Min value for maxLoadedJsps is 1
         Tomcat.initWebappDefaults(ctxt);
         Wrapper w = (Wrapper) ctxt.findChild("jsp");
 
@@ -515,6 +515,18 @@ public class TestELInJsp extends TomcatBaseTest {
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/bug6nnnn/bug69635.jsp");
         String result = res.toString();
         assertEcho(result, "01-3");
+    }
+
+
+    @Test
+    public void testBug70246() throws Exception {
+        getTomcatInstanceTestWebapp(true, true);
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/bug7nnnn/bug70249.jsp");
+        String result = res.toString();
+        assertEcho(result, "01-[1, 2, 11]");
+        assertEcho(result, "02-[1, 2, 11]");
+        assertEcho(result, "03-[1, 11, 2]");
     }
 
 

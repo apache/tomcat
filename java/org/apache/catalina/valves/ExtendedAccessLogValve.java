@@ -32,6 +32,7 @@ import java.util.TimeZone;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpSession;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.ServerInfo;
@@ -59,7 +60,9 @@ import org.apache.tomcat.util.ExceptionUtils;
  * <li><code>sc(xxx)</code>: The value of header xxx from server to client</li>
  * <li><code>sc-status</code>: The status code</li>
  * <li><code>time</code>: Time the request was served</li>
- * <li><code>time-taken</code>: Time (in seconds) taken to serve the request</li>
+ * <li><code>time-taken</code>: Time taken to serve the request. In seconds by default; one of the suffixes
+ * <code>-ms</code>, <code>-us</code>, <code>-ns</code> or <code>-fracsec</code> may be appended to select the unit
+ * (unknown suffixes default to seconds)</li>
  * <li><code>x-threadname</code>: Current request thread name (can compare later with stacktraces)</li>
  * <li><code>x-A(xxx)</code>: Pull xxx attribute from the servlet context</li>
  * <li><code>x-C(xxx)</code>: Pull the cookie(s) of the name xxx</li>
@@ -130,7 +133,9 @@ public class ExtendedAccessLogValve extends AccessLogValve {
     @Override
     protected synchronized void open() {
         super.open();
-        if (currentLogFile.length() == 0) {
+        // The base class tolerates a failed open and leaves the writer null
+        // in which case there is nothing to write the header to
+        if (writer != null && currentLogFile.length() == 0) {
             writer.println("#Fields: " + pattern);
             writer.println("#Version: 2.0");
             writer.println("#Software: " + ServerInfo.getServerInfo());
@@ -258,7 +263,11 @@ public class ExtendedAccessLogValve extends AccessLogValve {
 
         @Override
         public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
-            wrap(request.getContext().getServletContext().getAttribute(attribute), buf);
+            // The request may not have mapped to a context, for example when a
+            // valve attached to a Host or Engine logs requests that matched no
+            // context
+            Context context = request.getContext();
+            wrap(context == null ? null : context.getServletContext().getAttribute(attribute), buf);
         }
     }
 
@@ -357,7 +366,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
 
         @Override
         public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
-            wrap(request.getAttribute(attribute), buf);
+            wrap(request == null ? "??" : request.getAttribute(attribute), buf);
         }
     }
 
@@ -383,7 +392,12 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                 session = request.getSession(false);
                 if (session != null) {
                     wrap(session.getAttribute(attribute), buf);
+                    return;
+                } else {
+                    buf.append('-');
                 }
+            } else {
+                buf.append("??");
             }
         }
     }
@@ -466,6 +480,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
          * Returns the next token from the pattern string.
          *
          * @return the next token, or {@code null} if no more tokens are available
+         *
          * @throws IOException if an I/O error occurs
          */
         public String getToken() throws IOException {
@@ -514,6 +529,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
          * Returns the parameter value from the most recent parameter token.
          *
          * @return the parameter value, or {@code null} if no parameter is available
+         *
          * @throws IOException if an I/O error occurs
          */
         public String getParameter() throws IOException {
@@ -539,6 +555,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
          * Returns any whitespace following the current position.
          *
          * @return the whitespace characters, or an empty string if none
+         *
          * @throws IOException if an I/O error occurs
          */
         public String getWhiteSpaces() throws IOException {
@@ -576,6 +593,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
          * Returns the remaining unparsed portion of the pattern string.
          *
          * @return the remaining characters in the pattern
+         *
          * @throws IOException if an I/O error occurs
          */
         public String getRemains() throws IOException {
@@ -640,7 +658,9 @@ public class ExtendedAccessLogValve extends AccessLogValve {
      *
      * @param token     the pattern token
      * @param tokenizer the pattern tokenizer
+     *
      * @return the log element, or {@code null} if the token is unrecognized
+     *
      * @throws IOException if an I/O error occurs while reading the pattern
      */
     protected AccessLogElement getLogElement(String token, PatternTokenizer tokenizer) throws IOException {
@@ -719,7 +739,9 @@ public class ExtendedAccessLogValve extends AccessLogValve {
      * Returns the appropriate log element for a client-to-server token.
      *
      * @param tokenizer the pattern tokenizer
+     *
      * @return the log element, or {@code null} if unrecognized
+     *
      * @throws IOException if an I/O error occurs while reading the pattern
      */
     protected AccessLogElement getClientToServerElement(PatternTokenizer tokenizer) throws IOException {
@@ -768,7 +790,9 @@ public class ExtendedAccessLogValve extends AccessLogValve {
      * Returns the appropriate log element for a server-to-client token.
      *
      * @param tokenizer the pattern tokenizer
+     *
      * @return the log element, or {@code null} if unrecognized
+     *
      * @throws IOException if an I/O error occurs while reading the pattern
      */
     protected AccessLogElement getServerToClientElement(PatternTokenizer tokenizer) throws IOException {
@@ -795,7 +819,9 @@ public class ExtendedAccessLogValve extends AccessLogValve {
      * Returns the appropriate log element for a proxy token.
      *
      * @param tokenizer the pattern tokenizer
+     *
      * @return the log element, or {@code null} if unrecognized
+     *
      * @throws IOException if an I/O error occurs while reading the pattern
      */
     protected AccessLogElement getProxyElement(PatternTokenizer tokenizer) throws IOException {
@@ -814,7 +840,9 @@ public class ExtendedAccessLogValve extends AccessLogValve {
      * Returns the appropriate log element for an x-parameter token.
      *
      * @param tokenizer the pattern tokenizer
+     *
      * @return the log element, or {@code null} if unrecognized
+     *
      * @throws IOException if an I/O error occurs while reading the pattern
      */
     protected AccessLogElement getXParameterElement(PatternTokenizer tokenizer) throws IOException {
@@ -869,6 +897,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
      * Returns the appropriate log element for a servlet request method parameter.
      *
      * @param parameter the parameter name mapping to a request method
+     *
      * @return the log element, or {@code null} if the parameter is unrecognized
      */
     protected AccessLogElement getServletRequestElement(String parameter) {

@@ -74,6 +74,7 @@ public class RewriteCond {
                 matcher.set(m);
                 return true;
             } else {
+                matcher.set(null);
                 return false;
             }
         }

@@ -66,7 +66,7 @@ public class TestSendFile extends TomcatBaseTest {
         for (int i = 0; i < ITERATIONS; i++) {
             WritingServlet servlet = new WritingServlet(files[i]);
             Tomcat.addServlet(root, "servlet" + i, servlet);
-            root.addServletMappingDecoded("/servlet" + i, "servlet" + i);
+            root.addServletMapping("/servlet" + i, "servlet" + i);
         }
 
         tomcat.start();
@@ -154,7 +154,7 @@ public class TestSendFile extends TomcatBaseTest {
         Context ctx = tomcat.addContext("", TEMP_DIR);
         File file = generateFile(TEMP_DIR, "", EXPECTED_CONTENT_LENGTH);
         Tomcat.addServlet(ctx, "test", new Bug60409Servlet(file));
-        ctx.addServletMappingDecoded("/", "test");
+        ctx.addServletMapping("/", "test");
 
         tomcat.start();
 

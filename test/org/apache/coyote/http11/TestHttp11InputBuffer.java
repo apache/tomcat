@@ -67,7 +67,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
 
             Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "Bug48839", new Bug48839Servlet());
-            root.addServletMappingDecoded("/test", "Bug48839");
+            root.addServletMapping("/test", "Bug48839");
 
             try {
                 tomcat.start();
@@ -103,7 +103,9 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
             if (getResponseBody() == null) {
                 return false;
             }
-            if (!getResponseBody().contains("abcd\tefgh")) {
+            // The line folding (CRLF + HTAB) is replaced with a single SP as
+            // required by RFC 9112 section 5.2
+            if (!getResponseBody().contains("abcd efgh")) {
                 return false;
             }
             return true;
@@ -130,6 +132,71 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
                 out.println(values.nextElement());
             }
         }
+    }
+
+
+    /**
+     * Test case for https://bz.apache.org/bugzilla/show_bug.cgi?id=48839 with a space rather than a tab starting the
+     * continuation line. Both fold forms must result in a single space in the parsed value (RFC 9112 section 5.2).
+     */
+    @Test
+    public void testObsFoldWithSpaceContinuation() {
+
+        ObsFoldClient client = new ObsFoldClient();
+
+        client.doRequest();
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertTrue(client.getResponseBody(), client.getResponseBody().contains("abcd efgh"));
+    }
+
+
+    /**
+     * Obs-fold test client. Uses a SP continuation line.
+     */
+    private class ObsFoldClient extends SimpleHttpClient {
+
+        private Exception doRequest() {
+
+            Tomcat tomcat = getTomcatInstance();
+
+            Context root = tomcat.addContext("", TEMP_DIR);
+            Tomcat.addServlet(root, "ObsFold", new Bug48839Servlet());
+            root.addServletMapping("/test", "ObsFold");
+
+            try {
+                tomcat.start();
+                setPort(tomcat.getConnector().getLocalPort());
+
+                // Open connection
+                connect();
+
+                String[] request = new String[1];
+                // @formatter:off
+                request[0] =
+                        "GET http://localhost:8080/test HTTP/1.1" + CRLF +
+                        "Host: localhost:8080" + CRLF +
+                        "X-Bug48839: abcd" + CRLF +
+                        " efgh" + CRLF +
+                        "Connection: close" + CRLF +
+                        CRLF;
+                // @formatter:on
+
+                setRequest(request);
+                processRequest(); // blocks until response has been read
+
+                // Close the connection
+                disconnect();
+            } catch (Exception e) {
+                return e;
+            }
+            return null;
+        }
+
+        @Override
+        public boolean isResponseBodyOK() {
+            return getResponseBody() != null && getResponseBody().contains("abcd efgh");
+        }
+
     }
 
 
@@ -306,7 +373,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
 
             Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "Bug51557", new Bug51557Servlet(headerName));
-            root.addServletMappingDecoded("/test", "Bug51557");
+            root.addServletMapping("/test", "Bug51557");
 
             try {
                 Connector connector = tomcat.getConnector();
@@ -440,7 +507,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
 
             Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "test", new TesterServlet());
-            root.addServletMappingDecoded("/test", "test");
+            root.addServletMapping("/test", "test");
 
             try {
                 tomcat.start();
@@ -511,7 +578,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
 
             Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "Bug54947", new TesterServlet());
-            root.addServletMappingDecoded("/test", "Bug54947");
+            root.addServletMapping("/test", "Bug54947");
 
             try {
                 tomcat.start();
@@ -704,7 +771,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
 
         // Add servlet
         Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
-        ctx.addServletMappingDecoded("/foo", "TesterServlet");
+        ctx.addServletMapping("/foo", "TesterServlet");
 
         tomcat.start();
 

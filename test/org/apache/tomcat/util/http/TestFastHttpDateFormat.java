@@ -16,10 +16,47 @@
  */
 package org.apache.tomcat.util.http;
 
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 public class TestFastHttpDateFormat {
+
+    private static final DateTimeFormatter RFC850 =
+            DateTimeFormatter.ofPattern("EEEE, dd-MMM-yy HH:mm:ss 'GMT'", Locale.US);
+
+    /*
+     * RFC 9110, section 5.6.7: a two-digit year that appears to be more than 50 years in the future is the most recent
+     * year in the past with the same last two digits.
+     */
+    @Test
+    public void testParseRfc850TwoDigitYear() {
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC).withMonth(6).withDayOfMonth(15).withHour(12)
+                .withMinute(30).withSecond(15).withNano(0);
+
+        // Not more than 50 years in the future, so the year is in the future
+        doTestParseRfc850(now.plusYears(10));
+        doTestParseRfc850(now.plusYears(40));
+        // More than 50 years in the future, so the year is in the past
+        doTestParseRfc850(now.plusYears(60), now.minusYears(40));
+        doTestParseRfc850(now.plusYears(90), now.minusYears(10));
+        // In the past
+        doTestParseRfc850(now.minusYears(10));
+        doTestParseRfc850(now.minusYears(45));
+    }
+
+    private void doTestParseRfc850(ZonedDateTime expected) {
+        doTestParseRfc850(expected, expected);
+    }
+
+    private void doTestParseRfc850(ZonedDateTime formatted, ZonedDateTime expected) {
+        String value = RFC850.format(formatted);
+        Assert.assertEquals(value, expected.toInstant().toEpochMilli(), FastHttpDateFormat.parseDate(value));
+    }
 
     @Test
     public void testGetCurrentDate() {

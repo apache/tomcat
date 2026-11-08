@@ -21,9 +21,18 @@ package org.apache.tomcat.jdbc.pool.interceptor;
  */
 public interface ResetAbandonedTimerMBean {
     /**
-     * Reset the abandoned timer for the pooled connection.
+     * Reset the abandoned timer of the pooled connection this interceptor is
+     * bound to, while that connection is checked out. For a connection sitting
+     * idle in the pool the operation resets nothing - the abandoned timer is a
+     * property of a borrow, and the timestamp it moves is the age the idle check
+     * releases a connection by
+     * ({@link org.apache.tomcat.jdbc.pool.PoolConfiguration#setMinEvictableIdleTimeMillis(int)}),
+     * so the operation cannot postpone that release either.
      *
-     * @return True if the timer was reset, false if no connection is associated
+     * @return True if the timer was reset, false if the connection bound to this
+     *             interceptor is not currently checked out - including a
+     *             connection idle in the pool and one this interceptor has been
+     *             unbound from
      */
     boolean resetTimer();
 }

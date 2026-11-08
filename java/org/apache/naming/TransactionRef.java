@@ -34,7 +34,7 @@ public class TransactionRef extends AbstractRef {
 
 
     /**
-     * Resource Reference.
+     * Transaction Reference.
      */
     public TransactionRef() {
         this(null, null);
@@ -42,7 +42,7 @@ public class TransactionRef extends AbstractRef {
 
 
     /**
-     * Resource Reference.
+     * Transaction Reference.
      *
      * @param factory         The factory class
      * @param factoryLocation The factory location

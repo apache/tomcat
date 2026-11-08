@@ -20,7 +20,7 @@ import java.util.Iterator;
 
 /**
  * A managed channel interface gives you access to the components of the channels such as senders, receivers,
- * interceptors etc for configurations purposes
+ * interceptors etc for configuration purposes
  */
 public interface ManagedChannel extends Channel {
 

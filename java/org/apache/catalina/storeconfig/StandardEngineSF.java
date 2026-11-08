@@ -64,12 +64,7 @@ public class StandardEngineSF extends StoreFactoryBase {
 
             // Store nested <Realm> element
             Realm realm = engine.getRealm();
-            Realm parentRealm = null;
-            // TODO is this case possible? (see it a old Server 5.0 impl)
-            if (engine.getParent() != null) {
-                parentRealm = engine.getParent().getRealm();
-            }
-            if (realm != parentRealm) {
+            if (realm != null) {
                 storeElement(aWriter, indent, realm);
 
             }
@@ -91,10 +86,10 @@ public class StandardEngineSF extends StoreFactoryBase {
             if (cluster != null) {
                 storeElement(aWriter, indent, cluster);
             }
+
             // store all <Host> elements
             Container[] children = engine.findChildren();
             storeElementArray(aWriter, indent, children);
-
         }
     }
 }

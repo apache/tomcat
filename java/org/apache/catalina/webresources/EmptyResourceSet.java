@@ -142,7 +142,7 @@ public class EmptyResourceSet extends LifecycleBase implements WebResourceSet {
      */
     @Override
     public void setReadOnly(boolean readOnly) {
-
+        // NO-OP
     }
 
     /**
@@ -152,6 +152,7 @@ public class EmptyResourceSet extends LifecycleBase implements WebResourceSet {
      */
     @Override
     public void setAllowLinking(boolean allowLinking) {
+        // NO-OP
     }
 
     /**

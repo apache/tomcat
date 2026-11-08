@@ -17,17 +17,17 @@
 package org.apache.catalina.ha.deploy;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * The <b>WarWatcher </b> watches the deployDir for changes made to the directory (adding new WAR files-&gt;deploy or
+ * The <b>WarWatcher </b> watches the watchDir for changes made to the directory (adding new WAR files-&gt;deploy or
  * remove WAR files-&gt;undeploy) and notifies a listener of the changes made.
  */
 public class WarWatcher {
@@ -48,9 +48,11 @@ public class WarWatcher {
     protected final FileChangeListener listener;
 
     /**
-     * Currently deployed files
+     * Currently deployed files. A concurrent map is used since clear() may be
+     * called on the stop thread while check() iterates on the container
+     * background thread.
      */
-    protected final Map<String,WarInfo> currentStatus = new HashMap<>();
+    protected final Map<String,WarInfo> currentStatus = new ConcurrentHashMap<>();
 
     /*--Constructor---------------------------------------------*/
 

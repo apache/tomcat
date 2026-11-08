@@ -54,9 +54,9 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
     /**
      * Creates a new SimpleServerAuthConfig.
      *
-     * @param layer Message layer
+     * @param layer      Message layer
      * @param appContext Application context
-     * @param handler Callback handler
+     * @param handler    Callback handler
      * @param properties Configuration properties
      */
     public SimpleServerAuthConfig(String layer, String appContext, CallbackHandler handler,
@@ -94,7 +94,7 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
     /**
      * {@inheritDoc}
      * <p>
-     * Clears the cached ServerAuthConfig so it will be recreated on next use.
+     * Clears the cached ServerAuthContext so it will be recreated on next use.
      */
     @Override
     public void refresh() {
@@ -117,8 +117,8 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
      * {@inheritDoc}
      * <p>
      * Loads ServerAuthModule instances from properties keyed with
-     * {@code org.apache.catalina.authenticator.jaspic.ServerAuthModule.N} where N is 1-based index.
-     * The returned context is cached and reused for subsequent calls.
+     * {@code org.apache.catalina.authenticator.jaspic.ServerAuthModule.N} where N is 1-based index. The returned
+     * context is cached and reused for subsequent calls.
      */
     @Override
     public ServerAuthContext getAuthContext(String authContextID, Subject serviceSubject, Map<String,Object> properties)
@@ -141,11 +141,21 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
                     Object moduleClassName = mergedProperties.get(key);
                     while (moduleClassName instanceof String) {
                         try {
-                            Class<?> clazz = Class.forName((String) moduleClassName);
+                            Class<?> clazz = null;
+                            try {
+                                clazz = Class.forName((String) moduleClassName, true,
+                                        Thread.currentThread().getContextClassLoader());
+                            } catch (ClassNotFoundException ignore) {
+                                // Ignore so the re-try below can proceed
+                            }
+                            if (clazz == null) {
+                                clazz = Class.forName((String) moduleClassName);
+                            }
                             ServerAuthModule module = (ServerAuthModule) clazz.getConstructor().newInstance();
                             module.initialize(null, null, handler, mergedProperties);
                             modules.add(module);
-                        } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException e) {
+                        } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException |
+                                ClassCastException e) {
                             throw new AuthException(e);
                         }
 
@@ -173,6 +183,7 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
      * Creates the ServerAuthContext. Can be overridden by subclasses to provide a custom implementation.
      *
      * @param modules List of ServerAuthModule instances
+     *
      * @return The ServerAuthContext instance
      */
     protected ServerAuthContext createServerAuthContext(List<ServerAuthModule> modules) {

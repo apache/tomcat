@@ -26,18 +26,21 @@
 
     <groupId>org.apache.tomcat</groupId>
     <artifactId>tomcat-owb</artifactId>
-    <name>Apache Tomcat CDI 4 support</name>
-    <description>Apache Tomcat CDI 4 support using Apache OpenWebBeans</description>
+    <name>Apache Tomcat CDI 4.1 support</name>
+    <description>Apache Tomcat CDI 4.1 support using Apache OpenWebBeans</description>
     <!-- This is the Apache OpenWebBeans version -->
-    <version>4.0.3</version>
+    <version>4.1.1</version>
     <packaging>jar</packaging>
 
     <properties>
         <jakarta-inject.version>2.0.1</jakarta-inject.version>
-        <jakarta-interceptor.version>2.1.0</jakarta-interceptor.version>
-        <jakarta-enterprise-cdi.version>4.0.1</jakarta-enterprise-cdi.version>
-        <jakarta-annotation-api.version>2.1.1</jakarta-annotation-api.version>
+        <jakarta-interceptor.version>2.2.0</jakarta-interceptor.version>
+        <jakarta-enterprise-cdi.version>4.1.0</jakarta-enterprise-cdi.version>
+        <jakarta-annotation-api.version>3.0.0</jakarta-annotation-api.version>
+        <jakarta-el.version>6.0.1</jakarta-el.version>
         <tomcat.version>12.0.0-SNAPSHOT</tomcat.version>
+        <junit.version>5.11.4</junit.version>
+        <ecj.version>3.41.0</ecj.version>
     </properties>
 
     <dependencies>
@@ -90,6 +93,37 @@
             <version>${tomcat.version}</version>
             <scope>provided</scope>
         </dependency>
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>jakarta.el</groupId>
+            <artifactId>jakarta.el-api</artifactId>
+            <version>${jakarta-el.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-el</artifactId>
+            <version>${tomcat.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-jasper</artifactId>
+            <version>${tomcat.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jdt</groupId>
+            <artifactId>ecj</artifactId>
+            <version>${ecj.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -100,6 +134,37 @@
                 <configuration>
                     <release>21</release>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <!-- Always rebuild the unshaded JAR before shading so that
+                         repeated builds do not shade the previously shaded JAR. -->
+                    <forceCreation>true</forceCreation>
+                </configuration>
+            </plugin>
+            <!-- Create an empty directory used to keep target/classes off the
+                 integration test runtime classpath. The tests must run against
+                 the shaded JAR. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>create-empty-classes-dir</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <mkdir dir="${project.build.directory}/empty-classes"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -142,6 +207,51 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <!-- Integration tests use embedded Tomcat. They run after the
+                 shade plugin has produced the deployable JAR. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.5.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!-- Required by the optional classloader leak checks. -->
+                    <argLine>--add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED</argLine>
+                    <!-- Test the shaded JAR rather than the unshaded classes -->
+                    <classesDirectory>${project.build.directory}/empty-classes</classesDirectory>
+                    <additionalClasspathElements>
+                        <additionalClasspathElement>${project.build.directory}/${project.build.finalName}.jar</additionalClasspathElement>
+                    </additionalClasspathElements>
+                    <!-- Remove unshaded copies of the classes contained in the
+                         shaded JAR so the test validates the deployable JAR. -->
+                    <classpathDependencyExcludes>
+                        <classpathDependencyExclude>org.apache.openwebbeans:openwebbeans-spi</classpathDependencyExclude>
+                        <classpathDependencyExclude>org.apache.openwebbeans:openwebbeans-impl</classpathDependencyExclude>
+                        <classpathDependencyExclude>org.apache.openwebbeans:openwebbeans-web</classpathDependencyExclude>
+                        <classpathDependencyExclude>org.apache.openwebbeans:openwebbeans-el22</classpathDependencyExclude>
+                        <classpathDependencyExclude>org.apache.xbean:xbean-finder-shaded</classpathDependencyExclude>
+                        <classpathDependencyExclude>org.apache.xbean:xbean-asm9-shaded</classpathDependencyExclude>
+                        <classpathDependencyExclude>jakarta.enterprise:jakarta.enterprise.cdi-api</classpathDependencyExclude>
+                        <classpathDependencyExclude>jakarta.enterprise:jakarta.enterprise.lang-model</classpathDependencyExclude>
+                        <classpathDependencyExclude>jakarta.inject:jakarta.inject-api</classpathDependencyExclude>
+                        <classpathDependencyExclude>jakarta.interceptor:jakarta.interceptor-api</classpathDependencyExclude>
+                        <classpathDependencyExclude>jakarta.annotation:jakarta.annotation-api</classpathDependencyExclude>
+                    </classpathDependencyExcludes>
+                    <!-- Test webapp templates and the shaded JAR are passed to
+                         the test JVM explicitly; target/classes is not used. -->
+                    <systemPropertyVariables>
+                        <owb.test.webapp.root>${project.basedir}/src/test/webapp</owb.test.webapp.root>
+                        <owb.test.jar>${project.build.directory}/${project.build.finalName}.jar</owb.test.jar>
+                    </systemPropertyVariables>
+                </configuration>
             </plugin>
         </plugins>
     </build>

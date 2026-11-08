@@ -42,7 +42,8 @@ public class SSISet implements SSICommand {
      * @param paramValues  the parameter values
      * @param writer       the print writer for output
      *
-     * @return the last modified timestamp
+     * @return the current time (in milliseconds) if a variable was set, or
+     *         zero if no variable was set
      *
      * @throws SSIStopProcessingException if processing should stop
      */
@@ -52,26 +53,36 @@ public class SSISet implements SSICommand {
         long lastModified = 0;
         String errorMessage = ssiMediator.getConfigErrMsg();
         String variableName = null;
+        boolean variableSeen = false;
+        // As for Apache, a value is assigned to the most recent var attribute so
+        // multiple var/value pairs may be used in a single directive and a value
+        // must follow the var attribute it applies to
         for (int i = 0; i < paramNames.length; i++) {
             String paramName = paramNames[i];
             String paramValue = paramValues[i];
             if (paramName.equalsIgnoreCase("var")) {
                 variableName = paramValue;
+                variableSeen = true;
             } else if (paramName.equalsIgnoreCase("value")) {
-                if (variableName != null) {
-                    String substitutedValue = ssiMediator.substituteVariables(paramValue);
-                    ssiMediator.setVariableValue(variableName, substitutedValue);
-                    lastModified = System.currentTimeMillis();
-                } else {
+                if (variableName == null) {
                     ssiMediator.log(sm.getString("ssiSet.noVariable"));
                     writer.write(errorMessage);
                     throw new SSIStopProcessingException();
                 }
+                String substitutedValue = ssiMediator.substituteVariables(paramValue);
+                ssiMediator.setVariableValue(variableName, substitutedValue);
+                lastModified = System.currentTimeMillis();
             } else {
                 ssiMediator.log(sm.getString("ssiCommand.invalidAttribute", paramName));
                 writer.write(errorMessage);
                 throw new SSIStopProcessingException();
             }
+        }
+        if (lastModified == 0) {
+            // Nothing was set, so a required attribute was missing
+            ssiMediator.log(sm.getString(variableSeen ? "ssiSet.noValue" : "ssiSet.noVariable"));
+            writer.write(errorMessage);
+            throw new SSIStopProcessingException();
         }
         return lastModified;
     }

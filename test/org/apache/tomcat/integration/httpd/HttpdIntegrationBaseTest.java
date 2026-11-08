@@ -118,7 +118,7 @@ public abstract class HttpdIntegrationBaseTest extends TomcatBaseTest {
             ctx.getPipeline().addValve(valve);
         }
         Tomcat.addServlet(ctx, SERVLET_NAME, new SnoopServlet());
-        ctx.addServletMappingDecoded("/" + SERVLET_NAME, SERVLET_NAME);
+        ctx.addServletMapping("/" + SERVLET_NAME, SERVLET_NAME);
         tomcat.start();
         tomcatPort = getPort();
     }

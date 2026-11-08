@@ -63,7 +63,7 @@ public class TestHttp2Section_6_2 extends Http2TestBase {
 
         sendSimpleGetRequest(3, padding);
 
-        handleGoAwayResponse(1);
+        handleGoAwayResponse(3);
     }
 
 
@@ -87,7 +87,7 @@ public class TestHttp2Section_6_2 extends Http2TestBase {
         os.write(headerFrame);
         os.flush();
 
-        handleGoAwayResponse(1);
+        handleGoAwayResponse(3);
     }
 
 
@@ -121,9 +121,7 @@ public class TestHttp2Section_6_2 extends Http2TestBase {
         os.write(headerFrame);
         os.flush();
 
-        // 1 is the last stream processed before the connection error (stream 1
-        // from the initial HTTP/1.1 upgrade)
-        handleGoAwayResponse(1);
+        handleGoAwayResponse(3);
     }
 
 
@@ -136,5 +134,69 @@ public class TestHttp2Section_6_2 extends Http2TestBase {
         sendSimpleGetRequest(3, padding);
         readSimpleGetResponse();
         Assert.assertEquals(getSimpleResponseTrace(3), output.getTrace());
+    }
+
+
+    @Test
+    public void testContinuationFrameOnWrongStream() throws Exception {
+        // RFC 9113, section 6.2: a HEADERS frame without the END_HEADERS flag set MUST be
+        // followed by a CONTINUATION frame on the same stream. A CONTINUATION frame on a
+        // different stream MUST be treated as a connection error of type PROTOCOL_ERROR.
+        http2Connect();
+
+        // Send HEADERS on stream 3 without END_HEADERS
+        byte[] frameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+        buildSimpleGetRequestPart1(frameHeader, headersPayload, 3);
+        writeFrame(frameHeader, headersPayload);
+
+        // Send CONTINUATION on stream 5 instead of stream 3
+        byte[] frameHeader2 = new byte[9];
+        ByteBuffer headersPayload2 = ByteBuffer.allocate(128);
+        buildSimpleGetRequestPart2(frameHeader2, headersPayload2, 5);
+        writeFrame(frameHeader2, headersPayload2);
+
+        handleGoAwayResponse(3, Http2Error.PROTOCOL_ERROR);
+    }
+
+
+    @Test
+    public void testRstStreamOnDifferentStreamDuringHeaderBlock() throws Exception {
+        // RFC 9113, section 6.2: a HEADERS frame without the END_HEADERS flag set MUST be
+        // followed by a CONTINUATION frame on the same stream. A RST_STREAM frame on a
+        // different stream MUST be treated as a connection error of type PROTOCOL_ERROR.
+        http2Connect();
+
+        // Send HEADERS on stream 3 without END_HEADERS
+        byte[] frameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+        buildSimpleGetRequestPart1(frameHeader, headersPayload, 3);
+        writeFrame(frameHeader, headersPayload);
+
+        // Send RST_STREAM for stream 5 instead of CONTINUATION for stream 3
+        sendRst(5, Http2Error.CANCEL.getCode());
+
+        handleGoAwayResponse(3, Http2Error.PROTOCOL_ERROR);
+    }
+
+
+    @Test
+    public void testRstStreamDuringHeaderBlock() throws Exception {
+        // RFC 9113, section 6.2: a HEADERS frame without the END_HEADERS flag
+        // set MUST be followed by a CONTINUATION frame for the same stream.
+        // The receipt of any other frame type, including RST_STREAM, MUST be
+        // treated as a connection error of type PROTOCOL_ERROR.
+        http2Connect();
+
+        // Send HEADERS on stream 3 without the END_HEADERS flag
+        byte[] frameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+        buildSimpleGetRequestPart1(frameHeader, headersPayload, 3);
+        writeFrame(frameHeader, headersPayload);
+
+        // Send RST_STREAM for stream 3 instead of the required CONTINUATION
+        sendRst(3, Http2Error.CANCEL.getCode());
+
+        handleGoAwayResponse(3, Http2Error.PROTOCOL_ERROR);
     }
 }

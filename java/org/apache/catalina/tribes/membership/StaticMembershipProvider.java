@@ -32,6 +32,7 @@ import org.apache.catalina.tribes.ChannelException.FaultyMember;
 import org.apache.catalina.tribes.ChannelListener;
 import org.apache.catalina.tribes.Heartbeat;
 import org.apache.catalina.tribes.Member;
+import org.apache.catalina.tribes.group.GroupChannel;
 import org.apache.catalina.tribes.group.Response;
 import org.apache.catalina.tribes.group.RpcCallback;
 import org.apache.catalina.tribes.group.RpcChannel;
@@ -72,7 +73,7 @@ public class StaticMembershipProvider extends MembershipProviderBase
     /**
      * List of static members for this cluster.
      */
-    protected ArrayList<StaticMember> staticMembers;
+    protected List<StaticMember> staticMembers;
     /**
      * Send options flag for channel messages.
      */
@@ -119,8 +120,19 @@ public class StaticMembershipProvider extends MembershipProviderBase
 
     @Override
     public void init(Properties properties) throws Exception {
+        // All the default properties have been set by StaticMembershipService.setDefaults, so no need to check
         String expirationTimeStr = properties.getProperty("expirationTime");
         this.expirationTime = Long.parseLong(expirationTimeStr);
+        if (expirationTime <= 0) {
+            throw new IllegalArgumentException(sm.getString("membershipService.invalidTimingProperty", "expirationTime",
+                    Long.valueOf(expirationTime)));
+        }
+        String pingIntervalStr = properties.getProperty("pingInterval");
+        this.pingInterval = Long.parseLong(pingIntervalStr);
+        if (pingInterval <= 0) {
+            throw new IllegalArgumentException(sm.getString("membershipService.invalidTimingProperty", "pingInterval",
+                    Long.valueOf(pingInterval)));
+        }
         String connectTimeoutStr = properties.getProperty("connectTimeout");
         this.connectTimeout = Integer.parseInt(connectTimeoutStr);
         String rpcTimeouStr = properties.getProperty("rpcTimeout");
@@ -132,8 +144,6 @@ public class StaticMembershipProvider extends MembershipProviderBase
         this.channel.addChannelListener(this);
         String useThreadStr = properties.getProperty("useThread");
         this.useThread = Boolean.parseBoolean(useThreadStr);
-        String pingIntervalStr = properties.getProperty("pingInterval");
-        this.pingInterval = Long.parseLong(pingIntervalStr);
     }
 
     @Override
@@ -146,7 +156,15 @@ public class StaticMembershipProvider extends MembershipProviderBase
         }
         startLevel = (startLevel | level);
         if (startLevel == (Channel.MBR_RX_SEQ | Channel.MBR_TX_SEQ)) {
-            startMembership(getAliveMembers(staticMembers.toArray(new Member[0])));
+            try {
+                startMembership(getAliveMembers(staticMembers.toArray(new Member[0])));
+            } catch (ChannelException ce) {
+                // A member that was reachable at the liveness check above may still fail the actual
+                // RPC (e.g. it has not finished its own startup yet). That is expected during cluster
+                // start-up and must not prevent this member from starting; the next ping will pick up
+                // any member that is not yet up.
+                log.warn(sm.getString("staticMembershipProvider.startMembership.failed"), ce);
+            }
             running = true;
             if (thread == null && useThread) {
                 thread = new PingThread();
@@ -396,7 +414,7 @@ public class StaticMembershipProvider extends MembershipProviderBase
     protected void checkExpired() {
         Member[] expired = membership.expire(expirationTime);
         for (Member member : expired) {
-            membershipListener.memberDisappeared(member);
+            memberDisappeared(member);
         }
     }
 
@@ -412,16 +430,23 @@ public class StaticMembershipProvider extends MembershipProviderBase
      * Sets the static members for this cluster.
      * @param staticMembers the list of static members
      */
-    public void setStaticMembers(ArrayList<StaticMember> staticMembers) {
+    public void setStaticMembers(List<StaticMember> staticMembers) {
         this.staticMembers = staticMembers;
     }
 
     private Member[] getAliveMembers(Member[] members) {
+        boolean channelSecure = channel instanceof GroupChannel groupChannel && groupChannel.getSecure();
         List<Member> aliveMembers = new ArrayList<>();
         for (Member member : members) {
+            boolean useSecurePort = channelSecure || member.getSecurePort() >= 0 && member.getPort() < 0;
+            int port = useSecurePort ? member.getSecurePort() : member.getPort();
+            if (port < 0) {
+                // no usable port to connect to, so the member can't be checked
+                continue;
+            }
             try (Socket socket = new Socket()) {
                 InetAddress ia = InetAddress.getByAddress(member.getHost());
-                InetSocketAddress addr = new InetSocketAddress(ia, member.getPort());
+                InetSocketAddress addr = new InetSocketAddress(ia, port);
                 socket.connect(addr, connectTimeout);
                 aliveMembers.add(member);
             } catch (Throwable t) {
@@ -506,8 +531,8 @@ public class StaticMembershipProvider extends MembershipProviderBase
 
         @Override
         public String toString() {
-            return "MemberMessage[" + "name=" + new String(membershipId) + "; type=" + getTypeDesc() + "; member=" +
-                    member + ']';
+            return "MemberMessage[" + "name=" + new String(membershipId, StandardCharsets.ISO_8859_1) + "; type=" +
+                    getTypeDesc() + "; member=" + member + ']';
         }
 
         /**
@@ -541,7 +566,7 @@ public class StaticMembershipProvider extends MembershipProviderBase
                     sleep(pingInterval);
                     ping();
                 } catch (InterruptedException ix) {
-                    // Ignore
+                    // Expected during shutdown. The running flag is already set to false, so the loop will exit.
                 } catch (Exception e) {
                     log.warn(sm.getString("staticMembershipProvider.pingThread.failed"), e);
                 }

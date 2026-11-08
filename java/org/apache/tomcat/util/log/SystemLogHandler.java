@@ -35,7 +35,7 @@ public class SystemLogHandler extends PrintStream {
 
 
     /**
-     * Construct the handler to capture the output of the given steam.
+     * Construct the handler to capture the output of the given stream.
      *
      * @param wrapped The stream to capture
      */

@@ -76,7 +76,7 @@ public class TestStreamQueryString extends Http2TestBase {
 
         Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "query", new Query(queryValue));
-        ctxt.addServletMappingDecoded("/query", "query");
+        ctxt.addServletMapping("/query", "query");
 
         tomcat.start();
 

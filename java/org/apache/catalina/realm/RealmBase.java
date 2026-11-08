@@ -68,9 +68,8 @@ import org.ietf.jgss.GSSException;
 import org.ietf.jgss.GSSName;
 
 /**
- * Abstract base class for Realm implementations.
- * Provides common functionality including credential handling, security constraint evaluation,
- * and GSS-API authentication support.
+ * Abstract base class for Realm implementations. Provides common functionality including credential handling, security
+ * constraint evaluation, and GSS-API authentication support.
  */
 public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
@@ -324,8 +323,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
 
     /**
-     * Returns the comma separated names of user attributes to additionally query from the realm. These will be
-     * provided to the user through the created Principal's <i>attributes</i> map.
+     * Returns the comma separated names of user attributes to additionally query from the realm. These will be provided
+     * to the user through the created Principal's <i>attributes</i> map.
      *
      * @return The comma separated names of user attributes to additionally query from the realm
      */
@@ -339,9 +338,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * field's name, that is, the name of the field serves as the key of the mapping.
      * <p>
      * If set to the wildcard character, or, if the wildcard character is part of the comma separated list, all
-     * available attributes - except the <i>password</i> attribute (as specified by <code>userCredCol</code>) - are
-     * queried. The wildcard character is defined by constant {@link RealmBase#USER_ATTRIBUTES_WILDCARD}. It defaults to
-     * the asterisk (*) character.
+     * available attributes - except the <i>password</i> attribute - are queried. The wildcard character is defined by
+     * constant {@link RealmBase#USER_ATTRIBUTES_WILDCARD}. It defaults to the asterisk (*) character.
      *
      * @param userAttributes the comma separated names of user attributes
      */
@@ -636,7 +634,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                 boolean matched = false;
                 int length = -1;
                 for (String pattern : patterns) {
-                    if (pattern.startsWith("/") && pattern.endsWith("/*") && pattern.length() >= longest) {
+                    if (pattern.startsWith("/") && pattern.endsWith("/*") && pattern.length() >= longest &&
+                            pattern.length() >= length) {
 
                         if (pattern.length() == 2) {
                             matched = true;
@@ -856,7 +855,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             }
             // Check for an all roles(role-name="*")
             for (SecurityConstraint constraint : constraints) {
-                // If the all roles mode exists, sets
+                // Check whether the constraint grants access to all roles (role-name="*")
                 if (constraint.getAllRoles()) {
                     if (allRolesMode == AllRolesMode.AUTH_ONLY_MODE) {
                         if (log.isTraceEnabled()) {
@@ -902,13 +901,14 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     public boolean hasRole(Wrapper wrapper, Principal principal, String role) {
         // Check for a role alias
         if (wrapper != null) {
-            String realRole = wrapper.findSecurityReference(role);
-            if (realRole != null) {
-                role = realRole;
+            if (wrapper.getParent() instanceof Context context) {
+                String realRole = context.findRoleMapping(role);
+                if (realRole != null) {
+                    role = realRole;
+                }
             }
         }
 
-        // Should be overridden in JAASRealm - to avoid pretty inefficient conversions
         if (principal == null || role == null) {
             return false;
         }
@@ -944,7 +944,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         }
         List<String> attrs = new ArrayList<>();
         for (String name : userAttributes.split(USER_ATTRIBUTES_DELIMITER)) {
-            name = name.trim();
+            name = name.strip();
             if (name.isEmpty()) {
                 continue;
             }
@@ -974,7 +974,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      *             Realm; otherwise return <code>false</code>.
      */
     protected boolean hasRoleInternal(Principal principal, String role) {
-        // Should be overridden in JAASRealm - to avoid pretty inefficient conversions
         if (!(principal instanceof GenericPrincipal gp)) {
             return false;
         }
@@ -1125,8 +1124,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * Check whether the current credential handler uses the specified message digest algorithm.
      *
      * @param algorithm The name of the message digest algorithm to check
-     * @return {@code true} if the credential handler is a {@link MessageDigestCredentialHandler}
-     *             using the specified algorithm
+     *
+     * @return {@code true} if the credential handler is a {@link MessageDigestCredentialHandler} using the specified
+     *             algorithm
      */
     protected boolean hasMessageDigest(String algorithm) {
         CredentialHandler ch = credentialHandler;
@@ -1151,7 +1151,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * @param realmName The realm name
      * @param algorithm The name of the message digest algorithm to use
      *
-     * @return the digest for the specified user
+     * @return the digest for the specified user, or {@code null} if the user has no stored credential
      */
     protected String getDigest(String username, String realmName, String algorithm) {
         String password = getPassword(username);
@@ -1265,7 +1265,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         if (isStripRealmForGss()) {
             int i = name.indexOf('@');
             if (i > 0) {
-                // Zero so we don't leave a zero length name
+                // The 'i > 0' guard avoids stripping the name to an empty string when it starts with '@'
                 name = name.substring(0, i);
             }
         }
@@ -1322,8 +1322,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * the default for the CredentialHandler will be used.</li>
      * <li><b>-k</b> - The length (in bits) of the key(s), if any, created while generating the credential. If not
      * specified, the default for the CredentialHandler will be used.</li>
-     * <li><b>-h</b> - The fully qualified class name of the CredentialHandler to use. If not specified, the built-in
-     * handlers will be tested in turn and the first one to accept the specified algorithm will be used.</li>
+     * <li><b>-h</b> - The fully qualified class name of the {@link DigestCredentialHandlerBase} to use. If not
+     * specified, the built-in handlers will be tested in turn and the first one to accept the specified algorithm will
+     * be used.</li>
      * <li><b>-f</b> - The name of the file that contains passwords to encode. Each line in the file should contain only
      * one password. Using this option ignores other password input.</li>
      * </ul>
@@ -1445,7 +1446,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                 Class<?> clazz = Class.forName(handlerClassName);
                 handler = (DigestCredentialHandlerBase) clazz.getConstructor().newInstance();
                 IntrospectionUtils.setProperty(handler, "algorithm", algorithm);
-            } catch (ReflectiveOperationException e) {
+            } catch (ReflectiveOperationException | ClassCastException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -1608,7 +1609,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     }
 
     private static X509UsernameRetriever createUsernameRetriever(String className) throws LifecycleException {
-        if (null == className || className.trim().isEmpty()) {
+        if (null == className || className.strip().isEmpty()) {
             return new X509SubjectDnRetriever();
         }
 

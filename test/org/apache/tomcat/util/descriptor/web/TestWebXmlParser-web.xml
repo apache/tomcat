@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!--
+  Every URL and URL pattern in this file uses %25 so that the two forms are
+  easy to tell apart. If the patterns are treated as being provided in encoded
+  form they will be decoded to "%". If they are treated as being provided in
+  decoded form they will be left as "%25".
+-->
+<web-app>
+  <error-page>
+    <error-code>404</error-code>
+    <location>/error%25</location>
+  </error-page>
+  <filter>
+    <filter-name>filter</filter-name>
+    <filter-class>org.apache.tomcat.TestFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>filter</filter-name>
+    <url-pattern>/filter%25</url-pattern>
+  </filter-mapping>
+  <servlet>
+    <servlet-name>servlet</servlet-name>
+    <servlet-class>org.apache.tomcat.TestServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>servlet</servlet-name>
+    <url-pattern>/servlet%25</url-pattern>
+  </servlet-mapping>
+  <jsp-config>
+    <jsp-property-group>
+      <url-pattern>/jsp%25</url-pattern>
+    </jsp-property-group>
+  </jsp-config>
+  <login-config>
+    <auth-method>FORM</auth-method>
+    <form-login-config>
+      <form-login-page>/login%25</form-login-page>
+      <form-error-page>/login-error%25</form-error-page>
+    </form-login-config>
+  </login-config>
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>resource</web-resource-name>
+      <url-pattern>/secure%25</url-pattern>
+    </web-resource-collection>
+  </security-constraint>
+</web-app>

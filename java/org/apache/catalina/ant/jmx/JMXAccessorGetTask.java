@@ -41,11 +41,10 @@ import org.apache.tools.ant.BuildException;
  *           name="Catalina:type=IDataSender,host=localhost,senderAddress=192.168.1.2,senderPort=9025"
  *           attribute="nrOfRequests"
  *           resultproperty="IDataSender.9025.nrOfRequests"
- *           echo="false"&gt;
- *       /&gt;
+ *           echo="false" /&gt;
  * </pre>
  * <p>
- * First call to a remote MBeanserver save the JMXConnection a referenz <em>jmx.server</em>
+ * First call to a remote MBeanserver save the JMXConnection a reference <em>jmx.server</em>
  * </p>
  * These tasks require Ant 1.6 or later interface.
  *

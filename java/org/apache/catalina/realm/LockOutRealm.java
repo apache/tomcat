@@ -84,6 +84,15 @@ public class LockOutRealm extends CombinedRealm {
      */
     private boolean caseSensitive = false;
 
+    /*
+     * Should user names (the keys) in the failedUsers Map have leading space removed. The default is true.
+     */
+    private boolean stripLeadingSpace = true;
+
+    /*
+     * Should user names (the keys) in the failedUsers Map have trailing space removed. The default is true.
+     */
+    private boolean stripTrailingSpace = true;
 
     @Override
     protected void startInternal() throws LifecycleException {
@@ -215,8 +224,8 @@ public class LockOutRealm extends CombinedRealm {
 
 
     /**
-     * Check if the current user is locked. If this is associated with a login attempt, then the last access
-     * time will be recorded and any attempt to authenticate a locked user will log a warning.
+     * Check if the specified user is locked, that is, the user has at least the configured number of recent
+     * authentication failures and the lock out period has not yet expired.
      *
      * @param username The username to check
      * @return true if the user is locked, false otherwise
@@ -358,9 +367,9 @@ public class LockOutRealm extends CombinedRealm {
 
 
     /**
-     * Get the case sensitivity flag for username matching.
+     * Get the case sensitivity flag for user name matching.
      *
-     * @return the caseSensitive
+     * @return the current caseSensitive value
      */
     public boolean getCaseSensitive() {
         return caseSensitive;
@@ -368,7 +377,7 @@ public class LockOutRealm extends CombinedRealm {
 
 
     /**
-     * Set the case sensitivity flag for username matching.
+     * Set the case sensitivity flag for user name matching.
      *
      * @param caseSensitive the caseSensitive to set
      */
@@ -377,11 +386,76 @@ public class LockOutRealm extends CombinedRealm {
     }
 
 
+    /**
+     * Get the case strip leading space flag for user name matching.
+     *
+     * @return the current stripLeadingSpace value
+     */
+    public boolean getStripLeadingSpace() {
+        return stripLeadingSpace;
+    }
+
+
+    /**
+     * Set the strip leading space flag for user name matching.
+     *
+     * @param stripLeadingSpace the stripLeadingSpace to set
+     */
+    public void setStripLeadingSpace(boolean stripLeadingSpace) {
+        this.stripLeadingSpace = stripLeadingSpace;
+    }
+
+
+    /**
+     * Get the case strip trailing space flag for user name matching.
+     *
+     * @return the current stripTrailingSpace value
+     */
+    public boolean getStripTrailingSpace() {
+        return stripTrailingSpace;
+    }
+
+
+    /**
+     * Set the strip trailing space flag for user name matching.
+     *
+     * @param stripTrailingSpace the stripTrailingSpace to set
+     */
+    public void setStripTrailingSpace(boolean stripTrailingSpace) {
+        this.stripTrailingSpace = stripTrailingSpace;
+    }
+
+
     private String normalizeUsername(String username) {
-        if (username != null && !getCaseSensitive()) {
-            return username.toLowerCase(Locale.ROOT);
+        if (username == null) {
+            return null;
         }
-        return username;
+        if (!getCaseSensitive()) {
+            username = username.toLowerCase(Locale.ROOT);
+        }
+
+        // String.strip() only covers Character.isWhitespace(). Character.isSpaceChar() is also needed here.
+        int start = 0;
+        int end = username.length();
+        if (getStripLeadingSpace()) {
+            while (start < end) {
+                char c = username.charAt(start);
+                if (!Character.isSpaceChar(c) && !Character.isWhitespace(c)) {
+                    break;
+                }
+                start++;
+            }
+        }
+        if (getStripTrailingSpace()) {
+            while (end > start) {
+                char c = username.charAt(end - 1);
+                if (!Character.isSpaceChar(c) && !Character.isWhitespace(c)) {
+                    break;
+                }
+                end--;
+            }
+        }
+        return username.substring(start, end);
     }
 
 

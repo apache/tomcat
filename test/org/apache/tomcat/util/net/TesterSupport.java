@@ -18,11 +18,15 @@ package org.apache.tomcat.util.net;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -31,16 +35,21 @@ import java.security.PrivateKey;
 import java.security.cert.CertPathValidator;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.PKIXBuilderParameters;
 import java.security.cert.PKIXRevocationChecker;
 import java.security.cert.TrustAnchor;
 import java.security.cert.X509CertSelector;
 import java.security.cert.X509Certificate;
+import java.util.Base64;
 import java.util.EnumSet;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.crypto.Cipher;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 import javax.net.ssl.CertPathTrustManagerParameters;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
@@ -72,6 +81,7 @@ import org.apache.catalina.core.OpenSSLLifecycleListener;
 import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.tomcat.util.buf.Asn1Writer;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
@@ -99,12 +109,17 @@ public final class TesterSupport {
     public static final String LOCALHOST_EC_KEY_PEM = SSL_DIR + "localhost-ec-key.pem";
     public static final String LOCALHOST_RSA_CERT_PEM = SSL_DIR + "localhost-rsa-cert.pem";
     public static final String LOCALHOST_RSA_KEY_PEM = SSL_DIR + "localhost-rsa-key.pem";
+    public static final String LOCALHOST_RSA_LONGCHAIN_CERT_PEM = SSL_DIR + "localhost-rsa-longchain-cert.pem";
+    public static final String LOCALHOST_RSA_LONGCHAIN_KEY_PEM = SSL_DIR + "localhost-rsa-longchain-key.pem";
+    public static final String LOCALHOST_RSA_LONGCHAIN_CHAIN_PEM = SSL_DIR + "localhost-rsa-longchain-chain.pem";
     public static final String DB_INDEX = SSL_DIR + "index.db";
     public static final String OCSP_RESPONDER_RSA_CERT = SSL_DIR + "ocsp-responder-rsa-cert.pem";
     public static final String OCSP_RESPONDER_RSA_KEY = SSL_DIR + "ocsp-responder-rsa-key.pem";
     public static final String LOCALHOST_CRL_RSA_JKS = SSL_DIR + "localhost-crl-rsa.jks";
     public static final String CLIENT_CRL_JKS = SSL_DIR + "user2-crl.jks";
     public static final String CLIENT_CRL_LONG_JKS = SSL_DIR + "user3-crl-long.jks";
+    public static final String EMPTY_CRL = SSL_DIR + "empty-crl.pem";
+    public static final String POPULATED_CRL = SSL_DIR + "populated-crl.pem";
     public static final boolean TLSV13_AVAILABLE;
 
     public static final String ROLE = "testrole";
@@ -287,6 +302,121 @@ public final class TesterSupport {
         return ks;
     }
 
+    /**
+     * Creates a PKCS#12 bundle (the file name ends with {@code .pkcs12}) that holds the localhost RSA private key and
+     * its certificate. The bundle is protected with {@link #JKS_PASS}.
+     *
+     * @param includeCa If {@code true} the certificate of the CA that issued the certificate is included in the
+     *                      bundle so it holds the certificate chain, otherwise the bundle only holds the certificate
+     *
+     * @return the bundle, which is deleted when the JVM exits
+     *
+     * @throws Exception if the bundle could not be created
+     */
+    public static File createLocalhostRsaPkcs12(boolean includeCa) throws Exception {
+        KeyStore jks = getKeyStore(LOCALHOST_RSA_JKS);
+        String alias = null;
+        Enumeration<String> aliases = jks.aliases();
+        while (alias == null && aliases.hasMoreElements()) {
+            String candidate = aliases.nextElement();
+            if (jks.isKeyEntry(candidate)) {
+                alias = candidate;
+            }
+        }
+        Assert.assertNotNull(alias);
+        PrivateKey key = (PrivateKey) jks.getKey(alias, JKS_PASS.toCharArray());
+        Certificate leaf = jks.getCertificateChain(alias)[0];
+
+        Certificate[] chain;
+        if (includeCa) {
+            Certificate ca;
+            try (InputStream is = new FileInputStream(CA_CERT_PEM)) {
+                ca = CertificateFactory.getInstance("X.509").generateCertificate(is);
+            }
+            chain = new Certificate[] { leaf, ca };
+        } else {
+            chain = new Certificate[] { leaf };
+        }
+
+        KeyStore pkcs12 = KeyStore.getInstance("PKCS12");
+        pkcs12.load(null, null);
+        pkcs12.setKeyEntry("localhost", key, JKS_PASS.toCharArray(), chain);
+
+        File file = File.createTempFile("tomcat-test-", ".pkcs12");
+        file.deleteOnExit();
+        try (OutputStream os = new FileOutputStream(file)) {
+            pkcs12.store(os, JKS_PASS.toCharArray());
+        }
+        return file;
+    }
+
+
+    /**
+     * Creates a PEM file that holds the localhost RSA certificate followed by the certificate of the CA that issued
+     * it, i.e. the certificate and its certificate chain.
+     *
+     * @return the file, which is deleted when the JVM exits
+     *
+     * @throws Exception if the file could not be created
+     */
+    public static File createLocalhostRsaCertAndCaPem() throws Exception {
+        File file = File.createTempFile("tomcat-test-", ".pem");
+        file.deleteOnExit();
+        try (OutputStream os = new FileOutputStream(file)) {
+            os.write(Files.readAllBytes(new File(LOCALHOST_RSA_CERT_PEM).toPath()));
+            os.write('\n');
+            os.write(Files.readAllBytes(new File(CA_CERT_PEM).toPath()));
+        }
+        return file;
+    }
+
+    /**
+     * Creates a PEM file that holds the localhost RSA certificate, followed by the certificate of the CA that issued
+     * it (i.e. the certificate chain), followed by the localhost RSA private key encrypted with the given password.
+     *
+     * @param password The password to encrypt the private key with
+     *
+     * @return the file, which is deleted when the JVM exits
+     *
+     * @throws Exception if the file could not be created
+     */
+    public static File createLocalhostRsaCertCaAndEncryptedKeyPem(String password) throws Exception {
+        // The private key file holds an unencrypted PKCS#8 key
+        StringBuilder base64 = new StringBuilder();
+        for (String line : Files.readAllLines(new File(LOCALHOST_RSA_KEY_PEM).toPath())) {
+            if (!line.startsWith("-----")) {
+                base64.append(line.trim());
+            }
+        }
+        byte[] pkcs8 = Base64.getDecoder().decode(base64.toString());
+
+        String algorithm = "PBEWithHmacSHA256AndAES_128";
+        Cipher cipher = Cipher.getInstance(algorithm);
+        cipher.init(Cipher.ENCRYPT_MODE,
+                SecretKeyFactory.getInstance(algorithm).generateSecret(new PBEKeySpec(password.toCharArray())));
+        byte[] encrypted = cipher.doFinal(pkcs8);
+        // EncryptedPrivateKeyInfo with the PBES2 algorithm identifier (1.2.840.113549.1.5.13) and the parameters from
+        // the cipher. The JRE class used for this can't be used as it doesn't recognise the algorithm name.
+        byte[] pbes2Oid = new byte[] { 0x06, 0x09, 0x2A, (byte) 0x86, 0x48, (byte) 0x86, (byte) 0xF7, 0x0D, 0x01, 0x05,
+                0x0D };
+        byte[] algorithmIdentifier = Asn1Writer.writeSequence(pbes2Oid, cipher.getParameters().getEncoded());
+        byte[] encryptedKeyInfo =
+                Asn1Writer.writeSequence(algorithmIdentifier, Asn1Writer.writeOctetString(encrypted));
+
+        File file = File.createTempFile("tomcat-test-", ".pem");
+        file.deleteOnExit();
+        try (OutputStream os = new FileOutputStream(file)) {
+            os.write(Files.readAllBytes(new File(LOCALHOST_RSA_CERT_PEM).toPath()));
+            os.write('\n');
+            os.write(Files.readAllBytes(new File(CA_CERT_PEM).toPath()));
+            os.write('\n');
+            os.write("-----BEGIN ENCRYPTED PRIVATE KEY-----\n".getBytes(StandardCharsets.US_ASCII));
+            os.write(Base64.getMimeEncoder(64, new byte[] { '\n' }).encode(encryptedKeyInfo));
+            os.write("\n-----END ENCRYPTED PRIVATE KEY-----\n".getBytes(StandardCharsets.US_ASCII));
+        }
+        return file;
+    }
+
     protected static boolean isClientRenegotiationSupported(Tomcat tomcat) {
         // Disabled for Tomcat Native (part of response to CVE-2009-3555)
         // Only JRE provided JSSE implementation supports this
@@ -320,7 +450,11 @@ public final class TesterSupport {
     }
 
     public static void configureClientCertContext(Tomcat tomcat) {
-        initSsl(tomcat);
+        configureClientCertContext(tomcat, false, CLIENT_JKS);
+    }
+
+    public static void configureClientCertContext(Tomcat tomcat, boolean useOpenSSLTrust, String... keyStores) {
+        initSsl(tomcat, useOpenSSLTrust);
 
         /* When running on Java 11, TLSv1.3 is enabled by default. The JSSE
          * implementation of TLSv1.3 does not support
@@ -335,12 +469,12 @@ public final class TesterSupport {
         Context ctx = tomcat.addContext("", null);
 
         Tomcat.addServlet(ctx, "simple", new SimpleServlet());
-        ctx.addServletMappingDecoded("/unprotected", "simple");
-        ctx.addServletMappingDecoded("/protected", "simple");
+        ctx.addServletMapping("/unprotected", "simple");
+        ctx.addServletMapping("/protected", "simple");
 
         // Security constraints
         SecurityCollection collection = new SecurityCollection();
-        collection.addPatternDecoded("/protected");
+        collection.addPattern("/protected");
         SecurityConstraint sc = new SecurityConstraint();
         sc.addAuthRole(ROLE);
         sc.addCollection(collection);
@@ -358,17 +492,25 @@ public final class TesterSupport {
             throw new RuntimeException(ex);
         }
 
-        String cn = "NOTFOUND";
-        try {
-            KeyStore ks = getKeyStore(CLIENT_JKS);
-            X509Certificate cert = (X509Certificate)ks.getCertificate(CLIENT_ALIAS);
-            cn = cert.getSubjectX500Principal().toString();
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
+        // Add the user for each certificate in each key store to the realm and assign each user the standard role
+        for (String keyStore : keyStores) {
+            String cn = "NOTFOUND";
+            try {
+                KeyStore ks = getKeyStore(keyStore);
+                Enumeration<String> aliases = ks.aliases();
+                while (aliases.hasMoreElements()) {
+                    String alias = aliases.nextElement();
+                    X509Certificate cert = (X509Certificate)ks.getCertificate(alias);
+                    cn = cert.getSubjectX500Principal().toString();
 
-        realm.addUser(cn, "not used");
-        realm.addUserRole(cn, ROLE);
+                    realm.addUser(cn, "not used");
+                    realm.addUserRole(cn, ROLE);
+                }
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+
+        }
         ctx.setRealm(realm);
 
         // Configure the authenticator

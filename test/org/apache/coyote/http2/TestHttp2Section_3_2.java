@@ -41,6 +41,24 @@ public class TestHttp2Section_3_2 extends Http2TestBase {
     }
 
 
+    /*
+     * RFC 9110, section 7.8: A server that receives an Upgrade header field in an HTTP/1.0 request MUST ignore that
+     * Upgrade field.
+     */
+    @Test
+    public void testConnectionUpgradeHttp10() throws Exception {
+        enableHttp2();
+        configureAndStartWebApplication();
+        openClientConnection();
+        byte[] upgradeRequest = ("GET /simple HTTP/1.0\r\n" + "Host: localhost:" + getPort() + "\r\n" +
+                "Connection: " + DEFAULT_CONNECTION_HEADER_VALUE + "\r\n" + "Upgrade: h2c\r\n" +
+                EMPTY_HTTP2_SETTINGS_HEADER + "\r\n").getBytes(StandardCharsets.ISO_8859_1);
+        os.write(upgradeRequest);
+        os.flush();
+        parseHttp11Response();
+    }
+
+
     @Test
     public void testConnectionUpgradeWrongProtocol() throws Exception {
         enableHttp2();
@@ -170,4 +188,31 @@ public class TestHttp2Section_3_2 extends Http2TestBase {
     // No need to test how trailing '=' are handled here. HTTP2Settings payloads
     // are always a multiple of 6 long which means valid payloads never end in
     // '='. Invalid payloads will be rejected anyway.
+
+    @Test
+    public void testInvalidBase64Http2Settings() throws Exception {
+        // RFC 7540, section 3.2.1: a server MUST NOT upgrade if the HTTP2-Settings value is
+        // not a valid BASE64URL-encoded SETTINGS payload. A value containing characters
+        // outside the base64url alphabet must be rejected before the 101 is sent.
+        enableHttp2();
+        configureAndStartWebApplication();
+        openClientConnection();
+        doHttpUpgrade(DEFAULT_CONNECTION_HEADER_VALUE, "h2c", "HTTP2-Settings: !!!invalid!!!\r\n", false);
+        parseHttp11Response();
+    }
+
+
+    @Test
+    public void testInvalidLengthHttp2Settings() throws Exception {
+        // RFC 7540, section 3.2.1: the HTTP2-Settings value must be a BASE64URL encoding of
+        // an HTTP/2 SETTINGS payload (section 6.5). Each entry is exactly 6 octets, so the
+        // decoded length must be a multiple of 6. A valid base64url string that decodes to a
+        // length that is not a multiple of 6 must also be rejected.
+        enableHttp2();
+        configureAndStartWebApplication();
+        openClientConnection();
+        // "AQID" is valid base64url and decodes to 3 bytes, which is not a multiple of 6
+        doHttpUpgrade(DEFAULT_CONNECTION_HEADER_VALUE, "h2c", "HTTP2-Settings: AQID\r\n", false);
+        parseHttp11Response();
+    }
 }

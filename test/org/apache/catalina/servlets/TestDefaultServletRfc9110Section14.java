@@ -44,7 +44,7 @@ public class TestDefaultServletRfc9110Section14 extends TomcatBaseTest {
         Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
 
         Tomcat.addServlet(ctxt, "default", DefaultServlet.class.getName());
-        ctxt.addServletMappingDecoded("/", "default");
+        ctxt.addServletMapping("/", "default");
 
         tomcat.start();
 
@@ -79,7 +79,7 @@ public class TestDefaultServletRfc9110Section14 extends TomcatBaseTest {
         Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
 
         Tomcat.addServlet(ctxt, "default", DefaultServlet.class.getName());
-        ctxt.addServletMappingDecoded("/", "default");
+        ctxt.addServletMapping("/", "default");
 
         tomcat.start();
 

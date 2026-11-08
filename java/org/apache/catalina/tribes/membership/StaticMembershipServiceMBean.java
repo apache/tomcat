@@ -59,7 +59,8 @@ public interface StaticMembershipServiceMBean {
     // Operation
     /**
      * Returns the configuration properties.
-     * @return the properties
+     * @return the live, internal Properties object; it is mutable and can be used to modify the service
+     *             configuration through the returned reference
      */
     Properties getProperties();
 

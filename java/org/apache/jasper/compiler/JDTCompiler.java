@@ -56,7 +56,7 @@ import org.eclipse.jdt.internal.compiler.lookup.ModuleBinding;
 import org.eclipse.jdt.internal.compiler.problem.DefaultProblemFactory;
 
 /**
- * JDT class compiler. This compiler will load source dependencies from the context classloader, reducing dramatically
+ * JDT class compiler. This compiler will load source dependencies from the JSP classloader, reducing dramatically
  * disk access during the compilation process. Based on code from Cocoon2.
  */
 public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
@@ -318,16 +318,17 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                 case "23" -> settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_23);
                 case "24" -> settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_24);
                 case "25" -> settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_25);
-                case "26" ->
-                        // Constant not available in latest ECJ version shipped with
-                        // Tomcat. May be supported in a snapshot build.
-                        // This is checked against the actual version below.
-                        settings.put(CompilerOptions.OPTION_Source, "26");
+                case "26" -> settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_26);
                 case "27" ->
                         // Constant not available in latest ECJ version shipped with
                         // Tomcat. May be supported in a snapshot build.
                         // This is checked against the actual version below.
                         settings.put(CompilerOptions.OPTION_Source, "27");
+                case "28" ->
+                        // Constant not available in latest ECJ version shipped with
+                        // Tomcat. May be supported in a snapshot build.
+                        // This is checked against the actual version below.
+                        settings.put(CompilerOptions.OPTION_Source, "28");
                 default -> {
                     log.warn(Localizer.getMessage("jsp.warning.unknown.sourceVM", opt));
                     settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_21);
@@ -433,11 +434,8 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                     settings.put(CompilerOptions.OPTION_Compliance, CompilerOptions.VERSION_25);
                 }
                 case "26" -> {
-                    // Constant not available in latest ECJ version shipped with
-                    // Tomcat. May be supported in a snapshot build.
-                    // This is checked against the actual version below.
-                    settings.put(CompilerOptions.OPTION_TargetPlatform, "26");
-                    settings.put(CompilerOptions.OPTION_Compliance, "26");
+                    settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_26);
+                    settings.put(CompilerOptions.OPTION_Compliance, CompilerOptions.VERSION_26);
                 }
                 case "27" -> {
                     // Constant not available in latest ECJ version shipped with
@@ -445,6 +443,13 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                     // This is checked against the actual version below.
                     settings.put(CompilerOptions.OPTION_TargetPlatform, "27");
                     settings.put(CompilerOptions.OPTION_Compliance, "27");
+                }
+                case "28" -> {
+                    // Constant not available in latest ECJ version shipped with
+                    // Tomcat. May be supported in a snapshot build.
+                    // This is checked against the actual version below.
+                    settings.put(CompilerOptions.OPTION_TargetPlatform, "28");
+                    settings.put(CompilerOptions.OPTION_Compliance, "28");
                 }
                 default -> {
                     log.warn(Localizer.getMessage("jsp.warning.unknown.targetVM", opt));
@@ -528,16 +533,18 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
         Compiler compiler = new Compiler(env, policy, cOptions, requestor, problemFactory);
         compiler.compile(compilationUnits);
 
+        // Dispatch any compilation problems before deleting the generated
+        // source, so a failure to delete can not mask the real problem
+        if (!problemList.isEmpty()) {
+            JavacErrorDetail[] jeds = problemList.toArray(new JavacErrorDetail[0]);
+            errDispatcher.javacError(jeds);
+        }
+
         if (!ctxt.keepGenerated()) {
             File javaFile = new File(ctxt.getServletJavaFileName());
             if (!javaFile.delete()) {
                 throw new JasperException(Localizer.getMessage("jsp.warning.compiler.javafile.delete.fail", javaFile));
             }
-        }
-
-        if (!problemList.isEmpty()) {
-            JavacErrorDetail[] jeds = problemList.toArray(new JavacErrorDetail[0]);
-            errDispatcher.javacError(jeds);
         }
 
         if (log.isDebugEnabled()) {

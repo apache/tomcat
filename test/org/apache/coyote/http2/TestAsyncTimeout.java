@@ -48,7 +48,7 @@ public class TestAsyncTimeout extends Http2TestBase {
         Context ctxt = getProgrammaticRootContext();
         // This is the target of the HTTP/2 upgrade request
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
-        ctxt.addServletMappingDecoded("/simple", "simple");
+        ctxt.addServletMapping("/simple", "simple");
 
         // This is the servlet that does that actual test
         // This latch is used to signal that that async thread used by the test
@@ -57,7 +57,7 @@ public class TestAsyncTimeout extends Http2TestBase {
         CountDownLatch latch = new CountDownLatch(1);
         Wrapper w = Tomcat.addServlet(ctxt, "async", new AsyncTimeoutServlet(latch));
         w.setAsyncSupported(true);
-        ctxt.addServletMappingDecoded("/async", "async");
+        ctxt.addServletMapping("/async", "async");
         tomcat.start();
 
         openClientConnection();

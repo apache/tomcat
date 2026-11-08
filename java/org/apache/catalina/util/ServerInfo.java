@@ -54,7 +54,7 @@ public class ServerInfo {
     private static final String serverBuilt;
 
     /**
-     * The server built String, in ISO-8604 date format.
+     * The server built String, in ISO-8601 date format.
      */
     private static final String serverBuiltIso;
 

@@ -17,7 +17,13 @@
 package org.apache.catalina.valves;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.RequestDispatcher;
@@ -51,7 +57,7 @@ public class TestErrorReportValve extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "errorServlet", new ErrorServlet());
-        ctx.addServletMappingDecoded("/", "errorServlet");
+        ctx.addServletMapping("/", "errorServlet");
 
         tomcat.start();
 
@@ -84,7 +90,7 @@ public class TestErrorReportValve extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "bug54220", new Bug54220Servlet(false));
-        ctx.addServletMappingDecoded("/", "bug54220");
+        ctx.addServletMapping("/", "bug54220");
 
         tomcat.start();
 
@@ -104,7 +110,7 @@ public class TestErrorReportValve extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "bug54220", new Bug54220Servlet(true));
-        ctx.addServletMappingDecoded("/", "bug54220");
+        ctx.addServletMapping("/", "bug54220");
 
         tomcat.start();
 
@@ -147,7 +153,7 @@ public class TestErrorReportValve extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "bug54536", new Bug54536Servlet());
-        ctx.addServletMappingDecoded("/", "bug54536");
+        ctx.addServletMapping("/", "bug54536");
 
         tomcat.start();
 
@@ -184,7 +190,7 @@ public class TestErrorReportValve extends TomcatBaseTest {
         Bug56042Servlet bug56042Servlet = new Bug56042Servlet();
         Wrapper wrapper = Tomcat.addServlet(ctx, "bug56042Servlet", bug56042Servlet);
         wrapper.setAsyncSupported(true);
-        ctx.addServletMappingDecoded("/bug56042Servlet", "bug56042Servlet");
+        ctx.addServletMapping("/bug56042Servlet", "bug56042Servlet");
 
         tomcat.start();
 
@@ -245,9 +251,9 @@ public class TestErrorReportValve extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "exception", new ExceptionServlet());
-        ctx.addServletMappingDecoded("/exception", "exception");
+        ctx.addServletMapping("/exception", "exception");
         Tomcat.addServlet(ctx, "erropage", new ErrorPageServlet());
-        ctx.addServletMappingDecoded("/erropage", "erropage");
+        ctx.addServletMapping("/erropage", "erropage");
         ErrorPage errorPage = new ErrorPage();
         errorPage.setErrorCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         errorPage.setLocation("/erropage");
@@ -260,6 +266,60 @@ public class TestErrorReportValve extends TomcatBaseTest {
 
         Assert.assertEquals(res.toString(), "OK");
         Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+    }
+
+
+    @Test
+    public void testAcceptLanguageResourceBundleCacheUsage() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        getProgrammaticRootContext();
+
+        tomcat.start();
+
+        int initial = resourceBundleCacheSize();
+
+        final int requests = 20;
+        final int localesPerRequest = 20;
+        for (int i = 0; i < requests; i++) {
+            StringBuilder acceptLanguage = new StringBuilder();
+            for (int j = 0; j < localesPerRequest; j++) {
+                if (acceptLanguage.length() > 0) {
+                    acceptLanguage.append(',');
+                }
+                acceptLanguage.append(fakeLanguageTag(i * localesPerRequest + j));
+            }
+            Map<String,List<String>> reqHead = new HashMap<>();
+            reqHead.put("Accept-Language", Collections.singletonList(acceptLanguage.toString()));
+            ByteChunk res = new ByteChunk();
+            int rc = getUrl("http://localhost:" + getPort() + "/does-not-exist-" + i, res, reqHead, null);
+            Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
+        }
+
+        int delta = resourceBundleCacheSize() - initial;
+        Assert.assertTrue("ResourceBundle cache grew by " + delta + " entries for " +
+                (requests * localesPerRequest) + " unknown request locales", delta < 50);
+    }
+
+
+    private static String fakeLanguageTag(int i) {
+        StringBuilder tag = new StringBuilder("xxxxx");
+        int v = i;
+        for (int k = 4; k >= 0; k--) {
+            tag.setCharAt(k, (char) ('a' + v % 26));
+            v /= 26;
+        }
+        return tag.toString();
+    }
+
+
+    @SuppressWarnings("unchecked")
+    private static int resourceBundleCacheSize() throws Exception {
+        Field field = ResourceBundle.class.getDeclaredField("cacheList");
+        field.setAccessible(true);
+        Map<Object,Object> cache = (Map<Object,Object>) field.get(null);
+        return cache.size();
     }
 
 

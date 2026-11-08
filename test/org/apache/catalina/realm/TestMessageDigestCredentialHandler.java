@@ -48,6 +48,29 @@ public class TestMessageDigestCredentialHandler {
         }
     }
 
+    /*
+     * A stored credential that specifies fewer than one iteration is invalid. It must not be treated as valid and it
+     * must not trigger an exception during verification.
+     */
+    @Test
+    public void testZeroIterationsStoredCredential() throws Exception {
+        MessageDigestCredentialHandler mdch = new MessageDigestCredentialHandler();
+        mdch.setAlgorithm("SHA-512");
+        mdch.setIterations(1);
+        mdch.setSaltLength(8);
+        String storedCredential = mdch.mutate(PWD);
+
+        int sep1 = storedCredential.indexOf('$');
+        int sep2 = storedCredential.indexOf('$', sep1 + 1);
+        Assert.assertTrue(sep1 > 0 && sep2 > sep1);
+        String tamperedCredential = storedCredential.substring(0, sep1 + 1) + "0" + storedCredential.substring(sep2);
+
+        MessageDigestCredentialHandler verifier = new MessageDigestCredentialHandler();
+        verifier.setAlgorithm("SHA-512");
+        Assert.assertFalse(verifier.matches(PWD, tamperedCredential));
+    }
+
+
     private void doTest(String digest, int saltLength, int iterations) throws NoSuchAlgorithmException {
         MessageDigestCredentialHandler mdch = new MessageDigestCredentialHandler();
         MessageDigestCredentialHandler verifier = new MessageDigestCredentialHandler();

@@ -39,6 +39,19 @@ import javax.sql.DataSource;
  * <ul>
  * <li><strong>dataSourceName</strong> - JNDI name of the DataSource, which must be located in the same Context
  * environment as the UserDatabase</li>
+ * <li><strong>readonly</strong> - whether the user database is read only</li>
+ * <li><strong>userTable</strong> - table that holds user data</li>
+ * <li><strong>groupTable</strong> - table that holds group data</li>
+ * <li><strong>roleTable</strong> - table that holds role data</li>
+ * <li><strong>userRoleTable</strong> - table that holds the relation between users and roles</li>
+ * <li><strong>userGroupTable</strong> - table that holds the relation between users and groups</li>
+ * <li><strong>groupRoleTable</strong> - table that holds the relation between groups and roles</li>
+ * <li><strong>roleNameCol</strong> - column in the user role table that names a role</li>
+ * <li><strong>roleAndGroupDescriptionCol</strong> - column used for role and group descriptions</li>
+ * <li><strong>groupNameCol</strong> - column used for group names</li>
+ * <li><strong>userCredCol</strong> - column in the user table that holds the user's credentials</li>
+ * <li><strong>userFullNameCol</strong> - column used for user full names</li>
+ * <li><strong>userNameCol</strong> - column in the user table that holds the user's name</li>
  * </ul>
  */
 public class DataSourceUserDatabaseFactory implements ObjectFactory {

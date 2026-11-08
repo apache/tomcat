@@ -50,7 +50,7 @@ public class LocalResolver implements EntityResolver2 {
      *
      * @param publicIds     mapping of well-known public identifiers to local resources
      * @param systemIds     mapping of well-known system identifiers to local resources
-     * @param blockExternal are external resources blocked that are not well-known
+     * @param blockExternal whether external resources that are not well-known are blocked
      */
     public LocalResolver(Map<String,String> publicIds, Map<String,String> systemIds, boolean blockExternal) {
         this.publicIds = publicIds;

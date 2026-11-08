@@ -34,26 +34,48 @@
 
 <section name="Introduction">
   <p>
-  Apache Tribes supports an interceptor architecture to intercept both messages and membership notifications.
-  This architecture allows decoupling of logic and opens the way for some very useful feature add-ons.
+    Apache Tribes supports an interceptor architecture to intercept both messages and membership notifications.
+    This architecture allows decoupling of logic and opens the way for some very useful feature add-ons.
+  </p>
+</section>
+
+<section name="Ordering">
+  <p>
+    The order of interceptors is important. The order in which the interceptors are defined in server.xml is the order
+    in which the interceptors appear in the channel stack. Think of it as a linked list, with the head being the first
+    most interceptor and the tail the last.
+  </p>
+  <p>
+    When sending a message, the message will pass through the interceptors in order (i.e. the order they are defined in
+    server.xml). When receiving a message, the messages will pass through the interceptors in reverse order.
   </p>
 </section>
 
 <section name="Available Interceptors">
+  <p>
+    Tribes has been designed as a general clustering solutiuon. Not all interceptors are expected to be of use
+    in Tomcat cluster configurations. The interceptors expected to be of use in Tomcat clusters are described in
+    more detail in the following sections. They are:
+   </p>
    <ul>
-    <li><code>org.apache.catalina.tribes.group.interceptors.TcpFailureDetector</code></li>
-    <li><code>org.apache.catalina.tribes.group.interceptors.ThroughputInterceptor</code></li>
+    <li><code>org.apache.catalina.tribes.group.interceptors.DomainFilterInterceptor</code></li>
+    <li><code>org.apache.catalina.tribes.group.interceptors.FragmentationInterceptor</code></li>
     <li><code>org.apache.catalina.tribes.group.interceptors.MessageDispatchInterceptor</code></li>
+    <li><code>org.apache.catalina.tribes.group.interceptors.StaticMembershipInterceptor</code></li>
+    <li><code>org.apache.catalina.tribes.group.interceptors.TcpFailureDetector</code></li>
+    <li><code>org.apache.catalina.tribes.group.interceptors.TcpPingInterceptor</code></li>
+    <li><code>org.apache.catalina.tribes.group.interceptors.ThroughputInterceptor</code></li>
+   </ul>
+   <p>
+    The interceptors not expected to be of use in Tomcat clusters are described in the Javadoc for each interceptor.
+    They are:
+   </p>
+   <ul>
     <li><code>org.apache.catalina.tribes.group.interceptors.NonBlockingCoordinator</code></li>
     <li><code>org.apache.catalina.tribes.group.interceptors.OrderInterceptor</code></li>
     <li><code>org.apache.catalina.tribes.group.interceptors.SimpleCoordinator</code></li>
-    <li><code>org.apache.catalina.tribes.group.interceptors.StaticMembershipInterceptor</code></li>
     <li><code>org.apache.catalina.tribes.group.interceptors.TwoPhaseCommitInterceptor</code></li>
-    <li><code>org.apache.catalina.tribes.group.interceptors.DomainFilterInterceptor</code></li>
-    <li><code>org.apache.catalina.tribes.group.interceptors.FragmentationInterceptor</code></li>
     <li><code>org.apache.catalina.tribes.group.interceptors.GzipInterceptor</code></li>
-    <li><code>org.apache.catalina.tribes.group.interceptors.TcpPingInterceptor</code></li>
-    <li><code>org.apache.catalina.tribes.group.interceptors.EncryptInterceptor</code></li>
    </ul>
 </section>
 
@@ -153,7 +175,9 @@
        to the suspect node. Default is 1000.
      </attribute>
      <attribute name="performSendTest" required="false">
-       If true is set, send a test message to the suspect node. Default is true.
+       If true is set, send a test message to the suspect node. Default is true
+       unless the channel is secure in which case test messages will never be
+       sent.
      </attribute>
      <attribute name="performReadTest" required="false">
        If true is set, read the response of the test message that sent. Default is false.
@@ -193,75 +217,6 @@
        The report is logged to the <code>org.apache.juli.logging.LogFactory.getLog(ThroughputInterceptor.class)</code>
        logger under the <code>INFO</code> level.
        Default value is to report every <code>10000</code> messages.
-     </attribute>
-   </attributes>
-  </subsection>
-  <subsection name="org.apache.catalina.tribes.group.interceptors.EncryptInterceptor Attributes">
-   <p>
-     The EncryptInterceptor adds encryption to the channel messages carrying
-     session data between nodes.
-   </p>
-   <p>
-     If using the <code>TcpFailureDetector</code>, the <code>EncryptInterceptor</code>
-     <i>must</i> be inserted into the interceptor chain <i>before</i> the
-     <code>TcpFailureDetector</code>. This is because when validating cluster
-     members, <code>TcpFailureDetector</code> writes channel data directly
-     to the other members without using the remainder of the interceptor chain,
-     but on the receiving side, the message still goes through the chain (in reverse).
-     Because of this asymmetry, the <code>EncryptInterceptor</code> must execute
-     <i>before</i> the <code>TcpFailureDetector</code> on the sender and <i>after</i>
-     it on the receiver, otherwise message corruption will occur.
-   </p>
-   <p>
-     The EncryptInterceptor uses the timestamp of the message to provide replay
-     protection. For this to be effective, clock skew between cluster nodes
-     should be minimised. If not, it is likely a high proportion of valid
-     messages will be rejected.
-   </p>
-   <attributes>
-     <attribute name="encryptionAlgorithm" required="false">
-       <p>The encryption algorithm to be used, including the mode and padding.
-       Please see
-       <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html">https://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html</a>
-       for the standard JCA names that can be used. Algorithms from other JCA
-       providers are also supported.</p>
-
-       <p>The EncryptInterceptor currently supports the following standard
-       <a href="https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation">block-cipher modes</a>:
-       CBC, CFB, OFB and GCM. Of these, it is recommended that GCM is always
-       used.</p>
-
-       <p>The length of the key will specify the flavor of the encryption
-       algorithm to be used, if applicable (e.g. AES-128 versus AES-256).</p>
-
-       <p>The default algorithm is <code>AES/GCM/NoPadding</code>.</p>
-     </attribute>
-     <attribute name="encryptionKey" required="true">
-       <p>The key to be used with the encryption algorithm.</p>
-
-       <p>The key should be specified as hex-encoded bytes of the appropriate
-       length for the algorithm (e.g. 16 bytes / 32 characters / 128 bits for
-       AES-128, 32 bytes / 64 characters / 256 bits for AES-256, etc.).</p>
-     </attribute>
-     <attribute name="replayWindowTime" required="false">
-       <p>Messages with a timestamp before the current time less this window or
-       after the current time plus this window will be rejected. This window
-       needs to account for clock skew across the cluster as well as the
-       expected maximum delay between messages being sent and received.
-       Specified in milliseconds. If not specified, the default value of 10000
-       (10 seconds) will be used.</p>
-     </attribute>
-     <attribute name="replayWindowMessageCount" required="false">
-       <p>The number of past messages for which the nonces will be tracked to
-       prevent replay attacks. Messages with a nonce that has already been
-       tracked will be rejected. If not specified, the default value of 8192
-       will be used.</p>
-
-       <p>If messages are received at a high rate, it is possible that a nonce
-       will be removed from the list of tracked nonces before
-       <code>replayWindowTime</code> milliseconds have elapsed. If that happens,
-       any message with a timestamp older than the last nonce evicted from the
-       list of tracked nonces will also be rejected.</p>
      </attribute>
    </attributes>
   </subsection>
@@ -311,11 +266,11 @@
         Only one implementation available:<code>org.apache.catalina.tribes.membership.StaticMember</code>
       </attribute>
       <attribute name="port" required="true">
-        The port that this static member listens to for cluster messages
+        The port that this static member listens to for non-secure cluster messages.
       </attribute>
       <attribute name="securePort" required="false">
-        The secure port this static member listens to for encrypted cluster messages
-        default value is <code>-1</code>, this value means the member is not listening on a secure port
+        The port this static member listens to for TLS protected cluster messages. The default value is
+        <code>-1</code>, meaning the member is not listening on a secure port.
       </attribute>
       <attribute name="host" required="true">
         The host (or network interface) that this static member listens for cluster messages.

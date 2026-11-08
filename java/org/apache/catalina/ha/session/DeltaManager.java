@@ -45,8 +45,7 @@ import org.apache.tomcat.util.res.StringManager;
  * The DeltaManager manages replicated sessions by only replicating the deltas in data. For applications written to
  * handle this, the DeltaManager is the optimal way of replicating data.
  * <p>
- * This code is almost identical to StandardManager with a difference in how it persists sessions and some modifications
- * to it.
+ * This manager extends {@link ClusterManagerBase} and does not persist sessions.
  * <p>
  * <b>IMPLEMENTATION NOTE </b>: Correct behavior of session storing and reloading depends upon external calls to the
  * <code>start()</code> and <code>stop()</code> methods of this class at the correct times.
@@ -438,9 +437,15 @@ public class DeltaManager extends ClusterManagerBase {
     /**
      * Set the batch size for sending all sessions.
      *
-     * @param sendAllSessionsSize The batch size value
+     * @param sendAllSessionsSize The batch size value. Must be a positive integer.
+     *
+     * @throws IllegalArgumentException if the batch size is not a positive integer
      */
     public void setSendAllSessionsSize(int sendAllSessionsSize) {
+        if (sendAllSessionsSize <= 0) {
+            throw new IllegalArgumentException(
+                    sm.getString("deltaManager.sendAllSessionsSize.invalid", Integer.valueOf(sendAllSessionsSize)));
+        }
         this.sendAllSessionsSize = sendAllSessionsSize;
     }
 
@@ -834,7 +839,11 @@ public class DeltaManager extends ClusterManagerBase {
             if (enableStatistics) {
                 counterSend_EVT_GET_ALL_SESSIONS.incrementAndGet();
             }
+            // Reset both flags that terminate the wait for the state transfer,
+            // so that a repeated transfer (context restart or JMX resync) does
+            // not exit immediately on a response from a previous transfer
             stateTransferred = false;
+            noContextManagerReceived = false;
             // FIXME This send call block the deploy thread, when sender waitForAck is enabled
             try {
                 synchronized (receivedMessageQueue) {
@@ -1076,7 +1085,7 @@ public class DeltaManager extends ClusterManagerBase {
         // check to see if we need to send out an access message
         if (!expires && (msg == null)) {
             long replDelta = System.currentTimeMillis() - session.getLastTimeReplicated();
-            if (session.getMaxInactiveInterval() >= 0 && replDelta > (session.getMaxInactiveInterval() * 1000L)) {
+            if (session.getMaxInactiveInterval() > 0 && replDelta > (session.getMaxInactiveInterval() * 1000L)) {
                 if (enableStatistics) {
                     counterSend_EVT_SESSION_ACCESSED.incrementAndGet();
                 }

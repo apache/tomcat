@@ -19,7 +19,7 @@ package org.apache.catalina.tribes;
 import java.io.Serializable;
 
 /**
- * An interface to listens to incoming messages from a channel.
+ * An interface to listen to incoming messages from a channel.
  * <p>
  * When a message is received, the Channel will invoke the channel listener in a conditional sequence.
  * <code>if (listener.accept(msg,sender)) listener.messageReceived(msg,sender);</code>

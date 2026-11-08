@@ -368,6 +368,16 @@
       increased privileges to the web application. Note that if the security
       manager is enabled that the <strong>deployXML</strong> attribute will
       default to <code>false</code>.</p>
+
+      <p>Using name-based virtual hosts on a secured connection requires careful
+      configuration of the names specified in a single certificate or the use of
+      SNI. SNI allows multiple certificates with different names to be
+      associated with a single TLS connector. Administrators should be aware
+      that virtual host matching using the HTTP host name header and TLS
+      configuration (including certificate) matching using SNI are completely
+      separate processes and that it is likely that they will want to keep the
+      two configurations synchronized.</p>
+
     </subsection>
 
     <subsection name="Context">
@@ -467,10 +477,6 @@
       <p>The UserDatabaseRealm is not intended for large-scale installations. It
       is intended for small-scale, relatively static environments.</p>
 
-      <p>The JAASRealm is not widely used and therefore the code is not as
-      mature as the other realms. Additional testing is recommended before using
-      this realm.</p>
-
       <p>By default, the realms do not implement any form of account lock-out.
       This means that brute force attacks can be successful. To prevent a brute
       force attack, the chosen realm should be wrapped in a LockOutRealm.</p>
@@ -510,16 +516,14 @@
     </subsection>
 
     <subsection name="Cluster">
-      <p>The cluster implementation is written on the basis that a secure,
-      trusted network is used for all of the cluster related network traffic. It
-      is not safe to run a cluster on a insecure, untrusted network.</p>
-
-      <p>If you require confidentiality and/or integrity protection then you can
-      use the
-      <a href="config/cluster-interceptor.html#org.apache.catalina.tribes.group.interceptors.EncryptInterceptor_Attributes">EncryptInterceptor</a>
-      to encrypt traffic between nodes. This interceptor does not protect
-      against all the risks of running on an untrusted network, particularly
-      DoS attacks.</p>
+      <p>Tomcat clustering is typically used over a secure, trusted network. If a trusted network is not available then
+      a cluster may be configured to use TLS. Other options for providing a secure, trusted network for use by a Tomcat
+      cluster include:</p>
+      <ul>
+        <li>private LAN</li>
+        <li>a Virtual Private Network (VPN)</li>
+        <li>IPSEC</li>
+      </ul>
     </subsection>
   </section>
 

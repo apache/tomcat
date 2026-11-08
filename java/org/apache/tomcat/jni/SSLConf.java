@@ -124,7 +124,7 @@ public final class SSLConf {
      *
      * @return The result of the native {@code SSL_CONF_CTX_finish} call
      *
-     * @see <a href="https://www.openssl.org/docs/man1.0.2/ssl/SSL_CONF_CTX_set_flags.html">OpenSSL
+     * @see <a href="https://www.openssl.org/docs/man1.0.2/ssl/SSL_CONF_CTX_finish.html">OpenSSL
      *          SSL_CONF_CTX_finish</a>
      */
     public static native int finish(long cctx);

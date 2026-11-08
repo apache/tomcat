@@ -34,7 +34,7 @@ public class AnnotationElementValue extends ElementValue {
     /**
      * Gets the annotation entry.
      *
-     * @return the annotation entry.
+     * @return The annotation entry.
      */
     public AnnotationEntry getAnnotationEntry() {
         return annotationEntry;

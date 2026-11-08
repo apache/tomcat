@@ -57,7 +57,7 @@ public class SSIServlet extends HttpServlet {
     protected boolean isVirtualWebappRelative = false;
     /** Input encoding. If not specified, uses platform default */
     protected String inputEncoding = null;
-    /** Output encoding. If not specified, uses platform default */
+    /** Output encoding. Defaults to UTF-8. */
     protected String outputEncoding = "UTF-8";
     /** Allow exec (normally blocked for security) */
     protected boolean allowExec = false;
@@ -101,7 +101,7 @@ public class SSIServlet extends HttpServlet {
 
 
     /**
-     * Process and forward the GET request to our <code>requestHandler()</code>.
+     * Delegate the GET request to our <code>requestHandler()</code>.
      *
      * @param req a value of type 'HttpServletRequest'
      * @param res a value of type 'HttpServletResponse'
@@ -119,7 +119,7 @@ public class SSIServlet extends HttpServlet {
 
 
     /**
-     * Process and forward the POST request to our <code>requestHandler()</code>.
+     * Delegate the POST request to our <code>requestHandler()</code>.
      *
      * @param req a value of type 'HttpServletRequest'
      * @param res a value of type 'HttpServletResponse'
@@ -151,7 +151,7 @@ public class SSIServlet extends HttpServlet {
             log("SSIServlet.requestHandler()\n" + "Serving " + (buffered ? "buffered " : "unbuffered ") + "resource '" +
                     path + "'");
         }
-        // Exclude any resource in the /WEB-INF and /META-INF subdirectories
+        // Exclude any resource whose path starts with /WEB-INF or /META-INF
         // (the "toUpperCase()" avoids problems on Windows systems)
         if (path == null || path.toUpperCase(Locale.ENGLISH).startsWith("/WEB-INF") ||
                 path.toUpperCase(Locale.ENGLISH).startsWith("/META-INF")) {
@@ -212,6 +212,7 @@ public class SSIServlet extends HttpServlet {
 
         try (BufferedReader bufferedReader = new BufferedReader(isr)) {
             long lastModified = ssiProcessor.process(bufferedReader, resourceInfo.getLastModified(), printWriter);
+            // Setting last-modified as best effort
             if (lastModified > 0) {
                 res.setDateHeader("last-modified", lastModified);
             }

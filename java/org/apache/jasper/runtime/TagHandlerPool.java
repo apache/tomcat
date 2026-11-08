@@ -67,7 +67,7 @@ public class TagHandlerPool {
     protected boolean useInstanceManagerForTags;
 
     /**
-     * Creates or retrieves a TagHandlerPool for the given servlet configuration.
+     * Creates a TagHandlerPool for the given servlet configuration.
      *
      * @param config the servlet configuration
      * @return the tag handler pool instance

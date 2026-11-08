@@ -312,8 +312,8 @@ public class StringCache {
                             size = cacheSize;
                         }
                         ByteEntry[] tempbcCache = new ByteEntry[size];
-                        // Fill it up using an alphabetical order
-                        // and a dumb insert sort
+                        // Fill it up in descending order of occurrence count, breaking ties in alphabetical order,
+                        // using a dumb insert sort
                         ByteChunk tempChunk = new ByteChunk();
                         int n = 0;
                         while (n < size) {
@@ -426,8 +426,8 @@ public class StringCache {
                             size = cacheSize;
                         }
                         CharEntry[] tempccCache = new CharEntry[size];
-                        // Fill it up using an alphabetical order
-                        // and a dumb insert sort
+                        // Fill it up in descending order of occurrence count, breaking ties in alphabetical order,
+                        // using a dumb insert sort
                         CharChunk tempChunk = new CharChunk();
                         int n = 0;
                         while (n < size) {

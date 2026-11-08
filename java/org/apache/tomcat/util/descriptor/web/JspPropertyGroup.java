@@ -21,12 +21,10 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.apache.tomcat.util.buf.UDecoder;
-
 /**
  * Representation of a jsp-property-group element in web.xml.
  */
-public class JspPropertyGroup extends XmlEncodingBase {
+public class JspPropertyGroup {
 
     /**
      * Creates a new JspPropertyGroup instance with default settings.
@@ -218,20 +216,11 @@ public class JspPropertyGroup extends XmlEncodingBase {
     private final LinkedHashSet<String> urlPattern = new LinkedHashSet<>();
 
     /**
-     * Adds a URL pattern (URL-decoded) to this property group.
+     * Adds a URL pattern to this property group.
      *
      * @param urlPattern the URL pattern to add
      */
     public void addUrlPattern(String urlPattern) {
-        addUrlPatternDecoded(UDecoder.URLDecode(urlPattern, getCharset()));
-    }
-
-    /**
-     * Adds a pre-decoded URL pattern to this property group.
-     *
-     * @param urlPattern the decoded URL pattern to add
-     */
-    public void addUrlPatternDecoded(String urlPattern) {
         this.urlPattern.add(urlPattern);
     }
 

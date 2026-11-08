@@ -17,8 +17,8 @@
 package org.apache.catalina.startup;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.descriptor.web.NamingResources;
 import org.apache.tomcat.util.digester.Rule;
 
 
@@ -78,12 +78,14 @@ public class SetNextNamingRule extends Rule {
         Object parent = digester.peek(1);
         boolean context = false;
 
-        NamingResourcesImpl namingResources;
+        NamingResources namingResources;
         if (parent instanceof Context) {
             namingResources = ((Context) parent).getNamingResources();
             context = true;
+        } else if (parent instanceof NamingResources) {
+            namingResources = (NamingResources) parent;
         } else {
-            namingResources = (NamingResourcesImpl) parent;
+            throw new IllegalArgumentException(sm.getString("setNextNamingRule.invalidParent"));
         }
 
         // Call the specified method
@@ -105,7 +107,7 @@ public class SetNextNamingRule extends Rule {
 
     @Override
     public String toString() {
-        return "SetNextRule[" + "methodName=" + methodName + ", paramType=" + paramType + ']';
+        return "SetNextNamingRule[" + "methodName=" + methodName + ", paramType=" + paramType + ']';
     }
 
 

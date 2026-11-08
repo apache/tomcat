@@ -78,7 +78,8 @@ public final class UEncoder {
      * @param start the beginning index, inclusive
      * @param end   the ending index, exclusive
      *
-     * @return A new CharChunk contained the URL encoded string
+     * @return the URL encoded string in an internal {@link CharChunk} that is recycled at the start of the next
+     *         {@code encodeURL} call. The content must be copied before invoking {@code encodeURL} again.
      *
      * @throws IOException If an I/O error occurs
      */
@@ -92,6 +93,11 @@ public final class UEncoder {
             bb.recycle();
             cb.recycle();
             output.recycle();
+            // Recycle the converter as well. Otherwise, an unpaired surrogate
+            // left over from the previous call is retained in the converter's
+            // internal buffer and silently combined with the start of the
+            // next, unrelated string.
+            c2b.recycle();
         }
 
         for (int i = start; i < end; i++) {

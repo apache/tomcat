@@ -20,6 +20,7 @@ import java.util.ArrayList;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,7 +28,9 @@ import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ManagedChannel;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.MembershipListener;
+import org.apache.catalina.tribes.TesterUtil;
 import org.apache.catalina.tribes.group.GroupChannel;
+import org.apache.catalina.tribes.transport.ReceiverBase;
 import org.apache.catalina.tribes.util.UUIDGenerator;
 
 public class TestDomainFilterInterceptor {
@@ -37,8 +40,11 @@ public class TestDomainFilterInterceptor {
 
     @Before
     public void setUp() throws Exception {
+        Assume.assumeTrue("Skipping test - IP multicast is not available in this environment",
+                TesterUtil.isMulticastAvailable());
         for (int i = 0; i < channels.length; i++) {
             channels[i] = new GroupChannel();
+            ((ReceiverBase) channels[i].getChannelReceiver()).setPort(0);
             channels[i].getMembershipService().setPayload( ("Channel-" + (i + 1)).getBytes("ASCII"));
             listeners[i] = new TestMbrListener( ("Listener-" + (i + 1)));
             channels[i].addMembershipListener(listeners[i]);

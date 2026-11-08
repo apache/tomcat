@@ -181,11 +181,17 @@ public class NioSender extends AbstractSender {
     }
 
     private void configureSocket() throws IOException {
+        // The timeout is a long in milliseconds but SO_TIMEOUT is an int,
+        // so cap it at the largest value the socket option can represent.
+        // Casting directly would overflow to a negative value for timeouts
+        // larger than Integer.MAX_VALUE, which the socket then rejects with
+        // an IllegalArgumentException.
+        int soTimeout = (int) Math.min(getTimeout(), Integer.MAX_VALUE);
         if (socketChannel != null) {
             socketChannel.configureBlocking(false);
             socketChannel.socket().setSendBufferSize(getTxBufSize());
             socketChannel.socket().setReceiveBufferSize(getRxBufSize());
-            socketChannel.socket().setSoTimeout((int) getTimeout());
+            socketChannel.socket().setSoTimeout(soTimeout);
             socketChannel.socket().setTcpNoDelay(getTcpNoDelay());
             socketChannel.socket().setKeepAlive(getSoKeepAlive());
             socketChannel.socket().setReuseAddress(getSoReuseAddress());
@@ -196,7 +202,7 @@ public class NioSender extends AbstractSender {
             dataChannel.configureBlocking(false);
             dataChannel.socket().setSendBufferSize(getUdpTxBufSize());
             dataChannel.socket().setReceiveBufferSize(getUdpRxBufSize());
-            dataChannel.socket().setSoTimeout((int) getTimeout());
+            dataChannel.socket().setSoTimeout(soTimeout);
             dataChannel.socket().setReuseAddress(getSoReuseAddress());
             dataChannel.socket().setTrafficClass(getSoTrafficClass());
         }
@@ -214,7 +220,8 @@ public class NioSender extends AbstractSender {
     /**
      * Reads acknowledgment data from the channel.
      *
-     * @return {@code true} if there is more data to read
+     * @return {@code true} if the read phase is complete (acknowledgment received, or there was nothing to read),
+     *             {@code false} if more data is still needed
      *
      * @throws IOException If an I/O error occurs
      */
@@ -426,7 +433,11 @@ public class NioSender extends AbstractSender {
      */
     public void setMessage(byte[] data, int offset, int length) throws IOException {
         if (data != null) {
-            current = data;
+            if (offset == 0 && length == data.length) {
+                current = data;
+            } else {
+                current = Arrays.copyOfRange(data, offset, offset + length);
+            }
             remaining = length;
             ackbuf.clear();
             if (writebuf != null) {
@@ -437,8 +448,6 @@ public class NioSender extends AbstractSender {
             if (writebuf.capacity() < length) {
                 writebuf = getBuffer(length);
             }
-
-            // TODO use ByteBuffer.wrap to avoid copying the data.
             writebuf.put(data, offset, length);
             writebuf.flip();
             if (isConnected()) {

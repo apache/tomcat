@@ -25,8 +25,7 @@ import java.util.BitSet;
 
 /**
  * This class is very similar to the java.net.URLEncoder class. Unfortunately, with java.net.URLEncoder there is no way
- * to specify to the java.net.URLEncoder which characters should NOT be encoded. This code was moved from
- * DefaultServlet.java
+ * to specify to the java.net.URLEncoder which characters should NOT be encoded.
  */
 public final class URLEncoder implements Cloneable {
 
@@ -177,7 +176,8 @@ public final class URLEncoder implements Cloneable {
          * happen. The only Tomcat code that currently (January 2026) might call this method with something other than
          * UTF-8 is the rewrite valve. In that case, the rewrite rules should be consistent with the configured URI
          * encoding on the Connector. Given all of this, the IAE is only expected to be thrown as a result of
-         * configuration errors.
+         * configuration errors. Note that unpaired surrogate characters are not reported by the UTF-8 encoder and are
+         * silently dropped.
          */
         OutputStreamWriter writer = new OutputStreamWriter(buf, charset.newEncoder()
                 .onMalformedInput(CodingErrorAction.REPORT).onUnmappableCharacter(CodingErrorAction.REPORT));

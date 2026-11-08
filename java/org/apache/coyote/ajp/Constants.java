@@ -47,12 +47,12 @@ public final class Constants {
     /**
      * AJP13 shutdown message prefix code.
      */
-    public static final byte JK_AJP13_SHUTDOWN = 7; // XXX Unused
+    public static final byte JK_AJP13_SHUTDOWN = 7; // Unused
 
     /**
      * AJP13 ping request message prefix code.
      */
-    public static final byte JK_AJP13_PING_REQUEST = 8; // XXX Unused
+    public static final byte JK_AJP13_PING_REQUEST = 8; // Unused
 
     /**
      * AJP13 cping request message prefix code.
@@ -143,22 +143,17 @@ public final class Constants {
      */
     public static final int SC_RESP_WWW_AUTHENTICATE = 0xA00B;
 
-    /**
-     * Maximum number of response header codes.
-     */
-    public static final int SC_RESP_AJP13_MAX = 11;
-
     // Integer codes for common (optional) request attribute names
 
     /**
      * Attribute code for context.
      */
-    public static final byte SC_A_CONTEXT = 1; // XXX Unused
+    public static final byte SC_A_CONTEXT = 1; // Unused
 
     /**
      * Attribute code for servlet path.
      */
-    public static final byte SC_A_SERVLET_PATH = 2; // XXX Unused
+    public static final byte SC_A_SERVLET_PATH = 2; // Unused
 
     /**
      * Attribute code for remote user.
@@ -280,9 +275,12 @@ public final class Constants {
      *
      * @param code the coded value
      *
-     * @return the string value of the method
+     * @return the string value of the method, or <code>null</code> if the code is out of range
      */
     public static String getMethodForCode(final int code) {
+        if (code < 0 || code >= methodTransArray.length) {
+            return null;
+        }
         return methodTransArray[code];
     }
 
@@ -373,9 +371,12 @@ public final class Constants {
      *
      * @param code the coded value
      *
-     * @return the string value of the header name
+     * @return the string value of the header name, or <code>null</code> if the code is out of range
      */
     public static String getHeaderForCode(final int code) {
+        if (code < 0 || code >= headerTransArray.length) {
+            return null;
+        }
         return headerTransArray[code];
     }
 
@@ -388,16 +389,19 @@ public final class Constants {
      *
      * @param code the coded value
      *
-     * @return the string value of the header
+     * @return the string value of the header, or <code>null</code> if the code is out of range
      */
     public static String getResponseHeaderForCode(final int code) {
+        if (code < 0 || code >= responseTransArray.length) {
+            return null;
+        }
         return responseTransArray[code];
     }
 
     private static final Map<String,Integer> responseTransMap = new HashMap<>(20);
 
     static {
-        for (int i = 0; i < SC_RESP_AJP13_MAX; i++) {
+        for (int i = 0; i < responseTransArray.length; i++) {
             responseTransMap.put(getResponseHeaderForCode(i), Integer.valueOf(0xA001 + i));
         }
     }

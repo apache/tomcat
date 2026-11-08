@@ -85,6 +85,7 @@ import org.apache.tomcat.util.bcel.classfile.ClassParser;
 import org.apache.tomcat.util.bcel.classfile.ElementValue;
 import org.apache.tomcat.util.bcel.classfile.ElementValuePair;
 import org.apache.tomcat.util.bcel.classfile.JavaClass;
+import org.apache.tomcat.util.buf.CloseableURLConnection;
 import org.apache.tomcat.util.buf.UriUtil;
 import org.apache.tomcat.util.descriptor.InputSourceUtil;
 import org.apache.tomcat.util.descriptor.XmlErrorHandler;
@@ -696,8 +697,12 @@ public class ContextConfig implements LifecycleListener {
                     if (generateCode) {
                         contextXmlJavaSource =
                                 getContextXmlJavaSource(contextXmlPackageName, contextXmlSimpleClassName);
-                        digester.startGeneratingCode();
-                        generateClassHeader(digester, contextXmlPackageName, contextXmlSimpleClassName);
+                        if (contextXmlJavaSource != null) {
+                            digester.startGeneratingCode();
+                            generateClassHeader(digester, contextXmlPackageName, contextXmlSimpleClassName);
+                        } else {
+                            generateCode = false;
+                        }
                     }
                     URL defaultContextUrl = contextXmlResource.getURI().toURL();
                     processContextConfig(digester, defaultContextUrl, contextXmlResource.getInputStream());
@@ -735,8 +740,12 @@ public class ContextConfig implements LifecycleListener {
             } else if (!useGeneratedCode) {
                 if (generateCode) {
                     contextXmlJavaSource = getContextXmlJavaSource(contextXmlPackageName, contextXmlSimpleClassName);
-                    digester.startGeneratingCode();
-                    generateClassHeader(digester, contextXmlPackageName, contextXmlSimpleClassName);
+                    if (contextXmlJavaSource != null) {
+                        digester.startGeneratingCode();
+                        generateClassHeader(digester, contextXmlPackageName, contextXmlSimpleClassName);
+                    } else {
+                        generateCode = false;
+                    }
                 }
                 processContextConfig(digester, context.getConfigFile(), null);
                 if (generateCode) {
@@ -768,22 +777,21 @@ public class ContextConfig implements LifecycleListener {
             log.debug(sm.getString("contextConfig.processContext", context.getName(), contextXml));
         }
 
-        InputSource source = null;
+        InputSource source;
 
-        try {
-            source = new InputSource(contextXml.toString());
-            if (stream == null) {
+        if (stream == null) {
+            try {
                 URLConnection xmlConn = contextXml.openConnection();
                 xmlConn.setUseCaches(false);
                 stream = xmlConn.getInputStream();
+            } catch (Exception e) {
+                log.error(sm.getString("contextConfig.contextMissing", contextXml), e);
+                ok = false;
+                return;
             }
-        } catch (Exception e) {
-            log.error(sm.getString("contextConfig.contextMissing", contextXml), e);
         }
 
-        if (source == null) {
-            return;
-        }
+        source = new InputSource(contextXml.toString());
 
         try {
             source.setByteStream(stream);
@@ -1021,7 +1029,7 @@ public class ContextConfig implements LifecycleListener {
 
 
     /**
-     * Process a "contextConfig" event for this Context.
+     * Process a "configure_start" event for this Context.
      */
     protected synchronized void configureStart() {
         // Called from StandardContext.start()
@@ -1077,7 +1085,7 @@ public class ContextConfig implements LifecycleListener {
 
 
     /**
-     * Process a "stop" event for this Context.
+     * Process a "configure_stop" event for this Context.
      */
     protected synchronized void configureStop() {
 
@@ -1504,7 +1512,7 @@ public class ContextConfig implements LifecycleListener {
             context.getNamingResources().addMessageDestinationRef(mdr);
         }
 
-        // messageDestinations were ignored in Tomcat 6, so ignore here
+        // message-destination declarations are not supported and are ignored
 
         context.setMetadataComplete(webxml.isMetadataComplete());
         for (Entry<String,String> entry : webxml.getMimeMappings().entrySet()) {
@@ -1584,7 +1592,7 @@ public class ContextConfig implements LifecycleListener {
             context.addChild(wrapper);
         }
         for (Entry<String,String> entry : webxml.getServletMappings().entrySet()) {
-            context.addServletMappingDecoded(entry.getKey(), entry.getValue());
+            context.addServletMapping(entry.getKey(), entry.getValue());
         }
         SessionConfig sessionConfig = webxml.getSessionConfig();
         if (sessionConfig != null) {
@@ -1622,7 +1630,7 @@ public class ContextConfig implements LifecycleListener {
             }
             if (context.findChild(jspServletName) != null) {
                 for (String urlPattern : jspPropertyGroup.getUrlPatterns()) {
-                    context.addServletMappingDecoded(urlPattern, jspServletName, true);
+                    context.addServletMapping(urlPattern, jspServletName, true);
                 }
             } else {
                 if (log.isDebugEnabled()) {
@@ -1686,44 +1694,24 @@ public class ContextConfig implements LifecycleListener {
         long hostTimeStamp = 0;
 
         if (globalWebXml != null) {
-            URLConnection uc = null;
             try {
                 URI uri = new URI(globalWebXml.getSystemId());
-                URL url = uri.toURL();
-                uc = url.openConnection();
-                globalTimeStamp = uc.getLastModified();
+                try (CloseableURLConnection uc = new CloseableURLConnection(uri.toURL())) {
+                    globalTimeStamp = uc.getLastModified();
+                }
             } catch (IOException | URISyntaxException | IllegalArgumentException e) {
                 globalTimeStamp = -1;
-            } finally {
-                if (uc != null) {
-                    try {
-                        uc.getInputStream().close();
-                    } catch (IOException ioe) {
-                        ExceptionUtils.handleThrowable(ioe);
-                        globalTimeStamp = -1;
-                    }
-                }
             }
         }
 
         if (hostWebXml != null) {
-            URLConnection uc = null;
             try {
                 URI uri = new URI(hostWebXml.getSystemId());
-                URL url = uri.toURL();
-                uc = url.openConnection();
-                hostTimeStamp = uc.getLastModified();
+                try (CloseableURLConnection uc = new CloseableURLConnection(uri.toURL())) {
+                    hostTimeStamp = uc.getLastModified();
+                }
             } catch (IOException | URISyntaxException | IllegalArgumentException e) {
                 hostTimeStamp = -1;
-            } finally {
-                if (uc != null) {
-                    try {
-                        uc.getInputStream().close();
-                    } catch (IOException ioe) {
-                        ExceptionUtils.handleThrowable(ioe);
-                        hostTimeStamp = -1;
-                    }
-                }
             }
         }
 
@@ -1741,6 +1729,8 @@ public class ContextConfig implements LifecycleListener {
             entry = hostWebXmlCache.get(host);
             if (entry != null && entry.getGlobalTimeStamp() == globalTimeStamp &&
                     entry.getHostTimeStamp() == hostTimeStamp) {
+                InputSourceUtil.close(globalWebXml);
+                InputSourceUtil.close(hostWebXml);
                 return entry.getWebXml();
             }
 
@@ -1853,7 +1843,9 @@ public class ContextConfig implements LifecycleListener {
         }
 
         for (ServletContainerInitializer sci : detectedScis) {
-            initializerClassMap.put(sci, new HashSet<>());
+            // The per-SCI sets are updated concurrently when parallel annotation
+            // scanning is enabled
+            initializerClassMap.put(sci, ConcurrentHashMap.newKeySet());
 
             HandlesTypes ht;
             try {
@@ -2075,8 +2067,12 @@ public class ContextConfig implements LifecycleListener {
 
         try {
             stream = webXmlResource.getInputStream();
-            source = new InputSource(webXmlResource.getURI().toString());
             if (stream != null) {
+                // Only create the input source if the stream is available so
+                // that a source without a byte stream is never returned. The
+                // parser would otherwise try to resolve the URI itself and
+                // report the same problem a second time.
+                source = new InputSource(webXmlResource.getURI().toString());
                 source.setByteStream(stream);
             }
         } catch (Exception e) {
@@ -2448,9 +2444,12 @@ public class ContextConfig implements LifecycleListener {
                     return;
                 }
 
+                // All SCIs are registered in processServletContainerInitializers()
+                // before scanning starts, so the map is only read here. The value
+                // sets are updated concurrently when parallel annotation scanning
+                // is enabled.
                 for (ServletContainerInitializer sci : entry.getSciSet()) {
-                    Set<Class<?>> classes = initializerClassMap.computeIfAbsent(sci, k -> new HashSet<>());
-                    classes.add(clazz);
+                    initializerClassMap.get(sci).add(clazz);
                 }
             }
         }
@@ -2509,12 +2508,9 @@ public class ContextConfig implements LifecycleListener {
 
     private void populateJavaClassCache(String className, JavaClass javaClass,
             Map<String,JavaClassCacheEntry> javaClassCache) {
-        if (javaClassCache.containsKey(className)) {
+        if (javaClassCache.putIfAbsent(className, new JavaClassCacheEntry(javaClass)) != null) {
             return;
         }
-
-        // Add this class to the cache
-        javaClassCache.put(className, new JavaClassCacheEntry(javaClass));
 
         populateJavaClassCache(javaClass.getSuperclassName(), javaClassCache);
 
@@ -2553,7 +2549,15 @@ public class ContextConfig implements LifecycleListener {
             return;
         }
 
-        // May be null of the class is not present or could not be loaded.
+        // May be null if the class is not present or could not be loaded.
+        if (superClassCacheEntry == null) {
+            // With parallel annotation scanning the entry may also be absent because
+            // another thread has not finished adding the hierarchy to the cache.
+            // Ensure the entry is present, loading the class if necessary, so the
+            // set computed here cannot miss an SCI that matches a super class.
+            populateJavaClassCache(superClassName, javaClassCache);
+            superClassCacheEntry = javaClassCache.get(superClassName);
+        }
         if (superClassCacheEntry != null) {
             if (superClassCacheEntry.getSciSet() == null) {
                 populateSCIsForCacheEntry(superClassCacheEntry, javaClassCache);
@@ -2565,6 +2569,13 @@ public class ContextConfig implements LifecycleListener {
         // Interfaces
         for (String interfaceName : cacheEntry.getInterfaceNames()) {
             JavaClassCacheEntry interfaceEntry = javaClassCache.get(interfaceName);
+            // As for the super class, a null may mean the parallel scanner has
+            // not finished populating the cache, so attempt the load before
+            // deciding there is nothing of interest.
+            if (interfaceEntry == null) {
+                populateJavaClassCache(interfaceName, javaClassCache);
+                interfaceEntry = javaClassCache.get(interfaceName);
+            }
             // A null could mean that the class not present in application or
             // that there is nothing of interest. Either way, nothing to do here
             // so move along
@@ -2751,7 +2762,6 @@ public class ContextConfig implements LifecycleListener {
                 urlPatterns = processAnnotationsStringArray(evp.getValue());
                 urlPatternsSet = urlPatterns.length > 0;
                 for (String urlPattern : urlPatterns) {
-                    // % decoded (if required) using UTF-8
                     filterMap.addURLPattern(urlPattern);
                 }
             } else if ("servletNames".equals(name)) {
@@ -2968,8 +2978,10 @@ public class ContextConfig implements LifecycleListener {
 
         /**
          * The set of ServletContainerInitializers interested in this class, or {@link #EMPTY_SCI_SET} if none.
+         * Volatile for safe publication: the set is computed once and the reference may be handed between
+         * threads when annotation scanning runs in parallel.
          */
-        private Set<ServletContainerInitializer> sciSet = null;
+        private volatile Set<ServletContainerInitializer> sciSet = null;
 
         /**
          * Constructs a new cache entry from a parsed Java class.

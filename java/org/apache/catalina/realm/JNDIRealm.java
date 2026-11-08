@@ -65,6 +65,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 
 import org.apache.catalina.LifecycleException;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.ietf.jgss.GSSContext;
@@ -80,7 +81,7 @@ import org.ietf.jgss.GSSName;
  * <ul>
  * <li>Each user that can be authenticated is represented by an individual element in the top level
  * <code>DirContext</code> that is accessed via the <code>connectionURL</code> property.</li>
- * <li>If a socket connection cannot be made to the <code>connectURL</code> an attempt will be made to use the
+ * <li>If a socket connection cannot be made to the <code>connectionURL</code> an attempt will be made to use the
  * <code>alternateURL</code> if it exists.</li>
  * <li>Each user element has a distinguished name that can be formed by substituting the presented username into a
  * pattern configured by the <code>userPattern</code> property.</li>
@@ -101,11 +102,10 @@ import org.ietf.jgss.GSSName;
  * specified, in which case:
  * <ul>
  * <li>The element for this user must contain an attribute named by the <code>userPassword</code> property.
- * <li>The value of the user password attribute is either a cleartext String, or the result of passing a cleartext
- * String through the <code>RealmBase.digest()</code> method (using the standard digest support included in
- * <code>RealmBase</code>).
- * <li>The user is considered to be authenticated if the presented credentials (after being passed through
- * <code>RealmBase.digest()</code>) are equal to the retrieved value for the user password attribute.</li>
+ * <li>The value of the user password attribute is either a cleartext String, or the result of mutating a cleartext
+ * String using the configured <code>CredentialHandler</code>.
+ * <li>The user is considered to be authenticated if the presented credentials match the retrieved value for the user
+ * password attribute when compared using the configured <code>CredentialHandler</code>.</li>
  * </ul>
  * </li>
  * <li>Each group of users that has been assigned a particular role may be represented by an individual element in the
@@ -145,14 +145,18 @@ public class JNDIRealm extends RealmBase {
      */
     public static final String DEREF_ALIASES = "java.naming.ldap.derefAliases";
 
+    // Note: Usage assumes this value is escaped / doesn't need escaping
+    private static final String NULL_USER_ROLE_ATTRIBUTE_PLACEHOLDER = "tomcat-unset-ignore";
+
+    private static final String AUTHENTICATION_NAME_GSSAPI = "GSSAPI";
+    private static final String AUTHENTICATION_NAME_SIMPLE = "simple";
+
+
     /**
      * Constructs a new JNDIRealm.
      */
     public JNDIRealm() {
     }
-
-    private static final String AUTHENTICATION_NAME_GSSAPI = "GSSAPI";
-
 
     /**
      * The type of authentication to use
@@ -238,9 +242,9 @@ public class JNDIRealm extends RealmBase {
     protected String userRoleAttribute = null;
 
     /**
-     * A string of LDAP user patterns or paths, ":"-separated These will be used to form the distinguished name of a
-     * user, with "{0}" marking the spot where the specified username goes. This is similar to userPattern, but allows
-     * for multiple searches for a user.
+     * A string of LDAP user patterns or paths, each enclosed in parentheses. These will be used to form the
+     * distinguished name of a user, with "{0}" marking the spot where the specified username goes. This is similar to
+     * userPattern, but allows for multiple searches for a user.
      */
     protected String[] userPatternArray = null;
 
@@ -294,11 +298,6 @@ public class JNDIRealm extends RealmBase {
     protected String alternateURL;
 
     /**
-     * The number of connection attempts. If greater than zero we use the alternate url.
-     */
-    protected int connectionAttempt = 0;
-
-    /**
      * Add this role to every authenticated user
      */
     protected String commonRole = null;
@@ -341,8 +340,6 @@ public class JNDIRealm extends RealmBase {
      * Whether to use TLS for connections
      */
     private boolean useStartTls = false;
-
-    private StartTlsResponse tls = null;
 
     /**
      * The list of enabled cipher suites used for establishing tls connections. <code>null</code> means to use the
@@ -893,11 +890,13 @@ public class JNDIRealm extends RealmBase {
      * @param userPattern The new user pattern
      */
     public void setUserPattern(String userPattern) {
-        this.userPattern = userPattern;
         if (userPattern == null) {
+            this.userPattern = null;
             userPatternArray = null;
         } else {
-            userPatternArray = parseUserPatternString(userPattern);
+            String[] parsed = parseUserPatternString(userPattern);
+            this.userPattern = userPattern;
+            userPatternArray = parsed;
             singleConnection = create();
         }
     }
@@ -1090,7 +1089,7 @@ public class JNDIRealm extends RealmBase {
         if (cipherSuites == null || cipherSuitesArray != null) {
             return cipherSuitesArray;
         }
-        this.cipherSuites = this.cipherSuites.trim();
+        this.cipherSuites = this.cipherSuites.strip();
         if (this.cipherSuites.isEmpty()) {
             containerLog.warn(sm.getString("jndiRealm.emptyCipherSuites"));
             this.cipherSuitesArray = null;
@@ -1157,7 +1156,7 @@ public class JNDIRealm extends RealmBase {
      */
     public void setHostnameVerifierClassName(String verifierClassName) {
         if (verifierClassName != null) {
-            this.hostNameVerifierClassName = verifierClassName.trim();
+            this.hostNameVerifierClassName = verifierClassName.strip();
         } else {
             this.hostNameVerifierClassName = null;
         }
@@ -1977,10 +1976,8 @@ public class JNDIRealm extends RealmBase {
         // Elicit an LDAP bind operation using the provided user credentials
         try {
             userCredentialsAdd(context, dn, credentials);
-            // Need to make sure GSSAPI SASL authentication is not used if configured
-            if (AUTHENTICATION_NAME_GSSAPI.equals(preservedEnvironment.get(Context.SECURITY_AUTHENTICATION))) {
-                context.removeFromEnvironment(Context.SECURITY_AUTHENTICATION);
-            }
+            // Check credentials by performing a simple bind
+            context.addToEnvironment(Context.SECURITY_AUTHENTICATION, AUTHENTICATION_NAME_SIMPLE);
             if (containerLog.isTraceEnabled()) {
                 containerLog.trace("  binding as " + dn);
             }
@@ -1991,7 +1988,7 @@ public class JNDIRealm extends RealmBase {
                 containerLog.trace("  bind attempt failed", e);
             }
         } finally {
-            // Restore GSSAPI SASL if previously configured
+            // Restore any previously configured authentication mechanism
             restoreEnvironmentParameter(context, Context.SECURITY_AUTHENTICATION, preservedEnvironment);
             userCredentialsRemove(context);
         }
@@ -2007,9 +2004,15 @@ public class JNDIRealm extends RealmBase {
      * @param dn          Distinguished name of user
      * @param credentials Credentials of user
      *
-     * @exception NamingException if a directory server error occurs
+     * @exception NamingException if a directory server error occurs or no credentials are available for the user
      */
     private void userCredentialsAdd(DirContext context, String dn, String credentials) throws NamingException {
+        if (credentials == null) {
+            // The JNDI environment is a Hashtable that does not accept null
+            // values. Without credentials, searching or binding as the user is
+            // not possible.
+            throw new AuthenticationException(sm.getString("jndiRealm.noUserCredentials", dn));
+        }
         // Set up security environment to bind as the user
         context.addToEnvironment(Context.SECURITY_PRINCIPAL, dn);
         context.addToEnvironment(Context.SECURITY_CREDENTIALS, credentials);
@@ -2093,6 +2096,29 @@ public class JNDIRealm extends RealmBase {
             return list;
         }
 
+        /*
+         * If the userRoleAttribute is unavailable (not configured or not set) for the current user, it would be more
+         * efficient to skip any role search using that attribute. However, filters can use boolean expressions and
+         * there is no standard Java API to parse a filter string into an abstract syntax tree. So, without writing a
+         * custom parser / importing a parser library, there is no way to determine if the filter is unaffected by the
+         * unavailable attribute, is a NO-OP if the attribute is unavailable or if the filter could be more efficiently
+         * expressed knowing the attribute is unavailable.
+         *
+         * Therefore, the solution chosen is to allow the lookup with a potentially inefficient filter to proceed.
+         *
+         * If userRoleId is left as null, that will result in it being treated as "null" by the filter. While it is
+         * considered that a role with a name containing "null" would not be present in the directory it is
+         * theoretically possible which would lead to the role being incorrectly included in the results. Therefore,
+         * userRoleId is modified to "tomcat-unset-ignore" as it is even less likely that a role with a name containing
+         * that string would exist. In the extremely unlikely event a role with such a name is returned, it is removed
+         * from the results below.
+         */
+        boolean placeholderUsed = false;
+        if (userRoleId == null && connection.roleFormatUsesUserRoleAttribute) {
+            userRoleId = NULL_USER_ROLE_ATTRIBUTE_PLACEHOLDER;
+            placeholderUsed = true;
+        }
+
         // Set up parameters for an appropriate search filter
         // The dn is already attribute value escaped but the others are not
         // This is a filter so all input will require filter escaping
@@ -2140,7 +2166,9 @@ public class JNDIRealm extends RealmBase {
                 }
                 String dname = getDistinguishedName(connection.context, base, result);
                 String name = getAttributeValue(roleName, attrs);
-                if (name != null && dname != null) {
+                // Also filters out roles with names containing NULL_USER_ROLE_ATTRIBUTE_PLACEHOLDER - see above
+                if (name != null && dname != null &&
+                        !(placeholderUsed && dname.contains(NULL_USER_ROLE_ATTRIBUTE_PLACEHOLDER))) {
                     groupMap.put(dname, name);
                 }
             }
@@ -2180,8 +2208,7 @@ public class JNDIRealm extends RealmBase {
                             doFilterEscaping(doAttributeValueEscaping(group.getValue())) });
 
                     if (containerLog.isTraceEnabled()) {
-                        containerLog
-                                .trace("Perform a nested group search with base " + roleBase + " and filter " + filter);
+                        containerLog.trace("Perform a nested group search with base " + base + " and filter " + filter);
                     }
 
                     results = searchAsUser(connection.context, user, base, filter, controls, isRoleSearchAsUser());
@@ -2193,7 +2220,7 @@ public class JNDIRealm extends RealmBase {
                             if (attrs == null) {
                                 continue;
                             }
-                            String dname = getDistinguishedName(connection.context, roleBase, result);
+                            String dname = getDistinguishedName(connection.context, base, result);
                             String name = getAttributeValue(roleName, attrs);
                             if (name != null && dname != null && !groupMap.containsKey(dname)) {
                                 groupMap.put(dname, name);
@@ -2363,11 +2390,13 @@ public class JNDIRealm extends RealmBase {
         }
 
         // Close tls startResponse if used
-        if (tls != null) {
+        if (connection.tls != null) {
             try {
-                tls.close();
+                connection.tls.close();
             } catch (IOException ioe) {
                 containerLog.error(sm.getString("jndiRealm.tlsClose"), ioe);
+            } finally {
+                connection.tls = null;
             }
         }
         // Close our opened connection
@@ -2667,21 +2696,16 @@ public class JNDIRealm extends RealmBase {
     protected void open(JNDIConnection connection) throws NamingException {
         try {
             // Ensure that we have a directory context available
-            connection.context = createDirContext(getDirectoryContextEnvironment());
+            connection.context = createDirContext(connection, getDirectoryContextEnvironment(false));
         } catch (Exception e) {
             if (alternateURL == null || alternateURL.isEmpty()) {
                 // No alternate URL. Re-throw the exception.
                 throw e;
             }
-            connectionAttempt = 1;
             // log the first exception.
             containerLog.info(sm.getString("jndiRealm.exception.retry"), e);
             // Try connecting to the alternate url.
-            connection.context = createDirContext(getDirectoryContextEnvironment());
-        } finally {
-            // reset it in case the connection times out.
-            // the primary may come back.
-            connectionAttempt = 0;
+            connection.context = createDirContext(connection, getDirectoryContextEnvironment(true));
         }
     }
 
@@ -2693,9 +2717,10 @@ public class JNDIRealm extends RealmBase {
     }
 
 
-    private DirContext createDirContext(Hashtable<String,String> env) throws NamingException {
+    private DirContext createDirContext(JNDIConnection connection, Hashtable<String,String> env)
+            throws NamingException {
         if (useStartTls) {
-            return createTlsDirContext(env);
+            return createTlsDirContext(connection, env);
         } else {
             return new InitialDirContext(env);
         }
@@ -2707,7 +2732,7 @@ public class JNDIRealm extends RealmBase {
             return sslSocketFactory;
         }
         final SSLSocketFactory result;
-        if (this.sslSocketFactoryClassName != null && !sslSocketFactoryClassName.trim().isEmpty()) {
+        if (this.sslSocketFactoryClassName != null && !sslSocketFactoryClassName.strip().isEmpty()) {
             result = createSSLSocketFactoryFromClassName(this.sslSocketFactoryClassName);
         } else {
             result = createSSLContextFactoryFromProtocol(sslProtocol);
@@ -2750,15 +2775,17 @@ public class JNDIRealm extends RealmBase {
 
 
     /**
-     * Create a tls enabled LdapContext and set the StartTlsResponse tls instance variable.
+     * Create a tls enabled LdapContext and set the StartTlsResponse tls instance field of the connection.
      *
-     * @param env Environment to use for context creation
+     * @param connection The directory server connection wrapper
+     * @param env        Environment to use for context creation
      *
      * @return configured {@link LdapContext}
      *
      * @throws NamingException when something goes wrong while negotiating the connection
      */
-    private DirContext createTlsDirContext(Hashtable<String,String> env) throws NamingException {
+    private DirContext createTlsDirContext(JNDIConnection connection, Hashtable<String,String> env)
+            throws NamingException {
         Map<String,Object> savedEnv = new HashMap<>();
         for (String key : Arrays.asList(Context.SECURITY_AUTHENTICATION, Context.SECURITY_CREDENTIALS,
                 Context.SECURITY_PRINCIPAL, Context.SECURITY_PROTOCOL)) {
@@ -2768,6 +2795,7 @@ public class JNDIRealm extends RealmBase {
             }
         }
         LdapContext result = null;
+        StartTlsResponse tls = null;
         try {
             result = new InitialLdapContext(env, null);
             tls = (StartTlsResponse) result.extendedOperation(new StartTlsRequest());
@@ -2777,20 +2805,39 @@ public class JNDIRealm extends RealmBase {
             if (getCipherSuitesArray() != null) {
                 tls.setEnabledCipherSuites(getCipherSuitesArray());
             }
+            SSLSession negotiate = tls.negotiate(getSSLSocketFactory());
+            containerLog.debug(sm.getString("jndiRealm.negotiatedTls", negotiate.getProtocol()));
+            for (Map.Entry<String,Object> savedEntry : savedEnv.entrySet()) {
+                result.addToEnvironment(savedEntry.getKey(), savedEntry.getValue());
+            }
+            connection.tls = tls;
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            NamingException ne;
+            if (t instanceof NamingException) {
+                ne = (NamingException) t;
+            } else {
+                ne = new NamingException(t.getMessage());
+                ne.initCause(t);
+            }
             try {
-                SSLSession negotiate = tls.negotiate(getSSLSocketFactory());
-                containerLog.debug(sm.getString("jndiRealm.negotiatedTls", negotiate.getProtocol()));
-            } catch (IOException ioe) {
-                NamingException ne = new NamingException(ioe.getMessage());
-                ne.initCause(ioe);
-                throw ne;
-            }
-        } finally {
-            if (result != null) {
-                for (Map.Entry<String,Object> savedEntry : savedEnv.entrySet()) {
-                    result.addToEnvironment(savedEntry.getKey(), savedEntry.getValue());
+                if (tls != null) {
+                    tls.close();
                 }
+            } catch (Throwable t1) {
+                ExceptionUtils.handleThrowable(t1);
+                ne.addSuppressed(t1);
             }
+            try {
+                if (result != null) {
+                    result.close();
+                }
+            } catch (Throwable t2) {
+                ExceptionUtils.handleThrowable(t2);
+                ne.addSuppressed(t2);
+            }
+            result = null;
+            throw ne;
         }
         return result;
     }
@@ -2799,16 +2846,18 @@ public class JNDIRealm extends RealmBase {
     /**
      * Create our directory context configuration.
      *
+     * @param useAlternateURL Whether the alternate URL should be used in place of the connection URL
+     *
      * @return java.util.Hashtable the configuration for the directory context.
      */
-    protected Hashtable<String,String> getDirectoryContextEnvironment() {
+    protected Hashtable<String,String> getDirectoryContextEnvironment(boolean useAlternateURL) {
 
         Hashtable<String,String> env = new Hashtable<>();
 
         // Configure our directory context environment.
-        if (containerLog.isTraceEnabled() && connectionAttempt == 0) {
+        if (containerLog.isTraceEnabled() && !useAlternateURL) {
             containerLog.trace("Connecting to URL " + connectionURL);
-        } else if (containerLog.isTraceEnabled() && connectionAttempt > 0) {
+        } else if (containerLog.isTraceEnabled() && useAlternateURL) {
             containerLog.trace("Connecting to URL " + alternateURL);
         }
         env.put(Context.INITIAL_CONTEXT_FACTORY, contextFactory);
@@ -2818,9 +2867,9 @@ public class JNDIRealm extends RealmBase {
         if (connectionPassword != null) {
             env.put(Context.SECURITY_CREDENTIALS, connectionPassword);
         }
-        if (connectionURL != null && connectionAttempt == 0) {
+        if (connectionURL != null && !useAlternateURL) {
             env.put(Context.PROVIDER_URL, connectionURL);
-        } else if (alternateURL != null && connectionAttempt > 0) {
+        } else if (alternateURL != null && useAlternateURL) {
             env.put(Context.PROVIDER_URL, alternateURL);
         }
         if (authentication != null) {
@@ -2922,36 +2971,88 @@ public class JNDIRealm extends RealmBase {
      * @param userPatternString - a string LDAP search paths surrounded by parentheses
      *
      * @return a parsed string array
+     *
+     * @throws IllegalArgumentException if the pattern contains unbalanced parentheses
      */
     protected String[] parseUserPatternString(String userPatternString) {
 
-        if (userPatternString != null) {
-            List<String> pathList = new ArrayList<>();
-            int startParenLoc = userPatternString.indexOf('(');
-            if (startParenLoc == -1) {
-                // no parens here; return whole thing
-                return new String[] { userPatternString };
-            }
-            while (startParenLoc > -1) {
-                // weed out escaped open parens and parens enclosing the
-                // whole statement (in the case of valid LDAP search
-                // strings: (|(something)(somethingelse))
-                while ((userPatternString.charAt(startParenLoc + 1) == '|') ||
-                        (startParenLoc != 0 && userPatternString.charAt(startParenLoc - 1) == '\\')) {
-                    startParenLoc = userPatternString.indexOf('(', startParenLoc + 1);
-                }
-                int endParenLoc = userPatternString.indexOf(')', startParenLoc + 1);
-                // weed out escaped end-parens
-                while (userPatternString.charAt(endParenLoc - 1) == '\\') {
-                    endParenLoc = userPatternString.indexOf(')', endParenLoc + 1);
-                }
-                String nextPathPart = userPatternString.substring(startParenLoc + 1, endParenLoc);
-                pathList.add(nextPathPart);
-                startParenLoc = userPatternString.indexOf('(', endParenLoc + 1);
-            }
-            return pathList.toArray(new String[0]);
+        if (userPatternString == null) {
+            return null;
         }
-        return null;
+
+        List<String> pathList = new ArrayList<>();
+        // Number of open "(|" wrappers around the patterns
+        int wrapperDepth = 0;
+        boolean unescapedOpenParen = false;
+        // A close paren without a matching open paren
+        boolean strayCloseParen = false;
+        // Text other than whitespace outside of any pattern
+        boolean strayText = false;
+        int length = userPatternString.length();
+        int i = 0;
+        while (i < length) {
+            char c = userPatternString.charAt(i);
+            if (c == '\\') {
+                // Skip the escaped character
+                strayText = true;
+                i += 2;
+            } else if (c == '(') {
+                unescapedOpenParen = true;
+                if (i + 1 < length && userPatternString.charAt(i + 1) == '|') {
+                    // Parens enclosing the whole statement. Valid LDAP search strings: (|(something)(somethingelse))
+                    wrapperDepth++;
+                    i += 2;
+                } else {
+                    int endParenLoc = findUnescapedCloseParen(userPatternString, i + 1);
+                    if (endParenLoc == -1) {
+                        // no matching close paren for this pattern
+                        throw new IllegalArgumentException(
+                                sm.getString("jndiRealm.invalidUserPattern", userPatternString));
+                    }
+                    pathList.add(userPatternString.substring(i + 1, endParenLoc));
+                    i = endParenLoc + 1;
+                }
+            } else if (c == ')') {
+                if (wrapperDepth == 0) {
+                    strayCloseParen = true;
+                } else {
+                    wrapperDepth--;
+                }
+                i++;
+            } else {
+                if (!Character.isWhitespace(c)) {
+                    strayText = true;
+                }
+                i++;
+            }
+        }
+
+        if (!unescapedOpenParen) {
+            // No open parens (or only escaped open parens) here, so this is a plain pattern. A close paren is not
+            // special in a distinguished name; return whole thing
+            return new String[] { userPatternString };
+        }
+        if (wrapperDepth != 0 || strayCloseParen || pathList.isEmpty() || strayText) {
+            // unclosed wrapper, extra close paren, nothing but wrappers or text between the patterns
+            throw new IllegalArgumentException(sm.getString("jndiRealm.invalidUserPattern", userPatternString));
+        }
+        return pathList.toArray(new String[0]);
+    }
+
+
+    private static int findUnescapedCloseParen(String value, int start) {
+        int i = start;
+        while (i < value.length()) {
+            char c = value.charAt(i);
+            if (c == '\\') {
+                i += 2;
+            } else if (c == ')') {
+                return i;
+            } else {
+                i++;
+            }
+        }
+        return -1;
     }
 
 
@@ -3318,9 +3419,19 @@ public class JNDIRealm extends RealmBase {
         public final MessageFormat roleFormat;
 
         /**
+         * A flag that indicates that roleSearch includes a reference to the {2} placeholder.
+         */
+        public final boolean roleFormatUsesUserRoleAttribute;
+
+        /**
          * The directory context linking us to our directory server.
          */
         public volatile DirContext context = null;
+
+        /**
+         * The {@link StartTlsResponse} negotiated for this connection, if any.
+         */
+        public volatile StartTlsResponse tls = null;
 
 
         /**
@@ -3356,8 +3467,10 @@ public class JNDIRealm extends RealmBase {
 
             if (roleSearch == null) {
                 roleFormat = null;
+                roleFormatUsesUserRoleAttribute = false;
             } else {
                 roleFormat = new MessageFormat(roleSearch);
+                roleFormatUsesUserRoleAttribute = roleSearch.contains("{2}");
             }
         }
     }

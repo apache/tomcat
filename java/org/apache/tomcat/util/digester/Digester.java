@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -43,7 +42,6 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.IntrospectionUtils.PropertySource;
-import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ToStringUtil;
 import org.apache.tomcat.util.res.StringManager;
 import org.xml.sax.Attributes;
@@ -58,7 +56,6 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.ext.DefaultHandler2;
 import org.xml.sax.ext.EntityResolver2;
-import org.xml.sax.ext.Locator2;
 import org.xml.sax.helpers.AttributesImpl;
 
 
@@ -75,10 +72,6 @@ import org.xml.sax.helpers.AttributesImpl;
  * <strong>IMPLEMENTATION NOTE</strong> - A single Digester instance may only be used within the context of a single
  * thread at a time, and a call to <code>parse()</code> must be completed before another can be initiated even from the
  * same thread.
- * </p>
- * <p>
- * <strong>IMPLEMENTATION NOTE</strong> - A bug in Xerces 2.0.2 prevents the support of XML schema. You need Xerces
- * 2.1/2.3 and up to make this class working with XML schema
  * </p>
  */
 public class Digester extends DefaultHandler2 {
@@ -106,7 +99,7 @@ public class Digester extends DefaultHandler2 {
         if (classNames != null) {
             StringTokenizer classNamesTokenizer = new StringTokenizer(classNames, ",");
             while (classNamesTokenizer.hasMoreTokens()) {
-                String className = classNamesTokenizer.nextToken().trim();
+                String className = classNamesTokenizer.nextToken().strip();
                 ClassLoader[] cls = new ClassLoader[] { Digester.class.getClassLoader(),
                         Thread.currentThread().getContextClassLoader() };
                 for (ClassLoader cl : cls) {
@@ -649,7 +642,7 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
-     * Sets a flag indicating whether the requested feature is supported by the underlying implementation of
+     * Sets the value of the requested feature in the underlying implementation of
      * <code>org.xml.sax.XMLReader</code>. See
      * <a href="http://www.saxproject.org/apidoc/xml/sax/package-summary.html#package-description">
      * http://www.saxproject.org/apidoc/xml/sax/package-summary.html#package-description</a> for information about the
@@ -952,8 +945,7 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
-     * Return the XMLReader to be used for parsing the input document. FIX ME: there is a bug in JAXP/XERCES that
-     * prevent the use of a parser that contains a schema with a DTD.
+     * Return the XMLReader to be used for parsing the input document.
      *
      * @return the XML reader
      *
@@ -1088,7 +1080,7 @@ public class Digester extends DefaultHandler2 {
         // Fire "body" events for all relevant rules
         List<Rule> rules = matches.pop();
         if ((rules != null) && (!rules.isEmpty())) {
-            String bodyText = this.bodyText.toString().intern();
+            String bodyText = this.bodyText.toString();
             for (Rule rule : rules) {
                 try {
                     if (debug) {
@@ -1277,19 +1269,6 @@ public class Digester extends DefaultHandler2 {
             saxLog.trace("startDocument()");
         }
 
-        if (locator instanceof Locator2) {
-            if (root instanceof DocumentProperties.Charset) {
-                String enc = ((Locator2) locator).getEncoding();
-                if (enc != null) {
-                    try {
-                        ((DocumentProperties.Charset) root).setCharset(B2CConverter.getCharset(enc));
-                    } catch (UnsupportedEncodingException e) {
-                        log.warn(sm.getString("digester.encodingInvalid", enc), e);
-                    }
-                }
-            }
-        }
-
         // ensure that the digester is properly configured, as
         // the digester could be used as a SAX ContentHandler
         // rather than via the parse() methods.
@@ -1304,7 +1283,7 @@ public class Digester extends DefaultHandler2 {
      *                         processing is not being performed.
      * @param localName    The local name (without prefix), or the empty string if Namespace processing is not being
      *                         performed.
-     * @param qName        The qualified name (with prefix), or the empty string if qualified names are not available.\
+     * @param qName        The qualified name (with prefix), or the empty string if qualified names are not available.
      * @param list         The attributes attached to the element. If there are no attributes, it shall be an empty
      *                         Attributes object.
      *
@@ -1600,6 +1579,12 @@ public class Digester extends DefaultHandler2 {
             InputSource input = new InputSource(fis);
             input.setSystemId("file://" + file.getAbsolutePath());
             getXMLReader().parse(input);
+        } catch (Exception e) {
+            // endDocument() is not reached when parsing fails. Restore a
+            // consistent state so the Digester can safely be reused.
+            clear();
+            root = null;
+            throw e;
         }
         return root;
     }
@@ -1618,7 +1603,15 @@ public class Digester extends DefaultHandler2 {
      */
     public Object parse(InputSource input) throws IOException, SAXException {
         configure();
-        getXMLReader().parse(input);
+        try {
+            getXMLReader().parse(input);
+        } catch (Exception e) {
+            // endDocument() is not reached when parsing fails. Restore a
+            // consistent state so the Digester can safely be reused.
+            clear();
+            root = null;
+            throw e;
+        }
         return root;
     }
 
@@ -1635,10 +1628,7 @@ public class Digester extends DefaultHandler2 {
      * @exception SAXException if a parsing exception occurs
      */
     public Object parse(InputStream input) throws IOException, SAXException {
-        configure();
-        InputSource is = new InputSource(input);
-        getXMLReader().parse(is);
-        return root;
+        return parse(new InputSource(input));
     }
 
 
@@ -1855,12 +1845,12 @@ public class Digester extends DefaultHandler2 {
     public void clear() {
 
         match = "";
+        matches.clear();
+        namespaces.clear();
         bodyTexts.clear();
         params.clear();
         publicId = null;
         stack.clear();
-        log = null;
-        saxLog = null;
         configured = false;
 
     }
@@ -2129,8 +2119,7 @@ public class Digester extends DefaultHandler2 {
         for (int i = 0; i < nAttributes; ++i) {
             String value = newAttrs.getValue(i);
             try {
-                newAttrs.setValue(i,
-                        IntrospectionUtils.replaceProperties(value, null, source, getClassLoader()).intern());
+                newAttrs.setValue(i, IntrospectionUtils.replaceProperties(value, null, source, getClassLoader()));
             } catch (Exception e) {
                 log.warn(sm.getString("digester.failedToUpdateAttributes", newAttrs.getLocalName(i), value), e);
             }

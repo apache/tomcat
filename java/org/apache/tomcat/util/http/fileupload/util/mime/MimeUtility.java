@@ -85,6 +85,7 @@ public final class MimeUtility {
      *
      * @return The decoded text string.
      * @throws UnsupportedEncodingException if the detected encoding in the input text is not supported.
+     * @throws IllegalArgumentException if a malformed base64 encoded-word is encountered.
      */
     public static String decodeText(final String text) throws UnsupportedEncodingException {
         // if the text contains any encoded tokens, those tokens will be marked with "=?".  If the
@@ -139,7 +140,7 @@ public final class MimeUtility {
                 // is the token encoded?  decode the word
                 if (word.startsWith(ENCODED_TOKEN_MARKER)) {
                     try {
-                        // if this gives a parsing failure, treat it like a non-encoded word.
+                        // if this gives a ParseException, treat it like a non-encoded word.
                         final String decodedWord = decodeWord(word);
 
                         // are any whitespace characters significant?  Append 'em if we've got 'em.
@@ -151,7 +152,7 @@ public final class MimeUtility {
                         previousTokenEncoded = true;
                         // and add this to the text.
                         decodedText.append(decodedWord);
-                        // we continue parsing from here...we allow parsing errors to fall through
+                        // we continue parsing from here...we allow ParseExceptions to fall through
                         // and get handled as normal text.
                         continue;
 

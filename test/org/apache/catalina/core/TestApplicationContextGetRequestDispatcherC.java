@@ -97,11 +97,11 @@ public class TestApplicationContextGetRequestDispatcherC extends TomcatBaseTest 
 
         // Servlet that performs a dispatch to ...
         Tomcat.addServlet(ctx, "rd", new Dispatch(pathInfoRequest));
-        ctx.addServletMappingDecoded("/dispatch/*", "rd");
+        ctx.addServletMapping("/dispatch/*", "rd");
 
         // ... this Servlet
         Tomcat.addServlet(ctx, "target", new Target());
-        ctx.addServletMappingDecoded("/target/*", "target");
+        ctx.addServletMapping("/target/*", "target");
 
         tomcat.start();
 

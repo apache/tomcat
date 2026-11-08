@@ -19,6 +19,7 @@ package org.apache.catalina;
 
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.util.concurrent.locks.ReadWriteLock;
 
 
 /**
@@ -48,7 +49,8 @@ public interface Store {
      * Return the number of Sessions present in this Store.
      *
      * @return the number of Sessions
-     * @exception IOException if an input/output error occurs
+     *
+     * @throws IOException if an input/output error occurs
      */
     int getSize() throws IOException;
 
@@ -62,11 +64,12 @@ public interface Store {
 
 
     /**
-     * Return an array containing the session identifiers of all Sessions currently saved in this Store. If there are
-     * no such Sessions, a zero-length array is returned.
+     * Return an array containing the session identifiers of all Sessions currently saved in this Store. If there are no
+     * such Sessions, a zero-length array is returned.
      *
      * @return the session identifiers
-     * @exception IOException if an input/output error occurred
+     *
+     * @throws IOException if an input/output error occurred
      */
     String[] keys() throws IOException;
 
@@ -82,8 +85,8 @@ public interface Store {
      *
      * @param id Session identifier of the session to load
      *
-     * @exception ClassNotFoundException if a deserialization error occurs
-     * @exception IOException            if an input/output error occurs
+     * @throws ClassNotFoundException if a deserialization error occurs
+     * @throws IOException             if an input/output error occurs
      *
      * @return the loaded Session instance
      */
@@ -101,7 +104,7 @@ public interface Store {
      *
      * @param id Session identifier of the Session to be removed
      *
-     * @exception IOException if an input/output error occurs
+     * @throws IOException if an input/output error occurs
      */
     void remove(String id) throws IOException;
 
@@ -109,7 +112,7 @@ public interface Store {
     /**
      * Remove all Sessions from this Store.
      *
-     * @exception IOException if an input/output error occurs
+     * @throws IOException if an input/output error occurs
      */
     void clear() throws IOException;
 
@@ -131,7 +134,28 @@ public interface Store {
      *
      * @param session Session to be saved
      *
-     * @exception IOException if an input/output error occurs
+     * @throws IOException if an input/output error occurs
      */
     void save(Session session) throws IOException;
+
+
+    /**
+     * Obtain the session store lock for the session with the given identifier.
+     * <p>
+     * Sub-classes of StoreBase use this lock as necessary. External users of the Store must obtain a write lock before
+     * changing the session identifier. More generally, external users of the store must obtain a write lock before
+     * manipulating the session in any way that changes the mapping from session object to session identifier.
+     * <p>
+     * Implementations of this interface <b>MUST</b> provide an implementation of this method else any change in session
+     * identifier, e.g. on authentication, may result in inconsistent data being held in the store.
+     * <p>
+     * The default implementation throws an {@link UnsupportedOperationException}.
+     *
+     * @param sessionId the session identifier
+     *
+     * @return The lock for the given session identifier
+     */
+    default ReadWriteLock getSessionStoreLock(String sessionId) {
+        throw new UnsupportedOperationException();
+    }
 }

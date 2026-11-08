@@ -31,7 +31,7 @@ public class VariableMapperFactory extends VariableMapper {
      */
     private final VariableMapper target;
     /**
-     * The momento mapper that tracks resolved variables.
+     * The memento mapper that tracks resolved variables.
      */
     private VariableMapper momento;
 

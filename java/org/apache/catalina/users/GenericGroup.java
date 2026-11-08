@@ -32,7 +32,7 @@ import org.apache.catalina.UserDatabase;
  * Concrete implementation of {@link org.apache.catalina.Group} for a {@link UserDatabase}.
  * </p>
  *
- * @param <UD> The specific type of UserDase with which this group is associated
+ * @param <UD> The specific type of UserDatabase with which this group is associated
  */
 public class GenericGroup<UD extends UserDatabase> extends AbstractGroup {
 
@@ -77,6 +77,20 @@ public class GenericGroup<UD extends UserDatabase> extends AbstractGroup {
 
 
     // ------------------------------------------------------------- Properties
+
+
+    @Override
+    public void setGroupname(String groupname) {
+        // Note: changing the groupname (which is the key) in a database will not work
+        // and the group should be removed and added instead
+    }
+
+
+    @Override
+    public void setDescription(String description) {
+        database.modifiedGroup(this);
+        super.setDescription(description);
+    }
 
 
     @Override

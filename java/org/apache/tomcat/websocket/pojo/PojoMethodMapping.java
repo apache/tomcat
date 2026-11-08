@@ -51,8 +51,9 @@ import org.apache.tomcat.websocket.Util;
 import org.apache.tomcat.websocket.Util.DecoderMatch;
 
 /**
- * For a POJO class annotated with {@link jakarta.websocket.server.ServerEndpoint}, an instance of this class creates
- * and caches the method handler, method information and parameter information for the onXXX calls.
+ * For a POJO class annotated with {@link jakarta.websocket.server.ServerEndpoint}, an instance of this class caches the
+ * method information and parameter information for the onXXX calls. The message handlers themselves are not cached;
+ * they are created per session from the cached information.
  */
 public class PojoMethodMapping {
 
@@ -72,7 +73,7 @@ public class PojoMethodMapping {
      * Create a method mapping for the given POJO
      *
      * @param clazzPojo       POJO implementation class
-     * @param decoderClazzes  Set of potential decoder classes
+     * @param decoderClazzes  List of potential decoder classes
      * @param wsPath          Path at which the endpoint will be deployed
      * @param instanceManager Instance manager to use to create Decoder instances
      *
@@ -203,7 +204,12 @@ public class PojoMethodMapping {
 
 
     private boolean isMethodOverride(Method method1, Method method2) {
-        return method1.getName().equals(method2.getName()) && method1.getReturnType().equals(method2.getReturnType()) &&
+        // The return type is deliberately not compared. An overriding method may
+        // use a covariant return type and, within a single class hierarchy, two
+        // methods with the same name and parameter types are override
+        // equivalent since the compiler does not permit them to differ only in
+        // return type unless one overrides the other.
+        return method1.getName().equals(method2.getName()) &&
                 Arrays.equals(method1.getParameterTypes(), method2.getParameterTypes());
     }
 
@@ -605,6 +611,11 @@ public class PojoMethodMapping {
             if (indexInputStream != -1 && indexBoolean != -1) {
                 throw new DeploymentException(sm.getString("pojoMethodMapping.partialInputStream", m.getName(),
                         m.getDeclaringClass().getName()));
+            }
+            if (indexPrimitive != -1 && indexBoolean != -1) {
+                throw new DeploymentException(
+                        sm.getString("pojoMethodMapping.partialPrimitive", m.getName(),
+                                m.getDeclaringClass().getName()));
             }
             if (decoderMatch != null && decoderMatch.hasMatches() && indexBoolean != -1) {
                 throw new DeploymentException(

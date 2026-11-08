@@ -66,18 +66,22 @@ public class Asn1Writer {
         }
 
         // How many bytes required to write the value? No more than 4 for int.
+        // Note the limit is required to terminate the loop since the shift
+        // distance is evaluated modulo 32.
         int valueSize = 1;
-        while ((value >> (valueSize * 8)) > 0) {
+        while (valueSize < 4 && (value >>> (valueSize * 8)) != 0) {
             valueSize++;
         }
 
-        byte[] valueBytes = new byte[valueSize];
-        int i = 0;
-        while (valueSize > 0) {
-            valueBytes[i] = (byte) (value >> (8 * (valueSize - 1)));
-            value = value >> 8;
-            valueSize--;
-            i++;
+        /*
+         * DER INTEGER content octets are a two's complement value. A positive value whose most significant bit is set
+         * requires a leading zero byte so that it is not decoded as a negative number.
+         */
+        boolean pad = ((value >>> ((valueSize - 1) * 8)) & 0x80) != 0;
+        byte[] valueBytes = new byte[pad ? valueSize + 1 : valueSize];
+        int offset = pad ? 1 : 0;
+        for (int i = 0; i < valueSize; i++) {
+            valueBytes[offset + i] = (byte) (value >> (8 * (valueSize - 1 - i)));
         }
 
         return writeTag((byte) 0x02, valueBytes);
@@ -102,38 +106,35 @@ public class Asn1Writer {
      */
     public static byte[] writeTag(byte tagId, byte[] data) {
         int dataSize = data.length;
-        // How many bytes to write the length?
-        int lengthSize = 1;
-        if (dataSize > 127) {
-            // 1 byte we have is now used to record how many bytes we need to
-            // record a length > 127
-            // Result is lengthSize = 1 + number of bytes to record length
-            do {
-                lengthSize++;
-            } while ((dataSize >> (lengthSize * 8)) > 0);
-        }
 
         byte[] result;
+        int headerSize;
         if (dataSize < 128) {
-            // 1 for tag + lengthSize + dataSize
-            result = new byte[1 + lengthSize + dataSize];
+            // Short form. The length is a single byte.
+            headerSize = 2;
+            result = new byte[headerSize + dataSize];
             result[1] = (byte) dataSize;
         } else {
-            // lengthSize is 1 + number of bytes for length
-            // 1 for tag + one for the lengthSize + lengthSize + dataSize
-            result = new byte[2 + lengthSize + dataSize];
-            result[1] = (byte) (128 + lengthSize);
-            int i = lengthSize;
-            while (dataSize > 0) {
-                result[i + 1] = (byte) (dataSize & 0xFF);
-                dataSize = dataSize >> 8;
-                i--;
+            /*
+             * Long form. The first length byte is 0x80 plus the number of bytes required to record the length. DER
+             * (X.690 10.1) requires the minimum number of length bytes. No more than 4 are required for a Java array
+             * length. The limit is also required to terminate the loop since the shift distance is evaluated modulo
+             * 32.
+             */
+            int lengthBytes = 1;
+            while (lengthBytes < 4 && (dataSize >>> (lengthBytes * 8)) != 0) {
+                lengthBytes++;
             }
-            lengthSize++; // we added the size.
+            headerSize = 2 + lengthBytes;
+            result = new byte[headerSize + dataSize];
+            result[1] = (byte) (0x80 + lengthBytes);
+            for (int i = 0; i < lengthBytes; i++) {
+                result[2 + i] = (byte) (dataSize >>> (8 * (lengthBytes - 1 - i)));
+            }
         }
         result[0] = tagId;
 
-        System.arraycopy(data, 0, result, 1 + lengthSize, data.length);
+        System.arraycopy(data, 0, result, headerSize, data.length);
 
         return result;
     }

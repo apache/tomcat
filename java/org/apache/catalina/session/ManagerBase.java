@@ -414,8 +414,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
                 sessionIdGenerator = sessionIdGeneratorClass.getConstructor().newInstance();
                 return sessionIdGenerator;
             } catch (ReflectiveOperationException ex) {
-                log.warn(sm.getString("managerBase.sessionIdGeneratorInitFailed",
-                        sessionIdGeneratorClass.getName()), ex);
+                log.warn(sm.getString("managerBase.sessionIdGeneratorInitFailed", sessionIdGeneratorClass.getName()),
+                        ex);
             }
         }
         return null;
@@ -776,7 +776,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
         // the manager because it is being persisted - update the expired stats
         if (update) {
             long timeNow = System.currentTimeMillis();
-            int timeAlive = (int) (timeNow - session.getCreationTimeInternal()) / 1000;
+            int timeAlive = (int) ((timeNow - session.getCreationTimeInternal()) / 1000L);
             updateSessionMaxAliveTime(timeAlive);
             expiredSessions.incrementAndGet();
             SessionTiming timing = new SessionTiming(timeNow, timeAlive);
@@ -815,9 +815,9 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
     /**
      * Change the session ID.
      *
-     * @param session The session
-     * @param newId The new session ID
-     * @param notifySessionListeners Whether to notify session listeners
+     * @param session                  The session
+     * @param newId                    The new session ID
+     * @param notifySessionListeners   Whether to notify session listeners
      * @param notifyContainerListeners Whether to notify container listeners
      */
     protected void changeSessionId(Session session, String newId, boolean notifySessionListeners,
@@ -833,7 +833,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
      * <p>
      * This implementation excludes session attributes from distribution if the:
      * <ul>
-     * <li>attribute name matches {@link #getSessionAttributeNameFilter()}</li>
+     * <li>attribute name does not match {@link #getSessionAttributeNameFilter()}</li>
+     * <li>attribute value class name does not match {@link #getSessionAttributeValueClassNameFilter()}</li>
      * </ul>
      */
     @Override
@@ -1093,8 +1094,9 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
             }
         }
         if (counter > 0) {
-            if (oldest < now) {
-                result = (1000 * 60 * counter) / (int) (now - oldest);
+            long span = now - oldest;
+            if (span > 0) {
+                result = (int) ((1000L * 60 * counter) / span);
             } else {
                 // Better than reporting zero
                 result = Integer.MAX_VALUE;
@@ -1197,6 +1199,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
      * Get the timestamp of the last access for the given session.
      *
      * @param sessionId The session ID
+     *
      * @return the timestamp or -1 if not found
      */
     public long getThisAccessedTimestamp(String sessionId) {
@@ -1214,6 +1217,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
      * Get the last access time for the given session as a formatted string.
      *
      * @param sessionId The session ID
+     *
      * @return the formatted time or empty string if not found
      */
     public String getThisAccessedTime(String sessionId) {
@@ -1231,6 +1235,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
      * Get the timestamp of the last access for the given session.
      *
      * @param sessionId The session ID
+     *
      * @return the timestamp or -1 if not found
      */
     public long getLastAccessedTimestamp(String sessionId) {
@@ -1248,6 +1253,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
      * Get the last access time for the given session as a formatted string.
      *
      * @param sessionId The session ID
+     *
      * @return the formatted time or empty string if not found
      */
     public String getLastAccessedTime(String sessionId) {
@@ -1265,6 +1271,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
      * Get the creation time for the given session as a formatted string.
      *
      * @param sessionId The session ID
+     *
      * @return the formatted time or empty string if not found
      */
     public String getCreationTime(String sessionId) {
@@ -1282,6 +1289,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
      * Get the creation timestamp for the given session.
      *
      * @param sessionId The session ID
+     *
      * @return the timestamp or -1 if not found
      */
     public long getCreationTimestamp(String sessionId) {
@@ -1333,7 +1341,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
      * Record for session timing information.
      *
      * @param timestamp The time stamp in milliseconds
-     * @param duration The duration in seconds
+     * @param duration  The duration in seconds
      */
     protected record SessionTiming(long timestamp, int duration) {
 

@@ -54,7 +54,7 @@ public class TestStandardContextValve extends TomcatBaseTest {
 
         // Add the error page
         Tomcat.addServlet(ctx, "errorPage", new Bug51653ErrorPage(trace));
-        ctx.addServletMappingDecoded("/error", "errorPage");
+        ctx.addServletMapping("/error", "errorPage");
         // And the handling for 404 responses
         ErrorPage errorPage = new ErrorPage();
         errorPage.setErrorCode(Response.SC_NOT_FOUND);
@@ -99,11 +99,11 @@ public class TestStandardContextValve extends TomcatBaseTest {
 
         // Add the page that generates the error
         Tomcat.addServlet(ctx, "test", new Bug51653ErrorTrigger());
-        ctx.addServletMappingDecoded("/test", "test");
+        ctx.addServletMapping("/test", "test");
 
         // Add the error page
         Tomcat.addServlet(ctx, "errorPage", new Bug51653ErrorPage(trace));
-        ctx.addServletMappingDecoded("/error", "errorPage");
+        ctx.addServletMapping("/error", "errorPage");
         // And the handling for 404 responses
         ErrorPage errorPage = new ErrorPage();
         errorPage.setErrorCode(Response.SC_NOT_FOUND);
@@ -230,7 +230,7 @@ public class TestStandardContextValve extends TomcatBaseTest {
         final Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "echo", new EchoBodyServlet());
-        ctx.addServletMappingDecoded("/echo", "echo");
+        ctx.addServletMapping("/echo", "echo");
 
         tomcat.start();
 

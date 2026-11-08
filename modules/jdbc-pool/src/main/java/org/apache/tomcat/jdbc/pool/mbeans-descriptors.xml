@@ -32,12 +32,12 @@
              writeable="false"/>
 
     <attribute    name="size"
-           description="The number of established connections in the pool, idle and in use"
+           description="The current pool size: idle and in-use connection slots, including wake-up placeholders for waiting borrowers"
                   type="java.lang.Integer"
              writeable="false"/>
 
     <attribute    name="idle"
-           description="The number of established connections in the pool that are idle"
+           description="The number of idle entries, including wake-up placeholders for waiting borrowers"
                   type="java.lang.Integer"
              writeable="false"/>
 
@@ -47,7 +47,7 @@
              writeable="false"/>
 
     <attribute    name="active"
-           description="The number of established connections in the pool that are in use"
+           description="The number of connections currently in use by borrowers"
                   type="java.lang.Integer"
              writeable="false"/>
 
@@ -57,7 +57,7 @@
              writeable="false"/>
 
     <attribute    name="poolSweeperEnabled"
-           description="Returns true if the pool has a background thread running"
+           description="True if the pool configuration enables the background sweeper"
                   type="java.lang.Boolean"
                     is="true"
              writeable="false"/>
@@ -95,7 +95,7 @@
              writeable="false"/>
 
     <attribute    name="defaultCatalog"
-           description="The JDBC transaction isolation setting for new connections"
+           description="The default JDBC catalog for new connections"
                   type="java.lang.String"
              writeable="false"/>
 
@@ -191,7 +191,7 @@
              writeable="false"/>
 
     <attribute    name="loginTimeout"
-           description="Not in use"
+           description="The login timeout in seconds, mapped to the pool's maxWait"
                   type="java.lang.Integer"
              writeable="false"/>
 
@@ -300,7 +300,7 @@
              writeable="false"/>
 
     <attribute    name="useDisposableConnectionFacade"
-           description="If true, connection pool is configured to use a connection facade to prevent re-use of connection after close() has been invoked"
+           description="Deprecated, no longer has any effect: the pool always uses a connection facade to prevent re-use of connection after close() has been invoked"
                   type="java.lang.Boolean"
                     is="false"
              writeable="false"/>
@@ -334,7 +334,7 @@
              writeable="false"/>
 
     <attribute    name="useStatementFacade"
-           description="If true, connection pool is configured to wrap statements."
+           description="Deprecated, no longer has any effect: the pool always uses a statement facade, so statements and result sets cannot be used after the connection they came from is returned"
                   type="java.lang.Boolean"
                     is="false"
              writeable="false"/>
@@ -385,7 +385,7 @@
                   returnType="void" />
 
     <operation    name="testIdle"
-                  description="forces a validation of abandoned connections"
+                  description="Runs a validation and eviction pass over the idle connections"
                   impact="ACTION"
                   returnType="void" />
 

@@ -42,6 +42,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -263,6 +264,13 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      * The "correctly configured" flag for this Context.
      */
     private boolean configured = false;
+
+
+    /**
+     * Indicates that this Context was deployed from a Context element defined in server.xml. The flag is for internal
+     * use only (it is not exposed via JMX and is not persisted by storeconfig).
+     */
+    private boolean deployedFromServerXml = false;
 
 
     /**
@@ -1193,7 +1201,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
             return;
         }
         for (String servletName : resourceOnlyServlets.split(",")) {
-            servletName = servletName.trim();
+            servletName = servletName.strip();
             if (!servletName.isEmpty()) {
                 this.resourceOnlyServlets.add(servletName);
             }
@@ -1517,6 +1525,29 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     @Override
     public void setConfigFile(URL configFile) {
         this.configFile = configFile;
+    }
+
+
+    /**
+     * Indicates whether this Context was deployed from a Context element defined in server.xml. The flag is set by the
+     * server.xml digester and is for internal use only. In particular, it is not exposed via JMX and is not stored by
+     * storeconfig.
+     *
+     * @return <code>true</code> if the Context element was parsed from server.xml
+     */
+    public boolean getDeployedFromServerXml() {
+        return this.deployedFromServerXml;
+    }
+
+
+    /**
+     * Sets the flag indicating that this Context was deployed from a Context element defined in server.xml. The flag is
+     * for internal use only. In particular, it is not exposed via JMX and is not stored by storeconfig.
+     *
+     * @param deployedFromServerXml The new flag value
+     */
+    public void setDeployedFromServerXml(boolean deployedFromServerXml) {
+        this.deployedFromServerXml = deployedFromServerXml;
     }
 
 
@@ -2005,7 +2036,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("standardContext.loginConfig.loginWarning", loginPage));
                 }
-                config.setLoginPageDecoded("/" + loginPage);
+                config.setLoginPage("/" + loginPage);
             } else {
                 throw new IllegalArgumentException(sm.getString("standardContext.loginConfig.loginPage", loginPage));
             }
@@ -2016,7 +2047,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("standardContext.loginConfig.errorWarning", errorPage));
                 }
-                config.setErrorPageDecoded("/" + errorPage);
+                config.setErrorPage("/" + errorPage);
             } else {
                 throw new IllegalArgumentException(sm.getString("standardContext.loginConfig.errorPage", errorPage));
             }
@@ -2092,8 +2123,16 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
     @Override
     public void setPath(String path) {
+        String original = path;
         boolean invalid = false;
-        if (path == null || path.equals("/")) {
+        if (path != null) {
+            while (path.endsWith("/")) {
+                invalid = true;
+                path = path.substring(0, path.length() - 1);
+            }
+        }
+
+        if (path == null || "/ROOT".equals(path) || "ROOT".equals(path)) {
             invalid = true;
             this.path = "";
         } else if (path.isEmpty() || path.startsWith("/")) {
@@ -2102,12 +2141,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
             invalid = true;
             this.path = "/" + path;
         }
-        if (this.path.endsWith("/")) {
-            invalid = true;
-            this.path = this.path.substring(0, this.path.length() - 1);
-        }
         if (invalid) {
-            log.warn(sm.getString("standardContext.pathInvalid", path, this.path));
+            log.warn(sm.getString("standardContext.pathInvalid", original, this.path));
         }
         encodedPath = URLEncoder.DEFAULT.encode(this.path, StandardCharsets.UTF_8);
         if (getName() == null) {
@@ -2815,7 +2850,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
              */
             String[] jspMappings = oldJspServlet.findMappings();
             for (int i = 0; jspMappings != null && i < jspMappings.length; i++) {
-                addServletMappingDecoded(jspMappings[i], child.getName());
+                addServletMapping(jspMappings[i], child.getName());
             }
         }
     }
@@ -2862,7 +2897,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("standardContext.errorPage.warning", location));
                 }
-                errorPage.setLocationDecoded("/" + location);
+                errorPage.setLocation("/" + location);
             } else {
                 throw new IllegalArgumentException(sm.getString("standardContext.errorPage.error", location));
             }
@@ -2999,7 +3034,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
 
     @Override
-    public void addServletMappingDecoded(String pattern, String name, boolean jspWildCard) {
+    public void addServletMapping(String pattern, String name, boolean jspWildCard) {
         // Validate the proposed mapping
         if (findChild(name) == null) {
             throw new IllegalArgumentException(sm.getString("standardContext.servletMap.name", name));
@@ -4733,10 +4768,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     private void mergeParameters() {
         Map<String,String> mergedParams = new HashMap<>();
 
-        String[] names = findParameters();
-        for (String s : names) {
-            mergedParams.put(s, findParameter(s));
-        }
+        mergedParams.putAll(parameters);
 
         ApplicationParameter[] params = findApplicationParameters();
         for (ApplicationParameter param : params) {
@@ -4751,7 +4783,6 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         for (Map.Entry<String,String> entry : mergedParams.entrySet()) {
             sc.setInitParameter(entry.getKey(), entry.getValue());
         }
-
     }
 
 
@@ -4769,8 +4800,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         // requests will be mapped) but is still available.
 
         // Give the in progress async requests a chance to complete
-        long limit = System.currentTimeMillis() + unloadDelay;
-        while (inProgressAsyncCount.get() > 0 && System.currentTimeMillis() < limit) {
+        long limit = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(unloadDelay);
+        while (inProgressAsyncCount.get() > 0 && (System.nanoTime() - limit) < 0) {
             try {
                 Thread.sleep(50);
             } catch (InterruptedException e) {
@@ -5152,7 +5183,10 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         Loader loader = getLoader();
         ClassLoader webApplicationClassLoader = null;
         if (loader != null) {
-            webApplicationClassLoader = loader.getClassLoader();
+            // Don't bind the web application class loader if it isn't started yet.
+            if (!(loader instanceof Lifecycle) || ((Lifecycle) loader).getState().isAvailable()) {
+                webApplicationClassLoader = loader.getClassLoader();
+            }
         }
 
         Thread currentThread = Thread.currentThread();
@@ -5583,8 +5617,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                     new MBeanNotificationInfo(new String[] { "j2ee.state.running" }, Notification.class.getName(),
                             "web application is running"),
                     new MBeanNotificationInfo(new String[] { "j2ee.state.stopping" }, Notification.class.getName(),
-                            "web application start to stopped"),
-                    new MBeanNotificationInfo(new String[] { "j2ee.object.stopped" }, Notification.class.getName(),
+                            "web application is stopping"),
+                    new MBeanNotificationInfo(new String[] { "j2ee.state.stopped" }, Notification.class.getName(),
                             "web application is stopped"),
                     new MBeanNotificationInfo(new String[] { "j2ee.object.deleted" }, Notification.class.getName(),
                             "web application is deleted"),

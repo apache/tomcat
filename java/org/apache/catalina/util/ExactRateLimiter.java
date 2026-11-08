@@ -19,7 +19,7 @@ package org.apache.catalina.util;
 import java.util.concurrent.ScheduledExecutorService;
 
 /**
- * A RateLimiter that compromises efficiency for accuracy in order to provide exact rate limiting.
+ * A RateLimiter that trades efficiency for accuracy in order to provide exact rate limiting.
  */
 public class ExactRateLimiter extends RateLimiterBase {
 

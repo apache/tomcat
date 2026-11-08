@@ -35,7 +35,7 @@ public abstract class WebSocketBaseTest extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(configClass.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         tomcat.start();
         return tomcat;

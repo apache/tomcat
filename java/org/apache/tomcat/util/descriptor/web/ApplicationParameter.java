@@ -40,7 +40,7 @@ public class ApplicationParameter implements Serializable {
 
 
     /**
-     * The description of this environment entry.
+     * The description of this context initialization parameter.
      */
     private String description = null;
 

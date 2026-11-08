@@ -22,8 +22,8 @@ import java.util.List;
 import org.apache.tomcat.util.modeler.BaseModelMBean;
 
 /**
-  * JMX artifact to aggregate data from each request processor thread.
-  */
+ * JMX artifact to aggregate data from each request processor thread.
+ */
 public class RequestGroupInfo extends BaseModelMBean {
     /**
      * List of request processors.
@@ -155,11 +155,11 @@ public class RequestGroupInfo extends BaseModelMBean {
      * @return the error count
      */
     public synchronized int getErrorCount() {
-        int requestCount = deadErrorCount;
+        int errorCount = deadErrorCount;
         for (RequestInfo rp : processors) {
-            requestCount += rp.getErrorCount();
+            errorCount += rp.getErrorCount();
         }
-        return requestCount;
+        return errorCount;
     }
 
     /**

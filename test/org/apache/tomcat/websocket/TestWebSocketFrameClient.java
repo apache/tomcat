@@ -16,17 +16,24 @@
  */
 package org.apache.tomcat.websocket;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.websocket.ClientEndpointConfig;
 import jakarta.websocket.ClientEndpointConfig.Configurator;
 import jakarta.websocket.ContainerProvider;
+import jakarta.websocket.HandshakeResponse;
 import jakarta.websocket.Session;
 import jakarta.websocket.WebSocketContainer;
 
@@ -37,10 +44,12 @@ import org.apache.catalina.Context;
 import org.apache.catalina.authenticator.AuthenticatorBase;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.websocket.TesterMessageCountClient.BasicText;
+import org.apache.tomcat.websocket.TesterMessageCountClient.TesterEndpoint;
 import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEndpoint;
 
 public class TestWebSocketFrameClient extends WebSocketBaseTest {
@@ -57,17 +66,17 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
         Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterFirehoseServer.ConfigInline.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         tomcat.start();
 
         WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
 
         // BZ 62596
-        ClientEndpointConfig clientEndpointConfig = ClientEndpointConfig.Builder.create()
-                .configurator(new Configurator() {
+        ClientEndpointConfig clientEndpointConfig =
+                ClientEndpointConfig.Builder.create().configurator(new Configurator() {
                     @Override
-                    public void beforeRequest(Map<String, List<String>> headers) {
+                    public void beforeRequest(Map<String,List<String>> headers) {
                         headers.put("Dummy",
                                 Collections.singletonList(String.join("", Collections.nCopies(4000, "A"))));
                         super.beforeRequest(headers);
@@ -97,11 +106,11 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
         Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
         Context ctx2 = tomcat.addContext("/foo", null);
         ctx2.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx2, "default", new DefaultServlet());
-        ctx2.addServletMappingDecoded("/", "default");
+        ctx2.addServletMapping("/", "default");
 
         tomcat.start();
 
@@ -147,10 +156,10 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
         Context ctx = tomcat.addContext(URI_PROTECTED, null);
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         SecurityCollection collection = new SecurityCollection();
-        collection.addPatternDecoded("/");
+        collection.addPattern("/");
         String utf8User = "test";
         String utf8Pass = "123\u00A3"; // pound sign
 
@@ -179,16 +188,148 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
     }
 
     @Test
+    public void testAuthenticatedWebSocketClosedWhenHttpSessionEndsWithoutRotatedSession() throws Exception {
+        doTestAuthenticatedWebSocketClosedWhenHttpSessionEnds(false);
+    }
+
+
+    @Test
+    public void testAuthenticatedWebSocketClosedWhenHttpSessionEndsWithRotatedSession() throws Exception {
+        doTestAuthenticatedWebSocketClosedWhenHttpSessionEnds(true);
+    }
+
+
+    private void doTestAuthenticatedWebSocketClosedWhenHttpSessionEnds(boolean rotateSessionID) throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+        Context ctx = tomcat.addContext(URI_PROTECTED, null);
+        ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMapping("/", "default");
+        Tomcat.addServlet(ctx, "invalidate", new HttpServlet() {
+
+            @Override
+            protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+                req.getSession(false).invalidate();
+            }
+        });
+        ctx.addServletMapping("/invalidate", "invalidate");
+        Tomcat.addServlet(ctx, "changeSessionID", new HttpServlet() {
+
+            @Override
+            protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+                req.changeSessionId();
+            }
+        });
+        ctx.addServletMapping("/changeSessionID", "changeSessionID");
+
+        SecurityCollection collection = new SecurityCollection();
+        collection.addPattern("/*");
+
+        tomcat.addUser(USER, PWD);
+        tomcat.addRole(USER, ROLE);
+
+        SecurityConstraint sc = new SecurityConstraint();
+        sc.addAuthRole(ROLE);
+        sc.addCollection(collection);
+        ctx.addConstraint(sc);
+
+        LoginConfig lc = new LoginConfig();
+        lc.setAuthMethod("BASIC");
+        ctx.setLoginConfig(lc);
+
+        AuthenticatorBase basicAuthenticator = new org.apache.catalina.authenticator.BasicAuthenticator();
+        basicAuthenticator.setAlwaysUseSession(true);
+        ctx.getPipeline().addValve(basicAuthenticator);
+
+        tomcat.start();
+
+        AtomicReference<String> sessionCookie = new AtomicReference<>();
+        ClientEndpointConfig clientEndpointConfig =
+                ClientEndpointConfig.Builder.create().configurator(new Configurator() {
+
+                    @Override
+                    public void afterResponse(HandshakeResponse hr) {
+                        List<String> cookies = hr.getHeaders().get("Set-Cookie");
+                        if (cookies != null) {
+                            for (String cookie : cookies) {
+                                if (cookie.startsWith("JSESSIONID=")) {
+                                    sessionCookie.set(cookie.split(";", 2)[0]);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }).build();
+        clientEndpointConfig.getUserProperties().put(Constants.WS_AUTHENTICATION_USER_NAME, USER);
+        clientEndpointConfig.getUserProperties().put(Constants.WS_AUTHENTICATION_PASSWORD, PWD);
+
+        WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
+        Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class, clientEndpointConfig,
+                new URI("ws://localhost:" + getPort() + URI_PROTECTED + TesterEchoServer.Config.PATH_BASIC));
+
+        CountDownLatch messageLatch = new CountDownLatch(1);
+        BasicText handler = new BasicText(messageLatch);
+        wsSession.addMessageHandler(handler);
+        wsSession.getBasicRemote().sendText("Hello");
+        Assert.assertTrue(messageLatch.await(10, TimeUnit.SECONDS));
+        Assert.assertEquals("Hello", handler.getMessages().poll());
+
+        if (rotateSessionID) {
+            Assert.assertNotNull(sessionCookie.get());
+            Map<String,List<String>> requestHeaders = new HashMap<>();
+            requestHeaders.put("Cookie", List.of(sessionCookie.get()));
+            Map<String,List<String>> responseHeaders = new HashMap<>();
+            int status = getUrl("http://localhost:" + getPort() + URI_PROTECTED + "/changeSessionID", new ByteChunk(),
+                    requestHeaders, responseHeaders);
+            List<String> cookies = responseHeaders.get("Set-Cookie");
+            Assert.assertNotNull(cookies);
+            Assert.assertEquals(1, cookies.size());
+            sessionCookie.set(cookies.get(0).split(";", 2)[0]);
+            Assert.assertEquals(HttpServletResponse.SC_OK, status);
+
+            // CyclicBarrier would be cleaner but that requires a larger refactoring
+            wsSession.removeMessageHandler(handler);
+            CountDownLatch messageLatch2 = new CountDownLatch(1);
+            BasicText handler2 = new BasicText(messageLatch2);
+            wsSession.addMessageHandler(handler2);
+            wsSession.getBasicRemote().sendText("Hello");
+            Assert.assertTrue(messageLatch2.await(10, TimeUnit.SECONDS));
+            Assert.assertEquals("Hello", handler2.getMessages().poll());
+        }
+
+        CountDownLatch closeLatch = new CountDownLatch(1);
+        TesterEndpoint endpoint = (TesterEndpoint) wsSession.getUserProperties().get("endpoint");
+        endpoint.setLatch(closeLatch);
+
+        Assert.assertNotNull(sessionCookie.get());
+        Map<String,List<String>> requestHeaders = new HashMap<>();
+        requestHeaders.put("Cookie", List.of(sessionCookie.get()));
+        int status = getUrl("http://localhost:" + getPort() + URI_PROTECTED + "/invalidate", new ByteChunk(),
+                requestHeaders, null);
+        Assert.assertEquals(HttpServletResponse.SC_OK, status);
+
+        Assert.assertTrue(closeLatch.await(10, TimeUnit.SECONDS));
+        // Account for a timing window
+        int i = 0;
+        while (wsSession.isOpen() && i < 100) {
+            Thread.sleep(50);
+        }
+        Assert.assertFalse(wsSession.isOpen());
+    }
+
+
+    @Test
     public void testConnectToDigestEndpoint() throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
         Context ctx = tomcat.addContext(URI_PROTECTED, null);
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         SecurityCollection collection = new SecurityCollection();
-        collection.addPatternDecoded("/*");
+        collection.addPattern("/*");
 
         tomcat.addUser(USER, PWD);
         tomcat.addRole(USER, ROLE);

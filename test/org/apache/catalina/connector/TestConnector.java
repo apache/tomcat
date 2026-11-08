@@ -50,7 +50,7 @@ public class TestConnector extends TomcatBaseTest {
         Context root = tomcat.addContext("", TEMP_DIR);
         Wrapper w = Tomcat.addServlet(root, "tester", new TesterServlet());
         w.setAsyncSupported(true);
-        root.addServletMappingDecoded("/", "tester");
+        root.addServletMapping("/", "tester");
 
         Connector connector = tomcat.getConnector();
 
@@ -188,7 +188,7 @@ public class TestConnector extends TomcatBaseTest {
         File appDir = new File("test/webapp");
         Context root = tomcat.addContext("", appDir.getAbsolutePath());
         Tomcat.addServlet(root, "default", servlet);
-        root.addServletMappingDecoded("/", "default");
+        root.addServletMapping("/", "default");
 
         Connector connector = tomcat.getConnector();
         connector.setAllowTrace(allowTrace);
@@ -214,5 +214,39 @@ public class TestConnector extends TomcatBaseTest {
         } else {
             Assert.assertFalse(foundTrace);
         }
+    }
+
+
+    @Test
+    public void testBug70144a() throws Exception {
+        // Simple test case
+        doTestBug70144("/bug%5C70144");
+    }
+
+
+    @Test
+    public void testBug70144b() throws Exception {
+        // User provided test case
+        doTestBug70144("/search/%22F%5C%22%22");
+    }
+
+
+    private void doTestBug70144(String path) throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        Context root = getProgrammaticRootContext();
+        Tomcat.addServlet(root, "default", new TesterServlet());
+        root.addServletMapping("/", "default");
+
+        Connector connector = tomcat.getConnector();
+        connector.setAllowBackslash(true);
+
+        tomcat.start();
+
+        ByteChunk body = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + path, body, true);
+
+        Assert.assertEquals(200, rc);
+        Assert.assertEquals("OK", body.toString());
     }
 }

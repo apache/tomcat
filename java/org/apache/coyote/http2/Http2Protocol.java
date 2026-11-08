@@ -17,6 +17,7 @@
 package org.apache.coyote.http2;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Enumeration;
 
 import javax.management.ObjectName;
@@ -177,11 +178,24 @@ public class Http2Protocol implements UpgradeProtocol {
         // Should only be one HTTP2-Settings header
         Enumeration<String> settings = request.getMimeHeaders().values("HTTP2-Settings");
         int count = 0;
+        String settingsValue = null;
         while (settings.hasMoreElements()) {
             count++;
-            settings.nextElement();
+            settingsValue = settings.nextElement();
         }
         if (count != 1) {
+            return false;
+        }
+
+        // RFC 7540, section 3.2.1: the server MUST NOT upgrade if the value is not a valid
+        // BASE64URL-encoded HTTP/2 SETTINGS payload (section 6.5). A valid payload decodes
+        // without error and its length is a multiple of 6 octets (each entry is 6 octets).
+        try {
+            byte[] decoded = Base64.getUrlDecoder().decode(settingsValue);
+            if (decoded.length % 6 != 0) {
+                return false;
+            }
+        } catch (IllegalArgumentException e) {
             return false;
         }
 
@@ -206,7 +220,7 @@ public class Http2Protocol implements UpgradeProtocol {
 
 
     /**
-     * Configure whether HTTP/2 streams atr allowed to provide a scheme that is inconsistent with the transport over
+     * Configure whether HTTP/2 streams are allowed to provide a scheme that is inconsistent with the transport over
      * which the stream was received
      *
      * @param allowSchemeMismatch {@code true} if a mismatched scheme is permitted, otherwise {@code false}
@@ -327,7 +341,9 @@ public class Http2Protocol implements UpgradeProtocol {
 
 
     /**
-     * Sets the maximum number of concurrent streams.
+     * Sets the maximum number of concurrent streams. The value must be in the range {@code 0} to {@code 2^32-1} (both
+     * inclusive) as this value is advertised to the client as an unsigned 32-bit integer. Values outside of this range
+     * will cause HTTP/2 connections to be rejected.
      *
      * @param maxConcurrentStreams the maximum concurrent streams
      */
@@ -367,7 +383,9 @@ public class Http2Protocol implements UpgradeProtocol {
 
 
     /**
-     * Sets the initial window size advertised to the client.
+     * Sets the initial window size advertised to the client. The value must be in the range {@code 0} to
+     * {@code 2^31-1} (both inclusive) as defined by the HTTP/2 specification. Values outside of this range will cause
+     * HTTP/2 connections to be rejected.
      *
      * @param initialWindowSize the initial window size
      */

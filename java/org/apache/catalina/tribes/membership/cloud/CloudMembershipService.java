@@ -33,8 +33,9 @@ import org.apache.juli.logging.LogFactory;
  * A {@link org.apache.catalina.tribes.MembershipService} that uses Kubernetes API(default) or DNS to retrieve the
  * members of a cluster.<br>
  * <p>
- * The default implementation of the MembershipProvider component is the {@link KubernetesMembershipProvider}. The
- * MembershipProvider can be configured by the <code>membershipProviderClassName</code> property. Possible shortcuts are
+ * The default (and recommended) implementation of the MembershipProvider component is the
+ * {@link KubernetesMembershipProvider}. The MembershipProvider can be configured by the
+ * <code>membershipProviderClassName</code> property. Possible shortcuts are
  * {@code kubernetes} and {@code dns}. For dns look at the {@link DNSMembershipProvider}.
  * </p>
  * <p>
@@ -161,10 +162,13 @@ public class CloudMembershipService extends MembershipServiceBase implements Clo
             if (log.isTraceEnabled()) {
                 log.trace("Using membershipProvider: " + provider);
             }
-            membershipProvider = (MembershipProvider) Class.forName(provider).getConstructor().newInstance();
-            membershipProvider.setMembershipListener(this);
-            membershipProvider.setMembershipService(this);
-            membershipProvider.init(properties);
+            MembershipProvider newProvider = (MembershipProvider) Class.forName(provider).getConstructor().newInstance();
+            newProvider.setMembershipListener(this);
+            newProvider.setMembershipService(this);
+            newProvider.init(properties);
+            // Only keep the provider once it has been initialised so that a rejected configuration does not leave an
+            // uninitialised provider behind for the next start
+            membershipProvider = newProvider;
         }
         membershipProvider.start(level);
 
@@ -179,7 +183,10 @@ public class CloudMembershipService extends MembershipServiceBase implements Clo
         try {
             if (membershipProvider != null && membershipProvider.stop(level)) {
                 if (oname != null) {
-                    JmxRegistry.getRegistry(channel).unregisterJmx(oname);
+                    JmxRegistry jmxRegistry = JmxRegistry.getRegistry(channel);
+                    if (jmxRegistry != null) {
+                        jmxRegistry.unregisterJmx(oname);
+                    }
                     oname = null;
                 }
                 membershipProvider = null;
@@ -220,6 +227,13 @@ public class CloudMembershipService extends MembershipServiceBase implements Clo
     }
 
     private void createOrUpdateLocalMember() throws IOException {
+        // The listen properties are provided by setLocalMemberProperties(), which is called when the channel receiver
+        // starts. Starting the membership without them leaves the local member unknown.
+        for (String name : new String[] { "tcpListenHost", "tcpListenPort", "tcpSecurePort", "udpListenPort" }) {
+            if (properties.getProperty(name) == null) {
+                throw new IllegalStateException(sm.getString("cloudMembershipService.localMemberNotSet", name));
+            }
+        }
         String host = properties.getProperty("tcpListenHost");
         int port = Integer.parseInt(properties.getProperty("tcpListenPort"));
         int securePort = Integer.parseInt(properties.getProperty("tcpSecurePort"));

@@ -92,10 +92,10 @@ public class TestSSOChangeSessionId extends TomcatBaseTest {
 
         // Add protected servlet to the context
         Tomcat.addServlet(testContext, "TesterServlet1", new TesterServlet());
-        testContext.addServletMappingDecoded(URI_PROTECTED, "TesterServlet1");
+        testContext.addServletMapping(URI_PROTECTED, "TesterServlet1");
 
         SecurityCollection collection1 = new SecurityCollection();
-        collection1.addPatternDecoded(URI_PROTECTED);
+        collection1.addPattern(URI_PROTECTED);
         SecurityConstraint sc1 = new SecurityConstraint();
         sc1.addAuthRole(ROLE);
         sc1.addCollection(collection1);
@@ -103,10 +103,10 @@ public class TestSSOChangeSessionId extends TomcatBaseTest {
 
         // Add Authenticator
         Tomcat.addServlet(testContext, "LoginServlet", new LoginServlet());
-        testContext.addServletMappingDecoded(URI_AUTHENTICATION, "LoginServlet");
+        testContext.addServletMapping(URI_AUTHENTICATION, "LoginServlet");
 
         SecurityCollection collection2 = new SecurityCollection();
-        collection2.addPatternDecoded(URI_AUTHENTICATION);
+        collection2.addPattern(URI_AUTHENTICATION);
         SecurityConstraint sc2 = new SecurityConstraint();
         // do not add a role - which signals access permitted without one
         sc2.addCollection(collection2);

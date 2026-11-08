@@ -24,14 +24,12 @@ import java.util.Locale;
 
 import jakarta.servlet.DispatcherType;
 
-import org.apache.tomcat.util.buf.UDecoder;
-
 /**
-     * Representation of a filter mapping for a web application, as represented in a <code>&lt;filter-mapping&gt;</code>
-     * element in the deployment descriptor. Each filter mapping must contain a filter name plus either a URL pattern or a
-     * servlet name.
-     */
-public class FilterMap extends XmlEncodingBase implements Serializable {
+ * Representation of a filter mapping for a web application, as represented in a <code>&lt;filter-mapping&gt;</code>
+ * element in the deployment descriptor. Each filter mapping must contain a filter name plus either a URL pattern or a
+ * servlet name.
+ */
+public class FilterMap implements Serializable {
 
     /**
      * Default constructor for FilterMap.
@@ -190,15 +188,6 @@ public class FilterMap extends XmlEncodingBase implements Serializable {
      * @param urlPattern The URL pattern to add
      */
     public void addURLPattern(String urlPattern) {
-        addURLPatternDecoded(UDecoder.URLDecode(urlPattern, getCharset()));
-    }
-
-    /**
-     * Adds a decoded URL pattern to the set of URL patterns this mapping matches.
-     *
-     * @param urlPattern The decoded URL pattern to add
-     */
-    public void addURLPatternDecoded(String urlPattern) {
         if ("*".equals(urlPattern)) {
             this.matchAllUrlPatterns = true;
         } else {
@@ -231,7 +220,7 @@ public class FilterMap extends XmlEncodingBase implements Serializable {
             // apply ERROR to the global dispatcherMapping.
             dispatcherMapping |= ERROR;
         } else if (dispatcher.equals(DispatcherType.ASYNC.name())) {
-            // apply ERROR to the global dispatcherMapping.
+            // apply ASYNC to the global dispatcherMapping.
             dispatcherMapping |= ASYNC;
         }
     }

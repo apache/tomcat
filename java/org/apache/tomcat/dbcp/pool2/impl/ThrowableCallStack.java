@@ -47,7 +47,8 @@ public class ThrowableCallStack implements CallStack {
         }
 
         /**
-         * Constructs a new instance and use the timestamp as the message with using {@link DateTimeFormatter#ISO_INSTANT} for more precision.
+         * Constructs a new instance and uses the timestamp as the message. The message is the string representation of
+         * the timestamp (see {@link Instant#toString()}).
          *
          * @param timestamp normally the now instant.
          */
@@ -97,7 +98,7 @@ public class ThrowableCallStack implements CallStack {
             message = messageFormat;
         } else {
             synchronized (dateFormat) {
-                // The throwable message is in {@link DateTimeFormatter#ISO_INSTANT} format for more precision.
+                // The timestamp is truncated to milliseconds before it is formatted.
                 message = dateFormat.format(Long.valueOf(snapshotRef.timestamp.toEpochMilli()));
             }
         }

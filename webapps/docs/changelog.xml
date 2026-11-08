@@ -112,15 +112,29 @@
     <changelog>
       <scode>
         This release contains all of the changes up to and including those in
-        Apache Tomcat 11.0.23 plus the additional changes listed below. (markt)
+        Apache Tomcat 11.0.27 plus the additional changes listed below. (markt)
       </scode>
       <update>
         The minimum Java version has been updated to Java 21. (markt)
       </update>
+      <scode>
+        Switch to using <code>String.strip()</code> rather than
+        <code>String.trim()</code> where appropriate. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Catalina">
     <changelog>
+      <fix>
+        Treat a filter as not supporting asynchronous processing unless
+        async supported is explicitly set to <code>"true"</code>.
+        Previously, a filter registered via
+        <code>ServletContext.addFilter()</code> that did not call
+        <code>setAsyncSupported(true)</code> was incorrectly treated as
+        async supported, and descriptor values such as <code>"yes"</code>
+        were treated as <code>true</code> for some uses and
+        <code>false</code> for others. (remm)
+      </fix>
       <fix>
         Lower the log level to debug when OpenSSL initialization fails in
         <code>OpenSSLLifecycleListener</code> to avoid stack traces
@@ -133,6 +147,17 @@
         Prevent duplicate log messages when clustering JARs are not present on
         startup. (csutherl)
       </fix>
+      <add>
+        Add support for configuring TLS pre-shared keys under an
+        <code>SSLHostConfig</code>. (markt)
+      </add>
+      <add>
+        Add TLS pre-shared key support to the OpenSSL FFM implementation.
+        (markt)
+      </add>
+      <add>
+        Add TLS 1.2 and TLS 1.3 pre-shared key support to Apache Tribes. (markt)
+      </add>
       <add>
         Add the Jakarta EE 12 XML schemas. (markt)
       </add>
@@ -225,38 +250,309 @@
         Reject BASIC authorization with empty user names as required by RFC
         7613. (markt)
       </fix>
+      <add>
+        Add support for the HTTP <code>QUERY</code> method as defined in RFC
+        10008. Based on pull request <pr>1026</pr> by Mario Daniel Ruiz
+        Saavedra. (markt)
+      </add>
+      <fix>
+        Remove the <code>Context</code> attribute
+        <code>urlPatternsProvidedInDecodedForm</code> and all supporting code.
+        The attribute is now effectively hard-coded to <code>true</code> for all
+        web applications which is a change from the default of
+        <code>false</code> in Tomcat 11 and earlier. The default implementation
+        of <code>Context.addServletMapping(String,String,boolean)</code> has
+        been removed so classes that implement the <code>Context</code>
+        interface must implement this method. (markt)
+      </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
-        Avoid a race condition with concurrent lookups for a singleton JNDI
-        resource. (markt)
+        Use the resolved <code>roleBase</code> value when computing the
+        distinguished name of a group found during a nested role search in
+        <code>JNDIRealm</code>, so that groups nested more than one level deep
+        are found when <code>roleBase</code> uses pattern replacements. (remm)
       </fix>
       <fix>
-        Improve the performance of range validation for the default servlet.
+        Track the <code>StartTlsResponse</code> used by <code>JNDIRealm</code>
+        per connection rather than in a single realm-wide field, so that
+        closing one pooled connection when <code>useStartTls</code> is enabled
+        no longer terminates the TLS session of another, still active pooled
+        connection. (remm)
+      </fix>
+      <fix>
+        Select the primary or alternate directory server URL for each
+        <code>JNDIRealm</code> connection attempt individually rather than via
+        a realm-wide mutable flag that concurrent pooled connections raced on,
+        which could transiently cause a connection to use the wrong URL. Note
+        that this removes the <code>connectionAttempt</code> protected field
+        and changes the signature of the protected
+        <code>getDirectoryContextEnvironment()</code> method. (remm)
+      </fix>
+      <fix>
+        Stop pre-digesting the HTTP DIGEST client digest in
+        <code>JAASCallbackHandler</code>. The pre-digest, a leftover from the
+        pre-<code>CredentialHandler</code> design, could never match the
+        deterministic server digest and so made DIGEST authentication via
+        <code>JAASRealm</code> always fail whenever the realm's credential
+        handler algorithm matched the digest algorithm. The client digest is
+        now passed to the <code>LoginModule</code> unchanged, consistent with
+        the non-JAAS realms. (remm)
+      </fix>
+      <fix>
+        Give the SSI conditional expression operators <code>&amp;&amp;</code>
+        and <code>||</code> distinct precedences, <code>&amp;&amp;</code>
+        binding more tightly than <code>||</code>, consistent with the
+        convention used by the C-like languages and by Apache HTTP Server
+        expressions. Previously, mixed chains were evaluated strictly left to
+        right, so <code>$a || $b &amp;&amp; $c</code> was evaluated as
+        <code>($a || $b) &amp;&amp; $c</code> rather than the expected
+        <code>$a || ($b &amp;&amp; $c)</code>. Note that this changes the
+        evaluation of existing documents using unparenthesized mixed
+        <code>&amp;&amp;</code> and <code>||</code> chains. (remm)
+      </fix>
+      <fix>
+        Fix the built-in SSI variables <code>DATE_GMT</code>,
+        <code>DATE_LOCAL</code> and <code>LAST_MODIFIED</code> always
+        resolving to <code>null</code> and rendering as
+        <code>(none)</code>. The mediator stored and looked them up as
+        external variables using names starting with its own fully qualified
+        class name, which the servlet resolver rejects since those names fall
+        under the reserved <code>org.apache.catalina.</code> prefix. Hold the
+        built-in variables in the mediator itself and resolve them there, as
+        they are per-document values that do not need to be stored in the
+        external resolver. (remm)
+      </fix>
+      <fix>
+        Fix multiple data races in annotation scanning when the
+        <code>parallelAnnotationScanning</code> attribute of the
+        <code>StandardContext</code> is enabled. Classes matched for a
+        <code>ServletContainerInitializer</code> were collected into
+        non-thread-safe sets, which could silently lose matches. A scanner
+        thread could also cache an incomplete set of initializers for a class
+        when another thread had not finished adding that class' super class or
+        interfaces to the shared class cache, and the lazily computed set was
+        not safely published between threads. Matched classes could therefore
+        be missing from the set passed to
+        <code>ServletContainerInitializer.onStartup()</code>, misconfiguring
+        the application at runtime. (remm)
+      </fix>
+      <fix>
+        When automatic migration of a legacy Java EE web application from
+        the <code>legacyAppBase</code> to the <code>appBase</code> failed
+        after the previous version of the application had been moved aside,
+        the previous application was left in a temporary location from which
+        it was neither restored nor cleaned up, making it effectively lost.
+        The previous application is now restored to the deployment location
+        when the migrated application cannot be placed, and is retained with
+        a warning in the temporary location only in the rare cases where
+        restoring it is not possible. (remm)
+      </fix>
+      <fix>
+        Fix the <code>ManagerSF</code> store configuration factory always
+        treating a started <code>StandardManager</code> as non-default, since
+        the manager propagates its (possibly <code>null</code>) node identifier
+        to its session ID generator when it starts, which the default check
+        compared against an empty string. This caused a redundant
+        <code>Manager</code> element with a nested
+        <code>SessionIdGenerator</code> to be written for every context using
+        the default manager configuration when the running configuration was
+        stored. The default check was strengthened to require the exact
+        manager and session ID generator classes and to test
+        <code>throwOnFailure</code>, so the now reachable skip path cannot
+        silently drop a customised configuration. (remm)
+      </fix>
+      <fix>
+        Correctly handle error reports that cannot be proxied by
+        <code>ProxyErrorReportValve</code>. Previously, a relative location
+        or an unreachable, non-HTTP or failing proxy target resulted in an
+        empty response with only the error status set. The valve now falls
+        back to the error report of the default <code>ErrorReportValve</code>
+        in these cases, no longer applies proxy target metadata to the
+        response before the target response has been received, restricts
+        proxying to absolute HTTP and HTTPS URLs and applies connect and
+        read timeouts to the connection to the proxy target. (remm)
+      </fix>
+      <fix>
+        Make the selection of the effective parameter limits by
+        <code>ParameterLimitValve</code> deterministic when several configured
+        URL patterns match a request. Previously, the first matching pattern
+        was encountered in hash map iteration order, which is arbitrary for
+        <code>java.util.regex.Pattern</code> keys and could change between JVM
+        restarts. The limits are now stored in configuration order and the
+        first matching pattern in configuration order is applied. (remm)
+      </fix>
+      <fix>
+        When the Servlet asynchronous processing mechanism is used,
+        <code>SemaphoreValve</code> no longer attempts to acquire a second
+        permit when the request is dispatched back to the container. A
+        saturated semaphore previously rejected such a dispatch with a 503
+        response or an <code>IllegalStateException</code>. The permit
+        obtained when asynchronous processing starts is now released when
+        that asynchronous processing completes or fails. (remm)
+      </fix>
+      <fix>
+        Correct the values of the <code>TIME_MON</code> and
+        <code>TIME_WDAY</code> server variables in the rewrite valve, which
+        exposed the raw <code>java.util.Calendar</code> fields (month 0-11,
+        day of week 1-7 with Sunday first) instead of the documented
+        mod_rewrite values (month 1-12, day of week 0-6 with Sunday being 0).
+        (remm)
+      </fix>
+      <fix>
+        Stop resolving the <code>REMOTE_IDENT</code> server variable of the
+        rewrite valve to the authenticated user name. <code>REMOTE_IDENT</code>
+        is the RFC 931 ident protocol user name, which Tomcat does not support.
+        It now resolves to undefined, expanding to an empty string, instead of
+        silently turning ident-based rules into authentication checks. (remm)
+      </fix>
+      <fix>
+        Refactor the default Servlet <code>Accept-Encoding</code> handling to
+        use the common HTTP header parser for processing these headers. (markt)
+      </fix>
+      <fix>
+        Connector compression will now enable gzip compression with a request
+        header of the form <code>Accept-Encoding: *</code>. (markt)
+      </fix>
+      <fix>
+        Remove JAASRealm. (schultz)
+      </fix>
+      <fix>
+        Correct the DER INTEGER encoding produced by
+        <code>Asn1Writer.writeInteger()</code> for multi-byte values and add
+        the leading zero byte required by DER for positive values whose most
+        significant bit is set. The length calculation loops in
+        <code>writeInteger()</code> and <code>writeTag()</code> were also
+        corrected to terminate, since the Java shift distance is evaluated
+        modulo 32. (remm)
+      </fix>
+      <fix>
+        Correct the selection of multi-release JAR entries by the
+        <code>jar:file:</code> and <code>file:</code> based JAR
+        implementation used when scanning. The entry selected for a class
+        present with multiple versions depended on the order of the entries
+        in the JAR, so an older version, or a version intended for a later
+        runtime, could be scanned instead of the version the runtime would
+        use. The highest applicable version is now selected, independently
+        of the entry order, matching the behaviour of the stream based JAR
+        implementation. (remm)
+      </fix>
+      <fix>
+        Correct the accounting of the count of submitted tasks that
+        <code>ThreadPoolExecutor</code> maintains for <code>TaskQueue</code>.
+        The count was not always adjusted when a submitted task could no
+        longer complete, such as when a rejected execution handler did not
+        throw, or when a queued task was removed. A drifted value caused
+        thread pools with idle threads to create unnecessary threads.
+        (remm)
+      </fix>
+      <fix>
+        Rework <code>maxLocaleCount</code> behavior to ignore extra locales
+        when parsed instead of throwing an ISE, since a request remains
+        functionally coherent. (remm)
+      </fix>
+      <fix>
+        Include an <code>Allow</code> header when <code>HttpServlet</code> sends
+        a 405 response. Based on pull request <pr>1103</pr> by Arturo Bernal.
         (markt)
       </fix>
       <fix>
-        Avoid NPE in RewriteValve. (markt)
+        Ensure the DefaultServlet returns the correct Allow header for
+        <code>PATCH</code> and <code>QUERY</code> requests. (markt)
       </fix>
       <fix>
-        Restore ability to extend many element classes from
-        <code>AbstractAccessLogValve</code>. (remm)
+        Correctly parse RFC 850 formatted dates with two digit years where the
+        date appears to be more than 50 years in the future as required by RFC
+        9110. Treat the year as the most recent year in the past that had the
+        same last two digits. Based on pull request <pr>1104</pr> by Arturo
+        Bernal. (markt)
       </fix>
       <fix>
-        Align DIGEST authentication with RFC 7616 and require clients to provide
-        a valid <code>qop</code> parameter. (markt)
+        Validate that applications calling
+        <code>HttpServletRequest.upgrade</code> are also setting the
+        <code>upgrade</code> header on the response. Attempted upgrades without
+        this header will now fail. (markt)
       </fix>
       <fix>
-        Use <code>Files</code> API to create temporary docBase when
-        <code>antiLockingDocBase</code> is enabled. (markt)
+        Ensure that requests cannot try to start asynchronous processing and the
+        HTTP upgrade process on the same request. (markt)
       </fix>
       <fix>
-        <code>JAASRealm</code> should do a logout if login does not fail outright but
-        does not produce a Principal. (remm)
+        Align the format of the <code>TIME_MON</code>, <code>TIME_DAY</code>,
+        <code>TIME_HOUR</code>, <code>TIME_MIN</code>, <code>TIME_SEC</code>
+        and <code>TIME</code> server variables in the rewrite valve with
+        mod_rewrite. The first five are now zero padded to two digits and
+        <code>TIME</code> is now of the form <code>yyyyMMddHHmmss</code>
+        rather than an HTTP date.
+      </fix>
+      <fix>
+        Refactor to reduce duplication and improve consistency when working with
+        resources in multi-release JAR files. Versions that include signs,
+        leading zeros or values less than 8 are no longer considered valid. All
+        types of resources, not just class files, are now handled in
+        multi-release JAR files. (markt)
+      </fix>
+      <fix>
+        Singleton JNDI resources built by the Tomcat JDBC pool factory that do
+        not configure the pool's <code>object_name</code> attribute are now
+        given a container-generated pool name, of the form
+        <code>domain/host/context-path/JNDI-name</code> for webapp resources
+        and <code>domain/JNDI-name</code> for global resources. Previously,
+        the pool generated a name that repeated across pools, which caused
+        pools to share the same name. (remm)
+      </fix>
+      <fix>
+        Use RequestDispatcher target rather than source when looking up
+        <code>security-role-ref</code>s for the current Servlet. (markt)
+      </fix>
+      <fix>
+        As per the Jakarta Authentication specification, an
+        <code>AuthException</code> during
+        <code>serverAuthContext.secureResponse()</code> should result in an
+        internal server error (500) response. (markt)
+      </fix>
+      <fix>
+        Do not depend on the content length being defined when processing
+        request bodies with the CGI Servlet. (csutherl)
+      </fix>
+      <fix>
+        Align LockoutRealm with some Realm implementations and ignore leading
+        and trailing space in user names by default. (markt)
+      </fix>
+      <fix>
+        <code>ExpiresFilter</code> now takes account of headers set by a
+        previous filter in the filter chain. (markt)
+      </fix>
+      <fix>
+        <bug>70290</bug>: Fix a leak of the in-progress async request count
+        that could prevent a clean shutdown. If the connection was in an error
+        state when the initial async service call completed (for example, a
+        client dropped the connection and an
+        <code>AsyncListener.onError()</code> handler then called
+        <code>AsyncContext.dispatch()</code>), the request could be recycled
+        while still in the <code>MUST_DISPATCH</code> state so that
+        <code>onComplete()</code> was not called and the in-progress async
+        count was not decremented. In addition, when the error state still
+        permits I/O, output buffered before the request was completed is now
+        written rather than being discarded. Also fix a case where the async
+        processing never ended if the response had been committed and the
+        connection was then closed after the application had requested a
+        dispatch or completion, and ensure
+        <code>AsyncListener.onError()</code> is called when the container
+        reports an error without an exception. (markt)
       </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
     <changelog>
+      <fix>
+        Use the <code>certificateChainFile</code> only if the PEM certificate
+        file (all TLS implementations) or the PKCS#12 bundle (OpenSSL FFM
+        implementation) contains the server certificate alone. If it already
+        contains the certificate chain, the <code>certificateChainFile</code>
+        is ignored. The OpenSSL FFM implementation now sends the intermediate
+        certificates of a PEM certificate file or a PKCS#12 bundle to the
+        client. (markt)
+      </fix>
       <update>
         Change the default value of the <code>cookiesWithoutEquals</code>
         attribute of the <code>Rfc6265CookieProcessor</code> from
@@ -284,6 +580,33 @@
       <update>
         Remove support for HTTP 0.9. (markt)
       </update>
+      <fix>
+        <bug>70236</bug>: Fix a stalled TLS handshake with the OpenSSL based
+        implementations of <code>SSLEngine</code> when the first flight of
+        handshake messages sent by the server is too large to fit in the
+        buffer used by the BIO pair. Patch submitted by Lukas Hellebrandt.
+        (remm)
+      </fix>
+      <fix>
+        Ensure the Tomcat Native based OpenSSL <code>SSLContext</code> does not
+        drop TLS 1.3 when rebuilding the list of enabled protocols during
+        initialization. (dsoumis)
+      </fix>
+      <update>
+        When a <code>Certificate</code> is configured using a key store and no
+        <code>certificateKeyAlias</code> is set, ignore key entries whose
+        certificate has a malformed Extended Key Usage extension or one that
+        does not permit TLS server authentication when automatically selecting
+        which key in the key store to use. A configured
+        <code>certificateKeyAlias</code> is used even if its certificate is not
+        valid for TLS server authentication, except in the Windows-MY key store
+        accessed through the SunMSCAPI provider: there, if the configured
+        certificate is not valid but the store holds a valid certificate under
+        that alias with a numeric suffix appended - the format that provider uses
+        to give unique aliases to several certificates that share a name - the
+        suffixed certificate is used instead.
+        (dsoumis)
+      </update>
       <add>
         Add a new <code>maxTrailerCount</code> attribute to the HTTP/1.1
         connector that limits the number of trailing headers permitted in a
@@ -295,9 +618,183 @@
       </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
-        Avoid a potential JVM crash if a suitable version of Tomcat Native is
-        not available when the connector is explicitly configured to use Tomcat
-        Native with OpenSSL for TLS. (markt)
+        Keep the asynchronous timeout in place until the timeout event has
+        been processed, rather than clearing it when the event is dispatched.
+        A dispatched event may be discarded without being processed, for
+        example when no container thread is available to process it, which
+        previously left the asynchronous request running without any timeout.
+        (remm)
+      </fix>
+      <fix>
+        Restore the fall-back to the raw method token when the request
+        method, parsed from bytes, is not one of the methods known to
+        Tomcat. This fall-back was lost when the internal representation of
+        the method changed from <code>MessageBytes</code> to
+        <code>String</code>, causing unknown methods to be reported as null
+        to the application, which typically resulted in a 500 response with
+        a null pointer exception instead of the expected 501 response.
+        (remm)
+      </fix>
+      <fix>
+        Stop reporting available bytes once a request body that was buffered
+        to allow a TLS client authentication renegotiation has been read in
+        full. Reporting the buffered length, or data belonging to a pipelined
+        next request, as available after the end of the stream was reached
+        violated the <code>ServletInputStream</code> contract and could keep
+        an application loop that polls <code>available()</code> running.
+        (remm)
+      </fix>
+      <fix>
+        Report a clean end of input on an upgraded connection as end of
+        stream, with blocking and non-blocking reads returning
+        <code>-1</code> and the non-blocking <code>ReadListener</code>
+        receiving <code>onAllDataRead()</code>, rather than as an error with
+        an <code>EOFException</code>. Also ensure that no further
+        <code>ReadListener</code> call-backs occur once an error has been
+        reported to the listener, or once the end of the data has been
+        reported. (remm)
+      </fix>
+      <fix>
+        Report an error to the <code>WriteListener</code> of an upgraded
+        connection at most once and stop triggering further call-backs once
+        an error has been reported. A single failure to flush the output was
+        previously reported to the listener multiple times. (remm)
+      </fix>
+      <fix>
+        When releasing the HTTP/2 connection back log, cap the allocation to
+        each stream at the connection window capacity that remains to be
+        distributed, decrement that capacity by every allocation made and stop
+        distributing once it is exhausted. Previously, when the capacity was
+        exhausted by incremental streams, allocations could exceed the capacity
+        the client had made available, since every incremental stream received
+        a share rounded up to at least one byte and non-incremental streams at
+        the same urgency level received a share computed using a denominator
+        that only counted incremental streams. The connection could then send
+        more data than the client's flow control window allowed, which a
+        compliant client must treat as a connection error of type
+        <code>FLOW_CONTROL_ERROR</code>. Streams that are left without an
+        allocation remain in the back log and are considered again when the
+        next window increment arrives. Any part of the increment left
+        unallocated by the rounding of the proportional shares is allocated to
+        the waiting streams in priority order rather than being lost. (remm)
+      </fix>
+      <fix>
+        Permit the <code>WINDOW_UPDATE</code> and <code>RST_STREAM</code>
+        frames that may legitimately be in flight when an HTTP/2 stream is
+        closed by the receipt of an end of stream frame, rather than treating
+        them as a connection error of type <code>STREAM_CLOSED</code> that
+        closes the entire connection. These frames are already permitted when
+        the stream is closed in the other direction. (remm)
+      </fix>
+      <fix>
+        The JSON parser now accepts numbers that have an exponent but no
+        fraction, such as <code>1e5</code>, as required by RFC 8259. Note that
+        when the lenient dialect is used, a bare object key that is such a
+        number (for example <code>{1e5:1}</code>) is now a number and the key
+        is the string form of the parsed number (<code>1E+5</code>) rather than
+        the original text, as already happened for bare keys that have both a
+        fraction and an exponent. Quoted keys are not affected. Numbers with an
+        exponent that is too large or too small to be represented are now
+        rejected with a <code>ParseException</code> rather than an unchecked
+        <code>NumberFormatException</code>. (remm)
+      </fix>
+      <fix>
+        With native numbers enabled, the JSON parser now returns integers that
+        do not fit in a <code>long</code> as <code>BigInteger</code> rather than
+        failing with an unchecked <code>NumberFormatException</code>. (remm)
+      </fix>
+      <fix>
+        The JSON parser now rejects input with a nesting depth greater than
+        1000 with a <code>ParseException</code>. Previously, deeply nested
+        input caused a <code>StackOverflowError</code> since the parser
+        recursed once per nesting level with no limit. RFC 8259 allows
+        implementations to set a limit on the maximum depth of nesting.
+        (remm)
+      </fix>
+      <fix>
+        In the OpenSSL cipher configuration parser, treat an AND expression
+        (<code>+</code>) that contains an unknown term as matching no ciphers
+        and log a warning, rather than silently ignoring the unknown term and
+        using only the known terms. This matches OpenSSL behavior, where such
+        an expression results in no cipher match. (remm)
+      </fix>
+      <fix>
+        In the OpenSSL cipher name conversion, ignore the unimplemented SSLv2
+        ciphers so that names shared with a modern cipher, for example
+        <code>RC4-MD5</code>, resolve to the JSSE name of the modern cipher
+        rather than returning <code>null</code>, and so that names matching
+        only an SSLv2 cipher no longer resolve to a non-standard name.
+        Ambiguous and unknown names still resolve to <code>null</code>; the
+        OpenSSL engine implementations now filter such unmapped names rather
+        than adding <code>null</code> to the lists of cipher suites they
+        expose. (remm)
+      </fix>
+      <fix>
+        Correct the computation of the authentication method passed to a custom
+        <code>X509TrustManager</code> by the FFM based OpenSSL implementation.
+        The key exchange and authentication NIDs of the negotiated cipher were
+        compared against legacy OpenSSL flag values rather than the actual NID
+        constants, so the trust manager received <code>UNKNOWN</code> as the
+        authentication type for almost every cipher suite. The computation now
+        matches the one performed by the JNI based implementation. (remm)
+      </fix>
+      <fix>
+        Correct <code>Asn1Parser.parseLength()</code> to report the actual decoded
+        length instead of a placeholder value when the length is valid but exceeds
+        the available input data, and to use a distinct, accurate message when a
+        length cannot be represented by this implementation due to Java's 32-bit
+        signed <code>int</code> limitation rather than misreporting it as an
+        invalid length. (michaelo)
+      </fix>
+      <fix>
+        Align the OCSP checking performed by the OpenSSL/Panama based
+        implementation of <code>SSLEngine</code> with the behaviour of the
+        JSSE based implementation so that a certificate that is itself a
+        trust anchor (whether a self-signed root or a certificate trusted
+        directly via the configured trust store) is not subject to OCSP
+        checking. (markt)
+      </fix>
+      <fix>
+        <bug>70286</bug>: Strip the script tag in the
+        <code>AcceptLanguage2</code> parser. If the script subtag needs to be
+        preserved, use the standard parser by setting the system property
+        <code>org.apache.tomcat.util.http.parser.StandardAcceptLanguageParser</code>
+        to <code>true</code>. (remm)
+      </fix>
+      <fix>
+        Detect and disconnect a mis-behaving HTTP/2 client that sends large
+        numbers of unexpected settings acknowledgement frames. (markt)
+      </fix>
+      <fix>
+        Fix excessive CPU usage after a client half-closes an upgraded
+        connection while the application keeps the output stream open to finish
+        its response. Stop polling for input at end of stream and ensure that a
+        subsequent <code>WebConnection.close()</code> closes the connection.
+        (markt)
+      </fix>
+      <fix>
+        Fix rejection of large HTTP/2 response headers that fit within a frame
+        after HPACK compression. Allow the encoding workspace to grow to the
+        larger of twice the peer's advertised maximum frame payload size and
+        the peer's dynamic table capacity, so indexed fields remain usable after
+        a frame size reduction. Check the encoded payload against the peer's
+        frame size limit before writing it and close the connection with an
+        <code>INTERNAL_ERROR</code> if a header block can not be written. (markt)
+      </fix>
+      <fix>
+        <bug>70305</bug>: Move callback registrations in FFM code to the
+        SSL context. (remm)
+      </fix>
+      <fix>
+        When validating HTTP/2 frames, make sure more serious errors take
+        priority over less serious errors. (markt)
+      </fix>
+      <fix>
+        Ensure that time spent processing the TLS handshake with NIO, such as
+        OCSP checks of client certificates, is not counted towards the
+        connection timeout. Previously, a slow handshake could cause the
+        connection to be closed as soon as the server started waiting for the
+        client. (markt)
       </fix>
     </changelog>
   </subsection>
@@ -321,7 +818,8 @@
         Refactor the performance optimisation for
         <code>jakarta.servlet.jsp.el.ImportELResolver</code> to use the new
         marker class,
-        <code>jakarta.el.ELResolver.StandaloneIdentifierMarker</code>. (markt)
+        <code>jakarta.el.ELResolver.StandaloneIdentifierMarker</code>. Further
+        performance optimisation by AngeloRubens. (markt)
       </scode>
       <add>
         Extend the support for relational operators to include
@@ -336,23 +834,147 @@
         Add support for <code>java.util.Optional</code> to the empty operator.
         (markt)
       </add>
+      <fix>
+        Route <code>JspC</code> servlet context logging through Ant when used as
+        an Ant task. (sainadh777)
+      </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
-        <bug>70120</bug>: The fix for <bug>69399</bug> (itself a fix for a
-        regression in the fix for <bug>69333</bug>) was incomplete and tags that
-        threw exceptions in <code>doStartTag()</code> and
-        <code>doEndTag()</code> were incorrectly re-used. This fix prevents tags
-        from being re-used if such an exception occurs. (markt)
+        Correct the handling of the <code>--</code> argument by
+        <code>jspc</code>. The argument position was advanced past the full
+        stop argument on each iteration while collecting the JSP file
+        arguments, so every second file argument after <code>--</code> was
+        silently omitted from processing. Option parsing now stops at the
+        first full stop argument wherever it appears. (remm)
+      </fix>
+      <fix>
+        When removing white-space only template text nodes from the body of a
+        <code>jsp:attribute</code> action while parsing a JSP document, the
+        node that was shifted into the vacated position is now re-examined.
+        Previously it was skipped, which, for bodies containing adjacent
+        template text nodes such as those produced by CDATA sections, could
+        leave a white-space only text node in the body or prevent the final
+        text node from being trimmed when <code>trim</code> was
+        <code>true</code>. (remm)
+      </fix>
+      <fix>
+        Correct the assignability check <code>GraalBeanELResolver</code> uses
+        when selecting a setter for an EL value. The check was inverted, so a
+        setter whose parameter type was a super-type of the value type, for
+        example a setter taking <code>Object</code> or an interface, was
+        rejected and EL writes to such properties could be silently dropped
+        when running in a GraalVM native image. (remm)
+      </fix>
+      <fix>
+        The tag plugins for <code>c:when</code> and <code>c:otherwise</code>
+        now fall back to the standard tag handlers when the direct parent tag
+        is not a plugin enabled <code>c:choose</code>. Previously, they
+        generated unbalanced Java code for such misplaced tags, for example a
+        <code>c:when</code> nested directly in a <code>c:forEach</code>, which
+        failed the translation of the entire page instead of reporting the
+        illegal nesting at runtime as the reference implementation does.
+        (remm)
+      </fix>
+      <fix>
+        The tag plugins for <code>c:import</code> and <code>c:param</code> now
+        share the working URL of the import tag through the plugin context
+        rather than the page scope attribute <code>url_without_param</code>.
+        The import plugin set that attribute while generating the tag body and
+        removed it afterwards, clobbering an application attribute of the same
+        name, and the fixed name made the exchange prone to interference
+        between nested URL tags. This matches the reference implementation,
+        which keeps the parameters of each tag to itself and never touches
+        page scope attributes. (remm)
+      </fix>
+      <fix>
+        The tag plugin for <code>c:out</code> now uses its body as the
+        fallback for a null value like the standard tag handler does: the
+        body content is captured, trimmed, then written with escaping
+        according to the <code>escapeXml</code> attribute, and the capture
+        is unwound if the body fails. The plugin previously wrote the body
+        inline, including its surrounding whitespace, and did not escape
+        the body content. (remm)
+      </fix>
+      <fix>
+        The tag plugin for <code>c:set</code> now handles a deferred value
+        expression (<code>#{...}</code>) with a <code>var</code> attribute
+        like the standard tag handler does. Such a value is passed to the
+        tag as a value expression object, and it is now stored as a mapping
+        in the variable mapper of the EL context, where it evaluates
+        lazily, rather than being stored as an attribute holding the raw
+        expression object. As in the standard handler, a non-page scope is
+        rejected for a deferred value, and mappings that would shadow a
+        plain attribute are removed. (remm)
+      </fix>
+      <fix>
+        The tag plugin for <code>c:set</code> now falls back to the standard
+        tag handler when the tag has a value but neither a
+        <code>var</code> nor a <code>target</code> attribute, so that the
+        invalid use fails as it does with the handler instead of being
+        silently ignored. (remm)
+      </fix>
+      <fix>
+        The tag plugins for <code>c:url</code> and <code>c:redirect</code>
+        now strip a trailing slash from a <code>context</code> path before
+        joining it with the URL, as the standard tag handlers do, so that a
+        context path ending in a slash no longer produces a resolved path
+        with a doubled slash. Previously only the root context was handled.
+        (remm)
+      </fix>
+      <fix>
+        The tag plugins for <code>c:url</code>, <code>c:redirect</code> and
+        <code>c:param</code> now share the working URL of the URL tag through
+        the plugin context rather than the page scope attribute
+        <code>url_without_param</code>. That fixed name overwrote an
+        application attribute of the same name while the tag body was
+        processed and removed it afterwards, and it let a nested URL tag
+        destroy the outer tag's URL, which then silently rendered as
+        <code>null</code>. This matches the reference implementation, which
+        keeps the parameters of each tag to itself and never touches page
+        scope attributes. (remm)
+      </fix>
+      <fix>
+        The tag plugins for <code>c:url</code>, <code>c:redirect</code> and
+        <code>c:import</code> now insert the parameters of nested
+        <code>c:param</code> tags ahead of any query string already present in
+        the URL, as the standard tag handlers do. A <code>c:param</code> that
+        the plugin cannot append to inline, because it is nested in a tag that
+        is generated by its standard tag handler, now returns the enclosing
+        URL tag to its standard handler instead of failing at runtime.
+        (markt)
+      </fix>
+      <fix>
+        <code>RecordELResolver</code> no longer prevents
+        <code>BeanELResolver</code> from resolving bean-style properties (such
+        as <code>isValid()</code>) on a <code>Record</code>. (markt)
+      </fix>
+      <fix>
+        Fix a JAR file handle leak when a tag file specifies an unsupported
+        <code>pageEncoding</code>. Close the input stream if reader creation
+        fails so that its reference to the JAR is released. (remm)
       </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
     <changelog>
-      <scode>
-        Change the default algorithm for the <code>EncryptInterceptor</code> to
-        <code>AES/GCM/NoPadding</code>. (markt)
-      </scode>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        When the cluster receiver automatically binds to a port other than the
+        configured port, retain the configured <code>port</code>,
+        <code>securePort</code> and <code>udpPort</code> values and expose the
+        bound ports via the new read-only <code>boundPort</code>,
+        <code>boundSecurePort</code> and <code>boundUdpPort</code> properties
+        so that the configured values are not lost when the configuration is
+        stored. (markt)
+      </fix>
+      <fix>
+        Preserve the interrupt status of threads that are interrupted while
+        waiting in the cluster code (sender and receiver shutdown, membership
+        start-up and recovery, heartbeat checks and coordinator elections),
+        report an interrupt while waiting for a pooled sender as such rather
+        than as a time out and measure the wait for a pooled sender with a
+        monotonic clock. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
@@ -385,33 +1007,760 @@
       </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
-        <bug>70126</bug>: Fix WebSocket extension permessage-deflate so that it
-        does not drop bytes if a compressed message inflates to more than the
-        available buffer. Fix written by GPT-5.5. Test case written by Hironori
-        Ichimiya. (markt)
+        Make the WebSocket client secure channel wrapper,
+        <code>AsyncChannelWrapperSecure</code>, honor the timeout specified for
+        write operations so a stalled peer cannot block the write thread
+        indefinitely. (remm)
       </fix>
       <fix>
-        Optimise WebSocket client processing of server responses during
-        WebSocket HTTP upgrade process. (markt)
+        Correct the calculation of the digest <code>response</code> value by
+        the WebSocket client when the server uses <code>qop="auth-int"</code>.
+        The hash of the (empty) entity body was omitted, resulting in an
+        incorrect response that the server always rejected. (remm)
+      </fix>
+      <fix>
+        Encode the credentials used for basic authentication by the WebSocket
+        client with UTF-8 by default rather than ISO-8859-1, and reject
+        challenges that specify a charset other than UTF-8, the only value
+        RFC 7617 allows. (remm)
+      </fix>
+      <fix>
+        Fix the entries returned by
+        <code>CaseInsensitiveKeyMap.entrySet()</code> so they implement the
+        <code>Map.Entry</code> <code>equals()</code> and <code>hashCode()</code>
+        contracts. This map backs the WebSocket handshake request and response
+        header maps. Pull request <pr>1075</pr> provided by breken-ai. (markt)
+      </fix>
+      <fix>
+        Improve resource clean-up during WebSocket error handling. (remm)
       </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
     <changelog>
+      <add>
+        Add Manager 2.0 webapp with a modern reactive design. Provided as a
+        module in the <code>modules/manager2</code> folder in the source
+        package. (remm)
+      </add>
       <update>
         Manager: Drop session handling dedicated to extracting the locale from
         Tapestry attributes, used for locale session sorting. (remm)
       </update>
+      <update>
+        Documentation: Describe how to configure the Windows certificate store
+        and reload externally renewed TLS certificates. (dsoumis)
+      </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Host Manager: Host names are now always converted to lower case before
+        use. (markt)
+      </fix>
+      <fix>
+        Documentation: Expand the documentation of the
+        <code>maxHttpRequestHeaderSize</code> attribute for the HTTP connector.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        When the <code>MessageDispatchInterceptor</code> is configured with
+        <code>useDeepClone="false"</code>, asynchronously sent messages are now
+        detached from the caller's buffer with a shallow clone before being
+        queued. Previously, the buffer could be returned to the send buffer pool
+        and reused by a concurrent send while the queued message still
+        referenced it, corrupting the transmitted data. (remm)
+      </fix>
+      <fix>
+        Fix the queue size accounting of the
+        <code>MessageDispatchInterceptor</code>. The message length
+        recorded when a message is queued is now also the length used
+        to release the accounting when the send completes. Previously,
+        when a downstream interceptor like
+        <code>FragmentationInterceptor</code> replaced or extended the
+        message payload while the message was sent, the recorded queue
+        size drifted towards negative values and the
+        <code>maxQueueSize</code> limit eventually stopped being
+        enforced. (remm)
+      </fix>
+      <fix>
+        The <code>NonBlockingCoordinator</code> now uses a separate,
+        configurable <code>mergeAliveTimeout</code> with a default of
+        one second for the TCP liveness checks that run while merging
+        an arriving coordination message, instead of the 15 second
+        coordination message wait timeout. Members that do not respond
+        within this timeout are excluded from the merged view and the
+        exclusion is now logged. (remm)
+      </fix>
+      <fix>
+        The <code>TcpFailureDetector</code> now performs its TCP
+        liveness checks outside the membership monitor, and only
+        applies the result after re-acquiring the monitor and
+        re-checking that the membership state has not changed in the
+        meantime. Previously, the network I/O, up to the configured
+        connection timeout for each member, was performed while
+        holding the monitor, which blocked every other membership
+        operation and update for seconds during a network outage.
+        Member events forwarded by the interceptor are also no longer
+        sent while holding the monitor, removing a potential deadlock
+        with membership listeners that call back into the
+        interceptor. (remm)
+      </fix>
+      <fix>
+        When a node that is configured with the
+        <code>StaticMembershipInterceptor</code> is also discovered
+        dynamically, the <code>StaticMembershipInterceptor</code> now
+        replaces the statically configured member with the dynamically
+        discovered member if the host and all of the ports (TCP, secure
+        and UDP) match. Previously, the node was a member twice because
+        the unique id of a dynamically discovered member is random and
+        can not match the statically configured unique id, and every
+        message sent to all members was sent to the node twice. If only
+        some of the ports match, the mismatch is logged as a
+        configuration error and the members are not merged. The
+        failure detector is told to forget the statically configured
+        member before the discovered member is announced, so that it is
+        not added again by the member checks. If the dynamically
+        discovered member disappears, the statically configured member
+        is restored. A second statically configured member with the
+        same host and ports as an earlier one is logged as a
+        configuration error and ignored. (markt)
+      </fix>
+      <fix>
+        The <code>TwoPhaseCommitInterceptor</code> now forwards the
+        interceptor payload, and with it the <code>ErrorHandler</code>
+        supplied by the application, with the original message instead
+        of with its internal confirmation message. When the
+        <code>MessageDispatchInterceptor</code> performed the actual
+        send, completion and error callbacks were previously reported
+        under the confirmation message's random id, which the
+        application cannot correlate with the id returned by the send,
+        and failures of the original message were never reported at
+        all. (remm)
+      </fix>
+      <fix>
+        The <code>TwoPhaseCommitInterceptor</code> now remembers a
+        confirmation message that arrives before the original message
+        it confirms, and releases the original as soon as it arrives.
+        Previously, the confirmation was consumed as an error and the
+        original message was silently dropped when it arrived and no
+        further confirmation ever followed, so a single moment of
+        network reordering cost one lost cluster message. (remm)
+      </fix>
+      <fix>
+        The <code>AbstractReplicatedMap</code> now holds the map
+        members lock and the state lock only briefly. The entry
+        relocation triggered by the ping expiry runs outside the map
+        members lock, the backup selection for a newly added member
+        outside the state lock, and the (de)serialization of the map
+        content for a member joining or transferring its state
+        likewise outside the state lock. Previously, a slow send to a
+        dead member or the serialization of a large map blocked every
+        session operation and the state transfer of joining members
+        for the duration of that work. (remm)
+      </fix>
+      <fix>
+        The <code>udpRxBufSize</code> and <code>udpTxBufSize</code> configured
+        on the cluster channel <code>Sender</code> now take effect for messages
+        sent using UDP. These two properties were missing from the properties
+        transferred from the configured sender to the pooled senders and on to
+        the per-member senders those create, so the datagram socket was always
+        configured with the default buffer sizes and the configured values were
+        silently ignored. (remm)
+      </fix>
+      <fix>
+        The start of the cluster receiver now fails when the configured bind
+        address cannot be resolved. Previously, the resolution failure was only
+        logged and the receiver bound to the wildcard address, silently
+        exposing the cluster listener on all interfaces instead of the
+        configured address, while the unresolvable host was advertised to the
+        other cluster members. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        <bug>68436</bug>: Reduce the log level from warning to debug for the
+        message logged when <code>driverClassName</code> is not set, as relying
+        on <code>DriverManager</code> to locate the driver is a valid
+        configuration. Pull request <pr>1084</pr> provided by Raphael Vullriede.
+        (markt)
+      </fix>
+      <fix>
+        <bug>69236</bug>: Reset the interceptors of a new connection in the
+        order they are declared, as is already done for a connection taken from
+        the pool, rather than in reverse order. A failure to reset an
+        interceptor is now reported as an <code>SQLException</code> that names
+        the interceptor and the connection is discarded rather than left
+        borrowed. A connection is also no longer left borrowed if the
+        interceptors cannot be instantiated or the connection proxy cannot be
+        created. Pull request provided by Arturo Bernal. (markt)
+      </fix>
+      <fix>
+        <bug>70269</bug>: Correct a regression in the change that reset the
+        properties of statements cached by the <code>StatementCache</code>
+        interceptor that meant no statements were cached when using JDBC
+        drivers, such as H2 and MariaDB Connector/J, that always report
+        statements as not poolable. Pull request <pr>1083</pr> provided by
+        Raphael Vullriede. (markt)
+      </fix>
+      <fix>
+        Correct a defect that meant closing the connection pool from a thread
+        that carried an interrupt status, when
+        <code>propagateInterruptState</code> was set to
+        <code>true</code>, looped forever without closing any of the pool's
+        connections. The shutdown drain now always completes and the
+        interrupted status is propagated once it has. (remm)
+      </fix>
+      <fix>
+        Correct a defect that meant a connection borrow that was in flight
+        while the pool was force-closed could be handed a newly created,
+        working connection from the closed pool, leaving that physical
+        connection open indefinitely. The borrow side now honours the closed
+        flag after the physical connect completes, like the return side
+        already did, and disconnects the new connection. (remm)
+      </fix>
+      <fix>
+        Correct two races in the wake-up protocol between releasing and
+        waiting threads in the connection pool. Destroying the last connection
+        while a borrower was about to register as a waiter could leave that
+        borrower blocked although a slot was free (forever when
+        <code>maxWait</code> was set to 0 or less), and releasing an already
+        released connection still injected an extra wake-up placeholder,
+        inflating the pool size and allowing more physical connections than
+        <code>maxActive</code>. (remm)
+      </fix>
+      <fix>
+        Correct a defect that meant <code>rollbackOnReturn</code> and
+        <code>commitOnReturn</code> were silently ignored unless
+        <code>defaultAutoCommit</code> was explicitly set to
+        <code>false</code>, so a connection returned while still in a
+        transaction could be handed to the next borrower inside that
+        transaction. These options now act on the actual transaction state
+        of the connection being returned. (remm)
+      </fix>
+      <fix>
+        Correct a defect in the JDBC connection pool where the cached proxy
+        constructor ignored the connection kind after the first proxy was
+        created, so swapping the data source backing a running pool could
+        proxy later connections of the wrong kind: connections backed by an
+        XA connection no longer implemented <code>XAConnection</code>, and
+        plain connections falsely did, with XA method calls on them failing
+        with a NullPointerException. (remm)
+      </fix>
+      <fix>
+        Correct a defect in the <code>ConnectionState</code> interceptor where
+        the configured connection defaults were restored while the previous
+        borrower's transaction was still open: the isolation level and the
+        read only state are transaction scoped on many drivers, so the
+        restore was refused or deferred and the previous borrower's state
+        reached the next borrower, and restoring auto-commit committed
+        whatever the previous borrower had left pending. The interceptor now
+        terminates the pending transaction before restoring the configured
+        state, and fails the borrow rather than handing out a connection it
+        cannot verify. Pools that configure no defaults, and borrows that
+        need no restore, keep the previous behaviour of leaving the
+        transaction untouched. (remm)
+      </fix>
+      <fix>
+        Correct two defects in the <code>StatementFinalizer</code>
+        interceptor. Tracked statements were only removed in bulk when the
+        connection was returned, so a borrow that closed every statement it
+        created still accumulated one tracking entry per statement created
+        for the whole borrow cycle; and the tracking relied on weak
+        references without a queue, so exactly the statements the
+        interceptor exists for - those an application forgot about - could
+        be garbage collected before being closed, leaking their
+        database-side state to the next borrower. Statements are now
+        tracked with a strong reference in a list guarded against the
+        pool's cleaner thread, and the statement proxy handed to the
+        application removes its tracking entry as soon as the application
+        closes the statement, while a leaked statement is reliably closed
+        when the connection is returned regardless of the garbage
+        collector. (remm)
+      </fix>
+      <fix>
+        Remove the unfinished, experimental
+        <code>MultiLockFairBlockingQueue</code> class together with the
+        unreachable code that referenced it. The class was never
+        selectable - its instantiation in the pool was commented out and
+        no configuration property existed to enable it - while its
+        striped design kept items and waiting threads on unrelated
+        stripes, so enabling it as it stood could hang borrowers while
+        idle connections sat in another stripe, report the pool as
+        exhausted although it was not, lose a connection permanently
+        whenever a waiting thread was interrupted, and silently disable
+        the idle connection sweep because the queue's iterator was
+        always empty. Fair queueing remains available through
+        <code>FairBlockingQueue</code>. (remm)
+      </fix>
+      <fix>
+        Make the JDBC pool fail fast and explicitly when a resource of
+        type <code>javax.sql.XADataSource</code> is not actually backed
+        by an XA data source. XA connections are created by the data
+        source named by the <code>dataSource</code> or
+        <code>dataSourceJNDI</code> attribute, but the documentation
+        presented the resource type alone as enabling XA, so the common
+        <code>driverClassName</code> and <code>url</code> configuration
+        silently produced a pool of plain JDBC connections that looked
+        and behaved exactly like a non-XA pool; the missing XA support
+        only surfaced later, as an opaque generic failure inside the
+        transaction manager when it requested an XA connection. Such a
+        request now fails immediately with a message that names the
+        missing configuration, and the documentation now states the
+        requirement. (remm)
+      </fix>
+      <fix>
+        Make the asynchronous poll of the JDBC pool's fair queue
+        cancellable. Cancelling the future returned by
+        <code>pollAsync()</code> was a no-op, so the waiter it had
+        registered stayed on the queue indefinitely and a later
+        <code>offer()</code> handed an item – in the pool, a returned
+        connection – to a future nobody was reading, losing it from the
+        pool. Cancellation now deregisters the waiter as long as the
+        item has not already been handed over, a cancelled future fails
+        its <code>get()</code> methods with
+        <code>CancellationException</code> instead of blocking forever,
+        and the pool's own connection future uses this to release its
+        queue waiter, only falling back to retrieving and closing an
+        already in-flight connection when the cancellation comes too
+        late. (remm)
+      </fix>
+      <fix>
+        Include the JDBC 4.2 execution methods
+        <code>executeLargeUpdate()</code> and
+        <code>executeLargeBatch()</code> in the methods that the query
+        reporting interceptors recognise as query executions. Slow or
+        failed large updates and large batches – a common bulk
+        processing pattern – were never timed, never reported as slow
+        and never counted in the query statistics, so the monitoring the
+        interceptors exist to provide silently missed exactly the work
+        most likely to be slow. (remm)
+      </fix>
+      <fix>
+        Always wrap connection handles in the disposable connection
+        facade. The <code>useDisposableConnectionFacade</code> property
+        that could switch the facade off is deprecated and no longer has
+        any effect; it is still accepted so existing configurations keep
+        loading. Switching the facade off exposed the pool's cached
+        interceptor chain directly to the application: a handle kept from
+        an earlier borrow stayed usable and its close returned – or its
+        calls drove – the connection a later borrower was still using.
+        (remm)
+      </fix>
+      <fix>
+        Keep the abandoned timer alive while a pooled connection is
+        streaming a result set. The <code>ResetAbandonedTimer</code>
+        interceptor only reset the timer while a statement was executing,
+        so a borrower that left a cursor open across a long pause - the
+        usual reason for configuring a fetch size - appeared idle, and a
+        connection that was actively streaming could be reported as
+        abandoned and reclaimed from underneath its borrower. Statement
+        creation and result-set access through a pooled connection now
+        also reset the timer, so the abandoned check only reports a
+        connection that is genuinely making no progress. The
+        <code>jdbcInterceptors</code> documentation, which listed only
+        three of the interceptors bundled with the pool, has been
+        corrected. (remm)
+      </fix>
+      <fix>
+        The <code>SlowQueryReportJmx</code> interceptor MBean now exposes
+        the management surface its metadata declares: the
+        <code>PoolName</code> and <code>PoolNames</code> attributes and
+        the <code>resetStats()</code> operation are reachable through
+        JMX. Previously the MBean interface declared only
+        <code>SlowQueriesCD</code>, so the attributes and the operation
+        did not exist on the registered MBean, and once declared,
+        <code>resetStats()</code> would have thrown an
+        <code>IllegalStateException</code> whenever statistics were
+        present. (remm)
+      </fix>
+      <fix>
+        The <code>CacheSize</code> attribute of the
+        <code>StatementCache</code> interceptor MBean is now a plain
+        <code>int</code>. It used to be a
+        <code>java.util.concurrent.atomic.AtomicInteger</code>, which
+        meant that a client reading the attribute from inside the JVM
+        received the very object the pool uses to enforce its
+        <code>max</code> cache size, and could change the accounting it
+        had only come to observe: inflating it stopped the pool from
+        caching any further statement, deflating it let the cache grow
+        beyond <code>max</code>. A remote client, on the other hand,
+        received a snapshot that its writes could not affect. The value
+        reported by an interceptor instance that is not bound to a pooled
+        connection is now <code>-1</code> instead of no value at all.
+        (remm)
+      </fix>
+      <fix>
+        Pool JMX notifications are now delivered on a dedicated
+        notification thread instead of on the thread that reported the
+        condition. Several of the pool's notifications are raised from
+        the connection lifecycle, some of them while the pool holds the
+        lock of the connection concerned, so a monitoring listener that
+        was slow or blocked stalled the borrow, return and abandon
+        processing of that connection for as long as it held on, and a
+        failed borrow from an exhausted pool repeated that cost on every
+        miss. Listeners observe the notifications in the same order the
+        pool reported them; a listener that stops draining the bounded
+        delivery queue now causes later notifications to be dropped and
+        logged rather than delaying the pool. The result of reporting a
+        notification through the pool MBean now describes that handoff
+        only, and no longer depends on whether a locally registered
+        listener threw. (remm)
+      </fix>
+      <fix>
+        The notification types that the connection pool MBean sends are now
+        declared as constants on the <code>ConnectionPoolMBean</code>
+        interface, the client-facing type for pool management. The types
+        were already discoverable as runtime metadata of the registered
+        MBean, but the interface that a JMX client compiles its listener
+        and notification filter against declared none of them, so client
+        code had to hardcode the type strings or compile against the
+        implementation class. The implementation now inherits the
+        constants from the interface; the notification types and the
+        strings they carry on the wire are unchanged. (remm)
+      </fix>
+      <fix>
+        Closing the connection pool now also terminates the asynchronous
+        borrows that were still waiting for a connection. A caller blocked in
+        the <code>get()</code> of the future that
+        <code>getConnectionAsync()</code> had returned waited forever on the
+        closed pool: a closed pool never hands another connection to the queue
+        that future waits on, and the waiter itself cannot observe the closed
+        state. The pool now cancels those outstanding polls, so their
+        <code>get()</code> reports a <code>CancellationException</code>. An
+        asynchronous borrow that races the closure is rejected with an
+        <code>SQLException</code>, like a synchronous borrow on a closed pool;
+        a borrow that had registered its waiter just before the closure ran
+        gets a future that reports that cancellation instead. (remm)
+      </fix>
+      <fix>
+        Correct a defect in the asynchronous borrow of the JDBC connection pool
+        that handed one physical connection to two users at once, silently
+        sharing a session between them. The queue delivers the connection it
+        produced to every caller of its <code>get()</code>, and the cancellation
+        of the future that <code>getConnectionAsync()</code> had returned used
+        that same delivery to retrieve the connection and close it, without
+        establishing whether a borrower had taken delivery of it. A
+        <code>cancel()</code> that landed while a borrower was receiving the
+        connection, or was still setting it up, therefore reported a successful
+        cancellation while the borrower was using that connection: it went back
+        to the pool and to the next borrower underneath its owner, or the owner
+        was handed a connection that had already been closed. The connection the
+        queue produces is now claimed once, by whichever of the borrower and the
+        cancellation gets there first. A borrower that won the claim keeps its
+        connection and <code>cancel()</code> reports that nothing was cancelled,
+        the way <code>java.util.concurrent.Future</code> reports nothing
+        cancelled once the work is done; a cancellation that won it returns the
+        connection to the pool exactly once and the future reports a
+        <code>CancellationException</code> to its callers instead of a closed
+        connection. (remm)
+      </fix>
+      <fix>
+        Make a timed-out retrieval from the JDBC pool's fair queue fail
+        terminally instead of leaving its future in a state nobody can
+        complete. (remm)
+      </fix>
+      <fix>
+        A JDBC pool validation that runs its built-in check against the
+        database now terminates a pending transaction with a rollback rather
+        than by committing it, so a health check no longer commits work the
+        application left uncommitted, and a validation whose rollback fails
+        is reported as failed so the connection is taken out of service; the
+        configured <code>commitOnReturn</code> or
+        <code>rollbackOnReturn</code> termination of a returned connection
+        now runs before the return validation that would otherwise override
+        it. (remm)
+      </fix>
+      <fix>
+        Always wrap pooled statements and their result sets in the statement
+        facade, so a statement handle kept past the end of its borrow can no
+        longer execute against the session the next borrower holds, and a
+        statement reports the pooled connection it was created from rather
+        than the driver's. Every result set those handles hand back is sealed
+        with them, whatever the method that returned it was called: a cursor
+        read through <code>getObject()</code>, the way a driver reports a REF
+        cursor or hands out a nested cursor, arrives as a handle too and
+        retires with the borrow, while <code>unwrap()</code> still reaches the
+        driver's own object. The <code>useStatementFacade</code> property that
+        could switch the facade off is deprecated and no longer has any
+        effect, but it is still accepted so existing configurations keep
+        loading. (remm)
+      </fix>
+      <add>
+        Send the JDBC 4.3 request boundary hints on the pooled connections:
+        <code>beginRequest()</code> is now called on the physical connection
+        when the pool hands it to the application and
+        <code>endRequest()</code> when the application returns it, so that a
+        driver which optimises session handling around a unit of work can do
+        so. The hints are looked up reflectively and skipped on a Java runtime
+        that predates JDBC 4.3, and a driver that refuses a hint has the
+        refusal logged rather than the borrow or the return around it failed.
+        Pull request <pr>677</pr> provided by Fernanda Meheust. (remm)
+      </add>
+      <fix>
+        Record the borrow site of a connection borrowed from the JDBC pool
+        with <code>logAbandoned</code> enabled as stack trace elements
+        instead of a formatted thread-dump string, and format the trace only
+        when an abandoned-connection report actually reads it. Every borrow
+        previously formatted - and almost always threw away - a full thread
+        dump; the text reported for a connection that really is abandoned is
+        unchanged. Pull request <pr>1048</pr> provided by sainadh777. (remm)
+      </fix>
+      <fix>
+        <bug>59569</bug>: Unwrap a pooled connection through a driver whose
+        own connection is itself a wrapper around another driver's
+        connection: when the physical connection does not directly implement
+        the requested interface, <code>isWrapperFor()</code> and
+        <code>unwrap()</code> now delegate to it, so the vendor object behind
+        a wrapping driver - like the AWS JDBC wrapper over the PostgreSQL
+        driver - is reachable through the pooled connection. The pool's
+        <code>DataSource</code>, whose implementations of the two methods
+        always answered false and returned null, now recognises itself and
+        the configured <code>dataSource</code>, and reports a failed unwrap
+        as the <code>SQLException</code> that the <code>Wrapper</code>
+        contract requires. Pull request <pr>1077</pr> provided by Shayan
+        Davarzani. (remm)
+      </fix>
+      <fix>
+        <bug>63705</bug>: Publish a JMX MBean for every physical connection
+        held by the JDBC pool, not only for the ones the application has
+        borrowed at least once. The connection MBeans that appear below the
+        pool's MBean as <code>connections=PooledConnection[n]</code> were
+        registered when a connection was borrowed for the first time, so the
+        connections the pool pre-created for its <code>initialSize</code>, and
+        any idle connection that was never borrowed, were counted in the pool's
+        <code>Size</code> and <code>NumIdle</code> attributes while remaining
+        invisible to management. A connection's MBean is now registered as soon
+        as its physical connection is established, and the connections a
+        running pool already holds are published when the pool's own MBean is
+        registered. A connection keeps its registration across a reconnect and
+        releases it, as before, when it leaves the pool.
+        (remm)
+      </fix>
+      <fix>
+        Correct a defect that meant the JNDI factory for the JDBC pool aborted
+        with a <code>NullPointerException</code> when a resource reference
+        carried an attribute with null content, and that made it impossible to
+        give the pool a live <code>javax.sql.DataSource</code> through a
+        reference: an object-valued <code>dataSource</code> attribute was
+        stringified and then rejected with a message contradicting the
+        documented property type. Attributes with null content are now skipped
+        and an object-valued <code>dataSource</code> attribute is used to back
+        the pool, taking precedence over <code>dataSourceJNDI</code>; a string
+        value for that attribute is still rejected, with a message that now
+        points at the supported ways of providing a data source. (remm)
+      </fix>
+      <fix>
+        Do not wait on pool creation when closing a JDBC pool data source.
+        The pool constructor pre-establishes the <code>initialSize</code>
+        connections, and it previously ran under the data source monitor that
+        <code>close()</code> takes, so closing a data source whose initial
+        connections were still being attempted against an unresponsive
+        database parked the shutdown on the driver for an unbounded,
+        uninterruptible time. The construction now runs under a gate that
+        serializes it on its own, outside that monitor, so a close does not
+        wait for an in-flight creation; that creation observes the closure at its
+        publication step and tears down the pool it built rather than
+        publishing it. As before, no database session and no pool cleaner
+        outlives the close, and the closure stays terminal. (remm)
+      </fix>
+      <fix>
+        <bug>50571</bug>: A configured connection state (auto-commit,
+        read-only or catalog) that could not be restored on a pooled
+        connection was logged and ignored, and the connection was handed out
+        in the wrong state: a <code>defaultCatalog</code> naming a database
+        that does not exist, for example, left the application working on the
+        session's original catalog with nothing surfaced to the application.
+        The borrow now fails with an <code>SQLException</code> and the
+        connection is discarded. Restoring the transaction isolation level
+        retains the previously logged-and-ignored behavior. (remm)
+      </fix>
+      <fix>
+        <bug>56586</bug>: An <code>initSQL</code> statement run by the JDBC
+        pool while a connection is established is now committed when the pool
+        runs with auto commit off, so the initialization it performs - a data
+        change or a session setting - persists for the lifetime of the
+        connection. It previously ran inside a transaction that the
+        connect-time validation then rolled back again, so the effects were
+        discarded before the first borrower ever used the connection.
+        Validation queries and the <code>isValid()</code> check keep the
+        opposite rule and still terminate an open transaction with a rollback,
+        so a health check continues to never commit application work. (remm)
+      </fix>
+      <fix>
+        <bug>65929</bug>: Calling <code>abort()</code> on a pooled connection
+        bypassed the pool. The call reached the physical connection while the
+        borrow stayed open: the session remained counted in the busy pool
+        against <code>maxActive</code>, and the handle kept reporting itself
+        open although the specification says a connection is closed once
+        <code>abort()</code> returns, so an application that trusts that and
+        does not call <code>close()</code> afterwards permanently consumed one
+        connection slot per call until the pool reported exhaustion. The pool
+        now intercepts <code>abort()</code>: the call is delegated to the
+        driver, the session is then taken out of service whatever the driver
+        made of it - no borrower may receive a session an abort was attempted
+        on - the slot is freed, and the handle is closed, reporting
+        <code>isClosed()</code> true, <code>isValid()</code> false and an
+        <code>SQLException</code> for any further use. On a handle already
+        closed, <code>abort()</code> is the no-op the specification
+        prescribes. Based on code submitted by Arturo Bernal. (remm)
+      </fix>
+      <fix>
+        Correct a defect in the <code>StatementCache</code> interceptor
+        where an interceptor listed after the cache that wraps statements
+        beneath it - <code>StatementDecoratorInterceptor</code>, for
+        example - silently stopped the cache from caching. The cached
+        statement recorded as its connection whatever that lower wrapper
+        answered for the statement's <code>getConnection()</code> - the
+        pool's handle for the borrow, not the physical connection - so no
+        closed statement ever passed the session check on the way into the
+        cache, every one was closed instead, and the next prepare prepared
+        again, at any log level. The cache now binds a cached statement to
+        the physical session the prepare ran on, using the driver's own
+        answer where it is readable, while a statement prepared on a
+        session that has since been replaced still refuses both caching
+        and reuse, and a park refused for a lost association is now noted
+        once per connection at debug level. (remm)
+      </fix>
+      <fix>
+        Correct a defect where listing the <code>StatementCache</code>
+        interceptor before the <code>StatementFinalizer</code> interceptor in
+        <code>jdbcInterceptors</code> handed the next borrower of a session a
+        cached statement that failed on any use. The finalizer tracked the
+        driver statement beneath the cache and closed every statement still
+        open when the connection was returned, while a statement parked in
+        the cache is deliberately left open, so that return-time close killed
+        the cached statement out from under a live cache entry and the next
+        cache hit served a closed statement. The cache now refuses to park
+        statements when such a tracker is configured beneath it - the close
+        then reaches the statement through the normal path - and the pool
+        warns once at start when the configuration lists the cache before the
+        finalizer, as it already does for the analogous query timeout
+        ordering. (remm)
+      </fix>
+      <fix>
+        Mask the password carried in the <code>user:password@host</code>
+        userinfo section of a JDBC URL, and in the equivalent
+        <code>user/password@host</code> form of the legacy Oracle URLs, in the
+        <code>toString()</code> dump of the pool configuration, where the rest
+        of the dump is masked and the leak gave a false impression that the
+        dump carried no credential. The user name, host, port and the rest of
+        the URL stay readable, and an authority that carries no credential -
+        a bare host or a port - is left untouched. (remm)
+      </fix>
+      <fix>
+        Correct a defect in the <code>ResetAbandonedTimer</code> interceptor
+        where a call that was still in flight when its borrow ended, and that
+        completed after the same connection had been handed to the next
+        borrower, reset the timer of that next borrower and cleared its
+        suspect state: the completing call is refused by the pool below, but
+        the interceptor booked its activity from the completion of the call,
+        where the connection looked checked out again, and the borrower the
+        abandoned check was watching read as active. Stamps from calls are now
+        booked only for the borrow the call started under, while the
+        <code>resetTimer()</code> management operation is unchanged. (remm)
+      </fix>
+      <fix>
+        Correct a defect where renaming a running connection pool - the pool's
+        own JMX exposes a <code>setName</code> that rewrites the name property
+        of a live pool - silently detached the <code>SlowQueryReport</code>
+        and <code>SlowQueryReportJmx</code> interceptors from the state their
+        pool had registered under its start-time name: connections borrowed
+        after the rename booked their statistics nowhere and logged a false
+        "Connection has already been closed or abandoned" warning on every
+        execution, a <code>SlowQueryReportJmx</code> borrow registered a
+        second MBean under the new name, and the pool's close released the
+        name it carried at close time rather than the one it had registered,
+        leaving the statistics, the interceptor MBean and with them the whole
+        closed pool's object graph registered forever. A nulling rename made
+        the same release throw and be swallowed, leaking the same way. The
+        registrations are now recorded under the name the pool started with
+        and every lookup of them resolves through that record, so a rename
+        changes what the pool calls itself and nothing else. (remm)
+      </fix>
+      <fix>
+        The <code>SlowQueryReportJmx</code> interceptor now publishes a
+        small, pool-independent resource as the MBean for a pool name,
+        instead of publishing the borrowing connection's own interceptor
+        instance. That instance holds the connection, the pool and the
+        pool's properties, so as long as the MBean was registered the JVM
+        could not reclaim a pool that had been abandoned without being
+        closed - a pool leaked this way kept its connections, its
+        statistics and its MBean alive for the life of the JVM, and a
+        pool that was never closed never released the name either. The
+        MBean also showed the name of whichever pool had borrowed first,
+        and its statistics and <code>resetStats()</code> operation acted
+        on that pool's state long after it had been replaced under the
+        name. The published MBean now resolves the pool currently using
+        its name, so it reports that pool, and an abandoned pool is
+        collected once nothing else refers to it, with its name released
+        by the next pool that takes it over. (remm)
+      </fix>
+      <fix>
+        The <code>SlowQueryReport</code> and <code>SlowQueryReportJmx</code>
+        interceptors now key their statistics and their JMX registration to
+        the connection pool rather than to the pool name. Statistics belong
+        to the pool that records them, are published under the name that
+        pool started with and are given up when that pool closes, so
+        starting, closing or replacing a pool no longer disturbs the
+        statistics or the registration of another pool; reading recorded
+        queries by name remains available as a view. Sharing one name
+        between live pools is no longer supported. The identity hash term in
+        the default pool name, which identified only the class loader and
+        added no uniqueness, has been removed. (remm)
+      </fix>
+      <fix>
+        Correct a defect in the JDBC connection pool where a non-fatal
+        <code>Error</code> raised by a driver or a wrapper while a connection
+        was being created, for example a <code>LinkageError</code> from a web
+        application that has stopped, escaped the creation guard. The
+        connection had already claimed one of the pool's
+        <code>maxActive</code> slots, so the slot and the physical session
+        were lost for the life of the pool; a pre-load of
+        <code>initialSize</code> connections that failed the same way also
+        bypassed the pool's start-up failure handling. The creation now treats
+        a non-fatal <code>Error</code> like any other failed creation, releases
+        the connection and reports the failure as an
+        <code>SQLException</code>. (remm)
+      </fix>
+      <fix>
+        Report a duplicate live pool name as an error from the JDBC pool's slow
+        query reporting interceptors. Tomcat gives every pool it manages a name
+        of its own, but a pool built programmatically can be given the name of a
+        live pool, and the statistics and the JMX registration are keyed by that
+        name: the two pools then displaced each other's statistics store. The
+        name is documented as having to be unique among live pools, and a
+        duplicate is reported at error level. (remm)
+      </fix>
+      <fix>
+        Remove the retry of refused JMX unregistrations from the JDBC pool's
+        JMX helper. JMX is a best-effort management channel and Catalina gives
+        every pool component a name of its own, so a refusal is logged for the
+        operator rather than remembered and retried later. A retry by name
+        could unregister a replacement MBean that had taken the name in the
+        meantime, silently removing the replacement's management surface.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
     <changelog>
+      <update>
+        Update the OWB module to Apache OpenWebBeans 4.1.1. (remm)
+      </update>
+      <update>
+        Remove the <code>modules/cxf</code> optional module and the JAX-RS
+        support it provided. (remm)
+      </update>
+      <update>
+        Update Maven Resolver Ant Tasks to 1.6.1. (rjung)
+      </update>
       <add>
         Add test profile system for selective test execution. Profiles can be
         specified via <code>-Dtest.profile=&lt;name&gt;</code> to run specific
@@ -429,12 +1778,54 @@
         to make it easier to see when it's not used by the suite. (csutherl)
       </add>
       <update>
-        Update Checkstyle to 13.4.2. (markt)
+        Update Checkstyle to 14.1.0. (markt)
       </update>
+      <update>
+        Add directory prefix to embedded ZIP packaging. (schultz)
+      </update>
+      <add>
+        Generate a JaCoCo XML coverage report
+        (<code>output/coverage/jacoco.xml</code>) alongside the existing HTML
+        report when the build is run with code coverage enabled. (dsoumis)
+      </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <update>
+        <bug>69902</bug>: Change the ZIP distribution to store the same file
+        and directory permissions as the tar.gz distribution so that the
+        scripts in <code>bin</code> are executable when the archive is
+        extracted on a Unix platform.
+      </update>
+      <fix>
+        <bug>70262</bug>: Fix <code>service.bat</code> so <code>install
+        &lt;name&gt; --rename</code> renames the Windows service executables in
+        <code>CATALINA_HOME\bin</code>. <code>remove</code> now restores the
+        default executable names only when the service name differs from the
+        default. Based on pull request <pr>1095</pr> provided by StrongOx.
+        (markt)
+      </fix>
+      <update>
+        Update Tomcat Native to 2.0.17. (markt)
+      </update>
+      <update>
+        Update Byte Buddy to 1.18.17. (markt)
+      </update>
+      <update>
+        Update Checkstyle to 14.4.0. (markt)
+      </update>
+      <update>
+        Update JaCoCo to 0.8.16. (markt)
+      </update>
+      <update>
+        Update JSign to 7.6. (markt)
+      </update>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
+      <add>
+        Improvements to Japanese translations provided by tak7iji. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
 </body>
 </document>
-

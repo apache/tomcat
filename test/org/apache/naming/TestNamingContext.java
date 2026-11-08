@@ -16,9 +16,12 @@
  */
 package org.apache.naming;
 
+import java.util.Hashtable;
+
 import javax.naming.Context;
 import javax.naming.NamingException;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -92,6 +95,61 @@ public class TestNamingContext extends TomcatBaseTest {
         // Shortcut should fail too
         obj = factory.getObjectInstance(rlr, null, null, null);
         Assert.assertNull(obj);
+    }
+
+
+    @After
+    public void resetResourceLinkGlobalContext() {
+        // The test below installs a private global context in a static field
+        ResourceLinkFactory.setGlobalContext(null);
+    }
+
+
+    @Test
+    public void testResourceLinkWithoutGlobalIsRejectedBeforeBinding() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.enableNaming();
+
+        org.apache.catalina.Context ctx = getProgrammaticRootContext();
+        tomcat.start();
+
+        ContextResourceLink crl = new ContextResourceLink();
+        crl.setName(LOCAL_NAME);
+        crl.setType(DATA.getClass().getName());
+        try {
+            ctx.getNamingResources().addResourceLink(crl);
+            Assert.fail("Expected an IllegalArgumentException for the missing global attribute");
+        } catch (IllegalArgumentException iae) {
+            Assert.assertTrue(iae.getMessage(), iae.getMessage().contains(LOCAL_NAME));
+        }
+
+        // The rejected link must not have been bound
+        Assert.assertNull(doLookup(ContextBindings.getContext(ctx), COMP_ENV + "/" + LOCAL_NAME));
+    }
+
+
+    @Test
+    public void testResourceLinkWithoutGlobalName() {
+        // Use a private context to keep the global context validation out of
+        // the way, whatever test order is used within the JVM
+        Context context = new NamingContext(new Hashtable<>(), "test");
+        ResourceLinkFactory.setGlobalContext(context);
+
+        // A resource link without a global name is a configuration error that
+        // must be reported as such, not as a NullPointerException
+        try {
+            ResourceLinkFactory.registerGlobalResourceAccess(context, LOCAL_NAME, null);
+            Assert.fail("Expected an IllegalArgumentException for the missing global name");
+        } catch (IllegalArgumentException iae) {
+            // Expected
+        }
+
+        try {
+            ResourceLinkFactory.registerGlobalResourceAccess(context, null, GLOBAL_NAME);
+            Assert.fail("Expected an IllegalArgumentException for the missing local name");
+        } catch (IllegalArgumentException iae) {
+            // Expected
+        }
     }
 
 

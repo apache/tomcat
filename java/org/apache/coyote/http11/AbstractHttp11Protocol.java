@@ -107,16 +107,24 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     @Override
     public void destroy() throws Exception {
-        // There may be upgrade protocols with their own MBeans. These need to
-        // be de-registered.
-        ObjectName rgOname = getGlobalRequestProcessorMBeanName();
-        if (rgOname != null) {
-            Registry registry = Registry.getRegistry(null);
-            ObjectName query = new ObjectName(rgOname.getCanonicalName() + ",Upgrade=*");
-            Set<ObjectInstance> upgrades = registry.getMBeanServer().queryMBeans(query, null);
-            for (ObjectInstance upgrade : upgrades) {
-                registry.unregisterComponent(upgrade.getObjectName());
+        // Synchronise on the group info map to prevent an upgrade that is
+        // being created and registered from racing with the de-registration
+        // below and the clearing of the map.
+        synchronized (upgradeProtocolGroupInfos) {
+            // There may be upgrade protocols with their own MBeans. These need
+            // to be de-registered.
+            ObjectName rgOname = getGlobalRequestProcessorMBeanName();
+            if (rgOname != null) {
+                Registry registry = Registry.getRegistry(null);
+                ObjectName query = new ObjectName(rgOname.getCanonicalName() + ",Upgrade=*");
+                Set<ObjectInstance> upgrades = registry.getMBeanServer().queryMBeans(query, null);
+                for (ObjectInstance upgrade : upgrades) {
+                    registry.unregisterComponent(upgrade.getObjectName());
+                }
             }
+            // Release the cached group infos so they are freed and, if the
+            // handler is re-initialised, re-created and registered with JMX.
+            upgradeProtocolGroupInfos.clear();
         }
 
         super.destroy();
@@ -548,8 +556,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      * Set restricted user agent list (which will downgrade the connector to HTTP/1.0 mode). Regular expression as
      * supported by {@link Pattern}.
      *
-     * @param restrictedUserAgents The regular expression as supported by {@link Pattern} for the user agents e.g.
-     *                                 "gorilla|desesplorer|tigrus"
+     * @param restrictedUserAgents The regular expression as supported by {@link Pattern} for the user agents
      */
     public void setRestrictedUserAgents(String restrictedUserAgents) {
         if (restrictedUserAgents == null || restrictedUserAgents.isEmpty()) {
@@ -600,6 +607,41 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      */
     public void setServerRemoveAppProvidedValues(boolean serverRemoveAppProvidedValues) {
         this.serverRemoveAppProvidedValues = serverRemoveAppProvidedValues;
+    }
+
+
+    private String altService;
+
+    /**
+     * Get the alternative service that is announced to clients in the {@code Alt-Svc} response header.
+     *
+     * @return The alternative service protocol identifier or {@code null} if no alternative service is announced
+     */
+    public String getAltService() {
+        return altService;
+    }
+
+
+    /**
+     * Set the alternative service that is announced to clients in the {@code Alt-Svc} response header. The alternative
+     * service is assumed to be reachable at the same host and port as this connector. Announcing an alternative
+     * service allows clients to discover it from the first HTTP response without any client-side configuration. The
+     * value is used as the alternative service protocol identifier and must therefore be a valid HTTP token (RFC
+     * 7230).
+     *
+     * @param altService  The alternative service protocol identifier or {@code null}/empty to not announce an
+     *                        alternative service
+     *
+     * @throws IllegalArgumentException  If the value is not a valid alternative service protocol identifier
+     */
+    public void setAltService(String altService) {
+        if (altService == null || altService.isEmpty()) {
+            this.altService = null;
+        } else if (HttpParser.isToken(altService)) {
+            this.altService = altService;
+        } else {
+            throw new IllegalArgumentException(sm.getString("abstractHttp11Protocol.invalidAltSvc", altService));
+        }
     }
 
 
@@ -751,6 +793,8 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
                 }
             }
             allowedTrailerHeaders.removeAll(toRemove);
+        } else {
+            allowedTrailerHeaders.clear();
         }
     }
 
@@ -816,6 +860,15 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     @Override
     public void addUpgradeProtocol(UpgradeProtocol upgradeProtocol) {
         upgradeProtocols.add(upgradeProtocol);
+    }
+
+    /**
+     * Remove specified upgrade protocol.
+     * @param upgradeProtocol the upgrade protocol
+     * @return <code>true</code> if the protocol was removed
+     */
+    public boolean removeUpgradeProtocol(UpgradeProtocol upgradeProtocol) {
+        return upgradeProtocols.remove(upgradeProtocol);
     }
 
     @Override
@@ -889,7 +942,9 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      * Get the upgrade group info for the specified upgrade protocol.
      *
      * @param upgradeProtocol The upgrade protocol name
-     * @return The upgrade group info for the specified protocol
+     * @return The upgrade group info for the specified protocol, or
+     *             {@code null} if the protocol name is null or the statistics
+     *             MBean for the protocol could not be registered
      */
     public UpgradeGroupInfo getUpgradeGroupInfo(String upgradeProtocol) {
         if (upgradeProtocol == null) {
@@ -903,15 +958,19 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
                 result = upgradeProtocolGroupInfos.get(upgradeProtocol);
                 if (result == null) {
                     result = new UpgradeGroupInfo();
-                    upgradeProtocolGroupInfos.put(upgradeProtocol, result);
                     ObjectName oname = getONameForUpgrade(upgradeProtocol);
                     if (oname != null) {
                         try {
                             Registry.getRegistry(null).registerComponent(result, oname, null);
                         } catch (Exception e) {
                             getLog().warn(sm.getString("abstractHttp11Protocol.upgradeJmxRegistrationFail"), e);
+                            // Do not cache the result so that a later call can
+                            // retry the registration.
                             result = null;
                         }
+                    }
+                    if (result != null) {
+                        upgradeProtocolGroupInfos.put(upgradeProtocol, result);
                     }
                 }
             }

@@ -22,8 +22,7 @@ import java.io.Writer;
 import org.apache.tomcat.util.security.Escape;
 
 /**
- * XMLWriter helper class. writeText is the only method in the class doing
- * XML escaping.
+ * XMLWriter helper class.
  */
 public class XMLWriter {
 
@@ -111,7 +110,7 @@ public class XMLWriter {
      */
     public void writeProperty(String namespace, String name, String value) {
         writeElement(namespace, name, OPENING);
-        buffer.append(value);
+        buffer.append(Escape.xml(value));
         writeElement(namespace, name, CLOSING);
     }
 
@@ -145,7 +144,7 @@ public class XMLWriter {
                     }
                     if (namespaceInfo != null) {
                         buffer.append("<").append(namespace).append(":").append(name).append(" xmlns:")
-                                .append(namespace).append("=\"").append(namespaceInfo).append("\">");
+                                .append(namespace).append("=\"").append(Escape.xml(namespaceInfo)).append("\">");
                     } else {
                         buffer.append("<").append(namespace).append(":").append(name).append(">");
                     }
@@ -162,7 +161,7 @@ public class XMLWriter {
                     }
                     if (namespaceInfo != null) {
                         buffer.append("<").append(namespace).append(":").append(name).append(" xmlns:")
-                                .append(namespace).append("=\"").append(namespaceInfo).append("\"/>\n");
+                                .append(namespace).append("=\"").append(Escape.xml(namespaceInfo)).append("\"/>\n");
                     } else {
                         buffer.append("<").append(namespace).append(":").append(name).append("/>\n");
                     }
@@ -175,7 +174,7 @@ public class XMLWriter {
                     if (lastWriteWasOpen) {
                         buffer.append('\n');
                     }
-                    buffer.append("<").append(name).append(" xmlns=\"").append(namespaceInfo).append("\">");
+                    buffer.append("<").append(name).append(" xmlns=\"").append(Escape.xml(namespaceInfo)).append("\">");
                     lastWriteWasOpen = true;
                     break;
                 case CLOSING:
@@ -187,7 +186,8 @@ public class XMLWriter {
                     if (lastWriteWasOpen) {
                         buffer.append('\n');
                     }
-                    buffer.append("<").append(name).append(" xmlns=\"").append(namespaceInfo).append("\"/>\n");
+                    buffer.append("<").append(name).append(" xmlns=\"").append(Escape.xml(namespaceInfo))
+                            .append("\"/>\n");
                     lastWriteWasOpen = false;
                     break;
             }
@@ -243,7 +243,17 @@ public class XMLWriter {
      * @param data Data to append
      */
     public void writeData(String data) {
-        buffer.append("<![CDATA[").append(data).append("]]>");
+        buffer.append("<![CDATA[");
+        int start = 0;
+        int idx;
+        while ((idx = data.indexOf("]]>", start)) >= 0) {
+            buffer.append(data, start, idx);
+            // Embedded ']]>'. We append ']]', terminate, restart the sequence, append '>' and then continue.
+            buffer.append("]]]]><![CDATA[>");
+            start = idx + 3;
+        }
+        buffer.append(data.substring(start));
+        buffer.append("]]>");
     }
 
 

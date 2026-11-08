@@ -98,7 +98,7 @@ public class JMXGetTask extends AbstractCatalinaTask {
         }
         log("Getting attribute " + attribute + " in bean " + bean);
         try {
-            execute("/jmxproxy/?get=" + URLEncoder.encode(bean, getCharset()) + "&att=" +
+            execute("/../jmxproxy/?get=" + URLEncoder.encode(bean, getCharset()) + "&att=" +
                     URLEncoder.encode(attribute, getCharset()));
         } catch (UnsupportedEncodingException e) {
             throw new BuildException("Invalid 'charset' attribute: " + getCharset());

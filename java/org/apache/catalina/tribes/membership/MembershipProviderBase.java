@@ -67,7 +67,7 @@ public abstract class MembershipProviderBase implements MembershipProvider {
 
     @Override
     public Member getMember(Member mbr) {
-        if (membership.getMembers() == null) {
+        if (membership == null || membership.getMembers() == null) {
             return null;
         }
         return membership.getMember(mbr);
@@ -75,7 +75,7 @@ public abstract class MembershipProviderBase implements MembershipProvider {
 
     @Override
     public Member[] getMembers() {
-        if (membership.getMembers() == null) {
+        if (membership == null || membership.getMembers() == null) {
             return Membership.EMPTY_MEMBERS;
         }
         return membership.getMembers();

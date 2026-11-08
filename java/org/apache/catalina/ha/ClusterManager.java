@@ -57,11 +57,9 @@ public interface ClusterManager extends Manager {
     String[] getInvalidatedSessions();
 
     /**
-     * Return the name of the manager, at host /context name and at engine hostname+/context.
+     * Return the name of the manager.
      *
-     * @return String
-     *
-     * @since 5.5.10
+     * @return the name of the manager
      */
     String getName();
 
@@ -69,8 +67,6 @@ public interface ClusterManager extends Manager {
      * Set the name of the manager, at host /context name and at engine hostname+/context
      *
      * @param name The manager name
-     *
-     * @since 5.5.10
      */
     void setName(String name);
 

@@ -24,7 +24,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.net.ConnectException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -79,6 +81,12 @@ public class Catalina {
      */
     public static final String SERVER_XML = "conf/server.xml";
 
+    /**
+     * Timeout, in milliseconds, for connecting to the shutdown port when
+     * stopping the server.
+     */
+    private static final int SHUTDOWN_CONNECT_TIMEOUT_MS = 10000;
+
     // ----------------------------------------------------- Instance Variables
 
     /**
@@ -91,7 +99,6 @@ public class Catalina {
      */
     protected String configFile = SERVER_XML;
 
-    // XXX Should be moved to embedded
     /**
      * The shared extensions class loader for this server.
      */
@@ -549,6 +556,11 @@ public class Catalina {
         digester.addSetNext("Server/Service/Connector/SSLHostConfig/Certificate", "addCertificate",
                 "org.apache.tomcat.util.net.SSLHostConfigCertificate");
 
+        digester.addRule("Server/Service/Connector/SSLHostConfig/PreSharedKey", new PreSharedKeyCreateRule());
+        digester.addSetProperties("Server/Service/Connector/SSLHostConfig/PreSharedKey");
+        digester.addSetNext("Server/Service/Connector/SSLHostConfig/PreSharedKey", "addPreSharedKey",
+                "org.apache.tomcat.util.net.SSLHostConfigPreSharedKey");
+
         digester.addObjectCreate("Server/Service/Connector/SSLHostConfig/OpenSSLConf",
                 "org.apache.tomcat.util.net.openssl.OpenSSLConf");
         digester.addSetProperties("Server/Service/Connector/SSLHostConfig/OpenSSLConf");
@@ -773,12 +785,17 @@ public class Catalina {
         // Stop the existing server
         s = getServer();
         if (s.getPortWithOffset() > 0) {
-            try (Socket socket = new Socket(s.getAddress(), s.getPortWithOffset());
-                    OutputStream stream = socket.getOutputStream()) {
-                String shutdown = s.getShutdown();
-                for (int i = 0; i < shutdown.length(); i++) {
-                    stream.write(shutdown.charAt(i));
-                }
+            // Use a connect timeout so a shutdown port that silently drops
+            // packets does not block the stop command indefinitely
+            try (Socket socket = new Socket()) {
+                socket.connect(new InetSocketAddress(s.getAddress(), s.getPortWithOffset()),
+                        SHUTDOWN_CONNECT_TIMEOUT_MS);
+                OutputStream stream = socket.getOutputStream();
+                // Send the shutdown command as UTF-8 bytes. Writing the
+                // characters one at a time with OutputStream.write(int) would
+                // silently truncate any character above U+00FF and the server
+                // would then never match the configured shutdown string.
+                stream.write(s.getShutdown().getBytes(StandardCharsets.UTF_8));
                 stream.flush();
             } catch (ConnectException ce) {
                 log.error(sm.getString("catalina.stopServer.connectException", s.getAddress(),
@@ -805,6 +822,7 @@ public class Catalina {
         if (loaded) {
             return;
         }
+        // No load retry after a failure
         loaded = true;
 
         long t1 = System.nanoTime();
@@ -830,7 +848,14 @@ public class Catalina {
         try {
             getServer().init();
         } catch (LifecycleException e) {
-            if (throwOnInitFailure) {
+            /*
+             * The server will be in the FAILED state. If start() is then called, that will first call stop() to
+             * clean-up before trying to start the server. Calling stop() means a future call to getServer().await()
+             * will return immediately. That in turn means if the call to start() succeeds it will be immediately
+             * followed by another call to stop(). If await is enabled then it is better to throw the error here than to
+             * start the Server only to immediately stop it again.
+             */
+            if (throwOnInitFailure || await) {
                 throw new Error(e);
             } else {
                 log.error(sm.getString("catalina.initError"), e);
@@ -867,7 +892,21 @@ public class Catalina {
     public void start() {
 
         if (getServer() == null) {
-            load();
+            try {
+                load();
+            } catch (Throwable t) {
+                // Re-throw critical errors immediately. Otherwise, try and clean-up first.
+                ExceptionUtils.handleThrowable(t);
+                log.fatal(sm.getString("catalina.initError"), t);
+                if (getServer() != null) {
+                    try {
+                        getServer().destroy();
+                    } catch (LifecycleException e) {
+                        log.debug(sm.getString("catalina.destroyFail"), e);
+                    }
+                }
+                return;
+            }
         }
 
         if (getServer() == null) {
@@ -943,8 +982,7 @@ public class Catalina {
             }
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            // This will fail on JDK 1.2. Ignoring, as Tomcat can run
-            // fine without the shutdown hook.
+            // Failure to remove the shutdown hook is non-fatal
         }
 
         // Shut down the server

@@ -88,7 +88,7 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
      *
      * @return a PrintWriter object
      *
-     * @exception java.io.IOException if the outputstream already been called
+     * @exception IllegalStateException if the output stream has already been returned
      */
     @Override
     public PrintWriter getWriter() throws IOException {
@@ -109,7 +109,7 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
      *
      * @return an OutputStream object
      *
-     * @exception java.io.IOException if the printwriter already been called
+     * @exception IllegalStateException if the print writer has already been returned
      */
     @Override
     public ServletOutputStream getOutputStream() throws IOException {

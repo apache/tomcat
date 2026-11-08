@@ -70,6 +70,7 @@
         <TransientAttribute>configured</TransientAttribute>
         <TransientAttribute>displayName</TransientAttribute>
         <TransientAttribute>distributable</TransientAttribute>
+        <TransientAttribute>deployedFromServerXml</TransientAttribute>
         <TransientAttribute>domain</TransientAttribute>
         <TransientAttribute>name</TransientAttribute>
         <TransientAttribute>publicId</TransientAttribute>
@@ -130,6 +131,14 @@
         children="false"
         storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase"
         storeAppenderClass="org.apache.catalina.storeconfig.CertificateStoreAppender">
+     </Description>
+     <Description
+        tag="PreSharedKey"
+        standard="true"
+        default="true"
+        tagClass="org.apache.tomcat.util.net.SSLHostConfigPreSharedKey"
+        children="false"
+        storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
      </Description>
      <Description
         tag="OpenSSLConf"
@@ -351,6 +360,13 @@
         storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
      </Description>
      <Description
+        tag="ServiceRef"
+        standard="true"
+        default="false"
+        tagClass="org.apache.tomcat.util.descriptor.web.ContextService"
+        storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
+     </Description>
+     <Description
         tag="Transaction"
         standard="true"
         default="false"
@@ -487,4 +503,3 @@
         storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
      </Description>
 </Registry>
-

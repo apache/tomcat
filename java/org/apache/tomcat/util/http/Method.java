@@ -66,6 +66,9 @@ public class Method {
     // Other methods recognised by Tomcat
     /** CONNECT method. */
     public static final String CONNECT = "CONNECT";
+    // RFC 10008 HTTP QUERY method
+    /** QUERY method. */
+    public static final String QUERY = "QUERY";
 
 
     /**
@@ -168,6 +171,13 @@ public class Method {
                 if (len == 6 && buf[start + 1] == 'N' && buf[start + 2] == 'L' && buf[start + 3] == 'O' &&
                         buf[start + 4] == 'C' && buf[start + 5] == 'K') {
                     return UNLOCK;
+                }
+                break;
+            }
+            case 'Q': {
+                if (len == 5 && buf[start + 1] == 'U' && buf[start + 2] == 'E' && buf[start + 3] == 'R' &&
+                        buf[start + 4] == 'Y') {
+                    return QUERY;
                 }
                 break;
             }

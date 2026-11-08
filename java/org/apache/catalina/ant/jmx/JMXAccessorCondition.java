@@ -212,38 +212,65 @@ public class JMXAccessorCondition extends JMXAccessorConditionBase {
             throw new BuildException("Must specify an MBean name and attribute for condition");
         }
         if (testIfCondition() && testUnlessCondition()) {
+            String op = getOperation();
+            boolean equals = "==".equals(op);
+            boolean notEquals = "!=".equals(op);
+            boolean greater = ">".equals(op);
+            boolean greaterOrEquals = ">=".equals(op);
+            boolean lesser = "<".equals(op);
+            boolean lesserOrEquals = "<=".equals(op);
+            if (!equals && !notEquals && !greater && !greaterOrEquals && !lesser && !lesserOrEquals) {
+                throw new BuildException("Unsupported operation '" + op +
+                        "'. Supported operations are ==, !=, >, >=, < and <=.");
+            }
+            boolean relational = !equals && !notEquals;
+            if (relational && !"long".equals(type) && !"double".equals(type)) {
+                throw new BuildException("Unsupported type '" + type + "' for operation '" + op +
+                        "'. Supported types for relational operations are long and double.");
+            }
             String jmxValue = accessJMXValue();
             if (jmxValue != null) {
-                String op = getOperation();
-                if ("==".equals(op)) {
+                if (equals) {
                     return jmxValue.equals(value);
-                } else if ("!=".equals(op)) {
+                } else if (notEquals) {
                     return !jmxValue.equals(value);
+                } else if ("double".equals(type)) {
+                    double jvalue;
+                    double dvalue;
+                    try {
+                        jvalue = Double.parseDouble(jmxValue);
+                        dvalue = Double.parseDouble(value);
+                    } catch (NumberFormatException e) {
+                        throw new BuildException("Unable to compare the JMX attribute value '" + jmxValue +
+                                "' with the expected value '" + value + "' as a double", e);
+                    }
+                    if (greater) {
+                        return jvalue > dvalue;
+                    } else if (greaterOrEquals) {
+                        return jvalue >= dvalue;
+                    } else if (lesser) {
+                        return jvalue < dvalue;
+                    } else {
+                        return jvalue <= dvalue;
+                    }
                 } else {
-                    if ("long".equals(type)) {
-                        long jvalue = Long.parseLong(jmxValue);
-                        long lvalue = Long.parseLong(value);
-                        if (">".equals(op)) {
-                            return jvalue > lvalue;
-                        } else if (">=".equals(op)) {
-                            return jvalue >= lvalue;
-                        } else if ("<".equals(op)) {
-                            return jvalue < lvalue;
-                        } else if ("<=".equals(op)) {
-                            return jvalue <= lvalue;
-                        }
-                    } else if ("double".equals(type)) {
-                        double jvalue = Double.parseDouble(jmxValue);
-                        double dvalue = Double.parseDouble(value);
-                        if (">".equals(op)) {
-                            return jvalue > dvalue;
-                        } else if (">=".equals(op)) {
-                            return jvalue >= dvalue;
-                        } else if ("<".equals(op)) {
-                            return jvalue < dvalue;
-                        } else if ("<=".equals(op)) {
-                            return jvalue <= dvalue;
-                        }
+                    long jvalue;
+                    long lvalue;
+                    try {
+                        jvalue = Long.parseLong(jmxValue);
+                        lvalue = Long.parseLong(value);
+                    } catch (NumberFormatException e) {
+                        throw new BuildException("Unable to compare the JMX attribute value '" + jmxValue +
+                                "' with the expected value '" + value + "' as a long", e);
+                    }
+                    if (greater) {
+                        return jvalue > lvalue;
+                    } else if (greaterOrEquals) {
+                        return jvalue >= lvalue;
+                    } else if (lesser) {
+                        return jvalue < lvalue;
+                    } else {
+                        return jvalue <= lvalue;
                     }
                 }
             }

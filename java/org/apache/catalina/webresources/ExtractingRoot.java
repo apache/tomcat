@@ -70,6 +70,17 @@ public class ExtractingRoot extends StandardRoot {
                 try {
                     File dest = new File(expansionTarget, possibleJar.getName());
                     dest = dest.getCanonicalFile();
+                    try {
+                        String expansionCanonical = expansionTarget.getCanonicalPath();
+                        String destCanonical = dest.getCanonicalPath();
+                        if (!destCanonical.startsWith(expansionCanonical + File.separator) &&
+                                !destCanonical.equals(expansionCanonical)) {
+                            throw new LifecycleException(
+                                    sm.getString("extractingRoot.pathTraversal", possibleJar.getName()));
+                        }
+                    } catch (IOException ioe) {
+                        throw new LifecycleException(sm.getString("extractingRoot.targetFailed", expansionTarget), ioe);
+                    }
                     try (InputStream sourceStream = possibleJar.getInputStream();
                             OutputStream destStream = new FileOutputStream(dest)) {
                         IOTools.flow(sourceStream, destStream);
@@ -89,6 +100,11 @@ public class ExtractingRoot extends StandardRoot {
     }
 
 
+    /**
+     * Always returns false because ExtractingRoot extracts JARs to the work
+     * directory, making the deployment behave as if it were exploded. Callers
+     * that check isPackedWarFile() should treat this as an exploded deployment.
+     */
     @Override
     protected boolean isPackedWarFile() {
         return false;

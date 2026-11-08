@@ -31,9 +31,9 @@ import org.junit.Test;
 
 public class TestUtil {
 
-    // Used to init SecureRandom prior to running tests
-    public static void generateMask() {
-        Util.generateMask();
+    // Used to initialise SecureRandom prior to running tests
+    public static void initSecureRandom() {
+        Util.generateRandomBytes(1);
     }
 
     @Test
@@ -366,6 +366,20 @@ public class TestUtil {
     @Test
     public void testParseExtensionHeaderSimple04() {
         doTestParseExtensionHeaderSimple(" ext ; a = 1 ; b = 2 ");
+    }
+
+    @Test
+    public void testParseExtensionHeaderQuotedPair() {
+        List<Extension> result = new ArrayList<>();
+        Util.parseExtensionHeader(result, "ext;a=\"\\1\\5\"");
+
+        Assert.assertEquals(1, result.size());
+        Assert.assertEquals("15", result.get(0).getParameters().get(0).getValue());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testParseExtensionHeaderQuotedPairEscapedQuote() {
+        Util.parseExtensionHeader(new ArrayList<>(), "ext;a=\"1\\\"5\"");
     }
 
     private void doTestParseExtensionHeaderSimple(String header) {

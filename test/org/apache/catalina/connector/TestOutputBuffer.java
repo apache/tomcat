@@ -51,7 +51,7 @@ public class TestOutputBuffer extends TomcatBaseTest {
         for (int i = 1; i <= WritingServlet.EXPECTED_CONTENT_LENGTH; i *= 10) {
             WritingServlet servlet = new WritingServlet(i);
             Tomcat.addServlet(root, "servlet" + i, servlet);
-            root.addServletMappingDecoded("/servlet" + i, "servlet" + i);
+            root.addServletMapping("/servlet" + i, "servlet" + i);
         }
 
         tomcat.start();
@@ -81,7 +81,7 @@ public class TestOutputBuffer extends TomcatBaseTest {
 
         Bug52577Servlet bug52577 = new Bug52577Servlet();
         Tomcat.addServlet(root, "bug52577", bug52577);
-        root.addServletMappingDecoded("/", "bug52577");
+        root.addServletMapping("/", "bug52577");
 
         tomcat.start();
 
@@ -168,7 +168,7 @@ public class TestOutputBuffer extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         Context root = tomcat.addContext("", TEMP_DIR);
         Tomcat.addServlet(root, "Test", new Utf8WriteChars(data));
-        root.addServletMappingDecoded("/test", "Test");
+        root.addServletMapping("/test", "Test");
 
         tomcat.start();
 

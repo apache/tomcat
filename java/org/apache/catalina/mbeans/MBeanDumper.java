@@ -20,6 +20,7 @@ import java.lang.reflect.Array;
 import java.util.Set;
 import java.util.StringJoiner;
 
+import javax.management.AttributeNotFoundException;
 import javax.management.JMRuntimeException;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
@@ -57,7 +58,7 @@ public class MBeanDumper {
 
 
     /**
-     * The following code to dump MBeans has been copied from JMXProxyServlet.
+     * Dump MBeans to a string. JMXProxyServlet uses this method to dump MBeans.
      *
      * @param mbeanServer the MBean server
      * @param names       a set of object names for which to dump the info
@@ -75,7 +76,7 @@ public class MBeanDumper {
                 MBeanInfo minfo = mbeanServer.getMBeanInfo(oname);
                 // can't be null - I think
                 String code = minfo.getClassName();
-                if ("org.apache.commons.modeler.BaseModelMBean".equals(code)) {
+                if ("org.apache.tomcat.util.modeler.BaseModelMBean".equals(code)) {
                     code = (String) mbeanServer.getAttribute(oname, "modelerType");
                 }
                 buf.append("modelerType: ");
@@ -111,6 +112,14 @@ public class MBeanDumper {
                             }
                         } else {
                             log.error(sm.getString("mBeanDumper.getAttributeError", attName, oname), rme);
+                        }
+                        continue;
+                    } catch (AttributeNotFoundException e) {
+                        // Attributes that are advertised in the descriptor for
+                        // every protocol but handled by a single protocol do
+                        // not exist on the other protocols
+                        if (log.isDebugEnabled()) {
+                            log.debug(sm.getString("mBeanDumper.getAttributeError", attName, oname), e);
                         }
                         continue;
                     } catch (Throwable t) {
@@ -171,10 +180,11 @@ public class MBeanDumper {
      * Escape a string value for display.
      *
      * @param value the value to escape
+     *
      * @return the escaped value
      */
     public static String escape(String value) {
-        // The only invalid char is \n
+        // \n is escaped to keep the output line-oriented. \r is not escaped.
         // We also need to keep the string short and split it with \nSPACE
         // XXX TODO
         int idx = value.indexOf('\n');

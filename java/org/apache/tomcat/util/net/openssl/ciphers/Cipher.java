@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * All the standard cipher suites for SSL/TSL.
+ * All the standard cipher suites for SSL/TLS.
  *
  * @see <a href="https://github.com/openssl/openssl/blob/master/ssl/s3_lib.c" >OpenSSL cipher definitions</a>
  * @see <a href="http://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-4" >The cipher suite
@@ -2697,7 +2697,7 @@ public enum Cipher {
 
     // Cipher 0x00FF  TLS_EMPTY_RENEGOTIATION_INFO_SCSV
 
-    // TLS 1.3 ciphers (draft - v26)
+    // TLS 1.3 ciphers (RFC 8446)
     /** Cipher 1301 */
     TLS_AES_128_GCM_SHA256(
             0x1301,
@@ -2790,8 +2790,7 @@ public enum Cipher {
      * No other ciphers defined until 0xC001 below
      */
 
-    /* ECC cipher suites from draft-ietf-tls-ecc-01.txt (
-            Mar 15, 2001) */
+    /* ECC cipher suites (RFC 4492) */
     /** Cipher C001 */
     TLS_ECDH_ECDSA_WITH_NULL_SHA(
             0xC001,
@@ -4716,7 +4715,7 @@ public enum Cipher {
             null,
             null
     ),
-    /** Draft: https://tools.ietf.org/html/draft-ietf-tls-chacha20-poly1305-04 */
+    /** ChaCha20-Poly1305 ciphers (RFC 7905). */
     TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256(
             0xCCA8,
             "ECDHE-RSA-CHACHA20-POLY1305",

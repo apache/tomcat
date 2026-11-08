@@ -65,8 +65,8 @@ public interface Wrapper extends Container {
 
     /**
      * Set the available date/time for this servlet, in milliseconds since the epoch. If this date/time is in the
-     * future, any request for this servlet will return an SC_SERVICE_UNAVAILABLE error. A value equal to Long.MAX_VALUE
-     * is considered to mean that unavailability is permanent.
+     * future, any request for this servlet will return an SC_SERVICE_UNAVAILABLE error. If it is zero, the servlet is
+     * currently available. A value equal to Long.MAX_VALUE is considered to mean that unavailability is permanent.
      *
      * @param available The new available date/time
      */
@@ -132,7 +132,7 @@ public interface Wrapper extends Container {
     String[] getServletMethods() throws ServletException;
 
 
-   /**
+    /**
      * Returns whether this Servlet is currently unavailable.
      *
      * @return <code>true</code> if this Servlet is currently unavailable

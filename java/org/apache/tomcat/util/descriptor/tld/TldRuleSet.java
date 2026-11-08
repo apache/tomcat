@@ -319,7 +319,7 @@ public class TldRuleSet implements RuleSet {
          */
         public TagAttributeInfo toTagAttributeInfo() {
             if (fragment) {
-                // JSP8.5.2: for a fragment type is fixed and rexprvalue is true
+                // JSP spec 8.5.2: for a fragment the type is fixed and rtexprvalue is true
                 type = "jakarta.servlet.jsp.tagext.JspFragment";
                 requestTime = true;
             } else if (deferredValue) {
@@ -484,7 +484,7 @@ public class TldRuleSet implements RuleSet {
         @Override
         public void body(String namespace, String name, String text) throws Exception {
             if (null != text) {
-                text = text.trim();
+                text = text.strip();
             }
             boolean value = "true".equalsIgnoreCase(text) || "yes".equalsIgnoreCase(text);
             setter.invoke(digester.peek(), Boolean.valueOf(value));

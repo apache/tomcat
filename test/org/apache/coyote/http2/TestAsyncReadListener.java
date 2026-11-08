@@ -96,10 +96,10 @@ public class TestAsyncReadListener extends Http2TestBase {
 
         Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
-        ctxt.addServletMappingDecoded("/simple", "simple");
+        ctxt.addServletMapping("/simple", "simple");
         Wrapper w = Tomcat.addServlet(ctxt, "async", asyncServlet);
         w.setAsyncSupported(true);
-        ctxt.addServletMappingDecoded("/async", "async");
+        ctxt.addServletMapping("/async", "async");
         tomcat.start();
     }
 

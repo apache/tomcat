@@ -112,6 +112,7 @@ public class SecureNioChannel extends NioChannel {
         if (channel != null) {
             sniComplete = false;
             handshakeComplete = false;
+            needHandshakeWrap = false;
             closed = false;
             closing = false;
             netInBuffer.clear();
@@ -160,8 +161,9 @@ public class SecureNioChannel extends NioChannel {
      * @return 0 if handshake is complete, -1 if an error (other than an IOException) occurred, otherwise it returns a
      *             SelectionKey interestOps value
      *
-     * @throws IOException If an I/O error occurs during the handshake or if the handshake fails during wrapping or
-     *                         unwrapping
+     * @throws IOException           If an I/O error occurs during the handshake or if the handshake fails during
+     *                                 wrapping or unwrapping
+     * @throws IllegalStateException If an invalid handshake status is encountered during the handshake
      */
     @Override
     public int handshake(boolean read, boolean write) throws IOException {
@@ -291,6 +293,8 @@ public class SecureNioChannel extends NioChannel {
         String hostName = null;
         List<Cipher> clientRequestedCiphers = null;
         List<String> clientRequestedApplicationProtocols = null;
+        List<String> clientRequestedProtocols = null;
+        List<String> clientRequestedCipherNames = null;
         List<Group> clientSupportedGroups = null;
         List<SignatureScheme> clientSignatureSchemes = null;
         switch (extractor.getResult()) {
@@ -301,6 +305,8 @@ public class SecureNioChannel extends NioChannel {
                 //$FALL-THROUGH$ to set the client requested ciphers
             case NOT_PRESENT:
                 clientRequestedCiphers = extractor.getClientRequestedCiphers();
+                clientRequestedProtocols = extractor.getClientRequestedProtocols();
+                clientRequestedCipherNames = extractor.getClientRequestedCipherNames();
                 clientSupportedGroups = extractor.getClientSupportedGroups();
                 clientSignatureSchemes = extractor.getClientSignatureSchemes();
                 break;
@@ -313,6 +319,11 @@ public class SecureNioChannel extends NioChannel {
                 }
                 hostName = endpoint.getDefaultSSLHostConfigName();
                 clientRequestedCiphers = Collections.emptyList();
+                clientRequestedApplicationProtocols = Collections.emptyList();
+                clientRequestedProtocols = Collections.emptyList();
+                clientRequestedCipherNames = Collections.emptyList();
+                clientSupportedGroups = Collections.emptyList();
+                clientSignatureSchemes = Collections.emptyList();
                 break;
             case NON_SECURE:
                 netOutBuffer.clear();
@@ -327,13 +338,12 @@ public class SecureNioChannel extends NioChannel {
         }
 
         createSSLEngine(hostName, clientRequestedCiphers, clientRequestedApplicationProtocols,
-                extractor.getClientRequestedProtocols(), clientSupportedGroups, clientSignatureSchemes);
+                clientRequestedProtocols, clientSupportedGroups, clientSignatureSchemes);
 
         // Populate additional TLS attributes obtained from the handshake that
         // aren't available from the session
-        additionalTlsAttributes.put(SSLSupport.REQUESTED_PROTOCOL_VERSIONS_KEY,
-                extractor.getClientRequestedProtocols());
-        additionalTlsAttributes.put(SSLSupport.REQUESTED_CIPHERS_KEY, extractor.getClientRequestedCipherNames());
+        additionalTlsAttributes.put(SSLSupport.REQUESTED_PROTOCOL_VERSIONS_KEY, clientRequestedProtocols);
+        additionalTlsAttributes.put(SSLSupport.REQUESTED_CIPHERS_KEY, clientRequestedCipherNames);
 
         // Ensure the application buffers (which have to be created earlier) are
         // big enough.
@@ -556,7 +566,6 @@ public class SecureNioChannel extends NioChannel {
      * </pre>
      *
      * @throws IOException if an I/O error occurs
-     * @throws IOException if there is data on the outgoing network buffer, and we are unable to flush it
      */
     @Override
     public void close() throws IOException {
@@ -909,6 +918,8 @@ public class SecureNioChannel extends NioChannel {
         netOutBuffer.clear();
 
         SSLEngineResult result = sslEngine.wrap(srcs, offset, length, netOutBuffer);
+        // Call to wrap() will have included any required handshake data
+        needHandshakeWrap = false;
         // The number of bytes written
         int written = result.bytesConsumed();
         netOutBuffer.flip();

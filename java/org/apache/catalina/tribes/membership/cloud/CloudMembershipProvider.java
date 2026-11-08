@@ -92,6 +92,11 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
     protected int port;
 
     /**
+     * The local secure port number.
+     */
+    protected int securePort;
+
+    /**
      * Member expiration time in milliseconds.
      */
     protected long expirationTime = 5000;
@@ -171,9 +176,14 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
         connectionTimeout = service.getConnectTimeout();
         readTimeout = service.getReadTimeout();
         expirationTime = service.getExpirationTime();
+        if (expirationTime <= 0) {
+            throw new IllegalArgumentException(sm.getString("cloudMembershipProvider.invalidTimingProperty",
+                    "expirationTime", Long.valueOf(expirationTime)));
+        }
 
         localIp = InetAddress.getLocalHost().getHostAddress();
         port = Integer.parseInt(properties.getProperty("tcpListenPort"));
+        securePort = Integer.parseInt(properties.getProperty("tcpSecurePort"));
     }
 
     @Override
@@ -186,12 +196,16 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
 
     @Override
     public boolean stop(int level) throws Exception {
+        service.getChannel().removeChannelListener(this);
         return true;
     }
 
     @Override
     public void heartbeat() {
         Member[] announcedMembers = fetchMembers();
+        if (announcedMembers == null) {
+            return;
+        }
         // Add new members or refresh the members in the membership
         for (Member member : announcedMembers) {
             updateMember(member, true);
@@ -206,7 +220,7 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
     /**
      * Fetch current cluster members from the cloud orchestration.
      *
-     * @return the member array
+     * @return the member array, or {@code null} if an error occurred
      */
     protected abstract Member[] fetchMembers();
 

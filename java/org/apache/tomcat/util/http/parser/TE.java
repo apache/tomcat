@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Represents a Transfer-Encoding value with optional parameters and quality factor.
+ * Represents a single transfer coding in a TE header value, with optional parameters and quality factor.
  */
 public class TE {
 
@@ -85,7 +85,7 @@ public class TE {
 
 
     /**
-     * Parses a Transfer-Encoding header value into a list of TE instances.
+     * Parses a TE header value into a list of TE instances.
      *
      * @param input the input reader containing the header value
      * @return the list of parsed TE values

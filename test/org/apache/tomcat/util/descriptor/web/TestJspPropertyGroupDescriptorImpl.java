@@ -42,7 +42,7 @@ public class TestJspPropertyGroupDescriptorImpl {
     @Test
     public void testUrlPatternsAreIsolated() {
         JspPropertyGroup jpg = new JspPropertyGroup();
-        jpg.addUrlPatternDecoded("pattern");
+        jpg.addUrlPattern("pattern");
         JspPropertyGroupDescriptorImpl descriptor = new JspPropertyGroupDescriptorImpl(jpg);
         descriptor.getUrlPatterns().clear();
         Assert.assertEquals(1, descriptor.getUrlPatterns().size());

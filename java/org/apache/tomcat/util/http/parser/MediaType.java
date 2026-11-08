@@ -155,10 +155,14 @@ public class MediaType {
                         if (entry.getKey().equalsIgnoreCase("charset")) {
                             continue;
                         }
+                        String value = entry.getValue();
+                        if (value == null || value.isEmpty()) {
+                            continue;
+                        }
                         result.append(';');
                         result.append(entry.getKey());
                         result.append('=');
-                        result.append(entry.getValue());
+                        result.append(value);
                     }
 
                     noCharset = result.toString();
@@ -173,7 +177,9 @@ public class MediaType {
      *
      * @param input a reader over the header text
      *
-     * @return a MediaType parsed from the input, or null if not valid
+     * @return a MediaType parsed from the input, or null if the required type or subtype is missing. Some
+     *             syntactically invalid parameter values (e.g. a dangling {@code ;}) are accepted and produce a
+     *             non-null result.
      *
      * @throws IOException if there was a problem reading the input
      */
@@ -211,7 +217,7 @@ public class MediaType {
                 value = "";
             }
 
-            if (attribute != null) {
+            if (attribute != null && !attribute.isEmpty()) {
                 parameters.put(attribute.toLowerCase(Locale.ENGLISH), value);
             }
 

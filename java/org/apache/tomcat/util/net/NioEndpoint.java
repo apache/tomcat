@@ -39,8 +39,10 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
@@ -198,6 +200,93 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
 
 
     /**
+     * Permissions which will be checked for / set on the parent directory of the Unix Domain Socket path before the
+     * Unix Domain Socket is created.
+     */
+    private String unixDomainSocketParentPermissions = null;
+
+    /**
+     * Sets the permissions that will be checked for / set on the parent directory of the Unix Domain Socket path
+     * before the Unix Domain Socket is created.
+     *
+     * @param unixDomainSocketParentPermissions the permissions string
+     */
+    public void setUnixDomainSocketParentPermissions(String unixDomainSocketParentPermissions) {
+        this.unixDomainSocketParentPermissions = unixDomainSocketParentPermissions;
+    }
+
+    /**
+     * Returns the permissions that will be checked for / set on the parent directory of the Unix Domain Socket path
+     * before the Unix Domain Socket is created.
+     *
+     * @return the permissions string
+     */
+    public String getUnixDomainSocketParentPermissions() {
+        return unixDomainSocketParentPermissions;
+    }
+
+    private Set<PosixFilePermission> getUnixDomainSocketParentPermissionsInternal() {
+        String permissionString = getUnixDomainSocketParentPermissions();
+        boolean derivePermissions = false;
+
+        if (permissionString == null) {
+            permissionString = getUnixDomainSocketPathPermissions();
+            /*
+             * UDS permissions will be file permissions which will be missing the execute bit required at the directory
+             * level and may include write permissions which are not required so set flag to derive a sensible default.
+             */
+            derivePermissions = true;
+        }
+
+        if (permissionString == null || permissionString.isBlank()) {
+            return null;
+        }
+
+        Set<PosixFilePermission> result = PosixFilePermissions.fromString(permissionString);
+        if (derivePermissions) {
+            // Add execute before removing write
+            if (result.contains(PosixFilePermission.OWNER_READ) || result.contains(PosixFilePermission.OWNER_WRITE)) {
+                result.add(PosixFilePermission.OWNER_EXECUTE);
+            }
+            if (result.contains(PosixFilePermission.GROUP_READ) || result.contains(PosixFilePermission.GROUP_WRITE)) {
+                result.add(PosixFilePermission.GROUP_EXECUTE);
+            }
+            if (result.contains(PosixFilePermission.OTHERS_READ) || result.contains(PosixFilePermission.OTHERS_WRITE)) {
+                result.add(PosixFilePermission.OTHERS_EXECUTE);
+            }
+            result.remove(PosixFilePermission.GROUP_WRITE);
+            result.remove(PosixFilePermission.OTHERS_WRITE);
+        }
+
+        return result;
+    }
+
+
+    /**
+     * If the parent directory for the UDS already exists, the name of the expected owner.
+     */
+    private String unixDomainSocketParentOwner = null;
+
+    /**
+     * Returns the expected name of the owner of the parent directory for the UDS if it already exists.
+     *
+     * @return the owner name
+     */
+    public String getUnixDomainSocketParentOwner() {
+        return unixDomainSocketParentOwner;
+    }
+
+    /**
+     * Sets the expected name of the owner of the parent directory for the UDS if it already exists.
+     *
+     * @param unixDomainSocketParentOwner the expected owner name
+     */
+    public void setUnixDomainSocketParentOwner(String unixDomainSocketParentOwner) {
+        this.unixDomainSocketParentOwner = unixDomainSocketParentOwner;
+    }
+
+
+    /**
      * Priority of the poller thread.
      */
     private int pollerThreadPriority = Thread.NORM_PRIORITY;
@@ -255,9 +344,10 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
     /**
      * Number of keep-alive sockets.
      *
-     * @return The number of sockets currently in the keep-alive state waiting for the next request to be received on
-     *             the socket
+     * @return The number of sockets currently registered with the poller (i.e. all active sockets, including the
+     *             keep-alive sockets waiting for the next request to be received on the socket)
      */
+    @Override
     public int getKeepAliveCount() {
         if (poller == null) {
             return 0;
@@ -312,9 +402,79 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
                 throw new IllegalArgumentException(sm.getString("endpoint.init.bind.inherited"));
             }
         } else if (getUnixDomainSocketPath() != null) {
+            /*
+             * If permissions are configured, need to create the parent folder first with the correct permissions to
+             * avoid a TOCTOU issue with the Unix Domain Socket.
+             */
+            Set<PosixFilePermission> parentPosixPermissions = getUnixDomainSocketParentPermissionsInternal();
+            if (parentPosixPermissions != null) {
+                Path udsPath = Paths.get(getUnixDomainSocketPath()).toAbsolutePath();
+                Path parentPath = udsPath.getParent();
+                File parentFile = parentPath.toFile();
+
+                boolean posixSupported = parentPath.getFileSystem().supportedFileAttributeViews().contains("posix");
+
+                if (!Files.exists(parentPath, LinkOption.NOFOLLOW_LINKS) || !Files.readAttributes(
+                        parentPath, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS).isDirectory()) {
+                    if (posixSupported) {
+                        /*
+                         * The immediate parent will be configured with the requested permissions. If other parents are
+                         * created, they will be created with the specified permissions masked as per the current
+                         * process's UMASK.
+                         */
+                        Files.createDirectories(parentPath, PosixFilePermissions.asFileAttribute(parentPosixPermissions));
+                        FileAttribute<Set<PosixFilePermission>> attrs = PosixFilePermissions.asFileAttribute(parentPosixPermissions);
+                        Files.setAttribute(parentPath, attrs.name(), attrs.value());
+                    } else {
+                        Files.createDirectories(parentPath);
+                    }
+                }
+
+                // Directory should exist now
+                if (posixSupported) {
+                    // Check permissions are at least as restrictive as those specified.
+                    Set<PosixFilePermission> currentPosixPermissions =
+                            Files.getPosixFilePermissions(parentPath, LinkOption.NOFOLLOW_LINKS);
+                    currentPosixPermissions.removeAll(parentPosixPermissions);
+                    if (!currentPosixPermissions.isEmpty()) {
+                        throw new IllegalStateException(sm.getString("endpoint.nio.uds.parentLaxPermissions",
+                                parentPath, currentPosixPermissions));
+                    }
+                } else {
+                    log.warn(sm.getString("endpoint.nio.uds.parentNotPosix", parentPath));
+                    setPermissionsForNonPosixFile(parentFile, parentPosixPermissions);
+                }
+
+                /*
+                 * Check the owner - should either be the current user (if created above) or the expected owner (if
+                 * pre-created).
+                 */
+                String expectedOwner = getUnixDomainSocketParentOwner();
+                if (expectedOwner == null || !expectedOwner.isEmpty()) {
+                    String owner;
+                    try {
+                        owner = Files.getOwner(parentPath, LinkOption.NOFOLLOW_LINKS).getName();
+                    } catch (Throwable t) {
+                        ExceptionUtils.handleThrowable(t);
+                        throw new IllegalStateException(sm.getString("endpoint.nio.uds.noOwner", parentPath), t);
+                    }
+                    if (!owner.equals(expectedOwner)) {
+                        String currentUser = System.getProperty("user.name");
+                        if (!owner.equals(currentUser)) {
+                            throw new IllegalStateException(sm.getString("endpoint.nio.uds.parentOwner",
+                                    parentPath, owner, expectedOwner, currentUser));
+
+                        }
+                    }
+                }
+            }
+
+            // Create the Unix Domain Socket
             SocketAddress sa = UnixDomainSocketAddress.of(getUnixDomainSocketPath());
             serverSock = ServerSocketChannel.open(StandardProtocolFamily.UNIX);
             serverSock.bind(sa, getAcceptCount());
+
+            // If permissions are configured, set them on the Unix Domain Socket
             if (getUnixDomainSocketPathPermissions() != null) {
                 Path path = Paths.get(getUnixDomainSocketPath());
                 Set<PosixFilePermission> permissions =
@@ -323,13 +483,9 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
                     FileAttribute<Set<PosixFilePermission>> attrs = PosixFilePermissions.asFileAttribute(permissions);
                     Files.setAttribute(path, attrs.name(), attrs.value());
                 } else {
+                    log.warn(sm.getString("endpoint.nio.uds.notPosix", path));
                     File file = path.toFile();
-                    if (permissions.contains(PosixFilePermission.OTHERS_READ) && !file.setReadable(true, false)) {
-                        log.warn(sm.getString("endpoint.nio.perms.readFail", file.getPath()));
-                    }
-                    if (permissions.contains(PosixFilePermission.OTHERS_WRITE) && !file.setWritable(true, false)) {
-                        log.warn(sm.getString("endpoint.nio.perms.writeFail", file.getPath()));
-                    }
+                    setPermissionsForNonPosixFile(file, permissions);
                 }
             }
         } else {
@@ -339,6 +495,16 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
             serverSock.bind(addr, getAcceptCount());
         }
         serverSock.configureBlocking(true); // mimic APR behavior
+    }
+
+
+    private void setPermissionsForNonPosixFile(File file, Set<PosixFilePermission> permissions) {
+        if (permissions.contains(PosixFilePermission.OTHERS_READ) && !file.setReadable(true, false)) {
+            log.warn(sm.getString("endpoint.nio.perms.readFail", file.getAbsolutePath()));
+        }
+        if (permissions.contains(PosixFilePermission.OTHERS_WRITE) && !file.setWritable(true, false)) {
+            log.warn(sm.getString("endpoint.nio.perms.writeFail", file.getAbsolutePath()));
+        }
     }
 
 
@@ -514,6 +680,21 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
      */
     protected SynchronizedStack<NioChannel> getNioChannels() {
         return nioChannels;
+    }
+
+
+    @Override
+    public void setSSLEnabled(boolean SSLEnabled) {
+        if (SSLEnabled != isSSLEnabled() && nioChannels != null) {
+            // The channel cache may contain channels of the previous
+            // type (secure or plain) which must not be re-used once the
+            // SSL state of the endpoint has changed.
+            NioChannel channel;
+            while ((channel = nioChannels.pop()) != null) {
+                channel.free();
+            }
+        }
+        super.setSSLEnabled(SSLEnabled);
     }
 
 
@@ -806,8 +987,8 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
 
         /**
          * Add specified socket and associated pool to the poller. The socket will be added to a temporary array, and
-         * polled first after a maximum amount of time equal to pollTime (in most cases, latency will be much lower,
-         * however).
+         * polled first after a maximum amount of time equal to the <code>selectorTimeout</code> (in most cases, latency
+         * will be much lower, however).
          *
          * @param socketWrapper to add to the poller
          * @param interestOps   Operations for which to register this socket with the Poller
@@ -1400,9 +1581,13 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
                 return true;
             }
 
-            fillReadBuffer(false);
+            int nRead = fillReadBuffer(false);
 
-            return socketBufferHandler.getReadBuffer().position() > 0;
+            // A return of -1 signals the end of the input. Report that the
+            // socket is ready in that case since a subsequent read is able to
+            // report the end of the data to the reader immediately rather than
+            // waiting for data that will never arrive.
+            return nRead == -1 || socketBufferHandler.getReadBuffer().position() > 0;
         }
 
 
@@ -1539,7 +1724,7 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
                     synchronized (readLock) {
                         n = getSocket().read(buffer);
                         if (n == -1) {
-                            throw new EOFException();
+                            return -1;
                         } else if (n == 0) {
                             // Ensure a spurious wake-up doesn't trigger a duplicate registration
                             if (!readBlocking) {
@@ -1564,9 +1749,6 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
                 } while (n == 0); // TLS needs to loop as reading zero application bytes is possible
             } else {
                 n = getSocket().read(buffer);
-                if (n == -1) {
-                    throw new EOFException();
-                }
             }
             return n;
         }
@@ -2042,8 +2224,17 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
                     getHandler().process(socketWrapper, SocketEvent.CONNECT_FAIL);
                     socketWrapper.close();
                 } else if (handshake == SelectionKey.OP_READ) {
+                    /*
+                     * The handshake reads from the channel directly so does not update the last read time. Time spent
+                     * processing the handshake (e.g. OCSP checks of the client certificate) must not count towards
+                     * the time spent waiting for the client else the Poller may time out the connection as soon as
+                     * read interest is registered.
+                     */
+                    ((NioSocketWrapper) socketWrapper).updateLastRead();
                     socketWrapper.registerReadInterest();
                 } else if (handshake == SelectionKey.OP_WRITE) {
+                    // Same as for read above
+                    ((NioSocketWrapper) socketWrapper).updateLastWrite();
                     socketWrapper.registerWriteInterest();
                 }
             } catch (CancelledKeyException cx) {

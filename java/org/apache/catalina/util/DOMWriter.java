@@ -112,7 +112,6 @@ public class DOMWriter {
             case Node.PROCESSING_INSTRUCTION_NODE:
                 out.print("<?");
                 out.print(node.getLocalName());
-
                 String piData = node.getNodeValue();
                 if (piData != null && !piData.isEmpty()) {
                     out.print(' ');
@@ -122,14 +121,44 @@ public class DOMWriter {
                     int start = 0;
                     int end = piData.indexOf("?>");
                     while (end >= 0) {
-                        out.print(piData.substring(start, end + 1));
-                        out.print(' ');
-                        start = end + 1;
+                        out.print(piData.substring(start, end));
+                        out.print("? >");
+                        start = end + 2;
                         end = piData.indexOf("?>", start);
                     }
                     out.print(piData.substring(start));
                 }
                 out.print("?>");
+                break;
+
+            // print comment
+            case Node.COMMENT_NODE:
+                out.print("<!--");
+                String commentValue = node.getNodeValue();
+                if (commentValue != null) {
+                    // The only illegal sequence in comment data is --> which
+                    // would terminate the comment early. Break it with a space.
+                    int start = 0;
+                    int end = commentValue.indexOf("-->");
+                    while (end >= 0) {
+                        out.print(commentValue.substring(start, end));
+                        out.print("- >");
+                        start = end + 3;
+                        end = commentValue.indexOf("-->", start);
+                    }
+                    out.print(commentValue.substring(start));
+                }
+                out.print("-->");
+                break;
+
+            // print document fragment (just its children)
+            case Node.DOCUMENT_FRAGMENT_NODE:
+                printChildren(node);
+                break;
+
+            default:
+                // Unhandled node types (ENTITY_NODE, NOTATION_NODE,
+                // ATTRIBUTE_NODE) are silently skipped.
                 break;
         }
 

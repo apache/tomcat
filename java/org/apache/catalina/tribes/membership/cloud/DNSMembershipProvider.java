@@ -32,7 +32,19 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * A {@link org.apache.catalina.tribes.MembershipProvider} that uses DNS to retrieve the members of a cluster.<br>
+ * A {@link org.apache.catalina.tribes.MembershipProvider} that uses DNS to retrieve the members of a cluster.
+ * <p>
+ * Relying solely on DNS to determine cluster membership requires that all DNS caching between the cluster nodes and the
+ * authoritative name server must honour the TTL set by the authoritative name server. Experience has shown that that is
+ * often not the case. Therefore, to ensure that new cluster members are not excluded from the cluster due to a stale
+ * DNS cache, this membership service accepts messages from any node regardless of whether it or not is listed as a
+ * cluster member in DNS and adds that node to the cluster. The DNS entry is, effectively, used by new nodes to identify
+ * the other nodes in the cluster to which cluster messages should be sent.
+ * <p>
+ * If more control is required over cluster membership, users are strongly encouraged to configure a securePort and use
+ * TLS to ensure that only nodes with knowledge of the shared key are able to participate in the cluster.
+ * <p>
+ * TODO: Make the "accept messages from any node and add that node to the cluster" behaviour optional.
  * <p>
  * <strong>Configuration example for Kubernetes</strong>
  * </p>
@@ -143,40 +155,40 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
 
     @Override
     protected Member[] fetchMembers() {
-        List<MemberImpl> members = new ArrayList<>();
 
         InetAddress[] inetAddresses = null;
         try {
             inetAddresses = InetAddress.getAllByName(dnsServiceName);
         } catch (UnknownHostException exception) {
             log.warn(sm.getString("dnsMembershipProvider.dnsError", dnsServiceName), exception);
+            return null;
         }
 
-        if (inetAddresses != null) {
-            for (InetAddress inetAddress : inetAddresses) {
-                String ip = inetAddress.getHostAddress();
-                byte[] id = digest(ip.getBytes(StandardCharsets.US_ASCII));
-                // We found ourselves, ignore
-                if (ip.equals(localIp)) {
-                    // Update the UID on initial lookup
-                    Member localMember = service.getLocalMember(false);
-                    if (localMember.getUniqueId() == CloudMembershipService.INITIAL_ID &&
-                            localMember instanceof MemberImpl) {
-                        ((MemberImpl) localMember).setUniqueId(id);
-                    }
-                    continue;
+        List<MemberImpl> members = new ArrayList<>();
+        for (InetAddress inetAddress : inetAddresses) {
+            String ip = inetAddress.getHostAddress();
+            byte[] id = digest(ip.getBytes(StandardCharsets.US_ASCII));
+            // We found ourselves, ignore
+            if (ip.equals(localIp)) {
+                // Update the UID on initial lookup
+                Member localMember = service.getLocalMember(false);
+                if (localMember.getUniqueId() == CloudMembershipService.INITIAL_ID &&
+                        localMember instanceof MemberImpl) {
+                    ((MemberImpl) localMember).setUniqueId(id);
                 }
-                long aliveTime = -1;
-                MemberImpl member;
-                try {
-                    member = new MemberImpl(ip, port, aliveTime);
-                } catch (IOException ioe) {
-                    log.error(sm.getString("kubernetesMembershipProvider.memberError"), ioe);
-                    continue;
-                }
-                member.setUniqueId(id);
-                members.add(member);
+                continue;
             }
+            long aliveTime = -1;
+            MemberImpl member;
+            try {
+                member = new MemberImpl(ip, port, aliveTime);
+                member.setSecurePort(securePort);
+            } catch (IOException ioe) {
+                log.error(sm.getString("dnsMembershipProvider.memberError"), ioe);
+                continue;
+            }
+            member.setUniqueId(id);
+            members.add(member);
         }
 
         return members.toArray(new Member[0]);
@@ -199,10 +211,11 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
             MemberImpl member = new MemberImpl();
             member.setHost(sender.getHost());
             member.setPort(sender.getPort());
+            member.setSecurePort(sender.getSecurePort());
             byte[] host = sender.getHost();
             int i = 0;
             StringBuilder buf = new StringBuilder();
-            if (host.length > 0 ) {
+            if (host.length > 0) {
                 buf.append(host[i++] & 0xff);
                 for (; i < host.length; i++) {
                     buf.append('.').append(host[i] & 0xff);
@@ -213,6 +226,7 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
             member.setMemberAliveTime(-1);
             updateMember(member, true);
         }
+        // We will not actually process the message
         return false;
     }
 }

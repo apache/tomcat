@@ -46,7 +46,6 @@ public class Url implements TagPlugin {
         String valueName = ctxt.getTemporaryVariableName();
         String contextName = ctxt.getTemporaryVariableName();
         String baseUrlName = ctxt.getTemporaryVariableName();
-        String resultName = ctxt.getTemporaryVariableName();
         String responseName = ctxt.getTemporaryVariableName();
 
         // get the scope
@@ -71,33 +70,28 @@ public class Url implements TagPlugin {
 
         // get the raw url
         ctxt.generateJavaSource("String " + baseUrlName + " = " + "org.apache.jasper.tagplugins.jstl.Util.resolveUrl(" +
-                valueName + ", " + contextName + ", pageContext);");
-        ctxt.generateJavaSource("pageContext.setAttribute" + "(\"url_without_param\", " + baseUrlName + ");");
+                valueName + ", " + contextName + ", _jspx_page_context);");
 
         // add params
-        ctxt.generateBody();
-
-        ctxt.generateJavaSource(
-                "String " + resultName + " = " + "(String)pageContext.getAttribute(\"url_without_param\");");
-        ctxt.generateJavaSource("pageContext.removeAttribute(\"url_without_param\");");
+        UrlParameters.generateBody(ctxt, baseUrlName);
 
         // if the url is relative, encode it
-        ctxt.generateJavaSource("if(!org.apache.jasper.tagplugins.jstl.Util.isAbsoluteUrl(" + resultName + ")){");
+        ctxt.generateJavaSource("if(!org.apache.jasper.tagplugins.jstl.Util.isAbsoluteUrl(" + baseUrlName + ")){");
         ctxt.generateJavaSource("    HttpServletResponse " + responseName + " = " +
-                "((HttpServletResponse) pageContext.getResponse());");
-        ctxt.generateJavaSource("    " + resultName + " = " + responseName + ".encodeURL(" + resultName + ");");
+                "((HttpServletResponse) _jspx_page_context.getResponse());");
+        ctxt.generateJavaSource("    " + baseUrlName + " = " + responseName + ".encodeURL(" + baseUrlName + ");");
         ctxt.generateJavaSource("}");
 
-        // if "var" is specified, the url string store in the attribute var defines
+        // if "var" is specified, the url string is stored in the attribute var
         if (hasVar) {
             String strVar = ctxt.getConstantAttribute("var");
             ctxt.generateJavaSource(
-                    "pageContext.setAttribute" + "(\"" + strVar + "\", " + resultName + ", " + iScope + ");");
+                    "_jspx_page_context.setAttribute" + "(\"" + strVar + "\", " + baseUrlName + ", " + iScope + ");");
 
             // if var is not specified, just print out the url string
         } else {
             ctxt.generateJavaSource("try{");
-            ctxt.generateJavaSource("    pageContext.getOut().print(" + resultName + ");");
+            ctxt.generateJavaSource("    _jspx_page_context.getOut().print(" + baseUrlName + ");");
             ctxt.generateJavaSource("}catch(java.io.IOException ex){");
             ctxt.generateJavaSource("    throw new JspTagException(ex.toString(), ex);");
             ctxt.generateJavaSource("}");

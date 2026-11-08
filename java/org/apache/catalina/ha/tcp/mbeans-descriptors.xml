@@ -28,7 +28,7 @@
     <attribute
       name="channelSendOptions"
       description="This sets channel behaviour on sent messages."
-      type="java.lang.String"/>
+      type="int"/>
     <attribute
       name="channelSendOptionsName"
       description="channelSendOptions name."
@@ -37,7 +37,7 @@
     <attribute
       name="channelStartOptions"
       description="This sets channel start behaviour."
-      type="java.lang.String"/>
+      type="int"/>
     <attribute
       name="clusterName"
       description="name of cluster"

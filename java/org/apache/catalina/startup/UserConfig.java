@@ -38,7 +38,7 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Startup event listener for a <b>Host</b> that configures Contexts (web applications) for all defined "users" who have
  * a web application in a directory with the specified name in their home directories. The context path of each deployed
- * application will be set to <code>~xxxxx</code>, where xxxxx is the username of the owning user for that web
+ * application will be set to <code>/~xxxxx</code>, where xxxxx is the username of the owning user for that web
  * application
  */
 public final class UserConfig implements LifecycleListener {
@@ -97,14 +97,14 @@ public final class UserConfig implements LifecycleListener {
     private String userClass = "org.apache.catalina.startup.PasswdUserDatabase";
 
     /**
-     * A regular expression defining user who deployment is allowed.
+     * A regular expression defining users for whom deployment is allowed.
      */
-    Pattern allow = null;
+    private Pattern allow = null;
 
     /**
-     * A regular expression defining user who deployment is denied.
+     * A regular expression defining users for whom deployment is denied.
      */
-    Pattern deny = null;
+    private Pattern deny = null;
 
     // ------------------------------------------------------------- Properties
 
@@ -222,7 +222,7 @@ public final class UserConfig implements LifecycleListener {
 
 
     /**
-     * Set the regular expression used to test for user who deployment is allowed.
+     * Set the regular expression used to test for users for whom deployment is allowed.
      *
      * @param allow The new allow expression
      */
@@ -249,7 +249,7 @@ public final class UserConfig implements LifecycleListener {
 
 
     /**
-     * Set the regular expression used to test for user who deployment is denied.
+     * Set the regular expression used to test for users for whom deployment is denied.
      *
      * @param deny The new deny expression
      */
@@ -363,6 +363,7 @@ public final class UserConfig implements LifecycleListener {
         try {
             Class<?> clazz = Class.forName(contextClass);
             Context context = (Context) clazz.getConstructor().newInstance();
+            // StandardContext or any compatible Context impl should also set the name derived from the path
             context.setPath(contextPath);
             context.setDocBase(app.toString());
             clazz = Class.forName(configClass);

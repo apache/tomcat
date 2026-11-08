@@ -17,10 +17,11 @@
 package org.apache.coyote.http2;
 
 import java.nio.ByteBuffer;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -36,7 +37,11 @@ public class HpackDecoder {
     /**
      * The object that receives the headers that are emitted from this decoder
      */
-    private HeaderEmitter headerEmitter;
+    private final AtomicReference<HeaderEmitter> headerEmitter = new AtomicReference<>();
+    /**
+     * The lock used to avoid a race between replacing the stream and emitting a header.
+     */
+    private final ReentrantLock streamEmitterLock = new ReentrantLock();
 
     /**
      * The header table
@@ -115,7 +120,7 @@ public class HpackDecoder {
                     buffer.position(originalPos);
                     return;
                 }
-                String headerValue = readHpackString(buffer, false);
+                String headerValue = readHpackString(buffer);
                 if (headerValue == null) {
                     buffer.position(originalPos);
                     return;
@@ -129,7 +134,7 @@ public class HpackDecoder {
                     buffer.position(originalPos);
                     return;
                 }
-                String headerValue = readHpackString(buffer, false);
+                String headerValue = readHpackString(buffer);
                 if (headerValue == null) {
                     buffer.position(originalPos);
                     return;
@@ -142,7 +147,7 @@ public class HpackDecoder {
                     buffer.position(originalPos);
                     return;
                 }
-                String headerValue = readHpackString(buffer, false);
+                String headerValue = readHpackString(buffer);
                 if (headerValue == null) {
                     buffer.position(originalPos);
                     return;
@@ -204,11 +209,11 @@ public class HpackDecoder {
         } else if (index != 0) {
             return handleIndexedHeaderName(index);
         } else {
-            return readHpackString(buffer, true);
+            return readHpackString(buffer);
         }
     }
 
-    private String readHpackString(ByteBuffer buffer, boolean isFieldName) throws HpackException {
+    private String readHpackString(ByteBuffer buffer) throws HpackException {
         if (!buffer.hasRemaining()) {
             return null;
         }
@@ -220,34 +225,18 @@ public class HpackDecoder {
         }
         boolean huffman = (data & 0b10000000) != 0;
         if (huffman) {
-            return readHuffmanString(length, buffer, isFieldName);
+            return readHuffmanString(length, buffer);
         }
         StringBuilder stringBuilder = new StringBuilder(length);
         for (int i = 0; i < length; ++i) {
-            char c = (char) (buffer.get() & 0xFF);
-            if (isFieldName) {
-                if (HttpParser.isToken(c) && !Character.isUpperCase(c)) {
-                    stringBuilder.append(c);
-                } else {
-                    throw new IllegalArgumentException(
-                            sm.getString("hpackdecoder.illegalCharacterName", Character.toString(c)));
-                }
-            } else {
-                if ((i == 0 || i == length - 1) && HttpParser.isFieldVChar(c) ||
-                        i > 0 && i < length - 1 && HttpParser.isFieldContent(c)) {
-                    stringBuilder.append(c);
-                } else {
-                    throw new IllegalArgumentException(
-                            sm.getString("hpackdecoder.illegalCharacterValue", Character.toString(c)));
-                }
-            }
+            stringBuilder.append((char) (buffer.get() & 0xFF));
         }
         return stringBuilder.toString();
     }
 
-    private String readHuffmanString(int length, ByteBuffer buffer, boolean isFieldName) throws HpackException {
+    private String readHuffmanString(int length, ByteBuffer buffer) throws HpackException {
         StringBuilder stringBuilder = new StringBuilder(length);
-        HPackHuffman.decode(buffer, length, stringBuilder, isFieldName);
+        HPackHuffman.decode(buffer, length, stringBuilder);
         return stringBuilder.toString();
     }
 
@@ -303,7 +292,8 @@ public class HpackDecoder {
         int dynamicIndex = index - Hpack.STATIC_TABLE_LENGTH;
         // The index is one based, but our table is zero based
         // Also, because of our ring buffer set up, the indexes are reversed
-        // index = 1 is at position firstSlotPosition + filledSlots
+        // Dynamic index 1 (the most recently added entry) is at position
+        // (firstSlotPosition + filledTableSlots - 1) % headerTable.length
         if (dynamicIndex < 1 || dynamicIndex > filledTableSlots) {
             throw new HpackException(sm.getString("hpackdecoder.headerTableIndexInvalid", Integer.valueOf(index),
                     Integer.valueOf(Hpack.STATIC_TABLE_LENGTH), Integer.valueOf(filledTableSlots)));
@@ -397,10 +387,10 @@ public class HpackDecoder {
         void setHeaderException(StreamException streamException);
 
         /**
-         * Are the headers pass to the recipient so far valid? The decoder needs to process all the headers to maintain
-         * state even if there is a problem. In addition, it is easy for the intended recipient to track if the complete
-         * set of headers is valid since to do that state needs to be maintained between the parsing of the initial
-         * headers and the parsing of any trailer headers. The recipient is the best place to maintain that state.
+         * Are the headers passed to the recipient valid? The decoder needs to process all the headers to maintain state
+         * even if there is a problem. In addition, it is easy for the intended recipient to track if the complete set
+         * of headers is valid since to do that state needs to be maintained between the parsing of the initial headers
+         * and the parsing of any trailer headers. The recipient is the best place to maintain that state.
          *
          * @throws StreamException If the headers received to date are not valid
          */
@@ -409,12 +399,12 @@ public class HpackDecoder {
 
 
     HeaderEmitter getHeaderEmitter() {
-        return headerEmitter;
+        return headerEmitter.get();
     }
 
 
     void setHeaderEmitter(HeaderEmitter headerEmitter) {
-        this.headerEmitter = headerEmitter;
+        this.headerEmitter.set(headerEmitter);
         // Reset limit tracking
         headerCount = 0;
         countedCookie = false;
@@ -422,8 +412,14 @@ public class HpackDecoder {
     }
 
 
+    void compareAndSetHeaderEmitter(HeaderEmitter expectedValue, HeaderEmitter newValue) {
+        // Only used in stream replacement so should not reset limits
+        this.headerEmitter.compareAndSet(expectedValue, newValue);
+    }
+
+
     void clearHeaderEmitter() {
-        headerEmitter = null;
+        headerEmitter.set(null);
     }
 
 
@@ -458,8 +454,18 @@ public class HpackDecoder {
             if (log.isTraceEnabled()) {
                 log.trace(sm.getString("hpackdecoder.emitHeader", name, value));
             }
-            headerEmitter.emitHeader(name, value);
+            streamEmitterLock.lock();
+            try {
+                headerEmitter.get().emitHeader(name, value);
+            } finally {
+                streamEmitterLock.unlock();
+            }
         }
+    }
+
+
+    ReentrantLock getStreamEmitterLock() {
+        return streamEmitterLock;
     }
 
 

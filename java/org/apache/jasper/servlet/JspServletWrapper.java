@@ -49,9 +49,8 @@ import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.Jar;
 
 /**
- * The Jasper JSP engine. The servlet container is responsible for providing a URLClassLoader for the web application
- * context Jasper is being used in. Jasper will try to get the Tomcat ServletContext attribute for its ServletContext
- * class loader, if that fails, it uses the parent class loader. In either case, it must be a URLClassLoader.
+ * Holds the per-JSP (or tag file) state for the Jasper JSP engine: manages compilation on first use, reloading, and
+ * participation in the JSP unload queue.
  */
 public class JspServletWrapper {
 
@@ -87,6 +86,8 @@ public class JspServletWrapper {
     private volatile long servletClassLastModifiedTime;
     private long lastModificationTest = 0L;
     private long lastUsageTime = System.currentTimeMillis();
+    // Background unload cycle last observed by this wrapper's queue entry.
+    private long lastJspQueueUpdate;
     private FastRemovalDequeue<JspServletWrapper>.Entry unloadHandle;
     private final boolean unloadAllowed;
     private final boolean unloadByCount;
@@ -481,17 +482,20 @@ public class JspServletWrapper {
             if (unloadAllowed) {
                 synchronized (this) {
                     if (unloadByCount) {
+                        long jspQueueUpdate = ctxt.getRuntimeContext().getLastJspQueueUpdate();
                         if (unloadHandle == null) {
                             unloadHandle = ctxt.getRuntimeContext().push(this);
-                        } else if (lastUsageTime < ctxt.getRuntimeContext().getLastJspQueueUpdate()) {
+                        } else if (lastJspQueueUpdate != jspQueueUpdate) {
+                            // Limit queue re-ordering to a single move per
+                            // background checkUnload() cycle.
                             ctxt.getRuntimeContext().makeYoungest(unloadHandle);
-                            lastUsageTime = System.currentTimeMillis();
                         }
-                    } else {
-                        if (lastUsageTime < ctxt.getRuntimeContext().getLastJspQueueUpdate()) {
-                            lastUsageTime = System.currentTimeMillis();
-                        }
+                        lastJspQueueUpdate = jspQueueUpdate;
                     }
+                    // Always record the usage time, so an actively used JSP is
+                    // never seen as idle by checkUnload(), independent of how
+                    // often the queue order above was updated.
+                    lastUsageTime = System.currentTimeMillis();
                 }
             }
 

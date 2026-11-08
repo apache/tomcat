@@ -21,6 +21,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.junit.Test;
 
 import org.apache.catalina.connector.Request;
+import org.apache.tomcat.unittest.TesterContext;
 
 /*
  * This is an absolute performance test. There is no benefit it running it as part of a standard test run so it is
@@ -32,7 +33,8 @@ public class TesterApplicationHttpRequestPerformance {
     public void testGetAttribute() {
         org.apache.coyote.Request coyoteRequest = new org.apache.coyote.Request();
         Request request = new Request(null, coyoteRequest);
-        ApplicationHttpRequest applicationHttpRequest = new ApplicationHttpRequest(request, null, false);
+        request.getMappingData().context = new TesterContext();
+        ApplicationHttpRequest applicationHttpRequest = new ApplicationHttpRequest(request, null, false, null);
 
         // Warm-up
         doTestGetAttribute(applicationHttpRequest);
@@ -55,9 +57,10 @@ public class TesterApplicationHttpRequestPerformance {
         if (depth <= 0) {
             org.apache.coyote.Request coyoteRequest = new org.apache.coyote.Request();
             Request request = new Request(null, coyoteRequest);
+            request.getMappingData().context = new TesterContext();
             return request;
         }
-        return new ApplicationHttpRequest(getRequest(depth - 1), null, false);
+        return new ApplicationHttpRequest(getRequest(depth - 1), null, false, null);
     }
 
 

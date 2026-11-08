@@ -127,7 +127,7 @@ public class TestLargeUpload extends Http2TestBase {
         // Retain '/simple' url-pattern since it enables code re-use
         Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "read", new DataReadServlet());
-        ctxt.addServletMappingDecoded("/simple", "read");
+        ctxt.addServletMapping("/simple", "read");
 
         tomcat.start();
     }

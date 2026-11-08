@@ -188,6 +188,7 @@ public class DeployTask extends AbstractCatalinaCommandTask {
                 try {
                     URI uri = new URI(war);
                     URLConnection conn = uri.toURL().openConnection();
+                    configureTimeout(conn, timeout);
                     contentLength = conn.getContentLengthLong();
                     stream = new BufferedInputStream(conn.getInputStream(), 1024);
                 } catch (IOException | URISyntaxException e) {

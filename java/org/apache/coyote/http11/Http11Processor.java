@@ -155,7 +155,7 @@ public class Http11Processor extends AbstractProcessor {
      * Creates a new HTTP/1.1 processor.
      *
      * @param protocol the protocol handler
-     * @param adapter the adapter to pass requests to
+     * @param adapter  the adapter to pass requests to
      */
     public Http11Processor(AbstractHttp11Protocol<?> protocol, Adapter adapter) {
         super(adapter);
@@ -330,8 +330,10 @@ public class Http11Processor extends AbstractProcessor {
                 setErrorState(ErrorState.CLOSE_CLEAN, t);
             }
 
-            // Has an upgrade been requested?
-            if (isConnectionToken(request.getMimeHeaders(), "upgrade")) {
+            // Has an upgrade been requested? An Upgrade header field in an HTTP/1.0 request must be ignored
+            // (RFC 9110, section 7.8)
+            if (request.protocol().equals(Constants.HTTP_11) &&
+                    isConnectionToken(request.getMimeHeaders(), "upgrade")) {
                 // Check the protocol
                 String requestedProtocol = request.getHeader("Upgrade");
 
@@ -342,6 +344,11 @@ public class Http11Processor extends AbstractProcessor {
                         Request upgradeRequest = null;
                         try {
                             upgradeRequest = cloneRequest(request);
+                            /*
+                             * Make sure any remaining body is swallowed before we start processing the upgraded
+                             * protocol.
+                             */
+                            inputBuffer.endRequest();
                         } catch (ByteChunk.BufferOverflowException ioe) {
                             response.setStatus(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
                             setErrorState(ErrorState.CLOSE_CLEAN, null);
@@ -350,7 +357,7 @@ public class Http11Processor extends AbstractProcessor {
                             setErrorState(ErrorState.CLOSE_CLEAN, ioe);
                         }
 
-                        if (upgradeRequest != null) {
+                        if (upgradeRequest != null && !getErrorState().isError()) {
                             // Complete the HTTP/1.1 upgrade process
                             response.setStatus(HttpServletResponse.SC_SWITCHING_PROTOCOLS);
                             response.setHeader("Connection", "Upgrade");
@@ -418,7 +425,7 @@ public class Http11Processor extends AbstractProcessor {
                         response.reset();
                         response.setStatus(500);
                         setErrorState(ErrorState.CLOSE_CLEAN, e);
-                        response.setHeader("Connection", "close"); // TODO: Remove
+                        response.setHeader("Connection", "close");
                     }
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
@@ -487,6 +494,48 @@ public class Http11Processor extends AbstractProcessor {
                 }
             }
         }
+    }
+
+
+    private boolean validateUpgradeToken() {
+        // Can't upgrade in an error state
+        if (getErrorState().isError()) {
+            return false;
+        }
+        // Make sure the application hasn't changed the status
+        if (response.getStatus() != HttpServletResponse.SC_SWITCHING_PROTOCOLS) {
+            return false;
+        }
+        // Make sure the application has set the Upgrade header
+        String upgrade = response.getMimeHeaders().getHeader("upgrade");
+        if (upgrade == null) {
+            return false;
+        } else {
+            upgrade = upgrade.trim();
+        }
+
+        if (!upgradeToken.protocol().equalsIgnoreCase(upgrade)) {
+            // The application set/updated the upgrade protocol name. Update the token.
+            upgradeToken = new UpgradeToken(upgradeToken.httpUpgradeHandler(), upgradeToken.contextBind(),
+                    upgradeToken.instanceManager(), upgrade);
+        }
+        return true;
+    }
+
+
+    private void cleanUpgradeToken() {
+        if (upgradeToken.instanceManager() != null) {
+            ClassLoader oldCL = upgradeToken.contextBind().bind(null);
+            try {
+                upgradeToken.instanceManager().destroyInstance(upgradeToken.httpUpgradeHandler());
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                log.warn(sm.getString("http11processor.upgrade.clean.fail"), t);
+            } finally {
+                upgradeToken.contextBind().unbind(oldCL);
+            }
+        }
+        upgradeToken = null;
     }
 
 
@@ -803,14 +852,18 @@ public class Http11Processor extends AbstractProcessor {
         // HTTP 1.x header from a 1.x client unless the specs says otherwise.
         MessageBytes transferEncodingValueMB = headers.getValue("transfer-encoding");
         if (transferEncodingValueMB != null) {
-            List<String> encodingNames = new ArrayList<>();
-            if (TokenList.parseTokenList(headers.values("transfer-encoding"), encodingNames)) {
-                for (String encodingName : encodingNames) {
-                    addInputFilter(inputFilters, encodingName);
+            if (http11) {
+                List<String> encodingNames = new ArrayList<>();
+                if (TokenList.parseTokenList(headers.values("transfer-encoding"), encodingNames)) {
+                    for (String encodingName : encodingNames) {
+                        addInputFilter(inputFilters, encodingName);
+                    }
+                } else {
+                    // Invalid transfer encoding
+                    badRequest("http11processor.request.invalidTransferEncoding");
                 }
             } else {
-                // Invalid transfer encoding
-                badRequest("http11processor.request.invalidTransferEncoding");
+                badRequest("http11processor.request.transferEncodingWithHttp10");
             }
         }
 
@@ -1029,6 +1082,29 @@ public class Http11Processor extends AbstractProcessor {
             headers.setValue("Server").setString(server);
         }
 
+        // Announce the configured alternative service so clients can
+        // discover it without any pre-configuration. The alternative
+        // service is assumed to listen on the same port as this request. An
+        // Alt-Svc header set by the application takes precedence.
+        String altService = protocol.getAltService();
+        if (altService != null && headers.getValue(Constants.ALT_SVC_HEADER_NAME) == null) {
+            headers.addValue(Constants.ALT_SVC_HEADER_NAME)
+                    .setString(altService + "=\":" + request.getServerPort() + "\"");
+        }
+
+        if (upgradeToken != null && !validateUpgradeToken()) {
+            /*
+             * doHttpUpgrade() stopped further HTTP output. The upgrade has failed so the HTTP response must be
+             * completed.
+             */
+            outputBuffer.responseFinished = false;
+            cleanUpgradeToken();
+            // Don't overwrite any existing error
+            if (!getErrorState().isError()) {
+                setErrorState(ErrorState.CLOSE_CLEAN, null);
+            }
+        }
+
         writeHeaders(response.getStatus(), headers);
 
         outputBuffer.commit();
@@ -1118,13 +1194,12 @@ public class Http11Processor extends AbstractProcessor {
     protected boolean flushBufferedWrite() throws IOException {
         if (outputBuffer.hasDataToWrite()) {
             if (outputBuffer.flushBuffer(false)) {
-                // The buffer wasn't fully flushed so re-register the
-                // socket for write. Note this does not go via the
-                // Response since the write registration state at
-                // that level should remain unchanged. Once the buffer
-                // has been emptied then the code below will call
-                // Adaptor.asyncDispatch() which will enable the
-                // Response to respond to this event.
+                /*
+                 * The buffer wasn't fully flushed so re-register the socket for write. Note this does not go via the
+                 * Response since the write registration state at that level should remain unchanged. Once the buffer
+                 * has been emptied then the code below will call Adaptor.asyncDispatch() which will enable the Response
+                 * to respond to this event.
+                 */
                 outputBuffer.registerWriteInterest();
                 return true;
             }

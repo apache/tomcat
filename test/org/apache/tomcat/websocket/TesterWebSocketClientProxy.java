@@ -162,7 +162,7 @@ public class TesterWebSocketClientProxy extends WebSocketBaseTest {
         Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         if (serverAuthentication) {
             // Configure Realm
@@ -171,7 +171,7 @@ public class TesterWebSocketClientProxy extends WebSocketBaseTest {
 
             // Configure security constraints
             SecurityCollection securityCollection = new SecurityCollection();
-            securityCollection.addPatternDecoded("/*");
+            securityCollection.addPattern("/*");
             SecurityConstraint securityConstraint = new SecurityConstraint();
             securityConstraint.addAuthRole(TOMCAT_ROLE);
             securityConstraint.addCollection(securityCollection);

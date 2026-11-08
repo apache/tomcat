@@ -27,7 +27,6 @@ import java.nio.charset.StandardCharsets;
 import jakarta.servlet.http.WebConnection;
 
 import org.apache.coyote.ProtocolException;
-import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteBufferUtils;
@@ -238,12 +237,7 @@ class Http2Parser {
 
         headersEndStream = Flags.isEndOfStream(flags);
 
-        try {
-            hpackDecoder.setHeaderEmitter(output.headersStart(streamId, headersEndStream));
-        } catch (StreamException se) {
-            swallowPayload(streamId, FrameType.HEADERS.getId(), payloadSize, false, buffer);
-            throw se;
-        }
+        output.headersStart(streamId, headersEndStream);
 
         int padLength = 0;
         boolean padding = Flags.hasPadding(flags);
@@ -287,17 +281,21 @@ class Http2Parser {
             // The padding does not count towards the size of payload that is read below.
             payloadSize -= padLength;
 
-            // Any RFC 7450 priority data was read into the byte[] optional above. It is ignored.
+            // Any RFC 7540 priority data was read into the byte[] optional above. It is ignored.
         }
 
         readHeaderPayload(streamId, payloadSize, buffer);
 
         swallowPayload(streamId, FrameType.HEADERS.getId(), padLength, true, buffer);
 
-        // Validate the headers so far
-        hpackDecoder.getHeaderEmitter().validateHeaders();
-
         if (Flags.isEndOfHeaders(flags)) {
+            // Validate the headers once complete
+            hpackDecoder.getStreamEmitterLock().lock();
+            try {
+                hpackDecoder.getHeaderEmitter().validateHeaders();
+            } finally {
+                hpackDecoder.getStreamEmitterLock().unlock();
+            }
             onHeadersComplete(streamId);
         } else {
             headersCurrentStream = streamId;
@@ -306,7 +304,7 @@ class Http2Parser {
 
 
     protected void readPriorityFrame(int streamId, ByteBuffer buffer) throws IOException {
-        // RFC 7450 priority frames are ignored. Still need to treat as overhead.
+        // RFC 7540 priority frames are ignored. Still need to treat as overhead.
         try {
             swallowPayload(streamId, FrameType.PRIORITY.getId(), 5, false, buffer);
         } catch (ConnectionException ignore) {
@@ -463,11 +461,16 @@ class Http2Parser {
 
         readHeaderPayload(streamId, payloadSize, buffer);
 
-        // Validate the headers so far
-        hpackDecoder.getHeaderEmitter().validateHeaders();
-
         if (endOfHeaders) {
             headersCurrentStream = -1;
+
+            // Validate the headers once complete
+            hpackDecoder.getStreamEmitterLock().lock();
+            try {
+                hpackDecoder.getHeaderEmitter().validateHeaders();
+            } finally {
+                hpackDecoder.getStreamEmitterLock().unlock();
+            }
             onHeadersComplete(streamId);
         }
     }
@@ -554,8 +557,6 @@ class Http2Parser {
             } catch (HpackException hpe) {
                 throw new ConnectionException(sm.getString("http2Parser.processFrameHeaders.decodingFailed"),
                         Http2Error.COMPRESSION_ERROR, hpe);
-            } catch (IllegalArgumentException iae) {
-                throw new StreamException("Invalid headers", Http2Error.PROTOCOL_ERROR, streamId, iae);
             }
 
             // switches to write mode
@@ -566,14 +567,24 @@ class Http2Parser {
                 StreamException headerException = new StreamException(
                         sm.getString("http2Parser.headerLimitCount", connectionId, Integer.valueOf(streamId)),
                         Http2Error.ENHANCE_YOUR_CALM, streamId);
-                hpackDecoder.getHeaderEmitter().setHeaderException(headerException);
+                hpackDecoder.getStreamEmitterLock().lock();
+                try {
+                    hpackDecoder.getHeaderEmitter().setHeaderException(headerException);
+                } finally {
+                    hpackDecoder.getStreamEmitterLock().unlock();
+                }
             }
 
             if (hpackDecoder.isHeaderSizeExceeded(headerReadBuffer.position())) {
                 StreamException headerException = new StreamException(
                         sm.getString("http2Parser.headerLimitSize", connectionId, Integer.valueOf(streamId)),
                         Http2Error.ENHANCE_YOUR_CALM, streamId);
-                hpackDecoder.getHeaderEmitter().setHeaderException(headerException);
+                hpackDecoder.getStreamEmitterLock().lock();
+                try {
+                    hpackDecoder.getHeaderEmitter().setHeaderException(headerException);
+                } finally {
+                    hpackDecoder.getStreamEmitterLock().unlock();
+                }
             }
 
             if (hpackDecoder.isHeaderSwallowSizeExceeded(headerReadBuffer.position())) {
@@ -710,10 +721,11 @@ class Http2Parser {
                     Integer.toString(flags), Integer.toString(payloadSize)));
         }
 
-        if (expected != null && frameType != expected) {
-            throw new StreamException(sm.getString("http2Parser.processFrame.unexpectedType", expected, frameType),
-                    Http2Error.PROTOCOL_ERROR, streamId);
-        }
+        /*
+         * Frames with multiple errors may trigger multiple failures. Check the things that can trigger the more serious
+         * ConnectionException first so such errors are not masked by a less serious error that triggers a
+         * StreamException.
+         */
 
         int maxFrameSize = input.getMaxFrameSize();
         if (payloadSize > maxFrameSize) {
@@ -726,17 +738,21 @@ class Http2Parser {
                 throw new ConnectionException(
                         sm.getString("http2Parser.headers.wrongStream", connectionId,
                                 Integer.toString(headersCurrentStream), Integer.toString(streamId)),
-                        Http2Error.COMPRESSION_ERROR);
+                        Http2Error.PROTOCOL_ERROR);
             }
-            if (frameType == FrameType.RST) {
-                // NO-OP: RST is OK here
-            } else if (frameType != FrameType.CONTINUATION) {
+            if (frameType != FrameType.CONTINUATION) {
                 throw new ConnectionException(sm.getString("http2Parser.headers.wrongFrameType", connectionId,
-                        Integer.toString(headersCurrentStream), frameType), Http2Error.COMPRESSION_ERROR);
+                        Integer.toString(headersCurrentStream), frameType), Http2Error.PROTOCOL_ERROR);
             }
         }
 
+        // May throw StreamException or ConnectionException
         frameType.check(streamId, payloadSize);
+
+        if (expected != null && frameType != expected) {
+            throw new StreamException(sm.getString("http2Parser.processFrame.unexpectedType", expected, frameType),
+                    Http2Error.PROTOCOL_ERROR, streamId);
+        }
     }
 
 
@@ -850,7 +866,7 @@ class Http2Parser {
                 throws ConnectionException, IOException;
 
         // Header frames
-        HeaderEmitter headersStart(int streamId, boolean headersEndStream) throws Http2Exception, IOException;
+        void headersStart(int streamId, boolean headersEndStream) throws Http2Exception, IOException;
 
         void headersContinue(int payloadSize, boolean endOfHeaders);
 

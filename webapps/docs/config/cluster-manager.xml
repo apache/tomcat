@@ -158,6 +158,8 @@
       <attribute name="sendAllSessionsSize" required="false">
         The number of sessions in a session block message. This value is
         effective only when <code>sendAllSessions</code> is <code>false</code>.
+        It must be a positive integer; any other value is rejected with an
+        <code>IllegalArgumentException</code> during configuration.
         Default is <code>1000</code>.
       </attribute>
       <attribute name="sendAllSessionsWaitTime" required="false">

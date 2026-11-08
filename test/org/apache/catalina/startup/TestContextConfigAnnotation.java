@@ -211,7 +211,7 @@ public class TestContextConfigAnnotation {
 
         webxml.addFilter(filterDef);
         FilterMap filterMap = new FilterMap();
-        filterMap.addURLPatternDecoded("/param1");
+        filterMap.addURLPattern("/param1");
         filterMap.setFilterName("paramFilter");
         webxml.addFilterMapping(filterMap);
 
@@ -266,6 +266,22 @@ public class TestContextConfigAnnotation {
         }
         FilterDef filterDef = webxml.getFilters().get("paramD");
         Assert.assertNull(filterDef);
+    }
+
+    @Test
+    public void testUrlPatternsExpectDecoded() throws Exception {
+        WebXml webXml = new WebXml();
+        Map<String,JavaClassCacheEntry> javaClassCache = new HashMap<>();
+        ContextConfig config = new ContextConfig();
+
+        File servletFile = paramClassResource("org/apache/catalina/startup/UrlPatternServlet");
+        config.processAnnotationsFile(servletFile, webXml, false, javaClassCache);
+        Assert.assertEquals("urlPatternServlet", webXml.getServletMappings().get("/servlet%25"));
+
+        File filterFile = paramClassResource("org/apache/catalina/startup/UrlPatternFilter");
+        config.processAnnotationsFile(filterFile, webXml, false, javaClassCache);
+        FilterMap filterMap = webXml.getFilterMappings().iterator().next();
+        Assert.assertArrayEquals(new String[] { "/filter%25" }, filterMap.getURLPatterns());
     }
 
     @Test

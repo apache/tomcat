@@ -55,7 +55,7 @@ public abstract class Authenticator {
      *
      * @throws AuthenticationException When an error occurs
      *
-     * @deprecated Unused. Will be remove in Tomcat 12. Use
+     * @deprecated Unused. Will be removed in a future release. Use
      *                 {@link #getAuthorization(String, String, String, String, String, String)}
      */
     @Deprecated
@@ -109,7 +109,7 @@ public abstract class Authenticator {
             String qtedValue = m.group(3);
             String value = m.group(4);
 
-            parameterMap.put(key, qtedValue != null ? qtedValue : value);
+            parameterMap.put(key, qtedValue != null ? qtedValue : value.trim());
 
         }
 

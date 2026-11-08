@@ -255,9 +255,10 @@ public class HttpHeaderParser {
                     headerParsePos = HeaderParsePosition.HEADER_START;
                     break;
                 } else {
-                    // Copying one extra space in the buffer (since there must
-                    // be at least one space inserted between the lines)
-                    source.getHeaderByteBuffer().put(headerData.realPos, peek);
+                    // Replace the line folding with a single space as required
+                    // by RFC 9112 section 5.2. Any further whitespace at the
+                    // start of the continuation line is skipped below.
+                    source.getHeaderByteBuffer().put(headerData.realPos, SP);
                     headerData.realPos++;
                     headerParsePos = HeaderParsePosition.HEADER_VALUE_START;
                 }
@@ -339,8 +340,8 @@ public class HttpHeaderParser {
         /**
          * Reading a header name. All characters of header are HTTP_TOKEN_CHAR. Header name is followed by ':'. No
          * whitespace is allowed.<br>
-         * Any non-HTTP_TOKEN_CHAR (this includes any whitespace) encountered before ':' will result in the whole line
-         * being ignored.
+         * Any non-HTTP_TOKEN_CHAR (this includes any whitespace) encountered before ':' will cause an
+         * {@code IllegalArgumentException} to be thrown, resulting in the whole request being rejected.
          */
         HEADER_NAME,
         /**

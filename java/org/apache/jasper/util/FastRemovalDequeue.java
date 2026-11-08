@@ -16,6 +16,8 @@
  */
 package org.apache.jasper.util;
 
+import org.apache.jasper.compiler.Localizer;
+
 /**
  * The FastRemovalDequeue is a Dequeue that supports constant time removal of entries. This is achieved by using a
  * doubly linked list and wrapping any object added to the collection with an Entry type, that is returned to the
@@ -55,10 +57,13 @@ public class FastRemovalDequeue<T> {
      * Initialize empty queue.
      *
      * @param maxSize The maximum size to which the queue will be allowed to grow
+     *
+     * @throws IllegalArgumentException if the maximum size is less than one
      */
     public FastRemovalDequeue(int maxSize) {
-        if (maxSize <= 1) {
-            maxSize = 2;
+        if (maxSize < 1) {
+            throw new IllegalArgumentException(
+                    Localizer.getMessage("jsp.error.fastremovaldequeue.maxSize", Integer.valueOf(maxSize)));
         }
         this.maxSize = maxSize;
         first = null;
@@ -67,8 +72,7 @@ public class FastRemovalDequeue<T> {
     }
 
     /**
-     * Retrieve the size of the list. This method also needs to be externally synchronized to ensure correct publication
-     * of changes.
+     * Retrieve the size of the list.
      *
      * @return the size of the list.
      */
@@ -319,7 +323,7 @@ public class FastRemovalDequeue<T> {
 
         @Override
         public String toString() {
-            return "Entry-" + content.toString();
+            return "Entry-" + String.valueOf(content);
         }
     }
 

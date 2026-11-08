@@ -165,8 +165,9 @@
       </attribute>
       <attribute name="maxWait" required="false">
         The maximum number of milliseconds that the senderPool will wait when
-        there are no available senders. The default value is <code>3000</code>
-        milliseconds.(3 seconds).
+        there are no available senders. A value of zero or less means that the
+        senderPool will wait until a sender becomes available. The default
+        value is <code>3000</code> milliseconds.(3 seconds).
       </attribute>
     </attributes>
   </subsection>

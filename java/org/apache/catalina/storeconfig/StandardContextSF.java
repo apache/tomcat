@@ -21,6 +21,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,8 +51,11 @@ import org.apache.tomcat.util.http.CookieProcessor;
 /**
  * Store server.xml Context element with all children
  * <ul>
- * <li>Store all context at server.xml</li>
- * <li>Store existing app.xml context a conf/enginename/hostname/app.xml</li>
+ * <li>Store a context that has an external configuration file to that file</li>
+ * <li>Store a context without an external configuration file to
+ * conf/enginename/hostname/context.xml, unless the registry allows inline
+ * storage in server.xml and the context was deployed from a Context element
+ * in server.xml, in which case it is stored back inline to server.xml</li>
  * <li>Store with backup</li>
  * </ul>
  */
@@ -85,9 +90,17 @@ public class StandardContextSF extends StoreFactoryBase {
                             storeContextSeparate(aWriter, indent, (StandardContext) aContext);
                         }
                         return;
+                    } else if (aWriter == null) {
+                        if (log.isInfoEnabled()) {
+                            log.info(sm.getString("standardContextSF.storeContextSkipped",
+                                    ((StandardContext) aContext).getPath()));
+                        }
+                        return;
                     }
-                } else if (desc.isExternalOnly()) {
-                    // Set a configFile so that the configuration is actually saved
+                } else if (desc.isExternalOnly() || !((StandardContext) aContext).getDeployedFromServerXml()) {
+                    // Set a configFile so that the configuration is actually saved. This only happens when the
+                    // registry requires external storage or when the Context was not deployed from a Context element
+                    // in server.xml (a Context defined in server.xml is stored back inline to server.xml instead).
                     Context context = ((StandardContext) aContext);
                     Host host = (Host) context.getParent();
                     File configBase = host.getConfigBaseFile();
@@ -99,6 +112,12 @@ public class StandardContextSF extends StoreFactoryBase {
                         storeWithBackup((StandardContext) aContext);
                     } else {
                         storeContextSeparate(aWriter, indent, (StandardContext) aContext);
+                    }
+                    return;
+                } else if (aWriter == null) {
+                    if (log.isInfoEnabled()) {
+                        log.info(sm.getString("standardContextSF.storeContextInlineSkipped",
+                                ((StandardContext) aContext).getPath()));
                     }
                     return;
                 }
@@ -130,10 +149,16 @@ public class StandardContextSF extends StoreFactoryBase {
             if (log.isInfoEnabled()) {
                 log.info(sm.getString("standardContextSF.storeContext", aContext.getPath(), config));
             }
+            // Generate the configuration in memory so that the layout of the previous version of the file can
+            // be preserved. This has to happen before the output stream is opened because opening the output
+            // stream truncates the file that XMLFormatPreserver reads the previous layout from.
+            StringWriter buffer = new StringWriter();
+            storeXMLHead(new PrintWriter(buffer));
+            super.store(new PrintWriter(buffer), -2, aContext);
+            String formatted = XMLFormatPreserver.preserve(config, buffer.toString(), getRegistry().getEncoding());
             try (FileOutputStream fos = new FileOutputStream(config);
                     PrintWriter writer = new PrintWriter(new OutputStreamWriter(fos, getRegistry().getEncoding()))) {
-                storeXMLHead(writer);
-                super.store(writer, -2, aContext);
+                writer.write(formatted);
             }
         } else {
             super.store(aWriter, indent, aContext);
@@ -164,8 +189,13 @@ public class StandardContextSF extends StoreFactoryBase {
                         mover.getConfigSave()));
             }
             try (PrintWriter writer = mover.getWriter()) {
-                storeXMLHead(writer);
-                super.store(writer, -2, aContext);
+                // Generate the configuration in memory so that the layout of the previous version of the file can
+                // be preserved
+                StringWriter buffer = new StringWriter();
+                storeXMLHead(new PrintWriter(buffer));
+                super.store(new PrintWriter(buffer), -2, aContext);
+                writer.write(XMLFormatPreserver.preserve(mover.getConfigOld(), buffer.toString(),
+                        getRegistry().getEncoding()));
             }
             mover.move();
         }
@@ -231,7 +261,6 @@ public class StandardContextSF extends StoreFactoryBase {
             Realm realm = context.getRealm();
             if (realm != null) {
                 Realm parentRealm = null;
-                // @TODO is this case possible?
                 if (context.getParent() != null) {
                     parentRealm = context.getParent().getRealm();
                 }
@@ -325,8 +354,17 @@ public class StandardContextSF extends StoreFactoryBase {
                 new File(System.getProperty(Globals.CATALINA_BASE_PROP), "conf/context.xml").getCanonicalPath();
         String confWeb = new File(System.getProperty(Globals.CATALINA_BASE_PROP), "conf/web.xml").getCanonicalPath();
         String confHostDefault = new File(configBase, "context.xml.default").getCanonicalPath();
-        String configFile =
-                (context.getConfigFile() != null ? new File(context.getConfigFile().toURI()).getCanonicalPath() : null);
+        String configFile = null;
+        if (context.getConfigFile() != null) {
+            try {
+                configFile = new File(context.getConfigFile().toURI()).getCanonicalPath();
+            } catch (URISyntaxException | IllegalArgumentException e) {
+                // Non-file scheme URL (e.g., jar:), skip configFile comparison
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("standardContextSF.nonFileConfigUrl", context.getConfigFile()), e);
+                }
+            }
+        }
         String webxml = "WEB-INF/web.xml";
         String tomcatwebxml = "WEB-INF/tomcat-web.xml";
 

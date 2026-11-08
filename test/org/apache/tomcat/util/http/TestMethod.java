@@ -32,7 +32,7 @@ public class TestMethod {
     public void testHttpMethodParsing() {
         List<String> methods = Arrays.asList(Method.GET, Method.POST, Method.PUT, Method.PATCH, Method.HEAD,
                 Method.OPTIONS, Method.DELETE, Method.TRACE, Method.PROPPATCH, Method.PROPFIND, Method.MKCOL,
-                Method.COPY, Method.MOVE, Method.LOCK, Method.UNLOCK, Method.CONNECT);
+                Method.COPY, Method.MOVE, Method.LOCK, Method.UNLOCK, Method.CONNECT, Method.QUERY);
 
         for (String method : methods) {
             byte[] bytes = method.getBytes(StandardCharsets.ISO_8859_1);

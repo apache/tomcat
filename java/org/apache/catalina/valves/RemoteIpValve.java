@@ -20,8 +20,10 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.Enumeration;
+import java.util.List;
 
 import jakarta.servlet.ServletException;
 
@@ -30,6 +32,7 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.NetMaskSet;
+import org.apache.catalina.util.RequestUtil;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.StringUtils;
@@ -116,7 +119,7 @@ import org.apache.tomcat.util.http.parser.Host;
  * </tr>
  * <tr>
  * <td>protocolHeader</td>
- * <td>Name of the http header read by this valve that holds the flag that this request</td>
+ * <td>Name of the http header read by this valve that holds the flag that this request was made over https</td>
  * <td>N/A</td>
  * <td>Compliant http header name like <code>X-Forwarded-Proto</code>, <code>X-Forwarded-Ssl</code> or
  * <code>Front-End-Https</code></td>
@@ -224,7 +227,7 @@ import org.apache.tomcat.util.http.parser.Host;
  *   internalProxies="192.168.0.10/31"
  *   remoteIpHeader="x-forwarded-for"
  *   proxiesHeader="x-forwarded-by"
- *   trustedProxies="proxy1|proxy2"
+ *   trustedProxies="proxy1, proxy2"
  *   /&gt;</code>
  * <table border="1">
  * <caption>Request Values</caption>
@@ -267,7 +270,7 @@ import org.apache.tomcat.util.http.parser.Host;
  *   internalProxies="192.168.0.10/31"
  *   remoteIpHeader="x-forwarded-for"
  *   proxiesHeader="x-forwarded-by"
- *   trustedProxies="proxy1|proxy2"
+ *   trustedProxies="proxy1, proxy2"
  *   /&gt;</code>
  * <table border="1">
  * <caption>Request Values</caption>
@@ -311,7 +314,7 @@ import org.apache.tomcat.util.http.parser.Host;
  *   internalProxies="192.168.0.10/31"
  *   remoteIpHeader="x-forwarded-for"
  *   proxiesHeader="x-forwarded-by"
- *   trustedProxies="proxy1|proxy2"
+ *   trustedProxies="proxy1, proxy2"
  *   /&gt;</code>
  * <table border="1">
  * <caption>Request Values</caption>
@@ -337,7 +340,7 @@ import org.apache.tomcat.util.http.parser.Host;
  * </tr>
  * </table>
  * <p>
- * Note : <code>x-forwarded-by</code> holds the trusted proxy <code>proxy1</code>. <code>x-forwarded-by</code> holds
+ * Note : <code>x-forwarded-by</code> holds the trusted proxy <code>proxy1</code>. <code>x-forwarded-for</code> holds
  * <code>140.211.11.130</code> because <code>untrusted-proxy</code> is not trusted and thus, we cannot trust that
  * <code>untrusted-proxy</code> is the actual remote ip. <code>request.remoteAddr</code> is <code>untrusted-proxy</code>
  * that is an IP verified by <code>proxy1</code>.
@@ -569,8 +572,14 @@ public class RemoteIpValve extends ValveBase {
         final String originalLocalName = isChangeLocalName() ? request.getLocalName() : null;
         final int originalServerPort = request.getServerPort();
         final int originalLocalPort = request.getLocalPort();
-        final String originalProxiesHeader = request.getHeader(proxiesHeader);
-        final String originalRemoteIpHeader = request.getHeader(remoteIpHeader);
+        final List<String> originalProxiesHeaderValues = new ArrayList<>();
+        for (Enumeration<String> e = request.getHeaders(proxiesHeader); e.hasMoreElements();) {
+            originalProxiesHeaderValues.add(e.nextElement());
+        }
+        final List<String> originalRemoteIpHeaderValues = new ArrayList<>();
+        for (Enumeration<String> e = request.getHeaders(remoteIpHeader); e.hasMoreElements();) {
+            originalRemoteIpHeaderValues.add(e.nextElement());
+        }
 
         boolean isInternal = isInternalProxy(originalRemoteAddr);
 
@@ -595,6 +604,12 @@ public class RemoteIpValve extends ValveBase {
             // loop on remoteIpHeaderValue to find the first trusted remote ip and to build the proxies chain
             for (idx = remoteIpHeaderValue.length - 1; idx >= 0; idx--) {
                 String currentRemoteIp = remoteIpHeaderValue[idx];
+                if (currentRemoteIp.isEmpty()) {
+                    // Skip empty entries, such as those resulting from a
+                    // whitespace-only header value, rather than ending up
+                    // setting an empty remote address
+                    continue;
+                }
                 remoteIp = currentRemoteIp;
                 if (isInternalProxy(currentRemoteIp)) {
                     // do nothing, internalProxies IPs are not appended to the
@@ -609,6 +624,9 @@ public class RemoteIpValve extends ValveBase {
             Deque<String> newRemoteIpHeaderValue = new ArrayDeque<>();
             for (; idx >= 0; idx--) {
                 String currentRemoteIp = remoteIpHeaderValue[idx];
+                if (currentRemoteIp.isEmpty()) {
+                    continue;
+                }
                 newRemoteIpHeaderValue.addFirst(currentRemoteIp);
             }
             if (remoteIp != null) {
@@ -649,8 +667,8 @@ public class RemoteIpValve extends ValveBase {
                 }
             }
 
-            if (protocolHeader != null) {
-                String protocolHeaderValue = request.getHeader(protocolHeader);
+            if (protocolHeader != null && !protocolHeader.isEmpty()) {
+                String protocolHeaderValue = RequestUtil.getMergedHeaderValue(request, protocolHeader);
                 if (protocolHeaderValue == null) {
                     // Don't modify the secure, scheme and serverPort attributes
                     // of the request
@@ -728,16 +746,14 @@ public class RemoteIpValve extends ValveBase {
                 request.setLocalPort(originalLocalPort);
 
                 MimeHeaders headers = request.getCoyoteRequest().getMimeHeaders();
-                if (originalProxiesHeader == null || originalProxiesHeader.isEmpty()) {
-                    headers.removeHeader(proxiesHeader);
-                } else {
-                    headers.setValue(proxiesHeader).setString(originalProxiesHeader);
+                headers.removeHeader(proxiesHeader);
+                for (String v : originalProxiesHeaderValues) {
+                    headers.addValue(proxiesHeader).setString(v);
                 }
 
-                if (originalRemoteIpHeader == null || originalRemoteIpHeader.isEmpty()) {
-                    headers.removeHeader(remoteIpHeader);
-                } else {
-                    headers.setValue(remoteIpHeader).setString(originalRemoteIpHeader);
+                headers.removeHeader(remoteIpHeader);
+                for (String v : originalRemoteIpHeaderValues) {
+                    headers.addValue(remoteIpHeader).setString(v);
                 }
             }
         }
@@ -807,6 +823,12 @@ public class RemoteIpValve extends ValveBase {
                     if (log.isDebugEnabled()) {
                         log.debug(sm.getString("remoteIpValve.invalidPortHeader", portHeaderValue, portHeader), nfe);
                     }
+                }
+                if (port < 1 || port > 65535) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("remoteIpValve.invalidPortHeader", portHeaderValue, portHeader));
+                    }
+                    port = defaultPort;
                 }
             }
         }

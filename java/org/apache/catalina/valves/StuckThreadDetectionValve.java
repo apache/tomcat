@@ -54,7 +54,7 @@ public class StuckThreadDetectionValve extends ValveBase {
     private static final StringManager sm = StringManager.getManager(Constants.Package);
 
     /**
-     * Keeps count of the number of stuck threads detected
+     * Keeps count of the number of threads currently detected as stuck
      */
     private final AtomicInteger stuckCount = new AtomicInteger(0);
 
@@ -71,7 +71,7 @@ public class StuckThreadDetectionValve extends ValveBase {
     /**
      * In seconds. Default is -1 to disable interruption.
      */
-    private int interruptThreadThreshold;
+    private int interruptThreadThreshold = -1;
 
     /**
      * The only references we keep to actual running Thread objects are in this Map (which is automatically cleaned in
@@ -115,7 +115,7 @@ public class StuckThreadDetectionValve extends ValveBase {
 
     /**
      * Specifies the threshold (in seconds) before stuck threads are interrupted. If &lt;=0, the interruption is
-     * disabled. The default is -1. If &gt;=0, the value must actually be &gt;= threshold.
+     * disabled. The default is -1.
      *
      * @param interruptThreadThreshold The new thread interruption threshold in seconds
      */
@@ -279,8 +279,7 @@ public class StuckThreadDetectionValve extends ValveBase {
     }
 
     /**
-     * Returns the total number of threads that have been interrupted
-     * due to being stuck.
+     * Returns the total number of threads that have been interrupted due to being stuck.
      *
      * @return the count of interrupted threads
      */
@@ -304,8 +303,9 @@ public class StuckThreadDetectionValve extends ValveBase {
          */
         private final Semaphore interruptionSemaphore;
         /**
-         * Set to true after the thread is interrupted. No need to make it volatile since it is accessed right after
-         * acquiring the semaphore.
+         * Set to true after the thread is interrupted. Also checked to avoid interrupting, and logging, a thread that
+         * remains stuck on every background process cycle. No need to make it volatile since it is read and written
+         * while holding the interruption semaphore, and read right after acquiring it.
          */
         private boolean interrupted;
 
@@ -375,6 +375,13 @@ public class StuckThreadDetectionValve extends ValveBase {
                 return false;
             }
             try {
+                if (this.interrupted) {
+                    // The thread has already been interrupted for this request.
+                    // A thread that is still stuck despite the interrupt would
+                    // otherwise be interrupted, and logged, again on every
+                    // background process cycle.
+                    return false;
+                }
                 if (log.isWarnEnabled()) {
                     @SuppressWarnings("deprecation")
                     String msg = sm.getString("stuckThreadDetectionValve.notifyStuckThreadInterrupted",

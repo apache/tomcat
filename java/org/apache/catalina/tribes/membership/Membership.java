@@ -24,9 +24,8 @@ import java.util.HashMap;
 import org.apache.catalina.tribes.Member;
 
 /**
- * A <b>membership</b> implementation using simple multicast. This is the representation of a multicast membership. This
- * class is responsible for maintaining a list of active cluster nodes in the cluster. If a node fails to send out a
- * heartbeat, the node will be dismissed.
+ * This is the representation of a multicast membership. This class is responsible for maintaining a list of active
+ * cluster nodes in the cluster. If a node fails to send out a heartbeat, the node will be dismissed.
  */
 public class Membership implements Cloneable {
 

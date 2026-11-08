@@ -24,7 +24,7 @@ public class ExceptionUtils {
     /**
      * Default constructor. This class is not intended to be instantiated.
      */
-    public ExceptionUtils() {
+    private ExceptionUtils() {
         // NO-OP
     }
 

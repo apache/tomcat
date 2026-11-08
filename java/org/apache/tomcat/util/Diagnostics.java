@@ -116,7 +116,7 @@ public class Diagnostics {
     }
 
     /**
-     * Enable or disable thread contention monitoring via the ThreadMxMXBean.
+     * Enable or disable thread contention monitoring via the ThreadMXBean.
      *
      * @param enable whether to enable thread contention monitoring
      */
@@ -139,7 +139,7 @@ public class Diagnostics {
     }
 
     /**
-     * Enable or disable thread cpu time measurement via the ThreadMxMXBean.
+     * Enable or disable thread cpu time measurement via the ThreadMXBean.
      *
      * @param enable whether to enable thread cpu time measurement
      */
@@ -350,6 +350,11 @@ public class Diagnostics {
     private static String getThreadDump(ThreadInfo[] tinfos) {
         StringBuilder sb = new StringBuilder();
         for (ThreadInfo tinfo : tinfos) {
+            // A null entry means the thread died after the thread id
+            // snapshot was taken. Skip it.
+            if (tinfo == null) {
+                continue;
+            }
             sb.append(getThreadDump(tinfo));
             sb.append(CRLF);
         }
@@ -364,7 +369,15 @@ public class Diagnostics {
     public static String findDeadlock() {
         long[] ids = threadMXBean.findDeadlockedThreads();
         if (ids != null) {
-            ThreadInfo[] tinfos = threadMXBean.getThreadInfo(threadMXBean.findDeadlockedThreads(), true, true);
+            // Use the ids from the first call rather than calling
+            // findDeadlockedThreads() a second time. A second call may return
+            // null if the deadlock is resolved in between, in which case
+            // getThreadInfo() throws a null pointer exception; or it may
+            // return ids for threads that have since died, in which case
+            // getThreadInfo() returns null entries. Note getThreadInfo() can
+            // also return null entries for threads that die after this first
+            // snapshot; those are skipped by getThreadDump(ThreadInfo[]).
+            ThreadInfo[] tinfos = threadMXBean.getThreadInfo(ids, true, true);
             if (tinfos != null) {
                 return sm.getString("diagnostics.deadlockFound") + CRLF + getThreadDump(tinfos);
             }

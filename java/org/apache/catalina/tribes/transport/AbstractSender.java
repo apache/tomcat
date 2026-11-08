@@ -76,6 +76,7 @@ public abstract class AbstractSender implements DataSender {
     private boolean udpBased = false;
     /** The UDP port of the destination. */
     private int udpPort = -1;
+    private TribesSslContext sslContext;
 
     /**
      * transfers sender properties from one sender to another
@@ -86,6 +87,8 @@ public abstract class AbstractSender implements DataSender {
     public static void transferProperties(AbstractSender from, AbstractSender to) {
         to.rxBufSize = from.rxBufSize;
         to.txBufSize = from.txBufSize;
+        to.udpRxBufSize = from.udpRxBufSize;
+        to.udpTxBufSize = from.udpTxBufSize;
         to.directBuffer = from.directBuffer;
         to.keepAliveCount = from.keepAliveCount;
         to.keepAliveTime = from.keepAliveTime;
@@ -104,6 +107,7 @@ public abstract class AbstractSender implements DataSender {
         to.throwOnFailedAck = from.throwOnFailedAck;
         to.udpBased = from.udpBased;
         to.udpPort = from.udpPort;
+        to.sslContext = from.sslContext;
     }
 
 
@@ -118,7 +122,7 @@ public abstract class AbstractSender implements DataSender {
     public boolean keepalive() {
         boolean disconnect = false;
         if (isUdpBased()) {
-            disconnect = true; // always disconnect UDP, TODO optimize the keepalive handling
+            disconnect = true; // always disconnect UDP
         } else if (keepAliveCount >= 0 && requestCount > keepAliveCount) {
             disconnect = true;
         } else if (keepAliveTime >= 0 && (System.currentTimeMillis() - connectTime) > keepAliveTime) {
@@ -216,6 +220,22 @@ public abstract class AbstractSender implements DataSender {
      */
     public int getPort() {
         return port;
+    }
+
+    /**
+     * Returns the SSL context used to secure the connection with TLS.
+     * @return the SSL context, or <code>null</code> if the channel is not secure
+     */
+    public TribesSslContext getSslContext() {
+        return sslContext;
+    }
+
+    /**
+     * Sets the SSL context used to secure the connection with TLS.
+     * @param sslContext the SSL context to use
+     */
+    public void setSslContext(TribesSslContext sslContext) {
+        this.sslContext = sslContext;
     }
 
     /**

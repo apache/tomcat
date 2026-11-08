@@ -17,6 +17,7 @@
 package org.apache.catalina.webresources.war;
 
 import java.io.File;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
@@ -49,5 +50,31 @@ public class TestWarURLConnection {
         int size = urlConn.getContentLength();
 
         Assert.assertEquals(137, size);
+    }
+
+
+    @Test
+    public void testSetUseCaches() throws Exception {
+        File f = new File("test/webresources/war-url-connection.war");
+        String fileUrl = f.toURI().toURL().toString();
+
+        URL warUrl = URI.create("war:" + fileUrl + "*/WEB-INF/lib/test.jar").toURL();
+
+        URLConnection urlConn = warUrl.openConnection();
+        Assert.assertTrue(urlConn instanceof WarURLConnection);
+
+        urlConn.setUseCaches(false);
+        Assert.assertFalse(urlConn.getUseCaches());
+
+        try (InputStream is = urlConn.getInputStream()) {
+            is.readAllBytes();
+        }
+
+        try {
+            urlConn.getInputStream();
+            Assert.fail("Expected IllegalStateException");
+        } catch (IllegalStateException expected) {
+            // Expected as the JarFile has been closed
+        }
     }
 }

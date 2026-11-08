@@ -27,7 +27,7 @@ import org.xml.sax.Attributes;
  * </p>
  * <ul>
  * <li>from an attribute of the current element See {@link #CallParamRule(int paramIndex, String attributeName)}
- * <li>from current the element body See {@link #CallParamRule(int paramIndex)}
+ * <li>from the element body See {@link #CallParamRule(int paramIndex)}
  * </ul>
  */
 public class CallParamRule extends Rule {
@@ -157,7 +157,7 @@ public class CallParamRule extends Rule {
             if (bodyTextStack == null) {
                 bodyTextStack = new ArrayStack<>();
             }
-            bodyTextStack.push(bodyText.trim());
+            bodyTextStack.push(bodyText.strip());
         }
 
     }

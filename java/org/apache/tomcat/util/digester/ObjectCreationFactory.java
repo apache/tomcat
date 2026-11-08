@@ -44,7 +44,7 @@ public interface ObjectCreationFactory {
     /**
      * Gets the digester that was set upon initialization.
      *
-     * @return the {@link Digester} that was set by the {@link FactoryCreateRule} upon initialization.
+     * @return the {@link Digester} that was set by {@link Digester#addFactoryCreate} upon initialization.
      */
     Digester getDigester();
 

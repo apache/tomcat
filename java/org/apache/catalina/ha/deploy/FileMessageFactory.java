@@ -36,7 +36,7 @@ import org.apache.tomcat.util.res.StringManager;
  * The factory can be used as a reader or writer but not both at the same time. When done reading or writing the factory
  * will close the input or output streams and mark the factory as closed. It is not possible to use it after that. <BR>
  * To force a cleanup, call cleanup() from the calling object. <BR>
- * This class is not thread safe.
+ * The read path is not thread safe. The write path is synchronized.
  */
 public class FileMessageFactory {
     /*--Static Variables----------------------------------------*/
@@ -146,7 +146,9 @@ public class FileMessageFactory {
             out = new FileOutputStream(f);
         } else {
             size = file.length();
-            totalNrOfMessages = (size / READ_SIZE) + 1;
+            // The number of messages the file is split into. One full message
+            // per READ_SIZE bytes plus one for a non-empty remainder
+            totalNrOfMessages = (size + READ_SIZE - 1) / READ_SIZE;
             in = new FileInputStream(f);
         } // end if
         lastModified = System.currentTimeMillis();
@@ -235,17 +237,15 @@ public class FileMessageFactory {
         lastModified = System.currentTimeMillis();
 
         FileMessage next;
-        synchronized (this) {
-            if (!isWriting) {
-                next = msgBuffer.get(Long.valueOf(lastMessageProcessed.get() + 1));
-                if (next != null) {
-                    isWriting = true;
-                } else {
-                    return false;
-                }
+        if (!isWriting) {
+            next = msgBuffer.get(Long.valueOf(lastMessageProcessed.get() + 1));
+            if (next != null) {
+                isWriting = true;
             } else {
                 return false;
             }
+        } else {
+            return false;
         }
 
         while (next != null) {
@@ -257,11 +257,9 @@ public class FileMessageFactory {
                 cleanup();
                 return true;
             }
-            synchronized (this) {
-                next = msgBuffer.get(Long.valueOf(lastMessageProcessed.get() + 1));
-                if (next == null) {
-                    isWriting = false;
-                }
+            next = msgBuffer.get(Long.valueOf(lastMessageProcessed.get() + 1));
+            if (next == null) {
+                isWriting = false;
             }
         }
 
@@ -336,7 +334,7 @@ public class FileMessageFactory {
      *
      * @return True if the factory is still valid, false if it has expired
      */
-    public boolean isValid() {
+    public synchronized boolean isValid() {
         if (maxValidTime > 0) {
             long timeNow = System.currentTimeMillis();
             long timeIdle = (timeNow - lastModified) / 1000L;

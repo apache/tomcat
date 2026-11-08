@@ -21,7 +21,10 @@ import java.io.IOException;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.jsp.JspException;
+import jakarta.servlet.jsp.tagext.PageData;
+import jakarta.servlet.jsp.tagext.TagLibraryValidator;
 import jakarta.servlet.jsp.tagext.TagSupport;
+import jakarta.servlet.jsp.tagext.ValidationMessage;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -39,6 +42,65 @@ public class TestValidator extends TomcatBaseTest {
         int rc = getUrl("http://localhost:" + getPort() + "/test/bug47331.jsp", new ByteChunk(), null);
 
         Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+    }
+
+    @Test
+    public void testInvalidTldVersion() throws Exception {
+        getTomcatInstanceTestWebapp(false, true);
+
+        ByteChunk res = new ByteChunk();
+
+        int rc = getUrl("http://localhost:" + getPort() + "/test/jsp/parsing/taglib-invalid-version.jsp", res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+
+        // The invalid jsp-version in the TLD must produce a clean translation
+        // error. It previously triggered a raw NumberFormatException at
+        // translation time since the value was parsed without a catch.
+        String result = res.toString();
+        Assert.assertTrue(result, result.contains("Invalid JSP version [2.1.1]"));
+        Assert.assertFalse(result, result.contains("NumberFormatException"));
+    }
+
+    @Test
+    public void testNullIdTlv() throws Exception {
+        getTomcatInstanceTestWebapp(false, true);
+
+        ByteChunk res = new ByteChunk();
+
+        int rc = getUrl("http://localhost:" + getPort() + "/test/jsp/parsing/taglib-null-id-tlv.jsp", res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+
+        // The validator returns a ValidationMessage with a null id. The id
+        // and the following separator must be omitted from the reported
+        // message. They were previously appended unconditionally which
+        // rendered the literal text "null: " in front of the message.
+        String result = res.toString();
+        Assert.assertTrue(result, result.contains("message without an id"));
+        Assert.assertFalse(result, result.contains("null: message"));
+        // The id of a ValidationMessage that has one is still reported
+        Assert.assertTrue(result, result.contains("123: message with an id"));
+    }
+
+    @Test
+    public void testDuplicateJspElementName() throws Exception {
+        getTomcatInstanceTestWebapp(false, true);
+
+        ByteChunk res = new ByteChunk();
+
+        int rc = getUrl("http://localhost:" + getPort() + "/test/jsp/parsing/element-duplicate-name.jspx", res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+
+        // XML allows two attributes with the local name 'name' as long as
+        // they use different namespace prefixes. jsp:element must report that
+        // as a translation error. It previously sized the JspAttribute array
+        // for a single 'name' attribute which left a null entry that later
+        // triggered a NullPointerException.
+        String result = res.toString();
+        Assert.assertTrue(result, result.contains("attribute appears more than once"));
+        Assert.assertFalse(result, result.contains("NullPointerException"));
     }
 
     @Test
@@ -302,6 +364,15 @@ public class TestValidator extends TomcatBaseTest {
         Assert.assertTrue(result.indexOf("<p>08-hello world</p>") > 0);
         Assert.assertTrue(result.indexOf("<p>09-hello world</p>") > 0);
         Assert.assertTrue(result.indexOf("<p>10-hello world</p>") > 0);
+    }
+
+    public static class NullIdValidator extends TagLibraryValidator {
+
+        @Override
+        public ValidationMessage[] validate(String prefix, String uri, PageData page) {
+            return new ValidationMessage[] { new ValidationMessage(null, "message without an id"),
+                    new ValidationMessage("123", "message with an id") };
+        }
     }
 
     public static class Echo extends TagSupport {

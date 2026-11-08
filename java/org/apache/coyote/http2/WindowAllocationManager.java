@@ -34,7 +34,7 @@ import org.apache.tomcat.util.res.StringManager;
  * triggered.
  * <p>
  * With the implementation at the time of writing, it is not possible for a stream to receive an unexpected connection
- * notification as these are only issues to streams in the backlog and a stream must be waiting for a connection
+ * notification as these are only issued to streams in the backlog and a stream must be waiting for a connection
  * allocation in order to be placed on the backlog. However, as a precaution, this class protects against unexpected
  * connection notifications.
  * <p>

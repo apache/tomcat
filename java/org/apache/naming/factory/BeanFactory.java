@@ -19,6 +19,7 @@ package org.apache.naming.factory;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -34,6 +35,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.naming.ResourceRef;
 import org.apache.naming.StringManager;
+import org.apache.tomcat.util.ExceptionUtils;
 
 /**
  * Object factory for any Resource conforming to the JavaBean spec.
@@ -122,7 +124,8 @@ public class BeanFactory implements ObjectFactory {
                     String propName = ra.getType();
 
                     if (propName.equals(Constants.FACTORY) || propName.equals("scope") || propName.equals("auth") ||
-                            propName.equals("forceString") || propName.equals("singleton")) {
+                            propName.equals("description") || propName.equals("forceString") ||
+                            propName.equals("singleton")) {
                         continue;
                     }
 
@@ -138,42 +141,67 @@ public class BeanFactory implements ObjectFactory {
                             Class<?> propType = pda[i].getPropertyType();
                             Method setProp = pda[i].getWriteMethod();
 
-                            if (propType.equals(String.class)) {
-                                valueArray[0] = value;
-                            } else if (propType.equals(Character.class) || propType.equals(char.class)) {
-                                valueArray[0] = Character.valueOf(value.charAt(0));
-                            } else if (propType.equals(Byte.class) || propType.equals(byte.class)) {
-                                valueArray[0] = Byte.valueOf(value);
-                            } else if (propType.equals(Short.class) || propType.equals(short.class)) {
-                                valueArray[0] = Short.valueOf(value);
-                            } else if (propType.equals(Integer.class) || propType.equals(int.class)) {
-                                valueArray[0] = Integer.valueOf(value);
-                            } else if (propType.equals(Long.class) || propType.equals(long.class)) {
-                                valueArray[0] = Long.valueOf(value);
-                            } else if (propType.equals(Float.class) || propType.equals(float.class)) {
-                                valueArray[0] = Float.valueOf(value);
-                            } else if (propType.equals(Double.class) || propType.equals(double.class)) {
-                                valueArray[0] = Double.valueOf(value);
-                            } else if (propType.equals(Boolean.class) || propType.equals(boolean.class)) {
-                                valueArray[0] = Boolean.valueOf(value);
-                            } else if (setProp != null) {
-                                // This is a Tomcat specific extension and is not part of the
-                                // Java Bean specification.
-                                String setterName = setProp.getName();
-                                try {
-                                    setProp = bean.getClass().getMethod(setterName, String.class);
+                            // The conversion methods of the numeric types and
+                            // the reading of the first character report an
+                            // invalid value of a configured property with an
+                            // unchecked exception, which is replaced here by a
+                            // NamingException which names the property, its
+                            // value and its type.
+                            try {
+                                if (propType.equals(String.class)) {
                                     valueArray[0] = value;
-                                } catch (NoSuchMethodException nsme) {
+                                } else if (propType.equals(Character.class) || propType.equals(char.class)) {
+                                    valueArray[0] = Character.valueOf(value.charAt(0));
+                                } else if (propType.equals(Byte.class) || propType.equals(byte.class)) {
+                                    valueArray[0] = Byte.valueOf(value);
+                                } else if (propType.equals(Short.class) || propType.equals(short.class)) {
+                                    valueArray[0] = Short.valueOf(value);
+                                } else if (propType.equals(Integer.class) || propType.equals(int.class)) {
+                                    valueArray[0] = Integer.valueOf(value);
+                                } else if (propType.equals(Long.class) || propType.equals(long.class)) {
+                                    valueArray[0] = Long.valueOf(value);
+                                } else if (propType.equals(Float.class) || propType.equals(float.class)) {
+                                    valueArray[0] = Float.valueOf(value);
+                                } else if (propType.equals(Double.class) || propType.equals(double.class)) {
+                                    valueArray[0] = Double.valueOf(value);
+                                } else if (propType.equals(Boolean.class) || propType.equals(boolean.class)) {
+                                    valueArray[0] = Boolean.valueOf(value);
+                                } else if (setProp != null) {
+                                    // This is a Tomcat specific extension and is not part of the
+                                    // Java Bean specification.
+                                    String setterName = setProp.getName();
+                                    try {
+                                        setProp = bean.getClass().getMethod(setterName, String.class);
+                                        valueArray[0] = value;
+                                    } catch (NoSuchMethodException nsme) {
+                                        throw new NamingException(
+                                                sm.getString("beanFactory.noStringConversion", propName,
+                                                        propType.getName()));
+                                    }
+                                } else {
                                     throw new NamingException(sm.getString("beanFactory.noStringConversion", propName,
                                             propType.getName()));
                                 }
-                            } else {
-                                throw new NamingException(
-                                        sm.getString("beanFactory.noStringConversion", propName, propType.getName()));
+                            } catch (NumberFormatException | StringIndexOutOfBoundsException ex) {
+                                NamingException ne = new NamingException(sm.getString("beanFactory.invalidValue",
+                                        value, propName, propType.getName()));
+                                ne.initCause(ex);
+                                throw ne;
                             }
 
                             if (setProp != null) {
-                                setProp.invoke(bean, valueArray);
+                                try {
+                                    setProp.invoke(bean, valueArray);
+                                } catch (InvocationTargetException ite) {
+                                    ExceptionUtils.handleThrowable(ite);
+                                    // The message of the wrapper is always null, so name the property and report
+                                    // the exception thrown by the set method as the cause.
+                                    Throwable cause = ite.getCause() != null ? ite.getCause() : ite;
+                                    NamingException ne = new NamingException(
+                                            sm.getString("beanFactory.setFailed", propName, cause.toString()));
+                                    ne.initCause(cause);
+                                    throw ne;
+                                }
                             } else {
                                 throw new NamingException(sm.getString("beanFactory.readOnlyProperty", propName));
                             }

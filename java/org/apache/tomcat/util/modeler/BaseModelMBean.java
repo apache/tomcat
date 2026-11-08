@@ -19,6 +19,7 @@ package org.apache.tomcat.util.modeler;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.Attribute;
 import javax.management.AttributeChangeNotification;
@@ -56,7 +57,7 @@ import org.apache.tomcat.util.res.StringManager;
  *    uses, but now it is required.
  *  - some of the gratuitous flexibility removed - instead this is more predictive and
  *    strict with the use cases.
- *  - all Method and metadata is stored in ManagedBean. BaseModelBMean and ManagedBean act
+ *  - all Method and metadata is stored in ManagedBean. BaseModelMBean and ManagedBean act
  *    like Object and Class.
  *  - setModelMBean is no longer called on resources ( not used in tomcat )
  *  - no caching of Methods for now - operations and setters are not called repeatedly in most
@@ -64,9 +65,6 @@ import org.apache.tomcat.util.res.StringManager;
  *  are, the overhead of getting the method should be small compared with other JMX costs ( RMI, etc ).
  *  We can add getter cache if needed.
  *  - removed unused constructor, fields
- *
- *  TODO:
- *   - clean up catalina.mbeans, stop using weird inheritance
  */
 
 /**
@@ -88,6 +86,8 @@ import org.apache.tomcat.util.res.StringManager;
  * <ul>
  * <li>One of the Java primitive types (boolean, byte, char, double, float, integer, long, short). Corresponding value
  * will be wrapped in the appropriate wrapper class automatically.</li>
+ * <li>Any other Bean-compatible class, such as <code>String</code>, <code>String[]</code>, <code>Object[]</code>,
+ * <code>ObjectName</code>, <code>BigDecimal</code>, <code>BigInteger</code> or <code>java.io.File</code>.</li>
  * <li>Operations that return no value should declare a return type of <code>void</code>.</li>
  * </ul>
  * <li>Attribute caching is not supported</li>
@@ -139,6 +139,11 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
      * The type of the managed resource.
      */
     protected String resourceType = null;
+
+    /**
+     * The sequence number for the next notification sent by this MBean.
+     */
+    private final AtomicLong sequenceNumber = new AtomicLong();
 
     // key: operation val: invoke method
     // private Hashtable invokeAttMap=new Hashtable();
@@ -355,9 +360,15 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
                     sm.getString("baseModelMBean.nullAttributeName"));
         }
 
+        // Get the old value for the change notification below. The attribute
+        // may be write-only or the getter may fail, in which case the old
+        // value remains unknown (null).
         Object oldValue = null;
-        // if( getAttMap.get(name) != null )
-        // oldValue=getAttribute( name );
+        try {
+            oldValue = getAttribute(name);
+        } catch (Exception ignore) {
+            // Old value unknown - ignore
+        }
 
         Method m = managedBean.getSetter(name, this, resource);
 
@@ -466,7 +477,8 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
      *
      * @param resource The resource object to be managed
      * @param type     The type of reference for the managed resource ("ObjectReference", "Handle", "IOR", "EJBHandle",
-     *                     or "RMIReference")
+     *                     or "RMIReference"). This parameter is not used; the resource type is derived from the
+     *                     resource object.
      *
      * @exception InstanceNotFoundException  if the managed resource object cannot be found
      * @exception MBeanException             if the initializer of the object throws an exception
@@ -517,9 +529,12 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
             throw new IllegalArgumentException(sm.getString("baseModelMBean.nullListener"));
         }
 
-        // FIXME - currently this removes *all* notifications for this listener
+        if (log.isTraceEnabled()) {
+            log.trace("removeAttributeNotificationListener " + listener);
+        }
+
         if (attributeBroadcaster != null) {
-            attributeBroadcaster.removeNotificationListener(listener);
+            attributeBroadcaster.removeAttributeNotificationListener(listener, name);
         }
 
     }
@@ -559,8 +574,10 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
             return; // Old and new are both null == no change
         }
 
-        AttributeChangeNotification notification = new AttributeChangeNotification(this, 1, System.currentTimeMillis(),
-                "Attribute value has changed", oldValue.getName(), type, oldValue.getValue(), newValue.getValue());
+        AttributeChangeNotification notification =
+                new AttributeChangeNotification(this, sequenceNumber.incrementAndGet(), System.currentTimeMillis(),
+                        "Attribute value has changed", oldValue.getName(), type, oldValue.getValue(),
+                        newValue.getValue());
         sendAttributeChangeNotification(notification);
 
     }
@@ -590,7 +607,8 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
                     new IllegalArgumentException(sm.getString("baseModelMBean.nullMessage")),
                     sm.getString("baseModelMBean.nullMessage"));
         }
-        Notification notification = new Notification("jmx.modelmbean.generic", this, 1, message);
+        Notification notification =
+                new Notification("jmx.modelmbean.generic", this, sequenceNumber.incrementAndGet(), message);
         sendNotification(notification);
 
     }

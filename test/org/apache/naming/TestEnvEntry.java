@@ -106,7 +106,7 @@ public class TestEnvEntry extends TomcatBaseTest {
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
 
         // JSP has leading and trailing white-space
-        String result = out.toString().trim();
+        String result = out.toString().strip();
         Assert.assertEquals(expected, result);
     }
 
@@ -118,7 +118,7 @@ public class TestEnvEntry extends TomcatBaseTest {
         Context context = tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 
         Tomcat.addServlet(context, "InjectionServlet", "org.apache.naming.TesterInjectionServlet");
-        context.addServletMappingDecoded("/injection", "InjectionServlet");
+        context.addServletMapping("/injection", "InjectionServlet");
 
         tomcat.enableNaming();
         tomcat.start();
@@ -130,7 +130,7 @@ public class TestEnvEntry extends TomcatBaseTest {
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
 
         // JSP has leading and trailing white-space
-        String result = out.toString().trim();
+        String result = out.toString().strip();
         Assert.assertEquals(expected, result);
     }
 }

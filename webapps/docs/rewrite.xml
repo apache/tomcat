@@ -24,7 +24,7 @@
   &project;
 
   <properties>
-    <title>The rewrite Valve</title>
+    <title>The Rewrite Valve</title>
   </properties>
 
 <body>
@@ -41,17 +41,13 @@
   <p>The rewrite valve is configured as a valve using the <code>org.apache.catalina.valves.rewrite.RewriteValve</code>
   class name.</p>
 
-  <p>The rewrite valve can be configured as a valve added in a Host.
-     See <a href="config/host.html">virtual-server</a> documentation for
-     information on how to configure it. It will use a <code>rewrite.config</code> file
-     containing the rewrite directives, it must be placed in the Host configuration
-     folder.
-  </p>
+  <p>The rewrite valve can be configured as a valve added in a Host. See the <a href="config/host.html">Host</a>
+  documentation for information on how to configure it. The <code>rewrite.config</code> file containing the rewrite
+  directives must be placed in the Host configuration folder.</p>
 
-  <p>It can also be in the context.xml of a webapp.
-  The valve will then use a <code>rewrite.config</code> file containing the
-  rewrite directives, it must be placed in the WEB-INF folder of the web application
-  </p>
+  <p>The Valve can also be configured as a Valve added in a Context. The Valve must be added in the context.xml of a
+  webapp. The valve will then use the <code>rewrite.config</code> file containing the rewrite directives found in the
+  WEB-INF folder of the web application.</p>
 
 </section>
 
@@ -106,7 +102,7 @@
           (0 &lt;= N &lt;= 9), which provide access to the grouped
           parts (in parentheses) of the pattern, from the
           <code>RewriteRule</code> which is subject to the current
-          set of <code>RewriteCond</code> conditions..
+          set of <code>RewriteCond</code> conditions.
         </li>
         <li>
           <strong>RewriteCond backreferences</strong>: These are
@@ -151,7 +147,6 @@
             REMOTE_HOST<br />
             REMOTE_PORT<br />
             REMOTE_USER<br />
-            REMOTE_IDENT<br />
             REQUEST_METHOD<br />
             SCRIPT_FILENAME<br />
             REQUEST_PATH<br />
@@ -197,45 +192,53 @@
           </li>
           </ul>
 
-                <p>These variables all
-                correspond to the similarly named HTTP
-                MIME-headers and Servlet API methods.
-                Most are documented elsewhere in the Manual or in
-                the CGI specification. Those that are special to
-                the rewrite valve include those below.</p>
+                <p>These variables correspond to the similarly named HTTP MIME-headers and Servlet API methods. Most are
+                documented in the Servlet API in the CGI specification. Those that are special to the rewrite valve
+                include those below.</p>
 
                 <dl>
 
                   <dt><code>REQUEST_PATH</code></dt>
 
-                  <dd>Corresponds to the full path that is used for mapping.</dd>
+                  <dd>Corresponds to the decoded, normalized path (excluding the context path) that is used for
+                  mapping.</dd>
 
                   <dt><code>CONTEXT_PATH</code></dt>
 
-                  <dd>Corresponds to the path of the mapped context.</dd>
+                  <dd>Corresponds to the canonical (decoded and normalized) path of the mapped context.</dd>
 
                   <dt><code>SERVLET_PATH</code></dt>
 
-                  <dd>Corresponds to the servlet path.</dd>
+                  <dd>Corresponds to <code>HttpServletRequest.getServletPath()</code>. The value is decoded and
+                  normalized.</dd>
+
+                  <dt><code>PATH_INFO</code></dt>
+
+                  <dd>Corresponds to <code>HttpServletRequest.getPathInfo()</code>. The value is decoded and
+                  normalized.</dd>
 
                   <dt><code>THE_REQUEST</code></dt>
 
-                  <dd>The full HTTP request line sent by the
-                  browser to the server (e.g., "<code>GET
-                  /index.html HTTP/1.1</code>"). This does not
-                  include any additional headers sent by the
-                  browser.</dd>
+                  <dd>The full HTTP request line sent by the browser to the server (e.g., "<code>GET /index.html
+                  HTTP/1.1</code>"). This does not include any additional headers sent by the browser.</dd>
 
                   <dt><code>REQUEST_URI</code></dt>
 
-                  <dd>The resource requested in the HTTP request
-                  line. (In the example above, this would be
-                  "/index.html".)</dd>
+                  <dd>The resource requested in the HTTP request line. (In the example above, this would be
+                  "/index.html".) Corresponds to <code>HttpServletRequest.getRequestURI()</code>. This is the original,
+                  non-decoded, non-normalized value and as such may not be suitable for many rewrite use cases. In most
+                  cases <code>%{CONTEXT_PATH}%{REQUEST_PATH}</code> will be more suitable than
+                  <code>%{REQUEST_URI}</code> </dd>
+
+                  <dt><code>SCRIPT_FILENAME</code></dt>
+
+                  <dd>The full local file system path to the file or script matching the request servlet path. The exact
+                  value returned is <code>ServletContext.getRealPath(HttpServletRequest.getServletPath()).</code></dd>
 
                   <dt><code>REQUEST_FILENAME</code></dt>
 
-                  <dd>The full local file system path to the file or
-                  script matching the request.</dd>
+                  <dd>The full local file system path to the file or script matching the request path info. The exact
+                  value returned is <code>ServletContext.getRealPath(HttpServletRequest.getPathInfo()).</code></dd>
 
                   <dt><code>HTTPS</code></dt>
 
@@ -250,15 +253,6 @@
       <p>Other things you should be aware of:</p>
 
       <ol>
-        <li>The variables SCRIPT_FILENAME and REQUEST_FILENAME
-        contain the same value - the value of the
-        <code>filename</code> field of the internal
-        <code>request_rec</code> structure of the Apache server.
-        The first name is the commonly known CGI variable name
-        while the second is the appropriate counterpart of
-        REQUEST_URI (which contains the value of the
-        <code>uri</code> field of <code>request_rec</code>).</li>
-
         <li>
         <code>%{ENV:variable}</code>, where <em>variable</em> can be
         any Java system property, is also available.</li>
@@ -527,33 +521,38 @@ RewriteRule ^/(.*)$ ${uc:$1}
       <p>Some hints on the syntax of regular
       expressions:</p>
 
-<!-- TODO: Why is the following pre-formatted non-wrappable text? -->
-<pre>
-<strong>Text:</strong>
-  <strong><code>.</code></strong>           Any single character
-  <strong><code>[</code></strong>chars<strong><code>]</code></strong>     Character class: Any character of the class 'chars'
-  <strong><code>[^</code></strong>chars<strong><code>]</code></strong>    Character class: Not a character of the class 'chars'
-  text1<strong><code>|</code></strong>text2 Alternative: text1 or text2
-
-<strong>Quantifiers:</strong>
-  <strong><code>?</code></strong>           0 or 1 occurrences of the preceding text
-  <strong><code>*</code></strong>           0 or N occurrences of the preceding text (N &gt; 0)
-  <strong><code>+</code></strong>           1 or N occurrences of the preceding text (N &gt; 1)
-
-<strong>Grouping:</strong>
-  <strong><code>(</code></strong>text<strong><code>)</code></strong>      Grouping of text
-              (used either to set the borders of an alternative as above, or
-              to make backreferences, where the <strong>N</strong>th group can
-              be referred to on the RHS of a RewriteRule as <code>$</code><strong>N</strong>)
-
-<strong>Anchors:</strong>
-  <strong><code>^</code></strong>           Start-of-line anchor
-  <strong><code>$</code></strong>           End-of-line anchor
-
-<strong>Escaping:</strong>
-  <strong><code>\</code></strong>char       escape the given char
-              (for instance, to specify the chars "<code>.[]()</code>" <em>etc.</em>)
-</pre>
+      <table class="defaultTable">
+        <tr><th colspan="2">Text</th></tr>
+        <tr><td><code>.</code></td>
+          <td>Any single character</td></tr>
+        <tr><td><code>[chars]</code></td>
+          <td>Character class: Any character of the class 'chars'</td></tr>
+        <tr><td><code>[^chars]</code></td>
+          <td>Character class: Not a character of the class 'chars'</td></tr>
+        <tr><td><code>text1|text2</code></td>
+          <td>Alternative: text1 or text2</td></tr>
+        <tr><th colspan="2">Quantifiers</th></tr>
+        <tr><td><code>?</code></td>
+          <td>0 or 1 occurrences of the preceding text</td></tr>
+        <tr><td><code>*</code></td>
+          <td>0 or N occurrences of the preceding text (N &gt; 0)</td></tr>
+        <tr><td><code>+</code></td>
+          <td>1 or N occurrences of the preceding text (N &gt; 1)</td></tr>
+        <tr><th colspan="2">Grouping</th></tr>
+        <tr><td><code>(text)</code></td>
+          <td>Grouping of text (used either to set the borders of an
+            alternative as above, or to make backreferences, where the Nth
+            group can be referred to on the RHS of a RewriteRule as $N)</td></tr>
+        <tr><th colspan="2">Anchors</th></tr>
+        <tr><td><code>^</code></td>
+          <td>Start-of-line anchor</td></tr>
+        <tr><td><code>$</code></td>
+          <td>End-of-line anchor</td></tr>
+        <tr><th colspan="2">Escaping</th></tr>
+        <tr><td><code>\char</code></td>
+          <td>Escape the given char (for instance, to specify the chars
+            ".[]()" <em>etc.</em>)</td></tr>
+      </table>
 
       <p>For more information about regular expressions, have a look at the
       perl regular expression manpage ("<a
@@ -667,7 +666,7 @@ cannot use <code>$N</code> in the substitution string!
         is specified by <em>NAME</em> and the value is
         <em>VAL</em>. The <em>domain</em> field is the domain of the
         cookie, such as '.apache.org', the optional <em>lifetime</em>
-        is the lifetime of the cookie in minutes, and the optional
+        is the lifetime of the cookie in seconds, and the optional
         <em>path</em> is the path of the cookie</li>
 
         <li>

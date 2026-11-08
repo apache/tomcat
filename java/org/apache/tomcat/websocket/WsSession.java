@@ -58,6 +58,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.websocket.pojo.PojoEndpointBase;
 import org.apache.tomcat.websocket.pojo.PojoEndpointServer;
 import org.apache.tomcat.websocket.server.DefaultServerEndpointConfigurator;
 
@@ -104,7 +105,6 @@ public class WsSession implements Session {
     private final String subProtocol;
     private final Map<String,String> pathParameters;
     private final boolean secure;
-    private final String httpSessionId;
     private final String id;
 
     // Expected to handle message types of <String> only
@@ -138,7 +138,7 @@ public class WsSession implements Session {
      * @param secure               Was this session initiated over a secure connection?
      * @param clientEndpointConfig The configuration information for the client end point
      *
-     * @throws DeploymentException if an invalid encode is specified
+     * @throws DeploymentException if an invalid encoder is specified
      */
     public WsSession(ClientEndpointHolder clientEndpointHolder, WsRemoteEndpointImplBase wsRemoteEndpoint,
             WsWebSocketContainer wsWebSocketContainer, List<Extension> negotiatedExtensions, String subProtocol,
@@ -158,7 +158,6 @@ public class WsSession implements Session {
         this.requestParameterMap = Collections.emptyMap();
         this.queryString = null;
         this.userPrincipal = null;
-        this.httpSessionId = null;
         this.negotiatedExtensions = negotiatedExtensions;
         this.subProtocol = Objects.requireNonNullElse(subProtocol, "");
         this.pathParameters = pathParameters;
@@ -169,7 +168,12 @@ public class WsSession implements Session {
         this.userProperties.putAll(endpointConfig.getUserProperties());
         this.id = Long.toHexString(ids.getAndIncrement());
 
-        this.localEndpoint = clientEndpointHolder.getInstance(getInstanceManager());
+        try {
+            this.localEndpoint = clientEndpointHolder.getInstance(getInstanceManager());
+        } catch (RuntimeException e) {
+            destroyEncodersOnFailure();
+            throw e;
+        }
 
         if (log.isTraceEnabled()) {
             log.trace(sm.getString("wsSession.created", id));
@@ -192,8 +196,6 @@ public class WsSession implements Session {
      *                                 <code>null</code> if this is a client session
      * @param userPrincipal        The principal associated with the request that initiated this session or
      *                                 <code>null</code> if this is a client session
-     * @param httpSessionId        The HTTP session ID associated with the request that initiated this session or
-     *                                 <code>null</code> if this is a client session
      * @param negotiatedExtensions The agreed extensions to use for this session
      * @param subProtocol          The agreed sub-protocol to use for this session
      * @param pathParameters       The path parameters associated with the request that initiated this session or
@@ -201,13 +203,12 @@ public class WsSession implements Session {
      * @param secure               Was this session initiated over a secure connection?
      * @param serverEndpointConfig The configuration information for the server end point
      *
-     * @throws DeploymentException if an invalid encode is specified
+     * @throws DeploymentException if an invalid encoder is specified
      */
     public WsSession(WsRemoteEndpointImplBase wsRemoteEndpoint, WsWebSocketContainer wsWebSocketContainer,
             URI requestUri, Map<String,List<String>> requestParameterMap, String queryString, Principal userPrincipal,
-            String httpSessionId, List<Extension> negotiatedExtensions, String subProtocol,
-            Map<String,String> pathParameters, boolean secure, ServerEndpointConfig serverEndpointConfig)
-            throws DeploymentException {
+            List<Extension> negotiatedExtensions, String subProtocol, Map<String,String> pathParameters, boolean secure,
+            ServerEndpointConfig serverEndpointConfig) throws DeploymentException {
 
         this.wsRemoteEndpoint = wsRemoteEndpoint;
         this.wsRemoteEndpoint.setSession(this);
@@ -223,7 +224,6 @@ public class WsSession implements Session {
         this.requestParameterMap = Objects.requireNonNullElse(requestParameterMap, Collections.emptyMap());
         this.queryString = queryString;
         this.userPrincipal = userPrincipal;
-        this.httpSessionId = httpSessionId;
         this.negotiatedExtensions = negotiatedExtensions;
         this.subProtocol = Objects.requireNonNullElse(subProtocol, "");
         this.pathParameters = pathParameters;
@@ -253,7 +253,11 @@ public class WsSession implements Session {
                 endpointInstance = instanceManager.newInstance(clazz);
             }
         } catch (ReflectiveOperationException | NamingException e) {
+            destroyEncodersOnFailure();
             throw new DeploymentException(sm.getString("wsSession.instanceCreateFailed"), e);
+        } catch (RuntimeException e) {
+            destroyEncodersOnFailure();
+            throw e;
         }
 
         if (endpointInstance instanceof Endpoint) {
@@ -276,8 +280,26 @@ public class WsSession implements Session {
     }
 
 
+    /*
+     * Releases the encoders the remote endpoint created for this session when the session could not be created. Since
+     * the session does not exist, close() is never called for the remote endpoint and nothing else releases those
+     * encoders - including any clean-up the instance manager performs when it destroys an instance it registered.
+     * Failures during the clean-up are logged rather than propagated since they must not replace the exception that
+     * caused the session creation to fail.
+     */
+    private void destroyEncodersOnFailure() {
+        try {
+            wsRemoteEndpoint.destroyEncoders();
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            log.warn(sm.getString("wsSession.destroyEncodersFailed"), t);
+        }
+    }
+
+
     /**
      * Returns the instance manager for this session.
+     *
      * @return the instance manager
      */
     public InstanceManager getInstanceManager() {
@@ -458,7 +480,18 @@ public class WsSession implements Session {
 
 
     /**
+     * Checks if the session close process has started.
+     *
+     * @return true if the session is closing or closed
+     */
+    boolean isClosing() {
+        return state.get() != State.OPEN;
+    }
+
+
+    /**
      * Checks if the session is closed.
+     *
      * @return true if the session is closed
      */
     public boolean isClosed() {
@@ -483,6 +516,9 @@ public class WsSession implements Session {
     @Override
     public void setMaxBinaryMessageBufferSize(int max) {
         checkState();
+        if (max < 1) {
+            throw new IllegalArgumentException(sm.getString("wsSession.illegalBufferSize", Integer.valueOf(max)));
+        }
         this.maxBinaryMessageBufferSize = max;
     }
 
@@ -497,6 +533,9 @@ public class WsSession implements Session {
     @Override
     public void setMaxTextMessageBufferSize(int max) {
         checkState();
+        if (max < 1) {
+            throw new IllegalArgumentException(sm.getString("wsSession.illegalBufferSize", Integer.valueOf(max)));
+        }
         this.maxTextMessageBufferSize = max;
     }
 
@@ -542,8 +581,8 @@ public class WsSession implements Session {
 
 
     /**
-     * WebSocket 1.0. Section 2.1.5. Need internal close method as spec requires that the local endpoint receives a 1006
-     * on timeout.
+     * RFC 6455, sections 5.5.1 and 7.4.2. Need internal close method as spec requires that the local endpoint receives
+     * a 1006 on timeout.
      *
      * @param closeReasonMessage The close reason to pass to the remote endpoint
      * @param closeReasonLocal   The close reason to pass to the local endpoint
@@ -554,8 +593,8 @@ public class WsSession implements Session {
 
 
     /**
-     * WebSocket 1.0. Section 2.1.5. Need internal close method as spec requires that the local endpoint receives a 1006
-     * on timeout.
+     * RFC 6455, sections 5.5.1 and 7.4.2. Need internal close method as spec requires that the local endpoint receives
+     * a 1006 on timeout.
      *
      * @param closeReasonMessage The close reason to pass to the remote endpoint
      * @param closeReasonLocal   The close reason to pass to the local endpoint
@@ -606,6 +645,55 @@ public class WsSession implements Session {
         SendResult sr = new SendResult(this, ioe);
         for (FutureToSendHandler f2sh : futures.keySet()) {
             f2sh.onResult(sr);
+        }
+    }
+
+
+    /**
+     * Closes the session without waiting for the remote endpoint to complete the closing handshake. This is used when
+     * the connection could not be established, for example because the end point's onOpen method threw an exception.
+     * Such a session is not registered with the container so, unlike other sessions that are waiting for the closing
+     * handshake to complete, the session close timeout processing will never see this session. The close process has to
+     * be completed here instead, otherwise the resources associated with the session are never released - notably the
+     * end point instance and the encoders held by the instance manager.
+     * <p>
+     * If the close process has already been started, for example because the end point closed the session from its
+     * onOpen method, the close reason provided here is ignored and the close process that was started is completed.
+     *
+     * @param closeReason The close reason to use if the close process has not yet been started
+     */
+    public void closeImmediately(CloseReason closeReason) {
+        try {
+            // Start the close process if it has not already been started. Note: the socket is closed rather than
+            // waiting for the remote endpoint to respond to the close message that is sent.
+            doClose(closeReason, closeReason, true);
+        } catch (RuntimeException e) {
+            /*
+             * The close message could not be sent. This happens if the connection was never fully established, for
+             * example if the frame used to process the WebSocket protocol could not be created. Complete the close
+             * here without sending the close message. The resources associated with the session still need to be
+             * released - notably the end point instance and the encoders held by the instance manager.
+             */
+            if (log.isWarnEnabled()) {
+                log.warn(sm.getString("wsSession.sendCloseFail", id), e);
+            }
+            if (state.compareAndSet(State.OPEN, State.CLOSED) ||
+                    state.compareAndSet(State.OUTPUT_CLOSING, State.CLOSED)) {
+                fireEndpointOnClose(closeReason);
+                closeConnection();
+            }
+        }
+
+        // If the close process was started elsewhere, the call above is ignored since the close process only runs once.
+        // Complete that process here. Note: the CLOSING state is not handled below since that state is only reached
+        // once a close message has been received from the remote endpoint which, for a session that was never fully
+        // established, can not have happened.
+        if (state.compareAndSet(State.OUTPUT_CLOSING, State.CLOSED) ||
+                state.compareAndSet(State.OUTPUT_CLOSED, State.CLOSED)) {
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("wsSession.closeImmediately", id));
+            }
+            closeConnection();
         }
     }
 
@@ -673,13 +761,14 @@ public class WsSession implements Session {
 
     /**
      * Returns the session close timeout in milliseconds.
+     *
      * @return the session close timeout
      */
     protected long getSessionCloseTimeout() {
         long result = 0;
         Object obj = userProperties.get(Constants.SESSION_CLOSE_TIMEOUT_PROPERTY);
         if (obj instanceof Long) {
-            result = ((Long) obj).intValue();
+            result = ((Long) obj).longValue();
         }
         if (result <= 0) {
             result = Constants.DEFAULT_SESSION_CLOSE_TIMEOUT;
@@ -737,7 +826,7 @@ public class WsSession implements Session {
         } finally {
             if (instanceManager != null) {
                 try {
-                    instanceManager.destroyInstance(localEndpoint);
+                    instanceManager.destroyInstance(getManagedEndpointInstance());
                 } catch (Throwable t2) {
                     ExceptionUtils.handleThrowable(t2);
                     if (throwable == null) {
@@ -751,6 +840,26 @@ public class WsSession implements Session {
         if (throwable != null) {
             fireEndpointOnError(throwable);
         }
+    }
+
+
+    /*
+     * The instance the instance manager registered is the one it created or, for an endpoint instance the application
+     * provides itself (via a configurator on the server or when connecting a client), the one passed to
+     * InstanceManager.newInstance(Object). Annotated POJO endpoints are wrapped by a PojoEndpointBase implementation
+     * before use, so the wrapper is not an instance the instance manager knows about and passing it to
+     * destroyInstance(Object) would by-pass the clean-up the instance manager performs when it destroys an instance it
+     * registered. Return the registered instance, which is the wrapper for a standard Endpoint and the POJO for a POJO
+     * endpoint.
+     */
+    private Object getManagedEndpointInstance() {
+        if (localEndpoint instanceof PojoEndpointBase pojoEndpoint) {
+            Object pojo = pojoEndpoint.getPojo();
+            if (pojo != null) {
+                return pojo;
+            }
+        }
+        return localEndpoint;
     }
 
 
@@ -944,6 +1053,7 @@ public class WsSession implements Session {
 
     /**
      * Returns the user principal for this session.
+     *
      * @return the user principal
      */
     public Principal getUserPrincipalInternal() {
@@ -973,6 +1083,7 @@ public class WsSession implements Session {
 
     /**
      * Returns the local endpoint for this session.
+     *
      * @return the local endpoint
      */
     public Endpoint getLocal() {
@@ -981,16 +1092,8 @@ public class WsSession implements Session {
 
 
     /**
-     * Returns the HTTP session ID associated with this WebSocket session.
-     * @return the HTTP session ID, or null if not associated
-     */
-    public String getHttpSessionId() {
-        return httpSessionId;
-    }
-
-
-    /**
      * Returns the text message handler for this session.
+     *
      * @return the text message handler
      */
     protected MessageHandler getTextMessageHandler() {
@@ -1000,6 +1103,7 @@ public class WsSession implements Session {
 
     /**
      * Returns the binary message handler for this session.
+     *
      * @return the binary message handler
      */
     protected MessageHandler getBinaryMessageHandler() {
@@ -1009,6 +1113,7 @@ public class WsSession implements Session {
 
     /**
      * Returns the pong message handler for this session.
+     *
      * @return the pong message handler
      */
     protected MessageHandler.Whole<PongMessage> getPongMessageHandler() {

@@ -16,10 +16,21 @@
  */
 package org.apache.tomcat.buildutil.translate;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.Properties;
+
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public class TestUtils {
+
+    @Rule
+    public TemporaryFolder temp = new TemporaryFolder();
 
     @Test
     public void testFormatValue01() {
@@ -55,5 +66,38 @@ public class TestUtils {
     public void testFormatValue06() {
         // Export from Tomcat
         Assert.assertEquals("line1\\n\\\n\\tline2\\n\\\n\\tline3", Utils.formatValueExport("line1\n\tline2\n\tline3"));
+    }
+
+    @Test
+    public void testLoadValid() throws IOException {
+        File f = temp.newFile("valid.properties");
+        Files.write(f.toPath(), "key=caf\u00e9\n".getBytes(StandardCharsets.UTF_8));
+        Properties props = Utils.load(f);
+        Assert.assertEquals("caf\u00e9", props.getProperty("key"));
+    }
+
+    @Test
+    public void testLoadInvalidUtf8() throws IOException {
+        File f = temp.newFile("invalid-utf8.properties");
+        Files.write(f.toPath(), new byte[] { 'k', '=', (byte) 0xC3, (byte) 0x28, '\n' });
+        try {
+            Utils.load(f);
+            Assert.fail("Invalid UTF-8 was accepted");
+        } catch (IOException e) {
+            Assert.assertTrue(e.getMessage(), e.getMessage().contains("invalid-utf8.properties"));
+        }
+    }
+
+    @Test
+    public void testLoadMalformedEscape() throws IOException {
+        File f = temp.newFile("bad-escape.properties");
+        Files.write(f.toPath(), "key=\\u12\n".getBytes(StandardCharsets.UTF_8));
+        try {
+            Utils.load(f);
+            Assert.fail("The malformed escape was accepted");
+        } catch (IOException e) {
+            Assert.assertTrue(e.getMessage(), e.getMessage().contains("bad-escape.properties"));
+            Assert.assertTrue(e.getCause() instanceof IllegalArgumentException);
+        }
     }
 }

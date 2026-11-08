@@ -30,7 +30,7 @@ import org.apache.tools.ant.BuildException;
 /**
  * Query for Mbeans.
  * <ul>
- * <li>open no existing JSR 160 rmi jmx connection</li>
+ * <li>reuse existing JSR 160 rmi jmx connection</li>
  * <li>Get all Mbeans attributes</li>
  * <li>Get only the Query Mbeans ObjectNames</li>
  * <li>Show query result as Ant console log</li>
@@ -43,12 +43,12 @@ import org.apache.tools.ant.BuildException;
  *   &lt;jmxQuery
  *           host="127.0.0.1"
  *           port="9014"
- *           name="Catalina:type=Manager,*
+ *           name="Catalina:type=Manager,*"
  *           resultproperty="manager" /&gt;
  * </pre>
  *
  * with attribute <em>attributebinding="true"</em> you can get all attributes also from result objects.<br>
- * The property manager.length show the size of the result and with manager.[0..length].name the resulted ObjectNames
+ * The property manager.Length show the size of the result and with manager.[0..Length].Name the resulted ObjectNames
  * are saved. These tasks require Ant 1.6 or later interface.
  *
  * @since 5.5.10

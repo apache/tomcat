@@ -52,8 +52,12 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
     public abstract DataSender getNewDataSender();
 
     /**
-     * Retrieves a sender from the pool, waiting up to maxWait milliseconds.
-     * @return a DataSender from the pool, or null if timeout expires
+     * Retrieves a sender from the pool, waiting up to maxWait milliseconds. If maxWait is zero or negative, the call
+     * waits indefinitely for a sender to become available.
+     *
+     * @return a DataSender from the pool, or null if the wait timed out or the calling thread was interrupted
+     *
+     * @throws IllegalStateException if the sender pool has been closed
      */
     public DataSender getSender() {
         return queue.getSender(getMaxWait());
@@ -64,7 +68,6 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
      * @param sender the sender to return
      */
     public void returnSender(DataSender sender) {
-        sender.keepalive();
         queue.returnSender(sender);
     }
 
@@ -125,7 +128,9 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
     }
 
     /**
-     * Sets the maximum time to wait for a sender from the pool, in milliseconds.
+     * Sets the maximum time to wait for a sender from the pool, in milliseconds. A value of zero or less means the
+     * wait for a sender is unbounded.
+     *
      * @param maxWait the maximum wait time
      */
     public void setMaxWait(long maxWait) {
@@ -173,15 +178,17 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
         /**
          * @return Returns the limit.
          */
-        public int getLimit() {
+        public synchronized int getLimit() {
             return limit;
         }
 
         /**
          * @param limit The limit to set.
          */
-        public void setLimit(int limit) {
+        public synchronized void setLimit(int limit) {
             this.limit = limit;
+            // Raising the limit can make room for a new sender to be created
+            notifyAll();
         }
 
         public synchronized int getInUsePoolSize() {
@@ -203,7 +210,7 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
         }
 
         public synchronized DataSender getSender(long timeout) {
-            long start = System.currentTimeMillis();
+            long start = System.nanoTime();
             while (true) {
                 if (!isOpen) {
                     throw new IllegalStateException(sm.getString("pooledSender.closed.queue"));
@@ -218,15 +225,25 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
                     inuse.add(sender);
                     return sender;
                 }
-                long delta = System.currentTimeMillis() - start;
-                if (delta > timeout && timeout > 0) {
-                    return null;
-                } else {
-                    try {
-                        wait(Math.max(timeout - delta, 1));
-                    } catch (InterruptedException x) {
-                        // Ignore
+                try {
+                    if (timeout > 0) {
+                        long delta = (System.nanoTime() - start) / 1_000_000;
+                        if (delta >= timeout) {
+                            return null;
+                        }
+                        // Everything that can make a sender available - returnSender(),
+                        // open(), close() and setLimit() - notifies every waiting
+                        // thread, so there is no need to poll.
+                        wait(timeout - delta);
+                    } else {
+                        // No timeout configured: wait until a sender becomes
+                        // available or the queue is closed.
+                        wait();
                     }
+                } catch (InterruptedException x) {
+                    // Restore the interrupt status and let the caller handle it
+                    Thread.currentThread().interrupt();
+                    return null;
                 }
             }
         }
@@ -236,7 +253,6 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
                 sender.disconnect();
                 return;
             }
-            // to do
             inuse.remove(sender);
             // just in case the limit has changed
             if (notinuse.size() < this.getLimit()) {

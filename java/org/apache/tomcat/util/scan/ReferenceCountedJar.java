@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.scan;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -26,6 +27,11 @@ import org.apache.tomcat.Jar;
 /**
  * This class provides a wrapper around {@link Jar} that uses reference counting to close and re-create the wrapped
  * {@link Jar} instance as required.
+ * <p>
+ * Each stream returned by {@link #getInputStream(String)} or {@link #getEntryInputStream()} holds a reference to the
+ * wrapped {@link Jar} until it is closed. The wrapped {@link Jar}, and its underlying file handle, therefore remains
+ * open until every returned stream has been closed, even if all other references have been released. Callers are
+ * responsible for closing every stream they obtain.
  */
 public class ReferenceCountedJar implements Jar {
 
@@ -60,11 +66,48 @@ public class ReferenceCountedJar implements Jar {
 
     @Override
     public synchronized void close() {
+        if (referenceCount <= 0) {
+            // More closes than opens have been requested. Ignore the extra
+            // close rather than letting the count go negative, which would
+            // prevent the wrapped Jar from ever being closed again.
+            return;
+        }
         referenceCount--;
         if (referenceCount == 0) {
             wrappedJar.close();
             wrappedJar = null;
         }
+    }
+
+
+    /*
+     * Transfers the reference obtained by open() to the given stream obtained from the wrapped Jar. The reference is
+     * released when - and only when - the stream is closed, so the wrapped Jar remains open while the stream is in
+     * use. A null stream releases the reference immediately.
+     */
+    private InputStream retainReference(InputStream is) {
+        if (is == null) {
+            close();
+            return null;
+        }
+
+        return new FilterInputStream(is) {
+
+            private boolean released = false;
+
+            @Override
+            public synchronized void close() throws IOException {
+                if (released) {
+                    return;
+                }
+                released = true;
+                try {
+                    in.close();
+                } finally {
+                    ReferenceCountedJar.this.close();
+                }
+            }
+        };
     }
 
 
@@ -76,8 +119,12 @@ public class ReferenceCountedJar implements Jar {
 
     @Override
     public InputStream getInputStream(String name) throws IOException {
-        try (ReferenceCountedJar jar = open()) {
-            return jar.wrappedJar.getInputStream(name);
+        ReferenceCountedJar jar = open();
+        try {
+            return jar.retainReference(jar.wrappedJar.getInputStream(name));
+        } catch (IOException | RuntimeException e) {
+            jar.close();
+            throw e;
         }
     }
 
@@ -120,8 +167,12 @@ public class ReferenceCountedJar implements Jar {
 
     @Override
     public InputStream getEntryInputStream() throws IOException {
-        try (ReferenceCountedJar jar = open()) {
-            return jar.wrappedJar.getEntryInputStream();
+        ReferenceCountedJar jar = open();
+        try {
+            return jar.retainReference(jar.wrappedJar.getEntryInputStream());
+        } catch (IOException | RuntimeException e) {
+            jar.close();
+            throw e;
         }
     }
 

@@ -19,8 +19,9 @@ package org.apache.catalina.ssi;
 import java.io.Serial;
 
 /**
- * Exception used to tell SSIProcessor that it should stop processing SSI commands. This is used to mimic the Apache
- * behavior in #set with invalid attributes.
+ * Exception used to tell SSIProcessor that it should stop processing SSI commands, causing the remainder of the
+ * document to be discarded. This is used, among other cases, to mimic the Apache behavior in #set with invalid
+ * attributes and for unparseable #if/#elif expressions.
  */
 public class SSIStopProcessingException extends Exception {
 

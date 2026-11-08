@@ -234,7 +234,7 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
             } else {
                 w.setMultipartConfigElement(new MultipartConfigElement(""));
             }
-            context.addServletMappingDecoded(URI, servletName);
+            context.addServletMapping(URI, servletName);
             context.setSwallowAbortedUploads(swallow);
 
             Connector c = tomcat.getConnector();
@@ -345,7 +345,7 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
             context = tomcat.addContext("", TEMP_DIR);
             AbortedPOSTServlet servlet = new AbortedPOSTServlet(status);
             Tomcat.addServlet(context, servletName, servlet);
-            context.addServletMappingDecoded(URI, servletName);
+            context.addServletMapping(URI, servletName);
             context.setSwallowAbortedUploads(swallow);
 
             tomcat.start();

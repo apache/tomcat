@@ -42,7 +42,7 @@ public final class C2BConverter {
     private CharBuffer cb = null;
 
     /**
-     * Leftover buffer used for multi-characters characters.
+     * Leftover buffer used for multi-character characters.
      */
     private final CharBuffer leftovers;
 

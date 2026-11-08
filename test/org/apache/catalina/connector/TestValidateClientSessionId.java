@@ -37,7 +37,7 @@ public class TestValidateClientSessionId extends TomcatBaseTest {
 
         Context ctx = getProgrammaticRootContext();
         Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
-        ctx.addServletMappingDecoded("/", "snoop");
+        ctx.addServletMapping("/", "snoop");
 
         tomcat.start();
 
@@ -60,12 +60,12 @@ public class TestValidateClientSessionId extends TomcatBaseTest {
         Context ctx1 = tomcat.addContext("/app1", null);
         ctx1.setSessionCookiePath("/");
         Tomcat.addServlet(ctx1, "snoop", new SnoopServlet());
-        ctx1.addServletMappingDecoded("/", "snoop");
+        ctx1.addServletMapping("/", "snoop");
 
         Context ctx2 = tomcat.addContext("/app2", null);
         ctx2.setSessionCookiePath("/");
         Tomcat.addServlet(ctx2, "snoop", new SnoopServlet());
-        ctx2.addServletMappingDecoded("/", "snoop");
+        ctx2.addServletMapping("/", "snoop");
 
         tomcat.start();
 

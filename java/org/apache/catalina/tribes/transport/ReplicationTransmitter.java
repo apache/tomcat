@@ -25,6 +25,7 @@ import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.ChannelSender;
 import org.apache.catalina.tribes.Member;
+import org.apache.catalina.tribes.group.GroupChannel;
 import org.apache.catalina.tribes.jmx.JmxRegistry;
 import org.apache.catalina.tribes.transport.nio.PooledParallelSender;
 
@@ -70,6 +71,9 @@ public class ReplicationTransmitter implements ChannelSender {
 
     @Override
     public void sendMessage(ChannelMessage message, Member[] destination) throws ChannelException {
+        if (channel instanceof GroupChannel groupChannel && groupChannel.getSecure()) {
+            message.setOptions(message.getOptions() | Channel.SEND_OPTIONS_SECURE);
+        }
         MultiPointSender sender = getTransport();
         sender.sendMessage(destination, message);
     }
@@ -99,7 +103,10 @@ public class ReplicationTransmitter implements ChannelSender {
     public synchronized void stop() {
         getTransport().disconnect();
         if (oname != null) {
-            JmxRegistry.getRegistry(channel).unregisterJmx(oname);
+            JmxRegistry jmxRegistry = JmxRegistry.getRegistry(channel);
+            if (jmxRegistry != null) {
+                jmxRegistry.unregisterJmx(oname);
+            }
             oname = null;
         }
         channel = null;
@@ -108,7 +115,7 @@ public class ReplicationTransmitter implements ChannelSender {
     /**
      * Call transmitter to check for sender socket status
      *
-     * @see org.apache.catalina.ha.tcp.SimpleTcpCluster#backgroundProcess()
+     * @see org.apache.catalina.tribes.ChannelSender#heartbeat()
      */
     @Override
     public void heartbeat() {
@@ -145,6 +152,9 @@ public class ReplicationTransmitter implements ChannelSender {
     @Override
     public void setChannel(Channel channel) {
         this.channel = channel;
+        if (transport instanceof AbstractSender sender && channel instanceof GroupChannel groupChannel) {
+            sender.setSslContext(groupChannel.getSslContext());
+        }
     }
 
 }

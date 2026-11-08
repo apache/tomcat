@@ -7,6 +7,15 @@ package org.apache.el.parser;
 public class ELParserTokenManager implements ELParserConstants {
     java.util.Deque<Integer> deque = new java.util.ArrayDeque<Integer>();
 
+    /*
+     * Field initialisers only run when the token manager is constructed, not when it is re-initialised via ReInit().
+     * Reset any state added above so that a token manager reused across parses (e.g. after a previous parse failed part
+     * way through) starts from a known state.
+     */
+    void reset() {
+        deque.clear();
+    }
+
     /** Debug output. */
     public java.io.PrintStream debugStream = System.out;
 

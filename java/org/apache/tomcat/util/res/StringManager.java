@@ -45,6 +45,9 @@ public class StringManager {
 
     private static final int LOCALE_CACHE_SIZE = 10;
 
+    private static final ResourceBundle.Control BUNDLE_CONTROL =
+            ResourceBundle.Control.getControl(ResourceBundle.Control.FORMAT_PROPERTIES);
+
     /**
      * The ResourceBundle for this StringManager.
      */
@@ -54,7 +57,8 @@ public class StringManager {
 
     /**
      * Creates a new StringManager for a given package. This is a private method and all access to it is arbitrated by
-     * the static getManager method call so that only one StringManager per package will be created.
+     * the static getManager method call so that only one StringManager per package and Locale combination will be
+     * created. Created managers are held in a per package LRU cache (see {@link #getManager(String, Locale)}).
      *
      * @param packageName Name of package to create StringManager for.
      */
@@ -215,9 +219,10 @@ public class StringManager {
         Map<Locale,StringManager> map = managers.get(packageName);
         if (map == null) {
             /*
-             * Don't want the HashMap size to exceed LOCALE_CACHE_SIZE. Expansion occurs when size() exceeds capacity.
-             * Therefore, keep size at or below capacity. removeEldestEntry() executes after insertion therefore the
-             * test for removal needs to use one less than the maximum desired size. Note this is an LRU cache.
+             * Note this is an LRU cache. The map holds at most LOCALE_CACHE_SIZE - 1 entries: removeEldestEntry()
+             * executes after insertion, so the test for removal uses one less than the maximum desired size. With the
+             * 0.75 load factor the underlying table resizes when size() exceeds 7, so the capacity argument is not a
+             * size limit.
              */
             map = new LinkedHashMap<>(LOCALE_CACHE_SIZE, 0.75f, true) {
                 @Serial
@@ -241,7 +246,9 @@ public class StringManager {
 
 
     /**
-     * Retrieve the StringManager for a list of Locales. The first StringManager found will be returned.
+     * Retrieve the StringManager for a list of Locales. The first StringManager whose effective locale exactly matches
+     * one of the requested Locales will be returned. Requested Locales that do not match exactly (e.g. regional
+     * variants such as <code>en-US</code>) are skipped.
      *
      * @param packageName      The package for which the StringManager was requested
      * @param requestedLocales The list of Locales
@@ -251,12 +258,75 @@ public class StringManager {
     public static StringManager getManager(String packageName, Enumeration<Locale> requestedLocales) {
         while (requestedLocales.hasMoreElements()) {
             Locale locale = requestedLocales.nextElement();
+            // Only look up locales that can actually match.
+            if (!hasBundle(packageName, locale)) {
+                continue;
+            }
             StringManager result = getManager(packageName, locale);
-            if (result.getLocale().equals(locale)) {
+            if (result.getLocale() != null && result.getLocale().equals(locale)) {
                 return result;
             }
         }
         // Return the default
         return getManager(packageName);
+    }
+
+
+    /**
+     * Determines if a requested locale can ever match. Only locales for which an exact match bundle exists can
+     * match so only those should be passed to the constructor.
+     *
+     * @param packageName The package name
+     * @param locale      The requested locale
+     *
+     * @return true if the locale should be looked up
+     */
+    private static boolean hasBundle(String packageName, Locale locale) {
+        String bundleName = packageName + ".LocalStrings";
+        // The constructor coerces all English locales to Locale.ROOT and the
+        // root bundle is reported as Locale.ENGLISH so only a plain "en"
+        // request can match. Locale.ROOT is a single, fixed cache key so it
+        // is probed rather than every en-* variant.
+        if (Locale.ENGLISH.getLanguage().equals(locale.getLanguage())) {
+            return locale.equals(Locale.ENGLISH) && bundleExists(bundleName, Locale.ROOT);
+        }
+        return bundleExists(bundleName, locale);
+    }
+
+
+    /**
+     * Checks if a bundle exists for the given locale without adding an entry to the JVM-wide ResourceBundle cache.
+     *
+     * @param bundleName The full bundle name
+     * @param locale     The locale
+     *
+     * @return true if a bundle exists for the given locale
+     */
+    public static boolean bundleExists(String bundleName, Locale locale) {
+        ClassLoader classLoader = StringManager.class.getClassLoader();
+        if (bundleExists(bundleName, locale, classLoader)) {
+            return true;
+        }
+        // The constructor also falls back to the current thread context
+        // class loader so probe it too.
+        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        if (contextClassLoader != null && contextClassLoader != classLoader) {
+            return bundleExists(bundleName, locale, contextClassLoader);
+        }
+        return false;
+    }
+
+
+    private static boolean bundleExists(String bundleName, Locale locale, ClassLoader classLoader) {
+        try {
+            // Control.newBundle() loads the bundle (or returns null) without
+            // caching the result in the JVM-wide ResourceBundle cache.
+            return BUNDLE_CONTROL.newBundle(bundleName, locale,
+                    ResourceBundle.Control.FORMAT_PROPERTIES.get(0), classLoader, false) != null;
+        } catch (Exception ignore) {
+            // Any load failure is treated as "no bundle" which matches the
+            // behaviour of the constructor.
+            return false;
+        }
     }
 }

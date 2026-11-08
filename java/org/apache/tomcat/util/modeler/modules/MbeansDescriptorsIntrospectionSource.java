@@ -21,6 +21,7 @@ import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -56,7 +57,6 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource {
 
     private Registry registry;
     private String type;
-    private final List<ObjectName> mbeans = new ArrayList<>();
 
     /**
      * Set the registry.
@@ -91,15 +91,13 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource {
         setType(type);
         setSource(source);
         execute();
-        return mbeans;
+        return Collections.emptyList();
     }
 
     /**
-     * Execute the descriptor loading.
-     *
-     * @throws Exception if an error occurs
+     * Execute the descriptor loading. Errors are logged and not propagated.
      */
-    public void execute() throws Exception {
+    public void execute() {
         if (registry == null) {
             registry = Registry.getRegistry(null);
         }
@@ -270,8 +268,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource {
     }
 
     /**
-     * XXX Find if the 'className' is the name of the MBean or the real class ( I suppose first ) XXX Read (optional)
-     * descriptions from a .properties, generated from source XXX Deal with constructors
+     * Analyze the given class and create the ManagedBean descriptor for it.
      *
      * @param registry  The Bean registry (not used)
      * @param domain    The bean domain (not used)

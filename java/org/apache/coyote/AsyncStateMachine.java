@@ -217,7 +217,7 @@ class AsyncStateMachine {
     }
 
     boolean isAsyncError() {
-        return state == AsyncState.ERROR;
+        return state == AsyncState.ERROR || state == AsyncState.MUST_ERROR;
     }
 
     boolean isCompleting() {
@@ -252,9 +252,26 @@ class AsyncStateMachine {
         }
     }
 
-    synchronized void asyncOperation() {
+    /**
+     * Updates the state machine after a "ready for read" or "ready for write" notification has been received from the
+     * network layer.
+     *
+     * @return {@code true} if the caller should notify the associated listener, otherwise {@code false}
+     */
+    synchronized boolean asyncOperation() {
         if (state == AsyncState.STARTED) {
             updateState(AsyncState.READ_WRITE_OP);
+            return true;
+        } else if (state == AsyncState.MUST_COMPLETE || state == AsyncState.COMPLETE_PENDING ||
+                state == AsyncState.COMPLETING || state == AsyncState.MUST_DISPATCH ||
+                state == AsyncState.DISPATCH_PENDING || state == AsyncState.DISPATCHING) {
+            /*
+             * It is possible that a read or write notification could race with a completion or dispatch. In that
+             * scenario if the complete/dispatch win the later call to this method triggered by the read/write
+             * notification will trigger an ISE. Therefore, if the state machine has already processed a
+             * complete/dispatch, ignore the read/write notification.
+             */
+            return false;
         } else {
             throw new IllegalStateException(
                     sm.getString("asyncStateMachine.invalidAsyncState", "asyncOperation()", state));
@@ -286,7 +303,26 @@ class AsyncStateMachine {
             asyncCtxt.decrementInProgressAsyncCount();
             return SocketState.ASYNC_END;
         } else if (state == AsyncState.MUST_DISPATCH) {
-            updateState(AsyncState.DISPATCHING);
+            if (!processor.getErrorState().isError()) {
+                updateState(AsyncState.DISPATCHING);
+                return SocketState.ASYNC_END;
+            }
+            // The processor is in an error state (including CLOSE_CLEAN which
+            // still permits IO) so the connection will be closed rather than
+            // being used for the dispatch. The dispatch requested (e.g. by a
+            // call to dispatch() from AsyncListener.onError()) can no longer be
+            // performed. Complete the async processing here so that
+            // onComplete() is called and the in-progress async count is
+            // balanced, rather than leaving the request in MUST_DISPATCH. If IO
+            // is still allowed (CLOSE_CLEAN) the current response can still be
+            // completed before the connection is closed so write any buffered
+            // output first.
+            if (processor.getErrorState().isIoAllowed() && processor.flushBufferedWrite()) {
+                return SocketState.LONG;
+            }
+            asyncCtxt.fireOnComplete();
+            updateState(AsyncState.DISPATCHED);
+            asyncCtxt.decrementInProgressAsyncCount();
             return SocketState.ASYNC_END;
         } else if (state == AsyncState.DISPATCHING) {
             if (processor.getErrorState().isIoAllowed() && processor.flushBufferedWrite()) {

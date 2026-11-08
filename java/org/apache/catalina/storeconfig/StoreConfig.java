@@ -17,6 +17,7 @@
 package org.apache.catalina.storeconfig;
 
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URL;
 
 import javax.management.MBeanServer;
@@ -96,7 +97,9 @@ public class StoreConfig implements IStoreConfig {
 
     @Override
     public void storeConfig() {
-        store(server);
+        if (!store(server)) {
+            throw new IllegalStateException(sm.getString("config.storeServerError"));
+        }
     }
 
     /**
@@ -184,6 +187,8 @@ public class StoreConfig implements IStoreConfig {
                             desc.setBackup(oldBackup);
                             desc.setExternalAllowed(oldExternalAllowed);
                         }
+                    } else {
+                        log.warn(sm.getString("factory.storeNoDescriptor", aContext.getClass()));
                     }
                 } else {
                     log.error(sm.getString("config.missingContextFile", aContext.getPath()));
@@ -198,12 +203,22 @@ public class StoreConfig implements IStoreConfig {
 
     @Override
     public synchronized boolean store(Server aServer) {
+        StoreDescription desc = getRegistry().findDescription(aServer.getClass());
+        if (desc == null) {
+            log.warn(sm.getString("factory.storeNoDescriptor", aServer.getClass()));
+            return false;
+        }
         StoreFileMover mover =
                 new StoreFileMover(Bootstrap.getCatalinaBase(), getServerFilename(), getRegistry().getEncoding());
         // Open an output writer for the new configuration file
         try {
             try (PrintWriter writer = mover.getWriter()) {
-                store(writer, -2, aServer);
+                // Generate the configuration in memory so that the layout of the previous version of the file can
+                // be preserved
+                StringWriter buffer = new StringWriter();
+                store(new PrintWriter(buffer), -2, aServer);
+                writer.write(XMLFormatPreserver.preserve(mover.getConfigOld(), buffer.toString(),
+                        getRegistry().getEncoding()));
             }
             mover.move();
             return true;
@@ -217,14 +232,16 @@ public class StoreConfig implements IStoreConfig {
     public synchronized boolean store(Context aContext) {
         try {
             StoreDescription desc = getRegistry().findDescription(aContext.getClass());
-            if (desc != null) {
-                boolean old = desc.isStoreSeparate();
-                try {
-                    desc.setStoreSeparate(true);
-                    desc.getStoreFactory().store(null, -2, aContext);
-                } finally {
-                    desc.setStoreSeparate(old);
-                }
+            if (desc == null) {
+                log.warn(sm.getString("factory.storeNoDescriptor", aContext.getClass()));
+                return false;
+            }
+            boolean old = desc.isStoreSeparate();
+            try {
+                desc.setStoreSeparate(true);
+                desc.getStoreFactory().store(null, -2, aContext);
+            } finally {
+                desc.setStoreSeparate(old);
             }
             return true;
         } catch (Exception e) {

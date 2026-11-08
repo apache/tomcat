@@ -69,7 +69,9 @@ import org.apache.catalina.util.ResourceSet;
 public interface WebResourceRoot extends Lifecycle {
     /**
      * Obtain the object that represents the resource at the given path. Note that the resource at that path may not
-     * exist. If the resource does not exist, the WebResource returned will be associated with the main WebResourceSet.
+     * exist. If the resource does not exist and a virtual resource is defined for the path, the WebResource returned
+     * will be associated with the WebResourceSet that defines the virtual resource. Otherwise, it will be associated
+     * with the main WebResourceSet.
      *
      * @param path The path for the resource of interest relative to the root of the web application. It must start with
      *                 '/'.
@@ -369,7 +371,7 @@ public interface WebResourceRoot extends Lifecycle {
     /**
      * Get the strategy to use for the resources archive lookup.
      *
-     * @return The strategy to use for the resources archive lookup
+     * @return The strategy, as an {@link ArchiveIndexStrategy}, to use for the resources archive lookup
      */
     ArchiveIndexStrategy getArchiveIndexStrategyEnum();
 

@@ -22,6 +22,9 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import org.apache.tomcat.util.scan.MultiReleaseUtil;
+import org.apache.tomcat.util.scan.MultiReleaseUtil.MultiReleaseInfo;
+
 /**
  * This class represents the contents of a jar by determining whether a given resource <b>might</b> be in the cache,
  * based on a bloom filter. This is not a general-purpose bloom filter because it contains logic to strip out characters
@@ -76,6 +79,14 @@ public final class JarContents {
 
     private void processEntry(JarEntry entry) {
         String name = entry.getName();
+
+        // A resource set lookup of the archive root is handled before the
+        // filter is consulted, so an entry with an empty name never needs to
+        // be recorded in the filter.
+        if (name.isEmpty()) {
+            return;
+        }
+
         int startPos = 0;
 
         // If the path starts with a slash, that's not useful information.
@@ -87,13 +98,10 @@ public final class JarContents {
         }
 
         // Versioned entries should be added to the table according to their real name
-        if (name.startsWith("META-INF/versions/", startPos)) {
-            int i = name.indexOf('/', 18 + startPos);
-            if (i > 0) {
-                int version = Integer.parseInt(name.substring(18 + startPos, i));
-                if (version <= Runtime.version().feature()) {
-                    startPos = i + 1;
-                }
+        MultiReleaseInfo multiVersionInfo = MultiReleaseUtil.parseVersion(name);
+        if (multiVersionInfo != null) {
+            if (multiVersionInfo.isValid() && multiVersionInfo.version() <= Runtime.version().feature()) {
+                startPos = multiVersionInfo.namePos();
             }
             if (startPos == name.length()) {
                 return;
@@ -122,8 +130,9 @@ public final class JarContents {
      * Simple hashcode of a portion of the string. Typically we would use substring, but memory and runtime speed are
      * critical.
      *
-     * @param content  Wrapping String.
-     * @param startPos First character in the range.
+     * @param content   Wrapping String.
+     * @param startPos  First character in the range.
+     * @param hashPrime The prime used to compute the hashcode.
      *
      * @return hashcode of the range.
      */
@@ -136,32 +145,26 @@ public final class JarContents {
         for (int i = startPos; i < endPos; i++) {
             h = hashPrime * h + content.charAt(i);
         }
-
-        if (h < 0) {
-            h = h * -1;
-        }
-        return h;
+        // Use bitwise AND to ensure non-negative result, handles Integer.MIN_VALUE
+        return h & Integer.MAX_VALUE;
     }
 
 
     /**
      * Method that identifies whether a given path <b>MIGHT</b> be in this jar. Uses the Bloom filter mechanism.
      *
-     * @param path       Requested path. Sometimes starts with "/WEB-INF/classes".
-     * @param webappRoot The value of the webapp location, which can be stripped from the path. Typically it is
-     *                       "/WEB-INF/classes".
+     * @param path Requested path, including any internal path of the resource set but excluding the web application
+     *                 mount.
      *
      * @return Whether the prefix of the path is known to be in this jar.
      */
-    public boolean mightContainResource(String path, String webappRoot) {
+    public boolean mightContainResource(String path) {
         int startPos = 0;
-        if (path.startsWith(webappRoot)) {
-            startPos = webappRoot.length();
-        }
-
-        if (path.charAt(startPos) == '/') {
-            // ignore leading slash
+        while (startPos < path.length() && path.charAt(startPos) == '/') {
             startPos++;
+        }
+        if (startPos == path.length()) {
+            return true; // archive root: cannot rule out
         }
 
         // calculate the hash lazily and return a boolean value for this path

@@ -44,7 +44,7 @@ import org.apache.tools.ant.types.FileSet;
  * While originally written to address an issue with Javadoc output, this task takes a generic approach that could be
  * used with any archive. The task takes a set of zip (or jar, war etc) files as its input and sets the last modified
  * time of every file in the archive to be the same as the last modified time of the archive.
-  */
+ */
 public class RepeatableArchive extends Task {
 
     /**
@@ -109,9 +109,11 @@ public class RepeatableArchive extends Task {
             for (String file : files) {
                 File archive = new File(basedir, file);
                 File oldArchive = new File(basedir, file + ".old");
+                boolean renamed = false;
 
                 try {
                     Files.move(archive.toPath(), oldArchive.toPath(), StandardCopyOption.ATOMIC_MOVE);
+                    renamed = true;
 
                     try (ZipFile oldZipFile = new ZipFile(oldArchive);
                             ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(archive))) {
@@ -125,11 +127,11 @@ public class RepeatableArchive extends Task {
 
                             zipOut.putNextEntry(entry);
 
-                            InputStream is = oldZipFile.getInputStream(oldEntry);
-
-                            int numRead;
-                            while ((numRead = is.read(buf)) >= 0) {
-                                zipOut.write(buf, 0, numRead);
+                            try (InputStream is = oldZipFile.getInputStream(oldEntry)) {
+                                int numRead;
+                                while ((numRead = is.read(buf)) >= 0) {
+                                    zipOut.write(buf, 0, numRead);
+                                }
                             }
                         }
                     }
@@ -138,8 +140,23 @@ public class RepeatableArchive extends Task {
                         throw new BuildException("setLastModified failed for [" + archive.getAbsolutePath() + "]");
                     }
                     Files.delete(oldArchive.toPath());
-                } catch (IOException ioe) {
-                    throw new BuildException(ioe);
+                } catch (IOException | RuntimeException e) {
+                    // The task did not run to completion for this archive. This includes the
+                    // BuildException thrown when the timestamp cannot be set. If the original was
+                    // renamed, restore it rather than leaving the archive in its current, possibly
+                    // truncated, state together with a stray ".old".
+                    try {
+                        if (renamed) {
+                            Files.move(oldArchive.toPath(), archive.toPath(), StandardCopyOption.REPLACE_EXISTING,
+                                    StandardCopyOption.ATOMIC_MOVE);
+                        }
+                    } catch (IOException restoreException) {
+                        e.addSuppressed(restoreException);
+                    }
+                    if (e instanceof RuntimeException) {
+                        throw (RuntimeException) e;
+                    }
+                    throw new BuildException(e);
                 }
             }
         }

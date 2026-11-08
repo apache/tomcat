@@ -17,15 +17,24 @@
 package org.apache.catalina.util;
 
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.Enumeration;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.Request;
+import org.apache.tomcat.util.buf.EncodedSolidusHandling;
+import org.apache.tomcat.util.buf.UDecoder;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * General purpose request parsing and encoding utility methods.
  */
 public final class RequestUtil {
+
+    private static final StringManager sm = StringManager.getManager(RequestUtil.class);
+
     /**
      * Default constructor.
      */
@@ -116,7 +125,7 @@ public final class RequestUtil {
      * @param url     The URL to test
      *
      * @return {@code true} if the provided URL is for a resource contained within the same web application as the
-     * request, otherwise {@code false}
+     *             request, otherwise {@code false}
      */
     public static boolean isSameWebApplication(HttpServletRequest request, URL url) {
         // Does this URL match down to (and including) the context path?
@@ -147,13 +156,179 @@ public final class RequestUtil {
         }
 
         /*
-         * This isn't perfect but is the best that can be done without running the full mapping logic on the url to
-         * determine which web application that url will map to.
+         * May not be perfect, but make a best efforts attempt to determine whether the URL belongs to current request
+         * or not.
+         *
+         * Stripping of path parameters, decoding and normalization should all be unnecessary but are included here as
+         * hardening against the application using untrusted data when constructing the URL.
          */
-        if (!url.getPath().startsWith(request.getServletContext().getContextPath())) {
+        String urlPath = url.getPath();
+        urlPath = stripPathParams(urlPath, null);
+        urlPath = UDecoder.URLDecode(urlPath, StandardCharsets.UTF_8);
+        urlPath = org.apache.tomcat.util.http.RequestUtil.normalize(urlPath);
+        if (urlPath == null) {
+            // Normalization failed. Path tried to escape the root.
             return false;
         }
 
-        return true;
+        // Context path will not end with "/"
+        String requestContextPath = request.getServletContext().getContextPath();
+
+        if (urlPath.equals(requestContextPath) || urlPath.startsWith(requestContextPath + "/")) {
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * Behaves the same way as {@link HttpServletRequest#getHeader(String)} but with the addition that, if multiple
+     * headers of the specified name are present, the values are concatenated (with commas) before returning a single
+     * combined value.
+     *
+     * @param request    The request from which the header value(s) should be retrieved
+     * @param headerName The name of the HTTP header for which the merged value should be obtained
+     *
+     * @return The merged value for the given HTTP header.
+     */
+    public static String getMergedHeaderValue(HttpServletRequest request, String headerName) {
+        Enumeration<String> values = request.getHeaders(headerName);
+        if (!values.hasMoreElements()) {
+            return null;
+        }
+        StringBuilder result = new StringBuilder();
+        result.append(values.nextElement());
+        while (values.hasMoreElements()) {
+            result.append(',');
+            result.append(values.nextElement());
+        }
+        return result.toString();
+    }
+
+
+    /**
+     * Obtains the original, encoded, non-normalized (including sequences of multiple '/') context path as provided by
+     * the user agent.
+     *
+     * @param connector          The Connector on which the request was received
+     * @param httpServletRequest The request from which the original context path should be extracted
+     *
+     * @return The original, encoded, non-normalized context path
+     */
+    public static String getContextPathEncoded(Connector connector, HttpServletRequest httpServletRequest) {
+
+        String canonicalContextPath = httpServletRequest.getServletContext().getContextPath();
+        int lastSlash = slashCount(canonicalContextPath);
+        // Special case handling for the root context
+        if (lastSlash == 0) {
+            return "";
+        }
+
+        String uri = httpServletRequest.getRequestURI();
+        EncodedSolidusHandling encodedSolidusHandling = connector.getEncodedSolidusHandlingInternal();
+
+        int pos = 0;
+        char[] uriChars = uri.toCharArray();
+        // Need at least the number of slashes in the context path
+        while (lastSlash > 0) {
+            pos = nextSlash(uriChars, pos + 1, encodedSolidusHandling);
+            if (pos == -1) {
+                break;
+            }
+            lastSlash--;
+        }
+        // Now allow for path parameters, normalization and/or encoding.
+        // Essentially, keep extending the candidate path up to the next slash
+        // until the decoded and normalized candidate path (with the path
+        // parameters removed) is the same as the canonical path.
+        String candidate;
+        if (pos == -1) {
+            candidate = uri;
+        } else {
+            candidate = uri.substring(0, pos);
+        }
+        candidate = removePathParameters(candidate);
+        candidate = UDecoder.URLDecode(candidate, connector.getURICharset());
+        candidate = org.apache.tomcat.util.http.RequestUtil.normalize(candidate);
+        boolean match = canonicalContextPath.equals(candidate);
+        while (!match && pos != -1) {
+            pos = nextSlash(uriChars, pos + 1, encodedSolidusHandling);
+            if (pos == -1) {
+                candidate = uri;
+            } else {
+                candidate = uri.substring(0, pos);
+            }
+            candidate = removePathParameters(candidate);
+            candidate = UDecoder.URLDecode(candidate, connector.getURICharset());
+            candidate = org.apache.tomcat.util.http.RequestUtil.normalize(candidate);
+            match = canonicalContextPath.equals(candidate);
+        }
+        if (match) {
+            if (pos == -1) {
+                return uri;
+            } else {
+                return uri.substring(0, pos);
+            }
+        } else {
+            // Should never happen
+            throw new IllegalStateException(
+                    sm.getString("requestUtil.getContextPath.ise", canonicalContextPath, uri));
+        }
+    }
+
+
+    private static String removePathParameters(String input) {
+        int nextSemiColon = input.indexOf(';');
+        // Shortcut
+        if (nextSemiColon == -1) {
+            return input;
+        }
+        StringBuilder result = new StringBuilder(input.length());
+        result.append(input, 0, nextSemiColon);
+        while (true) {
+            int nextSlash = input.indexOf('/', nextSemiColon);
+            if (nextSlash == -1) {
+                break;
+            }
+            nextSemiColon = input.indexOf(';', nextSlash);
+            if (nextSemiColon == -1) {
+                result.append(input.substring(nextSlash));
+                break;
+            } else {
+                result.append(input, nextSlash, nextSemiColon);
+            }
+        }
+
+        return result.toString();
+    }
+
+
+    private static int nextSlash(char[] uri, int startPos, EncodedSolidusHandling encodedSolidusHandling) {
+        int len = uri.length;
+        int pos = startPos;
+        while (pos < len) {
+            if (uri[pos] == '/') {
+                return pos;
+            } else if (encodedSolidusHandling == EncodedSolidusHandling.DECODE &&
+                    uri[pos] == '%' && pos + 2 < len && uri[pos + 1] == '2' &&
+                    (uri[pos + 2] == 'f' || uri[pos + 2] == 'F')) {
+                return pos;
+            }
+            pos++;
+        }
+        return -1;
+    }
+
+
+    private static int slashCount(String uri) {
+        int result = 0;
+        int start = 0;
+        while ((start = uri.indexOf('/', start)) > -1) {
+            start++;
+            result++;
+        }
+
+        return result;
     }
 }
