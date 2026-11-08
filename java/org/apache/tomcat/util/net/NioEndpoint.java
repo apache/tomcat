@@ -2205,8 +2205,17 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     getHandler().process(socketWrapper, SocketEvent.CONNECT_FAIL);
                     socketWrapper.close();
                 } else if (handshake == SelectionKey.OP_READ) {
+                    /*
+                     * The handshake reads from the channel directly so does not update the last read time. Time spent
+                     * processing the handshake (e.g. OCSP checks of the client certificate) must not count towards
+                     * the time spent waiting for the client else the Poller may time out the connection as soon as
+                     * read interest is registered.
+                     */
+                    ((NioSocketWrapper) socketWrapper).updateLastRead();
                     socketWrapper.registerReadInterest();
                 } else if (handshake == SelectionKey.OP_WRITE) {
+                    // Same as for read above
+                    ((NioSocketWrapper) socketWrapper).updateLastWrite();
                     socketWrapper.registerWriteInterest();
                 }
             } catch (CancelledKeyException cx) {
