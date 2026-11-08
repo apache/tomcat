@@ -578,6 +578,13 @@
         connection, so the client saw a connection reset rather than the end of
         the stream and could lose response data it had not yet read. (markt)
       </fix>
+      <fix>
+        Ensure that time spent processing the TLS handshake with NIO, such as
+        OCSP checks of client certificates, is not counted towards the
+        connection timeout. Previously, a slow handshake could cause the
+        connection to be closed as soon as the server started waiting for the
+        client. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
