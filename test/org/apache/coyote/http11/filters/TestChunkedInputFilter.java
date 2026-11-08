@@ -346,7 +346,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         Assert.assertTrue(tomcat.getConnector().setProperty("allowedTrailerHeaders", "x-trailer1"));
 
         Tomcat.addServlet(ctx, "servlet", new EchoHeaderServlet(true));
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         tomcat.start();
 
@@ -392,7 +392,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "servlet", new EchoHeaderServlet(false));
-        ctx.addServletMappingDecoded("/", "servlet");
+        ctx.addServletMapping("/", "servlet");
 
         // Limit the number of trailing headers
         Assert.assertTrue(tomcat.getConnector().setProperty("maxTrailerCount", Integer.toString(maxTrailerCount)));
