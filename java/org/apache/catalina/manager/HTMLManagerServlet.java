@@ -332,7 +332,7 @@ public class HTMLManagerServlet extends ManagerServlet {
         }
 
         // HTML Header Section
-        writer.print(MessageFormat.format(Constants.HTML_HEADER_SECTION, args));
+        writer.print(MessageFormat.format(Constants.HTML_HEADER_SECTION, args[0], Constants.getLanguageTag(smClient)));
 
         // Body Header Section
         writer.print(MessageFormat.format(Constants.BODY_HEADER_SECTION, args));
@@ -1146,7 +1146,7 @@ public class HTMLManagerServlet extends ManagerServlet {
 
     //@formatter:off
     private static final String APPS_HEADER_SECTION =
-            "<table>\n" +
+            "<table class=\"data-table\">\n" +
             "<tr>\n" +
             " <td colspan=\"6\" class=\"title\">{0}</td>\n" +
             "</tr>\n" +
@@ -1258,7 +1258,7 @@ public class HTMLManagerServlet extends ManagerServlet {
     private static final String DEPLOY_SECTION =
             "</table>\n" +
             "<br>\n" +
-            "<table>\n" +
+            "<table class=\"data-table\">\n" +
             "<tr>\n" +
             " <td colspan=\"2\" class=\"title\">{0}</td>\n" +
             "</tr>\n" +
@@ -1348,7 +1348,7 @@ public class HTMLManagerServlet extends ManagerServlet {
             "\n";
 
     private static final String CONFIG_SECTION =
-            "<table>\n" +
+            "<table class=\"data-table\">\n" +
             "<tr>\n" +
             " <td colspan=\"2\" class=\"title\">{0}</td>\n" +
             "</tr>\n" +
@@ -1383,7 +1383,7 @@ public class HTMLManagerServlet extends ManagerServlet {
             "<br>";
 
     private static final String DIAGNOSTICS_SECTION =
-            "<table>\n" +
+            "<table class=\"data-table\">\n" +
             "<tr>\n" +
             " <td colspan=\"2\" class=\"title\">{0}</td>\n" +
             "</tr>\n" +

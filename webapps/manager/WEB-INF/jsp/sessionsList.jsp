@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <%--
  Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -16,6 +15,7 @@
   limitations under the License.
 --%>
 <%@page session="false" contentType="text/html; charset=UTF-8" %>
+<%@page import="java.io.IOException" %>
 <%@page import="java.util.Collection" %>
 <%@page import="org.apache.catalina.Session" %>
 <%@page import="org.apache.catalina.manager.Constants" %>
@@ -40,6 +40,40 @@ static {
     deltaSessionClass = clazz;
     isPrimaryMethod = method;
 }
+
+/*
+ * The columns of the sessions table: the key submitted by the column's sort
+ * button and the column label (HTML). There is no comparator for the session
+ * type so the Type column sorts by id.
+ */
+private static final String[][] COLUMNS = {
+        { "id", "Session Id" },
+        { "id", "Type" },
+        { "locale", "Guessed Locale" },
+        { "user", "Guessed User name" },
+        { "CreationTime", "Creation Time" },
+        { "LastAccessedTime", "Last Accessed Time" },
+        { "UsedTime", "Used Time" },
+        { "InactiveTime", "Inactive Time" },
+        { "TTL", "<span title=\"Time To Live\">TTL</span>" } };
+
+/*
+ * Writes the column header cells for <thead> and <tfoot>. If ariaSort is not
+ * null, it is the aria-sort value of the first column that sorts by sortKey.
+ * Only that column is marked because Type sorts by id as well.
+ */
+private static void printColumnHeaders(JspWriter out, String sortKey, String ariaSort) throws IOException {
+    boolean marked = false;
+    for (String[] column : COLUMNS) {
+        out.print("\n                    <th scope=\"col\"");
+        if (ariaSort != null && !marked && column[0].equalsIgnoreCase(sortKey)) {
+            out.print(" aria-sort=\"" + ariaSort + "\"");
+            marked = true;
+        }
+        out.print("><button type=\"submit\" class=\"sort\" name=\"sort\" value=\"" + column[0] + "\">" +
+                column[1] + "</button></th>");
+    }
+}
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -54,10 +88,6 @@ static {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="pragma" content="no-cache"/><!-- HTTP 1.0 -->
-    <meta http-equiv="cache-control" content="no-cache,must-revalidate"/><!-- HTTP 1.1 -->
-    <meta http-equiv="expires" content="0"/><!-- 0 is an invalid value and should be treated as 'now' -->
-    <meta http-equiv="content-language" content="en"/>
     <meta name="copyright" content="<%= Constants.COPYRIGHT_NOTICE %>"/>
     <meta name="robots" content="noindex,nofollow,noarchive"/>
     <title>Sessions Administration for <%= JspHelper.escapeXml(cn.getDisplayName()) %></title>
@@ -78,7 +108,6 @@ static {
 
 <form action="<%= submitUrl %>" method="POST" id="sessionsForm">
     <fieldset><legend>Active HttpSessions information</legend>
-        <input type="hidden" name="action" id="sessionsFormAction" value="injectSessions"/>
         <% String order = (String) request.getAttribute("order");
            if (order == null || "".equals(order)) {
                order = "ASC";
@@ -87,35 +116,21 @@ static {
         <input type="hidden" name="order" id="sessionsFormSortOrder" value="<%= JspHelper.escapeXml(order) %>"/>
         <input type="submit" name="refresh" value="Refresh Sessions list"/>
         <%= JspHelper.formatNumber(activeSessions.size()) %> active Sessions<br/>
-        <table class="sessions">
+        <% String sort = (String) request.getAttribute("sort");
+           // The order attribute holds the direction of the next sort request, the
+           // opposite of the current one. It is only set if the list was sorted by
+           // a valid key. The error attribute is set if sorting failed.
+           Object nextOrder = request.getAttribute("order");
+           String ariaSort = null;
+           if (nextOrder != null && request.getAttribute("error") == null) {
+               ariaSort = "DESC".equals(nextOrder) ? "ascending" : "descending";
+           }
+        %>
+        <table class="data-table sessions">
             <thead>
-                <tr>
-                    <th scope="col"<% if ("id".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="id">Session Id</button></th>
-                    <th scope="col"<% if ("id".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="id">Type</button></th>
-                    <th scope="col"<% if ("locale".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="locale">Guessed Locale</button></th>
-                    <th scope="col"<% if ("user".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="user">Guessed User name</button></th>
-                    <th scope="col"<% if ("CreationTime".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="CreationTime">Creation Time</button></th>
-                    <th scope="col"<% if ("LastAccessedTime".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="LastAccessedTime">Last Accessed Time</button></th>
-                    <th scope="col"<% if ("UsedTime".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="UsedTime">Used Time</button></th>
-                    <th scope="col"<% if ("InactiveTime".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="InactiveTime">Inactive Time</button></th>
-                    <th scope="col"<% if ("TTL".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="TTL"><span title="Time To Live">TTL</span></button></th>
+                <tr><% printColumnHeaders(out, sort, ariaSort); %>
                 </tr>
             </thead>
-            <% if (activeSessions.size() > 10) { %>
-            <tfoot><%-- <tfoot> is the same as <thead> --%>
-                <tr>
-                    <th scope="col"<% if ("id".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="id">Session Id</button></th>
-                    <th scope="col"<% if ("id".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="id">Type</button></th>
-                    <th scope="col"<% if ("locale".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="locale">Guessed Locale</button></th>
-                    <th scope="col"<% if ("user".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="user">Guessed User name</button></th>
-                    <th scope="col"<% if ("CreationTime".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="CreationTime">Creation Time</button></th>
-                    <th scope="col"<% if ("LastAccessedTime".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="LastAccessedTime">Last Accessed Time</button></th>
-                    <th scope="col"<% if ("UsedTime".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="UsedTime">Used Time</button></th>
-                    <th scope="col"<% if ("InactiveTime".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="InactiveTime">Inactive Time</button></th>
-                    <th scope="col"<% if ("TTL".equals(request.getAttribute("sort"))) { %> aria-sort="<%= "DESC".equals(order) ? "descending" : "ascending" %>"<% } %>><button type="submit" class="sort" name="sort" value="TTL"><span title="Time To Live">TTL</span></button></th>
-                </tr>
-            </tfoot>
-            <% } // end if %>
             <tbody>
 <%
     for (Session currentSession : activeSessions) {
@@ -160,7 +175,20 @@ static {
                 </tr>
 <% } // end while %>
             </tbody>
+            <% if (activeSessions.size() > 10) { %>
+            <tfoot><%-- The same as <thead> but without aria-sort --%>
+                <tr><% printColumnHeaders(out, sort, null); %>
+                </tr>
+            </tfoot>
+            <% } // end if %>
         </table>
+        <%-- The current sort key, so that Refresh and Invalidate keep the sort
+             column. It must come after all the sort buttons: browsers submit the
+             fields in tree order and the servlet uses the first sort value, so a
+             clicked column header button takes precedence over this field. --%>
+        <% if (sort != null && !sort.isEmpty()) { %>
+        <input type="hidden" name="sort" value="<%= JspHelper.escapeXml(sort) %>"/>
+        <% } %>
         <p class="center-text">
             <button type="submit" name="action" value="invalidateSessions">Invalidate selected Sessions</button>
         </p>

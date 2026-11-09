@@ -90,6 +90,11 @@ td {
     color         : black;
 }
 
+/* Preformatted text (e.g. certificate chains) is not centred with its cell */
+td pre {
+    text-align: left;
+}
+
 /* Specialized table cells */
 td.page-title {
     text-align    : center;
@@ -144,31 +149,28 @@ td.highlighted {
     background-color: #C3F3C3;
 }
 
+td.message-label {
+    width: 10%;
+}
+
 /* Specialized table styles */
-table.sessions {
-    border: 1px solid black;
-    border-collapse: collapse;
-    width: 100%;
-}
-
-table.sessions th,
-table.sessions td {
-    padding: 2px;
-}
-
-table.sessions td:not(:first-child) {
-    text-align: center;
-}
-
 table.data-table {
-    width: 100%;
-    border: 1px solid black;
     border-collapse: collapse;
 }
 
-table.data-table th,
-table.data-table td {
-    padding: 2px;
+/*
+ * Child combinators so that tables nested in a data table cell (e.g. forms) are not styled.
+ * Do not add text-align here: it would override the td.row-* alignment classes.
+ */
+table.data-table > * > tr > th,
+table.data-table > * > tr > td {
+    border : 1px solid gray;
+    padding: 3px;
+}
+
+table.sessions > tbody > tr > td:first-child {
+    text-align: left;
+    white-space: nowrap;
 }
 
 /* === Images === */
@@ -180,6 +182,7 @@ img.tomcat-logo {
 img.asf-logo {
     width: 266px;
     height: 83px;
+    float: right;
 }
 
 /* === Utility Classes === */
@@ -187,8 +190,9 @@ img.asf-logo {
     white-space: nowrap;
 }
 
+/* Relative to the enclosing td.page-title */
 .subtitle {
-    font-size: 1.2em;
+    font-size: 0.8em;
 }
 
 footer.copyright {
@@ -211,8 +215,14 @@ button.sort {
     text-align: center;
 }
 
-.table-left {
+/* Applied to the cells as the default th/td centring would win over inheritance from the table */
+.table-left th,
+.table-left td {
     text-align: left;
+}
+
+.table-left td.center-text {
+    text-align: center;
 }
 
 .caption-small-caps {

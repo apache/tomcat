@@ -252,7 +252,8 @@ public class HTMLHostManagerServlet extends HostManagerServlet {
         args[1] = smClient.getString("htmlHostManagerServlet.title");
 
         // HTML Header Section
-        writer.print(MessageFormat.format(org.apache.catalina.manager.Constants.HTML_HEADER_SECTION, args));
+        writer.print(MessageFormat.format(org.apache.catalina.manager.Constants.HTML_HEADER_SECTION, args[0],
+                org.apache.catalina.manager.Constants.getLanguageTag(smClient)));
 
         // Body Header Section
         writer.print(MessageFormat.format(org.apache.catalina.manager.Constants.BODY_HEADER_SECTION, args));
@@ -441,7 +442,7 @@ public class HTMLHostManagerServlet extends HostManagerServlet {
 
     //@formatter:off
     private static final String HOSTS_HEADER_SECTION =
-            "<table>\n" +
+            "<table class=\"data-table\">\n" +
             "<tr>\n" +
             " <td colspan=\"5\" class=\"title\">{0}</td>\n" +
             "</tr>\n" +
@@ -464,7 +465,7 @@ public class HTMLHostManagerServlet extends HostManagerServlet {
             "</tr>\n";
 
     private static final String HOSTS_ROW_BUTTON_SECTION =
-            " <td class=\"row-left\">\n" +
+            " <td class=\"row-left nowrap\">\n" +
             "  <form class=\"inline\" method=\"POST\" action=\"{0}\">" +
             "   <small><input type=\"submit\" value=\"{1}\"></small>" +
             "  </form>\n" +
@@ -477,7 +478,7 @@ public class HTMLHostManagerServlet extends HostManagerServlet {
     private static final String ADD_SECTION_START =
             "</table>\n" +
             "<br>\n" +
-            "<table>\n" +
+            "<table class=\"data-table\">\n" +
             "<tr>\n" +
             " <td colspan=\"2\" class=\"title\">{0}</td>\n" +
             "</tr>\n" +
@@ -541,7 +542,7 @@ public class HTMLHostManagerServlet extends HostManagerServlet {
             "\n";
 
     private static final String PERSIST_SECTION =
-            "<table>\n" +
+            "<table class=\"data-table\">\n" +
             "<tr>\n" +
             " <td class=\"title\">{0}</td>\n" +
             "</tr>\n" +

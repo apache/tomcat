@@ -43,9 +43,9 @@ public class Constants {
      * The HTML message section template for host manager pages.
      */
     public static final String MESSAGE_SECTION =
-            "<table>\n" +
+            "<table class=\"data-table\">\n" +
             " <tr>\n" +
-            "  <td class=\"row-left\">" +
+            "  <td class=\"row-left message-label\">" +
             "<small><strong>{0}</strong></small>&nbsp;</td>\n" +
             "  <td class=\"row-left\"><pre>{1}</pre></td>\n" +
             " </tr>\n" +
@@ -57,7 +57,7 @@ public class Constants {
      * The HTML manager section template for host manager pages.
      */
     public static final String MANAGER_SECTION =
-            "<table>\n" +
+            "<table class=\"data-table\">\n" +
             "<tr>\n" +
             " <td colspan=\"4\" class=\"title\">{0}</td>\n" +
             "</tr>\n" +
@@ -75,7 +75,7 @@ public class Constants {
      * The HTML server header section template for host manager pages.
      */
     public static final String SERVER_HEADER_SECTION =
-            "<table>\n" +
+            "<table class=\"data-table\">\n" +
             "<tr>\n" +
             " <td colspan=\"6\" class=\"title\">{0}</td>\n" +
             "</tr>\n" +

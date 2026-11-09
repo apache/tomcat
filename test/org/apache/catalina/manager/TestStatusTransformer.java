@@ -18,6 +18,8 @@ package org.apache.catalina.manager;
 
 import java.io.File;
 import java.io.StringReader;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -137,6 +139,29 @@ public class TestStatusTransformer extends TomcatBaseTest {
             Assert.assertFalse(body.contains(" nowrap>"));
             Assert.assertFalse(body.contains(" width="));
             Assert.assertFalse(body.contains("style=\""));
+            // The application list links target closed anchors identified by id, not the obsolete name attribute
+            Assert.assertFalse(Pattern.compile("<a\\b[^>]*\\sname=").matcher(body).find());
+            Matcher link = Pattern.compile("<a href=\"#([^\"]+)\">").matcher(body);
+            int links = 0;
+            while (link.find()) {
+                Assert.assertTrue(body.contains("<a id=\"" + link.group(1) + "\"></a>"));
+                links++;
+            }
+            Assert.assertTrue(links > 0);
+
+            // The lang attribute follows the language the page is rendered in
+            // @formatter:off
+            client.setRequest(new String[] {
+                    "GET /status HTTP/1.1" + CRLF +
+                        "Host: localhost" + CRLF +
+                        "Accept-Language: fr" + CRLF +
+                        "Connection: Close" + CRLF +
+                        CRLF
+                    });
+            // @formatter:on
+            client.connect();
+            client.processRequest(true);
+            Assert.assertTrue(client.getResponseBody().contains("<html lang=\"fr\">"));
         }
     }
 

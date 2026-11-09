@@ -16,6 +16,9 @@
  */
 package org.apache.catalina.manager;
 
+import java.util.Locale;
+
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Constants used by the manager web application.
@@ -54,7 +57,8 @@ public class Constants {
     public static final String HTML_COPYRIGHT_NOTICE;
 
     /**
-     * The HTML header section template for manager pages.
+     * The HTML header section template for manager pages. The parameters are the context path of the web application
+     * ({@code {0}}) and the language tag of the page ({@code {1}}, see {@link #getLanguageTag(StringManager)}).
      */
     public static final String HTML_HEADER_SECTION;
 
@@ -97,7 +101,7 @@ public class Constants {
 
         HTML_HEADER_SECTION =
                 "<!DOCTYPE html>\n" +
-                "<html lang=\"en\">\n" +
+                "<html lang=\"{1}\">\n" +
                 "<head>\n" +
                 "<meta charset=\"utf-8\">\n" +
                 "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n" +
@@ -134,9 +138,9 @@ public class Constants {
                 "\n";
 
         MESSAGE_SECTION =
-                "<table>\n" +
+                "<table class=\"data-table\">\n" +
                 " <tr>\n" +
-                "  <td class=\"row-left\">" +
+                "  <td class=\"row-left message-label\">" +
                 "<small><strong>{0}</strong></small>&nbsp;</td>\n" +
                 "  <td class=\"row-left\"><pre>{1}</pre></td>\n" +
                 " </tr>\n" +
@@ -145,7 +149,7 @@ public class Constants {
                 "\n";
 
         MANAGER_SECTION =
-                "<table>\n" +
+                "<table class=\"data-table\">\n" +
                 "<tr>\n" +
                 " <td colspan=\"4\" class=\"title\">{0}</td>\n" +
                 "</tr>\n" +
@@ -160,7 +164,7 @@ public class Constants {
                 "\n";
 
         SERVER_HEADER_SECTION =
-                "<table>\n" +
+                "<table class=\"data-table\">\n" +
                 "<tr>\n" +
                 " <td colspan=\"8\" class=\"title\">{0}</td>\n" +
                 "</tr>\n" +
@@ -215,4 +219,21 @@ public class Constants {
      * The XML stylesheet processing instruction used in manager responses.
      */
     public static final String XML_STYLE = "<?xml-stylesheet type=\"text/xsl\" href=\"{0}/xform.xsl\" ?>\n";
+
+    /**
+     * Obtain the language tag for the {@code lang} attribute of a manager page. This is the language of the resource
+     * bundle the given StringManager actually uses, which may differ from the language the client asked for if no
+     * translation is available for the latter.
+     *
+     * @param smClient the StringManager used to render the page
+     *
+     * @return the IETF BCP 47 language tag of the page, or {@code en} if it is not known
+     */
+    public static String getLanguageTag(StringManager smClient) {
+        Locale locale = smClient.getLocale();
+        if (locale == null) {
+            return "en";
+        }
+        return locale.toLanguageTag();
+    }
 }

@@ -118,6 +118,8 @@ public class TestHostManagerWebapp extends TomcatBaseTest {
         Assert.assertFalse(html.contains(" nowrap>"));
         Assert.assertFalse(html.contains(" width="));
         Assert.assertFalse(html.contains("style=\""));
+        // Table borders and padding are provided by CSS
+        Assert.assertTrue(html.contains("<table class=\"data-table\">"));
 
         // Strict Content-Security-Policy header present
         boolean cspFound = false;
@@ -129,6 +131,24 @@ public class TestHostManagerWebapp extends TomcatBaseTest {
             }
         }
         Assert.assertTrue("strict CSP header not present on /host-manager/html", cspFound);
+
+        // The lang attribute follows the language the page is rendered in
+        for (String language : new String[] { "fr", "en" }) {
+            // @formatter:off
+            client.setRequest(new String[] {
+                    "GET /host-manager/html HTTP/1.1" + CRLF +
+                        "Host: localhost" + CRLF +
+                        "Authorization: " + basicHeader + CRLF +
+                        "Accept-Language: " + language + CRLF +
+                        "Connection: Close" + CRLF +
+                        CRLF
+                    });
+            // @formatter:on
+            client.connect();
+            client.processRequest(true);
+            Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+            Assert.assertTrue(client.getResponseBody().contains("<html lang=\"" + language + "\">"));
+        }
 
         // @formatter:off
         client.setRequest(new String[] {

@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <%--
  Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -27,10 +26,6 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="pragma" content="no-cache"/><!-- HTTP 1.0 -->
-    <meta http-equiv="cache-control" content="no-cache,must-revalidate"/><!-- HTTP 1.1 -->
-    <meta http-equiv="expires" content="0"/><!-- 0 is an invalid value and should be treated as 'now' -->
-    <meta http-equiv="content-language" content="en"/>
     <meta name="copyright" content="<%= Constants.COPYRIGHT_NOTICE %>"/>
     <meta name="robots" content="noindex,nofollow,noarchive"/>
     <title>Configured ciphers per Connector</title>
@@ -40,7 +35,7 @@
 <body>
 <h1>Configured ciphers per Connector</h1>
 
-<table class="data-table">
+<table class="data-table table-left">
     <thead>
         <tr>
             <th>Connector / TLS Virtual Host</th>

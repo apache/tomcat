@@ -21,6 +21,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -72,13 +73,19 @@ public class StatusTransformer {
      * Write an HTML or XML header.
      *
      * @param writer the PrintWriter to use
-     * @param args   Path prefix for URLs
+     * @param args   Path prefix for URLs, followed for HTML by the language tag of the page (<code>en</code> if not
+     *                   provided)
      * @param mode   - 0 = HTML header, 1 = XML declaration, 2 = JSON
      */
     public static void writeHeader(PrintWriter writer, Object[] args, int mode) {
         if (mode == 0) {
             // HTML Header Section
-            writer.print(MessageFormat.format(Constants.HTML_HEADER_SECTION, args));
+            Object[] headerArgs = args;
+            if (args.length < 2) {
+                headerArgs = Arrays.copyOf(args, 2);
+                headerArgs[1] = "en";
+            }
+            writer.print(MessageFormat.format(Constants.HTML_HEADER_SECTION, headerArgs));
         } else if (mode == 1) {
             writer.write(Constants.XML_DECLARATION);
             writer.print(MessageFormat.format(Constants.XML_STYLE, args));
@@ -746,7 +753,8 @@ public class StatusTransformer {
             iterator = hostsON.iterator();
             while (iterator.hasNext()) {
                 ObjectName contextON = iterator.next();
-                writer.print("<a class=\"A.name\" name=\"" + count++ + ".0\">");
+                // Target of the link written for this web application above
+                writer.print("<a id=\"" + count++ + ".0\"></a>");
                 writeContext(writer, contextON, mBeanServer, mode);
             }
 
@@ -827,7 +835,6 @@ public class StatusTransformer {
             writer.print("<h1>");
             writer.print(Escape.htmlElementContent(name));
             writer.print("</h1>");
-            writer.print("</a>");
 
             writer.print("<p>");
             writer.print("State: ");

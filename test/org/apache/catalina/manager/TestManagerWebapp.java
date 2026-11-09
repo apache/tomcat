@@ -22,6 +22,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,6 +40,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
 import org.apache.catalina.authenticator.TestBasicAuthParser.BasicAuthHeader;
 import org.apache.catalina.filters.Constants;
@@ -50,6 +56,7 @@ import org.apache.catalina.storeconfig.StoreConfigLifecycleListener;
 import org.apache.catalina.util.IOTools;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.URLEncoder;
+import org.apache.tomcat.util.buf.ByteChunk;
 
 
 public class TestManagerWebapp extends TomcatBaseTest {
@@ -61,6 +68,17 @@ public class TestManagerWebapp extends TomcatBaseTest {
             "<role rolename=\"admin\" />" +
             "<user username=\"admin\" password=\"sekr3t\" roles=\"manager-gui,manager-script,manager-jmx,manager-status,admin-gui,admin-script\" />" +
             "</tomcat-users>";
+
+    private static final Pattern NONCE =
+            Pattern.compile(Pattern.quote(Constants.CSRF_NONCE_REQUEST_PARAM) + "=([A-F0-9]+)");
+    private static final Pattern SESSIONS_FORM =
+            Pattern.compile("<form\\b([^>]*\\bid=\"sessionsForm\"[^>]*)>(.*?)</form>", Pattern.DOTALL);
+    private static final Pattern FORM_CONTROL = Pattern.compile("<(input|button)\\b([^>]*)>");
+    private static final Pattern ATTRIBUTE = Pattern.compile("([\\w-]+)=\"([^\"]*)\"");
+    private static final Pattern SESSION_ID = Pattern.compile("name=\"sessionIds\" value=\"([^\"]*)\"");
+    // Groups: aria-sort value, sort key, label
+    private static final Pattern ARIA_SORT = Pattern.compile(
+            "<th\\b[^>]*\\baria-sort=\"([^\"]*)\"[^>]*>\\s*<button\\b[^>]*\\bvalue=\"([^\"]*)\"[^>]*>(.*?)</button>");
 
     /**
      * Integration test for the manager webapp (verify all main Servlets are working).
@@ -778,9 +796,7 @@ public class TestManagerWebapp extends TomcatBaseTest {
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
 
         String body = client.getResponseBody();
-        Pattern noncePattern = Pattern.compile(
-                Pattern.quote(Constants.CSRF_NONCE_REQUEST_PARAM) + "=([A-F0-9]+)");
-        Matcher m = noncePattern.matcher(body);
+        Matcher m = NONCE.matcher(body);
         Assert.assertTrue("CSRF nonce not found in manager HTML response", m.find());
         String nonce = m.group(1);
 
@@ -825,12 +841,274 @@ public class TestManagerWebapp extends TomcatBaseTest {
         Assert.assertFalse("inline style", sessionsPage.contains("style=\""));
         Assert.assertTrue("missing stylesheet link", sessionsPage.contains("/manager/css/manager.css"));
         Assert.assertTrue("missing doctype", sessionsPage.contains("<!DOCTYPE html>"));
-        // Regression guard: the stale hidden "sort" field (which used to shadow the
-        // sort buttons and break column sorting) must be gone.
-        Assert.assertFalse("stale hidden sort field present",
-                sessionsPage.contains("id=\"sessionsFormSort\""));
 
         tomcat.stop();
+    }
+
+
+    /*
+     * Submit the sessions list form the way a browser does (see
+     * ManagerBrowser.submitSessionsForm()) and check the result of sorting,
+     * refreshing and invalidating sessions.
+     */
+    @Test
+    public void testSessionsListForm() throws Exception {
+        ignoreTearDown = true;
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.addUser("admin", "sekr3t");
+        tomcat.addRole("admin", "manager-gui");
+
+        File appDir = new File(getBuildDirectory(), "webapps/manager");
+        tomcat.addWebapp(null, "/manager", appDir.getAbsolutePath());
+        Context ctx = tomcat.addContext("/testapp", null);
+
+        tomcat.start();
+
+        // More than 10 sessions so the column headers are repeated in <tfoot>
+        Manager manager = ctx.getManager();
+        long lastCreationTime = 0;
+        for (int i = 0; i < 12; i++) {
+            // Distinct creation times so there is only one creation time order
+            while (System.currentTimeMillis() <= lastCreationTime) {
+                Thread.sleep(1);
+            }
+            lastCreationTime = manager.createSession(null).getCreationTime();
+        }
+
+        ManagerBrowser browser = new ManagerBrowser(getPort());
+        Matcher m = NONCE.matcher(browser.get("/manager/html"));
+        Assert.assertTrue("CSRF nonce not found in manager HTML response", m.find());
+        String page = browser.get("/manager/html/sessions?path=/testapp&" +
+                Constants.CSRF_NONCE_REQUEST_PARAM + "=" + m.group(1));
+        Assert.assertEquals(12, sessionIds(page).size());
+
+        // Sort by creation time, click again to reverse the order
+        page = browser.submitSessionsForm(page, null, "sort", "CreationTime");
+        Assert.assertArrayEquals(new String[] { "ascending", "CreationTime", "Creation Time" }, sortedColumn(page));
+        assertCreationTimeOrder(page, manager, true);
+        page = browser.submitSessionsForm(page, null, "sort", "CreationTime");
+        Assert.assertArrayEquals(new String[] { "descending", "CreationTime", "Creation Time" }, sortedColumn(page));
+        assertCreationTimeOrder(page, manager, false);
+
+        // Refresh keeps the sort column
+        page = browser.submitSessionsForm(page, null, "refresh", null);
+        String[] sortedColumn = sortedColumn(page);
+        Assert.assertEquals("CreationTime", sortedColumn[1]);
+        assertCreationTimeOrder(page, manager, "ascending".equals(sortedColumn[0]));
+
+        // Invalidate the ticked session, and only that one, keeping the sort column
+        List<String> sessionIds = sessionIds(page);
+        String invalidatedId = sessionIds.get(0);
+        page = browser.submitSessionsForm(page, invalidatedId, "action", "invalidateSessions");
+        Assert.assertTrue(page, page.contains("1 sessions invalidated"));
+        Assert.assertNull(manager.findSession(invalidatedId));
+        for (String sessionId : sessionIds.subList(1, sessionIds.size())) {
+            Assert.assertNotNull(manager.findSession(sessionId));
+        }
+        Assert.assertEquals(11, sessionIds(page).size());
+        sortedColumn = sortedColumn(page);
+        Assert.assertEquals("CreationTime", sortedColumn[1]);
+        assertCreationTimeOrder(page, manager, "ascending".equals(sortedColumn[0]));
+
+        // Session Id and Type both sort by id. Only Session Id has aria-sort.
+        page = browser.submitSessionsForm(page, null, "sort", "id");
+        sortedColumn = sortedColumn(page);
+        Assert.assertEquals("id", sortedColumn[1]);
+        Assert.assertEquals("Session Id", sortedColumn[2]);
+
+        // Valid HTML5: <tfoot> follows <tbody> and no invalid pragma directives
+        int tbodyEnd = page.indexOf("</tbody>");
+        Assert.assertTrue("missing </tbody>", tbodyEnd > 0);
+        Assert.assertTrue("missing <tfoot> or <tfoot> before </tbody>", page.indexOf("<tfoot") > tbodyEnd);
+        String lowerCasePage = page.toLowerCase(Locale.ENGLISH);
+        for (String pragma : new String[] { "pragma", "cache-control", "expires", "content-language" }) {
+            Assert.assertFalse("http-equiv=\"" + pragma + "\" present",
+                    lowerCasePage.contains("http-equiv=\"" + pragma + "\""));
+        }
+
+        tomcat.stop();
+    }
+
+
+    /*
+     * The lang attribute of the HTML Manager page follows the request locale
+     * if the page is available in that language.
+     */
+    @Test
+    public void testHtmlLang() throws Exception {
+        ignoreTearDown = true;
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.addUser("admin", "sekr3t");
+        tomcat.addRole("admin", "manager-gui");
+
+        File appDir = new File(getBuildDirectory(), "webapps/manager");
+        tomcat.addWebapp(null, "/manager", appDir.getAbsolutePath());
+
+        tomcat.start();
+
+        String basicHeader = (new BasicAuthHeader("Basic", "admin", "sekr3t")).getHeader().toString();
+        for (String language : new String[] { "fr", "en" }) {
+            Map<String,List<String>> reqHead = new HashMap<>();
+            reqHead.put("Authorization", List.of(basicHeader));
+            reqHead.put("Accept-Language", List.of(language));
+            ByteChunk res = new ByteChunk();
+            int rc = getUrl("http://localhost:" + getPort() + "/manager/html", res, reqHead, null);
+            Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+            Assert.assertTrue("Accept-Language: " + language,
+                    res.toString().contains("<html lang=\"" + language + "\">"));
+        }
+
+        tomcat.stop();
+    }
+
+
+    /*
+     * Returns the aria-sort value, the sort key and the label of the sorted
+     * column, checking that exactly one column header, in <thead>, has
+     * aria-sort.
+     */
+    private static String[] sortedColumn(String page) {
+        Assert.assertEquals("number of aria-sort attributes", 1, page.split("aria-sort=", -1).length - 1);
+        Matcher m = ARIA_SORT.matcher(page);
+        Assert.assertTrue("no column header with aria-sort", m.find());
+        Assert.assertTrue("aria-sort outside <thead>", m.start() < page.indexOf("</thead>"));
+        return new String[] { m.group(1), m.group(2), m.group(3) };
+    }
+
+
+    private static void assertCreationTimeOrder(String page, Manager manager, boolean ascending)
+            throws IOException {
+        long previous = ascending ? Long.MIN_VALUE : Long.MAX_VALUE;
+        for (String sessionId : sessionIds(page)) {
+            Session session = manager.findSession(sessionId);
+            Assert.assertNotNull(sessionId, session);
+            long creationTime = session.getCreationTime();
+            Assert.assertTrue("sessions not in " + (ascending ? "ascending" : "descending") + " creation time order",
+                    ascending ? creationTime > previous : creationTime < previous);
+            previous = creationTime;
+        }
+    }
+
+
+    private static List<String> sessionIds(String page) {
+        List<String> sessionIds = new ArrayList<>();
+        Matcher m = SESSION_ID.matcher(page);
+        while (m.find()) {
+            sessionIds.add(unescape(m.group(1)));
+        }
+        return sessionIds;
+    }
+
+
+    private static Map<String,String> attributes(String tag) {
+        Map<String,String> attributes = new HashMap<>();
+        Matcher m = ATTRIBUTE.matcher(tag);
+        while (m.find()) {
+            attributes.put(m.group(1), unescape(m.group(2)));
+        }
+        return attributes;
+    }
+
+
+    private static String unescape(String value) {
+        return value.replace("&lt;", "<").replace("&gt;", ">").replace("&quot;", "\"").replace("&apos;", "'")
+                .replace("&amp;", "&");
+    }
+
+
+    /*
+     * Sends requests to the HTML Manager like a browser using BASIC
+     * authentication. The session ID changes on the second authenticated
+     * request (changeSessionIdOnAuthentication) and the CSRF nonces are stored
+     * in the session so the latest session cookie must always be used.
+     */
+    private static class ManagerBrowser {
+
+        private final String baseUrl;
+        private final String authorization;
+        private String sessionCookie;
+
+        ManagerBrowser(int port) {
+            baseUrl = "http://localhost:" + port;
+            authorization = (new BasicAuthHeader("Basic", "admin", "sekr3t")).getHeader().toString();
+        }
+
+        String get(String path) throws IOException {
+            ByteChunk res = new ByteChunk();
+            Map<String,List<String>> resHead = new HashMap<>();
+            int rc = getUrl(baseUrl + path, res, requestHeaders(), resHead);
+            return response(rc, res, resHead);
+        }
+
+        String post(String path, String body) throws IOException {
+            Map<String,List<String>> reqHead = requestHeaders();
+            reqHead.put("Content-Type", List.of("application/x-www-form-urlencoded"));
+            ByteChunk res = new ByteChunk();
+            Map<String,List<String>> resHead = new HashMap<>();
+            int rc = postUrl(body.getBytes(StandardCharsets.UTF_8), baseUrl + path, res, reqHead, resHead);
+            return response(rc, res, resHead);
+        }
+
+        /*
+         * Submits the sessions form of the given page as a browser would: the
+         * form controls in tree order, hidden inputs always, a checkbox only
+         * if it is the ticked one and, of the submit buttons, only the clicked
+         * one, i.e. the first with the given name and value (if not null).
+         */
+        String submitSessionsForm(String page, String tickedSessionId, String buttonName, String buttonValue)
+                throws IOException {
+            Matcher form = SESSIONS_FORM.matcher(page);
+            Assert.assertTrue("sessions form not found", form.find());
+            StringBuilder body = new StringBuilder();
+            boolean clicked = false;
+            Matcher control = FORM_CONTROL.matcher(form.group(2));
+            while (control.find()) {
+                Map<String,String> attributes = attributes(control.group(2));
+                String name = attributes.get("name");
+                String value = attributes.getOrDefault("value", "");
+                String type = attributes.getOrDefault("type", "input".equals(control.group(1)) ? "text" : "submit");
+                boolean include = false;
+                if ("hidden".equals(type) || "text".equals(type)) {
+                    include = true;
+                } else if ("checkbox".equals(type)) {
+                    include = value.equals(tickedSessionId);
+                } else if ("submit".equals(type) && !clicked) {
+                    clicked = buttonName.equals(name) && (buttonValue == null || buttonValue.equals(value));
+                    include = clicked;
+                }
+                if (include && name != null) {
+                    if (body.length() > 0) {
+                        body.append('&');
+                    }
+                    body.append(java.net.URLEncoder.encode(name, StandardCharsets.UTF_8)).append('=')
+                            .append(java.net.URLEncoder.encode(value, StandardCharsets.UTF_8));
+                }
+            }
+            Assert.assertTrue("button [" + buttonName + "] not found", clicked);
+            return post(attributes(form.group(1)).get("action"), body.toString());
+        }
+
+        private Map<String,List<String>> requestHeaders() {
+            Map<String,List<String>> reqHead = new HashMap<>();
+            reqHead.put("Authorization", List.of(authorization));
+            if (sessionCookie != null) {
+                reqHead.put("Cookie", List.of(sessionCookie));
+            }
+            return reqHead;
+        }
+
+        private String response(int rc, ByteChunk res, Map<String,List<String>> resHead) {
+            Assert.assertEquals(res.toString(), HttpServletResponse.SC_OK, rc);
+            List<String> setCookies = resHead.get("Set-Cookie");
+            if (setCookies != null) {
+                for (String setCookie : setCookies) {
+                    if (setCookie.startsWith("JSESSIONID=")) {
+                        sessionCookie = setCookie.split(";")[0];
+                    }
+                }
+            }
+            return res.toString();
+        }
     }
 
     private static class FailOnceListener implements LifecycleListener {
