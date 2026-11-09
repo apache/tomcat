@@ -30,6 +30,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Request;
@@ -37,8 +38,10 @@ import org.apache.catalina.connector.Response;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.SmokeTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
+@Category(SmokeTest.class)
 public class TestStuckThreadDetectionValve extends TomcatBaseTest {
     private StandardContext context;
     private Tomcat tomcat;

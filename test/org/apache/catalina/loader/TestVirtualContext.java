@@ -25,6 +25,7 @@ import java.util.HashSet;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.core.JreMemoryLeakPreventionListener;
@@ -34,9 +35,11 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.util.IOTools;
 import org.apache.catalina.webresources.StandardRoot;
+import org.apache.tomcat.categories.SmokeTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.scan.StandardJarScanner;
 
+@Category(SmokeTest.class)
 public class TestVirtualContext extends TomcatBaseTest {
 
     @Override

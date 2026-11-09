@@ -404,6 +404,15 @@
         report when the build is run with code coverage enabled. (dsoumis)
       </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <add>
+        Replace the smoke profile file list in
+        <code>test-profiles.properties.default</code> with JUnit
+        <code>@Category(SmokeTest.class)</code> annotations on the smoke test
+        classes. <code>CategoryScanner</code> discovers annotated tests at
+        build time and feeds the result into the existing
+        <code>batchtest</code> mechanism so per-test JVM isolation is
+        preserved. (vgosain)
+      </add>
     </changelog>
   </subsection>
 </section>

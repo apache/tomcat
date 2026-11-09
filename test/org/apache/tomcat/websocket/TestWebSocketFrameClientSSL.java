@@ -41,6 +41,7 @@ import jakarta.websocket.WebSocketContainer;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -48,11 +49,13 @@ import org.junit.runners.Parameterized.Parameter;
 import org.apache.catalina.Context;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.tomcat.categories.SmokeTest;
 import org.apache.tomcat.util.net.TesterSupport;
 import org.apache.tomcat.websocket.TesterMessageCountClient.BasicText;
 import org.apache.tomcat.websocket.TesterMessageCountClient.SleepingText;
 import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEndpoint;
 
+@Category(SmokeTest.class)
 @RunWith(Parameterized.class)
 public class TestWebSocketFrameClientSSL extends WebSocketBaseTest {
 

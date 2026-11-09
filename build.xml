@@ -2026,9 +2026,15 @@
     <attribute name="profile"/>
     <sequential>
       <!-- Set test.name property based on the profile attribute -->
-      <condition property="test.name" value="${test.profile.smoke}">
+
+      <!-- For category-based profiles, record the category class so that the
+           -test-categories target (which runs after test-compile) can run
+           CategoryScanner and set test.name. -->
+      <condition property="test.category.class"
+                 value="org.apache.tomcat.categories.SmokeTest">
         <equals arg1="@{profile}" arg2="smoke"/>
       </condition>
+
       <condition property="test.name" value="${test.profile.catalina}">
         <equals arg1="@{profile}" arg2="catalina"/>
       </condition>
@@ -2054,10 +2060,14 @@
   <target name="-test-profile-init" if="test.profile" unless="test.entry">
     <set-profile-pattern profile="${test.profile}"/>
 
-    <!-- Validate that the profile exists -->
-    <fail message="Unknown test profile '${test.profile}'. Check test-profiles.properties[.default] for available profiles.">
+    <!-- Validate that the profile exists: either test.name is set (pattern-based)
+         or test.category.class is set (category-based, test.name set later). -->
+    <fail message="Unknown test profile '${test.profile}'. Available profiles: smoke, catalina, coyote, performance, tribes, buildutil, integration.">
       <condition>
-        <not><isset property="test.name"/></not>
+        <and>
+          <not><isset property="test.name"/></not>
+          <not><isset property="test.category.class"/></not>
+        </and>
       </condition>
     </fail>
 
@@ -2084,9 +2094,28 @@
     <echo message="Test profile: ${test.profile}"/>
   </target>
 
-  <!-- Set default test.name if no profile specified, using ant's immutability feature -->
+  <!-- Set default test.name if no profile or a pattern-based profile is in use.
+       Skipped for category-based profiles: test.name is set by -test-categories
+       after test-compile completes. -->
   <target name="-test-name-default" depends="-test-profile-init">
-    <property name="test.name" value="**/Test*.java"/>
+    <property name="test.name" value="**/Test*.java" unless:set="test.category.class"/>
+  </target>
+
+  <!-- Scan compiled test classes for the category recorded by -test-profile-init
+       and populate test.name. Listed after test-compile in test-nio and
+       test-only-nio so that .class files are available; no compile dependency
+       here so that test-only can scan without recompiling. -->
+  <target name="-test-categories" if="test.category.class">
+    <java classname="org.apache.tomcat.categories.CategoryScanner"
+          outputproperty="test.name"
+          fork="true"
+          logError="true"
+          failonerror="true">
+      <classpath refid="tomcat.test.classpath"/>
+      <arg value="${test.category.class}"/>
+      <arg value="${test.classes}"/>
+      <arg value="${basedir}/test"/>
+    </java>
   </target>
 
   <!-- ==================== End of Test Profile System ==================== -->
@@ -2136,13 +2165,13 @@
   </target>
 
   <target name="test-nio" description="Runs the JUnit test cases for NIO. Does not stop on errors."
-          depends="-test-name-default,setup-jacoco,test-compile,deploy,test-openssl-exists,test-tcnative-exists" if="${execute.test.nio}">
+          depends="-test-name-default,setup-jacoco,test-compile,deploy,-test-categories,test-openssl-exists,test-tcnative-exists" if="${execute.test.nio}">
     <runtests protocol="org.apache.coyote.http11.Http11NioProtocol"
               extension=".NIO" />
   </target>
 
   <target name="test-only-nio" description="Runs the JUnit test cases or NIO without test preparations. Does not stop on errors."
-          depends="-test-name-default,setup-jacoco,test-openssl-exists,test-tcnative-exists" if="${execute.test.nio}">
+          depends="-test-name-default,setup-jacoco,-test-categories,test-openssl-exists,test-tcnative-exists" if="${execute.test.nio}">
     <runtests protocol="org.apache.coyote.http11.Http11NioProtocol"
               extension=".NIO" />
   </target>

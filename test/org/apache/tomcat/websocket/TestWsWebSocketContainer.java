@@ -43,10 +43,12 @@ import jakarta.websocket.server.ServerEndpoint;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.tomcat.categories.SmokeTest;
 import org.apache.tomcat.websocket.TesterMessageCountClient.BasicBinary;
 import org.apache.tomcat.websocket.TesterMessageCountClient.BasicHandler;
 import org.apache.tomcat.websocket.TesterMessageCountClient.BasicText;
@@ -54,6 +56,7 @@ import org.apache.tomcat.websocket.TesterMessageCountClient.TesterEndpoint;
 import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEndpoint;
 import org.apache.tomcat.websocket.server.WsContextListener;
 
+@Category(SmokeTest.class)
 public class TestWsWebSocketContainer extends WsWebSocketContainerBaseTest {
 
     private static final String MESSAGE_EMPTY = "";

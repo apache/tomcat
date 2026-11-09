@@ -31,11 +31,14 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.core.StandardContext;
+import org.apache.tomcat.categories.SmokeTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
+@Category(SmokeTest.class)
 public class TestContextConfig extends TomcatBaseTest {
 
     @Test
