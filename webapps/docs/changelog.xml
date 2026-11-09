@@ -108,6 +108,21 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 11.0.29 (markt)" rtext="in development">
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        Fix reproducible build after addition of i18n strings. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Ignore the bash auto-completion cache for Ant build targets when
+        building source distributions. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.28 (markt)" rtext="not released">
   <subsection name="General">
