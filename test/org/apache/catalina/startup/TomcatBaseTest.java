@@ -1001,22 +1001,26 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         }
 
         public boolean containsText(CharSequence s) {
-            for (LogRecord record : logRecords) {
-                if (record.getMessage().contains(s)) {
-                    return true;
+            synchronized (logRecords) {
+                for (LogRecord record : logRecords) {
+                    if (record.getMessage().contains(s)) {
+                        return true;
+                    }
                 }
+                return false;
             }
-            return false;
         }
         public boolean hasException(Class<? extends Throwable> type) {
-            for (LogRecord record : logRecords) {
-                Throwable t = record.getThrown();
-                while (t != null) {
-                    if (type.isInstance(t)) {return true;}
-                    t = t.getCause();
+            synchronized (logRecords) {
+                for (LogRecord record : logRecords) {
+                    Throwable t = record.getThrown();
+                    while (t != null) {
+                        if (type.isInstance(t)) {return true;}
+                        t = t.getCause();
+                    }
                 }
+                return false;
             }
-            return false;
         }
 
         @Override
