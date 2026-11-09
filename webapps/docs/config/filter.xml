@@ -872,7 +872,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
 
     <p>The HTTP Header Security Filter adds security-related HTTP response
       headers to help protect against common web vulnerabilities. It supports
-      three independent protections, each of which can be enabled or disabled
+      four independent protections, each of which can be enabled or disabled
       individually:</p>
 
     <ul>
@@ -891,6 +891,15 @@ FINE: Request "/docs/config/manager.html" with response status "200"
         <code>X-Content-Type-Options</code> header to <code>nosniff</code>,
         preventing browsers from MIME-sniffing the response away from the
         declared content type.</li>
+      <li><strong>Content Security Policy (CSP)</strong> - sets the
+        <code>Content-Security-Policy</code> header, or
+        <code>Content-Security-Policy-Report-Only</code> in report-only mode, to
+        the configured policy, restricting which scripts, styles, images and
+        other resources the page may load to help mitigate cross-site scripting
+        and other content injection attacks. Unlike the other protections, CSP
+        is disabled by default. See
+        <a href="https://www.w3.org/TR/CSP3/">Content Security Policy Level 3</a>
+        for further details.</li>
     </ul>
 
     <p>Note that security-related headers with more complex requirements, such
@@ -1007,8 +1016,10 @@ FINE: Request "/docs/config/manager.html" with response status "200"
 
       <attribute name="cspEnabled" required="false">
         <p>Should a <code>Content-Security-Policy</code> header be set on every
-          response? Any existing header with the same name will be replaced. If
-          not specified, the default value of <code>false</code> will be used.</p>
+          response? Any existing header with the same name will be replaced.
+          Whether the application can then replace the policy is controlled by
+          <strong>cspAllowOverride</strong>. If not specified, the default value
+          of <code>false</code> will be used.</p>
       </attribute>
 
       <attribute name="cspReportOnly" required="false">
@@ -1021,9 +1032,61 @@ FINE: Request "/docs/config/manager.html" with response status "200"
       <attribute name="cspPolicy" required="false">
         <p>The Content Security Policy value to use. Required when
           <strong>cspEnabled</strong> is <code>true</code>. Must be a valid CSP
-          directive string. Example: <code>default-src 'none'; style-src 'self';
-          img-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri
-          'none'</code></p>
+          directive string. Leading and trailing whitespace is removed and each
+          remaining run of whitespace, including line breaks, is collapsed to a
+          single space, so a long policy may be wrapped over several lines in
+          <code>web.xml</code>. Example: <code>default-src 'none'; style-src
+          'self'; img-src 'self'; form-action 'self'; frame-ancestors 'none';
+          base-uri 'none'</code></p>
+        <p>If the policy contains the placeholder <code>{nonce}</code>, for
+          example <code>script-src 'self' 'nonce-{nonce}'</code>, every
+          occurrence is replaced with a new nonce for each request: 128 random
+          bits, Base64 encoded. The nonce is also stored in the request attribute
+          <code>org.apache.catalina.CSP_NONCE</code> so that pages can add it to
+          their inline scripts and styles. For example, in a JSP:
+          <code>&lt;script
+          nonce="${requestScope['org.apache.catalina.CSP_NONCE']}"&gt;</code>.
+          If that attribute already holds a nonce, for example one set by another
+          instance of this filter that processed the request earlier, that nonce
+          is used instead of a new one. If the policy does not contain the
+          placeholder, no nonce is generated and the attribute is not set.</p>
+        <p>When the policy is enforced (<strong>cspReportOnly</strong> is
+          <code>false</code>) and contains a <code>frame-ancestors</code>
+          directive, browsers that implement CSP Level 3 ignore the
+          <code>X-Frame-Options</code> header, so the
+          <strong>antiClickJackingEnabled</strong>,
+          <strong>antiClickJackingOption</strong> and
+          <strong>antiClickJackingUri</strong> settings have no effect in those
+          browsers.</p>
+        <p>To use different policies for different parts of an application,
+          define this filter more than once, each definition with its own policy,
+          and map each definition to the URL patterns it applies to. If more than
+          one definition sets the same header on a request, the policy of a later
+          filter replaces the policy of an earlier one unless the earlier one has
+          <strong>cspAllowOverride</strong> set to <code>false</code>, in which
+          case both policies are sent.</p>
+      </attribute>
+
+      <attribute name="cspAllowOverride" required="false">
+        <p>Can the application replace the policy set by this filter? When
+          <code>true</code>, the policy is a default: the first policy the
+          application sets, using either <code>setHeader()</code> or
+          <code>addHeader()</code>, replaces it. When <code>false</code>, the
+          policy is always sent and any policy the application sets is sent in
+          addition to it. Browsers enforce every policy they receive, so the
+          application can then make the effective policy stricter but never more
+          permissive. If not specified, the default value of <code>true</code>
+          will be used.</p>
+        <p>In both cases the policy set by this filter is hidden from the
+          application: <code>containsHeader()</code>, <code>getHeader()</code>,
+          <code>getHeaders()</code> and <code>getHeaderNames()</code> report only
+          the policies set by the application. Frameworks that only add a policy
+          if none is present, such as Spring Security, therefore still add their
+          own. The application is everything that processes the request after
+          this filter in the filter chain; a framework filter that runs before
+          this filter sees the policy set by this filter as an ordinary header.
+          If the application resets the response, the policy set by this filter
+          is restored.</p>
       </attribute>
 
     </attributes>

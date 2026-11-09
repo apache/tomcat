@@ -15,7 +15,7 @@
   limitations under the License.
 --%>
 <%@ page import="org.apache.tomcat.util.security.Escape" session="false"
-         trimDirectiveWhitespaces="true" %>
+         contentType="text/html; charset=UTF-8" trimDirectiveWhitespaces="true" %>
 <!DOCTYPE html>
 <html lang="en">
  <head>
@@ -23,7 +23,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>404 Not found</title>
   <link href="<%=request.getContextPath()%>/images/favicon.ico" rel="icon" type="image/x-icon" />
-  <link rel="stylesheet" href="<%=request.getContextPath()%>/css/manager.css">
+  <style nonce="${requestScope['org.apache.catalina.CSP_NONCE']}">body{font-family:Tahoma,Arial,sans-serif;color:black;background-color:white;font-size:12px}h1{color:white;background-color:#525D76;font-size:22px}pre,code{border:1px dotted #525D76}a{color:black}</style>
  </head>
  <body>
    <h1>404 Not found</h1>

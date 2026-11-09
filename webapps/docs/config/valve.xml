@@ -2235,6 +2235,13 @@ RequestHeader unset SSL_CLIENT_ESCAPED_CERT</source>
     also be configured to return pre-defined static HTML pages for specific
     status codes and/or exception types.</p>
 
+    <p>If the request attribute <code>org.apache.catalina.CSP_NONCE</code> holds
+    a nonce, for example one set by the
+    <a href="filter.html#HTTP_Header_Security_Filter">HTTP Header Security
+    Filter</a>, the inline style sheet of a generated error page carries that
+    nonce, so the page renders correctly under a nonce-based
+    Content-Security-Policy.</p>
+
     <p><strong>NOTE:</strong> Disabling both showServerInfo and showReport will
     only return the HTTP status code.</p>
 

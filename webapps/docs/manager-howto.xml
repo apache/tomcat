@@ -236,6 +236,24 @@ action does not have correct value of the token, the action will be denied.
 If the token has expired you can start again from the main page or
 <em>List Applications</em> page of Manager.</p>
 
+<p>The Manager and Host Manager web applications send a strict
+<code>Content-Security-Policy</code>, configured by the <code>cspPolicy</code>
+initialisation parameter of the
+<a href="config/filter.html#HTTP_Header_Security_Filter">HTTP Header Security
+Filter</a> in their <code>WEB-INF/web.xml</code>. Inline styles are only
+allowed in <code>&lt;style&gt;</code> elements that carry the nonce the filter
+generates for each request. A customized page can obtain the nonce from the
+<code>org.apache.catalina.CSP_NONCE</code> request attribute and use it as the
+error pages do:
+<code>&lt;style nonce="${requestScope['org.apache.catalina.CSP_NONCE']}"&gt;</code>.
+Scripts, <code>style</code> attributes and resources from other origins need
+the policy adjusted; for example, adding <code>script-src 'nonce-{nonce}'</code>
+allows inline scripts that carry the nonce. With
+<code>frame-ancestors 'none'</code> in the policy, the filter's anti
+click-jacking settings cannot relax framing, because browsers give the policy
+precedence over <code>X-Frame-Options</code>. To allow framing, change
+<code>frame-ancestors</code>.</p>
+
 <p>To customize the subtitle of the HTML interface of the Manager web application,
 you can add any valid xml escaped html code to the <code>htmlSubTitle</code>
 initialisation parameter of the <code>HTMLManagerServlet</code>

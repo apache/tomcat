@@ -76,6 +76,10 @@ public class TestManagerWebapp extends TomcatBaseTest {
     private static final Pattern FORM_CONTROL = Pattern.compile("<(input|button)\\b([^>]*)>");
     private static final Pattern ATTRIBUTE = Pattern.compile("([\\w-]+)=\"([^\"]*)\"");
     private static final Pattern SESSION_ID = Pattern.compile("name=\"sessionIds\" value=\"([^\"]*)\"");
+
+    private static final Pattern STYLE_SRC_NONCE = Pattern.compile("style-src [^;]*'nonce-([A-Za-z0-9+/_-]+={0,2})'");
+
+    private static final Pattern STYLE_NONCE = Pattern.compile("<style\\b[^>]*\\bnonce=\"([^\"]*)\"");
     // Groups: aria-sort value, sort key, label
     private static final Pattern ARIA_SORT = Pattern.compile(
             "<th\\b[^>]*\\baria-sort=\"([^\"]*)\"[^>]*>\\s*<button\\b[^>]*\\bvalue=\"([^\"]*)\"[^>]*>(.*?)</button>");
@@ -140,16 +144,19 @@ public class TestManagerWebapp extends TomcatBaseTest {
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody().contains("/manager/css/manager.css"));
 
-        // Strict Content-Security-Policy header present
-        boolean cspFound = false;
+        // Strict Content-Security-Policy header present. Check the directives
+        // rather than the whole header as style-src also lists a per-request nonce.
+        String csp = null;
         for (String header : client.getResponseHeaders()) {
-            if (header.equals("Content-Security-Policy: " +
-                    "default-src 'none'; style-src 'self'; img-src 'self'; " +
-                    "form-action 'self'; frame-ancestors 'none'; base-uri 'none'")) {
-                cspFound = true;
+            if (header.startsWith("Content-Security-Policy:")) {
+                csp = header.substring("Content-Security-Policy:".length()).trim();
             }
         }
-        Assert.assertTrue("strict CSP header not present on /manager/html", cspFound);
+        Assert.assertNotNull("CSP header not present on /manager/html", csp);
+        for (String directive : new String[] { "default-src 'none'", "style-src 'self'", "img-src 'self'",
+                "form-action 'self'", "frame-ancestors 'none'", "base-uri 'none'" }) {
+            Assert.assertTrue("CSP [" + csp + "] lacks [" + directive + "]", csp.contains(directive));
+        }
 
         // Modernized, valid HTML5 markup (no quirks mode, no obsolete tags)
         String html = client.getResponseBody();
@@ -959,6 +966,75 @@ public class TestManagerWebapp extends TomcatBaseTest {
         }
 
         tomcat.stop();
+    }
+
+
+    /*
+     * The Content-Security-Policy allows the inline styles of the error pages
+     * and of the default error report by nonce. Responses rejected before the
+     * HTTP header security filter runs have no policy and an empty nonce.
+     */
+    @Test
+    public void testErrorPageCspNonce() throws Exception {
+        ignoreTearDown = true;
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.addUser("admin", "sekr3t");
+        tomcat.addRole("admin", "manager-gui");
+
+        File appDir = new File(getBuildDirectory(), "webapps/manager");
+        tomcat.addWebapp(null, "/manager", appDir.getAbsolutePath());
+
+        tomcat.start();
+
+        String base = "http://localhost:" + getPort() + "/manager";
+        Map<String,List<String>> authHead = new HashMap<>();
+        authHead.put("Authorization",
+                List.of((new BasicAuthHeader("Basic", "admin", "sekr3t")).getHeader().toString()));
+
+        // 404 error page (the default servlet runs after the filter)
+        String notFoundNonce = assertStyleUsesPolicyNonce(base + "/does-not-exist", null, "GET",
+                HttpServletResponse.SC_NOT_FOUND);
+        // 403 error page from the CSRF filter, which runs after the HTTP header security filter
+        assertStyleUsesPolicyNonce(base + "/html/does-not-exist", authHead, "GET", HttpServletResponse.SC_FORBIDDEN);
+        // No error page for 405 so the default error report is used
+        String errorReportNonce = assertStyleUsesPolicyNonce(base + "/does-not-exist", null, "DELETE",
+                HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+        // Each response has a new nonce
+        Assert.assertNotEquals(notFoundNonce, errorReportNonce);
+
+        // The authenticator rejects the request before the filter runs: no policy and an empty nonce
+        ByteChunk res = new ByteChunk();
+        Map<String,List<String>> resHead = new HashMap<>();
+        int rc = getUrl(base + "/html", res, null, resHead);
+        Assert.assertEquals(HttpServletResponse.SC_UNAUTHORIZED, rc);
+        Assert.assertNull(getSingleHeader("Content-Security-Policy", resHead));
+        Assert.assertTrue(res.toString(), res.toString().contains("<style nonce=\"\">"));
+
+        tomcat.stop();
+    }
+
+
+    /*
+     * Checks the response status and that the inline style element carries the
+     * nonce from the style-src directive of the Content-Security-Policy header
+     * sent with it. Returns the nonce.
+     */
+    private static String assertStyleUsesPolicyNonce(String url, Map<String,List<String>> reqHead, String method,
+            int expectedStatus) throws IOException {
+        ByteChunk res = new ByteChunk();
+        Map<String,List<String>> resHead = new HashMap<>();
+        int rc = methodUrl(url, res, DEFAULT_CLIENT_TIMEOUT_MS, reqHead, resHead, method);
+        Assert.assertEquals(method + " " + url, expectedStatus, rc);
+        String csp = getSingleHeader("Content-Security-Policy", resHead);
+        Assert.assertNotNull("CSP header not present: " + method + " " + url, csp);
+        Assert.assertFalse(csp, csp.contains("{nonce}"));
+        Matcher m = STYLE_SRC_NONCE.matcher(csp);
+        Assert.assertTrue(csp, m.find());
+        String nonce = m.group(1);
+        Matcher styleNonce = STYLE_NONCE.matcher(res.toString());
+        Assert.assertTrue(res.toString(), styleNonce.find());
+        Assert.assertEquals(nonce, styleNonce.group(1));
+        return nonce;
     }
 
 

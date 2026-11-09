@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.RequestDispatcher;
@@ -38,11 +40,16 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Globals;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.filters.HttpHeaderSecurityFilter;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.util.TomcatCSS;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.ErrorPage;
+import org.apache.tomcat.util.descriptor.web.FilterDef;
+import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.res.StringManager;
 
 public class TestErrorReportValve extends TomcatBaseTest {
@@ -266,6 +273,119 @@ public class TestErrorReportValve extends TomcatBaseTest {
 
         Assert.assertEquals(res.toString(), "OK");
         Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+    }
+
+
+    @Test
+    public void testCspNonce() throws Exception {
+        doTestCspNonce("dGVzdCBub25jZQ==", "<style type=\"text/css\" nonce=\"dGVzdCBub25jZQ==\">");
+    }
+
+
+    @Test
+    public void testCspNonceBase64CharactersUnchanged() throws Exception {
+        doTestCspNonce("ab+/cd==", "<style type=\"text/css\" nonce=\"ab+/cd==\">");
+    }
+
+
+    @Test
+    public void testCspNonceEscaped() throws Exception {
+        doTestCspNonce("a\"b<c", "<style type=\"text/css\" nonce=\"a&quot;b&lt;c\">");
+    }
+
+
+    @Test
+    public void testCspNonceEmpty() throws Exception {
+        doTestCspNonce("", "<style type=\"text/css\">");
+    }
+
+
+    @Test
+    public void testNoCspNonce() throws Exception {
+        doTestCspNonce(null, "<style type=\"text/css\">");
+    }
+
+
+    private void doTestCspNonce(String nonce, String expectedStyleTag) throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = getProgrammaticRootContext();
+
+        Tomcat.addServlet(ctx, "cspNonce", new CspNonceServlet(nonce));
+        ctx.addServletMapping("/", "cspNonce");
+
+        tomcat.start();
+
+        ByteChunk res = new ByteChunk();
+        res.setCharset(StandardCharsets.UTF_8);
+        int rc = getUrl("http://localhost:" + getPort(), res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
+        String body = res.toString();
+        Assert.assertTrue(body, body.contains("</title>" + expectedStyleTag + TomcatCSS.TOMCAT_CSS + "</style>"));
+        if (nonce == null || nonce.isEmpty()) {
+            Assert.assertFalse(body, body.contains("nonce"));
+        }
+    }
+
+
+    @Test
+    public void testCspNonceFromHttpHeaderSecurityFilter() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = getProgrammaticRootContext();
+
+        Tomcat.addServlet(ctx, "cspNonce", new CspNonceServlet(null));
+        ctx.addServletMapping("/", "cspNonce");
+
+        FilterDef filterDef = new FilterDef();
+        filterDef.setFilterClass(HttpHeaderSecurityFilter.class.getName());
+        filterDef.setFilterName("httpHeaderSecurity");
+        filterDef.addInitParameter("cspEnabled", "true");
+        filterDef.addInitParameter("cspPolicy", "default-src 'none'; style-src 'nonce-{nonce}'");
+        ctx.addFilterDef(filterDef);
+        FilterMap filterMap = new FilterMap();
+        filterMap.setFilterName("httpHeaderSecurity");
+        filterMap.addURLPattern("/*");
+        ctx.addFilterMap(filterMap);
+
+        tomcat.start();
+
+        ByteChunk res = new ByteChunk();
+        res.setCharset(StandardCharsets.UTF_8);
+        Map<String,List<String>> resHead = new HashMap<>();
+        int rc = getUrl("http://localhost:" + getPort(), res, resHead);
+
+        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
+        String csp = getSingleHeader("Content-Security-Policy", resHead);
+        Assert.assertNotNull(csp);
+        Matcher matcher = Pattern.compile("^default-src 'none'; style-src 'nonce-([^']+)'$").matcher(csp);
+        Assert.assertTrue(csp, matcher.matches());
+        // The error page's style sheet carries, unchanged, the nonce from the policy sent with it
+        String expectedStyleTag = "<style type=\"text/css\" nonce=\"" + matcher.group(1) + "\">";
+        Assert.assertTrue(res.toString(), res.toString().contains(expectedStyleTag));
+    }
+
+
+    private static final class CspNonceServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private final String nonce;
+
+        private CspNonceServlet(String nonce) {
+            this.nonce = nonce;
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            if (nonce != null) {
+                req.setAttribute(Globals.CSP_NONCE_ATTR, nonce);
+            }
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+        }
     }
 
 

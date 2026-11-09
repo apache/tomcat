@@ -36,6 +36,15 @@ public final class Globals {
 
 
     /**
+     * The request attribute under which the Content Security Policy nonce for the current request is stored (as an
+     * object of type {@link String}). {@link org.apache.catalina.filters.HttpHeaderSecurityFilter} sets it if its
+     * policy contains the {@code {nonce}} placeholder. Pages can use it to mark their inline scripts and styles, and
+     * {@link org.apache.catalina.valves.ErrorReportValve} uses it to mark the inline style sheet of its error page.
+     */
+    public static final String CSP_NONCE_ATTR = "org.apache.catalina.CSP_NONCE";
+
+
+    /**
      * Request attribute name for the GSS credential.
      */
     public static final String GSS_CREDENTIAL_ATTR = "org.apache.catalina.realm.GSS_CREDENTIAL";

@@ -50,11 +50,6 @@ a {
     color: black;
 }
 
-pre,
-tt {
-    border: 1px dotted #525D76;
-}
-
 /* === Layout Helpers === */
 .line {
     height          : 1px;

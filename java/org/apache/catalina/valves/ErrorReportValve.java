@@ -29,6 +29,7 @@ import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.Globals;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.ErrorPageSupport;
@@ -246,7 +247,13 @@ public class ErrorReportValve extends ValveBase {
         sb.append("<title>");
         sb.append(smClient.getString("errorReportValve.statusHeader", String.valueOf(statusCode), reason));
         sb.append("</title>");
-        sb.append("<style type=\"text/css\">");
+        sb.append("<style type=\"text/css\"");
+        // Allow the style sheet under a nonce-based Content Security Policy. Escape.xml() leaves the Base64
+        // characters of a valid nonce (including '/' and '+') unchanged.
+        if (request.getAttribute(Globals.CSP_NONCE_ATTR) instanceof String nonce && !nonce.isEmpty()) {
+            sb.append(" nonce=\"").append(Escape.xml(nonce)).append('"');
+        }
+        sb.append('>');
         sb.append(TomcatCSS.TOMCAT_CSS);
         sb.append("</style>");
         sb.append("</head><body>");

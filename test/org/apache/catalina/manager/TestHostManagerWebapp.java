@@ -20,6 +20,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -39,6 +41,11 @@ import org.apache.catalina.storeconfig.StoreConfigLifecycleListener;
 import org.apache.catalina.util.IOTools;
 
 public class TestHostManagerWebapp extends TomcatBaseTest {
+
+    private static final String CSP_HEADER = "Content-Security-Policy:";
+    // A nonce source in the style-src directive, with the nonce limited to the base64-value syntax of CSP
+    private static final Pattern STYLE_SRC_NONCE = Pattern.compile("style-src [^;]*'nonce-([A-Za-z0-9+/_-]+={0,2})'");
+    private static final Pattern STYLE_NONCE = Pattern.compile("<style\\b[^>]*\\bnonce=\"([^\"]*)\"");
 
     @Test
     public void testServlet() throws Exception {
@@ -122,15 +129,12 @@ public class TestHostManagerWebapp extends TomcatBaseTest {
         Assert.assertTrue(html.contains("<table class=\"data-table\">"));
 
         // Strict Content-Security-Policy header present
-        boolean cspFound = false;
-        for (String header : client.getResponseHeaders()) {
-            if (header.equals("Content-Security-Policy: " +
-                    "default-src 'none'; style-src 'self'; img-src 'self'; " +
-                    "form-action 'self'; frame-ancestors 'none'; base-uri 'none'")) {
-                cspFound = true;
-            }
+        String csp = getCspHeader(client);
+        Assert.assertNotNull("CSP header not present on /host-manager/html", csp);
+        for (String directive : new String[] { "default-src 'none'", "style-src 'self'", "img-src 'self'",
+                "form-action 'self'", "frame-ancestors 'none'", "base-uri 'none'" }) {
+            Assert.assertTrue(csp, csp.contains(directive));
         }
-        Assert.assertTrue("strict CSP header not present on /host-manager/html", cspFound);
 
         // The lang attribute follows the language the page is rendered in
         for (String language : new String[] { "fr", "en" }) {
@@ -434,5 +438,126 @@ public class TestHostManagerWebapp extends TomcatBaseTest {
                 client.getResponseBody().contains("OK - Host [rehost] added"));
 
         tomcat.stop();
+    }
+
+
+    /*
+     * The Content-Security-Policy allows the inline styles of the error pages and of the default error report by
+     * nonce. Responses that do not pass through the HTTP header security filter have no policy and an empty nonce.
+     */
+    @Test
+    public void testErrorPageCspNonce() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.addUser("admin", "sekr3t");
+        tomcat.addRole("admin", "admin-gui");
+
+        // Keep the default and JSP servlets so that a missing resource reaches the JSP error page
+        File webappDir = new File(getBuildDirectory(), "webapps");
+        File appDir = new File(webappDir, "host-manager");
+        tomcat.addWebapp(null, "/host-manager", appDir.getAbsolutePath());
+
+        tomcat.start();
+
+        SimpleHttpClient client = new SimpleHttpClient() {
+            @Override
+            public boolean isResponseBodyOK() {
+                return true;
+            }
+        };
+        client.setPort(getPort());
+        String basicHeader = (new BasicAuthHeader("Basic", "admin", "sekr3t")).getHeader().toString();
+
+        // The 404 error page uses the nonce from the policy
+        // @formatter:off
+        client.setRequest(new String[] {
+                "GET /host-manager/does-not-exist HTTP/1.1" + CRLF +
+                    "Host: localhost" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, client.getStatusCode());
+        String errorPageNonce = getStyleSrcNonce(client);
+        Assert.assertTrue(client.getResponseBody(),
+                client.getResponseBody().contains("<style nonce=\"" + errorPageNonce + "\">"));
+
+        // The CSRF filter runs after the HTTP header security filter so its 403 error page uses the nonce from the
+        // policy
+        // @formatter:off
+        client.setRequest(new String[] {
+                "GET /host-manager/html/does-not-exist HTTP/1.1" + CRLF +
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_FORBIDDEN, client.getStatusCode());
+        String csrfNonce = getStyleSrcNonce(client);
+        Assert.assertTrue(client.getResponseBody(),
+                client.getResponseBody().contains("<style nonce=\"" + csrfNonce + "\">"));
+
+        // There is no error page for 405 so the default error report uses the nonce from the policy
+        // @formatter:off
+        client.setRequest(new String[] {
+                "DELETE /host-manager/does-not-exist HTTP/1.1" + CRLF +
+                    "Host: localhost" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_METHOD_NOT_ALLOWED, client.getStatusCode());
+        String errorReportNonce = getStyleSrcNonce(client);
+        Matcher m = STYLE_NONCE.matcher(client.getResponseBody());
+        Assert.assertTrue(client.getResponseBody(), m.find());
+        Assert.assertEquals(errorReportNonce, m.group(1));
+
+        // Each response has a new nonce
+        Assert.assertNotEquals(errorPageNonce, errorReportNonce);
+
+        // The authenticator rejects the request before the filter runs so there is no policy and the 401 error page
+        // has an empty nonce
+        // @formatter:off
+        client.setRequest(new String[] {
+                "GET /host-manager/html HTTP/1.1" + CRLF +
+                    "Host: localhost" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_UNAUTHORIZED, client.getStatusCode());
+        Assert.assertNull("CSP header present on the 401 response", getCspHeader(client));
+        Assert.assertTrue(client.getResponseBody(), client.getResponseBody().contains("<style nonce=\"\">"));
+
+        tomcat.stop();
+    }
+
+
+    private static String getCspHeader(SimpleHttpClient client) {
+        for (String header : client.getResponseHeaders()) {
+            if (header.regionMatches(true, 0, CSP_HEADER, 0, CSP_HEADER.length())) {
+                return header.substring(CSP_HEADER.length()).trim();
+            }
+        }
+        return null;
+    }
+
+
+    private static String getStyleSrcNonce(SimpleHttpClient client) {
+        String csp = getCspHeader(client);
+        Assert.assertNotNull("CSP header not present", csp);
+        // Every placeholder has been replaced
+        Assert.assertFalse(csp, csp.contains("{nonce}"));
+        Matcher m = STYLE_SRC_NONCE.matcher(csp);
+        Assert.assertTrue(csp, m.find());
+        return m.group(1);
     }
 }

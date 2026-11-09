@@ -19,6 +19,12 @@ package org.apache.catalina.filters;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Collection;
+import java.util.List;
+import java.util.regex.Pattern;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -26,7 +32,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponseWrapper;
 
+import org.apache.catalina.Globals;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -71,9 +79,16 @@ public class HttpHeaderSecurityFilter extends FilterBase {
     // Content Security Policy
     private static final String CSP_HEADER_NAME = "Content-Security-Policy";
     private static final String CSP_REPORT_ONLY_HEADER_NAME = "Content-Security-Policy-Report-Only";
+    private static final String CSP_NONCE_PLACEHOLDER = "{nonce}";
+    private static final int CSP_NONCE_BYTES = 16;
+    private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
     private boolean cspEnabled = false;
     private boolean cspReportOnly = false;
+    private boolean cspAllowOverride = true;
     private String cspPolicy = "";
+    private String cspHeaderValue;
+    private boolean cspNonceRequired;
+    private SecureRandom cspNonceRandom;
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -102,8 +117,16 @@ public class HttpHeaderSecurityFilter extends FilterBase {
         antiClickJackingHeaderValue = cjValue.toString();
 
         // Content Security Policy
-        if (cspEnabled && (cspPolicy == null || cspPolicy.isBlank())) {
+        // Collapse whitespace, including line breaks, so a policy wrapped over several lines in web.xml is sent as
+        // a single line. CR and LF are not permitted in HTTP/2 field values.
+        cspHeaderValue = cspPolicy == null ? "" : WHITESPACE_PATTERN.matcher(cspPolicy.strip()).replaceAll(" ");
+        if (cspEnabled && cspHeaderValue.isEmpty()) {
             throw new IllegalArgumentException(sm.getString("httpHeaderSecurityFilter.csp.invalid"));
+        }
+        // Only generate nonces if the policy uses them
+        cspNonceRequired = cspHeaderValue.contains(CSP_NONCE_PLACEHOLDER);
+        if (cspEnabled && cspNonceRequired) {
+            cspNonceRandom = new SecureRandom();
         }
     }
 
@@ -111,6 +134,8 @@ public class HttpHeaderSecurityFilter extends FilterBase {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
+
+        ServletResponse chainResponse = response;
 
         if (response instanceof HttpServletResponse httpResponse) {
             if (response.isCommitted()) {
@@ -135,12 +160,36 @@ public class HttpHeaderSecurityFilter extends FilterBase {
 
             // Content Security Policy
             if (cspEnabled) {
-                httpResponse.setHeader(cspReportOnly ? CSP_REPORT_ONLY_HEADER_NAME : CSP_HEADER_NAME,
-                        cspPolicy);
+                String cspName = cspReportOnly ? CSP_REPORT_ONLY_HEADER_NAME : CSP_HEADER_NAME;
+                String cspValue = cspHeaderValue;
+                if (cspNonceRequired) {
+                    cspValue = cspValue.replace(CSP_NONCE_PLACEHOLDER, getCspNonce(request));
+                }
+                // Set the policy now so it is present even if the response is committed early. The wrapper controls
+                // how the rest of the chain sees and changes it.
+                httpResponse.setHeader(cspName, cspValue);
+                chainResponse = new CspResponseWrapper(httpResponse, cspName, cspValue, cspAllowOverride);
             }
         }
 
-        chain.doFilter(request, response);
+        chain.doFilter(request, chainResponse);
+    }
+
+
+    /*
+     * Returns the nonce to use for the current request. A nonce already stored in the request, e.g. by another
+     * instance of this filter earlier in the filter chain, is reused so every policy sent for the request accepts the
+     * same nonce.
+     */
+    private String getCspNonce(ServletRequest request) {
+        if (request.getAttribute(Globals.CSP_NONCE_ATTR) instanceof String existing && !existing.isEmpty()) {
+            return existing;
+        }
+        byte[] bytes = new byte[CSP_NONCE_BYTES];
+        cspNonceRandom.nextBytes(bytes);
+        String nonce = Base64.getEncoder().encodeToString(bytes);
+        request.setAttribute(Globals.CSP_NONCE_ATTR, nonce);
+        return nonce;
     }
 
 
@@ -356,6 +405,31 @@ public class HttpHeaderSecurityFilter extends FilterBase {
 
 
     /**
+     * Returns whether the application may replace the policy set by this filter.
+     *
+     * @return {@code true} if the policy is a default that the application may replace
+     */
+    public boolean isCspAllowOverride() {
+        return cspAllowOverride;
+    }
+
+
+    /**
+     * Sets whether the application may replace the policy set by this filter. If {@code true}, the policy is a default
+     * that the first policy set by the application replaces. If {@code false}, the policy is always sent and any
+     * policy set by the application is sent in addition to it, so the application can make the effective policy
+     * stricter but never more permissive. In both cases, the policy set by this filter is not visible to the
+     * application through {@code containsHeader()}, {@code getHeader()}, {@code getHeaders()} and
+     * {@code getHeaderNames()}, so components that only set a policy if none is present still set theirs.
+     *
+     * @param cspAllowOverride {@code true} to allow the application to replace the policy
+     */
+    public void setCspAllowOverride(boolean cspAllowOverride) {
+        this.cspAllowOverride = cspAllowOverride;
+    }
+
+
+    /**
      * Returns the configured Content-Security-Policy value.
      *
      * @return the policy string
@@ -366,7 +440,9 @@ public class HttpHeaderSecurityFilter extends FilterBase {
 
 
     /**
-     * Sets the Content-Security-Policy value. Required when CSP is enabled.
+     * Sets the Content-Security-Policy value. Required when CSP is enabled. Every occurrence of {@code {nonce}} is
+     * replaced with a nonce for the current request that is also stored in the request attribute
+     * {@link Globals#CSP_NONCE_ATTR}.
      *
      * @param cspPolicy the policy string
      */
@@ -405,6 +481,147 @@ public class HttpHeaderSecurityFilter extends FilterBase {
 
         public String getHeaderValue() {
             return headerValue;
+        }
+    }
+
+
+    /*
+     * Hides the policy set by the filter from the rest of the chain, so components that only set a policy if none is
+     * present still set theirs, and applies cspAllowOverride to any policy the rest of the chain sets.
+     */
+    private static final class CspResponseWrapper extends HttpServletResponseWrapper {
+
+        private final String cspName;
+        private final String cspValue;
+        private final boolean allowOverride;
+        // The policies set by the application. Only used if the application may not override the filter's policy.
+        private final List<String> applicationValues = new ArrayList<>();
+        // Is the filter's policy the only one present? Only used if the application may override the filter's policy.
+        private boolean defaultOnly = true;
+
+        CspResponseWrapper(HttpServletResponse response, String cspName, String cspValue, boolean allowOverride) {
+            super(response);
+            this.cspName = cspName;
+            this.cspValue = cspValue;
+            this.allowOverride = allowOverride;
+        }
+
+
+        @Override
+        public void setHeader(String name, String value) {
+            if (!isCspHeader(name)) {
+                super.setHeader(name, value);
+            } else if (allowOverride) {
+                super.setHeader(name, value);
+                defaultOnly = false;
+            } else {
+                // Replace the application's policies but keep the filter's policy
+                applicationValues.clear();
+                super.setHeader(cspName, cspValue);
+                if (value != null) {
+                    applicationValues.add(value);
+                    super.addHeader(name, value);
+                }
+            }
+        }
+
+
+        @Override
+        public void addHeader(String name, String value) {
+            if (!isCspHeader(name)) {
+                super.addHeader(name, value);
+            } else if (allowOverride) {
+                if (defaultOnly && value != null) {
+                    // The first policy set by the application replaces the filter's policy
+                    super.setHeader(name, value);
+                    defaultOnly = false;
+                } else {
+                    super.addHeader(name, value);
+                }
+            } else if (value != null) {
+                applicationValues.add(value);
+                super.addHeader(name, value);
+            }
+        }
+
+
+        @Override
+        public boolean containsHeader(String name) {
+            if (isCspHeader(name) && isFilterPolicyHidden()) {
+                return !applicationValues.isEmpty();
+            }
+            return super.containsHeader(name);
+        }
+
+
+        @Override
+        public String getHeader(String name) {
+            if (isCspHeader(name) && isFilterPolicyHidden()) {
+                return applicationValues.isEmpty() ? null : applicationValues.get(0);
+            }
+            return super.getHeader(name);
+        }
+
+
+        @Override
+        public Collection<String> getHeaders(String name) {
+            if (isCspHeader(name) && isFilterPolicyHidden()) {
+                return new ArrayList<>(applicationValues);
+            }
+            return super.getHeaders(name);
+        }
+
+
+        @Override
+        public Collection<String> getHeaderNames() {
+            Collection<String> names = super.getHeaderNames();
+            if (names == null || !isFilterPolicyHidden()) {
+                return names;
+            }
+            /*
+             * Remove the name of the filter's policy. Some containers, including Tomcat, list a name once for each
+             * value, and the filter's policy is always the first value. Others list each name once. Removing leading
+             * occurrences until no more remain than the application has set values handles both.
+             */
+            int excess = -applicationValues.size();
+            for (String name : names) {
+                if (isCspHeader(name)) {
+                    excess++;
+                }
+            }
+            List<String> result = new ArrayList<>(names.size());
+            for (String name : names) {
+                if (excess > 0 && isCspHeader(name)) {
+                    excess--;
+                } else {
+                    result.add(name);
+                }
+            }
+            return result;
+        }
+
+
+        @Override
+        public void reset() {
+            super.reset();
+            applicationValues.clear();
+            defaultOnly = true;
+            super.setHeader(cspName, cspValue);
+        }
+
+
+        private boolean isCspHeader(String name) {
+            return cspName.equalsIgnoreCase(name);
+        }
+
+
+        /*
+         * If the application may override the filter's policy, the filter's policy is hidden until the application
+         * sets a policy and the header then behaves normally. Otherwise, the filter's policy is always hidden and only
+         * the application's policies are visible.
+         */
+        private boolean isFilterPolicyHidden() {
+            return !allowOverride || defaultOnly;
         }
     }
 }

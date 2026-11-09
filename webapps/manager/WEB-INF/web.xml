@@ -107,9 +107,11 @@
     </init-param>
   </filter>
 
-  <!-- Configured to set X-FRAME-OPTIONS. Disable HSTS in case it interferes -->
-  <!-- with an existing setting. Keep X-Content-Type-Options and             -->
-  <!-- X-XSS-Protection as they are page specific.                           -->
+  <!-- Configured to set X-Frame-Options, X-Content-Type-Options and a       -->
+  <!-- strict Content-Security-Policy. Disable HSTS in case it interferes    -->
+  <!-- with an existing setting. The {nonce} placeholder gives each          -->
+  <!-- response a fresh nonce, which the error pages and Tomcat's default    -->
+  <!-- error report add to their inline styles.                              -->
   <filter>
     <filter-name>HTTP header security filter</filter-name>
     <filter-class>org.apache.catalina.filters.HttpHeaderSecurityFilter</filter-class>
@@ -123,7 +125,7 @@
     </init-param>
     <init-param>
       <param-name>cspPolicy</param-name>
-      <param-value>default-src 'none'; style-src 'self'; img-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'</param-value>
+      <param-value>default-src 'none'; style-src 'self' 'nonce-{nonce}'; img-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'</param-value>
     </init-param>
   </filter>
 
