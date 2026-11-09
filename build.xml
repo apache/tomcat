@@ -2720,6 +2720,7 @@
       <fileset dir="${basedir}" defaultexcludes="true">
         <not>
           <or>
+            <filename name="**/.ant-targets-build.xml" />
             <filename name="**/.settings/**" />
             <filename name="**/.classpath"/>
             <filename name="**/.checkstyle"/>
