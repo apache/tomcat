@@ -43,9 +43,9 @@ org/apache/catalina/servlets/TestDefaultServlet.java,\
 org/apache/catalina/servlets/TestDefaultServletOptions.java,\
 org/apache/catalina/servlets/TestWebdavServletOptionsFile.java,\
 org/apache/catalina/startup/TestContextConfig.java,\
-org/apache/catalina/startup/TestHostConfigAutomaticDeploymentA.java,\
-org/apache/catalina/startup/TestHostConfigAutomaticDeploymentB.java,\
-org/apache/catalina/startup/TestHostConfigAutomaticDeploymentC.java,\
+org/apache/catalina/startup/TestHostConfigAutomaticDeploymentDir.java,\
+org/apache/catalina/startup/TestHostConfigAutomaticDeploymentWar.java,\
+org/apache/catalina/startup/TestHostConfigAutomaticDeploymentXml.java,\
 org/apache/catalina/valves/rewrite/TestRewriteValve.java,\
 org/apache/catalina/valves/TestStuckThreadDetectionValve.java,\
 org/apache/coyote/ajp/TestAbstractAjpProcessor.java,\
