@@ -54,6 +54,7 @@
   <property name="tomcat.classes"        value="${tomcat.pool}/classes"/>
   <property name="tomcat.api"            value="${tomcat.pool}/api"/>
   <property name="tomcat.mbeans"         value="${tomcat.pool}/mbeans"/>
+  <property name="tomcat.i18n"           value="${tomcat.pool}/i18n"/>
 
   <!-- JAR Artifacts -->
   <property name="tomcat-jdbc.jar" value="${tomcat.pool}/tomcat-jdbc.jar"/>
@@ -101,9 +102,16 @@
         <include name="org/apache/tomcat/jdbc/**/*.xml" />
       </fileset>
     </copy>
+    <copy todir="${tomcat.i18n}">
+      <fileset dir="${basedir}/src/main/java">
+        <include name="org/apache/tomcat/jdbc/**/LocalStrings*.properties" />
+      </fileset>
+    </copy>
     <fixcrlf srcdir="${tomcat.pool}" includes="LICENSE,NOTICE" eol="lf"
         encoding="UTF-8" fixlast="false" />
     <fixcrlf srcdir="${tomcat.mbeans}" eol="lf"
+        encoding="UTF-8" fixlast="false" />
+    <fixcrlf srcdir="${tomcat.i18n}" eol="lf"
         encoding="UTF-8" fixlast="false" />
   </target>
 
@@ -154,13 +162,6 @@
       <include name="org/apache/tomcat/jdbc/**" />
     </javac>
 
-    <!-- Localized messages are stored with the sources -->
-    <copy todir="${tomcat.classes}">
-      <fileset dir="${basedir}/src/main/java">
-        <include name="org/apache/tomcat/jdbc/**/*.properties" />
-      </fileset>
-    </copy>
-
     <!-- connection pool JAR File -->
     <jar jarfile="${tomcat-jdbc.jar}"
          update="true"
@@ -170,6 +171,7 @@
         <include name="org/apache/tomcat/jdbc/**" />
       </fileset>
       <fileset dir="${tomcat.mbeans}"/>
+      <fileset dir="${tomcat.i18n}"/>
       <fileset refid="license.notice"/>
     </jar>
   </target>
