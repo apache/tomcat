@@ -15,8 +15,11 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
+<!-- The SDK is named after the Java version ant ide-intellij ran on, as the build compiles with that JDK. The
+     project language level is the SDK default, which the tomcat-ffm module uses. The tomcat module sets its own
+     level, the minimum Java version to build Tomcat. !-->
 <project version="4">
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_@BUILD_JAVA_VERSION@" default="false" project-jdk-name="@BUILD_JAVA_VERSION@" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_@BUILD_JAVA_VERSION@" default="true" project-jdk-name="@ANT_JAVA_VERSION@" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/.idea/output" />
   </component>
 </project>

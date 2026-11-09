@@ -16,12 +16,21 @@
   limitations under the License.
 -->
 <module type="JAVA_MODULE" version="4">
-  <component name="NewModuleRootManager" inherit-compiler-output="true">
+  <!-- The language level is the minimum Java version to build Tomcat, not the project level that follows the SDK !-->
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_@BUILD_JAVA_VERSION@" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/webapps/examples/WEB-INF/classes" isTestSource="true" />
+
+      <!-- The code that uses the FFM API is only compiled when the build runs on Java
+          @RELEASE_JAVA_VERSION@ or later. When ant ide-intellij runs on such a version it omits the
+          excludeFolder lines below, so that code belongs to the tomcat-ffm module, whose content roots
+          are nested in the java folder above. An exclusion in this module would also hide those
+          directories from that module. On an earlier version the code is excluded instead. !-->
+      <excludeFolder url="file://$MODULE_DIR$/java/org/apache/tomcat/util/net/openssl/panama" /><!-- IDEA-FFM-EXCLUDE -->
+      <excludeFolder url="file://$MODULE_DIR$/java/org/apache/tomcat/util/openssl" /><!-- IDEA-FFM-EXCLUDE -->
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
