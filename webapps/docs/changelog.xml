@@ -115,7 +115,7 @@
         suggested by abernal. (markt)
       </fix>
     </changelog>
-  </subsection>  
+  </subsection>
   <subsection name="jdbc-pool">
     <changelog>
       <fix>
