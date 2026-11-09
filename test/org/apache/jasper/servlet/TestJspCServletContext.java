@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Collection;
@@ -36,6 +37,7 @@ import javax.servlet.descriptor.JspConfigDescriptor;
 import javax.servlet.descriptor.JspPropertyGroupDescriptor;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 
 public class TestJspCServletContext {
@@ -147,6 +149,14 @@ public class TestJspCServletContext {
 
     @Test
     public void testGetResourceWithUriIllegalCharacters() throws Exception {
+        // This is an undocumented property so treat with caution.
+        String fileSystemPathEncoding = System.getProperty("sun.jnu.encoding");
+        System.out.println(fileSystemPathEncoding);
+        if (fileSystemPathEncoding != null) {
+            Charset fileSystemPathCharset = Charset.forName(fileSystemPathEncoding);
+            Assume.assumeTrue("File system path encoding can't encode \u00fc. Consider using UTF-8.",
+                    fileSystemPathCharset.newEncoder().canEncode('\u00fc'));
+        }
         // A resource path is a decoded logical path. Resources whose name
         // contains characters that are not permitted in a URI, for example a
         // space or a non-ASCII character, resolve correctly at runtime so
