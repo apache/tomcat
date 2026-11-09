@@ -29,6 +29,7 @@ import jakarta.servlet.jsp.tagext.SimpleTagSupport;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -41,8 +42,10 @@ import org.apache.jasper.JspCompilationContext;
 import org.apache.jasper.compiler.ELInterpreter;
 import org.apache.jasper.compiler.ELInterpreterFactory;
 import org.apache.jasper.compiler.StringInterpreter;
+import org.apache.tomcat.categories.SmokeTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
+@Category(SmokeTest.class)
 @RunWith(Parameterized.class)
 public class TestELInterpreterTagSetters extends TomcatBaseTest {
 

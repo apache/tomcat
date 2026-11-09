@@ -40,6 +40,7 @@ import javax.net.ssl.X509TrustManager;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -50,6 +51,7 @@ import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.SmokeTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate.StoreType;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
@@ -59,6 +61,7 @@ import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 /*
  * Tests compatibility of JSSE and OpenSSL settings.
  */
+@Category(SmokeTest.class)
 @RunWith(Parameterized.class)
 public class TestSSLHostConfigCompat extends TomcatBaseTest {
 

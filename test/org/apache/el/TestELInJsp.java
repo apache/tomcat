@@ -24,18 +24,21 @@ import jakarta.servlet.DispatcherType;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.jasper.servlet.JasperInitializer;
+import org.apache.tomcat.categories.SmokeTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
  * Tests EL with an without JSP attributes using a test web application. Similar tests may be found in
  * {@link TestELEvaluation} and {@link org.apache.jasper.compiler.TestAttributeParser}.
  */
+@Category(SmokeTest.class)
 public class TestELInJsp extends TomcatBaseTest {
 
     @Test

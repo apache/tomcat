@@ -16,8 +16,12 @@
  */
 package org.apache.catalina.servlets;
 
-import org.apache.catalina.servlets.DefaultServlet.BomConfig;
+import org.junit.experimental.categories.Category;
 
+import org.apache.catalina.servlets.DefaultServlet.BomConfig;
+import org.apache.tomcat.categories.SmokeTest;
+
+@Category(SmokeTest.class)
 public class TestDefaultServletEncodingWithoutBom extends DefaultServletEncodingBaseTest {
 
     @Override

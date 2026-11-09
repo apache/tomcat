@@ -17,13 +17,16 @@
 package org.apache.catalina.startup;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.LifecycleState;
+import org.apache.tomcat.categories.SmokeTest;
 
 /**
  * The purpose of this class is to test the automatic deployment features of the
  * {@link HostConfig} implementation.
  */
+@Category(SmokeTest.class)
 public class TestHostConfigAutomaticDeploymentWar extends HostConfigAutomaticDeploymentBaseTest {
 
     /*
