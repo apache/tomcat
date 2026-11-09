@@ -1435,6 +1435,13 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
 
                 if (processor != null) {
                     wrapper.setCurrentProcessor(processor);
+                    if (wrapper.isClosed()) {
+                        /*
+                         * The socket was closed while this thread owned the processor so the close could not release
+                         * it.
+                         */
+                        release(wrapper);
+                    }
                 }
                 return state;
             } catch (SocketException e) {
