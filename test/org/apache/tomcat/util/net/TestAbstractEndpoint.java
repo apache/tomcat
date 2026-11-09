@@ -23,8 +23,10 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.threads.VirtualThreadExecutor;
 
 public class TestAbstractEndpoint {
@@ -77,6 +79,7 @@ public class TestAbstractEndpoint {
      */
     @Test
     public void testCreatedVirtualThreadExecutorIsShutDownOnStop() throws Exception {
+        Assume.assumeTrue("JRE 21+ not available", JreCompat.isJre21Available());
         NioEndpoint endpoint = new NioEndpoint();
         endpoint.setUseVirtualThreads(true);
         endpoint.createExecutor();
@@ -97,6 +100,7 @@ public class TestAbstractEndpoint {
 
     @Test
     public void testExternalVirtualThreadExecutorIsNotShutDownOnStop() throws Exception {
+        Assume.assumeTrue("JRE 21+ not available", JreCompat.isJre21Available());
         NioEndpoint endpoint = new NioEndpoint();
         VirtualThreadExecutor executor = new VirtualThreadExecutor("test-external-");
         endpoint.setExecutor(executor);
