@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!-- The code that uses the FFM API. It needs Java @RELEASE_JAVA_VERSION@ or later, unlike the rest of Tomcat, so it is
+     a module of its own. It uses the project SDK and the project language level, which follows the SDK. The build
+     compiles this code for Java @RELEASE_JAVA_VERSION@, so code that needs a later version is accepted here but
+     fails the build. Its content roots are nested in the java folder of the tomcat module, which gives this module
+     those directories. ant ide-intellij only adds this module when it runs on Java @RELEASE_JAVA_VERSION@ or
+     later. !-->
+<module type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/java/org/apache/tomcat/util/net/openssl/panama">
+      <sourceFolder url="file://$MODULE_DIR$/java/org/apache/tomcat/util/net/openssl/panama" isTestSource="false"
+          packagePrefix="org.apache.tomcat.util.net.openssl.panama" />
+    </content>
+    <content url="file://$MODULE_DIR$/java/org/apache/tomcat/util/openssl">
+      <sourceFolder url="file://$MODULE_DIR$/java/org/apache/tomcat/util/openssl" isTestSource="false"
+          packagePrefix="org.apache.tomcat.util.openssl" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="tomcat" />
+  </component>
+</module>
