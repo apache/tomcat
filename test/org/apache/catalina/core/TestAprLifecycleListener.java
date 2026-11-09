@@ -44,14 +44,14 @@ public class TestAprLifecycleListener {
 
     @Test
     public void testMultipleServerInstancesUsingFFM01() throws Exception {
-        Assume.assumeTrue(JreCompat.isJre22Available());
+        Assume.assumeTrue("FFM requires Java 22+", JreCompat.isJre22Available());
         doTestMultipleServerInstancesUsingTomcatNativeLibrary(false, true);
     }
 
 
     @Test
     public void testMultipleServerInstancesUsingFFM02() throws Exception {
-        Assume.assumeTrue(JreCompat.isJre22Available());
+        Assume.assumeTrue("FFM requires Java 22+", JreCompat.isJre22Available());
         doTestMultipleServerInstancesUsingTomcatNativeLibrary(true, true);
     }
 
