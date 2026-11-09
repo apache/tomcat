@@ -2748,6 +2748,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <fileset dir="${basedir}" defaultexcludes="true">
         <not>
           <or>
+            <filename name="**/.ant-targets-build.xml" />
             <filename name="**/.settings/**" />
             <filename name="**/.classpath"/>
             <filename name="**/.checkstyle"/>
