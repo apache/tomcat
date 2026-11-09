@@ -596,6 +596,10 @@
         connection to be closed as soon as the server started waiting for the
         client. (markt)
       </fix>
+      <fix>
+        Fix unregistering of UpgradeInfo when a connection is closed. Patch
+        suggested by abernal. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
