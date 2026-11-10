@@ -242,8 +242,14 @@ public class ConnectionPool {
      * @param prop PoolProperties - all the properties for this connection pool
      *
      * @throws SQLException Pool initialization error
+     * @throws IllegalArgumentException if {@code prop} is a display-only bean/JMX configuration view instead of the
+     *                                      underlying {@link PoolProperties}
      */
     public ConnectionPool(PoolConfiguration prop) throws SQLException {
+        if (prop instanceof DataSourceProxy || prop instanceof org.apache.tomcat.jdbc.pool.jmx.ConnectionPool) {
+            throw new IllegalArgumentException(
+                    MessageFactory.get("poolProperties.displayConfigurationNotAllowed"));
+        }
         init(prop);
     }
 
