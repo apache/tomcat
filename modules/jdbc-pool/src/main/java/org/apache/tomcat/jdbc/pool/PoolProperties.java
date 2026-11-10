@@ -641,8 +641,11 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
      * field's value even when this string names that key, the rule the
      * credential setters establish. A configuration whose
      * database properties are {@code null} only stores the raw string, as there
-     * is no property collection to parse into. The string is parsed before any
-     * state is touched, so a value the parser rejects - a malformed Unicode
+     * is no property collection to parse into; the connect path still parses
+     * the string when it builds the driver properties, so the null collection
+     * does not make the configured pairs inert. When there is a collection, the
+     * string is parsed into it before any state is touched, so a value the
+     * parser rejects - a malformed Unicode
      * escape - leaves the previous configuration fully in place
      * along with the exception. The remove and re-add run inside
      * this one synchronized method; an unsynchronised reader of the database
