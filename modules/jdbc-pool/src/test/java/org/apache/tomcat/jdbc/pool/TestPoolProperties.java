@@ -46,6 +46,24 @@ class TestPoolProperties {
     private static final String DEFAULT_PASSWD = "password_def";
 
     @Test
+    void toStringSanitisesLineBreaksInStringFields() {
+        PoolProperties properties = new PoolProperties();
+        properties.setName("pool\nforged");
+        properties.setDefaultCatalog("catalog\rforged");
+        properties.setUsername("user\rforged");
+        properties.setDriverClassName("driver\nforged");
+
+        String dump = properties.toString();
+
+        Assertions.assertFalse(dump.contains("\n") || dump.contains("\r"),
+                "the configuration dump must stay one log line, was: " + dump);
+        Assertions.assertTrue(dump.contains("pool forged"),
+                "the sanitised name must stay readable, was: " + dump);
+        Assertions.assertTrue(dump.contains("catalog forged"),
+                "the sanitised catalog must stay readable, was: " + dump);
+    }
+
+    @Test
     void toStringOutputShouldHaveBalancedBrackets() {
         PoolProperties properties = new PoolProperties();
         properties.setUsername(DEFAULT_USER);
@@ -1126,8 +1144,8 @@ class TestPoolProperties {
 
         asString = escaped.toString();
 
-        Assertions.assertTrue(asString.contains("connectionProperties=password=********\ncont16=y"),
-                "the next pair is really separate and must stay readable, was: " + asString);
+        Assertions.assertTrue(asString.contains("connectionProperties=password=******** cont16=y"),
+                "the next pair must stay readable on the sanitised one-line dump, was: " + asString);
     }
 
     @Test

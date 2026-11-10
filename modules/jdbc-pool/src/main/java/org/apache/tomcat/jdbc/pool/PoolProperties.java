@@ -1149,7 +1149,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         try {
             // object_name has no getter of its own: the factory applies it to
             // the pool name, which the dump therefore prints explicitly.
-            buf.append("name=").append(name).append("; ");
+            buf.append("name=").append(sanitizeForLog(name)).append("; ");
             String[] fields = DataSourceFactory.ALL_PROPERTIES;
             for (String field : fields) {
                 final String[] prefix = new String[] { "get", "is" };
@@ -1184,14 +1184,14 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                             // The same dump prints these raw configuration
                             // strings, so a credential typed into one of them
                             // has to be masked too, not just the password field.
-                            buf.append(value == null ? "null" : maskCredentials((String) value));
+                            buf.append(value == null ? "null" : sanitizeForLog(maskCredentials((String) value)));
                         } else if (DataSourceFactory.PROP_INTERCEPTORS.equals(field)) {
                             // Interceptor properties reach a third-party
                             // interceptor through setProperties(), so this
                             // configuration string carries credentials the
                             // same way; its pairs live inside parentheses,
                             // which the segment-start walk above cannot see.
-                            buf.append(value == null ? "null" : maskInterceptorCredentials((String) value));
+                            buf.append(value == null ? "null" : sanitizeForLog(maskInterceptorCredentials((String) value)));
                         } else if (DataSourceFactory.PROP_DATASOURCE.equals(field)) {
                             // A live data source object prints its identity
                             // only: its own toString() may carry the URL, the
@@ -1208,13 +1208,13 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                             // presence of the statement.
                             buf.append(value == null ? "null" : "<sql>");
                         } else {
-                            buf.append(value);
+                            buf.append(value == null ? "null" : sanitizeForLog(String.valueOf(value)));
                         }
                     } catch (ReflectiveOperationException | RuntimeException | Error x) {
                         Throwable cause = ExceptionUtils.unwrapInvocationTargetException(x);
                         ExceptionUtils.handleThrowable(cause);
                         try {
-                            buf.append("<error: ").append(cause).append('>');
+                            buf.append("<error: ").append(sanitizeForLog(String.valueOf(cause))).append('>');
                         } catch (Throwable hostile) {
                             // A Throwable whose own toString() throws must
                             // cost only its own field, not every field after
@@ -1239,6 +1239,23 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             buf.append(']');
         }
         return buf.toString();
+    }
+
+
+    /**
+     * Replaces carriage returns and line feeds with spaces in a value that is
+     * interpolated into the one-line configuration dump, so application-shaped
+     * text cannot forge additional log lines.
+     *
+     * @param value the text, possibly {@code null}
+     *
+     * @return the text with line breaks flattened, or {@code null}
+     */
+    private static String sanitizeForLog(String value) {
+        if (value == null || (value.indexOf('\r') < 0 && value.indexOf('\n') < 0)) {
+            return value;
+        }
+        return value.replace('\r', ' ').replace('\n', ' ');
     }
 
 
