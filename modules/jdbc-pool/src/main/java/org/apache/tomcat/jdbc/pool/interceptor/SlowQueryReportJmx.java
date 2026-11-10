@@ -521,13 +521,13 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
                 ConnectionPool p = currentPool();
                 org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = p == null ? null : p.getJmxPool();
                 if (jmx != null) {
-                    jmx.notify(type, query);
+                    jmx.notify(type, sqlForLog(query));
                 }
             } else {
                 NotificationBroadcasterSupport target = broadcasterToSendTo();
                 if (target != null) {
                     Notification notification = new Notification(type, getNotificationSource(), sequence,
-                            System.currentTimeMillis(), query);
+                            System.currentTimeMillis(), sqlForLog(query));
 
                     target.sendNotification(notification);
                 }
@@ -1026,9 +1026,35 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
         if (override != null && override.getValue() != null) {
             oname = new ObjectName(override.getValue());
         } else {
-            oname = new ObjectName(ConnectionPool.POOL_JMX_TYPE_PREFIX + clazz.getName() + ",name=" + poolName);
+            oname = new ObjectName(ConnectionPool.POOL_JMX_TYPE_PREFIX + clazz.getName() + ",name=" +
+                    objectNameValue(poolName));
         }
         return oname;
+    }
+
+    /**
+     * Renders a pool name as an ObjectName property value, quoting it only when the unquoted grammar cannot carry it.
+     * A name containing a comma, equals sign, colon, quote or another character the grammar reserves would otherwise
+     * alter the ObjectName instead of naming the pool, or fail registration.
+     *
+     * @param poolName the pool name
+     *
+     * @return the property value, quoted when needed
+     */
+    private static String objectNameValue(String poolName) {
+        if (poolName == null) {
+            return "null";
+        }
+        try {
+            ObjectName probe = new ObjectName(ConnectionPool.POOL_JMX_TYPE_PREFIX +
+                    SlowQueryReportJmx.class.getName() + ",name=" + poolName);
+            if (poolName.equals(probe.getKeyProperty("name")) && probe.getKeyPropertyList().size() == 2) {
+                return poolName;
+            }
+        } catch (MalformedObjectNameException x) {
+            // The grammar cannot carry the name unquoted; quote it below.
+        }
+        return ObjectName.quote(poolName);
     }
 
     /**

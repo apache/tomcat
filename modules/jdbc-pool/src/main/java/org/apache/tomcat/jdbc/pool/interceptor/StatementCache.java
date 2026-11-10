@@ -41,6 +41,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
+import org.apache.tomcat.jdbc.pool.PoolUtilities;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
 import org.apache.tomcat.jdbc.pool.util.ExceptionUtils;
@@ -165,14 +166,17 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
         super.setProperties(properties);
         InterceptorProperty p = properties.get("prepared");
         if (p != null) {
+            warnInvalidBoolean("prepared", p, cachePrepared);
             cachePrepared = p.getValueAsBoolean(cachePrepared);
         }
         p = properties.get("callable");
         if (p != null) {
+            warnInvalidBoolean("callable", p, cacheCallable);
             cacheCallable = p.getValueAsBoolean(cacheCallable);
         }
         p = properties.get("max");
         if (p != null) {
+            warnInvalidInteger("max", p, maxCacheSize);
             maxCacheSize = p.getValueAsInt(maxCacheSize);
         }
         if (cachePrepared && cacheCallable) {
@@ -185,6 +189,42 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
             this.types = NO_TYPE;
         }
 
+    }
+
+    /**
+     * Warns when a boolean property was supplied with a value the property parser does not recognise. The parser keeps
+     * the current value silently, which hides a configuration typo.
+     *
+     * @param name  the property name
+     * @param property the supplied property
+     * @param current the value that will be kept
+     */
+    private void warnInvalidBoolean(String name, InterceptorProperty property, boolean current) {
+        String value = property.getValue();
+        if (value != null && !"true".equals(value) && !"false".equals(value)) {
+            log.warn(MessageFactory.get("interceptor.invalidBooleanProperty", name, value,
+                    Boolean.valueOf(current)));
+        }
+    }
+
+    /**
+     * Warns when an integer property was supplied with a value the property parser cannot read. The parser keeps the
+     * current value silently, which hides a configuration typo.
+     *
+     * @param name  the property name
+     * @param property the supplied property
+     * @param current the value that will be kept
+     */
+    private void warnInvalidInteger(String name, InterceptorProperty property, int current) {
+        String value = property.getValue();
+        if (value != null) {
+            try {
+                Integer.parseInt(value);
+            } catch (NumberFormatException x) {
+                log.warn(MessageFactory.get("interceptor.invalidIntegerProperty", name, value,
+                        Integer.valueOf(current)));
+            }
+        }
     }
 
     private static final Map<ConnectionPool, AtomicInteger> cacheSizeMap =
@@ -854,7 +894,8 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
                     ExceptionUtils.handleThrowable(x);
                     removeStatement(proxy);
                     if (log.isDebugEnabled()) {
-                        log.debug("Unable to recycle statement: " + sqlForLog(getSql()), x);
+                        log.debug("Unable to recycle statement: " + sqlForLog(getSql()),
+                                PoolUtilities.maskCredentials(x));
                     }
                 }
             }
@@ -916,7 +957,8 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
                 // A non-fatal Error from the driver's close is a failed close
                 // here, not a reason to abort the remainder of the purge.
                 ExceptionUtils.handleThrowable(x);
-                log.warn(MessageFactory.get("statementCache.unableToCloseDiscardedStatement", sqlForLog(getSql())), x);
+                log.warn(MessageFactory.get("statementCache.unableToCloseDiscardedStatement", sqlForLog(getSql())),
+                        PoolUtilities.maskCredentials(x));
             }
         }
 
