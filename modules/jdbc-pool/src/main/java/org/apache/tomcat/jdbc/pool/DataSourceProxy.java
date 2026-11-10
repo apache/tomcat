@@ -84,6 +84,11 @@ public class DataSourceProxy implements PoolConfiguration {
         if (poolProperties == null) {
             throw new NullPointerException(MessageFactory.get("dataSourceProxy.poolConfigurationNull"));
         }
+        if (poolProperties instanceof DataSourceProxy
+                || poolProperties instanceof org.apache.tomcat.jdbc.pool.jmx.ConnectionPool) {
+            throw new IllegalArgumentException(
+                    MessageFactory.get("poolProperties.displayConfigurationNotAllowed"));
+        }
         this.poolProperties = poolProperties;
     }
 
@@ -507,16 +512,24 @@ public class DataSourceProxy implements PoolConfiguration {
      * borrow, return, validation, cleaner and configuration surfaces all operate on the configuration the pool was
      * built from; replacing the data source's configuration at that point would leave the data source and its setters
      * writing a second configuration object that the live pool does not use. The setter is therefore rejected after
-     * the pool has started and after the data source has closed, like the other start-time properties.
+     * the pool has started and after the data source has closed, like the other start-time properties. A display-only
+     * bean/JMX view, such as another data source proxy, is not a usable backing configuration and is rejected as well;
+     * pass the underlying {@link PoolProperties} instead.
      *
      * @param poolProperties The new pool configuration
      *
      * @throws NullPointerException if the configuration is null
+     * @throws IllegalArgumentException if the configuration is a display-only bean/JMX view
      * @throws UnsupportedOperationException if the pool has already been created or this data source has been closed
      */
     public synchronized void setPoolProperties(PoolConfiguration poolProperties) {
         if (poolProperties == null) {
             throw new NullPointerException(MessageFactory.get("dataSourceProxy.poolConfigurationNull"));
+        }
+        if (poolProperties instanceof DataSourceProxy
+                || poolProperties instanceof org.apache.tomcat.jdbc.pool.jmx.ConnectionPool) {
+            throw new IllegalArgumentException(
+                    MessageFactory.get("poolProperties.displayConfigurationNotAllowed"));
         }
         checkPoolNotStarted("poolProperties");
         this.poolProperties = poolProperties;
