@@ -1003,7 +1003,10 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
      * none is configured, and the {@code url}, {@code connectionProperties}
      * and {@code jdbcInterceptors} strings pass through credential masking,
      * and a configured live {@code dataSource} object is printed as its class
-     * and identity rather than through its own {@code toString()}, so the dump
+     * and identity rather than through its own {@code toString()}, and the
+     * {@code initSQL} and {@code validationQuery} statements print as
+     * {@code <sql>} rather than as text SQL syntax can shape around a
+     * credential, so the dump
      * can be logged without carrying a cleartext credential. The
      * masking is best effort in the way {@link #maskCredentials(String)} and
      * {@link #maskInterceptorCredentials(String)} describe, so it removes the
@@ -1072,6 +1075,13 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                             buf.append(value == null ? "null"
                                     : value.getClass().getName() + "@" +
                                             Integer.toHexString(System.identityHashCode(value)));
+                        } else if (DataSourceFactory.PROP_INITSQL.equals(field)
+                                || DataSourceFactory.PROP_VALIDATIONQUERY.equals(field)) {
+                            // SQL statement text is application-shaped and can
+                            // embed a credential in syntax the credential
+                            // masker does not know. The dump reports only the
+                            // presence of the statement.
+                            buf.append(value == null ? "null" : "<sql>");
                         } else {
                             buf.append(value);
                         }

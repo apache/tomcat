@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.jdbc.pool;
 
+import java.sql.SQLException;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -154,7 +155,15 @@ public class PoolUtilities {
             return previous;
         }
         String message = PoolProperties.maskCredentials(value.getMessage());
-        MaskedThrowable copy = new MaskedThrowable(value.getClass().getName(), message);
+        Throwable copy;
+        if (value instanceof SQLException) {
+            SQLException sql = (SQLException) value;
+            copy = new SQLException(message, sql.getSQLState(), sql.getErrorCode());
+        } else if (value instanceof UnsupportedOperationException) {
+            copy = new UnsupportedOperationException(message);
+        } else {
+            copy = new MaskedThrowable(value.getClass().getName(), message);
+        }
         masked.put(value, copy);
         copy.setStackTrace(value.getStackTrace());
         for (Throwable suppressed : value.getSuppressed()) {

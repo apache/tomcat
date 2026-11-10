@@ -268,15 +268,15 @@ public class SlowQueryReport extends AbstractQueryReport {
      * otherwise split the report into additional lines the pool's logger identity carries - forged log entries
      * shaped by the SQL text itself. They are replaced by spaces, which keeps the statement readable in the one
      * line the report owns. The length is not bounded here: surfacing the slow statement in full is what this
-     * interceptor is configured for, and the JMX representation of the same statistics - an opt-in channel the
-     * operator reads, not a sequential log to forge - keeps the text exactly as executed.
+     * interceptor is configured for. The JMX notification for the same event sanitises it the same way, because a
+     * listener may log the text it receives; the statistics store keeps the statement as executed.
      * </p>
      *
      * @param sql the SQL text to report, possibly {@code null}
      *
      * @return the text as safe to interpolate into a log message
      */
-    private static String sqlForLog(String sql) {
+    protected static String sqlForLog(String sql) {
         if (sql == null) {
             return "null";
         }

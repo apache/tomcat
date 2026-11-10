@@ -28,6 +28,7 @@ import java.sql.Statement;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.jdbc.pool.PoolUtilities;
 import org.apache.tomcat.jdbc.pool.util.ExceptionUtils;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
@@ -217,7 +218,8 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
             result = constructor.newInstance(new Object[] { new StatementProxy(statement, sql) });
             return result;
         } catch (Exception x) {
-            log.warn(MessageFactory.get("abstractQueryReport.unableToCreateStatementProxy"), x);
+            log.warn(MessageFactory.get("abstractQueryReport.unableToCreateStatementProxy"),
+                    PoolUtilities.maskCredentials(x));
         }
         return statement;
     }
@@ -342,7 +344,8 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
                         // the driver's exception is the one being thrown
                         if (log.isWarnEnabled()) {
                             log.warn(MessageFactory.get("abstractQueryReport.unableToProcessFailedQuery",
-                                    AbstractQueryReport.this.getClass().getName()), reporting);
+                                    AbstractQueryReport.this.getClass().getName()),
+                                    PoolUtilities.maskCredentials(reporting));
                         }
                     }
                 }
@@ -370,7 +373,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
                     ExceptionUtils.handleThrowable(t);
                     if (log.isWarnEnabled()) {
                         log.warn(MessageFactory.get("abstractQueryReport.unableToProcessSlowQuery",
-                                AbstractQueryReport.this.getClass().getName()), t);
+                                AbstractQueryReport.this.getClass().getName()), PoolUtilities.maskCredentials(t));
                     }
                 }
             } else if (process) {
@@ -381,7 +384,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
                     // Reporting must never disturb the application
                     if (log.isWarnEnabled()) {
                         log.warn(MessageFactory.get("abstractQueryReport.unableToProcessQueryReport",
-                                AbstractQueryReport.this.getClass().getName()), t);
+                                AbstractQueryReport.this.getClass().getName()), PoolUtilities.maskCredentials(t));
                     }
                 }
             }

@@ -318,6 +318,42 @@ class TestJmxRegistration extends JdbcPoolBaseTest {
     }
 
     @Test
+    void aDirectlyRegisteredPoolMBeanReleasesItsChildrenWhenDeregistered() throws Exception {
+        MBeanServer server = server();
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setJmxEnabled(true);
+        ds.getPoolProperties().setInitialSize(0);
+        ds.createPool();
+        ConnectionPool jmx = ds.getPool().getJmxPool();
+        ObjectName direct = new ObjectName("tomcat.jdbc:type=DirectPool,role=direct-deregister,uid=" +
+                System.nanoTime());
+        try {
+            server.registerMBean(jmx, direct);
+            ObjectName connectionName;
+            try (Connection borrowed = ds.getConnection()) {
+                connectionName = connectionMBeanUnder(server, direct);
+                Assertions.assertNotNull(connectionName,
+                        "precondition: the directly published pool has its connection MBean below it");
+            }
+            Assertions.assertTrue(server.isRegistered(connectionName),
+                    "precondition: the connection MBean stays published while the connection is idle");
+
+            server.unregisterMBean(direct);
+
+            Assertions.assertFalse(server.isRegistered(direct), "the direct deregistration must remove the pool MBean");
+            Assertions.assertFalse(server.isRegistered(connectionName),
+                    "a direct deregistration must not leave the connection MBean behind");
+        } finally {
+            ds.close();
+            try {
+                server.unregisterMBean(direct);
+            } catch (Exception x) {
+                // already gone
+            }
+        }
+    }
+
+    @Test
     void releasingThePoolMBeanReleasesTheConnectionAndInterceptorMBeans() throws Exception {
         MBeanServer server = server();
         DataSource ds = newDataSource();

@@ -247,7 +247,7 @@ public class PooledConnection implements PooledConnectionMBean {
         if (released.get()) {
             throw new SQLException(MessageFactory.get("pooledConnection.cannotReestablish"));
         }
-        if (connection != null) {
+        if (connection != null || xaConnection != null || cpdsConnection != null) {
             try {
                 this.disconnect(false);
             } catch (Throwable x) {
@@ -740,10 +740,10 @@ public class PooledConnection implements PooledConnectionMBean {
             throw ex;
         }
 
-        if (served == null) {
-            // There was no session to replace: this is a plain connect of a
-            // connection that had none, and the new session is already in
-            // place.
+        if (served == null && servedXa == null && servedCpds == null) {
+            // There was no session or handle to replace: this is a plain
+            // connect of a connection that had none, and the new session is
+            // already in place.
             return;
         }
 
@@ -1653,8 +1653,14 @@ public class PooledConnection implements PooledConnectionMBean {
 
     /**
      * Returns the attributes map for this connection.
+     * <p>
+     * This is the live internal map, not a copy: the pool and the interceptor chain read and write it while the
+     * session runs. It also holds the plaintext credential entries the connect path mirrors there, so it is intended
+     * for internal and trusted interceptor code; application code that obtains a {@link PooledConnection} through the
+     * delegate or reflection must not treat this as a public, credential-free view. The wrapper contract refuses the
+     * internal pooled connection; this accessor is the one internal surface that still exposes it.
      *
-     * @return the attributes map
+     * @return the live attributes map for this connection
      */
     public HashMap<Object, Object> getAttributes() {
         return attributes;
