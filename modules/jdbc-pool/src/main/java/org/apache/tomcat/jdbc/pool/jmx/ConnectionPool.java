@@ -15,6 +15,7 @@
  */
 package org.apache.tomcat.jdbc.pool.jmx;
 
+import java.lang.ref.WeakReference;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -314,20 +315,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
             // listeners, it means nothing was queued at all. The order the
             // two halves of the delivery run in is the one the javadoc above
             // promises.
-            NOTIFIER.execute(() -> {
-                try {
-                    sendNotification(n);
-                } catch (Exception x) {
-                    // sendNotification contains what a listener or a filter
-                    // throws, job per job; this catch is a defence against a
-                    // failure escaping it, which must not skip the local
-                    // listeners of this notification
-                    if (log.isDebugEnabled()) {
-                        log.debug("JMX notification hand-off failed. Type=" + type, PoolUtilities.maskCredentials(x));
-                    }
-                }
-                deliverLocally(n, type);
-            });
+            NOTIFIER.execute(new NotificationDelivery(n, type, new WeakReference<>(this)));
             return true;
         } catch (RejectedExecutionException x) {
             // The delivery queue is full; dropping the notification is the
@@ -346,24 +334,47 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     }
 
     /**
-     * Hands a notification to the listeners registered with this MBean outside JMX. Runs on the notifier thread. Each
-     * listener is handed the notification on its own and what one of them throws is contained at that one listener: it
-     * may not kill the notifier thread that every pool in the JVM delivers its notifications on, and it may not
-     * suppress the delivery of that notification to the listeners registered behind the thrower either. An
-     * {@link Error} is not contained - as it is not on the JMX half of the delivery, where the JDK broadcaster catches
-     * only what a listener throws - and takes the notifier thread down; the pool replaces the worker as soon as the
-     * executor notices it is gone, so the next notification is delivered by a live worker.
-     *
-     * @param n    the notification to deliver
-     * @param type the notification type, for the failure log
+     * A delivery task handed to the shared notifier. It holds the MBean only through a weak reference, so a
+     * notification queued for a pool MBean that has been released or abandoned does not keep the pool, its sessions or
+     * its driver class loader reachable from the executor queue. The notification and the local listeners are read from
+     * the MBean when the task actually runs; if the MBean has been collected by then, neither it nor its listeners
+     * remain and there is nothing to deliver.
      */
-    private void deliverLocally(Notification n, String type) {
-        for (NotificationListener listener : listeners) {
+    private static final class NotificationDelivery implements Runnable {
+        private final Notification notification;
+        private final String type;
+        private final WeakReference<ConnectionPool> owner;
+
+        NotificationDelivery(Notification notification, String type, WeakReference<ConnectionPool> owner) {
+            this.notification = notification;
+            this.type = type;
+            this.owner = owner;
+        }
+
+        @Override
+        public void run() {
+            ConnectionPool mbean = owner.get();
+            if (mbean == null) {
+                return;
+            }
             try {
-                listener.handleNotification(n, this);
+                mbean.sendNotification(notification);
             } catch (Exception x) {
+                // sendNotification contains what a listener or a filter
+                // throws, job per job; this catch is a defence against a
+                // failure escaping it, which must not skip the local
+                // listeners of this notification.
                 if (log.isDebugEnabled()) {
-                    log.debug("Local notification listener failed. Type=" + type, PoolUtilities.maskCredentials(x));
+                    log.debug("JMX notification hand-off failed. Type=" + type, PoolUtilities.maskCredentials(x));
+                }
+            }
+            for (NotificationListener listener : mbean.listeners) {
+                try {
+                    listener.handleNotification(notification, mbean);
+                } catch (Exception x) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Local notification listener failed. Type=" + type, PoolUtilities.maskCredentials(x));
+                    }
                 }
             }
         }
