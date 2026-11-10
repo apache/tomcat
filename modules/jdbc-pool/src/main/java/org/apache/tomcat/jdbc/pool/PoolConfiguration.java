@@ -487,7 +487,8 @@ public interface PoolConfiguration {
     /**
      * Sets the username used to establish the connection with It will also be a property called 'user' in the database
      * properties. A {@code null} user name removes that entry instead, as {@link #setPassword(String)} does its
-     * password, and for the same reason.
+     * password, and for the same reason; the removal covers a differently cased spelling of the key as well, so a
+     * {@code USER} entry cannot keep authenticating connections either.
      *
      * @param username The user name
      *
