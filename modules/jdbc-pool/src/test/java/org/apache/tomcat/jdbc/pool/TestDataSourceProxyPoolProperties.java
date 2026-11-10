@@ -73,6 +73,41 @@ class TestDataSourceProxyPoolProperties extends JdbcPoolBaseTest {
     }
 
     @Test
+    void replacingTheConfigurationWithADisplayOnlyViewIsRejected() {
+        DataSourceProxy display = new DataSourceProxy();
+
+        IllegalArgumentException constructorFailure = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> new DataSourceProxy(display));
+        IllegalArgumentException setterFailure = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> new DataSourceProxy().setPoolProperties(display));
+        IllegalArgumentException poolFailure = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> new ConnectionPool(display));
+
+        Assertions.assertTrue(constructorFailure.getMessage().contains("display-only"));
+        Assertions.assertTrue(setterFailure.getMessage().contains("display-only"));
+        Assertions.assertTrue(poolFailure.getMessage().contains("display-only"));
+    }
+
+    @Test
+    void replacingTheConfigurationWithAJmxWrapperIsRejected() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setJmxEnabled(true);
+        ds.createPool();
+        org.apache.tomcat.jdbc.pool.jmx.ConnectionPool wrapper = ds.getPool().getJmxPool();
+
+        IllegalArgumentException constructorFailure = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> new DataSourceProxy(wrapper));
+        IllegalArgumentException setterFailure = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> new DataSourceProxy().setPoolProperties(wrapper));
+        IllegalArgumentException poolFailure = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> new ConnectionPool(wrapper));
+
+        Assertions.assertTrue(constructorFailure.getMessage().contains("display-only"));
+        Assertions.assertTrue(setterFailure.getMessage().contains("display-only"));
+        Assertions.assertTrue(poolFailure.getMessage().contains("display-only"));
+    }
+
+    @Test
     void replacingTheConfigurationBeforePoolStartIsAccepted() {
         DataSource ds = new DataSource();
         PoolProperties properties = replacementProperties();
