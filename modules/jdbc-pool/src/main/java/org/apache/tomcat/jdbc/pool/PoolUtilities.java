@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.jdbc.pool;
 
+import java.util.IdentityHashMap;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -131,5 +133,65 @@ public class PoolUtilities {
             }
         }
         return result;
+    }
+
+    /**
+     * Returns a copy of a throwable whose message - and the messages of its suppressed throwables and causes - carry
+     * no configured credentials. The stack frames are preserved. A diagnostic that has to include a driver or wrapper
+     * failure without trusting the text that failure carries uses this copy for its log record.
+     *
+     * @param value the throwable to copy, possibly {@code null}
+     *
+     * @return the masked copy, or {@code null} when the input is {@code null}
+     */
+    public static Throwable maskCredentials(Throwable value) {
+        return value == null ? null : mask(value, new IdentityHashMap<>());
+    }
+
+    private static Throwable mask(Throwable value, Map<Throwable, Throwable> masked) {
+        Throwable previous = masked.get(value);
+        if (previous != null) {
+            return previous;
+        }
+        String message = PoolProperties.maskCredentials(value.getMessage());
+        MaskedThrowable copy = new MaskedThrowable(value.getClass().getName(), message);
+        masked.put(value, copy);
+        copy.setStackTrace(value.getStackTrace());
+        for (Throwable suppressed : value.getSuppressed()) {
+            Throwable maskedSuppressed = mask(suppressed, masked);
+            if (maskedSuppressed != copy) {
+                copy.addSuppressed(maskedSuppressed);
+            }
+        }
+        Throwable cause = value.getCause();
+        if (cause != null) {
+            Throwable maskedCause = mask(cause, masked);
+            if (maskedCause != copy) {
+                copy.initCause(maskedCause);
+            }
+        }
+        return copy;
+    }
+
+    /**
+     * The throwable {@link #maskCredentials(Throwable)} logs in place of the original: it keeps the original class name
+     * in its message and its stack frames, but not the original message text.
+     */
+    private static final class MaskedThrowable extends Throwable {
+
+        private static final long serialVersionUID = 1L;
+
+        private final String originalClass;
+
+        MaskedThrowable(String originalClass, String message) {
+            super(message);
+            this.originalClass = originalClass;
+        }
+
+        @Override
+        public String toString() {
+            String message = getMessage();
+            return originalClass + (message == null || message.isEmpty() ? "" : ": " + message);
+        }
     }
 }
