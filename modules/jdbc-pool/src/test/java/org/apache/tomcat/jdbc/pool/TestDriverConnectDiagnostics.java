@@ -227,6 +227,15 @@ class TestDriverConnectDiagnostics extends JdbcPoolBaseTest {
         }
     }
 
+    public static class SecretToStringNullReturningDriver extends NullReturningDriver {
+        static final String SECRET = "S3cret-In-The-Driver-ToString";
+
+        @Override
+        public String toString() {
+            return "NullReturningDriver[" + SECRET + "]";
+        }
+    }
+
     public static class FailingDriver implements java.sql.Driver {
         @Override
         public Connection connect(String url, java.util.Properties info) throws SQLException {
@@ -305,6 +314,23 @@ class TestDriverConnectDiagnostics extends JdbcPoolBaseTest {
                 "the URL must stay diagnosable with only its credential masked, was: " + message);
         Assertions.assertFalse(message.contains(secret),
                 "the declined-URL failure must not carry the credential, was: " + message);
+    }
+
+    @Test
+    void aThirdPartyDriverToStringIsNotUsedInTheReturnedNullFailure() throws Exception {
+        PoolProperties properties = new PoolProperties();
+        properties.setUrl("jdbc:declined:thin:@dbhost:1521:sid");
+        properties.setDriverClassName(SecretToStringNullReturningDriver.class.getName());
+        properties.setJmxEnabled(false);
+        properties.setInitialSize(0);
+        properties.setTimeBetweenEvictionRunsMillis(-1);
+        PooledConnection con = new PooledConnection(properties, new ConnectionPool(properties));
+
+        SQLException thrown = Assertions.assertThrows(SQLException.class, con::connect);
+        Assertions.assertFalse(thrown.getMessage().contains(SecretToStringNullReturningDriver.SECRET),
+                "the failure must not use the third-party driver's toString(), was: " + thrown.getMessage());
+        Assertions.assertTrue(thrown.getMessage().contains(SecretToStringNullReturningDriver.class.getName()),
+                "the failure must still identify the driver class, was: " + thrown.getMessage());
     }
 
     /**
