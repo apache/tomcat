@@ -1333,10 +1333,12 @@ public class ConnectionPool {
      * thread safe way to release a connection
      *
      * @param con PooledConnection
+     *
+     * @return {@code true} if this call took the connection out of service, {@code false} if it was already released
      */
-    protected void release(PooledConnection con) {
+    protected boolean release(PooledConnection con) {
         if (con == null) {
-            return;
+            return false;
         }
         boolean destroyed;
         try {
@@ -1425,6 +1427,7 @@ public class ConnectionPool {
                 createdCount.incrementAndGet();
             }
         }
+        return destroyed;
     }
 
     /**
@@ -2361,8 +2364,9 @@ public class ConnectionPool {
                         if (!idle.remove(con)) {
                             continue;
                         }
-                        releasedIdleCount.incrementAndGet();
-                        release(con);
+                        if (release(con)) {
+                            releasedIdleCount.incrementAndGet();
+                        }
                         setToNull = true;
                     } else {
                         // Do nothing
@@ -2474,7 +2478,9 @@ public class ConnectionPool {
                         // and to the close() drain alike. Take it out of
                         // service instead, as a failed check already does.
                         con.setDiscarded(true);
-                        release(con);
+                        if (release(con)) {
+                            releasedIdleCount.incrementAndGet();
+                        }
                         log.warn(MessageFactory.get("connectionPool.unableToTestIdleConnection", con), x);
                         continue;
                     }
@@ -2488,7 +2494,9 @@ public class ConnectionPool {
                             // path does - an offer would land it in a dead
                             // queue that nothing drains any more, stranding
                             // the session out of every counter
-                            release(con);
+                            if (release(con)) {
+                                releasedIdleCount.incrementAndGet();
+                            }
                         } else if (((idle.size() >= poolProperties.getMaxIdle()) &&
                                 !poolProperties.isPoolSweeperEnabled()) || (!idle.offer(con))) {
                             if (log.isDebugEnabled()) {
@@ -2496,7 +2504,9 @@ public class ConnectionPool {
                                         "not returned to the pool, idle[" + idle.size() + "]>=maxIdle[" +
                                         poolProperties.getMaxIdle() + "] idle.offer failed.");
                             }
-                            release(con);
+                            if (release(con)) {
+                                releasedIdleCount.incrementAndGet();
+                            }
                         } else if (isClosed() && idle.remove(con)) {
                             // The closed check above and this offer are not
                             // one atomic step: a close arriving in between
@@ -2508,11 +2518,14 @@ public class ConnectionPool {
                                 log.debug("Connection [" + con +
                                         "] was offered back after the close drained the queue and is closed now.");
                             }
-                            release(con);
+                            if (release(con)) {
+                                releasedIdleCount.incrementAndGet();
+                            }
                         }
                     } else {
-                        releasedIdleCount.incrementAndGet();
-                        release(con);
+                        if (release(con)) {
+                            releasedIdleCount.incrementAndGet();
+                        }
                     }
                 } finally {
                     con.unlock();
