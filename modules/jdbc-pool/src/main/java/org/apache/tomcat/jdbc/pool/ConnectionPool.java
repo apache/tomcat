@@ -2123,6 +2123,14 @@ public class ConnectionPool {
      *                        permanently ahead of the borrowed one
      */
     private void returnConnection(PooledConnection con, boolean countReturn) {
+        if (con != null && countReturn) {
+            // A borrower's hand-back is the counterpart of its borrow. Count
+            // it before the closed check below: a connection returned after
+            // the pool closed is released rather than queued, but it was
+            // still handed back by its borrower and must pair with the borrow
+            // counted when it was served.
+            returnedCount.incrementAndGet();
+        }
         if (isClosed()) {
             // If the connection pool is closed
             // close the connection instead of returning it
@@ -2132,13 +2140,6 @@ public class ConnectionPool {
 
         if (con != null) {
             try {
-                if (countReturn) {
-                    // A borrower's hand-back is the counterpart of its borrow;
-                    // the pool's preload returns connections it never handed
-                    // out, and counting those would run the returned count
-                    // permanently ahead of the borrowed one
-                    returnedCount.incrementAndGet();
-                }
                 con.lock();
                 if (con.isSuspect()) {
                     if (poolProperties.isLogAbandoned() && log.isInfoEnabled()) {
