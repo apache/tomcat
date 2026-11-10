@@ -374,6 +374,59 @@ class TestPoolProperties {
     }
 
     @Test
+    void clearingThePasswordRemovesNonStringCredentialEntries() {
+        PoolProperties properties = new PoolProperties();
+        properties.getDbProperties().put("password", new Object());
+        properties.getDbProperties().put("PWD", new char[] { 'x' });
+
+        properties.setPassword(null);
+
+        Assertions.assertFalse(properties.getDbProperties().containsKey("password"),
+                "a password entry whose direct value is not a String must be removed");
+        Assertions.assertFalse(properties.getDbProperties().containsKey("PWD"),
+                "all password aliases must be removed whatever their value type");
+    }
+
+    @Test
+    void clearingTheUsernameRemovesCaseVariantEntries() {
+        PoolProperties properties = new PoolProperties();
+        properties.getDbProperties().setProperty("USER", "fromstring");
+        properties.setUsername("fromfield");
+
+        properties.setUsername(null);
+
+        Assertions.assertNull(properties.getDbProperties().getProperty("USER"),
+                "a USER spelling must not keep authenticating connections after the username is cleared");
+        Assertions.assertNull(properties.getDbProperties().getProperty("user"),
+                "the lower-case user entry must also be removed");
+    }
+
+    @Test
+    void clearingTheUsernameStripsAUSERPairTheStringContributes() {
+        PoolProperties properties = new PoolProperties();
+        properties.setConnectionProperties("USER=fromstring");
+
+        properties.setUsername(null);
+
+        Assertions.assertFalse(properties.getDbProperties().containsKey("USER"),
+                "clearing the username must remove a differently cased pair from connectionProperties");
+    }
+
+    @Test
+    void clearingThePasswordStripsAnUncoveredDefaultsEntry() {
+        Properties defaults = new Properties();
+        defaults.setProperty("pwd", "fromdefaults");
+        Properties dbProperties = new Properties(defaults);
+        PoolProperties properties = new PoolProperties();
+        properties.setDbProperties(dbProperties);
+
+        properties.setPassword(null);
+
+        Assertions.assertNull(properties.getDbProperties().getProperty("pwd"),
+                "a credential resolved only through the defaults table must also be removed");
+    }
+
+    @Test
     void clearingTheFieldAlsoStripsTheEntryTheStringContributes() {
         PoolProperties properties = new PoolProperties();
         properties.setConnectionProperties("password=fromstring");

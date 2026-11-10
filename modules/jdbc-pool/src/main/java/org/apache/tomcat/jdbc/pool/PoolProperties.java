@@ -777,12 +777,56 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         if (props == null) {
             return;
         }
-        for (String key : props.stringPropertyNames()) {
+        // The keys have to be collected from the direct entries as well as the
+        // resolved String names: stringPropertyNames() omits a key whose direct
+        // value is not a String, and such an entry must still be removed.
+        for (String key : allPropertyKeys(props)) {
             if (PoolUtilities.isCredentialKey(key)) {
                 removeDbProperty(key);
                 warnStringStillNamesCredential(key);
             }
         }
+    }
+
+
+    /**
+     * Removes every database property whose key names the user, ignoring case
+     * and surrounding whitespace, so clearing the username also stops a value
+     * configured as {@code USER} from still authenticating connections.
+     */
+    private void removeUsernameDbProperties() {
+        Properties props = this.dbProperties;
+        if (props == null) {
+            return;
+        }
+        for (String key : allPropertyKeys(props)) {
+            if (PoolUtilities.PROP_USER.equalsIgnoreCase(key.trim())) {
+                removeDbProperty(key);
+                warnStringStillNamesCredential(key);
+            }
+        }
+    }
+
+
+    /**
+     * Returns a snapshot of every String key a properties collection currently
+     * resolves, including the keys whose only value is not a String. The
+     * removal loops use the snapshot because removing an uncovered defaults
+     * value can publish a replacement collection.
+     *
+     * @param props the properties to inspect
+     *
+     * @return the snapshot of String keys
+     */
+    private static Set<String> allPropertyKeys(Properties props) {
+        Set<String> keys = new HashSet<>();
+        for (Object key : props.keySet().toArray()) {
+            if (key instanceof String) {
+                keys.add((String) key);
+            }
+        }
+        keys.addAll(props.stringPropertyNames());
+        return keys;
     }
 
 
@@ -831,7 +875,8 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     /**
      * Stores the user name and keeps the {@code user} entry of the database properties in step with it, for the
      * reason given on {@link #setPassword(String)}. A {@code null} user name likewise removes the entry whatever
-     * contributed it, including a pair the {@code connectionProperties} string names.
+     * contributed it, including a pair the {@code connectionProperties} string names; the key is matched ignoring
+     * case and surrounding whitespace, so a {@code USER} spelling cannot keep authenticating connections either.
      *
      * @param username The user name
      */
@@ -840,8 +885,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         this.username = username;
         if (this.dbProperties != null) {
             if (username == null) {
-                removeDbProperty(PoolUtilities.PROP_USER);
-                warnStringStillNamesCredential(PoolUtilities.PROP_USER);
+                removeUsernameDbProperties();
             } else {
                 this.dbProperties.setProperty(PoolUtilities.PROP_USER, username);
             }
