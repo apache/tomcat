@@ -256,7 +256,7 @@ public class PooledConnection implements PooledConnectionMBean {
                 // connection attempt.
                 ExceptionUtils.handleThrowable(x);
                 if (log.isDebugEnabled()) {
-                    log.debug("Unable to disconnect previous connection.", x);
+                    log.debug("Unable to disconnect previous connection.", PoolUtilities.maskCredentials(x));
                 }
             }
         }
@@ -369,7 +369,7 @@ public class PooledConnection implements PooledConnectionMBean {
                 // Contract-violating provider: a handle without a logical
                 // connection is of no use either.
                 failure = new SQLException(
-                        MessageFactory.get("pooledConnection.xaDataSourceNullConnection", xds));
+                        MessageFactory.get("pooledConnection.xaDataSourceNullConnection", dataSourceIdentity(xds)));
             }
             if (failure != null) {
                 // Do not strand the handle if the logical connection
@@ -410,7 +410,8 @@ public class PooledConnection implements PooledConnectionMBean {
                 // when no connection can be provided; keeping that null would
                 // surface later as a misleading validation failure, or as a
                 // null pointer when the default connection state is applied.
-                throw new SQLException(MessageFactory.get("pooledConnection.dataSourceNullConnection", ds));
+                throw new SQLException(MessageFactory.get("pooledConnection.dataSourceNullConnection",
+                        dataSourceIdentity(ds)));
             }
         } else if (poolProperties.getDataSource() instanceof javax.sql.ConnectionPoolDataSource) {
             javax.sql.ConnectionPoolDataSource ds = (javax.sql.ConnectionPoolDataSource) poolProperties.getDataSource();
@@ -431,7 +432,8 @@ public class PooledConnection implements PooledConnectionMBean {
                 // Contract-violating provider: a handle without a logical
                 // connection is of no use either.
                 failure = new SQLException(
-                        MessageFactory.get("pooledConnection.connectionPoolDataSourceNullConnection", ds));
+                        MessageFactory.get("pooledConnection.connectionPoolDataSourceNullConnection",
+                                dataSourceIdentity(ds)));
             }
             if (failure != null) {
                 // Do not strand the handle if the logical connection
@@ -456,6 +458,19 @@ public class PooledConnection implements PooledConnectionMBean {
             throw new SQLException(MessageFactory.get("pooledConnection.unknownDataSource",
                     (poolProperties.getDataSource() != null ? poolProperties.getDataSource().getClass() : "null")));
         }
+    }
+
+    /**
+     * The diagnostic identity of a third-party data source: its class and identity hash, never its {@code toString()},
+     * which may carry the configured URL or credentials.
+     *
+     * @param dataSource the data source, possibly {@code null}
+     *
+     * @return the identity text
+     */
+    private static String dataSourceIdentity(Object dataSource) {
+        return dataSource == null ? "null" : dataSource.getClass().getName() + "@" +
+                Integer.toHexString(System.identityHashCode(dataSource));
     }
 
     /**
@@ -498,7 +513,7 @@ public class PooledConnection implements PooledConnectionMBean {
             }
         } catch (Exception cn) {
             if (log.isDebugEnabled()) {
-                log.debug("Unable to instantiate JDBC driver.", cn);
+                log.debug("Unable to instantiate JDBC driver.", PoolUtilities.maskCredentials(cn));
             }
             SQLException ex = new SQLException(cn.getMessage());
             ex.initCause(cn);
@@ -794,7 +809,8 @@ public class PooledConnection implements PooledConnectionMBean {
             // catch only guards against a failure of the walk itself;
             // an interceptor must not be able to keep the physical
             // connection from being closed
-            log.warn(MessageFactory.get("pooledConnection.interceptorDisconnectedFailed"), x);
+            log.warn(MessageFactory.get("pooledConnection.interceptorDisconnectedFailed"),
+                    PoolUtilities.maskCredentials(x));
         }
     }
 
@@ -861,9 +877,10 @@ public class PooledConnection implements PooledConnectionMBean {
             // installed: the caller has already settled the release.
             ExceptionUtils.handleThrowable(ignore);
             if (cpdsHandle != null || xaHandle != null) {
-                log.warn(MessageFactory.get("pooledConnection.unableToCloseUnderlyingConnection"), ignore);
+                log.warn(MessageFactory.get("pooledConnection.unableToCloseUnderlyingConnection"),
+                        PoolUtilities.maskCredentials(ignore));
             } else if (log.isDebugEnabled()) {
-                log.debug("Unable to close underlying SQL connection", ignore);
+                log.debug("Unable to close underlying SQL connection", PoolUtilities.maskCredentials(ignore));
             }
         }
     }
@@ -1004,9 +1021,9 @@ public class PooledConnection implements PooledConnectionMBean {
                 // handleThrowable re-throws keep propagating.
                 if (getPoolProperties().getLogValidationErrors()) {
                     log.error(MessageFactory.get("pooledConnection.customValidationThrew",
-                            validator), x);
+                            validator), PoolUtilities.maskCredentials(x));
                 } else if (log.isDebugEnabled()) {
-                    log.debug("Custom validation threw an exception.", x);
+                    log.debug("Custom validation threw an exception.", PoolUtilities.maskCredentials(x));
                 }
                 return false;
             }
@@ -1072,7 +1089,8 @@ public class PooledConnection implements PooledConnectionMBean {
                 // idle and busy queues and strands the pooled connection -
                 // permanently shrinking the pool
                 if (getPoolProperties().getLogValidationErrors()) {
-                    log.error(MessageFactory.get("pooledConnection.isValidFailed"), e);
+                    log.error(MessageFactory.get("pooledConnection.isValidFailed"),
+                            PoolUtilities.maskCredentials(e));
                 } else if (e instanceof RuntimeException) {
                     // Unlike the checked failure this anomaly would once
                     // have escaped as the driver's own throw; the caller
@@ -1081,9 +1099,10 @@ public class PooledConnection implements PooledConnectionMBean {
                     // than debug - otherwise at the default log level a
                     // broken driver would fail every validation with no
                     // trace anywhere
-                    log.warn(MessageFactory.get("pooledConnection.isValidFailed"), e);
+                    log.warn(MessageFactory.get("pooledConnection.isValidFailed"),
+                            PoolUtilities.maskCredentials(e));
                 } else if (log.isDebugEnabled()) {
-                    log.debug("isValid() failed.", e);
+                    log.debug("isValid() failed.", PoolUtilities.maskCredentials(e));
                 }
                 return false;
             } catch (Throwable x) {
@@ -1096,11 +1115,13 @@ public class PooledConnection implements PooledConnectionMBean {
                 // keeps the fatal conditions it keeps everywhere else.
                 ExceptionUtils.handleThrowable(x);
                 if (getPoolProperties().getLogValidationErrors()) {
-                    log.error(MessageFactory.get("pooledConnection.isValidFailed"), x);
+                    log.error(MessageFactory.get("pooledConnection.isValidFailed"),
+                            PoolUtilities.maskCredentials(x));
                 } else {
                     // Logged like the unchecked case above: this is the
                     // same anomaly one type further out
-                    log.warn(MessageFactory.get("pooledConnection.isValidFailed"), x);
+                    log.warn(MessageFactory.get("pooledConnection.isValidFailed"),
+                            PoolUtilities.maskCredentials(x));
                 }
                 return false;
             } finally {
@@ -1152,9 +1173,10 @@ public class PooledConnection implements PooledConnectionMBean {
             // the pooled connection, whatever the throw's type.
             ExceptionUtils.handleThrowable(ex);
             if (getPoolProperties().getLogValidationErrors()) {
-                log.error(MessageFactory.get("pooledConnection.sqlValidationError"), ex);
+                log.error(MessageFactory.get("pooledConnection.sqlValidationError"),
+                        PoolUtilities.maskCredentials(ex));
             } else if (log.isDebugEnabled()) {
-                log.debug("Unable to validate object:", ex);
+                log.debug("Unable to validate object:", PoolUtilities.maskCredentials(ex));
             }
             if (stmt != null) {
                 try {
@@ -1191,21 +1213,21 @@ public class PooledConnection implements PooledConnectionMBean {
             }
             return true;
         } catch (SQLException e) {
-            log.debug("Failed to commit transaction", e);
+            log.debug("Failed to commit transaction", PoolUtilities.maskCredentials(e));
         } catch (Throwable e) {
             // A non-fatal Error is the same failed commit an unchecked
             // exception is: it must not escape through the caller's finally
             // block and strand the connection.
             ExceptionUtils.handleThrowable(e);
             if (getPoolProperties().getLogValidationErrors()) {
-                log.error(MessageFactory.get("pooledConnection.commitFailed"), e);
+                log.error(MessageFactory.get("pooledConnection.commitFailed"), PoolUtilities.maskCredentials(e));
             } else {
                 // The unchecked variant is logged at warn rather than debug,
                 // like the rollback helper's: the caller surfaces it only as
                 // the generic validation failure, so at the default log level
                 // a driver that fails to commit would otherwise destroy
                 // connection after connection with no trace anywhere
-                log.warn(MessageFactory.get("pooledConnection.commitFailed"), e);
+                log.warn(MessageFactory.get("pooledConnection.commitFailed"), PoolUtilities.maskCredentials(e));
             }
         }
         return false;
@@ -1219,7 +1241,7 @@ public class PooledConnection implements PooledConnectionMBean {
             }
             return true;
         } catch (SQLException e) {
-            log.debug("Failed to rollback transaction", e);
+            log.debug("Failed to rollback transaction", PoolUtilities.maskCredentials(e));
         } catch (Throwable e) {
             // A non-fatal Error is handled exactly like the unchecked
             // failure below.
@@ -1232,7 +1254,7 @@ public class PooledConnection implements PooledConnectionMBean {
             // converts it, and strand the pooled connection between the
             // idle and busy queues
             if (getPoolProperties().getLogValidationErrors()) {
-                log.error(MessageFactory.get("pooledConnection.rollbackFailed"), e);
+                log.error(MessageFactory.get("pooledConnection.rollbackFailed"), PoolUtilities.maskCredentials(e));
             } else {
                 // The unchecked variant is an anomaly of the same kind as
                 // a throwing custom Validator, and unlike the checked
@@ -1242,7 +1264,7 @@ public class PooledConnection implements PooledConnectionMBean {
                 // level a driver that fails to end a transaction unchecked
                 // would destroy connection after connection with no trace
                 // anywhere
-                log.warn(MessageFactory.get("pooledConnection.rollbackFailed"), e);
+                log.warn(MessageFactory.get("pooledConnection.rollbackFailed"), PoolUtilities.maskCredentials(e));
             }
         }
         return false;
@@ -1290,7 +1312,7 @@ public class PooledConnection implements PooledConnectionMBean {
                 // pool uses to retire the slot and count the release.
                 ExceptionUtils.handleThrowable(x);
                 if (log.isDebugEnabled()) {
-                    log.debug("Unable to close SQL connection", x);
+                    log.debug("Unable to close SQL connection", PoolUtilities.maskCredentials(x));
                 }
             }
         }
@@ -1592,7 +1614,7 @@ public class PooledConnection implements PooledConnectionMBean {
                         // One broken interceptor must not stop the rest of the
                         // chain from being reset
                         log.warn(MessageFactory.get("pooledConnection.interceptorResetFailed",
-                                interceptor.getClass().getName()), t);
+                                interceptor.getClass().getName()), PoolUtilities.maskCredentials(t));
                     }
                     interceptor = next;
                 }
@@ -1683,7 +1705,7 @@ public class PooledConnection implements PooledConnectionMBean {
                 // its MBean must not keep the others registered
                 ExceptionUtils.handleThrowable(x);
                 if (log.isDebugEnabled()) {
-                    log.debug("Unable to unregister interceptor MBean", x);
+                    log.debug("Unable to unregister interceptor MBean", PoolUtilities.maskCredentials(x));
                 }
             }
         }

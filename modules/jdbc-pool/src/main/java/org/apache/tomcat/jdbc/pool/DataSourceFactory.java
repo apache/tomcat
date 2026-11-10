@@ -847,7 +847,7 @@ public class DataSourceFactory implements ObjectFactory {
             // stringifying it. A string cannot be turned into a data source
             // here.
             throw new IllegalArgumentException(MessageFactory.get("dataSourceFactory.cannotSetDataSourceString",
-                    value));
+                    PoolProperties.maskCredentials(value)));
         }
 
         value = properties.getProperty(PROP_DATASOURCE_JNDI);
