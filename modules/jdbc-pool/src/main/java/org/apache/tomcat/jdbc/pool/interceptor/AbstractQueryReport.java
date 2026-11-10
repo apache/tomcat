@@ -28,6 +28,7 @@ import java.sql.Statement;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.jdbc.pool.util.ExceptionUtils;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
@@ -332,6 +333,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
                     try {
                         reportFailedQuery(query, args, name, start, failedDelta, t);
                     } catch (Throwable reporting) {
+                        ExceptionUtils.handleThrowable(reporting);
                         // Reporting must never disturb the application -
                         // the driver's exception is the one being thrown
                         if (log.isWarnEnabled()) {
@@ -361,6 +363,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
                 try {
                     reportSlowQuery(query, args, name, start, delta);
                 } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
                     if (log.isWarnEnabled()) {
                         log.warn(MessageFactory.get("abstractQueryReport.unableToProcessSlowQuery",
                                 AbstractQueryReport.this.getClass().getName()), t);
@@ -370,6 +373,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
                 try {
                     reportQuery(query, args, name, start, delta);
                 } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
                     // Reporting must never disturb the application
                     if (log.isWarnEnabled()) {
                         log.warn(MessageFactory.get("abstractQueryReport.unableToProcessQueryReport",

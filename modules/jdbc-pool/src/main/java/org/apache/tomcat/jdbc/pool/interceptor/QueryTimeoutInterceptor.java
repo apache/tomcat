@@ -26,6 +26,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
+import org.apache.tomcat.jdbc.pool.util.ExceptionUtils;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
@@ -214,9 +215,14 @@ public class QueryTimeoutInterceptor extends AbstractCreateStatementInterceptor 
                 // reported, but not as a refusal, and not on the refusal's
                 // single-per-connection line: one odd failure must not spend
                 // the report a genuine refusal later on the same connection
-                // still deserves. Errors stay out of both catches, as
-                // everywhere in the module: they are not a driver's answer
-                // to anything.
+                // still deserves.
+                reportUnexpectedTimeoutFailure(x);
+            } catch (Error x) {
+                // The module treats a non-fatal Error as an ordinary failed
+                // wrapper call; a virtual-machine error is re-thrown first.
+                // The optional timeout is then reported as an unexpected
+                // failure and the statement is still handed out, as above.
+                ExceptionUtils.handleThrowable(x);
                 reportUnexpectedTimeoutFailure(x);
             }
         }
@@ -248,7 +254,7 @@ public class QueryTimeoutInterceptor extends AbstractCreateStatementInterceptor 
      * taking the refusal's report out of this connection's hands. The statement
      * is still handed out, for the same reason a refusal hands it out.
      */
-    private void reportUnexpectedTimeoutFailure(RuntimeException x) {
+    private void reportUnexpectedTimeoutFailure(Throwable x) {
         if (timeoutFailureReported) {
             return;
         }

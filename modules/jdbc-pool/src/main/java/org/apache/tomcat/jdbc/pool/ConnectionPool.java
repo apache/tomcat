@@ -740,6 +740,7 @@ public class ConnectionPool {
                     try {
                         release(con);
                     } catch (Throwable x) {
+                        ExceptionUtils.handleThrowable(x);
                         // One failing connection must not leave the
                         // remaining idle and busy connections undisconnected
                         log.warn(MessageFactory.get("connectionPool.unableToClosePooledConnection"), x);
@@ -2614,6 +2615,7 @@ public class ConnectionPool {
             try {
                 handler.reset(null, null);
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 // One broken interceptor must not stop the rest of the
                 // chain from being reset
                 log.warn(MessageFactory.get("connectionPool.interceptorResetFailed",
@@ -2638,6 +2640,7 @@ public class ConnectionPool {
             try {
                 handler.disconnected(this, con, finalizing);
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 // One broken interceptor must not stop the rest of the
                 // chain from being notified
                 log.warn(MessageFactory.get("connectionPool.interceptorDisconnectedFailed",
