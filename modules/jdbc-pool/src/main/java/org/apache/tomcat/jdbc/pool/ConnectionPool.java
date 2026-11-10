@@ -443,6 +443,11 @@ public class ConnectionPool {
         // preloaded connections directly and never sets one up here, so it
         // stays out of the count.
         borrowedCount.incrementAndGet();
+        // A close or an abandonment can have landed between the borrow's own
+        // publication of the connection and this method: the connection must
+        // fail the borrow rather than be set up into a handle with no live
+        // session behind it.
+        checkSetupStillValid(con);
         // Fetch previously cached interceptor proxy - one per connection
         JdbcInterceptor handler = con.getHandler();
         if (handler == null) {
@@ -533,6 +538,7 @@ public class ConnectionPool {
         // useStatementFacade property that used to switch this off is
         // deprecated and no longer has any effect.)
         handler = new StatementFacade(handler);
+        Connection connection;
         try {
             Constructor<?> proxyConstructor = getProxyConstructor(con.getXAConnection() != null);
             // TODO possible optimization, keep track if this connection was returned properly, and don't generate a new
@@ -543,7 +549,7 @@ public class ConnectionPool {
             // for the next borrower. (The useDisposableConnectionFacade
             // property that used to switch this off is deprecated and no
             // longer has any effect.)
-            Connection connection = (Connection) proxyConstructor
+            connection = (Connection) proxyConstructor
                     .newInstance(new Object[] { new DisposableConnectionFacade(handler) });
             // Tell the bottom of the chain which handle this borrow is served under. The chain is shared
             // between the borrows of this pooled connection and only the handle is per-borrow: a call left
@@ -559,7 +565,6 @@ public class ConnectionPool {
             // begins here. The matching endRequest() is sent at the return,
             // in returnConnection().
             invokeRequestHint(BEGIN_REQUEST, con.getConnection());
-            return connection;
         } catch (Throwable x) {
             ExceptionUtils.handleThrowable(x);
             SQLException s = new SQLException();
@@ -574,7 +579,35 @@ public class ConnectionPool {
             abandonSetup(con, s, true);
             throw s;
         }
+        // The release that a close or an abandonment performs can also have
+        // landed while the handle above was being built. The handle must not
+        // be handed out over a connection that is already out of service.
+        checkSetupStillValid(con);
+        return connection;
 
+    }
+
+    /**
+     * Fails a setup whose pooled connection is already out of service, or whose pool has closed, instead of returning a
+     * handle that no live session backs. The connection is discarded through {@link #abandonSetup}, so a close that
+     * raced the setup has neither a stale busy entry nor an unfinished chain left behind.
+     *
+     * @param con the pooled connection being set up
+     *
+     * @throws SQLException if the pool has closed or the connection has been released
+     */
+    private void checkSetupStillValid(PooledConnection con) throws SQLException {
+        String message;
+        if (isClosed()) {
+            message = MessageFactory.get("connectionPool.poolClosedDuringSetup");
+        } else if (con.isReleased() || con.isDiscarded()) {
+            message = MessageFactory.get("connectionPool.connectionReleasedDuringSetup");
+        } else {
+            return;
+        }
+        SQLException sx = new SQLException(message);
+        abandonSetup(con, sx, true);
+        throw sx;
     }
 
     /**
