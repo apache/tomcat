@@ -94,6 +94,13 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
             new LinkedBlockingQueue<>(NOTIFY_QUEUE_CAPACITY), r -> {
                 Thread t = new Thread(r, "JDBC-Pool-JMX-Notifier");
                 t.setDaemon(true);
+                // The notifier is a static thread shared by every pool in the
+                // JVM. It must not inherit the context class loader of the
+                // caller that first reports a notification: a web application
+                // thread would pin that application's loader for the life of
+                // the worker. Keep it on the class loader that loaded this
+                // module instead, as the pool cleaner timer does.
+                t.setContextClassLoader(ConnectionPool.class.getClassLoader());
                 return t;
             });
 
