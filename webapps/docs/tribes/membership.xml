@@ -28,9 +28,200 @@
 
 <body>
 
+<section name="Table of Contents">
+  <toc/>
+</section>
 
 <section name="Membership">
-    <p>TODO</p>
+  <p>The membership service maintains the set of remote nodes known to a
+     Tribes channel. It advertises the local receiver's address and ports,
+     discovers or monitors remote members, and reports additions and removals
+     to the channel's <code>MembershipListener</code>s. Applications use this
+     view through methods such as <code>Channel.getMembers()</code> and then
+     choose the members to which a message is sent.</p>
+
+  <p>Membership does not carry application messages. It supplies the
+     destination information used by the
+     <a href="transport.html">message transport</a>. A member record includes
+     the host, TCP port, secure port, UDP port, unique identifier, domain,
+     payload, and the time for which the member has been alive.</p>
+</section>
+
+<section name="Choosing a membership service">
+  <p>Tribes provides three membership services. Select the service that fits
+     the environment in which all of the nodes run.</p>
+
+  <table class="defaultTable">
+    <tr>
+      <th>Service</th>
+      <th>Discovery source</th>
+      <th>Typical use</th>
+    </tr>
+    <tr>
+      <td><code>McastService</code></td>
+      <td>UDP multicast heartbeats</td>
+      <td>Networks where multicast is available and permitted</td>
+    </tr>
+    <tr>
+      <td><code>StaticMembershipService</code></td>
+      <td>Members listed in the configuration</td>
+      <td>Fixed topologies or networks without multicast</td>
+    </tr>
+    <tr>
+      <td><code>CloudMembershipService</code></td>
+      <td>Kubernetes API or DNS</td>
+      <td>Orchestrated environments with changing node addresses</td>
+    </tr>
+  </table>
+
+  <p>The service is configured as the <code>Membership</code> component of a
+     <code>Channel</code>. The local member's message endpoints are taken from
+     the channel receiver, so the receiver must advertise an address that the
+     other nodes can reach. Complete property descriptions are in the
+     <a href="../config/cluster-membership.html">membership configuration
+     reference</a>.</p>
+</section>
+
+<section name="Multicast membership">
+  <p><code>McastService</code> periodically sends a heartbeat to a multicast
+     address and port. Nodes using the same multicast group discover each
+     other without an explicit list. A node is removed when no heartbeat is
+     received for <code>dropTime</code> milliseconds. The default
+     <code>frequency</code> is 500 ms and the default <code>dropTime</code> is
+     3000 ms.</p>
+
+  <source><![CDATA[<Membership className="org.apache.catalina.tribes.membership.McastService"
+            address="228.0.0.4"
+            port="45564"
+            frequency="500"
+            dropTime="3000"/>]]></source>
+
+  <p>The multicast address and port identify the group. Use different values
+     to keep unrelated clusters apart. On a host with multiple network
+     interfaces, set <code>bind</code> to the interface used for membership
+     traffic. The <code>ttl</code> controls how far multicast packets may
+     travel; network switches and routers must also be configured to pass the
+     traffic.</p>
+
+  <p>A busy JVM or network can delay heartbeats long enough to cause a false
+     removal. Increase <code>dropTime</code> when necessary, while remembering
+     that it also increases the time needed to detect a real failure. The
+     <a href="../config/cluster-interceptor.html#org.apache.catalina.tribes.group.interceptors.TcpFailureDetector_Attributes">
+     <code>TcpFailureDetector</code></a> may be added to confirm a suspected
+     failure with a TCP connection before the event is passed up the channel.</p>
+</section>
+
+<section name="Static membership">
+  <p><code>StaticMembershipService</code> avoids multicast. Each node is given
+     the same list of members and the service exchanges point-to-point ping
+     messages to announce membership and track liveness. This is useful when
+     the topology changes infrequently or multicast cannot cross the network
+     boundary between nodes.</p>
+
+  <source><![CDATA[<Membership className="org.apache.catalina.tribes.membership.StaticMembershipService">
+  <Member className="org.apache.catalina.tribes.membership.StaticMember"
+          host="tomcat-a.example.net"
+          port="4000"
+          uniqueId="{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}"/>
+  <Member className="org.apache.catalina.tribes.membership.StaticMember"
+          host="tomcat-b.example.net"
+          port="4000"
+          uniqueId="{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0}"/>
+</Membership>]]></source>
+
+  <p>The member host and ports must match the addresses advertised by the
+     corresponding receivers. Every <code>uniqueId</code> must contain 16
+     bytes and must be unique and stable across restarts. The local member is
+     normally identified from the receiver settings; a
+     <code>LocalMember</code> may be configured explicitly when required.</p>
+
+  <p>The default <code>expirationTime</code> is 5000 ms. Pings may be sent by
+     the channel heartbeat or by a dedicated membership thread when
+     <code>useThread</code> is enabled. Static membership requires the
+     <code>Cluster</code> element's <code>channelStartOptions</code> to retain
+     its default value of <code>15</code>, so both membership receive and send
+     processing are started.</p>
+</section>
+
+<section name="Cloud membership">
+  <p><code>CloudMembershipService</code> discovers nodes through a pluggable
+     cloud provider. Its default provider queries the Kubernetes API and can
+     restrict the returned pods with a label selector. The alternative
+     <code>dns</code> provider resolves a DNS service name. The channel
+     heartbeat refreshes the view, and members that are no longer returned are
+     removed after <code>expirationTime</code>.</p>
+
+  <source><![CDATA[<Membership
+    className="org.apache.catalina.tribes.membership.cloud.CloudMembershipService"
+    membershipProviderClassName="kubernetes"/>]]></source>
+
+  <p>The Kubernetes provider reads its API endpoint, namespace, credentials,
+     and optional label selector from the pod environment. The DNS provider
+     uses the service named by <code>DNS_MEMBERSHIP_SERVICE_NAME</code> and is
+     selected with <code>membershipProviderClassName="dns"</code>. See the
+     <doc path="/api/org/apache/catalina/tribes/membership/cloud/CloudMembershipService.html">
+     cloud membership JavaDoc</doc> for the provider-specific environment
+     variables and examples.</p>
+
+  <p>DNS is used to seed the membership view. To tolerate stale DNS caches,
+     the DNS provider also accepts a message from a previously unknown node
+     and adds that sender to the view. Use TLS for the cluster transport when
+     participation must be limited to nodes that possess the configured
+     credentials.</p>
+</section>
+
+<section name="Member events and failure detection">
+  <p>A membership provider reports a member only after it has enough
+     information to address that node's receiver. A newly discovered member
+     produces a <code>memberAdded()</code> event. An expired or explicitly
+     stopped member produces a <code>memberDisappeared()</code> event. These
+     events update the channel view and are then forwarded to registered
+     membership listeners.</p>
+
+  <p>Discovery and message delivery are separate observations. A member may
+     disappear from the membership view before a send notices a broken
+     connection, or a send may fail before the membership timeout expires.
+     Callers must therefore handle both membership events and
+     <code>ChannelException</code>s from sends.</p>
+
+  <p>The <code>domain</code> value is included in member records and can be
+     used by components such as <code>DomainFilterInterceptor</code> to filter
+     events and messages. It does not create a security boundary; use separate
+     discovery groups and protected transport where isolation is required.</p>
+</section>
+
+<section name="Security">
+  <p>Multicast membership traffic is not authenticated or encrypted and always
+     requires a trusted network. Static configuration removes multicast
+     discovery but does not, by itself, protect the point-to-point cluster
+     traffic. Cloud discovery is also a source of addresses rather than an
+     authorization mechanism.</p>
+
+  <p>Restrict membership and receiver traffic at the network layer. When
+     confidentiality and integrity are required, configure the receiver's
+     secure port and TLS for the cluster transport. See the
+     <a href="https://tomcat.apache.org/security-model.html">Tomcat security
+     model</a> and the cluster configuration documentation before exposing any
+     Tribes endpoint outside a trusted network.</p>
+</section>
+
+<section name="Operations and troubleshooting">
+  <ul>
+    <li>Verify that every receiver advertises an address and port reachable by
+        all other members. NAT and container addresses frequently require
+        explicit receiver configuration.</li>
+    <li>For multicast, verify routing, interface binding, group address, port,
+        and TTL from every node. A node that can send but not receive
+        multicast will have an inconsistent membership view.</li>
+    <li>For static membership, keep the member list, ports, and identifiers
+        consistent on every node.</li>
+    <li>For cloud membership, verify that the API or DNS response contains the
+        intended running nodes and that the configured refresh and expiration
+        times match the environment.</li>
+    <li>Inspect the <code>component=Membership</code> MBean to compare the
+        member view on each node. The <a href="status.html">Tribes status
+        guide</a> describes the available JMX information.</li>
+  </ul>
 </section>
 </body>
 
