@@ -134,10 +134,12 @@ public interface PoolConfiguration {
     /**
      * Overrides the database properties passed into the {@link java.sql.Driver#connect(String, Properties)} method. A
      * {@code null} collection is accepted as a configuration state, and it means what it says: the configuration has no
-     * driver properties. The credential setters then have no property to mirror into and {@link #getDbProperties()}
-     * returns {@code null}. It is not a configuration that cannot connect - the URL and the {@link #getUsername() user
-     * name} and {@link #getPassword() password} still establish connections, with no extra properties sent along - and
-     * connections made through a configured {@link javax.sql.DataSource} do not consult the database properties at all.
+     * driver properties in that collection. The credential setters then have no property to mirror into and
+     * {@link #getDbProperties()} returns {@code null}. It is not a configuration that cannot connect - the URL and the
+     * {@link #getUsername() user name} and {@link #getPassword() password} still establish connections, with no extra
+     * properties from the collection sent along, while a configured {@link #getConnectionProperties() connection
+     * properties} string still contributes its pairs to the driver. Connections made through a configured
+     * {@link javax.sql.DataSource} do not consult the database properties at all.
      *
      * @param dbProperties The database properties, may be {@code null}
      */
