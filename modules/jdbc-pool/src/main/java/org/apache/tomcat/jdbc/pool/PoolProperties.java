@@ -1842,6 +1842,23 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         }
 
         /**
+         * Returns an independent copy of this definition, including its property map and the cached class reference. A
+         * configuration clone shares no mutable definition state with its original: adding or replacing a property on
+         * one copy cannot change what the other copy configures.
+         *
+         * @return the copy
+         */
+        InterceptorDefinition copy() {
+            InterceptorDefinition copy = new InterceptorDefinition(className);
+            copy.clazz = clazz;
+            for (Map.Entry<String, InterceptorProperty> entry : properties.entrySet()) {
+                InterceptorProperty property = entry.getValue();
+                copy.properties.put(entry.getKey(), new InterceptorProperty(property.getName(), property.getValue()));
+            }
+            return copy;
+        }
+
+        /**
          * Returns the interceptor class name.
          *
          * @return the class name
@@ -2324,8 +2341,12 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
     /**
      * Returns a copy of the configuration, including a copy of the driver-properties collection so a defaults-backed
-     * property resolves on the copy too. The copy is taken under the monitor the reconfiguring setters hold, so a
-     * concurrent reconfiguration cannot appear in the copy as a state no setter ever published.
+     * property resolves on the copy too, and independent copies of the parsed interceptor definitions and their
+     * property maps. A property added to or replaced on a definition in one copy therefore cannot reconfigure the
+     * other. The validator instance is runtime state and is shared by the copy; replacing it through
+     * {@link #setValidator(Validator)} or {@link #setValidatorClassName(String)} only changes the copy it is called
+     * on. The copy is taken under the monitor the reconfiguring setters hold, so a concurrent reconfiguration cannot
+     * appear in the copy as a state no setter ever published.
      *
      * @return the copy
      * @throws CloneNotSupportedException if cloning of this class is ever refused
@@ -2336,6 +2357,18 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         Properties dbProperties = clone.dbProperties;
         if (dbProperties != null) {
             clone.dbProperties = PoolUtilities.clone(dbProperties);
+        }
+        InterceptorDefinition[] definitions = clone.interceptors;
+        if (definitions != null) {
+            InterceptorDefinition[] copies = new InterceptorDefinition[definitions.length];
+            for (int i = 0; i < definitions.length; i++) {
+                copies[i] = definitions[i] == null ? null : definitions[i].copy();
+            }
+            clone.interceptors = copies;
+        }
+        Set<String> keys = clone.connectionPropertyKeys;
+        if (keys != null && !keys.isEmpty()) {
+            clone.connectionPropertyKeys = new HashSet<>(keys);
         }
         return clone;
     }
