@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.jdbc.pool;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -29,6 +31,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
+import org.apache.tomcat.jdbc.pool.interceptor.AbstractCreateStatementInterceptor;
 
 /**
  * Closing a statement or result set handle from another thread, the way an
@@ -88,6 +91,15 @@ class TestStatementFacadeCrossThreadClose extends JdbcPoolBaseTest {
      * than one the oracle conjures. */
     private static final class FakeStatement implements InvocationHandler {
         private volatile boolean closed;
+        private final ResultSet resultSet;
+
+        FakeStatement() {
+            this(null);
+        }
+
+        FakeStatement(ResultSet resultSet) {
+            this.resultSet = resultSet;
+        }
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
@@ -97,6 +109,12 @@ class TestStatementFacadeCrossThreadClose extends JdbcPoolBaseTest {
                     throw new SQLException("statement closed by the closer thread");
                 }
                 return Boolean.TRUE;
+            }
+            if ("executeQuery".equals(name)) {
+                if (closed) {
+                    throw new SQLException("statement closed by the closer thread");
+                }
+                return resultSet;
             }
             if ("close".equals(name)) {
                 closed = true;
@@ -155,6 +173,24 @@ class TestStatementFacadeCrossThreadClose extends JdbcPoolBaseTest {
                 new Class<?>[] { ResultSet.class }, oracle);
     }
 
+    /*
+     * Replaces one constructor-cache slot through the package-private test seam
+     * in the interceptor package, and returns what was there. A constructor
+     * whose declaring class does not implement the expected interface makes
+     * getConstructor() reject the slot, which is the same failed-wrap path a
+     * class-initializer failure leaves behind.
+     */
+    private static Constructor<?> replaceConstructor(String slot, Constructor<?> replacement)
+            throws Exception {
+        Field idxField = AbstractCreateStatementInterceptor.class.getDeclaredField(slot);
+        idxField.setAccessible(true);
+        int idx = idxField.getInt(null);
+        Method replace = AbstractCreateStatementInterceptor.class
+                .getDeclaredMethod("replaceCachedConstructor", int.class, Constructor.class);
+        replace.setAccessible(true);
+        return (Constructor<?>) replace.invoke(null, Integer.valueOf(idx), replacement);
+    }
+
     private static void awaitGo(CountDownLatch go) {
         try {
             go.await();
@@ -169,6 +205,50 @@ class TestStatementFacadeCrossThreadClose extends JdbcPoolBaseTest {
      * closed contract, the handle says closed, a repeated close stays a
      * no-op, and the delegate underneath really was closed.
      */
+    @Test
+    void aStatementWhoseProxyCannotBeBuiltIsClosedAndFailsTheCreation() throws Throwable {
+        Constructor<?> previous = replaceConstructor("CREATE_STATEMENT_IDX", String.class.getConstructor());
+        try {
+            StatementFacade facade = facade();
+            FakeStatement oracle = new FakeStatement();
+            Method create = Connection.class.getMethod("createStatement");
+
+            IllegalStateException failure = Assertions.assertThrows(IllegalStateException.class,
+                    () -> facade.createStatement(new Object(), create, new Object[0],
+                            openStatement(oracle), 0),
+                    "an unsealed driver statement must not be returned to the caller");
+            Assertions.assertTrue(failure.getMessage().contains("statement proxy"),
+                    "the failure must name the proxy it could not build, was: " + failure.getMessage());
+            Assertions.assertTrue(oracle.closed,
+                    "the driver statement must be closed instead of being left open and unsealed");
+        } finally {
+            replaceConstructor("CREATE_STATEMENT_IDX", previous);
+        }
+    }
+
+    @Test
+    void aResultSetWhoseProxyCannotBeBuiltIsClosedAndFailsTheCall() throws Throwable {
+        Constructor<?> previous = replaceConstructor("RESULTSET_IDX", String.class.getConstructor());
+        try {
+            StatementFacade facade = facade();
+            FakeResultSet resultSetOracle = new FakeResultSet();
+            FakeStatement statementOracle = new FakeStatement(openResultSet(resultSetOracle));
+            Method create = Connection.class.getMethod("createStatement");
+
+            Statement handle = (Statement) facade.createStatement(new Object(), create, new Object[0],
+                    openStatement(statementOracle), 0);
+            SQLException failure = Assertions.assertThrows(SQLException.class,
+                    () -> handle.executeQuery("SELECT 1"),
+                    "an unsealed driver result set must not reach the caller");
+            Assertions.assertTrue(failure.getMessage().contains("result set proxy"),
+                    "the failure must name the proxy it could not build, was: " + failure.getMessage());
+            Assertions.assertTrue(resultSetOracle.closed,
+                    "the driver result set must be closed instead of being left open and unsealed");
+        } finally {
+            replaceConstructor("RESULTSET_IDX", previous);
+        }
+    }
+
     @Test
     void aCloseCompletedByAnotherThreadIsAnsweredAsClosedAfterwards() throws Throwable {
         StatementFacade facade = facade();
