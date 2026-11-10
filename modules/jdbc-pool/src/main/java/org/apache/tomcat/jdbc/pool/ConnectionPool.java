@@ -2919,15 +2919,11 @@ public class ConnectionPool {
          */
         @Override
         public boolean cancel(boolean mayInterruptIfRunning) {
-            // On the async path the pc field is never assigned; once a
-            // connection has been produced it is held in the result field,
-            // so a non-null result means the future is complete and it is
-            // too late to cancel. A queue future the pool closure already
-            // cancelled is complete in the same way and leaves nothing to
-            // deregister and no connection to clean up, so report nothing
-            // cancelled without arming the deferred cleanup task, which a
-            // java.util.concurrent.Future must not run for a completed task.
-            if (pc != null || result != null || cancelled.get() || pcFuture.isCancelled()) {
+            // A completed future cannot be cancelled. The terminal outcomes
+            // include the queue future timing out or failing, a timed get()
+            // abandoning the setup, and the pool closure cancelling the
+            // queued poll: isDone() covers all of them (see its javadoc).
+            if (isDone()) {
                 return false;
             }
             // The queue may have produced its connection already, and a get()
