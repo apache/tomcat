@@ -977,6 +977,37 @@ class TestJmxRegistration extends JdbcPoolBaseTest {
     }
 
     @Test
+    void startTimeOnlyPropertiesAreRejectedAfterThePoolIsCreated() throws Exception {
+        DataSource ds = newDataSource();
+        ds.createPool();
+
+        Assertions.assertThrows(UnsupportedOperationException.class,
+                () -> ds.setFairQueue(!ds.isFairQueue()),
+                "the queue type is fixed when the pool is created");
+        Assertions.assertThrows(UnsupportedOperationException.class,
+                () -> ds.setInitialSize(ds.getInitialSize() + 1),
+                "the initial size is used when the pool is created");
+        Assertions.assertThrows(UnsupportedOperationException.class,
+                () -> ds.setIgnoreExceptionOnPreLoad(!ds.isIgnoreExceptionOnPreLoad()),
+                "the pre-load flag is used when the pool is created");
+
+        Assertions.assertTrue(ds.isFairQueue(), "a refused write must not change the configuration");
+        Assertions.assertEquals(1, ds.getInitialSize(), "a refused write must not change the configuration");
+        Assertions.assertFalse(ds.isIgnoreExceptionOnPreLoad(), "a refused write must not change the configuration");
+
+        ds.close();
+        Assertions.assertThrows(UnsupportedOperationException.class,
+                () -> ds.setFairQueue(false),
+                "a closed data source can never create a pool again");
+        Assertions.assertThrows(UnsupportedOperationException.class,
+                () -> ds.setInitialSize(2),
+                "a closed data source can never create a pool again");
+        Assertions.assertThrows(UnsupportedOperationException.class,
+                () -> ds.setIgnoreExceptionOnPreLoad(true),
+                "a closed data source can never create a pool again");
+    }
+
+    @Test
     void aRefusedUnregistrationSucceedsWhenTheCallerAsksAgain() throws Exception {
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
         ObjectName name = uniqueName("retry-unregister");
