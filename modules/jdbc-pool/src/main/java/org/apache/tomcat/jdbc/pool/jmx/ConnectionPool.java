@@ -195,6 +195,20 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     @Override
     public void postRegister(Boolean registrationDone) {
         if (!Boolean.TRUE.equals(registrationDone)) {
+            // A registration the server refused published no pool MBean, but
+            // a connection that connected while preRegister() had installed
+            // the requested name may have published itself below that name.
+            // No postDeregister() runs for a refused registration, so release
+            // those children here before the name is forgotten.
+            if (pool != null) {
+                try {
+                    pool.unregisterConnectionMBeans();
+                } catch (Throwable x) {
+                    ExceptionUtils.handleThrowable(x);
+                    log.warn("Unable to release the connection MBeans below a refused pool registration.",
+                            PoolUtilities.maskCredentials(x));
+                }
+            }
             this.oname = null;
         }
     }
@@ -213,7 +227,10 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      * published below it. A directly registered pool MBean has no data source to run the child release before the
      * deregistration, so it is done here: leaving the children behind would keep the pool reachable from the MBean
      * server through the very registration that was just removed. {@link #preRegister(MBeanServer, ObjectName)} writes
-     * the name again if this MBean is ever registered anew, and the pool's connection sweep republishes the children.
+     * the name again if this MBean is ever registered anew; a directly registered MBean must then call
+     * {@link org.apache.tomcat.jdbc.pool.ConnectionPool#registerConnectionMBeans()} itself to republish the children,
+     * while the {@link org.apache.tomcat.jdbc.pool.DataSource} registration path runs that sweep after a successful
+     * publish.
      */
     @Override
     public void postDeregister() {
