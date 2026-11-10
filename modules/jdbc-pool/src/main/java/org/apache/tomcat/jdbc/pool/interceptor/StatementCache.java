@@ -23,6 +23,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -795,6 +796,12 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
                         delegate.setMaxFieldSize(0);
                         // Reset max rows
                         delegate.setMaxRows(0);
+                        // Reset the JDBC 4.2 large variants as well. A
+                        // driver that does not implement them has no such
+                        // state to reset; a driver that implements them but
+                        // refuses the reset leaves the recycle to the normal
+                        // close path through the enclosing catch.
+                        resetLargeStatementState(delegate);
                         // Reset fetchsize
                         delegate.setFetchSize(0);
                         // Reset the escape processing
@@ -835,6 +842,25 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
             } finally {
                 closed = true;
                 delegate = null;
+            }
+        }
+
+        /**
+         * Resets the JDBC 4.2 large statement row limit. Drivers compiled before JDBC 4.2 may not implement the optional
+         * method; such a driver has no large-limit state to reset, so an unsupported call is ignored. A driver that
+         * implements the method and refuses the reset propagates the failure, causing this statement to be closed
+         * rather than returned to the cache with an unknown limit.
+         *
+         * @param statement the statement whose large row limit to reset
+         *
+         * @throws SQLException if the driver refuses to reset a supported large row limit
+         */
+        private void resetLargeStatementState(PreparedStatement statement) throws SQLException {
+            try {
+                statement.setLargeMaxRows(0L);
+            } catch (SQLFeatureNotSupportedException | UnsupportedOperationException | AbstractMethodError x) {
+                // The driver does not support this optional JDBC 4.2 call;
+                // there is no state to reset.
             }
         }
 
