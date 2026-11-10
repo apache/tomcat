@@ -422,7 +422,7 @@ public class TesterHttpServletRequest implements HttpServletRequest {
 
     @Override
     public DispatcherType getDispatcherType() {
-        throw new RuntimeException("Not implemented");
+        return DispatcherType.REQUEST;
     }
 
     @Override

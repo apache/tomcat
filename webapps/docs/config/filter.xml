@@ -1050,6 +1050,13 @@ FINE: Request "/docs/config/manager.html" with response status "200"
           instance of this filter that processed the request earlier, that nonce
           is used instead of a new one. If the policy does not contain the
           placeholder, no nonce is generated and the attribute is not set.</p>
+        <p>If the policy contains the placeholder, it is not sent with
+          <code>304</code> (Not Modified) responses. A cache that revalidates a
+          stored page updates the stored header fields from a <code>304</code>
+          response but keeps the stored page, so a policy with a new nonce would
+          not match the nonces in that page. Without the policy in the
+          <code>304</code> response, the cache keeps the policy it stored with
+          the page.</p>
         <p>When the policy is enforced (<strong>cspReportOnly</strong> is
           <code>false</code>) and contains a <code>frame-ancestors</code>
           directive, browsers that implement CSP Level 3 ignore the

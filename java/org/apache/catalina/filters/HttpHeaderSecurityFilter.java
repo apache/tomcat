@@ -26,11 +26,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import jakarta.servlet.DispatcherType;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpServletResponseWrapper;
 
@@ -135,6 +138,7 @@ public class HttpHeaderSecurityFilter extends FilterBase {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
+        ServletRequest chainRequest = request;
         ServletResponse chainResponse = response;
 
         if (response instanceof HttpServletResponse httpResponse) {
@@ -158,8 +162,8 @@ public class HttpHeaderSecurityFilter extends FilterBase {
                         BLOCK_CONTENT_TYPE_SNIFFING_HEADER_VALUE);
             }
 
-            // Content Security Policy
-            if (cspEnabled) {
+            // Content Security Policy. The container ignores header changes made by an included resource.
+            if (cspEnabled && request.getDispatcherType() != DispatcherType.INCLUDE) {
                 String cspName = cspReportOnly ? CSP_REPORT_ONLY_HEADER_NAME : CSP_HEADER_NAME;
                 String cspValue = cspHeaderValue;
                 if (cspNonceRequired) {
@@ -168,11 +172,20 @@ public class HttpHeaderSecurityFilter extends FilterBase {
                 // Set the policy now so it is present even if the response is committed early. The wrapper controls
                 // how the rest of the chain sees and changes it.
                 httpResponse.setHeader(cspName, cspValue);
-                chainResponse = new CspResponseWrapper(httpResponse, cspName, cspValue, cspAllowOverride);
+                /*
+                 * The wrapper detects RequestDispatcher.include() from the dispatcher type of the request passed down
+                 * the chain. The container inserts the request of an include beneath the last request wrapper, so
+                 * wrap the request to make sure that the include is visible through it.
+                 */
+                if (request instanceof HttpServletRequest httpRequest) {
+                    chainRequest = new HttpServletRequestWrapper(httpRequest);
+                }
+                chainResponse = new CspResponseWrapper(httpResponse, chainRequest, cspName, cspValue,
+                        cspAllowOverride, cspNonceRequired);
             }
         }
 
-        chain.doFilter(request, chainResponse);
+        chain.doFilter(chainRequest, chainResponse);
     }
 
 
@@ -488,67 +501,79 @@ public class HttpHeaderSecurityFilter extends FilterBase {
     /*
      * Hides the policy set by the filter from the rest of the chain, so components that only set a policy if none is
      * present still set theirs, and applies cspAllowOverride to any policy the rest of the chain sets.
+     *
+     * The wrapper records whether the filter's policy is present, and the policies set by the application, rather
+     * than recognising them by their text: a policy set by the application, or by another instance of this filter, may
+     * have the same text as the filter's policy, and getHeaders() may not return repeated values. It does not record
+     * calls that the container ignores: those made by a resource included with RequestDispatcher.include() and those
+     * made once the response has been committed.
      */
     private static final class CspResponseWrapper extends HttpServletResponseWrapper {
 
+        private final ServletRequest request;
         private final String cspName;
         private final String cspValue;
         private final boolean allowOverride;
+        private final boolean nonceRequired;
+        /*
+         * Is the filter's policy present? If the application may override it, the first policy the application sets
+         * replaces it. Otherwise, it is only removed from a 304 response.
+         */
+        private boolean filterPolicyPresent = true;
         // The policies set by the application. Only used if the application may not override the filter's policy.
         private final List<String> applicationValues = new ArrayList<>();
-        // Is the filter's policy the only one present? Only used if the application may override the filter's policy.
-        private boolean defaultOnly = true;
 
-        CspResponseWrapper(HttpServletResponse response, String cspName, String cspValue, boolean allowOverride) {
+        CspResponseWrapper(HttpServletResponse response, ServletRequest request, String cspName, String cspValue,
+                boolean allowOverride, boolean nonceRequired) {
             super(response);
+            this.request = request;
             this.cspName = cspName;
             this.cspValue = cspValue;
             this.allowOverride = allowOverride;
+            this.nonceRequired = nonceRequired;
         }
 
 
         @Override
         public void setHeader(String name, String value) {
-            if (!isCspHeader(name)) {
+            if (!isCspHeader(name) || isIgnoredByContainer()) {
                 super.setHeader(name, value);
             } else if (allowOverride) {
-                super.setHeader(name, value);
-                defaultOnly = false;
+                // Replaces every policy present, including the filter's policy
+                super.setHeader(cspName, value);
+                filterPolicyPresent = false;
             } else {
                 // Replace the application's policies but keep the filter's policy
                 applicationValues.clear();
-                super.setHeader(cspName, cspValue);
                 if (value != null) {
                     applicationValues.add(value);
-                    super.addHeader(name, value);
                 }
+                writePolicies();
             }
         }
 
 
         @Override
         public void addHeader(String name, String value) {
-            if (!isCspHeader(name)) {
+            if (!isCspHeader(name) || value == null || isIgnoredByContainer()) {
                 super.addHeader(name, value);
-            } else if (allowOverride) {
-                if (defaultOnly && value != null) {
-                    // The first policy set by the application replaces the filter's policy
-                    super.setHeader(name, value);
-                    defaultOnly = false;
-                } else {
-                    super.addHeader(name, value);
-                }
-            } else if (value != null) {
+            } else if (!allowOverride) {
                 applicationValues.add(value);
-                super.addHeader(name, value);
+                super.addHeader(cspName, value);
+            } else if (filterPolicyPresent) {
+                // The first policy set by the application replaces the filter's policy
+                super.setHeader(cspName, value);
+                filterPolicyPresent = false;
+            } else {
+                super.addHeader(cspName, value);
             }
         }
 
 
         @Override
         public boolean containsHeader(String name) {
-            if (isCspHeader(name) && isFilterPolicyHidden()) {
-                return !applicationValues.isEmpty();
+            if (isCspHeader(name)) {
+                return !getVisibleValues().isEmpty();
             }
             return super.containsHeader(name);
         }
@@ -556,8 +581,9 @@ public class HttpHeaderSecurityFilter extends FilterBase {
 
         @Override
         public String getHeader(String name) {
-            if (isCspHeader(name) && isFilterPolicyHidden()) {
-                return applicationValues.isEmpty() ? null : applicationValues.get(0);
+            if (isCspHeader(name)) {
+                List<String> values = getVisibleValues();
+                return values.isEmpty() ? null : values.get(0);
             }
             return super.getHeader(name);
         }
@@ -565,8 +591,8 @@ public class HttpHeaderSecurityFilter extends FilterBase {
 
         @Override
         public Collection<String> getHeaders(String name) {
-            if (isCspHeader(name) && isFilterPolicyHidden()) {
-                return new ArrayList<>(applicationValues);
+            if (isCspHeader(name)) {
+                return getVisibleValues();
             }
             return super.getHeaders(name);
         }
@@ -575,19 +601,22 @@ public class HttpHeaderSecurityFilter extends FilterBase {
         @Override
         public Collection<String> getHeaderNames() {
             Collection<String> names = super.getHeaderNames();
-            if (names == null || !isFilterPolicyHidden()) {
+            if (names == null || !filterPolicyPresent) {
                 return names;
             }
             /*
              * Remove the name of the filter's policy. Some containers, including Tomcat, list a name once for each
-             * value, and the filter's policy is always the first value. Others list each name once. Removing leading
-             * occurrences until no more remain than the application has set values handles both.
+             * value. Others list each name once. Removing occurrences until no more remain than the application has
+             * set values handles both.
              */
             int excess = -applicationValues.size();
             for (String name : names) {
                 if (isCspHeader(name)) {
                     excess++;
                 }
+            }
+            if (excess <= 0) {
+                return names;
             }
             List<String> result = new ArrayList<>(names.size());
             for (String name : names) {
@@ -602,11 +631,31 @@ public class HttpHeaderSecurityFilter extends FilterBase {
 
 
         @Override
+        public void setStatus(int sc) {
+            super.setStatus(sc);
+            /*
+             * A 304 response refreshes the header fields a cache stored with the page (RFC 9111, section 4.3.4) but not
+             * the page itself, so a policy with the nonce of this request would not match the nonces in the cached
+             * page. Do not send it. The status is read back as the container ignores the call in some cases.
+             */
+            if (nonceRequired && filterPolicyPresent && !isIgnoredByContainer() &&
+                    getStatus() == HttpServletResponse.SC_NOT_MODIFIED) {
+                filterPolicyPresent = false;
+                // Keep the policies set by the application, if any
+                writePolicies();
+            }
+        }
+
+
+        @Override
         public void reset() {
             super.reset();
-            applicationValues.clear();
-            defaultOnly = true;
-            super.setHeader(cspName, cspValue);
+            // Restore the filter's policy unless the container ignored the call
+            if (!isIgnoredByContainer()) {
+                applicationValues.clear();
+                filterPolicyPresent = true;
+                super.setHeader(cspName, cspValue);
+            }
         }
 
 
@@ -616,12 +665,40 @@ public class HttpHeaderSecurityFilter extends FilterBase {
 
 
         /*
-         * If the application may override the filter's policy, the filter's policy is hidden until the application
-         * sets a policy and the header then behaves normally. Otherwise, the filter's policy is always hidden and only
-         * the application's policies are visible.
+         * The container ignores changes to the headers and the status, and calls to reset(), made by a resource
+         * included with RequestDispatcher.include(), and changes made once the response has been committed.
          */
-        private boolean isFilterPolicyHidden() {
-            return !allowOverride || defaultOnly;
+        private boolean isIgnoredByContainer() {
+            return isCommitted() || request.getDispatcherType() == DispatcherType.INCLUDE;
+        }
+
+
+        /*
+         * Writes the filter's policy, if present, followed by the policies set by the application. Only used if the
+         * application may not override the filter's policy, or if the filter's policy is the only one present. Tomcat
+         * removes a header that is set to null.
+         */
+        private void writePolicies() {
+            super.setHeader(cspName, filterPolicyPresent ? cspValue : null);
+            for (String value : applicationValues) {
+                super.addHeader(cspName, value);
+            }
+        }
+
+
+        /*
+         * The policies visible to the rest of the chain: all policies except the filter's policy.
+         */
+        private List<String> getVisibleValues() {
+            if (!allowOverride) {
+                return new ArrayList<>(applicationValues);
+            }
+            if (filterPolicyPresent) {
+                // Until the application sets a policy, the filter's policy is the only one present
+                return new ArrayList<>();
+            }
+            Collection<String> present = super.getHeaders(cspName);
+            return present == null ? new ArrayList<>() : new ArrayList<>(present);
         }
     }
 }
