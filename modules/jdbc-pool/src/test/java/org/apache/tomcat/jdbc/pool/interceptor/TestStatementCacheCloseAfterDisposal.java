@@ -19,6 +19,7 @@ package org.apache.tomcat.jdbc.pool.interceptor;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.time.Duration;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -198,6 +199,43 @@ class TestStatementCacheCloseAfterDisposal extends JdbcPoolBaseTest {
      * reservation is still in flight. The sentinel is withdrawn again - the
      * entry the disconnect purge later walks is never a foreign object.
      */
+    @Test
+    void aPurgeAfterTheCacheBindingWasDisposedStillTerminatesAndClosesTheEntries() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setJdbcInterceptors(StatementCache.class.getName() + "(prepared=true,max=5)");
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setMaxActive(1);
+        ds.createPool();
+
+        try (Connection pooled = ds.getConnection()) {
+            StatementCache cache = interceptorOf(pooled, StatementCache.class);
+            PooledConnection pcon = internalOf(pooled);
+            PreparedStatement statement = pooled.prepareStatement("SELECT 1");
+            Statement physical = driverStatement(statement);
+            statement.close();
+            Assertions.assertEquals(1, cache.getCacheSizePerConnection(),
+                    "precondition: the statement must be parked");
+
+            @SuppressWarnings("unchecked")
+            ConcurrentHashMap<Object, Object> map =
+                    (ConcurrentHashMap<Object, Object>) pcon.getAttributes().get(StatementCache.STATEMENT_CACHE_ATTR);
+            Assertions.assertNotNull(map, "precondition: the connection must own a cache map");
+
+            // Simulate the disposal window before the disconnect purge: the
+            // binding and counter are gone, but the cache map still holds an
+            // open parked statement.
+            cache.reset(null, null);
+            Assertions.assertEquals(-1, cache.getCacheSize(),
+                    "precondition: the disposal must unbind the interceptor");
+
+            Assertions.assertTimeoutPreemptively(Duration.ofSeconds(5),
+                    () -> cache.disconnected(ds.getPool(), pcon, false),
+                    "a purge after disposal must not loop forever");
+            Assertions.assertTrue(map.isEmpty(), "the purge must take every entry");
+            Assertions.assertTrue(physical.isClosed(), "the purge must close the parked statement");
+        }
+    }
+
     private static final class DisposalAtParkMap extends ConcurrentHashMap<Object, Object> {
 
         private static final long serialVersionUID = 1L;
