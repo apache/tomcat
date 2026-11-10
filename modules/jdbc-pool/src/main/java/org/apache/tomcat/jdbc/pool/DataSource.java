@@ -323,6 +323,7 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
             try {
                 unregisterJmx(name);
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 log.error(MessageFactory.get("dataSource.unableToUnregisterMBean", name), t);
             }
         }
