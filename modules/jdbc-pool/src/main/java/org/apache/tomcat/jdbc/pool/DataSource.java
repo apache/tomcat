@@ -26,6 +26,7 @@ import javax.management.ObjectName;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.jdbc.pool.PoolUtilities;
 import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
 import org.apache.tomcat.jdbc.pool.util.ExceptionUtils;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
@@ -305,7 +306,8 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
             p.unregisterConnectionMBeans();
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            log.error(MessageFactory.get("dataSource.unableToUnregisterConnectionMBeans"), t);
+            log.error(MessageFactory.get("dataSource.unableToUnregisterConnectionMBeans"),
+                    PoolUtilities.maskCredentials(t));
         }
     }
 
@@ -324,7 +326,8 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
                 unregisterJmx(name);
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
-                log.error(MessageFactory.get("dataSource.unableToUnregisterMBean", name), t);
+                log.error(MessageFactory.get("dataSource.unableToUnregisterMBean", name),
+                        PoolUtilities.maskCredentials(t));
             }
         }
     }
