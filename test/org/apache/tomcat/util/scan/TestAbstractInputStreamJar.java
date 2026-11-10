@@ -32,6 +32,7 @@ import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -40,6 +41,7 @@ import org.junit.rules.TemporaryFolder;
 import org.apache.catalina.util.IOTools;
 import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory;
 import org.apache.tomcat.Jar;
+import org.apache.tomcat.util.compat.JreCompat;
 
 public class TestAbstractInputStreamJar {
 
@@ -126,6 +128,8 @@ public class TestAbstractInputStreamJar {
 
     @Test
     public void testMultiReleaseVersionSelected() throws Exception {
+        Assume.assumeTrue("Multi-release JAR support requires Java 9+", JreCompat.isJre9Available());
+
         String v9 = VERSIONS + "9/" + BASE_CLASS;
         String v11 = VERSIONS + "11/" + BASE_CLASS;
         try (Jar jar = createJar(v9, v11, BASE_CLASS)) {
@@ -147,6 +151,8 @@ public class TestAbstractInputStreamJar {
      */
     @Test
     public void testMultiReleaseLeadingSlash() throws Exception {
+        Assume.assumeTrue("Multi-release JAR support requires Java 9+", JreCompat.isJre9Available());
+
         String versioned = "/" + VERSIONS + "9/" + BASE_CLASS;
         try (Jar jar = createJar(versioned, BASE_CLASS)) {
             Assert.assertEquals(versioned, read(jar, BASE_CLASS));
@@ -174,6 +180,8 @@ public class TestAbstractInputStreamJar {
 
     @Test
     public void testMultiReleaseEntryDirectlyBelowVersionsDirectory() throws Exception {
+        Assume.assumeTrue("Multi-release JAR support requires Java 9+", JreCompat.isJre9Available());
+
         try (Jar jar = createJar(VERSIONS + "Foo.class", VERSIONS + "9/" + BASE_CLASS, BASE_CLASS)) {
             Assert.assertEquals(VERSIONS + "9/" + BASE_CLASS, read(jar, BASE_CLASS));
 
@@ -237,6 +245,8 @@ public class TestAbstractInputStreamJar {
      */
     @Test
     public void testMultiReleaseUnselectedLeadingSlashEntryIsHidden() throws Exception {
+        Assume.assumeTrue("Multi-release JAR support requires Java 9+", JreCompat.isJre9Available());
+
         String lower = "/" + VERSIONS + "9/" + BASE_CLASS;
         String higher = VERSIONS + "11/" + BASE_CLASS;
         try (Jar jar = createJar(lower, higher, BASE_CLASS)) {
@@ -254,6 +264,8 @@ public class TestAbstractInputStreamJar {
      */
     @Test
     public void testMultiReleaseVersionedResourceIsUsed() throws Exception {
+        Assume.assumeTrue("Multi-release JAR support requires Java 9+", JreCompat.isJre9Available());
+
         String base = "test/resource.txt";
         String v9 = VERSIONS + "9/" + base;
         String v11 = VERSIONS + "11/" + base;
@@ -271,6 +283,8 @@ public class TestAbstractInputStreamJar {
      */
     @Test
     public void testMultiReleaseVersionedResourceWithoutBaseEntry() throws Exception {
+        Assume.assumeTrue("Multi-release JAR support requires Java 9+", JreCompat.isJre9Available());
+
         String base = "test/resource.txt";
         String v9 = VERSIONS + "9/" + base;
         try (Jar jar = createJar(v9)) {

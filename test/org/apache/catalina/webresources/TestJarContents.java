@@ -156,8 +156,10 @@ public class TestJarContents {
             // Signed version segments are invalid
             Assert.assertTrue(jarContents.mightContainResource("META-INF/versions/+9/plus.txt"));
             Assert.assertTrue(jarContents.mightContainResource("META-INF/versions/-9/minus.txt"));
-            // Valid version segments record the base name
-            Assert.assertTrue(jarContents.mightContainResource("ok.txt"));
+            if (JreCompat.isJre9Available()) {
+                // Valid version segments record the base name
+                Assert.assertTrue(jarContents.mightContainResource("ok.txt"));
+            }
         }
     }
 

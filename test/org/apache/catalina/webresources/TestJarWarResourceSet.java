@@ -30,6 +30,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,6 +39,7 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.compat.JreCompat;
 
 public class TestJarWarResourceSet extends TomcatBaseTest {
 
@@ -91,6 +93,9 @@ public class TestJarWarResourceSet extends TomcatBaseTest {
 
     @Test
     public void testMultiReleaseWithInvalidVersionDirectories() throws Exception {
+
+        Assume.assumeTrue("Multi-release JAR support requires Java 9+", JreCompat.isJre9Available());
+
         // An entry below a directory whose name is not a valid version number
         // must not stop the archive index being built. Such an entry is not a
         // versioned entry, so it stays in the index under its full name. An
@@ -142,6 +147,9 @@ public class TestJarWarResourceSet extends TomcatBaseTest {
 
     @Test
     public void testMultiReleaseVersionDirectoryRules() throws Exception {
+
+        Assume.assumeTrue("Multi-release JAR support requires Java 9+", JreCompat.isJre9Available());
+
         // Version directories with a sign or a leading zero are not version
         // directories as far as the JDK is concerned. An entry directly below
         // META-INF/versions/ has no version directory at all. All of these
@@ -195,6 +203,9 @@ public class TestJarWarResourceSet extends TomcatBaseTest {
 
     @Test
     public void testMultiReleaseVersionDirectoryEntry() throws Exception {
+
+        Assume.assumeTrue("Multi-release JAR support requires Java 9+", JreCompat.isJre9Available());
+
         // The entry for the version directory itself has no resource name so
         // it must not be added to the index as an entry with an empty name.
         File warFile = File.createTempFile("test-jar-war-resource-set", ".war");

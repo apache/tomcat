@@ -31,11 +31,12 @@ import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-
 import org.apache.tomcat.Jar;
+import org.apache.tomcat.util.compat.JreCompat;
 
 public class TestJarFileUrlJar {
 
@@ -122,6 +123,8 @@ public class TestJarFileUrlJar {
      */
     @Test
     public void testMultiReleaseFutureVersion() throws Exception {
+        Assume.assumeTrue("Multi-release JAR support requires Java 9+", JreCompat.isJre9Available());
+
         // The name is unlikely to ever be a valid class but it is certain to be later than the current runtime
         String futureClass = VERSIONS + "999999/" + BASE_CLASS;
 
@@ -149,6 +152,8 @@ public class TestJarFileUrlJar {
      */
     @Test
     public void testMultiReleaseSelectedEntryContent() throws Exception {
+        Assume.assumeTrue("Multi-release JAR support requires Java 9+", JreCompat.isJre9Available());
+
         Manifest manifest = new Manifest();
         manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
         manifest.getMainAttributes().putValue("Multi-Release", "true");
@@ -187,6 +192,8 @@ public class TestJarFileUrlJar {
      */
     @Test
     public void testMultiReleaseResetAndUnusableEntries() throws Exception {
+        Assume.assumeTrue("Multi-release JAR support requires Java 9+", JreCompat.isJre9Available());
+
         String unparseable = VERSIONS + "abc/" + BASE_CLASS;
         String versionedResource = VERSIONS + "9/test/resource.txt";
         String resource = "test/resource.txt";
@@ -213,6 +220,8 @@ public class TestJarFileUrlJar {
      */
     @Test
     public void testMultiReleaseVersionSelectionViaJarUrl() throws Exception {
+        Assume.assumeTrue("Multi-release JAR support requires Java 9+", JreCompat.isJre9Available());
+
         File file = createMultiReleaseJar(VERSIONS + "9/" + BASE_CLASS, VERSIONS + "11/" + BASE_CLASS, BASE_CLASS);
         URL url = URI.create("jar:" + file.toURI().toURL().toExternalForm() + "!/").toURL();
         try (Jar jar = new JarFileUrlJar(url, true)) {
@@ -230,6 +239,8 @@ public class TestJarFileUrlJar {
      */
     @Test
     public void testMultiReleaseEntryDirectlyBelowVersionsDirectory() throws Exception {
+        Assume.assumeTrue("Multi-release JAR support requires Java 9+", JreCompat.isJre9Available());
+
         File file = createMultiReleaseJar(VERSIONS + "Foo.class", VERSIONS + "9/" + BASE_CLASS, BASE_CLASS);
         try (Jar jar = new JarFileUrlJar(file.toURI().toURL(), false)) {
             List<String> names = entryNames(jar);
@@ -264,6 +275,8 @@ public class TestJarFileUrlJar {
      */
     @Test
     public void testMultiReleaseLeadingSlash() throws Exception {
+        Assume.assumeTrue("Multi-release JAR support requires Java 9+", JreCompat.isJre9Available());
+
         String versioned = "/" + VERSIONS + "9/" + BASE_CLASS;
         File file = createMultiReleaseJar(versioned, BASE_CLASS);
         try (Jar jar = new JarFileUrlJar(file.toURI().toURL(), false)) {
@@ -280,6 +293,8 @@ public class TestJarFileUrlJar {
      */
     @Test
     public void testMultiReleaseVersionSelectionForResources() throws Exception {
+        Assume.assumeTrue("Multi-release JAR support requires Java 9+", JreCompat.isJre9Available());
+
         String base = "test/resource.txt";
         String v9 = VERSIONS + "9/" + base;
         String v11 = VERSIONS + "11/" + base;
@@ -403,6 +418,8 @@ public class TestJarFileUrlJar {
 
     @Test
     public void testMultiReleaseLookupByName() throws Exception {
+        Assume.assumeTrue("Multi-release JAR support requires Java 9+", JreCompat.isJre9Available());
+
         File file = createLookupJar();
         try (Jar jar = new JarFileUrlJar(file.toURI().toURL(), false)) {
             doTestMultiReleaseLookupByName(jar);
@@ -412,6 +429,8 @@ public class TestJarFileUrlJar {
 
     @Test
     public void testMultiReleaseLookupByNameViaJarUrl() throws Exception {
+        Assume.assumeTrue("Multi-release JAR support requires Java 9+", JreCompat.isJre9Available());
+
         File file = createLookupJar();
         URL url = URI.create("jar:" + file.toURI().toURL().toExternalForm() + "!/").toURL();
         try (Jar jar = new JarFileUrlJar(url, true)) {
