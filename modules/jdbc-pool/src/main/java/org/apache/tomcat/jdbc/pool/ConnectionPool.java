@@ -51,6 +51,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.management.ObjectName;
+
 import javax.sql.XAConnection;
 
 import org.apache.juli.logging.Log;
@@ -58,6 +60,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.interceptor.QueryTimeoutInterceptor;
 import org.apache.tomcat.jdbc.pool.interceptor.StatementCache;
 import org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer;
+import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
 import org.apache.tomcat.jdbc.pool.util.ExceptionUtils;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
@@ -782,6 +785,20 @@ public class ConnectionPool {
             Thread.currentThread().interrupt();
         }
         if (this.getPoolProperties().isJmxEnabled()) {
+            // Release the pool MBean and every connection/interceptor MBean
+            // published below it before forgetting the JMX wrapper. A
+            // container-managed DataSource has already released these before
+            // it closes the pool; a directly registered pool MBean has no
+            // other owner to do it, and leaving it registered would keep the
+            // closed pool reachable from the MBean server.
+            org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = this.jmxPool;
+            if (jmx != null) {
+                unregisterConnectionMBeans();
+                ObjectName name = jmx.getObjectName();
+                if (name != null) {
+                    JmxUtil.unregisterJmx(name);
+                }
+            }
             this.jmxPool = null;
         }
         // Tell the interceptors about the close, once per definition. The

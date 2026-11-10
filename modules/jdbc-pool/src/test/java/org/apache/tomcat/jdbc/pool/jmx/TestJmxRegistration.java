@@ -18,6 +18,7 @@ package org.apache.tomcat.jdbc.pool.jmx;
 
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.util.HashSet;
 import java.util.Set;
@@ -251,6 +252,17 @@ class TestJmxRegistration extends JdbcPoolBaseTest {
     }
 
     /*
+     * The pool's close(boolean) is protected; a directly used pool has no
+     * DataSource close path to reach it, so the test invokes the same method a
+     * subclass would be able to call.
+     */
+    private static void closePoolDirect(org.apache.tomcat.jdbc.pool.ConnectionPool pool) throws Exception {
+        Method close = org.apache.tomcat.jdbc.pool.ConnectionPool.class.getDeclaredMethod("close", boolean.class);
+        close.setAccessible(true);
+        close.invoke(pool, Boolean.TRUE);
+    }
+
+    /*
      * The MBean of the one pooled connection that has been handed out, below the
      * given pool MBean. An interceptor's MBean sits below that and repeats the
      * connection's key properties, so it is skipped.
@@ -349,6 +361,81 @@ class TestJmxRegistration extends JdbcPoolBaseTest {
                 server.unregisterMBean(direct);
             } catch (Exception x) {
                 // already gone
+            }
+        }
+    }
+
+    @Test
+    void aDirectlyRegisteredPoolMBeanReleasesItsChildrenWhenThePoolCloses() throws Exception {
+        MBeanServer server = server();
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setJmxEnabled(true);
+        ds.getPoolProperties().setInitialSize(0);
+        ds.createPool();
+        ConnectionPool jmx = ds.getPool().getJmxPool();
+        ObjectName direct = new ObjectName("tomcat.jdbc:type=DirectPool,role=direct-close,uid=" +
+                System.nanoTime());
+        try {
+            server.registerMBean(jmx, direct);
+            ObjectName connectionName;
+            try (Connection borrowed = ds.getConnection()) {
+                connectionName = connectionMBeanUnder(server, direct);
+                Assertions.assertNotNull(connectionName,
+                        "precondition: the directly published pool has its connection MBean below it");
+            }
+            Assertions.assertTrue(server.isRegistered(connectionName),
+                    "precondition: the connection MBean stays published while the connection is idle");
+
+            closePoolDirect(ds.getPool());
+
+            Assertions.assertFalse(server.isRegistered(direct),
+                    "closing a directly registered pool must remove its pool MBean");
+            Assertions.assertFalse(server.isRegistered(connectionName),
+                    "closing a directly registered pool must not leave the connection MBean behind");
+        } finally {
+            ds.close();
+            try {
+                server.unregisterMBean(direct);
+            } catch (Exception x) {
+                // already gone
+            }
+        }
+    }
+
+    @Test
+    void aRefusedPoolRegistrationReleasesChildrenPublishedBelowTheRequestedName() throws Exception {
+        MBeanServer server = server();
+        ObjectName occupied = new ObjectName(POOL_DOMAIN + ":type=JmxRegistrationTest,role=refused-pool-owner,uid="
+                + System.nanoTime());
+        server.registerMBean(new Probe("owner"), occupied);
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setJmxEnabled(true);
+        ds.getPoolProperties().setInitialSize(0);
+        ds.createPool();
+        ConnectionPool jmx = ds.getPool().getJmxPool();
+        try {
+            // Simulate the registration phase the server runs before it
+            // refuses the name: preRegister installs it, and a connection that
+            // connects in that window publishes below it.
+            jmx.preRegister(server, occupied);
+            ObjectName connectionName;
+            try (Connection borrowed = ds.getConnection()) {
+                connectionName = connectionMBeanUnder(server, occupied);
+                Assertions.assertNotNull(connectionName,
+                        "precondition: the child was published while the refused name was installed");
+            }
+            Assertions.assertTrue(server.isRegistered(connectionName));
+
+            jmx.postRegister(Boolean.FALSE);
+
+            Assertions.assertFalse(server.isRegistered(connectionName),
+                    "a refused registration must release the children published below its attempted name");
+            Assertions.assertNull(jmx.getObjectName(),
+                    "a refused registration must forget the attempted name");
+        } finally {
+            ds.close();
+            if (server.isRegistered(occupied)) {
+                server.unregisterMBean(occupied);
             }
         }
     }
