@@ -70,6 +70,24 @@ class TestDataSourceFactoryRefAddrContent extends JdbcPoolBaseTest {
     }
 
     @Test
+    void aConnectionPoolDataSourceReferenceIsServedByThePoolDataSource() throws Exception {
+        Reference ref = new Reference("javax.sql.ConnectionPoolDataSource", null, null);
+        ref.add(new StringRefAddr("driverClassName", "org.h2.Driver"));
+        ref.add(new StringRefAddr("url", getUrl()));
+        ref.add(new StringRefAddr("username", "sa"));
+        ref.add(new StringRefAddr("password", ""));
+        ref.add(new StringRefAddr("jmxEnabled", "false"));
+        ref.add(new StringRefAddr("initialSize", "1"));
+        ref.add(new StringRefAddr("minIdle", "0"));
+
+        DataSource ds = managedPool(new DataSourceFactory().getObjectInstance(
+                ref, new CompositeName("jdbc/TestCPDS"), null, null));
+        Assertions.assertInstanceOf(javax.sql.ConnectionPoolDataSource.class, ds,
+                "the pool data source implements the standard ConnectionPoolDataSource interface");
+        assertPoolConnects(ds);
+    }
+
+    @Test
     void nullContentRefAddrIsSkippedAndThePoolStillComesUp() throws Exception {
         // RefAddr.getContent() is contractually nullable - a StringRefAddr
         // can be created with null content. Pre-fix, the toString() call on
