@@ -660,9 +660,10 @@ public class ConnectionPool {
             hint.invoke(connection);
         } catch (InvocationTargetException x) {
             log.warn(MessageFactory.get("connectionPool.requestHintRefused", hint.getName()),
-                    x.getTargetException());
+                    PoolUtilities.maskCredentials(x.getTargetException()));
         } catch (ReflectiveOperationException | IllegalArgumentException x) {
-            log.warn(MessageFactory.get("connectionPool.unableToSendRequestHint", hint.getName()), x);
+            log.warn(MessageFactory.get("connectionPool.unableToSendRequestHint", hint.getName()),
+                    PoolUtilities.maskCredentials(x));
         }
     }
 
@@ -743,7 +744,8 @@ public class ConnectionPool {
                         ExceptionUtils.handleThrowable(x);
                         // One failing connection must not leave the
                         // remaining idle and busy connections undisconnected
-                        log.warn(MessageFactory.get("connectionPool.unableToClosePooledConnection"), x);
+                        log.warn(MessageFactory.get("connectionPool.unableToClosePooledConnection"),
+                                PoolUtilities.maskCredentials(x));
                     }
                     if (!pool.isEmpty()) {
                         con = pool.poll(1000, TimeUnit.MILLISECONDS);
@@ -788,7 +790,8 @@ public class ConnectionPool {
             // A malformed list must not abort the close or skip the
             // notifications already recorded.
             ExceptionUtils.handleThrowable(x);
-            log.warn(MessageFactory.get("connectionPool.unableToParseInterceptorChain"), x);
+            log.warn(MessageFactory.get("connectionPool.unableToParseInterceptorChain"),
+                    PoolUtilities.maskCredentials(x));
             proxies = new PoolProperties.InterceptorDefinition[0];
         }
         for (int i = 0; i < proxies.length; i++) {
@@ -821,7 +824,7 @@ public class ConnectionPool {
         } catch (Throwable x) {
             ExceptionUtils.handleThrowable(x);
             if (log.isDebugEnabled()) {
-                log.debug("Unable to inform interceptor of pool closure.", x);
+                log.debug("Unable to inform interceptor of pool closure.", PoolUtilities.maskCredentials(x));
             }
         }
     }
@@ -928,7 +931,8 @@ public class ConnectionPool {
                 interceptor.poolStarted(this);
             } catch (Throwable x) {
                 ExceptionUtils.handleThrowable(x);
-                log.error(MessageFactory.get("connectionPool.unableToInformInterceptorOfPoolStart"), x);
+                log.error(MessageFactory.get("connectionPool.unableToInformInterceptorOfPoolStart"),
+                        PoolUtilities.maskCredentials(x));
                 org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = jmxPool;
                 if (jmx != null) {
                     jmx.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.NOTIFY_INIT, getStackTrace(x));
@@ -959,7 +963,8 @@ public class ConnectionPool {
 
         } catch (Throwable x) {
             ExceptionUtils.handleThrowable(x);
-            log.error(MessageFactory.get("connectionPool.unableToCreateInitialConnections"), x);
+            log.error(MessageFactory.get("connectionPool.unableToCreateInitialConnections"),
+                    PoolUtilities.maskCredentials(x));
             if (!poolProperties.isIgnoreExceptionOnPreLoad()) {
                 org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = jmxPool;
                 if (jmx != null) {
@@ -997,7 +1002,8 @@ public class ConnectionPool {
             // The constructor has already acquired resources that no caller can
             // reach once it fails, so close the partially built pool first.
             ExceptionUtils.handleThrowable(x);
-            log.error(MessageFactory.get("connectionPool.unableToInitializePoolCleaner"), x);
+            log.error(MessageFactory.get("connectionPool.unableToInitializePoolCleaner"),
+                    PoolUtilities.maskCredentials(x));
             close(true);
             SQLException ex = new SQLException(x.getMessage());
             ex.initCause(x);
@@ -1992,7 +1998,8 @@ public class ConnectionPool {
             }
             return true;
         } catch (SQLException x) {
-            log.warn(MessageFactory.get("connectionPool.unableToTerminateTransaction"), x);
+            log.warn(MessageFactory.get("connectionPool.unableToTerminateTransaction"),
+                    PoolUtilities.maskCredentials(x));
             return false;
         }
 
@@ -2018,7 +2025,7 @@ public class ConnectionPool {
                 return true;
             }
         } catch (SQLException e) {
-            log.warn(MessageFactory.get("connectionPool.unableToCheckClosed"), e);
+            log.warn(MessageFactory.get("connectionPool.unableToCheckClosed"), PoolUtilities.maskCredentials(e));
             return true;
         }
         if (isClosed()) {
@@ -2082,7 +2089,8 @@ public class ConnectionPool {
                 // connection that expired and failed - the pool identity
                 // would send operators chasing one session to the wrong
                 // subject entirely
-                log.error(MessageFactory.get("connectionPool.failedToReconnectExpired", con), e);
+                log.error(MessageFactory.get("connectionPool.failedToReconnectExpired", con),
+                        PoolUtilities.maskCredentials(e));
                 return false;
             }
         }
@@ -2149,7 +2157,8 @@ public class ConnectionPool {
                                 // caller for which a refused clear carries no
                                 // outcome anyone can act on, unlike the JMX
                                 // operation, which reports it to its client
-                                log.warn(MessageFactory.get("pooledConnection.unableToClearWarnings"), x);
+                                log.warn(MessageFactory.get("pooledConnection.unableToClearWarnings"),
+                                        PoolUtilities.maskCredentials(x));
                             }
                             con.setStackTrace(null);
                             con.setTimestamp(System.currentTimeMillis());
@@ -2236,7 +2245,8 @@ public class ConnectionPool {
                         // the driver that failed.
                         con.setDiscarded(true);
                         release(con);
-                        log.warn(MessageFactory.get("connectionPool.unableToReturnConnection", con), x);
+                        log.warn(MessageFactory.get("connectionPool.unableToReturnConnection", con),
+                                PoolUtilities.maskCredentials(x));
                     }
                 } else {
                     if (log.isDebugEnabled()) {
@@ -2479,7 +2489,8 @@ public class ConnectionPool {
                         if (release(con)) {
                             releasedIdleCount.incrementAndGet();
                         }
-                        log.warn(MessageFactory.get("connectionPool.unableToTestIdleConnection", con), x);
+                        log.warn(MessageFactory.get("connectionPool.unableToTestIdleConnection", con),
+                                PoolUtilities.maskCredentials(x));
                         continue;
                     }
                     if (keep) {
@@ -2574,9 +2585,10 @@ public class ConnectionPool {
         } else {
             java.io.ByteArrayOutputStream bout = new java.io.ByteArrayOutputStream();
             java.io.PrintStream writer = new java.io.PrintStream(bout);
-            x.printStackTrace(writer);
+            PoolUtilities.maskCredentials(x).printStackTrace(writer);
             String result = bout.toString();
-            return (x.getMessage() != null && x.getMessage().length() > 0) ? x.getMessage() + ";" + result : result;
+            String message = PoolProperties.maskCredentials(x.getMessage());
+            return (message != null && message.length() > 0) ? message + ";" + result : result;
         }
     }
 
@@ -2632,7 +2644,7 @@ public class ConnectionPool {
                 // One broken interceptor must not stop the rest of the
                 // chain from being reset
                 log.warn(MessageFactory.get("connectionPool.interceptorResetFailed",
-                        handler.getClass().getName()), t);
+                        handler.getClass().getName()), PoolUtilities.maskCredentials(t));
             }
             handler = next;
         }
@@ -2657,7 +2669,7 @@ public class ConnectionPool {
                 // One broken interceptor must not stop the rest of the
                 // chain from being notified
                 log.warn(MessageFactory.get("connectionPool.interceptorDisconnectedFailed",
-                        handler.getClass().getName()), t);
+                        handler.getClass().getName()), PoolUtilities.maskCredentials(t));
             }
             handler = next;
         }
@@ -2679,7 +2691,8 @@ public class ConnectionPool {
         try {
             jmxPool = new org.apache.tomcat.jdbc.pool.jmx.ConnectionPool(this);
         } catch (Exception x) {
-            log.warn(MessageFactory.get("connectionPool.unableToStartJmx", getName()), x);
+            log.warn(MessageFactory.get("connectionPool.unableToStartJmx", getName()),
+                    PoolUtilities.maskCredentials(x));
         }
     }
 
@@ -3098,7 +3111,8 @@ public class ConnectionPool {
                 try {
                     discardProducedConnection(pooled);
                 } catch (RuntimeException y) {
-                    log.warn(MessageFactory.get("connectionPool.unableToReturnTimedOutConnection"), y);
+                    log.warn(MessageFactory.get("connectionPool.unableToReturnTimedOutConnection"),
+                            PoolUtilities.maskCredentials(y));
                 }
                 cause = new SQLException(x.getMessage());
                 cause.initCause(x);
@@ -3137,7 +3151,8 @@ public class ConnectionPool {
                     }
                 }
             } catch (SQLException x) {
-                log.debug("Unable to discard a timed-out asynchronous connection.", x);
+                log.debug("Unable to discard a timed-out asynchronous connection.",
+                        PoolUtilities.maskCredentials(x));
             }
         }
 
@@ -3150,7 +3165,8 @@ public class ConnectionPool {
             try {
                 configured.close();
             } catch (SQLException x) {
-                log.warn(MessageFactory.get("connectionPool.unableToReturnTimedOutConnection"), x);
+                log.warn(MessageFactory.get("connectionPool.unableToReturnTimedOutConnection"),
+                        PoolUtilities.maskCredentials(x));
             }
         }
 
@@ -3212,7 +3228,8 @@ public class ConnectionPool {
                     }
                 }
             } catch (Exception x) {
-                log.error(MessageFactory.get("connectionPool.unableToCancelConnectionFuture"), x);
+                log.error(MessageFactory.get("connectionPool.unableToCancelConnectionFuture"),
+                        PoolUtilities.maskCredentials(x));
             } finally {
                 // Whatever came out of it, the callers waiting on the claim are
                 // done waiting
@@ -3262,7 +3279,8 @@ public class ConnectionPool {
                 // what starting a spent task has always answered with.
                 cleaners.remove(cleaner);
                 replacement.cancel();
-                log.error(MessageFactory.get("connectionPool.cleanerSchedulingFailed"), y);
+                log.error(MessageFactory.get("connectionPool.cleanerSchedulingFailed"),
+                        PoolUtilities.maskCredentials(y));
                 throw y;
             }
             // The diagnosis is the acceptance: every task the registry holds
@@ -3278,7 +3296,7 @@ public class ConnectionPool {
             poolCleanTimer = replacement;
             if (!stranded.isEmpty()) {
                 log.error(MessageFactory.get("connectionPool.cleanerTimerReplaced",
-                        Integer.valueOf(stranded.size())), x);
+                        Integer.valueOf(stranded.size())), PoolUtilities.maskCredentials(x));
                 try {
                     replacement.schedule(new CleanerReviver(stranded), 0);
                 } catch (RuntimeException z) {

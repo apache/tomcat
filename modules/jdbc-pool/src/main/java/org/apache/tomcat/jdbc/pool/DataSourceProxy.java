@@ -264,7 +264,8 @@ public class DataSourceProxy implements PoolConfiguration {
                 try {
                     fresh.close(true);
                 } catch (Exception y) {
-                    log.warn(MessageFactory.get("dataSourceProxy.errorClosingPool"), y);
+                    log.warn(MessageFactory.get("dataSourceProxy.errorClosingPool"),
+                            PoolUtilities.maskCredentials(y));
                 }
                 if (x instanceof SQLException) {
                     throw (SQLException) x;
@@ -281,7 +282,8 @@ public class DataSourceProxy implements PoolConfiguration {
                 try {
                     fresh.close(true);
                 } catch (Exception x) {
-                    log.warn(MessageFactory.get("dataSourceProxy.errorClosingPool"), x);
+                    log.warn(MessageFactory.get("dataSourceProxy.errorClosingPool"),
+                            PoolUtilities.maskCredentials(x));
                 }
                 throw new SQLException(MessageFactory.get("dataSourceProxy.dataSourceClosed"));
             }
@@ -405,7 +407,7 @@ public class DataSourceProxy implements PoolConfiguration {
             // interceptor value, for example - is a creation failure like any
             // other to this contract: report it and answer no pool rather than
             // let it escape from a getter documented to return null.
-            log.error(MessageFactory.get("dataSourceProxy.errorCreatingPool"), x);
+            log.error(MessageFactory.get("dataSourceProxy.errorCreatingPool"), PoolUtilities.maskCredentials(x));
             return null;
         }
     }
@@ -467,7 +469,7 @@ public class DataSourceProxy implements PoolConfiguration {
         try {
             p.close(all);
         } catch (Exception x) {
-            log.warn(MessageFactory.get("dataSourceProxy.errorClosingPool"), x);
+            log.warn(MessageFactory.get("dataSourceProxy.errorClosingPool"), PoolUtilities.maskCredentials(x));
         }
     }
 
@@ -817,7 +819,8 @@ public class DataSourceProxy implements PoolConfiguration {
             // interface (PoolProperties itself and the pool's JMX wrapper).
             getPoolProperties().setConnectionProperties(properties);
         } catch (RuntimeException x) {
-            log.error(MessageFactory.get("dataSourceProxy.unableToParseConnectionProperties"), x);
+            log.error(MessageFactory.get("dataSourceProxy.unableToParseConnectionProperties"),
+                    PoolUtilities.maskCredentials(x));
             throw x;
         }
     }
@@ -1622,7 +1625,7 @@ public class DataSourceProxy implements PoolConfiguration {
         try {
             createPool().purge();
         } catch (SQLException x) {
-            log.error(MessageFactory.get("dataSourceProxy.unableToPurgePool"), x);
+            log.error(MessageFactory.get("dataSourceProxy.unableToPurgePool"), PoolUtilities.maskCredentials(x));
         }
     }
 
@@ -1633,7 +1636,7 @@ public class DataSourceProxy implements PoolConfiguration {
         try {
             createPool().purgeOnReturn();
         } catch (SQLException x) {
-            log.error(MessageFactory.get("dataSourceProxy.unableToPurgePool"), x);
+            log.error(MessageFactory.get("dataSourceProxy.unableToPurgePool"), PoolUtilities.maskCredentials(x));
         }
     }
 }

@@ -21,10 +21,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+
+import javax.management.Notification;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -59,8 +64,10 @@ class TestDriverConnectDiagnostics extends JdbcPoolBaseTest {
 
         private final Logger logger = Logger.getLogger(PooledConnection.class.getName());
         private final Logger poolLogger = Logger.getLogger(ConnectionPool.class.getName());
+        private final Logger dataSourceLogger = Logger.getLogger(DataSourceProxy.class.getName());
         private final Level originalLevel = logger.getLevel();
         private final Level originalPoolLevel = poolLogger.getLevel();
+        private final Level originalDataSourceLevel = dataSourceLogger.getLevel();
         private final List<LogRecord> records = Collections.synchronizedList(new ArrayList<>());
         private final Handler handler = new Handler() {
             @Override
@@ -84,6 +91,8 @@ class TestDriverConnectDiagnostics extends JdbcPoolBaseTest {
             logger.setLevel(Level.ALL);
             poolLogger.addHandler(handler);
             poolLogger.setLevel(Level.ALL);
+            dataSourceLogger.addHandler(handler);
+            dataSourceLogger.setLevel(Level.ALL);
             LogFactory.getLog(PooledConnection.class).error(CANARY);
             if (records.stream().noneMatch(r -> CANARY.equals(r.getMessage()))) {
                 close();
@@ -127,6 +136,8 @@ class TestDriverConnectDiagnostics extends JdbcPoolBaseTest {
             logger.setLevel(originalLevel);
             poolLogger.removeHandler(handler);
             poolLogger.setLevel(originalPoolLevel);
+            dataSourceLogger.removeHandler(handler);
+            dataSourceLogger.setLevel(originalDataSourceLevel);
         }
     }
 
@@ -294,5 +305,175 @@ class TestDriverConnectDiagnostics extends JdbcPoolBaseTest {
                 "the URL must stay diagnosable with only its credential masked, was: " + message);
         Assertions.assertFalse(message.contains(secret),
                 "the declined-URL failure must not carry the credential, was: " + message);
+    }
+
+    /**
+     * A pool that attaches a notification listener as soon as its own MBean exists, before the initial pre-load runs.
+     * Configured as the pool under test directly.
+     */
+    public static class NotificationCapturingPool extends ConnectionPool {
+        static final LinkedBlockingQueue<Notification> NOTIFICATIONS = new LinkedBlockingQueue<>();
+
+        NotificationCapturingPool(PoolProperties properties) throws SQLException {
+            super(properties);
+        }
+
+        @Override
+        protected void createMBean() {
+            super.createMBean();
+            if (getJmxPool() != null) {
+                getJmxPool().addNotificationListener((notification, handback) ->
+                        NOTIFICATIONS.add(notification), null, null);
+            }
+        }
+    }
+
+    private static PoolProperties failingProperties(String url, int initialSize) {
+        PoolProperties properties = new PoolProperties();
+        properties.setUrl(url);
+        properties.setDriverClassName(FailingDriver.class.getName());
+        properties.setJmxEnabled(false);
+        properties.setInitialSize(initialSize);
+        properties.setMinIdle(0);
+        properties.setTimeBetweenEvictionRunsMillis(-1);
+        return properties;
+    }
+
+    @Test
+    void aPreloadFailureIsLoggedWithTheCredentialMasked() throws Exception {
+        String secret = "S3cret-In-The-Preload-Log";
+        String url = "jdbc:failing:thin:@dbhost:1521:sid?user=appuser;PASSWORD=" + secret;
+        DataSource ds = manage(new DataSource(failingProperties(url, 1)));
+
+        try (ConnectionLogCapture log = new ConnectionLogCapture()) {
+            Assertions.assertThrows(SQLException.class, ds::createPool,
+                    "the pre-load failure must be reported");
+            log.assertNothingLoggedCarries(secret);
+        }
+    }
+
+    @Test
+    void aRealDriverManagerUrlEchoIsMaskedInThePreloadLog() throws Exception {
+        // With no configured driver, connectUsingDriver() asks DriverManager,
+        // whose own failure message echoes the whole URL - including an inline
+        // PASSWORD pair. This is the JDK's message, not a test driver's.
+        String secret = "S3cret-In-The-DriverManager-Message";
+        PoolProperties properties = new PoolProperties();
+        properties.setUrl("jdbc:no-such:driver;user=appuser;PASSWORD=" + secret);
+        properties.setJmxEnabled(false);
+        properties.setInitialSize(1);
+        properties.setMinIdle(0);
+        properties.setTimeBetweenEvictionRunsMillis(-1);
+        DataSource ds = manage(new DataSource(properties));
+
+        try (ConnectionLogCapture log = new ConnectionLogCapture()) {
+            Assertions.assertThrows(SQLException.class, ds::createPool,
+                    "the pre-load failure must be reported");
+            log.assertNothingLoggedCarries(secret);
+        }
+    }
+
+    @Test
+    void aPreloadFailureNotificationCarriesNoCredential() throws Exception {
+        String secret = "S3cret-In-The-Preload-Notification";
+        String url = "jdbc:failing:thin:@dbhost:1521:sid?user=appuser;PASSWORD=" + secret;
+        PoolProperties properties = failingProperties(url, 1);
+        properties.setJmxEnabled(true);
+        properties.setName("preload-notification-" + System.nanoTime());
+        NotificationCapturingPool.NOTIFICATIONS.clear();
+
+        Assertions.assertThrows(SQLException.class, () -> new NotificationCapturingPool(properties),
+                "the pre-load failure must be reported");
+        Notification notification = NotificationCapturingPool.NOTIFICATIONS.poll(30, TimeUnit.SECONDS);
+        Assertions.assertNotNull(notification, "the pre-load failure must send its init notification");
+        Assertions.assertFalse(String.valueOf(notification.getMessage()).contains(secret),
+                "a JMX init notification must not carry the credential, was: " + notification.getMessage());
+    }
+
+    @Test
+    void aBorrowConnectFailureNotificationCarriesNoCredential() throws Exception {
+        String secret = "S3cret-In-The-Connect-Notification";
+        String url = "jdbc:failing:thin:@dbhost:1521:sid?user=appuser;PASSWORD=" + secret;
+        PoolProperties properties = failingProperties(url, 0);
+        properties.setJmxEnabled(true);
+        properties.setName("connect-notification-" + System.nanoTime());
+        NotificationCapturingPool.NOTIFICATIONS.clear();
+        NotificationCapturingPool pool = new NotificationCapturingPool(properties);
+
+        try {
+            Assertions.assertThrows(SQLException.class, pool::getConnection,
+                    "the borrow failure must be reported");
+            Notification notification = NotificationCapturingPool.NOTIFICATIONS.poll(30, TimeUnit.SECONDS);
+            Assertions.assertNotNull(notification, "the connect failure must send its notification");
+            Assertions.assertFalse(String.valueOf(notification.getMessage()).contains(secret),
+                    "a JMX connect notification must not carry the credential, was: "
+                            + notification.getMessage());
+        } finally {
+            pool.close(true);
+        }
+    }
+
+    @Test
+    void aPreloadFailureThroughTheDataSourceSurfaceIsLoggedWithoutTheCredential() throws Exception {
+        String secret = "S3cret-In-The-DataSource-Log";
+        String url = "jdbc:failing:thin:@dbhost:1521:sid?user=appuser;PASSWORD=" + secret;
+        DataSource ds = manage(new DataSource(failingProperties(url, 1)));
+
+        try (ConnectionLogCapture log = new ConnectionLogCapture()) {
+            Assertions.assertNull(ds.getPool(), "the data source must answer no pool after the failed creation");
+            log.assertNothingLoggedCarries(secret);
+        }
+    }
+
+    @Test
+    void aStringDataSourcePropertyIsMaskedInItsRefusal() {
+        String secret = "S3cret-In-The-DataSource-String";
+        Properties properties = new Properties();
+        properties.setProperty(DataSourceFactory.PROP_DATASOURCE,
+                "jdbc:some:driver;user=appuser;PASSWORD=" + secret);
+
+        IllegalArgumentException failure = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> DataSourceFactory.parsePoolProperties(properties));
+        Assertions.assertFalse(failure.getMessage().contains(secret),
+                "a string carried as the dataSource property must be masked in the refusal, was: "
+                        + failure.getMessage());
+        Assertions.assertTrue(failure.getMessage().contains("PASSWORD=********"),
+                "the refusal must keep the text readable with only the credential masked, was: "
+                        + failure.getMessage());
+    }
+
+    @Test
+    void aThirdPartyDataSourceToStringIsNotUsedInTheNullConnectionFailure() throws Exception {
+        String secret = "S3cret-In-The-DataSource-ToString";
+        javax.sql.DataSource dataSource = (javax.sql.DataSource) java.lang.reflect.Proxy.newProxyInstance(
+                getClass().getClassLoader(), new Class[] { javax.sql.DataSource.class },
+                (proxy, method, args) -> {
+                    if ("getConnection".equals(method.getName())) {
+                        return null;
+                    }
+                    if ("toString".equals(method.getName())) {
+                        return "jdbc:some:driver;user=appuser;PASSWORD=" + secret;
+                    }
+                    if ("isWrapperFor".equals(method.getName())) {
+                        return Boolean.FALSE;
+                    }
+                    return null;
+                });
+        PoolProperties properties = new PoolProperties();
+        properties.setDataSource(dataSource);
+        properties.setJmxEnabled(false);
+        properties.setInitialSize(0);
+        ConnectionPool pool = new ConnectionPool(properties);
+        try {
+            PooledConnection con = new PooledConnection(properties, pool);
+            SQLException failure = Assertions.assertThrows(SQLException.class, con::connect);
+            Assertions.assertFalse(failure.getMessage().contains(secret),
+                    "the failure must not use the third-party data source's toString(), was: "
+                            + failure.getMessage());
+            Assertions.assertTrue(failure.getMessage().contains("DataSource "),
+                    "the failure must still name the data source type, was: " + failure.getMessage());
+        } finally {
+            pool.close(true);
+        }
     }
 }
