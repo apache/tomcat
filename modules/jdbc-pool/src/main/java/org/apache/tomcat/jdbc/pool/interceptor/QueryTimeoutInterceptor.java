@@ -24,7 +24,9 @@ import java.util.Map;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
+import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
+import org.apache.tomcat.jdbc.pool.PoolUtilities;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 import org.apache.tomcat.jdbc.pool.util.ExceptionUtils;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
@@ -245,7 +247,7 @@ public class QueryTimeoutInterceptor extends AbstractCreateStatementInterceptor 
         }
         timeoutRefusalReported = true;
         log.warn(MessageFactory.get("queryTimeoutInterceptor.queryTimeoutRefused", Integer.valueOf(timeout),
-                reasonOf(x)), x);
+                PoolProperties.maskCredentials(reasonOf(x))), PoolUtilities.maskCredentials(x));
     }
 
     /*
@@ -260,7 +262,7 @@ public class QueryTimeoutInterceptor extends AbstractCreateStatementInterceptor 
         }
         timeoutFailureReported = true;
         log.warn(MessageFactory.get("queryTimeoutInterceptor.queryTimeoutSetupFailed", Integer.valueOf(timeout),
-                reasonOf(x)), x);
+                PoolProperties.maskCredentials(reasonOf(x))), PoolUtilities.maskCredentials(x));
     }
 
     /*

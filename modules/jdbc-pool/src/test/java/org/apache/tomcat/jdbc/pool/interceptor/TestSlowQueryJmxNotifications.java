@@ -192,6 +192,32 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
     }
 
     @Test
+    void aFailedQueryNotificationEscapesLineBreaksInTheSql() throws Exception {
+        String poolName = "JmxSqlLines-" + System.nanoTime();
+        DataSource ds = newDataSource();
+        ds.setName(poolName);
+        ds.setJdbcInterceptors("org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx"
+                + "(notifyPool=false,threshold=-1,logFailed=true)");
+        ds.getPoolProperties().setInitialSize(0);
+        List<Notification> received = new CopyOnWriteArrayList<>();
+        NotificationListener listener = (notification, handback) -> received.add(notification);
+
+        try (Connection con = ds.getConnection();
+                Statement st = con.createStatement()) {
+            interceptorOf(con, SlowQueryReportJmx.class).addNotificationListener(listener, null, null);
+            Assertions.assertThrows(SQLException.class,
+                    () -> st.execute("SELECT * FROM no_such_table /* line one\nline two */"));
+        }
+
+        awaitUntil(() -> !received.isEmpty());
+        String message = String.valueOf(received.get(0).getMessage());
+        Assertions.assertFalse(message.contains("\n") || message.contains("\r"),
+                "a SQL notification must not carry line breaks a listener's log would split: " + message);
+        Assertions.assertTrue(message.contains("line one line two"),
+                "the statement text must stay readable with its line breaks turned into spaces: " + message);
+    }
+
+    @Test
     void notificationSourceNamesTheRegisteredMBean() throws Exception {
         String poolName = "JmxSourceOname-" + System.nanoTime();
         DataSource ds = newDataSource();
@@ -314,16 +340,17 @@ class TestSlowQueryJmxNotifications extends JdbcPoolBaseTest {
 
     @Test
     void notificationSourceFallsBackToAStringWhenTheObjectNameCannotBeFormed() throws Exception {
-        // a pool name containing a colon cannot be quoted into the
-        // ObjectName the registration would use: registerJmx fails, the
-        // MBean is never registered - so no listener reached through a
-        // connector can exist for it - while local listeners must still
-        // get a source that names the pool and survives serialization
-        String poolName = "JmxSourceMalformed-" + System.nanoTime() + ":x";
+        // The default name quotes a pool name that needs it, so the way to
+        // make registration fail now is a malformed explicit objectName
+        // override: registerJmx fails, the MBean is never registered - so no
+        // listener reached through a connector can exist for it - while local
+        // listeners must still get a source that names the pool and survives
+        // serialization
+        String poolName = "JmxSourceMalformed-" + System.nanoTime();
         DataSource ds = newDataSource();
         ds.setName(poolName);
         ds.setJdbcInterceptors("org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx"
-                + "(notifyPool=false,threshold=0)");
+                + "(notifyPool=false,threshold=0,objectName=not a valid ObjectName)");
         ds.getPoolProperties().setInitialSize(0);
 
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();

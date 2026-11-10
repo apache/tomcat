@@ -288,7 +288,10 @@ public class DataSourceFactory implements ObjectFactory {
      * Creates and returns the pooled data source that the given {@code Reference}
      * describes: an {@link org.apache.tomcat.jdbc.pool.DataSource}, or an
      * {@link XADataSource} when the reference names {@code javax.sql.XADataSource}
-     * or the pool's own XA class.
+     * or the pool's own XA class. The reference may also name
+     * {@code javax.sql.ConnectionPoolDataSource}: the pool's
+     * {@link org.apache.tomcat.jdbc.pool.DataSource} implements that interface and is
+     * returned as the non-XA instance.
      * </p>
      *
      * @param obj         The possibly null object containing location or reference information that can be used in
@@ -330,6 +333,11 @@ public class DataSourceFactory implements ObjectFactory {
         if ("javax.sql.XADataSource".equals(ref.getClassName())) {
             ok = true;
             XA = true;
+        }
+        if ("javax.sql.ConnectionPoolDataSource".equals(ref.getClassName())) {
+            // The non-XA pool data source implements this standard interface,
+            // so a reference declared with it is served by that same class.
+            ok = true;
         }
         if (org.apache.tomcat.jdbc.pool.DataSource.class.getName().equals(ref.getClassName())) {
             ok = true;
@@ -1139,9 +1147,10 @@ public class DataSourceFactory implements ObjectFactory {
         }
         NamingException initialContextFailure = null;
         if (jndiDS == null) {
+            Context initialContext = null;
             try {
-                context = new InitialContext();
-                jndiDS = context.lookup(poolProperties.getDataSourceJNDI());
+                initialContext = new InitialContext();
+                jndiDS = initialContext.lookup(poolProperties.getDataSourceJNDI());
             } catch (NamingException e) {
                 // Not warned here: this failure always ends in the thrown
                 // jndiLookupFailed below, which names the same name and
@@ -1149,6 +1158,17 @@ public class DataSourceFactory implements ObjectFactory {
                 // that - warning as well only made the one failed resource
                 // read as two.
                 initialContextFailure = e;
+            } finally {
+                if (initialContext != null) {
+                    try {
+                        initialContext.close();
+                    } catch (NamingException x) {
+                        // Closing a context the lookup is done with is
+                        // housekeeping; a container context that refuses the
+                        // close must not replace the lookup's outcome.
+                        log.debug("Unable to close the initial JNDI context.", x);
+                    }
+                }
             }
         }
         if (jndiDS != null) {

@@ -189,10 +189,19 @@ public class ConnectionPool {
     private volatile Constructor<?> xaProxyClassConstructor;
 
     /**
-     * Executor service used to cancel Futures
+     * Executor service used to cancel Futures. It is per pool, with one daemon worker on the pool module's class
+     * loader: a cleanup task that blocks in a driver call must not keep the JVM alive or pin the class loader of the
+     * thread that first cancelled a future. The worker exits after its idle keep-alive, and close() does not shut the
+     * executor down because a cancellation racing the close can still need its cleanup to return a produced
+     * connection; the cleanup itself sees the closed pool and releases what it retrieves.
      */
     private ThreadPoolExecutor cancellator = new ThreadPoolExecutor(0, 1, 1000, TimeUnit.MILLISECONDS,
-            new LinkedBlockingQueue<>());
+            new LinkedBlockingQueue<>(), r -> {
+                Thread t = new Thread(r, "JDBC-Pool-Cancellator");
+                t.setDaemon(true);
+                t.setContextClassLoader(ConnectionPool.class.getClassLoader());
+                return t;
+            });
 
     /**
      * reference to the JMX mbean. close() gives it up without holding any pool lock while other threads still notify
@@ -2867,6 +2876,11 @@ public class ConnectionPool {
         SQLException cause = null;
         AtomicBoolean cancelled = new AtomicBoolean(false);
         /**
+         * A terminal outcome observed by a caller, even when no connection was produced: a queue future that fails or
+         * times out has completed this future from the caller's perspective.
+         */
+        volatile boolean done = false;
+        /**
          * Set when a timed get() gave up waiting for setup. The setup task then returns rather
          * than publishing a connection no caller owns.
          */
@@ -2963,7 +2977,23 @@ public class ConnectionPool {
                     deadline = Long.MAX_VALUE;
                 }
             }
-            PooledConnection pc = this.pc != null ? this.pc : pcFuture.get(timeout, unit);
+            PooledConnection pc;
+            try {
+                pc = this.pc != null ? this.pc : pcFuture.get(timeout, unit);
+            } catch (TimeoutException x) {
+                // A timeout is where a queue-poll future is failed terminally:
+                // no later get will wait again, so this future is complete.
+                done = true;
+                throw x;
+            } catch (ExecutionException x) {
+                // The queue future failed; no setup will ever publish here.
+                done = true;
+                throw x;
+            } catch (CancellationException x) {
+                // The pool closed and cancelled the queued poll.
+                done = true;
+                throw x;
+            }
             if (pc != null) {
                 if (result != null) {
                     return result;
@@ -3181,7 +3211,14 @@ public class ConnectionPool {
          */
         @Override
         public boolean isDone() {
-            return pc != null || pcFuture.isDone();
+            // The queue future completes as soon as it has produced a pooled
+            // connection, but the setup that turns that connection into a
+            // usable handle has not run yet. The future is done only when the
+            // setup published its outcome, when a caller abandoned it at its
+            // deadline, or when it was cancelled. The synchronous constructor
+            // has already set up its connection and reports through pc.
+            return pc != null || result != null || done || cancelled.get() || abandoned.get() ||
+                    pcFuture.isCancelled() || latch.getCount() == 0;
         }
 
         /**

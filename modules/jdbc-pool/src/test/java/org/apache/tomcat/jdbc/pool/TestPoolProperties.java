@@ -653,6 +653,24 @@ class TestPoolProperties {
     }
 
     @Test
+    void toStringWithholdsSQLStatementText() {
+        PoolProperties properties = new PoolProperties();
+        properties.setInitSQL("SET PASSWORD = 'sql-secret-init'");
+        properties.setValidationQuery("SELECT 'sql-secret-validation' AS probe");
+
+        String asString = properties.toString();
+
+        Assertions.assertFalse(asString.contains("sql-secret-init"),
+                "the initSQL statement text must not leak, was: " + asString);
+        Assertions.assertFalse(asString.contains("sql-secret-validation"),
+                "the validationQuery statement text must not leak, was: " + asString);
+        Assertions.assertTrue(asString.contains("initSQL=<sql>"),
+                "the dump must report that initSQL is set without printing it, was: " + asString);
+        Assertions.assertTrue(asString.contains("validationQuery=<sql>"),
+                "the dump must report that validationQuery is set without printing it, was: " + asString);
+    }
+
+    @Test
     void toStringMasksAPasswordParameterInTheUrl() {
         PoolProperties properties = new PoolProperties();
         properties.setUrl("jdbc:mysql://localhost:3306/db?user=me&password=url-secret&sessionVariables=foo=bar&ssl=true");

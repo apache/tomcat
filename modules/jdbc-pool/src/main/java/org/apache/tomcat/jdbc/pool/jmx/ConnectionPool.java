@@ -38,6 +38,7 @@ import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorDefinition;
 import org.apache.tomcat.jdbc.pool.PoolUtilities;
 import org.apache.tomcat.jdbc.pool.Validator;
+import org.apache.tomcat.jdbc.pool.util.ExceptionUtils;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
@@ -203,17 +204,28 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     }
 
     /**
-     * Drops the registration name.
+     * Drops the registration name and releases the connection and interceptor MBeans published below it.
      * <p>
      * The MBean server invokes this when the MBean is deregistered, and the pool it wraps may well keep running - a
      * container that takes its DataSource back releases the pool MBean without closing the pool. From then on the name
      * resolves to no MBean: notifications the pool still raises must not attribute themselves to it (see
      * {@link #getNotificationSource()}, which falls back to naming the pool as a string), and no further MBean may be
-     * published below it. {@link #preRegister(MBeanServer, ObjectName)} writes the name again if this MBean is ever
-     * registered anew.
+     * published below it. A directly registered pool MBean has no data source to run the child release before the
+     * deregistration, so it is done here: leaving the children behind would keep the pool reachable from the MBean
+     * server through the very registration that was just removed. {@link #preRegister(MBeanServer, ObjectName)} writes
+     * the name again if this MBean is ever registered anew, and the pool's connection sweep republishes the children.
      */
     @Override
     public void postDeregister() {
+        if (pool != null) {
+            try {
+                pool.unregisterConnectionMBeans();
+            } catch (Throwable x) {
+                ExceptionUtils.handleThrowable(x);
+                log.warn("Unable to release the connection MBeans below a directly deregistered pool.",
+                        PoolUtilities.maskCredentials(x));
+            }
+        }
         this.oname = null;
     }
 

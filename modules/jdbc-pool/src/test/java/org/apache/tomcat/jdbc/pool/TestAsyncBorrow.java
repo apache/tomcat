@@ -19,6 +19,7 @@ package org.apache.tomcat.jdbc.pool;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -236,6 +237,34 @@ class TestAsyncBorrow extends JdbcPoolBaseTest {
         Assertions.assertEquals(2, ds.getIdle(),
                 "the pool must keep at most maxActive connections");
         awaitSessions(2);
+    }
+
+    @Test
+    void aCompletedQueueWaitIsNotDoneUntilSetupRuns() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setFairQueue(true);
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setMinIdle(0);
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setMaxIdle(1);
+        ds.createPool();
+
+        Connection holder = ds.getConnection();
+        Future<Connection> future = ds.getConnectionAsync();
+        ConnectionPool.ConnectionFuture async = (ConnectionPool.ConnectionFuture) future;
+        Assertions.assertFalse(future.isDone(),
+                "the poll must wait for a connection to be handed to its queue future");
+
+        holder.close();
+        awaitUntil(() -> async.pcFuture.isDone());
+        Assertions.assertFalse(future.isDone(),
+                "the queue future completing is not a completed connection future: setup has not run yet");
+
+        try (Connection con = future.get(); Statement st = con.createStatement()) {
+            st.execute("SELECT 1");
+        }
+        Assertions.assertTrue(future.isDone(), "the setup completion must complete the future");
+        ds.close();
     }
 
     @Test
