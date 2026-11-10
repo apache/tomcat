@@ -144,6 +144,34 @@ class TestBorrowReturnStatistics extends JdbcPoolBaseTest {
     }
 
     @Test
+    void aConnectionReturnedAfterPoolCloseStillCountsAsReturned() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setMinIdle(0);
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(-1);
+        ds.createPool();
+        ConnectionPool pool = ds.getPool();
+
+        Connection held = ds.getConnection();
+        Assertions.assertEquals(1, pool.getBorrowedCount());
+        Assertions.assertEquals(0, pool.getReturnedCount());
+
+        // The closed pool releases the checked-out connection instead of
+        // queueing it, but the borrower's hand-back must still pair with the
+        // borrow that was counted when the connection was served.
+        ds.close(false);
+        held.close();
+
+        Assertions.assertEquals(1, pool.getBorrowedCount());
+        Assertions.assertEquals(1, pool.getReturnedCount(),
+                "a checked-out connection returned after close must count as a return");
+        Assertions.assertEquals(1, pool.getReleasedCount());
+        Assertions.assertEquals(0, pool.getSize());
+        awaitSessions(0);
+    }
+
+    @Test
     void aConnectionReleasedTwiceIsCountedOnce() throws Exception {
         DataSource ds = newDataSource();
         ds.getPoolProperties().setInitialSize(0);
