@@ -2808,6 +2808,11 @@ public class ConnectionPool {
         volatile Connection result = null;
         SQLException cause = null;
         AtomicBoolean cancelled = new AtomicBoolean(false);
+        /**
+         * Set when a timed get() gave up waiting for setup. The setup task then returns rather
+         * than publishing a connection no caller owns.
+         */
+        final AtomicBoolean abandoned = new AtomicBoolean(false);
         volatile PooledConnection pc = null;
 
         /**
@@ -2890,31 +2895,69 @@ public class ConnectionPool {
         @Override
         public Connection get(long timeout, TimeUnit unit)
                 throws InterruptedException, ExecutionException, TimeoutException {
+            boolean timed = timeout != Long.MAX_VALUE;
+            long deadline = 0;
+            if (timed) {
+                long timeoutNanos = unit.toNanos(timeout);
+                long now = System.nanoTime();
+                deadline = now + timeoutNanos;
+                if (timeoutNanos > 0 && deadline < now) {
+                    deadline = Long.MAX_VALUE;
+                }
+            }
             PooledConnection pc = this.pc != null ? this.pc : pcFuture.get(timeout, unit);
             if (pc != null) {
                 if (result != null) {
                     return result;
                 }
                 if (configured.compareAndSet(false, true)) {
-                    configure(pc);
+                    if (timed) {
+                        if (remainingNanos(deadline) <= 0) {
+                            // The deadline elapsed before setup could start.
+                            // Let the worker discard the produced pooled
+                            // connection and fail the caller rather than
+                            // running an unbounded setup synchronously.
+                            abandoned.set(true);
+                            startConfiguration(pc);
+                            throw new TimeoutException();
+                        }
+                        startConfiguration(pc);
+                        if (!latch.await(remainingNanos(deadline), TimeUnit.NANOSECONDS)) {
+                            abandonConfiguration();
+                            throw new TimeoutException();
+                        }
+                    } else {
+                        configure(pc);
+                    }
                 } else {
                     // If we reach here, another thread claimed the connection:
                     // a get() caller that is setting it up, or the cancellation
                     // cleanup that returns it to the pool
-                    if (!latch.await(timeout, unit)) { // This shouldn't block for long
-                        if (cancelled.get()) {
-                            // A cancellation won the claim, so its cleanup is
-                            // what this wait was for: as for a cancelled
-                            // java.util.concurrent.Future, its callers are told
-                            // about the cancellation rather than about their
-                            // own deadline expiring. A timeout observed before
-                            // the cancellation wins the claim stays a timeout;
-                            // that window is inherent and bounded, the next
-                            // get() here observes the cancellation
-                            throw new CancellationException();
+                    if (timed) {
+                        if (!latch.await(remainingNanos(deadline), TimeUnit.NANOSECONDS)) {
+                            // This shouldn't block for long
+                            if (cancelled.get()) {
+                                // A cancellation won the claim, so its cleanup
+                                // is what this wait was for: as for a cancelled
+                                // java.util.concurrent.Future, its callers are
+                                // told about the cancellation rather than about
+                                // their own deadline expiring. A timeout
+                                // observed before the cancellation wins the
+                                // claim stays a timeout; that window is
+                                // inherent and bounded, the next get() here
+                                // observes the cancellation
+                                throw new CancellationException();
+                            }
+                            throw new TimeoutException();
                         }
-                        throw new TimeoutException();
+                    } else {
+                        latch.await();
                     }
+                }
+                if (abandoned.get()) {
+                    // This future was abandoned after a timed get() expired;
+                    // it must not hand out a connection now.
+                    throw new TimeoutException();
                 }
                 if (result == null) {
                     if (cancelled.get()) {
@@ -2934,6 +2977,17 @@ public class ConnectionPool {
         }
 
         /**
+         * Returns the time remaining until the supplied monotonic deadline.
+         *
+         * @param deadline the deadline from {@link System#nanoTime()}, or {@link Long#MAX_VALUE} for no deadline
+         *
+         * @return the remaining time in nanoseconds
+         */
+        private long remainingNanos(long deadline) {
+            return deadline == Long.MAX_VALUE ? Long.MAX_VALUE : deadline - System.nanoTime();
+        }
+
+        /**
          * Sets up the pooled connection that the claim on {@link #configured} gave to this caller and publishes what
          * came out of it for the callers waiting on {@link #latch}. Only the winner of that claim may call this, which
          * is what keeps the connection from being handed to one caller while the cancellation cleanup returns it to the
@@ -2943,9 +2997,24 @@ public class ConnectionPool {
          */
         private void configure(PooledConnection pooled) {
             try {
+                if (abandoned.get()) {
+                    discardProducedConnection(pooled);
+                    return;
+                }
                 PooledConnection pc = borrowConnection(pooled, null, null);
                 if (pc != null) {
-                    result = ConnectionPool.this.setupConnection(pc);
+                    Connection configured = ConnectionPool.this.setupConnection(pc);
+                    boolean discard = false;
+                    synchronized (this) {
+                        if (abandoned.get()) {
+                            discard = true;
+                        } else {
+                            result = configured;
+                        }
+                    }
+                    if (discard) {
+                        closeConfiguredConnection(configured);
+                    }
                 } else {
                     // The connection was released while it sat idle, so this
                     // hand-off got nothing to set up. The synchronous borrow
@@ -2954,12 +3023,87 @@ public class ConnectionPool {
                     // fails the caller instead. Every caller released on the
                     // latch below reports what this publishes, and an
                     // ExecutionException with no cause tells them nothing.
-                    cause = new SQLException(MessageFactory.get("connectionPool.asyncBorrowConnectionReleased"));
+                    if (!abandoned.get()) {
+                        cause = new SQLException(MessageFactory.get("connectionPool.asyncBorrowConnectionReleased"));
+                    }
                 }
             } catch (SQLException x) {
-                cause = x;
+                if (!abandoned.get()) {
+                    cause = x;
+                }
             } finally {
                 latch.countDown();
+            }
+        }
+
+        /**
+         * Starts the asynchronous setup of a connection produced for a timed get().
+         *
+         * @param pooled the produced pooled connection
+         */
+        private void startConfiguration(PooledConnection pooled) {
+            try {
+                ConnectionPool.this.cancellator.execute(() -> configure(pooled));
+            } catch (RuntimeException x) {
+                // The executor is unbounded and is never shut down, so this is
+                // defensive. Discard the produced connection and fail the
+                // waiting callers with the executor failure.
+                try {
+                    discardProducedConnection(pooled);
+                } catch (RuntimeException y) {
+                    log.warn(MessageFactory.get("connectionPool.unableToReturnTimedOutConnection"), y);
+                }
+                cause = new SQLException(x.getMessage());
+                cause.initCause(x);
+                latch.countDown();
+            }
+        }
+
+        /**
+         * Abandons a timed-out setup. A connection the worker has already published is returned to the pool; a worker
+         * still in setup sees the flag and returns whatever it produces rather than publishing it.
+         */
+        private void abandonConfiguration() {
+            Connection configured;
+            synchronized (this) {
+                abandoned.set(true);
+                configured = result;
+                result = null;
+            }
+            if (configured != null) {
+                closeConfiguredConnection(configured);
+            }
+        }
+
+        /**
+         * Returns a produced pooled connection to the pool without publishing it.
+         *
+         * @param pooled the produced pooled connection
+         */
+        private void discardProducedConnection(PooledConnection pooled) {
+            try {
+                PooledConnection pc = borrowConnection(pooled, null, null);
+                if (pc != null) {
+                    Connection configured = ConnectionPool.this.setupConnection(pc);
+                    if (configured != null) {
+                        closeConfiguredConnection(configured);
+                    }
+                }
+            } catch (SQLException x) {
+                log.debug("Unable to discard a timed-out asynchronous connection.", x);
+            }
+        }
+
+        /**
+         * Returns a configured connection that no caller owns to the pool.
+         *
+         * @param configured the connection to return
+         */
+        private void closeConfiguredConnection(Connection configured) {
+            try {
+                configured.close();
+            } catch (SQLException x) {
+                log.warn(MessageFactory.get("connectionPool.unableToReturnTimedOutConnection"), x);
             }
         }
 
