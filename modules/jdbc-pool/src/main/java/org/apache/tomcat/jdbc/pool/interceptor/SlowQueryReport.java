@@ -163,7 +163,14 @@ public class SlowQueryReport extends AbstractQueryReport {
             return null;
         }
         String name = pool.getRegistrationName();
-        return name == null ? null : perPoolStats.get(name);
+        if (name == null) {
+            return null;
+        }
+        PoolStatistics stats = perPoolStats.get(name);
+        // The registry is keyed by the pool name, but a name can be reused by
+        // another pool after the first one was abandoned. The ownership check
+        // keeps a lookup made for one pool from resolving another pool's store.
+        return stats != null && stats.getPool() == pool && !stats.isReleased() ? stats : null;
     }
 
     /**
@@ -320,8 +327,9 @@ public class SlowQueryReport extends AbstractQueryReport {
     }
 
     /**
-     * Registers the statistics store of a pool that has started, under the name the pool started with. A start always
-     * begins a fresh store rather than inheriting numbers from an abandoned pool's leftover.
+     * Registers the statistics store of a pool that has started, under the name the pool started with. A store left
+     * under that name by an abandoned pool is not inherited: it is replaced and released. Several reporting definitions
+     * configured on one pool share the one store registered here.
      *
      * @param pool the connection pool that has started
      *
@@ -341,10 +349,17 @@ public class SlowQueryReport extends AbstractQueryReport {
             // ConcurrentHashMap would refuse the key before anything else could
             throw new IllegalStateException(MessageFactory.get("slowQueryReport.poolNameRequired"));
         }
-        PoolStatistics own = new PoolStatistics(pool, name);
-        PoolStatistics previous;
+        PoolStatistics own;
+        PoolStatistics previous = null;
         synchronized (perPoolStats) {
-            previous = perPoolStats.put(name, own);
+            own = perPoolStats.get(name);
+            if (own == null || own.getPool() != pool || own.isReleased()) {
+                // A fresh store for this pool. The previous store under the
+                // name may be the leftover of an abandoned pool or a duplicate
+                // live pool's store; it is released below.
+                own = new PoolStatistics(pool, name);
+                previous = perPoolStats.put(name, own);
+            }
         }
         reportDuplicateName(previous, pool, name);
         if (previous != null && previous.getPool() != pool) {
@@ -407,7 +422,11 @@ public class SlowQueryReport extends AbstractQueryReport {
                 return null;
             }
             own = perPoolStats.get(name);
-            if (own == null) {
+            if (own == null || own.getPool() != parent || own.isReleased()) {
+                // A fresh store for this pool. The store under the name may be
+                // a leftover from an abandoned pool or a duplicate live pool's
+                // store; it is released below so the name now belongs to this
+                // pool.
                 own = new PoolStatistics(parent, name);
                 previous = perPoolStats.put(name, own);
             }
