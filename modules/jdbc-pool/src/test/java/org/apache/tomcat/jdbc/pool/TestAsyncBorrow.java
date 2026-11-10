@@ -379,6 +379,12 @@ class TestAsyncBorrow extends JdbcPoolBaseTest {
                 "a poll whose timed get() timed out is complete");
         Assertions.assertFalse(future.isCancelled(),
                 "nobody cancelled the poll, a timeout must not report a cancellation");
+        Assertions.assertFalse(future.cancel(true),
+                "a future that has already timed out must not report a cancellation");
+        Assertions.assertFalse(future.isCancelled(),
+                "a refused cancel must not turn a timeout into a cancellation");
+        Assertions.assertTrue(future.isDone(),
+                "the timed-out future must remain complete after the refused cancel");
         Assertions.assertThrows(TimeoutException.class,
                 () -> future.get(100, TimeUnit.MILLISECONDS),
                 "a repeated timed get() must keep reporting the timeout");
