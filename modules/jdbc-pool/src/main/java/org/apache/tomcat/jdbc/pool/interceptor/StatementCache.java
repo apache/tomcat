@@ -317,16 +317,41 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
         // exactly the entries the purge owns. Each removal decrements the
         // counter once; closing runs after the sweep because it reaches the
         // driver.
+        AtomicInteger size = cacheSize;
         draining = true;
         if (statements != null) {
             do {
+                boolean removed = false;
                 for (Map.Entry<CacheKey, CachedStatement> entry : statements.entrySet()) {
                     CachedStatement statement = entry.getValue();
-                    if (statement != null && removeStatementInternal(statement)) {
+                    if (statement != null && statements.remove(entry.getKey(), statement)) {
+                        removed = true;
                         if (toClose == null) {
                             toClose = new ArrayList<>();
                         }
                         toClose.add(statement);
+                        if (size != null) {
+                            size.decrementAndGet();
+                        }
+                    }
+                }
+                if (!removed) {
+                    // No entry could be removed by identity: the value under
+                    // a key changed or the map is otherwise unable to make
+                    // progress for this call. The purge owns every entry in
+                    // the cache now, so take the remaining mappings and close
+                    // what they hold rather than looping forever.
+                    for (Map.Entry<CacheKey, CachedStatement> entry : statements.entrySet()) {
+                        CachedStatement statement = statements.remove(entry.getKey());
+                        if (statement != null) {
+                            if (toClose == null) {
+                                toClose = new ArrayList<>();
+                            }
+                            toClose.add(statement);
+                            if (size != null) {
+                                size.decrementAndGet();
+                            }
+                        }
                     }
                 }
             } while (!statements.isEmpty());
@@ -439,29 +464,32 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
         if (draining) {
             return false;
         }
-        boolean parked = cacheStatementInternal(proxy);
-        if (parked && draining) {
-            // The purge may have started while this park was in flight. If
-            // the entry is still ours, withdraw it and let the caller close
-            // it; if the purge already removed it, the purge closes it.
-            return !removeStatementInternal(proxy);
-        }
-        return parked;
-    }
-
-    private boolean cacheStatementInternal(CachedStatement proxy) {
+        // Capture both the map and the counter once. A disposal can null the
+        // counter field while this park is in flight; the captured counter
+        // object still has to receive the reservation withdrawal, and the
+        // captured map still contains the entry to withdraw.
         ConcurrentHashMap<CacheKey, CachedStatement> cache = getCache();
-        // Read the counter once, like getCacheSize() and closeInvoked() do:
-        // a disposal (the reset(null, null) walks) nulls the field, and every
-        // read of the field itself - here at the entry check, and again in the
-        // withdrawal below - could meet a null in the middle of this call, so
-        // that the withdrawal throws and the increment this call made is never
-        // returned to the counter the whole pool shares. The counter object
-        // outlives the field's nulling, so a local keeps it reachable.
         AtomicInteger size = cacheSize;
         if (cache == null || size == null) {
             return false;
         }
+        boolean parked = cacheStatementInternal(cache, size, proxy);
+        if (parked && (draining || cacheSize != size)) {
+            // The purge may have started while this park was in flight, or the
+            // cache may have been disposed. If the entry is still ours,
+            // withdraw it and let the caller close it; if the purge already
+            // removed it, the purge closes it.
+            if (cache.remove(proxy.getCacheKey(), proxy)) {
+                size.decrementAndGet();
+                return false;
+            }
+            return true;
+        }
+        return parked;
+    }
+
+    private boolean cacheStatementInternal(ConcurrentHashMap<CacheKey, CachedStatement> cache, AtomicInteger size,
+            CachedStatement proxy) {
         if (proxy.getCacheKey() == null) {
             return false;
         } else if (proxy.getAssociatedConnection() != currentPhysicalConnection()) {
