@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.jdbc.pool;
 
+import java.util.Collections;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Assertions;
@@ -80,6 +81,25 @@ class TestPoolUtilities {
     }
 
     @Test
+    void theCopyResolvesTheDefaultsStringBeneathANonStringDirectlyPresentValue() {
+        // Properties.getProperty(...) falls through to the defaults whenever
+        // the directly present value is not a String, so the source really
+        // does resolve "verify-full" under this key. A containsKey(...) guard
+        // in the materialization pass was blind to that: it saw the copied
+        // non-String entry and skipped the key, leaving the defaults-backed
+        // setting unresolvable in the tableless copy the driver receives.
+        Properties defaults = new Properties();
+        defaults.setProperty("sslmode", "verify-full");
+        Properties source = new Properties(defaults);
+        source.put("sslmode", new Object());
+
+        Properties clone = PoolUtilities.clone(source);
+
+        Assertions.assertEquals("verify-full", clone.getProperty("sslmode"),
+                "the copy must resolve what the source resolves");
+    }
+
+    @Test
     void directlyPresentValuesAreCopiedAsTheyAre() {
         // Properties tolerates non-String values through the Hashtable API;
         // the copy keeps them verbatim rather than dropping the entry.
@@ -111,6 +131,57 @@ class TestPoolUtilities {
         Assertions.assertFalse(masked.containsKey(PoolUtilities.PROP_PASSWORD));
         Assertions.assertEquals("verify-full", masked.getProperty("sslmode"));
         Assertions.assertEquals("bob", masked.getProperty(PoolUtilities.PROP_USER));
+    }
+
+    @Test
+    void cloneWithoutPasswordMasksAResolvedPasswordBeneathANonStringDirectValue() {
+        // The shape of the test above with the password also shadowed by a
+        // non-String direct value: the source resolves the defaults-held
+        // password through it, so the materialization must book it into the
+        // copy - and the mask must then remove it with the key.
+        Properties defaults = new Properties();
+        defaults.setProperty(PoolUtilities.PROP_PASSWORD, "s3cret");
+        Properties source = new Properties(defaults);
+        source.put(PoolUtilities.PROP_PASSWORD, new Object());
+
+        Properties masked = PoolUtilities.cloneWithoutPassword(source);
+
+        Assertions.assertNull(masked.getProperty(PoolUtilities.PROP_PASSWORD));
+        Assertions.assertFalse(masked.containsKey(PoolUtilities.PROP_PASSWORD));
+    }
+
+    @Test
+    void cloneWithoutPasswordMasksEveryCredentialKeySpelling() {
+        Properties source = new Properties();
+        source.setProperty("sslmode", "verify-full");
+        source.setProperty(PoolUtilities.PROP_PASSWORD, "secret1");
+        source.setProperty("pass", "secret2");
+        source.setProperty("pwd", "secret3");
+        source.setProperty("PASSWORD", "secret4");
+        source.setProperty(" Password ", "secret5");
+
+        Properties masked = PoolUtilities.cloneWithoutPassword(source);
+
+        Assertions.assertEquals(Collections.singleton("sslmode"),
+                masked.stringPropertyNames(),
+                "every credential-shaped key must be removed, whatever its spelling");
+    }
+
+    @Test
+    void cloneWithoutPasswordMasksCredentialKeysResolvedFromDefaults() {
+        Properties defaults = new Properties();
+        defaults.setProperty("pass", "secret1");
+        defaults.setProperty("pwd", "secret2");
+        defaults.setProperty("PASSWORD", "secret3");
+        defaults.setProperty("sslmode", "verify-full");
+        Properties source = new Properties(defaults);
+
+        Properties masked = PoolUtilities.cloneWithoutPassword(source);
+
+        Assertions.assertEquals(Collections.singleton("sslmode"),
+                masked.stringPropertyNames(),
+                "a credential the source resolves through its defaults must not survive"
+                        + " into the tableless copy");
     }
 
     @Test

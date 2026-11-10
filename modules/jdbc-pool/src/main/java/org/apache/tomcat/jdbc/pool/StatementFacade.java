@@ -36,33 +36,14 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 /**
  * Facade that creates statement and result set proxies.
  * <p>
- * The handles this facade hands out implement only the standard JDBC interfaces, as do the proxies of the interceptors
- * that wrap statements beneath it, so the driver's own statement and result set classes are never visible to the
- * application through a cast. Every result set a pooled statement hands back, and every result set that one of those
- * handles hands back in turn, reaches the application as one of these handles, whatever the method that returned it was
- * called: a cursor that arrives as a plain object - a REF cursor OUT-parameter read through
- * {@link java.sql.CallableStatement#getObject(int)}, or the nested cursor a {@link java.sql.ResultSet#getObject(int)}
- * column value hands out - is sealed to the borrow like the ones the standard result set methods return. The
- * <code>Wrapper</code> methods are delegated to the driver, and <code>unwrap</code> is the supported way to reach
- * driver-specific methods through every layer. An unwrapped driver object, however, is a driver object rather than a
- * pooled handle: retiring these handles at the end of the borrow does not retire what was already unwrapped, and only
- * tracking the statements with {@link org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer} (or the application
- * closing them) keeps the statements underneath from outliving the borrow - unless an interceptor recycles them for the
- * next borrow, as a statement cache does.
+ * The handles implement only the standard JDBC interfaces, so the driver's own classes are never visible through a cast.
+ * Every result set handed back - including cursors returned through {@code getObject(...)} - is sealed to the borrow.
+ * The {@code Wrapper} methods are delegated to the driver; an unwrapped driver object is not retired when the borrow
+ * ends, so statements underneath are kept alive only by {@link org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer}
+ * or by the application closing them.
  * <p>
- * The rule that decides what is sealed is a type rule, and its boundary is the type. A value a handle hands back
- * that is not itself a result set is passed through as it came (what a statement handle reports as its connection
- * is the pool's own handle, not the driver's), and a cursor that rides inside such a value reaches the application
- * over that same unsealed path: the {@link java.sql.Array} read for an ARRAY column or an ARRAY OUT-parameter
- * hands out its cursors through {@link java.sql.Array#getResultSet()}, a {@link java.sql.Struct} through its
- * attributes, and the deprecated {@link java.sql.Ref} a <code>getRef</code> call hands back is itself the
- * driver's object; the {@link java.sql.Blob}, {@link java.sql.Clob} and {@link java.sql.SQLXML} locators are the
- * same shape without a cursor in them. None of that is sealed to the borrow, just as what <code>unwrap()</code>
- * hands back is not: this facade seals the result sets a pooled statement hands out and the result sets those
- * handles hand out in turn, not cursors that arrive inside values of another type - the REF cursor OUT-parameter
- * and the nested cursor named above are themselves result sets, which is why they are sealed and these composites
- * are not. Whether a driver object kept past the borrow still reads, and over what session, is the driver's affair;
- * no handle of this facade retires it.
+ * Sealing follows the declared type: a value that is not itself a result set is passed through unchanged, so cursors
+ * carried inside an {@link java.sql.Array}, {@link java.sql.Struct} or {@link java.sql.Ref} are not sealed.
  */
 public class StatementFacade extends AbstractCreateStatementInterceptor {
 
@@ -84,11 +65,32 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
         setNext(interceptor);
     }
 
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        // The facade above ends the borrow on close and on abort alike, but
+        // the base class forwards only close to closeInvoked(), so seal the
+        // handles here for abort as well: an aborted borrow retires its
+        // statements and result sets exactly as a closed one does, rather
+        // than leaving them to answer from the driver on a session this
+        // handle can no longer claim. The seal runs ahead of the forward, as
+        // in the base class's close path, so no handle can observe the flag
+        // as live after the session has left service. Of the dispose calls
+        // the facade above lets exactly one reach this chain, and setting the
+        // flag is idempotent in any case.
+        if (compare(ABORT_VAL, method)) {
+            closeInvoked();
+        }
+        return super.invoke(proxy, method, args);
+    }
+
     /**
-     * Marks the borrow as ended, which closes every statement and result set handle this facade handed out. Called
-     * before the connection is handed back, so a handle cannot outlive the borrow and end up driving the session of the
-     * next borrower. A borrow that is abandoned instead never runs this method, but the pool destroys an abandoned
-     * session rather than lending it again, so those handles only fail at the driver.
+     * Marks the borrow as ended, sealing every statement and result set handle this facade handed out so later calls are
+     * refused. Called before the connection leaves the application - on close and, through {@link #invoke}, on abort -
+     * so a handle cannot outlive the borrow and end up driving the session of the next borrower. This method does not
+     * physically close the driver statements; that is done by the driver's connection close, or by
+     * {@link org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer} when configured. A borrow that is abandoned
+     * instead never runs this method, but the pool destroys an abandoned session rather than lending it again, so those
+     * handles only fail at the driver.
      */
     @Override
     public void closeInvoked() {
@@ -96,7 +98,7 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
     }
 
     /**
-     * Creates a statement interceptor to monitor query response times
+     * Wraps the statement produced underneath in a handle that retires with the borrow.
      */
     @Override
     public Object createStatement(Object proxy, Method method, Object[] args, Object statement, long time) {
@@ -105,35 +107,40 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
             Constructor<?> constructor = null;
             String sql = null;
             if (compare(CREATE_STATEMENT, name)) {
-                // createStatement
                 constructor = getConstructor(CREATE_STATEMENT_IDX, Statement.class);
             } else if (compare(PREPARE_STATEMENT, name)) {
-                // prepareStatement
                 constructor = getConstructor(PREPARE_STATEMENT_IDX, PreparedStatement.class);
                 sql = (String) args[0];
             } else if (compare(PREPARE_CALL, name)) {
-                // prepareCall
                 constructor = getConstructor(PREPARE_CALL_IDX, CallableStatement.class);
                 sql = (String) args[0];
             } else {
-                // Do nothing
+                // Not a statement creation - pass the object from beneath through
                 return statement;
             }
             return constructor.newInstance(new Object[] { new StatementProxy(statement, sql, proxy) });
         } catch (Exception x) {
-            logger.warn("Unable to create statement proxy.", x);
+            // Defensive branch: reaching it requires the proxy machinery
+            // to fail for the statement interfaces after it already built
+            // this borrow's connection handle - the constructor cache the
+            // wrap consults is written only by the class initializer and
+            // by a test seam that simulates a failed one, and a proxy
+            // constructor cannot refuse its single handler argument - so
+            // no application behavior gets here. Should it ever, the
+            // caller keeps a working statement, the posture upstream
+            // took, at the one cost that this facade's seal does not
+            // cover the object handed back; the warn below is that cost's
+            // only report.
+            logger.warn(MessageFactory.get("statementFacade.unableToCreateStatementProxy"), x);
         }
         return statement;
     }
 
     /**
-     * Proxy for a SQL statement used to measure query execute time.
+     * Proxy for a SQL statement. Refuses calls once the borrow that created it has ended, and seals every result set
+     * the statement hands back.
      */
     protected class StatementProxy implements InvocationHandler {
-        /**
-         * Indicates whether this statement has been closed.
-         */
-        protected boolean closed = false;
         /**
          * The delegated statement, nulled once a close has been forwarded. A handle can be closed from a thread other
          * than the one invoking on it, so the field is read by more threads than the one that nulls it and, like the
@@ -253,7 +260,8 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
                     throw t;
                 }
             }
-            // Perform close cleanup
+            // Drop the driver reference; the null delegate is what answers
+            // as closed from here on.
             if (compare(CLOSE_VAL, method)) {
                 delegate = null;
             }
@@ -383,7 +391,7 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
                     throw t;
                 }
             }
-            // Perform close cleanup
+            // Drop the driver reference, as in the statement proxy.
             if (compare(CLOSE_VAL, method)) {
                 delegate = null;
             }

@@ -42,8 +42,9 @@ import org.apache.tomcat.jdbc.pool.PoolProperties;
  * contract makes {@code getContent()} nullable and {@code Object}-
  * valued, so the factory loop must survive a null content instead of
  * stringifying blindly, and a {@code dataSource} attribute carrying an
- * actual {@code javax.sql.DataSource} object must reach the pool as
- * that object rather than as its {@code toString()}.
+ * actual backing object must reach the pool as that object rather than
+ * as its {@code toString()} - for every backing type the pool's own
+ * connect path accepts, not only {@code javax.sql.DataSource}.
  */
 class TestDataSourceFactoryRefAddrContent extends JdbcPoolBaseTest {
 
@@ -120,6 +121,65 @@ class TestDataSourceFactoryRefAddrContent extends JdbcPoolBaseTest {
     }
 
     @Test
+    void objectValuedXaOnlyDataSourceRefAddrBacksThePool() throws Exception {
+        // A driver's XA data source, like Oracle's, implements
+        // javax.sql.XADataSource without being a javax.sql.DataSource. The
+        // pool's connect path supports exactly that backing, but the
+        // instanceof test in the factory loop recognised only
+        // javax.sql.DataSource: the live object was stringified and the
+        // resource then died on the resulting string with a message telling
+        // the operator to do what the Reference already did.
+        Reference ref = new Reference("javax.sql.XADataSource", null, null);
+        ref.add(new StringRefAddr("jmxEnabled", "false"));
+        ref.add(new StringRefAddr("initialSize", "1"));
+        ref.add(new StringRefAddr("minIdle", "0"));
+        org.h2.jdbcx.JdbcDataSource delegate = new org.h2.jdbcx.JdbcDataSource();
+        delegate.setUrl(getUrl());
+        delegate.setUser("sa");
+        delegate.setPassword("");
+        Object xaOnly = singleInterfaceDataSource(delegate, javax.sql.XADataSource.class);
+        ref.add(new ObjectContentRefAddr("dataSource", xaOnly));
+
+        Object result = new DataSourceFactory().getObjectInstance(ref,
+                new CompositeName("jdbc/TestDS"), null, null);
+        Assertions.assertInstanceOf(org.apache.tomcat.jdbc.pool.XADataSource.class, result,
+                "a javax.sql.XADataSource reference must yield the pool's XA data source");
+        org.apache.tomcat.jdbc.pool.XADataSource ds =
+                manage((org.apache.tomcat.jdbc.pool.XADataSource) result);
+
+        Assertions.assertSame(xaOnly, ds.getPoolProperties().getDataSource(),
+                "the object carried by the dataSource RefAddr must back the pool");
+        assertPoolConnects(ds);
+        Assertions.assertEquals(1, poolSessions(),
+                "the pool must establish connections through that XA data source");
+    }
+
+    @Test
+    void objectValuedConnectionPoolDataSourceRefAddrBacksThePool() throws Exception {
+        // Same as above for the pooled-connections backing: a driver
+        // data source that is a javax.sql.ConnectionPoolDataSource but not
+        // a javax.sql.DataSource (PostgreSQL's CPDS sources, for instance)
+        // must reach the pool as an object, not as its toString().
+        Reference ref = poolReference();
+        org.h2.jdbcx.JdbcDataSource delegate = new org.h2.jdbcx.JdbcDataSource();
+        delegate.setUrl(getUrl());
+        delegate.setUser("sa");
+        delegate.setPassword("");
+        Object cpdsOnly = singleInterfaceDataSource(delegate,
+                javax.sql.ConnectionPoolDataSource.class);
+        ref.add(new ObjectContentRefAddr("dataSource", cpdsOnly));
+
+        DataSource ds = managedPool(new DataSourceFactory().getObjectInstance(
+                ref, new CompositeName("jdbc/TestDS"), null, null));
+
+        Assertions.assertSame(cpdsOnly, ds.getPoolProperties().getDataSource(),
+                "the object carried by the dataSource RefAddr must back the pool");
+        assertPoolConnects(ds);
+        Assertions.assertEquals(1, poolSessions(),
+                "the pool must establish connections through that pooled-connections data source");
+    }
+
+    @Test
     void objectValuedDataSourceRefAddrTakesPrecedenceOverDataSourceJNDI()
             throws Exception {
         // Both ways of giving the pool a backing data source are present.
@@ -145,6 +205,32 @@ class TestDataSourceFactoryRefAddrContent extends JdbcPoolBaseTest {
         Assertions.assertSame(handed, ds.getPoolProperties().getDataSource(),
                 "the object-valued dataSource attribute must win over dataSourceJNDI");
         assertPoolConnects(ds);
+    }
+
+    @Test
+    void objectValuedDataSourceRefAddrCarryingAnotherPoolIsRejectedWithTheAttributeContext() {
+        // A pool cannot wrap another pool. Pre-fix the object passed the
+        // factory's own acceptance check and was rejected deeper down by
+        // PoolProperties with a bare "Layered pools are not allowed." -
+        // neither the attribute at fault nor the object's class was named,
+        // unlike every other failure this factory reports (and unlike the
+        // dataSourceJNDI route's diagnosis of the same binding).
+        Reference ref = poolReference();
+        org.apache.tomcat.jdbc.pool.DataSource otherPool =
+                new org.apache.tomcat.jdbc.pool.DataSource();
+        ref.add(new ObjectContentRefAddr("dataSource", otherPool));
+
+        IllegalArgumentException e = Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> new DataSourceFactory().getObjectInstance(ref,
+                        new CompositeName("jdbc/TestDS"), null, null));
+        Assertions.assertTrue(e.getMessage().contains("dataSource"),
+                "the rejection must name the misconfigured attribute, was: "
+                        + e.getMessage());
+        Assertions.assertTrue(
+                e.getMessage().contains(otherPool.getClass().getName()),
+                "the rejection must name the class the attribute carried, was: "
+                        + e.getMessage());
     }
 
     @Test
@@ -272,6 +358,35 @@ class TestDataSourceFactoryRefAddrContent extends JdbcPoolBaseTest {
     }
 
     /*
+     * A JDBC data source exposed through a single interface, as the drivers
+     * that give their XA or pooled data source only that one type do. Every
+     * interface call is delegated to the given real data source, which must
+     * implement that interface.
+     */
+    private static Object singleInterfaceDataSource(final Object delegate,
+            Class<?> exposedInterface) {
+        return Proxy.newProxyInstance(
+                TestDataSourceFactoryRefAddrContent.class.getClassLoader(),
+                new Class<?>[] { exposedInterface },
+                (proxy, method, args) -> {
+                    switch (method.getName()) {
+                        case "toString":
+                            return "SingleInterfaceDataSource";
+                        case "hashCode":
+                            return Integer.valueOf(System.identityHashCode(proxy));
+                        case "equals":
+                            return Boolean.valueOf(proxy == args[0]);
+                        default:
+                            try {
+                                return method.invoke(delegate, args);
+                            } catch (java.lang.reflect.InvocationTargetException e) {
+                                throw e.getCause();
+                            }
+                    }
+                });
+    }
+
+    /*
      * A JNDI context whose lookup returns the given object for any name,
      * standing in for a bound data source.
      */
@@ -287,9 +402,9 @@ class TestDataSourceFactoryRefAddrContent extends JdbcPoolBaseTest {
                             case "lookup":
                                 return bound;
                             case "hashCode":
-                                return System.identityHashCode(proxy);
+                                return Integer.valueOf(System.identityHashCode(proxy));
                             case "equals":
-                                return proxy == args[0];
+                                return Boolean.valueOf(proxy == args[0]);
                             case "toString":
                                 return "ContextStub";
                             case "close":

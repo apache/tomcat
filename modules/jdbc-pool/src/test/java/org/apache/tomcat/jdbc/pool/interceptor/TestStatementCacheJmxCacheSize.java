@@ -85,6 +85,37 @@ class TestStatementCacheJmxCacheSize extends JdbcPoolBaseTest {
     }
 
     @Test
+    void aDefinitionAddedToARunningPoolGetsItsCounter() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setMaxActive(2);
+        ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(0);
+        ds.createPool();
+
+        // Hold a connection built before the definition is added, so the
+        // second borrow must create a physical connection and its chain.
+        Connection first = ds.getConnection();
+        try {
+            ds.getPoolProperties().setJdbcInterceptors(
+                    StatementCache.class.getName() + "(prepared=true,max=5)");
+            try (Connection second = ds.getConnection()) {
+                StatementCache cache = interceptorOf(second, StatementCache.class);
+                Assertions.assertNotNull(cache,
+                        "the new connection's chain must hold the added definition");
+                PreparedStatement statement = second.prepareStatement("SELECT 1");
+                statement.close();
+
+                Assertions.assertEquals(1, cache.getCacheSizePerConnection(),
+                        "a statement closed on the new chain must be parked");
+                Assertions.assertEquals(1, cache.getCacheSize(),
+                        "the late definition must have obtained a cache-size counter");
+            }
+        } finally {
+            first.close();
+        }
+    }
+
+    @Test
     void theCacheSizeAttributeIsADescribedNumber() throws Exception {
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
         DataSource ds = cachingPool("(prepared=true,max=5)");

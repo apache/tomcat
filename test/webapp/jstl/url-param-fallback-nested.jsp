@@ -20,3 +20,23 @@
 <c:url var="u" value="/a.jsp"><c:forEach var="i" varStatus="s"
     begin="1" end="1"><c:param name="p" value="q"/></c:forEach></c:url>
 <p>U=[${u}]</p>
+<c:url var="mixed" value="/a.jsp?q=1">
+  <c:param name="a" value="1"/>
+  <c:forEach var="i" varStatus="s" begin="1" end="1"><c:param name="b" value="2"/></c:forEach>
+  <c:param name="c" value="3"/>
+</c:url>
+<p>MIXED=[${mixed}]</p>
+<c:url var="outer" value="/o.jsp">
+  <c:param name="x" value="1"/>
+  <c:url var="inner" value="/i.jsp">
+    <c:forEach var="i" varStatus="s" begin="1" end="1"><c:param name="y" value="2"/></c:forEach>
+  </c:url>
+  <c:param name="z" value="3"/>
+</c:url>
+<p>OUTER=[${outer}]</p>
+<p>INNER=[${inner}]</p>
+<c:url var="ordered" value="/a.jsp?q=1&r=2">
+  <c:param name="a" value="1"/>
+  <c:param name="b" value="2"/>
+</c:url>
+<p>ORDERED=[${ordered}]</p>

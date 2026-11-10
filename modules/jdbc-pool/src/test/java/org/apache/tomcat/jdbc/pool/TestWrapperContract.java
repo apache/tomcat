@@ -41,9 +41,11 @@ import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
  * answered the same way through both entry points of the chain - the handle's
  * dispatch and the bottom interceptor's own public methods - and there
  * {@code isWrapperFor} must agree with what {@code unwrap} hands out. Once the
- * interceptor holds no pooled connection at all, the pair for that class is
- * the refusal: {@code isWrapperFor} says false and {@code unwrap} answers the
- * not-a-wrapper failure it predicts, rather than handing back a silent null.
+ * interceptor holds no pooled connection at all, the pair is the refusal for
+ * every interface the pool's own is answered with: {@code isWrapperFor} says
+ * false and {@code unwrap} answers the not-a-wrapper failure it predicts,
+ * rather than handing back a silent null or dereferencing the released field
+ * into a {@code NullPointerException}.
  * The one answer the two entry points legitimately differ on is
  * {@link javax.sql.PooledConnection}, which the handle implements and the
  * interceptor does not: the contract asks each object about its own wrappers,
@@ -124,20 +126,19 @@ class TestWrapperContract extends JdbcPoolBaseTest {
     }
 
     @Test
-    void theInternalPooledConnectionUnwrapIdiomIsUnchanged() throws Exception {
+    void theInternalPooledConnectionIsNotExposedThroughWrapper() throws Exception {
         DataSource ds = newDataSource();
         ds.createPool();
 
         try (Connection pooled = ds.getConnection()) {
-            // The pool's own introspection idiom (used in tests and by
-            // interceptors): unwrap to the internal pooled connection.
-            org.apache.tomcat.jdbc.pool.PooledConnection internal =
-                    pooled.unwrap(org.apache.tomcat.jdbc.pool.PooledConnection.class);
-            Assertions.assertSame(
-                    interceptorOf(pooled, ProxyConnection.class).getConnection(),
-                    internal,
-                    "unwrapping to the internal pooled connection must keep "
-                    + "returning the pool's own object");
+            Assertions.assertFalse(
+                    pooled.isWrapperFor(org.apache.tomcat.jdbc.pool.PooledConnection.class),
+                    "the pool-internal connection must not be advertised as wrapped");
+            SQLException thrown = Assertions.assertThrows(SQLException.class,
+                    () -> pooled.unwrap(org.apache.tomcat.jdbc.pool.PooledConnection.class),
+                    "the pool-internal connection must not be reachable through the public Wrapper contract");
+            Assertions.assertTrue(thrown.getMessage().contains("Not a wrapper"),
+                    "the failure must say it is a not-a-wrapper case: " + thrown.getMessage());
         }
     }
 
@@ -159,35 +160,28 @@ class TestWrapperContract extends JdbcPoolBaseTest {
     }
 
     @Test
-    void theInternalPooledConnectionIsAnsweredIdenticallyByBothEntryPoints()
+    void theInternalPooledConnectionIsRefusedByBothEntryPoints()
             throws Exception {
         DataSource ds = newDataSource();
         ds.createPool();
 
         try (Connection pooled = ds.getConnection()) {
             ProxyConnection interceptor = interceptorOf(pooled, ProxyConnection.class);
-            // What the handle's dispatch answers for the pool's own pooled
-            // connection, the bottom interceptor's public method answers
-            // too - one object on both entry points, pinning the
-            // consistency the two entry points of the chain must keep.
-            Object viaHandle = pooled.unwrap(
-                    org.apache.tomcat.jdbc.pool.PooledConnection.class);
-            Object viaInterceptor = interceptor.unwrap(
-                    org.apache.tomcat.jdbc.pool.PooledConnection.class);
-            Assertions.assertSame(viaInterceptor, viaHandle,
-                    "the handle and the interceptor must answer the same object");
-            Assertions.assertSame(interceptor.getConnection(), viaHandle,
-                    "the answer both entry points give is the pool's own pooled connection");
-            // The Wrapper contract: isWrapperFor must tell the truth about
-            // what unwrap hands out. Both objects sit on - are indirectly a
-            // wrapper of - the pooled connection their unwrap returns, so
-            // both must answer true, not the false that contradicted unwrap.
-            Assertions.assertTrue(
+            // Neither entry point advertises or hands out the pool-internal
+            // object: the public Wrapper contract exposes only the standard
+            // interfaces the handle itself implements.
+            Assertions.assertFalse(
                     pooled.isWrapperFor(org.apache.tomcat.jdbc.pool.PooledConnection.class),
-                    "isWrapperFor must agree with the unwrap the handle answers");
-            Assertions.assertTrue(
+                    "the handle must not advertise the pool-internal connection");
+            Assertions.assertFalse(
                     interceptor.isWrapperFor(org.apache.tomcat.jdbc.pool.PooledConnection.class),
-                    "isWrapperFor must agree with the unwrap the interceptor answers");
+                    "the interceptor must not advertise the pool-internal connection");
+            Assertions.assertThrows(SQLException.class,
+                    () -> pooled.unwrap(org.apache.tomcat.jdbc.pool.PooledConnection.class),
+                    "the handle must not hand out the pool-internal connection");
+            Assertions.assertThrows(SQLException.class,
+                    () -> interceptor.unwrap(org.apache.tomcat.jdbc.pool.PooledConnection.class),
+                    "the interceptor must not hand out the pool-internal connection");
         }
     }
 
@@ -216,6 +210,76 @@ class TestWrapperContract extends JdbcPoolBaseTest {
                 () -> interceptor.unwrap(org.apache.tomcat.jdbc.pool.PooledConnection.class),
                 "unwrap must answer the not-a-wrapper failure isWrapperFor "
                 + "predicts, not hand back a silent null");
+        Assertions.assertTrue(thrown.getMessage().contains("Not a wrapper"),
+                "the failure must say it is a not-a-wrapper case: "
+                + thrown.getMessage());
+    }
+
+    @Test
+    void theUnheldXaConnectionIsRefusedAsNotAWrapperByTheInterceptor()
+            throws Exception {
+        XADataSource ds = newXaDataSource();
+        ds.createPool();
+
+        Connection pooled = ds.getConnection();
+        // Taken while the chain is intact, as in the pooled-connection case
+        // above: after the close the disposable facade seals and no longer
+        // forwards to the interceptor.
+        ProxyConnection interceptor = interceptorOf(pooled, ProxyConnection.class);
+        // While the borrow is live the interceptor answers this class with
+        // the driver's XA connection; pin that here too, so the refusal
+        // below records the state change of the release and not a lost
+        // answer.
+        Assertions.assertTrue(interceptor.isWrapperFor(XAConnection.class));
+        Assertions.assertInstanceOf(XAConnection.class,
+                interceptor.unwrap(XAConnection.class));
+        pooled.close();
+        // The released interceptor holds no pooled connection, so its XA
+        // handle is gone with it, and the honest answer is the same refusal
+        // the PooledConnection case gives from this state - not the raw
+        // NullPointerException the unguarded dereference of the sealed field
+        // surfaced instead.
+        Assertions.assertFalse(
+                interceptor.isWrapperFor(XAConnection.class),
+                "an interceptor holding nothing is not a wrapper of it");
+        SQLException thrown = Assertions.assertThrows(SQLException.class,
+                () -> interceptor.unwrap(XAConnection.class),
+                "unwrap must answer the not-a-wrapper failure isWrapperFor "
+                + "predicts, not dereference the released field");
+        Assertions.assertTrue(thrown.getMessage().contains("Not a wrapper"),
+                "the failure must say it is a not-a-wrapper case: "
+                + thrown.getMessage());
+    }
+
+    @Test
+    void theUnheldPhysicalConnectionIsRefusedAsNotAWrapperByTheInterceptor()
+            throws Exception {
+        DataSource ds = newDataSource();
+        ds.createPool();
+
+        Connection pooled = ds.getConnection();
+        // Taken while the chain is intact, as in the pooled-connection case
+        // above.
+        ProxyConnection interceptor = interceptorOf(pooled, ProxyConnection.class);
+        // While held, the answer for this class is the driver's own physical
+        // connection below the pooled one; pin it so the refusal below is the
+        // release's state change.
+        Assertions.assertTrue(interceptor.isWrapperFor(Connection.class));
+        Assertions.assertSame(interceptor.getConnection().getConnection(),
+                interceptor.unwrap(Connection.class),
+                "while held, unwrapping reaches the physical connection");
+        pooled.close();
+        // The released interceptor holds nothing, so nothing below it
+        // provides this interface any more - and every other interface a
+        // caller can name shares the answer, since the refusal is about the
+        // missing session, not the question.
+        Assertions.assertFalse(
+                interceptor.isWrapperFor(Connection.class),
+                "an interceptor holding nothing is not a wrapper of it");
+        SQLException thrown = Assertions.assertThrows(SQLException.class,
+                () -> interceptor.unwrap(Connection.class),
+                "unwrap must answer the not-a-wrapper failure isWrapperFor "
+                + "predicts, not dereference the released field");
         Assertions.assertTrue(thrown.getMessage().contains("Not a wrapper"),
                 "the failure must say it is a not-a-wrapper case: "
                 + thrown.getMessage());

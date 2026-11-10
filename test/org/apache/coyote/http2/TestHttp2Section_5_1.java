@@ -159,16 +159,10 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         // HTTP2 upgrade
         http2Connect();
 
-        // Build the simple request
-        byte[] frameHeader = new byte[9];
-        ByteBuffer headersPayload = ByteBuffer.allocate(128);
-        buildSimpleGetRequest(frameHeader, headersPayload, null, 3);
-
-        // Remove the end of stream and end of headers flags
-        frameHeader[4] = 0;
-
-        // Process the request
-        writeFrame(frameHeader, headersPayload);
+        // Send the headers for a POST (END_HEADERS set, END_STREAM not set) that promises a body but does not send it.
+        // The servlet blocks reading the body so no response is generated before the reset below. The header block
+        // must be complete else the RST is a connection error (RFC 9113, section 6.2)
+        sendParameterPostRequest(3, null, null, 10, false);
 
         // Send a rst
         sendRst(3, Http2Error.INTERNAL_ERROR.getCode());

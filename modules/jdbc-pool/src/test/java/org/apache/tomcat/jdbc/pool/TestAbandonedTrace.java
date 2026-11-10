@@ -48,16 +48,16 @@ import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 class TestAbandonedTrace extends JdbcPoolBaseTest {
 
     /*
-     * The trace fields are private and the point of the change is what
-     * they hold between the borrow and the first read, so they are read
-     * directly - the way the suite's other fixture reaches behind the
-     * pool's own accessors.
+     * The borrow site lives in one private slot - the unformatted frames
+     * until something reads them, the formatted text after - and the point
+     * of the change is what that slot holds between the borrow and the
+     * first read, so its contents are read directly - the way the suite's
+     * other fixture reaches behind the pool's own accessors.
      */
-    private static Object traceField(PooledConnection pooled, String name)
-            throws ReflectiveOperationException {
-        Field field = PooledConnection.class.getDeclaredField(name);
+    private static Object traceSlot(PooledConnection pooled) throws ReflectiveOperationException {
+        Field field = PooledConnection.class.getDeclaredField("abandonTrace");
         field.setAccessible(true);
-        return field.get(pooled);
+        return ((java.util.concurrent.atomic.AtomicReference<?>) field.get(pooled)).get();
     }
 
     /* The pooled connection behind a borrowed handle. */
@@ -73,12 +73,13 @@ class TestAbandonedTrace extends JdbcPoolBaseTest {
         Connection borrowed = ds.getConnection();
         try {
             PooledConnection pooled = pooledOf(borrowed);
-            Assertions.assertNull(traceField(pooled, "abandonTrace"),
-                    "a borrow with logAbandoned must not format a thread dump up front");
-            StackTraceElement[] stored =
-                    (StackTraceElement[]) traceField(pooled, "abandonTraceElements");
-            Assertions.assertNotNull(stored,
-                    "the borrow must record the borrow site, unformatted");
+            Object site = traceSlot(pooled);
+            Assertions.assertTrue(site instanceof StackTraceElement[],
+                    "a borrow with logAbandoned must record the borrow site as unformatted frames, "
+                            + "not a thread dump up front, but the slot held: "
+                            + site.getClass().getName());
+            Assertions.assertTrue(((StackTraceElement[]) site).length > 0,
+                    "the borrow must record a borrow site");
 
             String trace = pooled.getStackTrace();
             Assertions.assertTrue(trace.startsWith("java.lang.Exception"),
@@ -94,8 +95,8 @@ class TestAbandonedTrace extends JdbcPoolBaseTest {
             Assertions.assertEquals(trace, pooled.getStackTrace());
             Assertions.assertSame(trace, pooled.getStackTrace(),
                     "the formatted trace must be cached, not reformatted per reading");
-            Assertions.assertNull(traceField(pooled, "abandonTraceElements"),
-                    "the elements must not be kept once they have been formatted");
+            Assertions.assertSame(trace, traceSlot(pooled),
+                    "the slot now holds the formatted text, and no longer the frames");
         } finally {
             borrowed.close();
         }

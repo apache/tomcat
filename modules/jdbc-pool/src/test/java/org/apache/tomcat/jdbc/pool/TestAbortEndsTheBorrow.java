@@ -21,8 +21,10 @@ import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverPropertyInfo;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
+import java.sql.Statement;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
@@ -37,6 +39,7 @@ import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
+import org.apache.tomcat.jdbc.pool.interceptor.ResetAbandonedTimer;
 
 /**
  * {@code Connection.abort(Executor)} ends a borrow. The specification has a
@@ -128,6 +131,41 @@ class TestAbortEndsTheBorrow extends JdbcPoolBaseTest {
     }
 
     @Test
+    void anAbortSealsTheStatementAndResultSetHandlesOfTheBorrow() throws Exception {
+        // Plain H2 here on purpose, as in the test above: its abort is a
+        // no-op that leaves the session open, so this is the honest probe
+        // that the seal runs at the pool layer - the handles of the aborted
+        // borrow must retire whatever the driver's abort did, mirroring the
+        // close-path pins of TestStatementHandleLifetime.
+        DataSource ds = abortPool(org.h2.Driver.class, 2);
+
+        Connection first = ds.getConnection();
+        Statement survivor = first.createStatement();
+        ResultSet cursor = survivor.executeQuery("SELECT 1");
+        Assertions.assertTrue(cursor.next(), "precondition: the cursor is live during the borrow");
+        Assertions.assertFalse(survivor.isClosed(), "precondition: the handle is live during the borrow");
+        first.abort(DIRECT_EXECUTOR);
+
+        Assertions.assertTrue(survivor.isClosed(),
+                "a statement whose borrow an abort ended must report itself closed");
+        SQLException thrown = Assertions.assertThrows(SQLException.class,
+                () -> survivor.execute("SELECT 1"),
+                "a statement whose borrow an abort ended must not run on the session");
+        Assertions.assertTrue(thrown.getMessage().contains("returned to the pool"),
+                "the failure must say what happened, but said: " + thrown.getMessage());
+        Assertions.assertThrows(SQLException.class, () -> survivor.unwrap(Statement.class),
+                "a handle retired by an abort must not reach the driver through unwrap()");
+        Assertions.assertDoesNotThrow(survivor::close,
+                "closing such a statement twice over stays the harmless no-op");
+
+        Assertions.assertTrue(cursor.isClosed(),
+                "a result set whose borrow an abort ended must report itself closed");
+        Assertions.assertThrows(SQLException.class, cursor::next,
+                "a result set whose borrow an abort ended must not read the session");
+        Assertions.assertDoesNotThrow(cursor::close);
+    }
+
+    @Test
     void anAbortedHandleReportsItselfClosedAndRefusesUse() throws Exception {
         SpecAbortDriver.ABORTS.set(0);
         DataSource ds = abortPool(SpecAbortDriver.class, 1);
@@ -148,6 +186,51 @@ class TestAbortEndsTheBorrow extends JdbcPoolBaseTest {
         Assertions.assertDoesNotThrow(pooled::close);
         Assertions.assertEquals(1, SpecAbortDriver.ABORTS.get(),
                 "the late close must not reach the driver a second time");
+    }
+
+    @Test
+    void resetTimerStopsStampingAsSoonAsTheAbortStarts() throws Exception {
+        CountDownLatch abortInDriver = new CountDownLatch(1);
+        CountDownLatch releaseDriver = new CountDownLatch(1);
+        SlowAbortDriver.abortInDriver = abortInDriver;
+        SlowAbortDriver.releaseDriver = releaseDriver;
+        DataSource ds = newDataSource();
+        ds.setDriverClassName(SlowAbortDriver.class.getName());
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setJdbcInterceptors(ResetAbandonedTimer.class.getName());
+        ds.createPool();
+
+        Connection held = ds.getConnection();
+        ResetAbandonedTimer timer = interceptorOf(held, ResetAbandonedTimer.class);
+        Assertions.assertNotNull(timer, "precondition: the timer must sit in the chain");
+        Assertions.assertTrue(timer.resetTimer(),
+                "precondition: the connection is checked out before the abort");
+
+        AtomicReference<Throwable> abortFailure = new AtomicReference<>();
+        Thread aborter = new Thread(() -> {
+            try {
+                held.abort(DIRECT_EXECUTOR);
+            } catch (Throwable t) {
+                abortFailure.set(t);
+            }
+        }, "abort-with-reset-timer");
+        aborter.start();
+        try {
+            Assertions.assertTrue(abortInDriver.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
+                    "precondition: the driver must be inside the abort");
+            // The borrow has ended at the pool layer, but the release walk
+            // that clears the timer's binding has not run yet. The management
+            // operation must already treat the connection as not checked out.
+            Assertions.assertFalse(timer.resetTimer(),
+                    "resetTimer() must not stamp a connection whose abort has started");
+        } finally {
+            releaseDriver.countDown();
+            aborter.join(AWAIT_TIMEOUT_MS);
+        }
+        Assertions.assertFalse(aborter.isAlive(), "the abort must finish once the gate opens");
+        Assertions.assertNull(abortFailure.get(), () -> "the abort must not fail: " + abortFailure.get());
+        awaitSessions(0);
     }
 
     @Test
@@ -381,6 +464,39 @@ class TestAbortEndsTheBorrow extends JdbcPoolBaseTest {
     }
 
     @Test
+    void anAbortAfterTheCheckEndedTheBorrowIsTheSpecificationsNoOp() throws Exception {
+        // The sequential form of the round below where the watchdog wins the
+        // claim: the check ends the borrow, and the application - unaware -
+        // aborts the handle it still holds. The abort is then what the
+        // specification prescribes for a closed connection, a no-op, and this
+        // test pins what that costs the bookkeeping: no hand-back is counted
+        // for a borrow whose end the pool already paid for.
+        SpecAbortDriver.ABORTS.set(0);
+        DataSource ds = abortPool(SpecAbortDriver.class, 1);
+        ds.getPoolProperties().setRemoveAbandoned(true);
+        ds.getPoolProperties().setRemoveAbandonedTimeout(1);
+        ConnectionPool pool = ds.getPool();
+
+        Connection overdue = ds.getConnection();
+        Thread.sleep(1100);
+
+        pool.checkAbandoned();
+        Assertions.assertEquals(1, pool.getRemoveAbandonedCount(), "the check claimed and abandoned the borrow");
+        Assertions.assertEquals(1, pool.getReleasedCount(), "exactly one terminal release settled it");
+        Assertions.assertTrue(overdue.isClosed(), "the handle of an abandoned borrow reports itself closed");
+
+        Assertions.assertDoesNotThrow(() -> overdue.abort(DIRECT_EXECUTOR),
+                "aborting a handle the pool already ended is the specification's no-op");
+        Assertions.assertEquals(0, SpecAbortDriver.ABORTS.get(), "the no-op does not reach the driver");
+        Assertions.assertEquals(0, pool.getActive());
+        Assertions.assertEquals(0, pool.getSize());
+        Assertions.assertEquals(1, pool.getReleasedCount(), "the abort added no second terminal step");
+        Assertions.assertEquals(0, pool.getReturnedCount(),
+                "and nothing was handed back for a borrow the check had already ended");
+        awaitSessions(0);
+    }
+
+    @Test
     void abortingABorrowThatTheAbandonedCheckAlsoClaimsEndsItExactlyOnce() throws Exception {
         // The abandoned-connection check and the borrower's abort are two
         // ways to end the same borrow, live at the same time: the pool's
@@ -448,8 +564,21 @@ class TestAbortEndsTheBorrow extends JdbcPoolBaseTest {
             awaitSessions(0); // and the physical session really left the database
         }
         Assertions.assertEquals(rounds, pool.getBorrowedCount());
-        Assertions.assertEquals(rounds, pool.getReturnedCount(),
-                "every borrow ended exactly once, whichever of the two steps won each race");
+        // The single-shot witness across the two claimants is the terminal
+        // release, not the hand-back count. The released guard settles exactly
+        // one release per borrow whichever step claimed it, while a hand-back
+        // is counted only when the abort reached the return: an abort that
+        // arrived after the check's teardown is the no-op the test above
+        // pins, and owes no count. Every round did end - the per-round
+        // assertions ruled the stranded shapes out, and each borrow below was
+        // either handed back or abandoned.
+        Assertions.assertEquals(rounds, pool.getReleasedCount(),
+                "every borrow was settled by exactly one terminal release, whichever of the two steps won each race");
+        Assertions.assertTrue(pool.getReturnedCount() + pool.getRemoveAbandonedCount() >= rounds,
+                () -> "every borrow was either handed back or abandoned, got returned="
+                        + pool.getReturnedCount() + " abandoned=" + pool.getRemoveAbandonedCount());
+        Assertions.assertTrue(pool.getReturnedCount() <= rounds,
+                "no borrow was handed back more than once");
     }
 
     @Test
@@ -653,9 +782,13 @@ class TestAbortEndsTheBorrow extends JdbcPoolBaseTest {
             return false;
         }
 
-        /* Where a subclass may hold up the abort once the call is already
-           inside the driver, the way a real driver's abort may run long; the
-           specification allows it. The base driver's abort is not slowed. */
+        /**
+         *  Where a subclass may hold up the abort once the call is already
+         *  inside the driver, the way a real driver's abort may run long; the
+         *  specification allows it. The base driver's abort is not slowed.
+         *
+         *  @throws InterruptedException If the abort is interrupted
+         */
         protected void parkInAbort() throws InterruptedException {
             // NOOP
         }

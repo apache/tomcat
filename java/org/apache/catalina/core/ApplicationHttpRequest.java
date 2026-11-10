@@ -32,6 +32,8 @@ import java.util.NoSuchElementException;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletRequestWrapper;
 import jakarta.servlet.http.HttpServletMapping;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
@@ -41,6 +43,8 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
+import org.apache.catalina.Wrapper;
+import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.util.ParameterMap;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.URLEncoder;
@@ -95,6 +99,11 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * The context for this request.
      */
     protected final Context context;
+
+    /**
+     * The target servlet for this request.
+     */
+    private final Wrapper wrapper;
 
 
     /**
@@ -196,11 +205,29 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * @param request      The servlet request being wrapped
      * @param context      The target context for the wrapped request
      * @param crossContext {@code true} if the wrapped request will be a cross-context request, otherwise {@code false}
+     *
+     * @deprecated Use {@link #ApplicationHttpRequest(HttpServletRequest, Context, boolean, Wrapper)}. Will be removed
+     *                 in Tomcat 12 onwards.
      */
+    @Deprecated
     ApplicationHttpRequest(HttpServletRequest request, Context context, boolean crossContext) {
+        this(request, context, crossContext, null);
+    }
+
+
+    /**
+     * Construct a new wrapped request around the specified servlet request.
+     *
+     * @param request      The servlet request being wrapped
+     * @param context      The target context for the wrapped request
+     * @param crossContext {@code true} if the wrapped request will be a cross-context request, otherwise {@code false}
+     * @param wrapper      The target Servlet for the wrapped request
+     */
+    ApplicationHttpRequest(HttpServletRequest request, Context context, boolean crossContext, Wrapper wrapper) {
         super(request);
         this.context = context;
         this.crossContext = crossContext;
+        this.wrapper = wrapper;
         setRequest(request);
     }
 
@@ -213,6 +240,57 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
             return null;
         }
         return context.getServletContext();
+    }
+
+
+    @Override
+    public boolean isUserInRole(String role) {
+        /*
+         * isUserInRole() has been called during an include/forward. isUserInRole() needs to use the security-role-ref
+         * mappings for the target Servlet of the RequestDispatcher.
+         *
+         * There may be multiple layers of wrapping on the Request and the Response. One or more of those layers might
+         * have overridden isUserInRole().
+         *
+         * If isUserInRole() has been overridden, it is the responsibility of whatever has overridden it to make sure
+         * that isUserInRole() returns the correct value.
+         *
+         * If the original Tomcat request object is not available then it is the responsibility of whatever replaced it
+         * to make sure isUserInRole() returns the correct value.
+         */
+
+        // If there is no wrapper, there is no need for special handling.
+        if (wrapper == null) {
+            return super.isUserInRole(role);
+        }
+
+        // Try and find the inner Tomcat RequestFacade
+        ServletRequest request = getRequest();
+        while (request instanceof ServletRequestWrapper) {
+            request = ((ServletRequestWrapper) request).getRequest();
+        }
+
+        // If the facade isn't available, just call the overridden method.
+        if (request instanceof RequestFacade facade) {
+            /*
+             * Only set this in the outer ApplicationHttpRequest so that for a long stream of include/forwards it is the
+             * current one that determines which wrapper is used.
+             */
+            boolean requestDispatcherWrapperSet = false;
+            if (facade.getRequestDispatcherWrapper() == null) {
+                facade.setRequestDispatcherWrapper(wrapper);
+                requestDispatcherWrapperSet = true;
+            }
+            try {
+                return super.isUserInRole(role);
+            } finally {
+                if (requestDispatcherWrapperSet) {
+                    facade.setRequestDispatcherWrapper(null);
+                }
+            }
+        } else {
+            return super.isUserInRole(role);
+        }
     }
 
 
@@ -620,8 +698,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     // -------------------------------------------------------- Package Methods
 
     /**
-     * Recycle this request. Since there is no object reuse, this only ends
-     * the session access.
+     * Recycle this request. Since there is no object reuse, this only ends the session access.
      */
     public void recycle() {
         if (session != null) {
@@ -804,7 +881,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      */
     protected boolean setSpecial(String name, Object value) {
         // Performance - see BZ 68089
-        if (name ==  null || name.length() < shortestSpecialNameLength) {
+        if (name == null || name.length() < shortestSpecialNameLength) {
             return false;
         }
         Integer index = specialsMap.get(name);

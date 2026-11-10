@@ -612,15 +612,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
      */
     protected ObjectName createObjectName(ContextResource resource) throws MalformedObjectNameException {
 
-        String domain = null;
-        if (container instanceof StandardServer) {
-            domain = ((StandardServer) container).getDomain();
-        } else if (container instanceof ContainerBase) {
-            domain = ((ContainerBase) container).getDomain();
-        }
-        if (domain == null) {
-            domain = "Catalina";
-        }
+        String domain = domainOrDefault();
 
         ObjectName name = null;
         String quotedResourceName = ObjectName.quote(resource.getName());
@@ -654,10 +646,12 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
         // interface which the application expects is used as the type of a
         // lookup reference. No type is given when the descriptor names no
         // interface, which leaves the type of the looked up object unchecked.
+        // An EJB 2.x reference looks up a home object, so prefer its home
+        // interface when present. Otherwise use the EJB 3.x business interface.
         String lookupName = ejb.getLookupName();
         Reference ref = null;
         if (lookupName != null && !lookupName.isEmpty()) {
-            String beanType = ejb.getRemote() != null ? ejb.getRemote() : ejb.getHome();
+            String beanType = ejb.getHome() != null ? ejb.getHome() : ejb.getRemote();
             ref = new LookupRef(beanType, lookupName);
         }
 
@@ -991,6 +985,8 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
                 StringRefAddr refAddr = new StringRefAddr(paramName, paramValue);
                 ref.add(refAddr);
             }
+            // Give a pool that does not name itself a container-unique name.
+            addContainerPoolName(ref, resource);
         }
 
         try {
@@ -1020,6 +1016,146 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
                 resource.setCloseMethod("close");
             }
         }
+    }
+
+
+    /**
+     * Pass a container-managed JNDI resource that the Tomcat JDBC connection
+     * pool will build, and that does not name itself, a container-unique pool
+     * registration name through the pool factory's {@code object_name}
+     * attribute.
+     *
+     * @param ref      the reference created for the resource
+     * @param resource the resource descriptor
+     */
+    protected void addContainerPoolName(Reference ref, ContextResource resource) {
+        // Never disturb a resource that names itself.
+        if (resource.getProperty(Constants.POOL_NAME_PARAMETER) != null) {
+            return;
+        }
+        // The pool factory builds only these resource classes.
+        if (!Constants.POOL_DATASOURCE_TYPES.contains(resource.getType())) {
+            return;
+        }
+        // Per-lookup pools already get a distinct generated name each; sharing
+        // one injected name across the instances would merge distinct live
+        // pools, the exact situation a container-unique name is meant to end.
+        if (!resource.getSingleton()) {
+            return;
+        }
+        if (!isTomcatJdbcPoolFactory(resource)) {
+            return;
+        }
+        String poolName = generatePoolName(resource);
+        if (poolName == null) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("naming.addResourceRefNoPoolName", resource.getName()));
+            }
+            return;
+        }
+        ref.add(new StringRefAddr(Constants.POOL_NAME_PARAMETER, poolName));
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("naming.addResourceRefPoolName", resource.getName(), getName(), poolName));
+        }
+    }
+
+
+    /**
+     * Does the factory that will build this resource's data source resolve to
+     * the Tomcat JDBC pool factory?
+     * <p>
+     * The match is on the exact class name, so a factory that subclasses the
+     * pool factory is not matched. Such a factory keeps its current behaviour
+     * and remains responsible for naming its pools itself.
+     *
+     * @param resource the resource descriptor
+     *
+     * @return <code>true</code> if the resource is built by the Tomcat JDBC
+     *             pool factory
+     */
+    private boolean isTomcatJdbcPoolFactory(ContextResource resource) {
+        // The factory attribute of a Resource element is stored as a parameter
+        // and reaches the Reference as its factory.
+        Object factory = resource.getProperty("factory");
+        if (factory == null) {
+            // With no factory attribute the container default
+            // org.apache.naming.factory.ResourceFactory answers for
+            // javax.sql.DataSource only, and delegates to the system property,
+            // DBCP2 by default. Mirror that resolution exactly. Other resource
+            // types have no delegating default and are not pool-built.
+            if ("javax.sql.DataSource".equals(resource.getType())) {
+                factory = System.getProperty(Constants.DATASOURCE_FACTORY_SYSPROP,
+                        org.apache.naming.factory.Constants.DBCP_DATASOURCE_FACTORY);
+            }
+        }
+        return Constants.TOMCAT_JDBC_POOL_FACTORY.equals(factory);
+    }
+
+
+    /**
+     * Generate the unique connection pool name for a resource of this
+     * container.
+     * <p>
+     * Webapp resources are named {@code <domain>/<host>/<context>/<jndiName>}
+     * and global resources {@code <domain>/<jndiName>}, where the JNDI name of
+     * a global resource is already unique within the Server's global
+     * namespace. Only the slash separator is used, a character with no
+     * meaning in a JMX object name or in a naming path; the pool's JNDI
+     * factory stores the name through {@link ObjectName#quote(String)}
+     * exactly as it stores any configured {@code object_name}. The
+     * generation is deterministic: the same configuration always yields the
+     * same name, across rebinds and context reloads.
+     *
+     * @param resource the resource descriptor
+     *
+     * @return the generated name, or <code>null</code> if this container's
+     *             position does not allow a stable unique name to be generated
+     */
+    protected String generatePoolName(ContextResource resource) {
+        if (container instanceof Context ctx) {
+            Container host = ctx.getParent();
+            if (!(host instanceof Host)) {
+                // Without a Host above it, this context's position is not
+                // predictable: leave the pool at its own generated name.
+                return null;
+            }
+            // The context name already carries the "##<version>" suffix of a
+            // parallel deployment, so each versioned instance of a path gets
+            // its own distinct pool name.
+            String path = ctx.getName();
+            if (path.startsWith("/")) {
+                path = path.substring(1);
+            }
+            return domainOrDefault() + "/" + host.getName() + "/" + path + "/" + resource.getName();
+        }
+        if (container instanceof Server) {
+            // A global resource is shared by every webapp that links to it. It
+            // must be named by the one container that owns it, and its JNDI
+            // name is unique within that Server's global namespace.
+            return domainOrDefault() + "/" + resource.getName();
+        }
+        return null;
+    }
+
+
+    /**
+     * The MBean domain of the associated container, defaulting to
+     * {@code Catalina} the way {@link #createObjectName(ContextResource)}
+     * does, which an embedded container without an Engine above it also gets.
+     *
+     * @return the domain, never <code>null</code>
+     */
+    private String domainOrDefault() {
+        String domain = null;
+        if (container instanceof StandardServer) {
+            domain = ((StandardServer) container).getDomain();
+        } else if (container instanceof ContainerBase) {
+            domain = ((ContainerBase) container).getDomain();
+        }
+        if (domain == null) {
+            domain = "Catalina";
+        }
+        return domain;
     }
 
 
@@ -1063,6 +1199,12 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
      * @param resourceLink the resource link
      */
     public void addResourceLink(ContextResourceLink resourceLink) {
+
+        // Reject a link which cannot be registered before anything is bound
+        if (resourceLink.getName() == null || resourceLink.getGlobal() == null) {
+            throw new IllegalArgumentException(
+                    sm.getString("naming.invalidResourceLink", resourceLink.getName(), resourceLink.getGlobal()));
+        }
 
         // Create a reference to the resource.
         Reference ref =

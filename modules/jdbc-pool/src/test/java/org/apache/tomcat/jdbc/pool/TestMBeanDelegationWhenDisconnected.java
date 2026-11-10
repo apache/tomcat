@@ -98,7 +98,7 @@ class TestMBeanDelegationWhenDisconnected extends JdbcPoolBaseTest {
         DataSource ds = newDataSource();
         Connection handle = ds.getConnection();
 
-        PooledConnection pooled = handle.unwrap(PooledConnection.class);
+        PooledConnection pooled = internalOf(handle);
         Assertions.assertFalse(pooled.isClosed());
         Assertions.assertTrue(pooled.getAutoCommit());
         Assertions.assertNotNull(pooled.getCatalog());

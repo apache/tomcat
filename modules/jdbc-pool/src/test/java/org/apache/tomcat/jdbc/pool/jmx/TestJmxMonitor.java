@@ -33,6 +33,7 @@ import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 import org.apache.tomcat.jdbc.pool.DataSource;
+import org.apache.tomcat.jdbc.pool.PoolConfiguration;
 
 /**
  * Expected JMX monitoring functionality. A container registers the
@@ -251,6 +252,41 @@ class TestJmxMonitor extends JdbcPoolBaseTest {
     }
 
     @Test
+    void theJmxViewOfNullDatabasePropertiesReturnsNull() throws Exception {
+        // The MBean's db-properties getter masks the password by cloning the
+        // live store; the null store the configuration accepts (see
+        // PoolConfiguration#setDbProperties) must pass through as the null
+        // it is instead of being dereferenced by the masking clone. The pool
+        // is built with an initial size of zero, so nothing is connected.
+        DataSource ds = new DataSource();
+        PoolConfiguration props = ds.getPoolProperties();
+        props.setUrl(getUrl());
+        props.setDriverClassName("org.h2.Driver");
+        props.setUsername("sa");
+        props.setPassword("");
+        props.setJmxEnabled(false);
+        props.setInitialSize(0);
+        props.setMinIdle(0);
+        ds.createPool();
+        try {
+            ConnectionPool mbean = new ConnectionPool(ds.getPool());
+
+            props.setDbProperties(null);
+            Assertions.assertDoesNotThrow(mbean::getDbProperties);
+            Assertions.assertNull(mbean.getDbProperties(),
+                    "a configuration with no database properties has nothing to mask");
+
+            Properties live = new Properties();
+            live.setProperty("appconfigured", "yes");
+            props.setDbProperties(live);
+            Assertions.assertEquals("yes", mbean.getDbProperties().getProperty("appconfigured"),
+                    "a live store must still reach the JMX view");
+        } finally {
+            ds.close();
+        }
+    }
+
+    @Test
     void monitoredConnectionsStayFullyFunctional() throws Exception {
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
         DataSource ds = newDataSource();
@@ -305,8 +341,14 @@ class TestJmxMonitor extends JdbcPoolBaseTest {
         dbProperties.setProperty("injected", "through-the-view");
         Assertions.assertNull(ds.getPoolProperties().getDbProperties().getProperty("injected"),
                 "the exposed db-properties must be a view, not the live object");
-        // and the pool must still authenticate - the copy is display-side
-        // only, the connect path keeps its own credentials
+        // The display path corrupted nothing live: with the fixture password
+        // back, a borrow succeeds. It would not while the fake secret stood:
+        // a session authenticated with anything other than the configured
+        // credentials is re-established for the next borrower rather than
+        // served, and this secret never existed in the database - the display
+        // path's silence about a credential cannot be matched by the connect
+        // path's use of it.
+        ds.setPassword("");
         Assertions.assertDoesNotThrow(() -> ds.getConnection().close());
     }
 

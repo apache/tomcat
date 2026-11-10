@@ -17,15 +17,24 @@
 package org.apache.tomcat.jdbc.pool.interceptor;
 
 import java.lang.management.ManagementFactory;
+import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
+import javax.management.MBeanNotificationInfo;
 import javax.management.MBeanOperationInfo;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -51,8 +60,8 @@ import org.apache.tomcat.jdbc.pool.DataSource;
  * through the MBeanServer: an operator must be able to discover pool
  * names and clear recorded statistics without restarting the pool.
  * <p>
- * Statistics are keyed by pool <em>name</em>, so the MBean of one name
- * reads and clears the statistics every live pool of that name shares.
+ * Statistics belong to a <em>pool</em>, so the MBean one pool published reads and clears what that pool recorded - and
+ * nothing another pool collected, however it was named.
  */
 class TestSlowQueryJmxMBeanSurface extends JdbcPoolBaseTest {
 
@@ -115,6 +124,64 @@ class TestSlowQueryJmxMBeanSurface extends JdbcPoolBaseTest {
             Assertions.assertEquals("void", reset.getReturnType(),
                     "resetStats() is declared without a return value, as the descriptor states");
         }
+    }
+
+    @Test
+    void mBeanInfoAdvertisesTheNotificationTypesTheMBeanSends() throws Exception {
+        // JMX clients discover what an MBean can send through
+        // MBeanInfo.getNotifications() - consoles, monitoring and bridge
+        // agents, tooling that builds a NotificationFilterSupport from the
+        // advertised types. An MBean that sends its queries as the two wire
+        // types of this class but advertises none of them leaves that tooling
+        // blind whatever delivery itself does (the pool's own MBean declares
+        // its types the same way, see TestJmxNotificationTypeContract).
+        String poolName = "JmxNotifInfo-" + System.nanoTime();
+        DataSource ds = reportingPoolNamed(poolName);
+
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        ObjectName oname = objectNameFor(poolName);
+
+        try (@SuppressWarnings("unused") Connection con = ds.getConnection()) {
+            Assertions.assertTrue(server.isRegistered(oname),
+                    "the premise: the interceptor MBean must be registered");
+            MBeanNotificationInfo[] advertisedInfo = server.getMBeanInfo(oname).getNotifications();
+            Set<String> advertised = advertisedInfo == null ? new HashSet<>()
+                    : Arrays.stream(advertisedInfo).flatMap(i -> Arrays.stream(i.getNotifTypes()))
+                            .collect(Collectors.toSet());
+            Assertions.assertEquals(new HashSet<>(Arrays.asList(
+                            SlowQueryReportJmx.SLOW_QUERY_NOTIFICATION,
+                            SlowQueryReportJmx.FAILED_QUERY_NOTIFICATION)), advertised,
+                    "the published MBean must advertise exactly the notification types it sends");
+        }
+    }
+
+    @Test
+    void theDescriptorAdvertisesTheWireTypesTheNotificationsCarry() throws Exception {
+        // mbeans-descriptors.xml is this MBean's legacy metadata, and like the
+        // published MBeanInfo it is material a tool builds its filters from:
+        // a notification type that differs from the wire string makes a filter
+        // built from the metadata match nothing. The constants are the wire
+        // contract (see TestJmxNotificationTypeContract), so the descriptor
+        // must carry exactly them, and no half-written descriptions.
+        Path descriptor = Paths.get("src", "main", "java", "org", "apache", "tomcat",
+                "jdbc", "pool", "interceptor", "mbeans-descriptors.xml");
+        String xml = new String(Files.readAllBytes(descriptor), StandardCharsets.UTF_8);
+
+        Set<String> advertised = new HashSet<>();
+        Matcher types = Pattern.compile("<notification-type>([^<]+)</notification-type>")
+                .matcher(xml);
+        while (types.find()) {
+            advertised.add(types.group(1));
+        }
+        Assertions.assertEquals(new HashSet<>(Arrays.asList(
+                        SlowQueryReportJmx.SLOW_QUERY_NOTIFICATION,
+                        SlowQueryReportJmx.FAILED_QUERY_NOTIFICATION)), advertised,
+                "the descriptor must name the notification types by the exact strings the"
+                        + " notifications carry on the wire - a client building its filter"
+                        + " from the metadata must match what the MBean actually sends");
+
+        Assertions.assertFalse(Pattern.compile("description=\"[^\"]*\\s\"").matcher(xml).find(),
+                "no description may dangle half-written on a trailing space");
     }
 
     @Test
@@ -193,87 +260,140 @@ class TestSlowQueryJmxMBeanSurface extends JdbcPoolBaseTest {
     }
 
     @Test
-    void resetStatsClearsTheStatisticsEveryPoolOfTheNameShares() throws Exception {
-        String poolName = "JmxResetShared-" + System.nanoTime();
+    void resetStatsClearsTheOwningPoolSStatistics() throws Exception {
+        String poolName = "JmxResetPerPool-" + System.nanoTime();
+        DataSource displaced = reportingPoolNamed(poolName);
+        // A second live pool under the same name: an unsupported configuration
+        // the pool only reaches programmatically. It takes the name over, so
+        // the published MBean reports for it and the displaced pool's store is
+        // released.
         DataSource owner = reportingPoolNamed(poolName);
-        DataSource sharer = reportingPoolNamed(poolName);
 
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
         ObjectName oname = objectNameFor(poolName);
 
-        try (@SuppressWarnings("unused") Connection ownerCon = owner.getConnection();
-                Connection sharerCon = sharer.getConnection();
-                Statement st = sharerCon.createStatement()) {
-            st.execute("SELECT 1");
+        try (Connection displacedCon = displaced.getConnection()) {
+            try (Statement st = displacedCon.createStatement()) {
+                st.execute("SELECT 1");
+            }
+            Assertions.assertTrue(server.isRegistered(oname),
+                    "the premise: the first borrow published the MBean of the pool");
 
-            Assertions.assertEquals(1, ((CompositeData[]) server.getAttribute(oname,
-                            "SlowQueriesCD")).length,
-                    "the query of the same-named pool must show up in the one registered MBean");
+            try (Connection ownerCon = owner.getConnection();
+                    Statement st = ownerCon.createStatement()) {
+                st.execute("SELECT 2");
 
-            server.invoke(oname, "resetStats", null, null);
+                CompositeData[] published = (CompositeData[]) server.getAttribute(oname,
+                        "SlowQueriesCD");
+                Assertions.assertEquals(1, published.length,
+                        "the MBean reports the statistics of the pool that now owns the name");
+                Assertions.assertEquals("SELECT 2", published[0].get("query"),
+                        "and what it reports is that pool's own query");
 
-            Assertions.assertTrue(SlowQueryReport.getPoolStats(poolName).isEmpty(),
-                    "statistics are keyed by pool name, so resetStats() through that name's MBean "
-                            + "clears the map all live pools of the name share, still holding: "
-                            + SlowQueryReport.getPoolStats(poolName).keySet());
-            Assertions.assertEquals(0, ((CompositeData[]) server.getAttribute(oname,
-                            "SlowQueriesCD")).length,
-                    "the exposed statistics must be empty for the owning pool as well");
+                Assertions.assertEquals(new HashSet<>(Arrays.asList("SELECT 2")),
+                        SlowQueryReport.getPoolStats(poolName).keySet(),
+                        "the read by name answers with the pool that owns the name");
+
+                server.invoke(oname, "resetStats", null, null);
+
+                Assertions.assertEquals(0, ((CompositeData[]) server.getAttribute(oname,
+                                "SlowQueriesCD")).length,
+                        "resetStats() through the published MBean clears the store that"
+                                + " registration reports for");
+                ConcurrentHashMap<String, SlowQueryReport.QueryStats> cleared =
+                        SlowQueryReport.getPoolStats(poolName);
+                Assertions.assertNotNull(cleared, "the owning pool must keep its store");
+                Assertions.assertFalse(cleared.containsKey("SELECT 2"),
+                        "and the reset must clear that store");
+                Assertions.assertFalse(cleared.containsKey("SELECT 1"),
+                        "the displaced pool's statistics must not be reachable under the name");
+            }
         }
     }
 
     @Test
-    void slowQueriesCDIsAnEmptyArrayWhileTheReleasedStatisticsOutliveTheRegistration()
+    void aFailedCompositeTypeDegradesReadsToAnEmptyArray() throws Exception {
+        Field typeField = SlowQueryReportJmx.class.getDeclaredField("SLOW_QUERY_TYPE");
+        typeField.setAccessible(true);
+        Field failedField = SlowQueryReportJmx.class.getDeclaredField("compositeTypeInitializationFailed");
+        failedField.setAccessible(true);
+        Object savedType = typeField.get(null);
+        boolean savedFailed = failedField.getBoolean(null);
+
+        String poolName = "JmxFailedCompositeType-" + System.nanoTime();
+        DataSource ds = reportingPoolNamed(poolName);
+        try {
+            typeField.set(null, null);
+            failedField.setBoolean(null, true);
+            ds.createPool();
+
+            try (Connection con = ds.getConnection();
+                    Statement st = con.createStatement()) {
+                st.execute("SELECT 1");
+                SlowQueryReportJmx interceptor = interceptorOf(con, SlowQueryReportJmx.class);
+                Assertions.assertNotNull(interceptor,
+                        "precondition: the pool must run the reporting interceptor");
+                Assertions.assertEquals(0, interceptor.getSlowQueriesCD().length,
+                        "a failed composite type must degrade to the documented empty array");
+            }
+        } finally {
+            typeField.set(null, savedType);
+            failedField.setBoolean(null, savedFailed);
+            ds.close();
+        }
+    }
+
+    @Test
+    void slowQueriesCDIsAnEmptyArrayOnceTheStatisticsBehindARegistrationAreReleased()
             throws Exception {
         String poolName = "JmxReleasedStats-" + System.nanoTime();
         DataSource ds = reportingPoolNamed(poolName);
 
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
         ObjectName oname = objectNameFor(poolName);
-        ConnectionPool pool = null;
         try {
+            ConnectionPool pool;
             try (Connection con = ds.getConnection();
                     Statement st = con.createStatement()) {
                 st.execute("SELECT 1");
             }
             pool = ds.getPool();
+            SlowQueryReport.PoolStatistics statistics = SlowQueryReport.statisticsFor(pool);
+            Assertions.assertNotNull(statistics,
+                    "the premise: the borrow must have registered a store for the pool");
             Assertions.assertEquals(1, ((CompositeData[]) server.getAttribute(oname,
                             "SlowQueriesCD")).length,
                     "the premise: the query must have been recorded while the pool was live");
 
-            // The window inside poolClosed: the close decides the release of
-            // the name's statistics first, and only after that gives up the
-            // registration - and JmxUtil.unregisterJmx swallows a refused
-            // unregistration, which leaves that state in place permanently.
-            // The window of a single close call is a thread race no test can
-            // force, so the test drives the two decided steps apart, in the
-            // order the race leaves them, and holds the registration back.
-            Assertions.assertTrue(SlowQueryReport.releaseStatistics(pool),
-                    "the premise: the pool must have been the last live pool of the name");
-            Assertions.assertTrue(server.isRegistered(oname),
-                    "the premise: the MBean of the name must still be registered");
-            Assertions.assertNull(SlowQueryReport.getPoolStats(poolName),
-                    "the premise: the statistics map of the name must be gone");
+            // The state a JMX client is left in when the unregistration of a
+            // closed pool's MBean was refused and JmxUtil swallowed the
+            // failure: the store behind the registration has been released and
+            // the registration is still being read. The window of a single
+            // close is a thread race no test can force, so the resource of that
+            // state is built here and driven through the release directly.
+            SlowQueryReportJmx.Registration registration = new SlowQueryReportJmx.Registration(
+                    poolName, statistics, SlowQueryReportJmx.jmxStateFor(pool));
+            Assertions.assertEquals(1, registration.getSlowQueriesCD().length,
+                    "the premise: the registration reads the statistics of its pool");
 
-            Object value = server.getAttribute(oname, "SlowQueriesCD");
+            SlowQueryReport.releaseStatistics(pool);
+            Assertions.assertTrue(statistics.isReleased(),
+                    "the premise: the close of the pool gives its store up");
+
+            Object value = registration.getSlowQueriesCD();
             Assertions.assertNotNull(value,
                     "a client that reads the attribute - advertised as "
-                            + "[Ljavax.management.openmbean.CompositeData; - through the "
-                            + "still-registered MBean must never get null in its hands");
+                            + "[Ljavax.management.openmbean.CompositeData; - through a "
+                            + "registration whose pool has come down must never get null in "
+                            + "its hands");
             Assertions.assertEquals(0, ((CompositeData[]) value).length,
                     "with the statistics gone the attribute must degrade to the empty "
                             + "array, the way getPoolNames() degrades to an empty String array");
+            Assertions.assertFalse(server.isRegistered(oname),
+                    "the close also gave the published ObjectName back, so this is the "
+                            + "state a refused unregistration leaves, not the normal one");
         } finally {
             ds.close();
-            // complete the release poolClosed decided with the statistics, so
-            // the window's registration is not left published behind this
-            // test: the close finds the statistics already decided free and
-            // skips the release of the name
-            SlowQueryReportJmx lateRelease = new SlowQueryReportJmx();
-            lateRelease.poolName = poolName;
-            lateRelease.releaseJmxRegistration(pool);
-            Assertions.assertFalse(server.isRegistered(oname),
-                    "teardown premise: completing the release must leave the name unregistered");
         }
     }
 

@@ -17,6 +17,7 @@
 package org.apache.tomcat.jdbc.pool;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
@@ -82,6 +83,20 @@ class TestBorrowReturnStatistics extends JdbcPoolBaseTest {
         Assertions.assertEquals(0, pool.getBorrowedCount(),
                 "the pool pre-creating its initialSize connections hands "
                         + "them to no borrower, so none of them is a borrow");
+        Assertions.assertEquals(0, pool.getReturnedCount(),
+                "the same hand-back with no borrower on either side must "
+                        + "not count as a return either - counting it would "
+                        + "run the returned count permanently ahead of the "
+                        + "borrowed one, which monitoring reads as phantom "
+                        + "returns for the pool's whole life");
+
+        Connection borrowed = ds.getConnection();
+        borrowed.close();
+        Assertions.assertEquals(1, pool.getBorrowedCount());
+        Assertions.assertEquals(1, pool.getReturnedCount(),
+                "one borrower's cycle must move the returned count by one, "
+                        + "not by one plus the preload");
+        awaitSessions(2);
     }
 
     @Test
@@ -114,7 +129,7 @@ class TestBorrowReturnStatistics extends JdbcPoolBaseTest {
         Assertions.assertFalse(queued.isDone(),
                 "the poll must wait for a connection the pool cannot spare");
         holder.close();
-        try (Connection served = queued.get(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
+        try (@SuppressWarnings("unused") Connection served = queued.get(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
             Assertions.assertEquals(4, pool.getBorrowedCount(),
                     "the connection the queue handed to the waiting poll is "
                             + "one borrow, counted once it is set up for "
@@ -126,5 +141,67 @@ class TestBorrowReturnStatistics extends JdbcPoolBaseTest {
         Assertions.assertEquals(1, pool.getCreatedCount(),
                 "every borrow here rode the same single physical connection");
         awaitSessions(1);
+    }
+
+    @Test
+    void aConnectionReleasedTwiceIsCountedOnce() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setMinIdle(0);
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(-1); // sweeper off
+        ds.createPool();
+        ConnectionPool pool = ds.getPool();
+
+        Connection held = ds.getConnection();
+        PooledConnection pc = interceptorOf(held, ProxyConnection.class).getConnection();
+        Assertions.assertEquals(1, pool.getCreatedCount());
+        Assertions.assertEquals(0, pool.getReleasedCount());
+
+        // The terminal step of one connection can be reached twice: an
+        // abandon releases it while the application is still working, and
+        // the application's later return - whose claim out of the busy queue
+        // lost that race - releases it once more. Only the call that
+        // actually destroyed the connection closes the bookkeeping the
+        // creation opened.
+        pool.release(pc);
+        Assertions.assertEquals(1, pool.getReleasedCount());
+        pool.release(pc);
+        Assertions.assertEquals(1, pool.getReleasedCount(),
+                "the second release of an already destroyed connection must "
+                        + "not count a second destruction against the creation");
+        Assertions.assertTrue(pool.getReleasedCount() <= pool.getCreatedCount(),
+                "the released count must never pass the created count");
+        Assertions.assertEquals(0, pool.getSize(),
+                "the slot is handed back once, by the destroying release");
+        ds.close();
+        awaitSessions(0);
+    }
+
+    @Test
+    void aFailedCreationBalancesItsOwnRelease() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setMinIdle(0);
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setUrl("jdbc:h2:tcp://localhost:1/mem:unreachable");
+        ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(-1); // sweeper off
+        ds.createPool();
+        ConnectionPool pool = ds.getPool();
+
+        // Nothing listens on port 1: each attempt brings one connection into
+        // the pool and the failed setup retires it at once. Counting the
+        // creation only when an attempt succeeds would make every such
+        // retirement a release without its creation - unbounded drift for a
+        // pool pointing at a dead database.
+        Assertions.assertThrows(SQLException.class, ds::getConnection);
+        Assertions.assertThrows(SQLException.class, ds::getConnection);
+
+        Assertions.assertEquals(2, pool.getCreatedCount(),
+                "each attempt took a connection into service, however briefly");
+        Assertions.assertEquals(pool.getCreatedCount(), pool.getReleasedCount(),
+                "every retired attempt, successful or not, balances its creation");
+        Assertions.assertEquals(0, pool.getSize(), "both attempts handed their slot back");
+        awaitSessions(0);
     }
 }

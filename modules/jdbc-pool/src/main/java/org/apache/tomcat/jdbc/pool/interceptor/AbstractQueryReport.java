@@ -38,11 +38,12 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
     private static final Log log = LogFactory.getLog(AbstractQueryReport.class);
 
     /**
-     * The threshold in milliseconds. An execution that takes longer than
-     * this is reported as a slow query; one that takes no longer is
-     * reported as a measured query. A negative threshold keeps every
-     * execution out of the slow path, so every execution is reported as
-     * measured.
+     * The threshold in milliseconds. A successful execution that takes
+     * longer than this is reported as a slow query; one that takes no
+     * longer is reported as a measured query. A negative threshold keeps
+     * every execution out of the slow path, so every successful execution
+     * is reported as measured. Failed executions are reported through
+     * {@link #reportFailedQuery} regardless of this threshold.
      */
     protected long threshold = 1000; // Executions slower than this are slow
 
@@ -81,12 +82,10 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      * @return the SQL, {@code "batch"} or {@code null}
      */
     private String extractQuery(String query, Object[] args, final String name) {
-        // Extract the query string
         String sql = query;
         if (sql == null && args != null && args.length > 0 && args[0] instanceof String) {
             sql = (String) args[0];
         }
-        // If we do batch execution, then we name the query 'batch'
         if (sql == null && (compare(EXECUTE_BATCH, name) || compare(EXECUTE_LARGE_BATCH, name))) {
             sql = "batch";
         }
@@ -99,7 +98,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      *
      * @param query the query that was executed and failed
      * @param args  the arguments to the execution
-     * @param name  the name of the method used to execute
+     * @param name  the name of the method used to execute, as recognised by
      *                  {@link AbstractCreateStatementInterceptor#isExecute(Method, boolean)}
      * @param start the wall clock time the query execution started
      * @param delta the time the execution took before it failed, measured with the monotonic clock
@@ -118,9 +117,9 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      * {@link AbstractCreateStatementInterceptor#isExecute(Method, boolean)}, succeeded and was within the timing
      * threshold
      *
-     * @param query the query that was executed and failed
+     * @param query the query that was executed
      * @param args  the arguments to the execution
-     * @param name  the name of the method used to execute
+     * @param name  the name of the method used to execute, as recognised by
      *                  {@link AbstractCreateStatementInterceptor#isExecute(Method, boolean)}
      * @param start the wall clock time the query execution started
      * @param delta the time the execution took, measured with the monotonic clock
@@ -134,12 +133,12 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
 
     /**
      * Invoked when a query execution, a call to an execute method as recognised by
-     * {@link AbstractCreateStatementInterceptor#isExecute(Method, boolean)}, succeeded and was exceeded the timing
+     * {@link AbstractCreateStatementInterceptor#isExecute(Method, boolean)}, succeeded and exceeded the timing
      * threshold
      *
-     * @param query the query that was executed and failed
+     * @param query the query that was executed
      * @param args  the arguments to the execution
-     * @param name  the name of the method used to execute
+     * @param name  the name of the method used to execute, as recognised by
      *                  {@link AbstractCreateStatementInterceptor#isExecute(Method, boolean)}
      * @param start the wall clock time the query execution started
      * @param delta the time the execution took, measured with the monotonic clock
@@ -153,9 +152,10 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
 
     /**
      * returns the query measure threshold. This value is in milliseconds.
-     * An execution that takes longer than this threshold is reported as a
-     * slow query; see {@link #setThreshold(long)} for the meaning of a
-     * negative value.
+     * A successful execution that takes longer than this threshold is
+     * reported as a slow query; see {@link #setThreshold(long)} for the
+     * meaning of a negative value and for the handling of failed
+     * executions.
      *
      * @return the threshold in milliseconds
      */
@@ -180,7 +180,8 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
     }
 
     /**
-     * Creates a statement interceptor to monitor query response times
+     * Wraps a newly created statement in a proxy that measures its executions, so they can be reported as measured,
+     * slow or failed queries.
      */
     @Override
     public Object createStatement(Object proxy, Method method, Object[] args, Object statement, long time) {
@@ -190,17 +191,14 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
             String sql = null;
             Constructor<?> constructor = null;
             if (compare(CREATE_STATEMENT, name)) {
-                // createStatement
                 constructor = getConstructor(CREATE_STATEMENT_IDX, Statement.class);
             } else if (compare(PREPARE_STATEMENT, name)) {
-                // prepareStatement
                 sql = (String) args[0];
                 constructor = getConstructor(PREPARE_STATEMENT_IDX, PreparedStatement.class);
                 if (sql != null) {
                     prepareStatement(sql, time);
                 }
             } else if (compare(PREPARE_CALL, name)) {
-                // prepareCall
                 sql = (String) args[0];
                 constructor = getConstructor(PREPARE_CALL_IDX, CallableStatement.class);
                 if (sql != null) {
@@ -219,24 +217,6 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
         return statement;
     }
 
-
-    /**
-     * Measures the milliseconds elapsed since the {@link System#nanoTime()}
-     * reading taken at {@code startNanos}, rounded to the nearest millisecond.
-     * <p>
-     * An interval is measured with the monotonic clock. The wall clock is not monotonic, so an NTP correction, a manual
-     * set, or resuming a suspended VM between two of its readings makes their difference negative, and a negative
-     * duration is never over the slow query threshold while the statistics book it as if it were real.
-     * </p>
-     *
-     * @param startNanos the {@link System#nanoTime()} reading the measurement began with
-     *
-     * @return the elapsed time in milliseconds
-     */
-    private static long elapsedMillis(long startNanos) {
-        return (System.nanoTime() - startNanos + 500000) / 1000000;
-    }
-
     /**
      * Class to measure query execute time
      */
@@ -249,20 +229,20 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
          */
         protected volatile boolean closed = false;
         /**
-         * The underlying statement or connection being proxied, nulled once a close has been forwarded. It is read by
-         * threads other than the one that nulls it, so, like {@link #closed}, volatile.
+         * The statement being proxied, or a further interceptor's proxy of it, nulled once a close has been forwarded.
+         * It is read by threads other than the one that nulls it, so, like {@link #closed}, volatile.
          */
         protected volatile Object delegate;
         /**
-         * The SQL query being executed.
+         * The SQL the statement was prepared with, or {@code null} when it was created without one.
          */
         protected final String query;
 
         /**
          * Constructs a new {@code StatementProxy}.
          *
-         * @param parent The underlying statement or connection
-         * @param query  The SQL query being executed
+         * @param parent The statement being proxied, or a further interceptor's proxy of it
+         * @param query  The SQL the statement was prepared with, or {@code null} when it was created without one
          */
         public StatementProxy(Object parent, String query) {
             this.delegate = parent;
@@ -271,7 +251,6 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            // Get the name of the method for comparison
             final String name = method.getName();
             // Handle identity on this proxy, like the statement facade
             // does, rather than forwarding it to the delegate: the delegate
@@ -289,7 +268,6 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
             if (compare(HASHCODE_VAL, name)) {
                 return Integer.valueOf(this.hashCode());
             }
-            // Was close invoked?
             boolean close = compare(CLOSE_VAL, name);
             // Read the state once: another thread's close() - the pool's
             // statement finalizer closes tracked statements from whichever
@@ -311,17 +289,15 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
             if (close && gone) {
                 return null;
             }
-            // Are we calling isClosed?
             if (compare(ISCLOSED_VAL, name)) {
                 return Boolean.valueOf(gone);
             }
-            // If we are calling anything else, bail out
+            // Anything other than close() or isClosed() on a closed handle is
+            // refused, the way the closed contract promises
             if (gone) {
                 throw new SQLException(MessageFactory.get("abstractQueryReport.statementClosed"));
             }
-            boolean process = false;
-            // Check to see if we are about to execute a query
-            process = isExecute(method, process);
+            boolean process = isExecute(method, false);
             // If we are executing, get the current time. The wall clock
             // only gives the timestamp the report hooks carry; the elapsed
             // time is measured with the monotonic clock on both the success
@@ -370,7 +346,6 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
                     throw t;
                 }
             }
-            // Measure the elapsed time with the monotonic clock
             long delta = (process) ? elapsedMillis(startNanos) : Long.MIN_VALUE;
             // See if we meet the requirements to measure. A negative
             // threshold keeps every execution out of the slow path: the
@@ -384,7 +359,6 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
             // threshold anyway.
             if (process && threshold >= 0 && delta > threshold) {
                 try {
-                    // Report the slow query
                     reportSlowQuery(query, args, name, start, delta);
                 } catch (Throwable t) {
                     if (log.isWarnEnabled()) {

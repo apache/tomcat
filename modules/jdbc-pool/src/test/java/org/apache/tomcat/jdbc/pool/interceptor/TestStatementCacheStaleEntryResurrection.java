@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 import org.apache.tomcat.jdbc.pool.DataSource;
-import org.apache.tomcat.jdbc.pool.PooledConnection;
 
 /**
  * A cached statement belongs to the physical session it was prepared on, so
@@ -67,7 +66,7 @@ class TestStatementCacheStaleEntryResurrection extends JdbcPoolBaseTest {
         String insert = "INSERT INTO " + table + " VALUES (?)";
 
         Connection first = ds.getConnection();
-        java.sql.Connection oldPhysical = first.unwrap(PooledConnection.class).getConnection();
+        java.sql.Connection oldPhysical = internalOf(first).getConnection();
         setSessionMarker(first, 21);
         PreparedStatement prepared = first.prepareStatement(insert);
         Statement oldDriverStatement = driverStatement(prepared);
@@ -84,7 +83,7 @@ class TestStatementCacheStaleEntryResurrection extends JdbcPoolBaseTest {
 
         // Replace the physical session underneath the pooled connection, as
         // any reconnect path does: the purge runs and clears the map.
-        first.unwrap(PooledConnection.class).reconnect();
+        internalOf(first).reconnect();
         Assertions.assertTrue(oldPhysical.isClosed(),
                 "the replaced session must be closed by the reconnect");
         Assertions.assertEquals(0, cacheMap.size(),

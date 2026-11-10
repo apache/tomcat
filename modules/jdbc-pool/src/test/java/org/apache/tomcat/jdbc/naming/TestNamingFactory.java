@@ -16,13 +16,17 @@
  */
 package org.apache.tomcat.jdbc.naming;
 
+import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import javax.naming.CompositeName;
 import javax.naming.Name;
 import javax.naming.NamingException;
@@ -36,7 +40,11 @@ import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.DataSourceFactory;
 import org.apache.tomcat.jdbc.pool.PoolConfiguration;
+import org.apache.tomcat.jdbc.pool.PoolProperties;
+import org.apache.tomcat.jdbc.pool.Validator;
 import org.apache.tomcat.jdbc.pool.XADataSource;
+import org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport;
+import org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx;
 
 /**
  * Expected JNDI/naming factory functionality: a container-style
@@ -59,6 +67,19 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
         ref.add(new StringRefAddr("initialSize", "1"));
         ref.add(new StringRefAddr("minIdle", "0"));
         return ref;
+    }
+
+    /*
+     * A property that cannot be applied fails the lookup: the partially
+     * configured object must never be returned, for a singleton resource
+     * the container caches whatever object the factory returns. Targets
+     * that a test must inspect despite the failure self-register in the
+     * constructor, which runs before any property is applied.
+     */
+    private void assertLookupFails(Reference ref, String boundName) {
+        Assertions.assertThrows(NamingException.class,
+                () -> new GenericNamingResourcesFactory().getObjectInstance(
+                        ref, new CompositeName(boundName), null, null));
     }
 
     @Test
@@ -89,6 +110,23 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
                 dataSourceReference("javax.sql.XADataSource"), name, null, null);
         Assertions.assertInstanceOf(XADataSource.class, result,
                 "a javax.sql.XADataSource reference must yield the pool's XA type");
+        if (result instanceof DataSource) {
+            manage((DataSource) result);
+        }
+    }
+
+    @Test
+    void concreteXaPoolClassNameReferenceProducesXaDataSourceType() throws Exception {
+        // A resource whose type names the factory's own XA class - the class
+        // the factory news for every XA reference - must build that XA pool,
+        // where previously only the sibling non-XA concrete class was
+        // accepted and this one came back as an unresolvable resource.
+        Name name = new CompositeName("jdbc/ConcreteXaDS");
+        Object result = new DataSourceFactory().getObjectInstance(
+                dataSourceReference("org.apache.tomcat.jdbc.pool.XADataSource"),
+                name, null, null);
+        Assertions.assertInstanceOf(XADataSource.class, result,
+                "the concrete XA class name must yield the pool's XA type");
         if (result instanceof DataSource) {
             manage((DataSource) result);
         }
@@ -172,6 +210,64 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
     }
 
     @Test
+    void emptyCredentialUrlAndValidatorAttributesLeaveThePropertiesUnset() {
+        // Pre-fix these four attributes stored the blank verbatim even
+        // though the factory contract promises a blank leaves the property
+        // at its PoolProperties default: a cleared password attribute left
+        // the pool authenticating with an empty password entry, a cleared
+        // url made every physical connection attempt fail against the
+        // driver, and a cleared validatorClassName looked for a class named
+        // "" on every pool start and warned of the ClassNotFoundException
+        // before falling back to standard validation.
+        java.util.Properties attrs = new java.util.Properties();
+        attrs.setProperty("username", " ");
+        attrs.setProperty("password", "");
+        attrs.setProperty("url", "  ");
+        attrs.setProperty("validatorClassName", "");
+
+        PoolConfiguration configured =
+                DataSourceFactory.parsePoolProperties(attrs);
+
+        Assertions.assertNull(configured.getUsername(),
+                "a blank username attribute must leave the driver "
+                        + "properties without a user entry");
+        Assertions.assertNull(configured.getPassword(),
+                "a blank password attribute must leave the driver "
+                        + "properties without a password entry");
+        Assertions.assertNull(configured.getUrl(),
+                "a blank url attribute must leave the url unset");
+        Assertions.assertNull(configured.getValidatorClassName(),
+                "a blank validatorClassName attribute must keep the "
+                        + "standard validation default");
+    }
+
+    @Test
+    void credentialAttributesApplyVerbatimAndValidatorClassNameAppliesTrimmed() {
+        // A credential can legitimately carry surrounding whitespace, so it
+        // is stored verbatim; a Java class name never can, so the factory
+        // trims it the same way it trims driverClassName.
+        java.util.Properties attrs = new java.util.Properties();
+        attrs.setProperty("username", " scott ");
+        attrs.setProperty("password", " secret ");
+        attrs.setProperty("validatorClassName",
+                " " + ParsingValidator.class.getName() + " ");
+
+        PoolConfiguration configured =
+                DataSourceFactory.parsePoolProperties(attrs);
+
+        Assertions.assertEquals(" scott ", configured.getUsername(),
+                "a non-blank username must be stored verbatim");
+        Assertions.assertEquals(" secret ", configured.getPassword(),
+                "a non-blank password must be stored verbatim");
+        Assertions.assertEquals(ParsingValidator.class.getName(),
+                configured.getValidatorClassName(),
+                "a non-blank validatorClassName must be stored trimmed");
+        Assertions.assertInstanceOf(ParsingValidator.class,
+                configured.getValidator(),
+                "the trimmed class name must be the one loaded");
+    }
+
+    @Test
     void emptyDefaultAutoCommitLeavesConnectionsAtTheDriverDefault()
             throws Exception {
         DataSource pool = factoryPoolWithAutoCommit("");
@@ -215,6 +311,389 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
                 "the exact lowercase spelling must keep working");
     }
 
+    /*
+     * The defaultTransactionIsolation attribute follows the same strict
+     * policy: names and the numeric java.sql.Connection constants are
+     * accepted ignoring surrounding whitespace, an empty attribute means
+     * "unset" - the "leave the driver default alone" state - and anything
+     * else fails the parse. Pre-fix an unusable value was silently applied
+     * as that unset sentinel, so connections ran at the driver's isolation
+     * level while the only trace was a System.err line claiming the
+     * attribute had not been set at all.
+     */
+
+    @Test
+    void isolationLevelNamesApplyIgnoringCaseAndSurroundingWhitespace() {
+        java.util.Properties attrs = new java.util.Properties();
+        attrs.setProperty("defaultTransactionIsolation", " read_committed ");
+        Assertions.assertEquals(java.sql.Connection.TRANSACTION_READ_COMMITTED,
+                DataSourceFactory.parsePoolProperties(attrs)
+                        .getDefaultTransactionIsolation(),
+                "\" read_committed \" must be accepted, whitespace included");
+
+        attrs.setProperty("defaultTransactionIsolation", "NONE");
+        Assertions.assertEquals(java.sql.Connection.TRANSACTION_NONE,
+                DataSourceFactory.parsePoolProperties(attrs)
+                        .getDefaultTransactionIsolation(),
+                "the documented name must still apply");
+    }
+
+    @Test
+    void numericIsolationLevelAppliesIgnoringSurroundingWhitespace() {
+        java.util.Properties attrs = new java.util.Properties();
+        attrs.setProperty("defaultTransactionIsolation", " 2 ");
+        Assertions.assertEquals(2,
+                DataSourceFactory.parsePoolProperties(attrs)
+                        .getDefaultTransactionIsolation(),
+                "the numeric form must be accepted, whitespace included");
+    }
+
+    @Test
+    void unusableIsolationLevelFailsTheParseNamingTheProperty() {
+        java.util.Properties attrs = new java.util.Properties();
+        attrs.setProperty("defaultTransactionIsolation", "READ_COMMIT");
+
+        IllegalArgumentException e = Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> DataSourceFactory.parsePoolProperties(attrs),
+                "an unusable isolation level must fail the parse instead of "
+                        + "silently leaving the level at the driver default");
+        Assertions.assertTrue(e.getMessage().contains("defaultTransactionIsolation"),
+                "the failure must name the misconfigured attribute, was: "
+                        + e.getMessage());
+        Assertions.assertTrue(e.getMessage().contains("READ_COMMIT"),
+                "the failure must show the offending value, was: "
+                        + e.getMessage());
+        Assertions.assertNotNull(e.getCause(),
+                "the parse failure must be kept as the cause");
+    }
+
+    @Test
+    void emptyIsolationLevelAttributeLeavesThePropertyUnset() {
+        java.util.Properties attrs = new java.util.Properties();
+        attrs.setProperty("defaultTransactionIsolation", "");
+
+        PoolConfiguration configured =
+                DataSourceFactory.parsePoolProperties(attrs);
+
+        Assertions.assertEquals(DataSourceFactory.UNKNOWN_TRANSACTIONISOLATION,
+                configured.getDefaultTransactionIsolation(),
+                "an empty attribute must keep the \"leave the driver default "
+                        + "alone\" state");
+    }
+
+    /*
+     * The numeric attributes follow the same strict policy as the booleans:
+     * surrounding whitespace is ignored, an empty attribute means "unset"
+     * (the PoolProperties default) rather than a NumberFormatException for
+     * the empty string, and a value that cannot be parsed - or does not fit
+     * the property - fails the configuration naming the property, instead of
+     * aborting the whole JNDI resource with an exception that only quotes
+     * the offending text.
+     */
+
+    @Test
+    void numericAttributesApplyIgnoringSurroundingWhitespace() {
+        java.util.Properties attrs = new java.util.Properties();
+        attrs.setProperty("maxActive", " 12 ");
+        attrs.setProperty("maxAge", " 86400000000 ");
+
+        PoolConfiguration configured =
+                DataSourceFactory.parsePoolProperties(attrs);
+
+        Assertions.assertEquals(12, configured.getMaxActive(),
+                "\" 12 \" must be accepted, whitespace included");
+        Assertions.assertEquals(86400000000L, configured.getMaxAge(),
+                "a long attribute must be accepted, whitespace included");
+    }
+
+    @Test
+    void emptyNumericAttributesLeaveThePropertiesUnset() {
+        java.util.Properties attrs = new java.util.Properties();
+        attrs.setProperty("maxActive", "");
+        attrs.setProperty("maxWait", " ");
+
+        PoolConfiguration configured =
+                DataSourceFactory.parsePoolProperties(attrs);
+
+        Assertions.assertEquals(PoolProperties.DEFAULT_MAX_ACTIVE,
+                configured.getMaxActive(),
+                "an empty numeric attribute must leave the default in place");
+        Assertions.assertEquals(new PoolProperties().getMaxWait(),
+                configured.getMaxWait(),
+                "an all-whitespace numeric attribute must leave the default in place");
+    }
+
+    @Test
+    void unparseableNumericValueFailsTheParseNamingTheProperty() {
+        java.util.Properties attrs = new java.util.Properties();
+        attrs.setProperty("maxWait", "12 seconds");
+
+        IllegalArgumentException e = Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> DataSourceFactory.parsePoolProperties(attrs));
+        Assertions.assertTrue(e.getMessage().contains("maxWait"),
+                "the failure must name the misconfigured attribute, was: "
+                        + e.getMessage());
+        Assertions.assertTrue(e.getMessage().contains("12 seconds"),
+                "the failure must show the offending value, was: "
+                        + e.getMessage());
+        Assertions.assertInstanceOf(NumberFormatException.class, e.getCause(),
+                "the parse failure must be kept as the cause");
+    }
+
+    @Test
+    void numericValueBeyondThePropertyRangeFailsTheParseNamingTheProperty() {
+        java.util.Properties attrs = new java.util.Properties();
+        // a millisecond value no int setter can hold (~2.7 years)
+        attrs.setProperty("minEvictableIdleTimeMillis", "86400000000");
+
+        IllegalArgumentException e = Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> DataSourceFactory.parsePoolProperties(attrs));
+        Assertions.assertTrue(e.getMessage().contains("minEvictableIdleTimeMillis"),
+                "the failure must name the misconfigured attribute, was: "
+                        + e.getMessage());
+        Assertions.assertTrue(e.getMessage().contains("86400000000"),
+                "the failure must show the offending value, was: "
+                        + e.getMessage());
+    }
+
+    @Test
+    void blankStringAttributesLeaveThePropertiesUnset() {
+        // The same cleared-template policy the booleans, numerics, the
+        // isolation level and dataSourceJNDI follow. Pre-fix a stored empty
+        // defaultCatalog reached connection.setCatalog("") on every physical
+        // connection - driver-dependent from inert to a per-connect failure -
+        // and a blank dataSource aborted the resource with guidance about
+        // carrying the object, irrelevant to a value cleared to mean "off".
+        java.util.Properties attrs = new java.util.Properties();
+        attrs.setProperty("defaultCatalog", "");
+        attrs.setProperty("dataSource", " ");
+        attrs.setProperty("driverClassName", "");
+        attrs.setProperty("jdbcInterceptors", " ");
+        attrs.setProperty("validationQuery", "");
+
+        PoolConfiguration configured =
+                DataSourceFactory.parsePoolProperties(attrs);
+
+        Assertions.assertNull(configured.getDefaultCatalog(),
+                "an empty defaultCatalog must leave the property unset");
+        Assertions.assertNull(configured.getDataSource(),
+                "a blank dataSource must leave the property unset");
+        Assertions.assertNull(configured.getDriverClassName(),
+                "a blank driverClassName must leave the property unset");
+        Assertions.assertNull(configured.getJdbcInterceptors(),
+                "a blank jdbcInterceptors must leave the property unset");
+        Assertions.assertNull(configured.getValidationQuery(),
+                "a blank validationQuery must leave the property unset,"
+                        + " routing validation to isValid()");
+    }
+
+    @Test
+    void blankDriverClassNameStillBuildsTheDriverManagerFallbackPool()
+            throws Exception {
+        // Pre-fix, the empty attribute defeated the connect path's documented
+        // DriverManager fallback (keyed on the property being null) and
+        // aborted the whole resource on loading the empty class.
+        Reference ref = new Reference("javax.sql.DataSource", null, null);
+        ref.add(new StringRefAddr("jmxEnabled", "false"));
+        ref.add(new StringRefAddr("initialSize", "1"));
+        ref.add(new StringRefAddr("minIdle", "0"));
+        ref.add(new StringRefAddr("url", getUrl()));
+        ref.add(new StringRefAddr("username", "sa"));
+        ref.add(new StringRefAddr("password", ""));
+        ref.add(new StringRefAddr("driverClassName", ""));
+        ref.add(new StringRefAddr("jdbcInterceptors", " "));
+
+        DataSource ds = manage((DataSource) new DataSourceFactory()
+                .getObjectInstance(ref, new CompositeName("jdbc/BlankDS"),
+                        null, null));
+
+        try (java.sql.Connection c = ds.getConnection();
+                java.sql.ResultSet rs = c.createStatement().executeQuery("SELECT 1")) {
+            Assertions.assertTrue(rs.next(),
+                    "the pool must build and connect through the fallback");
+        }
+    }
+
+    @Test
+    void driverClassNameAppliesIgnoringSurroundingWhitespace() {
+        // A Java class name carries no meaningful surrounding whitespace, so
+        // the padded shape a line-wrapped XML attribute yields must load the
+        // class it names, like the padded numeric and boolean spellings
+        // already do. Pre-fix only the blank test trimmed and the padded
+        // value went to the class loader verbatim.
+        java.util.Properties attrs = new java.util.Properties();
+        attrs.setProperty("driverClassName", " org.h2.Driver ");
+
+        Assertions.assertEquals("org.h2.Driver",
+                DataSourceFactory.parsePoolProperties(attrs).getDriverClassName(),
+                "a padded class name must be applied trimmed");
+    }
+
+    @Test
+    void interceptorListWithRedundantSeparatorsStillBuildsThePool()
+            throws Exception {
+        // Pre-fix, one stray doubled separator - or one whitespace-only
+        // segment - made createPool() load the generated class "...
+        // pool.interceptor." and abort the whole resource with a
+        // SQLException whose message was null; the identical separator
+        // dropped at the end of the list was tolerated.
+        Reference ref = new Reference("javax.sql.DataSource", null, null);
+        ref.add(new StringRefAddr("jmxEnabled", "false"));
+        ref.add(new StringRefAddr("initialSize", "1"));
+        ref.add(new StringRefAddr("minIdle", "0"));
+        ref.add(new StringRefAddr("url", getUrl()));
+        ref.add(new StringRefAddr("username", "sa"));
+        ref.add(new StringRefAddr("password", ""));
+        ref.add(new StringRefAddr("jdbcInterceptors",
+                " ; StatementFinalizer;;SlowQueryReport ; "));
+
+        DataSource ds = manage((DataSource) new DataSourceFactory()
+                .getObjectInstance(ref, new CompositeName("jdbc/SemiDS"),
+                        null, null));
+
+        try (java.sql.Connection c = ds.getConnection();
+                java.sql.ResultSet rs = c.createStatement().executeQuery("SELECT 1")) {
+            Assertions.assertTrue(rs.next(),
+                    "the pool must build and borrow with its named chain");
+        }
+    }
+
+    @Test
+    void aConfiguredCatalogIsStoredUntrimmed() {
+        // The counterpart: a catalog name is a database identifier, so only
+        // the blank test trims - a configured name keeps its exact spelling.
+        java.util.Properties attrs = new java.util.Properties();
+        attrs.setProperty("defaultCatalog", " My Catalog ");
+
+        Assertions.assertEquals(" My Catalog ",
+                DataSourceFactory.parsePoolProperties(attrs).getDefaultCatalog(),
+                "a configured catalog name must be stored verbatim");
+    }
+
+    @Test
+    void blankObjectNameLeavesThePoolAtItsGeneratedName() {
+        // A cleared object_name attribute must not reach the pool as an
+        // empty quoted name - the JMX object name would carry an empty name
+        // component where the property being unset lets the pool name
+        // itself.
+        java.util.Properties attrs = new java.util.Properties();
+        attrs.setProperty("object_name", " ");
+
+        String name = DataSourceFactory.parsePoolProperties(attrs).getName();
+
+        Assertions.assertNotEquals("\"\"", name,
+                "a blank object_name must not become an empty quoted name");
+        Assertions.assertTrue(name.startsWith("Tomcat Connection Pool["),
+                "an unset object_name must leave the generated pool name,"
+                        + " was: " + name);
+    }
+
+    @Test
+    void aConfiguredObjectNameIsQuotedButStoredVerbatim() {
+        // The counterpart, like the catalog: the name is quoted precisely so
+        // that "My Pool" survives the JMX object name, and only the blank
+        // test trims - a configured name keeps its exact spelling.
+        java.util.Properties attrs = new java.util.Properties();
+        attrs.setProperty("object_name", " My Pool ");
+
+        Assertions.assertEquals("\" My Pool \"",
+                DataSourceFactory.parsePoolProperties(attrs).getName(),
+                "a configured pool name must be quoted but stored verbatim");
+    }
+
+    @Test
+    void aContainerShapedObjectNameIsUsedVerbatim() throws Exception {
+        // The container passes this name to a pool that does not name
+        // itself. The factory stores it through ObjectName.quote(), the way
+        // it stores every configured name, and nothing else may touch it:
+        // the pool name, the registration name and the statistics key must
+        // all carry that one stored form.
+        String containerName = "Catalina/localhost/app1/jdbc/DS";
+        String storedName = ObjectName.quote(containerName);
+
+        Reference ref = dataSourceReference("javax.sql.DataSource");
+        ref.add(new StringRefAddr("jmxEnabled", "false"));
+        ref.add(new StringRefAddr("object_name", containerName));
+        ref.add(new StringRefAddr("jdbcInterceptors", "SlowQueryReport"));
+
+        DataSource ds = manage((DataSource) new DataSourceFactory().getObjectInstance(
+                ref, new CompositeName("jdbc/DS"), null, null));
+
+        Assertions.assertEquals(storedName, ds.getPoolProperties().getName(),
+                "the container-passed name must be the pool name, only the storage quote applied");
+
+        try (java.sql.Connection c = ds.getConnection();
+                java.sql.ResultSet rs = c.createStatement().executeQuery("SELECT 1")) {
+            Assertions.assertTrue(rs.next());
+        }
+
+        Assertions.assertEquals(storedName, ds.getPool().getRegistrationName(),
+                "the pool must register under the container-passed name");
+        ConcurrentHashMap<String, SlowQueryReport.QueryStats> stats =
+                SlowQueryReport.getPoolStats(storedName);
+        Assertions.assertNotNull(stats,
+                "the statistics registry must key the pool by its container name");
+        Assertions.assertTrue(stats.containsKey("SELECT 1"),
+                "the executed query must be recorded under the container name");
+    }
+
+    /* A factory-built pool carrying a container-shaped object_name. */
+    private DataSource containerNamedPool(String containerName) throws Exception {
+        Reference ref = dataSourceReference("javax.sql.DataSource");
+        ref.add(new StringRefAddr("jmxEnabled", "false"));
+        ref.add(new StringRefAddr("object_name", containerName));
+        ref.add(new StringRefAddr("jdbcInterceptors",
+                "SlowQueryReportJmx(notifyPool=false,threshold=-1)"));
+        return manage((DataSource) new DataSourceFactory().getObjectInstance(
+                ref, new CompositeName("jdbc/DS"), null, null));
+    }
+
+    @Test
+    void twoContainerNamedPoolsKeepSeparateRegistries() throws Exception {
+        // The two-webapp case at pool level: one JNDI name, two contexts, so
+        // two generated names of the container shape. Nothing may merge the
+        // pools: each keeps its own statistics registry and its own JMX
+        // registration, where the counter names of unnamed pools could once
+        // collide.
+        String name1 = "Catalina/localhost/app1/jdbc/DS";
+        String name2 = "Catalina/localhost/app2/jdbc/DS";
+        String stored1 = ObjectName.quote(name1);
+        String stored2 = ObjectName.quote(name2);
+
+        DataSource ds1 = containerNamedPool(name1);
+        DataSource ds2 = containerNamedPool(name2);
+
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        ObjectName oname1 = new ObjectName("tomcat.jdbc:type="
+                + SlowQueryReportJmx.class.getName() + ",name=" + stored1);
+        ObjectName oname2 = new ObjectName("tomcat.jdbc:type="
+                + SlowQueryReportJmx.class.getName() + ",name=" + stored2);
+
+        try (@SuppressWarnings("unused") java.sql.Connection c1 = ds1.getConnection();
+                @SuppressWarnings("unused") java.sql.Connection c2 = ds2.getConnection()) {
+            Assertions.assertTrue(server.isRegistered(oname1),
+                    "the first pool must publish its interceptor MBean under its own name");
+            Assertions.assertTrue(server.isRegistered(oname2),
+                    "the second pool must publish its interceptor MBean under its own name");
+            Assertions.assertEquals(stored1, ds1.getPool().getRegistrationName());
+            Assertions.assertEquals(stored2, ds2.getPool().getRegistrationName());
+        }
+
+        ConcurrentHashMap<String, SlowQueryReport.QueryStats> stats1 =
+                SlowQueryReport.getPoolStats(stored1);
+        ConcurrentHashMap<String, SlowQueryReport.QueryStats> stats2 =
+                SlowQueryReport.getPoolStats(stored2);
+        Assertions.assertNotNull(stats1);
+        Assertions.assertNotNull(stats2);
+        Assertions.assertSame(stats1, SlowQueryReport.getPoolStats(stored1),
+                "the statistics of one name must stay one registry");
+        Assertions.assertNotSame(stats1, stats2,
+                "the two container names must not share one statistics registry");
+    }
+
     /* A factory-built pool, H2-backed, with one extra attribute. */
     private DataSource factoryPoolWithAutoCommit(String value)
             throws Exception {
@@ -241,6 +720,152 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
         Assertions.assertEquals(7, target.getCount());
         Assertions.assertEquals(1234567890L, target.getRatio());
         Assertions.assertTrue(target.isEnabled());
+    }
+
+    @Test
+    void namingFactoryAppliesTheReferenceImplementationTypes()
+            throws Exception {
+        // BeanFactory converts all of these; the generic factory must not
+        // drop properties that the reference implementation configures
+        Reference ref = new Reference(WideTarget.class.getName(), null, null);
+        ref.add(new StringRefAddr("small", "7"));
+        ref.add(new StringRefAddr("tiny", "-3"));
+        ref.add(new StringRefAddr("ratio", "1.5"));
+        ref.add(new StringRefAddr("precise", "0.25"));
+        ref.add(new StringRefAddr("initial", "configured"));
+        ref.add(new StringRefAddr("boxed", "x"));
+
+        Object result = new GenericNamingResourcesFactory().getObjectInstance(
+                ref, new CompositeName("test/wide"), null, null);
+        Assertions.assertInstanceOf(WideTarget.class, result);
+        WideTarget target = (WideTarget) result;
+        Assertions.assertEquals((short) 7, target.getSmall());
+        Assertions.assertEquals((byte) -3, target.getTiny());
+        Assertions.assertEquals(1.5f, target.getRatio(), 0.0f);
+        Assertions.assertEquals(0.25d, target.getPrecise(), 0.0d);
+        Assertions.assertEquals('c', target.getInitial());
+        Assertions.assertEquals(Character.valueOf('x'), target.getBoxed());
+    }
+
+    @Test
+    void outOfRangeNumberFailsTheLookupNamingTheProperty() throws Exception {
+        Reference ref = new Reference(WideTarget.class.getName(), null, null);
+        // no short can hold this: the conversion must fail and, like every
+        // other unapplied property, fail the lookup
+        ref.add(new StringRefAddr("small", "99999"));
+
+        NamingException e = Assertions.assertThrows(NamingException.class,
+                () -> new GenericNamingResourcesFactory().getObjectInstance(
+                        ref, new CompositeName("test/widebad"), null, null));
+        Assertions.assertTrue(e.getMessage().contains("small"),
+                "the failure must name the property, was: " + e.getMessage());
+    }
+
+    @Test
+    void missingContentIsNotAppliedToAStringSetter() throws Exception {
+        Reference ref = new Reference(NamingTarget.class.getName(), null, null);
+        // pre-fix the String setter received a fabricated null, wiping the
+        // configured default and reporting success; missing content is not
+        // a value to apply, to a String setter no less than to a typed one
+        NamingTarget.last = null;
+        ref.add(new StringRefAddr("name", null));
+
+        assertLookupFails(ref, "test/nullstring");
+        NamingTarget target = NamingTarget.last;
+        Assertions.assertNotNull(target);
+        Assertions.assertEquals("untitled", target.getName(),
+                "the default must survive an address with no content");
+    }
+
+    @Test
+    void traceLoggingDoesNotIncludeThePropertyValue() throws Exception {
+        Logger logger = Logger.getLogger(
+                GenericNamingResourcesFactory.class.getName());
+        Level originalLevel = logger.getLevel();
+        final List<LogRecord> records = new ArrayList<>();
+        Handler handler = new Handler() {
+            @Override
+            public void publish(LogRecord record) {
+                records.add(record);
+            }
+            @Override
+            public void flush() {
+                // no buffering
+            }
+            @Override
+            public void close() {
+                // nothing to release
+            }
+        };
+        logger.addHandler(handler);
+        logger.setLevel(Level.FINEST);
+        try {
+            Reference ref = new Reference(NamingTarget.class.getName(),
+                    null, null);
+            ref.add(new StringRefAddr("name", "s3cr3t-value"));
+
+            Object result = new GenericNamingResourcesFactory().getObjectInstance(
+                    ref, new CompositeName("test/trace"), null, null);
+            Assertions.assertEquals("s3cr3t-value",
+                    ((NamingTarget) result).getName(),
+                    "the property must still be applied");
+        } finally {
+            logger.removeHandler(handler);
+            logger.setLevel(originalLevel);
+        }
+        for (LogRecord record : records) {
+            Assertions.assertFalse(record.getMessage() != null &&
+                    record.getMessage().contains("s3cr3t-value"),
+                    "the trace line must not log the configured value: "
+                            + record.getMessage());
+        }
+    }
+
+    /** Target with the numeric and character setters BeanFactory supports. */
+    public static class WideTarget {
+        private short small;
+        private byte tiny;
+        private float ratio;
+        private double precise;
+        private char initial;
+        private Character boxed;
+
+        public short getSmall() {
+            return small;
+        }
+        public void setSmall(short small) {
+            this.small = small;
+        }
+        public byte getTiny() {
+            return tiny;
+        }
+        public void setTiny(byte tiny) {
+            this.tiny = tiny;
+        }
+        public float getRatio() {
+            return ratio;
+        }
+        public void setRatio(float ratio) {
+            this.ratio = ratio;
+        }
+        public double getPrecise() {
+            return precise;
+        }
+        public void setPrecise(double precise) {
+            this.precise = precise;
+        }
+        public char getInitial() {
+            return initial;
+        }
+        public void setInitial(char initial) {
+            this.initial = initial;
+        }
+        public Character getBoxed() {
+            return boxed;
+        }
+        public void setBoxed(Character boxed) {
+            this.boxed = boxed;
+        }
     }
 
     /*
@@ -289,12 +914,11 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
             ref.add(new StringRefAddr("addr", null));
             ref.add(new StringRefAddr("host", ""));
 
-            Object result = new GenericNamingResourcesFactory()
-                    .getObjectInstance(
-                            ref, new CompositeName("test/converted"),
-                            null, null);
-            Assertions.assertInstanceOf(ConvertedTarget.class, result);
-            ConvertedTarget target = (ConvertedTarget) result;
+            ConvertedTarget.last = null;
+            assertLookupFails(ref, "test/converted");
+            ConvertedTarget target = ConvertedTarget.last;
+            Assertions.assertNotNull(target,
+                    "the object is created before properties are applied");
             for (String property : new String[] { "enabled", "checked",
                     "flag", "marker", "addr", "host" }) {
                 Assertions.assertFalse(target.isInvoked(property),
@@ -364,8 +988,97 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
                 target.getHost());
     }
 
+    /*
+     * Boolean.valueOf() maps everything that is not exactly "true" (ignore
+     * case) to false: whitespace-padded and misspelled configuration values
+     * were silently applied as false and reported as a successful set. The
+     * boolean conversion must accept only content that spells a boolean,
+     * like the pool's own DataSourceFactory.parseBoolean() does; anything
+     * else must leave the setter uninvoked and be reported as not applied.
+     */
+
+    @Test
+    void unrecognizedBooleanContentIsNotAppliedAsFalse() throws Exception {
+        Logger logger = Logger.getLogger(
+                GenericNamingResourcesFactory.class.getName());
+        Level originalLevel = logger.getLevel();
+        final List<LogRecord> records = new ArrayList<>();
+        Handler handler = new Handler() {
+            @Override
+            public void publish(LogRecord record) {
+                records.add(record);
+            }
+            @Override
+            public void flush() {
+                // no buffering
+            }
+            @Override
+            public void close() {
+                // nothing to release
+            }
+        };
+        logger.addHandler(handler);
+        logger.setLevel(Level.FINEST);
+        try {
+            Reference ref = new Reference(ConvertedTarget.class.getName(),
+                    null, null);
+            // the realistic configuration mistakes: a value padded by an XML
+            // line wrap, a synonym and a typo. Pre-fix every one of these
+            // was applied as false with no diagnostic.
+            ref.add(new StringRefAddr("checked", "Yes"));
+            ref.add(new StringRefAddr("flag", "1"));
+            ref.add(new StringRefAddr("marker", "ture"));
+            // surrounding whitespace around genuine content is still
+            // accepted, like DataSourceFactory.parseBoolean() does
+            ref.add(new StringRefAddr("enabled", " True "));
+
+            ConvertedTarget.last = null;
+            // checked/flag/marker are not applicable, so the lookup fails;
+            // enabled=" True " is applied first, verified via the target's
+            // self-registration before the failure
+            assertLookupFails(ref, "test/badboolean");
+            ConvertedTarget target = ConvertedTarget.last;
+            Assertions.assertNotNull(target);
+            Assertions.assertTrue(target.isEnabled(),
+                    "\" True \" is a padded true and must be applied");
+            for (String property : new String[] { "checked", "flag",
+                    "marker" }) {
+                Assertions.assertFalse(target.isInvoked(property),
+                        "the setter for [" + property
+                                + "] must not be invoked with content that"
+                                + " does not spell a boolean");
+            }
+            Assertions.assertFalse(target.isChecked());
+            Assertions.assertNull(target.getFlag(),
+                    "the default must survive unrecognized content");
+            Assertions.assertNull(target.getMarker(),
+                    "the default must survive unrecognized content");
+        } finally {
+            logger.removeHandler(handler);
+            logger.setLevel(originalLevel);
+        }
+        for (String property : new String[] { "checked", "flag",
+                "marker" }) {
+            boolean warned = false;
+            for (LogRecord record : records) {
+                if (record.getLevel().intValue() >= Level.WARNING.intValue()
+                        && record.getMessage() != null
+                        && record.getMessage().contains("[" + property + "]")) {
+                    warned = true;
+                    break;
+                }
+            }
+            Assertions.assertTrue(warned, "failure to apply property ["
+                    + property
+                    + "] must be reported at warn level or above");
+        }
+    }
+
     /** Target with primitive and boxed boolean and InetAddress setters. */
     public static class ConvertedTarget {
+        // set by the constructor so a test can inspect the created object
+        // even when the factory fails the lookup before returning it
+        static ConvertedTarget last;
         private final java.util.Set<String> invoked =
                 new java.util.HashSet<>();
         private boolean enabled;
@@ -374,6 +1087,10 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
         private Boolean marker;
         private java.net.InetAddress addr;
         private java.net.InetAddress host;
+
+        public ConvertedTarget() {
+            last = this;
+        }
 
         public boolean isInvoked(String name) {
             return invoked.contains(name);
@@ -431,10 +1148,10 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
         // null argument, wiping the configured default.
         ref.add(new StringRefAddr("props", "anything"));
 
-        Object result = new GenericNamingResourcesFactory().getObjectInstance(
-                ref, new CompositeName("test/unsupported"), null, null);
-        Assertions.assertInstanceOf(UnsupportedTypeTarget.class, result);
-        UnsupportedTypeTarget target = (UnsupportedTypeTarget) result;
+        UnsupportedTypeTarget.last = null;
+        assertLookupFails(ref, "test/unsupported");
+        UnsupportedTypeTarget target = UnsupportedTypeTarget.last;
+        Assertions.assertNotNull(target);
         Assertions.assertFalse(target.isPropsInvoked(),
                 "setter with an unsupported parameter type must not be "
                         + "invoked with a null value");
@@ -452,10 +1169,10 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
         // must not be invoked with null instead.
         ref.add(new StringRefAddr("port", "12o"));
 
-        Object result = new GenericNamingResourcesFactory().getObjectInstance(
-                ref, new CompositeName("test/overloaded"), null, null);
-        Assertions.assertInstanceOf(OverloadedTarget.class, result);
-        OverloadedTarget target = (OverloadedTarget) result;
+        OverloadedTarget.last = null;
+        assertLookupFails(ref, "test/overloaded");
+        OverloadedTarget target = OverloadedTarget.last;
+        Assertions.assertNotNull(target);
         Assertions.assertFalse(target.isPropsInvoked(),
                 "the unsupported overload must not be invoked with null when "
                         + "the numeric conversion fails");
@@ -465,10 +1182,15 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
 
     /** Target with a setter of a type the factory cannot convert to. */
     public static class UnsupportedTypeTarget {
+        static UnsupportedTypeTarget last;
         static final java.util.Properties DEFAULT_PROPS =
                 new java.util.Properties();
         private java.util.Properties props = DEFAULT_PROPS;
         private boolean propsInvoked;
+
+        public UnsupportedTypeTarget() {
+            last = this;
+        }
 
         public java.util.Properties getProps() {
             return props;
@@ -484,9 +1206,14 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
 
     /** Target with an overloaded setter, one supported and one not. */
     public static class OverloadedTarget {
+        static OverloadedTarget last;
         private int port = -1;
         private java.util.Properties props;
         private boolean propsInvoked;
+
+        public OverloadedTarget() {
+            last = this;
+        }
 
         public int getPort() {
             return port;
@@ -503,6 +1230,55 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
         }
         public boolean isPropsInvoked() {
             return propsInvoked;
+        }
+    }
+
+    @Test
+    void convertibleSetterOverloadsAreChosenDeterministically() throws Exception {
+        Reference ref = new Reference(AmbiguousOverloadTarget.class.getName(),
+                null, null);
+        ref.add(new StringRefAddr("port", "1527"));
+        ref.add(new StringRefAddr("ratio", "1.5"));
+
+        AmbiguousOverloadTarget.last = null;
+        Object result = new GenericNamingResourcesFactory().getObjectInstance(
+                ref, new CompositeName("test/ambiguous"), null, null);
+
+        Assertions.assertInstanceOf(AmbiguousOverloadTarget.class, result);
+        AmbiguousOverloadTarget target = (AmbiguousOverloadTarget) result;
+        Assertions.assertEquals("int", target.getPortSetter(),
+                "the int overload must win over the long one for an integral value");
+        Assertions.assertEquals("double", target.getRatioSetter(),
+                "the double overload must win over the float one for a decimal value");
+    }
+
+    /** Target with several convertible setters for the same property. */
+    public static class AmbiguousOverloadTarget {
+        static AmbiguousOverloadTarget last;
+        private String portSetter;
+        private String ratioSetter;
+
+        public AmbiguousOverloadTarget() {
+            last = this;
+        }
+
+        public void setPort(@SuppressWarnings("unused") int port) {
+            portSetter = "int";
+        }
+        public void setPort(@SuppressWarnings("unused") long port) {
+            portSetter = "long";
+        }
+        public String getPortSetter() {
+            return portSetter;
+        }
+        public void setRatio(@SuppressWarnings("unused") float ratio) {
+            ratioSetter = "float";
+        }
+        public void setRatio(@SuppressWarnings("unused") double ratio) {
+            ratioSetter = "double";
+        }
+        public String getRatioSetter() {
+            return ratioSetter;
         }
     }
 
@@ -576,12 +1352,10 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
             // one can accept those arguments
             ref.add(new StringRefAddr("whatever", "v"));
 
-            Object result = new GenericNamingResourcesFactory()
-                    .getObjectInstance(
-                            ref, new CompositeName("test/decoy"), null, null);
-            Assertions.assertInstanceOf(DecoySetPropertyTarget.class, result);
+            DecoySetPropertyTarget.last = null;
+            assertLookupFails(ref, "test/decoy");
             Assertions.assertFalse(
-                    ((DecoySetPropertyTarget) result).isInvoked(),
+                    DecoySetPropertyTarget.last.isInvoked(),
                     "a setProperty overload the factory cannot call with the "
                             + "configured name and value must not run");
         } finally {
@@ -613,16 +1387,21 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
      * invoked with two arguments, fails reflectively.
      */
     public static class DecoySetPropertyTarget {
+        static DecoySetPropertyTarget last;
         private boolean invoked;
+
+        public DecoySetPropertyTarget() {
+            last = this;
+        }
 
         public boolean isInvoked() {
             return invoked;
         }
-        public boolean setProperty(String name) {
+        public boolean setProperty(@SuppressWarnings("unused") String name) {
             invoked = true;
             return true;
         }
-        public void setProperty(int index) {
+        public void setProperty(@SuppressWarnings("unused") int index) {
             invoked = true;
         }
     }
@@ -664,7 +1443,7 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
         public java.util.Map<String, String> getBag() {
             return bag;
         }
-        public void setProperty(int index) {
+        public void setProperty(@SuppressWarnings("unused") int index) {
             indexInvoked = true;
         }
         public boolean isIndexInvoked() {
@@ -702,7 +1481,113 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
     }
 
     @Test
-    void propertySetFailuresAreReportedAsWarnings() throws Exception {
+    void boxedBooleanBagRefusalFailsTheLookup() throws Exception {
+        Reference ref = new Reference(RefusingBoxedBagTarget.class.getName(),
+                null, null);
+        // pre-fix the boxed java.lang.Boolean return landed in the
+        // fire-and-forget bucket: the bag's refusal was counted as applied
+        // and the unconfigured object was returned
+        ref.add(new StringRefAddr("anything", "v"));
+
+        NamingException e = Assertions.assertThrows(NamingException.class,
+                () -> new GenericNamingResourcesFactory().getObjectInstance(
+                        ref, new CompositeName("test/boxedrefuse"),
+                        null, null));
+        Assertions.assertTrue(e.getMessage().contains("anything"),
+                "the failure must name the refused property, was: "
+                        + e.getMessage());
+    }
+
+    @Test
+    void boxedBooleanBagAcceptanceApplies() throws Exception {
+        Reference ref = new Reference(AcceptingBoxedBagTarget.class.getName(),
+                null, null);
+        ref.add(new StringRefAddr("databaseName", "sample"));
+
+        Object result = new GenericNamingResourcesFactory().getObjectInstance(
+                ref, new CompositeName("test/boxedaccept"), null, null);
+        Assertions.assertInstanceOf(AcceptingBoxedBagTarget.class, result);
+        Assertions.assertEquals(java.util.Collections.singletonMap(
+                        "databaseName", "sample"),
+                ((AcceptingBoxedBagTarget) result).getBag(),
+                "a boxed Boolean bag that returns TRUE must apply like "
+                        + "the primitive boolean one");
+    }
+
+    /** Property bag whose boxed Boolean return refuses every property. */
+    public static class RefusingBoxedBagTarget {
+        public Boolean setProperty(@SuppressWarnings("unused") String name,
+                @SuppressWarnings("unused") String value) {
+            return Boolean.FALSE;
+        }
+    }
+
+    /** Property bag whose boxed Boolean return accepts every property. */
+    public static class AcceptingBoxedBagTarget {
+        private final java.util.Map<String, String> bag =
+                new java.util.LinkedHashMap<>();
+
+        public Boolean setProperty(String name, String value) {
+            bag.put(name, value);
+            return Boolean.TRUE;
+        }
+        public java.util.Map<String, String> getBag() {
+            return bag;
+        }
+    }
+
+    @Test
+    void conversionFailureIsNotAbsorbedByThePropertyBag() throws Exception {
+        Reference ref = new Reference(
+                TypedSetterAndBagTarget.class.getName(), null, null);
+        // setCount(int) matches the property but the value does not build an
+        // int; pre-fix the permissive bag was still consulted, so the typo
+        // landed in the bag, the bean property kept its default and the
+        // lookup reported success
+        TypedSetterAndBagTarget.last = null;
+        ref.add(new StringRefAddr("count", "12o"));
+
+        NamingException e = Assertions.assertThrows(NamingException.class,
+                () -> new GenericNamingResourcesFactory().getObjectInstance(
+                        ref, new CompositeName("test/mixedbag"),
+                        null, null));
+        Assertions.assertTrue(e.getMessage().contains("count"),
+                "the failure must name the property, was: " + e.getMessage());
+        TypedSetterAndBagTarget target = TypedSetterAndBagTarget.last;
+        Assertions.assertNotNull(target);
+        Assertions.assertEquals(-1, target.getCount());
+        Assertions.assertTrue(target.getBag().isEmpty(),
+                "the bag must not absorb a value the typed setter rejected, "
+                        + "bag was: " + target.getBag());
+    }
+
+    /** Target with a typed setter and a permissive property bag. */
+    public static class TypedSetterAndBagTarget {
+        static TypedSetterAndBagTarget last;
+        private int count = -1;
+        private final java.util.Map<String, String> bag =
+                new java.util.LinkedHashMap<>();
+
+        public TypedSetterAndBagTarget() {
+            last = this;
+        }
+
+        public void setProperty(String name, String value) {
+            bag.put(name, value);
+        }
+        public void setCount(int count) {
+            this.count = count;
+        }
+        public int getCount() {
+            return count;
+        }
+        public java.util.Map<String, String> getBag() {
+            return bag;
+        }
+    }
+
+    @Test
+    void unappliedPropertiesFailTheLookupAndAreReportedAsWarnings() throws Exception {
         Logger logger = Logger.getLogger(
                 GenericNamingResourcesFactory.class.getName());
         Level originalLevel = logger.getLevel();
@@ -733,12 +1618,25 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
             // the matched setter throws
             ref.add(new StringRefAddr("boom", "go"));
 
-            Object result = new GenericNamingResourcesFactory()
-                    .getObjectInstance(
-                            ref, new CompositeName("test/warn"), null, null);
-            Assertions.assertInstanceOf(WarnTarget.class, result);
-            // the half-configured object is still returned, as documented
-            Assertions.assertEquals(-1, ((WarnTarget) result).getCount());
+            // a property that cannot be applied fails the lookup: the
+            // half-configured object must not be returned, for a singleton
+            // resource the container would cache it for every later lookup
+            NamingException e = Assertions.assertThrows(
+                    NamingException.class,
+                    () -> new GenericNamingResourcesFactory()
+                            .getObjectInstance(
+                                    ref, new CompositeName("test/warn"),
+                                    null, null));
+            for (String property : new String[] { "count", "noSuchProperty",
+                    "boom" }) {
+                Assertions.assertTrue(e.getMessage().contains(property),
+                        "the failure must name the unapplied property ["
+                                + property + "], was: " + e.getMessage());
+            }
+            Assertions.assertTrue(
+                    e.getMessage().contains(WarnTarget.class.getName()),
+                    "the failure must name the resource class, was: "
+                            + e.getMessage());
         } finally {
             logger.removeHandler(handler);
             logger.setLevel(originalLevel);
@@ -759,6 +1657,75 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
         }
     }
 
+    /*
+     * A failing setter must not write the configured value to the log: the
+     * property may well be a password, and the warn level is on by default.
+     * The real cause is reported once, by setProperty; the caller must not
+     * add a second, misleading "no usable setter found" warning on top.
+     */
+
+    @Test
+    void failureLogsDoNotEchoConfiguredValues() throws Exception {
+        Logger logger = Logger.getLogger(
+                GenericNamingResourcesFactory.class.getName());
+        Level originalLevel = logger.getLevel();
+        final List<LogRecord> records = new ArrayList<>();
+        Handler handler = new Handler() {
+            @Override
+            public void publish(LogRecord record) {
+                records.add(record);
+            }
+            @Override
+            public void flush() {
+                // no buffering
+            }
+            @Override
+            public void close() {
+                // nothing to release
+            }
+        };
+        logger.addHandler(handler);
+        logger.setLevel(Level.WARNING);
+        final String secret = "S3cr3t-Pa55word";
+        NamingException thrown;
+        try {
+            Reference ref = new Reference(WarnTarget.class.getName(),
+                    null, null);
+            // the matched setter throws with the secret in hand: pre-fix the
+            // WARN line echoed the value, and the caller added a second WARN
+            // claiming no usable setter had been found
+            ref.add(new StringRefAddr("password", secret));
+
+            thrown = Assertions.assertThrows(NamingException.class,
+                    () -> new GenericNamingResourcesFactory()
+                            .getObjectInstance(
+                                    ref, new CompositeName("test/secret"),
+                                    null, null));
+        } finally {
+            logger.removeHandler(handler);
+            logger.setLevel(originalLevel);
+        }
+        Assertions.assertFalse(thrown.getMessage().contains(secret),
+                "the failure must not echo the configured value, was: "
+                        + thrown.getMessage());
+        int reported = 0;
+        for (LogRecord record : records) {
+            Assertions.assertFalse(
+                    record.getMessage() != null
+                            && record.getMessage().contains(secret),
+                    "a failing setter must not write the configured value to"
+                            + " the log: " + record.getMessage());
+            if (record.getLevel().intValue() >= Level.WARNING.intValue()
+                    && record.getMessage() != null
+                    && record.getMessage().contains("[password]")) {
+                reported++;
+            }
+        }
+        Assertions.assertEquals(1, reported,
+                "the failing setter must be reported once, at warn level, "
+                        + "without a duplicate claim of a missing setter");
+    }
+
     /** Target exercising the property-set failure paths. */
     public static class WarnTarget {
         private int count = -1;
@@ -771,6 +1738,9 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
         }
         public void setBoom(@SuppressWarnings("unused") String value) {
             throw new IllegalStateException("setter always fails");
+        }
+        public void setPassword(@SuppressWarnings("unused") String password) {
+            throw new IllegalStateException("password setter always fails");
         }
     }
 
@@ -819,6 +1789,23 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
     }
 
     /**
+     * Validator the trimmed {@code validatorClassName} attribute applied by
+     * the parsing tests above must resolve to. Instantiated reflectively by
+     * PoolProperties, hence public with a public constructor, the same
+     * shape as the naming targets below.
+     */
+    public static class ParsingValidator implements Validator {
+
+        public ParsingValidator() {
+        }
+
+        @Override
+        public boolean validate(java.sql.Connection connection, int validateAction) {
+            return true;
+        }
+    }
+
+    /**
      * Target whose no-argument constructor throws. The constructor must
      * keep its explicit public modifier: the factory locates it with
      * reflection (Class.getConstructor() only finds declared public
@@ -833,10 +1820,15 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
 
     /** Plain configuration target for the generic naming factory. */
     public static class NamingTarget {
-        private String name;
+        static NamingTarget last;
+        private String name = "untitled";
         private int count;
         private long ratio;
         private boolean enabled;
+
+        public NamingTarget() {
+            last = this;
+        }
 
         public String getName() {
             return name;

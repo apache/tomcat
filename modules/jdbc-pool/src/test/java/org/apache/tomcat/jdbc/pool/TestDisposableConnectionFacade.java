@@ -92,7 +92,33 @@ class TestDisposableConnectionFacade {
         }
     }
 
-    private static Connection proxyFor(StubChain chain) {
+    /* Stands in for a chain that both seals the facade and then fails with
+       an NPE of its own - the shape of a driver or interceptor failure
+       landing while a concurrent abandon-close seals the facade, run
+       single-threaded so the interleaving is guaranteed. */
+    private static final class SealThenFailChain extends JdbcInterceptor {
+
+        final AtomicInteger closeCount = new AtomicInteger();
+
+        @Override
+        public void reset(ConnectionPool parent, PooledConnection con) {
+            // NOOP
+        }
+
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            if ("close".equals(method.getName())) {
+                closeCount.incrementAndGet();
+                return null;
+            }
+            // The dispose of the close below reaches the facade while this
+            // call is in flight, exactly as a reap on another thread would.
+            ((Connection) proxy).close();
+            throw new NullPointerException("failure from below the facade");
+        }
+    }
+
+    private static Connection proxyFor(JdbcInterceptor chain) {
         DisposableConnectionFacade facade = new DisposableConnectionFacade(chain);
         return (Connection) Proxy.newProxyInstance(
                 TestDisposableConnectionFacade.class.getClassLoader(),
@@ -144,6 +170,31 @@ class TestDisposableConnectionFacade {
         // A later close stays a no-op and never re-enters the chain
         proxy.close();
         Assertions.assertEquals(1, chain.closeCount.get());
+    }
+
+    /* The disposed answer used to ride on catching the NullPointerException
+       the dead chain throws. That catch also caught genuine failures from
+       below: a call the facade had already dispatched into the live chain,
+       whose driver or interceptor then threw an NPE, was rewritten into the
+       misleading "PooledConnection has already been closed." SQLException -
+       with its trace discarded - whenever a concurrent dispose sealed the
+       facade before the catch rechecked the link. A call that entered the
+       chain must see its own failure. */
+    @Test
+    void aFailureFromBelowSurvivesASealThatLandsWhileTheCallIsInFlight() throws Exception {
+        SealThenFailChain chain = new SealThenFailChain();
+        Connection proxy = proxyFor(chain);
+
+        NullPointerException failure = Assertions.assertThrows(NullPointerException.class,
+                proxy::getAutoCommit,
+                "the real failure from below the facade must reach the application, "
+                        + "not the disposed facade's already-closed answer");
+        Assertions.assertEquals("failure from below the facade", failure.getMessage(),
+                "the application must be told what actually failed");
+        Assertions.assertEquals(1, chain.closeCount.get(),
+                "precondition: the call sealed the facade before it failed");
+        Assertions.assertTrue(proxy.isClosed(),
+                "precondition: the facade was sealed before the failure surfaced");
     }
 
     @Test

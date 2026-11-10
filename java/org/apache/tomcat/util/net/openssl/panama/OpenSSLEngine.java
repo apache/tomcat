@@ -198,8 +198,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         if (MemorySegment.NULL.equals(ssl)) {
             throw new IllegalStateException(sm.getString("engine.noSSL", OpenSSLLibrary.getLastError()));
         }
-        // Set ssl_info_callback
-        SSL_set_info_callback(ssl, SSL_set_info_callback$cb.allocate(new InfoCallback(), engineArena));
         if (clientMode) {
             SSL_set_connect_state(ssl);
         } else {
@@ -209,7 +207,11 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         try (var localArena = Arena.ofConfined()) {
             var internalBIOPointer = localArena.allocate(ValueLayout.ADDRESS);
             var networkBIOPointer = localArena.allocate(ValueLayout.ADDRESS);
-            BIO_new_bio_pair(internalBIOPointer, 0, networkBIOPointer, 0);
+            if (BIO_new_bio_pair(internalBIOPointer, 0, networkBIOPointer, 0) <= 0) {
+                String error = OpenSSLLibrary.getLastError();
+                SSL_free(ssl);
+                throw new IllegalStateException(sm.getString("engine.errMakeBIO", error));
+            }
             var internalBIO = internalBIOPointer.get(ValueLayout.ADDRESS, 0);
             var networkBIO = networkBIOPointer.get(ValueLayout.ADDRESS, 0);
             SSL_set_bio(ssl, internalBIO, internalBIO);
@@ -677,13 +679,16 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             return new String[0];
         }
         String[] enabled = OpenSSLLibrary.getCiphers(state.ssl);
-        for (int i = 0; i < enabled.length; i++) {
-            String mapped = OpenSSLCipherConfigurationParser.openSSLToJsse(enabled[i]);
-            if (mapped != null) {
-                enabled[i] = mapped;
+        // Only report ciphers with a JSSE equivalent so the enabled ciphers are always a subset of the supported
+        // ciphers
+        List<String> mapped = new ArrayList<>(enabled.length);
+        for (String cipher : enabled) {
+            String jsseName = OpenSSLCipherConfigurationParser.openSSLToJsse(cipher);
+            if (jsseName != null) {
+                mapped.add(jsseName);
             }
         }
-        return enabled;
+        return mapped.toArray(new String[0]);
     }
 
     @Override
@@ -1122,14 +1127,14 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 case REQUIRE -> SSL_VERIFY_PEER() | SSL_VERIFY_FAIL_IF_NO_PEER_CERT();
                 case OPTIONAL -> SSL_VERIFY_PEER();
             };
-            // Note: Since a callback is always set by the context, the callback here could in theory
-            // be set to NULL (at the time of creation of the SSL, the SSL_CTX will have a non-null callback)
-            SSL_set_verify(state.ssl, value, SSL_set_verify$callback.allocate(new VerifyCallback(), engineArena));
+            // Note: Since a callback is always set by the context, the callback here can be set to NULL
+            // (at the time of creation of the SSL, the SSL_CTX will have a non-null callback)
+            SSL_set_verify(state.ssl, value, MemorySegment.NULL);
             clientAuth = mode;
         }
     }
 
-    private static class InfoCallback implements SSL_set_info_callback$cb.Function {
+    static class InfoCallback implements SSL_set_info_callback$cb.Function {
         @Override
         public void apply(MemorySegment ssl, int where, int ret) {
             EngineState state = getState(ssl);
@@ -1288,12 +1293,10 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                                             URL url = (new URI(urlString)).toURL();
                                             String protocol = url.getProtocol();
                                             if (!"http".equals(protocol) && !"https".equals(protocol)) {
-                                                // OpenSSLEngine can only talk HTTP/HTTPS to OCSP responders. Other
-                                                // protocol handlers (e.g. file) trigger a ClassCastException below so
-                                                // treat them as invalid and skip to the next URL, as the JNI
-                                                // implementation does when OCSP URL parsing fails.
-                                                log.warn(sm.getString("engine.invalidOCSPURL", urlString));
-                                                continue;
+                                                // Only HTTP and HTTPS are supported for OCSP responders. Treat any
+                                                // other protocol as an invalid URL, as the JNI implementation does
+                                                // when OCSP URL parsing fails.
+                                                throw new MalformedURLException(urlString);
                                             }
                                             requestAttempted = true;
                                             ocspResponse =

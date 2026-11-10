@@ -63,10 +63,8 @@ class TestThrowingResetInterceptor extends JdbcPoolBaseTest {
         // test: an abandoned, unclosed physical connection is otherwise
         // reclaimed by the JDK's socket cleaner and the leaked database
         // sessions would disappear with GC timing instead of staying open
-        PooledConnection pooledFirst =
-                (PooledConnection) first.unwrap(PooledConnection.class);
-        PooledConnection pooledSecond =
-                (PooledConnection) second.unwrap(PooledConnection.class);
+        PooledConnection pooledFirst = internalOf(first);
+        PooledConnection pooledSecond = internalOf(second);
         java.sql.Connection physicalFirst = pooledFirst.getConnection();
         java.sql.Connection physicalSecond = pooledSecond.getConnection();
         awaitSessions(2);
@@ -95,14 +93,13 @@ class TestThrowingResetInterceptor extends JdbcPoolBaseTest {
                 ThrowResetInterceptor.class.getName() + ";" + RecordingInterceptor.class.getName());
         Connection con = ds.getConnection();
         // keep the physical connection strongly reachable (see above)
-        java.sql.Connection physical = con.unwrap(PooledConnection.class).getConnection();
+        java.sql.Connection physical = internalOf(con).getConnection();
         con.close();
         ds.close();
-        // a shutdown reset walks the chain twice by existing design
-        // (once from finalize(), once from release()'s setHandler(null)),
-        // so only the presence of a callback past the throwing link is pinned
-        Assertions.assertTrue(RecordingInterceptor.SHUTDOWN_RESETS.get() >= 1,
-                "interceptors after a throwing link must still be reset for shutdown");
+        // the shutdown reset walks the chain once, through finalize()
+        Assertions.assertEquals(1, RecordingInterceptor.SHUTDOWN_RESETS.get(),
+                "interceptors after a throwing link must still be reset for shutdown,"
+                        + " and the teardown must be delivered exactly once");
         awaitSessions(0);
         Assertions.assertTrue(physical.isClosed(),
                 "the physical connection must be closed despite the throwing reset");

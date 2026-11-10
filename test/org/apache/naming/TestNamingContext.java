@@ -21,6 +21,7 @@ import java.util.Hashtable;
 import javax.naming.Context;
 import javax.naming.NamingException;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -94,6 +95,36 @@ public class TestNamingContext extends TomcatBaseTest {
         // Shortcut should fail too
         obj = factory.getObjectInstance(rlr, null, null, null);
         Assert.assertNull(obj);
+    }
+
+
+    @After
+    public void resetResourceLinkGlobalContext() {
+        // The test below installs a private global context in a static field
+        ResourceLinkFactory.setGlobalContext(null);
+    }
+
+
+    @Test
+    public void testResourceLinkWithoutGlobalIsRejectedBeforeBinding() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.enableNaming();
+
+        org.apache.catalina.Context ctx = getProgrammaticRootContext();
+        tomcat.start();
+
+        ContextResourceLink crl = new ContextResourceLink();
+        crl.setName(LOCAL_NAME);
+        crl.setType(DATA.getClass().getName());
+        try {
+            ctx.getNamingResources().addResourceLink(crl);
+            Assert.fail("Expected an IllegalArgumentException for the missing global attribute");
+        } catch (IllegalArgumentException iae) {
+            Assert.assertTrue(iae.getMessage(), iae.getMessage().contains(LOCAL_NAME));
+        }
+
+        // The rejected link must not have been bound
+        Assert.assertNull(doLookup(ContextBindings.getContext(ctx), COMP_ENV + "/" + LOCAL_NAME));
     }
 
 

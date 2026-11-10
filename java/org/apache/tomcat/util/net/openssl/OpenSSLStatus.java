@@ -222,12 +222,12 @@ public class OpenSSLStatus {
     }
 
     /**
-     * Checks if running with OpenSSL 3.0 or later.
+     * Checks if running with OpenSSL 3.0 or later. This includes OpenSSL 4.0 or later.
      *
      * @return true if running with OpenSSL 3.0+
      */
     public static boolean isOpenSSL3() {
-        return Name.OPENSSL3.equals(name);
+        return Name.OPENSSL3.equals(name) || Name.OPENSSL4.equals(name);
     }
 
     /**

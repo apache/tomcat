@@ -21,6 +21,7 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -129,6 +130,86 @@ class TestStatementCacheRacingPark extends JdbcPoolBaseTest {
         }
     }
 
+    /**
+     * A cache map that holds the next park at {@code putIfAbsent} until the
+     * test releases it, so a disconnect purge can be started while the park
+     * is provably still in flight.
+     */
+    static final class GatedParkMap extends ConcurrentHashMap<Object,Object> {
+
+        private static final long serialVersionUID = 1L;
+
+        final CountDownLatch entered = new CountDownLatch(1);
+        final CountDownLatch release = new CountDownLatch(1);
+
+        @Override
+        public Object putIfAbsent(Object key, Object value) {
+            entered.countDown();
+            try {
+                release.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException x) {
+                Thread.currentThread().interrupt();
+                throw new IllegalStateException("interrupted at the gated park", x);
+            }
+            return super.putIfAbsent(key, value);
+        }
+    }
+
+    @Test
+    void aParkRacingTheDisconnectPurgeIsCountedAndClosed() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setJdbcInterceptors(
+                StatementCache.class.getName() + "(prepared=true,max=5)");
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(60000);
+        ds.createPool();
+
+        Connection shared = ds.getConnection();
+        try {
+            StatementCache cache = interceptorOf(shared, StatementCache.class);
+            PooledConnection pcon = internalOf(shared);
+            GatedParkMap gated = new GatedParkMap();
+            pcon.getAttributes().put(StatementCache.STATEMENT_CACHE_ATTR, gated);
+
+            PreparedStatement closing = shared.prepareStatement("SELECT 1");
+            Statement driver = driverStatement(closing);
+            AtomicInteger parkFailure = new AtomicInteger();
+            Thread park = new Thread(() -> {
+                try {
+                    closing.close();
+                } catch (Throwable t) {
+                    parkFailure.incrementAndGet();
+                }
+            }, "gated-park");
+            park.start();
+            Assertions.assertTrue(gated.entered.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
+                    "precondition: the park must be held inside the cache map");
+
+            Thread purge = new Thread(() -> cache.disconnected(ds.getPool(), pcon, false),
+                    "disconnect-purge");
+            purge.start();
+            // On the fixed code the purge waits for the park to leave the
+            // critical section; on the old code it completes now, before the
+            // statement is inserted.
+            purge.join(500);
+            gated.release.countDown();
+            park.join(AWAIT_TIMEOUT_MS);
+            purge.join(AWAIT_TIMEOUT_MS);
+            Assertions.assertFalse(park.isAlive() || purge.isAlive(),
+                    "the park and the purge must both finish");
+            Assertions.assertEquals(0, parkFailure.get(), "the close must not fail");
+
+            Assertions.assertEquals(0, gated.size(),
+                    "the purge must remove the statement that was parked while it ran");
+            Assertions.assertEquals(0, cache.getCacheSize(),
+                    "the pool-wide counter must not retain a purged slot");
+            Assertions.assertTrue(driver.isClosed(),
+                    "the statement parked during the purge must be closed, not leaked");
+        } finally {
+            shared.close();
+        }
+    }
+
     @Test
     void twoConcurrentParksOfOneKeyParkOneStatementAndCountOne() throws Exception {
         DataSource ds = newDataSource();
@@ -149,7 +230,7 @@ class TestStatementCacheRacingPark extends JdbcPoolBaseTest {
             StatementCache cache = interceptorOf(shared, StatementCache.class);
             // getCache() re-reads the map from the attributes on every
             // call, so this swap is what the next closes will meet
-            PooledConnection pcon = (PooledConnection) shared.unwrap(PooledConnection.class);
+            PooledConnection pcon = internalOf(shared);
             ParkRendezvousMap parkPoint = new ParkRendezvousMap();
             pcon.getAttributes().put(StatementCache.STATEMENT_CACHE_ATTR, parkPoint);
 
@@ -222,7 +303,7 @@ class TestStatementCacheRacingPark extends JdbcPoolBaseTest {
             // must have closed it. Pre-fix both closes believed they had
             // parked, neither closed its delegate, and the overwritten one
             // stayed open with nothing left that could ever reach it.
-            Assertions.assertNotEquals(aClosed, bClosed,
+            Assertions.assertNotEquals(Boolean.valueOf(aClosed), Boolean.valueOf(bClosed),
                     "exactly one of the two racing statements may stay open: "
                             + "the winner of the park, not the loser (pre-fix "
                             + "both stayed open and the loser leaked); " + observed);

@@ -74,6 +74,7 @@ class TestQueryReportIdentity extends JdbcPoolBaseTest {
     }
 
     /* The contract of an open statement handle, for one layer. */
+    @SuppressWarnings("unlikely-arg-type") // Use of unlikely arg-type is deliberate
     private static void assertOpenStatementHandle(Statement handle,
             Connection pooled, String layer) throws SQLException {
         Assertions.assertTrue(handle.equals(handle),
@@ -131,6 +132,7 @@ class TestQueryReportIdentity extends JdbcPoolBaseTest {
         }
     }
 
+    @SuppressWarnings("unlikely-arg-type") // Use of unlikely arg-type is deliberate
     @Test
     void aClosedQueryReportHandleKeepsAnsweringWithItsOwnIdentity() throws Exception {
         DataSource ds = slowQueryPool();
@@ -265,6 +267,7 @@ class TestQueryReportIdentity extends JdbcPoolBaseTest {
         return layer == 0 ? "facade handle" : "interceptor handle";
     }
 
+    @SuppressWarnings("unlikely-arg-type") // Use of unlikely arg-type is deliberate
     @Test
     void everyQueryReportInterceptorAnswersTheSameWayAtBothLayers() throws Exception {
         String[] interceptors = { SlowQueryReport.class.getSimpleName(),

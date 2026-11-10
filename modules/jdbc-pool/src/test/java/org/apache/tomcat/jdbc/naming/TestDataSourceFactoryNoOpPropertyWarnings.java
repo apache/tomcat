@@ -131,17 +131,16 @@ class TestDataSourceFactoryNoOpPropertyWarnings {
     /**
      * A factory that stops where the real one parses the properties, so the
      * full JNDI route can be exercised without creating a pool behind it. The
-     * {@code dataSourceObject} parameter type is deliberately the fully
-     * qualified {@code javax.sql.DataSource} of the overridden signature: an
-     * override that narrows it to the pool's own class would be an overload
-     * the factory never calls.
+     * {@code dataSourceObject} parameter type is deliberately the widened
+     * {@code Object} of the overridden signature: an override that narrows it
+     * would be an overload the factory never calls.
      */
     private static final class ParsingFactory extends DataSourceFactory {
         private PoolConfiguration parsed;
 
         @Override
         protected javax.sql.DataSource createDataSource(Properties properties, Context context, boolean xa,
-                javax.sql.DataSource dataSourceObject) {
+                Object dataSourceObject) {
             // exactly what the real implementation does first
             parsed = DataSourceFactory.parsePoolProperties(properties);
             return null;
@@ -208,12 +207,18 @@ class TestDataSourceFactoryNoOpPropertyWarnings {
         properties.setProperty("numTestsPerEvictionRun", "not-a-number");
 
         try (FactoryLogCapture logs = new FactoryLogCapture()) {
-            Assertions.assertThrows(NumberFormatException.class,
+            IllegalArgumentException e = Assertions.assertThrows(
+                    IllegalArgumentException.class,
                     () -> DataSourceFactory.parsePoolProperties(properties),
                     "a value that cannot be parsed must still fail the parse, as it did before");
             // the warning reports the property being configured, not the
             // success of parsing it, so it must precede the parse failure
             logs.assertWarnedNoEffect("numTestsPerEvictionRun");
+            Assertions.assertInstanceOf(NumberFormatException.class, e.getCause(),
+                    "the parse failure must be kept as the cause");
+            Assertions.assertTrue(e.getMessage().contains("numTestsPerEvictionRun"),
+                    "the failure must name the misconfigured attribute, was: "
+                            + e.getMessage());
         }
     }
 
@@ -228,6 +233,24 @@ class TestDataSourceFactoryNoOpPropertyWarnings {
             DataSourceFactory.parsePoolProperties(properties);
             logs.assertWarnedNoEffect("poolPreparedStatements");
             logs.assertWarnedNoEffect("maxOpenPreparedStatements");
+        }
+    }
+
+    @Test
+    void blankNoOpAttributesAreNotReportedAsConfigured() {
+        Properties properties = new Properties();
+        properties.setProperty("accessToUnderlyingConnectionAllowed", "   ");
+        properties.setProperty("numTestsPerEvictionRun", "   ");
+        properties.setProperty("poolPreparedStatements", "");
+        properties.setProperty("maxOpenPreparedStatements", "\t");
+
+        try (FactoryLogCapture logs = new FactoryLogCapture()) {
+            PoolConfiguration parsed = DataSourceFactory.parsePoolProperties(properties);
+            logs.assertNothingReportedAsHavingNoEffect();
+            Assertions.assertEquals(0, parsed.getNumTestsPerEvictionRun(),
+                    "a blank attribute must leave the default in place");
+            Assertions.assertTrue(parsed.isAccessToUnderlyingConnectionAllowed(),
+                    "a blank attribute must leave the default in place");
         }
     }
 

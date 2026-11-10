@@ -24,10 +24,12 @@ import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.MBeanRegistration;
+import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.Notification;
@@ -60,7 +62,10 @@ import org.apache.tomcat.jdbc.pool.interceptor.StatementCache;
  * perfectly well.</p>
  * <p>
  * The contract the first tests pin is that the returned name is this call's own
- * publish, or nothing at all. The last five drive that through a real pool: a
+ * publish, or nothing at all. The unregistration tests pin the mirror: what the
+ * helper reports when it takes a name down, since every holder drops its handle
+ * the moment it calls, and a refusal it cannot see leaves the MBean registered
+ * for the life of the JVM. The pool-level tests drive that through a real pool: a
  * {@code StatementCache} whose name is taken must leave the MBean that owns the
  * name registered when its connection is discarded, and it must publish itself
  * at the next borrow once the obstacle is gone; the {@code DataSource} one
@@ -100,6 +105,47 @@ class TestJmxRegistration extends JdbcPoolBaseTest {
         @Override
         public String getMarker() {
             return marker;
+        }
+    }
+
+    /*
+     * An MBean that refuses to be unregistered until told otherwise: the
+     * MBeanRegistrationException a throwing preDeregister() turns into a
+     * refused unregisterMBean() call, which is how a deregistration fails
+     * besides the name simply being gone.
+     */
+    public interface StubbornMBean {
+        String getMarker();
+    }
+
+    public static class Stubborn implements StubbornMBean, MBeanRegistration {
+        private volatile boolean allowRelease;
+
+        @Override
+        public String getMarker() {
+            return "stubborn";
+        }
+
+        @Override
+        public ObjectName preRegister(MBeanServer server, ObjectName name) {
+            return name;
+        }
+
+        @Override
+        public void postRegister(Boolean registrationDone) {
+            // nothing to do once published
+        }
+
+        @Override
+        public void preDeregister() throws Exception {
+            if (!allowRelease) {
+                throw new MBeanRegistrationException(null, "this MBean gives up its name only once");
+            }
+        }
+
+        @Override
+        public void postDeregister() {
+            // nothing to undo
         }
     }
 
@@ -272,6 +318,58 @@ class TestJmxRegistration extends JdbcPoolBaseTest {
     }
 
     @Test
+    void releasingThePoolMBeanReleasesTheConnectionAndInterceptorMBeans() throws Exception {
+        MBeanServer server = server();
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setJmxEnabled(true);
+        ds.setJdbcInterceptors(StatementCache.class.getName() + "(prepared=true,max=5)");
+        ds.getPoolProperties().setInitialSize(0);
+        ds.createPool();
+        ds.preRegister(server, uniqueName("children-released"));
+        ObjectName poolOname = ds.getPool().getJmxPool().getObjectName();
+        Assertions.assertNotNull(poolOname, "precondition: the pool MBean is published");
+
+        ObjectName connectionName;
+        ObjectName cacheName;
+        try (@SuppressWarnings("unused") Connection borrowed = ds.getConnection()) {
+            connectionName = connectionMBeanUnder(server, poolOname);
+            cacheName = new ObjectName(connectionName.toString() + ",JdbcInterceptor=StatementCache");
+            Assertions.assertTrue(server.isRegistered(cacheName),
+                    "precondition: the cache of the borrowed connection publishes its MBean");
+        }
+
+        try {
+            ds.postDeregister();
+
+            Assertions.assertFalse(server.isRegistered(poolOname),
+                    "postDeregister must unregister the pool MBean");
+            Assertions.assertFalse(server.isRegistered(connectionName),
+                    "postDeregister must unregister the connection MBean below it");
+            Assertions.assertFalse(server.isRegistered(cacheName),
+                    "postDeregister must unregister the interceptor MBeans below the connection");
+
+            // The pool stays live; registering the DataSource again must
+            // republish the children whose handles the release cleared.
+            ds.preRegister(server, uniqueName("children-republished"));
+            ObjectName republishedPool = ds.getPool().getJmxPool().getObjectName();
+            Assertions.assertNotNull(republishedPool,
+                    "precondition: the DataSource can be registered again");
+            ObjectName republishedConnection = connectionMBeanUnder(server, republishedPool);
+            Assertions.assertNotNull(republishedConnection,
+                    "a connection released by the deregistration must republish itself");
+            try (@SuppressWarnings("unused") Connection borrowed = ds.getConnection()) {
+                ObjectName republishedCache = new ObjectName(
+                        republishedConnection.toString() + ",JdbcInterceptor=StatementCache");
+                Assertions.assertTrue(server.isRegistered(republishedCache),
+                        "an interceptor released by the deregistration must republish on the next borrow");
+            }
+        } finally {
+            ds.close();
+            ds.postDeregister();
+        }
+    }
+
+    @Test
     void aPublishedMBeanComesBackAsItsOwnNameAndStaysReleasable() throws Exception {
         MBeanServer server = server();
         ObjectName base = uniqueName("published");
@@ -355,6 +453,62 @@ class TestJmxRegistration extends JdbcPoolBaseTest {
                 "a name that cannot be built must not fall back to registering under the base");
         Assertions.assertEquals(before, new HashSet<>(poolMBeans(server)),
                 "a malformed name must publish nothing");
+    }
+
+    @Test
+    void aSuccessfulUnregistrationComesBackAsReleased() throws Exception {
+        MBeanServer server = server();
+        ObjectName name = uniqueName("released");
+        server.registerMBean(new Probe("released"), name);
+
+        Assertions.assertTrue(JmxUtil.unregisterJmx(name),
+                "an unregistration the server carried out must be reported as done: every"
+                        + " caller of this helper drops its handle the moment it calls, so a"
+                        + " release that silently did not happen is undetectable from the"
+                        + " calling side");
+        Assertions.assertFalse(server.isRegistered(name));
+    }
+
+    @Test
+    void aRefusedUnregistrationComesBackAsNotReleased() throws Exception {
+        MBeanServer server = server();
+        ObjectName name = uniqueName("stubborn");
+        Stubborn mbean = new Stubborn();
+        server.registerMBean(mbean, name);
+        try {
+            Assertions.assertFalse(JmxUtil.unregisterJmx(name),
+                    "an unregistration the MBean refused - a preDeregister() that throws, the"
+                            + " one failure besides the name simply being gone - must"
+                            + " come back as not done: the MBean is still registered under a"
+                            + " name its caller is about to forget, which is exactly the"
+                            + " failure the caller cannot see any other way, and it leaves a"
+                            + " live management surface for a dead component holding its"
+                            + " credentials and class loader until the JVM exits");
+            Assertions.assertTrue(server.isRegistered(name),
+                    "a refused unregistration must have left the MBean published - that is"
+                            + " the state the caller has to be warned about");
+        } finally {
+            mbean.allowRelease = true;
+            server.unregisterMBean(name);
+        }
+    }
+
+    @Test
+    void anUnregistrationOfNothingCountsAsDone() throws Exception {
+        MBeanServer server = server();
+        ObjectName gone = uniqueName("already-gone");
+        server.registerMBean(new Probe("gone"), gone);
+        server.unregisterMBean(gone);
+
+        // the MBean is already down - the desired end state, reached without
+        // this call - and no caller has anything left to do differently
+        Assertions.assertTrue(JmxUtil.unregisterJmx(gone),
+                "unregistering a name that is already gone must be reported as done, not as a"
+                        + " failure: an InstanceNotFoundException means the world is already"
+                        + " in the state the caller asked for, and grading it as a refusal"
+                        + " would hide the refusals that are real");
+        Assertions.assertTrue(JmxUtil.unregisterJmx(null),
+                "releasing nothing is the same end state and the same answer");
     }
 
     @Test
@@ -633,6 +787,95 @@ class TestJmxRegistration extends JdbcPoolBaseTest {
     }
 
     @Test
+    void aRefusedPoolMBeanRegistrationLeavesThePoolMBeanWithoutAName() throws Exception {
+        MBeanServer server = server();
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setJmxEnabled(true);
+        ds.getPoolProperties().setInitialSize(0);
+        ds.createPool();
+        ConnectionPool jmx = ds.getPool().getJmxPool();
+        Assertions.assertNotNull(jmx, "an enabled pool has a JMX wrapper");
+        Assertions.assertNull(jmx.getObjectName(), "this pool is not registered yet");
+
+        // A stale registration holds the name this pool would be published
+        // under - the leftover of a pool that died without deregistering, or
+        // another pool that picked the same name. It is live and reporting.
+        ObjectName dsName = uniqueName("refused-mbean");
+        ObjectName poolOname = ds.createObjectName(dsName);
+        server.registerMBean(new Probe("foreign"), poolOname);
+        BlockingQueue<Notification> delivered = new LinkedBlockingQueue<>();
+        NotificationListener listener = (n, handback) -> delivered.offer(n);
+        try {
+            // The container registers the DataSource, and the pool MBean the
+            // DataSource publishes from its preRegister() is refused that name.
+            // The MBean server calls the pool MBean's own preRegister() before
+            // it looks the name up in its repository, so the wrapper has taken
+            // the name into its registration handle by the time the refusal
+            // happens, and reports it back through postRegister(FALSE) - the
+            // one callback a refused registration still gets, since the server
+            // runs no postDeregister() for a registration it never made.
+            jmx.addListener(listener);
+            ds.preRegister(server, dsName);
+
+            Assertions.assertNull(jmx.getObjectName(),
+                    "a pool MBean whose registration the server refused must drop the name its own"
+                            + " preRegister() stored: this MBean never became the MBean behind that"
+                            + " name, and every user of the handle - the source its notifications"
+                            + " carry, and the connections that publish themselves below it - acts"
+                            + " on a registration it does not have");
+            Assertions.assertEquals("foreign", server.getAttribute(poolOname, "Marker"),
+                    "a refused registration must have left the MBean that owns the name alone");
+
+            // The harm, on the pool's own lifecycle: a connection publishes
+            // itself below whatever name the pool MBean believes it holds, so
+            // the connections of a pool that was never published turn up in
+            // the subtree of the stranger that owns the name.
+            try (Connection con = ds.getConnection()) {
+                Assertions.assertNotNull(con,
+                        "the pool must keep handing out connections while its own MBean cannot be"
+                                + " published");
+                Set<ObjectName> children = publishedFor(server, dsName);
+                children.remove(poolOname);
+                Assertions.assertTrue(children.isEmpty(),
+                        "a connection must not be published below a name the pool was refused:"
+                                + " that subtree belongs to the MBean that owns the name, and the"
+                                + " registrations are refused or collide with its own children"
+                                + " while the pool that made them is not monitored at all");
+            }
+
+            // And the harm on the notifications: an MBean that is not
+            // registered names itself with the string fallback, so that a
+            // listener is not told that a condition of this pool came from the
+            // MBean that owns the refused name.
+            Assertions.assertTrue(jmx.notify(ConnectionPool.POOL_EMPTY,
+                    "reported by a pool whose publication was refused"),
+                    "the notification must be accepted for delivery");
+            Notification n = delivered.poll(30, TimeUnit.SECONDS);
+            Assertions.assertNotNull(n, "the notification was handed off for delivery");
+            Assertions.assertFalse(poolOname.equals(n.getSource()),
+                    "a notification of a pool MBean whose registration was refused must not"
+                            + " attribute itself to the refused name: listeners take the source as"
+                            + " the address of the MBean that reported the condition, and this MBean"
+                            + " is not the one published there");
+            Assertions.assertInstanceOf(String.class, n.getSource(),
+                    "an unregistered pool MBean reports the condition as the string the name would"
+                            + " have had, which is what an MBean that was never published has");
+        } finally {
+            jmx.removeListener(listener);
+            ds.close();
+            ds.postDeregister();
+            if (server.isRegistered(poolOname)) {
+                server.unregisterMBean(poolOname);
+            }
+            // test hygiene: take away anything a regression would have left
+            // published below the name the foreign MBean holds
+            for (ObjectName stale : publishedFor(server, dsName)) {
+                server.unregisterMBean(stale);
+            }
+        }
+    }
+
+    @Test
     void aPoolThreadRaisesItsNotificationUnderTheNameTheRegistrationPublished() throws Exception {
         MBeanServer server = server();
         DataSource ds = newDataSource();
@@ -704,6 +947,111 @@ class TestJmxRegistration extends JdbcPoolBaseTest {
             for (ObjectName stale : publishedFor(server, dsName)) {
                 server.unregisterMBean(stale);
             }
+        }
+    }
+
+    @Test
+    void setJmxEnabledIsOnlyAcceptedBeforeThePoolIsCreated() throws Exception {
+        DataSource ds = newDataSource();
+        // Before the pool exists the property is ordinary configuration.
+        ds.setJmxEnabled(false);
+        Assertions.assertFalse(ds.isJmxEnabled(), "the pre-start write must be stored");
+
+        ds.setJmxEnabled(true);
+        ds.createPool();
+
+        // After creation the MBean decision has been made; a write through the
+        // data source must be refused like the pool MBean's own setter.
+        Assertions.assertThrows(UnsupportedOperationException.class,
+                () -> ds.setJmxEnabled(false),
+                "a post-start write would otherwise be stored without creating or removing anything");
+        Assertions.assertTrue(ds.isJmxEnabled(), "the refused write must not change the configuration");
+
+        ds.close();
+        Assertions.assertThrows(UnsupportedOperationException.class,
+                () -> ds.setJmxEnabled(false),
+                "a closed data source can never create a pool again, so a write there would be"
+                        + " stored without any possible effect");
+        Assertions.assertTrue(ds.isJmxEnabled(),
+                "the refused write on a closed data source must not change the configuration");
+    }
+
+    @Test
+    void aRefusedUnregistrationSucceedsWhenTheCallerAsksAgain() throws Exception {
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        ObjectName name = uniqueName("retry-unregister");
+        RefusingUnregister.REFUSALS.set(1);
+        server.registerMBean(new RefusingUnregister(), name);
+        try {
+            Assertions.assertFalse(JmxUtil.unregisterJmx(name),
+                    "the first refusal must be reported to the caller");
+            Assertions.assertTrue(server.isRegistered(name),
+                    "precondition: the refused unregistration leaves the MBean registered");
+
+            Assertions.assertTrue(JmxUtil.unregisterJmx(name),
+                    "a later call for the same name must try again");
+            Assertions.assertFalse(server.isRegistered(name),
+                    "the second call must take the MBean down");
+        } finally {
+            if (server.isRegistered(name)) {
+                server.unregisterMBean(name);
+            }
+        }
+    }
+
+    @Test
+    void aRefusedUnregistrationIsNotRetriedByAnUnrelatedCall() throws Exception {
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        ObjectName name = uniqueName("no-retry-unregister");
+        RefusingUnregister.REFUSALS.set(1);
+        server.registerMBean(new RefusingUnregister(), name);
+        try {
+            Assertions.assertFalse(JmxUtil.unregisterJmx(name),
+                    "precondition: the first refusal is reported");
+            Assertions.assertTrue(server.isRegistered(name),
+                    "precondition: the refused MBean stays registered");
+
+            // JMX is a best-effort management channel. A refusal is logged for
+            // the operator and is not remembered: a later retry by name could
+            // belong to a replacement MBean that took the name in the meantime.
+            Assertions.assertTrue(JmxUtil.unregisterJmx(null),
+                    "releasing nothing is still the requested end state");
+            Assertions.assertTrue(server.isRegistered(name),
+                    "an unrelated unregistration must not retry the refused name");
+        } finally {
+            if (server.isRegistered(name)) {
+                server.unregisterMBean(name);
+            }
+        }
+    }
+
+    /** Standard MBean interface for {@link RefusingUnregister}. */
+    public interface RefusingUnregisterMBean {
+    }
+
+    /** MBean whose preDeregister refuses the first unregistration. */
+    public static class RefusingUnregister implements RefusingUnregisterMBean, MBeanRegistration {
+
+        static final AtomicInteger REFUSALS = new AtomicInteger();
+
+        @Override
+        public ObjectName preRegister(MBeanServer server, ObjectName name) {
+            return name;
+        }
+
+        @Override
+        public void postRegister(Boolean registrationDone) {
+        }
+
+        @Override
+        public void preDeregister() throws Exception {
+            if (REFUSALS.compareAndSet(1, 0)) {
+                throw new IllegalStateException("simulated unregistration refusal");
+            }
+        }
+
+        @Override
+        public void postDeregister() {
         }
     }
 }

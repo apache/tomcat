@@ -165,6 +165,14 @@ class TestThrowingBuiltInValidation extends JdbcPoolBaseTest {
     }
 
     @Test
+    void errorRollbackFailureOnBorrowDoesNotStrandTheSlot() throws Exception {
+        // The transaction helper is called from validate()'s finally block,
+        // outside the main guard; a non-fatal Error from rollback() must be
+        // read as the failed termination it is.
+        assertFailingBuiltInCheckOnBorrowDoesNotStrand("rollback=error", true);
+    }
+
+    @Test
     void uncheckedRollbackFailureAfterValidationQueryDoesNotEscapeTheFinally()
             throws Exception {
         // the validation-query branch catches Exception around its body,
@@ -430,10 +438,15 @@ class TestThrowingBuiltInValidation extends JdbcPoolBaseTest {
             String armed = FAIL_FROM.get();
             if (armed != null) {
                 boolean honestFalse = armed.endsWith("=false");
-                String name = honestFalse ? armed.substring(0, armed.length() - "=false".length()) : armed;
+                boolean error = armed.endsWith("=error");
+                String suffix = honestFalse ? "=false" : error ? "=error" : "";
+                String name = suffix.isEmpty() ? armed : armed.substring(0, armed.length() - suffix.length());
                 if (method.getName().equals(name)) {
                     if (honestFalse) {
                         return Boolean.FALSE;
+                    }
+                    if (error) {
+                        throw new NoClassDefFoundError("boom from " + name + "()");
                     }
                     throw new IllegalStateException("boom from " + name + "()");
                 }

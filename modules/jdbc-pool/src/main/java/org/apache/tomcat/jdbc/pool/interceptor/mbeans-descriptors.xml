@@ -20,19 +20,22 @@
    "http://jakarta.apache.org/commons/dtds/mbeans-descriptors.dtd">
 <mbeans-descriptors>
 
-  <mbean description="Reports " domain="tomcat.jdbc" group="jdbc-pool" name="SlowQueryReportJmx"
+  <mbean description="Reports slow and failed queries through JMX and publishes the statistics of the pool that registered it" domain="tomcat.jdbc" group="jdbc-pool" name="SlowQueryReportJmx"
          type="org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx">
 
     <attribute description="The name of the connection pool this Jmx bean is representing" name="PoolName" type="java.lang.String" writeable="false"/>
-    <attribute description="List of all registered connections pools" name="PoolNames" type="[Ljava.lang.String;" writeable="false"/>
-    <attribute description="All the recorded query stats. " name="SlowQueriesCD" type="[Ljavax.management.openmbean.CompositeData;" writeable="false"/>
+    <attribute description="Names of the pools that currently publish recorded statistics in this JVM" name="PoolNames" type="[Ljava.lang.String;" writeable="false"/>
+    <attribute description="All the recorded query stats, as one CompositeData per recorded query" name="SlowQueriesCD" type="[Ljavax.management.openmbean.CompositeData;" writeable="false"/>
 
-    <notification description="Notification sent out by the slow query report when a query exceeds the threshold" name="slow-query">
-      <notification-type>Slow query</notification-type>
+    <!-- The notification-type values are the wire types of the notifications the MBean
+         sends; they must stay equal to the SLOW_QUERY_NOTIFICATION and
+         FAILED_QUERY_NOTIFICATION constants, which is pinned by the surface test. -->
+    <notification description="Notification sent out by the slow query report when a query exceeds the threshold" name="SLOW QUERY">
+      <notification-type>SLOW QUERY</notification-type>
     </notification>
 
-    <notification description="Notification sent out by the slow query report when a query fails execution" name="failed-query">
-      <notification-type>Failed query execution</notification-type>
+    <notification description="Notification sent out by the slow query report when a query fails execution" name="FAILED QUERY">
+      <notification-type>FAILED QUERY</notification-type>
     </notification>
 
     <operation description="Clears all the query stats" impact="ACTION" name="resetStats" returnType="void"/>

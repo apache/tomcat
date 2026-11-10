@@ -16,6 +16,7 @@
  */
 package org.apache.coyote.http11.upgrade;
 
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.LongAdder;
 
 /**
@@ -34,7 +35,7 @@ public class UpgradeInfo {
     /**
      * The parent group info for aggregated statistics.
      */
-    private UpgradeGroupInfo groupInfo = null;
+    private final AtomicReference<UpgradeGroupInfo> groupInfo = new AtomicReference<>();
 
     /**
      * Counter for bytes sent.
@@ -63,7 +64,7 @@ public class UpgradeInfo {
      * @return the group info
      */
     public UpgradeGroupInfo getGlobalProcessor() {
-        return groupInfo;
+        return groupInfo.get();
     }
 
 
@@ -74,12 +75,12 @@ public class UpgradeInfo {
      */
     public void setGroupInfo(UpgradeGroupInfo groupInfo) {
         if (groupInfo == null) {
-            if (this.groupInfo != null) {
-                this.groupInfo.removeUpgradeInfo(this);
-                this.groupInfo = null;
+            UpgradeGroupInfo oldGroupInfo = this.groupInfo.getAndSet(null);
+            if (oldGroupInfo != null) {
+                oldGroupInfo.removeUpgradeInfo(this);
             }
         } else {
-            this.groupInfo = groupInfo;
+            this.groupInfo.set(groupInfo);
             groupInfo.addUpgradeInfo(this);
         }
     }

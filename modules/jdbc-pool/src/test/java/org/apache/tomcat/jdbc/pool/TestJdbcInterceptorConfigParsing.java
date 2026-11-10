@@ -154,6 +154,36 @@ class TestJdbcInterceptorConfigParsing {
     }
 
     @Test
+    void aMalformedInterceptorPropertyMasksTheRestOfTheDefinition() {
+        String badConfig = "StatementCache(password=secret,bad)";
+        PoolProperties props = new PoolProperties();
+        props.setJdbcInterceptors(badConfig);
+
+        IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class,
+                props::getJdbcInterceptorsAsArray);
+
+        Assertions.assertFalse(thrown.getMessage().contains("secret"),
+                "the credential in the same definition must not leak: " + thrown.getMessage());
+        Assertions.assertTrue(thrown.getMessage().contains("password=********"),
+                "the credential must be shown masked: " + thrown.getMessage());
+        Assertions.assertTrue(thrown.getMessage().contains("StatementCache"),
+                "the definition must remain identifiable: " + thrown.getMessage());
+        Assertions.assertTrue(thrown.getMessage().contains("bad"),
+                "the invalid property must remain identifiable: " + thrown.getMessage());
+    }
+
+    @Test
+    void getPoolReturnsNullForAnUncheckedConfigurationFailure() {
+        DataSourceProxy proxy = new DataSourceProxy();
+        proxy.setJdbcInterceptors("MalformedParmsInterceptor(a=1,b)");
+
+        Assertions.assertDoesNotThrow(proxy::getPool,
+                "getPool documents null on a creation failure, including an unchecked"
+                        + " configuration error before the pool is built");
+        Assertions.assertNull(proxy.getPool(), "an unchecked creation failure must read as no pool");
+    }
+
+    @Test
     void otherMalformedConfigsOnlyFailLater() {
         String[] noExceptionButInvalidConfigs = {
             "MalformedParmsInterceptor(=   )",
@@ -172,26 +202,46 @@ class TestJdbcInterceptorConfigParsing {
     }
 
     @Test
-    void extraSemicolonsProduceAnExtraDefinitionOnlyInSomePositions() {
-        // This one DOES get an extra/empty definition
+    void redundantSemicolonsAreCosmeticInEveryPosition() {
+        // A redundant separator must mean the same thing wherever it
+        // appears: split() always dropped the trailing one, the property
+        // parse always tolerated one inside the parentheses, and an empty
+        // leading or doubled one used to survive as a definition without a
+        // class name - which the pool could only try to load as
+        // "...pool.interceptor.", failing the whole start with a message
+        // that named nothing. All positions now yield the same chain.
+        String[][] spellings = {
+            { ";LeadingSemicolonInterceptor", "LeadingSemicolonInterceptor" },
+            { "Doubled;;SemicolonInterceptor", "Doubled,SemicolonInterceptor" },
+            { "TrailingSemicolonInterceptor;", "TrailingSemicolonInterceptor" },
+            { "TrailingWhitespaceInterceptor; ", "TrailingWhitespaceInterceptor" },
+        };
+        for (String[] spelling : spellings) {
+            PoolProperties props = new PoolProperties();
+            props.setJdbcInterceptors(spelling[0]);
+            InterceptorDefinition[] jiDefs = props.getJdbcInterceptorsAsArray();
+            Assertions.assertNotNull(jiDefs);
+            String[] names = spelling[1].split(",");
+            Assertions.assertEquals(names.length + 1, jiDefs.length,
+                    spelling[0] + " must parse as trap plus the named interceptors");
+            Assertions.assertEquals(TrapException.class.getName(), jiDefs[0].getClassName());
+            for (int i = 0; i < names.length; i++) {
+                Assertions.assertEquals(names[i], jiDefs[i + 1].getClassName(),
+                        spelling[0] + " must keep its real interceptors, in order");
+            }
+        }
+    }
+
+    @Test
+    void aSegmentWithoutANameContributesNoDefinition() {
+        // "(", " ( " and a segment that opens straight on the property list
+        // name no interceptor at all; keeping such a definition only moved
+        // the failure from the parser to the pool start
         PoolProperties props = new PoolProperties();
-        props.setJdbcInterceptors(";EmptyLeadingSemiInterceptor");
+        props.setJdbcInterceptors("(parm=value);NamedInterceptor");
         InterceptorDefinition[] jiDefs = props.getJdbcInterceptorsAsArray();
-        Assertions.assertNotNull(jiDefs);
-        Assertions.assertEquals(3, jiDefs.length);
-
-        // This one does NOT get an extra/empty definition (no trailing whitespace)
-        props = new PoolProperties();
-        props.setJdbcInterceptors("EmptyTrailingSemiInterceptor;");
-        jiDefs = props.getJdbcInterceptorsAsArray();
-        Assertions.assertNotNull(jiDefs);
         Assertions.assertEquals(2, jiDefs.length);
-
-        // This one DOES get an extra/empty definition (with trailing whitespace)
-        props = new PoolProperties();
-        props.setJdbcInterceptors("EmptyTrailingSemiInterceptor; ");
-        jiDefs = props.getJdbcInterceptorsAsArray();
-        Assertions.assertNotNull(jiDefs);
-        Assertions.assertEquals(3, jiDefs.length);
+        Assertions.assertEquals(TrapException.class.getName(), jiDefs[0].getClassName());
+        Assertions.assertEquals("NamedInterceptor", jiDefs[1].getClassName());
     }
 }

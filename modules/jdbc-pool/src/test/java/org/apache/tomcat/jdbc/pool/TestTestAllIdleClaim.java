@@ -119,7 +119,7 @@ class TestTestAllIdleClaim extends JdbcPoolBaseTest {
         Connection first = ds.getConnection();
         awaitSessions(1);
         setSessionMarker(first, 7);
-        PooledConnection pc = (PooledConnection) first.unwrap(PooledConnection.class);
+        PooledConnection pc = internalOf(first);
         first.close();
         forceExpired(pc);
 
@@ -193,7 +193,7 @@ class TestTestAllIdleClaim extends JdbcPoolBaseTest {
             // the marker set on the old session is gone
             Connection again = handed.get();
             Assertions.assertNotNull(again);
-            Assertions.assertSame(pc, again.unwrap(PooledConnection.class));
+            Assertions.assertSame(pc, internalOf(again));
             Assertions.assertNull(sessionMarker(again));
 
             // and nothing was stranded: two physical connects (fill and
@@ -218,7 +218,7 @@ class TestTestAllIdleClaim extends JdbcPoolBaseTest {
 
         Connection first = ds.getConnection();
         awaitSessions(1);
-        PooledConnection pc = (PooledConnection) first.unwrap(PooledConnection.class);
+        PooledConnection pc = internalOf(first);
         first.close();
         forceExpired(pc);
 
@@ -273,7 +273,7 @@ class TestTestAllIdleClaim extends JdbcPoolBaseTest {
 
         Connection first = ds.getConnection();
         awaitSessions(1);
-        PooledConnection pc = (PooledConnection) first.unwrap(PooledConnection.class);
+        PooledConnection pc = internalOf(first);
         first.close();
         forceExpired(pc);
 
@@ -292,7 +292,7 @@ class TestTestAllIdleClaim extends JdbcPoolBaseTest {
         mode = DIRECT;
         try (Connection again = ds.getConnection()) {
             Assertions.assertNotNull(again);
-            Assertions.assertNotSame(pc, again.unwrap(PooledConnection.class));
+            Assertions.assertNotSame(pc, internalOf(again));
         }
         Assertions.assertEquals(1, ds.getPool().getIdle());
         awaitSessions(1);

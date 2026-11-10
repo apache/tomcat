@@ -30,8 +30,9 @@ import org.junit.jupiter.params.provider.MethodSource;
  * re-established for the borrower that asks for it?", checked in
  * isolation. A pooled session remembers the identity it logged in as, a
  * {@code null} in a request means the pool's default identity, and the
- * operation both decides <em>and</em> records what was asked - so every
- * case below starts from an explicitly configured session.
+ * decision records nothing on its own - the identity is recorded by the
+ * reconnect that the database accepted - so every case below starts from an
+ * explicitly configured session.
  *
  * <p>Ported from the retired legacy {@code ShouldForceReconnectTest}. The
  * {@code maxAge} half of the same decision is covered against a real
@@ -130,34 +131,42 @@ class TestShouldForceReconnect {
     }
 
     @Test
-    void theDecisionRecordsTheIdentityItJustVetoed() throws Exception {
+    void theDecisionAloneRecordsNoIdentity() throws Exception {
         PooledConnection con = pooledConnection();
         loggedInAs(con, DEFAULT_USER, DEFAULT_PASSWD);
 
         Assertions.assertTrue(con.shouldForceReconnect(ALT_USER, ALT_PASSWD),
                 "another identity must be refused the pooled session");
-        Assertions.assertFalse(con.shouldForceReconnect(ALT_USER, ALT_PASSWD),
-                "the decision records the new identity, so the next borrower asking "
-                        + "for the same user gets the session once it is re-established");
+        Assertions.assertTrue(con.shouldForceReconnect(ALT_USER, ALT_PASSWD),
+                "the decision records nothing, so the same identity is refused the "
+                        + "session again: only a reconnect the database accepted "
+                        + "establishes a new identity");
+        Assertions.assertFalse(con.shouldForceReconnect(DEFAULT_USER, DEFAULT_PASSWD),
+                "and the session is still the identity it was opened with");
 
-        loggedInAs(con, DEFAULT_USER, DEFAULT_PASSWD);
-        Assertions.assertFalse(con.shouldForceReconnect(null, null));
-        Assertions.assertTrue(con.shouldForceReconnect(ALT_USER, ALT_PASSWD));
+        loggedInAs(con, ALT_USER, ALT_PASSWD);
         Assertions.assertFalse(con.shouldForceReconnect(ALT_USER, ALT_PASSWD));
         Assertions.assertTrue(con.shouldForceReconnect(null, null),
                 "and the same holds in the other direction");
     }
 
     @Test
-    void withoutAlternateCredentialsSupportNoBorrowerEverForcesAReconnect()
-            throws Exception {
+    void withoutAlternateCredentialsSupportThePoolServesOnlyItsOwnIdentity() throws Exception {
         properties.setAlternateUsernameAllowed(false);
         PooledConnection con = pooledConnection();
-        loggedInAs(con, ALT_USER, ALT_PASSWD);
+        loggedInAs(con, DEFAULT_USER, DEFAULT_PASSWD);
 
-        Assertions.assertFalse(con.shouldForceReconnect(DEFAULT_USER, DEFAULT_PASSWD),
+        Assertions.assertFalse(con.shouldForceReconnect(ALT_USER, ALT_PASSWD),
                 "with alternates disallowed the credentials of the borrower are ignored, "
-                        + "so the session can never mismatch");
-        Assertions.assertFalse(con.shouldForceReconnect(ALT_USER, ALT_PASSWD));
+                        + "and this session already serves the pool's own identity");
+
+        loggedInAs(con, ALT_USER, ALT_PASSWD);
+        Assertions.assertTrue(con.shouldForceReconnect(DEFAULT_USER, DEFAULT_PASSWD),
+                "but a session carrying another identity than the pool's own is re-established, "
+                        + "however it came to carry it - the flag can be turned at runtime "
+                        + "over a session that was re-established while alternates were allowed");
+        Assertions.assertTrue(con.shouldForceReconnect(null, null),
+                "including for the default borrower, whose claim is exactly the identity "
+                        + "this session lacks");
     }
 }

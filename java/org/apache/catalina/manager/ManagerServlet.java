@@ -75,7 +75,6 @@ import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.SSLContext;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
-import org.apache.tomcat.util.net.SSLUtilBase;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.Escape;
 
@@ -1690,14 +1689,11 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                                 sslHostConfigCert.getType();
                         List<String> certList = new ArrayList<>();
                         SSLContext sslContext = sslHostConfigCert.getSslContext();
-                        String alias = sslHostConfigCert.getCertificateKeyAlias();
-                        if (alias == null) {
-                            alias = SSLUtilBase.DEFAULT_KEY_ALIAS;
-                        }
                         if (sslContext == null) {
                             certList.add(smClient.getString("managerServlet.certsNotLoaded"));
                         } else {
-                            X509Certificate[] certs = sslContext.getCertificateChain(alias);
+                            X509Certificate[] certs = sslContext.getCertificateChain(
+                                    sslContext.getServedAlias(sslHostConfigCert));
                             if (certs == null) {
                                 certList.add(smClient.getString("managerServlet.certsNotAvailable"));
                             } else {

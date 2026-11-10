@@ -17,6 +17,7 @@
 package org.apache.catalina.tribes.membership;
 
 import java.io.ByteArrayInputStream;
+import java.net.BindException;
 import java.util.Properties;
 
 import org.junit.Assert;
@@ -31,6 +32,36 @@ import org.apache.catalina.tribes.io.XByteBuffer;
 
 public class TestMcastService {
 
+    private static final int MAX_START_ATTEMPTS = 5;
+
+    /*
+     * The multicast port has to be known in advance so it cannot be left to the operating system. That leaves a window
+     * between finding a free port and the service binding it in which something else may take it. If that happens,
+     * pick another port and try again.
+     */
+    @SuppressWarnings("null")
+    private static McastService startService(Properties props) throws Exception {
+        BindException lastFailure = null;
+        for (int attempt = 0; attempt < MAX_START_ATTEMPTS; attempt++) {
+            props.setProperty("mcastPort", String.valueOf(TesterUtil.getFreeUdpPort()));
+
+            GroupChannel channel = new GroupChannel();
+            channel.setName("TestMcastService-" + System.nanoTime());
+
+            McastService service = new McastService();
+            service.setChannel(channel);
+            service.setProperties(props);
+            try {
+                service.start(Channel.MBR_TX_SEQ);
+                return service;
+            } catch (BindException e) {
+                lastFailure = e;
+            }
+        }
+        throw lastFailure;
+    }
+
+
     /*
      * The shutdown message that stop() broadcasts routinely fails when the network device is down or the socket is
      * already broken. That must not skip leaving the multicast group and closing the socket, nor prevent the service
@@ -38,10 +69,8 @@ public class TestMcastService {
      */
     @Test(timeout = 60000)
     public void testStopWithFailingShutdownSendCompletes() throws Exception {
-        int mcastPort = TesterUtil.getFreeUdpPort();
         StringBuilder properties = new StringBuilder();
         properties.append("mcastAddress=228.0.0.4\n");
-        properties.append("mcastPort=").append(mcastPort).append("\n");
         properties.append("tcpListenHost=127.0.0.1\n");
         properties.append("tcpListenPort=").append(0).append("\n");
         properties.append("tcpSecurePort=0\n");
@@ -52,15 +81,9 @@ public class TestMcastService {
         properties.append("recoveryCounter=10\n");
         properties.append("recoverySleepTime=3000\n");
 
-        GroupChannel channel = new GroupChannel();
-        channel.setName("TestMcastService-" + System.nanoTime());
-
-        McastService service = new McastService();
-        service.setChannel(channel);
         Properties props = new Properties();
         props.load(new ByteArrayInputStream(properties.toString().getBytes("UTF-8")));
-        service.setProperties(props);
-        service.start(Channel.MBR_TX_SEQ);
+        McastService service = startService(props);
 
         McastServiceImpl impl = service.impl;
         Assert.assertNotNull(impl);
@@ -168,10 +191,8 @@ public class TestMcastService {
      */
     @Test(timeout = 60000)
     public void testBroadcastRejectsPacketsTheSocketCannotCarry() throws Exception {
-        int mcastPort = TesterUtil.getFreeUdpPort();
         Properties props = new Properties();
         props.setProperty("mcastAddress", "228.0.0.4");
-        props.setProperty("mcastPort", String.valueOf(mcastPort));
         props.setProperty("tcpListenHost", "127.0.0.1");
         props.setProperty("tcpListenPort", "0");
         props.setProperty("tcpSecurePort", "0");
@@ -182,13 +203,7 @@ public class TestMcastService {
         props.setProperty("recoveryCounter", "10");
         props.setProperty("recoverySleepTime", "3000");
 
-        GroupChannel channel = new GroupChannel();
-        channel.setName("TestMcastService-" + System.nanoTime());
-
-        McastService service = new McastService();
-        service.setChannel(channel);
-        service.setProperties(props);
-        service.start(Channel.MBR_TX_SEQ);
+        McastService service = startService(props);
         try {
             // Build a packet just above the sendable size but still within the 65535 byte packet
             // limit the old check used, and small enough for this platform to actually send

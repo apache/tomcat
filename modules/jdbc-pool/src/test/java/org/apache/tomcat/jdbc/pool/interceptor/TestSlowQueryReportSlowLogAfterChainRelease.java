@@ -94,9 +94,9 @@ class TestSlowQueryReportSlowLogAfterChainRelease extends JdbcPoolBaseTest {
 
     /*
      * Releases the statistics reference the way the pool's own chain
-     * release does - reset(null, null) on the interceptor link, the call
-     * PooledConnection.setHandler(null) walks the chain with - while the
-     * borrow, the session and the application's statement all stay live,
+     * release does - reset(null, null) on the interceptor link, which the
+     * teardown walk calls - while the borrow, the session and the
+     * application's statement all stay live,
      * and pins that the window really opened: the instance can no longer
      * resolve any statistics entry.
      */
@@ -133,6 +133,31 @@ class TestSlowQueryReportSlowLogAfterChainRelease extends JdbcPoolBaseTest {
             st.execute(slowSql(1));
 
             logs.assertSlowQueryWarned("SELECT 1 FROM");
+        }
+    }
+
+    @Test
+    void aBorrowedConnectionDoesNotBookIntoAReleasedStore() throws Exception {
+        String poolName = "SlowLogReleasedStore-" + System.nanoTime();
+        DataSource ds = newDataSource();
+        ds.setName(poolName);
+        ds.setJdbcInterceptors(SlowQueryReport.class.getName() + "(threshold=0)");
+        ds.getPoolProperties().setInitialSize(0);
+
+        Connection con = ds.getConnection();
+        SlowQueryReport report = interceptorOf(con, SlowQueryReport.class);
+        Assertions.assertNotNull(report, "the chain must hold the report instance");
+        try {
+            // close(false) leaves this borrowed session alive but releases
+            // the pool's statistics store.
+            ds.close(false);
+            Assertions.assertNull(SlowQueryReport.getPoolStats(poolName),
+                    "precondition: the closed pool has released its store");
+
+            Assertions.assertNull(report.getQueryStats("SELECT released-store"),
+                    "a session left alive by close(false) must not book into the released store");
+        } finally {
+            con.close();
         }
     }
 
