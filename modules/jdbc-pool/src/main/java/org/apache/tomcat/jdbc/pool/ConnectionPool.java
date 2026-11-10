@@ -447,20 +447,6 @@ public class ConnectionPool {
      * @throws SQLException if an interceptor can't be configured, if the proxy can't be instantiated
      */
     protected Connection setupConnection(PooledConnection con) throws SQLException {
-        // The connection is being handed to a borrower: a borrow is counted
-        // here rather than where it was claimed, as that is the one point all
-        // hand-offs pass - the synchronous borrows, the async borrow that
-        // takes an idle connection, the configuration of a connection a queue
-        // handed to an async poll, and the cleanup that retrieves a cancelled
-        // poll's connection to return it - each exactly once, while a claim
-        // that ends in a throw never reaches a borrower at all. A setup that
-        // fails gives the connection back through abandonSetup(), which counts
-        // the return, so the borrow is counted on the way in to match. The
-        // pool's own initialization is the only path that takes connections
-        // out of the creation route without a borrower: it returns its
-        // preloaded connections directly and never sets one up here, so it
-        // stays out of the count.
-        borrowedCount.incrementAndGet();
         // A close or an abandonment can have landed between the borrow's own
         // publication of the connection and this method: the connection must
         // fail the borrow rather than be set up into a handle with no live
@@ -601,6 +587,11 @@ public class ConnectionPool {
         // landed while the handle above was being built. The handle must not
         // be handed out over a connection that is already out of service.
         checkSetupStillValid(con);
+        // Every check above passed and the handle is about to reach its
+        // caller: count the borrow at the hand-off. A setup that failed before
+        // this point never reached a borrower, and it neither moves this
+        // counter nor - through abandonSetup() - the returned one.
+        borrowedCount.incrementAndGet();
         return connection;
 
     }
@@ -629,8 +620,10 @@ public class ConnectionPool {
     }
 
     /**
-     * Gives up a connection that was borrowed but could not be set up, so that it does not stay borrowed forever. Any
-     * failure to do so is added to the exception that is about to be thrown rather than hiding it.
+     * Gives up a connection that was borrowed but could not be set up, so that it does not stay borrowed forever. The
+     * failed setup never reached a borrower, so the hand-back is not counted as a return; the borrow is not counted
+     * until {@link #setupConnection(PooledConnection)} reaches its hand-off. Any failure to give the connection back is
+     * added to the exception that is about to be thrown rather than hiding it.
      *
      * @param con     the borrowed connection
      * @param cause   the exception that is about to be thrown to the caller
@@ -641,7 +634,7 @@ public class ConnectionPool {
             if (discard) {
                 con.setDiscarded(true);
             }
-            returnConnection(con);
+            returnConnection(con, false);
         } catch (Exception y) {
             cause.addSuppressed(y);
         }

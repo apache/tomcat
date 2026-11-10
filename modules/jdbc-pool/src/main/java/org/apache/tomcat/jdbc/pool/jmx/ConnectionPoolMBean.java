@@ -92,7 +92,8 @@ public interface ConnectionPoolMBean extends PoolConfiguration {
 
     /**
      * Returns the total number of connections borrowed since the pool was created or since the last call to
-     * {@link #resetStats()}, whichever is more recent.
+     * {@link #resetStats()}, whichever is more recent. A borrow is counted when the connection handle is handed to
+     * the caller; a setup that fails before the hand-off is not counted as a borrow.
      *
      * @return borrowed count
      */
@@ -100,7 +101,8 @@ public interface ConnectionPoolMBean extends PoolConfiguration {
 
     /**
      * Returns the total number of connections returned since the pool was created or since the last call to
-     * {@link #resetStats()}, whichever is more recent.
+     * {@link #resetStats()}, whichever is more recent. A setup that fails before a connection reaches its borrower is
+     * not counted as a return.
      *
      * @return returned count
      */
