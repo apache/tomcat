@@ -190,6 +190,160 @@ public class TestELProcessor {
     }
 
 
+    /*
+     * Tests based on https://github.com/jakartaee/expression-language/issues/492 and variants.
+     */
+
+    private void doDefineFunctionSignature(String function, String signature, String expectedName, String expr,
+            String expectedCalls) throws Exception {
+        TesterFunctions.resetCallList();
+        ELProcessor elp = new ELProcessor();
+        elp.defineFunction("fn", function, "jakarta.el.TesterFunctions", signature);
+        Assert.assertNotNull(
+                elp.getELManager().getELContext().getFunctionMapper().resolveFunction("fn", expectedName));
+        elp.eval(expr);
+        Assert.assertEquals(expectedCalls, TesterFunctions.getCallList());
+    }
+
+
+    @Test
+    public void testDefineFunctionNoParams01() throws Exception {
+        doDefineFunctionSignature("test", "void doIt()", "test", "fn:test()", "A");
+    }
+
+
+    @Test
+    public void testDefineFunctionNoParams02() throws Exception {
+        doDefineFunctionSignature("test", "void doIt( )", "test", "fn:test()", "A");
+    }
+
+
+    @Test
+    public void testDefineFunctionTwoParamsWithSpace() throws Exception {
+        doDefineFunctionSignature("test", "void doIt(int, int)", "test", "fn:test(1,2)", "J");
+    }
+
+
+    @Test
+    public void testDefineFunctionTwoParamsNoSpace() throws Exception {
+        doDefineFunctionSignature("test", "void doIt(int,int)", "test", "fn:test(1,2)", "J");
+    }
+
+
+    @Test
+    public void testDefineFunctionTwoParamsExtraSpace() throws Exception {
+        doDefineFunctionSignature("test", "void doIt( int ,  int )", "test", "fn:test(1,2)", "J");
+    }
+
+
+    @Test
+    public void testDefineFunctionTwoParamsTab() throws Exception {
+        doDefineFunctionSignature("test", "void doIt(int,\tint)", "test", "fn:test(1,2)", "J");
+    }
+
+
+    @Test
+    public void testDefineFunctionEmptyNameNoParams() throws Exception {
+        doDefineFunctionSignature("", "void doIt()", "doIt", "fn:doIt()", "A");
+    }
+
+
+    @Test
+    public void testDefineFunctionEmptyNameTwoParams() throws Exception {
+        doDefineFunctionSignature("", "void doIt(int,int)", "doIt", "fn:doIt(1,2)", "J");
+    }
+
+
+    @Test
+    public void testDefineFunctionEmptyNameTwoParamsWithSpace() throws Exception {
+        doDefineFunctionSignature("", "void doIt(int, int)", "doIt", "fn:doIt(1,2)", "J");
+    }
+
+
+    @Test
+    public void testDefineFunctionLeadingTrailingSpace() throws Exception {
+        doDefineFunctionSignature("", "  void  doIt ( int , int )  ", "doIt", "fn:doIt(1,2)", "J");
+    }
+
+
+    @Test
+    public void testDefineFunctionArraySpaceBetweenBrackets() throws Exception {
+        doDefineFunctionSignature("test", "void doIt(Integer[] [])", "test", "fn:test([[1].stream().toArray()].stream().toArray())", "G");
+    }
+
+
+    @Test
+    public void testDefineFunctionVarArgsWithSpace() throws Exception {
+        doDefineFunctionSignature("test", "void doIt( long ... )", "test", "fn:test(1,2)", "H");
+    }
+
+
+    private void doDefineFunctionInvalidSignature(String signature) {
+        ELProcessor elp = new ELProcessor();
+        try {
+            elp.defineFunction("fn", "test", "jakarta.el.TesterFunctions", signature);
+        } catch (ClassNotFoundException | NoSuchMethodException e) {
+            // Expected
+            return;
+        }
+        Assert.fail("Invalid signature [" + signature + "] was accepted");
+    }
+
+
+    @Test
+    public void testDefineFunctionInvalidTrailingComma() {
+        doDefineFunctionInvalidSignature("void doIt(int,)");
+    }
+
+
+    @Test
+    public void testDefineFunctionInvalidTrailingCommaSpace() {
+        doDefineFunctionInvalidSignature("void doIt(int, )");
+    }
+
+
+    @Test
+    public void testDefineFunctionInvalidLeadingComma() {
+        doDefineFunctionInvalidSignature("void doIt(,int)");
+    }
+
+
+    @Test
+    public void testDefineFunctionInvalidOnlyComma() {
+        doDefineFunctionInvalidSignature("void doIt(,)");
+    }
+
+
+    @Test
+    public void testDefineFunctionInvalidDoubleComma() {
+        doDefineFunctionInvalidSignature("void doIt(int,,int)");
+    }
+
+
+    @Test
+    public void testDefineFunctionInvalidTrailingCommaTwoParams() {
+        doDefineFunctionInvalidSignature("void doIt(int,int,)");
+    }
+
+
+    @Test
+    public void testDefineFunctionInvalidMissingCloseParen() {
+        doDefineFunctionInvalidSignature("void doIt(int,int");
+    }
+
+
+    @Test
+    public void testDefineFunctionInvalidMissingReturnType() {
+        doDefineFunctionInvalidSignature("doIt(int,int)");
+    }
+
+
+    @Test
+    public void testDefineFunctionInvalidUnknownType() {
+        doDefineFunctionInvalidSignature("void doIt(int,NoSuchType)");
+    }
+
+
     @Test
     public void testPrimitiveArray01() {
         ELProcessor elp = new ELProcessor();
