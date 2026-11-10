@@ -635,6 +635,26 @@ class TestPoolProperties {
     }
 
     @Test
+    void aCloneCopiesTheParsedInterceptorDefinitions() throws Exception {
+        PoolProperties original = new PoolProperties();
+        original.setJdbcInterceptors("StatementCache(prepared=true,max=5);SlowQueryReport(threshold=1000)");
+        original.getJdbcInterceptorsAsArray();
+
+        PoolProperties clone = (PoolProperties) original.clone();
+        PoolProperties.InterceptorDefinition clonedDefinition = clone.getJdbcInterceptorsAsArray()[1];
+        clonedDefinition.addProperty("max", "1");
+
+        Assertions.assertNotSame(original.getJdbcInterceptorsAsArray()[1], clonedDefinition,
+                "the clone must not share the definition objects with the original");
+        Assertions.assertEquals("5",
+                original.getJdbcInterceptorsAsArray()[1].getProperties().get("max").getValue(),
+                "a property added to a cloned definition must not reconfigure the original");
+        Assertions.assertEquals("1",
+                clone.getJdbcInterceptorsAsArray()[1].getProperties().get("max").getValue(),
+                "the copy keeps the property its caller added to it");
+    }
+
+    @Test
     void aCloneResolvesPropertiesDefaultsLikeTheOriginal() throws Exception {
         Properties defaults = new Properties();
         defaults.setProperty("socketTimeout", "1000");
