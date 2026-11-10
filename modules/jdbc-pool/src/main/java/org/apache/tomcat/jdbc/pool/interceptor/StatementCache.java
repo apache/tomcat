@@ -86,6 +86,8 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
     protected static final String STATEMENT_CACHE_ATTR = StatementCache.class.getName() + ".cache";
 
     private static final String SET_POOLABLE = "setPoolable";
+    private static final String SET_CURSOR_NAME = "setCursorName";
+    private static final String REGISTER_OUT_PARAMETER = "registerOutParameter";
 
     /**
      * State of the one look for a tracker beneath this interceptor: the chain has not been looked at yet.
@@ -737,6 +739,23 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
          * {@code isPoolable()}.
          */
         private boolean poolable = true;
+        /**
+         * Whether the application set a cursor name on this statement. A
+         * cached statement must not hand a previous borrower's cursor name to
+         * the next one, so a park clears it first; the flag avoids calling
+         * {@code setCursorName(null)} on drivers that do not support cursor
+         * names when the application never used one.
+         */
+        private volatile boolean cursorNameSet = false;
+        /**
+         * Whether the application registered a callable statement out
+         * parameter. JDBC has no standard way to clear those registrations
+         * (clearing parameters releases values, not registrations), so a
+         * statement with any registered out parameter is closed rather than
+         * parked. Reusing it could otherwise expose a stale registration to
+         * the next borrower.
+         */
+        private volatile boolean outParametersRegistered = false;
 
         /**
          * Constructs a CachedStatement, recording the physical connection the statement was prepared on as the
@@ -829,7 +848,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
                 // is nothing left to reset or park.
                 return;
             }
-            if (size != null && size.get() < maxCacheSize && !trackerBelow()) {
+            if (size != null && size.get() < maxCacheSize && !trackerBelow() && !outParametersRegistered) {
                 // A tracker beneath this cache (see trackerBelow) would close a
                 // parked statement at the connection return, so the park is
                 // refused here and the close falls to the normal path below.
@@ -845,6 +864,11 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
                 try {
                     // Only cache if statement has been marked as poolable and not close on completion
                     if (poolable && !delegate.isCloseOnCompletion()) {
+                        // Clear a cursor name the application installed before
+                        // the statement is handed to another borrow.
+                        if (cursorNameSet) {
+                            delegate.setCursorName(null);
+                        }
                         // Clear Resultset
                         ResultSet result = delegate.getResultSet();
                         if (result != null && !result.isClosed()) {
@@ -938,6 +962,10 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
             Object result = super.invoke(proxy, method, args);
             if (compare(SET_POOLABLE, method)) {
                 poolable = ((Boolean) args[0]).booleanValue();
+            } else if (compare(SET_CURSOR_NAME, method)) {
+                cursorNameSet = args != null && args.length > 0 && args[0] != null;
+            } else if (compare(REGISTER_OUT_PARAMETER, method)) {
+                outParametersRegistered = true;
             }
             return result;
         }
