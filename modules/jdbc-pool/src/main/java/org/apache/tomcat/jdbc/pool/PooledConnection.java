@@ -354,6 +354,13 @@ public class PooledConnection implements PooledConnectionMBean {
             javax.sql.XADataSource xds = (javax.sql.XADataSource) poolProperties.getDataSource();
             javax.sql.XAConnection pooled = (usr != null || pwd != null) ? xds.getXAConnection(usr, pwd)
                     : xds.getXAConnection();
+            if (pooled == null) {
+                // A provider must return a handle or throw. Do not dereference
+                // the null and turn the contract violation into an unrelated
+                // NullPointerException in the connection's diagnostic.
+                throw new SQLException(MessageFactory.get(
+                        "pooledConnection.xaDataSourceNullHandle", dataSourceIdentity(xds)));
+            }
             // Keep the handle before obtaining the logical connection: the
             // physical connection is only closed when the handle is closed,
             // so losing the handle here would leak the physical connection.
@@ -417,6 +424,12 @@ public class PooledConnection implements PooledConnectionMBean {
             javax.sql.ConnectionPoolDataSource ds = (javax.sql.ConnectionPoolDataSource) poolProperties.getDataSource();
             javax.sql.PooledConnection pooled = (usr != null || pwd != null) ? ds.getPooledConnection(usr, pwd)
                     : ds.getPooledConnection();
+            if (pooled == null) {
+                // A provider must return a handle or throw; fail cleanly
+                // rather than dereferencing the missing handle.
+                throw new SQLException(MessageFactory.get(
+                        "pooledConnection.connectionPoolDataSourceNullHandle", dataSourceIdentity(ds)));
+            }
             // Keep the handle before obtaining the logical connection: the
             // physical connection is only closed when the handle is closed,
             // so losing the handle here would leak the physical connection.
