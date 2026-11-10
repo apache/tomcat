@@ -1433,10 +1433,18 @@ public class PooledConnection implements PooledConnectionMBean {
      *                                   set.
      */
     public void setDiscarded(boolean discarded) {
-        if (this.discarded && !discarded) {
+        if (discarded) {
+            this.discarded = true;
+        } else if (this.discarded) {
             throw new IllegalStateException(MessageFactory.get("pooledConnection.discardedStateChange"));
         }
-        this.discarded = discarded;
+        // A request to clear a flag that is already clear takes no write. The
+        // flag only ever transitions false-to-true through this setter, so a
+        // clear racing a discard can no longer read the false, be overtaken by
+        // the true, and write the false back: that interleaving resurrected a
+        // connection the pool had retired. The lifecycle reset that a reconnect
+        // performs writes the field directly (see connect()), under the pool's
+        // own serialization of that connection.
     }
 
     /**
