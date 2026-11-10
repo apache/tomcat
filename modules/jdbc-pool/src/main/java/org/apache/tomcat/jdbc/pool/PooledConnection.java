@@ -352,7 +352,7 @@ public class PooledConnection implements PooledConnectionMBean {
         }
         if (poolProperties.getDataSource() instanceof javax.sql.XADataSource) {
             javax.sql.XADataSource xds = (javax.sql.XADataSource) poolProperties.getDataSource();
-            javax.sql.XAConnection pooled = (usr != null && pwd != null) ? xds.getXAConnection(usr, pwd)
+            javax.sql.XAConnection pooled = (usr != null || pwd != null) ? xds.getXAConnection(usr, pwd)
                     : xds.getXAConnection();
             // Keep the handle before obtaining the logical connection: the
             // physical connection is only closed when the handle is closed,
@@ -400,7 +400,7 @@ public class PooledConnection implements PooledConnectionMBean {
             xaConnection = new XABranchTracker(pooled);
         } else if (poolProperties.getDataSource() instanceof javax.sql.DataSource) {
             javax.sql.DataSource ds = (javax.sql.DataSource) poolProperties.getDataSource();
-            if (usr != null && pwd != null) {
+            if (usr != null || pwd != null) {
                 connection = ds.getConnection(usr, pwd);
             } else {
                 connection = ds.getConnection();
@@ -415,7 +415,7 @@ public class PooledConnection implements PooledConnectionMBean {
             }
         } else if (poolProperties.getDataSource() instanceof javax.sql.ConnectionPoolDataSource) {
             javax.sql.ConnectionPoolDataSource ds = (javax.sql.ConnectionPoolDataSource) poolProperties.getDataSource();
-            javax.sql.PooledConnection pooled = (usr != null && pwd != null) ? ds.getPooledConnection(usr, pwd)
+            javax.sql.PooledConnection pooled = (usr != null || pwd != null) ? ds.getPooledConnection(usr, pwd)
                     : ds.getPooledConnection();
             // Keep the handle before obtaining the logical connection: the
             // physical connection is only closed when the handle is closed,

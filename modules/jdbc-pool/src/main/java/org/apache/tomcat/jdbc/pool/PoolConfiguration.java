@@ -957,11 +957,12 @@ public interface PoolConfiguration {
     /**
      * Injects a datasource that will be used to retrieve/create connections. If a data source is set, the
      * {@link PoolConfiguration#getUrl()} and {@link PoolConfiguration#getDriverClassName()} methods are ignored and not
-     * used by the pool. If the {@link PoolConfiguration#getUsername()} and {@link PoolConfiguration#getPassword()}
-     * values are set, the method {@link javax.sql.DataSource#getConnection(String, String)} method will be called
-     * instead of the {@link javax.sql.DataSource#getConnection()} method. If the data source implements
-     * {@link javax.sql.XADataSource} the methods {@link javax.sql.XADataSource#getXAConnection()} and
-     * {@link javax.sql.XADataSource#getXAConnection(String,String)} will be invoked. If it implements
+     * used by the pool. If either the {@link PoolConfiguration#getUsername()} or the
+     * {@link PoolConfiguration#getPassword()} value is set, the method {@link javax.sql.DataSource#getConnection(String,
+     * String)} method will be called with both values, passing the unset one as {@code null}, instead of the
+     * {@link javax.sql.DataSource#getConnection()} method; when both are unset, the no-argument method is used. If the
+     * data source implements {@link javax.sql.XADataSource} the methods {@link javax.sql.XADataSource#getXAConnection()}
+     * and {@link javax.sql.XADataSource#getXAConnection(String,String)} will be invoked on the same rule. If it implements
      * {@link javax.sql.ConnectionPoolDataSource} the methods
      * {@link javax.sql.ConnectionPoolDataSource#getPooledConnection()} and
      * {@link javax.sql.ConnectionPoolDataSource#getPooledConnection(String,String)} will be invoked instead.
