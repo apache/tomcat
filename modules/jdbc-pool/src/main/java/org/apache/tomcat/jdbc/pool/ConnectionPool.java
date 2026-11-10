@@ -2718,7 +2718,8 @@ public class ConnectionPool {
     /**
      * Releases the MBeans published for the connections this pool currently holds and for the interceptors of their
      * chains, when the pool's own MBean is released while the pool stays live. The connections and their sessions are
-     * untouched; a later borrow or reconnect can publish them again.
+     * untouched; a later reconnect, or the sweep that runs when the pool's own MBean is registered again, can publish
+     * them again. An ordinary borrow does not publish a connection MBean.
      */
     public void unregisterConnectionMBeans() {
         unregisterConnectionMBeans(idle);

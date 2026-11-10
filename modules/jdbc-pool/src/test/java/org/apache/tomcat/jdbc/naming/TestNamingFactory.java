@@ -242,6 +242,29 @@ public class TestNamingFactory extends JdbcPoolBaseTest {
     }
 
     @Test
+    void aBlankCredentialAttributeClearsACredentialFromConnectionProperties() {
+        // connectionProperties is applied after the credential attributes, so
+        // a blank password/user attribute must clear the pair the string
+        // contributed as well; otherwise the retired credential still reaches
+        // the driver.
+        java.util.Properties attrs = new java.util.Properties();
+        attrs.setProperty("connectionProperties", "user=cpuser;password=cpsecret;timeout=5");
+        attrs.setProperty("username", " ");
+        attrs.setProperty("password", "");
+
+        PoolConfiguration configured = DataSourceFactory.parsePoolProperties(attrs);
+
+        Assertions.assertNull(configured.getUsername(), "the blank username must leave no user");
+        Assertions.assertNull(configured.getPassword(), "the blank password must leave no password");
+        Assertions.assertNull(configured.getDbProperties().getProperty("user"),
+                "the blank username must remove the user pair from connectionProperties");
+        Assertions.assertNull(configured.getDbProperties().getProperty("password"),
+                "the blank password must remove the password pair from connectionProperties");
+        Assertions.assertEquals("5", configured.getDbProperties().getProperty("timeout"),
+                "the other connectionProperties pairs must stay in place");
+    }
+
+    @Test
     void credentialAttributesApplyVerbatimAndValidatorClassNameAppliesTrimmed() {
         // A credential can legitimately carry surrounding whitespace, so it
         // is stored verbatim; a Java class name never can, so the factory
