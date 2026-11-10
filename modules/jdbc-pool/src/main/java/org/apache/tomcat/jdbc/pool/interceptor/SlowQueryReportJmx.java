@@ -17,6 +17,7 @@
 package org.apache.tomcat.jdbc.pool.interceptor;
 
 import java.lang.management.ManagementFactory;
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -356,9 +357,17 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     protected boolean notifyPool = true;
 
     /**
-     * The connection pool reference.
+     * The connection pool reference. During a borrow this is a strong reference used to route the instance's
+     * notifications and JMX reads; it is cleared when the chain is released.
      */
     protected ConnectionPool pool = null;
+
+    /**
+     * A weak reference to the pool, kept across the release of the chain so an instance whose session outlives the
+     * connection can still resolve the pool's JMX state while the pool is alive. It must not keep a closed or abandoned
+     * pool, its sessions and its driver class loader reachable from a retained statement handle.
+     */
+    private volatile WeakReference<ConnectionPool> poolRef = new WeakReference<>(null);
 
     /**
      * Returns the composite type used for JMX query statistics.
@@ -434,7 +443,17 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
             // make a borrow register a second MBean under the new name
             poolName = parent.getRegistrationName();
             pool = parent;
+            poolRef = new WeakReference<>(parent);
             registerJmx();
+        } else {
+            // The chain is going out of service. Keep only the weak reference:
+            // a statement or result-set handle retained by the application
+            // keeps this instance reachable, so a strong pool reference here
+            // would keep a closed pool, its sessions and its driver class
+            // loader alive with it. A session that outlives its pool can still
+            // resolve the pool through the weak reference while the pool is
+            // alive.
+            pool = null;
         }
     }
 
@@ -446,8 +465,21 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     @Override
     public void poolStarted(ConnectionPool pool) {
         this.pool = pool;
+        this.poolRef = new WeakReference<>(pool);
         super.poolStarted(pool);
         this.poolName = pool.getRegistrationName();
+    }
+
+    /**
+     * Returns the pool this instance serves. While a connection is borrowed the strong field answers; after the chain
+     * is released the weak reference still resolves the pool while it is alive, so a session that outlives its
+     * connection can report on it, but a closed or abandoned pool is not kept alive by a retained statement handle.
+     *
+     * @return the pool, or {@code null} when there is none or it has been collected
+     */
+    private ConnectionPool currentPool() {
+        ConnectionPool strong = this.pool;
+        return strong != null ? strong : poolRef.get();
     }
 
     /**
@@ -486,7 +518,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
                 // Read the pool and its JMX object each only once: close()
                 // gives the JMX object up concurrently, and a second read can
                 // observe the null the first one did not
-                ConnectionPool p = this.pool;
+                ConnectionPool p = currentPool();
                 org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = p == null ? null : p.getJmxPool();
                 if (jmx != null) {
                     jmx.notify(type, query);
@@ -543,7 +575,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
         if (state != null) {
             return state;
         }
-        PoolStatistics own = statisticsFor(this.pool);
+        PoolStatistics own = statisticsFor(currentPool());
         return own == null ? null : own.getJmxState();
     }
 
@@ -729,8 +761,9 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
      * @return the statistics store to read, or {@code null} when there is none
      */
     private PoolStatistics statisticsToRead() {
+        ConnectionPool current = currentPool();
         PoolStatistics own = this.poolStatistics;
-        if (own != null && own.getPool() == this.pool) {
+        if (own != null && own.getPool() == current) {
             return own;
         }
         String name = poolName;
@@ -740,7 +773,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
         PoolStatistics stats = perPoolStats.get(name);
         // A name can be reused by another pool after this one is abandoned;
         // a read of this instance's pool must not answer from the successor.
-        return stats != null && stats.getPool() == this.pool ? stats : null;
+        return stats != null && stats.getPool() == current ? stats : null;
     }
 
     /**
