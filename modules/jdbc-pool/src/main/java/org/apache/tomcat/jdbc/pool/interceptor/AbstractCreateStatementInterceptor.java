@@ -30,6 +30,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
+import org.apache.tomcat.jdbc.pool.PoolUtilities;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 import org.apache.tomcat.jdbc.pool.util.ExceptionUtils;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
@@ -247,7 +248,7 @@ public abstract class AbstractCreateStatementInterceptor extends JdbcInterceptor
                 // with no way to retry the close.
                 ExceptionUtils.handleThrowable(t);
                 log.warn(MessageFactory.get("abstractCreateStatementInterceptor.closeInvokedFailed",
-                        getClass().getName()), t);
+                        getClass().getName()), PoolUtilities.maskCredentials(t));
             }
             return super.invoke(proxy, method, args);
         } else {
