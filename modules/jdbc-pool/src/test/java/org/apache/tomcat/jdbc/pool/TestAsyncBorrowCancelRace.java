@@ -459,4 +459,64 @@ class TestAsyncBorrowCancelRace extends JdbcPoolBaseTest {
         Assertions.assertEquals(1, ds.getIdle());
         ds.close();
     }
+
+    @Test
+    void aTimedGetDuringSetupHonoursTheDeadlineAndReturnsTheAbandonedConnection() throws Exception {
+        ParkingValidator validator = new ParkingValidator();
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setFairQueue(true);
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setMinIdle(0);
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setMaxIdle(1);
+        ds.getPoolProperties().setTestOnBorrow(true);
+        ds.getPoolProperties().setValidationInterval(0);
+        ds.getPoolProperties().setValidator(validator);
+        ds.createPool();
+        ConnectionPool pool = ds.getPool();
+        long returnedBefore = pool.getReturnedCount();
+
+        // Hold the only slot, then queue an async borrow behind it.
+        Connection holder = ds.getConnection();
+        Future<Connection> future = ds.getConnectionAsync();
+
+        CountDownLatch insideSetup = new CountDownLatch(1);
+        CountDownLatch resumeSetup = new CountDownLatch(1);
+        validator.insideSetup = insideSetup;
+        validator.resumeSetup = resumeSetup;
+
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+        Thread caller = new Thread(() -> {
+            try {
+                future.get(100, TimeUnit.MILLISECONDS);
+            } catch (Throwable e) {
+                failure.set(e);
+            }
+        }, "timed-async-borrower");
+        caller.setDaemon(true);
+        caller.start();
+
+        // Return the held connection to the queued poll: its setup parks.
+        holder.close();
+        Assertions.assertTrue(insideSetup.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
+                "the queued poll must have taken the returned connection into its setup");
+
+        // The timed get must return at its deadline, not when the parked
+        // setup finally completes.
+        caller.join(AWAIT_TIMEOUT_MS);
+        Assertions.assertFalse(caller.isAlive(), "the timed get must return at its deadline");
+        Assertions.assertInstanceOf(TimeoutException.class, failure.get(),
+                "the timed get must report its own timeout, got " + failure.get());
+
+        // The setup task sees the abandoned future when the validator is
+        // released and returns the connection instead of publishing it.
+        resumeSetup.countDown();
+        awaitUntil(() -> ds.getIdle() == 1 && ds.getActive() == 0);
+        Assertions.assertEquals(2, pool.getReturnedCount() - returnedBefore,
+                "the holder and the abandoned setup must each return their connection exactly once");
+        Assertions.assertThrows(TimeoutException.class,
+                () -> future.get(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
+                "the abandoned future must keep reporting the timeout");
+        ds.close();
+    }
 }
