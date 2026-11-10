@@ -131,7 +131,8 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
             // took, at the one cost that this facade's seal does not
             // cover the object handed back; the warn below is that cost's
             // only report.
-            logger.warn(MessageFactory.get("statementFacade.unableToCreateStatementProxy"), x);
+            logger.warn(MessageFactory.get("statementFacade.unableToCreateStatementProxy"),
+                    PoolUtilities.maskCredentials(x));
         }
         return statement;
     }

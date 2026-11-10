@@ -323,7 +323,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
                     // failure escaping it, which must not skip the local
                     // listeners of this notification
                     if (log.isDebugEnabled()) {
-                        log.debug("JMX notification hand-off failed. Type=" + type, x);
+                        log.debug("JMX notification hand-off failed. Type=" + type, PoolUtilities.maskCredentials(x));
                     }
                 }
                 deliverLocally(n, type);
@@ -338,7 +338,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
             return false;
         } catch (Exception x) {
             if (log.isDebugEnabled()) {
-                log.debug("Notify failed. Type=" + type + "; Message=" + message, x);
+                log.debug("Notify failed. Type=" + type + "; Message=" + message, PoolUtilities.maskCredentials(x));
             }
             return false;
         }
@@ -363,7 +363,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
                 listener.handleNotification(n, this);
             } catch (Exception x) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Local notification listener failed. Type=" + type, x);
+                    log.debug("Local notification listener failed. Type=" + type, PoolUtilities.maskCredentials(x));
                 }
             }
         }

@@ -43,6 +43,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
+import org.apache.tomcat.jdbc.pool.PoolUtilities;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 import org.apache.tomcat.jdbc.pool.jmx.ConnectionPoolMBean;
 import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
@@ -384,7 +385,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
                                 QueryStats.getFieldDescriptions(), QueryStats.getFieldTypes());
                     } catch (OpenDataException x) {
                         compositeTypeInitializationFailed = true;
-                        log.warn(MessageFactory.get("slowQueryReportJmx.unableToInitCompositeType"), x);
+                        log.warn(MessageFactory.get("slowQueryReportJmx.unableToInitCompositeType"), PoolUtilities.maskCredentials(x));
                     }
                 }
             }
@@ -534,7 +535,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
             }
         } catch (RuntimeOperationsException e) {
             if (log.isDebugEnabled()) {
-                log.debug("Unable to send failed query notification.", e);
+                log.debug("Unable to send failed query notification.", PoolUtilities.maskCredentials(e));
             }
         }
     }
@@ -845,7 +846,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
             // a pool name carrying characters the ObjectName grammar reserves.
             // There is no publication to make, and JMX is best effort, so this
             // is reported once and not attempted again.
-            log.error(MessageFactory.get("slowQueryReportJmx.jmxRegistrationFailedNoData"), x);
+            log.error(MessageFactory.get("slowQueryReportJmx.jmxRegistrationFailedNoData"), PoolUtilities.maskCredentials(x));
             return;
         }
         // The MBeanServer keeps the registration resource, never this
@@ -862,12 +863,12 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
             // and names are unique under Catalina, so this is reported rather
             // than retried: by the time a retry ran, the name could describe a
             // different component.
-            log.warn(MessageFactory.get("slowQueryReportJmx.jmxRegistrationInUse", oname), x);
+            log.warn(MessageFactory.get("slowQueryReportJmx.jmxRegistrationInUse", oname), PoolUtilities.maskCredentials(x));
             return;
         } catch (Exception x) {
             // A non-compliant resource, a security restriction, or another
             // server-side refusal. Reported once, not retried.
-            log.error(MessageFactory.get("slowQueryReportJmx.jmxRegistrationFailed", oname), x);
+            log.error(MessageFactory.get("slowQueryReportJmx.jmxRegistrationFailed", oname), PoolUtilities.maskCredentials(x));
             return;
         }
         if (!state.published(oname)) {
