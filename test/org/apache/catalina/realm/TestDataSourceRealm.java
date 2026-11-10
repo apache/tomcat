@@ -90,7 +90,7 @@ public class TestDataSourceRealm extends LoggingBaseTest {
     @Test
     public void testRealm() throws Exception {
 
-        Assume.assumeTrue(JreCompat.isJre16Available());
+        Assume.assumeTrue("Database tests require Derby which requires Java 17+", JreCompat.isJre17Available());
 
         db = new DerbyDataSourceRealm("dsRealm");
         db.setUserTable("users");
@@ -165,6 +165,8 @@ public class TestDataSourceRealm extends LoggingBaseTest {
 
     @Test
     public void testRealmWithoutRoleStore() throws Exception {
+
+        Assume.assumeTrue("Database tests require Derby which requires Java 17+", JreCompat.isJre17Available());
 
         db = new DerbyDataSourceRealm("dsRealmNoRoles");
         db.setUserTable("users");

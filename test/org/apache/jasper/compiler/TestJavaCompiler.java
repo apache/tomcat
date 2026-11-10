@@ -76,9 +76,9 @@ public class TestJavaCompiler {
         Options options = EasyMock.createMock(Options.class);
         EasyMock.expect(options.getJavaEncoding()).andReturn("UTF-8")
                 .anyTimes();
-        EasyMock.expect(options.getCompilerSourceVM()).andReturn("17")
+        EasyMock.expect(options.getCompilerSourceVM()).andReturn("11")
                 .anyTimes();
-        EasyMock.expect(options.getCompilerTargetVM()).andReturn("17")
+        EasyMock.expect(options.getCompilerTargetVM()).andReturn("11")
                 .anyTimes();
         EasyMock.replay(options);
 

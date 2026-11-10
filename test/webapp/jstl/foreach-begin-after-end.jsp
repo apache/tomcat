@@ -18,7 +18,7 @@
          pageEncoding="UTF-8" import="java.util.Iterator,java.util.List" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
-    Iterator<String> iterator = List.of("a", "b", "c", "d").iterator();
+    Iterator<String> iterator = Arrays.asList("a", "b", "c", "d").iterator();
     pageContext.setAttribute("values", iterator);
     pageContext.setAttribute("array", new String[] { "a", "b", "c", "d" });
 %>
