@@ -2786,6 +2786,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
             <filename name="work/**" />
             <filename name="modules/jdbc-pool/bin/**" />
             <filename name="modules/jdbc-pool/includes/**" />
+            <filename name="modules/jdbc-pool/target/**" />
             <and>
               <!-- exclude all modules except jdbc-pool -->
               <filename name="modules/**" />
