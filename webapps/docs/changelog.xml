@@ -2703,6 +2703,13 @@
       <update>
         Update the minimum version for Tomcat Native 1.x to 1.3.8. (markt)
       </update>
+      <fix>
+        Update <code>StoreRegistry</code> to dynamically load optional clustering
+        classes rather than statically referencing them. This matches the pattern
+        used in <code>Catalina.addClusterRuleSet()</code> and prevents
+        <code>NoClassDefFoundError</code> when <code>StoreConfigLifecycleListener</code>
+        is configured but clustering classes are not available. (csutherl)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -2914,6 +2921,20 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>69995</bug>: Make dependent ordering predictable. Patch submitted
+        by Jan Luehe. (remm)
+      </fix>
+      <fix>
+        <bug>70001</bug>: Ensure JSP compilation is reproducible when
+        dependencies exist for tag files and tag libraries located on the class
+        path but outside of the web application. <pr>992</pr> submitted by Jan
+        Luehe. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <fix>
@@ -2986,20 +3007,6 @@
       <fix>
         Align OpenSSl FFM behaviour with Tomcat Native for various OCSP edge
         cases. (markt)
-      </fix>
-    </changelog>
-  </subsection>
-  <subsection name="Jasper">
-    <changelog>
-      <fix>
-        <bug>69995</bug>: Make dependent ordering predictable. Patch submitted
-        by Jan Luehe. (remm)
-      </fix>
-      <fix>
-        <bug>70001</bug>: Ensure JSP compilation is reproducible when
-        dependencies exist for tag files and tag libraries located on the class
-        path but outside of the web application. <pr>992</pr> submitted by Jan
-        Luehe. (markt)
       </fix>
     </changelog>
   </subsection>
@@ -3076,13 +3083,6 @@
         when closing am HTTP/2 connection. Pull request <pr>917</pr> provided by
         Kai Burjack. (markt)
       </add>
-      <fix>
-        Update <code>StoreRegistry</code> to dynamically load optional clustering
-        classes rather than statically referencing them. This matches the pattern
-        used in <code>Catalina.addClusterRuleSet()</code> and prevents
-        <code>NoClassDefFoundError</code> when <code>StoreConfigLifecycleListener</code>
-        is configured but clustering classes are not available. (csutherl)
-      </fix>
       <update>
         Update the minimum recommended version of Tomcat Native so that users of
         1.3.x are recommended to update to 2.0.x. (markt)
@@ -3154,6 +3154,10 @@
       </fix>
       <fix>
         Fix case sensitive handling of the protocol host name. (remm)
+      </fix>
+      <fix>
+        <bug>69938</bug>: Avoid changing the closed state of TLS channel when
+        resetting it after close. (remm)
       </fix>
     </changelog>
   </subsection>
@@ -3238,10 +3242,6 @@
         <bug>69936</bug>: Fix bug in previous fix for Tomcat Native crashes on
         shutdown that triggered a significant memory leak. Patch provided by
         Wes. (markt)
-      </fix>
-      <fix>
-        <bug>69938</bug>: Avoid changing the closed state of TLS channel when
-        resetting it after close. (remm)
       </fix>
     </changelog>
   </subsection>
@@ -3609,6 +3609,9 @@
         Fix AJP message length check. Pull request <pr>916</pr> by Joshua
         Rogers. (remm)
       </fix>
+      <fix>
+        Various OCSP processing issues in the OpenSSL FFM code. (dsoumis)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -3688,9 +3691,6 @@
         <bug>69848</bug>: Fix copy/paste errors in 10.1.47 that meant DELETE
         requests received via the AJP connector were processed as OPTIONS
         requests and PROPFIND requests were processed as TRACE. (markt)
-      </fix>
-      <fix>
-        Various OCSP processing issues in the OpenSSL FFM code. (dsoumis)
       </fix>
     </changelog>
   </subsection>
@@ -6138,6 +6138,15 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Prevent the web application's ClassLoader from being pinned by the JSP
+        compiler if an application uses a custom XMLInputFactory. Based upon a
+        suggestion from Simon Niederberger. (schultz)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
@@ -6265,11 +6274,6 @@
         Correctly handle the case where a tag library is packaged in a JAR file
         and the web application is deployed as a WAR file rather than an
         unpacked directory. (markt)
-      </fix>
-      <fix>
-        Prevent the web application's ClassLoader from being pinned by the JSP
-        compiler if an application uses a custom XMLInputFactory. Based upon a
-        suggestion from Simon Niederberger. (schultz)
       </fix>
     </changelog>
   </subsection>
@@ -7018,6 +7022,10 @@
       <update>
         Update Tomcat Native to 2.0.5. (markt)
       </update>
+      <fix>
+        Align documentation for maxParameterCount to match hard-coded defaults.
+        Contributed by Michal Sobkiewicz. (schultz)
+      </fix>
     </changelog>
   </subsection>
 </section>
@@ -7134,10 +7142,6 @@
       <update>
         Update JSign to 5.0. (markt/rjung)
       </update>
-      <fix>
-        Align documentation for maxParameterCount to match hard-coded defaults.
-        Contributed by Michal Sobkiewicz. (schultz)
-      </fix>
     </changelog>
   </subsection>
 </section>
@@ -7325,6 +7329,10 @@
         Update the packaged version of the Tomcat Migration Tool for Jakarta EE
         to 1.0.7. (markt)
       </update>
+      <fix>
+        Enhance PEMFile to load from an InputStream. Patch provided by
+        Romain Manni-Bucau. (schultz)
+      </fix>
     </changelog>
   </subsection>
 </section>
@@ -7523,10 +7531,6 @@
       <update>
         Update Jacoco to 0.8.9. (markt)
       </update>
-      <fix>
-        Enhance PEMFile to load from an InputStream. Patch provided by
-        Romain Manni-Bucau. (schultz)
-      </fix>
     </changelog>
   </subsection>
 </section>
@@ -7843,6 +7847,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        <bug>66346</bug>: Ensure all JDBC pool JARs are reproducible. Pull
+        request <pr>566</pr> provided by John Neffenger. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <scode>
@@ -7951,14 +7963,6 @@
       <fix>
         <bug>66325</bug>: Fix concurrency issue in evaluation of expression
         language containing lambda expressions. (markt)
-      </fix>
-    </changelog>
-  </subsection>
-  <subsection name="jdbc-pool">
-    <changelog>
-      <fix>
-        <bug>66346</bug>: Ensure all JDBC pool JARs are reproducible. Pull
-        request <pr>566</pr> provided by John Neffenger. (markt)
       </fix>
     </changelog>
   </subsection>
