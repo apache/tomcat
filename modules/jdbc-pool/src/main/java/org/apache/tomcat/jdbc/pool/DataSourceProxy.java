@@ -521,8 +521,17 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
 
+    /**
+     * Sets the number of connections pre-loaded when the pool starts. The value is used when the pool is created; a
+     * later write would only change the configuration without pre-loading any connection.
+     *
+     * @param initialSize the number of connections to pre-load
+     *
+     * @throws UnsupportedOperationException if the pool has already been created or this data source has been closed
+     */
     @Override
-    public void setInitialSize(int initialSize) {
+    public synchronized void setInitialSize(int initialSize) {
+        checkPoolNotStarted("initialSize");
         this.poolProperties.setInitialSize(initialSize);
     }
 
@@ -719,6 +728,25 @@ public class DataSourceProxy implements PoolConfiguration {
 
 
     /**
+     * Rejects a write to a property that is read only while the pool is being created.
+     *
+     * @param property the property name
+     *
+     * @throws UnsupportedOperationException if the pool exists or this data source is closed
+     */
+    private void checkPoolNotStarted(String property) {
+        if (closed) {
+            throw new UnsupportedOperationException(
+                    MessageFactory.get("dataSourceProxy.startTimePropertyAfterClose", property));
+        }
+        if (pool != null) {
+            throw new UnsupportedOperationException(
+                    MessageFactory.get("dataSourceProxy.startTimePropertyAfterStart", property));
+        }
+    }
+
+
+    /**
      * Sets whether JMX is enabled, before the pool is created. Whether the pool registers an MBean is decided when
      * the pool is created, so a write after that point is rejected rather than stored without effect, matching the
      * pool MBean's own setter. A closed data source is rejected as well: it can never create a pool again, so a write
@@ -740,8 +768,17 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
 
+    /**
+     * Sets whether the pool's idle queue is fair. The queue type is chosen when the pool is created; a later write would
+     * only change the configuration without changing the live queue.
+     *
+     * @param fairQueue {@code true} to use a fair idle queue
+     *
+     * @throws UnsupportedOperationException if the pool has already been created or this data source has been closed
+     */
     @Override
-    public void setFairQueue(boolean fairQueue) {
+    public synchronized void setFairQueue(boolean fairQueue) {
+        checkPoolNotStarted("fairQueue");
         this.getPoolProperties().setFairQueue(fairQueue);
     }
 
@@ -1542,8 +1579,17 @@ public class DataSourceProxy implements PoolConfiguration {
         return getPoolProperties().isIgnoreExceptionOnPreLoad();
     }
 
+    /**
+     * Sets whether failures during the pool's initial pre-load may be ignored. The value is used only while the pool is
+     * being created; a later write would only change the configuration.
+     *
+     * @param ignoreExceptionOnPreLoad {@code true} to ignore pre-load failures
+     *
+     * @throws UnsupportedOperationException if the pool has already been created or this data source has been closed
+     */
     @Override
-    public void setIgnoreExceptionOnPreLoad(boolean ignoreExceptionOnPreLoad) {
+    public synchronized void setIgnoreExceptionOnPreLoad(boolean ignoreExceptionOnPreLoad) {
+        checkPoolNotStarted("ignoreExceptionOnPreLoad");
         getPoolProperties().setIgnoreExceptionOnPreLoad(ignoreExceptionOnPreLoad);
     }
 
