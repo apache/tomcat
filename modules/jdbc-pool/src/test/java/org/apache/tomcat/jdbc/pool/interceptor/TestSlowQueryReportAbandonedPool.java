@@ -238,4 +238,37 @@ class TestSlowQueryReportAbandonedPool extends JdbcPoolBaseTest {
             }
         }
     }
+
+    @Test
+    void aLateReportingDefinitionTakesOverAnAbandonedNameAndReleasesItOnClose() throws Exception {
+        String poolName = "late-report-" + System.nanoTime();
+        ConnectionPool abandoned = reportedPoolNamed(poolName);
+        use(abandoned);
+        WeakReference<ConnectionPool> probe = new WeakReference<>(abandoned);
+        abandoned = null;
+        Assertions.assertFalse(stillReachable(probe),
+                "precondition: the first pool is abandoned and collected");
+        Assertions.assertNotNull(SlowQueryReport.getPoolStats(poolName),
+                "the abandoned pool leaves its store published under the name");
+
+        DataSource successor = newDataSource();
+        successor.setName(poolName);
+        successor.getPoolProperties().setInitialSize(0);
+        successor.getPoolProperties().setMinIdle(0);
+        successor.createPool();
+        // The reporting definition is added after start, as the pool allows.
+        successor.getPoolProperties().setJdbcInterceptors(SlowQueryReport.class.getName() + "(threshold=-1)");
+        use(successor.getPool());
+
+        Assertions.assertNotNull(SlowQueryReport.getPoolStats(poolName),
+                "the late definition must publish its own store under the name");
+        SlowQueryReport.PoolStatistics statistics = SlowQueryReport.statisticsFor(successor.getPool());
+        Assertions.assertNotNull(statistics, "the successor must own a statistics store");
+        Assertions.assertSame(successor.getPool(), statistics.getPool(),
+                "the store under the name must belong to the successor");
+
+        successor.close();
+        Assertions.assertNull(SlowQueryReport.getPoolStats(poolName),
+                "the successor close must release the store it took over");
+    }
 }

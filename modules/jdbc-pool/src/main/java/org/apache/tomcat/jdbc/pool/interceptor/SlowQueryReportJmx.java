@@ -730,11 +730,17 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
      */
     private PoolStatistics statisticsToRead() {
         PoolStatistics own = this.poolStatistics;
-        if (own != null) {
+        if (own != null && own.getPool() == this.pool) {
             return own;
         }
         String name = poolName;
-        return name == null ? null : perPoolStats.get(name);
+        if (name == null) {
+            return null;
+        }
+        PoolStatistics stats = perPoolStats.get(name);
+        // A name can be reused by another pool after this one is abandoned;
+        // a read of this instance's pool must not answer from the successor.
+        return stats != null && stats.getPool() == this.pool ? stats : null;
     }
 
     /**
