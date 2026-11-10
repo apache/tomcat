@@ -62,6 +62,34 @@ class TestStatementCacheReuse extends JdbcPoolBaseTest {
     }
 
     @Test
+    void aStatementWithACursorNameIsResetBeforeItIsCached() throws Exception {
+        DataSource ds = cachedPool("prepared=true,max=5", 1);
+        ds.createPool();
+
+        Connection first = ds.getConnection();
+        PreparedStatement prepared = first.prepareStatement("SELECT 1");
+        prepared.setCursorName("cachedCursor");
+        prepared.close();
+        Assertions.assertEquals(1, cacheOf(first).getCacheSizePerConnection(),
+                "a statement carrying a cursor name must still be parked after the name is cleared");
+        first.close();
+
+        Connection second = ds.getConnection();
+        try {
+            PreparedStatement reused = second.prepareStatement("SELECT 1");
+            Assertions.assertEquals(0, cacheOf(second).getCacheSizePerConnection(),
+                    "the next borrower must take the cached statement");
+            try (java.sql.ResultSet rs = reused.executeQuery()) {
+                Assertions.assertTrue(rs.next());
+                Assertions.assertEquals(1, rs.getInt(1));
+            }
+            reused.close();
+        } finally {
+            second.close();
+        }
+    }
+
+    @Test
     void aClosedStatementServesTheNextBorrowerWithoutPreparingAgain() throws Exception {
         DataSource ds = cachedPool("prepared=true,max=5", 1);
         String table = uniqueTable();
