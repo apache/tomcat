@@ -2365,7 +2365,7 @@ public class ConnectionPool {
             }
             long now = System.currentTimeMillis();
             Iterator<PooledConnection> unlocked = idle.iterator();
-            while ((ignoreMinSize || (idle.size() >= getPoolProperties().getMinIdle())) && unlocked.hasNext()) {
+            while ((ignoreMinSize || (getSize() > getPoolProperties().getMinIdle())) && unlocked.hasNext()) {
                 PooledConnection con = unlocked.next();
                 boolean setToNull = false;
                 try {
