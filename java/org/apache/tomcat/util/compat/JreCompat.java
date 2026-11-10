@@ -67,6 +67,7 @@ public class JreCompat {
     private static final boolean jre11Available;
     private static final boolean jre12Available;
     private static final boolean jre16Available;
+    private static final boolean jre17Available;
     private static final boolean jre19Available;
     private static final boolean jre20Available;
     private static final boolean jre21Available;
@@ -100,6 +101,7 @@ public class JreCompat {
             jre21Available = true;
             jre20Available = true;
             jre19Available = true;
+            jre17Available = true;
             jre16Available = true;
             jre12Available = true;
             jre11Available = true;
@@ -110,6 +112,7 @@ public class JreCompat {
             jre21Available = true;
             jre20Available = true;
             jre19Available = true;
+            jre17Available = true;
             jre16Available = true;
             jre12Available = true;
             jre11Available = true;
@@ -120,6 +123,7 @@ public class JreCompat {
             jre21Available = false;
             jre20Available = true;
             jre19Available = true;
+            jre17Available = true;
             jre16Available = true;
             jre12Available = true;
             jre11Available = true;
@@ -130,6 +134,18 @@ public class JreCompat {
             jre21Available = false;
             jre20Available = false;
             jre19Available = true;
+            jre17Available = true;
+            jre16Available = true;
+            jre12Available = true;
+            jre11Available = true;
+            jre9Available = true;
+        } else if (Jre17Compat.isSupported()) {
+            instance = new Jre17Compat();
+            jre22Available = false;
+            jre21Available = false;
+            jre20Available = false;
+            jre19Available = false;
+            jre17Available = true;
             jre16Available = true;
             jre12Available = true;
             jre11Available = true;
@@ -140,6 +156,7 @@ public class JreCompat {
             jre21Available = false;
             jre20Available = false;
             jre19Available = false;
+            jre17Available = false;
             jre16Available = true;
             jre12Available = true;
             jre11Available = true;
@@ -150,6 +167,7 @@ public class JreCompat {
             jre21Available = false;
             jre20Available = false;
             jre19Available = false;
+            jre17Available = false;
             jre16Available = false;
             jre12Available = true;
             jre11Available = true;
@@ -160,6 +178,7 @@ public class JreCompat {
             jre21Available = false;
             jre20Available = false;
             jre19Available = false;
+            jre17Available = false;
             jre16Available = false;
             jre12Available = false;
             jre11Available = true;
@@ -170,6 +189,7 @@ public class JreCompat {
             jre21Available = false;
             jre20Available = false;
             jre19Available = false;
+            jre17Available = false;
             jre16Available = false;
             jre12Available = false;
             jre11Available = false;
@@ -180,6 +200,7 @@ public class JreCompat {
             jre21Available = false;
             jre20Available = false;
             jre19Available = false;
+            jre17Available = false;
             jre16Available = false;
             jre12Available = false;
             jre11Available = false;
@@ -241,6 +262,11 @@ public class JreCompat {
 
     public static boolean isJre16Available() {
         return jre16Available;
+    }
+
+
+    public static boolean isJre17Available() {
+        return jre17Available;
     }
 
 
