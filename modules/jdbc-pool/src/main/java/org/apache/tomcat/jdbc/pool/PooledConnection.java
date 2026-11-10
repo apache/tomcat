@@ -359,7 +359,7 @@ public class PooledConnection implements PooledConnectionMBean {
                 // the null and turn the contract violation into an unrelated
                 // NullPointerException in the connection's diagnostic.
                 throw new SQLException(MessageFactory.get(
-                        "pooledConnection.xaDataSourceNullHandle", dataSourceIdentity(xds)));
+                        "pooledConnection.xaDataSourceNullHandle", objectIdentity(xds)));
             }
             // Keep the handle before obtaining the logical connection: the
             // physical connection is only closed when the handle is closed,
@@ -376,7 +376,7 @@ public class PooledConnection implements PooledConnectionMBean {
                 // Contract-violating provider: a handle without a logical
                 // connection is of no use either.
                 failure = new SQLException(
-                        MessageFactory.get("pooledConnection.xaDataSourceNullConnection", dataSourceIdentity(xds)));
+                        MessageFactory.get("pooledConnection.xaDataSourceNullConnection", objectIdentity(xds)));
             }
             if (failure != null) {
                 // Do not strand the handle if the logical connection
@@ -418,7 +418,7 @@ public class PooledConnection implements PooledConnectionMBean {
                 // surface later as a misleading validation failure, or as a
                 // null pointer when the default connection state is applied.
                 throw new SQLException(MessageFactory.get("pooledConnection.dataSourceNullConnection",
-                        dataSourceIdentity(ds)));
+                        objectIdentity(ds)));
             }
         } else if (poolProperties.getDataSource() instanceof javax.sql.ConnectionPoolDataSource) {
             javax.sql.ConnectionPoolDataSource ds = (javax.sql.ConnectionPoolDataSource) poolProperties.getDataSource();
@@ -428,7 +428,7 @@ public class PooledConnection implements PooledConnectionMBean {
                 // A provider must return a handle or throw; fail cleanly
                 // rather than dereferencing the missing handle.
                 throw new SQLException(MessageFactory.get(
-                        "pooledConnection.connectionPoolDataSourceNullHandle", dataSourceIdentity(ds)));
+                        "pooledConnection.connectionPoolDataSourceNullHandle", objectIdentity(ds)));
             }
             // Keep the handle before obtaining the logical connection: the
             // physical connection is only closed when the handle is closed,
@@ -446,7 +446,7 @@ public class PooledConnection implements PooledConnectionMBean {
                 // connection is of no use either.
                 failure = new SQLException(
                         MessageFactory.get("pooledConnection.connectionPoolDataSourceNullConnection",
-                                dataSourceIdentity(ds)));
+                                objectIdentity(ds)));
             }
             if (failure != null) {
                 // Do not strand the handle if the logical connection
@@ -474,16 +474,16 @@ public class PooledConnection implements PooledConnectionMBean {
     }
 
     /**
-     * The diagnostic identity of a third-party data source: its class and identity hash, never its {@code toString()},
-     * which may carry the configured URL or credentials.
+     * The diagnostic identity of a third-party object - a data source, driver or other provider handle: its class and
+     * identity hash, never its {@code toString()}, which may carry the configured URL, user name or credentials.
      *
-     * @param dataSource the data source, possibly {@code null}
+     * @param object the object, possibly {@code null}
      *
      * @return the identity text
      */
-    private static String dataSourceIdentity(Object dataSource) {
-        return dataSource == null ? "null" : dataSource.getClass().getName() + "@" +
-                Integer.toHexString(System.identityHashCode(dataSource));
+    private static String objectIdentity(Object object) {
+        return object == null ? "null" : object.getClass().getName() + "@" +
+                Integer.toHexString(System.identityHashCode(object));
     }
 
     /**
@@ -603,7 +603,7 @@ public class PooledConnection implements PooledConnectionMBean {
             // debug line above do; the driver's identity and the rest of the
             // URL stay readable.
             throw new SQLException(MessageFactory.get("pooledConnection.driverReturnedNull",
-                    driver, PoolProperties.maskCredentials(driverURL)));
+                    objectIdentity(driver), PoolProperties.maskCredentials(driverURL)));
         }
     }
 
