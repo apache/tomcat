@@ -1497,6 +1497,14 @@
       <add>
         Improvements to Japanese translations provided by tak7iji. (markt)
       </add>
+      <fix>
+        <bug>70262</bug>: Fix <code>service.bat</code> so <code>install
+        &lt;name&gt; --rename</code> renames the Windows service executables in
+        <code>CATALINA_HOME\bin</code>. <code>remove</code> now restores the
+        default executable names only when the service name differs from the
+        default. Based on pull request <pr>1095</pr> provided by StrongOx.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
@@ -2686,6 +2694,13 @@
         Update both the minimum and recommended version for Tomcat Native 1.x to
         1.3.8. (markt)
       </update>
+      <fix>
+        Update <code>StoreRegistry</code> to dynamically load optional clustering
+        classes rather than statically referencing them. This matches the pattern
+        used in <code>Catalina.addClusterRuleSet()</code> and prevents
+        <code>NoClassDefFoundError</code> when <code>StoreConfigLifecycleListener</code>
+        is configured but clustering classes are not available. (csutherl)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -2897,6 +2912,20 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>69995</bug>: Make dependent ordering predictable. Patch submitted
+        by Jan Luehe. (remm)
+      </fix>
+      <fix>
+        <bug>70001</bug>: Ensure JSP compilation is reproducible when
+        dependencies exist for tag files and tag libraries located on the class
+        path but outside of the web application. <pr>992</pr> submitted by Jan
+        Luehe. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <fix>
@@ -2969,20 +2998,6 @@
       <fix>
         Align OpenSSl FFM behaviour with Tomcat Native for various OCSP edge
         cases. (markt)
-      </fix>
-    </changelog>
-  </subsection>
-  <subsection name="Jasper">
-    <changelog>
-      <fix>
-        <bug>69995</bug>: Make dependent ordering predictable. Patch submitted
-        by Jan Luehe. (remm)
-      </fix>
-      <fix>
-        <bug>70001</bug>: Ensure JSP compilation is reproducible when
-        dependencies exist for tag files and tag libraries located on the class
-        path but outside of the web application. <pr>992</pr> submitted by Jan
-        Luehe. (markt)
       </fix>
     </changelog>
   </subsection>
@@ -3067,13 +3082,6 @@
         Log an information message if an APR Connector is used, recommending
         that the appropriate NIO Connector is used instead. (markt)
       </add>
-      <fix>
-        Update <code>StoreRegistry</code> to dynamically load optional clustering
-        classes rather than statically referencing them. This matches the pattern
-        used in <code>Catalina.addClusterRuleSet()</code> and prevents
-        <code>NoClassDefFoundError</code> when <code>StoreConfigLifecycleListener</code>
-        is configured but clustering classes are not available. (csutherl)
-      </fix>
       <fix>
         Respect the value for the <code>jdk.tls.namedGroups</code> system
         property as the default value for the configured group list on the
@@ -3569,6 +3577,9 @@
         Fix AJP message length check. Pull request <pr>916</pr> by Joshua
         Rogers. (remm)
       </fix>
+      <fix>
+        Various OCSP processing issues in the OpenSSL FFM code. (dsoumis)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -3648,9 +3659,6 @@
         <bug>69848</bug>: Fix copy/paste errors in 9.0.110 that meant DELETE
         requests received via the AJP connector were processed as OPTIONS
         requests and PROPFIND requests were processed as TRACE. (markt)
-      </fix>
-      <fix>
-        Various OCSP processing issues in the OpenSSL FFM code. (dsoumis)
       </fix>
     </changelog>
   </subsection>
@@ -4842,6 +4850,14 @@
         Add <code>DataSource</code> based property storage for the
         <code>WebdavServlet</code>. (remm)
       </add>
+      <fix>
+        Send 415 response to WebDAV <code>MKCOL</code> operations that include
+        a request body since this is optional and unsupported. (remm)
+      </fix>
+      <fix>
+        WebDAV <code>DELETE</code> should remove any existing lock on
+        successfully deleted resources. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -4995,19 +5011,11 @@
         (remm)
       </fix>
       <fix>
-        Send 415 response to WebDAV <code>MKCOL</code> operations that include
-        a request body since this is optional and unsupported. (remm)
-      </fix>
-      <fix>
         Enforce <code>DAV:</code> namespace on WebDAV XML elements. (remm)
       </fix>
       <fix>
         Do not allow a new WebDAV lock on a child resource if a parent
         collection is locked (RFC 4918 section 6.1). (remm)
-      </fix>
-      <fix>
-        WebDAV <code>DELETE</code> should remove any existing lock on
-        successfully deleted resources. (remm)
       </fix>
       <update>
         Remove WebDAV lock null support in accordance with RFC 4918 section 7.3
@@ -5996,6 +6004,12 @@
         will scale back to the configured <code>minSpareThreads</code> size.
         (remm)
       </fix>
+      <fix>
+        Correct a regression in the support for user provided
+        <code>SSLContext</code> instances that broke the
+        <code>org.apache.catalina.security.TLSCertificateReloadListener</code>.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -6039,6 +6053,10 @@
       <add>
         Improvements to Chinese translations by leeyazhou. (remm)
       </add>
+      <fix>
+        <bug>57130</bug>: Allow digest.(sh|bat) to accept password from a file
+        or stdin. (csutherl/schultz)
+      </fix>
     </changelog>
   </subsection>
 </section>
@@ -6091,12 +6109,6 @@
         added to the backlog immediately rather than waiting until the write
         attempt for the remaining content. (markt)
       </fix>
-      <fix>
-        Correct a regression in the support for user provided
-        <code>SSLContext</code> instances that broke the
-        <code>org.apache.catalina.security.TLSCertificateReloadListener</code>.
-        (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -6125,10 +6137,6 @@
       <add>
         Improvements to Japanese translations by tak7iji. (markt)
       </add>
-      <fix>
-        <bug>57130</bug>: Allow digest.(sh|bat) to accept password from a file
-        or stdin. (csutherl/schultz)
-      </fix>
     </changelog>
   </subsection>
 </section>
@@ -7155,6 +7163,10 @@
       <update>
         Update Jacoco to 0.8.10. (markt)
       </update>
+      <fix>
+        Enhance PEMFile to load from an InputStream. Patch provided by
+        Romain Manni-Bucau. (schultz)
+      </fix>
     </changelog>
   </subsection>
 </section>
@@ -7335,10 +7347,6 @@
       <update>
         Update Jacoco to 0.8.9. (markt)
       </update>
-      <fix>
-        Enhance PEMFile to load from an InputStream. Patch provided by
-        Romain Manni-Bucau. (schultz)
-      </fix>
     </changelog>
   </subsection>
 </section>
@@ -7626,6 +7634,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        <bug>66346</bug>: Ensure all JDBC pool JARs are reproducible. Pull
+        request <pr>566</pr> provided by John Neffenger. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <scode>
@@ -7725,14 +7741,6 @@
       <fix>
         <bug>66325</bug>: Fix concurrency issue in evaluation of expression
         language containing lambda expressions. (markt)
-      </fix>
-    </changelog>
-  </subsection>
-  <subsection name="jdbc-pool">
-    <changelog>
-      <fix>
-        <bug>66346</bug>: Ensure all JDBC pool JARs are reproducible. Pull
-        request <pr>566</pr> provided by John Neffenger. (markt)
       </fix>
     </changelog>
   </subsection>
@@ -7981,6 +7989,11 @@
         incorrect check when matching HTTP/2 preface. Submitted by 刘文章.
         (lihan)
       </fix>
+      <scode>
+        Deprecated the <code>jvmRoute</code> system property used to configure a
+        default value for the <code>jvmRoute</code> attribute of an Engine.
+        (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -8118,11 +8131,6 @@
         using Tomcat Native 1.2.34 onwards built with OpenSSL 3.0.x onwards.
         (markt)
       </add>
-      <scode>
-        Deprecated the <code>jvmRoute</code> system property used to configure a
-        default value for the <code>jvmRoute</code> attribute of an Engine.
-        (markt)
-      </scode>
       <fix>
         Fix duplicate Poller registration with HTTP/2, NIO and async IO that
         could cause HTTP/2 connections to unexpectedly fail. (markt)
@@ -8855,6 +8863,10 @@
         Narrow the scope of the logging of invalid cookie headers to just the
         invalid cookie rather than the whole cookie header. (markt)
       </fix>
+      <fix>
+        Avoid a potential deadlock during the concurrent processing of incoming
+        HTTP/2 frames for a stream and that stream being reset. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -9008,8 +9020,9 @@
         authorities are configured and reject all client certificates. (markt)
       </add>
       <fix>
-        Avoid a potential deadlock during the concurrent processing of incoming
-        HTTP/2 frames for a stream and that stream being reset. (markt)
+        Fix a potential JVM crash when using the APR/Native connector with TLS.
+        A crash could occur if the connector was stopped whilst a connection was
+        performing a TLS handshake. (markt)
       </fix>
     </changelog>
   </subsection>
@@ -9075,11 +9088,6 @@
         open a server socket as continuing in this case will trigger a JVM crash.
         (markt)
       </fix>
-      <fix>
-        Fix a potential JVM crash when using the APR/Native connector with TLS.
-        A crash could occur if the connector was stopped whilst a connection was
-        performing a TLS handshake. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -9110,6 +9118,18 @@
         <code>KubernetesMembershipProvider</code> so that the missing attribute
         is clear to the user. PR provided by Hal Deadman. (markt)
       </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        <bug>65661</bug>: Update the internal fork of Apache Commons FileUpload
+        to 33d2d79 (2021-09-01, 2.0-SNAPSHOT). Refactoring and code clean-up. As
+        a result of Commons File Upload now using
+        <code>java.nio.file.Files</code>, applications using multi-part uploads
+        need to ensure that the JVM is configured with sufficient direct memory
+        to store all in progress multi-part uploads. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
@@ -9197,6 +9217,12 @@
       <fix>
         Clarify the JASPIC configuration options in the documentation web
         application. (markt)
+      </fix>
+      <fix>
+        <bug>65136</bug>: Remove the restriction that prevented the Manager web
+        application deploying different web applications in parallel. This
+        required some refactoring, most notably to
+        <code>HostConfig.check()</code> and how it is used. (markt)
       </fix>
     </changelog>
   </subsection>
@@ -9324,14 +9350,6 @@
         Add Apache Derby 10.14.2.0 to the testsuite dependencies, for JDBC
         and DataSource testing. (remm)
       </update>
-      <add>
-        <bug>65661</bug>: Update the internal fork of Apache Commons FileUpload
-        to 33d2d79 (2021-09-01, 2.0-SNAPSHOT). Refactoring and code clean-up. As
-        a result of Commons File Upload now using
-        <code>java.nio.file.Files</code>, applications using multi-part uploads
-        need to ensure that the JVM is configured with sufficient direct memory
-        to store all in progress multi-part uploads. (markt)
-      </add>
       <add>
         Update the internal fork of Apache Commons Pool to 2.11.1 (2021-08-17).
         Improvements, code clean-up and refactoring. (markt)
@@ -9737,6 +9755,11 @@
         <code>HttpServlet</code> to correctly handle responses generated using
         the Servlet non-blocking API. (markt)
       </fix>
+      <fix>
+        Improve the <code>SSLValve</code> so it is able to handle escaped
+        client certificate headers from Nginx. Based on a patch by Florent
+        Guillaume. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -9866,14 +9889,6 @@
         Update the packaged version of the Tomcat Native Library to 1.2.30. Also
         update the minimum recommended version to 1.2.30. (markt)
       </update>
-      <fix>
-        <bug>70262</bug>: Fix <code>service.bat</code> so <code>install
-        &lt;name&gt; --rename</code> renames the Windows service executables in
-        <code>CATALINA_HOME\bin</code>. <code>remove</code> now restores the
-        default executable names only when the service name differs from the
-        default. Based on pull request <pr>1095</pr> provided by StrongOx.
-        (markt)
-      </fix>
     </changelog>
   </subsection>
 </section>
@@ -9906,11 +9921,6 @@
         deployment of a web application that is being deployed by the Manager
         resulting in one of the deployments failing and errors being reported.
         (markt)
-      </fix>
-      <fix>
-        Improve the <code>SSLValve</code> so it is able to handle escaped
-        client certificate headers from Nginx. Based on a patch by Florent
-        Guillaume. (markt)
       </fix>
     </changelog>
   </subsection>
@@ -10190,16 +10200,6 @@
         Correct handling of write errors during non-blocking I/O to ensure that
         the associated <code>AsyncContext</code> was closed down correctly.
         (markt)
-      </fix>
-    </changelog>
-  </subsection>
-  <subsection name="Web applications">
-    <changelog>
-      <fix>
-        <bug>65136</bug>: Remove the restriction that prevented the Manager web
-        application deploying different web applications in parallel. This
-        required some refactoring, most notably to
-        <code>HostConfig.check()</code> and how it is used. (markt)
       </fix>
     </changelog>
   </subsection>
@@ -10650,6 +10650,11 @@
         <bug>64848</bug>: Fix a variation of this memory leak when a write I/O
         error occurs on a non-container thread. (markt)
       </fix>
+      <fix>
+        <bug>64848</bug>: Fix a potential issue where the write lock for a
+        WebSocket connection may not be released if an exception occurs during
+        the write. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
@@ -11045,11 +11050,6 @@
         <code>https</code>. Ensure that such requests are not rejected. PR
         provided by Ronny Perinke. (markt)
       </fix>
-      <fix>
-        <bug>64848</bug>: Fix a potential issue where the write lock for a
-        WebSocket connection may not be released if an exception occurs during
-        the write. (markt)
-      </fix>
       <add>
         <bug>64644</bug>: Add support for a read idle timeout and a write idle
         timeout to the WebSocket session via custom properties in the user
@@ -11132,6 +11132,9 @@
         Update the packaged version of the Tomcat Native Library to 1.2.25.
         (markt)
       </update>
+      <fix>
+        <bug>64548</bug>: Generate JPMS metadata. (rotty3000)
+      </fix>
     </changelog>
   </subsection>
 </section>
@@ -11287,9 +11290,6 @@
         Improve the quality and expand the coverage of the French translations
         provided with Apache Tomcat. (remm)
       </add>
-      <fix>
-        <bug>64548</bug>: Generate JPMS metadata. (rotty3000)
-      </fix>
     </changelog>
   </subsection>
 </section>
@@ -12019,6 +12019,10 @@
         could be missing in the access log for an HTTP/2 request where the
         connection was closed unexpectedly. (markt)
       </fix>
+      <fix>
+       Refactor JMX remote RMI registry creation. This is the fix for
+       CVE-2019-12418. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -12078,6 +12082,10 @@
         Add a new attribute, <code>allowedRequestAttributesPattern</code> to
         the AJP/1.3 Connector. Requests with unrecognised attributes will be
         blocked with a 403. (markt)
+      </add>
+      <add>
+        When reporting / logging invalid HTTP headers encode any non-printing
+        characters using the 0xNN form. (markt)
       </add>
     </changelog>
   </subsection>
@@ -12193,6 +12201,12 @@
         the authenticated Principal is not cached in the session when caching is
         disabled. This is the fix for CVE-2019-17563. (markt/kkolinko)
       </fix>
+      <add>
+        Improvement to CsrfPreventionFilter: expose the latest available nonce
+        as a request attribute; expose the expected nonce request parameter
+        name as a context attribute.
+        (schultz)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -12230,10 +12244,6 @@
         exception occurs for the operation, and add a boolean to make sure the
         completion handler is called only once. (remm/markt)
       </fix>
-      <add>
-        When reporting / logging invalid HTTP headers encode any non-printing
-        characters using the 0xNN form. (markt)
-      </add>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
@@ -12323,20 +12333,6 @@
   </subsection>
 </section>
 <section name="Tomcat 9.0.29 (markt)" rtext="2019-11-21">
-  <subsection name="Catalina">
-    <changelog>
-      <fix>
-       Refactor JMX remote RMI registry creation. This is the fix for
-       CVE-2019-12418. (remm)
-      </fix>
-      <add>
-        Improvement to CsrfPreventionFilter: expose the latest available nonce
-        as a request attribute; expose the expected nonce request parameter
-        name as a context attribute.
-        (schultz)
-      </add>
-    </changelog>
-  </subsection>
   <subsection name="Coyote">
     <changelog>
       <add>
@@ -12748,6 +12744,10 @@
         <code>accept-encoding</code> header to determine if gzip encoding is
         supported including only parsing the first header found. (markt)
       </fix>
+      <fix>
+        Fix typo in UTF-32LE charset name. Patch by zhanhb via Github.
+        (fschumacher)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -12842,6 +12842,14 @@
         were used with older, no longer supported versions of Windows that
         could not support larger pollsets. (markt)
       </scode>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        <bug>62696</bug>: The digital signature for the Windows installer now
+        uses SHA-256 for hashes. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
@@ -13017,10 +13025,6 @@
         directory to local administrators, Local System and Local Service.
         (markt)
       </fix>
-      <update>
-        <bug>62696</bug>: The digital signature for the Windows installer now
-        uses SHA-256 for hashes. (markt)
-      </update>
       <add>
         <bug>63285</bug>: Add an option to <code>service.bat</code> so that when
         installing a Windows service, the name of the executables used by the
@@ -13110,6 +13114,10 @@
       <update>
         Update the recommended minimum Tomcat Native version to 1.2.23. (markt)
       </update>
+      <fix>
+        Fix a potential concurrency issue in the StringCache identified by
+        Coverity scan. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -13122,10 +13130,6 @@
       <fix>
         <bug>63523</bug>: Restore SSLUtilBase methods as protected to preserve
         compatibility. (remm)
-      </fix>
-      <fix>
-        Fix typo in UTF-32LE charset name. Patch by zhanhb via Github.
-        (fschumacher)
       </fix>
       <fix>
         Once a URI is identified as invalid don't attempt to process it further.
@@ -13175,6 +13179,10 @@
         support. Also include a new documentation page describing how
         to use it. (remm)
       </add>
+      <update>
+        Start Graal native image compatibility, using the tomcat-maven
+        packaging. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>
@@ -13230,6 +13238,10 @@
         <code>RequestDispatcher</code>. The requested target path is logged as a
         warning since this is an application error. (markt)
       </add>
+      <fix>
+        Encode the output of the SSI <code>printenv</code> command. This is the
+        fix for CVE-2019-0221. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -13364,10 +13376,6 @@
       <update>
         Switch from FindBugs to SpotBugs. (fschumacher)
       </update>
-      <update>
-        Start Graal native image compatibility, using the tomcat-maven
-        packaging. (remm)
-      </update>
       <fix>
         <bug>63403</bug>: Fix TestHttp2InitialConnection test failures when
         running with a non-English locale. (kkolinko)
@@ -13412,10 +13420,6 @@
       <fix>
         Fix a potential resource leak when executing CGI scripts from a WAR
         file. Identified by Coverity scan. (markt)
-      </fix>
-      <fix>
-        Fix a potential concurrency issue in the StringCache identified by
-        Coverity scan. (markt)
       </fix>
       <fix>
         Fix a potential concurrency issue in the main Sendfile thread of the APR
@@ -13677,10 +13681,6 @@
         <bug>63311</bug>: Add support for https URLs to the local resolver within
         Tomcat used to resolve standard XML DTDs and schemas when Tomcat is
         configured to validate XML configuration files such as web.xml. (markt)
-      </fix>
-      <fix>
-        Encode the output of the SSI <code>printenv</code> command. This is the
-        fix for CVE-2019-0221. (markt)
       </fix>
       <scode>
         Use constants for SSI encoding values. (markt)
@@ -14288,6 +14288,9 @@
         <bug>63103</bug>: Remove the unused source.jsp file and associated tag
         from the examples web application as it is no longer used. (markt)
       </fix>
+      <fix>
+        Unify letter case of the word 'How-To' in the webapps (csutherl)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
@@ -14524,9 +14527,6 @@
       <fix>
         <bug>62918</bug>: Filter out subtype mbeans to avoid breaking the
         connector status page. (remm)
-      </fix>
-      <fix>
-        Unify letter case of the word 'How-To' in the webapps (csutherl)
       </fix>
     </changelog>
   </subsection>
@@ -14997,6 +14997,10 @@
         using the closer.lua script to avoid failures due to HTTPS to HTTP
         redirects. (rjung)
       </fix>
+      <add>
+        Add managed connections package to the package renamed DBCP 2 to provide
+        a complete DBCP 2 in Tomcat. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
@@ -15226,6 +15230,9 @@
         Correct various spelling errors throughout the source code and
         documentation. Patch provided by Kazuhiro Sera. (markt)
       </fix>
+      <add>
+        <bug>52381</bug>: Add OSGi metadata to JAR files. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
@@ -15348,6 +15355,10 @@
         Make <code>JAASRealm</code> mis-configuration more obvious by requiring
         the authenticated Subject to include at least one Principal of a type
         specified by <code>userClassNames</code>. (markt)
+      </fix>
+      <fix>
+        Improve handling of overflow in the UTF-8 decoder with supplementary
+        characters. (markt)
       </fix>
     </changelog>
   </subsection>
@@ -15520,9 +15531,6 @@
       <fix>
         Ensure that Apache Tomcat may be built from source with Java 11. (markt)
       </fix>
-      <add>
-        <bug>52381</bug>: Add OSGi metadata to JAR files. (markt)
-      </add>
       <fix>
         <bug>62391</bug>: Remove references to <code>javaw.exe</code> as this
         file is not required by Tomcat and the references prevent the use of the
@@ -15593,10 +15601,6 @@
         behaviour is enabled by default and configurable via the new Context
         attribute <code>allowMultipleLeadingForwardSlashInPath</code>. (markt)
       </add>
-      <fix>
-        Improve handling of overflow in the UTF-8 decoder with supplementary
-        characters. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -15799,10 +15803,6 @@
       </fix>
       <add>
         Always report the OS's umask when launching the JVM. (schultz)
-      </add>
-      <add>
-        Add managed connections package to the package renamed DBCP 2 to provide
-        a complete DBCP 2 in Tomcat. (remm)
       </add>
     </changelog>
   </subsection>
