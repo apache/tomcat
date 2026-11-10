@@ -486,15 +486,28 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                 // Always add the trap interceptor to the mix
                 definitions.add(new InterceptorDefinition(TrapException.class));
                 for (int i = 0; i < interceptorValues.length; i++) {
-                    int propIndex = interceptorValues[i].indexOf('(');
-                    int endIndex = interceptorValues[i].indexOf(')');
+                    String segment = interceptorValues[i];
+                    int propIndex = segment.indexOf('(');
                     String name;
                     String propsAsString = null;
-                    if (propIndex < 0 || endIndex < 0 || endIndex <= propIndex) {
-                        name = interceptorValues[i].trim();
+                    if (propIndex < 0) {
+                        name = segment.trim();
+                        if (name.indexOf(')') >= 0) {
+                            throw invalidInterceptorDefinition(segment);
+                        }
                     } else {
-                        name = interceptorValues[i].substring(0, propIndex).trim();
-                        propsAsString = interceptorValues[i].substring(propIndex + 1, endIndex);
+                        int endIndex = findClosingParenthesis(segment, propIndex);
+                        if (endIndex < 0) {
+                            throw invalidInterceptorDefinition(segment);
+                        }
+                        if (!segment.substring(endIndex + 1).trim().isEmpty()) {
+                            // Silently ignoring text after the closing
+                            // parenthesis would apply a configuration other
+                            // than the one written.
+                            throw invalidInterceptorDefinition(segment);
+                        }
+                        name = segment.substring(0, propIndex).trim();
+                        propsAsString = segment.substring(propIndex + 1, endIndex);
                     }
                     if (name.isEmpty()) {
                         // A leading or doubled separator, or a segment that
@@ -512,9 +525,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                     }
                     InterceptorDefinition definition = new InterceptorDefinition(name);
                     if (propsAsString != null) {
-                        String[] props = propsAsString.split(",");
-                        for (int j = 0; j < props.length; j++) {
-                            String prop = props[j];
+                        for (String prop : splitInterceptorProperties(propsAsString)) {
                             if (prop.trim().isEmpty()) {
                                 // An empty segment comes from Name(), Name( )
                                 // or a redundant separator: there is no property
@@ -526,7 +537,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                             if (pidx < 0) {
                                 throw new IllegalArgumentException(MessageFactory.get(
                                         "poolProperties.invalidInterceptorProperty", prop.trim(),
-                                        maskInterceptorCredentials(interceptorValues[i])));
+                                        maskInterceptorCredentials(segment)));
                             }
                             String propName = prop.substring(0, pidx).trim();
                             String propValue = prop.substring(pidx + 1).trim();
@@ -539,6 +550,76 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             }
         }
         return interceptors.clone();
+    }
+
+
+    /**
+     * Finds the parenthesis matching the one at {@code openIndex}, honoring
+     * nested parentheses inside a property value.
+     *
+     * @param value     the segment containing the opening parenthesis
+     * @param openIndex the index of the opening parenthesis
+     *
+     * @return the index of the matching closing parenthesis, or {@code -1}
+     */
+    private static int findClosingParenthesis(String value, int openIndex) {
+        int depth = 0;
+        for (int i = openIndex; i < value.length(); i++) {
+            char c = value.charAt(i);
+            if (c == '(') {
+                depth++;
+            } else if (c == ')') {
+                depth--;
+                if (depth == 0) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
+
+    /**
+     * Splits an interceptor property list at commas that are not inside
+     * parentheses, so a value may carry a parenthesized list containing
+     * commas. Empty segments are kept for the caller to tolerate.
+     *
+     * @param props the property list text
+     *
+     * @return the property segments
+     */
+    private static List<String> splitInterceptorProperties(String props) {
+        List<String> segments = new ArrayList<>();
+        int start = 0;
+        int depth = 0;
+        for (int i = 0; i < props.length(); i++) {
+            char c = props.charAt(i);
+            if (c == '(') {
+                depth++;
+            } else if (c == ')' && depth > 0) {
+                depth--;
+            } else if (c == ',' && depth == 0) {
+                segments.add(props.substring(start, i));
+                start = i + 1;
+            }
+        }
+        segments.add(props.substring(start));
+        return segments;
+    }
+
+
+    /**
+     * Builds the failure for an interceptor definition whose parentheses or
+     * trailing text cannot be parsed, with credentials in the definition
+     * masked.
+     *
+     * @param segment the malformed definition segment
+     *
+     * @return the named failure
+     */
+    private static IllegalArgumentException invalidInterceptorDefinition(String segment) {
+        return new IllegalArgumentException(MessageFactory.get(
+                "poolProperties.invalidInterceptorDefinition", maskInterceptorCredentials(segment)));
     }
 
 
