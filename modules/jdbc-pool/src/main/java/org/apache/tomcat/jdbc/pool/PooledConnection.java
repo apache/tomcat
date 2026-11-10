@@ -548,14 +548,28 @@ public class PooledConnection implements PooledConnectionMBean {
             getAttributes().put(PROP_PASSWORD, pwd);
         }
         // A null database-properties collection becomes an empty one: the URL
-        // and credentials are enough for the driver. The copy is taken under
-        // the configuration's monitor so a concurrent reconfigure cannot hand
-        // the driver a torn mix of two generations.
+        // and credentials are enough for the driver. The configured
+        // connectionProperties string is a source of driver properties in its
+        // own right and must still reach the driver, so it is parsed here when
+        // there is no collection to hold its pairs; the string and the null
+        // collection are read under the same monitor, so the driver cannot
+        // receive a torn mix of two configurations.
         Properties properties;
         synchronized (poolProperties) {
             Properties dbProperties = poolProperties.getDbProperties();
-            properties =
-                    dbProperties == null ? new Properties() : PoolUtilities.clone(dbProperties);
+            if (dbProperties == null) {
+                try {
+                    properties = PoolProperties.getProperties(
+                            poolProperties.getConnectionProperties(), new Properties());
+                } catch (RuntimeException x) {
+                    SQLException ex = new SQLException(
+                            MessageFactory.get("pooledConnection.invalidConnectionProperties"));
+                    ex.initCause(x);
+                    throw ex;
+                }
+            } else {
+                properties = PoolUtilities.clone(dbProperties);
+            }
         }
         if (usr != null) {
             properties.setProperty(PROP_USER, usr);
