@@ -503,16 +503,22 @@ public class DataSourceProxy implements PoolConfiguration {
 
 
     /**
-     * Replaces the configuration this data source hands out. A pool that already exists keeps the configuration it was
-     * built from; only a pool created afterwards uses the replacement. The one thing the replacement reaches on a
-     * running pool is its background maintenance, which is judged from this class's current configuration.
+     * Replaces the configuration this data source hands out, before the pool is created. Once a pool exists, its
+     * borrow, return, validation, cleaner and configuration surfaces all operate on the configuration the pool was
+     * built from; replacing the data source's configuration at that point would leave the data source and its setters
+     * writing a second configuration object that the live pool does not use. The setter is therefore rejected after
+     * the pool has started and after the data source has closed, like the other start-time properties.
      *
      * @param poolProperties The new pool configuration
+     *
+     * @throws NullPointerException if the configuration is null
+     * @throws UnsupportedOperationException if the pool has already been created or this data source has been closed
      */
-    public void setPoolProperties(PoolConfiguration poolProperties) {
+    public synchronized void setPoolProperties(PoolConfiguration poolProperties) {
         if (poolProperties == null) {
             throw new NullPointerException(MessageFactory.get("dataSourceProxy.poolConfigurationNull"));
         }
+        checkPoolNotStarted("poolProperties");
         this.poolProperties = poolProperties;
     }
 
