@@ -815,6 +815,12 @@ public class PooledConnection implements PooledConnectionMBean {
         xaConnection = null;
         cpdsConnection = null;
         lastConnected = -1;
+        // The validation timestamp belongs to the session that was just given
+        // up. Clearing it here keeps the published value at the documented 0
+        // for a connection whose current session has not been validated, even
+        // across the reconnect window while the per-connection MBean stays
+        // registered.
+        lastValidated = 0;
         // The chain's teardown reset is delivered once, by the release that
         // clears the handler after it has freed the pool slot - see
         // ConnectionPool.release(). The disconnect event above is a separate
@@ -1510,7 +1516,7 @@ public class PooledConnection implements PooledConnectionMBean {
      * Returns the timestamp at which the last successful validation completed on the current physical session. While
      * the session has not been validated it reports 0, so a validation inherited from the session a reconnect replaced
      * cannot be mistaken for one of this session. Before any session has been established, it reports the time this
-     * pooled connection was created.
+     * pooled connection was created; disconnecting the session clears the timestamp with it.
      *
      * @return the timestamp at which the last successful validation completed as defined by
      *             {@link System#currentTimeMillis()}, or 0 while the current session has not been validated
