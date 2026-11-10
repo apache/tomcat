@@ -1135,6 +1135,11 @@ public class DataSourceProxy implements PoolConfiguration {
      * Returns the connection properties with any credential they carry masked out, so the data source's own bean/JMX
      * surface does not expose a password in cleartext. The write is not masked: {@link #setConnectionProperties(String)}
      * takes the string as it is meant to reach the driver. Use {@link #getPoolProperties()} for the raw value.
+     * <p>
+     * The masked value is a display value, not a safe value to write back: the ordinary read-modify-write replaces the
+     * credential with the mask and leaves the pool unable to authenticate. Change the credential through
+     * {@link #setPassword(String)} and {@link #setUsername(String)}, or read the raw value from
+     * {@link #getPoolProperties()}.
      * {@inheritDoc}
      */
     @Override
@@ -1197,6 +1202,10 @@ public class DataSourceProxy implements PoolConfiguration {
     /**
      * Returns the interceptor configuration with any credential its definitions carry masked out, so the data source's
      * own bean/JMX surface does not expose a password in cleartext. Use {@link #getPoolProperties()} for the raw value.
+     * <p>
+     * The masked value is a display value, not a safe value to write back: the ordinary read-modify-write installs the
+     * mask into a definition's parameter list and can break the interceptor on the next chain build. Read the raw value
+     * from {@link #getPoolProperties()} before writing the configuration back.
      * {@inheritDoc}
      */
     @Override
@@ -1276,7 +1285,13 @@ public class DataSourceProxy implements PoolConfiguration {
     /**
      * Returns the JDBC URL with any credential it carries masked out, so the data source's own bean/JMX surface does
      * not expose a password in cleartext. The write is not masked: {@link #setUrl(String)} takes the URL as it is meant
-     * to reach the driver. Use {@link #getPoolProperties()} for the raw value. {@inheritDoc}
+     * to reach the driver. Use {@link #getPoolProperties()} for the raw value.
+     * <p>
+     * The masked value is a display value, not a safe value to write back: the ordinary read-modify-write replaces the
+     * credential with the mask and leaves the pool unable to authenticate. Change the credential through
+     * {@link #setPassword(String)} and {@link #setUsername(String)}, or read the raw value from
+     * {@link #getPoolProperties()}.
+     * {@inheritDoc}
      */
     @Override
     public String getUrl() {

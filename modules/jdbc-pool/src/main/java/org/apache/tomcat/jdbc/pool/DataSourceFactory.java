@@ -55,10 +55,12 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  * blank leaves its property at the {@link PoolProperties} default, and a value the
  * property cannot take fails the lookup with an exception naming the attribute
  * instead of being silently ignored. The legacy settings
- * {@code numTestsPerEvictionRun}, {@code accessToUnderlyingConnectionAllowed},
- * {@code poolPreparedStatements} and {@code maxOpenPreparedStatements} are the
- * exception: they are accepted for configuration compatibility but have no effect,
- * so a non-blank value is reported with a warning rather than failing the lookup.
+ * {@code poolPreparedStatements} and {@code maxOpenPreparedStatements} have no
+ * effect and are accepted for configuration compatibility: a non-blank value is
+ * reported with a warning. The legacy settings {@code numTestsPerEvictionRun} and
+ * {@code accessToUnderlyingConnectionAllowed} are reported with the same warning but
+ * their value is still applied through the strict rule, so a value those properties
+ * cannot take warns and then fails the lookup.
  * </p>
  */
 public class DataSourceFactory implements ObjectFactory {
@@ -631,6 +633,9 @@ public class DataSourceFactory implements ObjectFactory {
             }
         }
 
+        boolean blankPasswordAttribute = isBlankAttribute(properties.getProperty(PROP_PASSWORD));
+        boolean blankUsernameAttribute = isBlankAttribute(properties.getProperty(PROP_USERNAME));
+
         value = properties.getProperty(PROP_PASSWORD);
         if (value != null && !value.trim().isEmpty()) {
             // A stored empty value would go into the driver properties as an
@@ -758,6 +763,18 @@ public class DataSourceFactory implements ObjectFactory {
             poolProperties.setConnectionProperties(null);
         } else {
             poolProperties.setDbProperties(new Properties());
+        }
+
+        // A blank credential attribute means the property has no credential.
+        // connectionProperties is parsed after the attribute itself and can
+        // contribute the same credential pair, so clearing it here - after
+        // that string has been applied - is what makes the blank attribute
+        // win over the string it never sees.
+        if (blankPasswordAttribute) {
+            poolProperties.setPassword(null);
+        }
+        if (blankUsernameAttribute) {
+            poolProperties.setUsername(null);
         }
 
         if (poolProperties.getUsername() != null) {
@@ -931,6 +948,17 @@ public class DataSourceFactory implements ObjectFactory {
             }
         }
         return poolProperties;
+    }
+
+    /**
+     * Whether the attribute was supplied but carries no value.
+     *
+     * @param value the attribute value, possibly {@code null}
+     *
+     * @return {@code true} when the attribute is present and blank
+     */
+    private static boolean isBlankAttribute(String value) {
+        return value != null && value.trim().isEmpty();
     }
 
     /**

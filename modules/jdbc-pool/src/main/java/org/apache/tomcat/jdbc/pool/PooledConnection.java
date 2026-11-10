@@ -1688,7 +1688,8 @@ public class PooledConnection implements PooledConnectionMBean {
     /**
      * Releases the MBeans published for this connection and for the interceptors of its chain, without releasing the
      * physical session. The pool uses this when its own MBean is released while the pool stays live: the connection
-     * and its chain remain usable, and a later borrow or reconnect can publish them again.
+     * and its chain remain usable, and a later reconnect, or the sweep that runs when the pool's own MBean is registered
+     * again, can publish them again. An ordinary borrow does not publish a connection MBean.
      */
     public void unregisterMBean() {
         synchronized (this) {
