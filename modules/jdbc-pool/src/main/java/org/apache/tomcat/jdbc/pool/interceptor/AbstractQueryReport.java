@@ -103,7 +103,11 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      *                  {@link AbstractCreateStatementInterceptor#isExecute(Method, boolean)}
      * @param start the wall clock time the query execution started
      * @param delta the time the execution took before it failed, measured with the monotonic clock
-     * @param t     the exception that happened
+     * @param t     the throwable the invocation raised; when it is an {@link java.lang.reflect.InvocationTargetException}
+     *                  the driver's exception is its cause, and that cause is what the application receives. A custom
+     *                  report hook that examines {@code t} should unwrap it with
+     *                  {@link org.apache.tomcat.jdbc.pool.util.ExceptionUtils#unwrapInvocationTargetException(Throwable)}
+     *                  to see the driver's exception rather than the reflective wrapper
      *
      * @return - the SQL that was executed or the string &quot;batch&quot; if it was a batch execution, or {@code null}
      *             if the invocation carries no SQL string

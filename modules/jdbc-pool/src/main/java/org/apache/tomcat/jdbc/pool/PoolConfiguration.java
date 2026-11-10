@@ -93,6 +93,9 @@ public interface PoolConfiguration {
      * string is [propertyName=property;] <br>
      * NOTE - The "user" and "password" properties will be passed explicitly, so they do not need to be included here.
      * The default value is null.
+     * <p>
+     * A public bean or JMX view of this configuration may return a masked copy of the value, so a credential the
+     * configured string carries is not exposed in cleartext; such a copy is for display and is not safe to write back.
      *
      * @return the connection properties
      */
@@ -118,6 +121,10 @@ public interface PoolConfiguration {
     /**
      * Returns the database properties that are passed into the {@link java.sql.Driver#connect(String, Properties)}
      * method.
+     * <p>
+     * A public bean or JMX view of this configuration may return a copy with its credential entries removed, so a
+     * password the collection carries is not exposed in cleartext; such a copy is for display and is not safe to write
+     * back.
      *
      * @return database properties that are passed into the {@link java.sql.Driver#connect(String, Properties)}
      *             method, or {@code null} when the configuration has none
@@ -323,7 +330,8 @@ public interface PoolConfiguration {
      * The maximum number of connections that should be kept in the idle pool if {@link #isPoolSweeperEnabled()} returns
      * false. If {@link #isPoolSweeperEnabled()} returns true, then the idle pool can grow up to
      * {@link #getMaxActive} and will be shrunk according to {@link #getMinEvictableIdleTimeMillis()} setting. Default
-     * value is {@link #getMaxActive} (100 with the default configuration)
+     * value is the value of {@link #getMaxActive} when the configuration was created (100 with the default
+     * configuration); changing {@code maxActive} afterwards does not change {@code maxIdle}.
      *
      * @return the maximum number of idle connections.
      */
@@ -333,7 +341,8 @@ public interface PoolConfiguration {
      * The maximum number of connections that should be kept in the idle pool if {@link #isPoolSweeperEnabled()} returns
      * false. If {@link #isPoolSweeperEnabled()} returns true, then the idle pool can grow up to
      * {@link #getMaxActive} and will be shrunk according to {@link #getMinEvictableIdleTimeMillis()} setting. Default
-     * value is {@link #getMaxActive} (100 with the default configuration)
+     * value is the value of {@link #getMaxActive} when the configuration was created (100 with the default
+     * configuration); changing {@code maxActive} afterwards does not change {@code maxIdle}.
      *
      * @param maxIdle the maximum size of the idle pool
      */
@@ -621,6 +630,9 @@ public interface PoolConfiguration {
 
     /**
      * The URL used to connect to the database
+     * <p>
+     * A public bean or JMX view of this configuration may return the URL with an inline credential masked, so the
+     * password is not exposed in cleartext; such a value is for display and is not safe to write back.
      *
      * @return the configured URL for this connection pool
      *
@@ -784,6 +796,10 @@ public interface PoolConfiguration {
      * succeeded or failed. {@link org.apache.tomcat.jdbc.pool.interceptor.ConnectionState ConnectionState} caches the
      * auto commit, read only, transaction isolation and catalog settings to avoid round trips to the DB. The default
      * value is null.
+     * <p>
+     * A public bean or JMX view of this configuration may return the list with a credential in a definition's
+     * parameter list masked, so it is not exposed in cleartext; such a value is for display and is not safe to write
+     * back.
      *
      * @return the interceptors that are used for connections. Example format:
      *             'ConnectionState(useEquals=true,fast=yes);ResetAbandonedTimer'
@@ -948,6 +964,10 @@ public interface PoolConfiguration {
      * {@link javax.sql.ConnectionPoolDataSource} the methods
      * {@link javax.sql.ConnectionPoolDataSource#getPooledConnection()} and
      * {@link javax.sql.ConnectionPoolDataSource#getPooledConnection(String,String)} will be invoked instead.
+     * <p>
+     * If the object implements more than one of these interfaces, {@link javax.sql.XADataSource} takes precedence over
+     * {@link javax.sql.DataSource}, and {@link javax.sql.DataSource} takes precedence over
+     * {@link javax.sql.ConnectionPoolDataSource}.
      *
      * @param ds the {@link javax.sql.DataSource} to be used for creating connections to be pooled.
      */
