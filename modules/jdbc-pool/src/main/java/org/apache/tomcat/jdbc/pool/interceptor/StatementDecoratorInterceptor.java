@@ -29,6 +29,7 @@ import java.sql.Statement;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.jdbc.pool.PoolUtilities;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
@@ -138,7 +139,8 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
                     throw (VirtualMachineError) cause;
                 }
             }
-            logger.warn(MessageFactory.get("statementDecoratorInterceptor.unableToCreateStatementProxy"), x);
+            logger.warn(MessageFactory.get("statementDecoratorInterceptor.unableToCreateStatementProxy"),
+                    PoolUtilities.maskCredentials(x));
         }
         return statement;
     }

@@ -32,6 +32,7 @@ import javax.management.ObjectName;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
+import org.apache.tomcat.jdbc.pool.PoolUtilities;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
@@ -267,7 +268,7 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
             // degraded keep-alive this leaves is the price of the one stamp
             // that knows its own borrow.
             log.warn(MessageFactory.get("resetAbandonedTimer.unableToCreateTimerStatementProxy",
-                    getClass().getName()), x);
+                    getClass().getName()), PoolUtilities.maskCredentials(x));
         }
         return result;
     }
@@ -423,7 +424,7 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
                         // The application just does not get the timer reset
                         // while reading this result set
                         log.warn(MessageFactory.get("resetAbandonedTimer.unableToCreateTimerResultSetProxy",
-                                ResetAbandonedTimer.this.getClass().getName()), x);
+                                ResetAbandonedTimer.this.getClass().getName()), PoolUtilities.maskCredentials(x));
                     }
                 }
                 return result;
@@ -574,7 +575,7 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
                         // The application just does not get the timer reset
                         // while reading this nested cursor
                         log.warn(MessageFactory.get("resetAbandonedTimer.unableToCreateTimerResultSetProxy",
-                                ResetAbandonedTimer.this.getClass().getName()), x);
+                                ResetAbandonedTimer.this.getClass().getName()), PoolUtilities.maskCredentials(x));
                     }
                 }
                 return result;

@@ -2354,10 +2354,10 @@ public class ConnectionPool {
             }
         } catch (ConcurrentModificationException e) {
             if (log.isDebugEnabled()) {
-                log.debug("checkAbandoned failed.", e);
+                log.debug("checkAbandoned failed.", PoolUtilities.maskCredentials(e));
             }
         } catch (Exception e) {
-            log.warn(MessageFactory.get("connectionPool.checkAbandonedFailed"), e);
+            log.warn(MessageFactory.get("connectionPool.checkAbandonedFailed"), PoolUtilities.maskCredentials(e));
         }
     }
 
@@ -2417,10 +2417,10 @@ public class ConnectionPool {
             }
         } catch (ConcurrentModificationException e) {
             if (log.isDebugEnabled()) {
-                log.debug("checkIdle failed.", e);
+                log.debug("checkIdle failed.", PoolUtilities.maskCredentials(e));
             }
         } catch (Exception e) {
-            log.warn(MessageFactory.get("connectionPool.checkIdleFailed"), e);
+            log.warn(MessageFactory.get("connectionPool.checkIdleFailed"), PoolUtilities.maskCredentials(e));
         }
 
     }
@@ -2571,10 +2571,10 @@ public class ConnectionPool {
             }
         } catch (ConcurrentModificationException e) {
             if (log.isDebugEnabled()) {
-                log.debug("testAllIdle failed.", e);
+                log.debug("testAllIdle failed.", PoolUtilities.maskCredentials(e));
             }
         } catch (Exception e) {
-            log.warn(MessageFactory.get("connectionPool.testAllIdleFailed"), e);
+            log.warn(MessageFactory.get("connectionPool.testAllIdleFailed"), PoolUtilities.maskCredentials(e));
         }
 
     }
@@ -2764,7 +2764,7 @@ public class ConnectionPool {
                 // its MBeans must not keep the others registered
                 ExceptionUtils.handleThrowable(x);
                 if (log.isDebugEnabled()) {
-                    log.debug("Unable to unregister connection MBean", x);
+                    log.debug("Unable to unregister connection MBean", PoolUtilities.maskCredentials(x));
                 }
             }
         }
@@ -3359,7 +3359,7 @@ public class ConnectionPool {
                     // configuration write no failure it did not cause, so this
                     // is reported rather than thrown back at it; the pools left
                     // stranded are what the message counts.
-                    log.error(MessageFactory.get("connectionPool.cleanerRearmFailed"), z);
+                    log.error(MessageFactory.get("connectionPool.cleanerRearmFailed"), PoolUtilities.maskCredentials(z));
                 }
             }
         }
@@ -3422,7 +3422,7 @@ public class ConnectionPool {
                     // take the replacement timer down the way the last one went,
                     // and the pools further down this list with it.
                     ExceptionUtils.handleThrowable(x);
-                    log.error(MessageFactory.get("connectionPool.cleanerRearmFailed"), x);
+                    log.error(MessageFactory.get("connectionPool.cleanerRearmFailed"), PoolUtilities.maskCredentials(x));
                 }
             }
         }
@@ -3544,7 +3544,7 @@ public class ConnectionPool {
                     // task's next runs to a timer that dies on a fatal Error
                     // is borne by the replacement in registerCleaner.
                     ExceptionUtils.handleThrowable(x);
-                    log.error(MessageFactory.get("connectionPool.poolCleanerFailed"), x);
+                    log.error(MessageFactory.get("connectionPool.poolCleanerFailed"), PoolUtilities.maskCredentials(x));
                 }
             }
         }
