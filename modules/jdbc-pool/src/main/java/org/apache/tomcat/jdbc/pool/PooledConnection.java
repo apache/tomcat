@@ -789,6 +789,7 @@ public class PooledConnection implements PooledConnectionMBean {
         try {
             parent.disconnectEvent(this, finalizing);
         } catch (Throwable x) {
+            ExceptionUtils.handleThrowable(x);
             // The event itself isolates each link of the chain, so this
             // catch only guards against a failure of the walk itself;
             // an interceptor must not be able to keep the physical
@@ -1587,6 +1588,7 @@ public class PooledConnection implements PooledConnectionMBean {
                     try {
                         interceptor.reset(null, null);
                     } catch (Throwable t) {
+                        ExceptionUtils.handleThrowable(t);
                         // One broken interceptor must not stop the rest of the
                         // chain from being reset
                         log.warn(MessageFactory.get("pooledConnection.interceptorResetFailed",
