@@ -26,9 +26,11 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.catalina.core.StandardContext;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.descriptor.DigesterFactory;
 import org.apache.tomcat.util.descriptor.XmlErrorHandler;
 import org.apache.tomcat.util.descriptor.web.WebRuleSet;
@@ -102,6 +104,8 @@ public class TestTomcatNoServer {
 
     @Test
     public void testJarsDecoration() throws Exception {
+        Assume.assumeTrue("Requires BND in build environment which requires Java 17+", JreCompat.isJre17Available());
+
         File libDir = new File(LoggingBaseTest.getBuildDirectory(), "lib");
         try (JarFile catalinaJar = new JarFile(new File(libDir, "tomcat-util.jar"))) {
             Manifest manifest = catalinaJar.getManifest();
