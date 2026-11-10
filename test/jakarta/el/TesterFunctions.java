@@ -63,4 +63,8 @@ public class TesterFunctions {
     public static void doIt(@SuppressWarnings("unused") Object... a) {
         calls.append('I');
     }
+
+    public static void doIt(@SuppressWarnings("unused") int a, @SuppressWarnings("unused") int b) {
+        calls.append('J');
+    }
 }
