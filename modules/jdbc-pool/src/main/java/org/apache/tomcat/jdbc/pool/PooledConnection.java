@@ -21,6 +21,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -150,7 +151,14 @@ public class PooledConnection implements PooledConnectionMBean {
 
     private volatile boolean suspect = false;
 
-    private java.sql.Driver driver = null;
+    private volatile java.sql.Driver driver = null;
+
+    /**
+     * The configured driver class name the cached driver was instantiated for. A live change of the
+     * {@code driverClassName} property invalidates the cache, so a reconnect after the change uses the configured driver
+     * rather than the one the connection was first built with.
+     */
+    private volatile String driverClass = null;
 
     /**
      * Constructor
@@ -457,9 +465,17 @@ public class PooledConnection implements PooledConnectionMBean {
      */
     protected void connectUsingDriver() throws SQLException {
 
+        String configuredDriver = poolProperties.getDriverClassName();
         try {
+            if (driver != null && !Objects.equals(driverClass, configuredDriver)) {
+                // The configuration named a different driver since this
+                // connection cached one. Reconnect with the configured
+                // driver, not with the one the first session was built with.
+                driver = null;
+                driverClass = null;
+            }
             if (driver == null) {
-                if (poolProperties.getDriverClassName() == null) {
+                if (configuredDriver == null) {
                     // Rely on DriverManager
                     if (log.isDebugEnabled()) {
                         log.debug("No driverClassName is configured so the driver will be located by DriverManager.");
@@ -471,12 +487,13 @@ public class PooledConnection implements PooledConnectionMBean {
                         // is a standard support step, so a URL that carries
                         // its credential inline must reach this line masked
                         // as well - the driver is handed the real URL below.
-                        log.debug("Instantiating driver using class: " + poolProperties.getDriverClassName() +
+                        log.debug("Instantiating driver using class: " + configuredDriver +
                                 " [url=" + PoolProperties.maskCredentials(poolProperties.getUrl()) + "]");
                     }
-                    driver = (java.sql.Driver) ClassLoaderUtil.loadClass(poolProperties.getDriverClassName(),
+                    driver = (java.sql.Driver) ClassLoaderUtil.loadClass(configuredDriver,
                             PooledConnection.class.getClassLoader(), Thread.currentThread().getContextClassLoader())
                             .getConstructor().newInstance();
+                    driverClass = configuredDriver;
                 }
             }
         } catch (Exception cn) {
@@ -1401,6 +1418,10 @@ public class PooledConnection implements PooledConnectionMBean {
      */
     public void setPoolProperties(PoolConfiguration poolProperties) {
         this.poolProperties = poolProperties;
+        // The cached driver was built from the old configuration; the next
+        // reconnect must build one from the configuration now in effect.
+        this.driver = null;
+        this.driverClass = null;
     }
 
     /**
