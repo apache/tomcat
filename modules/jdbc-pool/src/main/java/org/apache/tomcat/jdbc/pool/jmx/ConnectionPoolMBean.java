@@ -217,6 +217,13 @@ public interface ConnectionPoolMBean extends PoolConfiguration {
      * Notification type sent when the initialization of the pool fails, because an interceptor could not be started or
      * because an initial connection of the pool could not be created and the failure is not ignored through
      * {@code ignoreExceptionOnPreLoad}. The notification message carries the stack trace of the failure.
+     * <p>
+     * The pool MBean itself is published only after a successful start. A failure during initialization therefore
+     * sends this notification on the not-yet-registered MBean object, before an external JMX listener can attach to
+     * it; the normal data source factory path reports such a failure through the exception it throws and the pool's
+     * logs. The type is observable by a caller that obtains the MBean object before starting the pool - for example a
+     * {@link org.apache.tomcat.jdbc.pool.ConnectionPool} subclass overriding
+     * {@link org.apache.tomcat.jdbc.pool.ConnectionPool#createMBean()} can attach a local listener there.
      */
     String NOTIFY_INIT = "INIT FAILED";
 
