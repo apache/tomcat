@@ -16,16 +16,22 @@
  */
 package org.apache.tomcat.jdbc.pool.interceptor;
 
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
+import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.DataSource;
+import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 
 /**
@@ -87,6 +93,90 @@ class TestStatementCacheRacingClose extends JdbcPoolBaseTest {
                 }
             }
             return super.cacheStatement(proxy);
+        }
+    }
+
+    /**
+     * An interceptor that parks the next {@code prepareStatement} above the
+     * cache. A caller can therefore enter the chain during one borrow and
+     * remain parked while that borrow ends and the same session is handed to
+     * the next borrower; opening the gate then delivers the stale call to the
+     * cache after the re-arm.
+     */
+    public static class GateInterceptor extends JdbcInterceptor {
+
+        static volatile CountDownLatch gate;
+        static volatile CountDownLatch parked;
+
+        @Override
+        public void reset(ConnectionPool parent, PooledConnection con) {
+            // NOOP
+        }
+
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            CountDownLatch currentGate = gate;
+            if (currentGate != null && "prepareStatement".equals(method.getName())) {
+                parked.countDown();
+                currentGate.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+            }
+            return super.invoke(proxy, method, args);
+        }
+    }
+
+    @Test
+    void aPrepareParkedPastItsBorrowCannotConsumeTheNextBorrowersCache() throws Exception {
+        GateInterceptor.gate = null;
+        GateInterceptor.parked = null;
+
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setJdbcInterceptors(
+                GateInterceptor.class.getName() + ";" + StatementCache.class.getName() + "(prepared=true,max=5)");
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(-1);
+        ds.createPool();
+
+        Connection first = ds.getConnection();
+        PreparedStatement firstPrepared = first.prepareStatement("SELECT 1");
+        Statement physical = driverStatement(firstPrepared);
+        firstPrepared.close();
+        Assertions.assertEquals(1, interceptorOf(first, StatementCache.class).getCacheSizePerConnection(),
+                "precondition: the statement is parked for the next borrower");
+
+        GateInterceptor.parked = new CountDownLatch(1);
+        CountDownLatch gate = new CountDownLatch(1);
+        GateInterceptor.gate = gate;
+
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+        Thread caller = new Thread(() -> {
+            try {
+                first.prepareStatement("SELECT 1");
+            } catch (Throwable t) {
+                failure.set(t);
+            }
+        }, "parked-prepare");
+        caller.setDaemon(true);
+        caller.start();
+        Assertions.assertTrue(GateInterceptor.parked.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
+                "precondition: the prepare must be parked above the cache");
+
+        // Stop parking further calls, end the first borrow and let a second
+        // borrower take the same session and re-arm the chain.
+        GateInterceptor.gate = null;
+        first.close();
+        try (Connection second = ds.getConnection()) {
+            gate.countDown();
+            caller.join(AWAIT_TIMEOUT_MS);
+            Assertions.assertFalse(caller.isAlive(), "the parked prepare must have been answered");
+
+            Assertions.assertNotNull(failure.get(),
+                    "a prepare whose borrow ended must not be handed the next borrow's cached statement");
+            Assertions.assertInstanceOf(SQLException.class, failure.get(),
+                    () -> "the stale cache hit must fail the way a closed connection fails, got " + failure.get());
+            Assertions.assertTrue(physical.isClosed(),
+                    "the refused cache entry must be closed rather than left open outside the cache");
+            Assertions.assertEquals(0, interceptorOf(second, StatementCache.class).getCacheSizePerConnection(),
+                    "the next borrower's cache must not have been consumed by the stale call");
         }
     }
 

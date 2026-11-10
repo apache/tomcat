@@ -43,6 +43,7 @@ import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
 import org.apache.tomcat.jdbc.pool.PoolUtilities;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
+import org.apache.tomcat.jdbc.pool.ProxyConnection;
 import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
 import org.apache.tomcat.jdbc.pool.util.ExceptionUtils;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
@@ -116,6 +117,15 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
     // Re-armed on every borrow and read from management/close threads.
     private volatile PooledConnection pcon;
     private volatile String[] types;
+
+    /**
+     * The {@link ProxyConnection} at the tail of this interceptor's chain,
+     * resolved once on first use. Only the tail's identity of the handle the
+     * current borrow runs under can tell a cache hit of that borrow from one
+     * left parked above this cache across a clean recycle (see
+     * {@link #servesCurrentBorrow(Object)}).
+     */
+    private volatile ProxyConnection chainFence = null;
 
     private ObjectName oname = null;
 
@@ -408,6 +418,48 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
     }
 
     /**
+     * Resolves, once, the proxy connection at the tail of the chain this
+     * interceptor serves in. The chain wiring is fixed when it is built and an
+     * interceptor instance belongs to exactly one chain, so the walk below
+     * runs until the tail is found and then never again.
+     *
+     * @return the tail of the chain, or {@code null} if there is none
+     */
+    private ProxyConnection resolveChainFence() {
+        ProxyConnection tail = chainFence;
+        if (tail == null) {
+            JdbcInterceptor link = this;
+            while (link != null && !(link instanceof ProxyConnection)) {
+                link = link.getNext();
+            }
+            if (link instanceof ProxyConnection) {
+                tail = (ProxyConnection) link;
+                chainFence = tail;
+            }
+        }
+        return tail;
+    }
+
+
+    /**
+     * Whether the calling handle is the handle of the borrow this cache is
+     * currently armed for. A call that entered the chain during one borrow can
+     * finish after that borrow has ended and after the pooled connection has
+     * been handed to the next borrower; a cache hit must not be served to such
+     * a call, because the hit answers above the tail's borrow fence and would
+     * remove and re-bind the cached statement for a borrow that is over.
+     *
+     * @param proxy the connection handle the call arrived on
+     *
+     * @return true if the handle names the current borrow
+     */
+    private boolean servesCurrentBorrow(Object proxy) {
+        ProxyConnection fence = resolveChainFence();
+        return fence != null && proxy != null && proxy == fence.getBorrowHandle();
+    }
+
+
+    /**
      * Closes the given cached statement by forcing it to close.
      *
      * @param st the cached statement to close
@@ -444,6 +496,15 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
         if (process && args.length > 0 && args[0] instanceof String) {
             CachedStatement statement = isCached(method, args);
             if (statement != null && removeStatement(statement)) {
+                if (!servesCurrentBorrow(proxy)) {
+                    // The call that reached this hit belongs to a borrow that
+                    // has already ended. The entry has been taken out of the
+                    // cache for this call, so close it rather than handing a
+                    // sealed per-borrow statement handle to the old caller;
+                    // the next borrower must see a fresh prepare.
+                    closeStatement(statement);
+                    throw new SQLException(MessageFactory.get("statementCache.connectionClosedOrAbandoned"));
+                }
                 if (statement.getAssociatedConnection() != currentPhysicalConnection()) {
                     // The entry belongs to a connection that has been
                     // replaced (a statement close that raced a reconnect
