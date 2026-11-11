@@ -124,6 +124,14 @@ public final class Globals {
 
 
     /**
+     * The request attribute that lists header values that must not be sent with a 304 (Not Modified) response. See
+     * {@link org.apache.coyote.Constants#NOT_MODIFIED_EXCLUDED_HEADERS_ATTR}.
+     */
+    public static final String NOT_MODIFIED_EXCLUDED_HEADERS_ATTR =
+            org.apache.coyote.Constants.NOT_MODIFIED_EXCLUDED_HEADERS_ATTR;
+
+
+    /**
      * The request attribute under which we store the array of X509Certificate objects representing the certificate
      * chain presented by our client, if any.
      */

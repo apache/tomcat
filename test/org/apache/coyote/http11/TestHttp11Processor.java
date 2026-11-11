@@ -60,6 +60,7 @@ import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.coyote.TesterNotModifiedExcludedHeaderServlet;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
@@ -2345,5 +2346,23 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         protocol.setAltService(null);
         Assert.assertNull(protocol.getAltService());
+    }
+
+    @Test
+    public void testNotModifiedExcludedHeaders() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        Context ctx = getProgrammaticRootContext();
+        Tomcat.addServlet(ctx, "notModified", new TesterNotModifiedExcludedHeaderServlet());
+        ctx.addServletMapping("/notModified", "notModified");
+
+        tomcat.start();
+
+        Map<String,List<String>> resHead = new HashMap<>();
+        int rc = getUrl("http://localhost:" + getPort() + "/notModified", new ByteChunk(), resHead);
+
+        Assert.assertEquals(HttpServletResponse.SC_NOT_MODIFIED, rc);
+        Assert.assertNull(getSingleHeader("Content-Security-Policy", resHead));
+        Assert.assertEquals("kept", getSingleHeader("X-Kept", resHead));
     }
 }

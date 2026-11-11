@@ -21,6 +21,7 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -195,6 +196,35 @@ public final class Response {
      */
     public MimeHeaders getMimeHeaders() {
         return headers;
+    }
+
+
+    /**
+     * Removes header fields named by the request attribute {@link Constants#NOT_MODIFIED_EXCLUDED_HEADERS_ATTR} if the
+     * status of the response is 304 (Not Modified). For each entry, if a header field with that name
+     * (case-insensitive) and exactly that value is present, every header field with that name is removed: a cache that
+     * receives a 304 response replaces all the values it stored for each field named in it, so sending only some of
+     * them would discard the others. Elements that are not a {@code Map.Entry} of a {@code String} name and value are
+     * ignored. Processors call this just before they write the response headers.
+     */
+    public void removeNotModifiedExcludedHeaders() {
+        if (getStatus() != 304 || req == null) {
+            return;
+        }
+        if (!(req.getAttribute(Constants.NOT_MODIFIED_EXCLUDED_HEADERS_ATTR) instanceof Collection<?> excluded)) {
+            return;
+        }
+        for (Object element : excluded) {
+            if (element instanceof Map.Entry<?,?> entry && entry.getKey() instanceof String name &&
+                    entry.getValue() instanceof String value) {
+                for (int i = 0; i < headers.size(); i++) {
+                    if (headers.getName(i).equalsIgnoreCase(name) && headers.getValue(i).equals(value)) {
+                        headers.removeHeader(name);
+                        break;
+                    }
+                }
+            }
+        }
     }
 
 

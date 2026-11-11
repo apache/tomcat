@@ -1050,13 +1050,17 @@ FINE: Request "/docs/config/manager.html" with response status "200"
           instance of this filter that processed the request earlier, that nonce
           is used instead of a new one. If the policy does not contain the
           placeholder, no nonce is generated and the attribute is not set.</p>
-        <p>If the policy contains the placeholder, it is not sent with
-          <code>304</code> (Not Modified) responses. A cache that revalidates a
-          stored page updates the stored header fields from a <code>304</code>
-          response but keeps the stored page, so a policy with a new nonce would
-          not match the nonces in that page. Without the policy in the
-          <code>304</code> response, the cache keeps the policy it stored with
-          the page.</p>
+        <p>If the policy contains the placeholder and the response is sent with
+          status <code>304</code> (Not Modified), Tomcat removes the filter's
+          policy, and every other policy sent in the same header, including those
+          set by the application, when it writes the response headers. A cache
+          that revalidates a stored page keeps the stored page but replaces the
+          stored values of each header present in the <code>304</code> response:
+          a policy with a new nonce would not match the nonces in that page, and
+          sending only some of the policies would discard the others. Without any
+          policy in the <code>304</code> response, the cache keeps all the policies
+          it stored with the page. If the application has replaced the filter's
+          policy, no policy is removed.</p>
         <p>When the policy is enforced (<strong>cspReportOnly</strong> is
           <code>false</code>) and contains a <code>frame-ancestors</code>
           directive, browsers that implement CSP Level 3 ignore the

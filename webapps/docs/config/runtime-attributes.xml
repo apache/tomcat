@@ -74,6 +74,15 @@
       request support asynchronous processing? Each component in the chain must
       support asynchronous processing for this to be <code>true</code>.</p>
     </property>
+    <property name="org.apache.catalina.CSP_NONCE">
+      <p>The request attribute that holds the nonce generated for the current
+      request by the HTTP Header Security Filter, as a <code>String</code>, if
+      the filter's <strong>cspPolicy</strong> contains the placeholder
+      <code>{nonce}</code>. Pages use it as the value of the <code>nonce</code>
+      attribute of their inline scripts and styles. If the attribute already
+      holds a non-empty <code>String</code> when the filter runs, the filter
+      uses that value instead of generating one.</p>
+    </property>
     <property name="org.apache.catalina.NAMED">
       <p>The name of the target Servlet for the current named dispatch, if
       any.</p>
@@ -94,6 +103,19 @@
     <property name="org.apache.catalina.realm.GSS_CREDENTIAL">
       <p>The GSS credential for the currently authenticated user if they have
       successfully authenticated using SPNEGO authentication.</p>
+    </property>
+    <property name="org.apache.tomcat.notModified.excludedHeaders">
+      <p>The request attribute that lists header values that must not be sent
+      with a <code>304</code> (Not Modified) response. The value should be a
+      modifiable <code>java.util.List</code> of
+      <code>Map.Entry&lt;String,String&gt;</code> elements, each a header name
+      and an exact header value. If the response is sent with status
+      <code>304</code> and contains a header with that name and exactly that
+      value, the connector removes every header with that name, because a cache
+      that receives a <code>304</code> response replaces all the values it
+      stored for each header in it. The list may be shared: add and remove your
+      own entries rather than replacing the list. The HTTP Header Security
+      Filter uses it for a policy that contains a nonce.</p>
     </property>
     <property name="org.apache.tomcat.peerAddr">
       <p>The request attribute set by the RemoteIpFilter, RemoteIpValve (and may

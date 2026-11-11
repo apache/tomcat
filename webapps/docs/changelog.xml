@@ -276,7 +276,9 @@
         request, and the nonce is made available to the application via the
         <code>org.apache.catalina.CSP_NONCE</code> request attribute. By
         default, a policy set by the application replaces the filter's policy.
-        (dsoumis)
+        If the policy contains a nonce, it is left out of <code>304</code>
+        responses together with any other policy in the same header, so that
+        caches keep the policies they stored with the page. (dsoumis)
       </add>
       <add>
         Add the nonce from the <code>org.apache.catalina.CSP_NONCE</code>
@@ -627,6 +629,15 @@
         suffixed certificate is used instead.
         (dsoumis)
       </update>
+      <add>
+        Add the <code>org.apache.tomcat.notModified.excludedHeaders</code>
+        request attribute, which lists header values that must not be sent with
+        a <code>304</code> response. If a response is sent with status
+        <code>304</code> and contains a listed value, the connector removes
+        every header with that name, because a cache replaces all the values it
+        stored for each header present in a <code>304</code> response.
+        (dsoumis)
+      </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
         Keep the asynchronous timeout in place until the timeout event has

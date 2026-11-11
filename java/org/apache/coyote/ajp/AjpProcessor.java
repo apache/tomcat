@@ -920,6 +920,8 @@ public class AjpProcessor extends AbstractProcessor {
      */
     @Override
     protected final void prepareResponse() throws IOException {
+        // Remove header values that must not be sent with a 304 response
+        response.removeNotModifiedExcludedHeaders();
 
         response.setCommitted(true);
 

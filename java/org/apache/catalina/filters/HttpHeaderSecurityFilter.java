@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import jakarta.servlet.DispatcherType;
@@ -181,7 +182,7 @@ public class HttpHeaderSecurityFilter extends FilterBase {
                     chainRequest = new HttpServletRequestWrapper(httpRequest);
                 }
                 chainResponse = new CspResponseWrapper(httpResponse, chainRequest, cspName, cspValue,
-                        cspAllowOverride, cspNonceRequired);
+                        cspAllowOverride, cspNonceRequired ? getNotModifiedExclusions(request) : null);
             }
         }
 
@@ -203,6 +204,26 @@ public class HttpHeaderSecurityFilter extends FilterBase {
         String nonce = Base64.getEncoder().encodeToString(bytes);
         request.setAttribute(Globals.CSP_NONCE_ATTR, nonce);
         return nonce;
+    }
+
+
+    /*
+     * Returns the list of header values that the connector must not send with a 304 response, creating it if
+     * necessary. One list is shared by every instance of this filter that processes the request. A list set by
+     * another component that may not be modifiable is replaced by a modifiable copy, which keeps its elements.
+     */
+    @SuppressWarnings("unchecked")
+    private static List<Object> getNotModifiedExclusions(ServletRequest request) {
+        Object existing = request.getAttribute(Globals.NOT_MODIFIED_EXCLUDED_HEADERS_ATTR);
+        if (existing instanceof ArrayList<?> list) {
+            return (List<Object>) list;
+        }
+        List<Object> exclusions = new ArrayList<>();
+        if (existing instanceof Collection<?> collection) {
+            exclusions.addAll(collection);
+        }
+        request.setAttribute(Globals.NOT_MODIFIED_EXCLUDED_HEADERS_ATTR, exclusions);
+        return exclusions;
     }
 
 
@@ -506,7 +527,9 @@ public class HttpHeaderSecurityFilter extends FilterBase {
      * than recognising them by their text: a policy set by the application, or by another instance of this filter, may
      * have the same text as the filter's policy, and getHeaders() may not return repeated values. It does not record
      * calls that the container ignores: those made by a resource included with RequestDispatcher.include() and those
-     * made once the response has been committed.
+     * made once the response has been committed. If the policy contains a nonce, the wrapper also lists the filter's
+     * policy, while it is present, in the request attribute that asks the connector to leave that header out of a 304
+     * response.
      */
     private static final class CspResponseWrapper extends HttpServletResponseWrapper {
 
@@ -514,23 +537,36 @@ public class HttpHeaderSecurityFilter extends FilterBase {
         private final String cspName;
         private final String cspValue;
         private final boolean allowOverride;
-        private final boolean nonceRequired;
+        /*
+         * The header values the connector must not send with a 304 response, shared by every instance of this filter
+         * that processes the request and possibly by other components, and the entry for this filter's policy. Both
+         * are null if the policy does not contain a nonce.
+         */
+        private final List<Object> notModifiedExclusions;
+        private final Map.Entry<String,String> notModifiedExclusion;
         /*
          * Is the filter's policy present? If the application may override it, the first policy the application sets
-         * replaces it. Otherwise, it is only removed from a 304 response.
+         * replaces it. Otherwise, it is always present.
          */
         private boolean filterPolicyPresent = true;
         // The policies set by the application. Only used if the application may not override the filter's policy.
         private final List<String> applicationValues = new ArrayList<>();
 
         CspResponseWrapper(HttpServletResponse response, ServletRequest request, String cspName, String cspValue,
-                boolean allowOverride, boolean nonceRequired) {
+                boolean allowOverride, List<Object> notModifiedExclusions) {
             super(response);
             this.request = request;
             this.cspName = cspName;
             this.cspValue = cspValue;
             this.allowOverride = allowOverride;
-            this.nonceRequired = nonceRequired;
+            this.notModifiedExclusions = notModifiedExclusions;
+            if (notModifiedExclusions == null) {
+                notModifiedExclusion = null;
+            } else {
+                notModifiedExclusion = Map.entry(cspName, cspValue);
+                // The filter's policy is present
+                notModifiedExclusions.add(notModifiedExclusion);
+            }
         }
 
 
@@ -541,7 +577,7 @@ public class HttpHeaderSecurityFilter extends FilterBase {
             } else if (allowOverride) {
                 // Replaces every policy present, including the filter's policy
                 super.setHeader(cspName, value);
-                filterPolicyPresent = false;
+                setFilterPolicyPresent(false);
             } else {
                 // Replace the application's policies but keep the filter's policy
                 applicationValues.clear();
@@ -563,7 +599,7 @@ public class HttpHeaderSecurityFilter extends FilterBase {
             } else if (filterPolicyPresent) {
                 // The first policy set by the application replaces the filter's policy
                 super.setHeader(cspName, value);
-                filterPolicyPresent = false;
+                setFilterPolicyPresent(false);
             } else {
                 super.addHeader(cspName, value);
             }
@@ -631,29 +667,12 @@ public class HttpHeaderSecurityFilter extends FilterBase {
 
 
         @Override
-        public void setStatus(int sc) {
-            super.setStatus(sc);
-            /*
-             * A 304 response refreshes the header fields a cache stored with the page (RFC 9111, section 4.3.4) but not
-             * the page itself, so a policy with the nonce of this request would not match the nonces in the cached
-             * page. Do not send it. The status is read back as the container ignores the call in some cases.
-             */
-            if (nonceRequired && filterPolicyPresent && !isIgnoredByContainer() &&
-                    getStatus() == HttpServletResponse.SC_NOT_MODIFIED) {
-                filterPolicyPresent = false;
-                // Keep the policies set by the application, if any
-                writePolicies();
-            }
-        }
-
-
-        @Override
         public void reset() {
             super.reset();
             // Restore the filter's policy unless the container ignored the call
             if (!isIgnoredByContainer()) {
                 applicationValues.clear();
-                filterPolicyPresent = true;
+                setFilterPolicyPresent(true);
                 super.setHeader(cspName, cspValue);
             }
         }
@@ -674,14 +693,33 @@ public class HttpHeaderSecurityFilter extends FilterBase {
 
 
         /*
-         * Writes the filter's policy, if present, followed by the policies set by the application. Only used if the
-         * application may not override the filter's policy, or if the filter's policy is the only one present. Tomcat
-         * removes a header that is set to null.
+         * Writes the filter's policy followed by the policies set by the application. Only used if the application may
+         * not override the filter's policy.
          */
         private void writePolicies() {
-            super.setHeader(cspName, filterPolicyPresent ? cspValue : null);
+            super.setHeader(cspName, cspValue);
             for (String value : applicationValues) {
                 super.addHeader(cspName, value);
+            }
+        }
+
+
+        /*
+         * Records whether the filter's policy is present, and keeps the list of header values the connector must not
+         * send with a 304 response in step with it.
+         */
+        private void setFilterPolicyPresent(boolean present) {
+            if (present == filterPolicyPresent) {
+                return;
+            }
+            filterPolicyPresent = present;
+            if (notModifiedExclusions != null) {
+                if (present) {
+                    notModifiedExclusions.add(notModifiedExclusion);
+                } else {
+                    // Remove this filter's entry, not an equal entry of another instance of this filter
+                    notModifiedExclusions.removeIf(entry -> entry == notModifiedExclusion);
+                }
             }
         }
 

@@ -27,7 +27,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -278,10 +282,11 @@ public class TestHttpHeaderSecurityFilter2 extends TomcatBaseTest {
 
 
     /*
-     * Only the filter's policy is removed from a 304 response, not the policies set by the application.
+     * A 304 response carries none of the policies, not even those set by the application: a cache replaces all the
+     * policies it stored with the page by those of a 304 response, and keeps them all if it has none.
      */
     @Test
-    public void testNotModifiedKeepsApplicationPolicy() throws Exception {
+    public void testNotModifiedOmitsApplicationPolicy() throws Exception {
         Context ctx = getProgrammaticRootContext();
         addFilter(ctx, NONCE_POLICY, false);
         addServlet(ctx, "/page", new HttpServlet() {
@@ -296,7 +301,7 @@ public class TestHttpHeaderSecurityFilter2 extends TomcatBaseTest {
         });
 
         Map<String,List<String>> resHead = request("/page", null, HttpServletResponse.SC_NOT_MODIFIED);
-        assertPolicies(List.of("img-src 'self'"), resHead);
+        assertPolicies(List.of(), resHead);
     }
 
 
@@ -327,6 +332,206 @@ public class TestHttpHeaderSecurityFilter2 extends TomcatBaseTest {
     }
 
 
+    /*
+     * The final status decides: a response that is 304 for a while but is sent with status 200 keeps the policy.
+     */
+    @Test
+    public void testNotModifiedThenOkKeepsNoncePolicy() throws Exception {
+        Context ctx = getProgrammaticRootContext();
+        addFilter(ctx, NONCE_POLICY, true);
+        addServlet(ctx, "/page", new HttpServlet() {
+            @Serial
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+                resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+                resp.setStatus(HttpServletResponse.SC_OK);
+                resp.getWriter().print(req.getAttribute(Globals.CSP_NONCE_ATTR));
+            }
+        });
+
+        ByteChunk body = new ByteChunk();
+        Map<String,List<String>> resHead = request("/page", body, HttpServletResponse.SC_OK);
+        assertPolicies(List.of("script-src 'nonce-" + body + "'"), resHead);
+    }
+
+
+    /*
+     * A response that is already 304 when the filter runs is sent without the policy.
+     */
+    @Test
+    public void testNotModifiedBeforeFilterOmitsNoncePolicy() throws Exception {
+        Context ctx = getProgrammaticRootContext();
+        addTestFilter(ctx, "notModified", new NotModifiedFilter());
+        addFilter(ctx, NONCE_POLICY, true);
+        addServlet(ctx, "/page", new HttpServlet() {
+            @Serial
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
+                // The response is already 304
+            }
+        });
+
+        Map<String,List<String>> resHead = request("/page", null, HttpServletResponse.SC_NOT_MODIFIED);
+        assertPolicies(List.of(), resHead);
+    }
+
+
+    /*
+     * A 304 response that becomes a 500 error page, because a filter further out fails after the chain, keeps the
+     * policy.
+     */
+    @Test
+    public void testNotModifiedThenErrorKeepsNoncePolicy() throws Exception {
+        Context ctx = getProgrammaticRootContext();
+        addTestFilter(ctx, "failing", new FailAfterChainFilter());
+        addFilter(ctx, NONCE_POLICY, true);
+        addServlet(ctx, "/page", new LastModifiedServlet());
+
+        ByteChunk body = new ByteChunk();
+        Map<String,List<String>> resHead = request("/page", body, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                "If-Modified-Since", FastHttpDateFormat.formatDate(LAST_MODIFIED));
+        List<String> policies = getPolicies(resHead);
+        Assert.assertEquals(policies.toString(), 1, policies.size());
+        Assert.assertTrue(policies.getFirst(), policies.getFirst().startsWith("script-src 'nonce-"));
+        // The error page uses the nonce of the policy
+        String nonce = policies.getFirst().substring("script-src 'nonce-".length(), policies.getFirst().length() - 1);
+        Assert.assertTrue(body.toString(), body.toString().contains("nonce=\"" + nonce + "\""));
+    }
+
+
+    /*
+     * A policy set by the application with the same text as the filter's policy belongs to the application and is
+     * kept on a 304 response.
+     */
+    @Test
+    public void testIdenticalApplicationPolicyKeptOnNotModified() throws Exception {
+        Context ctx = getProgrammaticRootContext();
+        addFilter(ctx, NONCE_POLICY, true);
+        addServlet(ctx, "/page", new HttpServlet() {
+            @Serial
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
+                String nonce = (String) req.getAttribute(Globals.CSP_NONCE_ATTR);
+                resp.setHeader(CSP, NONCE_POLICY.replace("{nonce}", nonce));
+                resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+            }
+        });
+
+        Map<String,List<String>> resHead = request("/page", null, HttpServletResponse.SC_NOT_MODIFIED);
+        List<String> policies = getPolicies(resHead);
+        Assert.assertEquals(policies.toString(), 1, policies.size());
+        Assert.assertTrue(policies.getFirst(), policies.getFirst().startsWith("script-src 'nonce-"));
+    }
+
+
+    /*
+     * Two filters with nonce policies that the application may not override: a 304 response carries none of the
+     * policies.
+     */
+    @Test
+    public void testTwoNonceFiltersNotModified() throws Exception {
+        Context ctx = getProgrammaticRootContext();
+        addFilter(ctx, "outer", NONCE_POLICY, false);
+        addFilter(ctx, "inner", "style-src 'nonce-{nonce}'", false);
+        addServlet(ctx, "/page", new HttpServlet() {
+            @Serial
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
+                resp.addHeader(CSP, "img-src 'self'");
+                resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+            }
+        });
+
+        Map<String,List<String>> resHead = request("/page", null, HttpServletResponse.SC_NOT_MODIFIED);
+        assertPolicies(List.of(), resHead);
+    }
+
+
+    /*
+     * A filter without a nonce and a filter with a nonce: a 304 response carries neither policy, so a cache keeps both
+     * policies it stored with the page.
+     */
+    @Test
+    public void testPlainAndNonceFiltersNotModified() throws Exception {
+        Context ctx = getProgrammaticRootContext();
+        addFilter(ctx, "outer", FILTER_POLICY, false);
+        addFilter(ctx, "inner", NONCE_POLICY, false);
+        addServlet(ctx, "/page", new HttpServlet() {
+            @Serial
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
+                resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+            }
+        });
+
+        Map<String,List<String>> resHead = request("/page", null, HttpServletResponse.SC_NOT_MODIFIED);
+        assertPolicies(List.of(), resHead);
+    }
+
+
+    /*
+     * reset() restores the filter's policy after the application replaced it, and with it the request to leave the
+     * policy out of a 304 response.
+     */
+    @Test
+    public void testResetRestoresNoncePolicyExclusion() throws Exception {
+        Context ctx = getProgrammaticRootContext();
+        addFilter(ctx, NONCE_POLICY, true);
+        addServlet(ctx, "/page", new HttpServlet() {
+            @Serial
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
+                resp.setHeader(CSP, "img-src 'self'");
+                resp.reset();
+                resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+            }
+        });
+
+        Map<String,List<String>> resHead = request("/page", null, HttpServletResponse.SC_NOT_MODIFIED);
+        assertPolicies(List.of(), resHead);
+    }
+
+
+    /*
+     * A list of header values set by another component that cannot be modified, and that holds an element that is not
+     * an entry, is replaced by a copy: the request succeeds, the other component's entry is honoured, and the policy
+     * that replaced the filter's policy is kept.
+     */
+    @Test
+    public void testForeignExclusionListIsCopied() throws Exception {
+        Context ctx = getProgrammaticRootContext();
+        addTestFilter(ctx, "foreign", new ForeignExclusionsFilter());
+        addFilter(ctx, NONCE_POLICY, true);
+        addServlet(ctx, "/page", new HttpServlet() {
+            @Serial
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
+                resp.setHeader("X-Other", "a");
+                resp.setHeader(CSP, "img-src 'self'");
+                resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+            }
+        });
+
+        Map<String,List<String>> resHead = request("/page", null, HttpServletResponse.SC_NOT_MODIFIED);
+        assertPolicies(List.of("img-src 'self'"), resHead);
+        Assert.assertFalse(resHead.toString(), resHead.keySet().stream().anyMatch("X-Other"::equalsIgnoreCase));
+    }
+
+
     private static void addFilter(Context ctx, String policy, boolean allowOverride) {
         addFilter(ctx, "httpHeaderSecurity", policy, allowOverride);
     }
@@ -339,6 +544,19 @@ public class TestHttpHeaderSecurityFilter2 extends TomcatBaseTest {
         filterDef.addInitParameter("cspEnabled", "true");
         filterDef.addInitParameter("cspPolicy", policy);
         filterDef.addInitParameter("cspAllowOverride", Boolean.toString(allowOverride));
+        ctx.addFilterDef(filterDef);
+        FilterMap filterMap = new FilterMap();
+        filterMap.setFilterName(filterName);
+        filterMap.addURLPattern("/*");
+        ctx.addFilterMap(filterMap);
+    }
+
+
+    private static void addTestFilter(Context ctx, String filterName, Filter filter) {
+        FilterDef filterDef = new FilterDef();
+        filterDef.setFilterClass(filter.getClass().getName());
+        filterDef.setFilterName(filterName);
+        filterDef.setFilter(filter);
         ctx.addFilterDef(filterDef);
         FilterMap filterMap = new FilterMap();
         filterMap.setFilterName(filterName);
@@ -441,6 +659,50 @@ public class TestHttpHeaderSecurityFilter2 extends TomcatBaseTest {
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
             resp.setContentType("text/html");
             resp.getWriter().print("<script nonce=\"" + req.getAttribute(Globals.CSP_NONCE_ATTR) + "\"></script>");
+        }
+    }
+
+
+    /*
+     * Sets the status to 304 before the rest of the chain runs.
+     */
+    private static final class NotModifiedFilter implements Filter {
+
+        @Override
+        public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+                throws IOException, ServletException {
+            ((HttpServletResponse) response).setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+            chain.doFilter(request, response);
+        }
+    }
+
+
+    /*
+     * Fails after the rest of the chain has run, so the container sends a 500 error page.
+     */
+    private static final class FailAfterChainFilter implements Filter {
+
+        @Override
+        public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+                throws IOException, ServletException {
+            chain.doFilter(request, response);
+            throw new ServletException("Failure after the chain");
+        }
+    }
+
+
+    /*
+     * Sets the list of header values that must not be sent with a 304 response as another component might: a list
+     * that cannot be modified, holding an entry for another header and an element that is not an entry.
+     */
+    private static final class ForeignExclusionsFilter implements Filter {
+
+        @Override
+        public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+                throws IOException, ServletException {
+            request.setAttribute(Globals.NOT_MODIFIED_EXCLUDED_HEADERS_ATTR,
+                    List.of("not an entry", Map.entry("X-Other", "a")));
+            chain.doFilter(request, response);
         }
     }
 }

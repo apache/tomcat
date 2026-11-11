@@ -139,6 +139,18 @@ public final class Constants {
     public static final String PEER_ADDR_ATTRIBUTE = "org.apache.tomcat.peerAddr";
 
     /**
+     * The request attribute that lists header values that must not be sent with a 304 (Not Modified) response. The
+     * value is a modifiable {@code java.util.List} of {@code Map.Entry<String, String>}, each a header name and the
+     * exact value of one header field. If the status of the response is 304 when its headers are written and a header
+     * field with that name (case-insensitive) and exactly that value is present, the connector removes every header
+     * field with that name: a cache that receives a 304 response replaces all the values it stored for each field
+     * named in it. The list may be shared by several components, which add and remove their own entries rather than
+     * replace the list. The attribute reaches the connector only if it is set on the container's request: a request
+     * wrapper that keeps attributes to itself prevents the removal.
+     */
+    public static final String NOT_MODIFIED_EXCLUDED_HEADERS_ATTR = "org.apache.tomcat.notModified.excludedHeaders";
+
+    /**
      * Private constructor to prevent instantiation.
      */
     private Constants() {

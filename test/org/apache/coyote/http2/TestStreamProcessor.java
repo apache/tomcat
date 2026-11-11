@@ -41,6 +41,7 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.ResponseFacade;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.coyote.TesterNotModifiedExcludedHeaderServlet;
 import org.apache.tomcat.util.compat.JrePlatform;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.Method;
@@ -919,6 +920,38 @@ public class TestStreamProcessor extends Http2TestBase {
         // The stream is reset, thus only the connection window update remains
         parser.readFrame();
         Assert.assertEquals("0-WindowSize-[" + INCOMPLETE_READ_BODY_SIZE + "]\n", output.getTrace());
+    }
+
+    @Test
+    public void testNotModifiedExcludedHeaders() throws Exception {
+        enableHttp2();
+
+        Tomcat tomcat = getTomcatInstance();
+
+        Context ctxt = getProgrammaticRootContext();
+        Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
+        ctxt.addServletMapping("/simple", "simple");
+        Tomcat.addServlet(ctxt, "notModified", new TesterNotModifiedExcludedHeaderServlet());
+        ctxt.addServletMapping("/notModified", "notModified");
+
+        tomcat.start();
+
+        openClientConnection();
+        doHttpUpgrade();
+        sendClientPreface();
+        validateHttp2InitialResponse();
+
+        byte[] frameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+        buildGetRequest(frameHeader, headersPayload, null, 3, "/notModified");
+        writeFrame(frameHeader, headersPayload);
+
+        parser.readFrame();
+
+        String trace = output.getTrace();
+        Assert.assertTrue(trace, trace.contains("3-Header-[:status]-[304]"));
+        Assert.assertTrue(trace, trace.contains("3-Header-[x-kept]-[kept]"));
+        Assert.assertFalse(trace, trace.contains("content-security-policy"));
     }
 
 
