@@ -1673,7 +1673,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
         }
 
         /**
-         * Pushes a processor to the pool.
+         * Pushes a processor to the pool. A processor that is not reusable is
+         * not added to the pool and is unregistered instead. This may happen,
+         * for example, after an asynchronous timeout or error while an
+         * application thread was blocked in a write. Reusing such a processor
+         * could write stale data to another request.
          *
          * @param processor The processor
          *
@@ -1682,6 +1686,13 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
         @SuppressWarnings("sync-override") // Size may exceed cache size a bit
         @Override
         public boolean push(Processor processor) {
+            if (!processor.isReusable()) {
+                // Also make sure any waiting-processor registration is
+                // removed before the processor is unregistered.
+                handler.getProtocol().removeWaitingProcessor(processor);
+                handler.unregister(processor);
+                return false;
+            }
             int cacheSize = handler.getProtocol().getProcessorCache();
             boolean offer = cacheSize == -1 || size.get() < cacheSize;
             // avoid over growing our cache or add after we have stopped
