@@ -259,6 +259,14 @@
         <bug>70288</bug>: Fix bug that could cause request body truncation with
         HTTP/2. Based on a patch by Alberto Limón. (markt)
       </fix>
+      <fix>
+        <bug>70311</bug>: Fix an infinite loop in
+        <code>SecureNioChannel.read(ByteBuffer)</code> when the TLS engine
+        returns <code>BUFFER_OVERFLOW</code> without consuming any input and
+        the destination buffer cannot be expanded. The read now fails with an
+        <code>IOException</code>. Pull request <pr>1157</pr> provided by
+        Pranav N V.
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
