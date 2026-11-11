@@ -389,6 +389,7 @@ public class TestResponse extends TomcatBaseTest {
     }
 
 
+    @Test
     public void testEncodeURL05() throws Exception {
         doTestEncodeURL("../../..", "../../..");
     }
