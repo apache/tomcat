@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.coyote.http2;
 
 import java.io.IOException;
@@ -26,8 +25,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.ReadListener;
-import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -46,7 +45,7 @@ import org.apache.catalina.startup.Tomcat;
  * calling setReadListener(). Every request must see exactly one body byte and complete. Without the fix some requests
  * get onAllDataRead() with no data or never receive a read event. Place the file in test/org/apache/coyote/http2 and
  * run: ant test -Dtest.name="**&#47;TestStreamReadCompletionRace.java"
- *
+ * <p>
  * This test is disabled for normal runs as it takes around 60s to complete.
  */
 public class TesterStreamReadCompletionRace extends Http2TestBase {
@@ -83,8 +82,8 @@ public class TesterStreamReadCompletionRace extends Http2TestBase {
                 ByteBuffer headersPayload = ByteBuffer.allocate(128);
                 byte[] dataFrameHeader = new byte[9];
                 ByteBuffer dataPayload = ByteBuffer.allocate(1);
-                buildPostRequest(headersFrameHeader, headersPayload, false, null, 1, "/async?i=" + i,
-                        dataFrameHeader, dataPayload, null, false, streamId);
+                buildPostRequest(headersFrameHeader, headersPayload, false, null, 1, "/async?i=" + i, dataFrameHeader,
+                        dataPayload, null, false, streamId);
                 dataFrameHeader[0] = 0;
                 dataFrameHeader[1] = 0;
                 dataFrameHeader[2] = 1;
@@ -147,7 +146,8 @@ public class TesterStreamReadCompletionRace extends Http2TestBase {
         final AtomicInteger completed = new AtomicInteger();
         final AtomicInteger wrong = new AtomicInteger();
         final AtomicInteger errors = new AtomicInteger();
-        final java.util.concurrent.ConcurrentHashMap<Integer,String> events = new java.util.concurrent.ConcurrentHashMap<>();
+        final java.util.concurrent.ConcurrentHashMap<Integer,String> events =
+                new java.util.concurrent.ConcurrentHashMap<>();
 
         void ev(HttpServletRequest req, String e) {
             Integer k = Integer.valueOf(req.getParameter("i"));
