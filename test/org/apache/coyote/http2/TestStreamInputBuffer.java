@@ -19,13 +19,8 @@ package org.apache.coyote.http2;
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicReference;
 
-import jakarta.servlet.ServletConnection;
-
 import org.junit.Assert;
 import org.junit.Test;
-
-import org.apache.tomcat.util.net.SocketWrapperBase;
-import org.easymock.EasyMock;
 
 public class TestStreamInputBuffer {
 
@@ -36,13 +31,7 @@ public class TestStreamInputBuffer {
      */
     @Test
     public void testRequestBodyFullyReadRace() throws Exception {
-        SocketWrapperBase<?> socket = EasyMock.createNiceMock(SocketWrapperBase.class);
-        ServletConnection connection = EasyMock.createNiceMock(ServletConnection.class);
-        EasyMock.expect(socket.getServletConnection("h2c", "")).andStubReturn(connection);
-        EasyMock.expect(connection.getConnectionId()).andStubReturn("0");
-        EasyMock.replay(socket, connection);
-
-        Http2UpgradeHandler handler = new Http2UpgradeHandler(new Http2Protocol(), null, null, socket);
+        Http2UpgradeHandler handler = new Http2UpgradeHandler(new Http2Protocol(), null, null);
 
         for (int i = 0; i < 20; i++) {
             Stream stream = new Stream(Integer.valueOf(3), handler);
@@ -86,13 +75,7 @@ public class TestStreamInputBuffer {
      */
     @Test
     public void testIsReadyForReadDataArrivesDuringCheck() throws Exception {
-        SocketWrapperBase<?> socket = EasyMock.createNiceMock(SocketWrapperBase.class);
-        ServletConnection connection = EasyMock.createNiceMock(ServletConnection.class);
-        EasyMock.expect(socket.getServletConnection("h2c", "")).andStubReturn(connection);
-        EasyMock.expect(connection.getConnectionId()).andStubReturn("0");
-        EasyMock.replay(socket, connection);
-
-        Http2UpgradeHandler handler = new Http2UpgradeHandler(new Http2Protocol(), null, null, socket);
+        Http2UpgradeHandler handler = new Http2UpgradeHandler(new Http2Protocol(), null, null);
 
         Stream stream = new Stream(Integer.valueOf(3), handler);
         stream.state.receivedStartOfHeaders();
