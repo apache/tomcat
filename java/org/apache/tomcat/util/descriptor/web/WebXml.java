@@ -2481,11 +2481,13 @@ public class WebXml {
     }
 
     private static boolean mergeFilter(FilterDef src, FilterDef dest, boolean failOnConflict) {
-        if (dest.getAsyncSupported() == null) {
-            dest.setAsyncSupported(src.getAsyncSupported());
-        } else if (src.getAsyncSupported() != null) {
-            if (failOnConflict && !src.getAsyncSupported().equals(dest.getAsyncSupported())) {
-                return false;
+        if (src.getAsyncSupported() != null) {
+            if (dest.getAsyncSupported() == null) {
+                dest.setAsyncSupported(src.getAsyncSupported().toString());
+            } else  {
+                if (failOnConflict && !src.getAsyncSupported().equals(dest.getAsyncSupported())) {
+                    return false;
+                }
             }
         }
 
