@@ -2130,9 +2130,24 @@
               extension=".APR" />
   </target>
 
-  <target name="test-apr-exists" description="Checks for APR lib"
+  <target name="test-apr-exists" description="Checks for APR/native connector support"
+          depends="test-tcnative-probe-classes"
           if="${execute.test.apr}">
-    <available file="${test.apr.loc}" property="apr.exists" />
+    <junit printsummary="no" fork="yes" showoutput="false" haltonfailure="false"
+           failureproperty="test.apr.error" logfailedtests="false">
+      <jvmarg value="${runtests.librarypath}"/>
+      <jvmarg value="${native.nativeaccess}"/>
+      <sysproperty key="tomcat.test.apr.required" value="true"/>
+      <classpath refid="tomcat.test.classpath"/>
+      <test name="org.apache.tomcat.jni.TesterLibraryLoad"/>
+    </junit>
+
+    <condition property="apr.exists">
+      <not>
+        <isset property="test.apr.error"/>
+      </not>
+    </condition>
+    <echo message="APR/native connector support is not available. APR tests will be skipped." if:set="test.apr.error" level="warning"/>
   </target>
 
   <target name="test-openssl-exists" description="Checks for the OpenSSL binary">
@@ -2152,7 +2167,7 @@
     <echo message="OpenSSL is not available. OpenSSL-related tests will be skipped or may fail." level="warning" unless:set="test.openssl.exists"/>
   </target>
 
-  <target name="test-tcnative-exists" description="Verifies tomcat-native library can be loaded">
+  <target name="test-tcnative-probe-classes" description="Compiles classes used to probe tomcat-native">
     <!-- Check if main classes are built -->
     <available file="${test.run.classes}/org/apache/tomcat/jni/Library.class"
                property="tomcat.classes.available"/>
@@ -2180,7 +2195,10 @@
         <pathelement location="${junit.jar}"/>
       </classpath>
     </javac>
+  </target>
 
+  <target name="test-tcnative-exists" description="Verifies tomcat-native library can be loaded"
+          depends="test-tcnative-probe-classes">
     <!-- Run test - it will check both test.apr.loc and system library paths -->
     <junit printsummary="no" fork="yes" showoutput="false" haltonfailure="false"
            failureproperty="test.tcnative.error" logfailedtests="false">

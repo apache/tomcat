@@ -26,12 +26,23 @@ public class TesterLibraryLoad {
 
     @Test
     public void testLibraryLoads() throws Exception {
+        boolean libraryInitialized = false;
         try {
             Library.initialize(null);
-            Library.terminate();
+            libraryInitialized = true;
+            if (Boolean.getBoolean("tomcat.test.apr.required")) {
+                Assert.assertTrue(
+                        "The APR/native connector requires Tomcat Native 1.x. Found Tomcat Native " +
+                                Library.versionString(),
+                        Library.TCN_MAJOR_VERSION < 2);
+            }
         } catch (LibraryNotFoundError e) {
             // Library not available - fail test to set property
             Assert.fail("Library not found");
+        } finally {
+            if (libraryInitialized) {
+                Library.terminate();
+            }
         }
     }
 }
