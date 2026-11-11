@@ -118,13 +118,13 @@ public class StringCache {
     /**
      * Access count.
      */
-    protected static int accessCount = 0;
+    protected static long accessCount = 0;
 
 
     /**
      * Hit count.
      */
-    protected static int hitCount = 0;
+    protected static long hitCount = 0;
 
 
     // ------------------------------------------------------------ Properties
@@ -211,12 +211,49 @@ public class StringCache {
 
 
     /**
+     * Returns the total number of cache lookups performed. If the total is more than {@link Integer#MAX_VALUE},
+     * {@link Integer#MAX_VALUE} is returned.
+     *
+     * @return the access count
+     *
+     * @deprecated Use {@link #getAccessCountLong()}. This method will be removed in Tomcat 12.0.x onwards.
+     */
+    @Deprecated
+    public int getAccessCount() {
+        long accessCount = StringCache.accessCount;
+        if (accessCount > Integer.MAX_VALUE) {
+            return Integer.MAX_VALUE;
+        } else {
+            return (int) accessCount;
+        }
+    }
+
+
+    /**
      * Returns the total number of cache lookups performed.
      *
      * @return the access count
      */
-    public int getAccessCount() {
+    public long getAccessCountLong() {
         return accessCount;
+    }
+
+    /**
+     * Returns the number of cache hits. If the total is more than {@link Integer#MAX_VALUE}, {@link Integer#MAX_VALUE}
+     * is returned.
+     *
+     * @return the hit count
+     *
+     * @deprecated Use {@link #getHitCountLong()}. This method will be removed in Tomcat 12.0.x onwards.
+     */
+    @Deprecated
+    public int getHitCount() {
+        long hitCount = StringCache.hitCount;
+        if (hitCount > Integer.MAX_VALUE) {
+            return Integer.MAX_VALUE;
+        } else {
+            return (int) hitCount;
+        }
     }
 
 
@@ -225,13 +262,12 @@ public class StringCache {
      *
      * @return the hit count
      */
-    public int getHitCount() {
+    public long getHitCountLong() {
         return hitCount;
     }
 
 
     // -------------------------------------------------- Public Static Methods
-
 
     /**
      * Resets all cache statistics and clears the cache.
