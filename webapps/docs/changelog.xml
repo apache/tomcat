@@ -251,6 +251,10 @@
         Remove support for HTTP 0.9. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        <bug>70287</bug>: Restore the keep-alive timeout after a sendfile write.
+        Patch provided by Artur Shellunts. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
