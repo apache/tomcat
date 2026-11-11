@@ -50,7 +50,7 @@
   following changes/additions to a working non-TLS cluster configuration are required:
   </p>
   <ul>
-    <li>OpenSSL-FFM support (Java 22+ and OpenSSL library) or Tomact Native 1.2.17+ must be available to provide the TLS
+    <li>OpenSSL-FFM support (Java 22+ and OpenSSL library) or Tomact Native 2.0.17+ must be available to provide the TLS
         support.</li>
     <li>The <code>pskKey</code> and <code>pskIdentity</code> attributes of the <code>Channel</code> must be set to the
         same values on each cluster node.</li>
