@@ -169,7 +169,6 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
         // Then try sending some data (which should fail)
         sendData(3, new byte[] {});
-        parser.readFrame();
 
         Assert.assertTrue(output.getTrace(),
                 output.getTrace().startsWith("3-RST-[" + Http2Error.STREAM_CLOSED.getCode() + "]"));

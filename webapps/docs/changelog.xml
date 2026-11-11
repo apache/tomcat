@@ -123,6 +123,11 @@
         counts and hit counts as <code>long</code> rather than <code>int</code>.
         (markt)
       </fix>
+      <fix>
+        Receiving an HTTP/2 <code>DATA</code> frame on a stream that has already
+        been reset is now treated as a connection error as per RFC 9113, section
+        5.1. Pull request <pr>1129</pr> provided by Arturo Bernal. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
