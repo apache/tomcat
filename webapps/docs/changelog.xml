@@ -259,6 +259,11 @@
         <bug>70288</bug>: Fix bug that could cause request body truncation with
         HTTP/2. Based on a patch by Alberto Limón. (markt)
       </fix>
+      <fix>
+        <bug>70296</bug>: Update the <code>StringCache</code> to report access
+        counts and hit counts as <code>long</code> rather than <code>int</code>.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
