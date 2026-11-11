@@ -114,6 +114,10 @@
         <bug>70287</bug>: Restore the keep-alive timeout after a sendfile write.
         Patch provided by Artur Shellunts. (markt)
       </fix>
+      <fix>
+        <bug>70288</bug>: Fix bug that could cause request body truncation with
+        HTTP/2. Based on a patch by Alberto Limón. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
