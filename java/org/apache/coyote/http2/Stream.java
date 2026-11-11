@@ -1420,6 +1420,15 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 }
 
                 if (!isRequestBodyFullyRead()) {
+                    /*
+                     * Data is written to the buffer without holding readStateLock so it may have arrived since the
+                     * check above. If it has, report it now rather than registering read interest which would trigger
+                     * an unnecessary dispatch. Any data that arrives after this point will trigger a call to
+                     * onDataAvailable() which is blocked on readStateLock until this method returns.
+                     */
+                    if (available() > 0) {
+                        return true;
+                    }
                     readInterest = true;
                     long readTimeout = handler.getProtocol().getStreamReadTimeout();
                     if (readTimeout > 0) {
@@ -1439,7 +1448,12 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         final boolean isRequestBodyFullyRead() {
             readStateLock.lock();
             try {
-                return (inBuffer == null || inBuffer.position() == 0) && isInputFinished();
+                /*
+                 * Check for end of input first. The producer buffers data before it records end of stream so, once
+                 * input is finished, the buffer check is reliable. The reverse order allows an old "buffer empty"
+                 * observation to be combined with a newer "input finished" observation.
+                 */
+                return isInputFinished() && (inBuffer == null || inBuffer.position() == 0);
             } finally {
                 readStateLock.unlock();
             }
