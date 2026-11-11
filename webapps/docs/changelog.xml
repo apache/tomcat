@@ -108,6 +108,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.63 (schultz)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>70287</bug>: Restore the keep-alive timeout after a sendfile write.
+        Patch provided by Artur Shellunts. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
