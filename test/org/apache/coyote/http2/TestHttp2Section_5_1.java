@@ -156,7 +156,11 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
     @Test
     public void testClosedInvalidFrame01() throws Exception {
-        // HTTP2 upgrade
+        // RFC 9113, section 5.1 permits an endpoint to treat receipt of any frame other than
+        // PRIORITY, WINDOW_UPDATE, or RST_STREAM on a closed stream as a connection error of
+        // type STREAM_CLOSED. Tomcat adopts this stricter policy for the CLOSED_RST_RX state,
+        // so receiving DATA after RST_STREAM produces a GOAWAY rather than a RST_STREAM.
+
         http2Connect();
 
         // Send the headers for a POST (END_HEADERS set, END_STREAM not set) that promises a body but does not send it.
@@ -171,8 +175,47 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         sendData(3, new byte[] {});
         parser.readFrame();
 
-        Assert.assertTrue(output.getTrace(),
-                output.getTrace().startsWith("3-RST-[" + Http2Error.STREAM_CLOSED.getCode() + "]"));
+        handleGoAwayResponse(3, Http2Error.STREAM_CLOSED);
+    }
+
+
+    @Test
+    public void testRstStreamAfterRstStreamReceived() throws Exception {
+        // RFC 9113, section 5.1: RST_STREAM on a closed stream must be silently ignored.
+        // A second RST_STREAM after the stream has entered CLOSED_RST_RX must not produce
+        // a connection error; the connection must remain open.
+        http2Connect();
+
+        sendSimpleGetRequest(3);
+        readSimpleGetResponse();
+        output.clearTrace();
+
+        sendRst(3, Http2Error.CANCEL.getCode());
+        sendRst(3, Http2Error.CANCEL.getCode());
+
+        sendSimpleGetRequest(5);
+        readSimpleGetResponse();
+        Assert.assertTrue(output.getTrace(), output.getTrace().contains(getSimpleResponseTrace(5)));
+    }
+
+
+    @Test
+    public void testWindowUpdateAfterRstStreamReceived() throws Exception {
+        // RFC 9113, section 5.1: WINDOW_UPDATE on a closed stream must be silently ignored.
+        // Receiving WINDOW_UPDATE after the stream has entered CLOSED_RST_RX must not produce
+        // a connection error; the connection must remain open.
+        http2Connect();
+
+        sendSimpleGetRequest(3);
+        readSimpleGetResponse();
+        output.clearTrace();
+
+        sendRst(3, Http2Error.CANCEL.getCode());
+        sendWindowUpdate(3, 100);
+
+        sendSimpleGetRequest(5);
+        readSimpleGetResponse();
+        Assert.assertTrue(output.getTrace(), output.getTrace().contains(getSimpleResponseTrace(5)));
     }
 
 
