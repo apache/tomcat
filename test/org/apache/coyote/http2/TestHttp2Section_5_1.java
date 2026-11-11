@@ -173,7 +173,6 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
         // Then try sending some data (which should fail)
         sendData(3, new byte[] {});
-        parser.readFrame();
 
         handleGoAwayResponse(3, Http2Error.STREAM_CLOSED);
     }
