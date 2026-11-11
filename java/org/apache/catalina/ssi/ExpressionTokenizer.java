@@ -62,7 +62,7 @@ public class ExpressionTokenizer {
      * @param expr The expression
      */
     public ExpressionTokenizer(String expr) {
-        this.expr = expr.trim().toCharArray();
+        this.expr = expr.strip().toCharArray();
         this.length = this.expr.length;
     }
 

@@ -252,7 +252,7 @@ public class SSIProcessor {
                     collectingName = false;
                 }
             } else if (endQuote == 0 && c == '=') {
-                retString[idx++] = nameBuf.toString().trim();
+                retString[idx++] = nameBuf.toString().strip();
                 nameBuf.setLength(0);
                 collectingName = false;
             } else if (endQuote == 0) {

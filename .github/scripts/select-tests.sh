@@ -36,6 +36,10 @@ while IFS= read -r path; do
     *) continue ;;
   esac
 
+  case "$path" in
+    *[!A-Za-z0-9/_.-]*) continue ;;
+  esac
+
   # Package dir: strip the leading java/ and the trailing /<Class>.java.
   pkg="$(dirname "${path#java/}")"
   [ "$pkg" = "." ] && continue

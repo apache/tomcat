@@ -560,7 +560,7 @@ public class RewriteValve extends ValveBase {
                 if (rule.isNext() && newtest != null) {
                     if (rounds >= MAX_REWRITE_ROUNDS) {
                         containerLog.warn(sm.getString("rewriteValve.maxRounds",
-                                Integer.valueOf(MAX_REWRITE_ROUNDS)));
+                                Integer.valueOf(MAX_REWRITE_ROUNDS), request.getRequestURI()));
                         break;
                     }
                     rounds++;
@@ -657,7 +657,7 @@ public class RewriteValve extends ValveBase {
                     request.setAsyncSupported(pipeline.isAsyncSupported());
                     pipeline.getFirst().invoke(request, response);
                 }
-            } else {
+            } else if (!done) {
                 Valve next = getNext();
                 if (valveSkip) {
                     next = next.getNext();

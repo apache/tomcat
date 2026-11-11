@@ -25,11 +25,7 @@ import javax.sql.XAConnection;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
@@ -82,9 +78,9 @@ class TestXaConnection extends JdbcPoolBaseTest {
         String t = uniqueTable();
 
         XAConnection xc = ds.getXAConnection();
-        assertNotNull(xc);
+        Assertions.assertNotNull(xc);
         XAResource xa = xc.getXAResource();
-        assertNotNull(xa, "pooled connection must expose its XA resource");
+        Assertions.assertNotNull(xa, "pooled connection must expose its XA resource");
         Xid xid = new TestXid(1);
 
         Connection c = xc.getConnection();
@@ -95,22 +91,22 @@ class TestXaConnection extends JdbcPoolBaseTest {
             st.execute("INSERT INTO " + t + " VALUES (1)");
         }
         xa.end(xid, XAResource.TMSUCCESS);
-        assertEquals(XAResource.XA_OK, xa.prepare(xid));
+        Assertions.assertEquals(XAResource.XA_OK, xa.prepare(xid));
 
         // not visible before commit
-        assertEquals(0, adminRowCount(t), "work must be invisible before commit");
+        Assertions.assertEquals(0, adminRowCount(t), "work must be invisible before commit");
 
         xa.commit(xid, false);
-        assertEquals(1, adminRowCount(t), "XA commit must persist to the database");
+        Assertions.assertEquals(1, adminRowCount(t), "XA commit must persist to the database");
 
         // the branch is complete; returning the XA connection to the pool
         // must keep the physical connection alive for the next borrower
         xc.close();
-        assertEquals(1, poolSessions(),
+        Assertions.assertEquals(1, poolSessions(),
                 "the physical XA connection must stay in the pool");
         try (Connection again = ds.getConnection();
                 ResultSet rs = again.createStatement().executeQuery("SELECT 1")) {
-            assertTrue(rs.next(), "the pooled connection must still be usable");
+            Assertions.assertTrue(rs.next(), "the pooled connection must still be usable");
         }
     }
 
@@ -132,24 +128,24 @@ class TestXaConnection extends JdbcPoolBaseTest {
         }
         xa.end(xid, XAResource.TMSUCCESS);
         xa.rollback(xid);
-        assertEquals(0, adminRowCount(t), "rolled back XA work must be gone");
+        Assertions.assertEquals(0, adminRowCount(t), "rolled back XA work must be gone");
         xc.close();
 
         // pool hands the very same physical connection out again, for plain
         // non-XA use, with the session state restored to the pool defaults
         try (Connection again = ds.getConnection()) {
             try (ResultSet rs = again.createStatement().executeQuery("SELECT 1")) {
-                assertTrue(rs.next());
+                Assertions.assertTrue(rs.next());
             }
-            assertTrue(again.getAutoCommit(),
+            Assertions.assertTrue(again.getAutoCommit(),
                     "a returned XA connection must come back in auto commit mode");
             setSessionMarker(again, 7);
         }
         try (Connection third = ds.getConnection()) {
-            assertEquals(Integer.valueOf(7), sessionMarker(third),
+            Assertions.assertEquals(Integer.valueOf(7), sessionMarker(third),
                     "the rolled back XA connection must have been pooled, not replaced");
         }
-        assertEquals(1, poolSessions(),
+        Assertions.assertEquals(1, poolSessions(),
                 "the XA pool must hold a single physical connection");
     }
 
@@ -157,7 +153,7 @@ class TestXaConnection extends JdbcPoolBaseTest {
     void xaPoolHandedOutConnectionImplementsXaConnection() throws Exception {
         XADataSource ds = newXaPool();
         Connection c = ds.getConnection();
-        assertInstanceOf(XAConnection.class, c,
+        Assertions.assertInstanceOf(XAConnection.class, c,
                 "connections from an XA pool must implement XAConnection");
         c.close();
     }
@@ -165,7 +161,117 @@ class TestXaConnection extends JdbcPoolBaseTest {
     @Test
     void plainPoolRefusesXaConnections() throws Exception {
         DataSource ds = newDataSource(); // non-XA pool
-        assertThrows(SQLException.class, ds::getXAConnection,
+        Assertions.assertThrows(SQLException.class, ds::getXAConnection,
                 "a non-XA pool must refuse XA connections");
+    }
+
+    @Test
+    void driverUrlBackedXaPoolFailsXaRequestWithActionableMessage() {
+        // The documented "<Resource type=javax.sql.XADataSource .../>"
+        // shape with only driver/URL: the marker class cannot make the
+        // pooled connections XA-capable, so the request must fail with an
+        // explicit hint at the missing configuration instead of a generic
+        // refusal that only reads as such after the connection was already
+        // borrowed, closed and thrown away.
+        XADataSource ds = new XADataSource();
+        ds.setUrl(getUrl());
+        ds.setDriverClassName("org.h2.Driver");
+        ds.setUsername("sa");
+        ds.setPassword("");
+        ds.getPoolProperties().setJmxEnabled(false);
+        ds.getPoolProperties().setInitialSize(1);
+        ds.getPoolProperties().setMinIdle(0);
+        manage(ds);
+
+        SQLException e = Assertions.assertThrows(SQLException.class, ds::getXAConnection,
+                "a driver/URL backed XA pool must refuse XA connections");
+        Assertions.assertTrue(e.getMessage().contains("dataSource"),
+                "failure must name the missing dataSource/dataSourceJNDI configuration, was: "
+                        + e.getMessage());
+        SQLException e2 = Assertions.assertThrows(
+                SQLException.class, () -> ds.getXAConnection("sa", ""),
+                "the credential variant must refuse the same way");
+        Assertions.assertTrue(e2.getMessage().contains("dataSource"),
+                "failure must name the missing dataSource/dataSourceJNDI configuration, was: "
+                        + e2.getMessage());
+    }
+
+    @Test
+    void nonXaBackedDataSourceFailsXaRequestWithActionableMessage() {
+        // A pool backed through the dataSource attribute by a data source
+        // that is not XA-capable must also fail with the configuration hint.
+        XADataSource ds = new XADataSource();
+        ds.getPoolProperties().setJmxEnabled(false);
+        ds.getPoolProperties().setInitialSize(1);
+        ds.getPoolProperties().setMinIdle(0);
+        ds.getPoolProperties().setDataSource(new PlainDataSource(getUrl()));
+        manage(ds);
+
+        SQLException e = Assertions.assertThrows(SQLException.class, ds::getXAConnection,
+                "a pool backed by a non-XA data source must refuse XA connections");
+        Assertions.assertTrue(e.getMessage().contains("PlainDataSource"),
+                "failure must name the offending data source, was: " + e.getMessage());
+        Assertions.assertTrue(e.getMessage().contains("javax.sql.XADataSource"),
+                "failure must name the missing XA data source type, was: " + e.getMessage());
+    }
+
+    /**
+     * A plain, non-XA data source, as one might reference by mistake
+     * through the dataSource or dataSourceJNDI attribute.
+     */
+    private static final class PlainDataSource implements javax.sql.DataSource {
+
+        private final org.h2.jdbcx.JdbcDataSource delegate = new org.h2.jdbcx.JdbcDataSource();
+
+        PlainDataSource(String url) {
+            delegate.setUrl(url);
+            delegate.setUser("sa");
+            delegate.setPassword("");
+        }
+
+        @Override
+        public Connection getConnection() throws SQLException {
+            return delegate.getConnection();
+        }
+
+        @Override
+        public Connection getConnection(String username, String password) throws SQLException {
+            return delegate.getConnection(username, password);
+        }
+
+        @Override
+        public java.io.PrintWriter getLogWriter() throws SQLException {
+            return delegate.getLogWriter();
+        }
+
+        @Override
+        public void setLogWriter(java.io.PrintWriter out) throws SQLException {
+            delegate.setLogWriter(out);
+        }
+
+        @Override
+        public void setLoginTimeout(int seconds) throws SQLException {
+            delegate.setLoginTimeout(seconds);
+        }
+
+        @Override
+        public int getLoginTimeout() throws SQLException {
+            return delegate.getLoginTimeout();
+        }
+
+        @Override
+        public java.util.logging.Logger getParentLogger() throws java.sql.SQLFeatureNotSupportedException {
+            return delegate.getParentLogger();
+        }
+
+        @Override
+        public <T> T unwrap(Class<T> iface) throws SQLException {
+            return delegate.unwrap(iface);
+        }
+
+        @Override
+        public boolean isWrapperFor(Class<?> iface) throws SQLException {
+            return iface.isInstance(this) || delegate.isWrapperFor(iface);
+        }
     }
 }

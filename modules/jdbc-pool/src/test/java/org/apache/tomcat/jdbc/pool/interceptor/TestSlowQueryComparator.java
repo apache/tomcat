@@ -21,8 +21,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport.QueryStats;
@@ -58,18 +57,18 @@ class TestSlowQueryComparator {
             stats.add(qs);
         }
 
-        assertDoesNotThrow(() -> Collections.sort(stats, comparator),
+        Assertions.assertDoesNotThrow(() -> Collections.sort(stats, comparator),
                 "sorting the collected statistics must not fail");
     }
 
     @Test
     void aQueryComparedWithItselfIsEqual() {
         QueryStats neverInvoked = new QueryStats("abc");
-        assertEquals(0, comparator.compare(neverInvoked, neverInvoked));
+        Assertions.assertEquals(0, comparator.compare(neverInvoked, neverInvoked));
 
         QueryStats invoked = new QueryStats("abc");
         invoked.add(0, 100);
-        assertEquals(0, comparator.compare(invoked, invoked));
+        Assertions.assertEquals(0, comparator.compare(invoked, invoked));
     }
 
     @Test
@@ -78,9 +77,9 @@ class TestSlowQueryComparator {
         QueryStats invoked = new QueryStats("def");
         invoked.add(0, 100);
 
-        assertEquals(1, comparator.compare(neverInvoked, invoked),
+        Assertions.assertEquals(1, comparator.compare(neverInvoked, invoked),
                 "a query without invocations must sort after an invoked one");
-        assertEquals(-1, comparator.compare(invoked, neverInvoked));
+        Assertions.assertEquals(-1, comparator.compare(invoked, neverInvoked));
     }
 
     @Test
@@ -90,8 +89,8 @@ class TestSlowQueryComparator {
         first.add(0, 100);
         second.add(0, 100);
 
-        assertEquals(0, comparator.compare(first, second));
-        assertEquals(0, comparator.compare(second, first));
+        Assertions.assertEquals(0, comparator.compare(first, second));
+        Assertions.assertEquals(0, comparator.compare(second, first));
     }
 
     @Test
@@ -101,7 +100,7 @@ class TestSlowQueryComparator {
         older.add(0, 100);
         newer.add(0, 150);
 
-        assertEquals(-1, comparator.compare(older, newer));
-        assertEquals(1, comparator.compare(newer, older));
+        Assertions.assertEquals(-1, comparator.compare(older, newer));
+        Assertions.assertEquals(1, comparator.compare(newer, older));
     }
 }

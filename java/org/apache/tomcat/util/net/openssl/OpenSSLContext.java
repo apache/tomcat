@@ -18,6 +18,7 @@ package org.apache.tomcat.util.net.openssl;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.ref.Cleaner;
 import java.lang.ref.Cleaner.Cleanable;
@@ -29,10 +30,9 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Base64;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 
@@ -60,7 +60,6 @@ import org.apache.tomcat.util.net.SSLHostConfig.CertificateVerification;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
 import org.apache.tomcat.util.net.SSLHostConfigPreSharedKey;
-import org.apache.tomcat.util.net.SSLUtilBase;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -551,6 +550,42 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
 
     /**
+     * Determines if a PEM certificate file holds more than the server certificate, i.e. it also holds the certificate
+     * chain. The certificates are counted without decoding the file. The file may also hold a private key, which may
+     * be encrypted, and the password for that key is not needed to find out if there is a certificate chain.
+     *
+     * @param certificateFile The certificate file
+     *
+     * @return {@code true} if the file holds the server certificate and at least one more certificate
+     */
+    private static boolean hasCertificateChain(String certificateFile) {
+        if (certificateFile.toLowerCase(Locale.ENGLISH).endsWith(".pkcs12")) {
+            // Not a PEM file. Leave the handling of the bundle to the native library.
+            return false;
+        }
+        int certificates = 0;
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(new FileInputStream(certificateFile), StandardCharsets.ISO_8859_1))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // The types of PEM object that OpenSSL reads as a certificate
+                if (line.startsWith("-----BEGIN CERTIFICATE-----") ||
+                        line.startsWith("-----BEGIN X509 CERTIFICATE-----") ||
+                        line.startsWith("-----BEGIN TRUSTED CERTIFICATE-----")) {
+                    certificates++;
+                    if (certificates > 1) {
+                        return true;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            // Leave any problems with the file to the native library.
+        }
+        return false;
+    }
+
+
+    /**
      * Adds a certificate to this SSL context.
      *
      * @param certificate The certificate to add
@@ -571,24 +606,31 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             } else {
                 passwordToUse = certificate.getCertificateKeyPassword();
             }
-            SSLContext.setCertificate(state.ctx, SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()),
+            String certificateFile = SSLHostConfig.adjustRelativePath(certificate.getCertificateFile());
+            SSLContext.setCertificate(state.ctx, certificateFile,
                     SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()), passwordToUse,
                     getCertificateIndex(certificate));
-            // Set certificate chain file
-            SSLContext.setCertificateChainFile(state.ctx,
-                    SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()), false);
+            // Set the certificate chain. The chain file is only used if the certificate file holds the server
+            // certificate alone. If the certificate file already contains the certificate chain, the chain is taken
+            // from the certificate file (skipping the server certificate) and the chain file is ignored.
+            if (hasCertificateChain(certificateFile)) {
+                if (log.isDebugEnabled() && certificate.getCertificateChainFile() != null) {
+                    log.debug(sm.getString("openssl.chainFileIgnored", certificate.getCertificateChainFile(),
+                            certificate.getCertificateFile()));
+                }
+                SSLContext.setCertificateChainFile(state.ctx, certificateFile, true);
+            } else {
+                SSLContext.setCertificateChainFile(state.ctx,
+                        SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()), false);
+            }
         } else {
-            String alias = certificate.getCertificateKeyAlias();
             X509KeyManager x509KeyManager = certificate.getCertificateKeyManager();
-            if (alias == null) {
-                alias = SSLUtilBase.DEFAULT_KEY_ALIAS;
-            }
+            String alias = getServedAlias(certificate);
             X509Certificate[] chain = x509KeyManager.getCertificateChain(alias);
-            if (chain == null) {
-                alias = findAlias(x509KeyManager, certificate);
-                chain = x509KeyManager.getCertificateChain(alias);
-            }
             PrivateKey key = x509KeyManager.getPrivateKey(alias);
+            if (key == null || key.getEncoded() == null || chain == null || chain.length == 0) {
+                throw new SSLException(sm.getString("openssl.errorLoadingCertificate", alias));
+            }
             String encodedKey = BEGIN_KEY +
                     Base64.getMimeEncoder(64, new byte[] { '\n' }).encodeToString(key.getEncoded()) + END_KEY;
             SSLContext.setCertificateRaw(state.ctx, chain[0].getEncoded(),
@@ -620,32 +662,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         return result;
     }
 
-
-    /*
-     * Find a valid alias when none was specified in the config.
-     */
-    private static String findAlias(X509KeyManager keyManager, SSLHostConfigCertificate certificate) {
-
-        Type type = certificate.getType();
-        String result = null;
-
-        List<Type> candidateTypes = new ArrayList<>();
-        if (Type.UNDEFINED.equals(type)) {
-            // Try all types to find an suitable alias
-            candidateTypes.addAll(Arrays.asList(Type.values()));
-            candidateTypes.remove(Type.UNDEFINED);
-        } else {
-            // Look for the specific type to find a suitable alias
-            candidateTypes.add(type);
-        }
-
-        Iterator<Type> iter = candidateTypes.iterator();
-        while (result == null && iter.hasNext()) {
-            result = keyManager.chooseServerAlias(iter.next().getKeyType(), null, null);
-        }
-
-        return result;
-    }
 
     private static X509TrustManager chooseTrustManager(TrustManager[] managers) {
         for (TrustManager m : managers) {
@@ -695,20 +711,17 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
     @Override
     public X509Certificate[] getCertificateChain(String alias) {
-        X509Certificate[] chain = null;
         X509KeyManager x509KeyManager = certificate.getCertificateKeyManager();
-        if (x509KeyManager != null) {
-            if (alias == null) {
-                alias = SSLUtilBase.DEFAULT_KEY_ALIAS;
-            }
-            chain = x509KeyManager.getCertificateChain(alias);
-            if (chain == null) {
-                alias = findAlias(x509KeyManager, certificate);
-                chain = x509KeyManager.getCertificateChain(alias);
-            }
+        if (x509KeyManager == null) {
+            return null;
         }
+        return x509KeyManager.getCertificateChain(alias);
+    }
 
-        return chain;
+    @Override
+    public X509KeyManager[] getServerKeyManagers(SSLHostConfigCertificate certificate) {
+        X509KeyManager x509KeyManager = certificate.getCertificateKeyManager();
+        return x509KeyManager == null ? new X509KeyManager[0] : new X509KeyManager[] { x509KeyManager };
     }
 
     @Override

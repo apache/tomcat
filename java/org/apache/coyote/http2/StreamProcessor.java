@@ -85,6 +85,7 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
         try {
             // Note: The regular processor uses the socketWrapper lock, but using that here triggers a deadlock
             processLock.lock();
+            // HTTP/2 equivalent of AbstractConnectionHandler#process() without the socket <-> processor mapping
             try {
                 /*
                  * In some scenarios, error handling may trigger multiple ERROR events for the same stream. The first
@@ -95,8 +96,10 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
                 if (!stream.equals(handler.getStream(stream.getIdAsInt()))) {
                     return;
                 }
-                // HTTP/2 equivalent of AbstractConnectionHandler#process() without the
-                // socket <-> processor mapping
+                // Avoid duplicate timeout events
+                if (event == SocketEvent.TIMEOUT && !checkAsyncTimeoutGeneration()) {
+                    return;
+                }
                 SocketState state = SocketState.CLOSED;
                 boolean reuseRequestAndResponse = false;
                 try {
@@ -134,12 +137,16 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
                             stream.close(ce);
                         } else if (!getErrorState().isIoAllowed()) {
                             StreamException se = stream.getResetException();
-                            if (se == null) {
+                            if (se == null && stream.canReset()) {
                                 se = new StreamException(
                                         sm.getString("streamProcessor.error.stream", stream.getConnectionId(),
                                                 stream.getIdAsString()),
                                         Http2Error.INTERNAL_ERROR, stream.getIdAsInt());
                             }
+                            /*
+                             * If the stream is already closed (e.g. the client has already reset it), se will be null
+                             * and there is no need to send a reset in response. Still need to call close to perform the necessary clean-up.
+                             */
                             stream.close(se);
                         } else {
                             if (!stream.isActive()) {

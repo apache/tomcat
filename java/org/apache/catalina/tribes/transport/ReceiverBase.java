@@ -258,24 +258,6 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
      * @param socket    The socket to bind
      * @param portstart Starting port for bind attempts
      * @param retries   Number of times to attempt to bind (port incremented between attempts)
-     *
-     * @throws IOException Socket bind error
-     *
-     * @deprecated Use {@link #bind(ServerSocket, int, int, boolean)}. This method will be removed in Tomcat 12.
-     */
-    @Deprecated
-    protected void bind(ServerSocket socket, int portstart, int retries) throws IOException {
-        bind(socket, portstart, retries, false);
-    }
-
-    /**
-     * Attempts to bind using the provided port and if that fails attempts to bind to each of the ports from portstart
-     * to (portstart + retries -1) until either there are no more ports or the bind is successful. The address to bind
-     * to is obtained via a call to {@link #resolveBind()}.
-     *
-     * @param socket    The socket to bind
-     * @param portstart Starting port for bind attempts
-     * @param retries   Number of times to attempt to bind (port incremented between attempts)
      * @param secure    Is this bind for a secure port or not
      *
      * @throws IOException Socket bind error

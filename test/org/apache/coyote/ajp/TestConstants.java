@@ -30,7 +30,6 @@ public class TestConstants {
     @Test
     public void testGetResponseHeaderForCodeOutOfBounds() {
         Assert.assertNull(Constants.getResponseHeaderForCode(-1));
-        Assert.assertNull(Constants.getResponseHeaderForCode(Constants.SC_RESP_AJP13_MAX));
         Assert.assertNull(Constants.getResponseHeaderForCode(Integer.MAX_VALUE));
     }
 }

@@ -163,16 +163,17 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
         http2Connect();
 
-        // Complete a full request/response on stream 3 to drive it to CLOSED_TX,
-        // then send RST_STREAM so the server transitions to CLOSED_RST_RX.
-        sendSimpleGetRequest(3);
-        readSimpleGetResponse();
-        output.clearTrace();
+        // Send the headers for a POST (END_HEADERS set, END_STREAM not set) that promises a body but does not send it.
+        // The servlet blocks reading the body so no response is generated before the reset below. The header block
+        // must be complete else the RST is a connection error (RFC 9113, section 6.2)
+        sendParameterPostRequest(3, null, null, 10, false);
 
-        sendRst(3, Http2Error.CANCEL.getCode());
+        // Send a rst
+        sendRst(3, Http2Error.INTERNAL_ERROR.getCode());
 
-        // DATA on a CLOSED_RST_RX stream must trigger a connection error.
+        // Then try sending some data (which should fail)
         sendData(3, new byte[] {});
+        parser.readFrame();
 
         handleGoAwayResponse(3, Http2Error.STREAM_CLOSED);
     }

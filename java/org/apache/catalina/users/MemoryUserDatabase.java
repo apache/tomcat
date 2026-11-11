@@ -700,10 +700,10 @@ class MemoryGroupCreationFactory extends AbstractObjectCreationFactory {
                 String rolename;
                 int comma = roles.indexOf(',');
                 if (comma >= 0) {
-                    rolename = roles.substring(0, comma).trim();
+                    rolename = roles.substring(0, comma).strip();
                     roles = roles.substring(comma + 1);
                 } else {
-                    rolename = roles.trim();
+                    rolename = roles.strip();
                     roles = "";
                 }
                 if (!rolename.isEmpty()) {
@@ -789,10 +789,10 @@ class MemoryUserCreationFactory extends AbstractObjectCreationFactory {
                 String groupname;
                 int comma = groups.indexOf(',');
                 if (comma >= 0) {
-                    groupname = groups.substring(0, comma).trim();
+                    groupname = groups.substring(0, comma).strip();
                     groups = groups.substring(comma + 1);
                 } else {
-                    groupname = groups.trim();
+                    groupname = groups.strip();
                     groups = "";
                 }
                 if (!groupname.isEmpty()) {
@@ -809,10 +809,10 @@ class MemoryUserCreationFactory extends AbstractObjectCreationFactory {
                 String rolename;
                 int comma = roles.indexOf(',');
                 if (comma >= 0) {
-                    rolename = roles.substring(0, comma).trim();
+                    rolename = roles.substring(0, comma).strip();
                     roles = roles.substring(comma + 1);
                 } else {
-                    rolename = roles.trim();
+                    rolename = roles.strip();
                     roles = "";
                 }
                 if (!rolename.isEmpty()) {

@@ -245,6 +245,33 @@ public class SSLHostConfigCertificate implements Serializable {
 
 
     /**
+     * Returns the alias the given key manager would choose to serve for this certificate, or {@code null} if it has no
+     * suitable entry. When {@link #getType()} is {@link Type#UNDEFINED} every key type is tried. For a key manager that
+     * Tomcat has pinned to an alias this is the alias used in every handshake, which can differ from
+     * {@link #getCertificateKeyAlias()} - for example after the SunMSCAPI Windows-MY numbered-duplicate resolution
+     * performed by SSLUtilBase#getKeyManagers(). Other key managers may choose differently in a handshake, for example
+     * depending on the negotiated key type or the requested server name.
+     *
+     * @param keyManager the key manager that will serve this certificate
+     *
+     * @return the served alias, or {@code null} if the key manager has no suitable entry
+     */
+    public String chooseServerAlias(X509KeyManager keyManager) {
+        Type[] candidateTypes = Type.UNDEFINED.equals(type) ? Type.values() : new Type[] { type };
+        for (Type candidateType : candidateTypes) {
+            if (candidateType == Type.UNDEFINED) {
+                continue;
+            }
+            String alias = keyManager.chooseServerAlias(candidateType.getKeyType(), null, null);
+            if (alias != null) {
+                return alias;
+            }
+        }
+        return null;
+    }
+
+
+    /**
      * Returns the password for the certificate's private key.
      *
      * @return the certificate key password
@@ -304,6 +331,16 @@ public class SSLHostConfigCertificate implements Serializable {
      */
     public String getCertificateKeyAlias() {
         return certificateKeyAlias;
+    }
+
+
+    /**
+     * Returns the configured key alias or, if none is configured, {@link SSLUtilBase#DEFAULT_KEY_ALIAS}.
+     *
+     * @return the configured or default key alias, never {@code null}
+     */
+    public String getCertificateKeyAliasOrDefault() {
+        return certificateKeyAlias == null ? SSLUtilBase.DEFAULT_KEY_ALIAS : certificateKeyAlias;
     }
 
 
@@ -478,7 +515,9 @@ public class SSLHostConfigCertificate implements Serializable {
     // OpenSSL
 
     /**
-     * Sets the path to the certificate chain file used by OpenSSL.
+     * Sets the path to the certificate chain file. The chain file is only used if the certificate file
+     * (a PEM file or a PKCS#12 bundle) contains the server certificate alone. If the certificate file already contains
+     * the certificate chain, the chain file is ignored.
      *
      * @param certificateChainFile the path to the certificate chain file
      */
@@ -489,7 +528,7 @@ public class SSLHostConfigCertificate implements Serializable {
 
 
     /**
-     * Returns the path to the certificate chain file used by OpenSSL.
+     * Returns the path to the certificate chain file.
      *
      * @return the certificate chain file path
      */

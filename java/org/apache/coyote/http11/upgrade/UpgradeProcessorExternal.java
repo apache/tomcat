@@ -17,6 +17,7 @@
 package org.apache.coyote.http11.upgrade;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.ServletOutputStream;
@@ -24,6 +25,7 @@ import jakarta.servlet.ServletOutputStream;
 import org.apache.coyote.UpgradeToken;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketEvent;
@@ -58,11 +60,13 @@ public class UpgradeProcessorExternal extends UpgradeProcessorBase {
      */
     private final SocketWrapperBase<?> wrapper;
 
+    private AtomicBoolean stopCalled = new AtomicBoolean();
+
     /**
      * Constructs a new UpgradeProcessorExternal.
      *
-     * @param wrapper the socket wrapper
-     * @param upgradeToken the upgrade token
+     * @param wrapper          the socket wrapper
+     * @param upgradeToken     the upgrade token
      * @param upgradeGroupInfo the group info for statistics
      */
     public UpgradeProcessorExternal(SocketWrapperBase<?> wrapper, UpgradeToken upgradeToken,
@@ -105,10 +109,16 @@ public class UpgradeProcessorExternal extends UpgradeProcessorBase {
 
     @Override
     public void close() throws Exception {
-        upgradeServletInputStream.close();
-        upgradeServletOutputStream.close();
+        closeStreamsQuietly();
         // Triggers update of stats from UpgradeInfo to UpgradeGroupInfo
         upgradeInfo.setGroupInfo(null);
+        if (stopCalled.compareAndSet(false, true)) {
+            /*
+             * Read polling may have stopped at EOF. Ensure an application thread closing the connection still
+             * triggers socket closure and handler cleanup on a container thread.
+             */
+            wrapper.processSocket(SocketEvent.STOP, true);
+        }
     }
 
 
@@ -137,16 +147,7 @@ public class UpgradeProcessorExternal extends UpgradeProcessorBase {
             if (log.isTraceEnabled()) {
                 log.trace(sm.getString("upgradeProcessor.stop"));
             }
-            try {
-                upgradeServletInputStream.close();
-            } catch (IOException ioe) {
-                log.debug(sm.getString("upgradeProcessor.isCloseFail", ioe));
-            }
-            try {
-                upgradeServletOutputStream.close();
-            } catch (IOException ioe) {
-                log.debug(sm.getString("upgradeProcessor.osCloseFail", ioe));
-            }
+            closeStreamsQuietly();
             return SocketState.CLOSED;
         } else if (status == SocketEvent.ERROR) {
             // Give the listeners (if any) the chance to handle the error before
@@ -157,16 +158,7 @@ public class UpgradeProcessorExternal extends UpgradeProcessorBase {
             }
             upgradeServletInputStream.onError(error);
             upgradeServletOutputStream.onError(error);
-            try {
-                upgradeServletInputStream.close();
-            } catch (IOException ioe) {
-                log.debug(sm.getString("upgradeProcessor.isCloseFail", ioe));
-            }
-            try {
-                upgradeServletOutputStream.close();
-            } catch (IOException ioe) {
-                log.debug(sm.getString("upgradeProcessor.osCloseFail", ioe));
-            }
+            closeStreamsQuietly();
             return SocketState.CLOSED;
         } else {
             // Unexpected state
@@ -183,7 +175,37 @@ public class UpgradeProcessorExternal extends UpgradeProcessorBase {
             }
             return SocketState.CLOSED;
         }
+        if (upgradeServletInputStream.isEof()) {
+            /*
+             * Do not re-register read interest after EOF, but allow the output stream to register write interest while
+             * the application finishes its response.
+             */
+            return SocketState.UPGRADED_HALF_CLOSED;
+        }
         return SocketState.UPGRADED;
+    }
+
+
+    /*
+     * Close the input and output streams if not already closed, logging any exceptions at debug level.
+     */
+    private void closeStreamsQuietly() {
+        try {
+            if (!upgradeServletInputStream.isClosed()) {
+                upgradeServletInputStream.close();
+            }
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            log.debug(sm.getString("upgradeProcessor.isCloseFail", t));
+        }
+        try {
+            if (!upgradeServletOutputStream.isClosed()) {
+                upgradeServletOutputStream.close();
+            }
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            log.debug(sm.getString("upgradeProcessor.osCloseFail", t));
+        }
     }
 
 

@@ -20,7 +20,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import org.apache.catalina.tribes.Member;
-import org.apache.catalina.tribes.group.TribesSslContext;
 
 /** Abstract base implementation of a data sender. */
 public abstract class AbstractSender implements DataSender {

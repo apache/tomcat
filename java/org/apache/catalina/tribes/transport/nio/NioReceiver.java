@@ -40,13 +40,13 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.group.GroupChannel;
-import org.apache.catalina.tribes.group.TribesSslContext;
 import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.ObjectReader;
 import org.apache.catalina.tribes.transport.AbstractRxTask;
 import org.apache.catalina.tribes.transport.Constants;
 import org.apache.catalina.tribes.transport.ReceiverBase;
 import org.apache.catalina.tribes.transport.RxTaskPool;
+import org.apache.catalina.tribes.transport.TribesSslContext;
 import org.apache.catalina.tribes.util.ExceptionUtils;
 import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;

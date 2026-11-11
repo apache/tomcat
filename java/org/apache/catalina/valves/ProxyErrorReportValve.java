@@ -301,11 +301,24 @@ public class ProxyErrorReportValve extends ErrorReportValve {
                 if (log.isWarnEnabled()) {
                     log.warn(sm.getString("proxyErrorReportValve.error", urlString), failure);
                 }
-                // Discard any target metadata that was applied to this response before the failure, so that a stale
-                // Content-Length cannot truncate or suppress the fallback report. Fall back to the default error
-                // report rather than returning an empty response. The reported flag is consumed by super.report().
-                response.setContentLength(-1);
-                super.report(request, response, throwable);
+                if (response.isCommitted()) {
+                    /*
+                     * Headers have already been sent. Need to abort the connection so the client sees an incomplete
+                     * response.
+                     */
+                    response.setErrorReported();
+                    response.getCoyoteResponse().action(ActionCode.CLOSE_NOW, failure);
+                } else {
+                    /*
+                     * Discard any target metadata that was applied to this response before the failure, so that a stale
+                     * Content-Length cannot truncate or suppress the fallback report. Fall back to the default error
+                     * report rather than returning an empty response. The reported flag is consumed by super.report().
+                     */
+                    response.resetBuffer();
+                    response.setContentType(null);
+                    response.setContentLength(-1);
+                    super.report(request, response, throwable);
+                }
             }
         }
     }

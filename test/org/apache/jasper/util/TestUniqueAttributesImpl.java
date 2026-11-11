@@ -270,4 +270,45 @@ public class TestUniqueAttributesImpl {
         }
         Assert.assertEquals(1, attrs.getLength());
     }
+
+
+    /*
+     * A call with an illegal index fails without side effects. It must not
+     * leave the new name in the tracking set, where it would cause a later
+     * attribute of that name to be rejected as a duplicate.
+     */
+    @Test
+    public void testIllegalIndexLeavesTrackingUnchanged() throws Exception {
+        UniqueAttributesImpl attrs = createAttributes();
+
+        try {
+            attrs.setQName(5, "c");
+            Assert.fail("Expected ArrayIndexOutOfBoundsException");
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // expected
+        }
+        try {
+            attrs.setAttribute(-1, "", "d", "d", "CDATA", "4");
+            Assert.fail("Expected ArrayIndexOutOfBoundsException");
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // expected
+        }
+        try {
+            attrs.setQName(5, "a");
+            Assert.fail("Expected ArrayIndexOutOfBoundsException");
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // expected
+        }
+
+        // The names are still free and the existing names are still tracked
+        attrs.addAttribute("", "c", "c", "CDATA", "3");
+        attrs.addAttribute("", "d", "d", "CDATA", "4");
+        Assert.assertEquals(4, attrs.getLength());
+        try {
+            attrs.addAttribute("", "a", "a", "CDATA", "5");
+            Assert.fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+    }
 }

@@ -123,8 +123,12 @@ class Http2AsyncParser extends Http2Parser {
                 // Finish processing the connection
                 upgradeHandler.processConnectionCallback(webConnection, stream);
             } else {
-                upgradeHandler
-                        .closeConnection(new ConnectionException(error.getMessage(), Http2Error.PROTOCOL_ERROR, error));
+                /*
+                 * Use the error code of the HTTP/2 error, if there is one, so that the client is told why the
+                 * connection is being closed.
+                 */
+                upgradeHandler.closeConnection(error instanceof Http2Exception http2Exception ? http2Exception :
+                        new ConnectionException(error.getMessage(), Http2Error.PROTOCOL_ERROR, error));
             }
             // Continue reading frames
             upgradeHandler.upgradeDispatch(SocketEvent.OPEN_READ);
@@ -225,6 +229,14 @@ class Http2AsyncParser extends Http2Parser {
             }
 
             if (payload.position() < payloadSize) {
+                /*
+                 * If the payload is larger than the buffer provided to read it, the read can never complete. Once all
+                 * of the buffers are full, further reads return zero bytes which, if continued, results in an endless
+                 * read loop. validateFrame() above should already have rejected such a frame.
+                 */
+                if (payloadSize > payload.capacity()) {
+                    return CompletionHandlerCall.DONE;
+                }
                 return CompletionHandlerCall.CONTINUE;
             }
 

@@ -21,11 +21,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
@@ -46,7 +42,9 @@ import org.apache.tomcat.jdbc.pool.DataSource;
  * <p>The rules asserted below are the documented ones: statements are
  * cached per connection, the {@code max} count is counted over the whole
  * pool, and once that count is reached further statements are not cached
- * and are closed immediately.</p>
+ * and are closed immediately. A reused statement must also report the
+ * connection of the borrow it is handed to, not the one its previous
+ * borrower closed it with.</p>
  */
 class TestStatementCacheReuse extends JdbcPoolBaseTest {
 
@@ -78,35 +76,135 @@ class TestStatementCacheReuse extends JdbcPoolBaseTest {
         PreparedStatement prepared = first.prepareStatement(insert);
         Statement physical = driverStatement(prepared);
         prepared.setInt(1, 1);
-        assertEquals(1, prepared.executeUpdate());
+        Assertions.assertEquals(1, prepared.executeUpdate());
         prepared.close();
-        assertEquals(1, cacheOf(first).getCacheSizePerConnection(),
+        Assertions.assertEquals(1, cacheOf(first).getCacheSizePerConnection(),
                 "a closed statement must be waiting in the cache of its session");
         first.close();
 
         Connection second = ds.getConnection();
         try {
-            assertEquals(Integer.valueOf(17), sessionMarker(second),
+            Assertions.assertEquals(Integer.valueOf(17), sessionMarker(second),
                     "the same physical session must have been reused");
-            assertEquals(1, cacheOf(second).getCacheSizePerConnection(),
+            Assertions.assertEquals(1, cacheOf(second).getCacheSizePerConnection(),
                     "the cache must survive the return to the pool");
 
             PreparedStatement reused = second.prepareStatement(insert);
-            assertEquals(0, cacheOf(second).getCacheSizePerConnection(),
+            Assertions.assertEquals(0, cacheOf(second).getCacheSizePerConnection(),
                     "preparing the same statement again must take it out of the cache");
-            assertSame(physical, driverStatement(reused),
+            Assertions.assertSame(physical, driverStatement(reused),
                     "the next borrower must get the same physical statement, not a "
                             + "second prepare on the session");
 
             reused.setInt(1, 2);
-            assertEquals(1, reused.executeUpdate());
+            Assertions.assertEquals(1, reused.executeUpdate());
             reused.close();
-            assertEquals(1, cacheOf(second).getCacheSizePerConnection(),
+            Assertions.assertEquals(1, cacheOf(second).getCacheSizePerConnection(),
                     "the statement must go back into the cache when closed again");
         } finally {
             second.close();
         }
-        assertEquals(2, adminRowCount(table), "both executes must have reached the database");
+        Assertions.assertEquals(2, adminRowCount(table),
+                "both executes must have reached the database");
+    }
+
+    /**
+     * The connection a recycled statement reports is the one it is handed
+     * out on, not the one its previous borrower closed it with: that handle
+     * stops working the moment its borrow ends, and a framework unwrapping
+     * through {@code Statement.getConnection()} would receive a connection
+     * that answers every call as closed.
+     */
+    @Test
+    void aRecycledStatementReportsTheBorrowerItIsHandedTo() throws Exception {
+        DataSource ds = cachedPool("prepared=true,max=5", 1);
+        String table = uniqueTable();
+        ds.createPool();
+        try (Connection admin = adminConnection(); Statement st = admin.createStatement()) {
+            st.execute("CREATE TABLE " + table + " (v INT)");
+        }
+        String insert = "INSERT INTO " + table + " VALUES (?)";
+
+        Connection first = ds.getConnection();
+        setSessionMarker(first, 31);
+        PreparedStatement prepared = first.prepareStatement(insert);
+        Assertions.assertSame(first, prepared.getConnection(),
+                "a freshly prepared statement reports the handle that prepared it");
+        prepared.setInt(1, 1);
+        Assertions.assertEquals(1, prepared.executeUpdate());
+        prepared.close();
+        Assertions.assertEquals(1, cacheOf(first).getCacheSizePerConnection(),
+                "the statement must be waiting in the cache");
+        first.close();
+
+        Connection second = ds.getConnection();
+        try {
+            Assertions.assertEquals(Integer.valueOf(31), sessionMarker(second),
+                    "the same physical session must have been reused");
+            PreparedStatement reused = second.prepareStatement(insert);
+            Assertions.assertEquals(0, cacheOf(second).getCacheSizePerConnection(),
+                    "the statement must have come out of the cache");
+
+            // The application handle is the facade's proxy, which answers
+            // from the current borrow (pinned separately by
+            // aRecycledStatementBehindTheDefaultFacadeReportsTheCurrentBorrower).
+            // Beneath it sits the cache's own proxy, and that is the object
+            // the cache must have rebound to the new borrower.
+            Connection reported = reused.getConnection();
+            Assertions.assertSame(second, reported,
+                    "the recycled statement must report the borrower it is handed to, "
+                            + "not the borrower that closed it");
+            Statement inner = (Statement) proxiedObject(reused);
+            Assertions.assertSame(second, inner.getConnection(),
+                    "the cache's own proxy must have been rebound to the new borrower");
+            Connection bound = inner.getConnection();
+            Assertions.assertFalse(bound.isClosed(),
+                    "the bound connection must be the live handle of the current borrow");
+            try (Statement probe = bound.createStatement()) {
+                Assertions.assertTrue(probe.execute("SELECT 1"),
+                        "the bound connection must serve the current borrower");
+            }
+
+            reused.setInt(1, 2);
+            Assertions.assertEquals(1, reused.executeUpdate());
+            reused.close();
+        } finally {
+            second.close();
+        }
+        Assertions.assertEquals(2, adminRowCount(table),
+                "both executes must have reached the database");
+    }
+
+    /**
+     * The same contract with the default statement facade on: the facade
+     * answers {@code getConnection()} from the current borrow, so the answer
+     * must not depend on which borrower originally prepared the statement.
+     */
+    @Test
+    void aRecycledStatementBehindTheDefaultFacadeReportsTheCurrentBorrower() throws Exception {
+        DataSource ds = cachedPool("prepared=true,max=5", 1);
+        ds.createPool();
+
+        Connection first = ds.getConnection();
+        setSessionMarker(first, 32);
+        PreparedStatement prepared = first.prepareStatement("SELECT 1");
+        prepared.close();
+        Assertions.assertEquals(1, cacheOf(first).getCacheSizePerConnection());
+        first.close();
+
+        Connection second = ds.getConnection();
+        try {
+            Assertions.assertEquals(Integer.valueOf(32), sessionMarker(second),
+                    "the same physical session must have been reused");
+            try (PreparedStatement reused = second.prepareStatement("SELECT 1")) {
+                Assertions.assertEquals(0, cacheOf(second).getCacheSizePerConnection(),
+                        "the statement must have come out of the cache");
+                Assertions.assertSame(second, reused.getConnection(),
+                        "the recycled statement must report the current handle");
+            }
+        } finally {
+            second.close();
+        }
     }
 
     @Test
@@ -122,7 +220,7 @@ class TestStatementCacheReuse extends JdbcPoolBaseTest {
         Connection first = ds.getConnection();
         Connection second = ds.getConnection();
         try {
-            assertEquals(2, poolSessions(), "two borrowers must hold two sessions");
+            Assertions.assertEquals(2, poolSessions(), "two borrowers must hold two sessions");
 
             PreparedStatement onFirst = first.prepareStatement(insert);
             Statement physicalOnFirst = driverStatement(onFirst);
@@ -134,20 +232,20 @@ class TestStatementCacheReuse extends JdbcPoolBaseTest {
             onSecond.executeUpdate();
             onSecond.close();
 
-            assertEquals(1, cacheOf(first).getCacheSizePerConnection(),
+            Assertions.assertEquals(1, cacheOf(first).getCacheSizePerConnection(),
                     "the first session caches its own statement");
-            assertEquals(1, cacheOf(second).getCacheSizePerConnection(),
+            Assertions.assertEquals(1, cacheOf(second).getCacheSizePerConnection(),
                     "the second session caches its own statement");
-            assertEquals(2, cacheOf(first).getCacheSize().get(),
+            Assertions.assertEquals(2, cacheOf(first).getCacheSize(),
                     "the pool-wide count must see both");
-            assertNotSame(physicalOnFirst, physicalOnSecond,
+            Assertions.assertNotSame(physicalOnFirst, physicalOnSecond,
                     "a cached statement belongs to the session it was prepared on and "
                             + "must never be handed to another session");
         } finally {
             first.close();
             second.close();
         }
-        assertEquals(2, adminRowCount(table));
+        Assertions.assertEquals(2, adminRowCount(table));
     }
 
     @Test
@@ -159,8 +257,8 @@ class TestStatementCacheReuse extends JdbcPoolBaseTest {
         PreparedStatement onFirst = first.prepareStatement("SELECT 1");
         Statement physicalOnFirst = driverStatement(onFirst);
         onFirst.close();
-        assertEquals(1, cacheOf(first).getCacheSizePerConnection());
-        assertEquals(1, cacheOf(first).getCacheSize().get());
+        Assertions.assertEquals(1, cacheOf(first).getCacheSizePerConnection());
+        Assertions.assertEquals(1, cacheOf(first).getCacheSize());
 
         // The limit is reached, so the second session's statement cannot be
         // cached: the documentation says it is closed immediately.
@@ -168,21 +266,21 @@ class TestStatementCacheReuse extends JdbcPoolBaseTest {
         PreparedStatement onSecond = second.prepareStatement("SELECT 2");
         Statement physicalOnSecond = driverStatement(onSecond);
         onSecond.close();
-        assertTrue(physicalOnSecond.isClosed(),
+        Assertions.assertTrue(physicalOnSecond.isClosed(),
                 "once the pool-wide count is at max, a further statement must not be "
                         + "cached but closed immediately");
-        assertEquals(0, cacheOf(second).getCacheSizePerConnection());
-        assertEquals(1, cacheOf(first).getCacheSize().get(),
+        Assertions.assertEquals(0, cacheOf(second).getCacheSizePerConnection());
+        Assertions.assertEquals(1, cacheOf(first).getCacheSize(),
                 "the count must not grow past max");
 
         // Taking the cached statement out of the cache frees the slot for
         // the other session.
         PreparedStatement reused = first.prepareStatement("SELECT 1");
-        assertSame(physicalOnFirst, driverStatement(reused),
+        Assertions.assertSame(physicalOnFirst, driverStatement(reused),
                 "the first session's statement must still come from the cache");
         reused.close();
-        assertEquals(1, cacheOf(first).getCacheSizePerConnection());
-        assertEquals(1, cacheOf(first).getCacheSize().get(),
+        Assertions.assertEquals(1, cacheOf(first).getCacheSizePerConnection());
+        Assertions.assertEquals(1, cacheOf(first).getCacheSize(),
                 "putting it back must not exceed the limit either");
 
         first.close();
@@ -200,23 +298,23 @@ class TestStatementCacheReuse extends JdbcPoolBaseTest {
             PreparedStatement inCache = pooled.prepareStatement("SELECT 1");
             Statement physicalInCache = driverStatement(inCache);
             inCache.close();
-            assertEquals(1, cache.getCacheSizePerConnection());
-            assertFalse(physicalInCache.isClosed(),
+            Assertions.assertEquals(1, cache.getCacheSizePerConnection());
+            Assertions.assertFalse(physicalInCache.isClosed(),
                     "a cached statement must stay open - that is what saves the prepare");
 
             PreparedStatement overLimit = pooled.prepareStatement("SELECT 2");
             Statement physicalOverLimit = driverStatement(overLimit);
             overLimit.close();
-            assertTrue(physicalOverLimit.isClosed(),
+            Assertions.assertTrue(physicalOverLimit.isClosed(),
                     "the statement that did not fit must be closed, not parked");
-            assertEquals(1, cache.getCacheSizePerConnection(),
+            Assertions.assertEquals(1, cache.getCacheSizePerConnection(),
                     "the cache must not grow past the configured limit");
 
             // and preparing that statement again works, on a fresh statement
             PreparedStatement again = pooled.prepareStatement("SELECT 2");
-            assertNotSame(physicalOverLimit, driverStatement(again),
+            Assertions.assertNotSame(physicalOverLimit, driverStatement(again),
                     "the closed statement cannot come back; a new one must be prepared");
-            assertTrue(again.execute(), "the re-prepared statement must work");
+            Assertions.assertTrue(again.execute(), "the re-prepared statement must work");
             again.close();
         }
     }
@@ -236,22 +334,22 @@ class TestStatementCacheReuse extends JdbcPoolBaseTest {
         Statement physical = driverStatement(prepared);
         prepared.executeUpdate();
         prepared.close();
-        assertEquals(1, cacheOf(pooled).getCacheSizePerConnection());
+        Assertions.assertEquals(1, cacheOf(pooled).getCacheSizePerConnection());
         pooled.close();
 
         // the physical session is retired, with everything hanging off it
         ds.purge();
         try (Connection next = ds.getConnection()) {
-            assertEquals(0, cacheOf(next).getCacheSizePerConnection(),
+            Assertions.assertEquals(0, cacheOf(next).getCacheSizePerConnection(),
                     "a fresh session must start with an empty statement cache");
             try (PreparedStatement fresh = next.prepareStatement(insert)) {
-                assertNotSame(physical, driverStatement(fresh),
+                Assertions.assertNotSame(physical, driverStatement(fresh),
                         "the statement of the retired session must not be reachable");
-                assertEquals(1, fresh.executeUpdate(),
+                Assertions.assertEquals(1, fresh.executeUpdate(),
                         "the statement must simply be prepared again on the new session");
             }
         }
-        assertEquals(2, adminRowCount(table));
+        Assertions.assertEquals(2, adminRowCount(table));
     }
 
     @Test
@@ -265,21 +363,21 @@ class TestStatementCacheReuse extends JdbcPoolBaseTest {
             PreparedStatement notCached = pooled.prepareStatement("SELECT 1");
             Statement physical = driverStatement(notCached);
             notCached.close();
-            assertEquals(0, cache.getCacheSizePerConnection(),
+            Assertions.assertEquals(0, cache.getCacheSizePerConnection(),
                     "prepared statements must not be cached when prepared=false");
             try (PreparedStatement again = pooled.prepareStatement("SELECT 1")) {
-                assertNotSame(physical, driverStatement(again),
+                Assertions.assertNotSame(physical, driverStatement(again),
                         "so preparing again means a real prepare");
             }
 
             CallableStatement cached = pooled.prepareCall("{call ROUND(2.5, 0)}");
             Statement physicalCallable = driverStatement(cached);
-            assertTrue(cached.execute(), "the procedure must run");
+            Assertions.assertTrue(cached.execute(), "the procedure must run");
             cached.close();
-            assertEquals(1, cache.getCacheSizePerConnection(),
+            Assertions.assertEquals(1, cache.getCacheSizePerConnection(),
                     "callable statements must be cached when callable=true");
             try (CallableStatement again = pooled.prepareCall("{call ROUND(2.5, 0)}")) {
-                assertSame(physicalCallable, driverStatement(again),
+                Assertions.assertSame(physicalCallable, driverStatement(again),
                         "and the cached one must be handed out again");
             }
         }

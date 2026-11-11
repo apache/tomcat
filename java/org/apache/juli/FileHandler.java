@@ -237,6 +237,14 @@ public class FileHandler extends Handler {
             tsDate = "";
         }
 
+        String result;
+        try {
+            result = getFormatter().format(record);
+        } catch (Exception e) {
+            reportError(null, e, ErrorManager.FORMAT_FAILURE);
+            return;
+        }
+
         writerLock.readLock().lock();
         try {
             // If the date has changed, switch log files
@@ -258,14 +266,6 @@ public class FileHandler extends Handler {
                     writerLock.readLock().lock();
                     writerLock.writeLock().unlock();
                 }
-            }
-
-            String result;
-            try {
-                result = getFormatter().format(record);
-            } catch (Exception e) {
-                reportError(null, e, ErrorManager.FORMAT_FAILURE);
-                return;
             }
 
             try {
@@ -464,7 +464,7 @@ public class FileHandler extends Handler {
         if (value == null) {
             value = defaultValue;
         } else {
-            value = value.trim();
+            value = value.strip();
         }
         return value;
     }

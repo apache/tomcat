@@ -944,7 +944,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         }
         List<String> attrs = new ArrayList<>();
         for (String name : userAttributes.split(USER_ATTRIBUTES_DELIMITER)) {
-            name = name.trim();
+            name = name.strip();
             if (name.isEmpty()) {
                 continue;
             }
@@ -1609,7 +1609,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     }
 
     private static X509UsernameRetriever createUsernameRetriever(String className) throws LifecycleException {
-        if (null == className || className.trim().isEmpty()) {
+        if (null == className || className.strip().isEmpty()) {
             return new X509SubjectDnRetriever();
         }
 

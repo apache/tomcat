@@ -218,6 +218,11 @@
   <!-- set above.                                                            -->
   <property name="test.jvmarg.egd" value="-Dignore" />
 
+  <!-- Flag for building FFM and associated tests -->
+  <condition property="has-ffm">
+    <javaversion atleast="${release.java.version}" />
+  </condition>
+
   <!-- Location of OpenSSL binary (file name, not directory) -->
   <!-- The OpenSSL tests cases be disabled by specifying an invalid path here -->
   <property name="test.openssl.path" value="" />
@@ -303,6 +308,7 @@
     <filter token="GIT_BRANCH" value="${git.branch}"/>
     <filter token="MIN_JAVA_VERSION" value="${min.java.version}"/>
     <filter token="BUILD_JAVA_VERSION" value="${build.java.version}"/>
+    <filter token="RELEASE_JAVA_VERSION" value="${release.java.version}"/>
     <filter token="ANT_VERSION_REQUIRED" value="${ant.version.required}"/>
     <filter token="SERVLET_SPEC_VERSION" value="${servlet.spec.version}"/>
     <filter token="JSP_SPEC_VERSION" value="${jsp.spec.version}"/>
@@ -1053,9 +1059,6 @@
       <exclude name="org/apache/tomcat/util/openssl/**"/>
     </javac>
     <!-- Compile internal server components that use FFM -->
-    <condition property="has-ffm">
-      <javaversion atleast="${release.java.version}" />
-    </condition>
     <javac srcdir="java" destdir="${tomcat.classes}"
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
@@ -1947,6 +1950,24 @@
       <!-- Exclude these by default as Gump can't run them because the -->
       <!-- classes on which they depend are not in any output JAR.     -->
       <exclude name="org/apache/tomcat/buildutil/**" unless="test.includeBuildutil"/>
+      <!-- Exclude FFM tests as they are compiled below -->
+      <exclude name="org/apache/tomcat/util/net/openssl/panama/**"/>
+      <exclude name="org/apache/tomcat/util/openssl/**"/>
+    </javac>
+    <!-- Compile tests that use FFM -->
+    <javac srcdir="test" destdir="${test.classes}"
+           debug="${compile.debug}"
+           deprecation="${compile.deprecation}"
+           release="${release.java.version}"
+           encoding="ISO-8859-1"
+           includeAntRuntime="true"
+           if:set="has-ffm" >
+      <!-- Uncomment this to show unchecked warnings:
+      <compilerarg value="-Xlint:unchecked"/>
+      -->
+      <classpath refid="tomcat.test.classpath" />
+      <include name="org/apache/tomcat/util/net/openssl/panama/**"/>
+      <include name="org/apache/tomcat/util/openssl/**"/>
     </javac>
     <copy todir="${test.classes}">
       <fileset dir="test">
@@ -2291,6 +2312,9 @@
               <exclude name="**/integration/**" unless="test.includeIntegration" />
               <!-- Exclude tests that require large heaps -->
               <exclude name="**/*LargeHeap.java" unless="${test.includeLargeHeap}" />
+              <!-- Exclude FFM tests unless FFM has been compiled -->
+              <exclude name="org/apache/tomcat/util/net/openssl/panama/**" unless="has-ffm"/>
+              <exclude name="org/apache/tomcat/util/openssl/**" unless="has-ffm"/>
             </fileset>
           </batchtest>
         </junit>
@@ -2708,6 +2732,7 @@
       <fileset dir="${basedir}" defaultexcludes="true">
         <not>
           <or>
+            <filename name="**/.ant-targets-build.xml" />
             <filename name="**/.settings/**" />
             <filename name="**/.classpath"/>
             <filename name="**/.checkstyle"/>
@@ -2745,6 +2770,7 @@
             <filename name="work/**" />
             <filename name="modules/jdbc-pool/bin/**" />
             <filename name="modules/jdbc-pool/includes/**" />
+            <filename name="modules/jdbc-pool/target/**" />
             <and>
               <!-- exclude all modules except jdbc-pool -->
               <filename name="modules/**" />
@@ -4280,22 +4306,42 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
           description="Creates project directory .idea for IntelliJ IDEA">
 
     <copy todir="${tomcat.home}/.idea" overwrite="true">
-      <fileset dir="${tomcat.home}/res/ide-support/idea"/>
+      <fileset dir="${tomcat.home}/res/ide-support/idea">
+        <exclude name="tomcat-ffm.iml" unless:set="has-ffm"/>
+      </fileset>
       <filterset refid="classpath.filters"/>
       <filterset refid="version.filters"/>
+      <filterset>
+        <!-- The SDK is named after the Java version this runs on, as the build compiles with that JDK -->
+        <filter token="ANT_JAVA_VERSION" value="${ant.java.version}"/>
+      </filterset>
+      <filterchain>
+        <!-- As for the build, the code that uses the FFM API is only included when this runs on a Java version
+             that supports it. It then belongs to the tomcat-ffm module rather than being excluded. -->
+        <linecontains negate="true" if:set="has-ffm">
+          <contains value="IDEA-FFM-EXCLUDE"/>
+        </linecontains>
+        <linecontains negate="true" unless:set="has-ffm">
+          <contains value="IDEA-FFM-MODULE"/>
+        </linecontains>
+      </filterchain>
     </copy>
 
     <mkdir dir="${tomcat.home}/lib"/>
 
     <echo>IntelliJ IDEA project directory created.
 
-The SDK was set to &quot;${build.java.version}&quot; so make sure that your IDE has an SDK with that name,
+The SDK was set to &quot;${ant.java.version}&quot;, the Java version that ran this build.
+Make sure that your IDE has an SDK with that name,
 or update the Project Settings accordingly. Choose [File &gt; Project Structure] to open the settings dialog
-and set the SDK level, language level, etc. as needed.
-
-Some folders have been excluded by default as they require the latest SDK version and enabling of preview
-features. You can remove or comment out the exclusions to enable the directories in the .idea/tomcat.iml
-file, or via the IDEA UI by right-clicking folders, and choosing [Mark Directory as &gt; Cancel Exclusion]</echo>
+and set the SDK level, language level, etc. as needed.</echo>
+    <echo if:set="has-ffm">
+The code that uses the FFM API and its tests are in a separate module, tomcat-ffm. Its language level
+follows the SDK, while the build compiles that code for Java ${release.java.version}. The rest of the project
+does not depend on that module.</echo>
+    <echo unless:set="has-ffm">
+The code that uses the FFM API has been excluded as it requires Java ${release.java.version} or later.
+Run ant ide-intellij with Java ${release.java.version} or later to include it in a separate module, tomcat-ffm.</echo>
   </target>
 
   <!-- ============================ NetBeans =============================== -->

@@ -22,7 +22,6 @@ import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.apache.catalina.tribes.group.TribesSslContext;
 import org.apache.catalina.tribes.membership.MemberImpl;
 import org.apache.catalina.tribes.transport.nio.NioSender;
 import org.apache.catalina.tribes.transport.nio.PooledParallelSender;

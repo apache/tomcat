@@ -130,6 +130,10 @@ public abstract class AbstractEndpoint<S, U> {
              */
             UPGRADED,
             /**
+             * The connection has been closed for reads from the client but writes to the client may continue.
+             */
+            UPGRADED_HALF_CLOSED,
+            /**
              * Asynchronous I/O is in progress.
              */
             ASYNC_IO,
@@ -613,6 +617,7 @@ public abstract class AbstractEndpoint<S, U> {
      */
     protected void logCertificate(SSLHostConfigCertificate certificate) {
         SSLHostConfig sslHostConfig = certificate.getSSLHostConfig();
+        SSLContext sslContext = certificate.getSslContext();
 
         String certificateInfo;
 
@@ -622,10 +627,7 @@ public abstract class AbstractEndpoint<S, U> {
                     certificate.getCertificateFile(), certificate.getCertificateChainFile());
         } else {
             // Keystore based
-            String keyAlias = certificate.getCertificateKeyAlias();
-            if (keyAlias == null) {
-                keyAlias = SSLUtilBase.DEFAULT_KEY_ALIAS;
-            }
+            String keyAlias = certificate.getCertificateKeyAliasOrDefault();
             String keystoreFile;
             if (certificate.getCertificateKeystoreInternal() != null) {
                 // Keystore was set directly. Original location is unknown.
@@ -647,17 +649,24 @@ public abstract class AbstractEndpoint<S, U> {
         getLogCertificate().info(sm.getString("endpoint.tls.info", getName(), sslHostConfig.getHostName(),
                 certificate.getType(), certificateInfo, trustStoreSource));
 
-        SSLContext sslContext = certificate.getSslContext();
-        if (getLogCertificate().isDebugEnabled() && sslContext != null) {
-            String alias = certificate.getCertificateKeyAlias();
-            if (alias == null) {
-                alias = SSLUtilBase.DEFAULT_KEY_ALIAS;
+        if (sslContext != null) {
+            String servedAlias = sslContext.getServedAlias(certificate);
+
+            // Only a SunMSCAPI Windows-MY numbered duplicate ("alias (1)" etc., see SSLUtilBase) replaces a configured
+            // alias. Report it so the alias logged above is not mistaken for the one in use.
+            String configuredAlias = certificate.getCertificateKeyAlias();
+            if (configuredAlias != null && servedAlias.startsWith(configuredAlias + " (")) {
+                getLogCertificate()
+                        .info(sm.getString("endpoint.tls.info.cert.aliasResolved", configuredAlias, servedAlias));
             }
-            X509Certificate[] x509Certificates = sslContext.getCertificateChain(alias);
-            if (x509Certificates != null && x509Certificates.length > 0) {
-                getLogCertificate().debug(generateCertificateDebug(x509Certificates[0]));
-            } else {
-                getLogCertificate().debug(sm.getString("endpoint.tls.cert.noCerts"));
+
+            if (getLogCertificate().isDebugEnabled()) {
+                X509Certificate[] x509Certificates = sslContext.getCertificateChain(servedAlias);
+                if (x509Certificates != null && x509Certificates.length > 0) {
+                    getLogCertificate().debug(generateCertificateDebug(x509Certificates[0]));
+                } else {
+                    getLogCertificate().debug(sm.getString("endpoint.tls.cert.noCerts"));
+                }
             }
         }
     }

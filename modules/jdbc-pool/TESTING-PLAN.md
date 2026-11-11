@@ -91,8 +91,12 @@ Deliberately dropped, with reasons:
 Two observations made *while* harvesting that are consciously **not**
 pinned (they look unintended; see §6): a failed alternate-credential
 borrow discards a healthy idle session (the pool shrinks to 0 sessions
-instead of keeping the one it had), and `ProxyConnection`'s own
-`equals`/`hashCode` below the disposable facade.
+instead of keeping the one it had). (The third observation — that
+`ProxyConnection`'s own `equals`/`hashCode` below the disposable facade
+threw — has since been fixed; the facadeless configuration that reached
+it has since been deprecated away — the facade is now always used, and
+the handle contract for such configurations is pinned by
+`pool/TestFacadeAlwaysUsed`.)
 
 ## 2. Database choice (unchanged conclusion)
 
@@ -142,10 +146,9 @@ JUnit 5, three groups:
    because the baseline contains no defect tests; once defect
    processing starts, reproducers land alongside (or slightly
    before) their fix, so the suite stays green throughout.
-3. **Dead-code coverage.** `MultiLockFairBlockingQueue` is
-   unreachable through the pool (instantiation commented out, no
-   `lockCount` property); if it is kept, it needs direct unit tests
-   in the later phase — not in the functional baseline.
+3. **Dead-code coverage.** `MultiLockFairBlockingQueue` was removed
+   during defect processing (it was unreachable through the pool and
+   its design was unfinished), so it needs no direct unit tests.
 
 Layout: each test class is `Test*.java` and sits in the package of
 the code it tests - `org.apache.tomcat.jdbc.pool` (pool behaviour and
@@ -198,7 +201,7 @@ Fixture details worth knowing before writing a test against it
 | 7. `SlowQueryReportJmx notifyPool=false` drops notifications | 2 concurrent borrowers slow-querying, count JMX notifications == expected |
 | 8. `XADataSource` marker silently non-XA | `<Resource type=javax.sql.XADataSource>` with plain driver → expect fail-fast `SQLException`, not silent non-XA; real 2-phase commit/rollback with H2's XA resource |
 | 9. `GenericNamingResourcesFactory` silent null-set | JNDI-configured pool with unsupported setter type; assert property unchanged and warning logged |
-| 10. `MultiLockFairBlockingQueue` ×3 | direct unit tests: cross-stripe starvation, interrupt-ghost-waiter, empty `FairIterator` |
+| 10. `MultiLockFairBlockingQueue` ×3 | resolved by removing the class (dead, unfinished design) — no tests needed |
 
 Medium themes (interceptor `disconnected()` leak chain, async ghost
 waiters, `getDbProperties()` password exposure, MBean
@@ -289,23 +292,48 @@ the working list.
     closes the *physical* connection, so the pool discards it
     instead of pooling it; returning only the `XAConnection` keeps
     it (what `TestXaConnection` asserts).
-  * `ConnectionPool.close()` releases idle connections via
-    `release()` but checked-out ones via `abandon()`, and only the
-    former unregisters the per-connection
-    `...,connections=PooledConnection[n]` MBean — a pool closed
-    while connections are borrowed leaves those MBeans in the
-    platform server.
+  * `ConnectionPool.close(true)` used to tear down connections that were
+    still borrowed via `abandon()`, booking a forced shutdown as one
+    application leak per connection in use (inflated
+    `removeAbandonedCount`, a WARN with the borrow trace under
+    `logAbandoned`, one `CONNECTION ABANDONED` notification each). The
+    drain now releases busy connections the way it releases idle ones —
+    disconnecting them and unregistering their
+    `...,connections=PooledConnection[n]` MBeans, as a release always
+    did through `abandon()` — and the abandonment bookkeeping stays
+    `checkAbandoned()`'s alone; `TestForcedShutdownDoesNotAbandon`
+    pins it.
 * Found while harvesting, same status (unintended-looking, so not
   pinned):
-  * `ProxyConnection`'s own `equals`/`hashCode`, reachable only with
-    `useDisposableConnectionFacade=false`, throw `NullPointerException`
-    because they are forwarded to the underlying connection through a
-    path that resolves `getXAConnection()` to `null` first. Any
-    `HashSet<Connection>` of pooled connections breaks. Already High
-    findings in `defects-pool/defects-...ProxyConnection.md` and
-    `...DisposableConnectionFacade.md`; the baseline therefore pins
-    only the identity semantics *at the facade*
-    (`TestProxyContract`).
+  * `ProxyConnection`'s own `equals`/`hashCode`, reachable with the
+    now-deprecated `useDisposableConnectionFacade=false`, used to throw
+    `NullPointerException` (and now answer with the identity of the
+    connection handle, as the facade-on configuration does). Fixed
+    (the calls are answered before the XA dispatch branch); that
+    configuration has since been deprecated away — the disposable
+    facade is always used now, so the handling is defensive only —
+    and the handle contract for such configurations is pinned by
+    `pool/TestFacadeAlwaysUsed`, on top of the facade-level identity
+    assertions in `TestProxyContract`.
+  * the rest of `ProxyConnection`'s XA dispatch branch was over-
+    matching the same way: methods declared by interfaces the handle
+    implements but the pool cannot honour – such as
+    `javax.sql.PooledConnection`'s `add`/`removeConnectionEventListener`
+    on a plain pool – were dispatched at a `null` `XAConnection` and
+    escaped as a raw `NullPointerException`. They now fail as an
+    `SQLException` naming the method; `pool/TestXaBranchDispatch`
+    pins that, with an XA-pool control showing the live dispatch
+    still works.
+  * a custom `Validator` that reports its failure by throwing — the
+    only option, since the SPI declares no checked exception — escaped
+    the unguarded call in `PooledConnection.validate()` and stranded the
+    pooled connection between the idle and busy queues on borrow and on
+    `close()` (a permanently lost slot), while aborting each idle sweep.
+    A throw now counts as a failed validation, exactly like the `false`
+    the built-in query/`isValid()` paths already return for any
+    exception; `pool/TestThrowingValidator` pins the borrow, return and
+    idle paths, with the already-safe create path and a plain-`false`
+    validator as controls.
   * a borrow with alternate credentials that the database refuses
     leaves the pool having *closed the healthy idle session it
     already had*: size and server session count drop to 0 and the
@@ -321,6 +349,15 @@ the working list.
   instead of the handle), the cache outliving a `reconnect()` whose
   purge hook was skipped, and the pool-wide `cacheSize` counter skewing
   when caching races `disconnected()`.
+* `TestQueryTimeoutWithStatementCache` (2) pins the ordering dependency
+  between the two: with `StatementCache` listed first, a cache hit skips
+  the rest of the chain and the next borrower of the same SQL gets the
+  timeout the *first* borrower configured or `0` after a recycle reset,
+  not the one it configured - that case is pinned as the documented
+  limitation, with the reset itself pinned first because H2 reports the
+  session-wide value; the supported order (`StatementCache` last) is
+  pinned to keep the configured timeout across a cache hit. Both are
+  javadoc/wording fixes in the shipped code, not behaviour changes.
 * `build.xml` (the Ant release build of this module) still has a
   `build-test` target that compiles `src/test/java` against a JUnit 4 +
   `tomcat-dbcp` + c3p0/derby/mysql classpath it downloads, and ships

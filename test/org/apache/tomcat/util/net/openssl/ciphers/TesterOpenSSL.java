@@ -250,7 +250,7 @@ public class TesterOpenSSL {
 
 
     public static Set<String> getOpenSSLCiphersAsSet(String specification) throws Exception {
-        String[] ciphers = getOpenSSLCiphersAsExpression(specification, true).trim().split(":");
+        String[] ciphers = getOpenSSLCiphersAsExpression(specification, true).strip().split(":");
         Set<String> result = new HashSet<>(Arrays.asList(ciphers));
         return result;
     }
@@ -390,7 +390,7 @@ public class TesterOpenSSL {
             System.err.println(errorText);
         }
 
-        return stdout.getText().trim();
+        return stdout.getText().strip();
     }
 
     private static class InputStreamToText implements Runnable {

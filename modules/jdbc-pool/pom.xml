@@ -81,6 +81,17 @@
     </dependency>
   </dependencies>
   <build>
+    <resources>
+      <!-- Localized messages are stored with the sources. Copy them, like
+           the Ant build, to make them available on the runtime and test
+           class paths. -->
+      <resource>
+        <directory>src/main/java</directory>
+        <includes>
+          <include>**/*.properties</include>
+        </includes>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

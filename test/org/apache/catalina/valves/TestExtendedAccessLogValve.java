@@ -166,7 +166,7 @@ public class TestExtendedAccessLogValve extends TomcatBaseTest {
         int result = 0;
         String[] lines = content.split("\\r?\\n");
         for (String line : lines) {
-            if (!line.startsWith("#") && !line.trim().isEmpty()) {
+            if (!line.startsWith("#") && !line.strip().isEmpty()) {
                 result++;
             }
         }
@@ -180,7 +180,7 @@ public class TestExtendedAccessLogValve extends TomcatBaseTest {
         List<String> dataLines = new ArrayList<>();
         for (String line : lines) {
             if (!line.startsWith("#")) { // Skip directives
-                dataLines.add(line.trim());
+                dataLines.add(line.strip());
             } else {
                 if (line.startsWith("#Fields: ")) {
                     Assert.assertEquals(line.substring("#Fields: ".length()), logPattern);

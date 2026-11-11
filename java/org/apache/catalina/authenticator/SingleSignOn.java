@@ -141,7 +141,7 @@ public class SingleSignOn extends ValveBase {
      * @param cookieDomain cookie domain name
      */
     public void setCookieDomain(String cookieDomain) {
-        if (cookieDomain != null && cookieDomain.trim().isEmpty()) {
+        if (cookieDomain != null && cookieDomain.strip().isEmpty()) {
             this.cookieDomain = null;
         } else {
             this.cookieDomain = cookieDomain;

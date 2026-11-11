@@ -264,7 +264,7 @@ public class RateLimitFilter extends FilterBase {
         rateLimiter.setFilterConfig(filterConfig);
 
         if (policyName != null) {
-            String trimmedName = policyName.trim();
+            String trimmedName = policyName.strip();
             if (!trimmedName.isEmpty()) {
                 rateLimiter.setPolicyName(trimmedName);
             }

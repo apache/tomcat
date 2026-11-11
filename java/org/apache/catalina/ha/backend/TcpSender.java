@@ -108,7 +108,7 @@ public class TcpSender implements Sender {
         proxies = new Proxy[tok.countTokens()];
         int i = 0;
         while (tok.hasMoreTokens()) {
-            String token = tok.nextToken().trim();
+            String token = tok.nextToken().strip();
             int pos = token.indexOf(':');
             if (pos <= 0) {
                 throw new Exception(sm.getString("tcpSender.invalidProxyList"));

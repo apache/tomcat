@@ -20,16 +20,16 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
+import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.DataSource;
+import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
+import org.apache.tomcat.jdbc.pool.PooledConnection;
 
 /**
  * Expected functionality of the interceptor configuration a resource
@@ -45,7 +45,7 @@ import org.apache.tomcat.jdbc.pool.DataSource;
  * driver: the interceptor leaves evidence in the database work it sees and
  * in the statistics it publishes.</p>
  */
-class TestInterceptorLifecycle extends JdbcPoolBaseTest {
+public class TestInterceptorLifecycle extends JdbcPoolBaseTest {
 
     private static final String REPORT_SQL = "SELECT COUNT(*) FROM SYSTEM_RANGE(1,10)";
 
@@ -64,10 +64,10 @@ class TestInterceptorLifecycle extends JdbcPoolBaseTest {
         try (Connection pooled = ds.getConnection()) {
             SlowQueryReport interceptor =
                     interceptorOf(pooled, SlowQueryReport.class);
-            assertNotNull(interceptor,
+            Assertions.assertNotNull(interceptor,
                     "the interceptor named by short name must sit in the chain of a "
                             + "borrowed connection");
-            assertEquals(7L, interceptor.getThreshold(),
+            Assertions.assertEquals(7L, interceptor.getThreshold(),
                     "the properties from the configuration string must be applied");
         }
     }
@@ -81,38 +81,99 @@ class TestInterceptorLifecycle extends JdbcPoolBaseTest {
         for (int i = 0; i < 2; i++) {
             try (Connection pooled = ds.getConnection(); Statement st = pooled.createStatement();
                     ResultSet rs = st.executeQuery(REPORT_SQL)) {
-                assertTrue(rs.next());
+                Assertions.assertTrue(rs.next());
             }
         }
 
         Map<String, SlowQueryReport.QueryStats> stats =
                 SlowQueryReport.getPoolStats(poolName);
-        assertNotNull(stats, "a running pool must have its report registered");
+        Assertions.assertNotNull(stats, "a running pool must have its report registered");
         SlowQueryReport.QueryStats query = stats.get(REPORT_SQL);
-        assertNotNull(query, "both executions must be reported, saw " + stats.keySet());
-        assertEquals(2, query.getNrOfInvocations(),
+        Assertions.assertNotNull(query, "both executions must be reported, saw " + stats.keySet());
+        Assertions.assertEquals(2, query.getNrOfInvocations(),
                 "the report must see the work of every borrower");
+    }
+
+    @Test
+    void anErrorFromOneInterceptorDoesNotAbortTheRemainingCloseNotifications() throws Exception {
+        ErrorOnCloseInterceptor.CLOSED.set(0);
+        RecordingCloseInterceptor.CLOSED.set(0);
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setJdbcInterceptors(
+                ErrorOnCloseInterceptor.class.getName() + ";" +
+                        RecordingCloseInterceptor.class.getName());
+        ds.createPool();
+
+        ds.close();
+
+        Assertions.assertEquals(1, ErrorOnCloseInterceptor.CLOSED.get(),
+                "the failing interceptor must have been told about the close");
+        Assertions.assertEquals(1, RecordingCloseInterceptor.CLOSED.get(),
+                "an Error from one interceptor must not skip the remaining definitions");
+    }
+
+    /**
+     * Interceptor whose poolClosed() fails with an Error. Public with a
+     * no-argument constructor because the pool instantiates it by class name.
+     */
+    public static class ErrorOnCloseInterceptor extends JdbcInterceptor {
+
+        static final AtomicInteger CLOSED = new AtomicInteger();
+
+        public ErrorOnCloseInterceptor() {
+        }
+
+        @Override
+        public void reset(ConnectionPool parent, PooledConnection con) {
+            // empty
+        }
+
+        @Override
+        public void poolClosed(ConnectionPool pool) {
+            CLOSED.incrementAndGet();
+            throw new NoClassDefFoundError(
+                    "the context that loaded this interceptor has stopped");
+        }
+    }
+
+    /** Interceptor recording that it was told about the pool close. */
+    public static class RecordingCloseInterceptor extends JdbcInterceptor {
+
+        static final AtomicInteger CLOSED = new AtomicInteger();
+
+        public RecordingCloseInterceptor() {
+        }
+
+        @Override
+        public void reset(ConnectionPool parent, PooledConnection con) {
+            // empty
+        }
+
+        @Override
+        public void poolClosed(ConnectionPool pool) {
+            CLOSED.incrementAndGet();
+        }
     }
 
     @Test
     void thePoolLifecycleIsReportedToTheInterceptor() throws Exception {
         DataSource ds = reportedPool();
         String poolName = ds.getPoolProperties().getPoolName();
-        assertNull(SlowQueryReport.getPoolStats(poolName),
+        Assertions.assertNull(SlowQueryReport.getPoolStats(poolName),
                 "nothing may be published before the pool starts");
 
         ds.createPool();
-        assertNotNull(SlowQueryReport.getPoolStats(poolName),
+        Assertions.assertNotNull(SlowQueryReport.getPoolStats(poolName),
                 "poolStarted must have reached the interceptor");
 
         try (Connection pooled = ds.getConnection()) {
             pooled.createStatement().execute(REPORT_SQL);
         }
-        assertFalse(SlowQueryReport.getPoolStats(poolName).isEmpty(),
+        Assertions.assertFalse(SlowQueryReport.getPoolStats(poolName).isEmpty(),
                 "the report must hold data while the pool runs");
 
         ds.close();
-        assertNull(SlowQueryReport.getPoolStats(poolName),
+        Assertions.assertNull(SlowQueryReport.getPoolStats(poolName),
                 "poolClosed must have made the interceptor give its statistics up");
     }
 }

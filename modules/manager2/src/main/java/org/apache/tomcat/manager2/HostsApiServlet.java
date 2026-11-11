@@ -219,7 +219,7 @@ public class HostsApiServlet extends HostManagerServlet {
         try (PrintWriter writer = new PrintWriter(stringWriter)) {
             operation.run(writer);
         }
-        return stringWriter.toString().trim();
+        return stringWriter.toString().strip();
     }
 
 

@@ -19,9 +19,7 @@ package org.apache.tomcat.jdbc.pool.interceptor;
 import java.sql.Connection;
 import java.sql.Statement;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
@@ -57,10 +55,11 @@ class TestSessionState extends JdbcPoolBaseTest {
         ds.createPool();
 
         try (Connection c = ds.getConnection()) {
-            assertFalse(c.getAutoCommit(), "the configured auto commit must apply");
-            assertEquals(Connection.TRANSACTION_SERIALIZABLE, c.getTransactionIsolation(),
+            Assertions.assertFalse(c.getAutoCommit(), "the configured auto commit must apply");
+            Assertions.assertEquals(Connection.TRANSACTION_SERIALIZABLE,
+                    c.getTransactionIsolation(),
                     "the configured isolation level must apply");
-            assertFalse(c.isReadOnly(), "the configured read-only state must apply");
+            Assertions.assertFalse(c.isReadOnly(), "the configured read-only state must apply");
         }
     }
 
@@ -74,19 +73,19 @@ class TestSessionState extends JdbcPoolBaseTest {
             first.setAutoCommit(true);
             first.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
             first.setReadOnly(true);
-            assertTrue(first.getAutoCommit());
-            assertTrue(first.isReadOnly());
+            Assertions.assertTrue(first.getAutoCommit());
+            Assertions.assertTrue(first.isReadOnly());
         }
 
         try (Connection second = ds.getConnection()) {
-            assertEquals(Integer.valueOf(21), sessionMarker(second),
+            Assertions.assertEquals(Integer.valueOf(21), sessionMarker(second),
                     "the same physical session must have been reused");
-            assertFalse(second.getAutoCommit(),
+            Assertions.assertFalse(second.getAutoCommit(),
                     "auto commit must be back at the pool default for the next borrower");
-            assertEquals(Connection.TRANSACTION_SERIALIZABLE,
+            Assertions.assertEquals(Connection.TRANSACTION_SERIALIZABLE,
                     second.getTransactionIsolation(),
                     "the isolation level must be back at the pool default");
-            assertFalse(second.isReadOnly(),
+            Assertions.assertFalse(second.isReadOnly(),
                     "the read-only flag must be back at the pool default");
 
             // database-side proof that the physical session really is not in
@@ -99,11 +98,12 @@ class TestSessionState extends JdbcPoolBaseTest {
             try (Statement st = second.createStatement()) {
                 st.executeUpdate("INSERT INTO " + table + " VALUES (1)");
             }
-            assertEquals(0, adminRowCount(table),
+            Assertions.assertEquals(0, adminRowCount(table),
                     "an uncommitted write must not be visible on a session in manual commit mode");
             second.rollback();
         }
-        assertEquals(1, poolSessions(), "the session must have survived the state changes");
+        Assertions.assertEquals(1, poolSessions(),
+                "the session must have survived the state changes");
     }
 
     @Test
@@ -117,18 +117,18 @@ class TestSessionState extends JdbcPoolBaseTest {
 
         try (Connection reader = ds.getConnection()) {
             reader.setReadOnly(true);
-            assertTrue(reader.isReadOnly(),
+            Assertions.assertTrue(reader.isReadOnly(),
                     "the borrower's own change must be visible to it");
         }
 
         try (Connection writer = ds.getConnection()) {
-            assertFalse(writer.isReadOnly(),
+            Assertions.assertFalse(writer.isReadOnly(),
                     "the read-only flag must not leak to the next borrower");
-            assertEquals(1, writer.createStatement()
+            Assertions.assertEquals(1, writer.createStatement()
                     .executeUpdate("INSERT INTO " + table + " VALUES (2)"),
                     "the next borrower must be able to write again");
             writer.commit();
         }
-        assertEquals(1, adminRowCount(table));
+        Assertions.assertEquals(1, adminRowCount(table));
     }
 }

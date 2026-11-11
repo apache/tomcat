@@ -91,11 +91,12 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
     /** Set of processors currently waiting for async processing. */
     private final Set<Processor> waitingProcessors = ConcurrentHashMap.newKeySet();
 
-    /** Controller for the timeout scheduling. Accessed under timeoutSchedulingLock. */
-    private ScheduledFuture<?> timeoutFuture = null;
     /** Scheduled future for the periodic monitor task. */
     private volatile ScheduledFuture<?> monitorFuture;
 
+    /** Controller for the timeout scheduling. Accessed under timeoutSchedulingLock. */
+    private ScheduledFuture<?> timeoutFuture = null;
+    private boolean timeoutEnabled;
     /** Guards the scheduling of the asynchronous timeout task. */
     private final Object timeoutSchedulingLock = new Object();
 
@@ -978,6 +979,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
         }
 
         endpoint.start();
+        synchronized (timeoutSchedulingLock) {
+            timeoutEnabled = true;
+        }
         monitorFuture = getUtilityExecutor().scheduleWithFixedDelay(this::startAsyncTimeout, 0, 60, TimeUnit.SECONDS);
     }
 
@@ -997,12 +1001,14 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
                         getLog().error(sm.getString("abstractProtocolHandler.asyncTimeoutError"), e);
                     }
                 }
-                timeoutFuture = getUtilityExecutor().scheduleAtFixedRate(() -> {
-                    long now = System.currentTimeMillis();
-                    for (Processor processor : waitingProcessors) {
-                        processor.timeoutAsync(now);
-                    }
-                }, 1, 1, TimeUnit.SECONDS);
+                if (timeoutEnabled) {
+                    timeoutFuture = getUtilityExecutor().scheduleAtFixedRate(() -> {
+                        long now = System.currentTimeMillis();
+                        for (Processor processor : waitingProcessors) {
+                            processor.timeoutAsync(now);
+                        }
+                    }, 1, 1, TimeUnit.SECONDS);
+                }
             }
         }
     }
@@ -1016,6 +1022,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
                 timeoutFuture.cancel(false);
                 timeoutFuture = null;
             }
+            timeoutEnabled = false;
         }
     }
 
@@ -1404,6 +1411,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
                         longPoll(wrapper, processor);
                         getProtocol().addWaitingProcessor(processor);
                     }
+                } else if (state == SocketState.UPGRADED_HALF_CLOSED) {
+                    // Don't add sockets back to the poller.
+                    // The handler will register for write as required
+                    // Add to waiting processors so the processor is visible if the protocol is stopped
+                    getProtocol().addWaitingProcessor(processor);
                 } else if (state == SocketState.ASYNC_IO) {
                     // Don't add sockets back to the poller.
                     // The handler will initiate all further I/O
@@ -1426,6 +1438,13 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
 
                 if (processor != null) {
                     wrapper.setCurrentProcessor(processor);
+                    if (wrapper.isClosed()) {
+                        /*
+                         * The socket was closed while this thread owned the processor so the close could not release
+                         * it.
+                         */
+                        release(wrapper);
+                    }
                 }
                 return state;
             } catch (SocketException e) {
@@ -1657,7 +1676,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
         }
 
         /**
-         * Pushes a processor to the pool.
+         * Pushes a processor to the pool. A processor that is not reusable is
+         * not added to the pool and is unregistered instead. This may happen,
+         * for example, after an asynchronous timeout or error while an
+         * application thread was blocked in a write. Reusing such a processor
+         * could write stale data to another request.
          *
          * @param processor The processor
          *
@@ -1666,6 +1689,13 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
         @SuppressWarnings("sync-override") // Size may exceed cache size a bit
         @Override
         public boolean push(Processor processor) {
+            if (!processor.isReusable()) {
+                // Also make sure any waiting-processor registration is
+                // removed before the processor is unregistered.
+                handler.getProtocol().removeWaitingProcessor(processor);
+                handler.unregister(processor);
+                return false;
+            }
             int cacheSize = handler.getProtocol().getProcessorCache();
             boolean offer = cacheSize == -1 || size.get() < cacheSize;
             // avoid over growing our cache or add after we have stopped

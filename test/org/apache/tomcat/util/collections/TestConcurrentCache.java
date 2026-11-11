@@ -27,11 +27,17 @@ import org.junit.Test;
  */
 public class TestConcurrentCache {
 
-    private static int edenSize(ConcurrentCache<String,String> cache)
+    private static Map<?,?> eden(ConcurrentCache<String,String> cache)
             throws Exception {
         Field edenField = ConcurrentCache.class.getDeclaredField("eden");
         edenField.setAccessible(true);
-        return ((Map<?,?>) edenField.get(cache)).size();
+        return (Map<?,?>) edenField.get(cache);
+    }
+
+
+    private static int edenSize(ConcurrentCache<String,String> cache)
+            throws Exception {
+        return eden(cache).size();
     }
 
 
@@ -65,11 +71,12 @@ public class TestConcurrentCache {
 
 
     /*
-     * A long-term hit must be promoted into eden while eden still has room,
-     * and served without promotion once eden is full.
+     * A long-term hit must be promoted into eden. If eden is full, its content
+     * is moved to the long-term store first, as for put(), so eden never
+     * exceeds the configured size.
      */
     @Test
-    public void testGetPromotesLongtermHitWithHeadroom() throws Exception {
+    public void testGetPromotesLongtermHit() throws Exception {
         ConcurrentCache<String,String> cache = new ConcurrentCache<>(2);
 
         cache.put("k1", "v1");
@@ -86,9 +93,50 @@ public class TestConcurrentCache {
         Assert.assertEquals("v1", cache.get("k1"));
         Assert.assertEquals(2, edenSize(cache));
 
-        // No room left, so this long-term hit is served without promotion
+        // Eden is full. The content of eden is moved to the long-term store
+        // and then k2 is promoted into the now empty eden.
         Assert.assertEquals("v2", cache.get("k2"));
-        Assert.assertEquals(2, edenSize(cache));
+        Assert.assertEquals(1, edenSize(cache));
+        Assert.assertTrue(eden(cache).containsKey("k2"));
+
+        // The entries that were moved out of eden are still available
+        Assert.assertEquals("v1", cache.get("k1"));
+        Assert.assertEquals("v3", cache.get("k3"));
+        Assert.assertEquals("v2", cache.get("k2"));
+    }
+
+
+    /*
+     * Without any calls to put(), the entries that are read must end up in eden
+     * (where they can be read without taking a lock) rather than eden staying
+     * as it was once it had filled.
+     */
+    @Test
+    public void testGetWorkingSetMovesToEden() throws Exception {
+        ConcurrentCache<String,String> cache = new ConcurrentCache<>(3);
+
+        String[] keys = { "a", "b", "c", "d", "e" };
+        for (String key : keys) {
+            cache.put(key, "v" + key);
+        }
+        // a, b and c are in the long-term store. d and e are in eden.
+        Assert.assertFalse(eden(cache).containsKey("a"));
+        Assert.assertFalse(eden(cache).containsKey("b"));
+
+        // Read the working set of a and b a number of times
+        for (int i = 0; i < 3; i++) {
+            Assert.assertEquals("va", cache.get("a"));
+            Assert.assertEquals("vb", cache.get("b"));
+        }
+
+        Assert.assertTrue(eden(cache).containsKey("a"));
+        Assert.assertTrue(eden(cache).containsKey("b"));
+        Assert.assertTrue(edenSize(cache) <= 3);
+
+        // Everything is still available
+        for (String key : keys) {
+            Assert.assertEquals("v" + key, cache.get(key));
+        }
     }
 
 

@@ -330,8 +330,10 @@ public class Http11Processor extends AbstractProcessor {
                 setErrorState(ErrorState.CLOSE_CLEAN, t);
             }
 
-            // Has an upgrade been requested?
-            if (isConnectionToken(request.getMimeHeaders(), "upgrade")) {
+            // Has an upgrade been requested? An Upgrade header field in an HTTP/1.0 request must be ignored
+            // (RFC 9110, section 7.8)
+            if (request.protocol().equals(Constants.HTTP_11) &&
+                    isConnectionToken(request.getMimeHeaders(), "upgrade")) {
                 // Check the protocol
                 String requestedProtocol = request.getHeader("Upgrade");
 
@@ -492,6 +494,48 @@ public class Http11Processor extends AbstractProcessor {
                 }
             }
         }
+    }
+
+
+    private boolean validateUpgradeToken() {
+        // Can't upgrade in an error state
+        if (getErrorState().isError()) {
+            return false;
+        }
+        // Make sure the application hasn't changed the status
+        if (response.getStatus() != HttpServletResponse.SC_SWITCHING_PROTOCOLS) {
+            return false;
+        }
+        // Make sure the application has set the Upgrade header
+        String upgrade = response.getMimeHeaders().getHeader("upgrade");
+        if (upgrade == null) {
+            return false;
+        } else {
+            upgrade = upgrade.trim();
+        }
+
+        if (!upgradeToken.protocol().equalsIgnoreCase(upgrade)) {
+            // The application set/updated the upgrade protocol name. Update the token.
+            upgradeToken = new UpgradeToken(upgradeToken.httpUpgradeHandler(), upgradeToken.contextBind(),
+                    upgradeToken.instanceManager(), upgrade);
+        }
+        return true;
+    }
+
+
+    private void cleanUpgradeToken() {
+        if (upgradeToken.instanceManager() != null) {
+            ClassLoader oldCL = upgradeToken.contextBind().bind(null);
+            try {
+                upgradeToken.instanceManager().destroyInstance(upgradeToken.httpUpgradeHandler());
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                log.warn(sm.getString("http11processor.upgrade.clean.fail"), t);
+            } finally {
+                upgradeToken.contextBind().unbind(oldCL);
+            }
+        }
+        upgradeToken = null;
     }
 
 
@@ -1048,6 +1092,19 @@ public class Http11Processor extends AbstractProcessor {
                     .setString(altService + "=\":" + request.getServerPort() + "\"");
         }
 
+        if (upgradeToken != null && !validateUpgradeToken()) {
+            /*
+             * doHttpUpgrade() stopped further HTTP output. The upgrade has failed so the HTTP response must be
+             * completed.
+             */
+            outputBuffer.responseFinished = false;
+            cleanUpgradeToken();
+            // Don't overwrite any existing error
+            if (!getErrorState().isError()) {
+                setErrorState(ErrorState.CLOSE_CLEAN, null);
+            }
+        }
+
         writeHeaders(response.getStatus(), headers);
 
         outputBuffer.commit();
@@ -1411,6 +1468,9 @@ public class Http11Processor extends AbstractProcessor {
         if (sendfileData != null && !getErrorState().isError()) {
             if (keepAlive) {
                 if (available(false) == 0) {
+                    // If sendfile does not complete inline, the endpoint will register the socket for read once it
+                    // does, without returning to this processor. Set the keep-alive timeout for the next request now.
+                    socketWrapper.setReadTimeout(protocol.getKeepAliveTimeout());
                     sendfileData.keepAliveState = SendfileKeepAliveState.OPEN;
                 } else {
                     sendfileData.keepAliveState = SendfileKeepAliveState.PIPELINED;

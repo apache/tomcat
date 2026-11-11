@@ -2873,17 +2873,17 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
                     }
                     return Boolean.valueOf(Boolean.parseBoolean(String.valueOf(json)));
                 case "int":
-                    return Integer.valueOf(Integer.parseInt(String.valueOf(json).trim()));
+                    return Integer.valueOf(Integer.parseInt(String.valueOf(json).strip()));
                 case "long":
-                    return Long.valueOf(Long.parseLong(String.valueOf(json).trim()));
+                    return Long.valueOf(Long.parseLong(String.valueOf(json).strip()));
                 case "short":
-                    return Short.valueOf(Short.parseShort(String.valueOf(json).trim()));
+                    return Short.valueOf(Short.parseShort(String.valueOf(json).strip()));
                 case "byte":
-                    return Byte.valueOf(Byte.parseByte(String.valueOf(json).trim()));
+                    return Byte.valueOf(Byte.parseByte(String.valueOf(json).strip()));
                 case "float":
-                    return Float.valueOf(Float.parseFloat(String.valueOf(json).trim()));
+                    return Float.valueOf(Float.parseFloat(String.valueOf(json).strip()));
                 case "double":
-                    return Double.valueOf(Double.parseDouble(String.valueOf(json).trim()));
+                    return Double.valueOf(Double.parseDouble(String.valueOf(json).strip()));
                 case "java.lang.String":
                     return String.valueOf(json);
                 case "[Ljava.lang.String;":
@@ -4181,7 +4181,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
 
     private static void validateParamValue(String name, String value, String type) throws ConfigException {
         try {
-            String trimmed = value.trim();
+            String trimmed = value.strip();
             switch (type) {
                 case "int" -> Integer.parseInt(trimmed);
                 case "long" -> Long.parseLong(trimmed);
@@ -4468,7 +4468,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
             type = SSLHostConfigCertificate.Type.UNDEFINED;
         } else {
             try {
-                type = SSLHostConfigCertificate.Type.valueOf(typeName.trim().toUpperCase(Locale.ENGLISH));
+                type = SSLHostConfigCertificate.Type.valueOf(typeName.strip().toUpperCase(Locale.ENGLISH));
             } catch (IllegalArgumentException e) {
                 throw new ConfigException(HttpServletResponse.SC_BAD_REQUEST, "INVALID_NAME",
                         Strings.sm().getString("manager2.configInvalidName", typeName));
@@ -5445,7 +5445,7 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         }
         if (value instanceof String s && !s.isEmpty()) {
             try {
-                return Integer.parseInt(s.trim());
+                return Integer.parseInt(s.strip());
             } catch (NumberFormatException e) {
                 return defaultValue;
             }
@@ -5458,14 +5458,14 @@ public class ConfigApiServlet extends HttpServlet implements ContainerServlet {
         List<String> result = new ArrayList<>();
         if (value instanceof List<?> list) {
             for (Object item : list) {
-                String s = String.valueOf(item).trim();
+                String s = String.valueOf(item).strip();
                 if (!s.isEmpty()) {
                     result.add(s);
                 }
             }
         } else if (value instanceof String s && !s.isEmpty()) {
             for (String part : s.split(",")) {
-                String trimmed = part.trim();
+                String trimmed = part.strip();
                 if (!trimmed.isEmpty()) {
                     result.add(trimmed);
                 }

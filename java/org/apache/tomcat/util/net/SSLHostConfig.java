@@ -178,11 +178,11 @@ public class SSLHostConfig implements Serializable {
     /**
      * The cipher configuration for TLS 1.2 and below (OpenSSL format).
      */
-    private String ciphers = DEFAULT_TLS_CIPHERS_12;
+    private String ciphers = null;
     /**
      * The cipher suite configuration for TLS 1.3.
      */
-    private String cipherSuites = DEFAULT_TLS_CIPHERS_13;
+    private String cipherSuites = null;
     /**
      * The parsed cipher list for TLS 1.2 and below.
      */
@@ -728,7 +728,8 @@ public class SSLHostConfig implements Serializable {
      * Set the new cipher (TLSv1.2 and below) configuration. Note: Regardless of the format used to set the
      * configuration, it is always stored in OpenSSL format.
      *
-     * @param ciphersList The new cipher configuration in OpenSSL or JSSE format
+     * @param ciphersList The new cipher configuration in OpenSSL or JSSE format. A value of {@code null} restores the
+     *                        default, {@link #DEFAULT_TLS_CIPHERS_12}.
      */
     public void setCiphers(String ciphersList) {
         // Ciphers is stored in OpenSSL format. Convert the provided value if
@@ -740,7 +741,7 @@ public class SSLHostConfig implements Serializable {
                 String[] components = ciphersList.split(":");
                 // Remove any TLS 1.3 cipher suites
                 for (String component : components) {
-                    String trimmed = component.trim();
+                    String trimmed = component.strip();
                     if (OpenSSLCipherConfigurationParser.isTls13Cipher(trimmed)) {
                         log.warn(sm.getString("sslHostConfig.ignoreTls13Ciphersuite", trimmed));
                     } else {
@@ -757,7 +758,7 @@ public class SSLHostConfig implements Serializable {
                 StringBuilder sb = new StringBuilder();
                 String[] ciphers = ciphersList.split(",");
                 for (String cipher : ciphers) {
-                    String trimmed = cipher.trim();
+                    String trimmed = cipher.strip();
                     if (!trimmed.isEmpty()) {
                         if (OpenSSLCipherConfigurationParser.isTls13Cipher(trimmed)) {
                             log.warn(sm.getString("sslHostConfig.ignoreTls13Ciphersuite", trimmed));
@@ -787,9 +788,13 @@ public class SSLHostConfig implements Serializable {
     /**
      * Returns the cipher (TLSv1.2 and below) configuration.
      *
-     * @return An OpenSSL cipher string for the current configuration.
+     * @return An OpenSSL cipher string for the current configuration. If no configuration has been set, or it was set
+     *             to {@code null}, this is {@link #DEFAULT_TLS_CIPHERS_12}.
      */
     public String getCiphers() {
+        if (ciphers == null) {
+            return DEFAULT_TLS_CIPHERS_12;
+        }
         return ciphers;
     }
 
@@ -828,11 +833,13 @@ public class SSLHostConfig implements Serializable {
      * Set the cipher suite (TLSv1.3) configuration. Note: Regardless of the format used to set the configuration, it is
      * always stored in OpenSSL format.
      *
-     * @param cipherSuites The cipher suites to use in a colon-separated, preference order list
+     * @param cipherSuites The cipher suites to use in a preference order list. The list may be colon-separated
+     *                         (OpenSSL format) or comma-separated (JSSE format). A value of {@code null} restores the
+     *                         default, {@link #DEFAULT_TLS_CIPHERS_13}.
      */
     public void setCipherSuites(String cipherSuites) {
         if (cipherSuites == null) {
-            // As for setCiphers(), a null value is stored as provided.
+            // As for setCiphers(), a null value restores the default.
             this.cipherSuites = null;
             this.cipherSuiteList = null;
             this.jsseCipherNames = null;
@@ -851,7 +858,7 @@ public class SSLHostConfig implements Serializable {
             values = cipherSuites.split(",");
         }
         for (String value : values) {
-            String trimmed = value.trim();
+            String trimmed = value.strip();
             if (!trimmed.isEmpty()) {
                 if (!OpenSSLCipherConfigurationParser.isTls13Cipher(trimmed)) {
                     log.warn(sm.getString("sslHostConfig.ignoreNonTls13Ciphersuite", trimmed));
@@ -881,9 +888,13 @@ public class SSLHostConfig implements Serializable {
     /**
      * Obtain the current cipher suite (TLSv1.3) configuration.
      *
-     * @return An OpenSSL cipher suite string for the current configuration.
+     * @return An OpenSSL cipher suite string for the current configuration. If no configuration has been set, or it
+     *             was set to {@code null}, this is {@link #DEFAULT_TLS_CIPHERS_13}.
      */
     public String getCipherSuites() {
+        if (cipherSuites == null) {
+            return DEFAULT_TLS_CIPHERS_13;
+        }
         return cipherSuites;
     }
 
@@ -1037,11 +1048,11 @@ public class SSLHostConfig implements Serializable {
         // Split using a positive lookahead to keep the separator in
         // the capture so we can check which case it is.
         for (String value : input.split("(?=[-+,])")) {
-            String trimmed = value.trim();
+            String trimmed = value.strip();
             // Ignore token which only consists of prefix character
             if (trimmed.length() > 1) {
                 if (trimmed.charAt(0) == '+') {
-                    trimmed = trimmed.substring(1).trim();
+                    trimmed = trimmed.substring(1).strip();
                     if (trimmed.equalsIgnoreCase(Constants.SSL_PROTO_ALL)) {
                         protocols.addAll(SSL_PROTO_ALL_SET);
                     } else {
@@ -1049,7 +1060,7 @@ public class SSLHostConfig implements Serializable {
                         explicitlyRequestedProtocols.add(trimmed);
                     }
                 } else if (trimmed.charAt(0) == '-') {
-                    trimmed = trimmed.substring(1).trim();
+                    trimmed = trimmed.substring(1).strip();
                     if (trimmed.equalsIgnoreCase(Constants.SSL_PROTO_ALL)) {
                         protocols.removeAll(SSL_PROTO_ALL_SET);
                     } else {
@@ -1058,7 +1069,7 @@ public class SSLHostConfig implements Serializable {
                     }
                 } else {
                     if (trimmed.charAt(0) == ',') {
-                        trimmed = trimmed.substring(1).trim();
+                        trimmed = trimmed.substring(1).strip();
                     }
                     if (!protocols.isEmpty()) {
                         log.warn(sm.getString("sslHostConfig.prefix_missing", trimmed, getHostName()));
@@ -1164,7 +1175,7 @@ public class SSLHostConfig implements Serializable {
                 String[] groupNames = groups.split(",");
                 for (String groupName : groupNames) {
                     try {
-                        Group group = Group.valueOf(groupName.trim());
+                        Group group = Group.valueOf(groupName.strip());
                         groupList.add(group);
                     } catch (IllegalArgumentException e) {
                         log.warn(sm.getString("sslHostConfig.unknownGroup", groupName));
@@ -1587,11 +1598,8 @@ public class SSLHostConfig implements Serializable {
         for (SSLHostConfigCertificate sslHostConfigCertificate : sslHostConfigCertificates) {
             SSLContext sslContext = sslHostConfigCertificate.getSslContext();
             if (sslContext != null) {
-                String alias = sslHostConfigCertificate.getCertificateKeyAlias();
-                if (alias == null) {
-                    alias = SSLUtilBase.DEFAULT_KEY_ALIAS;
-                }
-                X509Certificate[] certificates = sslContext.getCertificateChain(alias);
+                X509Certificate[] certificates = sslContext.getCertificateChain(
+                        sslContext.getServedAlias(sslHostConfigCertificate));
                 if (certificates != null && certificates.length > 0) {
                     X509Certificate certificate = certificates[0];
                     Date expirationDate = certificate.getNotAfter();

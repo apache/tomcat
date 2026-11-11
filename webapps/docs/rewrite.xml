@@ -147,7 +147,6 @@
             REMOTE_HOST<br />
             REMOTE_PORT<br />
             REMOTE_USER<br />
-            REMOTE_IDENT<br />
             REQUEST_METHOD<br />
             SCRIPT_FILENAME<br />
             REQUEST_PATH<br />

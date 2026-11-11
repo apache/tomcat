@@ -24,12 +24,7 @@ import java.sql.Statement;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -75,24 +70,24 @@ class TestStatementLifecycle extends JdbcPoolBaseTest {
 
         Connection pooled = ds.getConnection();
         Statement single = pooled.createStatement();
-        assertFalse(single.isClosed());
+        Assertions.assertFalse(single.isClosed());
 
         Statement[] many = new Statement[50];
         for (int i = 0; i < many.length; i++) {
             many[i] = pooled.createStatement();
-            assertFalse(many[i].isClosed(), "statement " + i + " must be open");
+            Assertions.assertFalse(many[i].isClosed(), "statement " + i + " must be open");
         }
 
         pooled.close();
 
-        assertTrue(single.isClosed(),
+        Assertions.assertTrue(single.isClosed(),
                 "a statement the application never closed must be closed with its connection");
         for (Statement st : many) {
-            assertTrue(st.isClosed(), "every dangling statement must be finalised");
+            Assertions.assertTrue(st.isClosed(), "every dangling statement must be finalised");
         }
         // finalising the statements must not have cost the pool its session
-        assertEquals(1, ds.getSize());
-        assertEquals(1, poolSessions());
+        Assertions.assertEquals(1, ds.getSize());
+        Assertions.assertEquals(1, poolSessions());
     }
 
     @Test
@@ -124,9 +119,9 @@ class TestStatementLifecycle extends JdbcPoolBaseTest {
             }
         }
 
-        assertArrayEquals(new int[] { 1 }, counts,
+        Assertions.assertArrayEquals(new int[] { 1 }, counts,
                 "the recycled statement must carry exactly the batch it was given");
-        assertEquals(1, adminRowCount(table),
+        Assertions.assertEquals(1, adminRowCount(table),
                 "only the second caller's row may reach the database");
     }
 
@@ -145,10 +140,10 @@ class TestStatementLifecycle extends JdbcPoolBaseTest {
 
         try (Connection second = ds.getConnection()) {
             try (PreparedStatement ps = second.prepareStatement("SELECT 1")) {
-                assertFalse(ps.isCloseOnCompletion(),
+                Assertions.assertFalse(ps.isCloseOnCompletion(),
                         "the next borrower must not inherit closeOnCompletion");
                 try (ResultSet rs = ps.executeQuery()) {
-                    assertTrue(rs.next());
+                    Assertions.assertTrue(rs.next());
                 }
             }
         }
@@ -178,9 +173,10 @@ class TestStatementLifecycle extends JdbcPoolBaseTest {
         try (Connection second = ds.getConnection()) {
             try (PreparedStatement ps = second.prepareStatement("SELECT 1")) {
                 int observed = reader.read(ps);
-                assertNotEquals(leaked, observed,
+                Assertions.assertNotEquals(leaked, observed,
                         label + " must not be inherited by the next borrower");
-                assertEquals(afterReset, observed, label + " must be back at the driver default");
+                Assertions.assertEquals(afterReset, observed,
+                        label + " must be back at the driver default");
             }
         }
     }
@@ -238,12 +234,12 @@ class TestStatementLifecycle extends JdbcPoolBaseTest {
         try (Connection pooled = ds.getConnection();
                 Statement st = pooled.createStatement();
                 ResultSet rs = st.executeQuery("SELECT 1")) {
-            assertTrue(rs.next());
-            assertSame(st, rs.getStatement(),
+            Assertions.assertTrue(rs.next());
+            Assertions.assertSame(st, rs.getStatement(),
                     "a result set must report the pool's statement, not the driver's");
-            assertFalse(rs.getStatement().getClass().getName().startsWith("org.h2."),
+            Assertions.assertFalse(rs.getStatement().getClass().getName().startsWith("org.h2."),
                     "the reported statement must not be the raw driver statement");
-            assertSame(pooled, rs.getStatement().getConnection(),
+            Assertions.assertSame(pooled, rs.getStatement().getConnection(),
                     "a statement must report the connection it was created from");
         }
     }

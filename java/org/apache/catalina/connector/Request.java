@@ -426,6 +426,11 @@ public class Request implements HttpServletRequest {
      */
     protected Boolean asyncSupported = null;
 
+    /**
+     * Has HttpServletRequest.upgrade() been called for this request?
+     */
+    private boolean upgradeRequested = false;
+
     private HttpServletRequest applicationRequest = null;
 
     /**
@@ -560,6 +565,7 @@ public class Request implements HttpServletRequest {
         }
 
         asyncSupported = null;
+        upgradeRequested = false;
         if (asyncContext != null) {
             asyncContext.recycle();
             asyncContext = null;
@@ -1587,6 +1593,10 @@ public class Request implements HttpServletRequest {
             throw ise;
         }
 
+        if (upgradeRequested) {
+            throw new IllegalStateException(sm.getString("coyoteRequest.asyncAfterUpgrade"));
+        }
+
         if (asyncContext == null) {
             asyncContext = new AsyncContextImpl(this);
         }
@@ -1912,6 +1922,13 @@ public class Request implements HttpServletRequest {
     @Override
     public <T extends HttpUpgradeHandler> T upgrade(Class<T> httpUpgradeHandlerClass)
             throws IOException, ServletException {
+        if (isAsyncStarted()) {
+            throw new IllegalStateException(sm.getString("coyoteRequest.upgradeAfterAsync"));
+        }
+        if (response.isCommitted()) {
+            throw new IllegalStateException(sm.getString("coyoteRequest.upgradeAfterCommit"));
+        }
+
         T handler;
         InstanceManager instanceManager = null;
         try {
@@ -1930,6 +1947,7 @@ public class Request implements HttpServletRequest {
                 getUpgradeProtocolName(httpUpgradeHandlerClass));
 
         coyoteRequest.action(ActionCode.UPGRADE, upgradeToken);
+        upgradeRequested = true;
 
         // Output required by RFC2616. Protocol specific headers should have
         // already been set.
@@ -1954,9 +1972,15 @@ public class Request implements HttpServletRequest {
         }
 
         if (result == null) {
-            // Ugly but use the class name - it is better than nothing
+            /*
+             * Use the class name temporarily. It will be replaced at the end of Servlet.service() by the upgrade header
+             * field value.
+             */
             result = httpUpgradeHandlerClass.getName();
+        } else {
+            result = result.trim();
         }
+
         return result;
     }
 
@@ -2233,8 +2257,29 @@ public class Request implements HttpServletRequest {
             return false;
         }
 
-        // Identify the Realm we will use for checking role assignments
-        Context context = getContext();
+        /*
+         * There might be a RequestDispatcher in use. That changes the wrapper that needs to be used to look up any
+         * security-role-ref. If the dispatch is a cross-context dispatch, the context changes as well.
+         */
+        Wrapper wrapper;
+        Context context;
+        if (mappingData.requestDispatcherWrapper != null) {
+            wrapper = mappingData.requestDispatcherWrapper;
+            Container container = wrapper.getParent();
+            if (container instanceof Context c) {
+                context = c;
+            } else {
+                context = null;
+            }
+        } else {
+            wrapper = getWrapper();
+            context = getContext();
+        }
+
+        /*
+         * This shouldn't happen. No context means no realm. No realm means no user can be authenticated. That in turn
+         * means userPrincipal should have been null.
+         */
         if (context == null) {
             return false;
         }
@@ -2251,13 +2296,13 @@ public class Request implements HttpServletRequest {
             return true;
         }
 
+        // Identify the Realm we will use for checking role assignments
         Realm realm = context.getRealm();
         if (realm == null) {
             return false;
         }
 
         // Check for a role alias defined in a <security-role-ref> element
-        Wrapper wrapper = getWrapper();
         if (wrapper != null) {
             String realRole = wrapper.findSecurityReference(role);
             if (realRole != null) {

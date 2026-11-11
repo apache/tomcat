@@ -517,9 +517,8 @@
 
     <subsection name="Cluster">
       <p>Tomcat clustering is typically used over a secure, trusted network. If a trusted network is not available then
-      a cluster may be configured to use TLS. The <code>EncryptInterceptor</code> is deprecated and should no longer be
-      used to secure cluster traffic. Other options for providing a secure, trusted network for use by a Tomcat cluster
-      include:</p>
+      a cluster may be configured to use TLS. Other options for providing a secure, trusted network for use by a Tomcat
+      cluster include:</p>
       <ul>
         <li>private LAN</li>
         <li>a Virtual Private Network (VPN)</li>

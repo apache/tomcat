@@ -49,7 +49,10 @@ public final class ConcurrentCache<K, V> {
 
     /**
      * Retrieves a value from the cache. If found in the long-term store, it is
-     * promoted to the eden space for faster subsequent access.
+     * promoted to the eden space for faster subsequent access. As for
+     * {@link #put(Object, Object)}, if the eden space is full, its contents are
+     * first moved to the long-term store so that the eden space never grows
+     * beyond the configured size.
      *
      * @param k the key to look up
      * @return the cached value, or {@code null} if not found
@@ -60,10 +63,20 @@ public final class ConcurrentCache<K, V> {
             synchronized (longterm) {
                 v = this.longterm.get(k);
             }
-            // Only promote into eden while it still has room. Otherwise, a
-            // workload dominated by cache hits could grow eden far beyond the
-            // configured size, since only put() trims eden.
-            if (v != null && this.eden.size() < size) {
+            if (v != null) {
+                // Handle a full eden in the same way as put(). Otherwise, a
+                // workload dominated by cache hits could grow eden far beyond
+                // the configured size. Not promoting when eden is full is not
+                // an option either as, without any calls to put(), eden would
+                // then be stuck with its current content and every other hot
+                // entry would be read from the long-term store, which
+                // requires a lock, for ever.
+                if (this.eden.size() >= size) {
+                    synchronized (longterm) {
+                        this.longterm.putAll(this.eden);
+                    }
+                    this.eden.clear();
+                }
                 this.eden.put(k, v);
             }
         }

@@ -54,6 +54,7 @@ import jakarta.servlet.http.HttpSession;
 import org.apache.catalina.Globals;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
+import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.util.IOTools;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -356,13 +357,13 @@ public final class CGIServlet extends HttpServlet {
 
         if (getServletConfig().getInitParameter("cgiMethods") != null) {
             String paramValue = getServletConfig().getInitParameter("cgiMethods");
-            paramValue = paramValue.trim();
+            paramValue = paramValue.strip();
             if ("*".equals(paramValue)) {
                 cgiMethodsAll = true;
             } else {
                 String[] methods = paramValue.split(",");
                 for (String method : methods) {
-                    String trimmedMethod = method.trim();
+                    String trimmedMethod = method.strip();
                     cgiMethods.add(trimmedMethod);
                 }
             }
@@ -534,6 +535,7 @@ public final class CGIServlet extends HttpServlet {
             super.service(req, res);
         } else {
             // Unsupported method
+            res.setHeader("allow", getAllowHeaderValue(req));
             res.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
         }
     }
@@ -581,9 +583,19 @@ public final class CGIServlet extends HttpServlet {
     protected void doOptions(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         // Note: This method will never be called if cgiMethods is "*" so that
         // case does not need to be handled here.
+        res.setHeader("allow", getAllowHeaderValue(req));
+    }
+
+
+    private String getAllowHeaderValue(HttpServletRequest req) {
         Set<String> allowedMethods = new HashSet<>();
         allowedMethods.addAll(cgiMethods);
         allowedMethods.addAll(DEFAULT_SUPER_METHODS);
+
+        // Trace - assume disabled unless we can prove otherwise
+        if (!(req instanceof RequestFacade && ((RequestFacade) req).getAllowTrace())) {
+            allowedMethods.remove(Method.TRACE);
+        }
 
         StringBuilder headerValue = new StringBuilder();
 
@@ -595,7 +607,7 @@ public final class CGIServlet extends HttpServlet {
         // Remove trailing comma
         headerValue.deleteCharAt(headerValue.length() - 1);
 
-        res.setHeader("allow", headerValue.toString());
+        return headerValue.toString();
     }
 
 
@@ -1401,7 +1413,7 @@ public final class CGIServlet extends HttpServlet {
             InputStream cgiOutput = null;
             BufferedReader commandsStdErr = null;
             Thread errReaderThread = null;
-            BufferedOutputStream commandsStdIn;
+            BufferedOutputStream commandsStdIn = null;
             Process proc = null;
             int bufRead = -1;
 
@@ -1419,14 +1431,12 @@ public final class CGIServlet extends HttpServlet {
                 rt = Runtime.getRuntime();
                 proc = rt.exec(cmdAndArgs.toArray(new String[0]), mapToStringArray(env), wd);
 
-                String sContentLength = env.get("CONTENT_LENGTH");
-
-                if (!"".equals(sContentLength)) {
-                    commandsStdIn = new BufferedOutputStream(proc.getOutputStream());
+                commandsStdIn = new BufferedOutputStream(proc.getOutputStream());
+                if (stdin != null) {
                     IOTools.flow(stdin, commandsStdIn);
-                    commandsStdIn.flush();
-                    commandsStdIn.close();
                 }
+                commandsStdIn.close();
+                commandsStdIn = null;
 
                 /*
                  * we want to wait for the process to exit, Process.waitFor() is useless in our situation; see
@@ -1529,6 +1539,13 @@ public final class CGIServlet extends HttpServlet {
                         cgiOutput.close();
                     } catch (IOException ioe) {
                         log.warn(sm.getString("cgiServlet.runOutputStreamFail"), ioe);
+                    }
+                }
+                if (commandsStdIn != null) {
+                    try {
+                        commandsStdIn.close();
+                    } catch (IOException ioe) {
+                        log.warn(sm.getString("cgiServlet.commandsStdInFail"), ioe);
                     }
                 }
                 // Close the error stream reader if used

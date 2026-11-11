@@ -262,7 +262,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
      */
     public void setSsoReauthenticationMode(String ssoReauthenticationMode) {
         this.ssoReauthenticationMode =
-                SsoReauthenticationMode.valueOf(ssoReauthenticationMode.trim().toUpperCase(Locale.ENGLISH));
+                SsoReauthenticationMode.valueOf(ssoReauthenticationMode.strip().toUpperCase(Locale.ENGLISH));
     }
 
     /**
@@ -280,7 +280,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
      * @param allowCorsPreflight the CORS preflight handling mode
      */
     public void setAllowCorsPreflight(String allowCorsPreflight) {
-        this.allowCorsPreflight = AllowCorsPreflight.valueOf(allowCorsPreflight.trim().toUpperCase(Locale.ENGLISH));
+        this.allowCorsPreflight = AllowCorsPreflight.valueOf(allowCorsPreflight.strip().toUpperCase(Locale.ENGLISH));
     }
 
     /**
@@ -784,21 +784,25 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
 
             boolean result = authenticateJaspic(request, response, jaspicRequestState, true);
 
-            secureResponseJaspic(request, response, jaspicRequestState);
+            // '&' is deliberate since short-cut is not appropriate here - secureResponseJaspic() always needs to run.
+            result = result & secureResponseJaspic(request, response, jaspicRequestState);
 
             return result;
         }
     }
 
 
-    private void secureResponseJaspic(Request request, Response response, JaspicRequestState state) {
+    private boolean secureResponseJaspic(Request request, Response response, JaspicRequestState state) throws IOException {
         try {
             state.serverAuthContext.secureResponse(state.messageInfo, null);
             request.setRequest((HttpServletRequest) state.messageInfo.getRequestMessage());
             response.setResponse((HttpServletResponse) state.messageInfo.getResponseMessage());
         } catch (AuthException e) {
             log.warn(sm.getString("authenticator.jaspicSecureResponseFail"), e);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return false;
         }
+        return true;
     }
 
 

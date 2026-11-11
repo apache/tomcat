@@ -63,6 +63,15 @@ public class TestJarResourceSetInternalMount extends AbstractTestResourceSetMoun
     }
 
     @Test
+    public void testGetResourceRootUrl() {
+        WebResource mountRoot = resourceRoot.getResource(getMount());
+
+        Assert.assertEquals(
+                "jar:" + new File("test/webresources/dir1-internal.jar").toURI() + "!/dir1/",
+                mountRoot.getURL().toString());
+    }
+
+    @Test
     public void testGetResourceAfterBloomFilterBuilt() {
         // Regression test: resources must still be found once the archive
         // (and therefore the bloom filter) has been opened by a previous

@@ -1206,13 +1206,13 @@ final class MappedNameRule extends Rule {
     @Override
     public void body(String namespace, String name, String text) throws Exception {
         ResourceBase resourceBase = (ResourceBase) digester.peek();
-        resourceBase.setProperty("mappedName", text.trim());
+        resourceBase.setProperty("mappedName", text.strip());
 
         StringBuilder code = digester.getGeneratedCode();
         if (code != null) {
             code.append(System.lineSeparator());
             code.append(digester.toVariableName(resourceBase));
-            code.append(".setProperty(\"mappedName\", \"").append(text.trim()).append("\");");
+            code.append(".setProperty(\"mappedName\", \"").append(text.strip()).append("\");");
             code.append(System.lineSeparator());
         }
     }

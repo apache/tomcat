@@ -27,9 +27,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -88,19 +86,19 @@ class TestAlternateCredentials extends JdbcPoolBaseTest {
         ds.createPool();
 
         try (Connection c = ds.getConnection()) {
-            assertEquals(DEFAULT_USER, sessionUser(c),
+            Assertions.assertEquals(DEFAULT_USER, sessionUser(c),
                     "a plain borrow uses the pool's own credentials");
         }
 
         try (Connection c = ds.getConnection(ALT_USER, ALT_PASSWORD)) {
             String expected = allowed ? ALT_USER : DEFAULT_USER;
-            assertEquals(expected, sessionUser(c), allowed
+            Assertions.assertEquals(expected, sessionUser(c), allowed
                     ? "a borrow with alternate credentials must be authenticated as that user"
                     : "with alternates disallowed the configured user must be kept");
         }
 
         try (Connection c = ds.getConnection()) {
-            assertEquals(DEFAULT_USER, sessionUser(c),
+            Assertions.assertEquals(DEFAULT_USER, sessionUser(c),
                     "a default borrow must never be served by the alternate user's session");
         }
     }
@@ -117,9 +115,9 @@ class TestAlternateCredentials extends JdbcPoolBaseTest {
         // the same identity gets the pooled session back, untouched
         Connection again = ds.getConnection(ALT_USER, ALT_PASSWORD);
         try {
-            assertEquals(Integer.valueOf(12), sessionMarker(again),
+            Assertions.assertEquals(Integer.valueOf(12), sessionMarker(again),
                     "the alternate user's session must be pooled and reused for the same user");
-            assertEquals(ALT_USER, sessionUser(again));
+            Assertions.assertEquals(ALT_USER, sessionUser(again));
         } finally {
             again.close();
         }
@@ -127,12 +125,58 @@ class TestAlternateCredentials extends JdbcPoolBaseTest {
         // a different identity must not be served by that session: the pool
         // re-establishes the session instead, so the switch costs a reconnect
         try (Connection other = ds.getConnection()) {
-            assertEquals(DEFAULT_USER, sessionUser(other),
+            Assertions.assertEquals(DEFAULT_USER, sessionUser(other),
                     "the alternate user's session must not be handed to the default user");
         }
-        assertEquals(1, ds.getSize(),
+        Assertions.assertEquals(1, ds.getSize(),
                 "switching identity replaces the session in place, it does not add one");
         awaitSessions(1);
+    }
+
+    @Test
+    void credentialsHandedToThePoolSurfaceAreIgnoredLikeEverywhereElse() throws Exception {
+        DataSource ds = alternatePool(false);
+        // No pre-created session to hand out: this borrow must be the one to
+        // create the physical session, which is exactly where credentials
+        // used to enter a pool that disallows alternates.
+        ds.getPoolProperties().setInitialSize(0);
+        ds.createPool();
+
+        // The application surface (DataSourceProxy) ignores credentials when
+        // alternates are disallowed; the pool's own getConnection(user,password)
+        // must not be a door behind it. Honouring them there would authenticate
+        // a session as the claimant and then serve that session, under the
+        // pool's own identity, to every borrower afterwards.
+        try (Connection c = ds.getPool().getConnection(ALT_USER, ALT_PASSWORD)) {
+            Assertions.assertEquals(DEFAULT_USER, sessionUser(c),
+                    "the ignored credentials must not authenticate the session");
+        }
+        try (Connection c = ds.getConnection()) {
+            Assertions.assertEquals(DEFAULT_USER, sessionUser(c),
+                    "and the pool keeps serving under its own identity afterwards");
+        }
+    }
+
+    @Test
+    void aSessionCarryingAnotherIdentityIsReEstablishedWhenAlternatesAreTurnedOff() throws Exception {
+        DataSource ds = alternatePool(true);
+        ds.createPool();
+
+        Connection alt = ds.getConnection(ALT_USER, ALT_PASSWORD);
+        setSessionMarker(alt, 33);
+        alt.close();
+
+        // An operator turns the feature off while an alternate session is
+        // alive in the pool. Nothing can purge every queue at that instant,
+        // but the session must never reach a default borrower as it stands.
+        ds.getPoolProperties().setAlternateUsernameAllowed(false);
+
+        try (Connection c = ds.getConnection()) {
+            Assertions.assertEquals(DEFAULT_USER, sessionUser(c),
+                    "the identity gate must not itself be switched off by the flag");
+            Assertions.assertNull(sessionMarker(c),
+                    "the pool's own identity means a session the alternate never touched");
+        }
     }
 
     @Test
@@ -141,14 +185,56 @@ class TestAlternateCredentials extends JdbcPoolBaseTest {
         ds.getPoolProperties().setMaxWait(5000);
         ds.createPool();
 
-        assertThrows(SQLException.class, () -> ds.getConnection(ALT_USER, "wrong-password"),
+        Assertions.assertThrows(SQLException.class,
+                () -> ds.getConnection(ALT_USER, "wrong-password"),
                 "the database must refuse a borrow with a wrong password");
 
         try (Connection c = ds.getConnection()) {
-            assertEquals(DEFAULT_USER, sessionUser(c),
+            Assertions.assertEquals(DEFAULT_USER, sessionUser(c),
                     "a refused borrow must leave the pool serving its default user");
         }
-        assertEquals(0, ds.getActive(), "a refused borrow must not leak a checked out connection");
+        Assertions.assertEquals(0, ds.getActive(),
+                "a refused borrow must not leak a checked out connection");
+    }
+
+    @Test
+    void aRefusedCredentialChangeCostsThePoolNothing() throws Exception {
+        DataSource ds = alternatePool(true);
+        ds.getPoolProperties().setMaxWait(5000);
+        ds.createPool();
+
+        // One healthy session of the pool's own user, checked back in: this is
+        // the session a later alternate-credential borrow picks up and is
+        // refused with.
+        try (Connection c = ds.getConnection()) {
+            setSessionMarker(c, 42);
+        }
+        int sizeBefore = ds.getSize();
+        int sessionsBefore = poolSessions();
+        long reconnectionsBefore = ds.getReconnectedCount();
+
+        Assertions.assertThrows(SQLException.class,
+                () -> ds.getConnection(ALT_USER, "wrong-password"),
+                "the database must refuse a borrow with a wrong password");
+
+        Assertions.assertEquals(sizeBefore, ds.getSize(),
+                "an attempt the database refused must not take a session - and with "
+                        + "it a maxActive slot - out of the pool");
+        Assertions.assertEquals(sessionsBefore, poolSessions(),
+                "the session the refused attempt was made on must still be open");
+        Assertions.assertEquals(reconnectionsBefore, ds.getReconnectedCount(),
+                "a refused attempt is not a reconnection");
+
+        // The session came back where it was, still authenticated as the user
+        // it was opened as: the refused credentials are not what it will be
+        // re-established with either.
+        try (Connection c = ds.getConnection()) {
+            Assertions.assertEquals(DEFAULT_USER, sessionUser(c));
+            Assertions.assertEquals(Integer.valueOf(42), sessionMarker(c),
+                    "the refused attempt must not have replaced the session");
+        }
+        Assertions.assertEquals(sizeBefore, ds.getSize(),
+                "serving the next borrower must not have needed a new session");
     }
 
     @Test
@@ -157,9 +243,10 @@ class TestAlternateCredentials extends JdbcPoolBaseTest {
         ds.getPoolProperties().setMaxWait(5000);
         ds.createPool();
 
-        assertThrows(SQLException.class, () -> ds.getConnection("NO_SUCH_POOL_USER", "x"),
+        Assertions.assertThrows(SQLException.class,
+                () -> ds.getConnection("NO_SUCH_POOL_USER", "x"),
                 "the database must refuse a borrow for a user that does not exist");
-        assertEquals(0, ds.getActive());
+        Assertions.assertEquals(0, ds.getActive());
     }
 
     @Test
@@ -201,15 +288,16 @@ class TestAlternateCredentials extends JdbcPoolBaseTest {
             worker.start();
         }
         start.countDown();
-        assertTrue(done.await(2 * AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
+        Assertions.assertTrue(done.await(2 * AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
                 "the churn threads must finish, problems: " + problems);
 
-        assertTrue(problems.isEmpty(), "every borrower must get its own identity: " + problems);
-        assertEquals(threads * iterations, served.get());
-        assertEquals(0, ds.getActive(), "every borrowed connection must be back");
-        assertTrue(ds.getSize() <= threads,
+        Assertions.assertTrue(problems.isEmpty(),
+                "every borrower must get its own identity: " + problems);
+        Assertions.assertEquals(threads * iterations, served.get());
+        Assertions.assertEquals(0, ds.getActive(), "every borrowed connection must be back");
+        Assertions.assertTrue(ds.getSize() <= threads,
                 "the pool must not exceed maxActive, size was " + ds.getSize());
-        assertTrue(poolSessions() <= threads,
+        Assertions.assertTrue(poolSessions() <= threads,
                 "the database must never see more sessions than maxActive, was "
                         + poolSessions());
     }

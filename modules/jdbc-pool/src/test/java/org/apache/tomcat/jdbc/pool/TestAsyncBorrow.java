@@ -19,14 +19,16 @@ package org.apache.tomcat.jdbc.pool;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
@@ -35,8 +37,10 @@ import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
  * Expected functionality of the asynchronous borrow API
  * ({@code getConnectionAsync()}): the same accounting, the same
  * database-side truth and the same delivery guarantees as the blocking
- * API, and a clear failure when the pool is configured with a queue that
- * cannot hand out futures.
+ * API, a clear failure when the pool is configured with a queue that
+ * cannot hand out futures, the termination of an outstanding poll once
+ * the pool is closed, and the immediate failure of a further retrieval
+ * from a poll whose timed get already timed out.
  *
  * <p>Scenario harvested from the retired legacy classes
  * {@code Bug50805} (async borrow accounting) and
@@ -53,30 +57,32 @@ class TestAsyncBorrow extends JdbcPoolBaseTest {
         ds.getPoolProperties().setMaxActive(10);
         ds.createPool();
 
-        assertEquals(0, ds.getSize(), "an empty pool must hold no connections");
-        assertEquals(0, ds.getIdle());
-        assertEquals(0, ds.getActive());
-        assertEquals(0, poolSessions(), "the database must not see any session yet");
+        Assertions.assertEquals(0, ds.getSize(), "an empty pool must hold no connections");
+        Assertions.assertEquals(0, ds.getIdle());
+        Assertions.assertEquals(0, ds.getActive());
+        Assertions.assertEquals(0, poolSessions(), "the database must not see any session yet");
 
         ds.getConnection().close();
-        assertEquals(1, ds.getSize(), "the pool must keep the connection it created");
-        assertEquals(1, ds.getIdle());
-        assertEquals(0, ds.getActive());
+        Assertions.assertEquals(1, ds.getSize(), "the pool must keep the connection it created");
+        Assertions.assertEquals(1, ds.getIdle());
+        Assertions.assertEquals(0, ds.getActive());
         awaitSessions(1);
 
         Future<Connection> future = ds.getConnectionAsync();
         try (Connection c = future.get(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
-            assertNotNull(c, "the future must hand out a connection");
-            assertEquals(1, ds.getActive(), "an async borrow must count as active");
-            assertEquals(0, ds.getIdle());
-            assertEquals(1, poolSessions(),
+            Assertions.assertNotNull(c, "the future must hand out a connection");
+            Assertions.assertEquals(1, ds.getActive(), "an async borrow must count as active");
+            Assertions.assertEquals(0, ds.getIdle());
+            Assertions.assertEquals(1, poolSessions(),
                     "the async borrow must reuse the pooled connection, not open a second one");
             try (ResultSet rs = c.createStatement().executeQuery("SELECT 1")) {
-                assertTrue(rs.next(), "the asynchronously borrowed connection must work");
+                Assertions.assertTrue(rs.next(),
+                        "the asynchronously borrowed connection must work");
             }
         }
-        assertEquals(0, ds.getActive(), "the returned connection must stop counting as active");
-        assertEquals(1, ds.getIdle());
+        Assertions.assertEquals(0, ds.getActive(),
+                "the returned connection must stop counting as active");
+        Assertions.assertEquals(1, ds.getIdle());
         awaitSessions(1);
     }
 
@@ -88,13 +94,13 @@ class TestAsyncBorrow extends JdbcPoolBaseTest {
         ds.getPoolProperties().setMinIdle(0);
         ds.getPoolProperties().setMaxActive(5);
         ds.createPool();
-        assertEquals(0, poolSessions());
+        Assertions.assertEquals(0, poolSessions());
 
         Future<Connection> future = ds.getConnectionAsync();
         try (Connection c = future.get(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
-            assertNotNull(c, "an empty fair pool must create the connection on demand");
+            Assertions.assertNotNull(c, "an empty fair pool must create the connection on demand");
             try (ResultSet rs = c.createStatement().executeQuery("SELECT 1")) {
-                assertTrue(rs.next());
+                Assertions.assertTrue(rs.next());
             }
         }
         awaitSessions(1);
@@ -109,13 +115,89 @@ class TestAsyncBorrow extends JdbcPoolBaseTest {
 
         Connection holder = ds.getConnection();
         try {
-            SQLException error = assertThrows(SQLException.class, ds::getConnectionAsync,
+            SQLException error = Assertions.assertThrows(SQLException.class, ds::getConnectionAsync,
                     "a non-fair queue cannot hand out futures once the pool is exhausted");
-            assertTrue(error.getMessage().toLowerCase().contains("fair"),
+            Assertions.assertTrue(error.getMessage().toLowerCase().contains("fair"),
                     "the failure must name the missing configuration, was: " + error.getMessage());
+            // The message is fetched for the application, not as a format
+            // pattern: it must render the writer's punctuation, not the
+            // doubled-quote escapes that only MessageFormat would collapse
+            Assertions.assertTrue(error.getMessage().contains("doesn't"),
+                    "the apostrophe must reach the application collapsed, was: "
+                            + error.getMessage());
+            Assertions.assertTrue(error.getMessage().contains("'fair'")
+                            && error.getMessage().contains("'true'"),
+                    "the quoted property names must reach the application with "
+                            + "single quotes, was: " + error.getMessage());
         } finally {
             holder.close();
         }
+    }
+
+    @Test
+    void asyncBorrowFailureWithoutAMessageStillSurfacesAsSqlException()
+            throws Exception {
+        // A failing connector whose exception carries no message: the pool
+        // wraps it as a message-less SQLException, and the async borrow must
+        // rethrow that failure rather than dereference its missing message
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setInitialSize(0);
+        ds.setDataSource(new javax.sql.DataSource() {
+            @Override
+            public Connection getConnection() {
+                throw new IllegalStateException();
+            }
+
+            @Override
+            public Connection getConnection(String user, String password) {
+                throw new IllegalStateException();
+            }
+
+            @Override
+            public java.io.PrintWriter getLogWriter() {
+                return null;
+            }
+
+            @Override
+            public void setLogWriter(java.io.PrintWriter out) {
+                // no logging
+            }
+
+            @Override
+            public void setLoginTimeout(int seconds) {
+                // no timeout
+            }
+
+            @Override
+            public int getLoginTimeout() {
+                return 0;
+            }
+
+            @Override
+            public java.util.logging.Logger getParentLogger()
+                    throws java.sql.SQLFeatureNotSupportedException {
+                throw new java.sql.SQLFeatureNotSupportedException();
+            }
+
+            @Override
+            public <T> T unwrap(Class<T> iface) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public boolean isWrapperFor(Class<?> iface) {
+                return false;
+            }
+        });
+
+        SQLException failure = Assertions.assertThrows(SQLException.class,
+                ds::getConnectionAsync,
+                "the borrow failure must reach the caller as a SQLException "
+                        + "even when its message is null");
+        Assertions.assertNull(failure.getMessage(),
+                "the rethrown failure must keep its absent message");
+        Assertions.assertTrue(failure.getCause() instanceof IllegalStateException,
+                "the wrapped connector failure must be preserved as cause");
     }
 
     @Test
@@ -148,10 +230,170 @@ class TestAsyncBorrow extends JdbcPoolBaseTest {
             thread.join(AWAIT_TIMEOUT_MS);
         }
 
-        assertEquals(0, failed.get(), "no async borrower may fail");
-        assertEquals(borrowers, served.get(), "every async borrower must be served");
-        assertEquals(0, ds.getActive());
-        assertEquals(2, ds.getIdle(), "the pool must keep at most maxActive connections");
+        Assertions.assertEquals(0, failed.get(), "no async borrower may fail");
+        Assertions.assertEquals(borrowers, served.get(), "every async borrower must be served");
+        Assertions.assertEquals(0, ds.getActive());
+        Assertions.assertEquals(2, ds.getIdle(),
+                "the pool must keep at most maxActive connections");
         awaitSessions(2);
+    }
+
+    @Test
+    void closingThePoolTerminatesAnAsyncPollThatIsBlockedInGet() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setFairQueue(true);
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setMinIdle(0);
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setMaxIdle(1);
+        ds.createPool();
+        ConnectionPool pool = ds.getPool();
+
+        ds.getConnection(); // takes the only slot, and the pool is at maxActive
+
+        // the borrow below cannot be served by a new connection, so it has to
+        // register a waiter on the idle queue and wait for a returned one
+        Future<Connection> future = ds.getConnectionAsync();
+        Assertions.assertFalse(future.isDone(),
+                "the poll must still be waiting for a connection");
+
+        CountDownLatch parked = new CountDownLatch(1);
+        CountDownLatch finished = new CountDownLatch(1);
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+        Thread caller = new Thread(() -> {
+            parked.countDown();
+            try {
+                future.get(); // the documented, untimed usage
+            } catch (Throwable e) {
+                failure.set(e);
+            } finally {
+                finished.countDown();
+            }
+        }, "blocked-async-borrower");
+        caller.setDaemon(true);
+        caller.start();
+        Assertions.assertTrue(parked.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS));
+        sleep(200); // let the caller reach the wait on the idle queue
+
+        ds.close(true);
+
+        // The caller cannot observe the closed pool itself - it is inside the
+        // queue wait, and a closed pool never offers a connection to that queue
+        // again. Closing the pool has to terminate the future instead.
+        Assertions.assertTrue(finished.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
+                "closing the pool must release a caller blocked in get()");
+        Assertions.assertTrue(failure.get() instanceof CancellationException,
+                "a pool closure must fail an outstanding poll with a "
+                        + "cancellation, got " + failure.get());
+        Assertions.assertTrue(future.isDone());
+        Assertions.assertTrue(future.isCancelled(),
+                "an outstanding poll must be cancelled by the pool closure");
+        Assertions.assertThrows(CancellationException.class, future::get,
+                "a completed poll must keep reporting its cancellation");
+
+        // and the borrow path itself reports the closure the same way a
+        // synchronous borrow does
+        Assertions.assertThrows(SQLException.class, pool::getConnectionAsync,
+                "an async borrow on a closed pool must be rejected");
+        awaitSessions(0);
+    }
+
+    @Test
+    void aTimedOutAsyncBorrowFailsFurtherGettersInsteadOfBlockingThem()
+            throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setFairQueue(true);
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setMinIdle(0);
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setMaxIdle(1);
+        ds.createPool();
+
+        Connection holder = ds.getConnection(); // takes the only slot
+        Future<Connection> future = ds.getConnectionAsync(); // queued poll
+
+        Assertions.assertThrows(TimeoutException.class,
+                () -> future.get(100, TimeUnit.MILLISECONDS),
+                "the borrow cannot be served while the pool holds its only slot");
+
+        // the timed-out poll left the idle queue, so the connection that
+        // comes back is not stranded on it but goes to the next borrower
+        holder.close();
+        try (Connection served = ds.getConnection()) {
+            Assertions.assertNotNull(served,
+                    "a returned connection must not be consumed by the abandoned poll");
+        }
+
+        // the poll can never receive a connection anymore - it must say so,
+        // instead of leaving a later getter parked on the abandoned waiter
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+        CountDownLatch finished = new CountDownLatch(1);
+        Thread caller = new Thread(() -> {
+            try {
+                future.get(); // the documented, untimed usage
+            } catch (Throwable e) {
+                failure.set(e);
+            } finally {
+                finished.countDown();
+            }
+        }, "timed-out-async-borrower");
+        caller.setDaemon(true);
+        caller.start();
+        Assertions.assertTrue(finished.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
+                "an untimed get() after the timeout must not block forever");
+        Assertions.assertTrue(failure.get() instanceof ExecutionException
+                        && failure.get().getCause() instanceof TimeoutException,
+                "the untimed get() must report the earlier timeout as its cause, got "
+                        + failure.get());
+
+        Assertions.assertTrue(future.isDone(),
+                "a poll whose timed get() timed out is complete");
+        Assertions.assertFalse(future.isCancelled(),
+                "nobody cancelled the poll, a timeout must not report a cancellation");
+        Assertions.assertThrows(TimeoutException.class,
+                () -> future.get(100, TimeUnit.MILLISECONDS),
+                "a repeated timed get() must keep reporting the timeout");
+
+        ds.close();
+    }
+
+    @Test
+    void cancellingAnAsyncPollAfterThePoolClosedReportsNothingCancelled() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setFairQueue(true);
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setMinIdle(0);
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setMaxIdle(1);
+        ds.createPool();
+        ConnectionPool pool = ds.getPool();
+
+        ds.getConnection(); // takes the only slot, so the poll stays queued
+        Future<Connection> future = ds.getConnectionAsync();
+
+        ds.close(true);
+
+        // the closure has already cancelled the queued poll
+        Assertions.assertTrue(future.isCancelled());
+        Assertions.assertTrue(future.isDone());
+
+        // a cancel() after the fact must report nothing cancelled, as the
+        // future is already complete, and must not arm the deferred cleanup
+        // task, which would only run to observe that same cancellation
+        Assertions.assertFalse(future.cancel(true),
+                "a poll the pool closure already cancelled must not report "
+                        + "a further cancellation");
+        Assertions.assertTrue(future.isCancelled());
+        Assertions.assertTrue(future.isDone());
+        Assertions.assertThrows(CancellationException.class, future::get,
+                "the completed cancellation must keep being reported");
+
+        // the refused cancel must not act on any connection: beyond what the
+        // closure itself already released, the pool released nothing
+        long releasedAfterClose = pool.getReleasedCount();
+        sleep(200); // a cleanup task scheduled by cancel() would have run
+        Assertions.assertEquals(releasedAfterClose, pool.getReleasedCount(),
+                "a refused cancel must not retrieve or release any connection");
+        awaitSessions(0);
     }
 }

@@ -84,7 +84,7 @@ public class CompressionConfig {
         if (encodings != null && !encodings.isEmpty()) {
             StringTokenizer tokens = new StringTokenizer(encodings, ",");
             while (tokens.hasMoreTokens()) {
-                String token = tokens.nextToken().trim();
+                String token = tokens.nextToken().strip();
                 if (!token.isEmpty()) {
                     newEncodings.add(token);
                 }
@@ -104,7 +104,7 @@ public class CompressionConfig {
     public void setCompression(String compression) {
         // Trim the value so that surrounding whitespace in the configuration
         // does not silently disable compression
-        String value = compression == null ? "" : compression.trim();
+        String value = compression == null ? "" : compression.strip();
         switch (value) {
             case "on" -> this.compressionLevel = 1;
             case "force" -> this.compressionLevel = 2;
@@ -226,7 +226,7 @@ public class CompressionConfig {
         List<String> values = new ArrayList<>();
         StringTokenizer tokens = new StringTokenizer(compressibleMimeType, ",");
         while (tokens.hasMoreTokens()) {
-            String token = tokens.nextToken().trim();
+            String token = tokens.nextToken().strip();
             if (!token.isEmpty()) {
                 values.add(token);
             }
@@ -346,6 +346,12 @@ public class CompressionConfig {
         }
 
         if (useContentEncoding && !useTransferEncoding) {
+            // The ranges of a partial response refer to the bytes of the representation so it must not be content
+            // encoded. The Content-Range header is not present at the top level of a multipart/byteranges response.
+            if (response.getStatus() == 206 || responseHeaders.getHeader("Content-Range") != null) {
+                return false;
+            }
+
             // If processing reaches this far, the response might be compressed.
             // Therefore, set the Vary header to keep proxies happy
             ResponseUtil.addVaryFieldName(responseHeaders, "accept-encoding");

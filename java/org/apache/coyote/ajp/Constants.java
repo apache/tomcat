@@ -143,11 +143,6 @@ public final class Constants {
      */
     public static final int SC_RESP_WWW_AUTHENTICATE = 0xA00B;
 
-    /**
-     * Maximum number of response header codes.
-     */
-    public static final int SC_RESP_AJP13_MAX = 11;
-
     // Integer codes for common (optional) request attribute names
 
     /**
@@ -406,7 +401,7 @@ public final class Constants {
     private static final Map<String,Integer> responseTransMap = new HashMap<>(20);
 
     static {
-        for (int i = 0; i < SC_RESP_AJP13_MAX; i++) {
+        for (int i = 0; i < responseTransArray.length; i++) {
             responseTransMap.put(getResponseHeaderForCode(i), Integer.valueOf(0xA001 + i));
         }
     }

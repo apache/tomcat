@@ -67,7 +67,7 @@ public enum EncodedSolidusHandling {
      * @throws IllegalStateException if the string does not match any known strategy
      */
     public static EncodedSolidusHandling fromString(String from) {
-        String trimmedLower = from.trim().toLowerCase(Locale.ENGLISH);
+        String trimmedLower = from.strip().toLowerCase(Locale.ENGLISH);
 
         for (EncodedSolidusHandling value : values()) {
             if (value.getValue().equals(trimmedLower)) {
