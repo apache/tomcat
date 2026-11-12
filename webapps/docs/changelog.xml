@@ -134,6 +134,10 @@
         connection error as required by RFC 9113, section 6.9.2. Pull request
         <pr>1131</pr> provided by Arturo Bernal. (markt)
       </fix>
+      <fix>
+        Ignore empty list elements when parsing the HTTP Upgrade header. Pull
+        request <pr>1143</pr> provided by Arturo Bernal. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
