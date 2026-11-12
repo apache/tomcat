@@ -51,6 +51,7 @@ class TestAsyncBorrowAbandonedSetup extends JdbcPoolBaseTest {
         ds.getPoolProperties().setValidationInterval(0);
         ds.getPoolProperties().setValidator(validator);
         ds.createPool();
+        ConnectionPool pool = ds.getPool();
 
         Connection holder = ds.getConnection();
         Future<Connection> future = ds.getConnectionAsync();
@@ -74,6 +75,7 @@ class TestAsyncBorrowAbandonedSetup extends JdbcPoolBaseTest {
         holder.close();
         Assertions.assertTrue(insideSetup.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
                 "the timed borrower must have taken the returned connection and entered setup");
+        pool.resetStats();
 
         AtomicReference<Throwable> waitingFailure = new AtomicReference<>();
         CountDownLatch waitingFinished = new CountDownLatch(1);
@@ -108,5 +110,7 @@ class TestAsyncBorrowAbandonedSetup extends JdbcPoolBaseTest {
         Assertions.assertEquals(1, ds.getSize(), "the connection must remain in the pool");
         Assertions.assertEquals(0, ds.getActive(), "no abandoned setup may leave the connection busy");
         Assertions.assertEquals(1, ds.getIdle(), "the produced connection must be returned to the pool");
+        Assertions.assertEquals(0, pool.getBorrowedCount(), "the abandoned setup never reached a caller");
+        Assertions.assertEquals(0, pool.getReturnedCount(), "the abandoned setup's cleanup is not a borrower's return");
     }
 }
