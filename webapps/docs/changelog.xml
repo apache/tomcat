@@ -136,6 +136,11 @@
         Improve search of existing methods when defining functions using an
         <code>ELProcressor</code>. (markt)
       </fix>
+      <fix>
+        <bug>70297</bug>: Avoid duplicate evaluation of a single vararg argument
+        when calling an EL function. Pull request <pr>1130</pr> by Mykola
+        Pavluchynskyi. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
