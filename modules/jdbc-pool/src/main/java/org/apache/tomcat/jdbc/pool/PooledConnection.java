@@ -695,6 +695,7 @@ public class PooledConnection implements PooledConnectionMBean {
         javax.sql.PooledConnection servedCpds = cpdsConnection;
         long servedLastConnected = lastConnected;
         long servedLastValidated = lastValidated;
+        boolean servedDiscarded = discarded;
         HashMap<Object, Object> sessionAttributes = getAttributes();
         boolean hadUser = sessionAttributes.containsKey(PROP_USER);
         Object servedUser = sessionAttributes.get(PROP_USER);
@@ -755,6 +756,7 @@ public class PooledConnection implements PooledConnectionMBean {
                 cpdsConnection = servedCpds;
                 lastConnected = servedLastConnected;
                 lastValidated = servedLastValidated;
+                discarded = servedDiscarded;
                 if (hadUser) {
                     sessionAttributes.put(PROP_USER, servedUser);
                 } else {
