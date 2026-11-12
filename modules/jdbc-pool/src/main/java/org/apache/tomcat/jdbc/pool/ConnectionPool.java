@@ -2382,7 +2382,11 @@ public class ConnectionPool {
             }
             long now = System.currentTimeMillis();
             Iterator<PooledConnection> unlocked = idle.iterator();
-            while ((ignoreMinSize || (getSize() > getPoolProperties().getMinIdle())) && unlocked.hasNext()) {
+            // Walk every idle connection: a purge-stale connection is released regardless of
+            // the minIdle floor, even when the pool is already at or below it. The floor is
+            // applied to the release decision itself for the connections that are only idle
+            // past their release time.
+            while (unlocked.hasNext()) {
                 PooledConnection con = unlocked.next();
                 boolean setToNull = false;
                 try {
@@ -2392,7 +2396,7 @@ public class ConnectionPool {
                         continue;
                     }
                     long time = con.getTimestamp();
-                    if (shouldReleaseIdle(now, con, time)) {
+                    if (shouldReleaseIdle(now, con, time, ignoreMinSize)) {
                         // Claim the connection before acting on it; without
                         // a real lock the checks above may already be stale,
                         // and a connection a borrower took out of the idle
@@ -2435,12 +2439,28 @@ public class ConnectionPool {
      * @return {@code true} if the connection should be released
      */
     protected boolean shouldReleaseIdle(long now, PooledConnection con, long time) {
+        return shouldReleaseIdle(now, con, time, false);
+    }
+
+    /**
+     * Determines whether an idle connection should be released from the pool, optionally ignoring the
+     * {@link PoolConfiguration#getMinIdle() minIdle} floor for connections that are only past their release time.
+     * Purge-stale connections are always released: the floor protects connections that are merely idle, not ones a
+     * purge has already marked for retirement.
+     *
+     * @param now          the current time in milliseconds
+     * @param con          the pooled connection to evaluate
+     * @param time         the timestamp when the connection last became idle
+     * @param ignoreMinSize whether the minIdle floor may be ignored for an aged connection
+     *
+     * @return {@code true} if the connection should be released
+     */
+    protected boolean shouldReleaseIdle(long now, PooledConnection con, long time, boolean ignoreMinSize) {
         if (con.getConnectionVersion() < getPoolVersion()) {
             return true;
-        } else {
-            return (con.getReleaseTime() > 0) && ((now - time) > con.getReleaseTime()) &&
-                    (getSize() > getPoolProperties().getMinIdle());
         }
+        return (con.getReleaseTime() > 0) && ((now - time) > con.getReleaseTime()) &&
+                (ignoreMinSize || getSize() > getPoolProperties().getMinIdle());
     }
 
     /**

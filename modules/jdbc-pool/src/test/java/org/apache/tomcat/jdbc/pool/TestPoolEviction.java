@@ -212,6 +212,46 @@ class TestPoolEviction extends JdbcPoolBaseTest {
     }
 
     @Test
+    void checkIdleWithIgnoreMinSizeEvictsAnAgedConnectionAtTheFloor() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setInitialSize(1);
+        ds.getPoolProperties().setMinIdle(1);
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setMaxIdle(1);
+        ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(0);
+        ds.getPoolProperties().setMinEvictableIdleTimeMillis(1);
+        ds.createPool();
+        Assertions.assertEquals(1, poolSessions());
+
+        sleep(50);
+        ds.getPool().checkIdle(true);
+
+        Assertions.assertEquals(0, ds.getSize(),
+                "ignoreMinSize must let the explicit check evict an aged connection at the minIdle floor");
+        Assertions.assertEquals(0, poolSessions(), "the evicted connection's physical session must be closed");
+    }
+
+    @Test
+    void checkIdleReleasesPurgeStaleConnectionBelowTheFloor() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setInitialSize(1);
+        ds.getPoolProperties().setMinIdle(1);
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setMaxIdle(1);
+        ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(0);
+        ds.getPoolProperties().setMinEvictableIdleTimeMillis(0);
+        ds.createPool();
+        Assertions.assertEquals(1, poolSessions());
+
+        ds.getPool().purgeOnReturn();
+        ds.getPool().checkIdle();
+
+        Assertions.assertEquals(0, ds.getSize(),
+                "a purge-stale connection must be released regardless of the minIdle floor");
+        Assertions.assertEquals(0, poolSessions(), "the purge-stale connection's physical session must be closed");
+    }
+
+    @Test
     void borrowAfterEvictionCycleYieldsFreshConnection() throws Exception {
         DataSource ds = newDataSource();
         ds.getPoolProperties().setMaxActive(1);
