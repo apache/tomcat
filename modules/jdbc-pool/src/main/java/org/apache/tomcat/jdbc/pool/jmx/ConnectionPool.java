@@ -917,7 +917,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      */
     @Override
     public void setFairQueue(boolean fairQueue) {
-        throw new UnsupportedOperationException("fairQueue must be set before the pool is started");
+        throw new UnsupportedOperationException(MessageFactory.get("dataSourceProxy.startTimePropertyAfterStart", "fairQueue"));
     }
 
 
@@ -927,7 +927,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      */
     @Override
     public void setInitialSize(int initialSize) {
-        throw new UnsupportedOperationException("initialSize must be set before the pool is started");
+        throw new UnsupportedOperationException(MessageFactory.get("dataSourceProxy.startTimePropertyAfterStart", "initialSize"));
     }
 
 
@@ -944,7 +944,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      */
     @Override
     public void setJdbcInterceptors(String jdbcInterceptors) {
-        throw new UnsupportedOperationException("jdbcInterceptors must be set before the pool is started");
+        throw new UnsupportedOperationException(MessageFactory.get("dataSourceProxy.startTimePropertyAfterStart", "jdbcInterceptors"));
     }
 
 
@@ -955,7 +955,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      */
     @Override
     public void setJmxEnabled(boolean jmxEnabled) {
-        throw new UnsupportedOperationException("jmxEnabled must be set before the pool is started");
+        throw new UnsupportedOperationException(MessageFactory.get("dataSourceProxy.startTimePropertyAfterStart", "jmxEnabled"));
     }
 
 
@@ -1307,7 +1307,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      */
     @Override
     public void setIgnoreExceptionOnPreLoad(boolean ignoreExceptionOnPreLoad) {
-        throw new UnsupportedOperationException("ignoreExceptionOnPreLoad must be set before the pool is started");
+        throw new UnsupportedOperationException(MessageFactory.get("dataSourceProxy.startTimePropertyAfterStart", "ignoreExceptionOnPreLoad"));
     }
 
     /**
