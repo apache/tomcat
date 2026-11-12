@@ -20,7 +20,6 @@ package org.apache.tomcat.util.net;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.Arrays;
 import java.util.logging.Level;
 
 import javax.net.ssl.SSLContext;
@@ -33,43 +32,21 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.tomcat.util.net.TesterCredentialGenerator.TesterCredential;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.DERUTF8String;
-import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.KeyUsage;
-import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
 
 public class TestLargeClientHello extends TomcatBaseTest {
 
     // https://bz.apache.org/bugzilla/show_bug.cgi?id=67938
     @Test
     public void testLargeClientHelloWithSessionResumption() throws Exception {
-        TesterCredential credential = TesterCredentialGenerator.generateCredential("localhost", "tomcat",
-                new String[] { "localhost", "*.localhost" }, (keyPair, certBuilder) -> {
-                    JcaX509ExtensionUtils extUtils = new JcaX509ExtensionUtils();
-                    certBuilder.addExtension(Extension.subjectKeyIdentifier, false,
-                            extUtils.createSubjectKeyIdentifier(keyPair.getPublic()));
-                    certBuilder.addExtension(Extension.authorityKeyIdentifier, false,
-                            extUtils.createAuthorityKeyIdentifier(keyPair.getPublic()));
-                    certBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(true));
-                    certBuilder.addExtension(Extension.keyUsage, false,
-                            new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyEncipherment));
-                    char[] padding = new char[16922];
-                    Arrays.fill(padding, 'x');
-                    certBuilder.addExtension(new ASN1ObjectIdentifier("2.999"), false,
-                            new DERUTF8String(new String(padding)));
-                });
-
         Tomcat tomcat = getTomcatInstance();
 
         Context ctx = getProgrammaticRootContext();
         Tomcat.addServlet(ctx, "hello", new HelloWorldServlet());
         ctx.addServletMapping("/", "hello");
 
-        TesterSupport.initSsl(tomcat, credential.getKeystore().getAbsolutePath(),
-                credential.getCertificate().getAbsolutePath(), credential.getKey().getAbsolutePath(), false);
+        TesterSupport.initSsl(tomcat, TesterSupport.LOCALHOST_RSA_LARGECERT_JKS,
+                TesterSupport.LOCALHOST_RSA_LARGECERT_CERT_PEM, TesterSupport.LOCALHOST_RSA_LARGECERT_KEY_PEM,
+                false);
 
         try (LogCapture nioCapture = attachLogCapture(Level.FINE, "org.apache.tomcat.util.net.SecureNioChannel");
                 LogCapture nio2Capture = attachLogCapture(Level.FINE, "org.apache.tomcat.util.net.SecureNio2Channel")) {

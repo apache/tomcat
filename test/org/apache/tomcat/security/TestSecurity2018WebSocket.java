@@ -30,7 +30,6 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.tomcat.util.net.TesterCredentialGenerator;
 import org.apache.tomcat.util.net.TesterSupport;
 import org.apache.tomcat.websocket.TesterEchoServer;
 import org.apache.tomcat.websocket.TesterMessageCountClient;
@@ -41,14 +40,10 @@ public class TestSecurity2018WebSocket extends WebSocketBaseTest {
     // https://www.cve.org/CVERecord?id=CVE-2018-8034
     @Test(expected = DeploymentException.class)
     public void testCVE_2018_8034() throws Exception {
-        TesterCredentialGenerator.TesterCredential credential = TesterCredentialGenerator.generateCredential(
-                "localhost", "tomcat",
-                new String[]{"localhost"}, null);
-
         Tomcat tomcat = getTomcatInstance();
 
-        TesterSupport.initSsl(tomcat, credential.getKeystore().getAbsolutePath(),
-            credential.getCertificate().getAbsolutePath(), credential.getKey().getAbsolutePath(), false);
+        TesterSupport.initSsl(tomcat, TesterSupport.LOCALHOST_RSA_DNSONLY_JKS,
+            TesterSupport.LOCALHOST_RSA_DNSONLY_CERT_PEM, TesterSupport.LOCALHOST_RSA_DNSONLY_KEY_PEM, false);
 
         Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
@@ -60,7 +55,7 @@ public class TestSecurity2018WebSocket extends WebSocketBaseTest {
         WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
         ClientEndpointConfig clientEndpointConfig = ClientEndpointConfig.Builder.create().build();
         clientEndpointConfig.getUserProperties().put(org.apache.tomcat.websocket.Constants.SSL_TRUSTSTORE_PROPERTY,
-            credential.getCertificate().getAbsolutePath());
+            TesterSupport.CA_JKS);
 
         wsContainer.connectToServer(
                 TesterMessageCountClient.TesterProgrammaticEndpoint.class,
