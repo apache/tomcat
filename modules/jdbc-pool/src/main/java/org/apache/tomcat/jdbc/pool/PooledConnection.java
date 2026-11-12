@@ -149,6 +149,13 @@ public class PooledConnection implements PooledConnectionMBean {
 
     private AtomicBoolean released = new AtomicBoolean(false);
 
+    /**
+     * Whether the borrow this pooled connection currently serves was counted in the pool's borrowed statistic and its
+     * return is therefore still to be counted. The pool sets it at a counted hand-off and clears it when that return is
+     * counted, so an internal setup that no caller receives is neither counted as a borrow nor as a return.
+     */
+    private volatile boolean borrowCounted = false;
+
     private volatile boolean suspect = false;
 
     private volatile java.sql.Driver driver = null;
@@ -1690,6 +1697,26 @@ public class PooledConnection implements PooledConnectionMBean {
     @Override
     public boolean isReleased() {
         return released.get();
+    }
+
+    /**
+     * Records whether the current borrow of this connection was counted as a borrow and still owes its return
+     * statistic.
+     *
+     * @param borrowCounted {@code true} if the current borrow was counted
+     */
+    void setBorrowCounted(boolean borrowCounted) {
+        this.borrowCounted = borrowCounted;
+    }
+
+    /**
+     * Returns whether the current borrow of this connection was counted as a borrow and its return has not yet been
+     * counted.
+     *
+     * @return {@code true} if a return of this borrow is still to be counted
+     */
+    boolean isBorrowCounted() {
+        return borrowCounted;
     }
 
     /**

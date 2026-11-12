@@ -289,11 +289,12 @@ class TestAsyncBorrowCancelRace extends JdbcPoolBaseTest {
         Assertions.assertTrue(future.isCancelled());
         Assertions.assertTrue(future.isDone());
 
-        // the connection the cleanup claimed is back in the pool, exactly once
-        awaitUntil(() -> pool.getReturnedCount() - returnedBefore == 1);
+        // the connection the cleanup claimed is back in the pool, exactly once. The cleanup never reached a
+        // borrower, so its hand-back must not move the returned statistic.
+        awaitUntil(() -> ds.getIdle() == 1 && ds.getActive() == 0);
         sleep(200); // a second return by the same cleanup would show up now
-        Assertions.assertEquals(1, pool.getReturnedCount() - returnedBefore,
-                "the cancellation cleanup must return the connection exactly once");
+        Assertions.assertEquals(0, pool.getReturnedCount() - returnedBefore,
+                "the cancellation cleanup's internal hand-back is not a borrower's return");
         Assertions.assertEquals(1, ds.getIdle(),
                 "the reclaimed connection must be idle again");
         Assertions.assertEquals(0, ds.getActive());
@@ -352,10 +353,10 @@ class TestAsyncBorrowCancelRace extends JdbcPoolBaseTest {
                         + " report the cancellation, not a timeout");
 
         resumeCleanup.countDown();
-        awaitUntil(() -> pool.getReturnedCount() - returnedBefore == 1);
+        awaitUntil(() -> ds.getIdle() == 1 && ds.getActive() == 0);
         sleep(200); // a second return by the same cleanup would show up now
-        Assertions.assertEquals(1, pool.getReturnedCount() - returnedBefore,
-                "the cleanup must return the connection exactly once");
+        Assertions.assertEquals(0, pool.getReturnedCount() - returnedBefore,
+                "the cleanup never reached a borrower, so its hand-back is not a return");
         Assertions.assertEquals(1, ds.getIdle());
         Assertions.assertEquals(0, ds.getActive());
         Assertions.assertTrue(future.isCancelled());
@@ -512,8 +513,8 @@ class TestAsyncBorrowCancelRace extends JdbcPoolBaseTest {
         // released and returns the connection instead of publishing it.
         resumeSetup.countDown();
         awaitUntil(() -> ds.getIdle() == 1 && ds.getActive() == 0);
-        Assertions.assertEquals(2, pool.getReturnedCount() - returnedBefore,
-                "the holder and the abandoned setup must each return their connection exactly once");
+        Assertions.assertEquals(1, pool.getReturnedCount() - returnedBefore,
+                "only the holder's hand-back is a borrower's return; the abandoned setup never reached one");
         Assertions.assertThrows(TimeoutException.class,
                 () -> future.get(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
                 "the abandoned future must keep reporting the timeout");

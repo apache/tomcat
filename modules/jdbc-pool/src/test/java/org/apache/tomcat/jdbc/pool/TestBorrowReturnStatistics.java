@@ -144,6 +144,35 @@ class TestBorrowReturnStatistics extends JdbcPoolBaseTest {
     }
 
     @Test
+    void aCancelledAsyncSetupCountsNeitherABorrowNorAReturn() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setFairQueue(true);
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setMinIdle(0);
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setMaxIdle(1);
+        ds.createPool();
+        ConnectionPool pool = ds.getPool();
+
+        Connection holder = ds.getConnection();
+        Future<Connection> future = ds.getConnectionAsync();
+        Assertions.assertFalse(future.isDone(), "the poll must wait for the held connection");
+
+        // Hand the connection to the queue future, then cancel before any getter has taken it.
+        holder.close();
+        Assertions.assertFalse(future.isDone(), "the queue delivery alone must not complete the future");
+        pool.resetStats();
+        Assertions.assertTrue(future.cancel(true), "a future whose setup has not run must be cancellable");
+
+        awaitUntil(() -> ds.getActive() == 0 && ds.getIdle() == 1);
+        Assertions.assertEquals(0, pool.getBorrowedCount(),
+                "the cancelled setup never reached a caller, so it is not a borrow");
+        Assertions.assertEquals(0, pool.getReturnedCount(),
+                "the cancelled setup's cleanup close is not a borrower's return");
+        Assertions.assertEquals(1, ds.getSize(), "the connection must remain in the pool");
+    }
+
+    @Test
     void aFailedSetupCountsNeitherABorrowNorAReturn() throws Exception {
         DataSource ds = newDataSource();
         ds.getPoolProperties().setInitialSize(0);

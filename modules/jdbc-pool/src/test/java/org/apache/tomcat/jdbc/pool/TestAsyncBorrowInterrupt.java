@@ -47,6 +47,7 @@ class TestAsyncBorrowInterrupt extends JdbcPoolBaseTest {
         ds.getPoolProperties().setValidationInterval(0);
         ds.getPoolProperties().setValidator(validator);
         ds.createPool();
+        ConnectionPool pool = ds.getPool();
 
         Connection holder = ds.getConnection();
         Future<Connection> future = ds.getConnectionAsync();
@@ -71,6 +72,7 @@ class TestAsyncBorrowInterrupt extends JdbcPoolBaseTest {
         holder.close();
         Assertions.assertTrue(insideSetup.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
                 "the borrower must have taken the returned connection and entered setup");
+        pool.resetStats();
 
         caller.interrupt();
         caller.join(AWAIT_TIMEOUT_MS);
@@ -85,5 +87,7 @@ class TestAsyncBorrowInterrupt extends JdbcPoolBaseTest {
         Assertions.assertEquals(1, ds.getSize(), "the connection must remain in the pool");
         Assertions.assertEquals(0, ds.getActive(), "the interrupted caller must not keep the connection busy");
         Assertions.assertEquals(1, ds.getIdle(), "the produced connection must be returned to the pool");
+        Assertions.assertEquals(0, pool.getBorrowedCount(), "the interrupted setup never reached a caller");
+        Assertions.assertEquals(0, pool.getReturnedCount(), "the interrupted setup's cleanup is not a borrower's return");
     }
 }

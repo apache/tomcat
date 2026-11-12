@@ -294,17 +294,19 @@ class TestAsyncBorrowFailureDiagnostics extends JdbcPoolBaseTest {
             // the queue produced its connection but no borrower claimed it:
             // cancel() wins the claim and arms the cleanup, which sets the
             // produced connection up and returns it - the documented, fully
-            // successful cancellation, with nothing left to report
+            // successful cancellation, with nothing left to report. The
+            // cleanup never reached a borrower, so its hand-back is not a
+            // returned statistic.
             PooledConnection pooled = pool.create(true);
             Future<Connection> future = pool.new ConnectionFuture(new DeliveredFuture(pooled));
 
             Assertions.assertTrue(future.cancel(true),
                     "a delivered poll nobody claimed must be cancellable");
-            awaitUntil(() -> pool.getReturnedCount() - returnedBefore == 1);
+            awaitUntil(() -> ds.getIdle() == 1 && ds.getActive() == 0);
             sleep(200); // a late error from the cleanup would show up now
 
-            Assertions.assertEquals(1, pool.getReturnedCount() - returnedBefore,
-                    "the cleanup must have returned the connection once");
+            Assertions.assertEquals(0, pool.getReturnedCount() - returnedBefore,
+                    "the cleanup's internal hand-back is not a borrower's return");
             Assertions.assertEquals(1, ds.getIdle(),
                     "the reclaimed connection must be idle again");
             Assertions.assertTrue(future.isCancelled());
