@@ -68,7 +68,7 @@ final class XABranchTracker implements XAConnection {
             globalId = gtid == null ? new byte[0] : gtid.clone();
             byte[] bqual = xid.getBranchQualifier();
             branchId = bqual == null ? new byte[0] : bqual.clone();
-            hash = Arrays.hashCode(globalId) * 31 + formatId;
+            hash = (Arrays.hashCode(globalId) * 31 + formatId) * 31 + Arrays.hashCode(branchId);
         }
 
         @Override

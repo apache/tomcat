@@ -2932,7 +2932,7 @@ public class ConnectionPool {
      * cancellable
      */
     protected class ConnectionFuture implements Future<Connection>, Runnable {
-        Future<PooledConnection> pcFuture = null;
+        final Future<PooledConnection> pcFuture;
         /**
          * The claim on the pooled connection this future produces. The queue hands its connection to every caller of
          * the queue future, so this single compare-and-set is what decides who may act on it: a
@@ -2995,6 +2995,7 @@ public class ConnectionPool {
          * @throws SQLException if connection setup fails
          */
         public ConnectionFuture(PooledConnection pc) throws SQLException {
+            this.pcFuture = null;
             this.pc = pc;
             result = ConnectionPool.this.setupConnection(pc);
             configured.set(true);
