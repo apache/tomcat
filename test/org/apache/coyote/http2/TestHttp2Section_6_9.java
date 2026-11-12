@@ -284,11 +284,15 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
 
         // Read initial server frames. The exact count varies (SETTINGS, SETTINGS-ACK,
         // PING, response HEADERS and DATA for the upgrade request on stream 1).
-        // Keep reading until the SETTINGS frame with INITIAL_WINDOW_SIZE=1024 is seen.
-        s.setSoTimeout(5000);
-        while (!output.getTrace().contains("0-Settings-[4]-[1024]")) {
-            parser.readFrame();
-        }
+        parser.readFrame();
+        parser.readFrame();
+        parser.readFrame();
+        parser.readFrame();
+        parser.readFrame();
+
+        // Confirm the expected SETTINGS frame is present
+        String trace = output.getTrace();
+        Assert.assertTrue(trace, trace.contains("0-Settings-[4]-[1024]"));
         output.clearTrace();
 
         // Open a stream so the server expects request body data.
@@ -307,5 +311,15 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
         }
         Assert.assertTrue(output.getTrace(),
                 output.getTrace().contains("3-RST-[" + Http2Error.FLOW_CONTROL_ERROR.getCode() + "]"));
+        output.clearTrace();
+
+        // The connection must still be open and usable for other streams.
+        sendSimpleGetRequest(5);
+        // The response to the upgrade request on stream 1 may still be pending so
+        // keep reading until the end of the response on stream 5 has been seen.
+        while (!output.getTrace().contains("5-EndOfStream")) {
+            parser.readFrame();
+        }
+        Assert.assertTrue(output.getTrace(), output.getTrace().contains(getSimpleResponseTrace(5)));
     }
 }
