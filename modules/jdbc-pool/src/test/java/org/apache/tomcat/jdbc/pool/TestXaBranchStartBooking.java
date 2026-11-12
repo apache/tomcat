@@ -122,6 +122,40 @@ class TestXaBranchStartBooking {
     }
 
     @Test
+    void aRetiredSessionRefusesRecoverAndTransactionTimeoutCalls() throws Exception {
+        AtomicInteger delegateCalls = new AtomicInteger();
+        XAResource resource = (XAResource) Proxy.newProxyInstance(
+                TestXaBranchStartBooking.class.getClassLoader(), new Class[] { XAResource.class },
+                (proxy, method, args) -> {
+                    delegateCalls.incrementAndGet();
+                    Class<?> type = method.getReturnType();
+                    if (type == boolean.class) {
+                        return Boolean.FALSE;
+                    }
+                    if (type == int.class) {
+                        return Integer.valueOf(0);
+                    }
+                    return null;
+                });
+        XABranchTracker tracker = new XABranchTracker(xaConnection(resource));
+        tracker.markClosed();
+
+        assertRetired(Assertions.assertThrows(XAException.class,
+                () -> tracker.getXAResource().recover(XAResource.TMSTARTRSCAN)));
+        assertRetired(Assertions.assertThrows(XAException.class,
+                tracker.getXAResource()::getTransactionTimeout));
+        assertRetired(Assertions.assertThrows(XAException.class,
+                () -> tracker.getXAResource().setTransactionTimeout(10)));
+        Assertions.assertEquals(0, delegateCalls.get(),
+                "none of the retired-session calls may reach the closed driver resource");
+    }
+
+    private static void assertRetired(XAException failure) {
+        Assertions.assertEquals(XAException.XAER_RMFAIL, failure.errorCode,
+                "a retired session must refuse with XAER_RMFAIL");
+    }
+
+    @Test
     void aRefusedStartRemovesOnlyAKeyItNewlyBooked() throws Exception {
         AtomicInteger starts = new AtomicInteger();
         XAResource resource = (XAResource) Proxy.newProxyInstance(TestXaBranchStartBooking.class.getClassLoader(),
