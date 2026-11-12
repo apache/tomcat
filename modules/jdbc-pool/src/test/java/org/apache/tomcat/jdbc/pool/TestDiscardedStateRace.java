@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.jdbc.pool;
 
+import java.sql.SQLException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -38,6 +39,42 @@ class TestDiscardedStateRace extends JdbcPoolBaseTest {
 
     private static final int ROUNDS = 20000;
     private static final int CLEARERS = 3;
+
+    /**
+     * Marks itself discarded while its replacement session is being established, the way an interceptor can while
+     * the pool is inside the driver call.
+     */
+    private static final class DiscardWhileConnectingConnection extends PooledConnection {
+        DiscardWhileConnectingConnection(PoolConfiguration prop, ConnectionPool parent) {
+            super(prop, parent);
+        }
+
+        @Override
+        protected void connectUsingDriver() throws SQLException {
+            super.connectUsingDriver();
+            setDiscarded(true);
+        }
+    }
+
+    @Test
+    void connectDoesNotClearADiscardRaisedWhileTheNewSessionIsEstablished() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(-1);
+        ds.createPool();
+
+        DiscardWhileConnectingConnection con =
+                new DiscardWhileConnectingConnection(ds.getPoolProperties(), ds.getPool());
+        try {
+            con.connect();
+            Assertions.assertTrue(con.isDiscarded(),
+                    "a discard raised during the new session's connect must survive connect() completing");
+            Assertions.assertNotNull(con.getConnection(), "the new physical session must be in place");
+        } finally {
+            con.release();
+            ds.close(true);
+        }
+    }
 
     @Test
     void aConcurrentClearCannotResurrectADiscardedConnection() throws Exception {

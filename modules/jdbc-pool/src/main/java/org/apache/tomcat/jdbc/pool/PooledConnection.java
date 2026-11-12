@@ -267,48 +267,68 @@ public class PooledConnection implements PooledConnectionMBean {
                 }
             }
         }
-        if (poolProperties.getDataSource() != null) {
-            connectUsingDataSource();
-        } else {
-            connectUsingDriver();
+        // A reconnect starts a new session; the previous session's discard, set by its disconnect above, does
+        // not apply to it. Clear it before the new session is established, under the monitor shared with
+        // setDiscarded(), so a discard raised while that session is being connected is not overwritten when
+        // connect() completes. A flag observed after the connect path is therefore a genuine discard of the
+        // new session.
+        synchronized (this) {
+            this.discarded = false;
         }
+        try {
+            if (poolProperties.getDataSource() != null) {
+                connectUsingDataSource();
+            } else {
+                connectUsingDriver();
+            }
 
-        // Set up the default state, unless we expect the interceptor to do it
-        if (!hasConnectionStateInterceptor()) {
-            if (poolProperties.getDefaultTransactionIsolation() != DataSourceFactory.UNKNOWN_TRANSACTIONISOLATION) {
-                connection.setTransactionIsolation(poolProperties.getDefaultTransactionIsolation());
+            // Set up the default state, unless we expect the interceptor to do it
+            if (!hasConnectionStateInterceptor()) {
+                if (poolProperties.getDefaultTransactionIsolation() != DataSourceFactory.UNKNOWN_TRANSACTIONISOLATION) {
+                    connection.setTransactionIsolation(poolProperties.getDefaultTransactionIsolation());
+                }
+                if (poolProperties.getDefaultReadOnly() != null) {
+                    connection.setReadOnly(poolProperties.getDefaultReadOnly().booleanValue());
+                }
+                if (poolProperties.getDefaultAutoCommit() != null) {
+                    connection.setAutoCommit(poolProperties.getDefaultAutoCommit().booleanValue());
+                }
+                if (poolProperties.getDefaultCatalog() != null) {
+                    connection.setCatalog(poolProperties.getDefaultCatalog());
+                }
             }
-            if (poolProperties.getDefaultReadOnly() != null) {
-                connection.setReadOnly(poolProperties.getDefaultReadOnly().booleanValue());
-            }
-            if (poolProperties.getDefaultAutoCommit() != null) {
-                connection.setAutoCommit(poolProperties.getDefaultAutoCommit().booleanValue());
-            }
-            if (poolProperties.getDefaultCatalog() != null) {
-                connection.setCatalog(poolProperties.getDefaultCatalog());
-            }
-        }
-        this.discarded = false;
-        this.lastConnected = System.currentTimeMillis();
-        // The validation timestamp belongs to the session that was just given
-        // up: a new physical session must be due for its own validation, or a
-        // recently validated predecessor lets the configured testOnBorrow /
-        // testOnReturn policy skip the check on this one.
-        this.lastValidated = 0;
+            this.lastConnected = System.currentTimeMillis();
+            // The validation timestamp belongs to the session that was just given
+            // up: a new physical session must be due for its own validation, or a
+            // recently validated predecessor lets the configured testOnBorrow /
+            // testOnReturn policy skip the check on this one.
+            this.lastValidated = 0;
 
-        // The physical session is up: this is the point at which the
-        // connection can publish itself below the pool's MBean. Tying that to
-        // the first borrow instead left a connection the pool pre-created for
-        // its initial size, or one that is simply never borrowed, counted in
-        // the pool's size yet invisible to JMX for its whole life. This also
-        // covers every reconnect; a connection that is already registered
-        // keeps its registration across a reconnect, and createMBean() leaves
-        // such a call alone by its own guards. With JMX disabled the pool has
-        // no JMX object to register under, and the borrow path still calls the
-        // registration unconditionally, so it is skipped here rather than
-        // called only to do nothing.
-        if (parent.getJmxPool() != null) {
-            createMBean();
+            // The physical session is up: this is the point at which the
+            // connection can publish itself below the pool's MBean. Tying that to
+            // the first borrow instead left a connection the pool pre-created for
+            // its initial size, or one that is simply never borrowed, counted in
+            // the pool's size yet invisible to JMX for its whole life. This also
+            // covers every reconnect; a connection that is already registered
+            // keeps its registration across a reconnect, and createMBean() leaves
+            // such a call alone by its own guards. With JMX disabled the pool has
+            // no JMX object to register under, and the borrow path still calls the
+            // registration unconditionally, so it is skipped here rather than
+            // called only to do nothing.
+            if (parent.getJmxPool() != null) {
+                createMBean();
+            }
+        } catch (Throwable x) {
+            ExceptionUtils.handleThrowable(x);
+            // The attempt did not establish the replacement session, or it failed after establishing it. Either
+            // way the pooled connection no longer has a usable session to serve, and a discard raised while the
+            // attempt was in flight must not be cleared by its failure path.
+            synchronized (this) {
+                if (!discarded) {
+                    discarded = true;
+                }
+            }
+            throw wrapConnectFailure(x);
         }
     }
 
@@ -1451,7 +1471,7 @@ public class PooledConnection implements PooledConnectionMBean {
      * @throws IllegalStateException if this method is called with the value false and the value true has already been
      *                                   set.
      */
-    public void setDiscarded(boolean discarded) {
+    public synchronized void setDiscarded(boolean discarded) {
         if (discarded) {
             this.discarded = true;
         } else if (this.discarded) {
@@ -1462,8 +1482,9 @@ public class PooledConnection implements PooledConnectionMBean {
         // clear racing a discard can no longer read the false, be overtaken by
         // the true, and write the false back: that interleaving resurrected a
         // connection the pool had retired. The lifecycle reset that a reconnect
-        // performs writes the field directly (see connect()), under the pool's
-        // own serialization of that connection.
+        // performs clears the field under the same monitor (see connect()), and
+        // only before the replacement session is established, so a discard
+        // raised while that session is connecting is not overwritten.
     }
 
     /**
