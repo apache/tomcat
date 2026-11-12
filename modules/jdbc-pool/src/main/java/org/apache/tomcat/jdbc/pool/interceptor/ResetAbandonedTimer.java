@@ -169,14 +169,11 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
      *             bound to no connection or to one that is not checked out
      */
     @Override
-    public boolean resetTimer() {
-        // Each field is read once: both are settled by other threads, and a gate
-        // that read one of them twice could act on a state that no longer holds.
-        // The window this leaves is the race itself - a stamp taken on a
-        // connection that was being discarded as the read happened, at most one
-        // - which is the posture the proxies below take toward a concurrent
-        // close, and borne for the same reason: no decision is taken on a
-        // timestamp of a connection that is on its way out.
+    public synchronized boolean resetTimer() {
+        // The binding, the checkout flag and the stamp are all settled under this
+        // monitor: reset() rebinds for a new borrow under it, and closeInvoked()
+        // lowers the flag under it, so the fields cannot change between the check
+        // and the stamp taken here.
         final PooledConnection con = pcon;
         final boolean held = checkedOut;
         if (con == null || !held) {
@@ -203,10 +200,10 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
      *
      * @param epoch the borrow this frame captured when it entered the chain
      */
-    private void stampFor(long epoch) {
-        // The epoch is read once, as in resetTimer(): it is settled by the
-        // thread that arms the chain, and a second read could match an arm
-        // this frame has nothing to do with.
+    private synchronized void stampFor(long epoch) {
+        // The epoch check and the stamp are taken under the same monitor as
+        // reset()'s rebind, so a new borrow cannot move the binding between the
+        // acceptance of this frame's epoch and the stamp it takes.
         if (epoch != borrowEpoch) {
             return;
         }
@@ -309,7 +306,7 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
      * interference one layer down. The override stays because the hook is abstract in the base class.
      */
     @Override
-    public void closeInvoked() {
+    public synchronized void closeInvoked() {
         // The borrow is ending: see above
         checkedOut = false;
     }
