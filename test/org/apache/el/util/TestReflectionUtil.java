@@ -16,6 +16,8 @@
  */
 package org.apache.el.util;
 
+import java.lang.ref.WeakReference;
+
 import jakarta.el.ELContext;
 import jakarta.el.ExpressionFactory;
 import jakarta.el.MethodExpression;
@@ -24,6 +26,7 @@ import jakarta.el.MethodNotFoundException;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.el.TesterIsolatedClassLoader;
 import org.apache.jasper.el.ELContextImpl;
 
 public class TestReflectionUtil {
@@ -81,5 +84,28 @@ public class TestReflectionUtil {
         Object result = methodExpression.invoke(context, null);
 
         Assert.assertEquals("2", result);
+    }
+
+    /*
+     * The cache of public methods must not prevent a class, or its class loader, from being garbage collected.
+     */
+    @Test
+    public void testMethodLookupDoesNotPreventClassUnloading() throws Exception {
+        WeakReference<ClassLoader> reference = findMethodOfIsolatedClass();
+        Assert.assertTrue("The class loader was not garbage collected",
+                TesterIsolatedClassLoader.awaitCollection(reference));
+    }
+
+
+    private WeakReference<ClassLoader> findMethodOfIsolatedClass() throws Exception {
+        ClassLoader loader = new TesterIsolatedClassLoader(TesterIsolatedClassLoader.Target.class);
+        Class<?> target = loader.loadClass(TesterIsolatedClassLoader.Target.class.getName());
+        Object bean = target.getDeclaredConstructor().newInstance();
+        // Look up the method twice to use the cached value on the second lookup
+        for (int i = 0; i < 2; i++) {
+            Assert.assertEquals(target, ReflectionUtil.getMethod(null, bean, "echo", new Class<?>[] { String.class },
+                    new Object[] { "a" }).getDeclaringClass());
+        }
+        return new WeakReference<>(loader);
     }
 }
