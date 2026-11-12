@@ -445,11 +445,28 @@ public class ConnectionPool {
      * @throws SQLException if an interceptor can't be configured, if the proxy can't be instantiated
      */
     protected Connection setupConnection(PooledConnection con) throws SQLException {
+        return setupConnection(con, true);
+    }
+
+    /**
+     * Configures a pooled connection as a proxy, optionally without counting the hand-off as a borrow. Internal
+     * cleanup paths use the non-counting form: they set a connection up only to close it again and no application
+     * caller ever receives it.
+     *
+     * @param con         a PooledConnection to wrap in a Proxy
+     * @param countBorrow whether this hand-off is a borrower's borrow and must be counted
+     *
+     * @return a Connection object wrapping the pooled connection
+     *
+     * @throws SQLException if the setup fails
+     */
+    private Connection setupConnection(PooledConnection con, boolean countBorrow) throws SQLException {
         // A close or an abandonment can have landed between the borrow's own
         // publication of the connection and this method: the connection must
         // fail the borrow rather than be set up into a handle with no live
         // session behind it.
         checkSetupStillValid(con);
+        con.setBorrowCounted(false);
         // Fetch previously cached interceptor proxy - one per connection
         JdbcInterceptor handler = con.getHandler();
         if (handler == null) {
@@ -588,8 +605,13 @@ public class ConnectionPool {
         // Every check above passed and the handle is about to reach its
         // caller: count the borrow at the hand-off. A setup that failed before
         // this point never reached a borrower, and it neither moves this
-        // counter nor - through abandonSetup() - the returned one.
-        borrowedCount.incrementAndGet();
+        // counter nor - through abandonSetup() - the returned one. An internal
+        // cleanup setup does not count, so closing the handle it produced does
+        // not count as a return either.
+        if (countBorrow) {
+            con.setBorrowCounted(true);
+            borrowedCount.incrementAndGet();
+        }
         return connection;
 
     }
@@ -2142,12 +2164,15 @@ public class ConnectionPool {
      *                        permanently ahead of the borrowed one
      */
     private void returnConnection(PooledConnection con, boolean countReturn) {
-        if (con != null && countReturn) {
+        if (con != null && countReturn && con.isBorrowCounted()) {
             // A borrower's hand-back is the counterpart of its borrow. Count
             // it before the closed check below: a connection returned after
             // the pool closed is released rather than queued, but it was
             // still handed back by its borrower and must pair with the borrow
-            // counted when it was served.
+            // counted when it was served. A connection set up by an internal
+            // cleanup was never counted as borrowed, so its close must not
+            // count as a return either.
+            con.setBorrowCounted(false);
             returnedCount.incrementAndGet();
         }
         if (isClosed()) {
@@ -2934,6 +2959,17 @@ public class ConnectionPool {
          * {@link #result}.
          */
         private boolean resultTaken = false;
+        /**
+         * The pooled connection whose configured handle was published as {@link #result} but not yet handed to a
+         * caller, so its borrow can be counted at the hand-off. Guarded by this future's monitor.
+         */
+        private PooledConnection configuredPooled = null;
+        /**
+         * Whether the configured connection's borrow has been counted. Set by the first caller that takes the
+         * published result, so concurrent getters still count one borrow for one connection. Guarded by this future's
+         * monitor.
+         */
+        private boolean borrowCounted = false;
         volatile PooledConnection pc = null;
 
         /**
@@ -3143,13 +3179,16 @@ public class ConnectionPool {
                 }
                 PooledConnection pc = borrowConnection(pooled, null, null);
                 if (pc != null) {
-                    Connection configured = ConnectionPool.this.setupConnection(pc);
+                    // The setup can still be abandoned before a caller takes its result, so the borrow is counted only
+                    // at the hand-off below. An internal cleanup close then cannot count itself as a return.
+                    Connection configured = ConnectionPool.this.setupConnection(pc, false);
                     boolean discard = false;
                     synchronized (this) {
                         if (abandoned) {
                             discard = true;
                         } else {
                             result = configured;
+                            configuredPooled = pc;
                         }
                     }
                     if (discard) {
@@ -3211,8 +3250,22 @@ public class ConnectionPool {
             if (result == null) {
                 return null;
             }
+            countBorrowForHandoff();
             resultTaken = true;
             return result;
+        }
+
+        /**
+         * Counts the borrow for the published result the first time a caller takes it. Setup for an asynchronous
+         * borrow does not count itself, so a setup abandoned before any caller takes its result counts neither a
+         * borrow nor a return.
+         */
+        private void countBorrowForHandoff() {
+            if (configuredPooled != null && !borrowCounted) {
+                borrowCounted = true;
+                configuredPooled.setBorrowCounted(true);
+                borrowedCount.incrementAndGet();
+            }
         }
 
         /**
@@ -3230,6 +3283,7 @@ public class ConnectionPool {
         private synchronized Connection takeTerminalResult()
                 throws TimeoutException, CancellationException, ExecutionException {
             if (result != null) {
+                countBorrowForHandoff();
                 resultTaken = true;
                 return result;
             }
@@ -3261,6 +3315,7 @@ public class ConnectionPool {
                 if (!resultTaken) {
                     configured = result;
                     result = null;
+                    configuredPooled = null;
                 } else {
                     configured = null;
                 }
@@ -3283,7 +3338,7 @@ public class ConnectionPool {
             try {
                 PooledConnection pc = borrowConnection(pooled, null, null);
                 if (pc != null) {
-                    Connection configured = ConnectionPool.this.setupConnection(pc);
+                    Connection configured = ConnectionPool.this.setupConnection(pc, false);
                     if (configured != null) {
                         closeConfiguredConnection(configured);
                     }
@@ -3361,7 +3416,7 @@ public class ConnectionPool {
                     try {
                         PooledConnection pc = borrowConnection(pooled, null, null);
                         if (pc != null) {
-                            Connection con = ConnectionPool.this.setupConnection(pc);
+                            Connection con = ConnectionPool.this.setupConnection(pc, false);
                             if (con != null) {
                                 con.close(); // Return to the pool
                             }
