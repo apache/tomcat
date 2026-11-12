@@ -1082,6 +1082,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         } catch (IllegalAccessException e) {
             log.warn(MessageFactory.get("poolProperties.validatorInaccessible", className), e);
         } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException e) {
+            ExceptionUtils.handleThrowable(ExceptionUtils.unwrapInvocationTargetException(e));
             log.warn(MessageFactory.get("poolProperties.validatorCannotInstantiate", className), e);
         }
 
