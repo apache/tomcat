@@ -119,6 +119,10 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
             }
             return constructor.newInstance(new Object[] { new StatementProxy(statement, sql, proxy) });
         } catch (Exception x) {
+            // A proxy constructor can wrap a fatal error from its handler in an InvocationTargetException. The
+            // module's fatal policy looks through that wrapper before the defensive branch below treats the failure
+            // as an ordinary proxy-construction failure.
+            ExceptionUtils.handleThrowable(ExceptionUtils.unwrapInvocationTargetException(x));
             // The facade's contract is that no unsealed driver handle leaves
             // it. Reaching this defensive branch means the proxy machinery
             // could not build the statement handle, so close the driver
@@ -170,7 +174,8 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
             return getConstructor(RESULTSET_IDX, ResultSet.class)
                     .newInstance(new ResultSetProxy(result, parent));
         } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
+            Throwable cause = ExceptionUtils.unwrapInvocationTargetException(t);
+            ExceptionUtils.handleThrowable(cause);
             try {
                 ((ResultSet) result).close();
             } catch (Throwable closeFailure) {

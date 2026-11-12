@@ -35,6 +35,7 @@ import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.PoolUtilities;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
+import org.apache.tomcat.jdbc.pool.util.ExceptionUtils;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
@@ -259,6 +260,7 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
             }
             return getConstructor(index, type).newInstance(new Object[] { new TimerStatementProxy(result) });
         } catch (Exception x) {
+            ExceptionUtils.handleThrowable(ExceptionUtils.unwrapInvocationTargetException(x));
             // The application keeps the query-report handle beneath: its
             // result sets come un-wrapped, and since the execution stamp is
             // taken on this handle, its queries keep no timer either. The
@@ -418,6 +420,7 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
                         return getConstructor(RESULTSET_IDX, ResultSet.class)
                                 .newInstance(new Object[] { new TimerResultSetProxy(result, proxy) });
                     } catch (Exception x) {
+                        ExceptionUtils.handleThrowable(ExceptionUtils.unwrapInvocationTargetException(x));
                         // The application just does not get the timer reset
                         // while reading this result set
                         log.warn(MessageFactory.get("resetAbandonedTimer.unableToCreateTimerResultSetProxy",
@@ -569,6 +572,7 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
                         return getConstructor(RESULTSET_IDX, ResultSet.class)
                                 .newInstance(new Object[] { new TimerResultSetProxy(result, stmt) });
                     } catch (Exception x) {
+                        ExceptionUtils.handleThrowable(ExceptionUtils.unwrapInvocationTargetException(x));
                         // The application just does not get the timer reset
                         // while reading this nested cursor
                         log.warn(MessageFactory.get("resetAbandonedTimer.unableToCreateTimerResultSetProxy",

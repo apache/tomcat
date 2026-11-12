@@ -30,6 +30,7 @@ import java.sql.Statement;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.PoolUtilities;
+import org.apache.tomcat.jdbc.pool.util.ExceptionUtils;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
@@ -130,15 +131,7 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
             }
             return createDecorator(proxy, method, args, statement, constructor, sql);
         } catch (Exception x) {
-            if (x instanceof InvocationTargetException) {
-                Throwable cause = x.getCause();
-                if (cause instanceof ThreadDeath) {
-                    throw (ThreadDeath) cause;
-                }
-                if (cause instanceof VirtualMachineError) {
-                    throw (VirtualMachineError) cause;
-                }
-            }
+            ExceptionUtils.handleThrowable(ExceptionUtils.unwrapInvocationTargetException(x));
             logger.warn(MessageFactory.get("statementDecoratorInterceptor.unableToCreateStatementProxy"),
                     PoolUtilities.maskCredentials(x));
         }
@@ -442,6 +435,7 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
                     Constructor<?> cons = getResultSetConstructor();
                     result = cons.newInstance(new Object[] { new ResultSetProxy(actualProxy, result) });
                 } catch (ReflectiveOperationException x) {
+                    ExceptionUtils.handleThrowable(ExceptionUtils.unwrapInvocationTargetException(x));
                     // The proxied methods that produce a result set -
                     // executeQuery, getResultSet, getGeneratedKeys - all
                     // declare SQLException and nothing else. A checked
