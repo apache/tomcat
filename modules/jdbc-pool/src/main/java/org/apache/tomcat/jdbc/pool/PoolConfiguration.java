@@ -140,6 +140,13 @@ public interface PoolConfiguration {
      * properties from the collection sent along, while a configured {@link #getConnectionProperties() connection
      * properties} string still contributes its pairs to the driver. Connections made through a configured
      * {@link javax.sql.DataSource} do not consult the database properties at all.
+     * <p>
+     * A non-null collection replaces the collection the connection properties string was parsed into. The string's
+     * pairs are not parsed into the replacement again: the replacement is the caller's complete collection, and only
+     * the explicitly passed credentials are layered over it. Call {@link #setConnectionProperties(String)} after
+     * replacing the collection to reapply the current string, or put the pairs in the replacement collection. As a
+     * result, {@link #getConnectionProperties()} can report a string whose pairs are not present in
+     * {@link #getDbProperties()} until that setter runs again.
      *
      * @param dbProperties The database properties, may be {@code null}
      */
