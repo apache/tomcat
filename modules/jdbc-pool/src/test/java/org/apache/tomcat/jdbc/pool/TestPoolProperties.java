@@ -255,6 +255,26 @@ class TestPoolProperties {
     }
 
     @Test
+    void replacingDatabasePropertiesDoesNotReapplyTheConnectionPropertiesString() {
+        PoolProperties properties = new PoolProperties();
+        properties.setConnectionProperties("replacement=string");
+        Assertions.assertEquals("string", properties.getDbProperties().getProperty("replacement"),
+                "precondition: the string is parsed into the current collection");
+
+        properties.setDbProperties(new Properties());
+
+        Assertions.assertNull(properties.getDbProperties().getProperty("replacement"),
+                "a replacement database-properties collection is the caller's complete set; the old string is not "
+                        + "parsed into it again");
+        Assertions.assertEquals("replacement=string", properties.getConnectionProperties(),
+                "the configuration still reports the string, which can be reapplied explicitly");
+
+        properties.setConnectionProperties("replacement=string");
+        Assertions.assertEquals("string", properties.getDbProperties().getProperty("replacement"),
+                "setting the string again after replacing the collection applies its pairs");
+    }
+
+    @Test
     void setConnectionPropertiesRoundTripsThroughTheFactory() {
         Properties attrs = new Properties();
         attrs.setProperty("connectionProperties", "first=one;second=two");

@@ -720,7 +720,10 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
      * Replaces the database properties the pool connects with. The keys tracked
      * from the last connection properties parse contributed to the previous
      * collection, not to the replacement, so the tracking is reset: the caller
-     * owns whatever the new collection holds.
+     * owns whatever the new collection holds. The current
+     * {@link #connectionProperties} string is not parsed into the replacement;
+     * call {@link #setConnectionProperties(String)} after this method to
+     * reapply it, or put the string's pairs in the replacement collection.
      *
      * @param dbProperties the new database properties, may be {@code null}
      */
