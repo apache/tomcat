@@ -1049,7 +1049,8 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
         try {
             ObjectName probe = new ObjectName(ConnectionPool.POOL_JMX_TYPE_PREFIX +
                     SlowQueryReportJmx.class.getName() + ",name=" + poolName);
-            if (poolName.equals(probe.getKeyProperty("name")) && probe.getKeyPropertyList().size() == 2) {
+            if (!probe.isPattern() && poolName.equals(probe.getKeyProperty("name"))
+                    && probe.getKeyPropertyList().size() == 2) {
                 return poolName;
             }
         } catch (MalformedObjectNameException x) {
