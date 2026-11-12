@@ -808,23 +808,25 @@ public class ConnectionPool {
         if (interrupted && getPoolProperties().getPropagateInterruptState()) {
             Thread.currentThread().interrupt();
         }
-        if (this.getPoolProperties().isJmxEnabled()) {
-            // Release the pool MBean and every connection/interceptor MBean
-            // published below it before forgetting the JMX wrapper. A
-            // container-managed DataSource has already released these before
-            // it closes the pool; a directly registered pool MBean has no
-            // other owner to do it, and leaving it registered would keep the
-            // closed pool reachable from the MBean server.
-            org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = this.jmxPool;
-            if (jmx != null) {
-                unregisterConnectionMBeans();
-                ObjectName name = jmx.getObjectName();
-                if (name != null) {
-                    JmxUtil.unregisterJmx(name);
-                }
+        // Release the pool MBean and every connection/interceptor MBean
+        // published below it before forgetting the JMX wrapper. A
+        // container-managed DataSource has already released these before
+        // it closes the pool; a directly registered pool MBean has no
+        // other owner to do it, and leaving it registered would keep the
+        // closed pool reachable from the MBean server. The decision is based
+        // on whether a wrapper was created, not on the live jmxEnabled
+        // property: that property can be changed directly on the backing
+        // configuration after the pool started, and a pool that published an
+        // MBean must still release it when it closes.
+        org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = this.jmxPool;
+        if (jmx != null) {
+            unregisterConnectionMBeans();
+            ObjectName name = jmx.getObjectName();
+            if (name != null) {
+                JmxUtil.unregisterJmx(name);
             }
-            this.jmxPool = null;
         }
+        this.jmxPool = null;
         // Tell the interceptors about the close, once per definition. The
         // definitions from the start come first, then the current list, then
         // the definitions the connection chains were actually built from, so a

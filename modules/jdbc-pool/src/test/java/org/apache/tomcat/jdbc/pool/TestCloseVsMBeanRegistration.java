@@ -147,6 +147,32 @@ class TestCloseVsMBeanRegistration extends JdbcPoolBaseTest {
     }
 
     @Test
+    void aCloseAfterJmxEnabledIsClearedStillReleasesThePoolMBean() throws Exception {
+        String poolName = "close-vs-jmxenabled-" + System.nanoTime();
+        ObjectName base = new ObjectName(
+                ConnectionPool.POOL_JMX_TYPE_PREFIX + "ConnectionPool,name=" + poolName);
+        ParkedRegistrationPool pool = new ParkedRegistrationPool(newPoolProperties(poolName));
+        ObjectName wrapper = null;
+        try {
+            wrapper = JmxUtil.registerJmx(base, null, pool.getJmxPool());
+            Assertions.assertNotNull(wrapper, "the pool MBean must be publishable");
+            Assertions.assertTrue(ManagementFactory.getPlatformMBeanServer().isRegistered(wrapper));
+
+            // Change the backing configuration directly, bypassing the DataSource and
+            // pool MBean start-only guards, then close the pool directly.
+            pool.getPoolProperties().setJmxEnabled(false);
+            pool.close(true);
+
+            Assertions.assertFalse(ManagementFactory.getPlatformMBeanServer().isRegistered(wrapper),
+                    "a published pool MBean must be released on close even when jmxEnabled is changed directly");
+            Assertions.assertNull(pool.getJmxPool(), "the closed pool must forget its JMX wrapper");
+        } finally {
+            pool.close(true);
+            JmxUtil.unregisterJmx(wrapper);
+        }
+    }
+
+    @Test
     void aCloseRacingAnInFlightRegistrationLeavesNoOrphanMBean() throws Exception {
         String poolName = "close-vs-mbean-" + System.nanoTime();
         ObjectName base = new ObjectName(
