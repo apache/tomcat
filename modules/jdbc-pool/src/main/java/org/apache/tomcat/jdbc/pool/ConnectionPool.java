@@ -508,7 +508,7 @@ public class ConnectionPool {
                     interceptor.setNext(handler);
                     handler = interceptor;
                 } catch (Throwable x) {
-                    ExceptionUtils.handleThrowable(x);
+                    ExceptionUtils.handleThrowable(ExceptionUtils.unwrapInvocationTargetException(x));
                     SQLException sx = new SQLException(MessageFactory.get("connectionPool.unableToInstantiateInterceptorChain"));
                     sx.initCause(x);
                     // Nothing has been done to the connection, it can go back to the pool
@@ -676,8 +676,9 @@ public class ConnectionPool {
     private static Method getRequestHintMethod(String methodName) {
         try {
             return Connection.class.getMethod(methodName);
-        } catch (NoSuchMethodException x) {
-            // Java 8 and earlier: there are no request boundary hints to send
+        } catch (NoSuchMethodException | SecurityException x) {
+            // Java 8 and earlier has no request boundary hints; a runtime that refuses the lookup for security
+            // reasons likewise has none the pool may use.
             return null;
         }
     }
@@ -871,7 +872,7 @@ public class ConnectionPool {
             interceptor.setProperties(definition.getProperties());
             interceptor.poolClosed(this);
         } catch (Throwable x) {
-            ExceptionUtils.handleThrowable(x);
+            ExceptionUtils.handleThrowable(ExceptionUtils.unwrapInvocationTargetException(x));
             if (log.isDebugEnabled()) {
                 log.debug("Unable to inform interceptor of pool closure.", PoolUtilities.maskCredentials(x));
             }
@@ -979,7 +980,7 @@ public class ConnectionPool {
                 interceptor.setProperties(proxies[i].getProperties());
                 interceptor.poolStarted(this);
             } catch (Throwable x) {
-                ExceptionUtils.handleThrowable(x);
+                ExceptionUtils.handleThrowable(ExceptionUtils.unwrapInvocationTargetException(x));
                 log.error(MessageFactory.get("connectionPool.unableToInformInterceptorOfPoolStart"),
                         PoolUtilities.maskCredentials(x));
                 org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = jmxPool;

@@ -975,8 +975,11 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
                     // other statement parked under the same key alone. A
                     // non-fatal Error is the same failed recycle as an
                     // unchecked exception: close the handle through the normal
-                    // path instead of leaving it open and unretired.
-                    ExceptionUtils.handleThrowable(x);
+                    // path instead of leaving it open and unretired. A proxy
+                    // constructor may wrap a fatal error in an
+                    // InvocationTargetException, so the fatal policy looks
+                    // through that wrapper.
+                    ExceptionUtils.handleThrowable(ExceptionUtils.unwrapInvocationTargetException(x));
                     removeStatement(proxy);
                     if (log.isDebugEnabled()) {
                         log.debug("Unable to recycle statement: " + sqlForLog(getSql()),
