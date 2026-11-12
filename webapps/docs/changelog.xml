@@ -128,6 +128,12 @@
         been reset is now treated as a connection error as per RFC 9113, section
         5.1. Pull request <pr>1129</pr> provided by Arturo Bernal. (markt)
       </fix>
+      <fix>
+        Treat a change to <code>SETTINGS_INITIAL_WINDOW_SIZE</code> that causes
+        any flow control window to exceed the maximum size as an HTTP/2
+        connection error as required by RFC 9113, section 6.9.2. Pull request
+        <pr>1131</pr> provided by Arturo Bernal. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
