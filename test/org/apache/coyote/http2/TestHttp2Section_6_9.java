@@ -263,11 +263,10 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
         // Increase the flow control window but keep it under the limit
         sendWindowUpdate(3, 1 << 30);
 
-        // Now increase beyond the limit via a settings frame
+        // Now increase beyond the limit via a settings frame.
+        // Per RFC 9113 section 6.9.2 this must be treated as a connection error
+        // of type FLOW_CONTROL_ERROR, not a stream error.
         sendSettings(0, false, new SettingValue(4, 1 << 30));
-        // Ack
-        parser.readFrame();
-        Assert.assertEquals("3-RST-[" + Http2Error.FLOW_CONTROL_ERROR.getCode() + "]\n", output.getTrace());
-
+        handleGoAwayResponse(3, Http2Error.FLOW_CONTROL_ERROR);
     }
 }
