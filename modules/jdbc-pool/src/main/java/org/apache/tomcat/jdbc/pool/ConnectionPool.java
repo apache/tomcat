@@ -255,9 +255,12 @@ public class ConnectionPool {
     /**
      * Retrieves a Connection future. If a connection is not available, one can block using future.get() until a
      * connection has become available. If a connection is not retrieved, the Future must be cancelled in order for the
-     * connection to be returned to the pool. Closing the pool cancels a future that has not received a connection yet,
-     * so a thread blocked in {@link Future#get()} observes a {@link java.util.concurrent.CancellationException} instead
-     * of waiting for a connection that can no longer be handed out.
+     * connection to be returned to the pool. Cancellation only applies while the future is not complete: a future for
+     * a connection that was already available is complete when this method returns, its {@code cancel()} reports
+     * {@code false} as for any completed {@link Future}, and the caller must retrieve the connection and close it
+     * instead. Closing the pool cancels a future that has not received a connection yet, so a thread blocked in
+     * {@link Future#get()} observes a {@link java.util.concurrent.CancellationException} instead of waiting for a
+     * connection that can no longer be handed out.
      *
      * @return a Future containing a reference to the connection or the future connection
      *
