@@ -312,6 +312,10 @@ public class DataSourceProxy implements PoolConfiguration {
     /**
      * Retrieves a connection future: the pool's synchronous borrow is invoked first with no wait, and when a
      * connection cannot be handed out immediately the returned future completes once one becomes available.
+     * <p>
+     * A future for a connection that was already available completes while this method runs. Such a future cannot
+     * be cancelled; its caller must retrieve the connection and close it to return it to the pool. Cancelling a
+     * future that is still waiting returns its queued connection request to the pool.
      *
      * @return a Future containing a reference to the connection when it becomes available
      *
