@@ -843,9 +843,11 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     public synchronized void setPassword(String password) {
         this.password = password;
         if (this.dbProperties != null) {
-            if (password == null) {
-                removeCredentialDbProperties();
-            } else {
+            // A non-null password replaces every spelling of the credential, not only the canonical
+            // lower-case key: an older pass, pwd or PASSWORD entry must not keep authenticating
+            // connections with the superseded value.
+            removeCredentialDbProperties(password == null);
+            if (password != null) {
                 this.dbProperties.setProperty(PoolUtilities.PROP_PASSWORD, password);
             }
         }
@@ -854,9 +856,14 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
     /**
      * Removes every database property whose key is recognized as a password alias, so clearing the password also
-     * stops a value configured as {@code pass} or {@code pwd} from still authenticating connections.
+     * stops a value configured as {@code pass} or {@code pwd} from still authenticating connections. When a new
+     * password replaces the old one, the canonical entry is written again after this removal; the warning for a
+     * credential the string still names is only wanted when the credential is actually being cleared.
+     *
+     * @param warnStringEntries whether to warn for each removed key the configured connection-properties string still
+     *                              names
      */
-    private void removeCredentialDbProperties() {
+    private void removeCredentialDbProperties(boolean warnStringEntries) {
         Properties props = this.dbProperties;
         if (props == null) {
             return;
@@ -867,7 +874,9 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         for (String key : allPropertyKeys(props)) {
             if (PoolUtilities.isCredentialKey(key)) {
                 removeDbProperty(key);
-                warnStringStillNamesCredential(key);
+                if (warnStringEntries) {
+                    warnStringStillNamesCredential(key);
+                }
             }
         }
     }
@@ -876,9 +885,13 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     /**
      * Removes every database property whose key names the user, ignoring case
      * and surrounding whitespace, so clearing the username also stops a value
-     * configured as {@code USER} from still authenticating connections.
+     * configured as {@code USER} from still authenticating connections. A new
+     * user name is written again after this removal.
+     *
+     * @param warnStringEntries whether to warn for each removed key the configured connection-properties string still
+     *                              names
      */
-    private void removeUsernameDbProperties() {
+    private void removeUsernameDbProperties(boolean warnStringEntries) {
         Properties props = this.dbProperties;
         if (props == null) {
             return;
@@ -886,7 +899,9 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         for (String key : allPropertyKeys(props)) {
             if (PoolUtilities.PROP_USER.equalsIgnoreCase(key.trim())) {
                 removeDbProperty(key);
-                warnStringStillNamesCredential(key);
+                if (warnStringEntries) {
+                    warnStringStillNamesCredential(key);
+                }
             }
         }
     }
@@ -968,9 +983,10 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     public synchronized void setUsername(String username) {
         this.username = username;
         if (this.dbProperties != null) {
-            if (username == null) {
-                removeUsernameDbProperties();
-            } else {
+            // A non-null user name replaces every spelling of the key, so an older USER entry cannot keep
+            // authenticating connections with the superseded identity.
+            removeUsernameDbProperties(username == null);
+            if (username != null) {
                 this.dbProperties.setProperty(PoolUtilities.PROP_USER, username);
             }
         }

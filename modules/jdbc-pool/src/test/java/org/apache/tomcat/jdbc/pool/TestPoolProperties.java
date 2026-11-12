@@ -392,6 +392,30 @@ class TestPoolProperties {
     }
 
     @Test
+    void settingNewCredentialsReplacesEveryCredentialAlias() {
+        PoolProperties properties = new PoolProperties();
+        properties.setConnectionProperties("keep=yes;pass=old;PWD=older;PASSWORD=oldest;USER=bob;user=old");
+
+        properties.setPassword("newpassword");
+        properties.setUsername("alice");
+
+        Assertions.assertEquals("newpassword", properties.getDbProperties().getProperty("password"),
+                "the canonical password entry must hold the new value");
+        Assertions.assertNull(properties.getDbProperties().getProperty("pass"),
+                "an older pass alias must not keep authenticating connections");
+        Assertions.assertNull(properties.getDbProperties().getProperty("PWD"),
+                "a case-variant pwd alias must not keep authenticating connections");
+        Assertions.assertNull(properties.getDbProperties().getProperty("PASSWORD"),
+                "a case-variant password alias must not keep authenticating connections");
+        Assertions.assertEquals("alice", properties.getDbProperties().getProperty("user"),
+                "the canonical user entry must hold the new value");
+        Assertions.assertNull(properties.getDbProperties().getProperty("USER"),
+                "an older USER spelling must not keep authenticating connections");
+        Assertions.assertEquals("yes", properties.getDbProperties().getProperty("keep"),
+                "non-credential entries must be preserved");
+    }
+
+    @Test
     void clearingThePasswordRemovesNonStringCredentialEntries() {
         PoolProperties properties = new PoolProperties();
         properties.getDbProperties().put("password", new Object());
