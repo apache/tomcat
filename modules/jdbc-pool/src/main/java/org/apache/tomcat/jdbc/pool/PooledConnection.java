@@ -726,6 +726,10 @@ public class PooledConnection implements PooledConnectionMBean {
         xaConnection = null;
         cpdsConnection = null;
         lastConnected = -1;
+        // The validation timestamp belongs to the session being replaced too. Clear it with the other
+        // session fields so the per-connection MBean, which stays registered across this window, does
+        // not report a timestamp for a session that is no longer current.
+        lastValidated = 0;
         try {
             connect();
         } catch (Throwable x) {

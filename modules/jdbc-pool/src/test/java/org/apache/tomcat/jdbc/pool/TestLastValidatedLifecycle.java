@@ -16,8 +16,14 @@
  */
 package org.apache.tomcat.jdbc.pool;
 
+import java.io.PrintWriter;
 import java.lang.management.ManagementFactory;
 import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -86,7 +92,119 @@ class TestLastValidatedLifecycle extends JdbcPoolBaseTest {
         }
     }
 
+    @Test
+    void reconnectWithClearsLastValidatedWhileTheNewSessionIsBeingEstablished() throws Exception {
+        BlockingDataSource backing = new BlockingDataSource(getUrl());
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setDataSource(backing);
+        // Use the no-argument DataSource method for the initial connection, so the parking latch is reserved
+        // for the credential-overloaded reconnect.
+        ds.getPoolProperties().setUsername(null);
+        ds.getPoolProperties().setPassword(null);
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(-1);
+        ds.createPool();
+
+        Connection held = ds.getConnection();
+        try {
+            PooledConnection pooled = interceptorOf(held, ProxyConnection.class).getConnection();
+            pooled.setLastValidated(12345L);
+
+            Thread reconnect = new Thread(() -> {
+                try {
+                    pooled.reconnectWith("other", "secret");
+                } catch (SQLException x) {
+                    throw new IllegalStateException(x);
+                }
+            }, "reconnect-with-thread");
+            reconnect.setDaemon(true);
+            reconnect.start();
+
+            Assertions.assertTrue(backing.entered.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
+                    "the driver must be establishing the replacement session");
+            Assertions.assertEquals(-1L, pooled.getLastConnected(),
+                    "the pooled connection must report no current session while the replacement is in flight");
+            Assertions.assertEquals(0L, pooled.getLastValidated(),
+                    "the replaced session's validation timestamp must not be published during the reconnect window");
+            Assertions.assertNull(pooled.getConnection(),
+                    "the pooled connection must not expose the old session during the staged reconnect");
+
+            backing.release.countDown();
+            reconnect.join(AWAIT_TIMEOUT_MS);
+            Assertions.assertFalse(reconnect.isAlive(), "the reconnect must complete");
+        } finally {
+            backing.release.countDown();
+            held.close();
+            ds.close(true);
+        }
+    }
+
     private static long attribute(MBeanServer server, ObjectName name, String attribute) throws Exception {
         return ((Number) server.getAttribute(name, attribute)).longValue();
+    }
+
+    /**
+     * A backing data source whose credential overload parks the reconnect while the test inspects the pooled
+     * connection's staged state.
+     */
+    private static final class BlockingDataSource implements javax.sql.DataSource {
+
+        private final String url;
+        final CountDownLatch entered = new CountDownLatch(1);
+        final CountDownLatch release = new CountDownLatch(1);
+
+        BlockingDataSource(String url) {
+            this.url = url;
+        }
+
+        @Override
+        public Connection getConnection() throws SQLException {
+            return DriverManager.getConnection(url, "sa", "");
+        }
+
+        @Override
+        public Connection getConnection(String username, String password) throws SQLException {
+            entered.countDown();
+            try {
+                release.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException x) {
+                Thread.currentThread().interrupt();
+                throw new SQLException(x);
+            }
+            return DriverManager.getConnection(url, "sa", "");
+        }
+
+        @Override
+        public PrintWriter getLogWriter() {
+            return null;
+        }
+
+        @Override
+        public void setLogWriter(PrintWriter out) {
+        }
+
+        @Override
+        public void setLoginTimeout(int seconds) {
+        }
+
+        @Override
+        public int getLoginTimeout() {
+            return 0;
+        }
+
+        @Override
+        public Logger getParentLogger() {
+            return null;
+        }
+
+        @Override
+        public <T> T unwrap(Class<T> iface) throws SQLException {
+            throw new SQLException();
+        }
+
+        @Override
+        public boolean isWrapperFor(Class<?> iface) {
+            return false;
+        }
     }
 }
