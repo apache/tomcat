@@ -149,6 +149,7 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
             return getConstructor(constructorIndex, statementInterface)
                     .newInstance(new Object[] { new CloseAwareProxy(entry) });
         } catch (Exception x) {
+            ExceptionUtils.handleThrowable(ExceptionUtils.unwrapInvocationTargetException(x));
             // The statement is still tracked and will be closed when the
             // connection is returned, but closing it early will no longer
             // forget it before then.

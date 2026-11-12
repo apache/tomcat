@@ -220,9 +220,11 @@ public abstract class AbstractCreateStatementInterceptor extends JdbcInterceptor
             Class<?> proxyClass = Proxy.getProxyClass(AbstractCreateStatementInterceptor.class.getClassLoader(),
                     new Class[] { clazz });
             constructors[idx] = proxyClass.getConstructor(new Class[] { InvocationHandler.class });
-        } catch (ReflectiveOperationException | IllegalArgumentException | LinkageError e) {
+        } catch (ReflectiveOperationException | RuntimeException | LinkageError e) {
             // An exception escaping the class initializer would surface as an
-            // ExceptionInInitializerError at every use of every subclass.
+            // ExceptionInInitializerError at every use of every subclass. The
+            // runtime branch covers security restrictions and other reflective
+            // refusals that are not ReflectiveOperationExceptions.
             log.warn(MessageFactory.get("abstractCreateStatementInterceptor.unableToCreateConstructorCacheEntry",
                     Integer.valueOf(idx), clazz.getName()), e);
         }

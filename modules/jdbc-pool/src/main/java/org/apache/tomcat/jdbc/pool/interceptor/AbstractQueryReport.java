@@ -218,6 +218,9 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
             result = constructor.newInstance(new Object[] { new StatementProxy(statement, sql) });
             return result;
         } catch (Exception x) {
+            // A proxy constructor can wrap a fatal error from its handler in an InvocationTargetException; the fatal
+            // policy looks through that wrapper before the ordinary degradation below.
+            ExceptionUtils.handleThrowable(ExceptionUtils.unwrapInvocationTargetException(x));
             log.warn(MessageFactory.get("abstractQueryReport.unableToCreateStatementProxy"),
                     PoolUtilities.maskCredentials(x));
         }
