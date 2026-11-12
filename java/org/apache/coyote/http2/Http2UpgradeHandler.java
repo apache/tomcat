@@ -1974,7 +1974,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                     // causes any flow-control window to exceed the maximum size is a connection error.
                     throw new ConnectionException(
                             sm.getString("upgradeHandler.windowSizeTooBig", connectionId, stream.getIdAsString()),
-                            Http2Error.FLOW_CONTROL_ERROR);
+                            Http2Error.FLOW_CONTROL_ERROR, h2e);
                 }
             }
         } else if (setting == Setting.NO_RFC7540_PRIORITIES) {
