@@ -182,7 +182,7 @@ public final class AstFunction extends SimpleNode {
                             if (isArray(value)) {
                                 params[i] = value;
                             } else {
-                                params[i] = new Object[] { ELSupport.coerceToType(ctx, value,
+                                params[i] = new Object[] { coerceToType(ctx, value,
                                         paramTypes[i].getComponentType()) };
                             }
                         } else {
