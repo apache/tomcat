@@ -240,6 +240,30 @@ class TestAsyncBorrow extends JdbcPoolBaseTest {
     }
 
     @Test
+    void anImmediateAsyncBorrowIsCompleteAndMustBeRetrieved() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setFairQueue(true);
+        ds.getPoolProperties().setMinIdle(0);
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setMaxIdle(1);
+        ds.createPool();
+
+        Future<Connection> future = ds.getConnectionAsync();
+        Assertions.assertTrue(future.isDone(),
+                "a connection available without waiting completes the future before it is returned");
+        Assertions.assertFalse(future.cancel(true),
+                "a completed future cannot be cancelled; it must be retrieved and closed");
+        Assertions.assertEquals(1, ds.getActive(),
+                "the completed future still owns the connection until the caller retrieves and closes it");
+
+        try (Connection c = future.get(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
+            Assertions.assertNotNull(c, "the caller must retrieve the completed future's connection");
+        }
+        Assertions.assertEquals(0, ds.getActive(), "closing the retrieved connection returns it to the pool");
+        Assertions.assertEquals(1, ds.getIdle());
+    }
+
+    @Test
     void aCompletedQueueWaitIsNotDoneUntilSetupRuns() throws Exception {
         DataSource ds = newDataSource();
         ds.getPoolProperties().setFairQueue(true);
