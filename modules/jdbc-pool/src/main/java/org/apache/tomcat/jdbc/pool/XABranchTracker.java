@@ -287,16 +287,19 @@ final class XABranchTracker implements XAConnection {
 
         @Override
         public Xid[] recover(int flag) throws XAException {
+            refuseRetiredSession();
             return delegate.recover(flag);
         }
 
         @Override
         public boolean setTransactionTimeout(int seconds) throws XAException {
+            refuseRetiredSession();
             return delegate.setTransactionTimeout(seconds);
         }
 
         @Override
         public int getTransactionTimeout() throws XAException {
+            refuseRetiredSession();
             return delegate.getTransactionTimeout();
         }
 
