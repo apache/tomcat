@@ -35,18 +35,21 @@ import jakarta.servlet.descriptor.TaglibDescriptor;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.Jar;
+import org.apache.tomcat.categories.SmokeTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
 import org.apache.tomcat.util.scan.JarFactory;
 import org.apache.tomcat.util.scan.StandardJarScanner;
 import org.easymock.EasyMock;
 
+@Category(SmokeTest.class)
 public class TestTldScanner extends TomcatBaseTest {
 
     @Test

@@ -58,6 +58,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
@@ -77,9 +78,11 @@ import org.apache.coyote.http11.InputFilter;
 import org.apache.coyote.http11.filters.ChunkedInputFilter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.categories.SmokeTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.ApplicationBufferHandler;
 
+@Category(SmokeTest.class)
 public class TestNonBlockingAPI extends TomcatBaseTest {
 
     private static final Log log = LogFactory.getLog(TestNonBlockingAPI.class);

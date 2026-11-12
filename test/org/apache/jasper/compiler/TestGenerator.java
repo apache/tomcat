@@ -50,6 +50,7 @@ import jakarta.servlet.jsp.tagext.VariableInfo;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
@@ -58,8 +59,10 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.jasper.servlet.JasperInitializer;
 import org.apache.jasper.servlet.JspServlet;
+import org.apache.tomcat.categories.SmokeTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
+@Category(SmokeTest.class)
 public class TestGenerator extends TomcatBaseTest {
 
     private static final String NEW_LINE = System.lineSeparator();
