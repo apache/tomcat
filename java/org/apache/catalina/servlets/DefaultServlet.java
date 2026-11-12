@@ -987,20 +987,36 @@ public class DefaultServlet extends HttpServlet {
             lastModifiedHttp = resource.getLastModifiedHttp();
         }
 
+        List<PrecompressedResource> precompressedResources = null;
+
         // Check if the conditions specified in the optional If headers are
         // satisfied.
         if (resource.isFile()) {
             // Checking If headers
             included = (request.getAttribute(RequestDispatcher.INCLUDE_CONTEXT_PATH) != null);
-            if (!included && !isError && !checkIfHeaders(request, response, resource)) {
-                return;
+            if (!included && !isError) {
+                /*
+                 * A 304 response has to include the Vary header field that the 200 response would have included so
+                 * add it before the If headers are checked. RFC 9110, section 15.4.5.
+                 */
+                if (compressionFormats.length > 0 && !pathEndsWithCompressedExtension(path)) {
+                    precompressedResources = getAvailablePrecompressedResources(path);
+                    if (!precompressedResources.isEmpty()) {
+                        ResponseUtil.addVaryFieldName(response, "accept-encoding");
+                    }
+                }
+                if (!checkIfHeaders(request, response, resource)) {
+                    return;
+                }
             }
         }
 
         // Serve a precompressed version of the file if present
         boolean usingPrecompressedVersion = false;
         if (compressionFormats.length > 0 && !included && resource.isFile() && !pathEndsWithCompressedExtension(path)) {
-            List<PrecompressedResource> precompressedResources = getAvailablePrecompressedResources(path);
+            if (precompressedResources == null) {
+                precompressedResources = getAvailablePrecompressedResources(path);
+            }
             if (!precompressedResources.isEmpty()) {
                 ResponseUtil.addVaryFieldName(response, "accept-encoding");
                 PrecompressedResource bestResource = getBestPrecompressedResource(request, precompressedResources);
