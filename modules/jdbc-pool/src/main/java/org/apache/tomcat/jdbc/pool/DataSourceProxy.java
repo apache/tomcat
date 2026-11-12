@@ -374,9 +374,19 @@ public class DataSourceProxy implements PoolConfiguration {
 
 
     /**
-     * Get a database connection. {@link javax.sql.DataSource#getConnection()}
+     * Get a database connection. {@link javax.sql.ConnectionPoolDataSource#getPooledConnection()}
+     * <p>
+     * Deviation from the {@code javax.sql} contract: the returned {@link javax.sql.PooledConnection} is a handle
+     * borrowed from the pool, not a newly opened physical connection, so under load this call blocks waiting for a
+     * free session or fails with pool exhaustion rather than with a database error. Its
+     * {@link java.sql.Connection#close() close()} returns the session to the pool instead of closing the physical
+     * connection. The connection obtained from the returned handle's
+     * {@link javax.sql.PooledConnection#getConnection()} is the driver's raw logical session, not a pool-managed
+     * connection: the pool's interceptors and features do not apply to it, and closing it invalidates the session
+     * under the pool's own notion of a live connection. Release the borrowed session by closing the handle, not that
+     * connection.
      *
-     * @return the connection
+     * @return the borrowed pooled-connection handle
      *
      * @throws SQLException Connection error
      */
@@ -385,12 +395,18 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
     /**
-     * Get a database connection. {@link javax.sql.DataSource#getConnection(String,String)}
+     * Get a database connection. {@link javax.sql.ConnectionPoolDataSource#getPooledConnection(String,String)}
+     * <p>
+     * The returned handle deviates from the {@code javax.sql} contract as described on
+     * {@link #getPooledConnection()}. The given credentials are honored only when
+     * {@link PoolConfiguration#setAlternateUsernameAllowed(boolean) alternateUsernameAllowed} is enabled; otherwise
+     * the borrow proceeds under the pool's configured user name, exactly as
+     * {@link #getConnection(String,String)} does.
      *
      * @param username The user name
      * @param password The password
      *
-     * @return the connection
+     * @return the borrowed pooled-connection handle
      *
      * @throws SQLException Connection error
      */

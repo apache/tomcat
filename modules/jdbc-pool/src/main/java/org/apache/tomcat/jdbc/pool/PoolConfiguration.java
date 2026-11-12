@@ -979,6 +979,12 @@ public interface PoolConfiguration {
      * If the object implements more than one of these interfaces, {@link javax.sql.XADataSource} takes precedence over
      * {@link javax.sql.DataSource}, and {@link javax.sql.DataSource} takes precedence over
      * {@link javax.sql.ConnectionPoolDataSource}.
+     * <p>
+     * A provider that requires both credential arguments or rejects a null one makes a configuration with only one of
+     * the credentials set fail; the two-argument method is called with the unset value as {@code null}. Configure both
+     * credentials, or configure neither so the provider's no-argument method and its own defaults are used. A provider
+     * that treats a null password as an empty password rather than its configured default can also authenticate
+     * differently than the pool configuration suggests.
      *
      * @param ds the {@link javax.sql.DataSource} to be used for creating connections to be pooled.
      */
