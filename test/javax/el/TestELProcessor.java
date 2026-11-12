@@ -198,7 +198,7 @@ public class TestELProcessor {
             String expectedCalls) throws Exception {
         TesterFunctions.resetCallList();
         ELProcessor elp = new ELProcessor();
-        elp.defineFunction("fn", function, "jakarta.el.TesterFunctions", signature);
+        elp.defineFunction("fn", function, "javax.el.TesterFunctions", signature);
         Assert.assertNotNull(
                 elp.getELManager().getELContext().getFunctionMapper().resolveFunction("fn", expectedName));
         elp.eval(expr);
