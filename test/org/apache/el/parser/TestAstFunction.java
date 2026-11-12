@@ -25,6 +25,7 @@ import jakarta.el.StandardELContext;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.el.TesterBeanK;
 import org.apache.el.TesterFunctions;
 
 public class TestAstFunction {
@@ -106,6 +107,19 @@ public class TestAstFunction {
 
         result = factory.createValueExpression(context, "${fn:format('%s','one')}", String.class).getValue(context);
         Assert.assertEquals("one", result);
+    }
+
+    @Test
+    public void testVarargMethodSingleArgumentEvaluatedOnce() throws NoSuchMethodException {
+        // The argument that alone fills the varargs parameter must be evaluated
+        // exactly once, as each argument is when there are several
+        ELProcessor processor = new ELProcessor();
+        TesterBeanK bean = new TesterBeanK();
+        processor.defineBean("beanK", bean);
+        processor.defineFunction("fn", "format", String.class.getMethod("format", String.class, Object[].class));
+
+        Assert.assertEquals("1", processor.getValue("fn:format('%s', beanK.next())", String.class));
+        Assert.assertEquals(1, bean.argCalls);
     }
 
     @Test
