@@ -2894,7 +2894,7 @@ public class ConnectionPool {
         CountDownLatch latch = new CountDownLatch(1);
         volatile Connection result = null;
         SQLException cause = null;
-        AtomicBoolean cancelled = new AtomicBoolean(false);
+        volatile boolean cancelled = false;
         /**
          * A terminal outcome observed by a caller, even when no connection was produced: a queue future that fails or
          * times out has completed this future from the caller's perspective.
@@ -2902,9 +2902,18 @@ public class ConnectionPool {
         volatile boolean done = false;
         /**
          * Set when a timed get() gave up waiting for setup. The setup task then returns rather
-         * than publishing a connection no caller owns.
+         * than publishing a connection no caller owns. Only the one get() that won the
+         * configuration claim can set it, and the setup worker is the only other reader, so a
+         * volatile flag is enough.
          */
-        final AtomicBoolean abandoned = new AtomicBoolean(false);
+        volatile boolean abandoned = false;
+        /**
+         * Whether a caller has observed the result published by the setup. Once true, a timed
+         * get() that subsequently gives up must not clear and close that result: it belongs to
+         * the caller that already took it. Guarded by this future's monitor, together with
+         * {@link #result}.
+         */
+        private boolean resultTaken = false;
         volatile PooledConnection pc = null;
 
         /**
@@ -2949,7 +2958,7 @@ public class ConnectionPool {
             if (!configured.compareAndSet(false, true)) {
                 return false;
             }
-            cancelled.set(true);
+            cancelled = true;
             if (pcFuture.cancel(mayInterruptIfRunning)) {
                 // The waiter was still queued, so it is deregistered and no
                 // connection will be produced for this future. Release the
@@ -3011,8 +3020,12 @@ public class ConnectionPool {
                 throw x;
             }
             if (pc != null) {
-                if (result != null) {
-                    return result;
+                // A result the setup has already published belongs to the caller that takes
+                // it. Claiming it under the same monitor that abandonment uses keeps a later
+                // timeout from clearing and closing it under that caller.
+                Connection published = takePublishedResult();
+                if (published != null) {
+                    return published;
                 }
                 if (configured.compareAndSet(false, true)) {
                     if (timed) {
@@ -3021,14 +3034,23 @@ public class ConnectionPool {
                             // Let the worker discard the produced pooled
                             // connection and fail the caller rather than
                             // running an unbounded setup synchronously.
-                            abandoned.set(true);
+                            abandoned = true;
                             startConfiguration(pc);
                             throw new TimeoutException();
                         }
                         startConfiguration(pc);
-                        if (!latch.await(remainingNanos(deadline), TimeUnit.NANOSECONDS)) {
+                        try {
+                            if (!latch.await(remainingNanos(deadline), TimeUnit.NANOSECONDS)) {
+                                abandonConfiguration();
+                                throw new TimeoutException();
+                            }
+                        } catch (InterruptedException x) {
+                            // The setup worker owns the produced connection and continues
+                            // after this caller gives up. Abandon the setup so the worker
+                            // returns or discards what it produces rather than publishing a
+                            // connection no caller owns.
                             abandonConfiguration();
-                            throw new TimeoutException();
+                            throw x;
                         }
                     } else {
                         configure(pc);
@@ -3037,10 +3059,20 @@ public class ConnectionPool {
                     // If we reach here, another thread claimed the connection:
                     // a get() caller that is setting it up, or the cancellation
                     // cleanup that returns it to the pool
+                    if (abandoned) {
+                        // The setup has already been given up. Its worker may still be in a
+                        // driver call, so waiting for the latch here would park this caller for
+                        // as long as that call takes even though the future is complete.
+                        throw new TimeoutException();
+                    }
+                    if (cancelled) {
+                        // A cancellation has already been observed and the future is terminal.
+                        throw new CancellationException();
+                    }
                     if (timed) {
                         if (!latch.await(remainingNanos(deadline), TimeUnit.NANOSECONDS)) {
                             // This shouldn't block for long
-                            if (cancelled.get()) {
+                            if (cancelled) {
                                 // A cancellation won the claim, so its cleanup
                                 // is what this wait was for: as for a cancelled
                                 // java.util.concurrent.Future, its callers are
@@ -3058,23 +3090,7 @@ public class ConnectionPool {
                         latch.await();
                     }
                 }
-                if (abandoned.get()) {
-                    // This future was abandoned after a timed get() expired;
-                    // it must not hand out a connection now.
-                    throw new TimeoutException();
-                }
-                if (result == null) {
-                    if (cancelled.get()) {
-                        // The cancellation cleanup won the claim on this
-                        // connection and returned it to the pool, so it is not
-                        // ours to hand out; the callers of a cancelled future
-                        // are told about the cancellation instead of being
-                        // handed a connection that is already back in the pool
-                        throw new CancellationException();
-                    }
-                    throw new ExecutionException(cause);
-                }
-                return result;
+                return takeTerminalResult();
             } else {
                 return null;
             }
@@ -3101,7 +3117,7 @@ public class ConnectionPool {
          */
         private void configure(PooledConnection pooled) {
             try {
-                if (abandoned.get()) {
+                if (abandoned) {
                     discardProducedConnection(pooled);
                     return;
                 }
@@ -3110,7 +3126,7 @@ public class ConnectionPool {
                     Connection configured = ConnectionPool.this.setupConnection(pc);
                     boolean discard = false;
                     synchronized (this) {
-                        if (abandoned.get()) {
+                        if (abandoned) {
                             discard = true;
                         } else {
                             result = configured;
@@ -3127,12 +3143,12 @@ public class ConnectionPool {
                     // fails the caller instead. Every caller released on the
                     // latch below reports what this publishes, and an
                     // ExecutionException with no cause tells them nothing.
-                    if (!abandoned.get()) {
+                    if (!abandoned) {
                         cause = new SQLException(MessageFactory.get("connectionPool.asyncBorrowConnectionReleased"));
                     }
                 }
             } catch (SQLException x) {
-                if (!abandoned.get()) {
+                if (!abandoned) {
                     cause = x;
                 }
             } finally {
@@ -3165,16 +3181,74 @@ public class ConnectionPool {
         }
 
         /**
+         * Takes a result the setup has already published, or returns {@code null} while setup has not published one.
+         * Marking the result taken under the monitor prevents a timed-out getter from clearing and closing a
+         * connection another caller already owns.
+         *
+         * @return the published connection, or {@code null}
+         */
+        private synchronized Connection takePublishedResult() {
+            if (result == null) {
+                return null;
+            }
+            resultTaken = true;
+            return result;
+        }
+
+        /**
+         * Returns the outcome of the setup once it has completed, or the abandonment/cancellation/failure that is
+         * terminal for this future. The decision over {@link #result}, {@link #abandoned}, {@link #cancelled} and
+         * {@link #cause} is taken under the monitor that publishes them, so a timeout cannot clear a result another
+         * getter has already observed.
+         *
+         * @return the configured connection
+         *
+         * @throws TimeoutException      if this future was abandoned after a timed get() expired
+         * @throws CancellationException if the future was cancelled or the pool closed its wait
+         * @throws ExecutionException    if setup failed before producing a connection
+         */
+        private synchronized Connection takeTerminalResult()
+                throws TimeoutException, CancellationException, ExecutionException {
+            if (result != null) {
+                resultTaken = true;
+                return result;
+            }
+            if (abandoned) {
+                // This future was abandoned after a timed get() expired;
+                // it must not hand out a connection now.
+                throw new TimeoutException();
+            }
+            if (cancelled) {
+                // The cancellation cleanup won the claim on this
+                // connection and returned it to the pool, so it is not
+                // ours to hand out; the callers of a cancelled future
+                // are told about the cancellation instead of being
+                // handed a connection that is already back in the pool
+                throw new CancellationException();
+            }
+            throw new ExecutionException(cause);
+        }
+
+        /**
          * Abandons a timed-out setup. A connection the worker has already published is returned to the pool; a worker
-         * still in setup sees the flag and returns whatever it produces rather than publishing it.
+         * still in setup sees the flag and returns whatever it produces rather than publishing it. A result a caller
+         * has already taken is left alone: it belongs to that caller and is not the timed-out getter's to close.
          */
         private void abandonConfiguration() {
             Connection configured;
             synchronized (this) {
-                abandoned.set(true);
-                configured = result;
-                result = null;
+                abandoned = true;
+                if (!resultTaken) {
+                    configured = result;
+                    result = null;
+                } else {
+                    configured = null;
+                }
             }
+            // The setup worker may still be in a driver call, so the latch is not guaranteed to
+            // be counted down soon. Wake callers waiting for the setup outcome now; they observe
+            // the abandoned flag (or a result another caller already took) and return promptly.
+            latch.countDown();
             if (configured != null) {
                 closeConfiguredConnection(configured);
             }
@@ -3219,7 +3293,7 @@ public class ConnectionPool {
          */
         @Override
         public boolean isCancelled() {
-            return pc == null && (pcFuture.isCancelled() || cancelled.get());
+            return pc == null && (pcFuture.isCancelled() || cancelled);
         }
 
         /**
@@ -3233,7 +3307,7 @@ public class ConnectionPool {
             // setup published its outcome, when a caller abandoned it at its
             // deadline, or when it was cancelled. The synchronous constructor
             // has already set up its connection and reports through pc.
-            return pc != null || result != null || done || cancelled.get() || abandoned.get() ||
+            return pc != null || result != null || done || cancelled || abandoned ||
                     pcFuture.isCancelled() || latch.getCount() == 0;
         }
 
