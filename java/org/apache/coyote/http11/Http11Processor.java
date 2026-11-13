@@ -316,6 +316,9 @@ public class Http11Processor extends AbstractProcessor {
                 }
                 setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
                 break;
+            } catch (RequestTargetTooLongException e) {
+                response.setStatus(HttpServletResponse.SC_REQUEST_URI_TOO_LONG);
+                setErrorState(ErrorState.CLOSE_CLEAN, e);
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 UserDataHelper.Mode logMode = userDataHelper.getNextMode();
@@ -332,8 +335,7 @@ public class Http11Processor extends AbstractProcessor {
                             log.debug(message, t);
                     }
                 }
-                // 400 - Bad Request
-                response.setStatus(400);
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 setErrorState(ErrorState.CLOSE_CLEAN, t);
             }
 
@@ -923,7 +925,10 @@ public class Http11Processor extends AbstractProcessor {
 
 
     private void badRequest(String errorKey) {
-        response.setStatus(400);
+        if (!getErrorState().isError()) {
+            // Do not replace the status of an error that has already been identified
+            response.setStatus(400);
+        }
         setErrorState(ErrorState.CLOSE_CLEAN, null);
         if (log.isDebugEnabled()) {
             log.debug(sm.getString(errorKey));
