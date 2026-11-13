@@ -2149,6 +2149,40 @@ public class TestHttp11Processor extends TomcatBaseTest {
     }
 
 
+    /*
+     * RFC 9110, section 15.2: a server MUST NOT send a 1xx response to an HTTP/1.0 client.
+     */
+    @Test
+    public void testEarlyHintsHttp10() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = getProgrammaticRootContext();
+
+        // Add servlet
+        Tomcat.addServlet(ctx, "EarlyHintsServlet", new EarlyHintsServlet());
+        ctx.addServletMapping("/ehs", "EarlyHintsServlet");
+
+        tomcat.start();
+
+        // @formatter:off
+        String request =
+                "GET /ehs HTTP/1.0" + CRLF +
+                "Host: localhost:" + getPort() + CRLF +
+                CRLF;
+        // @formatter:on
+
+        Client client = new Client(tomcat.getConnector().getLocalPort());
+        client.setRequest(new String[] { request });
+
+        client.connect(600000, 600000);
+        client.processRequest(false);
+
+        // The first (and only) response must be the final response
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+    }
+
+
     private static class EarlyHintsServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
