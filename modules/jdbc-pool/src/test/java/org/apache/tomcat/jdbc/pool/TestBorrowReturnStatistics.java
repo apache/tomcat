@@ -203,7 +203,7 @@ class TestBorrowReturnStatistics extends JdbcPoolBaseTest {
         // The same connection serves a later successful borrow normally, and
         // that hand-off and its return are counted once each.
         ds.getPoolProperties().setJdbcInterceptors(null);
-        try (Connection borrowed = ds.getConnection()) {
+        try (@SuppressWarnings("unused") Connection borrowed = ds.getConnection()) {
             Assertions.assertEquals(1, pool.getBorrowedCount());
         }
         Assertions.assertEquals(1, pool.getReturnedCount());
