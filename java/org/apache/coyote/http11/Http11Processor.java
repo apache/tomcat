@@ -1320,6 +1320,10 @@ public class Http11Processor extends AbstractProcessor {
 
     @Override
     protected void earlyHints() throws IOException {
+        // A server must not send a 1xx response to an HTTP/1.0 client (RFC 9110, section 15.2)
+        if (!http11) {
+            return;
+        }
         writeHeaders(HttpServletResponse.SC_EARLY_HINTS, response.getMimeHeaders());
         outputBuffer.writeHeaders();
         outputBuffer.resetHeaderBuffer();
