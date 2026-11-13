@@ -125,4 +125,27 @@ public class TestForEach extends AbstractTestTag {
         Assert.assertTrue(res.toString(), res.toString()
                 .contains("jakarta.servlet.jsp.JspTagException: " + message));
     }
+
+
+    /*
+     * The loop variable has nested visibility so it must not be visible after the loop and must not hide an attribute
+     * in another scope.
+     */
+    @Test
+    public void testVarNotVisibleAfterLoop() throws Exception {
+        ByteChunk res = new ByteChunk();
+
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/test/jstl/foreach-var-visibility.jsp", res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+
+        String body = res.toString();
+        Assert.assertTrue(body, body.contains("items=a"));
+        Assert.assertTrue(body, body.contains("items=b"));
+        Assert.assertTrue(body, body.contains("afterItems=outerI"));
+        Assert.assertTrue(body, body.contains("range=2"));
+        Assert.assertTrue(body, body.contains("afterRange=outerJ"));
+        Assert.assertTrue(body, body.contains("afterNone=</p>"));
+    }
 }
