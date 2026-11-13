@@ -238,4 +238,78 @@ class TestSlowQueryReportAbandonedPool extends JdbcPoolBaseTest {
             }
         }
     }
+
+    @Test
+    void aRetainedStatementDoesNotPinItsClosedJmxReportedPool() throws Exception {
+        String poolName = "retained-statement-" + System.nanoTime();
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        ObjectName oname = new ObjectName("tomcat.jdbc:type="
+                + SlowQueryReportJmx.class.getName() + ",name=" + poolName);
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setName(poolName);
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setMinIdle(0);
+        ds.getPoolProperties().setJdbcInterceptors(
+                "org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx(notifyPool=false,threshold=-1)");
+        ds.createPool();
+        ConnectionPool pool = ds.getPool();
+        Statement retained = null;
+        try {
+            Connection con = ds.getConnection();
+            retained = con.createStatement();
+            retained.execute("SELECT 1");
+            con.close();
+            ds.close();
+
+            WeakReference<ConnectionPool> probe = new WeakReference<>(pool);
+            pool = null;
+            Assertions.assertFalse(stillReachable(probe),
+                    "a statement handle the application retains past a closed pool must"
+                            + " not keep the pool, its sessions and its driver class loader"
+                            + " alive: the interceptor instance reachable from the handle"
+                            + " holds the pool only weakly once its chain is released");
+        } finally {
+            try {
+                server.unregisterMBean(oname);
+            } catch (Exception x) {
+                // never registered, or already gone
+            }
+            if (retained != null) {
+                retained.close();
+            }
+        }
+    }
+
+    @Test
+    void aLateReportingDefinitionTakesOverAnAbandonedNameAndReleasesItOnClose() throws Exception {
+        String poolName = "late-report-" + System.nanoTime();
+        ConnectionPool abandoned = reportedPoolNamed(poolName);
+        use(abandoned);
+        WeakReference<ConnectionPool> probe = new WeakReference<>(abandoned);
+        abandoned = null;
+        Assertions.assertFalse(stillReachable(probe),
+                "precondition: the first pool is abandoned and collected");
+        Assertions.assertNotNull(SlowQueryReport.getPoolStats(poolName),
+                "the abandoned pool leaves its store published under the name");
+
+        DataSource successor = newDataSource();
+        successor.setName(poolName);
+        successor.getPoolProperties().setInitialSize(0);
+        successor.getPoolProperties().setMinIdle(0);
+        successor.createPool();
+        // The reporting definition is added after start, as the pool allows.
+        successor.getPoolProperties().setJdbcInterceptors(SlowQueryReport.class.getName() + "(threshold=-1)");
+        use(successor.getPool());
+
+        Assertions.assertNotNull(SlowQueryReport.getPoolStats(poolName),
+                "the late definition must publish its own store under the name");
+        SlowQueryReport.PoolStatistics statistics = SlowQueryReport.statisticsFor(successor.getPool());
+        Assertions.assertNotNull(statistics, "the successor must own a statistics store");
+        Assertions.assertSame(successor.getPool(), statistics.getPool(),
+                "the store under the name must belong to the successor");
+
+        successor.close();
+        Assertions.assertNull(SlowQueryReport.getPoolStats(poolName),
+                "the successor close must release the store it took over");
+    }
 }

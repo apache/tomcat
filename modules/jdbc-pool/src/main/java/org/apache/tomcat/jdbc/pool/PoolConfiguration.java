@@ -93,6 +93,9 @@ public interface PoolConfiguration {
      * string is [propertyName=property;] <br>
      * NOTE - The "user" and "password" properties will be passed explicitly, so they do not need to be included here.
      * The default value is null.
+     * <p>
+     * A public bean or JMX view of this configuration may return a masked copy of the value, so a credential the
+     * configured string carries is not exposed in cleartext; such a copy is for display and is not safe to write back.
      *
      * @return the connection properties
      */
@@ -118,6 +121,10 @@ public interface PoolConfiguration {
     /**
      * Returns the database properties that are passed into the {@link java.sql.Driver#connect(String, Properties)}
      * method.
+     * <p>
+     * A public bean or JMX view of this configuration may return a copy with its credential entries removed, so a
+     * password the collection carries is not exposed in cleartext; such a copy is for display and is not safe to write
+     * back.
      *
      * @return database properties that are passed into the {@link java.sql.Driver#connect(String, Properties)}
      *             method, or {@code null} when the configuration has none
@@ -127,10 +134,19 @@ public interface PoolConfiguration {
     /**
      * Overrides the database properties passed into the {@link java.sql.Driver#connect(String, Properties)} method. A
      * {@code null} collection is accepted as a configuration state, and it means what it says: the configuration has no
-     * driver properties. The credential setters then have no property to mirror into and {@link #getDbProperties()}
-     * returns {@code null}. It is not a configuration that cannot connect - the URL and the {@link #getUsername() user
-     * name} and {@link #getPassword() password} still establish connections, with no extra properties sent along - and
-     * connections made through a configured {@link javax.sql.DataSource} do not consult the database properties at all.
+     * driver properties in that collection. The credential setters then have no property to mirror into and
+     * {@link #getDbProperties()} returns {@code null}. It is not a configuration that cannot connect - the URL and the
+     * {@link #getUsername() user name} and {@link #getPassword() password} still establish connections, with no extra
+     * properties from the collection sent along, while a configured {@link #getConnectionProperties() connection
+     * properties} string still contributes its pairs to the driver. Connections made through a configured
+     * {@link javax.sql.DataSource} do not consult the database properties at all.
+     * <p>
+     * A non-null collection replaces the collection the connection properties string was parsed into. The string's
+     * pairs are not parsed into the replacement again: the replacement is the caller's complete collection, and only
+     * the explicitly passed credentials are layered over it. Call {@link #setConnectionProperties(String)} after
+     * replacing the collection to reapply the current string, or put the pairs in the replacement collection. As a
+     * result, {@link #getConnectionProperties()} can report a string whose pairs are not present in
+     * {@link #getDbProperties()} until that setter runs again.
      *
      * @param dbProperties The database properties, may be {@code null}
      */
@@ -323,7 +339,8 @@ public interface PoolConfiguration {
      * The maximum number of connections that should be kept in the idle pool if {@link #isPoolSweeperEnabled()} returns
      * false. If {@link #isPoolSweeperEnabled()} returns true, then the idle pool can grow up to
      * {@link #getMaxActive} and will be shrunk according to {@link #getMinEvictableIdleTimeMillis()} setting. Default
-     * value is {@link #getMaxActive} (100 with the default configuration)
+     * value is the value of {@link #getMaxActive} when the configuration was created (100 with the default
+     * configuration); changing {@code maxActive} afterwards does not change {@code maxIdle}.
      *
      * @return the maximum number of idle connections.
      */
@@ -333,7 +350,8 @@ public interface PoolConfiguration {
      * The maximum number of connections that should be kept in the idle pool if {@link #isPoolSweeperEnabled()} returns
      * false. If {@link #isPoolSweeperEnabled()} returns true, then the idle pool can grow up to
      * {@link #getMaxActive} and will be shrunk according to {@link #getMinEvictableIdleTimeMillis()} setting. Default
-     * value is {@link #getMaxActive} (100 with the default configuration)
+     * value is the value of {@link #getMaxActive} when the configuration was created (100 with the default
+     * configuration); changing {@code maxActive} afterwards does not change {@code maxIdle}.
      *
      * @param maxIdle the maximum size of the idle pool
      */
@@ -478,7 +496,8 @@ public interface PoolConfiguration {
     /**
      * Sets the username used to establish the connection with It will also be a property called 'user' in the database
      * properties. A {@code null} user name removes that entry instead, as {@link #setPassword(String)} does its
-     * password, and for the same reason.
+     * password, and for the same reason; the removal covers a differently cased spelling of the key as well, so a
+     * {@code USER} entry cannot keep authenticating connections either.
      *
      * @param username The user name
      *
@@ -621,6 +640,9 @@ public interface PoolConfiguration {
 
     /**
      * The URL used to connect to the database
+     * <p>
+     * A public bean or JMX view of this configuration may return the URL with an inline credential masked, so the
+     * password is not exposed in cleartext; such a value is for display and is not safe to write back.
      *
      * @return the configured URL for this connection pool
      *
@@ -784,6 +806,10 @@ public interface PoolConfiguration {
      * succeeded or failed. {@link org.apache.tomcat.jdbc.pool.interceptor.ConnectionState ConnectionState} caches the
      * auto commit, read only, transaction isolation and catalog settings to avoid round trips to the DB. The default
      * value is null.
+     * <p>
+     * A public bean or JMX view of this configuration may return the list with a credential in a definition's
+     * parameter list masked, so it is not exposed in cleartext; such a value is for display and is not safe to write
+     * back.
      *
      * @return the interceptors that are used for connections. Example format:
      *             'ConnectionState(useEquals=true,fast=yes);ResetAbandonedTimer'
@@ -940,14 +966,25 @@ public interface PoolConfiguration {
     /**
      * Injects a datasource that will be used to retrieve/create connections. If a data source is set, the
      * {@link PoolConfiguration#getUrl()} and {@link PoolConfiguration#getDriverClassName()} methods are ignored and not
-     * used by the pool. If the {@link PoolConfiguration#getUsername()} and {@link PoolConfiguration#getPassword()}
-     * values are set, the method {@link javax.sql.DataSource#getConnection(String, String)} method will be called
-     * instead of the {@link javax.sql.DataSource#getConnection()} method. If the data source implements
-     * {@link javax.sql.XADataSource} the methods {@link javax.sql.XADataSource#getXAConnection()} and
-     * {@link javax.sql.XADataSource#getXAConnection(String,String)} will be invoked. If it implements
+     * used by the pool. If either the {@link PoolConfiguration#getUsername()} or the
+     * {@link PoolConfiguration#getPassword()} value is set, the method {@link javax.sql.DataSource#getConnection(String,
+     * String)} method will be called with both values, passing the unset one as {@code null}, instead of the
+     * {@link javax.sql.DataSource#getConnection()} method; when both are unset, the no-argument method is used. If the
+     * data source implements {@link javax.sql.XADataSource} the methods {@link javax.sql.XADataSource#getXAConnection()}
+     * and {@link javax.sql.XADataSource#getXAConnection(String,String)} will be invoked on the same rule. If it implements
      * {@link javax.sql.ConnectionPoolDataSource} the methods
      * {@link javax.sql.ConnectionPoolDataSource#getPooledConnection()} and
      * {@link javax.sql.ConnectionPoolDataSource#getPooledConnection(String,String)} will be invoked instead.
+     * <p>
+     * If the object implements more than one of these interfaces, {@link javax.sql.XADataSource} takes precedence over
+     * {@link javax.sql.DataSource}, and {@link javax.sql.DataSource} takes precedence over
+     * {@link javax.sql.ConnectionPoolDataSource}.
+     * <p>
+     * A provider that requires both credential arguments or rejects a null one makes a configuration with only one of
+     * the credentials set fail; the two-argument method is called with the unset value as {@code null}. Configure both
+     * credentials, or configure neither so the provider's no-argument method and its own defaults are used. A provider
+     * that treats a null password as an empty password rather than its configured default can also authenticate
+     * differently than the pool configuration suggests.
      *
      * @param ds the {@link javax.sql.DataSource} to be used for creating connections to be pooled.
      */

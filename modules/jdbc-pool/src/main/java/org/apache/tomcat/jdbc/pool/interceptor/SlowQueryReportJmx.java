@@ -17,6 +17,7 @@
 package org.apache.tomcat.jdbc.pool.interceptor;
 
 import java.lang.management.ManagementFactory;
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,6 +43,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
+import org.apache.tomcat.jdbc.pool.PoolUtilities;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 import org.apache.tomcat.jdbc.pool.jmx.ConnectionPoolMBean;
 import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
@@ -356,9 +358,17 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     protected boolean notifyPool = true;
 
     /**
-     * The connection pool reference.
+     * The connection pool reference. During a borrow this is a strong reference used to route the instance's
+     * notifications and JMX reads; it is cleared when the chain is released.
      */
     protected ConnectionPool pool = null;
+
+    /**
+     * A weak reference to the pool, kept across the release of the chain so an instance whose session outlives the
+     * connection can still resolve the pool's JMX state while the pool is alive. It must not keep a closed or abandoned
+     * pool, its sessions and its driver class loader reachable from a retained statement handle.
+     */
+    private volatile WeakReference<ConnectionPool> poolRef = new WeakReference<>(null);
 
     /**
      * Returns the composite type used for JMX query statistics.
@@ -375,7 +385,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
                                 QueryStats.getFieldDescriptions(), QueryStats.getFieldTypes());
                     } catch (OpenDataException x) {
                         compositeTypeInitializationFailed = true;
-                        log.warn(MessageFactory.get("slowQueryReportJmx.unableToInitCompositeType"), x);
+                        log.warn(MessageFactory.get("slowQueryReportJmx.unableToInitCompositeType"), PoolUtilities.maskCredentials(x));
                     }
                 }
             }
@@ -434,7 +444,17 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
             // make a borrow register a second MBean under the new name
             poolName = parent.getRegistrationName();
             pool = parent;
+            poolRef = new WeakReference<>(parent);
             registerJmx();
+        } else {
+            // The chain is going out of service. Keep only the weak reference:
+            // a statement or result-set handle retained by the application
+            // keeps this instance reachable, so a strong pool reference here
+            // would keep a closed pool, its sessions and its driver class
+            // loader alive with it. A session that outlives its pool can still
+            // resolve the pool through the weak reference while the pool is
+            // alive.
+            pool = null;
         }
     }
 
@@ -446,8 +466,21 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     @Override
     public void poolStarted(ConnectionPool pool) {
         this.pool = pool;
+        this.poolRef = new WeakReference<>(pool);
         super.poolStarted(pool);
         this.poolName = pool.getRegistrationName();
+    }
+
+    /**
+     * Returns the pool this instance serves. While a connection is borrowed the strong field answers; after the chain
+     * is released the weak reference still resolves the pool while it is alive, so a session that outlives its
+     * connection can report on it, but a closed or abandoned pool is not kept alive by a retained statement handle.
+     *
+     * @return the pool, or {@code null} when there is none or it has been collected
+     */
+    private ConnectionPool currentPool() {
+        ConnectionPool strong = this.pool;
+        return strong != null ? strong : poolRef.get();
     }
 
     /**
@@ -486,23 +519,23 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
                 // Read the pool and its JMX object each only once: close()
                 // gives the JMX object up concurrently, and a second read can
                 // observe the null the first one did not
-                ConnectionPool p = this.pool;
+                ConnectionPool p = currentPool();
                 org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = p == null ? null : p.getJmxPool();
                 if (jmx != null) {
-                    jmx.notify(type, query);
+                    jmx.notify(type, sqlForLog(query));
                 }
             } else {
                 NotificationBroadcasterSupport target = broadcasterToSendTo();
                 if (target != null) {
                     Notification notification = new Notification(type, getNotificationSource(), sequence,
-                            System.currentTimeMillis(), query);
+                            System.currentTimeMillis(), sqlForLog(query));
 
                     target.sendNotification(notification);
                 }
             }
         } catch (RuntimeOperationsException e) {
             if (log.isDebugEnabled()) {
-                log.debug("Unable to send failed query notification.", e);
+                log.debug("Unable to send failed query notification.", PoolUtilities.maskCredentials(e));
             }
         }
     }
@@ -543,7 +576,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
         if (state != null) {
             return state;
         }
-        PoolStatistics own = statisticsFor(this.pool);
+        PoolStatistics own = statisticsFor(currentPool());
         return own == null ? null : own.getJmxState();
     }
 
@@ -729,12 +762,19 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
      * @return the statistics store to read, or {@code null} when there is none
      */
     private PoolStatistics statisticsToRead() {
+        ConnectionPool current = currentPool();
         PoolStatistics own = this.poolStatistics;
-        if (own != null) {
+        if (own != null && own.getPool() == current) {
             return own;
         }
         String name = poolName;
-        return name == null ? null : perPoolStats.get(name);
+        if (name == null) {
+            return null;
+        }
+        PoolStatistics stats = perPoolStats.get(name);
+        // A name can be reused by another pool after this one is abandoned;
+        // a read of this instance's pool must not answer from the successor.
+        return stats != null && stats.getPool() == current ? stats : null;
     }
 
     /**
@@ -806,7 +846,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
             // a pool name carrying characters the ObjectName grammar reserves.
             // There is no publication to make, and JMX is best effort, so this
             // is reported once and not attempted again.
-            log.error(MessageFactory.get("slowQueryReportJmx.jmxRegistrationFailedNoData"), x);
+            log.error(MessageFactory.get("slowQueryReportJmx.jmxRegistrationFailedNoData"), PoolUtilities.maskCredentials(x));
             return;
         }
         // The MBeanServer keeps the registration resource, never this
@@ -823,12 +863,12 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
             // and names are unique under Catalina, so this is reported rather
             // than retried: by the time a retry ran, the name could describe a
             // different component.
-            log.warn(MessageFactory.get("slowQueryReportJmx.jmxRegistrationInUse", oname), x);
+            log.warn(MessageFactory.get("slowQueryReportJmx.jmxRegistrationInUse", oname), PoolUtilities.maskCredentials(x));
             return;
         } catch (Exception x) {
             // A non-compliant resource, a security restriction, or another
             // server-side refusal. Reported once, not retried.
-            log.error(MessageFactory.get("slowQueryReportJmx.jmxRegistrationFailed", oname), x);
+            log.error(MessageFactory.get("slowQueryReportJmx.jmxRegistrationFailed", oname), PoolUtilities.maskCredentials(x));
             return;
         }
         if (!state.published(oname)) {
@@ -987,9 +1027,36 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
         if (override != null && override.getValue() != null) {
             oname = new ObjectName(override.getValue());
         } else {
-            oname = new ObjectName(ConnectionPool.POOL_JMX_TYPE_PREFIX + clazz.getName() + ",name=" + poolName);
+            oname = new ObjectName(ConnectionPool.POOL_JMX_TYPE_PREFIX + clazz.getName() + ",name=" +
+                    objectNameValue(poolName));
         }
         return oname;
+    }
+
+    /**
+     * Renders a pool name as an ObjectName property value, quoting it only when the unquoted grammar cannot carry it.
+     * A name containing a comma, equals sign, colon, quote or another character the grammar reserves would otherwise
+     * alter the ObjectName instead of naming the pool, or fail registration.
+     *
+     * @param poolName the pool name
+     *
+     * @return the property value, quoted when needed
+     */
+    private static String objectNameValue(String poolName) {
+        if (poolName == null) {
+            return "null";
+        }
+        try {
+            ObjectName probe = new ObjectName(ConnectionPool.POOL_JMX_TYPE_PREFIX +
+                    SlowQueryReportJmx.class.getName() + ",name=" + poolName);
+            if (!probe.isPattern() && poolName.equals(probe.getKeyProperty("name"))
+                    && probe.getKeyPropertyList().size() == 2) {
+                return poolName;
+            }
+        } catch (MalformedObjectNameException x) {
+            // The grammar cannot carry the name unquoted; quote it below.
+        }
+        return ObjectName.quote(poolName);
     }
 
     /**

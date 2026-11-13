@@ -144,6 +144,102 @@ class TestBorrowReturnStatistics extends JdbcPoolBaseTest {
     }
 
     @Test
+    void aCancelledAsyncSetupCountsNeitherABorrowNorAReturn() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setFairQueue(true);
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setMinIdle(0);
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setMaxIdle(1);
+        ds.createPool();
+        ConnectionPool pool = ds.getPool();
+
+        Connection holder = ds.getConnection();
+        Future<Connection> future = ds.getConnectionAsync();
+        Assertions.assertFalse(future.isDone(), "the poll must wait for the held connection");
+
+        // Hand the connection to the queue future, then cancel before any getter has taken it.
+        holder.close();
+        Assertions.assertFalse(future.isDone(), "the queue delivery alone must not complete the future");
+        pool.resetStats();
+        Assertions.assertTrue(future.cancel(true), "a future whose setup has not run must be cancellable");
+
+        awaitUntil(() -> ds.getActive() == 0 && ds.getIdle() == 1);
+        Assertions.assertEquals(0, pool.getBorrowedCount(),
+                "the cancelled setup never reached a caller, so it is not a borrow");
+        Assertions.assertEquals(0, pool.getReturnedCount(),
+                "the cancelled setup's cleanup close is not a borrower's return");
+        Assertions.assertEquals(1, ds.getSize(), "the connection must remain in the pool");
+    }
+
+    @Test
+    void aFailedSetupCountsNeitherABorrowNorAReturn() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setMinIdle(0);
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(-1);
+        ds.createPool();
+        ConnectionPool pool = ds.getPool();
+
+        // A malformed interceptor list is parsed while the connection is set
+        // up, after it has been claimed but before a handle can be handed to
+        // the borrower. The failure returns the connection to the pool
+        // without either counter moving.
+        ds.getPoolProperties().setJdbcInterceptors("NoSuchInterceptor");
+        SQLException failure = Assertions.assertThrows(SQLException.class, ds::getConnection,
+                "an interceptor class that cannot be loaded must fail the borrow");
+        Assertions.assertNotNull(failure.getMessage(), "failure message: " + failure);
+        Assertions.assertEquals(0, pool.getBorrowedCount(),
+                "a setup that never reached a borrower is not a borrow");
+        Assertions.assertEquals(0, pool.getReturnedCount(),
+                "the failed setup's hand-back is not a borrower's return");
+        Assertions.assertEquals(1, pool.getCreatedCount());
+        Assertions.assertEquals(1, ds.getIdle(),
+                "the connection of a failed setup goes back to the idle queue; size=" + pool.getSize()
+                        + " released=" + pool.getReleasedCount() + " created=" + pool.getCreatedCount()
+                        + " failure=" + failure.getMessage());
+
+        // The same connection serves a later successful borrow normally, and
+        // that hand-off and its return are counted once each.
+        ds.getPoolProperties().setJdbcInterceptors(null);
+        try (@SuppressWarnings("unused") Connection borrowed = ds.getConnection()) {
+            Assertions.assertEquals(1, pool.getBorrowedCount());
+        }
+        Assertions.assertEquals(1, pool.getReturnedCount());
+        Assertions.assertEquals(1, pool.getCreatedCount());
+        awaitSessions(1);
+    }
+
+    @Test
+    void aConnectionReturnedAfterPoolCloseStillCountsAsReturned() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setMinIdle(0);
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(-1);
+        ds.createPool();
+        ConnectionPool pool = ds.getPool();
+
+        Connection held = ds.getConnection();
+        Assertions.assertEquals(1, pool.getBorrowedCount());
+        Assertions.assertEquals(0, pool.getReturnedCount());
+
+        // The closed pool releases the checked-out connection instead of
+        // queueing it, but the borrower's hand-back must still pair with the
+        // borrow that was counted when the connection was served.
+        ds.close(false);
+        held.close();
+
+        Assertions.assertEquals(1, pool.getBorrowedCount());
+        Assertions.assertEquals(1, pool.getReturnedCount(),
+                "a checked-out connection returned after close must count as a return");
+        Assertions.assertEquals(1, pool.getReleasedCount());
+        Assertions.assertEquals(0, pool.getSize());
+        awaitSessions(0);
+    }
+
+    @Test
     void aConnectionReleasedTwiceIsCountedOnce() throws Exception {
         DataSource ds = newDataSource();
         ds.getPoolProperties().setInitialSize(0);

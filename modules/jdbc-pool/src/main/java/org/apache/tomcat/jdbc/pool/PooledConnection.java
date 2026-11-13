@@ -21,6 +21,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -148,9 +149,23 @@ public class PooledConnection implements PooledConnectionMBean {
 
     private AtomicBoolean released = new AtomicBoolean(false);
 
+    /**
+     * Whether the borrow this pooled connection currently serves was counted in the pool's borrowed statistic and its
+     * return is therefore still to be counted. The pool sets it at a counted hand-off and clears it when that return is
+     * counted, so an internal setup that no caller receives is neither counted as a borrow nor as a return.
+     */
+    private volatile boolean borrowCounted = false;
+
     private volatile boolean suspect = false;
 
-    private java.sql.Driver driver = null;
+    private volatile java.sql.Driver driver = null;
+
+    /**
+     * The configured driver class name the cached driver was instantiated for. A live change of the
+     * {@code driverClassName} property invalidates the cache, so a reconnect after the change uses the configured driver
+     * rather than the one the connection was first built with.
+     */
+    private volatile String driverClass = null;
 
     /**
      * Constructor
@@ -239,7 +254,7 @@ public class PooledConnection implements PooledConnectionMBean {
         if (released.get()) {
             throw new SQLException(MessageFactory.get("pooledConnection.cannotReestablish"));
         }
-        if (connection != null) {
+        if (connection != null || xaConnection != null || cpdsConnection != null) {
             try {
                 this.disconnect(false);
             } catch (Throwable x) {
@@ -248,52 +263,72 @@ public class PooledConnection implements PooledConnectionMBean {
                 // connection attempt.
                 ExceptionUtils.handleThrowable(x);
                 if (log.isDebugEnabled()) {
-                    log.debug("Unable to disconnect previous connection.", x);
+                    log.debug("Unable to disconnect previous connection.", PoolUtilities.maskCredentials(x));
                 }
             }
         }
-        if (poolProperties.getDataSource() != null) {
-            connectUsingDataSource();
-        } else {
-            connectUsingDriver();
+        // A reconnect starts a new session; the previous session's discard, set by its disconnect above, does
+        // not apply to it. Clear it before the new session is established, under the monitor shared with
+        // setDiscarded(), so a discard raised while that session is being connected is not overwritten when
+        // connect() completes. A flag observed after the connect path is therefore a genuine discard of the
+        // new session.
+        synchronized (this) {
+            this.discarded = false;
         }
+        try {
+            if (poolProperties.getDataSource() != null) {
+                connectUsingDataSource();
+            } else {
+                connectUsingDriver();
+            }
 
-        // Set up the default state, unless we expect the interceptor to do it
-        if (!hasConnectionStateInterceptor()) {
-            if (poolProperties.getDefaultTransactionIsolation() != DataSourceFactory.UNKNOWN_TRANSACTIONISOLATION) {
-                connection.setTransactionIsolation(poolProperties.getDefaultTransactionIsolation());
+            // Set up the default state, unless we expect the interceptor to do it
+            if (!hasConnectionStateInterceptor()) {
+                if (poolProperties.getDefaultTransactionIsolation() != DataSourceFactory.UNKNOWN_TRANSACTIONISOLATION) {
+                    connection.setTransactionIsolation(poolProperties.getDefaultTransactionIsolation());
+                }
+                if (poolProperties.getDefaultReadOnly() != null) {
+                    connection.setReadOnly(poolProperties.getDefaultReadOnly().booleanValue());
+                }
+                if (poolProperties.getDefaultAutoCommit() != null) {
+                    connection.setAutoCommit(poolProperties.getDefaultAutoCommit().booleanValue());
+                }
+                if (poolProperties.getDefaultCatalog() != null) {
+                    connection.setCatalog(poolProperties.getDefaultCatalog());
+                }
             }
-            if (poolProperties.getDefaultReadOnly() != null) {
-                connection.setReadOnly(poolProperties.getDefaultReadOnly().booleanValue());
-            }
-            if (poolProperties.getDefaultAutoCommit() != null) {
-                connection.setAutoCommit(poolProperties.getDefaultAutoCommit().booleanValue());
-            }
-            if (poolProperties.getDefaultCatalog() != null) {
-                connection.setCatalog(poolProperties.getDefaultCatalog());
-            }
-        }
-        this.discarded = false;
-        this.lastConnected = System.currentTimeMillis();
-        // The validation timestamp belongs to the session that was just given
-        // up: a new physical session must be due for its own validation, or a
-        // recently validated predecessor lets the configured testOnBorrow /
-        // testOnReturn policy skip the check on this one.
-        this.lastValidated = 0;
+            this.lastConnected = System.currentTimeMillis();
+            // The validation timestamp belongs to the session that was just given
+            // up: a new physical session must be due for its own validation, or a
+            // recently validated predecessor lets the configured testOnBorrow /
+            // testOnReturn policy skip the check on this one.
+            this.lastValidated = 0;
 
-        // The physical session is up: this is the point at which the
-        // connection can publish itself below the pool's MBean. Tying that to
-        // the first borrow instead left a connection the pool pre-created for
-        // its initial size, or one that is simply never borrowed, counted in
-        // the pool's size yet invisible to JMX for its whole life. This also
-        // covers every reconnect; a connection that is already registered
-        // keeps its registration across a reconnect, and createMBean() leaves
-        // such a call alone by its own guards. With JMX disabled the pool has
-        // no JMX object to register under, and the borrow path still calls the
-        // registration unconditionally, so it is skipped here rather than
-        // called only to do nothing.
-        if (parent.getJmxPool() != null) {
-            createMBean();
+            // The physical session is up: this is the point at which the
+            // connection can publish itself below the pool's MBean. Tying that to
+            // the first borrow instead left a connection the pool pre-created for
+            // its initial size, or one that is simply never borrowed, counted in
+            // the pool's size yet invisible to JMX for its whole life. This also
+            // covers every reconnect; a connection that is already registered
+            // keeps its registration across a reconnect, and createMBean() leaves
+            // such a call alone by its own guards. With JMX disabled the pool has
+            // no JMX object to register under, and the borrow path still calls the
+            // registration unconditionally, so it is skipped here rather than
+            // called only to do nothing.
+            if (parent.getJmxPool() != null) {
+                createMBean();
+            }
+        } catch (Throwable x) {
+            ExceptionUtils.handleThrowable(x);
+            // The attempt did not establish the replacement session, or it failed after establishing it. Either
+            // way the pooled connection no longer has a usable session to serve, and a discard raised while the
+            // attempt was in flight must not be cleared by its failure path.
+            synchronized (this) {
+                if (!discarded) {
+                    discarded = true;
+                }
+            }
+            throw wrapConnectFailure(x);
         }
     }
 
@@ -344,8 +379,15 @@ public class PooledConnection implements PooledConnectionMBean {
         }
         if (poolProperties.getDataSource() instanceof javax.sql.XADataSource) {
             javax.sql.XADataSource xds = (javax.sql.XADataSource) poolProperties.getDataSource();
-            javax.sql.XAConnection pooled = (usr != null && pwd != null) ? xds.getXAConnection(usr, pwd)
+            javax.sql.XAConnection pooled = (usr != null || pwd != null) ? xds.getXAConnection(usr, pwd)
                     : xds.getXAConnection();
+            if (pooled == null) {
+                // A provider must return a handle or throw. Do not dereference
+                // the null and turn the contract violation into an unrelated
+                // NullPointerException in the connection's diagnostic.
+                throw new SQLException(MessageFactory.get(
+                        "pooledConnection.xaDataSourceNullHandle", objectIdentity(xds)));
+            }
             // Keep the handle before obtaining the logical connection: the
             // physical connection is only closed when the handle is closed,
             // so losing the handle here would leak the physical connection.
@@ -361,7 +403,7 @@ public class PooledConnection implements PooledConnectionMBean {
                 // Contract-violating provider: a handle without a logical
                 // connection is of no use either.
                 failure = new SQLException(
-                        MessageFactory.get("pooledConnection.xaDataSourceNullConnection", xds));
+                        MessageFactory.get("pooledConnection.xaDataSourceNullConnection", objectIdentity(xds)));
             }
             if (failure != null) {
                 // Do not strand the handle if the logical connection
@@ -392,7 +434,7 @@ public class PooledConnection implements PooledConnectionMBean {
             xaConnection = new XABranchTracker(pooled);
         } else if (poolProperties.getDataSource() instanceof javax.sql.DataSource) {
             javax.sql.DataSource ds = (javax.sql.DataSource) poolProperties.getDataSource();
-            if (usr != null && pwd != null) {
+            if (usr != null || pwd != null) {
                 connection = ds.getConnection(usr, pwd);
             } else {
                 connection = ds.getConnection();
@@ -402,12 +444,19 @@ public class PooledConnection implements PooledConnectionMBean {
                 // when no connection can be provided; keeping that null would
                 // surface later as a misleading validation failure, or as a
                 // null pointer when the default connection state is applied.
-                throw new SQLException(MessageFactory.get("pooledConnection.dataSourceNullConnection", ds));
+                throw new SQLException(MessageFactory.get("pooledConnection.dataSourceNullConnection",
+                        objectIdentity(ds)));
             }
         } else if (poolProperties.getDataSource() instanceof javax.sql.ConnectionPoolDataSource) {
             javax.sql.ConnectionPoolDataSource ds = (javax.sql.ConnectionPoolDataSource) poolProperties.getDataSource();
-            javax.sql.PooledConnection pooled = (usr != null && pwd != null) ? ds.getPooledConnection(usr, pwd)
+            javax.sql.PooledConnection pooled = (usr != null || pwd != null) ? ds.getPooledConnection(usr, pwd)
                     : ds.getPooledConnection();
+            if (pooled == null) {
+                // A provider must return a handle or throw; fail cleanly
+                // rather than dereferencing the missing handle.
+                throw new SQLException(MessageFactory.get(
+                        "pooledConnection.connectionPoolDataSourceNullHandle", objectIdentity(ds)));
+            }
             // Keep the handle before obtaining the logical connection: the
             // physical connection is only closed when the handle is closed,
             // so losing the handle here would leak the physical connection.
@@ -423,7 +472,8 @@ public class PooledConnection implements PooledConnectionMBean {
                 // Contract-violating provider: a handle without a logical
                 // connection is of no use either.
                 failure = new SQLException(
-                        MessageFactory.get("pooledConnection.connectionPoolDataSourceNullConnection", ds));
+                        MessageFactory.get("pooledConnection.connectionPoolDataSourceNullConnection",
+                                objectIdentity(ds)));
             }
             if (failure != null) {
                 // Do not strand the handle if the logical connection
@@ -451,15 +501,36 @@ public class PooledConnection implements PooledConnectionMBean {
     }
 
     /**
+     * The diagnostic identity of a third-party object - a data source, driver or other provider handle: its class and
+     * identity hash, never its {@code toString()}, which may carry the configured URL, user name or credentials.
+     *
+     * @param object the object, possibly {@code null}
+     *
+     * @return the identity text
+     */
+    private static String objectIdentity(Object object) {
+        return object == null ? "null" : object.getClass().getName() + "@" +
+                Integer.toHexString(System.identityHashCode(object));
+    }
+
+    /**
      * Connects using the configured JDBC Driver class.
      *
      * @throws SQLException if unable to instantiate the driver or obtain a connection
      */
     protected void connectUsingDriver() throws SQLException {
 
+        String configuredDriver = poolProperties.getDriverClassName();
         try {
+            if (driver != null && !Objects.equals(driverClass, configuredDriver)) {
+                // The configuration named a different driver since this
+                // connection cached one. Reconnect with the configured
+                // driver, not with the one the first session was built with.
+                driver = null;
+                driverClass = null;
+            }
             if (driver == null) {
-                if (poolProperties.getDriverClassName() == null) {
+                if (configuredDriver == null) {
                     // Rely on DriverManager
                     if (log.isDebugEnabled()) {
                         log.debug("No driverClassName is configured so the driver will be located by DriverManager.");
@@ -471,17 +542,18 @@ public class PooledConnection implements PooledConnectionMBean {
                         // is a standard support step, so a URL that carries
                         // its credential inline must reach this line masked
                         // as well - the driver is handed the real URL below.
-                        log.debug("Instantiating driver using class: " + poolProperties.getDriverClassName() +
+                        log.debug("Instantiating driver using class: " + configuredDriver +
                                 " [url=" + PoolProperties.maskCredentials(poolProperties.getUrl()) + "]");
                     }
-                    driver = (java.sql.Driver) ClassLoaderUtil.loadClass(poolProperties.getDriverClassName(),
+                    driver = (java.sql.Driver) ClassLoaderUtil.loadClass(configuredDriver,
                             PooledConnection.class.getClassLoader(), Thread.currentThread().getContextClassLoader())
                             .getConstructor().newInstance();
+                    driverClass = configuredDriver;
                 }
             }
         } catch (Exception cn) {
             if (log.isDebugEnabled()) {
-                log.debug("Unable to instantiate JDBC driver.", cn);
+                log.debug("Unable to instantiate JDBC driver.", PoolUtilities.maskCredentials(cn));
             }
             SQLException ex = new SQLException(cn.getMessage());
             ex.initCause(cn);
@@ -503,14 +575,28 @@ public class PooledConnection implements PooledConnectionMBean {
             getAttributes().put(PROP_PASSWORD, pwd);
         }
         // A null database-properties collection becomes an empty one: the URL
-        // and credentials are enough for the driver. The copy is taken under
-        // the configuration's monitor so a concurrent reconfigure cannot hand
-        // the driver a torn mix of two generations.
+        // and credentials are enough for the driver. The configured
+        // connectionProperties string is a source of driver properties in its
+        // own right and must still reach the driver, so it is parsed here when
+        // there is no collection to hold its pairs; the string and the null
+        // collection are read under the same monitor, so the driver cannot
+        // receive a torn mix of two configurations.
         Properties properties;
         synchronized (poolProperties) {
             Properties dbProperties = poolProperties.getDbProperties();
-            properties =
-                    dbProperties == null ? new Properties() : PoolUtilities.clone(dbProperties);
+            if (dbProperties == null) {
+                try {
+                    properties = PoolProperties.getProperties(
+                            poolProperties.getConnectionProperties(), new Properties());
+                } catch (RuntimeException x) {
+                    SQLException ex = new SQLException(
+                            MessageFactory.get("pooledConnection.invalidConnectionProperties"));
+                    ex.initCause(x);
+                    throw ex;
+                }
+            } else {
+                properties = PoolUtilities.clone(dbProperties);
+            }
         }
         if (usr != null) {
             properties.setProperty(PROP_USER, usr);
@@ -558,7 +644,7 @@ public class PooledConnection implements PooledConnectionMBean {
             // debug line above do; the driver's identity and the rest of the
             // URL stay readable.
             throw new SQLException(MessageFactory.get("pooledConnection.driverReturnedNull",
-                    driver, PoolProperties.maskCredentials(driverURL)));
+                    objectIdentity(driver), PoolProperties.maskCredentials(driverURL)));
         }
     }
 
@@ -629,6 +715,7 @@ public class PooledConnection implements PooledConnectionMBean {
         javax.sql.PooledConnection servedCpds = cpdsConnection;
         long servedLastConnected = lastConnected;
         long servedLastValidated = lastValidated;
+        boolean servedDiscarded = discarded;
         HashMap<Object, Object> sessionAttributes = getAttributes();
         boolean hadUser = sessionAttributes.containsKey(PROP_USER);
         Object servedUser = sessionAttributes.get(PROP_USER);
@@ -660,6 +747,10 @@ public class PooledConnection implements PooledConnectionMBean {
         xaConnection = null;
         cpdsConnection = null;
         lastConnected = -1;
+        // The validation timestamp belongs to the session being replaced too. Clear it with the other
+        // session fields so the per-connection MBean, which stays registered across this window, does
+        // not report a timestamp for a session that is no longer current.
+        lastValidated = 0;
         try {
             connect();
         } catch (Throwable x) {
@@ -685,6 +776,7 @@ public class PooledConnection implements PooledConnectionMBean {
                 cpdsConnection = servedCpds;
                 lastConnected = servedLastConnected;
                 lastValidated = servedLastValidated;
+                discarded = servedDiscarded;
                 if (hadUser) {
                     sessionAttributes.put(PROP_USER, servedUser);
                 } else {
@@ -708,10 +800,10 @@ public class PooledConnection implements PooledConnectionMBean {
             throw ex;
         }
 
-        if (served == null) {
-            // There was no session to replace: this is a plain connect of a
-            // connection that had none, and the new session is already in
-            // place.
+        if (served == null && servedXa == null && servedCpds == null) {
+            // There was no session or handle to replace: this is a plain
+            // connect of a connection that had none, and the new session is
+            // already in place.
             return;
         }
 
@@ -756,6 +848,12 @@ public class PooledConnection implements PooledConnectionMBean {
         xaConnection = null;
         cpdsConnection = null;
         lastConnected = -1;
+        // The validation timestamp belongs to the session that was just given
+        // up. Clearing it here keeps the published value at the documented 0
+        // for a connection whose current session has not been validated, even
+        // across the reconnect window while the per-connection MBean stays
+        // registered.
+        lastValidated = 0;
         // The chain's teardown reset is delivered once, by the release that
         // clears the handler after it has freed the pool slot - see
         // ConnectionPool.release(). The disconnect event above is a separate
@@ -772,11 +870,13 @@ public class PooledConnection implements PooledConnectionMBean {
         try {
             parent.disconnectEvent(this, finalizing);
         } catch (Throwable x) {
+            ExceptionUtils.handleThrowable(x);
             // The event itself isolates each link of the chain, so this
             // catch only guards against a failure of the walk itself;
             // an interceptor must not be able to keep the physical
             // connection from being closed
-            log.warn(MessageFactory.get("pooledConnection.interceptorDisconnectedFailed"), x);
+            log.warn(MessageFactory.get("pooledConnection.interceptorDisconnectedFailed"),
+                    PoolUtilities.maskCredentials(x));
         }
     }
 
@@ -843,9 +943,10 @@ public class PooledConnection implements PooledConnectionMBean {
             // installed: the caller has already settled the release.
             ExceptionUtils.handleThrowable(ignore);
             if (cpdsHandle != null || xaHandle != null) {
-                log.warn(MessageFactory.get("pooledConnection.unableToCloseUnderlyingConnection"), ignore);
+                log.warn(MessageFactory.get("pooledConnection.unableToCloseUnderlyingConnection"),
+                        PoolUtilities.maskCredentials(ignore));
             } else if (log.isDebugEnabled()) {
-                log.debug("Unable to close underlying SQL connection", ignore);
+                log.debug("Unable to close underlying SQL connection", PoolUtilities.maskCredentials(ignore));
             }
         }
     }
@@ -986,9 +1087,9 @@ public class PooledConnection implements PooledConnectionMBean {
                 // handleThrowable re-throws keep propagating.
                 if (getPoolProperties().getLogValidationErrors()) {
                     log.error(MessageFactory.get("pooledConnection.customValidationThrew",
-                            validator), x);
+                            validator), PoolUtilities.maskCredentials(x));
                 } else if (log.isDebugEnabled()) {
-                    log.debug("Custom validation threw an exception.", x);
+                    log.debug("Custom validation threw an exception.", PoolUtilities.maskCredentials(x));
                 }
                 return false;
             }
@@ -1054,7 +1155,8 @@ public class PooledConnection implements PooledConnectionMBean {
                 // idle and busy queues and strands the pooled connection -
                 // permanently shrinking the pool
                 if (getPoolProperties().getLogValidationErrors()) {
-                    log.error(MessageFactory.get("pooledConnection.isValidFailed"), e);
+                    log.error(MessageFactory.get("pooledConnection.isValidFailed"),
+                            PoolUtilities.maskCredentials(e));
                 } else if (e instanceof RuntimeException) {
                     // Unlike the checked failure this anomaly would once
                     // have escaped as the driver's own throw; the caller
@@ -1063,9 +1165,10 @@ public class PooledConnection implements PooledConnectionMBean {
                     // than debug - otherwise at the default log level a
                     // broken driver would fail every validation with no
                     // trace anywhere
-                    log.warn(MessageFactory.get("pooledConnection.isValidFailed"), e);
+                    log.warn(MessageFactory.get("pooledConnection.isValidFailed"),
+                            PoolUtilities.maskCredentials(e));
                 } else if (log.isDebugEnabled()) {
-                    log.debug("isValid() failed.", e);
+                    log.debug("isValid() failed.", PoolUtilities.maskCredentials(e));
                 }
                 return false;
             } catch (Throwable x) {
@@ -1078,11 +1181,13 @@ public class PooledConnection implements PooledConnectionMBean {
                 // keeps the fatal conditions it keeps everywhere else.
                 ExceptionUtils.handleThrowable(x);
                 if (getPoolProperties().getLogValidationErrors()) {
-                    log.error(MessageFactory.get("pooledConnection.isValidFailed"), x);
+                    log.error(MessageFactory.get("pooledConnection.isValidFailed"),
+                            PoolUtilities.maskCredentials(x));
                 } else {
                     // Logged like the unchecked case above: this is the
                     // same anomaly one type further out
-                    log.warn(MessageFactory.get("pooledConnection.isValidFailed"), x);
+                    log.warn(MessageFactory.get("pooledConnection.isValidFailed"),
+                            PoolUtilities.maskCredentials(x));
                 }
                 return false;
             } finally {
@@ -1134,9 +1239,10 @@ public class PooledConnection implements PooledConnectionMBean {
             // the pooled connection, whatever the throw's type.
             ExceptionUtils.handleThrowable(ex);
             if (getPoolProperties().getLogValidationErrors()) {
-                log.error(MessageFactory.get("pooledConnection.sqlValidationError"), ex);
+                log.error(MessageFactory.get("pooledConnection.sqlValidationError"),
+                        PoolUtilities.maskCredentials(ex));
             } else if (log.isDebugEnabled()) {
-                log.debug("Unable to validate object:", ex);
+                log.debug("Unable to validate object:", PoolUtilities.maskCredentials(ex));
             }
             if (stmt != null) {
                 try {
@@ -1173,21 +1279,21 @@ public class PooledConnection implements PooledConnectionMBean {
             }
             return true;
         } catch (SQLException e) {
-            log.debug("Failed to commit transaction", e);
+            log.debug("Failed to commit transaction", PoolUtilities.maskCredentials(e));
         } catch (Throwable e) {
             // A non-fatal Error is the same failed commit an unchecked
             // exception is: it must not escape through the caller's finally
             // block and strand the connection.
             ExceptionUtils.handleThrowable(e);
             if (getPoolProperties().getLogValidationErrors()) {
-                log.error(MessageFactory.get("pooledConnection.commitFailed"), e);
+                log.error(MessageFactory.get("pooledConnection.commitFailed"), PoolUtilities.maskCredentials(e));
             } else {
                 // The unchecked variant is logged at warn rather than debug,
                 // like the rollback helper's: the caller surfaces it only as
                 // the generic validation failure, so at the default log level
                 // a driver that fails to commit would otherwise destroy
                 // connection after connection with no trace anywhere
-                log.warn(MessageFactory.get("pooledConnection.commitFailed"), e);
+                log.warn(MessageFactory.get("pooledConnection.commitFailed"), PoolUtilities.maskCredentials(e));
             }
         }
         return false;
@@ -1201,7 +1307,7 @@ public class PooledConnection implements PooledConnectionMBean {
             }
             return true;
         } catch (SQLException e) {
-            log.debug("Failed to rollback transaction", e);
+            log.debug("Failed to rollback transaction", PoolUtilities.maskCredentials(e));
         } catch (Throwable e) {
             // A non-fatal Error is handled exactly like the unchecked
             // failure below.
@@ -1214,7 +1320,7 @@ public class PooledConnection implements PooledConnectionMBean {
             // converts it, and strand the pooled connection between the
             // idle and busy queues
             if (getPoolProperties().getLogValidationErrors()) {
-                log.error(MessageFactory.get("pooledConnection.rollbackFailed"), e);
+                log.error(MessageFactory.get("pooledConnection.rollbackFailed"), PoolUtilities.maskCredentials(e));
             } else {
                 // The unchecked variant is an anomaly of the same kind as
                 // a throwing custom Validator, and unlike the checked
@@ -1224,7 +1330,7 @@ public class PooledConnection implements PooledConnectionMBean {
                 // level a driver that fails to end a transaction unchecked
                 // would destroy connection after connection with no trace
                 // anywhere
-                log.warn(MessageFactory.get("pooledConnection.rollbackFailed"), e);
+                log.warn(MessageFactory.get("pooledConnection.rollbackFailed"), PoolUtilities.maskCredentials(e));
             }
         }
         return false;
@@ -1272,7 +1378,7 @@ public class PooledConnection implements PooledConnectionMBean {
                 // pool uses to retire the slot and count the release.
                 ExceptionUtils.handleThrowable(x);
                 if (log.isDebugEnabled()) {
-                    log.debug("Unable to close SQL connection", x);
+                    log.debug("Unable to close SQL connection", PoolUtilities.maskCredentials(x));
                 }
             }
         }
@@ -1365,11 +1471,20 @@ public class PooledConnection implements PooledConnectionMBean {
      * @throws IllegalStateException if this method is called with the value false and the value true has already been
      *                                   set.
      */
-    public void setDiscarded(boolean discarded) {
-        if (this.discarded && !discarded) {
+    public synchronized void setDiscarded(boolean discarded) {
+        if (discarded) {
+            this.discarded = true;
+        } else if (this.discarded) {
             throw new IllegalStateException(MessageFactory.get("pooledConnection.discardedStateChange"));
         }
-        this.discarded = discarded;
+        // A request to clear a flag that is already clear takes no write. The
+        // flag only ever transitions false-to-true through this setter, so a
+        // clear racing a discard can no longer read the false, be overtaken by
+        // the true, and write the false back: that interleaving resurrected a
+        // connection the pool had retired. The lifecycle reset that a reconnect
+        // performs clears the field under the same monitor (see connect()), and
+        // only before the replacement session is established, so a discard
+        // raised while that session is connecting is not overwritten.
     }
 
     /**
@@ -1401,6 +1516,10 @@ public class PooledConnection implements PooledConnectionMBean {
      */
     public void setPoolProperties(PoolConfiguration poolProperties) {
         this.poolProperties = poolProperties;
+        // The cached driver was built from the old configuration; the next
+        // reconnect must build one from the configuration now in effect.
+        this.driver = null;
+        this.driverClass = null;
     }
 
     /**
@@ -1431,7 +1550,7 @@ public class PooledConnection implements PooledConnectionMBean {
      * Returns the timestamp at which the last successful validation completed on the current physical session. While
      * the session has not been validated it reports 0, so a validation inherited from the session a reconnect replaced
      * cannot be mistaken for one of this session. Before any session has been established, it reports the time this
-     * pooled connection was created.
+     * pooled connection was created; disconnecting the session clears the timestamp with it.
      *
      * @return the timestamp at which the last successful validation completed as defined by
      *             {@link System#currentTimeMillis()}, or 0 while the current session has not been validated
@@ -1566,10 +1685,11 @@ public class PooledConnection implements PooledConnectionMBean {
                     try {
                         interceptor.reset(null, null);
                     } catch (Throwable t) {
+                        ExceptionUtils.handleThrowable(t);
                         // One broken interceptor must not stop the rest of the
                         // chain from being reset
                         log.warn(MessageFactory.get("pooledConnection.interceptorResetFailed",
-                                interceptor.getClass().getName()), t);
+                                interceptor.getClass().getName()), PoolUtilities.maskCredentials(t));
                     }
                     interceptor = next;
                 }
@@ -1607,9 +1727,35 @@ public class PooledConnection implements PooledConnectionMBean {
     }
 
     /**
-     * Returns the attributes map for this connection.
+     * Records whether the current borrow of this connection was counted as a borrow and still owes its return
+     * statistic.
      *
-     * @return the attributes map
+     * @param borrowCounted {@code true} if the current borrow was counted
+     */
+    void setBorrowCounted(boolean borrowCounted) {
+        this.borrowCounted = borrowCounted;
+    }
+
+    /**
+     * Returns whether the current borrow of this connection was counted as a borrow and its return has not yet been
+     * counted.
+     *
+     * @return {@code true} if a return of this borrow is still to be counted
+     */
+    boolean isBorrowCounted() {
+        return borrowCounted;
+    }
+
+    /**
+     * Returns the attributes map for this connection.
+     * <p>
+     * This is the live internal map, not a copy: the pool and the interceptor chain read and write it while the
+     * session runs. It also holds the plaintext credential entries the connect path mirrors there, so it is intended
+     * for internal and trusted interceptor code; application code that obtains a {@link PooledConnection} through the
+     * delegate or reflection must not treat this as a public, credential-free view. The wrapper contract refuses the
+     * internal pooled connection; this accessor is the one internal surface that still exposes it.
+     *
+     * @return the live attributes map for this connection
      */
     public HashMap<Object, Object> getAttributes() {
         return attributes;
@@ -1643,7 +1789,8 @@ public class PooledConnection implements PooledConnectionMBean {
     /**
      * Releases the MBeans published for this connection and for the interceptors of its chain, without releasing the
      * physical session. The pool uses this when its own MBean is released while the pool stays live: the connection
-     * and its chain remain usable, and a later borrow or reconnect can publish them again.
+     * and its chain remain usable, and a later reconnect, or the sweep that runs when the pool's own MBean is registered
+     * again, can publish them again. An ordinary borrow does not publish a connection MBean.
      */
     public void unregisterMBean() {
         synchronized (this) {
@@ -1660,7 +1807,7 @@ public class PooledConnection implements PooledConnectionMBean {
                 // its MBean must not keep the others registered
                 ExceptionUtils.handleThrowable(x);
                 if (log.isDebugEnabled()) {
-                    log.debug("Unable to unregister interceptor MBean", x);
+                    log.debug("Unable to unregister interceptor MBean", PoolUtilities.maskCredentials(x));
                 }
             }
         }

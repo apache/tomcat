@@ -313,7 +313,7 @@ public class ELProcessor {
                 if (paramString.isEmpty()) {
                     parameterTypeNames = EMPTY_STRING_ARRAY;
                 } else {
-                    parameterTypeNames = paramString.split(",");
+                    parameterTypeNames = paramString.split(",", -1);
                     ImportHandler importHandler = context.getImportHandler();
                     for (int i = 0; i < parameterTypeNames.length; i++) {
                         String parameterTypeName = parameterTypeNames[i].strip();

@@ -263,11 +263,63 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
         // Increase the flow control window but keep it under the limit
         sendWindowUpdate(3, 1 << 30);
 
-        // Now increase beyond the limit via a settings frame
+        // Now increase beyond the limit via a settings frame.
+        // Per RFC 9113 section 6.9.2 this must be treated as a connection error
+        // of type FLOW_CONTROL_ERROR, not a stream error.
         sendSettings(0, false, new SettingValue(4, 1 << 30));
-        // Ack
-        parser.readFrame();
-        Assert.assertEquals("3-RST-[" + Http2Error.FLOW_CONTROL_ERROR.getCode() + "]\n", output.getTrace());
+        handleGoAwayResponse(3, Http2Error.FLOW_CONTROL_ERROR);
+    }
 
+
+    @Test
+    public void testDataFrameExceedsFlowControlWindow() throws Exception {
+        // Configure the server with a small initial flow-control window so it
+        // is easy to exceed from a test.
+        enableHttp2();
+        http2Protocol.setInitialWindowSize(1024);
+        configureAndStartWebApplication();
+        openClientConnection();
+        doHttpUpgrade();
+        sendClientPreface();
+
+        // Read initial server frames. The exact count varies (SETTINGS, SETTINGS-ACK,
+        // PING, response HEADERS and DATA for the upgrade request on stream 1).
+        parser.readFrame();
+        parser.readFrame();
+        parser.readFrame();
+        parser.readFrame();
+        parser.readFrame();
+
+        // Confirm the expected SETTINGS frame is present
+        String trace = output.getTrace();
+        Assert.assertTrue(trace, trace.contains("0-Settings-[4]-[1024]"));
+        output.clearTrace();
+
+        // Open a stream so the server expects request body data.
+        sendSimplePostRequest(3, null, false);
+        output.clearTrace();
+
+        // Send 2 kB of data, exceeding the advertised 1 kB stream window.
+        // Expect the stream to be reset with FLOW_CONTROL_ERROR; the connection
+        // must remain open because this is a stream-level window violation.
+        sendData(3, new byte[2048]);
+
+        // A connection-level WINDOW_UPDATE may precede the RST_STREAM as a
+        // side-effect of consuming the excess payload.
+        while (!output.getTrace().contains("3-RST-")) {
+            parser.readFrame();
+        }
+        Assert.assertTrue(output.getTrace(),
+                output.getTrace().contains("3-RST-[" + Http2Error.FLOW_CONTROL_ERROR.getCode() + "]"));
+        output.clearTrace();
+
+        // The connection must still be open and usable for other streams.
+        sendSimpleGetRequest(5);
+        // The response to the upgrade request on stream 1 may still be pending so
+        // keep reading until the end of the response on stream 5 has been seen.
+        while (!output.getTrace().contains("5-EndOfStream")) {
+            parser.readFrame();
+        }
+        Assert.assertTrue(output.getTrace(), output.getTrace().contains(getSimpleResponseTrace(5)));
     }
 }

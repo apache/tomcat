@@ -49,6 +49,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.management.ObjectName;
 import javax.sql.XAConnection;
 
 import org.apache.juli.logging.Log;
@@ -56,6 +57,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.interceptor.QueryTimeoutInterceptor;
 import org.apache.tomcat.jdbc.pool.interceptor.StatementCache;
 import org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer;
+import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
 import org.apache.tomcat.jdbc.pool.util.ExceptionUtils;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
@@ -187,10 +189,19 @@ public class ConnectionPool {
     private volatile Constructor<?> xaProxyClassConstructor;
 
     /**
-     * Executor service used to cancel Futures
+     * Executor service used to cancel Futures. It is per pool, with one daemon worker on the pool module's class
+     * loader: a cleanup task that blocks in a driver call must not keep the JVM alive or pin the class loader of the
+     * thread that first cancelled a future. The worker exits after its idle keep-alive, and close() does not shut the
+     * executor down because a cancellation racing the close can still need its cleanup to return a produced
+     * connection; the cleanup itself sees the closed pool and releases what it retrieves.
      */
     private ThreadPoolExecutor cancellator = new ThreadPoolExecutor(0, 1, 1000, TimeUnit.MILLISECONDS,
-            new LinkedBlockingQueue<>());
+            new LinkedBlockingQueue<>(), r -> {
+                Thread t = new Thread(r, "JDBC-Pool-Cancellator");
+                t.setDaemon(true);
+                t.setContextClassLoader(ConnectionPool.class.getClassLoader());
+                return t;
+            });
 
     /**
      * reference to the JMX mbean. close() gives it up without holding any pool lock while other threads still notify
@@ -228,8 +239,14 @@ public class ConnectionPool {
      * @param prop PoolProperties - all the properties for this connection pool
      *
      * @throws SQLException Pool initialization error
+     * @throws IllegalArgumentException if {@code prop} is a display-only bean/JMX configuration view instead of the
+     *                                      underlying {@link PoolProperties}
      */
     public ConnectionPool(PoolConfiguration prop) throws SQLException {
+        if (prop instanceof DataSourceProxy || prop instanceof org.apache.tomcat.jdbc.pool.jmx.ConnectionPool) {
+            throw new IllegalArgumentException(
+                    MessageFactory.get("poolProperties.displayConfigurationNotAllowed"));
+        }
         init(prop);
     }
 
@@ -237,9 +254,12 @@ public class ConnectionPool {
     /**
      * Retrieves a Connection future. If a connection is not available, one can block using future.get() until a
      * connection has become available. If a connection is not retrieved, the Future must be cancelled in order for the
-     * connection to be returned to the pool. Closing the pool cancels a future that has not received a connection yet,
-     * so a thread blocked in {@link Future#get()} observes a {@link java.util.concurrent.CancellationException} instead
-     * of waiting for a connection that can no longer be handed out.
+     * connection to be returned to the pool. Cancellation only applies while the future is not complete: a future for
+     * a connection that was already available is complete when this method returns, its {@code cancel()} reports
+     * {@code false} as for any completed {@link Future}, and the caller must retrieve the connection and close it
+     * instead. Closing the pool cancels a future that has not received a connection yet, so a thread blocked in
+     * {@link Future#get()} observes a {@link java.util.concurrent.CancellationException} instead of waiting for a
+     * connection that can no longer be handed out.
      *
      * @return a Future containing a reference to the connection or the future connection
      *
@@ -427,20 +447,28 @@ public class ConnectionPool {
      * @throws SQLException if an interceptor can't be configured, if the proxy can't be instantiated
      */
     protected Connection setupConnection(PooledConnection con) throws SQLException {
-        // The connection is being handed to a borrower: a borrow is counted
-        // here rather than where it was claimed, as that is the one point all
-        // hand-offs pass - the synchronous borrows, the async borrow that
-        // takes an idle connection, the configuration of a connection a queue
-        // handed to an async poll, and the cleanup that retrieves a cancelled
-        // poll's connection to return it - each exactly once, while a claim
-        // that ends in a throw never reaches a borrower at all. A setup that
-        // fails gives the connection back through abandonSetup(), which counts
-        // the return, so the borrow is counted on the way in to match. The
-        // pool's own initialization is the only path that takes connections
-        // out of the creation route without a borrower: it returns its
-        // preloaded connections directly and never sets one up here, so it
-        // stays out of the count.
-        borrowedCount.incrementAndGet();
+        return setupConnection(con, true);
+    }
+
+    /**
+     * Configures a pooled connection as a proxy, optionally without counting the hand-off as a borrow. Internal
+     * cleanup paths use the non-counting form: they set a connection up only to close it again and no application
+     * caller ever receives it.
+     *
+     * @param con         a PooledConnection to wrap in a Proxy
+     * @param countBorrow whether this hand-off is a borrower's borrow and must be counted
+     *
+     * @return a Connection object wrapping the pooled connection
+     *
+     * @throws SQLException if the setup fails
+     */
+    private Connection setupConnection(PooledConnection con, boolean countBorrow) throws SQLException {
+        // A close or an abandonment can have landed between the borrow's own
+        // publication of the connection and this method: the connection must
+        // fail the borrow rather than be set up into a handle with no live
+        // session behind it.
+        checkSetupStillValid(con);
+        con.setBorrowCounted(false);
         // Fetch previously cached interceptor proxy - one per connection
         JdbcInterceptor handler = con.getHandler();
         if (handler == null) {
@@ -477,7 +505,7 @@ public class ConnectionPool {
                     interceptor.setNext(handler);
                     handler = interceptor;
                 } catch (Throwable x) {
-                    ExceptionUtils.handleThrowable(x);
+                    ExceptionUtils.handleThrowable(ExceptionUtils.unwrapInvocationTargetException(x));
                     SQLException sx = new SQLException(MessageFactory.get("connectionPool.unableToInstantiateInterceptorChain"));
                     sx.initCause(x);
                     // Nothing has been done to the connection, it can go back to the pool
@@ -531,6 +559,7 @@ public class ConnectionPool {
         // useStatementFacade property that used to switch this off is
         // deprecated and no longer has any effect.)
         handler = new StatementFacade(handler);
+        Connection connection;
         try {
             Constructor<?> proxyConstructor = getProxyConstructor(con.getXAConnection() != null);
             // TODO possible optimization, keep track if this connection was returned properly, and don't generate a new
@@ -541,7 +570,7 @@ public class ConnectionPool {
             // for the next borrower. (The useDisposableConnectionFacade
             // property that used to switch this off is deprecated and no
             // longer has any effect.)
-            Connection connection = (Connection) proxyConstructor
+            connection = (Connection) proxyConstructor
                     .newInstance(new Object[] { new DisposableConnectionFacade(handler) });
             // Tell the bottom of the chain which handle this borrow is served under. The chain is shared
             // between the borrows of this pooled connection and only the handle is per-borrow: a call left
@@ -557,7 +586,6 @@ public class ConnectionPool {
             // begins here. The matching endRequest() is sent at the return,
             // in returnConnection().
             invokeRequestHint(BEGIN_REQUEST, con.getConnection());
-            return connection;
         } catch (Throwable x) {
             ExceptionUtils.handleThrowable(x);
             SQLException s = new SQLException();
@@ -572,12 +600,52 @@ public class ConnectionPool {
             abandonSetup(con, s, true);
             throw s;
         }
+        // The release that a close or an abandonment performs can also have
+        // landed while the handle above was being built. The handle must not
+        // be handed out over a connection that is already out of service.
+        checkSetupStillValid(con);
+        // Every check above passed and the handle is about to reach its
+        // caller: count the borrow at the hand-off. A setup that failed before
+        // this point never reached a borrower, and it neither moves this
+        // counter nor - through abandonSetup() - the returned one. An internal
+        // cleanup setup does not count, so closing the handle it produced does
+        // not count as a return either.
+        if (countBorrow) {
+            con.setBorrowCounted(true);
+            borrowedCount.incrementAndGet();
+        }
+        return connection;
 
     }
 
     /**
-     * Gives up a connection that was borrowed but could not be set up, so that it does not stay borrowed forever. Any
-     * failure to do so is added to the exception that is about to be thrown rather than hiding it.
+     * Fails a setup whose pooled connection is already out of service, or whose pool has closed, instead of returning a
+     * handle that no live session backs. The connection is discarded through {@link #abandonSetup}, so a close that
+     * raced the setup has neither a stale busy entry nor an unfinished chain left behind.
+     *
+     * @param con the pooled connection being set up
+     *
+     * @throws SQLException if the pool has closed or the connection has been released
+     */
+    private void checkSetupStillValid(PooledConnection con) throws SQLException {
+        String message;
+        if (isClosed()) {
+            message = MessageFactory.get("connectionPool.poolClosedDuringSetup");
+        } else if (con.isReleased() || con.isDiscarded()) {
+            message = MessageFactory.get("connectionPool.connectionReleasedDuringSetup");
+        } else {
+            return;
+        }
+        SQLException sx = new SQLException(message);
+        abandonSetup(con, sx, true);
+        throw sx;
+    }
+
+    /**
+     * Gives up a connection that was borrowed but could not be set up, so that it does not stay borrowed forever. The
+     * failed setup never reached a borrower, so the hand-back is not counted as a return; the borrow is not counted
+     * until {@link #setupConnection(PooledConnection)} reaches its hand-off. Any failure to give the connection back is
+     * added to the exception that is about to be thrown rather than hiding it.
      *
      * @param con     the borrowed connection
      * @param cause   the exception that is about to be thrown to the caller
@@ -588,7 +656,7 @@ public class ConnectionPool {
             if (discard) {
                 con.setDiscarded(true);
             }
-            returnConnection(con);
+            returnConnection(con, false);
         } catch (Exception y) {
             cause.addSuppressed(y);
         }
@@ -605,8 +673,9 @@ public class ConnectionPool {
     private static Method getRequestHintMethod(String methodName) {
         try {
             return Connection.class.getMethod(methodName);
-        } catch (NoSuchMethodException x) {
-            // Java 8 and earlier: there are no request boundary hints to send
+        } catch (NoSuchMethodException | SecurityException x) {
+            // Java 8 and earlier has no request boundary hints; a runtime that refuses the lookup for security
+            // reasons likewise has none the pool may use.
             return null;
         }
     }
@@ -627,9 +696,10 @@ public class ConnectionPool {
             hint.invoke(connection);
         } catch (InvocationTargetException x) {
             log.warn(MessageFactory.get("connectionPool.requestHintRefused", hint.getName()),
-                    x.getTargetException());
+                    PoolUtilities.maskCredentials(x.getTargetException()));
         } catch (ReflectiveOperationException | IllegalArgumentException x) {
-            log.warn(MessageFactory.get("connectionPool.unableToSendRequestHint", hint.getName()), x);
+            log.warn(MessageFactory.get("connectionPool.unableToSendRequestHint", hint.getName()),
+                    PoolUtilities.maskCredentials(x));
         }
     }
 
@@ -707,9 +777,11 @@ public class ConnectionPool {
                     try {
                         release(con);
                     } catch (Throwable x) {
+                        ExceptionUtils.handleThrowable(x);
                         // One failing connection must not leave the
                         // remaining idle and busy connections undisconnected
-                        log.warn(MessageFactory.get("connectionPool.unableToClosePooledConnection"), x);
+                        log.warn(MessageFactory.get("connectionPool.unableToClosePooledConnection"),
+                                PoolUtilities.maskCredentials(x));
                     }
                     if (!pool.isEmpty()) {
                         con = pool.poll(1000, TimeUnit.MILLISECONDS);
@@ -734,9 +806,25 @@ public class ConnectionPool {
         if (interrupted && getPoolProperties().getPropagateInterruptState()) {
             Thread.currentThread().interrupt();
         }
-        if (this.getPoolProperties().isJmxEnabled()) {
-            this.jmxPool = null;
+        // Release the pool MBean and every connection/interceptor MBean
+        // published below it before forgetting the JMX wrapper. A
+        // container-managed DataSource has already released these before
+        // it closes the pool; a directly registered pool MBean has no
+        // other owner to do it, and leaving it registered would keep the
+        // closed pool reachable from the MBean server. The decision is based
+        // on whether a wrapper was created, not on the live jmxEnabled
+        // property: that property can be changed directly on the backing
+        // configuration after the pool started, and a pool that published an
+        // MBean must still release it when it closes.
+        org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = this.jmxPool;
+        if (jmx != null) {
+            unregisterConnectionMBeans();
+            ObjectName name = jmx.getObjectName();
+            if (name != null) {
+                JmxUtil.unregisterJmx(name);
+            }
         }
+        this.jmxPool = null;
         // Tell the interceptors about the close, once per definition. The
         // definitions from the start come first, then the current list, then
         // the definitions the connection chains were actually built from, so a
@@ -754,7 +842,8 @@ public class ConnectionPool {
             // A malformed list must not abort the close or skip the
             // notifications already recorded.
             ExceptionUtils.handleThrowable(x);
-            log.warn(MessageFactory.get("connectionPool.unableToParseInterceptorChain"), x);
+            log.warn(MessageFactory.get("connectionPool.unableToParseInterceptorChain"),
+                    PoolUtilities.maskCredentials(x));
             proxies = new PoolProperties.InterceptorDefinition[0];
         }
         for (int i = 0; i < proxies.length; i++) {
@@ -785,9 +874,9 @@ public class ConnectionPool {
             interceptor.setProperties(definition.getProperties());
             interceptor.poolClosed(this);
         } catch (Throwable x) {
-            ExceptionUtils.handleThrowable(x);
+            ExceptionUtils.handleThrowable(ExceptionUtils.unwrapInvocationTargetException(x));
             if (log.isDebugEnabled()) {
-                log.debug("Unable to inform interceptor of pool closure.", x);
+                log.debug("Unable to inform interceptor of pool closure.", PoolUtilities.maskCredentials(x));
             }
         }
     }
@@ -893,8 +982,9 @@ public class ConnectionPool {
                 interceptor.setProperties(proxies[i].getProperties());
                 interceptor.poolStarted(this);
             } catch (Throwable x) {
-                ExceptionUtils.handleThrowable(x);
-                log.error(MessageFactory.get("connectionPool.unableToInformInterceptorOfPoolStart"), x);
+                ExceptionUtils.handleThrowable(ExceptionUtils.unwrapInvocationTargetException(x));
+                log.error(MessageFactory.get("connectionPool.unableToInformInterceptorOfPoolStart"),
+                        PoolUtilities.maskCredentials(x));
                 org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = jmxPool;
                 if (jmx != null) {
                     jmx.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.NOTIFY_INIT, getStackTrace(x));
@@ -925,7 +1015,8 @@ public class ConnectionPool {
 
         } catch (Throwable x) {
             ExceptionUtils.handleThrowable(x);
-            log.error(MessageFactory.get("connectionPool.unableToCreateInitialConnections"), x);
+            log.error(MessageFactory.get("connectionPool.unableToCreateInitialConnections"),
+                    PoolUtilities.maskCredentials(x));
             if (!poolProperties.isIgnoreExceptionOnPreLoad()) {
                 org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = jmxPool;
                 if (jmx != null) {
@@ -963,7 +1054,8 @@ public class ConnectionPool {
             // The constructor has already acquired resources that no caller can
             // reach once it fails, so close the partially built pool first.
             ExceptionUtils.handleThrowable(x);
-            log.error(MessageFactory.get("connectionPool.unableToInitializePoolCleaner"), x);
+            log.error(MessageFactory.get("connectionPool.unableToInitializePoolCleaner"),
+                    PoolUtilities.maskCredentials(x));
             close(true);
             SQLException ex = new SQLException(x.getMessage());
             ex.initCause(x);
@@ -1297,10 +1389,12 @@ public class ConnectionPool {
      * thread safe way to release a connection
      *
      * @param con PooledConnection
+     *
+     * @return {@code true} if this call took the connection out of service, {@code false} if it was already released
      */
-    protected void release(PooledConnection con) {
+    protected boolean release(PooledConnection con) {
         if (con == null) {
-            return;
+            return false;
         }
         boolean destroyed;
         try {
@@ -1389,6 +1483,7 @@ public class ConnectionPool {
                 createdCount.incrementAndGet();
             }
         }
+        return destroyed;
     }
 
     /**
@@ -1955,7 +2050,8 @@ public class ConnectionPool {
             }
             return true;
         } catch (SQLException x) {
-            log.warn(MessageFactory.get("connectionPool.unableToTerminateTransaction"), x);
+            log.warn(MessageFactory.get("connectionPool.unableToTerminateTransaction"),
+                    PoolUtilities.maskCredentials(x));
             return false;
         }
 
@@ -1981,7 +2077,7 @@ public class ConnectionPool {
                 return true;
             }
         } catch (SQLException e) {
-            log.warn(MessageFactory.get("connectionPool.unableToCheckClosed"), e);
+            log.warn(MessageFactory.get("connectionPool.unableToCheckClosed"), PoolUtilities.maskCredentials(e));
             return true;
         }
         if (isClosed()) {
@@ -2045,7 +2141,8 @@ public class ConnectionPool {
                 // connection that expired and failed - the pool identity
                 // would send operators chasing one session to the wrong
                 // subject entirely
-                log.error(MessageFactory.get("connectionPool.failedToReconnectExpired", con), e);
+                log.error(MessageFactory.get("connectionPool.failedToReconnectExpired", con),
+                        PoolUtilities.maskCredentials(e));
                 return false;
             }
         }
@@ -2072,6 +2169,17 @@ public class ConnectionPool {
      *                        permanently ahead of the borrowed one
      */
     private void returnConnection(PooledConnection con, boolean countReturn) {
+        if (con != null && countReturn && con.isBorrowCounted()) {
+            // A borrower's hand-back is the counterpart of its borrow. Count
+            // it before the closed check below: a connection returned after
+            // the pool closed is released rather than queued, but it was
+            // still handed back by its borrower and must pair with the borrow
+            // counted when it was served. A connection set up by an internal
+            // cleanup was never counted as borrowed, so its close must not
+            // count as a return either.
+            con.setBorrowCounted(false);
+            returnedCount.incrementAndGet();
+        }
         if (isClosed()) {
             // If the connection pool is closed
             // close the connection instead of returning it
@@ -2081,13 +2189,6 @@ public class ConnectionPool {
 
         if (con != null) {
             try {
-                if (countReturn) {
-                    // A borrower's hand-back is the counterpart of its borrow;
-                    // the pool's preload returns connections it never handed
-                    // out, and counting those would run the returned count
-                    // permanently ahead of the borrowed one
-                    returnedCount.incrementAndGet();
-                }
                 con.lock();
                 if (con.isSuspect()) {
                     if (poolProperties.isLogAbandoned() && log.isInfoEnabled()) {
@@ -2112,7 +2213,8 @@ public class ConnectionPool {
                                 // caller for which a refused clear carries no
                                 // outcome anyone can act on, unlike the JMX
                                 // operation, which reports it to its client
-                                log.warn(MessageFactory.get("pooledConnection.unableToClearWarnings"), x);
+                                log.warn(MessageFactory.get("pooledConnection.unableToClearWarnings"),
+                                        PoolUtilities.maskCredentials(x));
                             }
                             con.setStackTrace(null);
                             con.setTimestamp(System.currentTimeMillis());
@@ -2199,7 +2301,8 @@ public class ConnectionPool {
                         // the driver that failed.
                         con.setDiscarded(true);
                         release(con);
-                        log.warn(MessageFactory.get("connectionPool.unableToReturnConnection", con), x);
+                        log.warn(MessageFactory.get("connectionPool.unableToReturnConnection", con),
+                                PoolUtilities.maskCredentials(x));
                     }
                 } else {
                     if (log.isDebugEnabled()) {
@@ -2278,10 +2381,10 @@ public class ConnectionPool {
             }
         } catch (ConcurrentModificationException e) {
             if (log.isDebugEnabled()) {
-                log.debug("checkAbandoned failed.", e);
+                log.debug("checkAbandoned failed.", PoolUtilities.maskCredentials(e));
             }
         } catch (Exception e) {
-            log.warn(MessageFactory.get("connectionPool.checkAbandonedFailed"), e);
+            log.warn(MessageFactory.get("connectionPool.checkAbandonedFailed"), PoolUtilities.maskCredentials(e));
         }
     }
 
@@ -2307,7 +2410,11 @@ public class ConnectionPool {
             }
             long now = System.currentTimeMillis();
             Iterator<PooledConnection> unlocked = idle.iterator();
-            while ((ignoreMinSize || (idle.size() >= getPoolProperties().getMinIdle())) && unlocked.hasNext()) {
+            // Walk every idle connection: a purge-stale connection is released regardless of
+            // the minIdle floor, even when the pool is already at or below it. The floor is
+            // applied to the release decision itself for the connections that are only idle
+            // past their release time.
+            while (unlocked.hasNext()) {
                 PooledConnection con = unlocked.next();
                 boolean setToNull = false;
                 try {
@@ -2317,7 +2424,7 @@ public class ConnectionPool {
                         continue;
                     }
                     long time = con.getTimestamp();
-                    if (shouldReleaseIdle(now, con, time)) {
+                    if (shouldReleaseIdle(now, con, time, ignoreMinSize)) {
                         // Claim the connection before acting on it; without
                         // a real lock the checks above may already be stale,
                         // and a connection a borrower took out of the idle
@@ -2325,8 +2432,9 @@ public class ConnectionPool {
                         if (!idle.remove(con)) {
                             continue;
                         }
-                        releasedIdleCount.incrementAndGet();
-                        release(con);
+                        if (release(con)) {
+                            releasedIdleCount.incrementAndGet();
+                        }
                         setToNull = true;
                     } else {
                         // Do nothing
@@ -2340,10 +2448,10 @@ public class ConnectionPool {
             }
         } catch (ConcurrentModificationException e) {
             if (log.isDebugEnabled()) {
-                log.debug("checkIdle failed.", e);
+                log.debug("checkIdle failed.", PoolUtilities.maskCredentials(e));
             }
         } catch (Exception e) {
-            log.warn(MessageFactory.get("connectionPool.checkIdleFailed"), e);
+            log.warn(MessageFactory.get("connectionPool.checkIdleFailed"), PoolUtilities.maskCredentials(e));
         }
 
     }
@@ -2359,12 +2467,28 @@ public class ConnectionPool {
      * @return {@code true} if the connection should be released
      */
     protected boolean shouldReleaseIdle(long now, PooledConnection con, long time) {
+        return shouldReleaseIdle(now, con, time, false);
+    }
+
+    /**
+     * Determines whether an idle connection should be released from the pool, optionally ignoring the
+     * {@link PoolConfiguration#getMinIdle() minIdle} floor for connections that are only past their release time.
+     * Purge-stale connections are always released: the floor protects connections that are merely idle, not ones a
+     * purge has already marked for retirement.
+     *
+     * @param now          the current time in milliseconds
+     * @param con          the pooled connection to evaluate
+     * @param time         the timestamp when the connection last became idle
+     * @param ignoreMinSize whether the minIdle floor may be ignored for an aged connection
+     *
+     * @return {@code true} if the connection should be released
+     */
+    protected boolean shouldReleaseIdle(long now, PooledConnection con, long time, boolean ignoreMinSize) {
         if (con.getConnectionVersion() < getPoolVersion()) {
             return true;
-        } else {
-            return (con.getReleaseTime() > 0) && ((now - time) > con.getReleaseTime()) &&
-                    (getSize() > getPoolProperties().getMinIdle());
         }
+        return (con.getReleaseTime() > 0) && ((now - time) > con.getReleaseTime()) &&
+                (ignoreMinSize || getSize() > getPoolProperties().getMinIdle());
     }
 
     /**
@@ -2438,8 +2562,11 @@ public class ConnectionPool {
                         // and to the close() drain alike. Take it out of
                         // service instead, as a failed check already does.
                         con.setDiscarded(true);
-                        release(con);
-                        log.warn(MessageFactory.get("connectionPool.unableToTestIdleConnection", con), x);
+                        if (release(con)) {
+                            releasedIdleCount.incrementAndGet();
+                        }
+                        log.warn(MessageFactory.get("connectionPool.unableToTestIdleConnection", con),
+                                PoolUtilities.maskCredentials(x));
                         continue;
                     }
                     if (keep) {
@@ -2452,7 +2579,9 @@ public class ConnectionPool {
                             // path does - an offer would land it in a dead
                             // queue that nothing drains any more, stranding
                             // the session out of every counter
-                            release(con);
+                            if (release(con)) {
+                                releasedIdleCount.incrementAndGet();
+                            }
                         } else if (((idle.size() >= poolProperties.getMaxIdle()) &&
                                 !poolProperties.isPoolSweeperEnabled()) || (!idle.offer(con))) {
                             if (log.isDebugEnabled()) {
@@ -2460,7 +2589,9 @@ public class ConnectionPool {
                                         "not returned to the pool, idle[" + idle.size() + "]>=maxIdle[" +
                                         poolProperties.getMaxIdle() + "] idle.offer failed.");
                             }
-                            release(con);
+                            if (release(con)) {
+                                releasedIdleCount.incrementAndGet();
+                            }
                         } else if (isClosed() && idle.remove(con)) {
                             // The closed check above and this offer are not
                             // one atomic step: a close arriving in between
@@ -2472,11 +2603,14 @@ public class ConnectionPool {
                                 log.debug("Connection [" + con +
                                         "] was offered back after the close drained the queue and is closed now.");
                             }
-                            release(con);
+                            if (release(con)) {
+                                releasedIdleCount.incrementAndGet();
+                            }
                         }
                     } else {
-                        releasedIdleCount.incrementAndGet();
-                        release(con);
+                        if (release(con)) {
+                            releasedIdleCount.incrementAndGet();
+                        }
                     }
                 } finally {
                     con.unlock();
@@ -2484,10 +2618,10 @@ public class ConnectionPool {
             }
         } catch (ConcurrentModificationException e) {
             if (log.isDebugEnabled()) {
-                log.debug("testAllIdle failed.", e);
+                log.debug("testAllIdle failed.", PoolUtilities.maskCredentials(e));
             }
         } catch (Exception e) {
-            log.warn(MessageFactory.get("connectionPool.testAllIdleFailed"), e);
+            log.warn(MessageFactory.get("connectionPool.testAllIdleFailed"), PoolUtilities.maskCredentials(e));
         }
 
     }
@@ -2527,9 +2661,10 @@ public class ConnectionPool {
         } else {
             java.io.ByteArrayOutputStream bout = new java.io.ByteArrayOutputStream();
             java.io.PrintStream writer = new java.io.PrintStream(bout);
-            x.printStackTrace(writer);
+            PoolUtilities.maskCredentials(x).printStackTrace(writer);
             String result = bout.toString();
-            return (x.getMessage() != null && x.getMessage().length() > 0) ? x.getMessage() + ";" + result : result;
+            String message = PoolProperties.maskCredentials(x.getMessage());
+            return (message != null && message.length() > 0) ? message + ";" + result : result;
         }
     }
 
@@ -2581,10 +2716,11 @@ public class ConnectionPool {
             try {
                 handler.reset(null, null);
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 // One broken interceptor must not stop the rest of the
                 // chain from being reset
                 log.warn(MessageFactory.get("connectionPool.interceptorResetFailed",
-                        handler.getClass().getName()), t);
+                        handler.getClass().getName()), PoolUtilities.maskCredentials(t));
             }
             handler = next;
         }
@@ -2605,10 +2741,11 @@ public class ConnectionPool {
             try {
                 handler.disconnected(this, con, finalizing);
             } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 // One broken interceptor must not stop the rest of the
                 // chain from being notified
                 log.warn(MessageFactory.get("connectionPool.interceptorDisconnectedFailed",
-                        handler.getClass().getName()), t);
+                        handler.getClass().getName()), PoolUtilities.maskCredentials(t));
             }
             handler = next;
         }
@@ -2630,7 +2767,8 @@ public class ConnectionPool {
         try {
             jmxPool = new org.apache.tomcat.jdbc.pool.jmx.ConnectionPool(this);
         } catch (Exception x) {
-            log.warn(MessageFactory.get("connectionPool.unableToStartJmx", getName()), x);
+            log.warn(MessageFactory.get("connectionPool.unableToStartJmx", getName()),
+                    PoolUtilities.maskCredentials(x));
         }
     }
 
@@ -2656,7 +2794,8 @@ public class ConnectionPool {
     /**
      * Releases the MBeans published for the connections this pool currently holds and for the interceptors of their
      * chains, when the pool's own MBean is released while the pool stays live. The connections and their sessions are
-     * untouched; a later borrow or reconnect can publish them again.
+     * untouched; a later reconnect, or the sweep that runs when the pool's own MBean is registered again, can publish
+     * them again. An ordinary borrow does not publish a connection MBean.
      */
     public void unregisterConnectionMBeans() {
         unregisterConnectionMBeans(idle);
@@ -2672,7 +2811,7 @@ public class ConnectionPool {
                 // its MBeans must not keep the others registered
                 ExceptionUtils.handleThrowable(x);
                 if (log.isDebugEnabled()) {
-                    log.debug("Unable to unregister connection MBean", x);
+                    log.debug("Unable to unregister connection MBean", PoolUtilities.maskCredentials(x));
                 }
             }
         }
@@ -2792,7 +2931,7 @@ public class ConnectionPool {
      * cancellable
      */
     protected class ConnectionFuture implements Future<Connection>, Runnable {
-        Future<PooledConnection> pcFuture = null;
+        final Future<PooledConnection> pcFuture;
         /**
          * The claim on the pooled connection this future produces. The queue hands its connection to every caller of
          * the queue future, so this single compare-and-set is what decides who may act on it: a
@@ -2805,7 +2944,37 @@ public class ConnectionPool {
         CountDownLatch latch = new CountDownLatch(1);
         volatile Connection result = null;
         SQLException cause = null;
-        AtomicBoolean cancelled = new AtomicBoolean(false);
+        volatile boolean cancelled = false;
+        /**
+         * A terminal outcome observed by a caller, even when no connection was produced: a queue future that fails or
+         * times out has completed this future from the caller's perspective.
+         */
+        volatile boolean done = false;
+        /**
+         * Set when a timed get() gave up waiting for setup. The setup task then returns rather
+         * than publishing a connection no caller owns. Only the one get() that won the
+         * configuration claim can set it, and the setup worker is the only other reader, so a
+         * volatile flag is enough.
+         */
+        volatile boolean abandoned = false;
+        /**
+         * Whether a caller has observed the result published by the setup. Once true, a timed
+         * get() that subsequently gives up must not clear and close that result: it belongs to
+         * the caller that already took it. Guarded by this future's monitor, together with
+         * {@link #result}.
+         */
+        private boolean resultTaken = false;
+        /**
+         * The pooled connection whose configured handle was published as {@link #result} but not yet handed to a
+         * caller, so its borrow can be counted at the hand-off. Guarded by this future's monitor.
+         */
+        private PooledConnection configuredPooled = null;
+        /**
+         * Whether the configured connection's borrow has been counted. Set by the first caller that takes the
+         * published result, so concurrent getters still count one borrow for one connection. Guarded by this future's
+         * monitor.
+         */
+        private boolean borrowCounted = false;
         volatile PooledConnection pc = null;
 
         /**
@@ -2825,6 +2994,7 @@ public class ConnectionPool {
          * @throws SQLException if connection setup fails
          */
         public ConnectionFuture(PooledConnection pc) throws SQLException {
+            this.pcFuture = null;
             this.pc = pc;
             result = ConnectionPool.this.setupConnection(pc);
             configured.set(true);
@@ -2835,15 +3005,11 @@ public class ConnectionPool {
          */
         @Override
         public boolean cancel(boolean mayInterruptIfRunning) {
-            // On the async path the pc field is never assigned; once a
-            // connection has been produced it is held in the result field,
-            // so a non-null result means the future is complete and it is
-            // too late to cancel. A queue future the pool closure already
-            // cancelled is complete in the same way and leaves nothing to
-            // deregister and no connection to clean up, so report nothing
-            // cancelled without arming the deferred cleanup task, which a
-            // java.util.concurrent.Future must not run for a completed task.
-            if (pc != null || result != null || cancelled.get() || pcFuture.isCancelled()) {
+            // A completed future cannot be cancelled. The terminal outcomes
+            // include the queue future timing out or failing, a timed get()
+            // abandoning the setup, and the pool closure cancelling the
+            // queued poll: isDone() covers all of them (see its javadoc).
+            if (isDone()) {
                 return false;
             }
             // The queue may have produced its connection already, and a get()
@@ -2854,7 +3020,7 @@ public class ConnectionPool {
             if (!configured.compareAndSet(false, true)) {
                 return false;
             }
-            cancelled.set(true);
+            cancelled = true;
             if (pcFuture.cancel(mayInterruptIfRunning)) {
                 // The waiter was still queued, so it is deregistered and no
                 // connection will be produced for this future. Release the
@@ -2888,47 +3054,119 @@ public class ConnectionPool {
         @Override
         public Connection get(long timeout, TimeUnit unit)
                 throws InterruptedException, ExecutionException, TimeoutException {
-            PooledConnection pc = this.pc != null ? this.pc : pcFuture.get(timeout, unit);
+            boolean timed = timeout != Long.MAX_VALUE;
+            long deadline = 0;
+            if (timed) {
+                long timeoutNanos = unit.toNanos(timeout);
+                long now = System.nanoTime();
+                deadline = now + timeoutNanos;
+                if (timeoutNanos > 0 && deadline < now) {
+                    deadline = Long.MAX_VALUE;
+                }
+            }
+            PooledConnection pc;
+            try {
+                pc = this.pc != null ? this.pc : pcFuture.get(timeout, unit);
+            } catch (TimeoutException x) {
+                // A timeout is where a queue-poll future is failed terminally:
+                // no later get will wait again, so this future is complete.
+                done = true;
+                throw x;
+            } catch (ExecutionException x) {
+                // The queue future failed; no setup will ever publish here.
+                done = true;
+                throw x;
+            } catch (CancellationException x) {
+                // The pool closed and cancelled the queued poll.
+                done = true;
+                throw x;
+            }
             if (pc != null) {
-                if (result != null) {
-                    return result;
+                // A result the setup has already published belongs to the caller that takes
+                // it. Claiming it under the same monitor that abandonment uses keeps a later
+                // timeout from clearing and closing it under that caller.
+                Connection published = takePublishedResult();
+                if (published != null) {
+                    return published;
                 }
                 if (configured.compareAndSet(false, true)) {
-                    configure(pc);
+                    if (timed) {
+                        if (remainingNanos(deadline) <= 0) {
+                            // The deadline elapsed before setup could start.
+                            // Let the worker discard the produced pooled
+                            // connection and fail the caller rather than
+                            // running an unbounded setup synchronously.
+                            abandoned = true;
+                            startConfiguration(pc);
+                            throw new TimeoutException();
+                        }
+                        startConfiguration(pc);
+                        try {
+                            if (!latch.await(remainingNanos(deadline), TimeUnit.NANOSECONDS)) {
+                                abandonConfiguration();
+                                throw new TimeoutException();
+                            }
+                        } catch (InterruptedException x) {
+                            // The setup worker owns the produced connection and continues
+                            // after this caller gives up. Abandon the setup so the worker
+                            // returns or discards what it produces rather than publishing a
+                            // connection no caller owns.
+                            abandonConfiguration();
+                            throw x;
+                        }
+                    } else {
+                        configure(pc);
+                    }
                 } else {
                     // If we reach here, another thread claimed the connection:
                     // a get() caller that is setting it up, or the cancellation
                     // cleanup that returns it to the pool
-                    if (!latch.await(timeout, unit)) { // This shouldn't block for long
-                        if (cancelled.get()) {
-                            // A cancellation won the claim, so its cleanup is
-                            // what this wait was for: as for a cancelled
-                            // java.util.concurrent.Future, its callers are told
-                            // about the cancellation rather than about their
-                            // own deadline expiring. A timeout observed before
-                            // the cancellation wins the claim stays a timeout;
-                            // that window is inherent and bounded, the next
-                            // get() here observes the cancellation
-                            throw new CancellationException();
-                        }
+                    if (abandoned) {
+                        // The setup has already been given up. Its worker may still be in a
+                        // driver call, so waiting for the latch here would park this caller for
+                        // as long as that call takes even though the future is complete.
                         throw new TimeoutException();
                     }
-                }
-                if (result == null) {
-                    if (cancelled.get()) {
-                        // The cancellation cleanup won the claim on this
-                        // connection and returned it to the pool, so it is not
-                        // ours to hand out; the callers of a cancelled future
-                        // are told about the cancellation instead of being
-                        // handed a connection that is already back in the pool
+                    if (cancelled) {
+                        // A cancellation has already been observed and the future is terminal.
                         throw new CancellationException();
                     }
-                    throw new ExecutionException(cause);
+                    if (timed) {
+                        if (!latch.await(remainingNanos(deadline), TimeUnit.NANOSECONDS)) {
+                            // This shouldn't block for long
+                            if (cancelled) {
+                                // A cancellation won the claim, so its cleanup
+                                // is what this wait was for: as for a cancelled
+                                // java.util.concurrent.Future, its callers are
+                                // told about the cancellation rather than about
+                                // their own deadline expiring. A timeout
+                                // observed before the cancellation wins the
+                                // claim stays a timeout; that window is
+                                // inherent and bounded, the next get() here
+                                // observes the cancellation
+                                throw new CancellationException();
+                            }
+                            throw new TimeoutException();
+                        }
+                    } else {
+                        latch.await();
+                    }
                 }
-                return result;
+                return takeTerminalResult();
             } else {
                 return null;
             }
+        }
+
+        /**
+         * Returns the time remaining until the supplied monotonic deadline.
+         *
+         * @param deadline the deadline from {@link System#nanoTime()}, or {@link Long#MAX_VALUE} for no deadline
+         *
+         * @return the remaining time in nanoseconds
+         */
+        private long remainingNanos(long deadline) {
+            return deadline == Long.MAX_VALUE ? Long.MAX_VALUE : deadline - System.nanoTime();
         }
 
         /**
@@ -2941,9 +3179,27 @@ public class ConnectionPool {
          */
         private void configure(PooledConnection pooled) {
             try {
+                if (abandoned) {
+                    discardProducedConnection(pooled);
+                    return;
+                }
                 PooledConnection pc = borrowConnection(pooled, null, null);
                 if (pc != null) {
-                    result = ConnectionPool.this.setupConnection(pc);
+                    // The setup can still be abandoned before a caller takes its result, so the borrow is counted only
+                    // at the hand-off below. An internal cleanup close then cannot count itself as a return.
+                    Connection configured = ConnectionPool.this.setupConnection(pc, false);
+                    boolean discard = false;
+                    synchronized (this) {
+                        if (abandoned) {
+                            discard = true;
+                        } else {
+                            result = configured;
+                            configuredPooled = pc;
+                        }
+                    }
+                    if (discard) {
+                        closeConfiguredConnection(configured);
+                    }
                 } else {
                     // The connection was released while it sat idle, so this
                     // hand-off got nothing to set up. The synchronous borrow
@@ -2952,12 +3208,164 @@ public class ConnectionPool {
                     // fails the caller instead. Every caller released on the
                     // latch below reports what this publishes, and an
                     // ExecutionException with no cause tells them nothing.
-                    cause = new SQLException(MessageFactory.get("connectionPool.asyncBorrowConnectionReleased"));
+                    if (!abandoned) {
+                        cause = new SQLException(MessageFactory.get("connectionPool.asyncBorrowConnectionReleased"));
+                    }
                 }
             } catch (SQLException x) {
-                cause = x;
+                if (!abandoned) {
+                    cause = x;
+                }
             } finally {
                 latch.countDown();
+            }
+        }
+
+        /**
+         * Starts the asynchronous setup of a connection produced for a timed get().
+         *
+         * @param pooled the produced pooled connection
+         */
+        private void startConfiguration(PooledConnection pooled) {
+            try {
+                ConnectionPool.this.cancellator.execute(() -> configure(pooled));
+            } catch (RuntimeException x) {
+                // The executor is unbounded and is never shut down, so this is
+                // defensive. Discard the produced connection and fail the
+                // waiting callers with the executor failure.
+                try {
+                    discardProducedConnection(pooled);
+                } catch (RuntimeException y) {
+                    log.warn(MessageFactory.get("connectionPool.unableToReturnTimedOutConnection"),
+                            PoolUtilities.maskCredentials(y));
+                }
+                cause = new SQLException(x.getMessage());
+                cause.initCause(x);
+                latch.countDown();
+            }
+        }
+
+        /**
+         * Takes a result the setup has already published, or returns {@code null} while setup has not published one.
+         * Marking the result taken under the monitor prevents a timed-out getter from clearing and closing a
+         * connection another caller already owns.
+         *
+         * @return the published connection, or {@code null}
+         */
+        private synchronized Connection takePublishedResult() {
+            if (result == null) {
+                return null;
+            }
+            countBorrowForHandoff();
+            resultTaken = true;
+            return result;
+        }
+
+        /**
+         * Counts the borrow for the published result the first time a caller takes it. Setup for an asynchronous
+         * borrow does not count itself, so a setup abandoned before any caller takes its result counts neither a
+         * borrow nor a return.
+         */
+        private void countBorrowForHandoff() {
+            if (configuredPooled != null && !borrowCounted) {
+                borrowCounted = true;
+                configuredPooled.setBorrowCounted(true);
+                borrowedCount.incrementAndGet();
+            }
+        }
+
+        /**
+         * Returns the outcome of the setup once it has completed, or the abandonment/cancellation/failure that is
+         * terminal for this future. The decision over {@link #result}, {@link #abandoned}, {@link #cancelled} and
+         * {@link #cause} is taken under the monitor that publishes them, so a timeout cannot clear a result another
+         * getter has already observed.
+         *
+         * @return the configured connection
+         *
+         * @throws TimeoutException      if this future was abandoned after a timed get() expired
+         * @throws CancellationException if the future was cancelled or the pool closed its wait
+         * @throws ExecutionException    if setup failed before producing a connection
+         */
+        private synchronized Connection takeTerminalResult()
+                throws TimeoutException, CancellationException, ExecutionException {
+            if (result != null) {
+                countBorrowForHandoff();
+                resultTaken = true;
+                return result;
+            }
+            if (abandoned) {
+                // This future was abandoned after a timed get() expired;
+                // it must not hand out a connection now.
+                throw new TimeoutException();
+            }
+            if (cancelled) {
+                // The cancellation cleanup won the claim on this
+                // connection and returned it to the pool, so it is not
+                // ours to hand out; the callers of a cancelled future
+                // are told about the cancellation instead of being
+                // handed a connection that is already back in the pool
+                throw new CancellationException();
+            }
+            throw new ExecutionException(cause);
+        }
+
+        /**
+         * Abandons a timed-out setup. A connection the worker has already published is returned to the pool; a worker
+         * still in setup sees the flag and returns whatever it produces rather than publishing it. A result a caller
+         * has already taken is left alone: it belongs to that caller and is not the timed-out getter's to close.
+         */
+        private void abandonConfiguration() {
+            Connection configured;
+            synchronized (this) {
+                abandoned = true;
+                if (!resultTaken) {
+                    configured = result;
+                    result = null;
+                    configuredPooled = null;
+                } else {
+                    configured = null;
+                }
+            }
+            // The setup worker may still be in a driver call, so the latch is not guaranteed to
+            // be counted down soon. Wake callers waiting for the setup outcome now; they observe
+            // the abandoned flag (or a result another caller already took) and return promptly.
+            latch.countDown();
+            if (configured != null) {
+                closeConfiguredConnection(configured);
+            }
+        }
+
+        /**
+         * Returns a produced pooled connection to the pool without publishing it.
+         *
+         * @param pooled the produced pooled connection
+         */
+        private void discardProducedConnection(PooledConnection pooled) {
+            try {
+                PooledConnection pc = borrowConnection(pooled, null, null);
+                if (pc != null) {
+                    Connection configured = ConnectionPool.this.setupConnection(pc, false);
+                    if (configured != null) {
+                        closeConfiguredConnection(configured);
+                    }
+                }
+            } catch (SQLException x) {
+                log.debug("Unable to discard a timed-out asynchronous connection.",
+                        PoolUtilities.maskCredentials(x));
+            }
+        }
+
+        /**
+         * Returns a configured connection that no caller owns to the pool.
+         *
+         * @param configured the connection to return
+         */
+        private void closeConfiguredConnection(Connection configured) {
+            try {
+                configured.close();
+            } catch (SQLException x) {
+                log.warn(MessageFactory.get("connectionPool.unableToReturnTimedOutConnection"),
+                        PoolUtilities.maskCredentials(x));
             }
         }
 
@@ -2966,7 +3374,7 @@ public class ConnectionPool {
          */
         @Override
         public boolean isCancelled() {
-            return pc == null && (pcFuture.isCancelled() || cancelled.get());
+            return pc == null && (pcFuture.isCancelled() || cancelled);
         }
 
         /**
@@ -2974,7 +3382,14 @@ public class ConnectionPool {
          */
         @Override
         public boolean isDone() {
-            return pc != null || pcFuture.isDone();
+            // The queue future completes as soon as it has produced a pooled
+            // connection, but the setup that turns that connection into a
+            // usable handle has not run yet. The future is done only when the
+            // setup published its outcome, when a caller abandoned it at its
+            // deadline, or when it was cancelled. The synchronous constructor
+            // has already set up its connection and reports through pc.
+            return pc != null || result != null || done || cancelled || abandoned ||
+                    pcFuture.isCancelled() || latch.getCount() == 0;
         }
 
         /**
@@ -3007,7 +3422,7 @@ public class ConnectionPool {
                     try {
                         PooledConnection pc = borrowConnection(pooled, null, null);
                         if (pc != null) {
-                            Connection con = ConnectionPool.this.setupConnection(pc);
+                            Connection con = ConnectionPool.this.setupConnection(pc, false);
                             if (con != null) {
                                 con.close(); // Return to the pool
                             }
@@ -3019,7 +3434,8 @@ public class ConnectionPool {
                     }
                 }
             } catch (Exception x) {
-                log.error(MessageFactory.get("connectionPool.unableToCancelConnectionFuture"), x);
+                log.error(MessageFactory.get("connectionPool.unableToCancelConnectionFuture"),
+                        PoolUtilities.maskCredentials(x));
             } finally {
                 // Whatever came out of it, the callers waiting on the claim are
                 // done waiting
@@ -3069,7 +3485,8 @@ public class ConnectionPool {
                 // what starting a spent task has always answered with.
                 cleaners.remove(cleaner);
                 replacement.cancel();
-                log.error(MessageFactory.get("connectionPool.cleanerSchedulingFailed"), y);
+                log.error(MessageFactory.get("connectionPool.cleanerSchedulingFailed"),
+                        PoolUtilities.maskCredentials(y));
                 throw y;
             }
             // The diagnosis is the acceptance: every task the registry holds
@@ -3085,7 +3502,7 @@ public class ConnectionPool {
             poolCleanTimer = replacement;
             if (!stranded.isEmpty()) {
                 log.error(MessageFactory.get("connectionPool.cleanerTimerReplaced",
-                        Integer.valueOf(stranded.size())), x);
+                        Integer.valueOf(stranded.size())), PoolUtilities.maskCredentials(x));
                 try {
                     replacement.schedule(new CleanerReviver(stranded), 0);
                 } catch (RuntimeException z) {
@@ -3094,7 +3511,7 @@ public class ConnectionPool {
                     // configuration write no failure it did not cause, so this
                     // is reported rather than thrown back at it; the pools left
                     // stranded are what the message counts.
-                    log.error(MessageFactory.get("connectionPool.cleanerRearmFailed"), z);
+                    log.error(MessageFactory.get("connectionPool.cleanerRearmFailed"), PoolUtilities.maskCredentials(z));
                 }
             }
         }
@@ -3156,7 +3573,7 @@ public class ConnectionPool {
                     // take the replacement timer down the way the last one went,
                     // and the pools further down this list with it.
                     ExceptionUtils.handleThrowable(x);
-                    log.error(MessageFactory.get("connectionPool.cleanerRearmFailed"), x);
+                    log.error(MessageFactory.get("connectionPool.cleanerRearmFailed"), PoolUtilities.maskCredentials(x));
                 }
             }
         }
@@ -3270,7 +3687,7 @@ public class ConnectionPool {
                     // task's next runs to a timer that dies on a fatal Error
                     // is borne by the replacement in registerCleaner.
                     ExceptionUtils.handleThrowable(x);
-                    log.error(MessageFactory.get("connectionPool.poolCleanerFailed"), x);
+                    log.error(MessageFactory.get("connectionPool.poolCleanerFailed"), PoolUtilities.maskCredentials(x));
                 }
             }
         }

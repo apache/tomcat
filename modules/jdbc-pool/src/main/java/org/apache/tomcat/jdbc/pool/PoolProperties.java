@@ -486,15 +486,28 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                 // Always add the trap interceptor to the mix
                 definitions.add(new InterceptorDefinition(TrapException.class));
                 for (int i = 0; i < interceptorValues.length; i++) {
-                    int propIndex = interceptorValues[i].indexOf('(');
-                    int endIndex = interceptorValues[i].indexOf(')');
+                    String segment = interceptorValues[i];
+                    int propIndex = segment.indexOf('(');
                     String name;
                     String propsAsString = null;
-                    if (propIndex < 0 || endIndex < 0 || endIndex <= propIndex) {
-                        name = interceptorValues[i].trim();
+                    if (propIndex < 0) {
+                        name = segment.trim();
+                        if (name.indexOf(')') >= 0) {
+                            throw invalidInterceptorDefinition(segment);
+                        }
                     } else {
-                        name = interceptorValues[i].substring(0, propIndex).trim();
-                        propsAsString = interceptorValues[i].substring(propIndex + 1, endIndex);
+                        int endIndex = findClosingParenthesis(segment, propIndex);
+                        if (endIndex < 0) {
+                            throw invalidInterceptorDefinition(segment);
+                        }
+                        if (!segment.substring(endIndex + 1).trim().isEmpty()) {
+                            // Silently ignoring text after the closing
+                            // parenthesis would apply a configuration other
+                            // than the one written.
+                            throw invalidInterceptorDefinition(segment);
+                        }
+                        name = segment.substring(0, propIndex).trim();
+                        propsAsString = segment.substring(propIndex + 1, endIndex);
                     }
                     if (name.isEmpty()) {
                         // A leading or doubled separator, or a segment that
@@ -512,9 +525,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                     }
                     InterceptorDefinition definition = new InterceptorDefinition(name);
                     if (propsAsString != null) {
-                        String[] props = propsAsString.split(",");
-                        for (int j = 0; j < props.length; j++) {
-                            String prop = props[j];
+                        for (String prop : splitInterceptorProperties(propsAsString)) {
                             if (prop.trim().isEmpty()) {
                                 // An empty segment comes from Name(), Name( )
                                 // or a redundant separator: there is no property
@@ -526,7 +537,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                             if (pidx < 0) {
                                 throw new IllegalArgumentException(MessageFactory.get(
                                         "poolProperties.invalidInterceptorProperty", prop.trim(),
-                                        maskInterceptorCredentials(interceptorValues[i])));
+                                        maskInterceptorCredentials(segment)));
                             }
                             String propName = prop.substring(0, pidx).trim();
                             String propValue = prop.substring(pidx + 1).trim();
@@ -539,6 +550,76 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             }
         }
         return interceptors.clone();
+    }
+
+
+    /**
+     * Finds the parenthesis matching the one at {@code openIndex}, honoring
+     * nested parentheses inside a property value.
+     *
+     * @param value     the segment containing the opening parenthesis
+     * @param openIndex the index of the opening parenthesis
+     *
+     * @return the index of the matching closing parenthesis, or {@code -1}
+     */
+    private static int findClosingParenthesis(String value, int openIndex) {
+        int depth = 0;
+        for (int i = openIndex; i < value.length(); i++) {
+            char c = value.charAt(i);
+            if (c == '(') {
+                depth++;
+            } else if (c == ')') {
+                depth--;
+                if (depth == 0) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
+
+    /**
+     * Splits an interceptor property list at commas that are not inside
+     * parentheses, so a value may carry a parenthesized list containing
+     * commas. Empty segments are kept for the caller to tolerate.
+     *
+     * @param props the property list text
+     *
+     * @return the property segments
+     */
+    private static List<String> splitInterceptorProperties(String props) {
+        List<String> segments = new ArrayList<>();
+        int start = 0;
+        int depth = 0;
+        for (int i = 0; i < props.length(); i++) {
+            char c = props.charAt(i);
+            if (c == '(') {
+                depth++;
+            } else if (c == ')' && depth > 0) {
+                depth--;
+            } else if (c == ',' && depth == 0) {
+                segments.add(props.substring(start, i));
+                start = i + 1;
+            }
+        }
+        segments.add(props.substring(start));
+        return segments;
+    }
+
+
+    /**
+     * Builds the failure for an interceptor definition whose parentheses or
+     * trailing text cannot be parsed, with credentials in the definition
+     * masked.
+     *
+     * @param segment the malformed definition segment
+     *
+     * @return the named failure
+     */
+    private static IllegalArgumentException invalidInterceptorDefinition(String segment) {
+        return new IllegalArgumentException(MessageFactory.get(
+                "poolProperties.invalidInterceptorDefinition", maskInterceptorCredentials(segment)));
     }
 
 
@@ -560,8 +641,11 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
      * field's value even when this string names that key, the rule the
      * credential setters establish. A configuration whose
      * database properties are {@code null} only stores the raw string, as there
-     * is no property collection to parse into. The string is parsed before any
-     * state is touched, so a value the parser rejects - a malformed Unicode
+     * is no property collection to parse into; the connect path still parses
+     * the string when it builds the driver properties, so the null collection
+     * does not make the configured pairs inert. When there is a collection, the
+     * string is parsed into it before any state is touched, so a value the
+     * parser rejects - a malformed Unicode
      * escape - leaves the previous configuration fully in place
      * along with the exception. The remove and re-add run inside
      * this one synchronized method; an unsynchronised reader of the database
@@ -636,7 +720,10 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
      * Replaces the database properties the pool connects with. The keys tracked
      * from the last connection properties parse contributed to the previous
      * collection, not to the replacement, so the tracking is reset: the caller
-     * owns whatever the new collection holds.
+     * owns whatever the new collection holds. The current
+     * {@link #connectionProperties} string is not parsed into the replacement;
+     * call {@link #setConnectionProperties(String)} after this method to
+     * reapply it, or put the string's pairs in the replacement collection.
      *
      * @param dbProperties the new database properties, may be {@code null}
      */
@@ -759,9 +846,11 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     public synchronized void setPassword(String password) {
         this.password = password;
         if (this.dbProperties != null) {
-            if (password == null) {
-                removeCredentialDbProperties();
-            } else {
+            // A non-null password replaces every spelling of the credential, not only the canonical
+            // lower-case key: an older pass, pwd or PASSWORD entry must not keep authenticating
+            // connections with the superseded value.
+            removeCredentialDbProperties(password == null);
+            if (password != null) {
                 this.dbProperties.setProperty(PoolUtilities.PROP_PASSWORD, password);
             }
         }
@@ -770,19 +859,76 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
     /**
      * Removes every database property whose key is recognized as a password alias, so clearing the password also
-     * stops a value configured as {@code pass} or {@code pwd} from still authenticating connections.
+     * stops a value configured as {@code pass} or {@code pwd} from still authenticating connections. When a new
+     * password replaces the old one, the canonical entry is written again after this removal; the warning for a
+     * credential the string still names is only wanted when the credential is actually being cleared.
+     *
+     * @param warnStringEntries whether to warn for each removed key the configured connection-properties string still
+     *                              names
      */
-    private void removeCredentialDbProperties() {
+    private void removeCredentialDbProperties(boolean warnStringEntries) {
         Properties props = this.dbProperties;
         if (props == null) {
             return;
         }
-        for (String key : props.stringPropertyNames()) {
+        // The keys have to be collected from the direct entries as well as the
+        // resolved String names: stringPropertyNames() omits a key whose direct
+        // value is not a String, and such an entry must still be removed.
+        for (String key : allPropertyKeys(props)) {
             if (PoolUtilities.isCredentialKey(key)) {
                 removeDbProperty(key);
-                warnStringStillNamesCredential(key);
+                if (warnStringEntries) {
+                    warnStringStillNamesCredential(key);
+                }
             }
         }
+    }
+
+
+    /**
+     * Removes every database property whose key names the user, ignoring case
+     * and surrounding whitespace, so clearing the username also stops a value
+     * configured as {@code USER} from still authenticating connections. A new
+     * user name is written again after this removal.
+     *
+     * @param warnStringEntries whether to warn for each removed key the configured connection-properties string still
+     *                              names
+     */
+    private void removeUsernameDbProperties(boolean warnStringEntries) {
+        Properties props = this.dbProperties;
+        if (props == null) {
+            return;
+        }
+        for (String key : allPropertyKeys(props)) {
+            if (PoolUtilities.PROP_USER.equalsIgnoreCase(key.trim())) {
+                removeDbProperty(key);
+                if (warnStringEntries) {
+                    warnStringStillNamesCredential(key);
+                }
+            }
+        }
+    }
+
+
+    /**
+     * Returns a snapshot of every String key a properties collection currently
+     * resolves, including the keys whose only value is not a String. The
+     * removal loops use the snapshot because removing an uncovered defaults
+     * value can publish a replacement collection.
+     *
+     * @param props the properties to inspect
+     *
+     * @return the snapshot of String keys
+     */
+    private static Set<String> allPropertyKeys(Properties props) {
+        Set<String> keys = new HashSet<>();
+        for (Object key : props.keySet().toArray()) {
+            if (key instanceof String) {
+                keys.add((String) key);
+            }
+        }
+        keys.addAll(props.stringPropertyNames());
+        return keys;
     }
 
 
@@ -831,7 +977,8 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     /**
      * Stores the user name and keeps the {@code user} entry of the database properties in step with it, for the
      * reason given on {@link #setPassword(String)}. A {@code null} user name likewise removes the entry whatever
-     * contributed it, including a pair the {@code connectionProperties} string names.
+     * contributed it, including a pair the {@code connectionProperties} string names; the key is matched ignoring
+     * case and surrounding whitespace, so a {@code USER} spelling cannot keep authenticating connections either.
      *
      * @param username The user name
      */
@@ -839,10 +986,10 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     public synchronized void setUsername(String username) {
         this.username = username;
         if (this.dbProperties != null) {
-            if (username == null) {
-                removeDbProperty(PoolUtilities.PROP_USER);
-                warnStringStillNamesCredential(PoolUtilities.PROP_USER);
-            } else {
+            // A non-null user name replaces every spelling of the key, so an older USER entry cannot keep
+            // authenticating connections with the superseded identity.
+            removeUsernameDbProperties(username == null);
+            if (username != null) {
                 this.dbProperties.setProperty(PoolUtilities.PROP_USER, username);
             }
         }
@@ -935,6 +1082,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         } catch (IllegalAccessException e) {
             log.warn(MessageFactory.get("poolProperties.validatorInaccessible", className), e);
         } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException e) {
+            ExceptionUtils.handleThrowable(ExceptionUtils.unwrapInvocationTargetException(e));
             log.warn(MessageFactory.get("poolProperties.validatorCannotInstantiate", className), e);
         }
 
@@ -1003,7 +1151,10 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
      * none is configured, and the {@code url}, {@code connectionProperties}
      * and {@code jdbcInterceptors} strings pass through credential masking,
      * and a configured live {@code dataSource} object is printed as its class
-     * and identity rather than through its own {@code toString()}, so the dump
+     * and identity rather than through its own {@code toString()}, and the
+     * {@code initSQL} and {@code validationQuery} statements print as
+     * {@code <sql>} rather than as text SQL syntax can shape around a
+     * credential, so the dump
      * can be logged without carrying a cleartext credential. The
      * masking is best effort in the way {@link #maskCredentials(String)} and
      * {@link #maskInterceptorCredentials(String)} describe, so it removes the
@@ -1021,7 +1172,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         try {
             // object_name has no getter of its own: the factory applies it to
             // the pool name, which the dump therefore prints explicitly.
-            buf.append("name=").append(name).append("; ");
+            buf.append("name=").append(sanitizeForLog(name)).append("; ");
             String[] fields = DataSourceFactory.ALL_PROPERTIES;
             for (String field : fields) {
                 final String[] prefix = new String[] { "get", "is" };
@@ -1056,14 +1207,14 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                             // The same dump prints these raw configuration
                             // strings, so a credential typed into one of them
                             // has to be masked too, not just the password field.
-                            buf.append(value == null ? "null" : maskCredentials((String) value));
+                            buf.append(value == null ? "null" : sanitizeForLog(maskCredentials((String) value)));
                         } else if (DataSourceFactory.PROP_INTERCEPTORS.equals(field)) {
                             // Interceptor properties reach a third-party
                             // interceptor through setProperties(), so this
                             // configuration string carries credentials the
                             // same way; its pairs live inside parentheses,
                             // which the segment-start walk above cannot see.
-                            buf.append(value == null ? "null" : maskInterceptorCredentials((String) value));
+                            buf.append(value == null ? "null" : sanitizeForLog(maskInterceptorCredentials((String) value)));
                         } else if (DataSourceFactory.PROP_DATASOURCE.equals(field)) {
                             // A live data source object prints its identity
                             // only: its own toString() may carry the URL, the
@@ -1072,14 +1223,21 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                             buf.append(value == null ? "null"
                                     : value.getClass().getName() + "@" +
                                             Integer.toHexString(System.identityHashCode(value)));
+                        } else if (DataSourceFactory.PROP_INITSQL.equals(field)
+                                || DataSourceFactory.PROP_VALIDATIONQUERY.equals(field)) {
+                            // SQL statement text is application-shaped and can
+                            // embed a credential in syntax the credential
+                            // masker does not know. The dump reports only the
+                            // presence of the statement.
+                            buf.append(value == null ? "null" : "<sql>");
                         } else {
-                            buf.append(value);
+                            buf.append(value == null ? "null" : sanitizeForLog(String.valueOf(value)));
                         }
                     } catch (ReflectiveOperationException | RuntimeException | Error x) {
                         Throwable cause = ExceptionUtils.unwrapInvocationTargetException(x);
                         ExceptionUtils.handleThrowable(cause);
                         try {
-                            buf.append("<error: ").append(cause).append('>');
+                            buf.append("<error: ").append(sanitizeForLog(String.valueOf(cause))).append('>');
                         } catch (Throwable hostile) {
                             // A Throwable whose own toString() throws must
                             // cost only its own field, not every field after
@@ -1104,6 +1262,23 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             buf.append(']');
         }
         return buf.toString();
+    }
+
+
+    /**
+     * Replaces carriage returns and line feeds with spaces in a value that is
+     * interpolated into the one-line configuration dump, so application-shaped
+     * text cannot forge additional log lines.
+     *
+     * @param value the text, possibly {@code null}
+     *
+     * @return the text with line breaks flattened, or {@code null}
+     */
+    private static String sanitizeForLog(String value) {
+        if (value == null || (value.indexOf('\r') < 0 && value.indexOf('\n') < 0)) {
+            return value;
+        }
+        return value.replace('\r', ' ').replace('\n', ' ');
     }
 
 
@@ -1690,6 +1865,23 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         }
 
         /**
+         * Returns an independent copy of this definition, including its property map and the cached class reference. A
+         * configuration clone shares no mutable definition state with its original: adding or replacing a property on
+         * one copy cannot change what the other copy configures.
+         *
+         * @return the copy
+         */
+        InterceptorDefinition copy() {
+            InterceptorDefinition copy = new InterceptorDefinition(className);
+            copy.clazz = clazz;
+            for (Map.Entry<String, InterceptorProperty> entry : properties.entrySet()) {
+                InterceptorProperty property = entry.getValue();
+                copy.properties.put(entry.getKey(), new InterceptorProperty(property.getName(), property.getValue()));
+            }
+            return copy;
+        }
+
+        /**
          * Returns the interceptor class name.
          *
          * @return the class name
@@ -2172,8 +2364,12 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
     /**
      * Returns a copy of the configuration, including a copy of the driver-properties collection so a defaults-backed
-     * property resolves on the copy too. The copy is taken under the monitor the reconfiguring setters hold, so a
-     * concurrent reconfiguration cannot appear in the copy as a state no setter ever published.
+     * property resolves on the copy too, and independent copies of the parsed interceptor definitions and their
+     * property maps. A property added to or replaced on a definition in one copy therefore cannot reconfigure the
+     * other. The validator instance is runtime state and is shared by the copy; replacing it through
+     * {@link #setValidator(Validator)} or {@link #setValidatorClassName(String)} only changes the copy it is called
+     * on. The copy is taken under the monitor the reconfiguring setters hold, so a concurrent reconfiguration cannot
+     * appear in the copy as a state no setter ever published.
      *
      * @return the copy
      * @throws CloneNotSupportedException if cloning of this class is ever refused
@@ -2184,6 +2380,18 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         Properties dbProperties = clone.dbProperties;
         if (dbProperties != null) {
             clone.dbProperties = PoolUtilities.clone(dbProperties);
+        }
+        InterceptorDefinition[] definitions = clone.interceptors;
+        if (definitions != null) {
+            InterceptorDefinition[] copies = new InterceptorDefinition[definitions.length];
+            for (int i = 0; i < definitions.length; i++) {
+                copies[i] = definitions[i] == null ? null : definitions[i].copy();
+            }
+            clone.interceptors = copies;
+        }
+        Set<String> keys = clone.connectionPropertyKeys;
+        if (keys != null && !keys.isEmpty()) {
+            clone.connectionPropertyKeys = new HashSet<>(keys);
         }
         return clone;
     }

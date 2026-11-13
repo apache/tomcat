@@ -184,15 +184,58 @@ class TestJdbcInterceptorConfigParsing {
     }
 
     @Test
-    void otherMalformedConfigsOnlyFailLater() {
-        String[] noExceptionButInvalidConfigs = {
-            "MalformedParmsInterceptor(=   )",
-            "MalformedParmsInterceptor(  =)",
+    void unclosedOrStrayParenthesesFailWithANamedException() {
+        String[] badConfigs = {
             "MalformedParmsInterceptor(",
             "MalformedParmsInterceptor( ",
             "MalformedParmsInterceptor)",
             "MalformedParmsInterceptor) ",
             "MalformedParmsInterceptor )"
+        };
+        for (String badConfig : badConfigs) {
+            PoolProperties props = new PoolProperties();
+            props.setJdbcInterceptors(badConfig);
+            IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class,
+                    props::getJdbcInterceptorsAsArray,
+                    "expected an early parse failure for " + badConfig);
+            Assertions.assertTrue(thrown.getMessage().contains("MalformedParmsInterceptor"),
+                    "the failure must name the definition it came from, was: " + thrown.getMessage());
+        }
+    }
+
+    @Test
+    void trailingTextAfterTheClosingParenthesisFailsTheParse() {
+        String[] badConfigs = {
+            "TrailingInterceptor(parm=value)junk",
+            "TrailingInterceptor(parm=value)garbage"
+        };
+        for (String badConfig : badConfigs) {
+            PoolProperties props = new PoolProperties();
+            props.setJdbcInterceptors(badConfig);
+            IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class,
+                    props::getJdbcInterceptorsAsArray,
+                    "text after the closing parenthesis must not be silently ignored: " + badConfig);
+            Assertions.assertTrue(thrown.getMessage().contains("TrailingInterceptor"));
+        }
+    }
+
+    @Test
+    void nestedParenthesesAndCommasInValuesArePreserved() {
+        PoolProperties props = new PoolProperties();
+        props.setJdbcInterceptors("NestedInterceptor(list=(1,2,3),name=value)");
+        InterceptorDefinition[] defs = props.getJdbcInterceptorsAsArray();
+
+        Assertions.assertEquals(2, defs.length);
+        Assertions.assertEquals("NestedInterceptor", defs[1].getClassName());
+        Assertions.assertEquals("(1,2,3)", defs[1].getProperties().get("list").getValue());
+        Assertions.assertEquals("value", defs[1].getProperties().get("name").getValue());
+    }
+
+    @Test
+    void emptyPropertyNamesOnlyFailLater() {
+        String[] noExceptionButInvalidConfigs = {
+            "MalformedParmsInterceptor(=   )",
+            "MalformedParmsInterceptor(  =)"
         };
         for (String badConfig : noExceptionButInvalidConfigs) {
             PoolProperties props = new PoolProperties();

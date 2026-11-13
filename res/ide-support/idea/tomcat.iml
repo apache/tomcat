@@ -16,19 +16,22 @@
   limitations under the License.
 -->
 <module type="JAVA_MODULE" version="4">
-  <component name="NewModuleRootManager" inherit-compiler-output="true">
+  <!-- The language level is the Java version Tomcat is compiled for, not the project level that follows the SDK !-->
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_@BUILD_JAVA_VERSION@" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/webapps/examples/WEB-INF/classes" isTestSource="true" />
 
-      <!-- The directories below are excluded by default as they require the FFM API which is
-          available as a preview feature in Java SDK 22. If you wish to use the FFM API in the
-          IDE then set your project and module SDK levels to Java 22 or later, enable preview
-          features if needed, and comment out or remove the excludeFolder lines below. !-->
-      <excludeFolder url="file://$MODULE_DIR$/java/org/apache/tomcat/util/net/openssl/panama" />
-      <excludeFolder url="file://$MODULE_DIR$/java/org/apache/tomcat/util/openssl" />
+      <!-- The code that uses the FFM API and its tests are only compiled when the build runs on Java
+          @RELEASE_JAVA_VERSION@ or later. When ant ide-intellij runs on such a version it omits the
+          excludeFolder lines below, so that code belongs to the tomcat-ffm module, whose content roots
+          are nested in the java and test folders above. An exclusion in this module would also hide
+          those directories from that module. On an earlier version the code is excluded instead. !-->
+      <excludeFolder url="file://$MODULE_DIR$/java/org/apache/tomcat/util/net/openssl/panama" /><!-- IDEA-FFM-EXCLUDE -->
+      <excludeFolder url="file://$MODULE_DIR$/java/org/apache/tomcat/util/openssl" /><!-- IDEA-FFM-EXCLUDE -->
+      <excludeFolder url="file://$MODULE_DIR$/test/org/apache/tomcat/util/net/openssl/panama" /><!-- IDEA-FFM-EXCLUDE -->
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

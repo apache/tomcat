@@ -131,8 +131,8 @@ Apache Tomcat, and using many of the Apache Tomcat features.</p>
     Developing WebSocket applications for Apache Tomcat.</li>
 <li><a href="rewrite.html"><strong>URL rewrite</strong></a> -
     Using the regexp based rewrite valve for conditional URL and host rewrite.</li>
-<li><a href="cdi.html"><strong>CDI and JAX-RS support</strong></a> -
-    Configuring CDI,JAX-RS and Eclipse Microprofile support.</li>
+<li><a href="cdi.html"><strong>CDI support</strong></a> -
+    Configuring CDI and Eclipse MicroProfile support.</li>
 <li><a href="graal.html"><strong>AOT compilation support</strong></a> -
     Ahead of Time compilation support with GraalVM/Native Image.</li>
 </ol>

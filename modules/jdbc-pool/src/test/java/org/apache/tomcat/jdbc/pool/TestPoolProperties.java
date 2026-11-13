@@ -46,6 +46,24 @@ class TestPoolProperties {
     private static final String DEFAULT_PASSWD = "password_def";
 
     @Test
+    void toStringSanitisesLineBreaksInStringFields() {
+        PoolProperties properties = new PoolProperties();
+        properties.setName("pool\nforged");
+        properties.setDefaultCatalog("catalog\rforged");
+        properties.setUsername("user\rforged");
+        properties.setDriverClassName("driver\nforged");
+
+        String dump = properties.toString();
+
+        Assertions.assertFalse(dump.contains("\n") || dump.contains("\r"),
+                "the configuration dump must stay one log line, was: " + dump);
+        Assertions.assertTrue(dump.contains("pool forged"),
+                "the sanitised name must stay readable, was: " + dump);
+        Assertions.assertTrue(dump.contains("catalog forged"),
+                "the sanitised catalog must stay readable, was: " + dump);
+    }
+
+    @Test
     void toStringOutputShouldHaveBalancedBrackets() {
         PoolProperties properties = new PoolProperties();
         properties.setUsername(DEFAULT_USER);
@@ -237,6 +255,26 @@ class TestPoolProperties {
     }
 
     @Test
+    void replacingDatabasePropertiesDoesNotReapplyTheConnectionPropertiesString() {
+        PoolProperties properties = new PoolProperties();
+        properties.setConnectionProperties("replacement=string");
+        Assertions.assertEquals("string", properties.getDbProperties().getProperty("replacement"),
+                "precondition: the string is parsed into the current collection");
+
+        properties.setDbProperties(new Properties());
+
+        Assertions.assertNull(properties.getDbProperties().getProperty("replacement"),
+                "a replacement database-properties collection is the caller's complete set; the old string is not "
+                        + "parsed into it again");
+        Assertions.assertEquals("replacement=string", properties.getConnectionProperties(),
+                "the configuration still reports the string, which can be reapplied explicitly");
+
+        properties.setConnectionProperties("replacement=string");
+        Assertions.assertEquals("string", properties.getDbProperties().getProperty("replacement"),
+                "setting the string again after replacing the collection applies its pairs");
+    }
+
+    @Test
     void setConnectionPropertiesRoundTripsThroughTheFactory() {
         Properties attrs = new Properties();
         attrs.setProperty("connectionProperties", "first=one;second=two");
@@ -371,6 +409,83 @@ class TestPoolProperties {
 
         Assertions.assertNull(properties.getDbProperties().getProperty("user"),
                 "the string must keep owning the entry while the field is unset");
+    }
+
+    @Test
+    void settingNewCredentialsReplacesEveryCredentialAlias() {
+        PoolProperties properties = new PoolProperties();
+        properties.setConnectionProperties("keep=yes;pass=old;PWD=older;PASSWORD=oldest;USER=bob;user=old");
+
+        properties.setPassword("newpassword");
+        properties.setUsername("alice");
+
+        Assertions.assertEquals("newpassword", properties.getDbProperties().getProperty("password"),
+                "the canonical password entry must hold the new value");
+        Assertions.assertNull(properties.getDbProperties().getProperty("pass"),
+                "an older pass alias must not keep authenticating connections");
+        Assertions.assertNull(properties.getDbProperties().getProperty("PWD"),
+                "a case-variant pwd alias must not keep authenticating connections");
+        Assertions.assertNull(properties.getDbProperties().getProperty("PASSWORD"),
+                "a case-variant password alias must not keep authenticating connections");
+        Assertions.assertEquals("alice", properties.getDbProperties().getProperty("user"),
+                "the canonical user entry must hold the new value");
+        Assertions.assertNull(properties.getDbProperties().getProperty("USER"),
+                "an older USER spelling must not keep authenticating connections");
+        Assertions.assertEquals("yes", properties.getDbProperties().getProperty("keep"),
+                "non-credential entries must be preserved");
+    }
+
+    @Test
+    void clearingThePasswordRemovesNonStringCredentialEntries() {
+        PoolProperties properties = new PoolProperties();
+        properties.getDbProperties().put("password", new Object());
+        properties.getDbProperties().put("PWD", new char[] { 'x' });
+
+        properties.setPassword(null);
+
+        Assertions.assertFalse(properties.getDbProperties().containsKey("password"),
+                "a password entry whose direct value is not a String must be removed");
+        Assertions.assertFalse(properties.getDbProperties().containsKey("PWD"),
+                "all password aliases must be removed whatever their value type");
+    }
+
+    @Test
+    void clearingTheUsernameRemovesCaseVariantEntries() {
+        PoolProperties properties = new PoolProperties();
+        properties.getDbProperties().setProperty("USER", "fromstring");
+        properties.setUsername("fromfield");
+
+        properties.setUsername(null);
+
+        Assertions.assertNull(properties.getDbProperties().getProperty("USER"),
+                "a USER spelling must not keep authenticating connections after the username is cleared");
+        Assertions.assertNull(properties.getDbProperties().getProperty("user"),
+                "the lower-case user entry must also be removed");
+    }
+
+    @Test
+    void clearingTheUsernameStripsAUSERPairTheStringContributes() {
+        PoolProperties properties = new PoolProperties();
+        properties.setConnectionProperties("USER=fromstring");
+
+        properties.setUsername(null);
+
+        Assertions.assertFalse(properties.getDbProperties().containsKey("USER"),
+                "clearing the username must remove a differently cased pair from connectionProperties");
+    }
+
+    @Test
+    void clearingThePasswordStripsAnUncoveredDefaultsEntry() {
+        Properties defaults = new Properties();
+        defaults.setProperty("pwd", "fromdefaults");
+        Properties dbProperties = new Properties(defaults);
+        PoolProperties properties = new PoolProperties();
+        properties.setDbProperties(dbProperties);
+
+        properties.setPassword(null);
+
+        Assertions.assertNull(properties.getDbProperties().getProperty("pwd"),
+                "a credential resolved only through the defaults table must also be removed");
     }
 
     @Test
@@ -564,6 +679,26 @@ class TestPoolProperties {
     }
 
     @Test
+    void aCloneCopiesTheParsedInterceptorDefinitions() throws Exception {
+        PoolProperties original = new PoolProperties();
+        original.setJdbcInterceptors("StatementCache(prepared=true,max=5);SlowQueryReport(threshold=1000)");
+        original.getJdbcInterceptorsAsArray();
+
+        PoolProperties clone = (PoolProperties) original.clone();
+        PoolProperties.InterceptorDefinition clonedDefinition = clone.getJdbcInterceptorsAsArray()[1];
+        clonedDefinition.addProperty("max", "1");
+
+        Assertions.assertNotSame(original.getJdbcInterceptorsAsArray()[1], clonedDefinition,
+                "the clone must not share the definition objects with the original");
+        Assertions.assertEquals("5",
+                original.getJdbcInterceptorsAsArray()[1].getProperties().get("max").getValue(),
+                "a property added to a cloned definition must not reconfigure the original");
+        Assertions.assertEquals("1",
+                clone.getJdbcInterceptorsAsArray()[1].getProperties().get("max").getValue(),
+                "the copy keeps the property its caller added to it");
+    }
+
+    @Test
     void aCloneResolvesPropertiesDefaultsLikeTheOriginal() throws Exception {
         Properties defaults = new Properties();
         defaults.setProperty("socketTimeout", "1000");
@@ -650,6 +785,24 @@ class TestPoolProperties {
                 "the key must be recognised ignoring case, was: " + asString);
         Assertions.assertTrue(asString.contains("connectionProperties=socketTimeout=1000;password=********;PWD=********"),
                 "the other pair must keep printing with the pair masked, was: " + asString);
+    }
+
+    @Test
+    void toStringWithholdsSQLStatementText() {
+        PoolProperties properties = new PoolProperties();
+        properties.setInitSQL("SET PASSWORD = 'sql-secret-init'");
+        properties.setValidationQuery("SELECT 'sql-secret-validation' AS probe");
+
+        String asString = properties.toString();
+
+        Assertions.assertFalse(asString.contains("sql-secret-init"),
+                "the initSQL statement text must not leak, was: " + asString);
+        Assertions.assertFalse(asString.contains("sql-secret-validation"),
+                "the validationQuery statement text must not leak, was: " + asString);
+        Assertions.assertTrue(asString.contains("initSQL=<sql>"),
+                "the dump must report that initSQL is set without printing it, was: " + asString);
+        Assertions.assertTrue(asString.contains("validationQuery=<sql>"),
+                "the dump must report that validationQuery is set without printing it, was: " + asString);
     }
 
     @Test
@@ -1055,8 +1208,8 @@ class TestPoolProperties {
 
         asString = escaped.toString();
 
-        Assertions.assertTrue(asString.contains("connectionProperties=password=********\ncont16=y"),
-                "the next pair is really separate and must stay readable, was: " + asString);
+        Assertions.assertTrue(asString.contains("connectionProperties=password=******** cont16=y"),
+                "the next pair must stay readable on the sanitised one-line dump, was: " + asString);
     }
 
     @Test

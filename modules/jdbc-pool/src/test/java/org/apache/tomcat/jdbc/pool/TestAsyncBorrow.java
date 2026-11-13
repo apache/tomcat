@@ -19,6 +19,7 @@ package org.apache.tomcat.jdbc.pool;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -117,15 +118,15 @@ class TestAsyncBorrow extends JdbcPoolBaseTest {
         try {
             SQLException error = Assertions.assertThrows(SQLException.class, ds::getConnectionAsync,
                     "a non-fair queue cannot hand out futures once the pool is exhausted");
-            Assertions.assertTrue(error.getMessage().toLowerCase().contains("fair"),
-                    "the failure must name the missing configuration, was: " + error.getMessage());
+            Assertions.assertTrue(error.getMessage().contains("fairQueue"),
+                    "the failure must name the missing configuration property, was: " + error.getMessage());
             // The message is fetched for the application, not as a format
             // pattern: it must render the writer's punctuation, not the
             // doubled-quote escapes that only MessageFormat would collapse
             Assertions.assertTrue(error.getMessage().contains("doesn't"),
                     "the apostrophe must reach the application collapsed, was: "
                             + error.getMessage());
-            Assertions.assertTrue(error.getMessage().contains("'fair'")
+            Assertions.assertTrue(error.getMessage().contains("'fairQueue'")
                             && error.getMessage().contains("'true'"),
                     "the quoted property names must reach the application with "
                             + "single quotes, was: " + error.getMessage());
@@ -236,6 +237,58 @@ class TestAsyncBorrow extends JdbcPoolBaseTest {
         Assertions.assertEquals(2, ds.getIdle(),
                 "the pool must keep at most maxActive connections");
         awaitSessions(2);
+    }
+
+    @Test
+    void anImmediateAsyncBorrowIsCompleteAndMustBeRetrieved() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setFairQueue(true);
+        ds.getPoolProperties().setMinIdle(0);
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setMaxIdle(1);
+        ds.createPool();
+
+        Future<Connection> future = ds.getConnectionAsync();
+        Assertions.assertTrue(future.isDone(),
+                "a connection available without waiting completes the future before it is returned");
+        Assertions.assertFalse(future.cancel(true),
+                "a completed future cannot be cancelled; it must be retrieved and closed");
+        Assertions.assertEquals(1, ds.getActive(),
+                "the completed future still owns the connection until the caller retrieves and closes it");
+
+        try (Connection c = future.get(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
+            Assertions.assertNotNull(c, "the caller must retrieve the completed future's connection");
+        }
+        Assertions.assertEquals(0, ds.getActive(), "closing the retrieved connection returns it to the pool");
+        Assertions.assertEquals(1, ds.getIdle());
+    }
+
+    @Test
+    void aCompletedQueueWaitIsNotDoneUntilSetupRuns() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setFairQueue(true);
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setMinIdle(0);
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setMaxIdle(1);
+        ds.createPool();
+
+        Connection holder = ds.getConnection();
+        Future<Connection> future = ds.getConnectionAsync();
+        ConnectionPool.ConnectionFuture async = (ConnectionPool.ConnectionFuture) future;
+        Assertions.assertFalse(future.isDone(),
+                "the poll must wait for a connection to be handed to its queue future");
+
+        holder.close();
+        awaitUntil(() -> async.pcFuture.isDone());
+        Assertions.assertFalse(future.isDone(),
+                "the queue future completing is not a completed connection future: setup has not run yet");
+
+        try (Connection con = future.get(); Statement st = con.createStatement()) {
+            st.execute("SELECT 1");
+        }
+        Assertions.assertTrue(future.isDone(), "the setup completion must complete the future");
+        ds.close();
     }
 
     @Test
@@ -350,6 +403,12 @@ class TestAsyncBorrow extends JdbcPoolBaseTest {
                 "a poll whose timed get() timed out is complete");
         Assertions.assertFalse(future.isCancelled(),
                 "nobody cancelled the poll, a timeout must not report a cancellation");
+        Assertions.assertFalse(future.cancel(true),
+                "a future that has already timed out must not report a cancellation");
+        Assertions.assertFalse(future.isCancelled(),
+                "a refused cancel must not turn a timeout into a cancellation");
+        Assertions.assertTrue(future.isDone(),
+                "the timed-out future must remain complete after the refused cancel");
         Assertions.assertThrows(TimeoutException.class,
                 () -> future.get(100, TimeUnit.MILLISECONDS),
                 "a repeated timed get() must keep reporting the timeout");

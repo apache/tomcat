@@ -31,6 +31,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
+import org.apache.tomcat.jdbc.pool.PoolUtilities;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 import org.apache.tomcat.jdbc.pool.util.ExceptionUtils;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
@@ -148,10 +149,12 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
             return getConstructor(constructorIndex, statementInterface)
                     .newInstance(new Object[] { new CloseAwareProxy(entry) });
         } catch (Exception x) {
+            ExceptionUtils.handleThrowable(ExceptionUtils.unwrapInvocationTargetException(x));
             // The statement is still tracked and will be closed when the
             // connection is returned, but closing it early will no longer
             // forget it before then.
-            log.warn(MessageFactory.get("statementFinalizer.unableToCreateTrackingProxy"), x);
+            log.warn(MessageFactory.get("statementFinalizer.unableToCreateTrackingProxy"),
+                    PoolUtilities.maskCredentials(x));
             return tracked;
         }
     }
@@ -197,6 +200,11 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
 
         PoolProperties.InterceptorProperty logProperty = properties.get("trace");
         if (null != logProperty) {
+            String value = logProperty.getValue();
+            if (value != null && !"true".equals(value) && !"false".equals(value)) {
+                log.warn(MessageFactory.get("interceptor.invalidBooleanProperty", "trace", value,
+                        Boolean.valueOf(logCreationStack)));
+            }
             logCreationStack = logProperty.getValueAsBoolean(logCreationStack);
         }
     }
@@ -318,7 +326,8 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
                     // abort the rest of the drain.
                     ExceptionUtils.handleThrowable(ignore);
                     if (log.isDebugEnabled()) {
-                        log.debug("Unable to close statement upon connection close.", ignore);
+                        log.debug("Unable to close statement upon connection close.",
+                                PoolUtilities.maskCredentials(ignore));
                     }
                 }
             }

@@ -142,4 +142,27 @@ public class TestBeanFactory {
                     e.getCause() instanceof StringIndexOutOfBoundsException);
         }
     }
+
+
+    /*
+     * A set method which rejects the value has to be reported with the name of
+     * the property, which the exception of the reflective call does not carry.
+     */
+    @Test
+    public void testSetMethodFailureNamesTheProperty() throws Exception {
+
+        ResourceRef resourceRef = new ResourceRef(TesterBean.class.getName(), null, null, null, false);
+        resourceRef.add(new StringRefAddr("server", "no such host.invalid"));
+
+        BeanFactory factory = new BeanFactory();
+
+        try {
+            Object obj = factory.getObjectInstance(resourceRef, null, null, null);
+            Assert.fail("The invalid value was accepted: " + obj);
+        } catch (NamingException e) {
+            Assert.assertTrue("The property is not named: " + e.getMessage(), e.getMessage().contains("server"));
+            Assert.assertTrue("The reason for the failure is not reported",
+                    e.getCause() instanceof IllegalArgumentException);
+        }
+    }
 }

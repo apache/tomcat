@@ -28,9 +28,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Wrapper;
 
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.interceptor.AbstractCreateStatementInterceptor;
+import org.apache.tomcat.jdbc.pool.util.ExceptionUtils;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
@@ -44,10 +43,10 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  * <p>
  * Sealing follows the declared type: a value that is not itself a result set is passed through unchanged, so cursors
  * carried inside an {@link java.sql.Array}, {@link java.sql.Struct} or {@link java.sql.Ref} are not sealed.
+ * If the proxy for a statement or result set cannot be built, the driver handle is closed and the call fails with a
+ * controlled exception rather than returning the unsealed handle.
  */
 public class StatementFacade extends AbstractCreateStatementInterceptor {
-
-    private static final Log logger = LogFactory.getLog(StatementFacade.class);
 
     /**
      * Whether the borrow this facade was created for has ended. The pool creates one facade per borrow, so this says
@@ -120,20 +119,76 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
             }
             return constructor.newInstance(new Object[] { new StatementProxy(statement, sql, proxy) });
         } catch (Exception x) {
-            // Defensive branch: reaching it requires the proxy machinery
-            // to fail for the statement interfaces after it already built
-            // this borrow's connection handle - the constructor cache the
-            // wrap consults is written only by the class initializer and
-            // by a test seam that simulates a failed one, and a proxy
-            // constructor cannot refuse its single handler argument - so
-            // no application behavior gets here. Should it ever, the
-            // caller keeps a working statement, the posture upstream
-            // took, at the one cost that this facade's seal does not
-            // cover the object handed back; the warn below is that cost's
-            // only report.
-            logger.warn(MessageFactory.get("statementFacade.unableToCreateStatementProxy"), x);
+            // A proxy constructor can wrap a fatal error from its handler in an InvocationTargetException. The
+            // module's fatal policy looks through that wrapper before the defensive branch below treats the failure
+            // as an ordinary proxy-construction failure.
+            ExceptionUtils.handleThrowable(ExceptionUtils.unwrapInvocationTargetException(x));
+            // The facade's contract is that no unsealed driver handle leaves
+            // it. Reaching this defensive branch means the proxy machinery
+            // could not build the statement handle, so close the driver
+            // statement rather than hand it to the application raw, and fail
+            // the creation. The interceptor above this one closes the statement
+            // when this hook throws as well, so the indirect path also leaves
+            // no handle behind; closing here covers a direct caller too.
+            closeDriverStatement(statement, x);
+            IllegalStateException failure = new IllegalStateException(
+                    MessageFactory.get("statementFacade.unableToCreateStatementProxy"));
+            failure.initCause(x);
+            throw failure;
         }
-        return statement;
+    }
+
+    /**
+     * Closes a driver statement that has not been sealed, adding a failure of the close to the failure that caused the
+     * statement to be abandoned rather than masking it.
+     *
+     * @param statement the unsealed driver statement
+     * @param cause     the failure being reported
+     */
+    private static void closeDriverStatement(Object statement, Throwable cause) {
+        if (statement instanceof Statement) {
+            try {
+                ((Statement) statement).close();
+            } catch (Throwable closeFailure) {
+                ExceptionUtils.handleThrowable(closeFailure);
+                if (closeFailure != cause) {
+                    cause.addSuppressed(closeFailure);
+                }
+            }
+        }
+    }
+
+    /**
+     * Wraps a driver result set in a sealed handle. If the proxy machinery cannot build the handle, the driver result
+     * set is closed rather than left open and unsealed, and the call fails with a controlled SQLException.
+     *
+     * @param result the driver result set the call produced
+     * @param parent the statement handle the result set is read from
+     *
+     * @return the sealed result set handle
+     *
+     * @throws SQLException if the sealed handle cannot be built
+     */
+    private Object wrapResultSet(Object result, Object parent) throws SQLException {
+        try {
+            return getConstructor(RESULTSET_IDX, ResultSet.class)
+                    .newInstance(new ResultSetProxy(result, parent));
+        } catch (Throwable t) {
+            Throwable cause = ExceptionUtils.unwrapInvocationTargetException(t);
+            ExceptionUtils.handleThrowable(cause);
+            try {
+                ((ResultSet) result).close();
+            } catch (Throwable closeFailure) {
+                ExceptionUtils.handleThrowable(closeFailure);
+                if (closeFailure != t) {
+                    t.addSuppressed(closeFailure);
+                }
+            }
+            SQLException failure = new SQLException(
+                    MessageFactory.get("statementFacade.unableToCreateResultSetProxy"));
+            failure.initCause(t);
+            throw failure;
+        }
     }
 
     /**
@@ -250,8 +305,7 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
                 // ResultSet. ResultSetProxy mirrors this rule for the result
                 // sets a result set itself hands out.
                 if (result instanceof ResultSet && method.getDeclaringClass() != Wrapper.class) {
-                    return getConstructor(RESULTSET_IDX, ResultSet.class)
-                            .newInstance(new ResultSetProxy(result, proxy));
+                    return wrapResultSet(result, proxy);
                 }
             } catch (Throwable t) {
                 if (t instanceof InvocationTargetException && t.getCause() != null) {
@@ -381,8 +435,7 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
                 // getStatement() keeps answering a Statement; the Wrapper
                 // carve-out is the statement proxy's, for its reason there.
                 if (result instanceof ResultSet && method.getDeclaringClass() != Wrapper.class) {
-                    return getConstructor(RESULTSET_IDX, ResultSet.class)
-                            .newInstance(new ResultSetProxy(result, parent));
+                    return wrapResultSet(result, parent);
                 }
             } catch (Throwable t) {
                 if (t instanceof InvocationTargetException && t.getCause() != null) {

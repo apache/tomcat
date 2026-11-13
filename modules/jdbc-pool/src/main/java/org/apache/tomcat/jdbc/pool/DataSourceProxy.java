@@ -84,6 +84,11 @@ public class DataSourceProxy implements PoolConfiguration {
         if (poolProperties == null) {
             throw new NullPointerException(MessageFactory.get("dataSourceProxy.poolConfigurationNull"));
         }
+        if (poolProperties instanceof DataSourceProxy
+                || poolProperties instanceof org.apache.tomcat.jdbc.pool.jmx.ConnectionPool) {
+            throw new IllegalArgumentException(
+                    MessageFactory.get("poolProperties.displayConfigurationNotAllowed"));
+        }
         this.poolProperties = poolProperties;
     }
 
@@ -264,7 +269,8 @@ public class DataSourceProxy implements PoolConfiguration {
                 try {
                     fresh.close(true);
                 } catch (Exception y) {
-                    log.warn(MessageFactory.get("dataSourceProxy.errorClosingPool"), y);
+                    log.warn(MessageFactory.get("dataSourceProxy.errorClosingPool"),
+                            PoolUtilities.maskCredentials(y));
                 }
                 if (x instanceof SQLException) {
                     throw (SQLException) x;
@@ -281,7 +287,8 @@ public class DataSourceProxy implements PoolConfiguration {
                 try {
                     fresh.close(true);
                 } catch (Exception x) {
-                    log.warn(MessageFactory.get("dataSourceProxy.errorClosingPool"), x);
+                    log.warn(MessageFactory.get("dataSourceProxy.errorClosingPool"),
+                            PoolUtilities.maskCredentials(x));
                 }
                 throw new SQLException(MessageFactory.get("dataSourceProxy.dataSourceClosed"));
             }
@@ -305,6 +312,10 @@ public class DataSourceProxy implements PoolConfiguration {
     /**
      * Retrieves a connection future: the pool's synchronous borrow is invoked first with no wait, and when a
      * connection cannot be handed out immediately the returned future completes once one becomes available.
+     * <p>
+     * A future for a connection that was already available completes while this method runs. Such a future cannot
+     * be cancelled; its caller must retrieve the connection and close it to return it to the pool. Cancelling a
+     * future that is still waiting returns its queued connection request to the pool.
      *
      * @return a Future containing a reference to the connection when it becomes available
      *
@@ -363,9 +374,19 @@ public class DataSourceProxy implements PoolConfiguration {
 
 
     /**
-     * Get a database connection. {@link javax.sql.DataSource#getConnection()}
+     * Get a database connection. {@link javax.sql.ConnectionPoolDataSource#getPooledConnection()}
+     * <p>
+     * Deviation from the {@code javax.sql} contract: the returned {@link javax.sql.PooledConnection} is a handle
+     * borrowed from the pool, not a newly opened physical connection, so under load this call blocks waiting for a
+     * free session or fails with pool exhaustion rather than with a database error. Its
+     * {@link java.sql.Connection#close() close()} returns the session to the pool instead of closing the physical
+     * connection. The connection obtained from the returned handle's
+     * {@link javax.sql.PooledConnection#getConnection()} is the driver's raw logical session, not a pool-managed
+     * connection: the pool's interceptors and features do not apply to it, and closing it invalidates the session
+     * under the pool's own notion of a live connection. Release the borrowed session by closing the handle, not that
+     * connection.
      *
-     * @return the connection
+     * @return the borrowed pooled-connection handle
      *
      * @throws SQLException Connection error
      */
@@ -374,12 +395,18 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
     /**
-     * Get a database connection. {@link javax.sql.DataSource#getConnection(String,String)}
+     * Get a database connection. {@link javax.sql.ConnectionPoolDataSource#getPooledConnection(String,String)}
+     * <p>
+     * The returned handle deviates from the {@code javax.sql} contract as described on
+     * {@link #getPooledConnection()}. The given credentials are honored only when
+     * {@link PoolConfiguration#setAlternateUsernameAllowed(boolean) alternateUsernameAllowed} is enabled; otherwise
+     * the borrow proceeds under the pool's configured user name, exactly as
+     * {@link #getConnection(String,String)} does.
      *
      * @param username The user name
      * @param password The password
      *
-     * @return the connection
+     * @return the borrowed pooled-connection handle
      *
      * @throws SQLException Connection error
      */
@@ -405,7 +432,7 @@ public class DataSourceProxy implements PoolConfiguration {
             // interceptor value, for example - is a creation failure like any
             // other to this contract: report it and answer no pool rather than
             // let it escape from a getter documented to return null.
-            log.error(MessageFactory.get("dataSourceProxy.errorCreatingPool"), x);
+            log.error(MessageFactory.get("dataSourceProxy.errorCreatingPool"), PoolUtilities.maskCredentials(x));
             return null;
         }
     }
@@ -467,7 +494,7 @@ public class DataSourceProxy implements PoolConfiguration {
         try {
             p.close(all);
         } catch (Exception x) {
-            log.warn(MessageFactory.get("dataSourceProxy.errorClosingPool"), x);
+            log.warn(MessageFactory.get("dataSourceProxy.errorClosingPool"), PoolUtilities.maskCredentials(x));
         }
     }
 
@@ -501,16 +528,30 @@ public class DataSourceProxy implements PoolConfiguration {
 
 
     /**
-     * Replaces the configuration this data source hands out. A pool that already exists keeps the configuration it was
-     * built from; only a pool created afterwards uses the replacement. The one thing the replacement reaches on a
-     * running pool is its background maintenance, which is judged from this class's current configuration.
+     * Replaces the configuration this data source hands out, before the pool is created. Once a pool exists, its
+     * borrow, return, validation, cleaner and configuration surfaces all operate on the configuration the pool was
+     * built from; replacing the data source's configuration at that point would leave the data source and its setters
+     * writing a second configuration object that the live pool does not use. The setter is therefore rejected after
+     * the pool has started and after the data source has closed, like the other start-time properties. A display-only
+     * bean/JMX view, such as another data source proxy, is not a usable backing configuration and is rejected as well;
+     * pass the underlying {@link PoolProperties} instead.
      *
      * @param poolProperties The new pool configuration
+     *
+     * @throws NullPointerException if the configuration is null
+     * @throws IllegalArgumentException if the configuration is a display-only bean/JMX view
+     * @throws UnsupportedOperationException if the pool has already been created or this data source has been closed
      */
-    public void setPoolProperties(PoolConfiguration poolProperties) {
+    public synchronized void setPoolProperties(PoolConfiguration poolProperties) {
         if (poolProperties == null) {
             throw new NullPointerException(MessageFactory.get("dataSourceProxy.poolConfigurationNull"));
         }
+        if (poolProperties instanceof DataSourceProxy
+                || poolProperties instanceof org.apache.tomcat.jdbc.pool.jmx.ConnectionPool) {
+            throw new IllegalArgumentException(
+                    MessageFactory.get("poolProperties.displayConfigurationNotAllowed"));
+        }
+        checkPoolNotStarted("poolProperties");
         this.poolProperties = poolProperties;
     }
 
@@ -521,8 +562,17 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
 
+    /**
+     * Sets the number of connections pre-loaded when the pool starts. The value is used when the pool is created; a
+     * later write would only change the configuration without pre-loading any connection.
+     *
+     * @param initialSize the number of connections to pre-load
+     *
+     * @throws UnsupportedOperationException if the pool has already been created or this data source has been closed
+     */
     @Override
-    public void setInitialSize(int initialSize) {
+    public synchronized void setInitialSize(int initialSize) {
+        checkPoolNotStarted("initialSize");
         this.poolProperties.setInitialSize(initialSize);
     }
 
@@ -719,6 +769,25 @@ public class DataSourceProxy implements PoolConfiguration {
 
 
     /**
+     * Rejects a write to a property that is read only while the pool is being created.
+     *
+     * @param property the property name
+     *
+     * @throws UnsupportedOperationException if the pool exists or this data source is closed
+     */
+    private void checkPoolNotStarted(String property) {
+        if (closed) {
+            throw new UnsupportedOperationException(
+                    MessageFactory.get("dataSourceProxy.startTimePropertyAfterClose", property));
+        }
+        if (pool != null) {
+            throw new UnsupportedOperationException(
+                    MessageFactory.get("dataSourceProxy.startTimePropertyAfterStart", property));
+        }
+    }
+
+
+    /**
      * Sets whether JMX is enabled, before the pool is created. Whether the pool registers an MBean is decided when
      * the pool is created, so a write after that point is rejected rather than stored without effect, matching the
      * pool MBean's own setter. A closed data source is rejected as well: it can never create a pool again, so a write
@@ -740,8 +809,17 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
 
+    /**
+     * Sets whether the pool's idle queue is fair. The queue type is chosen when the pool is created; a later write would
+     * only change the configuration without changing the live queue.
+     *
+     * @param fairQueue {@code true} to use a fair idle queue
+     *
+     * @throws UnsupportedOperationException if the pool has already been created or this data source has been closed
+     */
     @Override
-    public void setFairQueue(boolean fairQueue) {
+    public synchronized void setFairQueue(boolean fairQueue) {
+        checkPoolNotStarted("fairQueue");
         this.getPoolProperties().setFairQueue(fairQueue);
     }
 
@@ -780,7 +858,8 @@ public class DataSourceProxy implements PoolConfiguration {
             // interface (PoolProperties itself and the pool's JMX wrapper).
             getPoolProperties().setConnectionProperties(properties);
         } catch (RuntimeException x) {
-            log.error(MessageFactory.get("dataSourceProxy.unableToParseConnectionProperties"), x);
+            log.error(MessageFactory.get("dataSourceProxy.unableToParseConnectionProperties"),
+                    PoolUtilities.maskCredentials(x));
             throw x;
         }
     }
@@ -1095,6 +1174,11 @@ public class DataSourceProxy implements PoolConfiguration {
      * Returns the connection properties with any credential they carry masked out, so the data source's own bean/JMX
      * surface does not expose a password in cleartext. The write is not masked: {@link #setConnectionProperties(String)}
      * takes the string as it is meant to reach the driver. Use {@link #getPoolProperties()} for the raw value.
+     * <p>
+     * The masked value is a display value, not a safe value to write back: the ordinary read-modify-write replaces the
+     * credential with the mask and leaves the pool unable to authenticate. Change the credential through
+     * {@link #setPassword(String)} and {@link #setUsername(String)}, or read the raw value from
+     * {@link #getPoolProperties()}.
      * {@inheritDoc}
      */
     @Override
@@ -1157,6 +1241,10 @@ public class DataSourceProxy implements PoolConfiguration {
     /**
      * Returns the interceptor configuration with any credential its definitions carry masked out, so the data source's
      * own bean/JMX surface does not expose a password in cleartext. Use {@link #getPoolProperties()} for the raw value.
+     * <p>
+     * The masked value is a display value, not a safe value to write back: the ordinary read-modify-write installs the
+     * mask into a definition's parameter list and can break the interceptor on the next chain build. Read the raw value
+     * from {@link #getPoolProperties()} before writing the configuration back.
      * {@inheritDoc}
      */
     @Override
@@ -1236,7 +1324,13 @@ public class DataSourceProxy implements PoolConfiguration {
     /**
      * Returns the JDBC URL with any credential it carries masked out, so the data source's own bean/JMX surface does
      * not expose a password in cleartext. The write is not masked: {@link #setUrl(String)} takes the URL as it is meant
-     * to reach the driver. Use {@link #getPoolProperties()} for the raw value. {@inheritDoc}
+     * to reach the driver. Use {@link #getPoolProperties()} for the raw value.
+     * <p>
+     * The masked value is a display value, not a safe value to write back: the ordinary read-modify-write replaces the
+     * credential with the mask and leaves the pool unable to authenticate. Change the credential through
+     * {@link #setPassword(String)} and {@link #setUsername(String)}, or read the raw value from
+     * {@link #getPoolProperties()}.
+     * {@inheritDoc}
      */
     @Override
     public String getUrl() {
@@ -1542,8 +1636,17 @@ public class DataSourceProxy implements PoolConfiguration {
         return getPoolProperties().isIgnoreExceptionOnPreLoad();
     }
 
+    /**
+     * Sets whether failures during the pool's initial pre-load may be ignored. The value is used only while the pool is
+     * being created; a later write would only change the configuration.
+     *
+     * @param ignoreExceptionOnPreLoad {@code true} to ignore pre-load failures
+     *
+     * @throws UnsupportedOperationException if the pool has already been created or this data source has been closed
+     */
     @Override
-    public void setIgnoreExceptionOnPreLoad(boolean ignoreExceptionOnPreLoad) {
+    public synchronized void setIgnoreExceptionOnPreLoad(boolean ignoreExceptionOnPreLoad) {
+        checkPoolNotStarted("ignoreExceptionOnPreLoad");
         getPoolProperties().setIgnoreExceptionOnPreLoad(ignoreExceptionOnPreLoad);
     }
 
@@ -1576,7 +1679,7 @@ public class DataSourceProxy implements PoolConfiguration {
         try {
             createPool().purge();
         } catch (SQLException x) {
-            log.error(MessageFactory.get("dataSourceProxy.unableToPurgePool"), x);
+            log.error(MessageFactory.get("dataSourceProxy.unableToPurgePool"), PoolUtilities.maskCredentials(x));
         }
     }
 
@@ -1587,7 +1690,7 @@ public class DataSourceProxy implements PoolConfiguration {
         try {
             createPool().purgeOnReturn();
         } catch (SQLException x) {
-            log.error(MessageFactory.get("dataSourceProxy.unableToPurgePool"), x);
+            log.error(MessageFactory.get("dataSourceProxy.unableToPurgePool"), PoolUtilities.maskCredentials(x));
         }
     }
 }

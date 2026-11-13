@@ -412,4 +412,49 @@ class TestSlowQueryJmxMBeanSurface extends JdbcPoolBaseTest {
                 "with no statistics map the read must degrade to the empty array, "
                         + "not to a null a JMX client has to trip over");
     }
+
+    @Test
+    void aPoolNameWithWildcardCharactersIsQuoted() throws Exception {
+        String poolName = "wildcard-*?-name";
+        DataSource ds = reportingPoolNamed(poolName);
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        ObjectName expected = new ObjectName("tomcat.jdbc:type=" + SlowQueryReportJmx.class.getName()
+                + ",name=" + ObjectName.quote(poolName));
+        try {
+            try (Connection con = ds.getConnection();
+                    Statement st = con.createStatement()) {
+                st.execute("SELECT 1");
+            }
+            Assertions.assertFalse(expected.isPattern(), "the quoted registration name must not be a pattern");
+            Assertions.assertTrue(server.isRegistered(expected),
+                    "a pool name containing ObjectName wildcard characters must be quoted, not registered "
+                            + "as a pattern that the MBean server refuses: " + expected);
+        } finally {
+            ds.close();
+        }
+        Assertions.assertFalse(server.isRegistered(expected), "the close must release the quoted registration");
+    }
+
+    @Test
+    void aPoolNameWithObjectNameGrammarCharactersIsQuoted() throws Exception {
+        String poolName = "grammar-name,key=value";
+        DataSource ds = reportingPoolNamed(poolName);
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        ObjectName expected = new ObjectName("tomcat.jdbc:type=" + SlowQueryReportJmx.class.getName()
+                + ",name=" + ObjectName.quote(poolName));
+        try {
+            try (Connection con = ds.getConnection();
+                    Statement st = con.createStatement()) {
+                st.execute("SELECT 1");
+            }
+            Assertions.assertTrue(server.isRegistered(expected),
+                    "a pool name containing ObjectName grammar characters must be quoted into one property, "
+                            + "not parsed as extra keys: " + expected);
+            Assertions.assertTrue(expected.getKeyPropertyList().size() == 2,
+                    "the quoted name must stay the single name property: " + expected);
+        } finally {
+            ds.close();
+        }
+        Assertions.assertFalse(server.isRegistered(expected), "the close must release the quoted registration");
+    }
 }

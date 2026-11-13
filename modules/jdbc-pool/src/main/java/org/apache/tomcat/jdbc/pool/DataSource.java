@@ -305,7 +305,8 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
             p.unregisterConnectionMBeans();
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            log.error(MessageFactory.get("dataSource.unableToUnregisterConnectionMBeans"), t);
+            log.error(MessageFactory.get("dataSource.unableToUnregisterConnectionMBeans"),
+                    PoolUtilities.maskCredentials(t));
         }
     }
 
@@ -323,7 +324,9 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
             try {
                 unregisterJmx(name);
             } catch (Throwable t) {
-                log.error(MessageFactory.get("dataSource.unableToUnregisterMBean", name), t);
+                ExceptionUtils.handleThrowable(t);
+                log.error(MessageFactory.get("dataSource.unableToUnregisterMBean", name),
+                        PoolUtilities.maskCredentials(t));
             }
         }
     }

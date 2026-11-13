@@ -26,6 +26,7 @@ import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.DataSourceFactory;
 import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
 import org.apache.tomcat.jdbc.pool.PoolConfiguration;
+import org.apache.tomcat.jdbc.pool.PoolUtilities;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 import org.apache.tomcat.jdbc.pool.ProxyConnection;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
@@ -223,7 +224,8 @@ public class ConnectionState extends JdbcInterceptor {
                 } else {
                     refusedIsolationLevel = defaultTransactionIsolation;
                     log.error(MessageFactory.get("connectionState.unableToResetTransactionIsolation",
-                            Integer.valueOf(defaultTransactionIsolation)), confirmed);
+                            Integer.valueOf(defaultTransactionIsolation)),
+                            PoolUtilities.maskCredentials(confirmed));
                 }
             }
         }
@@ -529,7 +531,8 @@ public class ConnectionState extends JdbcInterceptor {
             }
         } catch (Throwable e) {
             if (write) {
-                log.warn(MessageFactory.get("connectionState.resetStateToNull", name), e);
+                log.warn(MessageFactory.get("connectionState.resetStateToNull", name),
+                        PoolUtilities.maskCredentials(e));
                 switch (index) {
                     case 0: {
                         autoCommit = null;

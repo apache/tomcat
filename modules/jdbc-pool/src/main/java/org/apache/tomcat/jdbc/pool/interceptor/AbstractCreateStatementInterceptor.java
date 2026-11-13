@@ -30,6 +30,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
+import org.apache.tomcat.jdbc.pool.PoolUtilities;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 import org.apache.tomcat.jdbc.pool.util.ExceptionUtils;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
@@ -219,9 +220,11 @@ public abstract class AbstractCreateStatementInterceptor extends JdbcInterceptor
             Class<?> proxyClass = Proxy.getProxyClass(AbstractCreateStatementInterceptor.class.getClassLoader(),
                     new Class[] { clazz });
             constructors[idx] = proxyClass.getConstructor(new Class[] { InvocationHandler.class });
-        } catch (ReflectiveOperationException | IllegalArgumentException | LinkageError e) {
+        } catch (ReflectiveOperationException | RuntimeException | LinkageError e) {
             // An exception escaping the class initializer would surface as an
-            // ExceptionInInitializerError at every use of every subclass.
+            // ExceptionInInitializerError at every use of every subclass. The
+            // runtime branch covers security restrictions and other reflective
+            // refusals that are not ReflectiveOperationExceptions.
             log.warn(MessageFactory.get("abstractCreateStatementInterceptor.unableToCreateConstructorCacheEntry",
                     Integer.valueOf(idx), clazz.getName()), e);
         }
@@ -247,7 +250,7 @@ public abstract class AbstractCreateStatementInterceptor extends JdbcInterceptor
                 // with no way to retry the close.
                 ExceptionUtils.handleThrowable(t);
                 log.warn(MessageFactory.get("abstractCreateStatementInterceptor.closeInvokedFailed",
-                        getClass().getName()), t);
+                        getClass().getName()), PoolUtilities.maskCredentials(t));
             }
             return super.invoke(proxy, method, args);
         } else {
