@@ -20,6 +20,7 @@ package org.apache.catalina.util;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -64,18 +65,166 @@ public class NetMaskSet {
     }
 
     /**
-     * Tests if the provided IP address matches any of the {@link NetMask}s in the set.
+     * Tests if the provided IP address matches any of the {@link NetMask}s in the set. The input is never resolved
+     * since it may come from an untrusted source such as a request header.
      *
-     * @param ipAddress an IP address or hostname to check
+     * @param ipAddress an IPv4 or IPv6 address literal to check
      *
      * @return {@code true} if the passed IP address is matched by any of the {@link NetMask}s in the set
      *
-     * @throws UnknownHostException if the passed input cannot be resolved to an IP address
+     * @throws UnknownHostException if the passed input is not an IP address literal
      */
     public boolean contains(String ipAddress) throws UnknownHostException {
 
-        InetAddress inetAddress = InetAddress.getByName(ipAddress);
-        return this.contains(inetAddress);
+        byte[] address = parseAddress(ipAddress);
+        if (address == null) {
+            throw new UnknownHostException(sm.getString("netmaskSet.invalidAddress", ipAddress));
+        }
+        return this.contains(InetAddress.getByAddress(address));
+    }
+
+
+    /*
+     * Parses an IPv4 or IPv6 address literal without any name resolution. An IPv6 address may be enclosed in square
+     * brackets and may have a zone ID which is ignored.
+     */
+    private static byte[] parseAddress(String input) {
+        if (input == null) {
+            return null;
+        }
+        String address = input;
+        if (address.length() > 2 && address.charAt(0) == '[' && address.charAt(address.length() - 1) == ']') {
+            address = address.substring(1, address.length() - 1);
+            if (address.indexOf(':') < 0) {
+                // Only an IPv6 address may be enclosed in square brackets
+                return null;
+            }
+        }
+        if (address.indexOf(':') < 0) {
+            return parseIPv4(address);
+        }
+        int zoneStart = address.indexOf('%');
+        if (zoneStart >= 0) {
+            if (!isZoneId(address, zoneStart + 1)) {
+                return null;
+            }
+            address = address.substring(0, zoneStart);
+        }
+        return parseIPv6(address);
+    }
+
+
+    /*
+     * Checks that the characters from the start position onwards are a zone ID as defined by RFC 6874.
+     */
+    private static boolean isZoneId(String address, int start) {
+        if (start >= address.length()) {
+            return false;
+        }
+        for (int i = start; i < address.length(); i++) {
+            char c = address.charAt(i);
+            if (!(c >= '0' && c <= '9' || c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c == '.' || c == '_' ||
+                    c == '~' || c == '-')) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    private static byte[] parseIPv4(String address) {
+        byte[] result = new byte[4];
+        int octet = 0;
+        int digits = 0;
+        int value = 0;
+        for (int i = 0; i < address.length(); i++) {
+            char c = address.charAt(i);
+            if (c >= '0' && c <= '9') {
+                value = value * 10 + (c - '0');
+                digits++;
+                if (digits > 3 || value > 255) {
+                    return null;
+                }
+            } else if (c == '.' && digits > 0 && octet < 3) {
+                result[octet++] = (byte) value;
+                value = 0;
+                digits = 0;
+            } else {
+                return null;
+            }
+        }
+        if (digits == 0 || octet != 3) {
+            return null;
+        }
+        result[3] = (byte) value;
+        return result;
+    }
+
+
+    private static byte[] parseIPv6(String address) {
+        int compress = address.indexOf("::");
+        if (compress < 0) {
+            byte[] result = parseIPv6Groups(address, true);
+            return result != null && result.length == 16 ? result : null;
+        }
+        if (address.indexOf("::", compress + 1) >= 0) {
+            // More than one "::"
+            return null;
+        }
+        byte[] head = parseIPv6Groups(address.substring(0, compress), false);
+        byte[] tail = parseIPv6Groups(address.substring(compress + 2), true);
+        // "::" stands for at least one group of zeros
+        if (head == null || tail == null || head.length + tail.length > 14) {
+            return null;
+        }
+        byte[] result = new byte[16];
+        System.arraycopy(head, 0, result, 0, head.length);
+        System.arraycopy(tail, 0, result, 16 - tail.length, tail.length);
+        return result;
+    }
+
+
+    /*
+     * Parses colon separated groups of one to four hex digits. If allowed, the last group may be an IPv4 address.
+     */
+    private static byte[] parseIPv6Groups(String groups, boolean allowIPv4) {
+        if (groups.isEmpty()) {
+            return new byte[0];
+        }
+        String[] parts = groups.split(":", -1);
+        byte[] buffer = new byte[16];
+        int length = 0;
+        for (int i = 0; i < parts.length; i++) {
+            String part = parts[i];
+            if (allowIPv4 && i == parts.length - 1 && part.indexOf('.') >= 0) {
+                byte[] ipv4 = parseIPv4(part);
+                if (ipv4 == null || length + 4 > buffer.length) {
+                    return null;
+                }
+                System.arraycopy(ipv4, 0, buffer, length, 4);
+                length += 4;
+            } else {
+                if (part.isEmpty() || part.length() > 4 || length + 2 > buffer.length) {
+                    return null;
+                }
+                int value = 0;
+                for (int j = 0; j < part.length(); j++) {
+                    char c = part.charAt(j);
+                    if (c >= '0' && c <= '9') {
+                        value = value * 16 + (c - '0');
+                    } else if (c >= 'a' && c <= 'f') {
+                        value = value * 16 + (c - 'a' + 10);
+                    } else if (c >= 'A' && c <= 'F') {
+                        value = value * 16 + (c - 'A' + 10);
+                    } else {
+                        return null;
+                    }
+                }
+                buffer[length++] = (byte) (value >> 8);
+                buffer[length++] = (byte) value;
+            }
+        }
+        return Arrays.copyOf(buffer, length);
     }
 
     /**
