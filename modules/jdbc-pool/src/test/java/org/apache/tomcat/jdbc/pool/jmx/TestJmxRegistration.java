@@ -342,7 +342,7 @@ class TestJmxRegistration extends JdbcPoolBaseTest {
         try {
             server.registerMBean(jmx, direct);
             ObjectName connectionName;
-            try (Connection borrowed = ds.getConnection()) {
+            try (@SuppressWarnings("unused") Connection borrowed = ds.getConnection()) {
                 connectionName = connectionMBeanUnder(server, direct);
                 Assertions.assertNotNull(connectionName,
                         "precondition: the directly published pool has its connection MBean below it");
@@ -378,7 +378,7 @@ class TestJmxRegistration extends JdbcPoolBaseTest {
         try {
             server.registerMBean(jmx, direct);
             ObjectName connectionName;
-            try (Connection borrowed = ds.getConnection()) {
+            try (@SuppressWarnings("unused") Connection borrowed = ds.getConnection()) {
                 connectionName = connectionMBeanUnder(server, direct);
                 Assertions.assertNotNull(connectionName,
                         "precondition: the directly published pool has its connection MBean below it");
@@ -419,7 +419,7 @@ class TestJmxRegistration extends JdbcPoolBaseTest {
             // connects in that window publishes below it.
             jmx.preRegister(server, occupied);
             ObjectName connectionName;
-            try (Connection borrowed = ds.getConnection()) {
+            try (@SuppressWarnings("unused") Connection borrowed = ds.getConnection()) {
                 connectionName = connectionMBeanUnder(server, occupied);
                 Assertions.assertNotNull(connectionName,
                         "precondition: the child was published while the refused name was installed");
