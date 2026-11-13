@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.function.Function;
 
 import javax.xml.transform.Source;
@@ -158,7 +159,11 @@ public class DefaultServlet extends HttpServlet {
 
     /**
      * MIME multipart separation string
+     *
+     * @deprecated Unused. A different boundary is generated for every multipart response. Will be removed in a future
+     *                 version.
      */
+    @Deprecated
     protected static final String mimeSeparation = "CATALINA_MIME_BOUNDARY";
 
     /**
@@ -1265,7 +1270,9 @@ public class DefaultServlet extends HttpServlet {
                     }
                 }
             } else {
-                response.setContentType("multipart/byteranges; boundary=" + mimeSeparation);
+                // RFC 2046: the boundary must not appear within the content so use a different one for every response
+                String boundary = UUID.randomUUID().toString();
+                response.setContentType("multipart/byteranges; boundary=" + boundary);
                 if (serveContent) {
                     try {
                         response.setBufferSize(output);
@@ -1273,7 +1280,7 @@ public class DefaultServlet extends HttpServlet {
                         // Content has already been written - this must be an include. Ignore the error and continue.
                     }
                     if (ostream != null) {
-                        copy(resource, contentLength, ostream, ranges, contentType);
+                        copy(resource, contentLength, ostream, ranges, contentType, boundary);
                     } else {
                         // we should not get here
                         throw new IllegalStateException();
@@ -2674,7 +2681,8 @@ public class DefaultServlet extends HttpServlet {
 
 
     /**
-     * Copy the selected contents of the specified resource to the specified output stream.
+     * Copy the selected contents of the specified resource to the specified output stream using the fixed boundary
+     * {@link #mimeSeparation}.
      *
      * @param resource    The source resource
      * @param length      the resource length
@@ -2683,9 +2691,31 @@ public class DefaultServlet extends HttpServlet {
      * @param contentType Content type of the resource
      *
      * @exception IOException if an input/output error occurs
+     *
+     * @deprecated Unused. Use {@link #copy(WebResource, long, ServletOutputStream, Ranges, String, String)}. Will be
+     *                 removed in a future version.
      */
+    @Deprecated
     protected void copy(WebResource resource, long length, ServletOutputStream ostream, Ranges ranges,
             String contentType) throws IOException {
+        copy(resource, length, ostream, ranges, contentType, mimeSeparation);
+    }
+
+
+    /**
+     * Copy the selected contents of the specified resource to the specified output stream.
+     *
+     * @param resource    The source resource
+     * @param length      the resource length
+     * @param ostream     The output stream to write to
+     * @param ranges      Enumeration of the ranges the client wanted to retrieve
+     * @param contentType Content type of the resource
+     * @param boundary    The boundary used to separate the parts of the multipart response
+     *
+     * @exception IOException if an input/output error occurs
+     */
+    protected void copy(WebResource resource, long length, ServletOutputStream ostream, Ranges ranges,
+            String contentType, String boundary) throws IOException {
 
         IOException exception = null;
 
@@ -2698,7 +2728,7 @@ public class DefaultServlet extends HttpServlet {
 
                 // Writing MIME header.
                 ostream.println();
-                ostream.println("--" + mimeSeparation);
+                ostream.println("--" + boundary);
                 if (contentType != null) {
                     ostream.println("Content-Type: " + contentType);
                 }
@@ -2713,7 +2743,7 @@ public class DefaultServlet extends HttpServlet {
         }
 
         ostream.println();
-        ostream.print("--" + mimeSeparation + "--");
+        ostream.print("--" + boundary + "--");
 
         // Rethrow any exception that has occurred
         if (exception != null) {

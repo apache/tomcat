@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -1001,6 +1002,58 @@ public class TestDefaultServlet extends TomcatBaseTest {
             Assert.assertNull(exception);
             Assert.assertArrayEquals(source, output.toByteArray());
         }
+    }
+
+
+    /*
+     * RFC 2046 requires that the boundary delimiter does not appear within any of the parts of a multipart body. Content
+     * that contains the delimiter used by earlier versions must not be able to inject an additional part.
+     */
+    @Test
+    public void testMultipartByteRangesBoundaryNotInContent() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File(getTemporaryDirectory(), "multipartBoundary");
+        addDeleteOnTearDown(appDir);
+        Assert.assertTrue(appDir.isDirectory() || appDir.mkdirs());
+        String content = "AAAA\r\n--CATALINA_MIME_BOUNDARY\r\nContent-Type: text/html\r\n" +
+                "Content-Range: bytes 0-3/5\r\n\r\nFORGED\r\nBBBB";
+        try (FileOutputStream fos = new FileOutputStream(new File(appDir, "boundary.txt"))) {
+            fos.write(content.getBytes(StandardCharsets.ISO_8859_1));
+        }
+
+        Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
+        ctxt.addMimeMapping("txt", "text/plain");
+        Tomcat.addServlet(ctxt, "default", DefaultServlet.class.getName());
+        ctxt.addServletMapping("/", "default");
+
+        tomcat.start();
+
+        String rangeHeader = "bytes=0-" + (content.length() - 1) + ",0-3";
+        String[] boundaries = new String[2];
+        for (int i = 0; i < boundaries.length; i++) {
+            ByteChunk body = new ByteChunk();
+            Map<String,List<String>> reqHeaders = new HashMap<>();
+            reqHeaders.put("Range", List.of(rangeHeader));
+            Map<String,List<String>> resHeaders = new HashMap<>();
+            int rc = getUrl("http://localhost:" + getPort() + "/boundary.txt", body, reqHeaders, resHeaders);
+            Assert.assertEquals(HttpServletResponse.SC_PARTIAL_CONTENT, rc);
+
+            String contentType = resHeaders.get("Content-Type").get(0);
+            Assert.assertTrue(contentType, contentType.startsWith("multipart/byteranges; boundary="));
+            boundaries[i] = contentType.substring(contentType.indexOf('=') + 1);
+            Assert.assertNotEquals("CATALINA_MIME_BOUNDARY", boundaries[i]);
+
+            // Two parts and the closing delimiter
+            String delimiter = "--" + boundaries[i];
+            String bodyText = body.toString();
+            int count = 0;
+            for (int pos = bodyText.indexOf(delimiter); pos != -1; pos = bodyText.indexOf(delimiter, pos + 1)) {
+                count++;
+            }
+            Assert.assertEquals(3, count);
+        }
+        Assert.assertNotEquals(boundaries[0], boundaries[1]);
     }
 
 
