@@ -546,6 +546,75 @@ public class TestDefaultServlet extends TomcatBaseTest {
     }
 
     /*
+     * RFC 9110, section 15.4.5: a 304 response must include the Vary header field that the 200 response would have
+     * included.
+     */
+    @Test
+    public void testPrecompressedNotModifiedIncludesVary() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+
+        // app dir is relative to server home
+        Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
+        Wrapper defaultServlet = Tomcat.addServlet(ctxt, "default", DefaultServlet.class.getName());
+        defaultServlet.addInitParameter("precompressed", "br=.br,gzip=.gz");
+        defaultServlet.addInitParameter("fileEncoding", "ISO-8859-1");
+
+        ctxt.addServletMapping("/", "default");
+        ctxt.addMimeMapping("html", "text/html");
+
+        tomcat.start();
+
+        TestCompressedClient client = new TestCompressedClient(getPort());
+
+        client.reset();
+        // @formatter:off
+        client.setRequest(new String[] {
+                "GET /index.html HTTP/1.1" + CRLF +
+                    "Host: localhost" + CRLF +
+                    "Connection: Close" + CRLF +
+                    "Accept-Encoding: gzip" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
+        client.connect();
+        client.processRequest();
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertTrue(client.getResponseHeaders().contains("vary: accept-encoding"));
+        String eTag = null;
+        String lastModified = null;
+        for (String responseHeader : client.getResponseHeaders()) {
+            if (responseHeader.startsWith("ETag: ")) {
+                eTag = responseHeader.substring("ETag: ".length());
+            } else if (responseHeader.startsWith("Last-Modified: ")) {
+                lastModified = responseHeader.substring("Last-Modified: ".length());
+            }
+        }
+        Assert.assertNotNull(eTag);
+        Assert.assertNotNull(lastModified);
+
+        for (String condition : new String[] { "If-None-Match: " + eTag, "If-Modified-Since: " + lastModified }) {
+            client.reset();
+            // @formatter:off
+            client.setRequest(new String[] {
+                    "GET /index.html HTTP/1.1" + CRLF +
+                        "Host: localhost" + CRLF +
+                        "Connection: Close" + CRLF +
+                        "Accept-Encoding: gzip" + CRLF +
+                        condition + CRLF +
+                        CRLF
+                    });
+            // @formatter:on
+            client.connect();
+            client.processRequest();
+            Assert.assertTrue(condition, client.getResponseLine().startsWith("HTTP/1.1 304"));
+            Assert.assertTrue(condition, client.getResponseHeaders().contains("vary: accept-encoding"));
+        }
+    }
+
+    /*
      * Verify preferring of brotli in default configuration for actual Firefox and Chrome requests.
      */
     @Test
