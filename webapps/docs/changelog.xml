@@ -190,6 +190,12 @@
       <update>
         Update the OWB module to Apache OpenWebBeans 4.1.1. (remm)
       </update>
+      <fix>
+        Configure appropriate line endings for <code>*.bat</code> and
+        <code>*.sh</code> files in <code>build/output</code> when building
+        Tomcat locally. Refactoring line-ending management in build.xml to
+        reduce repeated line-ending changes. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
