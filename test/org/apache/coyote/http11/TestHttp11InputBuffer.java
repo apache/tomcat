@@ -699,8 +699,8 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
     public void testInvalidMethod() {
 
         String[] request = new String[1];
-        request[0] = Method.GET + (char) 0 + " /test HTTP/1.1" + CRLF + "Host: localhost:8080" + CRLF + "Connection: close" +
-                CRLF + CRLF;
+        request[0] = Method.GET + (char) 0 + " /test HTTP/1.1" + CRLF + "Host: localhost:8080" + CRLF +
+                "Connection: close" + CRLF + CRLF;
 
         InvalidClient client = new InvalidClient(request);
 
@@ -886,5 +886,97 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
 
         // Expected response is a 400 response.
         Assert.assertTrue(client.getResponseLine(), client.isResponse400());
+    }
+
+    /*
+     * RFC 9112, section 3: a server that receives a request-target longer than any URI it wishes to parse MUST respond
+     * with a 414 (URI Too Long) status code.
+     */
+    @Test
+    public void testRequestTargetTooLong() {
+        LongRequestClient client =
+                new LongRequestClient("/test/" + new String(new char[9000]).replace("\0", "a"), "X-Test: a");
+
+        Exception e = client.doRequest();
+        Assert.assertNull(e);
+        Assert.assertTrue(client.getResponseLine(), client.isResponse414());
+    }
+
+
+    @Test
+    public void testRequestTargetQueryTooLong() {
+        LongRequestClient client =
+                new LongRequestClient("/test?q=" + new String(new char[9000]).replace("\0", "a"), "X-Test: a");
+
+        Exception e = client.doRequest();
+        Assert.assertNull(e);
+        Assert.assertTrue(client.getResponseLine(), client.isResponse414());
+    }
+
+
+    /*
+     * A header field that is too large is not a request-target problem so the response remains a 400.
+     */
+    @Test
+    public void testRequestHeaderTooLarge() {
+        LongRequestClient client =
+                new LongRequestClient("/test", "X-Test: " + new String(new char[9000]).replace("\0", "a"));
+
+        Exception e = client.doRequest();
+        Assert.assertNull(e);
+        Assert.assertTrue(client.getResponseLine(), client.isResponse400());
+    }
+
+
+    private class LongRequestClient extends SimpleHttpClient {
+
+        private final String requestTarget;
+        private final String headerLine;
+
+        private LongRequestClient(String requestTarget, String headerLine) {
+            this.requestTarget = requestTarget;
+            this.headerLine = headerLine;
+        }
+
+        private Exception doRequest() {
+
+            Tomcat tomcat = getTomcatInstance();
+
+            Context root = tomcat.addContext("", TEMP_DIR);
+            Tomcat.addServlet(root, "test", new TesterServlet());
+            root.addServletMapping("/test", "test");
+
+            try {
+                tomcat.start();
+                setPort(tomcat.getConnector().getLocalPort());
+
+                // Open connection
+                connect();
+
+                String[] request = new String[1];
+                // @formatter:off
+                request[0] =
+                        "GET " + requestTarget + " HTTP/1.1" + CRLF +
+                        "Host: localhost:8080" + CRLF +
+                        headerLine + CRLF +
+                        "Connection: close" + CRLF +
+                        CRLF;
+                // @formatter:on
+
+                setRequest(request);
+                processRequest(); // blocks until response has been read
+
+                // Close the connection
+                disconnect();
+            } catch (Exception e) {
+                return e;
+            }
+            return null;
+        }
+
+        @Override
+        public boolean isResponseBodyOK() {
+            return false;
+        }
     }
 }
