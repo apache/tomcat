@@ -75,6 +75,12 @@ public class TestDefaultServletRfc9110Section13 extends TomcatBaseTest {
         List<Object[]> parameterSets = new ArrayList<>();
         for (Boolean useStrongEtag : booleans) {
             for (Task task : Arrays.asList(Task.HEAD_INDEX_HTML, Task.GET_INDEX_HTML, Task.POST_INDEX_HTML)) {
+                // RFC 9110, Section 5.6.1.2: a list that contains no entity-tag is valid and nothing in it can match
+                parameterSets.add(new Object[] { useStrongEtag, task, EtagPrecondition.EMPTY, null, null, null, null,
+                        null, Boolean.FALSE, SC_412 });
+                parameterSets.add(new Object[] { useStrongEtag, task, null, null, EtagPrecondition.EMPTY, null, null,
+                        null, Boolean.FALSE, SC_200 });
+
                 // RFC 9110, Section 13.2.2, Step 1, HEAD: If-Match with and without If-Unmodified-Since
                 for (DatePrecondition dateCondition : DatePrecondition.values()) {
                     parameterSets.add(new Object[] { useStrongEtag, task, EtagPrecondition.ALL, dateCondition, null,
@@ -407,7 +413,8 @@ public class TestDefaultServletRfc9110Section13 extends TomcatBaseTest {
         ALL,
         NOT_IN,
         INVALID,
-        INVALID_ALL_PLUS_OTHER
+        INVALID_ALL_PLUS_OTHER,
+        EMPTY
     }
 
 
@@ -477,6 +484,10 @@ public class TestDefaultServletRfc9110Section13 extends TomcatBaseTest {
             case INVALID_ALL_PLUS_OTHER:
                 headerValues.add("*");
                 headerValues.add("W/\"1abcd\"");
+                break;
+            case EMPTY:
+                // A list with no elements is valid (RFC 9110, section 5.6.1.2) and nothing in it can match
+                headerValues.add("");
                 break;
         }
         if (!headerValues.isEmpty()) {
