@@ -22,12 +22,14 @@ import java.io.Serial;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import jakarta.servlet.FilterChain;
@@ -47,6 +49,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
+import org.apache.tomcat.util.http.parser.Forwarded;
 import org.apache.tomcat.util.http.parser.Host;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -164,6 +167,15 @@ import org.apache.tomcat.util.res.StringManager;
  * <td>N/A</td>
  * <td>integer</td>
  * <td>443</td>
+ * </tr>
+ * <tr>
+ * <td>forwardedStrategy</td>
+ * <td>Selects the headers that describe the original request: <code>legacy</code> for the headers named by the other
+ * properties, <code>rfc7239</code> for the <code>Forwarded</code> header only or <code>both</code> to use the
+ * <code>Forwarded</code> header when the request has one and the legacy headers otherwise</td>
+ * <td>N/A</td>
+ * <td><code>legacy</code>, <code>rfc7239</code> or <code>both</code></td>
+ * <td><code>legacy</code></td>
  * </tr>
  * <tr>
  * <td>enableLookups</td>
@@ -731,6 +743,21 @@ public class RemoteIpFilter extends GenericFilter {
 
 
     /**
+     * Parameter name for the forwarded strategy configuration.
+     *
+     * @since 12.0.0-M2
+     */
+    protected static final String FORWARDED_STRATEGY_PARAMETER = "forwardedStrategy";
+
+    private static final String FORWARDED_HEADER = "Forwarded";
+
+    private enum ForwardedStrategy {
+        LEGACY,
+        RFC7239,
+        BOTH
+    }
+
+    /**
      * Parameter name for the HTTP server port configuration.
      */
     protected static final String HTTP_SERVER_PORT_PARAMETER = "httpServerPort";
@@ -803,6 +830,9 @@ public class RemoteIpFilter extends GenericFilter {
      */
     protected static final String ENABLE_LOOKUPS_PARAMETER = "enableLookups";
 
+    /** The strategy used to select the headers that describe the original request. */
+    private volatile ForwardedStrategy forwardedStrategy = ForwardedStrategy.LEGACY;
+
     /** The default HTTP server port. */
     private int httpServerPort = 80;
 
@@ -862,134 +892,28 @@ public class RemoteIpFilter extends GenericFilter {
     public void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
+        final ForwardedStrategy strategy = forwardedStrategy;
         boolean isInternal = isInternalProxy(request.getRemoteAddr());
 
         if (isInternal || isTrustedProxy(request.getRemoteAddr())) {
-            String remoteIp = null;
-            Deque<String> proxiesHeaderValue = new ArrayDeque<>();
-            StringBuilder concatRemoteIpHeaderValue = new StringBuilder();
-
-            for (Enumeration<String> e = request.getHeaders(remoteIpHeader); e.hasMoreElements();) {
-                if (!concatRemoteIpHeaderValue.isEmpty()) {
-                    concatRemoteIpHeaderValue.append(", ");
-                }
-
-                concatRemoteIpHeaderValue.append(e.nextElement());
-            }
-
-            String[] remoteIpHeaderValue = StringUtils.splitCommaSeparated(concatRemoteIpHeaderValue.toString());
-            int idx;
-            if (!isInternal) {
-                proxiesHeaderValue.addFirst(request.getRemoteAddr());
-            }
-            // loop on remoteIpHeaderValue to find the first trusted remote ip and to build the proxies chain
-            for (idx = remoteIpHeaderValue.length - 1; idx >= 0; idx--) {
-                String currentRemoteIp = remoteIpHeaderValue[idx];
-                if (currentRemoteIp.isEmpty()) {
-                    // Skip empty entries, such as those resulting from a
-                    // whitespace-only header value, rather than ending up
-                    // setting an empty remote address
-                    continue;
-                }
-                remoteIp = currentRemoteIp;
-
-                if (isInternalProxy(currentRemoteIp)) {
-                    // do nothing, internalProxies IPs are not appended to the
-                } else if (isTrustedProxy(currentRemoteIp)) {
-                    proxiesHeaderValue.addFirst(currentRemoteIp);
-                } else {
-                    idx--; // decrement idx because break statement doesn't do it
-                    break;
-                }
-            }
-            // continue to loop on remoteIpHeaderValue to build the new value of the remoteIpHeader
-            LinkedList<String> newRemoteIpHeaderValue = new LinkedList<>();
-            for (; idx >= 0; idx--) {
-                String currentRemoteIp = remoteIpHeaderValue[idx];
-                if (currentRemoteIp.isEmpty()) {
-                    continue;
-                }
-                newRemoteIpHeaderValue.addFirst(currentRemoteIp);
-            }
-
             XForwardedRequest xRequest = new XForwardedRequest(request);
-            if (remoteIp != null) {
-
-                xRequest.setRemoteAddr(remoteIp);
-                if (getEnableLookups()) {
-                    // This isn't a lazy lookup but that would be a little more
-                    // invasive - mainly in XForwardedRequest - and if
-                    // enableLookups is true is seems reasonable that the
-                    // hostname will be required so look it up here.
-                    try {
-                        InetAddress inetAddress = InetAddress.getByName(remoteIp);
-                        // We know we need a DNS look up so use getCanonicalHostName()
-                        xRequest.setRemoteHost(inetAddress.getCanonicalHostName());
-                    } catch (UnknownHostException e) {
-                        if (log.isDebugEnabled()) {
-                            log.debug(sm.getString("remoteIpFilter.invalidRemoteAddress", remoteIp), e);
-                        }
-                        xRequest.setRemoteHost(remoteIp);
+            List<Forwarded.Element> forwardedElements = null;
+            if (strategy == ForwardedStrategy.RFC7239 ||
+                    strategy == ForwardedStrategy.BOTH && request.getHeader(FORWARDED_HEADER) != null) {
+                forwardedElements = Forwarded.parse(request.getHeaders(FORWARDED_HEADER));
+                if (forwardedElements == null) {
+                    // A malformed field value could hide the element added by a trusted proxy
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("remoteIpFilter.invalidForwardedHeader", request.getRemoteAddr()));
                     }
-                } else {
-                    xRequest.setRemoteHost(remoteIp);
-                }
-
-                if (proxiesHeaderValue.isEmpty()) {
-                    xRequest.removeHeader(proxiesHeader);
-                } else {
-                    String commaDelimitedListOfProxies = StringUtils.join(proxiesHeaderValue);
-                    xRequest.setHeader(proxiesHeader, commaDelimitedListOfProxies);
-                }
-                if (newRemoteIpHeaderValue.isEmpty()) {
-                    xRequest.removeHeader(remoteIpHeader);
-                } else {
-                    String commaDelimitedRemoteIpHeaderValue = StringUtils.join(newRemoteIpHeaderValue);
-                    xRequest.setHeader(remoteIpHeader, commaDelimitedRemoteIpHeaderValue);
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                    return;
                 }
             }
-
-            if (protocolHeader != null && !protocolHeader.isEmpty()) {
-                String protocolHeaderValue = RequestUtil.getMergedHeaderValue(request, protocolHeader);
-                if (protocolHeaderValue == null) {
-                    // Don't modify the secure, scheme and serverPort attributes
-                    // of the request
-                } else if (isForwardedProtoHeaderValueSecure(protocolHeaderValue)) {
-                    xRequest.setSecure(true);
-                    xRequest.setScheme("https");
-                    setPorts(xRequest, httpsServerPort);
-                } else {
-                    xRequest.setSecure(false);
-                    xRequest.setScheme("http");
-                    setPorts(xRequest, httpServerPort);
-                }
-            }
-
-            if (hostHeader != null) {
-                String hostHeaderValue = request.getHeader(hostHeader);
-                if (hostHeaderValue != null) {
-                    try {
-                        int portIndex = Host.parse(hostHeaderValue);
-                        if (portIndex > -1) {
-                            if (log.isDebugEnabled()) {
-                                log.debug(sm.getString("remoteIpFilter.invalidHostWithPort", hostHeaderValue,
-                                        hostHeader));
-                            }
-                            hostHeaderValue = hostHeaderValue.substring(0, portIndex);
-                        }
-
-                        xRequest.setServerName(hostHeaderValue);
-                        if (isChangeLocalName()) {
-                            xRequest.setLocalName(hostHeaderValue);
-                        }
-
-                    } catch (IllegalArgumentException iae) {
-                        if (log.isDebugEnabled()) {
-                            log.debug(sm.getString("remoteIpFilter.invalidHostHeader", hostHeaderValue, hostHeader),
-                                    iae);
-                        }
-                    }
-                }
+            if (forwardedElements != null) {
+                processForwarded(request, xRequest, isInternal, forwardedElements);
+            } else {
+                processLegacy(request, xRequest, isInternal);
             }
             request.setAttribute(Globals.REQUEST_FORWARDED_ATTRIBUTE, Boolean.TRUE);
 
@@ -1020,6 +944,134 @@ public class RemoteIpFilter extends GenericFilter {
             chain.doFilter(request, response);
         }
 
+    }
+
+    private void processLegacy(HttpServletRequest request, XForwardedRequest xRequest, boolean isInternal) {
+        String remoteIp = null;
+        Deque<String> proxiesHeaderValue = new ArrayDeque<>();
+        StringBuilder concatRemoteIpHeaderValue = new StringBuilder();
+
+        for (Enumeration<String> e = request.getHeaders(remoteIpHeader); e.hasMoreElements();) {
+            if (!concatRemoteIpHeaderValue.isEmpty()) {
+                concatRemoteIpHeaderValue.append(", ");
+            }
+
+            concatRemoteIpHeaderValue.append(e.nextElement());
+        }
+
+        String[] remoteIpHeaderValue = StringUtils.splitCommaSeparated(concatRemoteIpHeaderValue.toString());
+        int idx;
+        if (!isInternal) {
+            proxiesHeaderValue.addFirst(request.getRemoteAddr());
+        }
+        // loop on remoteIpHeaderValue to find the first trusted remote ip and to build the proxies chain
+        for (idx = remoteIpHeaderValue.length - 1; idx >= 0; idx--) {
+            String currentRemoteIp = remoteIpHeaderValue[idx];
+            if (currentRemoteIp.isEmpty()) {
+                // Skip empty entries, such as those resulting from a
+                // whitespace-only header value, rather than ending up
+                // setting an empty remote address
+                continue;
+            }
+            remoteIp = currentRemoteIp;
+
+            if (isInternalProxy(currentRemoteIp)) {
+                // do nothing, internalProxies IPs are not appended to the
+            } else if (isTrustedProxy(currentRemoteIp)) {
+                proxiesHeaderValue.addFirst(currentRemoteIp);
+            } else {
+                idx--; // decrement idx because break statement doesn't do it
+                break;
+            }
+        }
+        // continue to loop on remoteIpHeaderValue to build the new value of the remoteIpHeader
+        LinkedList<String> newRemoteIpHeaderValue = new LinkedList<>();
+        for (; idx >= 0; idx--) {
+            String currentRemoteIp = remoteIpHeaderValue[idx];
+            if (currentRemoteIp.isEmpty()) {
+                continue;
+            }
+            newRemoteIpHeaderValue.addFirst(currentRemoteIp);
+        }
+
+        if (remoteIp != null) {
+
+            xRequest.setRemoteAddr(remoteIp);
+            if (getEnableLookups()) {
+                // This isn't a lazy lookup but that would be a little more
+                // invasive - mainly in XForwardedRequest - and if
+                // enableLookups is true is seems reasonable that the
+                // hostname will be required so look it up here.
+                try {
+                    InetAddress inetAddress = InetAddress.getByName(remoteIp);
+                    // We know we need a DNS look up so use getCanonicalHostName()
+                    xRequest.setRemoteHost(inetAddress.getCanonicalHostName());
+                } catch (UnknownHostException e) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("remoteIpFilter.invalidRemoteAddress", remoteIp), e);
+                    }
+                    xRequest.setRemoteHost(remoteIp);
+                }
+            } else {
+                xRequest.setRemoteHost(remoteIp);
+            }
+
+            if (proxiesHeaderValue.isEmpty()) {
+                xRequest.removeHeader(proxiesHeader);
+            } else {
+                String commaDelimitedListOfProxies = StringUtils.join(proxiesHeaderValue);
+                xRequest.setHeader(proxiesHeader, commaDelimitedListOfProxies);
+            }
+            if (newRemoteIpHeaderValue.isEmpty()) {
+                xRequest.removeHeader(remoteIpHeader);
+            } else {
+                String commaDelimitedRemoteIpHeaderValue = StringUtils.join(newRemoteIpHeaderValue);
+                xRequest.setHeader(remoteIpHeader, commaDelimitedRemoteIpHeaderValue);
+            }
+        }
+
+        if (protocolHeader != null && !protocolHeader.isEmpty()) {
+            String protocolHeaderValue = RequestUtil.getMergedHeaderValue(request, protocolHeader);
+            if (protocolHeaderValue == null) {
+                // Don't modify the secure, scheme and serverPort attributes
+                // of the request
+            } else if (isForwardedProtoHeaderValueSecure(protocolHeaderValue)) {
+                xRequest.setSecure(true);
+                xRequest.setScheme("https");
+                setPorts(xRequest, httpsServerPort);
+            } else {
+                xRequest.setSecure(false);
+                xRequest.setScheme("http");
+                setPorts(xRequest, httpServerPort);
+            }
+        }
+
+        if (hostHeader != null) {
+            String hostHeaderValue = request.getHeader(hostHeader);
+            if (hostHeaderValue != null) {
+                try {
+                    int portIndex = Host.parse(hostHeaderValue);
+                    if (portIndex > -1) {
+                        if (log.isDebugEnabled()) {
+                            log.debug(sm.getString("remoteIpFilter.invalidHostWithPort", hostHeaderValue,
+                                    hostHeader));
+                        }
+                        hostHeaderValue = hostHeaderValue.substring(0, portIndex);
+                    }
+
+                    xRequest.setServerName(hostHeaderValue);
+                    if (isChangeLocalName()) {
+                        xRequest.setLocalName(hostHeaderValue);
+                    }
+
+                } catch (IllegalArgumentException iae) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("remoteIpFilter.invalidHostHeader", hostHeaderValue, hostHeader),
+                                iae);
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -1077,6 +1129,136 @@ public class RemoteIpFilter extends GenericFilter {
         return true;
     }
 
+    /*
+     * Process the Forwarded header (RFC 7239). Element i was added by the node identified by element i+1 (or by the
+     * connection peer for the last element) so the elements are consumed right to left until one that does not
+     * identify a known proxy is found.
+     */
+    private void processForwarded(HttpServletRequest request, XForwardedRequest xRequest, boolean isInternal,
+            List<Forwarded.Element> elements) {
+        String remoteIp = null;
+        Deque<String> proxiesHeaderValue = new ArrayDeque<>();
+        if (!isInternal) {
+            proxiesHeaderValue.addFirst(request.getRemoteAddr());
+        }
+        String proto = null;
+        String host = null;
+
+        int idx;
+        for (idx = elements.size() - 1; idx >= 0; idx--) {
+            Forwarded.Element element = elements.get(idx);
+            if (element.isValid()) {
+                // The leftmost consumed element that has a value wins
+                if (element.getProto() != null) {
+                    proto = element.getProto();
+                }
+                if (element.getHost() != null) {
+                    host = element.getHost();
+                }
+            }
+            Forwarded.Node node = element.isValid() ? element.getForNode() : null;
+            if (node == null || !node.isAddress()) {
+                // Unknown, obfuscated or invalid. Never use these as the remote address.
+                idx--;
+                break;
+            }
+            // Only validated IP address literals reach the proxy checks so no name resolution can occur
+            remoteIp = node.getName();
+            if (isInternalProxy(remoteIp)) {
+                // Internal proxies are not added to the proxies header
+            } else if (isTrustedProxy(remoteIp)) {
+                proxiesHeaderValue.addFirst(remoteIp);
+            } else {
+                idx--;
+                break;
+            }
+        }
+
+        if (remoteIp != null) {
+            xRequest.setRemoteAddr(remoteIp);
+            if (getEnableLookups()) {
+                try {
+                    InetAddress inetAddress = InetAddress.getByName(remoteIp);
+                    xRequest.setRemoteHost(inetAddress.getCanonicalHostName());
+                } catch (UnknownHostException e) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("remoteIpFilter.invalidRemoteAddress", remoteIp), e);
+                    }
+                    xRequest.setRemoteHost(remoteIp);
+                }
+            } else {
+                xRequest.setRemoteHost(remoteIp);
+            }
+        }
+
+        if (proxiesHeaderValue.isEmpty()) {
+            xRequest.removeHeader(proxiesHeader);
+        } else {
+            xRequest.setHeader(proxiesHeader, StringUtils.join(proxiesHeaderValue));
+        }
+
+        if (idx < 0) {
+            xRequest.removeHeader(FORWARDED_HEADER);
+        } else {
+            List<String> remaining = new ArrayList<>();
+            for (int i = 0; i <= idx; i++) {
+                remaining.add(elements.get(i).toHeaderValue());
+            }
+            xRequest.setHeader(FORWARDED_HEADER, String.join(", ", remaining));
+        }
+
+        int port = -1;
+        if (host != null) {
+            try {
+                int portIndex = Host.parse(host);
+                String serverName = host;
+                if (portIndex > -1) {
+                    port = parsePort(host.substring(portIndex + 1));
+                    serverName = host.substring(0, portIndex);
+                }
+                xRequest.setServerName(serverName);
+                if (isChangeLocalName()) {
+                    xRequest.setLocalName(serverName);
+                }
+            } catch (IllegalArgumentException iae) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("remoteIpFilter.invalidForwardedHost", host), iae);
+                }
+            }
+        }
+
+        if ("https".equalsIgnoreCase(proto)) {
+            xRequest.setSecure(true);
+            xRequest.setScheme("https");
+            setServerPort(xRequest, port > -1 ? port : httpsServerPort);
+        } else if ("http".equalsIgnoreCase(proto)) {
+            xRequest.setSecure(false);
+            xRequest.setScheme("http");
+            setServerPort(xRequest, port > -1 ? port : httpServerPort);
+        } else if (port > -1) {
+            setServerPort(xRequest, port);
+        }
+    }
+
+    private int parsePort(String value) {
+        try {
+            int port = Integer.parseInt(value);
+            if (port >= 1 && port <= 65535) {
+                return port;
+            }
+        } catch (NumberFormatException nfe) {
+            // Ignore the port
+        }
+        return -1;
+    }
+
+    private void setServerPort(XForwardedRequest xrequest, int port) {
+        xrequest.setServerPort(port);
+        if (isChangeLocalPort()) {
+            xrequest.setLocalPort(port);
+        }
+    }
+
     private void setPorts(XForwardedRequest xrequest, int defaultPort) {
         int port = defaultPort;
         if (getPortHeader() != null) {
@@ -1115,6 +1297,47 @@ public class RemoteIpFilter extends GenericFilter {
         } else {
             chain.doFilter(request, response);
         }
+    }
+
+    /**
+     * Obtain the strategy used to select the headers that describe the original request.
+     *
+     * @return One of <code>legacy</code>, <code>rfc7239</code> or <code>both</code>
+     *
+     * @since 12.0.0-M2
+     */
+    public String getForwardedStrategy() {
+        return forwardedStrategy.name().toLowerCase(Locale.ENGLISH);
+    }
+
+    /**
+     * Set the strategy used to select the headers that describe the original request. With <code>legacy</code> the
+     * <code>X-Forwarded-*</code> style headers are used and the <code>Forwarded</code> header (RFC 7239) is ignored.
+     * With <code>rfc7239</code> only the <code>Forwarded</code> header is used. With <code>both</code> the
+     * <code>Forwarded</code> header is used if the request has one and the legacy headers are used otherwise. The
+     * two sources are never combined for a single request.
+     *
+     * @param forwardedStrategy One of <code>legacy</code>, <code>rfc7239</code> or <code>both</code>, ignoring case
+     *
+     * @throws IllegalArgumentException If the value is not one of the permitted values
+     *
+     * @since 12.0.0-M2
+     */
+    public void setForwardedStrategy(String forwardedStrategy) {
+        ForwardedStrategy strategy = null;
+        if (forwardedStrategy != null) {
+            for (ForwardedStrategy candidate : ForwardedStrategy.values()) {
+                if (candidate.name().equalsIgnoreCase(forwardedStrategy)) {
+                    strategy = candidate;
+                    break;
+                }
+            }
+        }
+        if (strategy == null) {
+            throw new IllegalArgumentException(
+                    sm.getString("remoteIpFilter.invalidForwardedStrategy", forwardedStrategy));
+        }
+        this.forwardedStrategy = strategy;
     }
 
     /**
@@ -1239,6 +1462,10 @@ public class RemoteIpFilter extends GenericFilter {
     public void init() throws ServletException {
         if (getInitParameter(INTERNAL_PROXIES_PARAMETER) != null) {
             setInternalProxies(getInitParameter(INTERNAL_PROXIES_PARAMETER));
+        }
+
+        if (getInitParameter(FORWARDED_STRATEGY_PARAMETER) != null) {
+            setForwardedStrategy(getInitParameter(FORWARDED_STRATEGY_PARAMETER));
         }
 
         if (getInitParameter(PROTOCOL_HEADER_PARAMETER) != null) {

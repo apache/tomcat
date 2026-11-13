@@ -33,6 +33,7 @@ import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.NetMaskSet;
+import org.apache.tomcat.unittest.TesterResponse;
 import org.apache.tomcat.util.buf.StringUtils;
 
 /**
@@ -49,6 +50,16 @@ public class TestRemoteIpValve {
         private int serverPort;
         private String forwardedFor;
         private String forwardedBy;
+        private String forwarded;
+        private boolean invoked;
+
+        public String getForwarded() {
+            return forwarded;
+        }
+
+        public boolean isInvoked() {
+            return invoked;
+        }
 
         public String getRemoteAddr() {
             return remoteAddr;
@@ -92,6 +103,8 @@ public class TestRemoteIpValve {
             this.serverPort = request.getServerPort();
             this.forwardedFor = request.getHeader("x-forwarded-for");
             this.forwardedBy = request.getHeader("x-forwarded-by");
+            this.forwarded = request.getHeader("Forwarded");
+            this.invoked = true;
         }
     }
 
@@ -1329,6 +1342,187 @@ public class TestRemoteIpValve {
             // Test passes - exception was thrown as expected
             Assert.assertNotNull("Exception message should not be null", e.getMessage());
         }
+    }
+
+    private static class StatusResponse extends TesterResponse {
+        private int status = -1;
+
+        @Override
+        public void sendError(int status, String message) throws IOException {
+            this.status = status;
+        }
+    }
+
+    private static RemoteIpValve newForwardedValve(String strategy, RemoteAddrAndHostTrackerValve tracker) {
+        RemoteIpValve valve = new RemoteIpValve();
+        valve.setInternalProxies("192.168.0.10/31");
+        valve.setTrustedProxies("140.211.11.131");
+        valve.setForwardedStrategy(strategy);
+        valve.setNext(tracker);
+        return valve;
+    }
+
+    private static Request newForwardedRequest(String remoteAddr, String... namesAndValues) {
+        Request request = new MockRequest(new org.apache.coyote.Request());
+        request.setRemoteAddr(remoteAddr);
+        request.setRemoteHost(remoteAddr);
+        request.setServerPort(8080);
+        request.getCoyoteRequest().scheme().setString("http");
+        request.getCoyoteRequest().serverName().setString("original.example.org");
+        for (int i = 0; i < namesAndValues.length; i += 2) {
+            request.getCoyoteRequest().getMimeHeaders().addValue(namesAndValues[i]).setString(namesAndValues[i + 1]);
+        }
+        return request;
+    }
+
+    private static RemoteAddrAndHostTrackerValve invokeForwarded(String strategy, Request request) throws Exception {
+        RemoteAddrAndHostTrackerValve tracker = new RemoteAddrAndHostTrackerValve();
+        newForwardedValve(strategy, tracker).invoke(request, null);
+        return tracker;
+    }
+
+    @Test
+    public void testForwardedStrategyAccessors() {
+        RemoteIpValve valve = new RemoteIpValve();
+        Assert.assertEquals("legacy", valve.getForwardedStrategy());
+        valve.setForwardedStrategy("RFC7239");
+        Assert.assertEquals("rfc7239", valve.getForwardedStrategy());
+        valve.setForwardedStrategy("Both");
+        Assert.assertEquals("both", valve.getForwardedStrategy());
+        try {
+            valve.setForwardedStrategy("x");
+            Assert.fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            // Expected
+        }
+        Assert.assertEquals("both", valve.getForwardedStrategy());
+    }
+
+    @Test
+    public void testForwardedLegacyIgnoresForwarded() throws Exception {
+        Request request = newForwardedRequest("192.168.0.10", "X-Forwarded-For", "1.1.1.1", "Forwarded",
+                "for=2.2.2.2;proto=https");
+        RemoteAddrAndHostTrackerValve tracker = invokeForwarded("legacy", request);
+        Assert.assertEquals("1.1.1.1", tracker.getRemoteAddr());
+        Assert.assertEquals("for=2.2.2.2;proto=https", tracker.getForwarded());
+        Assert.assertFalse(tracker.isSecure());
+    }
+
+    @Test
+    public void testForwardedRfc7239IgnoresLegacyHeaders() throws Exception {
+        Request request = newForwardedRequest("192.168.0.10", "X-Forwarded-For", "1.1.1.1", "X-Forwarded-Proto",
+                "https", "Forwarded", "for=2.2.2.2");
+        RemoteAddrAndHostTrackerValve tracker = invokeForwarded("rfc7239", request);
+        Assert.assertEquals("2.2.2.2", tracker.getRemoteAddr());
+        Assert.assertEquals("1.1.1.1", tracker.getForwardedFor());
+        Assert.assertFalse(tracker.isSecure());
+        Assert.assertNull(tracker.getForwarded());
+    }
+
+    @Test
+    public void testForwardedBothPrefersForwarded() throws Exception {
+        Request request = newForwardedRequest("192.168.0.10", "X-Forwarded-For", "1.1.1.1", "Forwarded", "for=2.2.2.2");
+        RemoteAddrAndHostTrackerValve tracker = invokeForwarded("both", request);
+        Assert.assertEquals("2.2.2.2", tracker.getRemoteAddr());
+        Assert.assertEquals("1.1.1.1", tracker.getForwardedFor());
+    }
+
+    @Test
+    public void testForwardedBothFallsBackToLegacy() throws Exception {
+        Request request = newForwardedRequest("192.168.0.10", "X-Forwarded-For", "1.1.1.1");
+        RemoteAddrAndHostTrackerValve tracker = invokeForwarded("both", request);
+        Assert.assertEquals("1.1.1.1", tracker.getRemoteAddr());
+        Assert.assertNull(tracker.getForwardedFor());
+    }
+
+    @Test
+    public void testForwardedChain() throws Exception {
+        Request request = newForwardedRequest("192.168.0.10", "Forwarded",
+                "for=140.211.11.130, for=140.211.11.131;proto=https, for=192.168.0.11");
+        RemoteAddrAndHostTrackerValve tracker = invokeForwarded("rfc7239", request);
+        Assert.assertEquals("140.211.11.130", tracker.getRemoteAddr());
+        Assert.assertEquals("140.211.11.130", tracker.getRemoteHost());
+        Assert.assertEquals("140.211.11.131", tracker.getForwardedBy());
+        Assert.assertNull(tracker.getForwarded());
+        Assert.assertTrue(tracker.isSecure());
+        Assert.assertEquals("https", tracker.getScheme());
+        Assert.assertEquals(443, tracker.getServerPort());
+
+        // Restored after the invocation
+        Assert.assertEquals("192.168.0.10", request.getRemoteAddr());
+        Assert.assertEquals("for=140.211.11.130, for=140.211.11.131;proto=https, for=192.168.0.11",
+                request.getHeader("Forwarded"));
+        Assert.assertNull(request.getHeader("X-Forwarded-By"));
+        Assert.assertEquals(8080, request.getServerPort());
+        Assert.assertEquals("http", request.getScheme());
+        Assert.assertFalse(request.isSecure());
+    }
+
+    @Test
+    public void testForwardedUntrustedPeer() throws Exception {
+        Request request = newForwardedRequest("203.0.113.5", "Forwarded",
+                "for=1.1.1.1;proto=https;host=evil.example.org");
+        RemoteAddrAndHostTrackerValve tracker = invokeForwarded("rfc7239", request);
+        Assert.assertEquals("203.0.113.5", tracker.getRemoteAddr());
+        Assert.assertEquals("for=1.1.1.1;proto=https;host=evil.example.org", tracker.getForwarded());
+        Assert.assertFalse(tracker.isSecure());
+        Assert.assertEquals("original.example.org", tracker.getServerName());
+    }
+
+    @Test
+    public void testForwardedHiddenNodeKeepsPeer() throws Exception {
+        for (String node : new String[] { "_hidden", "unknown", "evil.example" }) {
+            Request request = newForwardedRequest("192.168.0.10", "Forwarded", "for=" + node + ";proto=https");
+            RemoteAddrAndHostTrackerValve tracker = invokeForwarded("rfc7239", request);
+            Assert.assertEquals(node, "192.168.0.10", tracker.getRemoteAddr());
+            Assert.assertEquals(node, "https", tracker.getScheme());
+            Assert.assertTrue(node, tracker.isSecure());
+            Assert.assertNull(node, tracker.getForwarded());
+        }
+    }
+
+    @Test
+    public void testForwardedSpoofedElementIsNotUsed() throws Exception {
+        Request request = newForwardedRequest("192.168.0.10", "Forwarded", "for=10.0.0.1, for=203.0.113.9");
+        RemoteAddrAndHostTrackerValve tracker = invokeForwarded("rfc7239", request);
+        Assert.assertEquals("203.0.113.9", tracker.getRemoteAddr());
+        Assert.assertEquals("for=10.0.0.1", tracker.getForwarded());
+    }
+
+    @Test
+    public void testForwardedHostAndPort() throws Exception {
+        Request request = newForwardedRequest("192.168.0.10", "Forwarded", "for=1.1.1.1;host=\"example.com:8443\";proto=https");
+        RemoteAddrAndHostTrackerValve tracker = invokeForwarded("rfc7239", request);
+        Assert.assertEquals("example.com", tracker.getServerName());
+        Assert.assertEquals(8443, tracker.getServerPort());
+        Assert.assertEquals("https", tracker.getScheme());
+    }
+
+    @Test
+    public void testForwardedInvalidHostIgnored() throws Exception {
+        Request request = newForwardedRequest("192.168.0.10", "Forwarded", "for=1.1.1.1;host=\"bad host\"");
+        RemoteAddrAndHostTrackerValve tracker = invokeForwarded("rfc7239", request);
+        Assert.assertEquals("original.example.org", tracker.getServerName());
+        Assert.assertEquals("1.1.1.1", tracker.getRemoteAddr());
+    }
+
+    @Test
+    public void testForwardedUnknownProtoIgnored() throws Exception {
+        Request request = newForwardedRequest("192.168.0.10", "Forwarded", "for=1.1.1.1;proto=ftp");
+        RemoteAddrAndHostTrackerValve tracker = invokeForwarded("rfc7239", request);
+        Assert.assertEquals("http", tracker.getScheme());
+        Assert.assertFalse(tracker.isSecure());
+        Assert.assertEquals(8080, tracker.getServerPort());
+    }
+
+    @Test
+    public void testForwardedMalformedHeaderRejected() throws Exception {
+        Request request = newForwardedRequest("192.168.0.10", "Forwarded", "for=\"1.1.1.1, for=140.211.11.131");
+        RemoteAddrAndHostTrackerValve tracker = new RemoteAddrAndHostTrackerValve();
+        StatusResponse response = new StatusResponse();
+        newForwardedValve("rfc7239", tracker).invoke(request, response);
+        Assert.assertEquals(400, response.status);
+        Assert.assertFalse(tracker.isInvoked());
     }
 
     private void doTestNetMaskSet(NetMaskSet netMaskSet, String remoteIp, boolean expectedMatch) throws UnknownHostException {
