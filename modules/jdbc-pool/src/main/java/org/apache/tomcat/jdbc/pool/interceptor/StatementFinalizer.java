@@ -327,7 +327,7 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
                     ExceptionUtils.handleThrowable(ignore);
                     if (log.isDebugEnabled()) {
                         log.debug("Unable to close statement upon connection close.",
-                            PoolUtilities.maskCredentials(ignore));
+                                PoolUtilities.maskCredentials(ignore));
                     }
                 }
             }
