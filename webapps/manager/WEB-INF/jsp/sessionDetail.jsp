@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <%--
  Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -22,13 +21,8 @@
 <%@page import="org.apache.catalina.manager.Constants" %>
 <%@page import="org.apache.catalina.manager.JspHelper" %>
 <%@page import="org.apache.catalina.util.ContextName" %>
-<!DOCTYPE html
-     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<%--!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
- "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"--%>
-
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <% String path = (String) request.getAttribute("path");
    String version = (String) request.getAttribute("version");
    ContextName cn = new ContextName(path, version);
@@ -46,15 +40,13 @@
            "?path=" + path + "&version=" + version));
 %>
 <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
-    <meta http-equiv="pragma" content="no-cache"/><!-- HTTP 1.0 -->
-    <meta http-equiv="cache-control" content="no-cache,must-revalidate"/><!-- HTTP 1.1 -->
-    <meta http-equiv="expires" content="0"/><!-- 0 is an invalid value and should be treated as 'now' -->
-    <meta http-equiv="content-language" content="en"/>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="copyright" content="<%= Constants.COPYRIGHT_NOTICE %>"/>
     <meta name="robots" content="noindex,nofollow,noarchive"/>
     <title>Sessions Administration: details for <%= currentSessionId %></title>
     <link href="<%=request.getContextPath()%>/images/favicon.ico" rel="icon" type="image/x-icon" />
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/css/manager.css">
 </head>
 <body>
 <% if (currentHttpSession == null) { %>
@@ -63,7 +55,7 @@
 <% } else { %>
    <h1>Details for Session <%= currentSessionId %></h1>
 
-   <table style="text-align: left;" border="0">
+   <table class="table-left">
      <tr>
        <th>Session Id</th>
        <td><%= currentSessionId %></td>
@@ -119,7 +111,7 @@
    <div class="error"><%= JspHelper.escapeXml(request.getAttribute("error")) %></div>
    <div class="message"><%= JspHelper.escapeXml(request.getAttribute("message")) %></div>
 
-   <table style="text-align: left;" border="1" cellpadding="2" cellspacing="2">
+   <table class="table-left data-table">
    <% int nAttributes = 0;
       Enumeration<String> attributeNamesEnumeration = currentHttpSession.getAttributeNames();
       while (attributeNamesEnumeration.hasMoreElements()) {
@@ -127,7 +119,7 @@
           ++nAttributes;
       }
    %>
-       <caption style="font-variant: small-caps;"><%= JspHelper.formatNumber(nAttributes) %> attributes</caption>
+       <caption class="caption-small-caps"><%= JspHelper.formatNumber(nAttributes) %> attributes</caption>
        <thead>
            <tr>
                <th>Remove Attribute</th>
@@ -148,7 +140,7 @@
           String attributeName = attributeNamesEnumeration.nextElement();
    %>
            <tr>
-               <td align="center">
+               <td class="center-text">
                    <form method="POST" action="<%= submitUrl %>">
                        <div>
                            <input type="hidden" name="action" value="removeSessionAttribute" />
@@ -176,7 +168,7 @@
 <% } // endif%>
 
 <form method="POST" action="<%=submitUrl%>">
-  <p style="text-align: center;">
+  <p class="center-text">
     <input type="submit" value="Return to session list" />
   </p>
 </form>

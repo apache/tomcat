@@ -16,6 +16,9 @@
  */
 package org.apache.catalina.manager;
 
+import java.util.Locale;
+
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Constants used by the manager web application.
@@ -54,7 +57,8 @@ public class Constants {
     public static final String HTML_COPYRIGHT_NOTICE;
 
     /**
-     * The HTML header section template for manager pages.
+     * The HTML header section template for manager pages. The parameters are the context path of the web application
+     * ({@code {0}}) and the language tag of the page ({@code {1}}, see {@link #getLanguageTag(StringManager)}).
      */
     public static final String HTML_HEADER_SECTION;
 
@@ -96,8 +100,11 @@ public class Constants {
         HTML_COPYRIGHT_NOTICE = "Copyright &copy; " + COPYRIGHT_DATE_RANGE + ", Apache Software Foundation";
 
         HTML_HEADER_SECTION =
-                "<html>\n" +
+                "<!DOCTYPE html>\n" +
+                "<html lang=\"{1}\">\n" +
                 "<head>\n" +
+                "<meta charset=\"utf-8\">\n" +
+                "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n" +
                 "<link href=\"{0}/images/favicon.ico\" rel=\"icon\" type=\"image/x-icon\" />\n" +
                 "<link rel=\"stylesheet\" href=\"{0}/css/manager.css\">\n";
 
@@ -105,9 +112,9 @@ public class Constants {
                 "<title>{0}</title>\n" +
                 "</head>\n" +
                 "\n" +
-                "<body bgcolor=\"#FFFFFF\">\n" +
+                "<body>\n" +
                 "\n" +
-                "<table cellspacing=\"4\" border=\"0\">\n" +
+                "<table>\n" +
                 " <tr>\n" +
                 "  <td colspan=\"2\">\n" +
                 "   <a href=\"https://tomcat.apache.org/\" " + REL_EXTERNAL + ">\n" +
@@ -115,28 +122,25 @@ public class Constants {
                 "         src=\"{0}/images/tomcat.svg\">\n" +
                 "   </a>\n" +
                 "   <a href=\"https://www.apache.org/\" " + REL_EXTERNAL + ">\n" +
-                "    <img border=\"0\" alt=\"The Apache Software Foundation\" align=\"right\"\n" +
-                "         src=\"{0}/images/asf-logo.svg\" style=\"width: 266px; height: 83px;\">\n" +
+                "    <img class=\"asf-logo\" alt=\"The Apache Software Foundation\"\n" +
+                "         src=\"{0}/images/asf-logo.svg\">\n" +
                 "   </a>\n" +
                 "  </td>\n" +
                 " </tr>\n" +
                 "</table>\n" +
-                "<hr size=\"1\" noshade=\"noshade\">\n" +
-                "<table cellspacing=\"4\" border=\"0\">\n" +
+                "<hr class=\"line\">\n" +
+                "<table>\n" +
                 " <tr>\n" +
-                "  <td class=\"page-title\" bordercolor=\"#000000\" " +
-                "align=\"left\" nowrap>\n" +
-                "   <font size=\"+2\">{1}</font>\n" +
-                "  </td>\n" +
+                "  <td class=\"page-title\">{1}</td>\n" +
                 " </tr>\n" +
                 "</table>\n" +
                 "<br>\n" +
                 "\n";
 
         MESSAGE_SECTION =
-                "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
+                "<table class=\"data-table\">\n" +
                 " <tr>\n" +
-                "  <td class=\"row-left\" width=\"10%\">" +
+                "  <td class=\"row-left message-label\">" +
                 "<small><strong>{0}</strong></small>&nbsp;</td>\n" +
                 "  <td class=\"row-left\"><pre>{1}</pre></td>\n" +
                 " </tr>\n" +
@@ -145,7 +149,7 @@ public class Constants {
                 "\n";
 
         MANAGER_SECTION =
-                "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
+                "<table class=\"data-table\">\n" +
                 "<tr>\n" +
                 " <td colspan=\"4\" class=\"title\">{0}</td>\n" +
                 "</tr>\n" +
@@ -160,7 +164,7 @@ public class Constants {
                 "\n";
 
         SERVER_HEADER_SECTION =
-                "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
+                "<table class=\"data-table\">\n" +
                 "<tr>\n" +
                 " <td colspan=\"8\" class=\"title\">{0}</td>\n" +
                 "</tr>\n" +
@@ -191,10 +195,10 @@ public class Constants {
                 "\n";
 
         HTML_TAIL_SECTION =
-                "<hr size=\"1\" noshade=\"noshade\">\n" +
-                "<center><font size=\"-1\" color=\"#525D76\">\n" +
-                " <em>" + HTML_COPYRIGHT_NOTICE + "</em>" +
-                "</font></center>\n" +
+                "<hr class=\"line\">\n" +
+                "<footer class=\"copyright\">\n" +
+                " <em>" + HTML_COPYRIGHT_NOTICE + "</em>\n" +
+                "</footer>\n" +
                 "\n" +
                 "</body>\n" +
                 "</html>";
@@ -215,4 +219,21 @@ public class Constants {
      * The XML stylesheet processing instruction used in manager responses.
      */
     public static final String XML_STYLE = "<?xml-stylesheet type=\"text/xsl\" href=\"{0}/xform.xsl\" ?>\n";
+
+    /**
+     * Obtain the language tag for the {@code lang} attribute of a manager page. This is the language of the resource
+     * bundle the given StringManager actually uses, which may differ from the language the client asked for if no
+     * translation is available for the latter.
+     *
+     * @param smClient the StringManager used to render the page
+     *
+     * @return the IETF BCP 47 language tag of the page, or {@code en} if it is not known
+     */
+    public static String getLanguageTag(StringManager smClient) {
+        Locale locale = smClient.getLocale();
+        if (locale == null) {
+            return "en";
+        }
+        return locale.toLanguageTag();
+    }
 }

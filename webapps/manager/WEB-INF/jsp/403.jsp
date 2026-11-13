@@ -14,20 +14,15 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 --%>
-<%@ page session="false" trimDirectiveWhitespaces="true" %>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<%@ page session="false" contentType="text/html; charset=UTF-8" trimDirectiveWhitespaces="true" %>
+<!DOCTYPE html>
+<html lang="en">
  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>403 Access Denied</title>
-  <style type="text/css">
-    <!--
-    BODY {font-family:Tahoma,Arial,sans-serif;color:black;background-color:white;font-size:12px;}
-    H1 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:22px;}
-    PRE, TT {border: 1px dotted #525D76}
-    A {color : black;}A.name {color : black;}
-    -->
-  </style>
   <link href="<%=request.getContextPath()%>/images/favicon.ico" rel="icon" type="image/x-icon" />
+  <style>body{font-family:Tahoma,Arial,sans-serif;color:black;background-color:white;font-size:12px}h1{color:white;background-color:#525D76;font-size:22px}pre,code{border:1px dotted #525D76}a{color:black}</style>
  </head>
  <body>
    <h1>403 Access Denied</h1>
@@ -37,7 +32,7 @@
    <p>
     By default the Manager is only accessible from a browser running on the
     same machine as Tomcat. If you wish to modify this restriction, you'll need
-    to edit the Manager's <tt>context.xml</tt> file.
+    to edit the Manager's <code>context.xml</code> file.
    </p>
    <p>
     If you have already configured the Manager application to allow access and
@@ -54,12 +49,12 @@
    <p>
     If you have not changed
     any configuration files, please examine the file
-    <tt>conf/tomcat-users.xml</tt> in your installation. That
+    <code>conf/tomcat-users.xml</code> in your installation. That
     file must contain the credentials to let you use this webapp.
    </p>
    <p>
-    For example, to add the <tt>manager-gui</tt> role to a user named
-    <tt>tomcat</tt> with a password of <tt>s3cret</tt>, add the following to the
+    For example, to add the <code>manager-gui</code> role to a user named
+    <code>tomcat</code> with a password of <code>s3cret</code>, add the following to the
     config file listed above.
    </p>
 <pre>
@@ -68,26 +63,26 @@
 </pre>
    <p>
     Note that for Tomcat 7 onwards, the roles required to use the manager
-    application were changed from the single <tt>manager</tt> role to the
+    application were changed from the single <code>manager</code> role to the
     following four roles. You will need to assign the role(s) required for
     the functionality you wish to access.
    </p>
     <ul>
-      <li><tt>manager-gui</tt> - allows access to the HTML GUI and the status
+      <li><code>manager-gui</code> - allows access to the HTML GUI and the status
           pages</li>
-      <li><tt>manager-script</tt> - allows access to the text interface and the
+      <li><code>manager-script</code> - allows access to the text interface and the
           status pages</li>
-      <li><tt>manager-jmx</tt> - allows access to the JMX proxy and the status
+      <li><code>manager-jmx</code> - allows access to the JMX proxy and the status
           pages</li>
-      <li><tt>manager-status</tt> - allows access to the status pages only</li>
+      <li><code>manager-status</code> - allows access to the status pages only</li>
     </ul>
    <p>
     The HTML interface is protected against CSRF but the text and JMX interfaces
     are not. To maintain the CSRF protection:
    </p>
    <ul>
-    <li>Users with the <tt>manager-gui</tt> role should not be granted either
-        the <tt>manager-script</tt> or <tt>manager-jmx</tt> roles.</li>
+    <li>Users with the <code>manager-gui</code> role should not be granted either
+        the <code>manager-script</code> or <code>manager-jmx</code> roles.</li>
     <li>If the text or jmx interfaces are accessed through a browser (e.g. for
         testing since these interfaces are intended for tools not humans) then
         the browser must be closed afterwards to terminate the session.</li>

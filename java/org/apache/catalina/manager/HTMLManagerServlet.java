@@ -328,11 +328,11 @@ public class HTMLManagerServlet extends ManagerServlet {
         args[0] = getServletContext().getContextPath();
         args[1] = smClient.getString("htmlManagerServlet.title");
         if (htmlSubTitle != null) {
-            args[1] += "</font><br/><font size=\"+1\">" + Escape.htmlElementContent(htmlSubTitle);
+            args[1] += "<br><span class=\"subtitle\">" + Escape.htmlElementContent(htmlSubTitle) + "</span>";
         }
 
         // HTML Header Section
-        writer.print(MessageFormat.format(Constants.HTML_HEADER_SECTION, args));
+        writer.print(MessageFormat.format(Constants.HTML_HEADER_SECTION, args[0], Constants.getLanguageTag(smClient)));
 
         // Body Header Section
         writer.print(MessageFormat.format(Constants.BODY_HEADER_SECTION, args));
@@ -393,7 +393,7 @@ public class HTMLManagerServlet extends ManagerServlet {
 
         boolean isHighlighted = true;
         boolean isDeployed;
-        String highlightColor;
+        String highlightClass;
 
         for (String contextName : contextNames) {
             Context ctxt = (Context) host.findChild(contextName);
@@ -402,9 +402,9 @@ public class HTMLManagerServlet extends ManagerServlet {
                 // Bugzilla 34818, alternating row colors
                 isHighlighted = !isHighlighted;
                 if (isHighlighted) {
-                    highlightColor = "#C3F3C3";
+                    highlightClass = "highlighted";
                 } else {
-                    highlightColor = "#FFFFFF";
+                    highlightClass = "";
                 }
 
                 String contextPath = ctxt.getPath();
@@ -456,7 +456,7 @@ public class HTMLManagerServlet extends ManagerServlet {
                     args[5] = Integer.valueOf(0);
                 }
 
-                args[6] = highlightColor;
+                args[6] = highlightClass;
 
                 writer.print(MessageFormat.format(APPS_ROW_DETAILS_SECTION, args));
 
@@ -483,7 +483,7 @@ public class HTMLManagerServlet extends ManagerServlet {
                     args[11] = Integer.valueOf(ctxt.getSessionTimeout());
                 }
                 args[12] = smClient.getString("htmlManagerServlet.expire.unit");
-                args[13] = highlightColor;
+                args[13] = highlightClass;
 
                 if (ctxt.getName().equals(this.context.getName())) {
                     writer.print(MessageFormat.format(MANAGER_APP_ROW_BUTTON_SECTION, args));
@@ -1146,7 +1146,7 @@ public class HTMLManagerServlet extends ManagerServlet {
 
     //@formatter:off
     private static final String APPS_HEADER_SECTION =
-            "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
+            "<table class=\"data-table\">\n" +
             "<tr>\n" +
             " <td colspan=\"6\" class=\"title\">{0}</td>\n" +
             "</tr>\n" +
@@ -1161,15 +1161,15 @@ public class HTMLManagerServlet extends ManagerServlet {
 
     private static final String APPS_ROW_DETAILS_SECTION =
             "<tr>\n" +
-            " <td class=\"row-left\" bgcolor=\"{6}\" rowspan=\"2\"><small>{0}</small></td>\n" +
-            " <td class=\"row-left\" bgcolor=\"{6}\" rowspan=\"2\"><small>{1}</small></td>\n" +
-            " <td class=\"row-left\" bgcolor=\"{6}\" rowspan=\"2\"><small>{2}</small></td>\n" +
-            " <td class=\"row-center\" bgcolor=\"{6}\" rowspan=\"2\"><small>{3}</small></td>\n" +
-            " <td class=\"row-center\" bgcolor=\"{6}\" rowspan=\"2\">" +
+            " <td class=\"row-left {6}\" rowspan=\"2\"><small>{0}</small></td>\n" +
+            " <td class=\"row-left {6}\" rowspan=\"2\"><small>{1}</small></td>\n" +
+            " <td class=\"row-left {6}\" rowspan=\"2\"><small>{2}</small></td>\n" +
+            " <td class=\"row-center {6}\" rowspan=\"2\"><small>{3}</small></td>\n" +
+            " <td class=\"row-center {6}\" rowspan=\"2\">" +
             "<small><a href=\"{4}\">{5}</a></small></td>\n";
 
     private static final String MANAGER_APP_ROW_BUTTON_SECTION =
-            " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
+            " <td class=\"row-left {13}\">\n" +
             "  <small>\n" +
             "  &nbsp;{1}&nbsp;\n" +
             "  &nbsp;{3}&nbsp;\n" +
@@ -1178,7 +1178,7 @@ public class HTMLManagerServlet extends ManagerServlet {
             "  </small>\n" +
             " </td>\n" +
             "</tr><tr>\n" +
-            " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
+            " <td class=\"row-left {13}\">\n" +
             "  <form method=\"POST\" action=\"{8}\">\n" +
             "  <small>\n" +
             "  &nbsp;<input type=\"submit\" value=\"{9}\">&nbsp;{10}&nbsp;<input type=\"text\" name=\"idle\" size=\"5\" value=\"{11}\">&nbsp;{12}&nbsp;\n" +
@@ -1188,7 +1188,7 @@ public class HTMLManagerServlet extends ManagerServlet {
             "</tr>\n";
 
     private static final String STARTED_DEPLOYED_APPS_ROW_BUTTON_SECTION =
-            " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
+            " <td class=\"row-left {13}\">\n" +
             "  &nbsp;<small>{1}</small>&nbsp;\n" +
             "  <form class=\"inline\" method=\"POST\" action=\"{2}\">" +
             "  <small><input type=\"submit\" value=\"{3}\"></small>" +
@@ -1201,7 +1201,7 @@ public class HTMLManagerServlet extends ManagerServlet {
             "  </form>\n" +
             " </td>\n" +
             " </tr><tr>\n" +
-            " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
+            " <td class=\"row-left {13}\">\n" +
             "  <form method=\"POST\" action=\"{8}\">\n" +
             "  <small>\n" +
             "  &nbsp;<input type=\"submit\" value=\"{9}\">&nbsp;{10}&nbsp;<input type=\"text\" name=\"idle\" size=\"5\" value=\"{11}\">&nbsp;{12}&nbsp;\n" +
@@ -1211,7 +1211,7 @@ public class HTMLManagerServlet extends ManagerServlet {
             "</tr>\n";
 
     private static final String STOPPED_DEPLOYED_APPS_ROW_BUTTON_SECTION =
-            " <td class=\"row-left\" bgcolor=\"{13}\" rowspan=\"2\">\n" +
+            " <td class=\"row-left {13}\" rowspan=\"2\">\n" +
             "  <form class=\"inline\" method=\"POST\" action=\"{0}\">" +
             "  <small><input type=\"submit\" value=\"{1}\"></small>" +
             "  </form>\n" +
@@ -1224,7 +1224,7 @@ public class HTMLManagerServlet extends ManagerServlet {
             "</tr>\n<tr></tr>\n";
 
     private static final String STARTED_NONDEPLOYED_APPS_ROW_BUTTON_SECTION =
-            " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
+            " <td class=\"row-left {13}\">\n" +
             "  &nbsp;<small>{1}</small>&nbsp;\n" +
             "  <form class=\"inline\" method=\"POST\" action=\"{2}\">" +
             "  <small><input type=\"submit\" value=\"{3}\"></small>" +
@@ -1235,7 +1235,7 @@ public class HTMLManagerServlet extends ManagerServlet {
             "  &nbsp;<small>{7}</small>&nbsp;\n" +
             " </td>\n" +
             " </tr><tr>\n" +
-            " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
+            " <td class=\"row-left {13}\">\n" +
             "  <form method=\"POST\" action=\"{8}\">\n" +
             "  <small>\n" +
             "  &nbsp;<input type=\"submit\" value=\"{9}\">&nbsp;{10}&nbsp;<input type=\"text\" name=\"idle\" size=\"5\" value=\"{11}\">&nbsp;{12}&nbsp;\n" +
@@ -1245,7 +1245,7 @@ public class HTMLManagerServlet extends ManagerServlet {
             "</tr>\n";
 
     private static final String STOPPED_NONDEPLOYED_APPS_ROW_BUTTON_SECTION =
-            " <td class=\"row-left\" bgcolor=\"{13}\" rowspan=\"2\">\n" +
+            " <td class=\"row-left {13}\" rowspan=\"2\">\n" +
             "  <form class=\"inline\" method=\"POST\" action=\"{0}\">" +
             "  <small><input type=\"submit\" value=\"{1}\"></small>" +
             "  </form>\n" +
@@ -1258,7 +1258,7 @@ public class HTMLManagerServlet extends ManagerServlet {
     private static final String DEPLOY_SECTION =
             "</table>\n" +
             "<br>\n" +
-            "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
+            "<table class=\"data-table\">\n" +
             "<tr>\n" +
             " <td colspan=\"2\" class=\"title\">{0}</td>\n" +
             "</tr>\n" +
@@ -1268,7 +1268,7 @@ public class HTMLManagerServlet extends ManagerServlet {
             "<tr>\n" +
             " <td colspan=\"2\">\n" +
             "<form method=\"post\" action=\"{2}\">\n" +
-            "<table cellspacing=\"0\" cellpadding=\"3\">\n" +
+            "<table>\n" +
             "<tr>\n" +
             " <td class=\"row-right\">\n" +
             "  <label for=\"deployPath\"><small>{3}</small></label>\n" +
@@ -1322,7 +1322,7 @@ public class HTMLManagerServlet extends ManagerServlet {
             " <td colspan=\"2\">\n" +
             "<form method=\"post\" action=\"{1}\" " +
             "enctype=\"multipart/form-data\">\n" +
-            "<table cellspacing=\"0\" cellpadding=\"3\">\n" +
+            "<table>\n" +
             "<tr>\n" +
             " <td class=\"row-right\">\n" +
             "  <label for=\"deployWarFile\"><small>{2}</small></label>\n" +
@@ -1348,7 +1348,7 @@ public class HTMLManagerServlet extends ManagerServlet {
             "\n";
 
     private static final String CONFIG_SECTION =
-            "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
+            "<table class=\"data-table\">\n" +
             "<tr>\n" +
             " <td colspan=\"2\" class=\"title\">{0}</td>\n" +
             "</tr>\n" +
@@ -1358,7 +1358,7 @@ public class HTMLManagerServlet extends ManagerServlet {
             "<tr>\n" +
             " <td colspan=\"2\">\n" +
             "<form method=\"post\" action=\"{2}\">\n" +
-            "<table cellspacing=\"0\" cellpadding=\"3\">\n" +
+            "<table>\n" +
             "<tr>\n" +
             " <td class=\"row-right\">\n" +
             "  <label for=\"tlsHostName\"><small>{3}</small></label>\n" +
@@ -1383,7 +1383,7 @@ public class HTMLManagerServlet extends ManagerServlet {
             "<br>";
 
     private static final String DIAGNOSTICS_SECTION =
-            "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
+            "<table class=\"data-table\">\n" +
             "<tr>\n" +
             " <td colspan=\"2\" class=\"title\">{0}</td>\n" +
             "</tr>\n" +

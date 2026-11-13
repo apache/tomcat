@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <%--
  Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -16,16 +15,12 @@
   limitations under the License.
 --%>
 <%@page session="false" contentType="text/html; charset=UTF-8" %>
+<%@page import="java.io.IOException" %>
 <%@page import="java.util.Collection" %>
 <%@page import="org.apache.catalina.Session" %>
 <%@page import="org.apache.catalina.manager.Constants" %>
 <%@page import="org.apache.catalina.manager.JspHelper" %>
 <%@page import="org.apache.catalina.util.ContextName" %>
-<!DOCTYPE html
-     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-
 <%@page import="java.lang.reflect.Method"%>
 <%@page import="org.apache.catalina.manager.DummyProxySession"%>
 <%!
@@ -45,8 +40,43 @@ static {
     deltaSessionClass = clazz;
     isPrimaryMethod = method;
 }
+
+/*
+ * The columns of the sessions table: the key submitted by the column's sort
+ * button and the column label (HTML). There is no comparator for the session
+ * type so the Type column sorts by id.
+ */
+private static final String[][] COLUMNS = {
+        { "id", "Session Id" },
+        { "id", "Type" },
+        { "locale", "Guessed Locale" },
+        { "user", "Guessed User name" },
+        { "CreationTime", "Creation Time" },
+        { "LastAccessedTime", "Last Accessed Time" },
+        { "UsedTime", "Used Time" },
+        { "InactiveTime", "Inactive Time" },
+        { "TTL", "<span title=\"Time To Live\">TTL</span>" } };
+
+/*
+ * Writes the column header cells for <thead> and <tfoot>. If ariaSort is not
+ * null, it is the aria-sort value of the first column that sorts by sortKey.
+ * Only that column is marked because Type sorts by id as well.
+ */
+private static void printColumnHeaders(JspWriter out, String sortKey, String ariaSort) throws IOException {
+    boolean marked = false;
+    for (String[] column : COLUMNS) {
+        out.print("\n                    <th scope=\"col\"");
+        if (ariaSort != null && !marked && column[0].equalsIgnoreCase(sortKey)) {
+            out.print(" aria-sort=\"" + ariaSort + "\"");
+            marked = true;
+        }
+        out.print("><button type=\"submit\" class=\"sort\" name=\"sort\" value=\"" + column[0] + "\">" +
+                column[1] + "</button></th>");
+    }
+}
 %>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <% String path = (String) request.getAttribute("path");
    String version = (String) request.getAttribute("version");
    ContextName cn = new ContextName(path, version);
@@ -56,15 +86,13 @@ static {
    Collection<Session> activeSessions = (Collection<Session>) request.getAttribute("activeSessions");
 %>
 <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
-    <meta http-equiv="pragma" content="no-cache"/><!-- HTTP 1.0 -->
-    <meta http-equiv="cache-control" content="no-cache,must-revalidate"/><!-- HTTP 1.1 -->
-    <meta http-equiv="expires" content="0"/><!-- 0 is an invalid value and should be treated as 'now' -->
-    <meta http-equiv="content-language" content="en"/>
-    <meta name="copyright" content="<%= Constants.COPYRIGHT_NOTICE %>" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="copyright" content="<%= Constants.COPYRIGHT_NOTICE %>"/>
     <meta name="robots" content="noindex,nofollow,noarchive"/>
     <title>Sessions Administration for <%= JspHelper.escapeXml(cn.getDisplayName()) %></title>
     <link href="<%=request.getContextPath()%>/images/favicon.ico" rel="icon" type="image/x-icon" />
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/css/manager.css">
 </head>
 <body>
 <h1>Sessions Administration for <%= JspHelper.escapeXml(cn.getDisplayName()) %></h1>
@@ -80,45 +108,29 @@ static {
 
 <form action="<%= submitUrl %>" method="POST" id="sessionsForm">
     <fieldset><legend>Active HttpSessions information</legend>
-        <input type="hidden" name="action" id="sessionsFormAction" value="injectSessions"/>
-        <input type="hidden" name="sort" id="sessionsFormSort" value="<%= JspHelper.escapeXml(request.getAttribute("sort")) %>"/>
         <% String order = (String) request.getAttribute("order");
            if (order == null || "".equals(order)) {
                order = "ASC";
            }
         %>
         <input type="hidden" name="order" id="sessionsFormSortOrder" value="<%= JspHelper.escapeXml(order) %>"/>
-        <input type="submit" name="refresh" id="refreshButton" value="Refresh Sessions list" onclick="document.getElementById('sessionsFormAction').value='refreshSessions'; return true;"/>
+        <input type="submit" name="refresh" value="Refresh Sessions list"/>
         <%= JspHelper.formatNumber(activeSessions.size()) %> active Sessions<br/>
-        <table border="1" cellpadding="2" cellspacing="2" width="100%">
+        <% String sort = (String) request.getAttribute("sort");
+           // The order attribute holds the direction of the next sort request, the
+           // opposite of the current one. It is only set if the list was sorted by
+           // a valid key. The error attribute is set if sorting failed.
+           Object nextOrder = request.getAttribute("order");
+           String ariaSort = null;
+           if (nextOrder != null && request.getAttribute("error") == null) {
+               ariaSort = "DESC".equals(nextOrder) ? "ascending" : "descending";
+           }
+        %>
+        <table class="data-table sessions">
             <thead>
-                <tr>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='id'; document.getElementById('refreshButton').click(); return true;">Session Id</a></th>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='id'; document.getElementById('refreshButton').click(); return true;">Type</a></th>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='locale'; document.getElementById('refreshButton').click(); return true;">Guessed Locale</a></th>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='user'; document.getElementById('refreshButton').click(); return true;">Guessed User name</a></th>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='CreationTime'; document.getElementById('refreshButton').click(); return true;">Creation Time</a></th>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='LastAccessedTime'; document.getElementById('refreshButton').click(); return true;">Last Accessed Time</a></th>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='UsedTime'; document.getElementById('refreshButton').click(); return true;">Used Time</a></th>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='InactiveTime'; document.getElementById('refreshButton').click(); return true;">Inactive Time</a></th>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='TTL'; document.getElementById('refreshButton').click(); return true;"><span title="Time To Live">TTL</span></a></th>
+                <tr><% printColumnHeaders(out, sort, ariaSort); %>
                 </tr>
             </thead>
-            <% if (activeSessions.size() > 10) { %>
-            <tfoot><%-- <tfoot> is the same as <thead> --%>
-                <tr>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='id'; document.getElementById('refreshButton').click(); return true;">Session Id</a></th>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='id'; document.getElementById('refreshButton').click(); return true;">Type</a></th>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='locale'; document.getElementById('refreshButton').click(); return true;">Guessed Locale</a></th>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='user'; document.getElementById('refreshButton').click(); return true;">Guessed User name</a></th>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='CreationTime'; document.getElementById('refreshButton').click(); return true;">Creation Time</a></th>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='LastAccessedTime'; document.getElementById('refreshButton').click(); return true;">Last Accessed Time</a></th>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='UsedTime'; document.getElementById('refreshButton').click(); return true;">Used Time</a></th>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='InactiveTime'; document.getElementById('refreshButton').click(); return true;">Inactive Time</a></th>
-                    <th><a onclick="document.getElementById('sessionsFormSort').value='TTL'; document.getElementById('refreshButton').click(); return true;"><span title="Time To Live">TTL</span></a></th>
-                </tr>
-            </tfoot>
-            <% } // end if %>
             <tbody>
 <%
     for (Session currentSession : activeSessions) {
@@ -152,26 +164,39 @@ static {
                         }
                       %>
                     </td>
-                    <td style="text-align: center;"><%= type %></td>
-                    <td style="text-align: center;"><%= JspHelper.guessDisplayLocaleFromSession(currentSession) %></td>
-                    <td style="text-align: center;"><%= JspHelper.guessDisplayUserFromSession(currentSession) %></td>
-                    <td style="text-align: center;"><%= JspHelper.getDisplayCreationTimeForSession(currentSession) %></td>
-                    <td style="text-align: center;"><%= JspHelper.getDisplayLastAccessedTimeForSession(currentSession) %></td>
-                    <td style="text-align: center;"><%= JspHelper.getDisplayUsedTimeForSession(currentSession) %></td>
-                    <td style="text-align: center;"><%= JspHelper.getDisplayInactiveTimeForSession(currentSession) %></td>
-                    <td style="text-align: center;"><%= JspHelper.getDisplayTTLForSession(currentSession) %></td>
+                    <td><%= type %></td>
+                    <td><%= JspHelper.guessDisplayLocaleFromSession(currentSession) %></td>
+                    <td><%= JspHelper.guessDisplayUserFromSession(currentSession) %></td>
+                    <td><%= JspHelper.getDisplayCreationTimeForSession(currentSession) %></td>
+                    <td><%= JspHelper.getDisplayLastAccessedTimeForSession(currentSession) %></td>
+                    <td><%= JspHelper.getDisplayUsedTimeForSession(currentSession) %></td>
+                    <td><%= JspHelper.getDisplayInactiveTimeForSession(currentSession) %></td>
+                    <td><%= JspHelper.getDisplayTTLForSession(currentSession) %></td>
                 </tr>
 <% } // end while %>
             </tbody>
+            <% if (activeSessions.size() > 10) { %>
+            <tfoot><%-- The same as <thead> but without aria-sort --%>
+                <tr><% printColumnHeaders(out, sort, null); %>
+                </tr>
+            </tfoot>
+            <% } // end if %>
         </table>
-        <p style="text-align: center;">
-            <input type="submit" name="invalidate" value="Invalidate selected Sessions" onclick="document.getElementById('sessionsFormAction').value='invalidateSessions'; return true;"/>
+        <%-- The current sort key, so that Refresh and Invalidate keep the sort
+             column. It must come after all the sort buttons: browsers submit the
+             fields in tree order and the servlet uses the first sort value, so a
+             clicked column header button takes precedence over this field. --%>
+        <% if (sort != null && !sort.isEmpty()) { %>
+        <input type="hidden" name="sort" value="<%= JspHelper.escapeXml(sort) %>"/>
+        <% } %>
+        <p class="center-text">
+            <button type="submit" name="action" value="invalidateSessions">Invalidate selected Sessions</button>
         </p>
     </fieldset>
 </form>
 
 <form method="GET" action="<%=request.getContextPath()%>/html">
-  <p style="text-align: center;">
+  <p class="center-text">
     <input type="submit" value="Return to main page" />
   </p>
 </form>

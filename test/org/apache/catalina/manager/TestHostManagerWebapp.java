@@ -105,7 +105,39 @@ public class TestHostManagerWebapp extends TomcatBaseTest {
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
-        Assert.assertTrue(client.getResponseBody().contains("/host-manager/css/manager.css"));
+
+        String html = client.getResponseBody();
+        Assert.assertTrue(html.contains("/host-manager/css/manager.css"));
+        Assert.assertTrue(html.contains("<!DOCTYPE html>"));
+        Assert.assertTrue(html.contains("<html lang="));
+        Assert.assertFalse(html.contains("<font"));
+        Assert.assertFalse(html.contains("bgcolor="));
+        Assert.assertFalse(html.contains("NOWRAP"));
+        Assert.assertFalse(html.contains(" border="));
+        Assert.assertFalse(html.contains(" align="));
+        Assert.assertFalse(html.contains(" nowrap>"));
+        Assert.assertFalse(html.contains(" width="));
+        Assert.assertFalse(html.contains("style=\""));
+        // Table borders and padding are provided by CSS
+        Assert.assertTrue(html.contains("<table class=\"data-table\">"));
+
+        // The lang attribute follows the language the page is rendered in
+        for (String language : new String[] { "fr", "en" }) {
+            // @formatter:off
+            client.setRequest(new String[] {
+                    "GET /host-manager/html HTTP/1.1" + CRLF +
+                        "Host: localhost" + CRLF +
+                        "Authorization: " + basicHeader + CRLF +
+                        "Accept-Language: " + language + CRLF +
+                        "Connection: Close" + CRLF +
+                        CRLF
+                    });
+            // @formatter:on
+            client.connect();
+            client.processRequest(true);
+            Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+            Assert.assertTrue(client.getResponseBody().contains("<html lang=\"" + language + "\">"));
+        }
 
         // @formatter:off
         client.setRequest(new String[] {

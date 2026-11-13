@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <%--
  Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -20,28 +19,23 @@
 <%@page import="java.util.Map.Entry" %>
 <%@page import="java.util.List" %>
 <%@page import="org.apache.catalina.manager.Constants" %>
-<!DOCTYPE html
-     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <% Map<String,List<String>> certList = (Map<String,List<String>>) request.getAttribute("certList");
 %>
 <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
-    <meta http-equiv="pragma" content="no-cache"/><!-- HTTP 1.0 -->
-    <meta http-equiv="cache-control" content="no-cache,must-revalidate"/><!-- HTTP 1.1 -->
-    <meta http-equiv="expires" content="0"/><!-- 0 is an invalid value and should be treated as 'now' -->
-    <meta http-equiv="content-language" content="en"/>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="copyright" content="<%= Constants.COPYRIGHT_NOTICE %>"/>
     <meta name="robots" content="noindex,nofollow,noarchive"/>
     <title>Configured certificate chains per Connector</title>
     <link href="<%=request.getContextPath()%>/images/favicon.ico" rel="icon" type="image/x-icon" />
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/css/manager.css">
 </head>
 <body>
 <h1>Configured certificate chains per Connector</h1>
 
-<table border="1" cellpadding="2" cellspacing="2" width="100%">
+<table class="data-table table-left">
     <thead>
         <tr>
             <th>Connector / TLS Virtual Host / Certificate type</th>
@@ -71,7 +65,7 @@
 </table>
 
 <form method="GET" action="<%=request.getContextPath()%>/html">
-  <p style="text-align: center;">
+  <p class="center-text">
     <input type="submit" value="Return to main page" />
   </p>
 </form>

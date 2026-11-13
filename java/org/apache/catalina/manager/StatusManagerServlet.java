@@ -180,8 +180,9 @@ public class StatusManagerServlet extends HttpServlet implements NotificationLis
         boolean completeStatus = request.getPathInfo() != null && request.getPathInfo().equals("/all");
 
         // use StatusTransformer to output status
-        Object[] args = new Object[1];
+        Object[] args = new Object[2];
         args[0] = getServletContext().getContextPath();
+        args[1] = Constants.getLanguageTag(smClient);
         StatusTransformer.writeHeader(writer, args, mode);
 
         // Body Header Section

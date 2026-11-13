@@ -382,6 +382,12 @@
         Manager: Drop session handling dedicated to extracting the locale from
         Tapestry attributes, used for locale session sorting. (remm)
       </update>
+      <update>
+        Modernize the manager, host-manager, and server status pages for valid
+        HTML5 markup and accessibility. Remove obsolete presentational HTML
+        attributes, inline event handlers and <code>style</code> attributes.
+        (dsoumis)
+      </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
     </changelog>
   </subsection>
