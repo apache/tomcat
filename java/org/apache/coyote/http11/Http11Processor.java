@@ -1468,6 +1468,9 @@ public class Http11Processor extends AbstractProcessor {
         if (sendfileData != null && !getErrorState().isError()) {
             if (keepAlive) {
                 if (available(false) == 0) {
+                    // If sendfile does not complete inline, the endpoint will register the socket for read once it
+                    // does, without returning to this processor. Set the keep-alive timeout for the next request now.
+                    socketWrapper.setReadTimeout(protocol.getKeepAliveTimeout());
                     sendfileData.keepAliveState = SendfileKeepAliveState.OPEN;
                 } else {
                     sendfileData.keepAliveState = SendfileKeepAliveState.PIPELINED;

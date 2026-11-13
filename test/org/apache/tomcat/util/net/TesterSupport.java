@@ -112,6 +112,16 @@ public final class TesterSupport {
     public static final String LOCALHOST_RSA_LONGCHAIN_CERT_PEM = SSL_DIR + "localhost-rsa-longchain-cert.pem";
     public static final String LOCALHOST_RSA_LONGCHAIN_KEY_PEM = SSL_DIR + "localhost-rsa-longchain-key.pem";
     public static final String LOCALHOST_RSA_LONGCHAIN_CHAIN_PEM = SSL_DIR + "localhost-rsa-longchain-chain.pem";
+    public static final String LOCALHOST_RSA_DNSONLY_JKS = SSL_DIR + "localhost-rsa-dnsonly.jks";
+    public static final String LOCALHOST_RSA_LARGECERT_JKS = SSL_DIR + "localhost-rsa-largecert.jks";
+    public static final String LOCALHOST_MLDSA_44_CERT_PEM = SSL_DIR + "localhost-mldsa-44-cert.pem";
+    public static final String LOCALHOST_MLDSA_44_KEY_PEM = SSL_DIR + "localhost-mldsa-44-key.pem";
+    public static final String LOCALHOST_MLDSA_65_CERT_PEM = SSL_DIR + "localhost-mldsa-65-cert.pem";
+    public static final String LOCALHOST_MLDSA_65_KEY_PEM = SSL_DIR + "localhost-mldsa-65-key.pem";
+    public static final String LOCALHOST_MLDSA_87_CERT_PEM = SSL_DIR + "localhost-mldsa-87-cert.pem";
+    public static final String LOCALHOST_MLDSA_87_KEY_PEM = SSL_DIR + "localhost-mldsa-87-key.pem";
+    public static final String TESTUSER_MLDSA_65_CERT_PEM = SSL_DIR + "testuser-mldsa-65-cert.pem";
+    public static final String TESTUSER_MLDSA_65_KEY_PEM = SSL_DIR + "testuser-mldsa-65-key.pem";
     public static final String DB_INDEX = SSL_DIR + "index.db";
     public static final String OCSP_RESPONDER_RSA_CERT = SSL_DIR + "ocsp-responder-rsa-cert.pem";
     public static final String OCSP_RESPONDER_RSA_KEY = SSL_DIR + "ocsp-responder-rsa-key.pem";
