@@ -165,6 +165,7 @@ public class TestWebappServiceLoader {
         control.replay();
         try {
             loader.loadServices(ServletContainerInitializer.class, names);
+            Assert.fail("Expected IOException");
         } catch (IOException ioe) {
             assertThat(ioe.getCause(), instanceOf(ClassCastException.class));
         } finally {
@@ -204,6 +205,7 @@ public class TestWebappServiceLoader {
         control.replay();
         try {
             loader.loadServices(ServletContainerInitializer.class, names);
+            Assert.fail("Expected IOException");
         } catch (IOException ioe) {
             assertThat(ioe.getCause(), instanceOf(ReflectiveOperationException.class));
         } finally {
