@@ -50,7 +50,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.ObjectName;
-
 import javax.sql.XAConnection;
 
 import org.apache.juli.logging.Log;
