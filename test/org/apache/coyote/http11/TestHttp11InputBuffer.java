@@ -803,10 +803,8 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
         LongRequestClient client = new LongRequestClient("/test/" + "a".repeat(9000), "X-Test: a");
 
         Exception e = client.doRequest();
-        if (e == null) {
-            Assert.assertTrue(client.getResponseLine(), client.isResponse414());
-        }
-        Assert.assertFalse(client.isResponseBodyOK());
+        Assert.assertNull(e);
+        Assert.assertTrue(client.getResponseLine(), client.isResponse414());
     }
 
 
@@ -815,10 +813,8 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
         LongRequestClient client = new LongRequestClient("/test?q=" + "a".repeat(9000), "X-Test: a");
 
         Exception e = client.doRequest();
-        if (e == null) {
-            Assert.assertTrue(client.getResponseLine(), client.isResponse414());
-        }
-        Assert.assertFalse(client.isResponseBodyOK());
+        Assert.assertNull(e);
+        Assert.assertTrue(client.getResponseLine(), client.isResponse414());
     }
 
 
@@ -830,10 +826,8 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
         LongRequestClient client = new LongRequestClient("/test", "X-Test: " + "a".repeat(9000));
 
         Exception e = client.doRequest();
-        if (e == null) {
-            Assert.assertTrue(client.getResponseLine(), client.isResponse400());
-        }
-        Assert.assertFalse(client.isResponseBodyOK());
+        Assert.assertNull(e);
+        Assert.assertTrue(client.getResponseLine(), client.isResponse400());
     }
 
 

@@ -287,7 +287,8 @@
       <fix>
         Respond with a 414 (URI Too Long) status rather than a 400 (Bad Request)
         status when the request target is too long to fit in the buffer used to
-        read the request line, as required by RFC 9112, section 3. (abernal)
+        read the request line, as required by RFC 9112, section 3. Pull request
+        <pr>1147</pr> provided by Arturo Bernal. (markt)
       </fix>
     </changelog>
   </subsection>

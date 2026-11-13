@@ -309,6 +309,9 @@ public class Http11Processor extends AbstractProcessor {
                 }
                 setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
                 break;
+            } catch (RequestTargetTooLongException e) {
+                response.setStatus(HttpServletResponse.SC_REQUEST_URI_TOO_LONG);
+                setErrorState(ErrorState.CLOSE_CLEAN, e);
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 UserDataHelper.Mode logMode = userDataHelper.getNextMode();
@@ -325,8 +328,7 @@ public class Http11Processor extends AbstractProcessor {
                             log.debug(message, t);
                     }
                 }
-                // 414 - URI Too Long (RFC 9112, section 3) or 400 - Bad Request
-                response.setStatus(t instanceof RequestTargetTooLongException ? 414 : 400);
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 setErrorState(ErrorState.CLOSE_CLEAN, t);
             }
 
