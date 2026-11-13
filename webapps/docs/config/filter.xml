@@ -1712,6 +1712,33 @@ FINE: Request "/docs/config/manager.html" with response status "200"
         default of <code>false</code> is used.</p>
       </attribute>
 
+      <attribute name="forwardedStrategy" required="false">
+        <p>Selects the headers that describe the original request. The value
+        <code>legacy</code> uses the headers named by the other parameters and
+        ignores the <code>Forwarded</code> header. The value <code>rfc7239</code>
+        uses only the <code>Forwarded</code> header defined by RFC 7239 and
+        ignores <strong>remoteIpHeader</strong>, <strong>protocolHeader</strong>,
+        <strong>portHeader</strong> and <strong>hostHeader</strong>. The value
+        <code>both</code> uses the <code>Forwarded</code> header if the request
+        has one and the legacy headers otherwise; the two are never combined
+        for a single request. Values are case-insensitive. If not specified,
+        the default of <code>legacy</code> is used.</p>
+        <p>When the <code>Forwarded</code> header is used, its elements are
+        processed from right to left. The <code>for</code> parameter of each
+        element is checked against the internal and trusted proxies in the same
+        way as for <strong>remoteIpHeader</strong>. A <code>for</code> value
+        that is <code>unknown</code>, obfuscated, a host name or otherwise not
+        an IP address is never used as the remote address and ends the
+        processing. Ports in <code>for</code> values are ignored and the
+        <code>by</code> parameter is ignored. The <code>proto</code> and
+        <code>host</code> parameters are taken from the leftmost element that
+        was processed and has them; a port in <code>host</code> sets the server
+        port. Elements that were not processed remain in the
+        <code>Forwarded</code> header. A request from a trusted proxy whose
+        <code>Forwarded</code> header is not syntactically valid is rejected
+        with a 400 response.</p>
+      </attribute>
+
       <attribute name="remoteIpHeader" required="false">
         <p>Name of the HTTP Header read by this valve that holds the list of
         traversed IP addresses starting from the requesting client. If not

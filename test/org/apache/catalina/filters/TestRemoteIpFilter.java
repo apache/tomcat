@@ -745,6 +745,11 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
 
     private MockFilterChain testRemoteIpFilter(FilterDef filterDef, Request request)
             throws LifecycleException, IOException, ServletException {
+        return testRemoteIpFilter(filterDef, request, new TesterResponse());
+    }
+
+    private MockFilterChain testRemoteIpFilter(FilterDef filterDef, Request request, TesterResponse response)
+            throws LifecycleException, IOException, ServletException {
         Tomcat tomcat = getTomcatInstance();
         Context root = tomcat.addContext("", TEMP_DIR);
 
@@ -764,7 +769,6 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         MockFilterChain filterChain = new MockFilterChain();
 
         // TEST
-        TesterResponse response = new TesterResponse();
         response.setRequest(request);
         remoteIpFilter.doFilter(request, response, filterChain);
         return filterChain;
@@ -1011,6 +1015,190 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         doTestNetMaskSet(netMaskSet, "fdff:ffff:ffff:ffff:ffff:ffff:ffff:ffff", true);
         doTestNetMaskSet(netMaskSet, "fe00:0000:0000:0000:0000:0000:0000:0000", false);
         doTestNetMaskSet(netMaskSet, "fe00::", false);
+    }
+
+    private static class StatusResponse extends TesterResponse {
+        private int status = -1;
+
+        @Override
+        public void sendError(int status, String message) throws IOException {
+            this.status = status;
+        }
+    }
+
+    private static FilterDef newForwardedFilterDef(String strategy) {
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("internalProxies", "192.168.0.10/31");
+        filterDef.addInitParameter("trustedProxies", "140.211.11.131");
+        filterDef.addInitParameter("forwardedStrategy", strategy);
+        return filterDef;
+    }
+
+    private static MockHttpServletRequest newForwardedRequest(String remoteAddr, String... namesAndValues) {
+        MockHttpServletRequest request = new MockHttpServletRequest(remoteAddr);
+        request.setRemoteHost(remoteAddr);
+        request.setServerPort(8080);
+        request.setScheme("http");
+        for (int i = 0; i < namesAndValues.length; i += 2) {
+            request.addHeader(namesAndValues[i], namesAndValues[i + 1]);
+        }
+        return request;
+    }
+
+    @Test
+    public void testForwardedStrategyAccessors() {
+        RemoteIpFilter filter = new RemoteIpFilter();
+        Assert.assertEquals("legacy", filter.getForwardedStrategy());
+        filter.setForwardedStrategy("RFC7239");
+        Assert.assertEquals("rfc7239", filter.getForwardedStrategy());
+        filter.setForwardedStrategy("Both");
+        Assert.assertEquals("both", filter.getForwardedStrategy());
+        try {
+            filter.setForwardedStrategy("x");
+            Assert.fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            // Expected
+        }
+        Assert.assertEquals("both", filter.getForwardedStrategy());
+    }
+
+    @Test
+    public void testForwardedLegacyIgnoresForwarded() throws Exception {
+        MockHttpServletRequest request = newForwardedRequest("192.168.0.10", "X-Forwarded-For", "1.1.1.1",
+                "Forwarded", "for=2.2.2.2;proto=https");
+        HttpServletRequest actual = testRemoteIpFilter(newForwardedFilterDef("legacy"), request).getRequest();
+        Assert.assertEquals("1.1.1.1", actual.getRemoteAddr());
+        Assert.assertEquals("for=2.2.2.2;proto=https", actual.getHeader("Forwarded"));
+        Assert.assertEquals("http", actual.getScheme());
+    }
+
+    @Test
+    public void testForwardedRfc7239IgnoresLegacyHeaders() throws Exception {
+        MockHttpServletRequest request = newForwardedRequest("192.168.0.10", "X-Forwarded-For", "1.1.1.1",
+                "X-Forwarded-Proto", "https", "Forwarded", "for=2.2.2.2");
+        HttpServletRequest actual = testRemoteIpFilter(newForwardedFilterDef("rfc7239"), request).getRequest();
+        Assert.assertEquals("2.2.2.2", actual.getRemoteAddr());
+        Assert.assertEquals("1.1.1.1", actual.getHeader("X-Forwarded-For"));
+        Assert.assertEquals("http", actual.getScheme());
+        Assert.assertNull(actual.getHeader("Forwarded"));
+    }
+
+    @Test
+    public void testForwardedBothPrefersForwarded() throws Exception {
+        MockHttpServletRequest request = newForwardedRequest("192.168.0.10", "X-Forwarded-For", "1.1.1.1",
+                "Forwarded", "for=2.2.2.2");
+        HttpServletRequest actual = testRemoteIpFilter(newForwardedFilterDef("both"), request).getRequest();
+        Assert.assertEquals("2.2.2.2", actual.getRemoteAddr());
+        Assert.assertEquals("1.1.1.1", actual.getHeader("X-Forwarded-For"));
+    }
+
+    @Test
+    public void testForwardedBothFallsBackToLegacy() throws Exception {
+        MockHttpServletRequest request = newForwardedRequest("192.168.0.10", "X-Forwarded-For", "1.1.1.1");
+        HttpServletRequest actual = testRemoteIpFilter(newForwardedFilterDef("both"), request).getRequest();
+        Assert.assertEquals("1.1.1.1", actual.getRemoteAddr());
+        Assert.assertNull(actual.getHeader("X-Forwarded-For"));
+    }
+
+    @Test
+    public void testForwardedChain() throws Exception {
+        MockHttpServletRequest request = newForwardedRequest("192.168.0.10", "Forwarded",
+                "for=140.211.11.130, for=140.211.11.131;proto=https, for=192.168.0.11");
+        HttpServletRequest actual = testRemoteIpFilter(newForwardedFilterDef("rfc7239"), request).getRequest();
+        Assert.assertEquals("140.211.11.130", actual.getRemoteAddr());
+        Assert.assertEquals("140.211.11.130", actual.getRemoteHost());
+        Assert.assertEquals("140.211.11.131", actual.getHeader("X-Forwarded-By"));
+        Assert.assertNull(actual.getHeader("Forwarded"));
+        Assert.assertTrue(actual.isSecure());
+        Assert.assertEquals("https", actual.getScheme());
+        Assert.assertEquals(443, actual.getServerPort());
+
+        // The original request is not modified
+        Assert.assertEquals("192.168.0.10", request.getRemoteAddr());
+        Assert.assertEquals("for=140.211.11.130, for=140.211.11.131;proto=https, for=192.168.0.11",
+                request.getHeader("Forwarded"));
+    }
+
+    @Test
+    public void testForwardedUntrustedPeer() throws Exception {
+        MockHttpServletRequest request = newForwardedRequest("203.0.113.5", "Forwarded",
+                "for=1.1.1.1;proto=https;host=evil.example.org");
+        HttpServletRequest actual = testRemoteIpFilter(newForwardedFilterDef("rfc7239"), request).getRequest();
+        Assert.assertEquals("203.0.113.5", actual.getRemoteAddr());
+        Assert.assertEquals("for=1.1.1.1;proto=https;host=evil.example.org", actual.getHeader("Forwarded"));
+        Assert.assertEquals("http", actual.getScheme());
+        Assert.assertEquals("localhost", actual.getServerName());
+    }
+
+    @Test
+    public void testForwardedObfuscatedNodeKeepsPeer() throws Exception {
+        doTestForwardedHiddenNode("_hidden");
+    }
+
+    @Test
+    public void testForwardedUnknownNodeKeepsPeer() throws Exception {
+        doTestForwardedHiddenNode("unknown");
+    }
+
+    @Test
+    public void testForwardedHostNameNodeKeepsPeer() throws Exception {
+        doTestForwardedHiddenNode("evil.example");
+    }
+
+    private void doTestForwardedHiddenNode(String node) throws Exception {
+        MockHttpServletRequest request = newForwardedRequest("192.168.0.10", "Forwarded",
+                "for=" + node + ";proto=https");
+        HttpServletRequest actual = testRemoteIpFilter(newForwardedFilterDef("rfc7239"), request).getRequest();
+        Assert.assertEquals("192.168.0.10", actual.getRemoteAddr());
+        Assert.assertEquals("https", actual.getScheme());
+        Assert.assertTrue(actual.isSecure());
+        Assert.assertNull(actual.getHeader("Forwarded"));
+    }
+
+    @Test
+    public void testForwardedSpoofedElementIsNotUsed() throws Exception {
+        MockHttpServletRequest request = newForwardedRequest("192.168.0.10", "Forwarded",
+                "for=10.0.0.1, for=203.0.113.9");
+        HttpServletRequest actual = testRemoteIpFilter(newForwardedFilterDef("rfc7239"), request).getRequest();
+        Assert.assertEquals("203.0.113.9", actual.getRemoteAddr());
+        Assert.assertEquals("for=10.0.0.1", actual.getHeader("Forwarded"));
+    }
+
+    @Test
+    public void testForwardedHostAndPort() throws Exception {
+        MockHttpServletRequest request = newForwardedRequest("192.168.0.10", "Forwarded",
+                "for=1.1.1.1;host=\"example.com:8443\";proto=https");
+        HttpServletRequest actual = testRemoteIpFilter(newForwardedFilterDef("rfc7239"), request).getRequest();
+        Assert.assertEquals("example.com", actual.getServerName());
+        Assert.assertEquals(8443, actual.getServerPort());
+        Assert.assertEquals("https", actual.getScheme());
+    }
+
+    @Test
+    public void testForwardedInvalidHostIgnored() throws Exception {
+        MockHttpServletRequest request = newForwardedRequest("192.168.0.10", "Forwarded",
+                "for=1.1.1.1;host=\"bad host\"");
+        HttpServletRequest actual = testRemoteIpFilter(newForwardedFilterDef("rfc7239"), request).getRequest();
+        Assert.assertEquals("localhost", actual.getServerName());
+        Assert.assertEquals("1.1.1.1", actual.getRemoteAddr());
+    }
+
+    @Test
+    public void testForwardedUnknownProtoIgnored() throws Exception {
+        MockHttpServletRequest request = newForwardedRequest("192.168.0.10", "Forwarded", "for=1.1.1.1;proto=ftp");
+        HttpServletRequest actual = testRemoteIpFilter(newForwardedFilterDef("rfc7239"), request).getRequest();
+        Assert.assertEquals("http", actual.getScheme());
+        Assert.assertEquals(8080, actual.getServerPort());
+    }
+
+    @Test
+    public void testForwardedMalformedHeaderRejected() throws Exception {
+        MockHttpServletRequest request = newForwardedRequest("192.168.0.10", "Forwarded",
+                "for=\"1.1.1.1, for=140.211.11.131");
+        StatusResponse response = new StatusResponse();
+        MockFilterChain chain = testRemoteIpFilter(newForwardedFilterDef("rfc7239"), request, response);
+        Assert.assertEquals(400, response.status);
+        Assert.assertNull(chain.getRequest());
     }
 
     private void doTestNetMaskSet(NetMaskSet netMaskSet, String remoteIp, boolean expectedMatch) throws UnknownHostException {

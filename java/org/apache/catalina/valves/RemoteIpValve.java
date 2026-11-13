@@ -24,8 +24,10 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Locale;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.AccessLog;
 import org.apache.catalina.Globals;
@@ -37,6 +39,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.http.parser.Forwarded;
 import org.apache.tomcat.util.http.parser.Host;
 
 /**
@@ -147,6 +150,15 @@ import org.apache.tomcat.util.http.parser.Host;
  * <td>N/A</td>
  * <td>integer</td>
  * <td>443</td>
+ * </tr>
+ * <tr>
+ * <td>forwardedStrategy</td>
+ * <td>Selects the headers that describe the original request: <code>legacy</code> for the headers named by the other
+ * properties, <code>rfc7239</code> for the <code>Forwarded</code> header only or <code>both</code> to use the
+ * <code>Forwarded</code> header when the request has one and the legacy headers otherwise</td>
+ * <td>N/A</td>
+ * <td><code>legacy</code>, <code>rfc7239</code> or <code>both</code></td>
+ * <td><code>legacy</code></td>
  * </tr>
  * </table>
  * <p>
@@ -350,6 +362,16 @@ public class RemoteIpValve extends ValveBase {
 
     private static final Log log = LogFactory.getLog(RemoteIpValve.class);
 
+    private static final String FORWARDED_HEADER = "Forwarded";
+
+    private enum ForwardedStrategy {
+        LEGACY,
+        RFC7239,
+        BOTH
+    }
+
+    private volatile ForwardedStrategy forwardedStrategy = ForwardedStrategy.LEGACY;
+
     private String hostHeader = null;
 
     private boolean changeLocalName = false;
@@ -385,6 +407,47 @@ public class RemoteIpValve extends ValveBase {
     public RemoteIpValve() {
         // Async requests are supported with this valve
         super(true);
+    }
+
+    /**
+     * Obtain the strategy used to select the headers that describe the original request.
+     *
+     * @return One of <code>legacy</code>, <code>rfc7239</code> or <code>both</code>
+     *
+     * @since 12.0.0-M2
+     */
+    public String getForwardedStrategy() {
+        return forwardedStrategy.name().toLowerCase(Locale.ENGLISH);
+    }
+
+    /**
+     * Set the strategy used to select the headers that describe the original request. With <code>legacy</code> the
+     * <code>X-Forwarded-*</code> style headers are used and the <code>Forwarded</code> header (RFC 7239) is ignored.
+     * With <code>rfc7239</code> only the <code>Forwarded</code> header is used. With <code>both</code> the
+     * <code>Forwarded</code> header is used if the request has one and the legacy headers are used otherwise. The
+     * two sources are never combined for a single request.
+     *
+     * @param forwardedStrategy One of <code>legacy</code>, <code>rfc7239</code> or <code>both</code>, ignoring case
+     *
+     * @throws IllegalArgumentException If the value is not one of the permitted values
+     *
+     * @since 12.0.0-M2
+     */
+    public void setForwardedStrategy(String forwardedStrategy) {
+        ForwardedStrategy strategy = null;
+        if (forwardedStrategy != null) {
+            for (ForwardedStrategy candidate : ForwardedStrategy.values()) {
+                if (candidate.name().equalsIgnoreCase(forwardedStrategy)) {
+                    strategy = candidate;
+                    break;
+                }
+            }
+        }
+        if (strategy == null) {
+            throw new IllegalArgumentException(
+                    sm.getString("remoteIpValve.invalidForwardedStrategy", forwardedStrategy));
+        }
+        this.forwardedStrategy = strategy;
     }
 
     /**
@@ -576,6 +639,13 @@ public class RemoteIpValve extends ValveBase {
         for (Enumeration<String> e = request.getHeaders(proxiesHeader); e.hasMoreElements();) {
             originalProxiesHeaderValues.add(e.nextElement());
         }
+        final ForwardedStrategy strategy = forwardedStrategy;
+        final List<String> originalForwardedHeaderValues = new ArrayList<>();
+        if (strategy != ForwardedStrategy.LEGACY) {
+            for (Enumeration<String> e = request.getHeaders(FORWARDED_HEADER); e.hasMoreElements();) {
+                originalForwardedHeaderValues.add(e.nextElement());
+            }
+        }
         final List<String> originalRemoteIpHeaderValues = new ArrayList<>();
         for (Enumeration<String> e = request.getHeaders(remoteIpHeader); e.hasMoreElements();) {
             originalRemoteIpHeaderValues.add(e.nextElement());
@@ -584,124 +654,23 @@ public class RemoteIpValve extends ValveBase {
         boolean isInternal = isInternalProxy(originalRemoteAddr);
 
         if (isInternal || isTrustedProxy(originalRemoteAddr)) {
-            String remoteIp = null;
-            Deque<String> proxiesHeaderValue = new ArrayDeque<>();
-            StringBuilder concatRemoteIpHeaderValue = new StringBuilder();
-
-            for (Enumeration<String> e = request.getHeaders(remoteIpHeader); e.hasMoreElements();) {
-                if (!concatRemoteIpHeaderValue.isEmpty()) {
-                    concatRemoteIpHeaderValue.append(", ");
-                }
-
-                concatRemoteIpHeaderValue.append(e.nextElement());
-            }
-
-            String[] remoteIpHeaderValue = StringUtils.splitCommaSeparated(concatRemoteIpHeaderValue.toString());
-            int idx;
-            if (!isInternal) {
-                proxiesHeaderValue.addFirst(originalRemoteAddr);
-            }
-            // loop on remoteIpHeaderValue to find the first trusted remote ip and to build the proxies chain
-            for (idx = remoteIpHeaderValue.length - 1; idx >= 0; idx--) {
-                String currentRemoteIp = remoteIpHeaderValue[idx];
-                if (currentRemoteIp.isEmpty()) {
-                    // Skip empty entries, such as those resulting from a
-                    // whitespace-only header value, rather than ending up
-                    // setting an empty remote address
-                    continue;
-                }
-                remoteIp = currentRemoteIp;
-                if (isInternalProxy(currentRemoteIp)) {
-                    // do nothing, internalProxies IPs are not appended to the
-                } else if (isTrustedProxy(currentRemoteIp)) {
-                    proxiesHeaderValue.addFirst(currentRemoteIp);
-                } else {
-                    idx--; // decrement idx because break statement doesn't do it
-                    break;
-                }
-            }
-            // continue to loop on remoteIpHeaderValue to build the new value of the remoteIpHeader
-            Deque<String> newRemoteIpHeaderValue = new ArrayDeque<>();
-            for (; idx >= 0; idx--) {
-                String currentRemoteIp = remoteIpHeaderValue[idx];
-                if (currentRemoteIp.isEmpty()) {
-                    continue;
-                }
-                newRemoteIpHeaderValue.addFirst(currentRemoteIp);
-            }
-            if (remoteIp != null) {
-
-                request.setRemoteAddr(remoteIp);
-                if (request.getConnector().getEnableLookups()) {
-                    // This isn't a lazy lookup but that would be a little more
-                    // invasive - mainly in Request.getRemoteHost() - and if
-                    // enableLookups is true it seems reasonable that the
-                    // hotsname will be required so look it up here.
-                    try {
-                        InetAddress inetAddress = InetAddress.getByName(remoteIp);
-                        // We know we need a DNS look up so use getCanonicalHostName()
-                        request.setRemoteHost(inetAddress.getCanonicalHostName());
-                    } catch (UnknownHostException e) {
-                        if (log.isDebugEnabled()) {
-                            log.debug(sm.getString("remoteIpValve.invalidRemoteAddress", remoteIp), e);
-                        }
-                        request.setRemoteHost(remoteIp);
+            List<Forwarded.Element> forwardedElements = null;
+            if (strategy == ForwardedStrategy.RFC7239 ||
+                    strategy == ForwardedStrategy.BOTH && request.getHeader(FORWARDED_HEADER) != null) {
+                forwardedElements = Forwarded.parse(request.getHeaders(FORWARDED_HEADER));
+                if (forwardedElements == null) {
+                    // A malformed field value could hide the element added by a trusted proxy
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("remoteIpValve.invalidForwardedHeader", originalRemoteAddr));
                     }
-                } else {
-                    request.setRemoteHost(remoteIp);
-                }
-
-                if (proxiesHeaderValue.isEmpty()) {
-                    request.getCoyoteRequest().getMimeHeaders().removeHeader(proxiesHeader);
-                } else {
-                    String commaDelimitedListOfProxies = StringUtils.join(proxiesHeaderValue);
-                    request.getCoyoteRequest().getMimeHeaders().setValue(proxiesHeader)
-                            .setString(commaDelimitedListOfProxies);
-                }
-                if (newRemoteIpHeaderValue.isEmpty()) {
-                    request.getCoyoteRequest().getMimeHeaders().removeHeader(remoteIpHeader);
-                } else {
-                    String commaDelimitedRemoteIpHeaderValue = StringUtils.join(newRemoteIpHeaderValue);
-                    request.getCoyoteRequest().getMimeHeaders().setValue(remoteIpHeader)
-                            .setString(commaDelimitedRemoteIpHeaderValue);
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                    return;
                 }
             }
-
-            if (protocolHeader != null && !protocolHeader.isEmpty()) {
-                String protocolHeaderValue = RequestUtil.getMergedHeaderValue(request, protocolHeader);
-                if (protocolHeaderValue == null) {
-                    // Don't modify the secure, scheme and serverPort attributes
-                    // of the request
-                } else if (isForwardedProtoHeaderValueSecure(protocolHeaderValue)) {
-                    request.setSecure(true);
-                    request.getCoyoteRequest().scheme().setString("https");
-                    setPorts(request, httpsServerPort);
-                } else {
-                    request.setSecure(false);
-                    request.getCoyoteRequest().scheme().setString("http");
-                    setPorts(request, httpServerPort);
-                }
-            }
-
-            if (hostHeader != null) {
-                String hostHeaderValue = request.getHeader(hostHeader);
-                if (hostHeaderValue != null) {
-                    try {
-                        int portIndex = Host.parse(hostHeaderValue);
-                        if (portIndex > -1) {
-                            log.debug(sm.getString("remoteIpValve.invalidHostWithPort", hostHeaderValue, hostHeader));
-                            hostHeaderValue = hostHeaderValue.substring(0, portIndex);
-                        }
-
-                        request.getCoyoteRequest().serverName().setString(hostHeaderValue);
-                        if (isChangeLocalName()) {
-                            request.getCoyoteRequest().localName().setString(hostHeaderValue);
-                        }
-
-                    } catch (IllegalArgumentException iae) {
-                        log.debug(sm.getString("remoteIpValve.invalidHostHeader", hostHeaderValue, hostHeader), iae);
-                    }
-                }
+            if (forwardedElements != null) {
+                processForwarded(request, originalRemoteAddr, isInternal, forwardedElements);
+            } else {
+                processLegacy(request, originalRemoteAddr, isInternal);
             }
 
             request.setAttribute(Globals.REQUEST_FORWARDED_ATTRIBUTE, Boolean.TRUE);
@@ -754,6 +723,135 @@ public class RemoteIpValve extends ValveBase {
                 headers.removeHeader(remoteIpHeader);
                 for (String v : originalRemoteIpHeaderValues) {
                     headers.addValue(remoteIpHeader).setString(v);
+                }
+
+                if (strategy != ForwardedStrategy.LEGACY) {
+                    headers.removeHeader(FORWARDED_HEADER);
+                    for (String v : originalForwardedHeaderValues) {
+                        headers.addValue(FORWARDED_HEADER).setString(v);
+                    }
+                }
+            }
+        }
+    }
+
+    private void processLegacy(Request request, String originalRemoteAddr, boolean isInternal) {
+        String remoteIp = null;
+        Deque<String> proxiesHeaderValue = new ArrayDeque<>();
+        StringBuilder concatRemoteIpHeaderValue = new StringBuilder();
+
+        for (Enumeration<String> e = request.getHeaders(remoteIpHeader); e.hasMoreElements();) {
+            if (!concatRemoteIpHeaderValue.isEmpty()) {
+                concatRemoteIpHeaderValue.append(", ");
+            }
+
+            concatRemoteIpHeaderValue.append(e.nextElement());
+        }
+
+        String[] remoteIpHeaderValue = StringUtils.splitCommaSeparated(concatRemoteIpHeaderValue.toString());
+        int idx;
+        if (!isInternal) {
+            proxiesHeaderValue.addFirst(originalRemoteAddr);
+        }
+        // loop on remoteIpHeaderValue to find the first trusted remote ip and to build the proxies chain
+        for (idx = remoteIpHeaderValue.length - 1; idx >= 0; idx--) {
+            String currentRemoteIp = remoteIpHeaderValue[idx];
+            if (currentRemoteIp.isEmpty()) {
+                // Skip empty entries, such as those resulting from a
+                // whitespace-only header value, rather than ending up
+                // setting an empty remote address
+                continue;
+            }
+            remoteIp = currentRemoteIp;
+            if (isInternalProxy(currentRemoteIp)) {
+                // do nothing, internalProxies IPs are not appended to the
+            } else if (isTrustedProxy(currentRemoteIp)) {
+                proxiesHeaderValue.addFirst(currentRemoteIp);
+            } else {
+                idx--; // decrement idx because break statement doesn't do it
+                break;
+            }
+        }
+        // continue to loop on remoteIpHeaderValue to build the new value of the remoteIpHeader
+        Deque<String> newRemoteIpHeaderValue = new ArrayDeque<>();
+        for (; idx >= 0; idx--) {
+            String currentRemoteIp = remoteIpHeaderValue[idx];
+            if (currentRemoteIp.isEmpty()) {
+                continue;
+            }
+            newRemoteIpHeaderValue.addFirst(currentRemoteIp);
+        }
+        if (remoteIp != null) {
+
+            request.setRemoteAddr(remoteIp);
+            if (request.getConnector().getEnableLookups()) {
+                // This isn't a lazy lookup but that would be a little more
+                // invasive - mainly in Request.getRemoteHost() - and if
+                // enableLookups is true it seems reasonable that the
+                // hotsname will be required so look it up here.
+                try {
+                    InetAddress inetAddress = InetAddress.getByName(remoteIp);
+                    // We know we need a DNS look up so use getCanonicalHostName()
+                    request.setRemoteHost(inetAddress.getCanonicalHostName());
+                } catch (UnknownHostException e) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("remoteIpValve.invalidRemoteAddress", remoteIp), e);
+                    }
+                    request.setRemoteHost(remoteIp);
+                }
+            } else {
+                request.setRemoteHost(remoteIp);
+            }
+
+            if (proxiesHeaderValue.isEmpty()) {
+                request.getCoyoteRequest().getMimeHeaders().removeHeader(proxiesHeader);
+            } else {
+                String commaDelimitedListOfProxies = StringUtils.join(proxiesHeaderValue);
+                request.getCoyoteRequest().getMimeHeaders().setValue(proxiesHeader)
+                        .setString(commaDelimitedListOfProxies);
+            }
+            if (newRemoteIpHeaderValue.isEmpty()) {
+                request.getCoyoteRequest().getMimeHeaders().removeHeader(remoteIpHeader);
+            } else {
+                String commaDelimitedRemoteIpHeaderValue = StringUtils.join(newRemoteIpHeaderValue);
+                request.getCoyoteRequest().getMimeHeaders().setValue(remoteIpHeader)
+                        .setString(commaDelimitedRemoteIpHeaderValue);
+            }
+        }
+
+        if (protocolHeader != null && !protocolHeader.isEmpty()) {
+            String protocolHeaderValue = RequestUtil.getMergedHeaderValue(request, protocolHeader);
+            if (protocolHeaderValue == null) {
+                // Don't modify the secure, scheme and serverPort attributes
+                // of the request
+            } else if (isForwardedProtoHeaderValueSecure(protocolHeaderValue)) {
+                request.setSecure(true);
+                request.getCoyoteRequest().scheme().setString("https");
+                setPorts(request, httpsServerPort);
+            } else {
+                request.setSecure(false);
+                request.getCoyoteRequest().scheme().setString("http");
+                setPorts(request, httpServerPort);
+            }
+        }
+
+        if (hostHeader != null) {
+            String hostHeaderValue = request.getHeader(hostHeader);
+            if (hostHeaderValue != null) {
+                try {
+                    int portIndex = Host.parse(hostHeaderValue);
+                    if (portIndex > -1) {
+                        log.debug(sm.getString("remoteIpValve.invalidHostWithPort", hostHeaderValue, hostHeader));
+                        hostHeaderValue = hostHeaderValue.substring(0, portIndex);
+                    }
+
+                    request.getCoyoteRequest().serverName().setString(hostHeaderValue);
+                    if (isChangeLocalName()) {
+                        request.getCoyoteRequest().localName().setString(hostHeaderValue);
+                    }
+
+                } catch (IllegalArgumentException iae) {
+                    log.debug(sm.getString("remoteIpValve.invalidHostHeader", hostHeaderValue, hostHeader), iae);
                 }
             }
         }
@@ -810,6 +908,136 @@ public class RemoteIpValve extends ValveBase {
             }
         }
         return true;
+    }
+
+    /*
+     * Process the Forwarded header (RFC 7239). Element i was added by the node identified by element i+1 (or by the
+     * connection peer for the last element) so the elements are consumed right to left until one that does not
+     * identify a known proxy is found.
+     */
+    private void processForwarded(Request request, String originalRemoteAddr, boolean isInternal,
+            List<Forwarded.Element> elements) {
+        String remoteIp = null;
+        Deque<String> proxiesHeaderValue = new ArrayDeque<>();
+        if (!isInternal) {
+            proxiesHeaderValue.addFirst(originalRemoteAddr);
+        }
+        String proto = null;
+        String host = null;
+
+        int idx;
+        for (idx = elements.size() - 1; idx >= 0; idx--) {
+            Forwarded.Element element = elements.get(idx);
+            if (element.isValid()) {
+                // The leftmost consumed element that has a value wins
+                if (element.getProto() != null) {
+                    proto = element.getProto();
+                }
+                if (element.getHost() != null) {
+                    host = element.getHost();
+                }
+            }
+            Forwarded.Node node = element.isValid() ? element.getForNode() : null;
+            if (node == null || !node.isAddress()) {
+                // Unknown, obfuscated or invalid. Never use these as the remote address.
+                idx--;
+                break;
+            }
+            // Only validated IP address literals reach the proxy checks so no name resolution can occur
+            remoteIp = node.getName();
+            if (isInternalProxy(remoteIp)) {
+                // Internal proxies are not added to the proxies header
+            } else if (isTrustedProxy(remoteIp)) {
+                proxiesHeaderValue.addFirst(remoteIp);
+            } else {
+                idx--;
+                break;
+            }
+        }
+
+        MimeHeaders headers = request.getCoyoteRequest().getMimeHeaders();
+        if (remoteIp != null) {
+            request.setRemoteAddr(remoteIp);
+            if (request.getConnector().getEnableLookups()) {
+                try {
+                    InetAddress inetAddress = InetAddress.getByName(remoteIp);
+                    request.setRemoteHost(inetAddress.getCanonicalHostName());
+                } catch (UnknownHostException e) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("remoteIpValve.invalidRemoteAddress", remoteIp), e);
+                    }
+                    request.setRemoteHost(remoteIp);
+                }
+            } else {
+                request.setRemoteHost(remoteIp);
+            }
+        }
+
+        if (proxiesHeaderValue.isEmpty()) {
+            headers.removeHeader(proxiesHeader);
+        } else {
+            headers.setValue(proxiesHeader).setString(StringUtils.join(proxiesHeaderValue));
+        }
+
+        headers.removeHeader(FORWARDED_HEADER);
+        if (idx >= 0) {
+            List<String> remaining = new ArrayList<>();
+            for (int i = 0; i <= idx; i++) {
+                remaining.add(elements.get(i).toHeaderValue());
+            }
+            headers.setValue(FORWARDED_HEADER).setString(String.join(", ", remaining));
+        }
+
+        int port = -1;
+        if (host != null) {
+            try {
+                int portIndex = Host.parse(host);
+                String serverName = host;
+                if (portIndex > -1) {
+                    port = parsePort(host.substring(portIndex + 1));
+                    serverName = host.substring(0, portIndex);
+                }
+                request.getCoyoteRequest().serverName().setString(serverName);
+                if (isChangeLocalName()) {
+                    request.getCoyoteRequest().localName().setString(serverName);
+                }
+            } catch (IllegalArgumentException iae) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("remoteIpValve.invalidForwardedHost", host), iae);
+                }
+            }
+        }
+
+        if ("https".equalsIgnoreCase(proto)) {
+            request.setSecure(true);
+            request.getCoyoteRequest().scheme().setString("https");
+            setServerPort(request, port > -1 ? port : httpsServerPort);
+        } else if ("http".equalsIgnoreCase(proto)) {
+            request.setSecure(false);
+            request.getCoyoteRequest().scheme().setString("http");
+            setServerPort(request, port > -1 ? port : httpServerPort);
+        } else if (port > -1) {
+            setServerPort(request, port);
+        }
+    }
+
+    private int parsePort(String value) {
+        try {
+            int port = Integer.parseInt(value);
+            if (port >= 1 && port <= 65535) {
+                return port;
+            }
+        } catch (NumberFormatException nfe) {
+            // Ignore the port
+        }
+        return -1;
+    }
+
+    private void setServerPort(Request request, int port) {
+        request.setServerPort(port);
+        if (changeLocalPort) {
+            request.setLocalPort(port);
+        }
     }
 
     private void setPorts(Request request, int defaultPort) {
