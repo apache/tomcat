@@ -32,8 +32,8 @@ public class EntityTag {
     }
 
     /**
-     * Parse the given input as (per RFC 7232) 1#entity-tag. Compare an ETag header with a resource ETag as described in
-     * RFC 7232 section 2.3.2.
+     * Parse the given input as (per RFC 9110) #entity-tag. Compare an ETag header with a resource ETag as described in
+     * RFC 9110 section 8.8.3.2.
      *
      * @param input        The input to parse
      * @param compareWeak  Use weak comparison e.g. match "etag" with W/"etag"
@@ -91,8 +91,6 @@ public class EntityTag {
                     result = Boolean.TRUE;
                 }
             }
-
-            HttpParser.skipWhitespace(input);
 
             switch (HttpParser.skipConstant(input, ",")) {
                 case EOF:
