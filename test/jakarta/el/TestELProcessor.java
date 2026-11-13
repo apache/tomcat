@@ -297,7 +297,13 @@ public class TestELProcessor {
 
 
     @Test
-    public void testDefineFunctionInvalidTrailingNonsense() {
+    public void testDefineFunctionInvalidTrailingNonsense01() {
+        doDefineFunctionInvalidSignature("void doIt() nonsense");
+    }
+
+
+    @Test
+    public void testDefineFunctionInvalidTrailingNonsense02() {
         doDefineFunctionInvalidSignature("void doIt(int) nonsense");
     }
 
