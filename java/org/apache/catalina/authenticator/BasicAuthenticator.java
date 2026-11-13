@@ -147,8 +147,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
     public static class BasicCredentials {
 
         // the only authentication method supported by this parser
-        // note: we include single white space as its delimiter
-        private static final String METHOD = "basic ";
+        private static final String METHOD = "basic";
 
         private final Charset charset;
         private final ByteChunk authorization;
@@ -197,13 +196,20 @@ public class BasicAuthenticator extends AuthenticatorBase {
         }
 
         /*
-         * The authorization method string is case-insensitive and must have exactly one space character as a delimiter.
+         * The authorization method string is case-insensitive and is followed by one or more space characters (RFC
+         * 9110, section 11.4).
          */
         private void parseMethod() throws IllegalArgumentException {
-            if (authorization.startsWithIgnoreCase(METHOD, 0)) {
-                // step past the auth method name
-                base64blobOffset = initialOffset + METHOD.length();
-                base64blobLength = authorization.getLength() - METHOD.length();
+            int end = initialOffset + authorization.getLength();
+            int pos = initialOffset + METHOD.length();
+            byte[] buffer = authorization.getBuffer();
+            if (authorization.startsWithIgnoreCase(METHOD, 0) && pos < end && buffer[pos] == ' ') {
+                // step past the auth method name and the space(s) that follow it
+                while (pos < end && buffer[pos] == ' ') {
+                    pos++;
+                }
+                base64blobOffset = pos;
+                base64blobLength = end - pos;
             } else {
                 // is this possible, or permitted?
                 throw new IllegalArgumentException(sm.getString("basicAuthenticator.notBasic"));

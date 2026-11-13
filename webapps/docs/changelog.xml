@@ -108,6 +108,17 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 11.0.30 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Accept one or more space characters between the authentication scheme
+        and the credentials in a <code>Basic</code> <code>Authorization</code>
+        header field, as allowed by RFC 9110, section 11.4. Previously exactly
+        one space was required. Pull request <pr>1148</pr> provided by Arturo
+        Bernal. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
