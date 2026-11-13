@@ -51,6 +51,16 @@ public class TestAcceptLanguage {
     }
 
     @Test
+    public void testWeightNameCaseInsensitive() throws Exception {
+        // RFC 9110, section 5.6.6: parameter names are case-insensitive
+        List<AcceptLanguage> actual = AcceptLanguage.parse(new StringReader("en-gb;Q=0.5"));
+
+        Assert.assertEquals(1, actual.size());
+        Assert.assertEquals(L_EN_GB, actual.get(0).getLocale());
+        Assert.assertEquals(Q0_500, actual.get(0).getQuality(), 0.0001);
+    }
+
+    @Test
     public void testSingle03() throws Exception {
         List<AcceptLanguage> actual = AcceptLanguage.parse(new StringReader("en-gb;"));
 
