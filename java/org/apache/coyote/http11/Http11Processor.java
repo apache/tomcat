@@ -325,8 +325,8 @@ public class Http11Processor extends AbstractProcessor {
                             log.debug(message, t);
                     }
                 }
-                // 400 - Bad Request
-                response.setStatus(400);
+                // 414 - URI Too Long (RFC 9112, section 3) or 400 - Bad Request
+                response.setStatus(t instanceof RequestTargetTooLongException ? 414 : 400);
                 setErrorState(ErrorState.CLOSE_CLEAN, t);
             }
 
@@ -903,7 +903,10 @@ public class Http11Processor extends AbstractProcessor {
 
 
     private void badRequest(String errorKey) {
-        response.setStatus(400);
+        if (!getErrorState().isError()) {
+            // Do not replace the status of an error that has already been identified
+            response.setStatus(400);
+        }
         setErrorState(ErrorState.CLOSE_CLEAN, null);
         if (log.isDebugEnabled()) {
             log.debug(sm.getString(errorKey));
