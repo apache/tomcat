@@ -166,6 +166,10 @@
         section 15.2). Pull request <pr>1149</pr> provided by Arturo Bernal.
         (markt)
       </fix>
+      <fix>
+        Skip empty elements when parsing entity tag lists. Pull request
+        <pr>1150</pr> provided by Arturo Bernal. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
