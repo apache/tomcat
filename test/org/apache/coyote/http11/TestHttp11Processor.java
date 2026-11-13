@@ -2267,6 +2267,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
     }
 
+
     private static class EarlyHintsServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;

@@ -300,7 +300,8 @@
       <fix>
         Do not send a 103 (Early Hints) response to an HTTP/1.0 client as a
         server must not send a 1xx response to an HTTP/1.0 client. (RFC 9110,
-        section 15.2) (abernal)
+        section 15.2). Pull request <pr>1149</pr> provided by Arturo Bernal.
+        (markt)
       </fix>
     </changelog>
   </subsection>
