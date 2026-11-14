@@ -183,7 +183,7 @@ public class OutputBuffer extends Writer {
         bytesWritten = 0;
         charsWritten = 0;
 
-        if (bb.capacity() > 16 * defaultBufferSize) {
+        if (bb.capacity() > 16L * defaultBufferSize) {
             // Discard buffers which are too large
             bb = ByteBuffer.allocate(defaultBufferSize);
         }

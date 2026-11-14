@@ -257,6 +257,13 @@
       <update>
         Remove support for HTTP 0.9. (markt)
       </update>
+      <add>
+        Add the <code>responseBufferSize</code> attribute to the HTTP/1.1
+        connectors to configure the size of the response buffer. The minimum
+        value is <code>1024</code>. Fix an integer overflow in
+        <code>OutputBuffer.recycle()</code> when the buffer is larger than
+        128 MiB. (abernal)
+      </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
         <bug>70287</bug>: Restore the keep-alive timeout after a sendfile write.
