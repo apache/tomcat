@@ -165,9 +165,8 @@ public abstract class TimeBucketCounterBase {
 
 
     /**
-     * When we want to test a full bucket duration we need to sleep until the next bucket starts.
-     * <p>
-     * <strong>WARNING:</strong> This method is used for test purpose.
+     * Returns the time until the current bucket ends. This is used to tell clients when to retry and, in tests, to
+     * wait until the next bucket starts.
      *
      * @return the number of milliseconds until the next bucket
      */
