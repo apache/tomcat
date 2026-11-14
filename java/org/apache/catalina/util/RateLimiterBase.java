@@ -118,6 +118,19 @@ public abstract class RateLimiterBase implements RateLimiter {
 
 
     @Override
+    public int getRetryAfter(long timestamp) {
+        long millis = bucketCounter.getMillisUntilNextBucket();
+        if (bucketCounter.getBucketIndex(timestamp) != bucketCounter.getCurrentBucketPrefix()) {
+            // The time window changed while the request was being counted, so it is not known which window counted it
+            return -1;
+        }
+        // The delay is never zero as the next window always starts after the current time. Round up so the client
+        // never retries before the window ends.
+        return (int) ((millis + 999) / 1000);
+    }
+
+
+    @Override
     public void destroy() {
         // bucketCounter remains null if setFilterConfig() failed before it was assigned, e.g. a counter
         // constructor rejected the configured duration. Do not mask that failure with an NPE here.

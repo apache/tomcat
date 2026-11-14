@@ -67,7 +67,10 @@ import org.apache.tomcat.util.res.StringManager;
  * <p>
  * <code>exposeHeaders</code> enables the output of the rate limiter configuration and state via a response header as
  * per <a href="https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers">RateLimit header fields for HTTP
- * (draft)</a>.
+ * (draft)</a>. It also adds a <code>Retry-After</code> header, as per
+ * <a href="https://www.rfc-editor.org/rfc/rfc9110#section-10.2.3">RFC 9110, section 10.2.3</a>, to the
+ * &quot;429 Too many requests&quot; responses that are sent when the limit is enforced. The header is omitted if the
+ * delay is not known.
  * </p>
  * <p>
  * <strong>WARNING:</strong> if Tomcat is behind a reverse proxy then you must make sure that the Rate Limit Filter sees
@@ -105,6 +108,12 @@ public class RateLimitFilter extends FilterBase {
      * (draft)</a>.
      */
     public static final String HEADER_RATE_LIMIT_POLICY = "RateLimit-Policy";
+
+    /**
+     * Name of the header field that tells the client how long to wait before retrying, defined in
+     * <a href="https://www.rfc-editor.org/rfc/rfc9110#section-10.2.3">RFC 9110, section 10.2.3</a>.
+     */
+    private static final String HEADER_RETRY_AFTER = "Retry-After";
 
     /**
      * Name of the rate limit remaining quota header field defined in
@@ -285,6 +294,9 @@ public class RateLimitFilter extends FilterBase {
             throws IOException, ServletException {
 
         String ipAddr = request.getRemoteAddr();
+        // Only read the time if a Retry-After header could be sent
+        boolean sendRetryAfter = exposeHeaders && enforce && statusCode == HttpServletResponse.SC_TOO_MANY_REQUESTS;
+        long timestamp = sendRetryAfter ? System.currentTimeMillis() : 0;
         int reqCount = rateLimiter.increment(ipAddr);
 
         request.setAttribute(RATE_LIMIT_ATTRIBUTE_COUNT, Integer.valueOf(reqCount));
@@ -298,12 +310,17 @@ public class RateLimitFilter extends FilterBase {
             }
         }
         if (reqCount > rateLimiter.getRequests()) {
+            // Before logging, so that as little time as possible passes between counting the request and this
+            int retryAfter = sendRetryAfter ? rateLimiter.getRetryAfter(timestamp) : -1;
 
             log.warn(sm.getString("rateLimitFilter.maxRequestsExceeded", filterName, Integer.valueOf(reqCount), ipAddr,
                     Integer.valueOf(rateLimiter.getRequests()), Integer.valueOf(rateLimiter.getDuration())));
 
             if (enforce) {
                 if (response instanceof HttpServletResponse) {
+                    if (retryAfter > 0) {
+                        ((HttpServletResponse) response).setHeader(HEADER_RETRY_AFTER, Integer.toString(retryAfter));
+                    }
                     ((HttpServletResponse) response).sendError(statusCode, statusMessage);
                 }
                 return;
