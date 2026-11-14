@@ -443,8 +443,8 @@ public class Request implements HttpServletRequest {
     private int maxPartHeaderSize = -1;
 
     /**
-     * The maximum number of locales permitted for a request. The Accept-Language header value is untrusted input
-     * bounded only by the maximum header size so the number of locales is bounded by default to limit the
+     * The maximum number of locales that will be parsed for a request. The Accept-Language header value is untrusted
+     * input bounded only by the maximum header size so the number of locales is bounded by default to limit the
      * per-request processing and the number of distinct locales exposed to web applications and internal components.
      * A value of less than zero means no limit.
      */
@@ -3183,7 +3183,7 @@ public class Request implements HttpServletRequest {
 
         // Determine how many more entries are of interest. One more than the
         // maximum is parsed so that a header that exceeds the limit is
-        // rejected rather than silently truncated. Parsing no further entries
+        // logged rather than silently truncated. Parsing no further entries
         // once the limit is reached avoids creating Locale objects for entries
         // that can never be used.
         int maxElements = -1;

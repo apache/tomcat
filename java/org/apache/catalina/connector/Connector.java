@@ -246,9 +246,9 @@ public class Connector extends LifecycleMBeanBase {
 
     /**
      * The maximum number of locales that will be parsed for a request.
-     * Use a value less than zero for no limit. Defaults to 10.
+     * Use a value less than zero for no limit. Defaults to 20.
      */
-    private int maxLocaleCount = 10;
+    private int maxLocaleCount = 20;
 
     /**
      * The maximum number of parameters (GET plus POST) which will be automatically parsed by the container. 1000 by
@@ -526,8 +526,8 @@ public class Connector extends LifecycleMBeanBase {
 
 
     /**
-     * Returns the maximum number of locales that are permitted for a request. Requests that exceed this limit will be
-     * rejected when the locales are parsed. A value of less than zero means no limit.
+     * Returns the maximum number of locales that will be parsed for a request. A value of less than zero means no
+     * limit.
      * @return the maximum locale count
      */
     public int getMaxLocaleCount() {
@@ -536,8 +536,7 @@ public class Connector extends LifecycleMBeanBase {
 
 
     /**
-     * Sets the maximum number of locales that are permitted for a request. Requests that exceed this limit will be
-     * rejected when the locales are parsed. A value of less than zero means no limit.
+     * Sets the maximum number of locales that will be parsed for a request. A value of less than zero means no limit.
      *
      * @param maxLocaleCount the new maximum locale count
      */

@@ -228,6 +228,10 @@
         one space was required. Pull request <pr>1148</pr> provided by Arturo
         Bernal. (markt)
       </fix>
+      <update>
+        Increase the default value of the <code>maxLocaleCount</code> attribute
+        of the <code>Connector</code> from 10 to 20.
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
