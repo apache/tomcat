@@ -526,8 +526,8 @@ public class Connector extends LifecycleMBeanBase {
 
 
     /**
-     * Returns the maximum number of locales that are permitted for a request. Requests that exceed this limit will be
-     * rejected when the locales are parsed. A value of less than zero means no limit.
+     * Returns the maximum number of locales that will be parsed for a request. A value of less than zero means no
+     * limit.
      * @return the maximum locale count
      */
     public int getMaxLocaleCount() {
@@ -536,8 +536,7 @@ public class Connector extends LifecycleMBeanBase {
 
 
     /**
-     * Sets the maximum number of locales that are permitted for a request. Requests that exceed this limit will be
-     * rejected when the locales are parsed. A value of less than zero means no limit.
+     * Sets the maximum number of locales that will be parsed for a request. A value of less than zero means no limit.
      *
      * @param maxLocaleCount the new maximum locale count
      */
