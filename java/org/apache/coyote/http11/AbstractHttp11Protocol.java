@@ -694,6 +694,48 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
 
     /**
+     * The smallest response buffer size that is accepted. The buffer has to be able to hold the encoded form of any
+     * single character, which is at most a few bytes for the character sets supported by the JRE.
+     */
+    private static final int MIN_RESPONSE_BUFFER_SIZE = 1024;
+
+    /**
+     * Size of the buffer used for the response content or -1 to use the default size of the servlet container.
+     */
+    private int responseBufferSize = -1;
+
+    /**
+     * Get the size of the buffer used for the response content.
+     *
+     * @return The size of the buffer in bytes or -1 if the default size of the servlet container is used
+     */
+    public int getResponseBufferSize() {
+        return responseBufferSize;
+    }
+
+    /**
+     * Set the size of the buffer used for the response content before the response is committed. Servlets may still
+     * request a larger buffer with {@link jakarta.servlet.ServletResponse#setBufferSize(int)}.
+     *
+     * @param responseBufferSize The size of the buffer in bytes
+     *
+     * @throws IllegalArgumentException If the size is less than 1024
+     */
+    public void setResponseBufferSize(int responseBufferSize) {
+        if (responseBufferSize < MIN_RESPONSE_BUFFER_SIZE) {
+            throw new IllegalArgumentException(sm.getString("abstractHttp11Protocol.invalidResponseBufferSize",
+                    Integer.toString(responseBufferSize), Integer.toString(MIN_RESPONSE_BUFFER_SIZE)));
+        }
+        this.responseBufferSize = responseBufferSize;
+    }
+
+    @Override
+    public int getDesiredBufferSize() {
+        return responseBufferSize;
+    }
+
+
+    /**
      * Maximum amount of request body to swallow.
      */
     private int maxSwallowSize = 2 * 1024 * 1024;
