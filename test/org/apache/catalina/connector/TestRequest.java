@@ -850,7 +850,7 @@ public class TestRequest extends TomcatBaseTest {
 
         // 5 + 6 = 11, exceeds the default limit
         Assert.assertEquals(10, localeCount(new Connector(), "aa-000,aa-001,aa-002,aa-003,aa-004",
-                    "aa-005,aa-006,aa-007,aa-008,aa-009,aa-010"));
+                "aa-005,aa-006,aa-007,aa-008,aa-009,aa-010"));
     }
 
     private static int localeCount(Connector connector, String... acceptLanguages) {
