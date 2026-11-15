@@ -17,11 +17,14 @@
 package org.apache.coyote.http2;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.coyote.http11.AbstractHttp11Protocol;
+import org.apache.tomcat.util.http.Method;
 
 /**
  * Unit tests for Section 6.8 of <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>. <br>
@@ -73,7 +76,7 @@ public class TestHttp2Section_6_8 extends Http2TestBase {
 
 
     @Test
-    public void testGoawayIgnoreNewStreamsAllowTrailers() throws Exception {
+    public void testGoawayIgnoreNewStreamFrames() throws Exception {
         setPingAckDelayMillis(PING_ACK_DELAY_MS);
 
         http2Connect();
@@ -110,8 +113,27 @@ public class TestHttp2Section_6_8 extends Http2TestBase {
 
         Thread.sleep(PING_ACK_DELAY_MS + TIMING_MARGIN_MS);
 
-        // Should be ignored
-        sendSimpleGetRequest(5);
+        // Should be ignored but the headers still need to be decoded to keep
+        // the HPACK state synchronized. Include the trailer header so the
+        // trailer below will use the dynamic table entry created here.
+        byte[] ignoredHeadersFrameHeader = new byte[9];
+        ByteBuffer ignoredHeadersPayload = ByteBuffer.allocate(128);
+        List<Header> ignoredHeaders = new ArrayList<>(5);
+        ignoredHeaders.add(new Header(":method", Method.GET));
+        ignoredHeaders.add(new Header(":scheme", "http"));
+        ignoredHeaders.add(new Header(":path", "/simple"));
+        ignoredHeaders.add(new Header(":authority", "localhost:" + getPort()));
+        ignoredHeaders.add(new Header(TRAILER_HEADER_NAME, TRAILER_HEADER_VALUE));
+        buildGetRequest(ignoredHeadersFrameHeader, ignoredHeadersPayload, null, ignoredHeaders, 5);
+        // Clear END_STREAM since a DATA frame will follow.
+        ignoredHeadersFrameHeader[4] = 0x04;
+        writeFrame(ignoredHeadersFrameHeader, ignoredHeadersPayload);
+
+        // The ignored DATA frame must still be accounted for in the
+        // connection flow-control window.
+        dataFrameHeader[4] = 0x01;
+        ByteUtil.set31Bits(dataFrameHeader, 5, 5);
+        writeFrame(dataFrameHeader, dataPayload);
 
         // Trailers
         buildTrailerHeaders(trailerFrameHeader, trailerPayload, 3);
@@ -123,9 +145,14 @@ public class TestHttp2Section_6_8 extends Http2TestBase {
         Assert.assertEquals("0-WindowSize-[256]\n3-WindowSize-[256]\n", output.getTrace());
         output.clearTrace();
 
-        // Go away frame after trying to send a GET on stream 5
+        // Go away frame after trying to open stream 5
         parser.readFrame();
         Assert.assertEquals("0-Goaway-[3]-[0]-[null]", output.getTrace());
+        output.clearTrace();
+
+        // Connection window update after swallowing the ignored DATA frame
+        parser.readFrame();
+        Assert.assertEquals("0-WindowSize-[256]\n", output.getTrace());
         output.clearTrace();
 
         // Stream 3 headers and body once trailer has been read (it is used to create body)
@@ -136,8 +163,6 @@ public class TestHttp2Section_6_8 extends Http2TestBase {
         String expected = "3-HeadersStart\n" + "3-Header-[:status]-[200]\n" +
                 "3-Header-[content-length]-[" + len + "]\n" + "3-Header-[date]-[" + DEFAULT_DATE + "]\n" +
                 "3-HeadersEnd\n3-Body-" + len + "\n" + "3-EndOfStream\n";
-
-
         Assert.assertEquals(expected, output.getTrace());
         output.clearTrace();
     }
@@ -152,8 +177,4 @@ public class TestHttp2Section_6_8 extends Http2TestBase {
 
         handleGoAwayResponse(1);
     }
-
-
-    // TODO Test header processing and window size processing for ignored
-    // streams
 }
