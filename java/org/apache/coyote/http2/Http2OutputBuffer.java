@@ -16,8 +16,11 @@
  */
 package org.apache.coyote.http2;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.coyote.Response;
 import org.apache.coyote.http11.HttpOutputBuffer;
@@ -32,6 +35,10 @@ public class Http2OutputBuffer implements HttpOutputBuffer {
 
     private final Response coyoteResponse;
     private HttpOutputBuffer next;
+    // Filters that hold resources that must be released, e.g. memory that is not managed by the JVM. Guarded by this.
+    private List<Closeable> closeableFilters;
+    // Guarded by this
+    private boolean closed;
 
 
     /**
@@ -44,6 +51,57 @@ public class Http2OutputBuffer implements HttpOutputBuffer {
     public void addFilter(OutputFilter filter) {
         filter.setBuffer(next);
         next = filter;
+        // As for HTTP/1.1, the filter is told which response it is for once the headers have been processed
+        filter.setResponse(coyoteResponse);
+        if (filter instanceof Closeable) {
+            // The response may be committed, which adds the filters, by a thread other than the one that closes them
+            boolean closeNow;
+            synchronized (this) {
+                closeNow = closed;
+                if (!closeNow) {
+                    if (closeableFilters == null) {
+                        closeableFilters = new ArrayList<>(1);
+                    }
+                    closeableFilters.add((Closeable) filter);
+                }
+            }
+            if (closeNow) {
+                // Closed before the filter was added so there will not be another chance
+                close((Closeable) filter);
+            }
+        }
+    }
+
+
+    /**
+     * Release the resources held by the filters. This is needed for a stream that is closed before the response has
+     * ended, which the filters would otherwise not be told about. The filters are not recycled as they are not reused.
+     * A filter that is added after this method has been called is closed when it is added.
+     * <p>
+     * The response may still be being written by another thread, e.g. if an asynchronous timeout has fired, so the
+     * filters that are closed must allow for that.
+     */
+    void close() {
+        List<Closeable> filters;
+        synchronized (this) {
+            closed = true;
+            filters = closeableFilters;
+            closeableFilters = null;
+        }
+        if (filters != null) {
+            for (Closeable filter : filters) {
+                close(filter);
+            }
+        }
+    }
+
+
+    private static void close(Closeable filter) {
+        try {
+            filter.close();
+        } catch (IOException ioe) {
+            // Nothing that can be done. The filters release what they can.
+        }
     }
 
 

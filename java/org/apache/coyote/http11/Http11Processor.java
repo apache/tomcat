@@ -32,12 +32,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Adapter;
+import org.apache.coyote.CompressionConfig;
 import org.apache.coyote.ContinueResponseTiming;
 import org.apache.coyote.ErrorState;
 import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
 import org.apache.coyote.UpgradeProtocol;
 import org.apache.coyote.UpgradeToken;
+import org.apache.coyote.http11.filters.BrotliOutputFilter;
 import org.apache.coyote.http11.filters.BufferedInputFilter;
 import org.apache.coyote.http11.filters.ChunkedInputFilter;
 import org.apache.coyote.http11.filters.ChunkedOutputFilter;
@@ -194,6 +196,7 @@ public class Http11Processor extends AbstractProcessor {
         // Create and add the gzip filters.
         // inputBuffer.addFilter(new GzipInputFilter());
         outputBuffer.addFilter(new GzipOutputFilter());
+        outputBuffer.addFilter(new BrotliOutputFilter());
 
         pluggableFilterIndex = inputBuffer.getFilters().length;
     }
@@ -1001,7 +1004,11 @@ public class Http11Processor extends AbstractProcessor {
         }
 
         if (useCompression) {
-            outputBuffer.addActiveFilter(outputFilters[Constants.GZIP_FILTER]);
+            if (CompressionConfig.isBrotli(response)) {
+                outputBuffer.addActiveFilter(outputFilters[Constants.BROTLI_FILTER]);
+            } else {
+                outputBuffer.addActiveFilter(outputFilters[Constants.GZIP_FILTER]);
+            }
         }
 
         // Add date header unless application has already set one (e.g. in a

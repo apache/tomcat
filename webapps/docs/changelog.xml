@@ -257,6 +257,12 @@
       <update>
         Remove support for HTTP 0.9. (markt)
       </update>
+      <add>
+        Add support for Brotli compression of responses, for HTTP/1.1 and
+        HTTP/2, with the new <code>compressionBrotliQuality</code> attribute of
+        the HTTP/1.1 connectors. It uses the Brotli library of the operating
+        system through the FFM API and is disabled by default. (abernal)
+      </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
         <bug>70287</bug>: Restore the keep-alive timeout after a sendfile write.

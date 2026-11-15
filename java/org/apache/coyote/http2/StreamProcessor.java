@@ -33,12 +33,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Adapter;
+import org.apache.coyote.CompressionConfig;
 import org.apache.coyote.ContinueResponseTiming;
 import org.apache.coyote.ErrorState;
 import org.apache.coyote.NonPipeliningProcessor;
 import org.apache.coyote.Request;
 import org.apache.coyote.RequestGroupInfo;
 import org.apache.coyote.Response;
+import org.apache.coyote.http11.filters.BrotliOutputFilter;
 import org.apache.coyote.http11.filters.GzipOutputFilter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -234,7 +236,11 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
         if (noSendfile && protocol != null && protocol.useCompression(coyoteRequest, coyoteResponse)) {
             // Enable compression. Headers will have been set. Need to configure
             // output filter at this point.
-            stream.addOutputFilter(new GzipOutputFilter());
+            if (CompressionConfig.isBrotli(coyoteResponse)) {
+                stream.addOutputFilter(new BrotliOutputFilter());
+            } else {
+                stream.addOutputFilter(new GzipOutputFilter());
+            }
         }
 
         // Check to see if a response body is present

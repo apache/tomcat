@@ -18,6 +18,7 @@
 Bundle-Name: tomcat-coyote-ffm
 Bundle-SymbolicName: org.apache.tomcat-coyote-ffm
 Export-Package: \
+    org.apache.coyote.http11.filters.brotli,\
     org.apache.tomcat.util.net.openssl.panama,\
     org.apache.tomcat.util.openssl
 X-Compile-Source-JDK: ${release.java.version}
