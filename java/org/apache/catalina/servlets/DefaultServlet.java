@@ -1285,9 +1285,6 @@ public class DefaultServlet extends HttpServlet {
 
 
     /*
-     * Code borrowed heavily from Jasper's EncodingDetector
-     */
-    /*
      * A last modified time in the future must be replaced with the message origination date (RFC 9110, section
      * 8.8.2.1). This is done for each response so the metadata of the resource, which may be cached, is not changed.
      */
@@ -1300,6 +1297,9 @@ public class DefaultServlet extends HttpServlet {
     }
 
 
+    /*
+     * Code borrowed heavily from Jasper's EncodingDetector
+     */
     private static Charset processBom(InputStream is, boolean stripBom) throws IOException {
         // Java supported character sets do not use BOMs longer than 4 bytes
         byte[] bom = new byte[4];
