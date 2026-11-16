@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -110,9 +111,9 @@ public class TestDefaultServlet extends TomcatBaseTest {
         addDeleteOnTearDown(appDir);
         Assert.assertTrue(appDir.mkdirs());
         File futureFile = new File(appDir, "future.txt");
-        Files.writeString(futureFile.toPath(), "future");
+        Files.write(futureFile.toPath(), "future".getBytes(StandardCharsets.UTF_8));
         File pastFile = new File(appDir, "past.txt");
-        Files.writeString(pastFile.toPath(), "past");
+        Files.write(pastFile.toPath(), "past".getBytes(StandardCharsets.UTF_8));
         long now = System.currentTimeMillis();
         Assert.assertTrue(futureFile.setLastModified(now + 24 * 60 * 60 * 1000L));
         Assert.assertTrue(pastFile.setLastModified(now - 24 * 60 * 60 * 1000L));
@@ -151,7 +152,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
         addDeleteOnTearDown(appDir);
         Assert.assertTrue(appDir.mkdirs());
         File futureFile = new File(appDir, "future.txt");
-        Files.writeString(futureFile.toPath(), "future");
+        Files.write(futureFile.toPath(), "future".getBytes(StandardCharsets.UTF_8));
         Assert.assertTrue(futureFile.setLastModified(System.currentTimeMillis() + 24 * 60 * 60 * 1000L));
 
         Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
