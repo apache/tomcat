@@ -34,6 +34,7 @@ import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.valves.RemoteHostValve;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.categories.SmokeTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
@@ -43,7 +44,7 @@ import org.apache.tomcat.websocket.server.WsContextListener;
 /**
  * Mapper tests that use web applications on a running Tomcat instance.
  */
-@Category(SmokeTest.class)
+@Category({SmokeTest.class, CatalinaTest.class})
 public class TestMapperWebapps extends TomcatBaseTest {
 
     @Test

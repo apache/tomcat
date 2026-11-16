@@ -23,6 +23,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
@@ -30,11 +31,13 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.json.JSONParser;
 import org.w3c.dom.Document;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.xml.sax.InputSource;
 
+@Category(CatalinaTest.class)
 public class TestStatusTransformer extends TomcatBaseTest {
 
     enum Mode {

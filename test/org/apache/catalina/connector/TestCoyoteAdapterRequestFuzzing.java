@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -38,6 +39,7 @@ import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.unittest.TesterData;
 
 /*
@@ -46,6 +48,7 @@ import org.apache.tomcat.unittest.TesterData;
  * response.
  */
 @RunWith(Parameterized.class)
+@Category(CatalinaTest.class)
 public class TestCoyoteAdapterRequestFuzzing extends TomcatBaseTest {
 
     private static final String VALUE_16K = TesterData.string('x', 16 * 1024);

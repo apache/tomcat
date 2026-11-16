@@ -22,11 +22,13 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.coyote.ContinueResponseTiming;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
+import org.apache.tomcat.categories.CoyoteTest;
 import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.MimeHeaders;
 
@@ -34,6 +36,7 @@ import org.apache.tomcat.util.http.MimeHeaders;
  * Unit tests for Section 8.1 of <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>. <br>
  * The order of tests in this class is aligned with the order of the examples in the RFC.
  */
+@Category(CoyoteTest.class)
 public class TestHttp2Section_8_1 extends Http2TestBase {
 
     @Test

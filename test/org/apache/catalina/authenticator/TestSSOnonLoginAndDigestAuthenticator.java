@@ -24,11 +24,13 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
@@ -46,6 +48,7 @@ import org.apache.tomcat.util.security.ConcurrentMessageDigest;
  * Note: these tests are intended to exercise the SSO logic of the Authenticator, but not to comprehensively test all of
  * its logic paths. That is the responsibility of the non-SSO test suite.
  */
+@Category(CatalinaTest.class)
 public class TestSSOnonLoginAndDigestAuthenticator extends TomcatBaseTest {
 
     private static final String USER = "user";

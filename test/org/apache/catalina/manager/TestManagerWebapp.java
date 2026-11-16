@@ -29,6 +29,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
@@ -50,8 +51,10 @@ import org.apache.catalina.storeconfig.StoreConfigLifecycleListener;
 import org.apache.catalina.util.IOTools;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.URLEncoder;
+import org.apache.tomcat.categories.CatalinaTest;
 
 
+@Category(CatalinaTest.class)
 public class TestManagerWebapp extends TomcatBaseTest {
 
     public static final String CONFIG = "<?xml version=\"1.0\" ?>" +

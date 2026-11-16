@@ -19,6 +19,7 @@ package org.apache.catalina.tribes.group;
 import org.junit.After;
 import org.junit.Assume;
 import org.junit.Before;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -27,10 +28,14 @@ import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.core.AprLifecycleListener;
 import org.apache.catalina.core.StandardServer;
+import org.apache.tomcat.categories.CatalinaTest;
+import org.apache.tomcat.categories.TribesTest;
 import org.apache.tomcat.jni.AprStatus;
 import org.apache.tomcat.jni.Library;
 
+
 @RunWith(Parameterized.class)
+@Category({CatalinaTest.class, TribesTest.class})
 public class TestGroupChannelTlsNative extends GroupChannelTlsTestBase {
 
     private static Lifecycle DUMMY_LIFECYCLE = new StandardServer();

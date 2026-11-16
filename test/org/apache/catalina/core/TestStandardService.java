@@ -20,11 +20,14 @@ import java.net.InetAddress;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 
+@Category(CatalinaTest.class)
 public class TestStandardService extends TomcatBaseTest {
 
     @Test(expected = IllegalArgumentException.class)

@@ -25,7 +25,11 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.CatalinaTest;
+
+@Category(CatalinaTest.class)
 public class TestExpressionParseTree {
 
     private static final long LAST_MODIFIED = 60 * 60 * 24 * 1000;

@@ -23,15 +23,18 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.coyote.http11.Http11NioProtocol;
 import org.apache.coyote.http11.Http11Processor;
+import org.apache.tomcat.categories.CoyoteTest;
 import org.apache.tomcat.util.net.SocketEvent;
 
 /**
  * Tests the dispatching of the asynchronous timeout by the timeout task of the protocol, which runs
  * {@link AbstractProcessor#timeoutAsync(long)} once per second for every processor that is waiting.
  */
+@Category(CoyoteTest.class)
 public class TestAbstractProcessorAsyncTimeout {
 
     private TestProcessor processor;

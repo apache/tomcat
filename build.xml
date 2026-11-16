@@ -1998,31 +1998,17 @@
 
   <!-- ==================== Test Profile System ==================== -->
   <!--
-    Property-based test profiles for convenient, selective test execution.
+    Annotation-based test profiles for convenient, selective test execution.
 
     Usage: ant test -Dtest.profile=<profile-name>
 
     Precedence: test.entry > test.profile > default
     If test.entry is set, the profile is ignored to maintain backward compatibility.
 
-    Profile patterns are defined in test-profiles.properties test.profile properties
-    to keep this file readable.
+    Profile membership is declared via @Category annotations on test classes.
+    CategoryScanner discovers matching tests at build time by scanning compiled
+    classes, so no separate file list needs to be maintained.
   -->
-
-  <!-- ================= Initialize Test Profile Property Values ================ -->
-
-  <!-- We read test profile definitions from "test-profiles.properties.default"   -->
-  <!-- and also from "test-profiles.properties" if it exists.                     -->
-  <!-- The values in "test-profiles.properties" have stronger preference.         -->
-  <!-- If you want to customize your build, you can either change the values      -->
-  <!-- directly in the default file, or create a new test-profiles.properties and -->
-  <!-- set the values there. This way you don't have to change a file which       -->
-  <!-- is part of the original project source code.                               -->
-  <!-- See "test-profiles.properties.default" in the top level directory for some -->
-  <!-- property values you may customize.                                         -->
-  <property file="${user.home}/test-profiles.properties"/>
-  <property file="test-profiles.properties"/>
-  <property file="test-profiles.properties.default"/>
 
   <!-- Macro to set test pattern based on profile name -->
   <macrodef name="set-profile-pattern">
@@ -2030,30 +2016,35 @@
     <sequential>
       <!-- Set test.name property based on the profile attribute -->
 
-      <!-- For category-based profiles, record the category class so that the
-           -test-categories target (which runs after test-compile) can run
-           CategoryScanner and set test.name. -->
+      <!-- All profiles are now annotation-driven. Record the category class so
+           that the -test-categories target (which runs after test-compile) can
+           invoke CategoryScanner and set test.name. -->
       <condition property="test.category.class"
                  value="org.apache.tomcat.categories.SmokeTest">
         <equals arg1="@{profile}" arg2="smoke"/>
       </condition>
-
-      <condition property="test.name" value="${test.profile.catalina}">
+      <condition property="test.category.class"
+                 value="org.apache.tomcat.categories.CatalinaTest">
         <equals arg1="@{profile}" arg2="catalina"/>
       </condition>
-      <condition property="test.name" value="${test.profile.coyote}">
+      <condition property="test.category.class"
+                 value="org.apache.tomcat.categories.CoyoteTest">
         <equals arg1="@{profile}" arg2="coyote"/>
       </condition>
-      <condition property="test.name" value="${test.profile.performance}">
+      <condition property="test.category.class"
+                 value="org.apache.tomcat.categories.PerformanceTest">
         <equals arg1="@{profile}" arg2="performance"/>
       </condition>
-      <condition property="test.name" value="${test.profile.tribes}">
+      <condition property="test.category.class"
+                 value="org.apache.tomcat.categories.TribesTest">
         <equals arg1="@{profile}" arg2="tribes"/>
       </condition>
-      <condition property="test.name" value="${test.profile.buildutil}">
+      <condition property="test.category.class"
+                 value="org.apache.tomcat.categories.BuildutilTest">
         <equals arg1="@{profile}" arg2="buildutil"/>
       </condition>
-      <condition property="test.name" value="${test.profile.integration}">
+      <condition property="test.category.class"
+                 value="org.apache.tomcat.categories.IntegrationTest">
         <equals arg1="@{profile}" arg2="integration"/>
       </condition>
     </sequential>

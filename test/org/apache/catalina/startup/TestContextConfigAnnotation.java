@@ -33,11 +33,13 @@ import jakarta.servlet.ServletException;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Loader;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.ContextConfig.JavaClassCacheEntry;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.descriptor.web.ServletDef;
@@ -47,6 +49,7 @@ import org.apache.tomcat.util.descriptor.web.WebXml;
  * Check Servlet 3.0 Spec 8.2.3.3: Override annotation parameter from web.xml or
  * fragment.
  */
+@Category(CatalinaTest.class)
 public class TestContextConfigAnnotation {
 
     @Test

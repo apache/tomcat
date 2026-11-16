@@ -35,16 +35,19 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.ResponseFacade;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.tomcat.categories.CoyoteTest;
 import org.apache.tomcat.util.compat.JrePlatform;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.Method;
 
+@Category(CoyoteTest.class)
 public class TestStreamProcessor extends Http2TestBase {
 
     private static final int INCOMPLETE_READ_BODY_SIZE = 8192;

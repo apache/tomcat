@@ -28,9 +28,12 @@ import java.util.regex.Pattern;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.categories.CatalinaTest;
 
+@Category(CatalinaTest.class)
 public class TestCustomObjectInputStream {
 
     /*

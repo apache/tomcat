@@ -23,15 +23,18 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Host;
 import org.apache.catalina.core.StandardHost;
+import org.apache.tomcat.categories.CatalinaTest;
 
 /**
  * The purpose of this class is to test the automatic deployment features of the
  * {@link HostConfig} implementation.
  */
+@Category(CatalinaTest.class)
 public class TestHostConfigAutomaticDeploymentContextClassName extends HostConfigAutomaticDeploymentBaseTest {
 
     @Test

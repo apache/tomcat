@@ -18,9 +18,12 @@ package org.apache.catalina.session;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.session.ManagerBase.SessionTiming;
+import org.apache.tomcat.categories.CatalinaTest;
 
+@Category(CatalinaTest.class)
 public class TestManagerBase {
 
     /*

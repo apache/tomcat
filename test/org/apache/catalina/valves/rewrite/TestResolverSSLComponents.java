@@ -23,12 +23,15 @@ import javax.security.auth.x500.X500Principal;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.connector.Request;
 import org.apache.juli.logging.Log;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.easymock.EasyMock;
 
+@Category(CatalinaTest.class)
 public class TestResolverSSLComponents {
 
     @Test

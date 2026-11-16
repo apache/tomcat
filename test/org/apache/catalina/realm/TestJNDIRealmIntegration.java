@@ -28,11 +28,13 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.categories.CatalinaTest;
 
 import com.unboundid.ldap.listener.InMemoryDirectoryServer;
 import com.unboundid.ldap.listener.InMemoryDirectoryServerConfig;
@@ -43,6 +45,7 @@ import com.unboundid.ldap.sdk.LDAPResult;
 import com.unboundid.ldap.sdk.ResultCode;
 
 @RunWith(Parameterized.class)
+@Category(CatalinaTest.class)
 public class TestJNDIRealmIntegration {
 
     private static final String USER_PATTERN = "cn={0},ou=people,dc=example,dc=com";

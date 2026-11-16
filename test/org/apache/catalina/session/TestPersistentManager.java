@@ -26,6 +26,7 @@ import jakarta.servlet.http.HttpSessionListener;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Host;
@@ -35,11 +36,13 @@ import org.apache.catalina.Store;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.RequestFacade;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.unittest.TesterContext;
 import org.apache.tomcat.unittest.TesterHost;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 
+@Category(CatalinaTest.class)
 public class TestPersistentManager {
 
     @Test

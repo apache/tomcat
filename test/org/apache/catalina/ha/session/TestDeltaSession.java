@@ -27,11 +27,14 @@ import jakarta.servlet.http.HttpSessionListener;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Manager;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.session.StandardManager;
+import org.apache.tomcat.categories.CatalinaTest;
 
+@Category(CatalinaTest.class)
 public class TestDeltaSession {
 
     @Test

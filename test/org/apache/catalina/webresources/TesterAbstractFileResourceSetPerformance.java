@@ -19,11 +19,15 @@ package org.apache.catalina.webresources;
 import java.util.regex.Pattern;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
+
+import org.apache.tomcat.categories.PerformanceTest;
 
 /*
  * This is an absolute performance test. There is no benefit it running it as part of a standard test run so it is
  * excluded due to the name starting Tester...
  */
+@Category(PerformanceTest.class)
 public class TesterAbstractFileResourceSetPerformance {
 
     private static final Pattern UNSAFE_WINDOWS_FILENAME_PATTERN = Pattern.compile(" $|[\"<>]");

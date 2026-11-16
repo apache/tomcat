@@ -18,7 +18,12 @@ package org.apache.catalina.tribes.io;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.CatalinaTest;
+import org.apache.tomcat.categories.TribesTest;
+
+@Category({CatalinaTest.class, TribesTest.class})
 public class TestChannelData {
 
     @Test

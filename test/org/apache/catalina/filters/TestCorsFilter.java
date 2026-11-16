@@ -31,10 +31,13 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.RequestUtil;
 
+@Category(CatalinaTest.class)
 public class TestCorsFilter {
     private FilterChain filterChain = new TesterFilterChain();
 

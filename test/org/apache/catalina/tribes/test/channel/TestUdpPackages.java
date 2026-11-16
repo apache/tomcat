@@ -26,6 +26,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelListener;
@@ -40,9 +41,14 @@ import org.apache.catalina.tribes.io.XByteBuffer;
 import org.apache.catalina.tribes.transport.AbstractSender;
 import org.apache.catalina.tribes.transport.ReceiverBase;
 import org.apache.catalina.tribes.transport.ReplicationTransmitter;
+import org.apache.tomcat.categories.CatalinaTest;
+import org.apache.tomcat.categories.TribesTest;
+
+
 
 /**
  */
+@Category({CatalinaTest.class, TribesTest.class})
 public class TestUdpPackages {
     private int msgCount = 500;
     private int threadCount = 20;

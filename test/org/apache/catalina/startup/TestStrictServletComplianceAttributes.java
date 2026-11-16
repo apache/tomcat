@@ -21,15 +21,18 @@ import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Manager;
 import org.apache.catalina.session.ManagerBase;
+import org.apache.tomcat.categories.CatalinaTest;
 
 /**
  * Tests STRICT_SERVLET_COMPLIANCE sets the attributes it is documented to set.
  */
+@Category(CatalinaTest.class)
 public class TestStrictServletComplianceAttributes extends TomcatBaseTest {
     private static final String STRICT_SERVLET_COMPLIANCE = "org.apache.catalina.STRICT_SERVLET_COMPLIANCE";
     private static String originalPropertyValue;

@@ -46,17 +46,20 @@ import jakarta.servlet.http.WebConnection;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
+import org.apache.tomcat.categories.CoyoteTest;
 
 /**
  * Tests for the validation of the response Upgrade header when an application calls
  * {@link HttpServletRequest#upgrade(Class)}.
  */
+@Category(CoyoteTest.class)
 public class TestUpgradeValidation extends TomcatBaseTest {
 
     private static final String MESSAGE = "This is a test.";

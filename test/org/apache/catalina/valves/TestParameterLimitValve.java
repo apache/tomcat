@@ -36,6 +36,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
@@ -43,10 +44,12 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.scan.StandardJarScanner;
 
 
+@Category(CatalinaTest.class)
 public class TestParameterLimitValve extends TomcatBaseTest {
 
     @Test

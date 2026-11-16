@@ -32,6 +32,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -40,10 +41,12 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Host;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.http.Method;
 
 @RunWith(Parameterized.class)
+@Category(CatalinaTest.class)
 public class TestExtendedAccessLogValve extends TomcatBaseTest {
 
     // Requests can return in the client before log() has been called

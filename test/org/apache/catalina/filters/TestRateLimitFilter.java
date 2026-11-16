@@ -21,15 +21,18 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.filters.TestRemoteIpFilter.MockFilterChain;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.util.FastRateLimiter;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 
+@Category(CatalinaTest.class)
 public class TestRateLimitFilter extends TomcatBaseTest {
 
     private void testRateLimitWith4Clients(boolean exposeHeaders, boolean enforce) throws Exception {

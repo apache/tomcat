@@ -18,12 +18,16 @@ package org.apache.catalina.mapper;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.CatalinaTest;
+import org.apache.tomcat.categories.PerformanceTest;
 import org.apache.tomcat.util.buf.MessageBytes;
 
 /*
  * This is an absolute performance test with an upper limit. Therefore it is executed as part of a standard test run.
  */
+@Category({CatalinaTest.class, PerformanceTest.class})
 public class TestMapperPerformance extends TestMapper {
 
     @Test

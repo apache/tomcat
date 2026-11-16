@@ -34,15 +34,18 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.webresources.StandardRoot;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.unittest.TesterContext;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 
+@Category(CatalinaTest.class)
 public class TestWebappServiceLoader {
     private static final String CONFIG_FILE =
             "META-INF/services/jakarta.servlet.ServletContainerInitializer";

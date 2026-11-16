@@ -34,9 +34,13 @@ import org.apache.catalina.tribes.MembershipListener;
 import org.apache.catalina.tribes.TesterUtil;
 import org.apache.catalina.tribes.group.GroupChannel;
 import org.apache.catalina.tribes.transport.ReceiverBase;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.categories.SmokeTest;
+import org.apache.tomcat.categories.TribesTest;
 
-@Category(SmokeTest.class)
+
+
+@Category({SmokeTest.class, CatalinaTest.class, TribesTest.class})
 public class TestTcpFailureDetector {
     private TcpFailureDetector tcpFailureDetector1 = null;
     private TcpFailureDetector tcpFailureDetector2 = null;

@@ -50,6 +50,7 @@ import jakarta.servlet.http.WebConnection;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
@@ -62,6 +63,7 @@ import org.apache.coyote.http11.Http11NioProtocol;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.ContextBind;
+import org.apache.tomcat.categories.CoyoteTest;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
@@ -70,6 +72,7 @@ import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.easymock.EasyMock;
 
+@Category(CoyoteTest.class)
 public class TestUpgrade extends TomcatBaseTest {
 
     private static final String MESSAGE = "This is a test.";

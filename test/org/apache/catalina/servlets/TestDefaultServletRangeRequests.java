@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -36,12 +37,14 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.util.IOTools;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
 
 @RunWith(Parameterized.class)
+@Category(CatalinaTest.class)
 public class TestDefaultServletRangeRequests extends TomcatBaseTest {
 
     @Parameterized.Parameters(name = "{index} rangeHeader [{0}], ifRangeHeader [{1}]")

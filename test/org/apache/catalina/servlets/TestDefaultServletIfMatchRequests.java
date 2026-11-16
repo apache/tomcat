@@ -38,12 +38,13 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.util.IOTools;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.categories.SmokeTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
 
-@Category(SmokeTest.class)
+@Category({SmokeTest.class, CatalinaTest.class})
 @RunWith(Parameterized.class)
 public class TestDefaultServletIfMatchRequests extends TomcatBaseTest {
 

@@ -20,9 +20,12 @@ import java.io.IOException;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.servlets.WebdavServlet.BoundedByteArrayOutputStream;
+import org.apache.tomcat.categories.CatalinaTest;
 
+@Category(CatalinaTest.class)
 public class TestWebdavBoundedByteArrayOutputStream {
 
     private static final int TEST_LIMIT = 10;

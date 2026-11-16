@@ -19,10 +19,13 @@ package org.apache.catalina.webresources;
 import java.io.File;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.WebResourceSet;
+import org.apache.tomcat.categories.CatalinaTest;
 
+@Category(CatalinaTest.class)
 public class TestJarResourceSetInternal extends AbstractTestResourceSet {
 
     @Override

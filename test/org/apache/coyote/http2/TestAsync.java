@@ -44,6 +44,7 @@ import org.junit.runners.Parameterized.Parameter;
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.tomcat.categories.CoyoteTest;
 import org.apache.tomcat.categories.SmokeTest;
 
 /*
@@ -52,7 +53,7 @@ import org.apache.tomcat.categories.SmokeTest;
  * https://bz.apache.org/bugzilla/show_bug.cgi?id=62620
  * https://bz.apache.org/bugzilla/show_bug.cgi?id=62628
  */
-@Category(SmokeTest.class)
+@Category({SmokeTest.class, CoyoteTest.class})
 @RunWith(Parameterized.class)
 public class TestAsync extends Http2TestBase {
 

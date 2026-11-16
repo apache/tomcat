@@ -22,6 +22,7 @@ import jakarta.servlet.MultipartConfigElement;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -32,10 +33,12 @@ import org.apache.catalina.core.StandardEngine;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.core.StandardService;
 import org.apache.catalina.core.StandardWrapper;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.descriptor.web.MultipartDef;
 import org.apache.tomcat.util.descriptor.web.ServletDef;
 import org.apache.tomcat.util.descriptor.web.WebXml;
 
+@Category(CatalinaTest.class)
 public class TestMultipartConfig {
     @Test
     public void testNoMultipartConfig() throws Exception {

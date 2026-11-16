@@ -20,11 +20,15 @@ import java.nio.ByteBuffer;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
+
+import org.apache.tomcat.categories.CoyoteTest;
 
 /**
  * Unit tests for Section 6.9 of <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>. <br>
  * The order of tests in this class is aligned with the order of the requirements in the RFC.
  */
+@Category(CoyoteTest.class)
 public class TestHttp2Section_6_9 extends Http2TestBase {
 
     @Test

@@ -18,12 +18,17 @@ package org.apache.catalina.tribes.test.channel;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.ha.session.BackupManager;
 import org.apache.catalina.ha.tcp.SimpleTcpCluster;
 import org.apache.catalina.tribes.Channel;
+import org.apache.tomcat.categories.CatalinaTest;
+import org.apache.tomcat.categories.TribesTest;
 
 
+
+@Category({CatalinaTest.class, TribesTest.class})
 public class TestChannelConfig {
 
     @Test

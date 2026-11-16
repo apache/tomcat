@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
@@ -33,6 +34,7 @@ import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.unittest.TesterContext;
 import org.apache.tomcat.unittest.TesterRequest;
 import org.apache.tomcat.unittest.TesterServletContext;
@@ -43,6 +45,7 @@ import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
 
+@Category(CatalinaTest.class)
 public class TestDigestAuthenticator extends TomcatBaseTest {
 
     private static String USER = "user";

@@ -37,14 +37,17 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.naming.NameParserImpl;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.unittest.TesterContext;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.easymock.EasyMock;
 
+@Category(CatalinaTest.class)
 public class TestJNDIRealm {
 
     private static final String ALGORITHM = "MD5";

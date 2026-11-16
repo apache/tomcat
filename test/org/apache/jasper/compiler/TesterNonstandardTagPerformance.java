@@ -24,13 +24,16 @@ import jakarta.servlet.jsp.TesterPageContext;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.jasper.runtime.JspRuntimeLibrary;
+import org.apache.tomcat.categories.PerformanceTest;
 
 /*
  * This test requires additional setup and cannot be run as part of a standard test run so it is excluded due to the
  * name starting Tester...
  */
+@Category(PerformanceTest.class)
 public class TesterNonstandardTagPerformance {
     static final long NUM_ITERATIONS = 100000000L;
 

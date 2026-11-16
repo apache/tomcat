@@ -26,6 +26,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.startup.LoggingBaseTest;
 import org.apache.catalina.tribes.Channel;
@@ -35,7 +36,12 @@ import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.TesterUtil;
 import org.apache.catalina.tribes.transport.ReceiverBase;
 import org.apache.catalina.tribes.transport.ReplicationTransmitter;
+import org.apache.tomcat.categories.CatalinaTest;
+import org.apache.tomcat.categories.TribesTest;
 
+
+
+@Category({CatalinaTest.class, TribesTest.class})
 public class TestGroupChannelSenderConnections extends LoggingBaseTest {
     private static final int count = 2;
     private ManagedChannel[] channels = new ManagedChannel[count];

@@ -32,9 +32,10 @@ import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CoyoteTest;
 import org.apache.tomcat.categories.SmokeTest;
 
-@Category(SmokeTest.class)
+@Category({SmokeTest.class, CoyoteTest.class})
 @RunWith(Parameterized.class)
 public class TestHttp11InputBufferCRLF extends TomcatBaseTest {
 

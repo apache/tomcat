@@ -29,6 +29,7 @@ import org.hamcrest.MatcherAssert;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Host;
@@ -40,8 +41,10 @@ import org.apache.catalina.connector.Response;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.session.StandardSession;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.easymock.EasyMock;
 
+@Category(CatalinaTest.class)
 public class TestCrawlerSessionManagerValve {
 
     private static final Manager TEST_MANAGER;

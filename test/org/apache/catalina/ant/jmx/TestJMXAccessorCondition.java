@@ -18,9 +18,12 @@ package org.apache.catalina.ant.jmx;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tools.ant.BuildException;
 
+@Category(CatalinaTest.class)
 public class TestJMXAccessorCondition {
 
     @Test

@@ -24,13 +24,16 @@ import java.util.logging.LogManager;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.PerformanceTest;
 import org.apache.tomcat.util.buf.B2CConverter;
 
 /*
  * This is an absolute performance test. There is no benefit it running it as part of a standard test run so it is
  * excluded due to the name starting Tester...
  */
+@Category(PerformanceTest.class)
 public class TesterParametersPerformance {
 
     @Test

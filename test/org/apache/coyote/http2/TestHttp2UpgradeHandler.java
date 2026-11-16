@@ -33,15 +33,18 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.coyote.http2.Http2UpgradeHandler.HeaderFrameBuffers;
+import org.apache.tomcat.categories.CoyoteTest;
 import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.easymock.EasyMock;
 
+@Category(CoyoteTest.class)
 public class TestHttp2UpgradeHandler extends Http2TestBase {
 
     @Test

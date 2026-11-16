@@ -18,10 +18,13 @@ package org.apache.catalina.core;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 
+@Category(CatalinaTest.class)
 public class TestApplicationFilterRegistration {
 
     @Test

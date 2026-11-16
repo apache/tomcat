@@ -25,8 +25,12 @@ import java.util.Properties;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.TemporaryFolder;
 
+import org.apache.tomcat.categories.BuildutilTest;
+
+@Category(BuildutilTest.class)
 public class TestUtils {
 
     @Rule

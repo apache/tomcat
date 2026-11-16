@@ -43,9 +43,10 @@ import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CoyoteTest;
 import org.apache.tomcat.categories.SmokeTest;
 
-@Category(SmokeTest.class)
+@Category({SmokeTest.class, CoyoteTest.class})
 public class TestChunkedInputFilter extends TomcatBaseTest {
 
     private static final int EXT_SIZE_LIMIT = 10;

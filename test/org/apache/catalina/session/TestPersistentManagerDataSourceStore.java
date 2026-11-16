@@ -30,15 +30,18 @@ import jakarta.servlet.http.HttpSession;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Session;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.unittest.TesterContext;
 import org.apache.tomcat.unittest.TesterServletContext;
 
+@Category(CatalinaTest.class)
 public class TestPersistentManagerDataSourceStore extends TomcatBaseTest {
 
     public static final String SIMPLE_SCHEMA =

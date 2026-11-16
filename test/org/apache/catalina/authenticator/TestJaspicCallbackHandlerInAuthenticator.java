@@ -35,6 +35,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Contained;
 import org.apache.catalina.Container;
@@ -43,7 +44,9 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.core.ContainerBase;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.realm.RealmBase;
+import org.apache.tomcat.categories.CatalinaTest;
 
+@Category(CatalinaTest.class)
 public class TestJaspicCallbackHandlerInAuthenticator {
 
     @Test

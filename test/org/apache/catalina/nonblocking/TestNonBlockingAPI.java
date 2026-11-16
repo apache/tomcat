@@ -78,11 +78,12 @@ import org.apache.coyote.http11.InputFilter;
 import org.apache.coyote.http11.filters.ChunkedInputFilter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.categories.SmokeTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.ApplicationBufferHandler;
 
-@Category(SmokeTest.class)
+@Category({SmokeTest.class, CatalinaTest.class})
 public class TestNonBlockingAPI extends TomcatBaseTest {
 
     private static final Log log = LogFactory.getLog(TestNonBlockingAPI.class);

@@ -29,11 +29,14 @@ import java.util.jar.Manifest;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.core.AprLifecycleListener;
 import org.apache.catalina.core.OpenSSLLifecycleListener;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.compat.JreCompat;
 
+@Category(CatalinaTest.class)
 public class TestServerInfo {
 
     /**

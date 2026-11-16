@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
@@ -31,12 +32,14 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 
 /**
  * A 405 response must include an Allow header (RFC 9110, section 15.5.6) that lists the methods the
  * {@link CGIServlet} currently accepts, which is the value it returns for an OPTIONS request. TRACE is only listed if
  * the connector allows it.
  */
+@Category(CatalinaTest.class)
 public class TestCGIServletMethodNotAllowed extends TomcatBaseTest {
 
     @Test

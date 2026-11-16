@@ -20,14 +20,18 @@ import java.net.URI;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.startup.LoggingBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
+import org.apache.tomcat.categories.PerformanceTest;
 import org.apache.tomcat.unittest.TesterRequest;
 
 /*
  * This is a relative performance test so it remains part of the standard test run. If the test fails then we need to
  * looking at why and possibly disable/remove the homebrew approach for some OS/Java combinations.
  */
+@Category({CatalinaTest.class, PerformanceTest.class})
 public class TestResponsePerformance extends LoggingBaseTest {
 
     private static final int ITERATIONS = 1000000;

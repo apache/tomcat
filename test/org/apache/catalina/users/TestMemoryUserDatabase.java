@@ -32,6 +32,7 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Group;
 import org.apache.catalina.Role;
@@ -39,7 +40,9 @@ import org.apache.catalina.User;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.realm.TestMemoryRealm;
 import org.apache.catalina.realm.UserDatabaseRealm;
+import org.apache.tomcat.categories.CatalinaTest;
 
+@Category(CatalinaTest.class)
 public class TestMemoryUserDatabase {
     private static File TEST_FILE = new File(System.getProperty("java.io.tmpdir"), "tomcat-users.xml");
 

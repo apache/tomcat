@@ -34,6 +34,7 @@ import jakarta.servlet.http.HttpSession;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -44,6 +45,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.json.JSONParser;
@@ -51,6 +53,7 @@ import org.apache.tomcat.util.json.ParseException;
 
 
 @RunWith(Parameterized.class)
+@Category(CatalinaTest.class)
 public class TestAccessLogValve extends TomcatBaseTest {
 
     private static Log log = LogFactory.getLog(TestAccessLogValve.class);

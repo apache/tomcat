@@ -35,10 +35,11 @@ import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CoyoteTest;
 import org.apache.tomcat.categories.SmokeTest;
 import org.apache.tomcat.util.http.Method;
 
-@Category(SmokeTest.class)
+@Category({SmokeTest.class, CoyoteTest.class})
 public class TestHttp11InputBuffer extends TomcatBaseTest {
 
     private static final String CR = "\r";

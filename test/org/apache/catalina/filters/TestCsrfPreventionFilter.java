@@ -32,12 +32,15 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.filters.CsrfPreventionFilter.LruCache;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.unittest.TesterRequest;
 import org.apache.tomcat.unittest.TesterServletContext;
 
+@Category(CatalinaTest.class)
 public class TestCsrfPreventionFilter extends TomcatBaseTest {
 
     private static final String RESULT_NONCE = Constants.CSRF_NONCE_SESSION_ATTR_NAME + "=TESTNONCE";

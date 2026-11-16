@@ -29,13 +29,16 @@ import jakarta.servlet.http.HttpSessionListener;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Session;
 import org.apache.catalina.startup.ExpandWar;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.unittest.TesterContext;
 import org.apache.tomcat.unittest.TesterHost;
 import org.apache.tomcat.unittest.TesterServletContext;
 
+@Category(CatalinaTest.class)
 public class TestStandardManager {
 
     private static final String VALID_ID = "validSessionId";

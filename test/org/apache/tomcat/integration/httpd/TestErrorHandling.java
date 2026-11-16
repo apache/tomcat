@@ -28,12 +28,15 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Valve;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.tomcat.categories.IntegrationTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
+@Category(IntegrationTest.class)
 public class TestErrorHandling extends HttpdIntegrationBaseTest {
 
     private static final String HTTPD_CONFIG = """

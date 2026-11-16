@@ -20,9 +20,12 @@ import java.security.NoSuchAlgorithmException;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
 
+@Category(CatalinaTest.class)
 public class TestMessageDigestCredentialHandler {
 
     private static final String[] DIGESTS = new String[] {"MD5", "SHA-1", "SHA-512"};

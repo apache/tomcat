@@ -38,10 +38,11 @@ import org.apache.catalina.connector.Response;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.categories.SmokeTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-@Category(SmokeTest.class)
+@Category({SmokeTest.class, CatalinaTest.class})
 public class TestStuckThreadDetectionValve extends TomcatBaseTest {
     private StandardContext context;
     private Tomcat tomcat;

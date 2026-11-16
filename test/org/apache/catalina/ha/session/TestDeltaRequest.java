@@ -23,11 +23,14 @@ import java.io.ObjectOutputStream;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Manager;
 import org.apache.catalina.session.StandardManager;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.unittest.TesterContext;
 
+@Category(CatalinaTest.class)
 public class TestDeltaRequest {
 
     /*

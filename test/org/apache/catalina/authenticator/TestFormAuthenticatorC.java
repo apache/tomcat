@@ -22,6 +22,7 @@ import java.util.StringTokenizer;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Valve;
@@ -29,6 +30,7 @@ import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.websocket.server.WsContextListener;
 
@@ -63,6 +65,7 @@ import org.apache.tomcat.websocket.server.WsContextListener;
  * but it makes no claims to generality).
  *
  */
+@Category(CatalinaTest.class)
 public class TestFormAuthenticatorC extends TomcatBaseTest {
 
     // these should really be singletons to be type-safe,

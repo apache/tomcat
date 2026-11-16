@@ -623,27 +623,35 @@ Usage:
     ant test -Dtest.profile=smoke
     ant test -Dtest.profile=catalina
 
-Pattern-based profile definitions are in test-profiles.properties.default and
-can be overridden by creating a test-profiles.properties file at the project
-root. The smoke profile is annotation-driven; see section (7.5.1) below.
+Profile membership is declared via @Category annotations directly on test
+classes. CategoryScanner discovers matching tests at build time by scanning
+compiled classes and feeds the result into the standard Ant batchtest
+mechanism so each test still runs in its own JVM.
 
-(7.5.1) The smoke profile and JUnit @Category
+(7.5.1) Adding a test to a profile
 
-The smoke profile selects tests via the @Category(SmokeTest.class)
-annotation rather than a file list in the properties file. At build time,
-CategoryScanner scans the compiled test classes, finds all classes annotated
-with @Category(SmokeTest.class), and feeds the result into the standard Ant
-batchtest mechanism so each test still runs in its own JVM.
+Annotate the test class with the appropriate category and add the
+corresponding import:
 
-    ant test -Dtest.profile=smoke
+  Profile     Category class
+  -------     --------------
+  smoke       SmokeTest
+  catalina    CatalinaTest
+  coyote      CoyoteTest
+  tribes      TribesTest        (also add CatalinaTest for catalina coverage)
+  performance PerformanceTest
+  buildutil   BuildutilTest
+  integration IntegrationTest
 
-To add a test to the smoke profile, annotate the test class:
+Example — adding a test to the catalina profile:
 
     import org.junit.experimental.categories.Category;
-    import org.apache.tomcat.categories.SmokeTest;
+    import org.apache.tomcat.categories.CatalinaTest;
 
-    @Category(SmokeTest.class)
+    @Category(CatalinaTest.class)
     public class MyNewTest { ... }
+
+All category interfaces are in the org.apache.tomcat.categories package.
 
 (7.6) Running httpd integration tests
 

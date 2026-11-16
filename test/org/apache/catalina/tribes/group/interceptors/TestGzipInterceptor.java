@@ -23,12 +23,18 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
+import org.apache.tomcat.categories.CatalinaTest;
+import org.apache.tomcat.categories.TribesTest;
+
+
 @RunWith(Parameterized.class)
+@Category({CatalinaTest.class, TribesTest.class})
 public class TestGzipInterceptor {
 
     @Parameters(name = "{index}: bufferSize[{0}]")

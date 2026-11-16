@@ -30,6 +30,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
@@ -38,11 +39,13 @@ import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 
+@Category(CatalinaTest.class)
 public class TestPropertiesRoleMappingListener extends TomcatBaseTest {
 
     @Test(expected = NullPointerException.class)

@@ -18,10 +18,13 @@ package org.apache.catalina.core;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.http.fileupload.disk.DiskFileItem;
 import org.apache.tomcat.util.http.fileupload.util.FileItemHeadersImpl;
 
+@Category(CatalinaTest.class)
 public class TestApplicationPart {
 
     private static ApplicationPart createPart(String contentDisposition) {

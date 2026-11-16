@@ -21,14 +21,18 @@ import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
+
+import org.apache.tomcat.categories.PerformanceTest;
 
 /*
  * This is an absolute performance test. There is no benefit it running it as part of a standard test run so it is
  * excluded due to the name starting Tester...
  */
+@Category(PerformanceTest.class)
 @RunWith(Parameterized.class)
 public class TesterOneLineFormatterMillisPerformance {
 

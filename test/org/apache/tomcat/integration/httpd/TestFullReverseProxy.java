@@ -24,14 +24,17 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Globals;
 import org.apache.catalina.Valve;
 import org.apache.catalina.valves.RemoteIpValve;
 import org.apache.catalina.valves.SSLValve;
+import org.apache.tomcat.categories.IntegrationTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.TesterSupport;
 
+@Category(IntegrationTest.class)
 public class TestFullReverseProxy extends HttpdIntegrationBaseTest {
     private static final String HTTPD_CONFIG = """
                       LoadModule proxy_module modules/mod_proxy.so

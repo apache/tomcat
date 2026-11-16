@@ -18,9 +18,14 @@ package org.apache.catalina.tribes.membership;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.tribes.util.UUIDGenerator;
+import org.apache.tomcat.categories.CatalinaTest;
+import org.apache.tomcat.categories.TribesTest;
 
+
+@Category({CatalinaTest.class, TribesTest.class})
 public class TestMemberImpl {
 
     /*

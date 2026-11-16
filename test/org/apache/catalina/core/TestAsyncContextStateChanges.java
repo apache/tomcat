@@ -49,6 +49,7 @@ import org.apache.catalina.connector.TestCoyoteAdapter;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.categories.SmokeTest;
 
 /*
@@ -56,7 +57,7 @@ import org.apache.tomcat.categories.SmokeTest;
  * Expanded to cover https://bz.apache.org/bugzilla/show_bug.cgi?id=63817 and
  * additional scenarios.
  */
-@Category(SmokeTest.class)
+@Category({SmokeTest.class, CatalinaTest.class})
 @RunWith(Parameterized.class)
 public class TestAsyncContextStateChanges extends TomcatBaseTest {
 

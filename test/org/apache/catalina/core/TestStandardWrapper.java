@@ -49,12 +49,13 @@ import org.apache.catalina.realm.MessageDigestCredentialHandler;
 import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.categories.SmokeTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.http.Method;
 
-@Category(SmokeTest.class)
+@Category({SmokeTest.class, CatalinaTest.class})
 public class TestStandardWrapper extends TomcatBaseTest {
 
     @Test

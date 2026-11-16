@@ -24,8 +24,10 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.categories.CatalinaTest;
 
 import com.unboundid.ldap.listener.InMemoryDirectoryServer;
 import com.unboundid.ldap.listener.InMemoryDirectoryServerConfig;
@@ -35,6 +37,7 @@ import com.unboundid.ldap.sdk.LDAPConnection;
 import com.unboundid.ldap.sdk.LDAPResult;
 import com.unboundid.ldap.sdk.ResultCode;
 
+@Category(CatalinaTest.class)
 public class TestJNDIRealmSearchAsUser {
 
     private static InMemoryDirectoryServer ldapServer;

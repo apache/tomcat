@@ -49,6 +49,7 @@ import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.valves.ValveBase;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.categories.SmokeTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.UDecoder;
@@ -63,7 +64,7 @@ import org.apache.tomcat.util.http.Method;
  * test. The tests expect the client to be configured with UTF-8 as the default
  * encoding. Use of any other encoding is likely to lead to test failures.
  */
-@Category(SmokeTest.class)
+@Category({SmokeTest.class, CatalinaTest.class})
 public class TestRewriteValve extends TomcatBaseTest {
 
     @Test

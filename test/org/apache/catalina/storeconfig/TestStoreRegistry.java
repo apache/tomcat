@@ -20,16 +20,19 @@ import java.lang.reflect.Method;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Manager;
 import org.apache.catalina.Realm;
 import org.apache.catalina.Valve;
+import org.apache.tomcat.categories.CatalinaTest;
 
 /**
  * Test StoreRegistry behavior, particularly dynamic loading of optional classes like clustering.
  *
  * Verifies StoreRegistry uses the same dynamic loading pattern.
  */
+@Category(CatalinaTest.class)
 public class TestStoreRegistry {
 
     /**

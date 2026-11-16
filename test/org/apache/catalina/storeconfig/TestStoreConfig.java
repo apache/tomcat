@@ -28,6 +28,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Host;
@@ -42,6 +43,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.util.SessionIdGeneratorBase;
 import org.apache.catalina.valves.AccessLogValve;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.SSLHostConfigPreSharedKey;
@@ -49,6 +51,7 @@ import org.apache.tomcat.util.net.openssl.OpenSSLConf;
 import org.apache.tomcat.util.net.openssl.OpenSSLConfCmd;
 import org.xml.sax.InputSource;
 
+@Category(CatalinaTest.class)
 public class TestStoreConfig extends TomcatBaseTest {
 
     @Test

@@ -23,13 +23,16 @@ import jakarta.servlet.ServletException;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.session.StandardSession;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.unittest.TesterRequest;
 import org.apache.tomcat.unittest.TesterResponse;
 
+@Category(CatalinaTest.class)
 public class TestPersistentValve {
 
     @Test

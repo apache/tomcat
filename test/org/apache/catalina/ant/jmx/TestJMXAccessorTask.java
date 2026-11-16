@@ -33,10 +33,13 @@ import javax.management.remote.JMXServiceURL;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 
+@Category(CatalinaTest.class)
 public class TestJMXAccessorTask {
 
     @Test

@@ -456,6 +456,12 @@
         <code>batchtest</code> mechanism so per-test JVM isolation is
         preserved. (vgosain)
       </add>
+      <add>
+        Extend <code>@Category</code>-based test profiles to all remaining
+        profiles (catalina, coyote, performance, tribes, buildutil,
+        integration). Remove <code>test-profiles.properties.default</code>
+        now that all profiles are annotation-driven. (vgosain)
+      </add>
     </changelog>
   </subsection>
 </section>

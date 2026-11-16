@@ -20,10 +20,12 @@ import java.io.IOException;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Session;
 import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.tribes.Member;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.easymock.EasyMock;
 
 
@@ -32,6 +34,7 @@ import org.easymock.EasyMock;
  * {@link DeltaManager} and the batched session sending in
  * {@link DeltaManager#handleGET_ALL_SESSIONS}.
  */
+@Category(CatalinaTest.class)
 public class TestDeltaManagerBatch {
 
     /**

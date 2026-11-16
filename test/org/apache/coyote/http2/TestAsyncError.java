@@ -32,15 +32,18 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.tomcat.categories.CoyoteTest;
 
 /*
  * Based on
  * https://bz.apache.org/bugzilla/show_bug.cgi?id=66841
  */
+@Category(CoyoteTest.class)
 public class TestAsyncError extends Http2TestBase {
 
     @Test

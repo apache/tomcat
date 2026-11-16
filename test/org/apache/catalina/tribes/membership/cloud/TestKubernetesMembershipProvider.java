@@ -23,9 +23,15 @@ import java.nio.file.Files;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.tribes.group.GroupChannel;
+import org.apache.tomcat.categories.CatalinaTest;
+import org.apache.tomcat.categories.TribesTest;
 
+
+
+@Category({CatalinaTest.class, TribesTest.class})
 public class TestKubernetesMembershipProvider {
 
     /*

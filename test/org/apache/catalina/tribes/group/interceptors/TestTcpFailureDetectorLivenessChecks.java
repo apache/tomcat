@@ -28,18 +28,24 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 import org.apache.catalina.tribes.group.GroupChannel;
 import org.apache.catalina.tribes.membership.MemberImpl;
 import org.apache.catalina.tribes.membership.StaticMember;
+import org.apache.tomcat.categories.CatalinaTest;
+import org.apache.tomcat.categories.TribesTest;
+
+
 
 /**
  * Verifies that the TCP liveness checks of the TcpFailureDetector are performed outside the
  * membership monitor, and that the check results are applied correctly once the monitor is
  * re-acquired.
  */
+@Category({CatalinaTest.class, TribesTest.class})
 public class TestTcpFailureDetectorLivenessChecks {
 
     /*

@@ -22,14 +22,17 @@ import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Realm;
 import org.apache.catalina.startup.TesterMapRealm;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.unittest.TesterContext;
 
+@Category(CatalinaTest.class)
 public class TestCombinedRealm {
 
     private static final String USER_NAME = "user";

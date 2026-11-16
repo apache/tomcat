@@ -41,11 +41,13 @@ import jakarta.servlet.http.WebConnection;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CoyoteTest;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketEvent;
@@ -53,6 +55,7 @@ import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.net.SocketWrapperBase.BlockingMode;
 import org.apache.tomcat.util.net.SocketWrapperBase.CompletionState;
 
+@Category(CoyoteTest.class)
 public class TestUpgradeInternalHandler extends TomcatBaseTest {
 
     private static final String MESSAGE = "This is a test.";

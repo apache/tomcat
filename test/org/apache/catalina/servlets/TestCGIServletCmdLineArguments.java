@@ -24,13 +24,16 @@ import java.util.regex.Pattern;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.compat.JrePlatform;
 
 @RunWith(Parameterized.class)
+@Category(CatalinaTest.class)
 public class TestCGIServletCmdLineArguments {
 
     private static final Pattern defaultDecodedPatternWindows;

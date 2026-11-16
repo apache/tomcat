@@ -79,8 +79,9 @@ public class CategoryScanner {
         for (File f : files) {
             if (f.isDirectory()) {
                 scanDir(root, f, testSrcDir, categoryClass, loader, results);
-            } else if (f.getName().startsWith("Test") && !f.getName().startsWith("Tester") &&
-                       f.getName().endsWith(".class") && !f.getName().contains("$")) {
+            } else if (f.getName().endsWith(".class") && !f.getName().contains("$") &&
+                       (!f.getName().startsWith("Tester") ||
+                        f.getName().endsWith("Performance.class"))) {
                 String relative = root.toURI().relativize(f.toURI()).getPath();
                 String javaPath = relative.replace(".class", ".java");
                 // Skip classes whose source no longer exists (stale .class from prior build).

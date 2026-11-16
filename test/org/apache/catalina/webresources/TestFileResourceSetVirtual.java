@@ -24,14 +24,17 @@ import java.nio.file.attribute.FileAttribute;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.startup.ExpandWar;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 
 /**
  * Mounts file resources in sub directories that do not exist in the main
  * resources.
  */
+@Category(CatalinaTest.class)
 public class TestFileResourceSetVirtual extends TestFileResourceSet {
 
     private static Path tempDir;

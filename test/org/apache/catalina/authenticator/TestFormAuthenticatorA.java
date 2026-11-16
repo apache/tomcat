@@ -41,6 +41,7 @@ import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.categories.SmokeTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
@@ -80,7 +81,7 @@ import org.apache.tomcat.websocket.server.WsContextListener;
  * but it makes no claims to generality).
  *
  */
-@Category(SmokeTest.class)
+@Category({SmokeTest.class, CatalinaTest.class})
 public class TestFormAuthenticatorA extends TomcatBaseTest {
 
     // these should really be singletons to be type-safe,

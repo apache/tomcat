@@ -35,6 +35,7 @@ import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.startup.TesterServletEncodeUrl;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.categories.SmokeTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
@@ -60,7 +61,7 @@ import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
  * ignore them. The Tomcat documentation clearly states that SSO <i>requires</i> the client to support cookies, so
  * access to resources in other webapp containers receives no SSO assistance.
  */
-@Category(SmokeTest.class)
+@Category({SmokeTest.class, CatalinaTest.class})
 public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
 
     protected static final boolean USE_COOKIES = true;

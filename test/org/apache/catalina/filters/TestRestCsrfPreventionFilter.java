@@ -29,10 +29,13 @@ import jakarta.servlet.http.HttpSession;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.http.Method;
 import org.easymock.EasyMock;
 
+@Category(CatalinaTest.class)
 public class TestRestCsrfPreventionFilter {
 
     private static final String NONCE = "nonce";

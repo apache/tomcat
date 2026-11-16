@@ -20,11 +20,15 @@ import java.nio.ByteBuffer;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
+
+import org.apache.tomcat.categories.CoyoteTest;
 
 /*
  * Implement here rather than jakarta.servlet.http.TestHttpServlet because it
  * needs access to package private classes.
  */
+@Category(CoyoteTest.class)
 public class TestHttpServlet extends Http2TestBase {
 
     @Test

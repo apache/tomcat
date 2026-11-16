@@ -34,6 +34,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.tribes.ErrorHandler;
 import org.apache.catalina.tribes.Member;
@@ -42,8 +43,13 @@ import org.apache.catalina.tribes.group.GroupChannel;
 import org.apache.catalina.tribes.io.XByteBuffer;
 import org.apache.catalina.tribes.membership.MemberImpl;
 import org.apache.catalina.tribes.tipis.AbstractReplicatedMap.MapMessage;
+import org.apache.tomcat.categories.CatalinaTest;
+import org.apache.tomcat.categories.TribesTest;
 import org.apache.tomcat.unittest.TesterSerializableKey;
 
+
+
+@Category({CatalinaTest.class, TribesTest.class})
 public class TestAbstractReplicatedMap {
 
     /*

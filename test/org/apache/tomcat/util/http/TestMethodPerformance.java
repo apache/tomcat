@@ -19,9 +19,12 @@ package org.apache.tomcat.util.http;
 import java.nio.charset.StandardCharsets;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.PerformanceTest;
 import org.apache.tomcat.util.buf.MessageBytes;
 
+@Category(PerformanceTest.class)
 public class TestMethodPerformance {
 
     private static final int LOOPS = 6;

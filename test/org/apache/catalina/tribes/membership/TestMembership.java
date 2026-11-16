@@ -22,10 +22,16 @@ import java.util.Map.Entry;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.membership.Membership.MbrEntry;
+import org.apache.tomcat.categories.CatalinaTest;
+import org.apache.tomcat.categories.TribesTest;
 
+
+
+@Category({CatalinaTest.class, TribesTest.class})
 public class TestMembership {
 
     @Test

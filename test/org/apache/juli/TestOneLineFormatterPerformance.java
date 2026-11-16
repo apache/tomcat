@@ -18,12 +18,16 @@ package org.apache.juli;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
+
+import org.apache.tomcat.categories.PerformanceTest;
 
 /**
  * Compares date/time format implementations. The current implementation ({@link
  * DateFormatCache} is one to two orders of magnitude faster than
  * {@link String#format(String, Object...)}
  */
+@Category(PerformanceTest.class)
 public class TestOneLineFormatterPerformance {
 
     @Test

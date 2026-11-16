@@ -21,17 +21,20 @@ import java.lang.reflect.InvocationTargetException;
 import javax.naming.NamingException;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.InstanceManager;
+import org.apache.tomcat.categories.PerformanceTest;
 
 /*
  * This is an absolute performance test. There is no benefit it running it as part of a standard test run so it is
  * excluded due to the name starting Tester...
  */
+@Category(PerformanceTest.class)
 public class TesterDefaultInstanceManagerPerformance extends TomcatBaseTest {
 
     @Test

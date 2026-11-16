@@ -18,9 +18,12 @@ package org.apache.catalina.valves;
 import java.io.IOException;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.valves.ExtendedAccessLogValve.PatternTokenizer;
+import org.apache.tomcat.categories.CatalinaTest;
 
+@Category(CatalinaTest.class)
 public class TestPatternTokenizer {
 
     @Test(expected = IOException.class)

@@ -22,15 +22,18 @@ import java.nio.ByteBuffer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.coyote.http11.Constants;
 import org.apache.coyote.http11.Http11NioProtocol;
 import org.apache.coyote.http11.Http11Processor;
+import org.apache.tomcat.categories.CoyoteTest;
 import org.apache.tomcat.util.net.ApplicationBufferHandler;
 import org.apache.tomcat.util.net.SocketBufferHandler;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.easymock.EasyMock;
 
+@Category(CoyoteTest.class)
 public class TestRequest {
 
     private final Http11NioProtocol protocol = new Http11NioProtocol();

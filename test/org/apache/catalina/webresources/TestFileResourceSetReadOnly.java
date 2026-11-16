@@ -24,10 +24,13 @@ import java.nio.file.attribute.FileAttribute;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.startup.ExpandWar;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 
+@Category(CatalinaTest.class)
 public class TestFileResourceSetReadOnly extends AbstractTestFileResourceSet {
 
     private static Path tempDir;

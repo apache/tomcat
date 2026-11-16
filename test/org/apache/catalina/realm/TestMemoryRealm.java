@@ -22,11 +22,14 @@ import java.security.Principal;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 
+@Category(CatalinaTest.class)
 public class TestMemoryRealm extends TomcatBaseTest {
 
     public static final String CONFIG = "<?xml version=\"1.0\" ?>"

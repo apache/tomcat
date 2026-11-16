@@ -22,13 +22,16 @@ import java.util.zip.GZIPOutputStream;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.coyote.Response;
+import org.apache.tomcat.categories.CoyoteTest;
 
 /**
  * Test case to demonstrate the interaction between gzip and flushing in the
  * output filter.
  */
+@Category(CoyoteTest.class)
 public class TestGzipOutputFilter {
 
     /*

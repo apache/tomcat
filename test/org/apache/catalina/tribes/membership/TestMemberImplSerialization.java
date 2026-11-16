@@ -21,9 +21,15 @@ import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.tribes.Member;
+import org.apache.tomcat.categories.CatalinaTest;
+import org.apache.tomcat.categories.TribesTest;
 
+
+
+@Category({CatalinaTest.class, TribesTest.class})
 public class TestMemberImplSerialization {
     private MemberImpl m1, m2, p1,p2;
     private byte[] payload = null;

@@ -25,6 +25,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
@@ -37,6 +38,7 @@ import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.core.StandardService;
 import org.apache.catalina.filters.TesterHttpServletResponse;
 import org.apache.catalina.startup.TesterMapRealm;
+import org.apache.tomcat.categories.PerformanceTest;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.http.Method;
@@ -46,6 +48,7 @@ import org.apache.tomcat.util.security.ConcurrentMessageDigest;
  * This is an absolute performance test. There is no benefit it running it as part of a standard test run so it is
  * excluded due to the name starting Tester...
  */
+@Category(PerformanceTest.class)
 public class TesterDigestAuthenticatorPerformance {
 
     private static String USER = "user";

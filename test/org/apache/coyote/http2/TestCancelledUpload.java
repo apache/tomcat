@@ -26,12 +26,15 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
+import org.apache.tomcat.categories.CoyoteTest;
 
+@Category(CoyoteTest.class)
 public class TestCancelledUpload extends Http2TestBase {
 
     @Test

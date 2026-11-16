@@ -25,9 +25,12 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 
+@Category(CatalinaTest.class)
 public class TestHttpHeaderSecurityFilter {
 
     private final FilterChain filterChain = new TesterFilterChain();

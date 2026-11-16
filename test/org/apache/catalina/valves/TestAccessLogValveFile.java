@@ -24,10 +24,12 @@ import java.nio.file.Files;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.compat.JrePlatform;
 
 /**
@@ -35,6 +37,7 @@ import org.apache.tomcat.util.compat.JrePlatform;
  * operations. Pattern-based access log format tests are covered by
  * {@link TestAccessLogValve}.
  */
+@Category(CatalinaTest.class)
 public class TestAccessLogValveFile extends TomcatBaseTest {
 
     private File logDir;

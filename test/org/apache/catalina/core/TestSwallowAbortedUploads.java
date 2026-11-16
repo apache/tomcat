@@ -41,6 +41,7 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
@@ -50,7 +51,9 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.categories.CatalinaTest;
 
+@Category(CatalinaTest.class)
 public class TestSwallowAbortedUploads extends TomcatBaseTest {
 
     private static Log log = LogFactory.getLog(TestSwallowAbortedUploads.class);
