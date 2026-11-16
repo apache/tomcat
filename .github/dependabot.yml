@@ -19,3 +19,73 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
+  - package-ecosystem: "maven"
+    directory: "/modules/jdbc-pool"
+    target-branch: "main"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "maven"
+    directory: "/modules/owb"
+    target-branch: "main"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "maven"
+    directory: "/modules/stuffed"
+    target-branch: "main"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "maven"
+    directory: "/modules/cxf"
+    target-branch: "11.0.x"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "maven"
+    directory: "/modules/jdbc-pool"
+    target-branch: "11.0.x"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "maven"
+    directory: "/modules/owb"
+    target-branch: "11.0.x"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "maven"
+    directory: "/modules/stuffed"
+    target-branch: "11.0.x"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "maven"
+    directory: "/modules/cxf"
+    target-branch: "10.1.x"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "maven"
+    directory: "/modules/jdbc-pool"
+    target-branch: "10.1.x"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "maven"
+    directory: "/modules/owb"
+    target-branch: "10.1.x"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "maven"
+    directory: "/modules/stuffed"
+    target-branch: "10.1.x"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "maven"
+    directory: "/modules/cxf"
+    target-branch: "9.0.x"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "maven"
+    directory: "/modules/jdbc-pool"
+    target-branch: "9.0.x"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "maven"
+    directory: "/modules/owb"
+    target-branch: "9.0.x"
+    schedule:
+      interval: "weekly"
