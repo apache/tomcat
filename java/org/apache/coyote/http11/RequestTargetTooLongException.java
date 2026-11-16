@@ -21,8 +21,6 @@ import java.io.Serial;
 /**
  * Exception used to mark the specific error condition of the request target exceeding the size of the buffer used to
  * read the request line.
- *
- * @since 12.0.x
  */
 public class RequestTargetTooLongException extends IllegalArgumentException {
 
