@@ -403,6 +403,15 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             }
         }
 
+        if ("content-length".equals(name) && !isNumeric(value)) {
+            // RFC 9110, section 8.6 only permits digits. Anything else, such as a sign, makes the message malformed.
+            headerException = new StreamException(
+                    sm.getString("stream.header.contentLength.invalid", getConnectionId(), getIdAsString()),
+                    Http2Error.PROTOCOL_ERROR, getIdAsInt());
+            // No need for further processing. The stream will be reset.
+            return;
+        }
+
         if (headerException != null) {
             // Don't bother processing the header since the stream is going to
             // be reset anyway
@@ -807,6 +816,19 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         state.receivedEndOfStream();
         inputBuffer.notifyEof();
     }
+
+    private static boolean isNumeric(String value) {
+        if (value.isEmpty()) {
+            return false;
+        }
+        for (int i = 0; i < value.length(); i++) {
+            if (!HttpParser.isNumeric(value.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     final long getContentLengthLong() throws Http2Exception {
         try {
