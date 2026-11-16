@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -51,6 +52,7 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.ErrorPage;
+import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.websocket.server.WsContextListener;
 
 public class TestDefaultServlet extends TomcatBaseTest {
@@ -93,6 +95,85 @@ public class TestDefaultServlet extends TomcatBaseTest {
                 "/META-INF/doesntexistanywhere", res, null);
         Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
 
+    }
+
+    /*
+     * RFC 9110, section 8.8.2.1: an origin server must not generate a Last-Modified date that is later than the Date
+     * of the response. If the last modification time of the resource is in the future the message origination date
+     * must be used.
+     */
+    @Test
+    public void testLastModifiedNotInFuture() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File(getTemporaryDirectory(), "testLastModifiedNotInFuture");
+        addDeleteOnTearDown(appDir);
+        Assert.assertTrue(appDir.mkdirs());
+        File futureFile = new File(appDir, "future.txt");
+        Files.writeString(futureFile.toPath(), "future");
+        File pastFile = new File(appDir, "past.txt");
+        Files.writeString(pastFile.toPath(), "past");
+        long now = System.currentTimeMillis();
+        Assert.assertTrue(futureFile.setLastModified(now + 24 * 60 * 60 * 1000L));
+        Assert.assertTrue(pastFile.setLastModified(now - 24 * 60 * 60 * 1000L));
+
+        Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
+        Tomcat.addServlet(ctxt, "default", "org.apache.catalina.servlets.DefaultServlet");
+        ctxt.addServletMapping("/", "default");
+
+        tomcat.start();
+
+        Map<String,List<String>> headers = new HashMap<>();
+        Assert.assertEquals(HttpServletResponse.SC_OK,
+                getUrl("http://localhost:" + getPort() + "/future.txt", new ByteChunk(), headers));
+        long lastModified = FastHttpDateFormat.parseDate(headers.get("Last-Modified").get(0));
+        long date = FastHttpDateFormat.parseDate(headers.get("Date").get(0));
+        Assert.assertTrue("Last-Modified is later than Date", lastModified <= date);
+        // The date is replaced by the time of the response, not by some arbitrary earlier time
+        Assert.assertTrue("Last-Modified is not the message origination date", lastModified >= (now / 1000) * 1000);
+
+        // A last modified time in the past is not changed
+        headers = new HashMap<>();
+        Assert.assertEquals(HttpServletResponse.SC_OK,
+                getUrl("http://localhost:" + getPort() + "/past.txt", new ByteChunk(), headers));
+        Assert.assertEquals(FastHttpDateFormat.formatDate(pastFile.lastModified()), headers.get("Last-Modified").get(0));
+    }
+
+    /*
+     * A resource that is served from the resource cache must still be given the message origination date of each
+     * response, not the date of the response that populated the cache.
+     */
+    @Test
+    public void testLastModifiedNotInFutureCached() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File(getTemporaryDirectory(), "testLastModifiedNotInFutureCached");
+        addDeleteOnTearDown(appDir);
+        Assert.assertTrue(appDir.mkdirs());
+        File futureFile = new File(appDir, "future.txt");
+        Files.writeString(futureFile.toPath(), "future");
+        Assert.assertTrue(futureFile.setLastModified(System.currentTimeMillis() + 24 * 60 * 60 * 1000L));
+
+        Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
+        Tomcat.addServlet(ctxt, "default", "org.apache.catalina.servlets.DefaultServlet");
+        ctxt.addServletMapping("/", "default");
+
+        tomcat.start();
+
+        // The cache TTL (default 5 seconds) must be longer than the delay between the requests
+        Assert.assertTrue(ctxt.getResources().getCacheTtl() > 3000);
+
+        for (int i = 0; i < 2; i++) {
+            Map<String,List<String>> headers = new HashMap<>();
+            Assert.assertEquals(HttpServletResponse.SC_OK,
+                    getUrl("http://localhost:" + getPort() + "/future.txt", new ByteChunk(), headers));
+            long lastModified = FastHttpDateFormat.parseDate(headers.get("Last-Modified").get(0));
+            long date = FastHttpDateFormat.parseDate(headers.get("Date").get(0));
+            Assert.assertTrue("Request " + i + ": Last-Modified is later than Date", lastModified <= date);
+            Assert.assertTrue("Request " + i + ": Last-Modified is not the message origination date",
+                    date - lastModified <= 1000);
+            Thread.sleep(2000);
+        }
     }
 
     @Test
