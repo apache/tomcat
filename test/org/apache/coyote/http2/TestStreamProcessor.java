@@ -90,6 +90,48 @@ public class TestStreamProcessor extends Http2TestBase {
     }
 
 
+    /*
+     * RFC 9113, section 8.1.1 states that a response is malformed if the value of the content-length header field is
+     * not the sum of the DATA frame payloads. As for HTTP/1.1, data written beyond the content length is discarded.
+     */
+    @Test
+    public void testResponseLongerThanContentLength() throws Exception {
+        enableHttp2();
+
+        Tomcat tomcat = getTomcatInstance();
+
+        // Map the servlet to /simple so we can re-use the HTTP/2 handling logic from the super class.
+        Context ctxt = getProgrammaticRootContext();
+        Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
+        ctxt.addServletMapping("/simple", "simple");
+        Tomcat.addServlet(ctxt, "excess", new ExcessContent());
+        ctxt.addServletMapping("/excess", "excess");
+
+        tomcat.start();
+
+        openClientConnection();
+        doHttpUpgrade();
+        sendClientPreface();
+        validateHttp2InitialResponse();
+
+        byte[] frameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+        buildGetRequest(frameHeader, headersPayload, null, 3, "/excess");
+        writeFrame(frameHeader, headersPayload);
+
+        // Headers and then the body, which ends the stream
+        parser.readFrame();
+        while (!output.getTrace().contains("3-EndOfStream")) {
+            parser.readFrame();
+        }
+
+        Assert.assertEquals("3-HeadersStart\n" + "3-Header-[:status]-[200]\n" +
+                "3-Header-[content-type]-[text/plain]\n" + "3-Header-[content-length]-[5]\n" +
+                "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" + "3-HeadersEnd\n" + "3-Body-5\n" +
+                "3-EndOfStream\n", output.getTrace());
+    }
+
+
     @Test
     public void testAsyncDispatch() throws Exception {
         enableHttp2();
@@ -965,6 +1007,19 @@ public class TestStreamProcessor extends Http2TestBase {
                 }
                 count++;
             }
+        }
+    }
+
+    private static final class ExcessContent extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+            response.setContentType("text/plain");
+            response.setContentLength(5);
+            // More than the content length
+            response.getOutputStream().write("0123456789".getBytes(StandardCharsets.ISO_8859_1));
         }
     }
 }
