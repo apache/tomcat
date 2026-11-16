@@ -58,6 +58,13 @@ import org.h2.tools.Server;
  *
  * Test classes must not run in parallel (each uses static fixture
  * state); Surefire's default sequential execution applies.
+ *
+ * <p>The suite is grouped into thematic {@code Test*} classes (for example
+ * {@code org.apache.tomcat.jdbc.pool.TestPoolLifecycle}).  Each former
+ * standalone test class is now an abstract {@code *Base} fixture, and one
+ * {@code @Nested} group in the thematic class extends it.  This keeps every
+ * test method, helper and fixture intact while making the suite navigable by
+ * theme; the abstract fixtures are never run directly.</p>
  */
 public abstract class JdbcPoolBaseTest {
 
