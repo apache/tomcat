@@ -67,6 +67,8 @@ updates:
     ignore:
       - dependency-name: "org.apache.tomcat:tomcat-juli"
         versions: ["(,9.0.0)", "[9.1.0,)"]
+      - dependency-name: "com.h2database:h2"
+        versions: ["(,2.2.0)", "[2.3.0,)"]
   - package-ecosystem: "maven"
     target-branch: "11.0.x"
     directory: "/modules/cxf"
