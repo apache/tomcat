@@ -22,24 +22,51 @@ updates:
   # No glob on main: modules/manager2 has no pom.xml, which would cause errors
   - package-ecosystem: "maven"
     target-branch: "main"
-    directories: ["/modules/jdbc-pool", "/modules/stuffed"]
+    directory: "/modules/stuffed"
     schedule:
       interval: "weekly"
   - package-ecosystem: "maven"
     target-branch: "11.0.x"
-    directories: ["/modules/jdbc-pool", "/modules/stuffed"]
+    directory: "/modules/stuffed"
     schedule:
       interval: "weekly"
   - package-ecosystem: "maven"
     target-branch: "10.1.x"
-    directories: ["/modules/jdbc-pool", "/modules/stuffed"]
+    directory: "/modules/stuffed"
     schedule:
       interval: "weekly"
+  - package-ecosystem: "maven"
+    target-branch: "main"
+    directory: "/modules/jdbc-pool"
+    schedule:
+      interval: "weekly"
+    ignore:
+      - dependency-name: "org.apache.tomcat:tomcat-juli"
+        versions: ["(,12.0.0)", "[12.1.0,)"]
+  - package-ecosystem: "maven"
+    target-branch: "11.0.x"
+    directory: "/modules/jdbc-pool"
+    schedule:
+      interval: "weekly"
+    ignore:
+      - dependency-name: "org.apache.tomcat:tomcat-juli"
+        versions: ["(,11.0.0)", "[11.1.0,)"]
+  - package-ecosystem: "maven"
+    target-branch: "10.1.x"
+    directory: "/modules/jdbc-pool"
+    schedule:
+      interval: "weekly"
+    ignore:
+      - dependency-name: "org.apache.tomcat:tomcat-juli"
+        versions: ["(,10.1.0)", "[10.2.0,)"]
   - package-ecosystem: "maven"
     target-branch: "9.0.x"
     directory: "/modules/jdbc-pool"
     schedule:
       interval: "weekly"
+    ignore:
+      - dependency-name: "org.apache.tomcat:tomcat-juli"
+        versions: ["(,9.0.0)", "[9.1.0,)"]
   - package-ecosystem: "maven"
     target-branch: "11.0.x"
     directory: "/modules/cxf"
