@@ -27,19 +27,43 @@ updates:
       interval: "weekly"
   - package-ecosystem: "maven"
     target-branch: "11.0.x"
-    directories: ["/modules/cxf", "/modules/jdbc-pool", "/modules/stuffed"]
+    directories: ["/modules/jdbc-pool", "/modules/stuffed"]
     schedule:
       interval: "weekly"
   - package-ecosystem: "maven"
     target-branch: "10.1.x"
-    directories: ["/modules/cxf", "/modules/jdbc-pool", "/modules/stuffed"]
+    directories: ["/modules/jdbc-pool", "/modules/stuffed"]
     schedule:
       interval: "weekly"
   - package-ecosystem: "maven"
     target-branch: "9.0.x"
-    directories: ["/modules/cxf", "/modules/jdbc-pool"]
+    directory: "/modules/jdbc-pool"
     schedule:
       interval: "weekly"
+  - package-ecosystem: "maven"
+    target-branch: "11.0.x"
+    directory: "/modules/cxf"
+    schedule:
+      interval: "weekly"
+    ignore:
+      - dependency-name: "org.apache.cxf:*"
+        versions: ["(,4.2.0)", "[4.3.0,)"]
+  - package-ecosystem: "maven"
+    target-branch: "10.1.x"
+    directory: "/modules/cxf"
+    schedule:
+      interval: "weekly"
+    ignore:
+      - dependency-name: "org.apache.cxf:*"
+        versions: ["(,4.1.0)", "[4.2.0,)"]
+  - package-ecosystem: "maven"
+    target-branch: "9.0.x"
+    directory: "/modules/cxf"
+    schedule:
+      interval: "weekly"
+    ignore:
+      - dependency-name: "org.apache.cxf:*"
+        versions: ["(,3.6.0)", "[3.7.0,)"]
   - package-ecosystem: "maven"
     target-branch: "main"
     directory: "/modules/owb"
