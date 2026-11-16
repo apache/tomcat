@@ -19,3 +19,24 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
+  # No glob on main: modules/manager2 has no pom.xml, which would cause errors
+  - package-ecosystem: "maven"
+    target-branch: "main"
+    directories: ["/modules/jdbc-pool", "/modules/owb", "/modules/stuffed"]
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "maven"
+    target-branch: "11.0.x"
+    directories: ["/modules/*"]
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "maven"
+    target-branch: "10.1.x"
+    directories: ["/modules/*"]
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "maven"
+    target-branch: "9.0.x"
+    directories: ["/modules/*"]
+    schedule:
+      interval: "weekly"
