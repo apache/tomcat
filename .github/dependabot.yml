@@ -68,8 +68,6 @@ updates:
     ignore:
       - dependency-name: "org.apache.cxf:*"
         versions: ["(,3.6.0)", "[3.7.0,)"]
-      - dependency-name: "jakarta.enterprise:jakarta.enterprise.cdi-api"
-        versions: ["(,3.0.0)", "[3.1.0,)"]
   - package-ecosystem: "maven"
     target-branch: "main"
     directory: "/modules/owb"
