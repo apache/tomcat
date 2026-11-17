@@ -1857,7 +1857,7 @@ RequestHeader unset SSL_CLIENT_ESCAPED_CERT</source>
       </attribute>
 
       <attribute name="validateUri" required="false">
-        <p>Should the URI be validated as required by RFC2617? If not specified,
+        <p>Should the URI be validated as required by RFC 7616? If not specified,
         the default value of <code>true</code> will be used. This should
         normally only be set when Tomcat is located behind a reverse proxy and
         the proxy is modifying the URI passed to Tomcat such that DIGEST

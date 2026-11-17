@@ -139,7 +139,7 @@
                writeable="false"/>
 
     <attribute name="validateUri"
-               description="Should the uri be validated as required by RFC2617?"
+               description="Should the uri be validated as required by RFC 7616?"
                type="boolean"/>
   </mbean>
 

@@ -157,7 +157,7 @@ public class DigestAuthenticator extends Authenticator {
 
         /*
          * If the "qop" value is "auth-int", then A2 is:
-         * A2 = Method ":" digest-uri-value ":" H(entity-body)
+         * A2 = Method ":" request-uri ":" H(entity-body)
          * There is no entity-body for a WebSocket handshake but the hash of
          * the empty body still has to be included.
          */

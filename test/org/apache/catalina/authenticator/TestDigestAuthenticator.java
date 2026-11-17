@@ -293,11 +293,11 @@ public class TestDigestAuthenticator extends TomcatBaseTest {
     /*
      * @formatter:off
      *
-     * Notes from RFC2617
-     * H(data) = MD5(data)
+     * Notes from RFC 7616
+     * H(data) = hash-algorithm(data)
      * KD(secret, data) = H(concat(secret, ":", data))
      * A1 = unq(username-value) ":" unq(realm-value) ":" passwd
-     * A2 = Method ":" digest-uri-value
+     * A2 = Method ":" request-uri
      * request-digest  = <"> < KD ( H(A1),     unq(nonce-value)
      *                              ":" nc-value
      *                              ":" unq(cnonce-value)
