@@ -22,10 +22,14 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 
+import javax.net.ssl.SSLEngineResult.Status;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Tests {@link SecureNioChannel#read(ByteBuffer)} when {@code unwrap()}
@@ -37,6 +41,8 @@ import org.junit.Test;
  * depend on timing.
  */
 public class TestSecureNioChannelOverflow {
+
+    private static final StringManager sm = StringManager.getManager(SecureNioChannel.class);
 
     /*
      * Without the fix, the overflow tests loop forever on one core. The
@@ -156,6 +162,88 @@ public class TestSecureNioChannelOverflow {
     }
 
 
+    /*
+     * Regression guard for the vectored read: passes with and without the fix.
+     */
+    @Test
+    public void testNormalVectoredRead() throws Exception {
+        int appSize = engines.getApplicationBufferSize();
+        SocketBufferHandler bh = new SocketBufferHandler(appSize, appSize, false);
+        SecureNioChannel ch = newChannel(bh);
+        byte[] payload = engines.wrapRecord(1000, ch.netInBuffer);
+
+        ByteBuffer dst = bh.getReadBuffer();
+        Assert.assertEquals(payload.length, ch.read(new ByteBuffer[] { dst }, 0, 1));
+        TesterSslEnginePair.assertContent(payload, dst);
+    }
+
+
+    /*
+     * Regression guard for the vectored read: passes with and without the fix. expand() replaces the socket read
+     * buffer with a larger one and the read succeeds.
+     */
+    @Test
+    public void testVectoredExpandGrowsSocketBuffer() throws Exception {
+        int appSize = engines.getApplicationBufferSize();
+        SocketBufferHandler bh = new SocketBufferHandler(appSize / 2, appSize / 2, false);
+        SecureNioChannel ch = newChannel(bh);
+        byte[] payload = engines.wrapRecord(appSize, ch.netInBuffer);
+        Assert.assertTrue(payload.length > appSize / 2);
+
+        Assert.assertEquals(payload.length, ch.read(new ByteBuffer[] { bh.getReadBuffer() }, 0, 1));
+        ByteBuffer dst = bh.getReadBuffer();
+        Assert.assertTrue(dst.capacity() >= appSize);
+        TesterSslEnginePair.assertContent(payload, dst);
+    }
+
+
+    /*
+     * The vectored equivalent of testNoRoomSocketBuffer().
+     */
+    @Test(timeout = TIMEOUT_MS)
+    public void testVectoredNoRoomSocketBuffer() throws Exception {
+        int appSize = engines.getApplicationBufferSize();
+        SocketBufferHandler bh = new SocketBufferHandler(appSize, appSize, false);
+        SecureNioChannel ch = newChannel(bh);
+        engines.wrapRecord(appSize, ch.netInBuffer);
+
+        ByteBuffer dst = bh.getReadBuffer();
+        dst.position(dst.limit());
+        assertVectoredReadFails(ch, dst);
+    }
+
+
+    /*
+     * The vectored equivalent of testNoRoomAppBuffer().
+     */
+    @Test(timeout = TIMEOUT_MS)
+    public void testVectoredNoRoomAppBuffer() throws Exception {
+        int appSize = engines.getApplicationBufferSize();
+        SecureNioChannel ch = newChannel(new SocketBufferHandler(appSize, appSize, false));
+        engines.wrapRecord(appSize, ch.netInBuffer);
+        TesterAppBuffer app = new TesterAppBuffer(appSize, appSize, appSize, false);
+        ch.setAppReadBufHandler(app);
+
+        assertVectoredReadFails(ch, app.getByteBuffer());
+    }
+
+
+    /*
+     * The vectored equivalent of testAppBufferExpandOnlyMovesLimit(). The buffer instance does not change but the
+     * first expand() adds room so the read must only fail once expand() adds no more room.
+     */
+    @Test(timeout = TIMEOUT_MS)
+    public void testVectoredAppBufferExpandOnlyMovesLimit() throws Exception {
+        int appSize = engines.getApplicationBufferSize();
+        SecureNioChannel ch = newChannel(new SocketBufferHandler(appSize, appSize, false));
+        engines.wrapRecord(appSize, ch.netInBuffer);
+        TesterAppBuffer app = new TesterAppBuffer(appSize, appSize - 100, appSize - 92, true);
+        ch.setAppReadBufHandler(app);
+
+        assertVectoredReadFails(ch, app.getByteBuffer());
+    }
+
+
     private SecureNioChannel newChannel(SocketBufferHandler bh) {
         SecureNioChannel ch = new SecureNioChannel(bh, new NioEndpoint());
         ch.sc = serverSock;
@@ -170,10 +258,26 @@ public class TestSecureNioChannelOverflow {
             ch.read(dst);
             Assert.fail("Expected IOException");
         } catch (IOException expected) {
-            // The message must be unwrapFailNoRoom, not another failure such as
-            // unwrapFailResize, so a stray IOException cannot pass this test.
-            Assert.assertTrue(String.valueOf(expected.getMessage()),
-                    expected.getMessage() != null && expected.getMessage().contains("no free space"));
+            assertNoRoomMessage(expected);
         }
+    }
+
+
+    private static void assertVectoredReadFails(SecureNioChannel ch, ByteBuffer dst) {
+        try {
+            ch.read(new ByteBuffer[] { dst }, 0, 1);
+            Assert.fail("Expected IOException");
+        } catch (IOException expected) {
+            assertNoRoomMessage(expected);
+        }
+    }
+
+
+    /*
+     * The message must be unwrapFailNoRoom, not another failure such as unwrapFailResize, so a stray IOException cannot
+     * pass the tests. The expected message is looked up so the check does not depend on the locale.
+     */
+    private static void assertNoRoomMessage(IOException e) {
+        Assert.assertEquals(sm.getString("channel.nio.ssl.unwrapFailNoRoom", Status.BUFFER_OVERFLOW), e.getMessage());
     }
 }
