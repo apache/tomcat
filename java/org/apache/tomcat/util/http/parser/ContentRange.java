@@ -37,7 +37,7 @@ public class ContentRange {
      * @param units  the range units (e.g., "bytes"), lowercased
      * @param start  the start position of the range
      * @param end    the end position of the range
-     * @param length the total length of the resource
+     * @param length the total length of the resource, or -1 if it is unknown
      */
     public ContentRange(String units, long start, long end, long length) {
         // Units are lower case (RFC 9110, section 14.1)
@@ -85,7 +85,7 @@ public class ContentRange {
     /**
      * Returns the total length of the resource.
      *
-     * @return the total resource length
+     * @return the total resource length, or -1 if it is unknown
      */
     public long getLength() {
         return length;
@@ -133,8 +133,15 @@ public class ContentRange {
                 return null;
             }
 
-            // Length
-            length = HttpParser.readLong(input);
+            // Length, or '*' if it is unknown (RFC 9110, section 14.4)
+            if (HttpParser.skipConstant(input, "*") == SkipResult.FOUND) {
+                length = -1;
+            } else {
+                length = HttpParser.readLong(input);
+                if (length == -1) {
+                    return null;
+                }
+            }
         } catch (NumberFormatException nfe) {
             // A value that doesn't fit in a long can't be a valid content range
             return null;
@@ -159,10 +166,14 @@ public class ContentRange {
 
     /**
      * Validates this content range according to RFC 9110 section 14.4.
+     * When the complete length is unknown, {@code end} must be less than {@link Long#MAX_VALUE} to
+     * prevent integer overflow in computations such as {@code end - start + 1}.
      *
-     * @return {@code true} if start &gt;= 0, end &gt;= start, and length &gt; end
+     * @return {@code true} if start &gt;= 0, end &gt;= start, and either the length is unknown with
+     *         end &lt; {@link Long#MAX_VALUE}, or the length is known and length &gt; end
      */
     public boolean isValid() {
-        return start >= 0 && end >= start && length > end;
+        return start >= 0 && end >= start &&
+                (length == -1 ? end < Long.MAX_VALUE : length > end);
     }
 }
