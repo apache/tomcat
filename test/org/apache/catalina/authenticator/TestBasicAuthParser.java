@@ -98,8 +98,8 @@ public class TestBasicAuthParser {
     }
 
     /*
-     * RFC 2045 says the Base64 encoded string should be represented as lines of no more than 76 characters. However,
-     * RFC 2617 says a base64-user-pass token is not limited to 76 char/line.
+     * RFC 7617 uses token68 which in this case holds base 64 without whitespace so there is no 76 character per line
+     * limit.
      */
     @Test
     public void testGoodCribBase64Big() throws Exception {
@@ -116,7 +116,7 @@ public class TestBasicAuthParser {
 
 
     /*
-     * verify the parser follows RFC2617 by treating the auth-scheme token as case-insensitive.
+     * Verify the parser follows RFC 9110 by treating the auth-scheme token as case-insensitive.
      */
     @Test
     public void testAuthMethodCaseBasic() throws Exception {
