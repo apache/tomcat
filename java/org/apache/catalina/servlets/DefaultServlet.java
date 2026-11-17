@@ -777,7 +777,9 @@ public class DefaultServlet extends HttpServlet {
                 }
             }
 
-            randAccessContentFile.setLength(range.getLength());
+            if (range.getLength() != -1) {
+                randAccessContentFile.setLength(range.getLength());
+            }
 
             // Append data in request input stream to contentFile
             randAccessContentFile.seek(range.getStart());
@@ -984,7 +986,7 @@ public class DefaultServlet extends HttpServlet {
 
         if (resource.isFile() && !isError) {
             eTag = generateETag(resource);
-            lastModifiedHttp = resource.getLastModifiedHttp();
+            lastModifiedHttp = getLastModifiedHttp(resource);
         }
 
         // Check if the conditions specified in the optional If headers are
@@ -1281,6 +1283,19 @@ public class DefaultServlet extends HttpServlet {
                 }
             }
         }
+    }
+
+
+    /*
+     * A last modified time in the future must be replaced with the message origination date (RFC 9110, section
+     * 8.8.2.1). This is done for each response so the metadata of the resource, which may be cached, is not changed.
+     */
+    private static String getLastModifiedHttp(WebResource resource) {
+        long now = System.currentTimeMillis();
+        if (resource.getLastModified() > now) {
+            return FastHttpDateFormat.formatDate(now);
+        }
+        return resource.getLastModifiedHttp();
     }
 
 

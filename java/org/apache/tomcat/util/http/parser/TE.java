@@ -21,6 +21,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -118,7 +119,8 @@ public class TE {
                     value = HttpParser.readTokenOrQuotedString(input, true);
                 }
                 if (name != null && value != null) {
-                    parameters.put(name, value);
+                    // Parameter names are case-insensitive (RFC 9110, section 5.6.6)
+                    parameters.put(name.toLowerCase(Locale.ENGLISH), value);
                 }
             }
 

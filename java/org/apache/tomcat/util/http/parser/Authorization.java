@@ -31,22 +31,20 @@ public class Authorization {
 
     static {
         // Digest field types.
-        // Note: These are more relaxed than RFC2617. This adheres to the
-        // recommendation of RFC2616 that servers are tolerant of buggy
-        // clients when they can be so without ambiguity.
+        // Note: These are more relaxed than RFC 7616 without introducing ambiguities
         fieldTypes.put("username", FieldType.QUOTED_STRING);
         fieldTypes.put("realm", FieldType.QUOTED_STRING);
         fieldTypes.put("nonce", FieldType.QUOTED_STRING);
-        fieldTypes.put("digest-uri", FieldType.QUOTED_STRING);
-        // RFC2617 says response is <">32LHEX<">. 32LHEX will also be accepted
+        fieldTypes.put("uri", FieldType.QUOTED_STRING);
+        // RFC 7616 says response is quoted lower case hex. unquoted will also be accepted
         fieldTypes.put("response", FieldType.LHEX);
-        // RFC2617 says algorithm is token. <">token<"> will also be accepted
+        // RFC 7616 says algorithm is token. <">token<"> will also be accepted
         fieldTypes.put("algorithm", FieldType.QUOTED_TOKEN);
         fieldTypes.put("cnonce", FieldType.QUOTED_STRING);
         fieldTypes.put("opaque", FieldType.QUOTED_STRING);
-        // RFC2617 says qop is token. <">token<"> will also be accepted
+        // RFC 7616 says qop is token. <">token<"> will also be accepted
         fieldTypes.put("qop", FieldType.QUOTED_TOKEN);
-        // RFC2617 says nc is 8LHEX. <">8LHEX<"> will also be accepted
+        // RFC 7616 says nc is 8LHEX. <">8LHEX<"> will also be accepted
         fieldTypes.put("nc", FieldType.LHEX);
 
     }
@@ -58,15 +56,15 @@ public class Authorization {
 
 
     /**
-     * Parses an HTTP Authorization header for DIGEST authentication as per RFC 2617 section 3.2.2.
+     * Parses an HTTP Authorization header for DIGEST authentication as per RFC 7616 section 3.4.
      *
      * @param input The header value to parse
      *
      * @return A map of directives and values as {@link String}s or <code>null</code> if a parsing error occurs.
      *             Although the values returned are {@link String}s they will have been validated to ensure that they
-     *             conform to RFC 2617.
+     *             conform to RFC 7616.
      *
-     * @throws IllegalArgumentException If the header does not conform to RFC 2617
+     * @throws IllegalArgumentException If the header does not conform to RFC 7616
      * @throws IOException              If an error occurs while reading the input
      */
     public static Map<String,String> parseAuthorizationDigest(StringReader input)
@@ -74,8 +72,20 @@ public class Authorization {
 
         Map<String,String> result = new HashMap<>();
 
-        if (HttpParser.skipConstant(input, "Digest") != SkipResult.FOUND) {
+        // The authentication scheme is case-insensitive (RFC 9110, section 11.1)
+        if (!"Digest".equalsIgnoreCase(HttpParser.readToken(input))) {
             return null;
+        }
+        // The scheme must be followed by at least one SP (RFC 9110, section 11.4)
+        input.mark(1);
+        int c = input.read();
+        if (c != -1 && c != ' ') {
+            return null;
+        }
+        input.reset();
+        // Empty list elements must be ignored (RFC 9110, section 5.6.1.2)
+        while (HttpParser.skipConstant(input, ",") == SkipResult.FOUND) {
+            // Skip
         }
         // All field names are valid tokens
         String field = HttpParser.readToken(input);
@@ -101,10 +111,19 @@ public class Authorization {
             if (value == null) {
                 return null;
             }
-            result.put(field, value);
-
-            if (HttpParser.skipConstant(input, ",") == SkipResult.NOT_FOUND) {
+            // The parameter names are case-insensitive (RFC 9110, section 11.2)
+            // Duplicate parameters are not allowed
+            if (result.put(field.toLowerCase(Locale.ENGLISH), value) != null) {
                 return null;
+            }
+
+            SkipResult skipResult = HttpParser.skipConstant(input, ",");
+            if (skipResult == SkipResult.NOT_FOUND) {
+                return null;
+            }
+            // Empty list elements must be ignored (RFC 9110, section 5.6.1.2)
+            while (skipResult == SkipResult.FOUND) {
+                skipResult = HttpParser.skipConstant(input, ",");
             }
             field = HttpParser.readToken(input);
             if (field == null) {

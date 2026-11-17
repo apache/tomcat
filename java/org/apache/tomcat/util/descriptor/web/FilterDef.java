@@ -235,14 +235,14 @@ public class FilterDef implements Serializable {
     /**
      * The async-supported setting for this filter.
      */
-    private String asyncSupported = null;
+    private Boolean asyncSupported = null;
 
     /**
      * Returns the async-supported setting for this filter.
      *
      * @return The async-supported value
      */
-    public String getAsyncSupported() {
+    public Boolean getAsyncSupported() {
         return asyncSupported;
     }
 
@@ -254,22 +254,11 @@ public class FilterDef implements Serializable {
      * @param asyncSupported The async-supported value
      */
     public void setAsyncSupported(String asyncSupported) {
-        this.asyncSupported = asyncSupported;
-        asyncSupportedBoolean = "true".equalsIgnoreCase(asyncSupported);
-    }
-
-    /**
-     * The async-supported boolean setting for this filter.
-     */
-    private boolean asyncSupportedBoolean = false;
-
-    /**
-     * Returns whether async processing is supported for this filter.
-     *
-     * @return True if async is supported, false otherwise
-     */
-    public boolean getAsyncSupportedBoolean() {
-        return asyncSupportedBoolean;
+        if (asyncSupported == null) {
+            this.asyncSupported = null;
+        } else {
+            this.asyncSupported = Boolean.valueOf(asyncSupported);
+        }
     }
 
     // --------------------------------------------------------- Public Methods

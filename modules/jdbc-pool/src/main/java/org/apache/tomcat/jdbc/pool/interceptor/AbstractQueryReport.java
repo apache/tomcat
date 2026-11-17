@@ -28,6 +28,8 @@ import java.sql.Statement;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.jdbc.pool.PoolUtilities;
+import org.apache.tomcat.jdbc.pool.util.ExceptionUtils;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
@@ -102,7 +104,11 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      *                  {@link AbstractCreateStatementInterceptor#isExecute(Method, boolean)}
      * @param start the wall clock time the query execution started
      * @param delta the time the execution took before it failed, measured with the monotonic clock
-     * @param t     the exception that happened
+     * @param t     the throwable the invocation raised; when it is an {@link java.lang.reflect.InvocationTargetException}
+     *                  the driver's exception is its cause, and that cause is what the application receives. A custom
+     *                  report hook that examines {@code t} should unwrap it with
+     *                  {@link org.apache.tomcat.jdbc.pool.util.ExceptionUtils#unwrapInvocationTargetException(Throwable)}
+     *                  to see the driver's exception rather than the reflective wrapper
      *
      * @return - the SQL that was executed or the string &quot;batch&quot; if it was a batch execution, or {@code null}
      *             if the invocation carries no SQL string
@@ -212,7 +218,11 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
             result = constructor.newInstance(new Object[] { new StatementProxy(statement, sql) });
             return result;
         } catch (Exception x) {
-            log.warn(MessageFactory.get("abstractQueryReport.unableToCreateStatementProxy"), x);
+            // A proxy constructor can wrap a fatal error from its handler in an InvocationTargetException; the fatal
+            // policy looks through that wrapper before the ordinary degradation below.
+            ExceptionUtils.handleThrowable(ExceptionUtils.unwrapInvocationTargetException(x));
+            log.warn(MessageFactory.get("abstractQueryReport.unableToCreateStatementProxy"),
+                    PoolUtilities.maskCredentials(x));
         }
         return statement;
     }
@@ -332,11 +342,13 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
                     try {
                         reportFailedQuery(query, args, name, start, failedDelta, t);
                     } catch (Throwable reporting) {
+                        ExceptionUtils.handleThrowable(reporting);
                         // Reporting must never disturb the application -
                         // the driver's exception is the one being thrown
                         if (log.isWarnEnabled()) {
                             log.warn(MessageFactory.get("abstractQueryReport.unableToProcessFailedQuery",
-                                    AbstractQueryReport.this.getClass().getName()), reporting);
+                                    AbstractQueryReport.this.getClass().getName()),
+                                    PoolUtilities.maskCredentials(reporting));
                         }
                     }
                 }
@@ -361,19 +373,21 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
                 try {
                     reportSlowQuery(query, args, name, start, delta);
                 } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
                     if (log.isWarnEnabled()) {
                         log.warn(MessageFactory.get("abstractQueryReport.unableToProcessSlowQuery",
-                                AbstractQueryReport.this.getClass().getName()), t);
+                                AbstractQueryReport.this.getClass().getName()), PoolUtilities.maskCredentials(t));
                     }
                 }
             } else if (process) {
                 try {
                     reportQuery(query, args, name, start, delta);
                 } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
                     // Reporting must never disturb the application
                     if (log.isWarnEnabled()) {
                         log.warn(MessageFactory.get("abstractQueryReport.unableToProcessQueryReport",
-                                AbstractQueryReport.this.getClass().getName()), t);
+                                AbstractQueryReport.this.getClass().getName()), PoolUtilities.maskCredentials(t));
                     }
                 }
             }

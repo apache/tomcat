@@ -48,6 +48,17 @@ public class TestTE {
     }
 
     @Test
+    public void testWeightNameCaseInsensitive() throws Exception {
+        // RFC 9110, section 5.6.6: parameter names are case-insensitive
+        List<TE> actual = TE.parse(new StringReader("gzip;Q=0.5, deflate;Q=0"));
+
+        Assert.assertEquals(1, actual.size());
+        Assert.assertEquals("gzip", actual.get(0).getEncoding());
+        Assert.assertEquals(Q0_500, actual.get(0).getQuality(), 0.0001);
+        Assert.assertTrue(actual.get(0).getParameters().isEmpty());
+    }
+
+    @Test
     public void testComplexTE2() throws Exception {
         List<TE> actual = TE.parse(new StringReader("gzip;q=0.5, something;q=0.05"));
 

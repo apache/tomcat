@@ -104,8 +104,9 @@ public final class ApplicationFilterChain implements FilterChain {
             ApplicationFilterConfig filterConfig = filters[pos++];
             try {
                 Filter filter = filterConfig.getFilter();
+                Boolean asyncSupported = filterConfig.getFilterDef().getAsyncSupported();
 
-                if (request.isAsyncSupported() && !(filterConfig.getFilterDef().getAsyncSupportedBoolean())) {
+                if (request.isAsyncSupported() && (asyncSupported == null || !asyncSupported.booleanValue())) {
                     request.setAttribute(Globals.ASYNC_SUPPORTED_ATTR, Boolean.FALSE);
                 }
                 filter.doFilter(request, response, this);
@@ -240,7 +241,8 @@ public final class ApplicationFilterChain implements FilterChain {
     public void findNonAsyncFilters(Set<String> result) {
         for (int i = 0; i < n; i++) {
             ApplicationFilterConfig filter = filters[i];
-            if (!(filter.getFilterDef().getAsyncSupportedBoolean())) {
+            Boolean asyncSupported = filter.getFilterDef().getAsyncSupported();
+            if (asyncSupported == null || !asyncSupported.booleanValue()) {
                 result.add(filter.getFilterClass());
             }
         }

@@ -15,6 +15,7 @@
  */
 package org.apache.tomcat.jdbc.pool.jmx;
 
+import java.lang.ref.WeakReference;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -38,6 +39,7 @@ import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorDefinition;
 import org.apache.tomcat.jdbc.pool.PoolUtilities;
 import org.apache.tomcat.jdbc.pool.Validator;
+import org.apache.tomcat.jdbc.pool.util.ExceptionUtils;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
@@ -94,6 +96,13 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
             new LinkedBlockingQueue<>(NOTIFY_QUEUE_CAPACITY), r -> {
                 Thread t = new Thread(r, "JDBC-Pool-JMX-Notifier");
                 t.setDaemon(true);
+                // The notifier is a static thread shared by every pool in the
+                // JVM. It must not inherit the context class loader of the
+                // caller that first reports a notification: a web application
+                // thread would pin that application's loader for the life of
+                // the worker. Keep it on the class loader that loaded this
+                // module instead, as the pool cleaner timer does.
+                t.setContextClassLoader(ConnectionPool.class.getClassLoader());
                 return t;
             });
 
@@ -187,6 +196,20 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     @Override
     public void postRegister(Boolean registrationDone) {
         if (!Boolean.TRUE.equals(registrationDone)) {
+            // A registration the server refused published no pool MBean, but
+            // a connection that connected while preRegister() had installed
+            // the requested name may have published itself below that name.
+            // No postDeregister() runs for a refused registration, so release
+            // those children here before the name is forgotten.
+            if (pool != null) {
+                try {
+                    pool.unregisterConnectionMBeans();
+                } catch (Throwable x) {
+                    ExceptionUtils.handleThrowable(x);
+                    log.warn("Unable to release the connection MBeans below a refused pool registration.",
+                            PoolUtilities.maskCredentials(x));
+                }
+            }
             this.oname = null;
         }
     }
@@ -196,17 +219,31 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     }
 
     /**
-     * Drops the registration name.
+     * Drops the registration name and releases the connection and interceptor MBeans published below it.
      * <p>
      * The MBean server invokes this when the MBean is deregistered, and the pool it wraps may well keep running - a
      * container that takes its DataSource back releases the pool MBean without closing the pool. From then on the name
      * resolves to no MBean: notifications the pool still raises must not attribute themselves to it (see
      * {@link #getNotificationSource()}, which falls back to naming the pool as a string), and no further MBean may be
-     * published below it. {@link #preRegister(MBeanServer, ObjectName)} writes the name again if this MBean is ever
-     * registered anew.
+     * published below it. A directly registered pool MBean has no data source to run the child release before the
+     * deregistration, so it is done here: leaving the children behind would keep the pool reachable from the MBean
+     * server through the very registration that was just removed. {@link #preRegister(MBeanServer, ObjectName)} writes
+     * the name again if this MBean is ever registered anew; a directly registered MBean must then call
+     * {@link org.apache.tomcat.jdbc.pool.ConnectionPool#registerConnectionMBeans()} itself to republish the children,
+     * while the {@link org.apache.tomcat.jdbc.pool.DataSource} registration path runs that sweep after a successful
+     * publish.
      */
     @Override
     public void postDeregister() {
+        if (pool != null) {
+            try {
+                pool.unregisterConnectionMBeans();
+            } catch (Throwable x) {
+                ExceptionUtils.handleThrowable(x);
+                log.warn("Unable to release the connection MBeans below a directly deregistered pool.",
+                        PoolUtilities.maskCredentials(x));
+            }
+        }
         this.oname = null;
     }
 
@@ -278,20 +315,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
             // listeners, it means nothing was queued at all. The order the
             // two halves of the delivery run in is the one the javadoc above
             // promises.
-            NOTIFIER.execute(() -> {
-                try {
-                    sendNotification(n);
-                } catch (Exception x) {
-                    // sendNotification contains what a listener or a filter
-                    // throws, job per job; this catch is a defence against a
-                    // failure escaping it, which must not skip the local
-                    // listeners of this notification
-                    if (log.isDebugEnabled()) {
-                        log.debug("JMX notification hand-off failed. Type=" + type, x);
-                    }
-                }
-                deliverLocally(n, type);
-            });
+            NOTIFIER.execute(new NotificationDelivery(n, type, new WeakReference<>(this)));
             return true;
         } catch (RejectedExecutionException x) {
             // The delivery queue is full; dropping the notification is the
@@ -302,7 +326,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
             return false;
         } catch (Exception x) {
             if (log.isDebugEnabled()) {
-                log.debug("Notify failed. Type=" + type + "; Message=" + message, x);
+                log.debug("Notify failed. Type=" + type + "; Message=" + message, PoolUtilities.maskCredentials(x));
             }
             return false;
         }
@@ -310,24 +334,47 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     }
 
     /**
-     * Hands a notification to the listeners registered with this MBean outside JMX. Runs on the notifier thread. Each
-     * listener is handed the notification on its own and what one of them throws is contained at that one listener: it
-     * may not kill the notifier thread that every pool in the JVM delivers its notifications on, and it may not
-     * suppress the delivery of that notification to the listeners registered behind the thrower either. An
-     * {@link Error} is not contained - as it is not on the JMX half of the delivery, where the JDK broadcaster catches
-     * only what a listener throws - and takes the notifier thread down; the pool replaces the worker as soon as the
-     * executor notices it is gone, so the next notification is delivered by a live worker.
-     *
-     * @param n    the notification to deliver
-     * @param type the notification type, for the failure log
+     * A delivery task handed to the shared notifier. It holds the MBean only through a weak reference, so a
+     * notification queued for a pool MBean that has been released or abandoned does not keep the pool, its sessions or
+     * its driver class loader reachable from the executor queue. The notification and the local listeners are read from
+     * the MBean when the task actually runs; if the MBean has been collected by then, neither it nor its listeners
+     * remain and there is nothing to deliver.
      */
-    private void deliverLocally(Notification n, String type) {
-        for (NotificationListener listener : listeners) {
+    private static final class NotificationDelivery implements Runnable {
+        private final Notification notification;
+        private final String type;
+        private final WeakReference<ConnectionPool> owner;
+
+        NotificationDelivery(Notification notification, String type, WeakReference<ConnectionPool> owner) {
+            this.notification = notification;
+            this.type = type;
+            this.owner = owner;
+        }
+
+        @Override
+        public void run() {
+            ConnectionPool mbean = owner.get();
+            if (mbean == null) {
+                return;
+            }
             try {
-                listener.handleNotification(n, this);
+                mbean.sendNotification(notification);
             } catch (Exception x) {
+                // sendNotification contains what a listener or a filter
+                // throws, job per job; this catch is a defence against a
+                // failure escaping it, which must not skip the local
+                // listeners of this notification.
                 if (log.isDebugEnabled()) {
-                    log.debug("Local notification listener failed. Type=" + type, x);
+                    log.debug("JMX notification hand-off failed. Type=" + type, PoolUtilities.maskCredentials(x));
+                }
+            }
+            for (NotificationListener listener : mbean.listeners) {
+                try {
+                    listener.handleNotification(notification, mbean);
+                } catch (Exception x) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Local notification listener failed. Type=" + type, PoolUtilities.maskCredentials(x));
+                    }
                 }
             }
         }
@@ -870,7 +917,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      */
     @Override
     public void setFairQueue(boolean fairQueue) {
-        throw new UnsupportedOperationException("fairQueue must be set before the pool is started");
+        throw new UnsupportedOperationException(MessageFactory.get("dataSourceProxy.startTimePropertyAfterStart", "fairQueue"));
     }
 
 
@@ -880,7 +927,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      */
     @Override
     public void setInitialSize(int initialSize) {
-        throw new UnsupportedOperationException("initialSize must be set before the pool is started");
+        throw new UnsupportedOperationException(MessageFactory.get("dataSourceProxy.startTimePropertyAfterStart", "initialSize"));
     }
 
 
@@ -897,7 +944,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      */
     @Override
     public void setJdbcInterceptors(String jdbcInterceptors) {
-        throw new UnsupportedOperationException("jdbcInterceptors must be set before the pool is started");
+        throw new UnsupportedOperationException(MessageFactory.get("dataSourceProxy.startTimePropertyAfterStart", "jdbcInterceptors"));
     }
 
 
@@ -908,7 +955,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      */
     @Override
     public void setJmxEnabled(boolean jmxEnabled) {
-        throw new UnsupportedOperationException("jmxEnabled must be set before the pool is started");
+        throw new UnsupportedOperationException(MessageFactory.get("dataSourceProxy.startTimePropertyAfterStart", "jmxEnabled"));
     }
 
 
@@ -1260,7 +1307,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      */
     @Override
     public void setIgnoreExceptionOnPreLoad(boolean ignoreExceptionOnPreLoad) {
-        throw new UnsupportedOperationException("ignoreExceptionOnPreLoad must be set before the pool is started");
+        throw new UnsupportedOperationException(MessageFactory.get("dataSourceProxy.startTimePropertyAfterStart", "ignoreExceptionOnPreLoad"));
     }
 
     /**

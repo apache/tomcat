@@ -246,7 +246,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
     }
 
     /**
-     * Get whether the URI should be validated as required by RFC2617.
+     * Get whether the URI should be validated as required by RFC 7616.
      *
      * @return {@code true} if URI validation is enabled
      */
@@ -255,7 +255,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
     }
 
     /**
-     * Set whether the URI should be validated as required by RFC2617.
+     * Set whether the URI should be validated as required by RFC 7616.
      *
      * @param validateUri {@code true} to enable URI validation
      */
@@ -715,7 +715,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
             if (cnonce == null || nc == null) {
                 return false;
             }
-            // RFC 2617 says nc must be 8 digits long. Older Android clients
+            // RFC 7616 says nc must be 8 digits long. Older Android clients
             // use 6. 2.3.5 < fixed Android version <= 4.0.3
             if (nc.length() < 6 || nc.length() > 8) {
                 return false;

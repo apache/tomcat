@@ -101,22 +101,22 @@ public class TestPQC extends TomcatBaseTest {
 
     @Test
     public void testHostMLDSA44() throws Exception {
-        File[] pqcFiles = configureHostMLDSA("ML-DSA-44");
-        doTestWithOpenSSLClient(pqcFiles[0].getAbsolutePath(), null, null, null);
+        configureHostMLDSA("ML-DSA-44");
+        doTestWithOpenSSLClient(getCaCertificateFile().getAbsolutePath(), null, null, null);
     }
 
 
     @Test
     public void testHostMLDSA65() throws Exception {
-        File[] pqcFiles = configureHostMLDSA("ML-DSA-65");
-        doTestWithOpenSSLClient(pqcFiles[0].getAbsolutePath(), null, null, null);
+        configureHostMLDSA("ML-DSA-65");
+        doTestWithOpenSSLClient(getCaCertificateFile().getAbsolutePath(), null, null, null);
     }
 
 
     @Test
     public void testHostMLDSA87() throws Exception {
-        File[] pqcFiles = configureHostMLDSA("ML-DSA-87");
-        doTestWithOpenSSLClient(pqcFiles[0].getAbsolutePath(), null, null, null);
+        configureHostMLDSA("ML-DSA-87");
+        doTestWithOpenSSLClient(getCaCertificateFile().getAbsolutePath(), null, null, null);
     }
 
     @Test
@@ -137,7 +137,7 @@ public class TestPQC extends TomcatBaseTest {
     public void testHostRSAwithX25519MLKEM768() throws Exception {
         configureHostRSA();
         configureHostWithGroup("X25519MLKEM768");
-        doTestWithOpenSSLClient(new File(TesterSupport.CA_CERT_PEM).getAbsolutePath(),
+        doTestWithOpenSSLClient(getCaCertificateFile().getAbsolutePath(),
                 "X25519MLKEM768", null, null);
     }
 
@@ -146,7 +146,7 @@ public class TestPQC extends TomcatBaseTest {
     public void testHostRSAwithSecP256r1MLKEM768() throws Exception {
         configureHostRSA();
         configureHostWithGroup("SecP256r1MLKEM768");
-        doTestWithOpenSSLClient(new File(TesterSupport.CA_CERT_PEM).getAbsolutePath(),
+        doTestWithOpenSSLClient(getCaCertificateFile().getAbsolutePath(),
                 "SecP256r1MLKEM768", null, null);
     }
 
@@ -154,45 +154,43 @@ public class TestPQC extends TomcatBaseTest {
     public void testHostRSAwithSecP384r1MLKEM1024() throws Exception {
         configureHostRSA();
         configureHostWithGroup("SecP384r1MLKEM1024");
-        doTestWithOpenSSLClient(new File(TesterSupport.CA_CERT_PEM).getAbsolutePath(),
+        doTestWithOpenSSLClient(getCaCertificateFile().getAbsolutePath(),
                 "SecP384r1MLKEM1024", null, null);
     }
 
     @Test
     public void testHostMLDSAwithX25519MLKEM768() throws Exception {
-        File[] pqcFiles = configureHostMLDSA("ML-DSA-65");
+        configureHostMLDSA("ML-DSA-65");
         configureHostWithGroup("X25519MLKEM768");
-        doTestWithOpenSSLClient(pqcFiles[0].getAbsolutePath(), "X25519MLKEM768", null, null);
+        doTestWithOpenSSLClient(getCaCertificateFile().getAbsolutePath(), "X25519MLKEM768", null, null);
     }
 
     @Test
     public void testHostMLDSAwithSecP256r1MLKEM768() throws Exception {
-        File[] pqcFiles = configureHostMLDSA("ML-DSA-65");
+        configureHostMLDSA("ML-DSA-65");
         configureHostWithGroup("SecP256r1MLKEM768");
-        doTestWithOpenSSLClient(pqcFiles[0].getAbsolutePath(), "SecP256r1MLKEM768", null, null);
+        doTestWithOpenSSLClient(getCaCertificateFile().getAbsolutePath(), "SecP256r1MLKEM768", null, null);
     }
 
     @Test
     public void testClientMLDSA() throws Exception {
         configureHostRSA();
-        File[] clientFiles = TesterKeystoreGenerator.generatePQCCertificate("testuser", "ML-DSA-65",
-                null, null);
+        File[] clientFiles = getTestUserMLDSA65Files();
         SSLHostConfig sslHostConfig = getTomcatInstance().getConnector().findSslHostConfigs()[0];
         sslHostConfig.setCertificateVerification("required");
-        sslHostConfig.setCaCertificateFile(clientFiles[0].getAbsolutePath());
-        doTestWithOpenSSLClient(new File(TesterSupport.CA_CERT_PEM).getAbsolutePath(), null,
+        sslHostConfig.setCaCertificateFile(getCaCertificateFile().getAbsolutePath());
+        doTestWithOpenSSLClient(getCaCertificateFile().getAbsolutePath(), null,
                 clientFiles[0].getAbsolutePath(), clientFiles[1].getAbsolutePath());
     }
 
     @Test
     public void testClientMLDSAwithMLDSAServer() throws Exception {
-        File[] serverFiles = configureHostMLDSA("ML-DSA-65");
-        File[] clientFiles = TesterKeystoreGenerator.generatePQCCertificate("testuser", "ML-DSA-65",
-                null, null);
+        configureHostMLDSA("ML-DSA-65");
+        File[] clientFiles = getTestUserMLDSA65Files();
         SSLHostConfig sslHostConfig = getTomcatInstance().getConnector().findSslHostConfigs()[0];
         sslHostConfig.setCertificateVerification("required");
-        sslHostConfig.setCaCertificateFile(clientFiles[0].getAbsolutePath());
-        doTestWithOpenSSLClient(serverFiles[0].getAbsolutePath(), null,
+        sslHostConfig.setCaCertificateFile(getCaCertificateFile().getAbsolutePath());
+        doTestWithOpenSSLClient(getCaCertificateFile().getAbsolutePath(), null,
                 clientFiles[0].getAbsolutePath(), clientFiles[1].getAbsolutePath());
     }
 
@@ -230,20 +228,43 @@ public class TestPQC extends TomcatBaseTest {
         }
     }
 
-    private File[] configureHostMLDSA(String algorithm) throws Exception {
-        File[] pqcFiles = TesterKeystoreGenerator.generatePQCCertificate("localhost", algorithm,
-                new String[] { "localhost" }, null);
+    private File getCaCertificateFile() {
+        return new File(TesterSupport.CA_CERT_PEM);
+    }
+
+    private File[] getTestUserMLDSA65Files() {
+        return new File[] { new File(TesterSupport.TESTUSER_MLDSA_65_CERT_PEM),
+                new File(TesterSupport.TESTUSER_MLDSA_65_KEY_PEM) };
+    }
+
+    private void configureHostMLDSA(String algorithm) {
+        String certFile;
+        String keyFile;
+        switch (algorithm) {
+            case "ML-DSA-44":
+                certFile = TesterSupport.LOCALHOST_MLDSA_44_CERT_PEM;
+                keyFile = TesterSupport.LOCALHOST_MLDSA_44_KEY_PEM;
+                break;
+            case "ML-DSA-65":
+                certFile = TesterSupport.LOCALHOST_MLDSA_65_CERT_PEM;
+                keyFile = TesterSupport.LOCALHOST_MLDSA_65_KEY_PEM;
+                break;
+            case "ML-DSA-87":
+                certFile = TesterSupport.LOCALHOST_MLDSA_87_CERT_PEM;
+                keyFile = TesterSupport.LOCALHOST_MLDSA_87_KEY_PEM;
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown ML-DSA algorithm [" + algorithm + "]");
+        }
 
         Tomcat tomcat = getTomcatInstance();
         Connector connector = tomcat.getConnector();
         SSLHostConfig sslHostConfig = connector.findSslHostConfigs()[0];
 
         SSLHostConfigCertificate cert = new SSLHostConfigCertificate(sslHostConfig, Type.MLDSA);
-        cert.setCertificateFile(pqcFiles[0].getAbsolutePath());
-        cert.setCertificateKeyFile(pqcFiles[1].getAbsolutePath());
+        cert.setCertificateFile(new File(certFile).getAbsolutePath());
+        cert.setCertificateKeyFile(new File(keyFile).getAbsolutePath());
         sslHostConfig.addCertificate(cert);
-
-        return pqcFiles;
     }
 
     private void configureHostRSA() {

@@ -303,8 +303,9 @@ public class HttpParser {
         if (s.isEmpty()) {
             return false;
         }
-        for (char c : s.toCharArray()) {
-            if (!isToken(c)) {
+        // Use charAt() rather than toCharArray() to avoid copying the String
+        for (int i = 0; i < s.length(); i++) {
+            if (!isToken(s.charAt(i))) {
                 return false;
             }
         }
@@ -834,7 +835,7 @@ public class HttpParser {
         if (c == -1 || c == delimiter) {
             // No q value just whitespace
             return 1;
-        } else if (c != 'q') {
+        } else if (c != 'q' && c != 'Q') {
             // Malformed. Use quality of -1 so it is dropped.
             skipUntil(input, c, delimiter);
             return -1;

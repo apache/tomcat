@@ -746,6 +746,10 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
                 if (parsingRequestLine) {
                     // Avoid unknown protocol triggering an additional error
                     request.protocol().setString(Constants.HTTP_11);
+                    if (parsingRequestLinePhase == 4) {
+                        // The buffer filled while reading the request target (RFC 9112, section 3)
+                        throw new RequestTargetTooLongException(sm.getString("iib.requesttargettoolong.error"));
+                    }
                 }
                 throw new IllegalArgumentException(sm.getString("iib.requestheadertoolarge.error"));
             }

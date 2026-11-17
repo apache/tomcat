@@ -68,7 +68,7 @@ final class XABranchTracker implements XAConnection {
             globalId = gtid == null ? new byte[0] : gtid.clone();
             byte[] bqual = xid.getBranchQualifier();
             branchId = bqual == null ? new byte[0] : bqual.clone();
-            hash = Arrays.hashCode(globalId) * 31 + formatId;
+            hash = (Arrays.hashCode(globalId) * 31 + formatId) * 31 + Arrays.hashCode(branchId);
         }
 
         @Override
@@ -95,11 +95,14 @@ final class XABranchTracker implements XAConnection {
 
     /**
      * Branches started on this session that the resource manager still
-     * considers attached to it. {@code end()} does not detach a branch -
-     * only commit, rollback or a successful forget does, and neither does a
-     * refusal of any of them: a branch whose resolution failed stays booked,
-     * because whether the resource manager kept it is then unknown and
-     * retiring the session is the only safe answer.
+     * considers attached to it. A branch is booked before its {@code start()}
+     * reaches the driver, so a concurrent return sees it as soon as the driver
+     * can have accepted it, and a start the driver refuses removes a key it
+     * newly booked. {@code end()} does not detach a branch - only commit,
+     * rollback or a successful forget does, and neither does a refusal of any
+     * of them: a branch whose resolution failed stays booked, because whether
+     * the resource manager kept it is then unknown and retiring the session is
+     * the only safe answer.
      */
     private final Set<XidKey> unresolved = ConcurrentHashMap.newKeySet();
 
@@ -129,7 +132,7 @@ final class XABranchTracker implements XAConnection {
      * Marks the session behind this handle as retired, from the pool's
      * disconnect path. After this, no branch work is accepted any more.
      */
-    void markClosed() {
+    synchronized void markClosed() {
         closed = true;
     }
 
@@ -224,13 +227,22 @@ final class XABranchTracker implements XAConnection {
 
         @Override
         public void start(Xid xid, int flags) throws XAException {
+            XidKey key = new XidKey(xid);
+            // Book the branch before handing the call to the driver. A return or abandon running concurrently must
+            // see the branch as soon as the driver can have accepted it; booking only after start() returned left a
+            // window in which the session could be pooled with the accepted branch attached. A failed start removes a
+            // newly booked key again; a key that was already present (a join or resume of a live branch) stays
+            // booked, since its branch was not created by this call.
             refuseRetiredSession();
-            delegate.start(xid, flags);
-            // Booked only once the resource manager accepted the branch: a
-            // refused start attached nothing to this session, so it leaves no
-            // debt. Joined and resumed branches land on the same key, so the
-            // set counts branches, not calls.
-            unresolved.add(new XidKey(xid));
+            boolean added = unresolved.add(key);
+            try {
+                delegate.start(xid, flags);
+            } catch (XAException x) {
+                if (added) {
+                    unresolved.remove(key);
+                }
+                throw x;
+            }
         }
 
         @Override
@@ -275,16 +287,19 @@ final class XABranchTracker implements XAConnection {
 
         @Override
         public Xid[] recover(int flag) throws XAException {
+            refuseRetiredSession();
             return delegate.recover(flag);
         }
 
         @Override
         public boolean setTransactionTimeout(int seconds) throws XAException {
+            refuseRetiredSession();
             return delegate.setTransactionTimeout(seconds);
         }
 
         @Override
         public int getTransactionTimeout() throws XAException {
+            refuseRetiredSession();
             return delegate.getTransactionTimeout();
         }
 

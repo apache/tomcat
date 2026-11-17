@@ -77,17 +77,33 @@ public class TestDefaultServletIfMatchRequests extends TomcatBaseTest {
             parameterSets.add(new Object[] { resourceWithStrongETag, null, RC_200, RC_200 });
 
             // match header is invalid
-            parameterSets.add(new Object[] { resourceWithStrongETag, "", RC_400, RC_400 });
             parameterSets.add(new Object[] { resourceWithStrongETag, "W", RC_400, RC_400 });
             parameterSets.add(new Object[] { resourceWithStrongETag, "W/", RC_400, RC_400 });
             parameterSets.add(new Object[] { resourceWithStrongETag, "w/" + resourceETagStrong, RC_400, RC_400 });
             parameterSets.add(new Object[] { resourceWithStrongETag, resourceETagStrong + " x", RC_400, RC_400 });
             parameterSets.add(new Object[] { resourceWithStrongETag, resourceETagStrong + "x", RC_400, RC_400 });
+
+            // match header is a list that contains no entity tag (RFC 9110, section 5.6.1.2). It is valid but nothing
+            // in it can match.
+            parameterSets.add(new Object[] { resourceWithStrongETag, "", RC_412, RC_200 });
             for (String concat : CONCAT) {
-                parameterSets.add(new Object[] { resourceWithStrongETag, concat + resourceETagStrong, RC_400, RC_400 });
-                parameterSets.add(new Object[] { resourceWithStrongETag, concat + resourceETagWeak, RC_400, RC_400 });
-                parameterSets.add(new Object[] { resourceWithStrongETag, resourceETagStrong + concat, RC_400, RC_400 });
-                parameterSets.add(new Object[] { resourceWithStrongETag, resourceETagWeak + concat, RC_400, RC_400 });
+                parameterSets.add(new Object[] { resourceWithStrongETag, concat, RC_412, RC_200 });
+            }
+
+            // empty list elements are ignored (RFC 9110, section 5.6.1.2) so the result is the same as without them
+            // The strong tag only matches a resource that has a strong tag. The weak tag never matches for If-Match.
+            Integer rcIfMatchStrongTag = resourceWithStrongETag.booleanValue() ? RC_200 : RC_412;
+            Integer rcIfNoneMatchStrongTag = resourceWithStrongETag.booleanValue() ? RC_304 : RC_200;
+            Integer rcIfNoneMatchWeakTag = resourceWithStrongETag.booleanValue() ? RC_200 : RC_304;
+            for (String concat : CONCAT) {
+                parameterSets.add(new Object[] { resourceWithStrongETag, concat + resourceETagStrong,
+                        rcIfMatchStrongTag, rcIfNoneMatchStrongTag });
+                parameterSets.add(new Object[] { resourceWithStrongETag, resourceETagStrong + concat,
+                        rcIfMatchStrongTag, rcIfNoneMatchStrongTag });
+                parameterSets.add(new Object[] { resourceWithStrongETag, concat + resourceETagWeak, RC_412,
+                        rcIfNoneMatchWeakTag });
+                parameterSets.add(new Object[] { resourceWithStrongETag, resourceETagWeak + concat, RC_412,
+                        rcIfNoneMatchWeakTag });
             }
 
             // match header always matches resource (leading and trailing space should be ignored)

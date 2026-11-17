@@ -23,6 +23,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,7 +41,9 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
+import org.apache.tomcat.jdbc.pool.PoolUtilities;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
+import org.apache.tomcat.jdbc.pool.ProxyConnection;
 import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
 import org.apache.tomcat.jdbc.pool.util.ExceptionUtils;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
@@ -84,6 +87,8 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
     protected static final String STATEMENT_CACHE_ATTR = StatementCache.class.getName() + ".cache";
 
     private static final String SET_POOLABLE = "setPoolable";
+    private static final String SET_CURSOR_NAME = "setCursorName";
+    private static final String REGISTER_OUT_PARAMETER = "registerOutParameter";
 
     /**
      * State of the one look for a tracker beneath this interceptor: the chain has not been looked at yet.
@@ -112,6 +117,15 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
     // Re-armed on every borrow and read from management/close threads.
     private volatile PooledConnection pcon;
     private volatile String[] types;
+
+    /**
+     * The {@link ProxyConnection} at the tail of this interceptor's chain,
+     * resolved once on first use. Only the tail's identity of the handle the
+     * current borrow runs under can tell a cache hit of that borrow from one
+     * left parked above this cache across a clean recycle (see
+     * {@link #servesCurrentBorrow(Object)}).
+     */
+    private volatile ProxyConnection chainFence = null;
 
     private ObjectName oname = null;
 
@@ -164,14 +178,17 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
         super.setProperties(properties);
         InterceptorProperty p = properties.get("prepared");
         if (p != null) {
+            warnInvalidBoolean("prepared", p, cachePrepared);
             cachePrepared = p.getValueAsBoolean(cachePrepared);
         }
         p = properties.get("callable");
         if (p != null) {
+            warnInvalidBoolean("callable", p, cacheCallable);
             cacheCallable = p.getValueAsBoolean(cacheCallable);
         }
         p = properties.get("max");
         if (p != null) {
+            warnInvalidInteger("max", p, maxCacheSize);
             maxCacheSize = p.getValueAsInt(maxCacheSize);
         }
         if (cachePrepared && cacheCallable) {
@@ -184,6 +201,42 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
             this.types = NO_TYPE;
         }
 
+    }
+
+    /**
+     * Warns when a boolean property was supplied with a value the property parser does not recognise. The parser keeps
+     * the current value silently, which hides a configuration typo.
+     *
+     * @param name  the property name
+     * @param property the supplied property
+     * @param current the value that will be kept
+     */
+    private void warnInvalidBoolean(String name, InterceptorProperty property, boolean current) {
+        String value = property.getValue();
+        if (value != null && !"true".equals(value) && !"false".equals(value)) {
+            log.warn(MessageFactory.get("interceptor.invalidBooleanProperty", name, value,
+                    Boolean.valueOf(current)));
+        }
+    }
+
+    /**
+     * Warns when an integer property was supplied with a value the property parser cannot read. The parser keeps the
+     * current value silently, which hides a configuration typo.
+     *
+     * @param name  the property name
+     * @param property the supplied property
+     * @param current the value that will be kept
+     */
+    private void warnInvalidInteger(String name, InterceptorProperty property, int current) {
+        String value = property.getValue();
+        if (value != null) {
+            try {
+                Integer.parseInt(value);
+            } catch (NumberFormatException x) {
+                log.warn(MessageFactory.get("interceptor.invalidIntegerProperty", name, value,
+                        Integer.valueOf(current)));
+            }
+        }
     }
 
     private static final Map<ConnectionPool, AtomicInteger> cacheSizeMap =
@@ -316,16 +369,41 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
         // exactly the entries the purge owns. Each removal decrements the
         // counter once; closing runs after the sweep because it reaches the
         // driver.
+        AtomicInteger size = cacheSize;
         draining = true;
         if (statements != null) {
             do {
+                boolean removed = false;
                 for (Map.Entry<CacheKey, CachedStatement> entry : statements.entrySet()) {
                     CachedStatement statement = entry.getValue();
-                    if (statement != null && removeStatementInternal(statement)) {
+                    if (statement != null && statements.remove(entry.getKey(), statement)) {
+                        removed = true;
                         if (toClose == null) {
                             toClose = new ArrayList<>();
                         }
                         toClose.add(statement);
+                        if (size != null) {
+                            size.decrementAndGet();
+                        }
+                    }
+                }
+                if (!removed) {
+                    // No entry could be removed by identity: the value under
+                    // a key changed or the map is otherwise unable to make
+                    // progress for this call. The purge owns every entry in
+                    // the cache now, so take the remaining mappings and close
+                    // what they hold rather than looping forever.
+                    for (Map.Entry<CacheKey, CachedStatement> entry : statements.entrySet()) {
+                        CachedStatement statement = statements.remove(entry.getKey());
+                        if (statement != null) {
+                            if (toClose == null) {
+                                toClose = new ArrayList<>();
+                            }
+                            toClose.add(statement);
+                            if (size != null) {
+                                size.decrementAndGet();
+                            }
+                        }
                     }
                 }
             } while (!statements.isEmpty());
@@ -338,6 +416,48 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
 
         super.disconnected(parent, con, finalizing);
     }
+
+    /**
+     * Resolves, once, the proxy connection at the tail of the chain this
+     * interceptor serves in. The chain wiring is fixed when it is built and an
+     * interceptor instance belongs to exactly one chain, so the walk below
+     * runs until the tail is found and then never again.
+     *
+     * @return the tail of the chain, or {@code null} if there is none
+     */
+    private ProxyConnection resolveChainFence() {
+        ProxyConnection tail = chainFence;
+        if (tail == null) {
+            JdbcInterceptor link = this;
+            while (link != null && !(link instanceof ProxyConnection)) {
+                link = link.getNext();
+            }
+            if (link instanceof ProxyConnection) {
+                tail = (ProxyConnection) link;
+                chainFence = tail;
+            }
+        }
+        return tail;
+    }
+
+
+    /**
+     * Whether the calling handle is the handle of the borrow this cache is
+     * currently armed for. A call that entered the chain during one borrow can
+     * finish after that borrow has ended and after the pooled connection has
+     * been handed to the next borrower; a cache hit must not be served to such
+     * a call, because the hit answers above the tail's borrow fence and would
+     * remove and re-bind the cached statement for a borrow that is over.
+     *
+     * @param proxy the connection handle the call arrived on
+     *
+     * @return true if the handle names the current borrow
+     */
+    private boolean servesCurrentBorrow(Object proxy) {
+        ProxyConnection fence = resolveChainFence();
+        return fence != null && proxy != null && proxy == fence.getBorrowHandle();
+    }
+
 
     /**
      * Closes the given cached statement by forcing it to close.
@@ -376,6 +496,15 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
         if (process && args.length > 0 && args[0] instanceof String) {
             CachedStatement statement = isCached(method, args);
             if (statement != null && removeStatement(statement)) {
+                if (!servesCurrentBorrow(proxy)) {
+                    // The call that reached this hit belongs to a borrow that
+                    // has already ended. The entry has been taken out of the
+                    // cache for this call, so close it rather than handing a
+                    // sealed per-borrow statement handle to the old caller;
+                    // the next borrower must see a fresh prepare.
+                    closeStatement(statement);
+                    throw new SQLException(MessageFactory.get("statementCache.connectionClosedOrAbandoned"));
+                }
                 if (statement.getAssociatedConnection() != currentPhysicalConnection()) {
                     // The entry belongs to a connection that has been
                     // replaced (a statement close that raced a reconnect
@@ -438,29 +567,32 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
         if (draining) {
             return false;
         }
-        boolean parked = cacheStatementInternal(proxy);
-        if (parked && draining) {
-            // The purge may have started while this park was in flight. If
-            // the entry is still ours, withdraw it and let the caller close
-            // it; if the purge already removed it, the purge closes it.
-            return !removeStatementInternal(proxy);
-        }
-        return parked;
-    }
-
-    private boolean cacheStatementInternal(CachedStatement proxy) {
+        // Capture both the map and the counter once. A disposal can null the
+        // counter field while this park is in flight; the captured counter
+        // object still has to receive the reservation withdrawal, and the
+        // captured map still contains the entry to withdraw.
         ConcurrentHashMap<CacheKey, CachedStatement> cache = getCache();
-        // Read the counter once, like getCacheSize() and closeInvoked() do:
-        // a disposal (the reset(null, null) walks) nulls the field, and every
-        // read of the field itself - here at the entry check, and again in the
-        // withdrawal below - could meet a null in the middle of this call, so
-        // that the withdrawal throws and the increment this call made is never
-        // returned to the counter the whole pool shares. The counter object
-        // outlives the field's nulling, so a local keeps it reachable.
         AtomicInteger size = cacheSize;
         if (cache == null || size == null) {
             return false;
         }
+        boolean parked = cacheStatementInternal(cache, size, proxy);
+        if (parked && (draining || cacheSize != size)) {
+            // The purge may have started while this park was in flight, or the
+            // cache may have been disposed. If the entry is still ours,
+            // withdraw it and let the caller close it; if the purge already
+            // removed it, the purge closes it.
+            if (cache.remove(proxy.getCacheKey(), proxy)) {
+                size.decrementAndGet();
+                return false;
+            }
+            return true;
+        }
+        return parked;
+    }
+
+    private boolean cacheStatementInternal(ConcurrentHashMap<CacheKey, CachedStatement> cache, AtomicInteger size,
+            CachedStatement proxy) {
         if (proxy.getCacheKey() == null) {
             return false;
         } else if (proxy.getAssociatedConnection() != currentPhysicalConnection()) {
@@ -668,6 +800,23 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
          * {@code isPoolable()}.
          */
         private boolean poolable = true;
+        /**
+         * Whether the application set a cursor name on this statement. A
+         * cached statement must not hand a previous borrower's cursor name to
+         * the next one, so a park clears it first; the flag avoids calling
+         * {@code setCursorName(null)} on drivers that do not support cursor
+         * names when the application never used one.
+         */
+        private volatile boolean cursorNameSet = false;
+        /**
+         * Whether the application registered a callable statement out
+         * parameter. JDBC has no standard way to clear those registrations
+         * (clearing parameters releases values, not registrations), so a
+         * statement with any registered out parameter is closed rather than
+         * parked. Reusing it could otherwise expose a stale registration to
+         * the next borrower.
+         */
+        private volatile boolean outParametersRegistered = false;
 
         /**
          * Constructs a CachedStatement, recording the physical connection the statement was prepared on as the
@@ -760,7 +909,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
                 // is nothing left to reset or park.
                 return;
             }
-            if (size != null && size.get() < maxCacheSize && !trackerBelow()) {
+            if (size != null && size.get() < maxCacheSize && !trackerBelow() && !outParametersRegistered) {
                 // A tracker beneath this cache (see trackerBelow) would close a
                 // parked statement at the connection return, so the park is
                 // refused here and the close falls to the normal path below.
@@ -776,6 +925,11 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
                 try {
                     // Only cache if statement has been marked as poolable and not close on completion
                     if (poolable && !delegate.isCloseOnCompletion()) {
+                        // Clear a cursor name the application installed before
+                        // the statement is handed to another borrow.
+                        if (cursorNameSet) {
+                            delegate.setCursorName(null);
+                        }
                         // Clear Resultset
                         ResultSet result = delegate.getResultSet();
                         if (result != null && !result.isClosed()) {
@@ -795,6 +949,12 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
                         delegate.setMaxFieldSize(0);
                         // Reset max rows
                         delegate.setMaxRows(0);
+                        // Reset the JDBC 4.2 large variants as well. A
+                        // driver that does not implement them has no such
+                        // state to reset; a driver that implements them but
+                        // refuses the reset leaves the recycle to the normal
+                        // close path through the enclosing catch.
+                        resetLargeStatementState(delegate);
                         // Reset fetchsize
                         delegate.setFetchSize(0);
                         // Reset the escape processing
@@ -815,11 +975,15 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
                     // other statement parked under the same key alone. A
                     // non-fatal Error is the same failed recycle as an
                     // unchecked exception: close the handle through the normal
-                    // path instead of leaving it open and unretired.
-                    ExceptionUtils.handleThrowable(x);
+                    // path instead of leaving it open and unretired. A proxy
+                    // constructor may wrap a fatal error in an
+                    // InvocationTargetException, so the fatal policy looks
+                    // through that wrapper.
+                    ExceptionUtils.handleThrowable(ExceptionUtils.unwrapInvocationTargetException(x));
                     removeStatement(proxy);
                     if (log.isDebugEnabled()) {
-                        log.debug("Unable to recycle statement: " + sqlForLog(getSql()), x);
+                        log.debug("Unable to recycle statement: " + sqlForLog(getSql()),
+                                PoolUtilities.maskCredentials(x));
                     }
                 }
             }
@@ -838,11 +1002,34 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
             }
         }
 
+        /**
+         * Resets the JDBC 4.2 large statement row limit. Drivers compiled before JDBC 4.2 may not implement the optional
+         * method; such a driver has no large-limit state to reset, so an unsupported call is ignored. A driver that
+         * implements the method and refuses the reset propagates the failure, causing this statement to be closed
+         * rather than returned to the cache with an unknown limit.
+         *
+         * @param statement the statement whose large row limit to reset
+         *
+         * @throws SQLException if the driver refuses to reset a supported large row limit
+         */
+        private void resetLargeStatementState(PreparedStatement statement) throws SQLException {
+            try {
+                statement.setLargeMaxRows(0L);
+            } catch (SQLFeatureNotSupportedException | UnsupportedOperationException | AbstractMethodError x) {
+                // The driver does not support this optional JDBC 4.2 call;
+                // there is no state to reset.
+            }
+        }
+
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             Object result = super.invoke(proxy, method, args);
             if (compare(SET_POOLABLE, method)) {
                 poolable = ((Boolean) args[0]).booleanValue();
+            } else if (compare(SET_CURSOR_NAME, method)) {
+                cursorNameSet = args != null && args.length > 0 && args[0] != null;
+            } else if (compare(REGISTER_OUT_PARAMETER, method)) {
+                outParametersRegistered = true;
             }
             return result;
         }
@@ -862,7 +1049,8 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
                 // A non-fatal Error from the driver's close is a failed close
                 // here, not a reason to abort the remainder of the purge.
                 ExceptionUtils.handleThrowable(x);
-                log.warn(MessageFactory.get("statementCache.unableToCloseDiscardedStatement", sqlForLog(getSql())), x);
+                log.warn(MessageFactory.get("statementCache.unableToCloseDiscardedStatement", sqlForLog(getSql())),
+                        PoolUtilities.maskCredentials(x));
             }
         }
 

@@ -40,6 +40,7 @@ import javax.naming.spi.ObjectFactory;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ClassLoaderUtil;
+import org.apache.tomcat.jdbc.pool.PoolUtilities;
 import org.apache.tomcat.jdbc.pool.util.ExceptionUtils;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
@@ -299,15 +300,15 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
 
         } catch (IllegalArgumentException ex2) {
             log.warn(MessageFactory.get("genericNamingResourcesFactory.unableToSetProperty",
-                    name, o.getClass().getName()), ex2);
+                    name, o.getClass().getName()), PoolUtilities.maskCredentials(ex2));
             return SetResult.REPORTED;
         } catch (SecurityException ex1) {
             log.warn(MessageFactory.get("genericNamingResourcesFactory.securityExceptionSettingProperty",
-                    name, o.getClass().getName()), ex1);
+                    name, o.getClass().getName()), PoolUtilities.maskCredentials(ex1));
             return SetResult.REPORTED;
         } catch (IllegalAccessException iae) {
             log.warn(MessageFactory.get("genericNamingResourcesFactory.illegalAccessExceptionSettingProperty",
-                    name, o.getClass().getName()), iae);
+                    name, o.getClass().getName()), PoolUtilities.maskCredentials(iae));
             return SetResult.REPORTED;
         } catch (InvocationTargetException ie) {
             // ExceptionUtils.handleThrowable() propagates the fatal
@@ -318,7 +319,7 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
             Throwable cause = ie.getCause();
             ExceptionUtils.handleThrowable(cause);
             log.warn(MessageFactory.get("genericNamingResourcesFactory.setterThrew",
-                    name, o.getClass().getName()), ie);
+                    name, o.getClass().getName()), PoolUtilities.maskCredentials(ie));
             return SetResult.REPORTED;
         }
         return SetResult.UNREPORTED;

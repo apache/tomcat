@@ -363,7 +363,11 @@ public class ServletDef implements Serializable {
      * @param asyncSupported whether async is supported as a string
      */
     public void setAsyncSupported(String asyncSupported) {
-        this.asyncSupported = Boolean.valueOf(asyncSupported);
+        if (asyncSupported == null) {
+            this.asyncSupported = null;
+        } else {
+            this.asyncSupported = Boolean.valueOf(asyncSupported);
+        }
     }
 
 

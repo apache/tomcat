@@ -209,6 +209,21 @@ public class TestAcceptEncoding {
     }
 
 
+    /*
+     * RFC 9110, section 12.4.2: the weight is "q=" qvalue. ABNF strings are case-insensitive (RFC 5234, section 2.3) and
+     * parameter names are case-insensitive (RFC 9110, section 5.6.6).
+     */
+    @Test
+    public void testWeightNameCaseInsensitive() throws Exception {
+        List<AcceptEncoding> actual = parse("gzip;Q=0.5, br;Q=0, *;Q=1");
+
+        Assert.assertEquals(3, actual.size());
+        assertEntry(actual.get(0), "gzip", 0.5);
+        assertEntry(actual.get(1), "br", 0);
+        assertEntry(actual.get(2), "*", 1);
+    }
+
+
     private static List<AcceptEncoding> parse(String header) throws IOException {
         return AcceptEncoding.parse(new StringReader(header));
     }

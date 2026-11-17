@@ -273,6 +273,12 @@ public class TestELProcessor extends ELBaseTest {
 
 
     @Test
+    public void testDefineFunctionArraySpaceBeforeBrackets() throws Exception {
+        doDefineFunctionSignature("test", "void doIt(Integer [])", "test", "fn:test([1].stream().toArray())", "F");
+    }
+
+
+    @Test
     public void testDefineFunctionVarArgsWithSpace() throws Exception {
         doDefineFunctionSignature("test", "void doIt( long ... )", "test", "fn:test(1,2)", "H");
     }
@@ -287,6 +293,18 @@ public class TestELProcessor extends ELBaseTest {
             return;
         }
         Assert.fail("Invalid signature [" + signature + "] was accepted");
+    }
+
+
+    @Test
+    public void testDefineFunctionInvalidTrailingNonsense01() {
+        doDefineFunctionInvalidSignature("void doIt() nonsense");
+    }
+
+
+    @Test
+    public void testDefineFunctionInvalidTrailingNonsense02() {
+        doDefineFunctionInvalidSignature("void doIt(int) nonsense");
     }
 
 

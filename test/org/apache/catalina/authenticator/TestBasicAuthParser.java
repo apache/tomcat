@@ -98,8 +98,8 @@ public class TestBasicAuthParser {
     }
 
     /*
-     * RFC 2045 says the Base64 encoded string should be represented as lines of no more than 76 characters. However,
-     * RFC 2617 says a base64-user-pass token is not limited to 76 char/line.
+     * RFC 7617 uses token68 which in this case holds base 64 without whitespace so there is no 76 character per line
+     * limit.
      */
     @Test
     public void testGoodCribBase64Big() throws Exception {
@@ -116,7 +116,7 @@ public class TestBasicAuthParser {
 
 
     /*
-     * verify the parser follows RFC2617 by treating the auth-scheme token as case-insensitive.
+     * Verify the parser follows RFC 9110 by treating the auth-scheme token as case-insensitive.
      */
     @Test
     public void testAuthMethodCaseBasic() throws Exception {
@@ -141,14 +141,29 @@ public class TestBasicAuthParser {
     }
 
     /*
-     * Confirm the Basic parser allows exactly one space after the authentication method.
+     * RFC 9110, section 11.4: the authentication scheme is followed by one or more space characters.
+     */
+    @Test
+    public void testAuthMethodMultipleSpaces() throws Exception {
+        final BasicAuthHeader AUTH_HEADER = new BasicAuthHeader(NICE_METHOD + "   ", USER_NAME, PASSWORD);
+        BasicAuthenticator.BasicCredentials credentials =
+                new BasicAuthenticator.BasicCredentials(AUTH_HEADER.getHeader(), StandardCharsets.UTF_8);
+        Assert.assertEquals(USER_NAME, credentials.getUsername());
+        Assert.assertEquals(PASSWORD, credentials.getPassword());
+    }
+
+    /*
+     * Confirm the Basic parser rejects an authentication method that is not followed by a space character.
      */
     @Test(expected = IllegalArgumentException.class)
-    public void testAuthMethodExtraLeadingSpace() throws Exception {
-        final BasicAuthHeader AUTH_HEADER = new BasicAuthHeader(NICE_METHOD + " ", USER_NAME, PASSWORD);
+    public void testAuthMethodNoSpace() throws Exception {
+        final String blob = Base64.getEncoder().encodeToString((USER_NAME + ":" + PASSWORD).getBytes(StandardCharsets.ISO_8859_1));
+        final byte[] header = (NICE_METHOD + blob).getBytes(StandardCharsets.ISO_8859_1);
+        final ByteChunk input = new ByteChunk();
+        input.setBytes(header, 0, header.length);
         @SuppressWarnings("unused")
         final BasicAuthenticator.BasicCredentials credentials =
-                new BasicAuthenticator.BasicCredentials(AUTH_HEADER.getHeader(), StandardCharsets.UTF_8);
+                new BasicAuthenticator.BasicCredentials(input, StandardCharsets.UTF_8);
     }
 
 
