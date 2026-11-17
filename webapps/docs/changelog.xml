@@ -181,6 +181,10 @@
         that Tomcat blocks from being sent as an HTTP trailer header.
         (remm/markt)
       </fix>
+      <fix>
+        Accept an unknown complete length in the <code>Content-Range</code>.
+        header. Pull request <pr>1107</pr> provided by Arturo Bernal. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
