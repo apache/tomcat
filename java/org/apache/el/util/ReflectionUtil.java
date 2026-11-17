@@ -47,6 +47,20 @@ public class ReflectionUtil {
     protected static final Class<?>[] PRIMITIVES = new Class[] { boolean.class, byte.class, char.class, double.class,
             float.class, int.class, long.class, short.class, Void.TYPE };
 
+    /*
+     * Class.getMethods() returns a new copy of every public method each time it is called. A ClassValue rather than a
+     * Map is used to cache the result so that the cache does not prevent a class, and its class loader, from being
+     * garbage collected. The arrays are shared so they must not be modified.
+     *
+     * This cache is duplicated in jakarta.el.Util. When making changes keep the code in sync.
+     */
+    private static final ClassValue<Method[]> publicMethodsCache = new ClassValue<>() {
+        @Override
+        protected Method[] computeValue(Class<?> type) {
+            return type.getMethods();
+        }
+    };
+
     private ReflectionUtil() {
         super();
     }
@@ -188,7 +202,7 @@ public class ReflectionUtil {
             return result;
         }
 
-        Method[] methods = clazz.getMethods();
+        Method[] methods = publicMethodsCache.get(clazz);
         Map<Method,MatchResult> candidates = new HashMap<>();
 
         for (Method m : methods) {
