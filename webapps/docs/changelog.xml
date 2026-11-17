@@ -204,6 +204,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <docs>
+        Expand the Tribes transport documentation to describe the current NIO
+        sender and receiver pipeline, TCP and UDP selection, delivery options,
+        configuration and security considerations. Based on pull request
+        <pr>1134</pr> by sainadh777. (markt)
+      </docs>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
