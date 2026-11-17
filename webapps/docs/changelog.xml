@@ -276,6 +276,66 @@
         HTTP/2. Based on a patch by Alberto Limón. (markt)
       </fix>
       <fix>
+        <bug>70296</bug>: Update the <code>StringCache</code> to report access
+        counts and hit counts as <code>long</code> rather than <code>int</code>.
+        (markt)
+      </fix>
+      <fix>
+        Receiving an HTTP/2 <code>DATA</code> frame on a stream that has already
+        been reset is now treated as a connection error as per RFC 9113, section
+        5.1. Pull request <pr>1129</pr> provided by Arturo Bernal. (markt)
+      </fix>
+      <fix>
+        Treat a change to <code>SETTINGS_INITIAL_WINDOW_SIZE</code> that causes
+        any flow control window to exceed the maximum size as an HTTP/2
+        connection error as required by RFC 9113, section 6.9.2. Pull request
+        <pr>1131</pr> provided by Arturo Bernal. (markt)
+      </fix>
+      <fix>
+        Ignore empty list elements when parsing the HTTP Upgrade header. Pull
+        request <pr>1143</pr> provided by Arturo Bernal. (markt)
+      </fix>
+      <fix>
+        When parsing HTTP headers, treat the name of the weight parameter (e.g.
+        in the <code>Accept-Language</code> header) as case insensitive. Pull
+        request <pr>1144</pr> provided by Arturo Bernal. (markt)
+      </fix>
+      <fix>
+        Respond with a 414 (URI Too Long) status rather than a 400 (Bad Request)
+        status when the request target is too long to fit in the buffer used to
+        read the request line, as required by RFC 9112, section 3. Pull request
+        <pr>1147</pr> provided by Arturo Bernal. (markt)
+      </fix>
+      <fix>
+        Do not send a 103 (Early Hints) response to an HTTP/1.0 client as a
+        server must not send a 1xx response to an HTTP/1.0 client. (RFC 9110,
+        section 15.2). Pull request <pr>1149</pr> provided by Arturo Bernal.
+        (markt)
+      </fix>
+      <fix>
+        Skip empty elements when parsing entity tag lists. Pull request
+        <pr>1150</pr> provided by Arturo Bernal. (markt)
+      </fix>
+      <fix>
+        Ensure that the <code>Last-Modified</code> header, if present, does not
+        represent a date in the future. Pull request <pr>1152</pr> provided by
+        Arturo Bernal. (markt)
+      </fix>
+      <fix>
+        Add <code>connection</code>, <code>upgrade</code>, <code>host</code>,
+        <code>te</code> and <code>www-authenticate</code> to the list of headers
+        that Tomcat blocks from being sent as an HTTP trailer header.
+        (remm/markt)
+      </fix>
+      <fix>
+        Accept an unknown complete length in the <code>Content-Range</code>.
+        header. Pull request <pr>1107</pr> provided by Arturo Bernal. (markt)
+      </fix>
+      <fix>
+        Add HTTP/2 response header filtering similar to that provided for
+        HTTP/1.1. Pull request <pr>1154</pr> provided by Arturo Bernal. (markt)
+      </fix>
+      <fix>
         <bug>70311</bug>: Fix an infinite loop in
         <code>SecureNioChannel.read(ByteBuffer)</code> when the TLS engine
         returns <code>BUFFER_OVERFLOW</code> without consuming any input and
