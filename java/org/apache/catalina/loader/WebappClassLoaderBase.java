@@ -76,7 +76,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstrumentableClassLoader;
 import org.apache.tomcat.util.ExceptionUtils;
-import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.buf.ToStringUtil;
 import org.apache.tomcat.util.collections.ConcurrentLruCache;
 import org.apache.tomcat.util.compat.JreCompat;
@@ -1730,9 +1729,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         if (clearReferencesRmiTargets) {
             clearReferencesRmiTargets();
         }
-
-        // Clear the IntrospectionUtils cache.
-        IntrospectionUtils.clear();
 
         // Clear the classloader reference in common-logging
         if (clearReferencesLogFactoryRelease) {
