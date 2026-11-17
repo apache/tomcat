@@ -37,8 +37,10 @@ public class HeaderUtil {
         disallowedTrailerFieldNames.add("content-type");
         disallowedTrailerFieldNames.add("date");
         disallowedTrailerFieldNames.add("expires");
+        disallowedTrailerFieldNames.add("host");
         disallowedTrailerFieldNames.add("location");
         disallowedTrailerFieldNames.add("retry-after");
+        disallowedTrailerFieldNames.add("te");
         disallowedTrailerFieldNames.add("trailer");
         disallowedTrailerFieldNames.add("transfer-encoding");
         disallowedTrailerFieldNames.add("vary");
