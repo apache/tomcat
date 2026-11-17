@@ -16,7 +16,6 @@
  */
 package org.apache.tomcat.util.scan;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -36,6 +35,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory;
+import org.apache.tomcat.util.buf.IOTools;
 
 public class TestReferenceCountedJar {
 
@@ -66,14 +66,7 @@ public class TestReferenceCountedJar {
 
 
     private static String readFully(InputStream is) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int read = is.read(buffer);
-        while (read > 0) {
-            baos.write(buffer, 0, read);
-            read = is.read(buffer);
-        }
-        return baos.toString("UTF-8");
+        return new String(IOTools.readFully(is), StandardCharsets.UTF_8);
     }
 
 

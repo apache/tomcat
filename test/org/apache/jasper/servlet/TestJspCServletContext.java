@@ -19,7 +19,6 @@ package org.apache.jasper.servlet;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.URL;
@@ -39,6 +38,8 @@ import javax.servlet.descriptor.JspPropertyGroupDescriptor;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
+
+import org.apache.tomcat.util.buf.IOTools;
 
 public class TestJspCServletContext {
 
@@ -177,22 +178,11 @@ public class TestJspCServletContext {
             Assert.assertNotNull(url);
             try (InputStream is = url.openStream()) {
                 Assert.assertEquals("<jsp/>",
-                        new String(readFully(is), StandardCharsets.UTF_8));
+                        new String(IOTools.readFully(is), StandardCharsets.UTF_8));
             }
             Assert.assertNotNull(context.getResource("/unicode-\u00fc.jsp"));
         } finally {
             deleteRecursively(docBase);
-        }
-    }
-
-    private static byte[] readFully(InputStream is) throws IOException {
-        byte[] buf = new byte[1024];
-        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            int read;
-            while ((read = is.read(buf)) >= 0) {
-                out.write(buf, 0, read);
-            }
-            return out.toByteArray();
         }
     }
 

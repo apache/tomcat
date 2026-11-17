@@ -16,10 +16,11 @@
  */
 package org.apache.el;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
+
+import org.apache.tomcat.util.buf.IOTools;
 
 /**
  * Defines a copy of a single class in a class loader of its own so that tests can check that the class, and therefore
@@ -45,25 +46,13 @@ public class TesterIsolatedClassLoader extends ClassLoader {
             Class<?> result = findLoadedClass(name);
             if (result == null) {
                 try (InputStream is = getParent().getResourceAsStream(name.replace('.', '/') + ".class")) {
-                    byte[] bytes = readFully(is);
+                    byte[] bytes = IOTools.readFully(is);
                     result = defineClass(name, bytes, 0, bytes.length);
                 } catch (IOException e) {
                     throw new ClassNotFoundException(name, e);
                 }
             }
             return result;
-        }
-    }
-
-
-    private static byte[] readFully(InputStream is) throws IOException {
-        byte[] buf = new byte[1024];
-        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            int read;
-            while ((read = is.read(buf)) >= 0) {
-                out.write(buf, 0, read);
-            }
-            return out.toByteArray();
         }
     }
 

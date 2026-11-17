@@ -18,7 +18,6 @@ package org.apache.tomcat.security;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
@@ -45,6 +44,7 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.coyote.http2.Http2TestBase;
 import org.apache.coyote.http2.TesterHttp2Parser;
+import org.apache.tomcat.util.buf.IOTools;
 
 public class TestSecurity2026Http2 extends Http2TestBase {
 
@@ -190,7 +190,7 @@ public class TestSecurity2026Http2 extends Http2TestBase {
                 Thread.sleep(VICTIM_HANDLER_MS); // e.g. authentication back-end
             } catch (InterruptedException ignore) {
             }
-            byte[] body = readFully(req.getInputStream());
+            byte[] body = IOTools.readFully(req.getInputStream());
             resp.setContentType("text/plain");
             resp.getOutputStream().write(("echo:" + body.length).getBytes(StandardCharsets.ISO_8859_1));
         }
@@ -308,17 +308,5 @@ public class TestSecurity2026Http2 extends Http2TestBase {
             bytes.write(part);
         }
         return bytes.toByteArray();
-    }
-
-
-    private static byte[] readFully(InputStream is) throws IOException {
-        byte[] buf = new byte[1024];
-        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            int read;
-            while ((read = is.read(buf)) >= 0) {
-                out.write(buf, 0, read);
-            }
-            return out.toByteArray();
-        }
     }
 }

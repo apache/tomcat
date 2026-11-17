@@ -42,6 +42,7 @@ import org.apache.jasper.JspCompilationContext;
 import org.apache.jasper.compiler.SmapStratum.LineInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.IOTools;
 
 /**
  * Contains static utilities for generating SMAP data based on the current version of Jasper.
@@ -982,7 +983,7 @@ public class SmapUtil {
         try {
             is = cl.getResourceAsStream(className.replace(".", "/") + ".smap");
             if (is != null) {
-                return new String(readFully(is), SMAP_ENCODING);
+                return new String(IOTools.readFully(is), SMAP_ENCODING);
             }
 
             is = cl.getResourceAsStream(className.replace(".", "/") + ".class");
@@ -1009,16 +1010,5 @@ public class SmapUtil {
             }
         }
         return null;
-    }
-
-    private static byte[] readFully(InputStream is) throws IOException {
-        byte[] buf = new byte[1024];
-        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            int read;
-            while ((read = is.read(buf)) >= 0) {
-                out.write(buf, 0, read);
-            }
-            return out.toByteArray();
-        }
     }
 }
