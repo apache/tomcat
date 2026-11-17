@@ -446,16 +446,6 @@ public final class IntrospectionUtils {
     }
 
     // -------------------- other utils --------------------
-    /**
-     * Clear the internal method cache.
-     *
-     * @deprecated No longer required. The cache is now held in a {@link ClassValue} so entries are released with
-     *                 their {@link Class}. This method does nothing and will be removed in Tomcat 12.
-     */
-    @Deprecated
-    public static void clear() {
-        // NO-OP
-    }
 
     private static final ClassValue<Method[]> objectMethods = new ClassValue<>() {
         @Override
