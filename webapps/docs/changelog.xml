@@ -312,6 +312,12 @@
         represent a date in the future. Pull request <pr>1152</pr> provided by
         Arturo Bernal. (markt)
       </fix>
+      <fix>
+        Add <code>connection</code>, <code>upgrade</code>, <code>host</code>,
+        <code>te</code> and <code>www-authenticate</code> to the list of headers
+        that Tomcat blocks from being sent as an HTTP trailer header.
+        (remm/markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
