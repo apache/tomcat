@@ -704,6 +704,7 @@ public class SecureNioChannel extends NioChannel {
                 } else {
                     // The SSL session has increased the required buffer size
                     // since the buffer was created.
+                    int roomBefore = dst.remaining();
                     if (dst == getBufHandler().getReadBuffer()) {
                         // This is the normal case for this code
                         getBufHandler().expand(sslEngine.getSession().getApplicationBufferSize());
@@ -715,6 +716,14 @@ public class SecureNioChannel extends NioChannel {
                         // Can't expand the buffer as there is no way to signal
                         // to the caller that the buffer has been replaced.
                         throw new IOException(sm.getString("channel.nio.ssl.unwrapFailResize", unwrap.getStatus()));
+                    }
+                    // If there is still input to unwrap but unwrap() consumed
+                    // nothing and expand() made no more room, the next unwrap()
+                    // overflows the same way and this loop never ends. Fail the
+                    // read instead. An empty netInBuffer exits the loop normally.
+                    if (netInBuffer.position() > 0 && unwrap.bytesConsumed() == 0
+                            && dst.remaining() <= roomBefore) {
+                        throw new IOException(sm.getString("channel.nio.ssl.unwrapFailNoRoom", unwrap.getStatus()));
                     }
                 }
             } else if (unwrap.getStatus() == Status.CLOSED && netInBuffer.position() == 0 && read > 0) {
@@ -731,6 +740,14 @@ public class SecureNioChannel extends NioChannel {
             }
         } while (netInBuffer.position() != 0); // continue unwrapping as long as the input buffer has stuff
         return read;
+    }
+
+    private static long remaining(ByteBuffer[] dsts, int offset, int length) {
+        long result = 0;
+        for (int i = offset; i < offset + length; i++) {
+            result += dsts[i].remaining();
+        }
+        return result;
     }
 
     @Override
@@ -800,30 +817,29 @@ public class SecureNioChannel extends NioChannel {
                 } else {
                     ByteBuffer readBuffer = getBufHandler().getReadBuffer();
                     boolean found = false;
-                    boolean resized = true;
+                    long roomBefore = remaining(dsts, offset, length);
                     for (int i = 0; i < length; i++) {
                         // The SSL session has increased the required buffer size
                         // since the buffer was created.
                         if (dsts[offset + i] == getBufHandler().getReadBuffer()) {
                             getBufHandler().expand(sslEngine.getSession().getApplicationBufferSize());
-                            if (dsts[offset + i] == getBufHandler().getReadBuffer()) {
-                                resized = false;
-                            }
                             dsts[offset + i] = getBufHandler().getReadBuffer();
                             found = true;
                         } else if (getAppReadBufHandler() != null &&
                                 dsts[offset + i] == getAppReadBufHandler().getByteBuffer()) {
                             getAppReadBufHandler().expand(sslEngine.getSession().getApplicationBufferSize());
-                            if (dsts[offset + i] == getAppReadBufHandler().getByteBuffer()) {
-                                resized = false;
-                            }
                             dsts[offset + i] = getAppReadBufHandler().getByteBuffer();
                             found = true;
                         }
                     }
                     if (found) {
-                        if (!resized) {
-                            throw new IOException(sm.getString("channel.nio.ssl.unwrapFail", unwrap.getStatus()));
+                        // Only fail if input remains, unwrap() consumed nothing
+                        // and expand() made no more room. Otherwise the read has
+                        // made progress or the loop exits normally.
+                        if (netInBuffer.position() > 0 && unwrap.bytesConsumed() == 0
+                                && remaining(dsts, offset, length) <= roomBefore) {
+                            throw new IOException(
+                                    sm.getString("channel.nio.ssl.unwrapFailNoRoom", unwrap.getStatus()));
                         }
                     } else {
                         // Add the main read buffer in the destinations and try again
