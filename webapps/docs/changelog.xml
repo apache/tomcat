@@ -341,7 +341,7 @@
         returns <code>BUFFER_OVERFLOW</code> without consuming any input and
         the destination buffer cannot be expanded. The read now fails with an
         <code>IOException</code>. Pull request <pr>1157</pr> provided by
-        Pranav N V.
+        Pranav N V. (markt)
       </fix>
     </changelog>
   </subsection>
