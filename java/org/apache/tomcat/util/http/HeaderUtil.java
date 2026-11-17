@@ -31,6 +31,7 @@ public class HeaderUtil {
         // Always add these in lower case
         disallowedTrailerFieldNames.add("age");
         disallowedTrailerFieldNames.add("cache-control");
+        disallowedTrailerFieldNames.add("connection");
         disallowedTrailerFieldNames.add("content-length");
         disallowedTrailerFieldNames.add("content-encoding");
         disallowedTrailerFieldNames.add("content-range");
@@ -43,8 +44,10 @@ public class HeaderUtil {
         disallowedTrailerFieldNames.add("te");
         disallowedTrailerFieldNames.add("trailer");
         disallowedTrailerFieldNames.add("transfer-encoding");
+        disallowedTrailerFieldNames.add("upgrade");
         disallowedTrailerFieldNames.add("vary");
         disallowedTrailerFieldNames.add("warning");
+        disallowedTrailerFieldNames.add("www-authenticate");
     }
 
 
