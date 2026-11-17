@@ -198,6 +198,14 @@
         Add HTTP/2 response header filtering similar to that provided for
         HTTP/1.1. Pull request <pr>1154</pr> provided by Arturo Bernal. (markt)
       </fix>
+      <fix>
+        <bug>70311</bug>: Fix an infinite loop in
+        <code>SecureNioChannel.read(ByteBuffer)</code> when the TLS engine
+        returns <code>BUFFER_OVERFLOW</code> without consuming any input and
+        the destination buffer cannot be expanded. The read now fails with an
+        <code>IOException</code>. Pull request <pr>1157</pr> provided by
+        Pranav N V. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
