@@ -303,8 +303,9 @@ public class HttpParser {
         if (s.isEmpty()) {
             return false;
         }
-        for (char c : s.toCharArray()) {
-            if (!isToken(c)) {
+        // Use charAt() rather than toCharArray() to avoid copying the String
+        for (int i = 0; i < s.length(); i++) {
+            if (!isToken(s.charAt(i))) {
                 return false;
             }
         }
