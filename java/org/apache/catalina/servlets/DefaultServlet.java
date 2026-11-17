@@ -782,7 +782,9 @@ public class DefaultServlet extends HttpServlet {
                 }
             }
 
-            randAccessContentFile.setLength(range.length);
+            if (range.length != -1) {
+                randAccessContentFile.setLength(range.length);
+            }
 
             // Append data in request input stream to contentFile
             randAccessContentFile.seek(range.start);
