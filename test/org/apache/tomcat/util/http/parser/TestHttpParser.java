@@ -107,6 +107,22 @@ public class TestHttpParser {
 
 
     @Test
+    public void testQuote() {
+        Assert.assertEquals("\"\"", HttpParser.quote(""));
+        Assert.assertEquals("\"abc de\"", HttpParser.quote("abc de"));
+        // Note: Test strings are also Java escaped
+        Assert.assertEquals("\"a\\\"b\\\\c\"", HttpParser.quote("a\"b\\c"));
+    }
+
+
+    @Test
+    public void testQuoteUnquote() {
+        String text = "CORP\\Intranet \"Test\"";
+        Assert.assertEquals(text, HttpParser.unquote(HttpParser.quote(text)));
+    }
+
+
+    @Test
     public void testUnquoteNull() {
         Assert.assertNull(HttpParser.unquote(null));
     }
