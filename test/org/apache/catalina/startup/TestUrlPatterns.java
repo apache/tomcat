@@ -22,7 +22,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
@@ -30,6 +32,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
  * Servlet at <code>/servlet%25</code> and protects <code>/secure%25</code> with a security constraint that denies all
  * access.
  */
+@Category(CatalinaTest.class)
 public class TestUrlPatterns extends TomcatBaseTest {
 
     @Test

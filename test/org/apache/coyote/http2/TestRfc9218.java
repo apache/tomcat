@@ -21,7 +21,11 @@ import java.nio.charset.StandardCharsets;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.CoyoteTest;
+
+@Category(CoyoteTest.class)
 public class TestRfc9218 extends Http2TestBase {
 
     @Test

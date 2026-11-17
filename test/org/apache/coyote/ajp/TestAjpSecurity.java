@@ -29,17 +29,20 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.tomcat.categories.CoyoteTest;
 import org.apache.tomcat.util.buf.HexUtils;
 
 /*
  * Tests that can't easily be added to the {@code org.apache.tomcat.security} package because they need access to
  * package private classes.
  */
+@Category(CoyoteTest.class)
 public class TestAjpSecurity extends AjpBaseTest {
 
 

@@ -32,10 +32,12 @@ import jakarta.servlet.http.HttpSession;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.unittest.TesterContext;
 import org.apache.tomcat.unittest.TesterRequest;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -45,6 +47,7 @@ import org.apache.tomcat.util.descriptor.web.ErrorPage;
 /**
  * Test case for {@link Request}.
  */
+@Category(CatalinaTest.class)
 public class TestResponse extends TomcatBaseTest {
 
     @Test

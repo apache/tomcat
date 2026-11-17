@@ -22,11 +22,14 @@ import java.nio.charset.StandardCharsets;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
+import org.apache.tomcat.categories.CoyoteTest;
 import org.apache.tomcat.util.net.ApplicationBufferHandler;
 
+@Category(CoyoteTest.class)
 public class TestBufferedInputFilter {
 
     /*

@@ -26,6 +26,7 @@ import jakarta.servlet.ServletException;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.AccessLog;
 import org.apache.catalina.Globals;
@@ -33,11 +34,13 @@ import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.NetMaskSet;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.buf.StringUtils;
 
 /**
  * {@link RemoteIpValve} Tests
  */
+@Category(CatalinaTest.class)
 public class TestRemoteIpValve {
 
     static class RemoteAddrAndHostTrackerValve extends ValveBase {

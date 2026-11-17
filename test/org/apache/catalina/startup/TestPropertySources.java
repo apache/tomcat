@@ -25,11 +25,14 @@ import java.nio.charset.StandardCharsets;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.TestTomcat.HelloWorld;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
+@Category(CatalinaTest.class)
 public class TestPropertySources extends LoggingBaseTest {
 
     public static class MyPropertySource1 implements org.apache.tomcat.util.IntrospectionUtils.PropertySource {

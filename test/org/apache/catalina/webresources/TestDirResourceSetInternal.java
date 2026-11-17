@@ -24,12 +24,15 @@ import java.nio.file.attribute.FileAttribute;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.WebResourceSet;
 import org.apache.catalina.startup.ExpandWar;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 
+@Category(CatalinaTest.class)
 public class TestDirResourceSetInternal extends AbstractTestResourceSet {
 
     private static Path tempDir;

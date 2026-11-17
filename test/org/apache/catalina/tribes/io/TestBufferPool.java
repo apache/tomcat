@@ -22,7 +22,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.CatalinaTest;
+import org.apache.tomcat.categories.TribesTest;
+
+
+@Category({CatalinaTest.class, TribesTest.class})
 public class TestBufferPool {
 
     private static final int MAX = 512 * 1024;

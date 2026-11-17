@@ -32,6 +32,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
@@ -42,11 +43,13 @@ import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.util.XMLWriter;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.websocket.server.WsContextListener;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 
+@Category(CatalinaTest.class)
 public class TestWebdavServlet extends TomcatBaseTest {
 
     @Test

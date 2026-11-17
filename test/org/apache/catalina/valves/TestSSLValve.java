@@ -22,15 +22,18 @@ import java.util.logging.Level;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Globals;
 import org.apache.catalina.Valve;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.Request;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.unittest.TesterLogValidationFilter;
 import org.apache.tomcat.util.buf.UEncoder;
 import org.easymock.EasyMock;
 
+@Category(CatalinaTest.class)
 public class TestSSLValve {
 
     public static class MockRequest extends Request {

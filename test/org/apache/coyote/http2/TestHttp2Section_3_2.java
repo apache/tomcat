@@ -20,11 +20,15 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
+
+import org.apache.tomcat.categories.CoyoteTest;
 
 /**
  * Unit tests for Section 3.2 of <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>. <br>
  * The order of tests in this class is aligned with the order of the requirements in the RFC.
  */
+@Category(CoyoteTest.class)
 public class TestHttp2Section_3_2 extends Http2TestBase {
 
     // Note: Tests for zero/multiple HTTP2-Settings fields can be found below

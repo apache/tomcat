@@ -26,11 +26,15 @@ import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import org.apache.tomcat.categories.CatalinaTest;
+
 @RunWith(Parameterized.class)
+@Category(CatalinaTest.class)
 public class TestQuotedStringTokenizer {
 
     private String inputText;

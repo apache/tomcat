@@ -24,11 +24,14 @@ import java.util.Locale;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.valves.ErrorReportValve;
+import org.apache.tomcat.categories.CoyoteTest;
 import org.apache.tomcat.util.res.StringManager;
 
+@Category(CoyoteTest.class)
 public class TestHttp2InitialConnection extends Http2TestBase {
 
     private TestData testData;

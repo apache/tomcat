@@ -27,8 +27,10 @@ import java.util.jar.Manifest;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.core.StandardContext;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.descriptor.DigesterFactory;
 import org.apache.tomcat.util.descriptor.XmlErrorHandler;
 import org.apache.tomcat.util.descriptor.web.WebRuleSet;
@@ -40,6 +42,7 @@ import org.xml.sax.InputSource;
 /**
  * Tests that do not require a Tomcat instance to be started.
  */
+@Category(CatalinaTest.class)
 public class TestTomcatNoServer {
 
     @Test

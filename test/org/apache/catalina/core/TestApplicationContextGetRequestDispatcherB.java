@@ -34,6 +34,7 @@ import jakarta.servlet.http.MappingMatch;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -42,9 +43,11 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 @RunWith(value = Parameterized.class)
+@Category(CatalinaTest.class)
 public class TestApplicationContextGetRequestDispatcherB extends TomcatBaseTest {
 
     @Parameters(name = "{index}: startMapping[{0}], startUri[{1}], dispatcherType[{2}], " +

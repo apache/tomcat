@@ -27,8 +27,10 @@ import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.tomcat.Jar;
+import org.apache.tomcat.categories.PerformanceTest;
 import org.apache.tomcat.util.bcel.classfile.ClassParser;
 import org.apache.tomcat.util.scan.JarFactory;
 
@@ -38,6 +40,7 @@ import org.apache.tomcat.util.scan.JarFactory;
  *
  * The test also requires that the Jira lib directory has been extracted from a Jira install and copied to /tmp.
  */
+@Category(PerformanceTest.class)
 public class TesterPerformance {
 
     private static final String JAR_LOCATION = "/tmp/jira-libs";

@@ -30,7 +30,11 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.CatalinaTest;
+
+@Category(CatalinaTest.class)
 public class TestParameterMap {
 
     private static final String[] TEST_PARAM_VALUES_1 = { "value1" };

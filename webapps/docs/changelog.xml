@@ -447,6 +447,21 @@
         Tomcat locally. Refactoring line-ending management in build.xml to
         reduce repeated line-ending changes. (markt)
       </fix>
+      <add>
+        Replace the smoke profile file list in
+        <code>test-profiles.properties.default</code> with JUnit
+        <code>@Category(SmokeTest.class)</code> annotations on the smoke test
+        classes. <code>CategoryScanner</code> discovers annotated tests at
+        build time and feeds the result into the existing
+        <code>batchtest</code> mechanism so per-test JVM isolation is
+        preserved. (vgosain)
+      </add>
+      <add>
+        Extend <code>@Category</code>-based test profiles to all remaining
+        profiles (catalina, coyote, performance, tribes, buildutil,
+        integration). Remove <code>test-profiles.properties.default</code>
+        now that all profiles are annotation-driven. (vgosain)
+      </add>
     </changelog>
   </subsection>
 </section>

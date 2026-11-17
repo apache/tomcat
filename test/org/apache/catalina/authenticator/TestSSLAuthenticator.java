@@ -19,11 +19,14 @@ package org.apache.catalina.authenticator;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.net.TesterSupport;
 
+@Category(CatalinaTest.class)
 public class TestSSLAuthenticator extends TomcatBaseTest {
 
     // https://bz.apache.org/bugzilla/show_bug.cgi?id=65991

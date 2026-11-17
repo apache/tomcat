@@ -27,6 +27,7 @@ import jakarta.servlet.http.HttpSession;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.ha.tcp.SimpleTcpCluster;
@@ -36,8 +37,10 @@ import org.apache.catalina.tribes.ManagedChannel;
 import org.apache.catalina.tribes.TesterUtil;
 import org.apache.catalina.tribes.group.GroupChannel;
 import org.apache.catalina.tribes.transport.ReceiverBase;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
+@Category(CatalinaTest.class)
 public class TestStandardSessionIntegration extends TomcatBaseTest {
 
     /*

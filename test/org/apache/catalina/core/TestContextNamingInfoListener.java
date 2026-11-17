@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -33,9 +34,11 @@ import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.util.ContextName;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.descriptor.web.ContextEnvironment;
 
 @RunWith(Parameterized.class)
+@Category(CatalinaTest.class)
 public class TestContextNamingInfoListener extends TomcatBaseTest {
 
     @Parameterized.Parameters(name = "{index}: contextPath[{0}], webappVersion[{1}], displayName[{2}], emptyOnRoot[{3}]")

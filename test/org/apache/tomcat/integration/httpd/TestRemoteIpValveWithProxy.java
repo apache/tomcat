@@ -24,11 +24,14 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Valve;
 import org.apache.catalina.valves.RemoteIpValve;
+import org.apache.tomcat.categories.IntegrationTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
+@Category(IntegrationTest.class)
 public class TestRemoteIpValveWithProxy extends HttpdIntegrationBaseTest {
     private static final String HTTPD_CONFIG = """
                       LoadModule proxy_module modules/mod_proxy.so

@@ -18,8 +18,12 @@ package org.apache.coyote.http2;
 
 import java.util.Collection;
 
+import org.junit.experimental.categories.Category;
 import org.junit.runners.Parameterized;
 
+import org.apache.tomcat.categories.CoyoteTest;
+
+@Category(CoyoteTest.class)
 public class TestHttp2Section_8_2_40To7F extends Http2Section_8_2BaseTest {
 
     @Parameterized.Parameters(name = "{index}: {0} {1} {2} {3} {4}")

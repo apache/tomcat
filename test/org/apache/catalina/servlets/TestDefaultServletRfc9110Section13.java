@@ -32,6 +32,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -41,6 +42,7 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 
@@ -48,6 +50,7 @@ import org.apache.tomcat.util.http.FastHttpDateFormat;
  * This test case is used to verify RFC 9110 Section 13. Conditional Requests.
  */
 @RunWith(Parameterized.class)
+@Category(CatalinaTest.class)
 public class TestDefaultServletRfc9110Section13 extends TomcatBaseTest {
 
     @Parameter(0)

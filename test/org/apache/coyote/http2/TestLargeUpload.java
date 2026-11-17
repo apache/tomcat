@@ -32,6 +32,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -41,9 +42,11 @@ import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
+import org.apache.tomcat.categories.CoyoteTest;
 import org.apache.tomcat.util.net.TesterSupport;
 
 @RunWith(Parameterized.class)
+@Category(CoyoteTest.class)
 public class TestLargeUpload extends Http2TestBase {
 
     @Parameters(name = "{0}: {1} {2}]")

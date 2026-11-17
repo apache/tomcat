@@ -22,13 +22,16 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.CoyoteTest;
 import org.apache.tomcat.util.http.Method;
 
 /**
  * Unit tests for Section 4.3 of <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>. <br>
  * The order of tests in this class is aligned with the order of the requirements in the RFC.
  */
+@Category(CoyoteTest.class)
 public class TestHttp2Section_4_3 extends Http2TestBase {
 
     private static final String MARKER_HEADER_NAME = "x-marker";

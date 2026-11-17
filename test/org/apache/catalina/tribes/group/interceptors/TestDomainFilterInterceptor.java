@@ -23,6 +23,7 @@ import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ManagedChannel;
@@ -32,7 +33,12 @@ import org.apache.catalina.tribes.TesterUtil;
 import org.apache.catalina.tribes.group.GroupChannel;
 import org.apache.catalina.tribes.transport.ReceiverBase;
 import org.apache.catalina.tribes.util.UUIDGenerator;
+import org.apache.tomcat.categories.CatalinaTest;
+import org.apache.tomcat.categories.TribesTest;
 
+
+
+@Category({CatalinaTest.class, TribesTest.class})
 public class TestDomainFilterInterceptor {
     private static int count = 10;
     private ManagedChannel[] channels = new ManagedChannel[count];

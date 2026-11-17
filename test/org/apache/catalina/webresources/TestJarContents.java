@@ -26,9 +26,12 @@ import java.util.zip.ZipOutputStream;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.WebResourceSet;
+import org.apache.tomcat.categories.CatalinaTest;
 
+@Category(CatalinaTest.class)
 public class TestJarContents {
 
     private static File empty;

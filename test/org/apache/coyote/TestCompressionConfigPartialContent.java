@@ -20,12 +20,16 @@ import java.util.Enumeration;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
+
+import org.apache.tomcat.categories.CoyoteTest;
 
 /**
  * The ranges in a Content-Range header field refer to the bytes of the representation (RFC 9110, section 14.4) so a
  * partial response must not be compressed with a content coding. A transfer coding applies to the message rather than
  * to the representation so it is not affected.
  */
+@Category(CoyoteTest.class)
 public class TestCompressionConfigPartialContent {
 
     @Test

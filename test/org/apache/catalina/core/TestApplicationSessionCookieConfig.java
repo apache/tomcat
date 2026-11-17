@@ -19,9 +19,12 @@ package org.apache.catalina.core;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.LifecycleState;
+import org.apache.tomcat.categories.CatalinaTest;
 
+@Category(CatalinaTest.class)
 public class TestApplicationSessionCookieConfig {
     private ApplicationSessionCookieConfig applicationSessionCookieConfig;
     private final CustomContext context = new CustomContext();

@@ -37,6 +37,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
@@ -45,6 +46,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.coyote.ActionCode;
+import org.apache.tomcat.categories.CatalinaTest;
 
 /**
  * Tests the handling in {@link CoyoteAdapter#service} of a request that starts async processing and requests a
@@ -52,6 +54,7 @@ import org.apache.coyote.ActionCode;
  * by the servlet between {@code startAsync()} and {@code dispatch()} so the state machine passes through the same
  * states in the same order every time. No client reset, timing or large response is required.
  */
+@Category(CatalinaTest.class)
 public class TestCoyoteAdapterAsyncErrorState extends TomcatBaseTest {
 
     private static final String REQUEST_ATTRIBUTE = TestCoyoteAdapterAsyncErrorState.class.getName() + ".request";

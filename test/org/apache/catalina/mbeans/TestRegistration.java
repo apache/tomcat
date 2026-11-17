@@ -30,6 +30,7 @@ import javax.management.ObjectName;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Realm;
@@ -38,12 +39,14 @@ import org.apache.catalina.realm.CombinedRealm;
 import org.apache.catalina.realm.NullRealm;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.modeler.Registry;
 
 /**
  * General tests around the process of registration and de-registration that don't necessarily apply to one specific
  * Tomcat class.
  */
+@Category(CatalinaTest.class)
 public class TestRegistration extends TomcatBaseTest {
 
     private static final String contextName = "/foo";

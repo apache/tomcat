@@ -20,7 +20,11 @@ import java.security.NoSuchAlgorithmException;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.CatalinaTest;
+
+@Category(CatalinaTest.class)
 public class TestSecretKeyCredentialHandler {
 
     private static final String[] ALGORITHMS = { "PBKDF2WithHmacSHA1", "PBEWithMD5AndDES" };

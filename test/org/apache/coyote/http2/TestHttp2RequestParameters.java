@@ -19,7 +19,11 @@ package org.apache.coyote.http2;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.CoyoteTest;
+
+@Category(CoyoteTest.class)
 public class TestHttp2RequestParameters extends Http2TestBase {
     /**
      * Test case for https://bz.apache.org/bugzilla/show_bug.cgi?id=69918 POST parameters are not returned from a call

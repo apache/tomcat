@@ -31,11 +31,13 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
 import org.apache.catalina.authenticator.TestBasicAuthParser.BasicAuthHeader;
 import org.apache.catalina.filters.Constants;
+import org.apache.tomcat.categories.CatalinaTest;
 
 /**
  * Tests that verify Tomcat functions correctly without clustering JARs
@@ -43,6 +45,7 @@ import org.apache.catalina.filters.Constants;
  * on the webapp/engine to hide clustering packages from the components
  * under test.
  */
+@Category(CatalinaTest.class)
 public class TestWithoutClustering extends TomcatBaseTest {
 
     private static void assertClusteringNotAvailable(ClassLoader cl) {

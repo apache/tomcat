@@ -22,12 +22,15 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.CoyoteTest;
 import org.apache.tomcat.util.http.Method;
 
 /**
  * Unit tests for Section 8.5 of <a href="https://tools.ietf.org/html/rfc9113#section-8.5">RFC 9113</a>.
  */
+@Category(CoyoteTest.class)
 public class TestHttp2Section_8_5 extends Http2TestBase {
 
     @Test

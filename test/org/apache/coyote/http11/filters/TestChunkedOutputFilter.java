@@ -22,11 +22,15 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
+import org.apache.tomcat.categories.CoyoteTest;
+
 @RunWith(Parameterized.class)
+@Category(CoyoteTest.class)
 public class TestChunkedOutputFilter {
 
     private final String VALID_STRING = "aaa";

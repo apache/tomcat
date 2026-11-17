@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.ContainerListener;
@@ -32,9 +33,11 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.websocket.server.WsContextListener;
 
+@Category(CatalinaTest.class)
 public class TestMapperListener extends TomcatBaseTest {
 
     @Test

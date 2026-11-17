@@ -17,11 +17,15 @@
 package org.apache.tomcat.util.http;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
+
+import org.apache.tomcat.categories.PerformanceTest;
 
 /*
  * This is an absolute performance test. There is no benefit it running it as part of a standard test run so it is
  * excluded due to the name starting Tester...
  */
+@Category(PerformanceTest.class)
 public class TesterFastHttpDateFormatPerformance {
 
     @Test

@@ -22,12 +22,15 @@ import java.nio.file.Paths;
 
 import org.junit.Assume;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.startup.Tomcat;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.net.TesterSupport;
 import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
 
+@Category(CatalinaTest.class)
 public class TestAprLifecycleListener {
 
     @Test

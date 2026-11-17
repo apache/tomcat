@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -35,9 +36,11 @@ import org.apache.catalina.startup.ExpandWar;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 @RunWith(Parameterized.class)
+@Category(CatalinaTest.class)
 public class TestDefaultServletPut extends TomcatBaseTest {
 
     private static final String START_TEXT= "Starting text";

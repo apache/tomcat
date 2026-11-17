@@ -22,11 +22,14 @@ import java.io.InputStream;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tools.ant.BuildException;
 
+@Category(CatalinaTest.class)
 public class TestDeployTask extends TomcatBaseTest {
 
     @Test

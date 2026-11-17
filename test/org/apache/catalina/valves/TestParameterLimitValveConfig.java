@@ -17,7 +17,11 @@
 package org.apache.catalina.valves;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.CatalinaTest;
+
+@Category(CatalinaTest.class)
 public class TestParameterLimitValveConfig {
 
     @Test(expected = IllegalArgumentException.class)

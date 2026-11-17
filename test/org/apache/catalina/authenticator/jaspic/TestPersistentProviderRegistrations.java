@@ -20,10 +20,13 @@ import java.io.File;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.authenticator.jaspic.PersistentProviderRegistrations.Provider;
 import org.apache.catalina.authenticator.jaspic.PersistentProviderRegistrations.Providers;
+import org.apache.tomcat.categories.CatalinaTest;
 
+@Category(CatalinaTest.class)
 public class TestPersistentProviderRegistrations {
 
     @Test

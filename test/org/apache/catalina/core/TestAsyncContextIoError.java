@@ -29,6 +29,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
@@ -36,11 +37,13 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 
 /*
  * There are lots of uses of statics in this class that you'd never use in production but are used in these tests as the
  * tests will only be executed once per JVM and never concurrently.
  */
+@Category(CatalinaTest.class)
 public class TestAsyncContextIoError extends TomcatBaseTest {
 
     private static final String RESPONSE_DATA = "AAAA";

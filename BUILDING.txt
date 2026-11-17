@@ -603,7 +603,57 @@ NOTE: Cobertura is licensed under GPL v2 with parts of it being under
 
         test.verbose=false
 
-(7.5) Running httpd integration tests
+(7.5) Running tests by profile
+
+Tomcat provides named test profiles for running curated subsets of tests
+without specifying file patterns manually.
+
+Available profiles:
+
+  smoke        - Core smoke tests covering key subsystems
+  catalina     - All Catalina servlet container tests
+  coyote       - All Coyote protocol/connector tests
+  tribes       - All Tribes clustering tests
+  performance  - Performance benchmark tests
+  buildutil    - Build utility tests (excluded by default)
+  integration  - httpd integration tests (excluded by default)
+
+Usage:
+
+    ant test -Dtest.profile=smoke
+    ant test -Dtest.profile=catalina
+
+Profile membership is declared via @Category annotations directly on test
+classes. CategoryScanner discovers matching tests at build time by scanning
+compiled classes and feeds the result into the standard Ant batchtest
+mechanism so each test still runs in its own JVM.
+
+(7.5.1) Adding a test to a profile
+
+Annotate the test class with the appropriate category and add the
+corresponding import:
+
+  Profile     Category class
+  -------     --------------
+  smoke       SmokeTest
+  catalina    CatalinaTest
+  coyote      CoyoteTest
+  tribes      TribesTest        (also add CatalinaTest for catalina coverage)
+  performance PerformanceTest
+  buildutil   BuildutilTest
+  integration IntegrationTest
+
+Example — adding a test to the catalina profile:
+
+    import org.junit.experimental.categories.Category;
+    import org.apache.tomcat.categories.CatalinaTest;
+
+    @Category(CatalinaTest.class)
+    public class MyNewTest { ... }
+
+All category interfaces are in the org.apache.tomcat.categories package.
+
+(7.6) Running httpd integration tests
 
   Tomcat includes integration tests that verify Tomcat's behavior when
   running behind an Apache HTTP Server (httpd) reverse proxy. These tests

@@ -27,6 +27,7 @@ import jakarta.servlet.ServletContextListener;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Host;
@@ -34,9 +35,11 @@ import org.apache.catalina.LifecycleState;
 import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.descriptor.web.ContextEnvironment;
 import org.apache.tomcat.util.descriptor.web.ContextResource;
 
+@Category(CatalinaTest.class)
 public class TestNamingContextListener extends TomcatBaseTest {
 
     private static final String BUG49132_NAME = "TestName";

@@ -19,14 +19,19 @@ package org.apache.catalina.tribes.group;
 import org.junit.After;
 import org.junit.Assume;
 import org.junit.Before;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import org.apache.tomcat.categories.CatalinaTest;
+import org.apache.tomcat.categories.TribesTest;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 
+
 @RunWith(Parameterized.class)
+@Category({CatalinaTest.class, TribesTest.class})
 public class TestGroupChannelTlsFFM extends GroupChannelTlsTestBase {
 
     @Before

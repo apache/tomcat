@@ -17,7 +17,11 @@
 package org.apache.coyote.http2;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.CoyoteTest;
+
+@Category(CoyoteTest.class)
 public class TestConnectionSettingsLocal {
 
     @Test(expected = IllegalArgumentException.class)

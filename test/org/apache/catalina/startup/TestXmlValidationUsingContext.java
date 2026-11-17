@@ -23,12 +23,15 @@ import java.io.IOException;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
+import org.apache.tomcat.categories.CatalinaTest;
 
 /**
  * Tests XML validation works on the Context.
  */
+@Category(CatalinaTest.class)
 public class TestXmlValidationUsingContext extends TomcatBaseTest {
     @Test
     public void contextValidationWithInvalidWebXml() throws Exception {

@@ -26,17 +26,20 @@ import jakarta.websocket.WebSocketContainer;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.PerformanceTest;
 import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEndpoint;
 
 /*
  * This test runs until the test machine runs out of resources. There is no benefit it running it as part of a standard
  * test run so it is excluded due to the name starting Tester...
  */
+@Category(PerformanceTest.class)
 public class TesterConnectionLimitPerformance extends TomcatBaseTest {
 
     /*

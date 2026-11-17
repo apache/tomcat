@@ -28,11 +28,13 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
+import org.apache.tomcat.categories.CoyoteTest;
 import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.MimeHeaders;
 
@@ -40,6 +42,7 @@ import org.apache.tomcat.util.http.MimeHeaders;
  * Tests that can't easily be added to the {@code org.apache.tomcat.security} package because they need access to
  * package private classes.
  */
+@Category(CoyoteTest.class)
 public class TestHttp2Security extends Http2TestBase {
 
     private static final String INJECTED_TRAILER_VALUE = "stolen-from-reset-stream-3";

@@ -21,9 +21,12 @@ import java.nio.charset.StandardCharsets;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.buf.UDecoder;
 
+@Category(CatalinaTest.class)
 public class TestURLEncoder {
 
     private static final String SPACE = " ";

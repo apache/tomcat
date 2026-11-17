@@ -22,16 +22,19 @@ import jakarta.servlet.ServletException;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.core.StandardContext;
+import org.apache.tomcat.categories.CatalinaTest;
 
 /**
  * {@link RequestFilterValve} Tests
  */
+@Category(CatalinaTest.class)
 public class TestRequestFilterValve {
 
     private static final int OK = 200;

@@ -23,7 +23,11 @@ import java.util.TimeZone;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.CatalinaTest;
+
+@Category(CatalinaTest.class)
 public class TestAccessLogValveDateFormatCache {
 
     // Note that there is a similar test:

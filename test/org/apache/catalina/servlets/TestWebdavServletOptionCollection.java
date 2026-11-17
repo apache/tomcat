@@ -22,10 +22,12 @@ import java.util.List;
 
 import jakarta.servlet.Servlet;
 
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.http.Method;
 
 /*
@@ -33,6 +35,7 @@ import org.apache.tomcat.util.http.Method;
  * of an entire test run.
  */
 @RunWith(Parameterized.class)
+@Category(CatalinaTest.class)
 public class TestWebdavServletOptionCollection extends ServletOptionsBaseTest {
 
     @Parameters

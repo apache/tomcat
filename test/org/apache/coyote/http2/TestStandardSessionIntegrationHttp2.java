@@ -30,12 +30,15 @@ import jakarta.servlet.http.HttpSession;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.tomcat.categories.CoyoteTest;
 import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.MimeHeaders;
 
+@Category(CoyoteTest.class)
 public class TestStandardSessionIntegrationHttp2 extends Http2TestBase {
 
     @Test

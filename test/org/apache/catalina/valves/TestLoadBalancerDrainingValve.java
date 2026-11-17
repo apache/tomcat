@@ -27,6 +27,7 @@ import jakarta.servlet.SessionCookieConfig;
 import jakarta.servlet.http.Cookie;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -37,11 +38,13 @@ import org.apache.catalina.Valve;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.core.StandardPipeline;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.descriptor.web.Constants;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 
 @RunWith(Parameterized.class)
+@Category(CatalinaTest.class)
 public class TestLoadBalancerDrainingValve {
 
     @Parameters(name = "{index}: activation[{0}], validSessionID[{1}], expectInvokeNext[{2}], enableIgnore[{3}], " +

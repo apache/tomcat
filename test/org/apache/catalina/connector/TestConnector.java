@@ -26,6 +26,7 @@ import jakarta.servlet.Servlet;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
@@ -35,12 +36,14 @@ import org.apache.catalina.servlets.WebdavServlet;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.http.Method;
 
 /**
  * Test cases for {@link Connector}.
  */
+@Category(CatalinaTest.class)
 public class TestConnector extends TomcatBaseTest {
 
     @Test

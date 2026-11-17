@@ -36,6 +36,7 @@ import jakarta.websocket.server.ServerEndpointConfig;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.servlets.DefaultServlet;
@@ -43,6 +44,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.coyote.http11.upgrade.UpgradeGroupInfo;
 import org.apache.coyote.http11.upgrade.UpgradeInfo;
+import org.apache.tomcat.categories.CoyoteTest;
 import org.apache.tomcat.websocket.WebSocketBaseTest;
 import org.apache.tomcat.websocket.server.Constants;
 import org.apache.tomcat.websocket.server.WsContextListener;
@@ -59,6 +61,7 @@ import org.apache.tomcat.websocket.server.WsContextListener;
  * The same issue exists in ConnectionHandler.release(SocketWrapperBase), which is called when the NIO poller closes a
  * socket directly (e.g., on thread pool rejection, invalid key, or CancelledKeyException).
  */
+@Category(CoyoteTest.class)
 public class TestAbstractProtocol extends WebSocketBaseTest {
 
     private static final String PATH = "/throwOnOpen";

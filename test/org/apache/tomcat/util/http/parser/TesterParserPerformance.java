@@ -19,7 +19,11 @@ package org.apache.tomcat.util.http.parser;
 import java.util.BitSet;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.PerformanceTest;
+
+@Category(PerformanceTest.class)
 public class TesterParserPerformance {
 
     @Test

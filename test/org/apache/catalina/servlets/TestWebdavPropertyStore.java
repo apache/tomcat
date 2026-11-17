@@ -37,6 +37,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -46,11 +47,13 @@ import org.apache.catalina.servlets.WebdavServlet.PropertyUpdateType;
 import org.apache.catalina.servlets.WebdavServlet.ProppatchOperation;
 import org.apache.catalina.startup.LoggingBaseTest;
 import org.apache.catalina.util.XMLWriter;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 
 @RunWith(Parameterized.class)
+@Category(CatalinaTest.class)
 public class TestWebdavPropertyStore extends LoggingBaseTest {
 
     private static final String PROPERTY1 =

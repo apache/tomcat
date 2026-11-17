@@ -22,12 +22,16 @@ import java.util.List;
 
 import jakarta.servlet.Servlet;
 
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import org.apache.tomcat.categories.CatalinaTest;
+import org.apache.tomcat.categories.SmokeTest;
 import org.apache.tomcat.util.http.Method;
 
+@Category({SmokeTest.class, CatalinaTest.class})
 @RunWith(Parameterized.class)
 public class TestDefaultServletOptions extends ServletOptionsBaseTest {
 

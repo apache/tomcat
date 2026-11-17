@@ -23,10 +23,12 @@ import jakarta.servlet.jsp.JspException;
 import jakarta.servlet.jsp.tagext.Tag;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.PerformanceTest;
 import org.apache.tomcat.unittest.TesterThreadedPerformance;
 import org.apache.tomcat.unittest.tags.Bug53545;
 
@@ -34,6 +36,7 @@ import org.apache.tomcat.unittest.tags.Bug53545;
  * This is an absolute performance test. There is no benefit it running it as part of a standard test run so it is
  * excluded due to the name starting Tester...
  */
+@Category(PerformanceTest.class)
 public class TesterTagHandlerPoolPerformance extends TomcatBaseTest {
 
     @Test

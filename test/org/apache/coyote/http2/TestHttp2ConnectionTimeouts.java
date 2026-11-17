@@ -17,7 +17,12 @@
 package org.apache.coyote.http2;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.CoyoteTest;
+import org.apache.tomcat.categories.SmokeTest;
+
+@Category({SmokeTest.class, CoyoteTest.class})
 public class TestHttp2ConnectionTimeouts extends Http2TestBase {
 
     @Test

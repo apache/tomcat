@@ -20,13 +20,16 @@ import java.util.function.IntConsumer;
 import java.util.function.Supplier;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.PerformanceTest;
 import org.apache.tomcat.unittest.TesterThreadedPerformance;
 
 /*
  * This is an absolute performance test. There is no benefit in running it as part of a standard test run so it is
  * excluded due to the name starting Tester...
  */
+@Category(PerformanceTest.class)
 public class TesterContainerProviderPerformance {
 
     @Test

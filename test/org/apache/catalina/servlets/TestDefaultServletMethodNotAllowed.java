@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -34,6 +35,7 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.http.Method;
 
 /**
@@ -42,6 +44,7 @@ import org.apache.tomcat.util.http.Method;
  * methods that the {@link DefaultServlet} overrides.
  */
 @RunWith(Parameterized.class)
+@Category(CatalinaTest.class)
 public class TestDefaultServletMethodNotAllowed extends TomcatBaseTest {
 
     @Parameters(name = "{index}: readonly[{0}], trace[{1}], method[{2}]")

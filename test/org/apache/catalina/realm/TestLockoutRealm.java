@@ -22,11 +22,14 @@ import java.util.Locale;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.TesterMapRealm;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.unittest.TesterContext;
 
+@Category(CatalinaTest.class)
 public class TestLockoutRealm {
 
     private static final String USER_NAME = "user";

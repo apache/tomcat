@@ -23,11 +23,14 @@ import java.util.logging.Logger;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.CoyoteTest;
 import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.res.StringManager;
 
+@Category(CoyoteTest.class)
 public class TestFlowControl extends Http2TestBase {
 
     private static final StringManager sm = StringManager.getManager(TestFlowControl.class);

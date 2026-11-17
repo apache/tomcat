@@ -28,11 +28,13 @@ import jakarta.websocket.WebSocketContainer;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.PerformanceTest;
 import org.apache.tomcat.websocket.TesterAsyncTiming;
 import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEndpoint;
 
@@ -41,6 +43,7 @@ import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEn
  * support a wider range of platforms and/or Java versions or if the failure is an indication of a performance drop in
  * the WebSocket implementation.
  */
+@Category(PerformanceTest.class)
 public class TestAsyncMessagesPerformance extends TomcatBaseTest {
 
     @Test

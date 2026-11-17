@@ -24,11 +24,15 @@ import java.util.StringJoiner;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
+import org.apache.tomcat.categories.CoyoteTest;
+
 @RunWith(Parameterized.class)
+@Category(CoyoteTest.class)
 public class TestCompressionConfig {
 
     @Parameterized.Parameters(name = "{index}: accept-encoding[{4}], ETag [{1}], compress[{2}], useTE[{3}]")

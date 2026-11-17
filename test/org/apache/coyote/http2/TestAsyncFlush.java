@@ -28,10 +28,12 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.tomcat.categories.CoyoteTest;
 
 /*
  * Based on
@@ -46,6 +48,7 @@ import org.apache.catalina.startup.Tomcat;
  *       while the specification allows this to work - it doesn't require that
  *       it does work.
  */
+@Category(CoyoteTest.class)
 public class TestAsyncFlush extends Http2TestBase {
 
     private static final int BLOCK_SIZE = 1024;

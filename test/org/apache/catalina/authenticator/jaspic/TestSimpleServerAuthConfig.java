@@ -26,7 +26,11 @@ import jakarta.security.auth.message.config.ServerAuthContext;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.CatalinaTest;
+
+@Category(CatalinaTest.class)
 public class TestSimpleServerAuthConfig {
 
     private static final String SERVER_AUTH_MODULE_KEY_PREFIX =

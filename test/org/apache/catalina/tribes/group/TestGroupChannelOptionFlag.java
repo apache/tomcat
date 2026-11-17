@@ -20,13 +20,18 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ChannelInterceptor;
 import org.apache.catalina.tribes.transport.ReceiverBase;
+import org.apache.tomcat.categories.CatalinaTest;
+import org.apache.tomcat.categories.TribesTest;
 import org.apache.tomcat.util.res.StringManager;
 
+
+@Category({CatalinaTest.class, TribesTest.class})
 public class TestGroupChannelOptionFlag {
     private final StringManager sm = StringManager.getManager(TestGroupChannelOptionFlag.class);
     private GroupChannel channel = null;

@@ -23,12 +23,15 @@ import java.util.Iterator;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Group;
 import org.apache.catalina.Role;
 import org.apache.catalina.User;
 import org.apache.catalina.startup.LoggingBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 
+@Category(CatalinaTest.class)
 public class TestDataSourceUserDatabase extends LoggingBaseTest {
 
     public static final String MINIMAL_SCHEMA =

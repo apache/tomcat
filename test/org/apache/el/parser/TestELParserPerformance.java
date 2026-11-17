@@ -30,12 +30,15 @@ import jakarta.el.ValueExpression;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.PerformanceTest;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 
 /*
  * This is a relative performance test so it remains part of the standard test run.
  */
+@Category(PerformanceTest.class)
 public class TestELParserPerformance extends ELBaseTest {
 
     private static final long DEFAULT_TEST_ITERATIONS = 1000000;

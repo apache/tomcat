@@ -24,6 +24,7 @@ import java.net.URL;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.WebResource;
@@ -31,7 +32,9 @@ import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 
+@Category(CatalinaTest.class)
 public class TestCachedResource extends TomcatBaseTest {
 
     // https://bz.apache.org/bugzilla/show_bug.cgi?id=63872

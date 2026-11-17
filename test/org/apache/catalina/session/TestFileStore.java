@@ -25,13 +25,16 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
 import org.apache.catalina.startup.ExpandWar;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.unittest.TesterContext;
 import org.apache.tomcat.unittest.TesterServletContext;
 
+@Category(CatalinaTest.class)
 public class TestFileStore {
 
     private static final String SESS_TEMPPATH = "SESS_TEMP";

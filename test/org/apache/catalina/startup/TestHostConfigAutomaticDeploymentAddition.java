@@ -17,13 +17,16 @@
 package org.apache.catalina.startup;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.LifecycleState;
+import org.apache.tomcat.categories.CatalinaTest;
 
 /**
  * The purpose of this class is to test the automatic deployment features of the
  * {@link HostConfig} implementation.
  */
+@Category(CatalinaTest.class)
 public class TestHostConfigAutomaticDeploymentAddition extends HostConfigAutomaticDeploymentBaseTest {
 
     /*

@@ -23,10 +23,14 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
+
+import org.apache.tomcat.categories.PerformanceTest;
 
 /*
  * This is a relative performance test so it remains part of the standard test run.
  */
+@Category(PerformanceTest.class)
 public class TestCharsetCachePerformance {
 
     @Test

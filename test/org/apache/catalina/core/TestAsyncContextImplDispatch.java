@@ -29,6 +29,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -37,6 +38,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
@@ -44,6 +46,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
  * but covers all combinations for completeness.
  */
 @RunWith(Parameterized.class)
+@Category(CatalinaTest.class)
 public class TestAsyncContextImplDispatch extends TomcatBaseTest {
 
     @Parameterized.Parameters(name = "{index}: tgt-sup [{0}], dis-sup [{1}], dis-st [{2}]")

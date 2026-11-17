@@ -22,11 +22,13 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
 import org.apache.catalina.startup.ExpandWar;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.unittest.TesterContext;
 
 /*
@@ -37,6 +39,7 @@ import org.apache.tomcat.unittest.TesterContext;
  * This needs to be run manually. It will not run as part of the standard unit tests as it is named "Tester...". This
  * could be changed once the bug has been fixed.
  */
+@Category(CatalinaTest.class)
 public class TestFileStoreConcurrency {
 
     private static final int TEST_RUN_TIME_MS = 5000;

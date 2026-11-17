@@ -21,6 +21,7 @@ import java.util.Collection;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -28,8 +29,10 @@ import org.junit.runners.Parameterized.Parameters;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.util.RequestUtil;
+import org.apache.tomcat.categories.CatalinaTest;
 
 @RunWith(value = Parameterized.class)
+@Category(CatalinaTest.class)
 public class TestApplicationContextStripPathParams extends TomcatBaseTest {
 
     private final String input;

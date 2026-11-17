@@ -33,6 +33,7 @@ import java.util.Enumeration;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
@@ -41,8 +42,10 @@ import org.apache.catalina.Server;
 import org.apache.catalina.Service;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.TestTomcat.HelloWorld;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
+@Category(CatalinaTest.class)
 public class TestTomcatStandalone extends LoggingBaseTest {
 
     private static final String TEST_WEBAPP_CONTEXT_XML =

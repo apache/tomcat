@@ -22,12 +22,15 @@ import java.util.Base64;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
  * Test the BasicAuthenticator's BasicCredentials inner class and the associated Base64 decoder.
  */
+@Category(CatalinaTest.class)
 public class TestBasicAuthParser {
 
     private static final String NICE_METHOD = "Basic";

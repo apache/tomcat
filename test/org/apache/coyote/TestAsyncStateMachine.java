@@ -22,9 +22,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.coyote.http11.Http11NioProtocol;
 import org.apache.coyote.http11.Http11Processor;
+import org.apache.tomcat.categories.CoyoteTest;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SocketEvent;
 
@@ -33,6 +35,7 @@ import org.apache.tomcat.util.net.SocketEvent;
  * thread that made the initial service() call exits. The tests drive the state machine directly through a processor so
  * the interleavings are deterministic and no sockets, threads or timing are required.
  */
+@Category(CoyoteTest.class)
 public class TestAsyncStateMachine {
 
     private TestProcessor processor;

@@ -39,6 +39,7 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Host;
@@ -50,12 +51,14 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.ha.context.ReplicatedContext;
+import org.apache.tomcat.categories.CatalinaTest;
 import org.apache.tomcat.util.MultiThrowable;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.ContextEnvironment;
 import org.apache.tomcat.util.descriptor.web.ContextResourceLink;
 import org.apache.tomcat.websocket.server.WsContextListener;
 
+@Category(CatalinaTest.class)
 public class TestTomcat extends TomcatBaseTest {
 
     /**

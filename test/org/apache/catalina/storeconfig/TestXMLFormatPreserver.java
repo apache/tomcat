@@ -25,12 +25,15 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import org.apache.tomcat.categories.CatalinaTest;
 import org.xml.sax.InputSource;
 
 /**
  * Unit tests for {@link XMLFormatPreserver}.
  */
+@Category(CatalinaTest.class)
 public class TestXMLFormatPreserver {
 
     @Test

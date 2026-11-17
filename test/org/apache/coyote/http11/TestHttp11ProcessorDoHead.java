@@ -32,6 +32,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -40,9 +41,11 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.categories.CoyoteTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 @RunWith(Parameterized.class)
+@Category(CoyoteTest.class)
 public class TestHttp11ProcessorDoHead extends TomcatBaseTest {
 
     private static final int DEFAULT_BUFFER_SIZE = 8192;
