@@ -521,7 +521,7 @@ these passwords. In addition, the realm must handle password digests
 itself, including variations in the algorithms used and ways of
 representing password hashes in the directory. However, the realm may
 sometimes need access to the stored password, for example to support
-HTTP Digest Access Authentication (RFC 2069). (Note that HTTP digest
+HTTP Digest Access Authentication (RFC 7616). (Note that HTTP digest
 authentication is different from the storage of password digests in
 the repository for user information as discussed above).
 </p>

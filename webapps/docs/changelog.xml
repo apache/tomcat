@@ -117,6 +117,10 @@
         one space was required. Pull request <pr>1148</pr> provided by Arturo
         Bernal. (markt)
       </fix>
+      <fix>
+        Stricter parsing of the digest authentication header. Pull request
+        <pr>1109</pr> provided by Arturo Bernal. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
