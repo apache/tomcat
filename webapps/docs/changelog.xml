@@ -206,6 +206,10 @@
         when calling an EL function. Pull request <pr>1130</pr> by Mykola
         Pavluchynskyi. (markt)
       </fix>
+      <fix>
+        <bug>70241</bug>: Cache the public methods used to resolve EL method
+        calls. Pull request <pr>1155</pr> provided by Arturo Bernal. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
