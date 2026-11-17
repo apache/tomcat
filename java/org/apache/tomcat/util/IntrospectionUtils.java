@@ -21,8 +21,6 @@ import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Hashtable;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -450,12 +448,21 @@ public final class IntrospectionUtils {
     // -------------------- other utils --------------------
     /**
      * Clear the internal method cache.
+     *
+     * @deprecated No longer required. The cache is now held in a {@link ClassValue} so entries are released with
+     *                 their {@link Class}. This method does nothing and will be removed in Tomcat 12.
      */
+    @Deprecated
     public static void clear() {
-        objectMethods.clear();
+        // NO-OP
     }
 
-    private static final Map<Class<?>,Method[]> objectMethods = new ConcurrentHashMap<>();
+    private static final ClassValue<Method[]> objectMethods = new ClassValue<>() {
+        @Override
+        protected Method[] computeValue(Class<?> type) {
+            return type.getMethods();
+        }
+    };
 
     /**
      * Find all public methods of the given class, using a cache for performance.
@@ -464,14 +471,7 @@ public final class IntrospectionUtils {
      * @return the array of methods
      */
     public static Method[] findMethods(Class<?> c) {
-        Method[] methods = objectMethods.get(c);
-        if (methods != null) {
-            return methods;
-        }
-
-        methods = c.getMethods();
-        objectMethods.put(c, methods);
-        return methods;
+        return objectMethods.get(c);
     }
 
     /**
