@@ -154,6 +154,17 @@ public class SocketBufferHandler {
 
 
     /**
+     * Returns the configured size of the read buffer without forcing the
+     * lazily allocated buffer to be created.
+     *
+     * @return the configured read buffer size
+     */
+    public int getReadBufferSize() {
+        return readBufferSize;
+    }
+
+
+    /**
      * Checks whether the read buffer contains any data.
      * @return {@code true} if the read buffer is empty
      */
@@ -297,6 +308,17 @@ public class SocketBufferHandler {
      */
     public ByteBuffer getWriteBuffer() {
         return writeBuffer();
+    }
+
+
+    /**
+     * Returns the configured size of the write buffer without forcing the
+     * lazily allocated buffer to be created.
+     *
+     * @return the configured write buffer size
+     */
+    public int getWriteBufferSize() {
+        return writeBufferSize;
     }
 
 

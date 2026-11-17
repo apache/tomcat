@@ -232,6 +232,15 @@
         Increase the default value of the <code>maxLocaleCount</code> attribute
         of the <code>Connector</code> from 10 to 20.
       </update>
+      <fix>
+        Stricter parsing of the digest authentication header. Pull request
+        <pr>1109</pr> provided by Arturo Bernal. (markt)
+      </fix>
+      <scode>
+        Refactor Tomcat's internal <code>IntrospectionUtils</code> to use
+        <code>ClassValue</code> to cache the result of calling
+        <code>Class.getMethods()</code>. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -311,6 +320,33 @@
         Skip empty elements when parsing entity tag lists. Pull request
         <pr>1150</pr> provided by Arturo Bernal. (markt)
       </fix>
+      <fix>
+        Ensure that the <code>Last-Modified</code> header, if present, does not
+        represent a date in the future. Pull request <pr>1152</pr> provided by
+        Arturo Bernal. (markt)
+      </fix>
+      <fix>
+        Add <code>connection</code>, <code>upgrade</code>, <code>host</code>,
+        <code>te</code> and <code>www-authenticate</code> to the list of headers
+        that Tomcat blocks from being sent as an HTTP trailer header.
+        (remm/markt)
+      </fix>
+      <fix>
+        Accept an unknown complete length in the <code>Content-Range</code>.
+        header. Pull request <pr>1107</pr> provided by Arturo Bernal. (markt)
+      </fix>
+      <fix>
+        Add HTTP/2 response header filtering similar to that provided for
+        HTTP/1.1. Pull request <pr>1154</pr> provided by Arturo Bernal. (markt)
+      </fix>
+      <fix>
+        <bug>70311</bug>: Fix an infinite loop in
+        <code>SecureNioChannel.read(ByteBuffer)</code> when the TLS engine
+        returns <code>BUFFER_OVERFLOW</code> without consuming any input and
+        the destination buffer cannot be expanded. The read now fails with an
+        <code>IOException</code>. Pull request <pr>1157</pr> provided by
+        Pranav N V. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -359,6 +395,21 @@
         when calling an EL function. Pull request <pr>1130</pr> by Mykola
         Pavluchynskyi. (markt)
       </fix>
+      <fix>
+        <bug>70241</bug>: Cache the public methods used to resolve EL method
+        calls. Pull request <pr>1155</pr> provided by Arturo Bernal. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <docs>
+        Expand the Tribes transport documentation to describe the current NIO
+        sender and receiver pipeline, TCP and UDP selection, delivery options,
+        configuration and security considerations. Based on pull request
+        <pr>1134</pr> by sainadh777. (markt)
+      </docs>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

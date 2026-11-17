@@ -16,10 +16,13 @@
  */
 package jakarta.el;
 
+import java.lang.ref.WeakReference;
 import java.util.Date;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import org.apache.el.TesterIsolatedClassLoader;
 
 public class TestUtil {
 
@@ -52,5 +55,45 @@ public class TestUtil {
         ELProcessor processor = new ELProcessor();
         processor.defineBean("string", "Not used. Any value is fine here");
         Assert.assertEquals("5", processor.eval("string.valueOf(5)"));
+    }
+
+    /*
+     * The cache of public methods must not prevent a class, or its class loader, from being garbage collected.
+     */
+    @Test
+    public void testMethodLookupDoesNotPreventClassUnloading() throws Exception {
+        WeakReference<ClassLoader> reference = invokeMethodOfIsolatedClass();
+        Assert.assertTrue("The class loader was not garbage collected",
+                TesterIsolatedClassLoader.awaitCollection(reference));
+    }
+
+
+    private WeakReference<ClassLoader> invokeMethodOfIsolatedClass() throws Exception {
+        ClassLoader loader = new TesterIsolatedClassLoader(TesterIsolatedClassLoader.Target.class);
+        Object bean = loader.loadClass(TesterIsolatedClassLoader.Target.class.getName()).getDeclaredConstructor()
+                .newInstance();
+        ELProcessor processor = new ELProcessor();
+        processor.defineBean("target", bean);
+        // Looking up a method with an argument populates the cache. Do it twice to use the cached value.
+        Assert.assertEquals("a", processor.eval("target.echo('a')"));
+        Assert.assertEquals("b", processor.eval("target.echo('b')"));
+        return new WeakReference<>(loader);
+    }
+
+
+    /*
+     * Classes with the same name in different class loaders must not share cached methods.
+     */
+    @Test
+    public void testMethodLookupWithSameClassNameInDifferentClassLoaders() throws Exception {
+        for (int i = 0; i < 2; i++) {
+            ClassLoader loader = new TesterIsolatedClassLoader(TesterIsolatedClassLoader.Target.class);
+            Object bean = loader.loadClass(TesterIsolatedClassLoader.Target.class.getName()).getDeclaredConstructor()
+                    .newInstance();
+            ELProcessor processor = new ELProcessor();
+            processor.defineBean("target", bean);
+            Assert.assertEquals("a" + i, processor.eval("target.echo('a" + i + "')"));
+            Assert.assertEquals("b" + i, processor.eval("target.echo('b" + i + "')"));
+        }
     }
 }

@@ -29,6 +29,7 @@ import org.apache.coyote.http11.HttpOutputBuffer;
 import org.apache.coyote.http11.OutputFilter;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.http.HeaderUtil;
+import org.apache.tomcat.util.http.parser.HttpParser;
 
 /**
  * Chunked output filter.
@@ -174,10 +175,19 @@ public class ChunkedOutputFilter implements OutputFilter {
                     if (HeaderUtil.isHeaderDisallowedInTrailers(trailerField.getKey())) {
                         continue;
                     }
-                    osw.write(filterForHeaders(trailerField.getKey()));
+                    // Ignore invalid field names
+                    if (!HttpParser.isToken(trailerField.getKey())) {
+                        continue;
+                    }
+                    // Correct the value or ignore the field if the value can't be sent
+                    String value = HeaderUtil.sanitizeFieldValue(trailerField.getValue());
+                    if (value == null) {
+                        continue;
+                    }
+                    osw.write(trailerField.getKey());
                     osw.write(':');
                     osw.write(' ');
-                    osw.write(filterForHeaders(trailerField.getValue()));
+                    osw.write(value);
                     osw.write("\r\n");
                 }
             }
@@ -191,33 +201,6 @@ public class ChunkedOutputFilter implements OutputFilter {
             }
         }
         buffer.end();
-    }
-
-
-    /*
-     * Filters out CTLs excluding TAB and any code points above 255 (since this is meant to be ISO-8859-1).
-     *
-     * This doesn't perform full HTTP validation. For example, it does not limit field names to tokens.
-     *
-     * Strictly, correct trailer fields is an application concern. The filtering here is a basic attempt to help
-     * mis-behaving applications prevent the worst of the potential side-effects of invalid trailer fields.
-     */
-    // package private so it is visible for testing
-    static String filterForHeaders(String input) {
-        char[] chars = input.toCharArray();
-        boolean updated = false;
-        for (int i = 0; i < chars.length; i++) {
-            if (chars[i] < 32 && chars [i] != 9 || chars[i] == 127 || chars[i] > 255) {
-                chars[i] = ' ';
-                updated = true;
-            }
-        }
-
-        if (updated) {
-            return new String(chars);
-        } else {
-            return input;
-        }
     }
 
 

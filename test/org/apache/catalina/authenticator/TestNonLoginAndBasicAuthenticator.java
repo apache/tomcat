@@ -138,7 +138,7 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
     }
 
     /*
-     * This is the same as testAcceptProtectedBasic (above), except to verify the server follows RFC2617 by treating the
+     * This is the same as testAcceptProtectedBasic (above), except to verify the server follows RFC 9110 by treating the
      * auth-scheme token as case-insensitive.
      */
     @Test

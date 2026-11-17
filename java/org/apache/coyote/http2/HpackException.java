@@ -21,7 +21,7 @@ import java.io.Serial;
 /**
  * Exception that is thrown when the HPACK compress context is broken. In this case the connection must be closed.
  */
-class HpackException extends Exception {
+public class HpackException extends Exception {
 
     @Serial
     private static final long serialVersionUID = 1L;
