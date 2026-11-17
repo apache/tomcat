@@ -672,15 +672,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     void sendStreamReset(StreamStateMachine state, StreamException se) throws IOException {
-
-        if (log.isTraceEnabled()) {
-            log.trace(sm.getString("upgradeHandler.rst.debug", connectionId, Integer.toString(se.getStreamId()),
-                    se.getError(), se.getMessage()));
-        }
-
-        // Treat a sent reset like a received reset and increment the overhead count
-        increaseOverheadCount(FrameType.RST, getProtocol().getOverheadResetFactor());
-
         // Write a RST frame
         byte[] rstFrame = new byte[13];
         // Length
@@ -704,11 +695,23 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         try {
             if (state != null) {
                 boolean active = state.isActive();
-                state.sendReset();
+                if (!state.sendReset()) {
+                    // This endpoint has already reset the stream so nothing more may be sent on it (RFC 9113,
+                    // section 5.1).
+                    return;
+                }
                 if (active) {
                     decrementActiveRemoteStreamCount(getStream(se.getStreamId()));
                 }
             }
+
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("upgradeHandler.rst.debug", connectionId, Integer.toString(se.getStreamId()),
+                        se.getError(), se.getMessage()));
+            }
+
+            // Treat a sent reset like a received reset and increment the overhead count
+            increaseOverheadCount(FrameType.RST, getProtocol().getOverheadResetFactor());
             socketWrapper.write(true, rstFrame, 0, rstFrame.length);
             socketWrapper.flush(true);
         } finally {

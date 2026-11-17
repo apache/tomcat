@@ -81,16 +81,25 @@ class StreamStateMachine {
      * <li>The stream is already reset</li>
      * <li>The stream is already closed</li>
      * </ul>
+     * Sending a second RST_STREAM frame for a stream that this endpoint has already reset would be sending a frame on a
+     * closed stream (RFC 9113, section 5.1) so the caller must only send the RST_STREAM frame if this method returns
+     * {@code true}.
+     *
+     * @return {@code false} if a RST_STREAM frame has already been sent for this stream, otherwise {@code true}
      *
      * @throws IllegalStateException If the stream is in a state that does not permit resets
      */
-    public synchronized void sendReset() {
+    public synchronized boolean sendReset() {
         if (state == State.IDLE) {
             throw new IllegalStateException(sm.getString("streamStateMachine.invalidReset", connectionId, streamId));
+        }
+        if (state == State.CLOSED_RST_TX) {
+            return false;
         }
         if (state.canReset()) {
             stateChange(state, State.CLOSED_RST_TX);
         }
+        return true;
     }
 
 
