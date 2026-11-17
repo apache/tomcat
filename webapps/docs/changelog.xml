@@ -232,6 +232,11 @@
         Stricter parsing of the digest authentication header. Pull request
         <pr>1109</pr> provided by Arturo Bernal. (markt)
       </fix>
+      <scode>
+        Refactor Tomcat's internal <code>IntrospectionUtils</code> to use
+        <code>ClassValue</code> to cache the result of calling
+        <code>Class.getMethods()</code>. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
