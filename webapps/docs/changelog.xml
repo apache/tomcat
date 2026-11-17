@@ -382,7 +382,8 @@
       <docs>
         Expand the Tribes transport documentation to describe the current NIO
         sender and receiver pipeline, TCP and UDP selection, delivery options,
-        configuration and security considerations. (sainadh777)
+        configuration and security considerations. Based on pull request
+        <pr>1134</pr> by sainadh777. (markt)
       </docs>
     </changelog>
   </subsection>
