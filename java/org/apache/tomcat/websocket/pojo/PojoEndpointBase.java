@@ -146,11 +146,13 @@ public abstract class PojoEndpointBase extends Endpoint {
     }
 
     /**
-     * Returns the POJO instance wrapped by this endpoint.
+     * Returns the POJO instance wrapped by this endpoint. This is the instance that the container's instance manager
+     * created (or registered) so, when the session using this endpoint closes, it is this instance and not the wrapper
+     * that must be passed to the instance manager to destroy it.
      *
      * @return the POJO instance
      */
-    protected Object getPojo() {
+    public Object getPojo() {
         return pojo;
     }
 

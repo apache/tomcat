@@ -132,6 +132,6 @@ public class TestRedirect extends AbstractTestTag {
 
         String location = getSingleHeader("Location", resHead);
         Assert.assertNotNull(location);
-        Assert.assertTrue(location, location.endsWith("/test/jstl/redirect-target.jsp?a=b&sp=x+y&u=%26%3D"));
+        Assert.assertTrue(location, location.endsWith("/test/jstl/redirect-target.jsp?sp=x+y&u=%26%3D&a=b"));
     }
 }

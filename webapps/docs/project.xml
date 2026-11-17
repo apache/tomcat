@@ -71,7 +71,7 @@
               href="jdbc-pool.html"/>
         <item name="31) WebSocket"          href="web-socket-howto.html"/>
         <item name="32) Rewrite"            href="rewrite.html"/>
-        <item name="33) CDI 2 and JAX-RS"   href="cdi.html"/>
+        <item name="33) CDI"                href="cdi.html"/>
         <item name="34) AOT/GraalVM Support"
               href="graal.html"/>
     </menu>

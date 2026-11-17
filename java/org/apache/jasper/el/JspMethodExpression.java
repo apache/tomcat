@@ -20,6 +20,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.io.Serial;
 import java.util.Objects;
 
 import jakarta.el.ELContext;
@@ -35,6 +36,9 @@ import jakarta.el.PropertyNotFoundException;
  * Implements Externalizable for serialization support.
  */
 public final class JspMethodExpression extends MethodExpression implements Externalizable {
+
+    @Serial
+    private static final long serialVersionUID = 5387881870932678316L;
 
     private String mark;
 

@@ -29,6 +29,13 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public abstract class BaseNamingResourceMBean<T> extends BaseCatalinaMBean<T> {
 
+    /**
+     * Creates a naming resource MBean.
+     */
+    public BaseNamingResourceMBean() {
+        // NOOP
+    }
+
     private static final StringManager sm = StringManager.getManager(BaseNamingResourceMBean.class);
 
 

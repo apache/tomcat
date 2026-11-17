@@ -224,7 +224,7 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
             request.getMappingData().context = ctxt;
             return request;
         }
-        return new ApplicationHttpRequest(getNestedRequest(depth - 1), null, false);
+        return new ApplicationHttpRequest(getNestedRequest(depth - 1), null, false, null);
     }
 
 

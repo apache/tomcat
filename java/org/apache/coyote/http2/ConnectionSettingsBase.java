@@ -77,7 +77,14 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
         }
 
         switch (setting) {
-            case HEADER_TABLE_SIZE -> validateHeaderTableSize(value);
+            case HEADER_TABLE_SIZE -> {
+                // RFC 9113, section 6.5.2: no protocol-defined upper bound exists for
+                // SETTINGS_HEADER_TABLE_SIZE; any value up to 2^32-1 is valid. Cap the
+                // stored value at the implementation limit rather than treating a large
+                // value as a protocol error.
+                set(setting, Long.valueOf(Math.min(value, MAX_HEADER_TABLE_SIZE)), force);
+                return;
+            }
             case ENABLE_PUSH -> validateEnablePush(value);
             case MAX_CONCURRENT_STREAMS, MAX_HEADER_LIST_SIZE -> validateUnsigned32BitSetting(setting, value);
             case INITIAL_WINDOW_SIZE -> validateInitialWindowSize(value);
@@ -185,15 +192,6 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
             return Integer.MAX_VALUE;
         } else {
             return (int) result;
-        }
-    }
-
-
-    private void validateHeaderTableSize(long headerTableSize) throws T {
-        if (headerTableSize > MAX_HEADER_TABLE_SIZE) {
-            String msg = sm.getString("connectionSettings.headerTableSizeLimit", connectionId,
-                    Long.toString(headerTableSize));
-            throwException(msg, Http2Error.PROTOCOL_ERROR);
         }
     }
 

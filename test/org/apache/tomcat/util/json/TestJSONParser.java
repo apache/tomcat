@@ -111,6 +111,54 @@ public class TestJSONParser {
         Assert.assertEquals(BigInteger.ONE, result.get("1E+5"));
     }
 
+    /*
+     * The exponent of a number must be one that BigDecimal can represent. A larger exponent must be reported as a
+     * ParseException rather than as an unchecked NumberFormatException.
+     */
+    @Test
+    public void testExponentOutOfRangeIsParseException() {
+        for (String number : new String[] { "1e-2147483649", "1e2147483649", "1.5e-2147483649", "-1E2147483649" }) {
+            try {
+                new JSONParser("[" + number + "]").parse();
+                Assert.fail("A ParseException was expected for " + number);
+            } catch (ParseException e) {
+                Assert.assertTrue(e.getMessage(), e.getMessage().contains(number));
+            }
+        }
+    }
+
+    @Test
+    public void testExponentOutOfRangeAsKeyIsParseException() {
+        Assert.assertThrows(ParseException.class, () -> new JSONParser("{1e2147483649:1}").parseObject());
+    }
+
+    @Test
+    public void testLargestExponentsAccepted() throws ParseException {
+        JSONParser parser = new JSONParser("[1e2147483647, 1e-2147483647]");
+        List<Object> values = parser.parseArray();
+        Assert.assertEquals(new BigDecimal("1e2147483647"), values.get(0));
+        Assert.assertEquals(new BigDecimal("1e-2147483647"), values.get(1));
+    }
+
+    @Test
+    public void testExponentWithLeadingZeros() throws ParseException {
+        Assert.assertEquals(new BigDecimal("1E5"), new JSONParser("1e05").parse());
+    }
+
+    /*
+     * Bare words that start with a number but are not numbers are not affected by the exponent-only number syntax.
+     */
+    @Test
+    public void testBareWordKeysStartingWithNumber() throws ParseException {
+        Map<String, Object> result = new JSONParser("{1e5x:1, 12abc:2, 1e:3, 3E2:4}").parseObject();
+        Assert.assertEquals(BigInteger.valueOf(1), result.get("1e5x"));
+        Assert.assertEquals(BigInteger.valueOf(2), result.get("12abc"));
+        Assert.assertEquals(BigInteger.valueOf(3), result.get("1e"));
+        // An exponent-only number is a number, so its key is the normalised form of the number
+        Assert.assertEquals(BigInteger.valueOf(4), result.get("3E+2"));
+        Assert.assertEquals(4, result.size());
+    }
+
     private static String nest(int depth) {
         StringBuilder result = new StringBuilder(depth * 2);
         for (int i = 0; i < depth; i++) {

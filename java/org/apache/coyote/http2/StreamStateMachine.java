@@ -131,6 +131,11 @@ class StreamStateMachine {
     }
 
 
+    final synchronized boolean canReset() {
+        return state.canReset();
+    }
+
+
     final synchronized boolean isActive() {
         return state.isActive();
     }
@@ -197,8 +202,10 @@ class StreamStateMachine {
                             Http2Error.STREAM_CLOSED,  FrameType.PRIORITY,
                                                        FrameType.RST,
                                                        FrameType.WINDOW_UPDATE),
-        CLOSED_RST_RX      (false, false, false, false,
-                            Http2Error.STREAM_CLOSED,  FrameType.PRIORITY),
+        CLOSED_RST_RX      (false, false, false, true,
+                            Http2Error.STREAM_CLOSED,  FrameType.PRIORITY,
+                                                       FrameType.RST,
+                                                       FrameType.WINDOW_UPDATE),
         CLOSED_RST_TX      (false, false, false, false,
                             Http2Error.STREAM_CLOSED,  FrameType.DATA,
                                                        FrameType.HEADERS,

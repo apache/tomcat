@@ -46,16 +46,17 @@ public class IPv6Utils {
      * fe80:0:0:0:f0f0:c0c0:1919:1234%4 -&gt; fe80::f0f0:c0c0:1919:1234%4).
      * </p>
      * <p>
-     * The behaviour of this method is undefined if an invalid IPv6 address is passed in as input.
+     * Input that looks like an IPv6 address but is malformed, such as one with more than 8 groups or a group with more
+     * than 4 significant characters, is returned without any processing. The result is otherwise undefined if an
+     * invalid IPv6 address is passed in as input.
      * </p>
      *
      * @param ipv6Address String representing valid IPv6 address.
      *
-     * @return String representing IPv6 in canonical form.
-     *
-     * @throws IllegalArgumentException if IPv6 format is unacceptable.
+     * @return String representing IPv6 in canonical form, or the unchanged input if it is null, not an IPv6 address or
+     *             malformed.
      */
-    public static String canonize(String ipv6Address) throws IllegalArgumentException {
+    public static String canonize(String ipv6Address) {
 
         if (ipv6Address == null) {
             return null;
@@ -130,19 +131,12 @@ public class IPv6Utils {
         int change = 0;
 
         if (colonsPos >= 0 && colonsPos < ipv6AddressLength - 1) {
-            int colonCounter = 0;
-            for (int i = 0; i < ipv6AddressLength; i++) {
-                if (ipv6Address.charAt(i) == ':') {
-                    colonCounter++;
-                }
-            }
-
             if (colonsPos == 0) {
                 expanded.insert(0, "0");
                 change = change + 1;
             }
 
-            for (int i = 0; i < MAX_NUMBER_OF_GROUPS - colonCounter; i++) {
+            for (int i = 0; i < MAX_NUMBER_OF_GROUPS - colonCount; i++) {
                 expanded.insert(colonsPos + 1, "0:");
                 change = change + 2;
             }

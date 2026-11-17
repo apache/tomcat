@@ -34,7 +34,7 @@ public class InlineExecutorService extends AbstractExecutorService {
     }
 
     private volatile boolean shutdown;
-    private volatile int runningTasks;
+    private int runningTasks;
     private volatile boolean terminated;
 
     private final Object lock = new Object();

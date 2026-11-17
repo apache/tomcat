@@ -19,6 +19,7 @@ package org.apache.naming.factory;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -34,6 +35,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.naming.ResourceRef;
 import org.apache.naming.StringManager;
+import org.apache.tomcat.util.ExceptionUtils;
 
 /**
  * Object factory for any Resource conforming to the JavaBean spec.
@@ -188,7 +190,18 @@ public class BeanFactory implements ObjectFactory {
                             }
 
                             if (setProp != null) {
-                                setProp.invoke(bean, valueArray);
+                                try {
+                                    setProp.invoke(bean, valueArray);
+                                } catch (InvocationTargetException ite) {
+                                    ExceptionUtils.handleThrowable(ite);
+                                    // The message of the wrapper is always null, so name the property and report
+                                    // the exception thrown by the set method as the cause.
+                                    Throwable cause = ite.getCause() != null ? ite.getCause() : ite;
+                                    NamingException ne = new NamingException(
+                                            sm.getString("beanFactory.setFailed", propName, cause.toString()));
+                                    ne.initCause(cause);
+                                    throw ne;
+                                }
                             } else {
                                 throw new NamingException(sm.getString("beanFactory.readOnlyProperty", propName));
                             }

@@ -66,6 +66,12 @@ public abstract class UpgradeProcessorBase extends AbstractProcessorLight implem
     }
 
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Upgrade processors are not recycled and re-used. This method is only used to trigger any necessary clean-up once
+     * the upgrade processor is no longer required.
+     */
     @Override
     public void recycle() {
         // NO-OP. Sub-classes override this to release resources when the

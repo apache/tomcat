@@ -18,7 +18,6 @@ package org.apache.catalina.core;
 
 import java.io.IOException;
 import java.io.Serial;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -42,7 +41,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Host;
 import org.apache.catalina.Valve;
 import org.apache.catalina.connector.Request;
-import org.apache.catalina.util.URLEncoder;
+import org.apache.catalina.util.RequestUtil;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.AsyncContextCallback;
 import org.apache.coyote.RequestInfo;
@@ -220,29 +219,19 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
     @Override
     public void dispatch() {
-        String path;
-        String pathInfo;
         Request request = this.request;
         // Calls check() so local copies are validated
-        ServletRequest servletRequest = getRequest();
-        if (servletRequest instanceof HttpServletRequest sr) {
-            path = sr.getServletPath();
-            pathInfo = sr.getPathInfo();
-        } else {
-            path = request.getServletPath();
-            pathInfo = request.getPathInfo();
-        }
-        if (pathInfo != null && !pathInfo.isEmpty()) {
-            path = path + pathInfo;
+        HttpServletRequest hsr = getRequest() instanceof HttpServletRequest h ? h : request;
+        String path = hsr.getRequestURI();
+        String cpath = RequestUtil.getContextPathEncoded(request.getConnector(), hsr);
+        if (cpath.length() > 1) {
+            path = path.substring(cpath.length());
         }
         /*
-         * This is a dispatch of the original request path. That path will always be URI-decoded. That will cause
-         * problems in ServletContext.getRequestDispatcher() if the decoded URI contains a literal '?' as it will be
-         * treated as a query delimiter. Therefore, ignore context.getDispatchersUseEncodedPaths() here and always
-         * encode. Also need to mark this request as ignoring context.getDispatchersUseEncodedPaths() so it is handled
-         * correctly in ServletContext.getRequestDispatcher().
+         * This is a dispatch of the original request path. That path (obtained from request.getRequestURI()) will
+         * always be URL-encoded. Therefore, ignore context.getDispatchersUseEncodedPaths() here and mark as always
+         * encoded so it is handled correctly in ServletContext.getRequestDispatcher().
          */
-        path = URLEncoder.DEFAULT.encode(path, StandardCharsets.UTF_8);
         try {
             uriEncoded.set(Boolean.TRUE);
             dispatch(path);

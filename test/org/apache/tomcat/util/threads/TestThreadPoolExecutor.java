@@ -20,6 +20,9 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -83,35 +86,120 @@ public class TestThreadPoolExecutor {
     }
 
     /*
-     * A rejected execution handler that does not throw discards the task or runs it in the calling thread. Either way
+     * A built-in rejection policy that does not throw discards the task or runs it in the calling thread. Either way
      * the task never reaches afterExecute(), so the submitted count must be decremented when the handler returns.
      */
     @Test
     public void testNonThrowingRejectionHandlerKeepsSubmittedCount() throws Exception {
-        // Test both handlers that do not throw.
+        // Test both policies, including inherited and delegated handling methods.
         for (ThreadPoolExecutor.RejectedExecutionHandler handler : new ThreadPoolExecutor.RejectedExecutionHandler[] {
-                new ThreadPoolExecutor.DiscardPolicy(), new ThreadPoolExecutor.CallerRunsPolicy() }) {
-            CountDownLatch release = new CountDownLatch(1);
+                new ThreadPoolExecutor.DiscardPolicy(), new ThreadPoolExecutor.CallerRunsPolicy(),
+                new ThreadPoolExecutor.DiscardPolicy() {}, new ThreadPoolExecutor.CallerRunsPolicy() {} }) {
             boolean expectRunInCaller = handler instanceof ThreadPoolExecutor.CallerRunsPolicy;
-            ThreadPoolExecutor pool = createPool(handler);
-            try {
-                CountDownLatch started = new CountDownLatch(1);
-                pool.execute(blockingTask("running", started, release));
-                awaitStarted(started);
-                pool.execute(blockingTask("queued", release));
-                AtomicBoolean ran = new AtomicBoolean();
-                pool.execute(() -> ran.set(true)); // rejected: discarded or run by this thread
-                // Only the running and the queued task are still outstanding.
-                Assert.assertEquals(handler.getClass().getName(), 2, pool.getSubmittedCount());
-                Assert.assertEquals(handler.getClass().getName(), Boolean.valueOf(expectRunInCaller),
-                        Boolean.valueOf(ran.get()));
-                release.countDown();
-                awaitSubmittedCount(pool, 0);
-            } finally {
-                pool.shutdownNow();
-            }
+            doTestNonThrowingRejectionHandler(handler, expectRunInCaller);
+            doTestNonThrowingRejectionHandler((task, executor) -> handler.rejectedExecution(task, executor),
+                    expectRunInCaller);
         }
     }
+
+
+    private void doTestNonThrowingRejectionHandler(ThreadPoolExecutor.RejectedExecutionHandler handler,
+            boolean expectRunInCaller) throws Exception {
+        CountDownLatch release = new CountDownLatch(1);
+        ThreadPoolExecutor pool = createPool(handler);
+        try {
+            CountDownLatch started = new CountDownLatch(1);
+            pool.execute(blockingTask("running", started, release));
+            awaitStarted(started);
+            pool.execute(blockingTask("queued", release));
+            AtomicBoolean ran = new AtomicBoolean();
+            pool.execute(() -> ran.set(true)); // rejected: discarded or run by this thread
+            // Only the running and the queued task are still outstanding.
+            Assert.assertEquals(handler.getClass().getName(), 2, pool.getSubmittedCount());
+            Assert.assertEquals(handler.getClass().getName(), Boolean.valueOf(expectRunInCaller),
+                    Boolean.valueOf(ran.get()));
+            release.countDown();
+            awaitSubmittedCount(pool, 0);
+        } finally {
+            pool.shutdownNow();
+            Assert.assertTrue(pool.awaitTermination(5, TimeUnit.SECONDS));
+        }
+    }
+
+
+    /*
+     * A rejection handler may enqueue the task instead of discarding it or running it itself. Even a subclass of a
+     * built-in policy may do this, so returning from the handler must not release the queued task's count.
+     */
+    @Test
+    public void testQueuingRejectionHandlerKeepsSubmittedCount() throws Exception {
+        CountDownLatch firstStarted = new CountDownLatch(1);
+        CountDownLatch releaseFirst = new CountDownLatch(1);
+        CountDownLatch secondStarted = new CountDownLatch(1);
+        CountDownLatch releaseSecond = new CountDownLatch(1);
+        CountDownLatch thirdCompleted = new CountDownLatch(1);
+        TaskQueue queue = new TaskQueue(1);
+        ThreadPoolExecutor pool = new ThreadPoolExecutor(1, 1, 60, TimeUnit.SECONDS, queue,
+                Executors.defaultThreadFactory(), new ThreadPoolExecutor.CallerRunsPolicy() {
+                    @Override
+                    public void rejectedExecution(Runnable task, ThreadPoolExecutor executor) {
+                        // Let the worker take the queued task so the handler can enqueue the rejected task.
+                        releaseFirst.countDown();
+                        try {
+                            awaitStarted(secondStarted);
+                            executor.getQueue().put(task);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                            throw new RejectedExecutionException(e);
+                        }
+                    }
+                });
+        queue.setParent(pool);
+        try {
+            pool.execute(blockingTask("first", firstStarted, releaseFirst));
+            awaitStarted(firstStarted);
+            pool.execute(blockingTask("second", secondStarted, releaseSecond));
+            pool.execute(thirdCompleted::countDown);
+
+            Assert.assertEquals("One running task and one task queued by the handler", 2, pool.getSubmittedCount());
+            Assert.assertEquals(1, queue.size());
+            releaseSecond.countDown();
+            Assert.assertTrue(thirdCompleted.await(5, TimeUnit.SECONDS));
+            awaitSubmittedCount(pool, 0);
+        } finally {
+            releaseFirst.countDown();
+            releaseSecond.countDown();
+            pool.shutdownNow();
+            Assert.assertTrue(pool.awaitTermination(5, TimeUnit.SECONDS));
+        }
+    }
+
+
+    @Test
+    public void testDiscardOldestPolicyKeepsSubmittedCount() throws Exception {
+        CountDownLatch release = new CountDownLatch(1);
+        CountDownLatch started = new CountDownLatch(1);
+        CountDownLatch completed = new CountDownLatch(1);
+        AtomicBoolean discardedTaskRan = new AtomicBoolean();
+        ThreadPoolExecutor pool = createPool(new ThreadPoolExecutor.DiscardOldestPolicy());
+        try {
+            pool.execute(blockingTask("running", started, release));
+            awaitStarted(started);
+            pool.execute(() -> discardedTaskRan.set(true));
+            pool.execute(completed::countDown);
+            // The original queued task was discarded. Only the running task and its replacement remain.
+            Assert.assertEquals(2, pool.getSubmittedCount());
+            release.countDown();
+            Assert.assertTrue(completed.await(5, TimeUnit.SECONDS));
+            awaitSubmittedCount(pool, 0);
+            Assert.assertFalse(discardedTaskRan.get());
+        } finally {
+            release.countDown();
+            pool.shutdownNow();
+            Assert.assertTrue(pool.awaitTermination(5, TimeUnit.SECONDS));
+        }
+    }
+
 
     /*
      * A null command is rejected with a NullPointerException before it can be counted.
@@ -181,6 +269,55 @@ public class TestThreadPoolExecutor {
         }
     }
 
+
+    /*
+     * A worker can dequeue a cancelled future after purge() has selected it but before purge() removes it. In that
+     * case afterExecute() accounts for the future and purge() must not decrement the count again.
+     */
+    @Test
+    public void testPurgeRacingWithWorkerKeepsSubmittedCount() throws Exception {
+        CountDownLatch firstStarted = new CountDownLatch(1);
+        CountDownLatch releaseFirst = new CountDownLatch(1);
+        CountDownLatch secondStarted = new CountDownLatch(1);
+        CountDownLatch releaseSecond = new CountDownLatch(1);
+        TaskQueue queue = new TaskQueue();
+        ThreadPoolExecutor pool = new ThreadPoolExecutor(1, 1, 60, TimeUnit.SECONDS, queue,
+                Executors.defaultThreadFactory());
+        queue.setParent(pool);
+        FutureTask<Void> cancelled = new FutureTask<>(() -> null) {
+            @Override
+            public boolean isCancelled() {
+                // The worker processes the cancelled future before starting the second task.
+                releaseFirst.countDown();
+                try {
+                    awaitStarted(secondStarted);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new AssertionError(e);
+                }
+                return super.isCancelled();
+            }
+        };
+        try {
+            pool.execute(blockingTask("first", firstStarted, releaseFirst));
+            awaitStarted(firstStarted);
+            Assert.assertTrue(cancelled.cancel(false));
+            pool.execute(cancelled);
+            pool.execute(blockingTask("second", secondStarted, releaseSecond));
+            pool.purge();
+
+            Assert.assertEquals("Only the second task is outstanding", 1, pool.getSubmittedCount());
+            releaseSecond.countDown();
+            awaitSubmittedCount(pool, 0);
+        } finally {
+            releaseFirst.countDown();
+            releaseSecond.countDown();
+            pool.shutdownNow();
+            Assert.assertTrue(pool.awaitTermination(5, TimeUnit.SECONDS));
+        }
+    }
+
+
     /*
      * If beforeExecute() throws, the worker dies without processing the task and without calling afterExecute(), so the
      * submitted count must be decremented for the lost task.
@@ -216,6 +353,44 @@ public class TestThreadPoolExecutor {
             pool.shutdownNow();
         }
     }
+
+    /*
+     * If the pool is shut down after a task has been queued but before execute() re-checks the pool state, execute()
+     * removes the task again and rejects it. The removal can empty the queue of a shut down pool that has no workers,
+     * so it must trigger the transition to terminated since nothing else will.
+     */
+    @Test
+    public void testRollbackOfQueuedTaskDuringShutdownTerminatesPool() throws Exception {
+        class ShutdownAfterOfferQueue extends LinkedBlockingQueue<Runnable> {
+            private static final long serialVersionUID = 1L;
+            private transient volatile ThreadPoolExecutor pool;
+
+            @Override
+            public boolean offer(Runnable r) {
+                boolean result = super.offer(r);
+                // Shut down while the task is queued, as a concurrent shutdown() call could
+                pool.shutdown();
+                return result;
+            }
+        }
+
+        ShutdownAfterOfferQueue queue = new ShutdownAfterOfferQueue();
+        // No core threads so there is no worker to terminate the pool once the queue has been emptied
+        @SuppressWarnings("resource")
+        ThreadPoolExecutor pool = new ThreadPoolExecutor(0, 1, 60, TimeUnit.SECONDS, queue,
+                Executors.defaultThreadFactory(), new ThreadPoolExecutor.AbortPolicy());
+        queue.pool = pool;
+        try {
+            Assert.assertThrows(RejectedExecutionException.class, () -> pool.execute(() -> {
+                // Must not run
+            }));
+            Assert.assertTrue("Pool did not terminate", pool.awaitTermination(5, TimeUnit.SECONDS));
+            Assert.assertEquals(0, pool.getSubmittedCount());
+        } finally {
+            pool.shutdownNow();
+        }
+    }
+
 
     /*
      * Tasks that complete normally or that throw must each decrement the submitted count exactly once.

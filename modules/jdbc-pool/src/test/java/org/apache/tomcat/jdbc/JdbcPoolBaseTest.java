@@ -37,6 +37,7 @@ import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
+import org.apache.tomcat.jdbc.pool.ProxyConnection;
 import org.h2.tools.Server;
 
 /**
@@ -57,6 +58,13 @@ import org.h2.tools.Server;
  *
  * Test classes must not run in parallel (each uses static fixture
  * state); Surefire's default sequential execution applies.
+ *
+ * <p>The suite is grouped into thematic {@code Test*} classes (for example
+ * {@code org.apache.tomcat.jdbc.pool.TestPoolLifecycle}).  Each former
+ * standalone test class is now an abstract {@code *Base} fixture, and one
+ * {@code @Nested} group in the thematic class extends it.  This keeps every
+ * test method, helper and fixture intact while making the suite navigable by
+ * theme; the abstract fixtures are never run directly.</p>
  */
 public abstract class JdbcPoolBaseTest {
 
@@ -164,6 +172,15 @@ public abstract class JdbcPoolBaseTest {
             interceptor = interceptor.getNext();
         }
         return null;
+    }
+
+    /*
+     * The pool-internal PooledConnection behind a borrowed handle. It is no
+     * longer reachable through the public Wrapper contract, so tests that need
+     * it reach it through the ProxyConnection at the bottom of the chain.
+     */
+    protected static PooledConnection internalOf(Connection pooled) {
+        return interceptorOf(pooled, ProxyConnection.class).getConnection();
     }
 
     /*

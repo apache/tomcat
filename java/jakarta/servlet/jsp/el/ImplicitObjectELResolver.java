@@ -487,12 +487,19 @@ public class ImplicitObjectELResolver extends ELResolver {
 
             @Override
             public boolean equals(Object obj) {
-                return obj != null && this.hashCode() == obj.hashCode();
+                if (this == obj) {
+                    return true;
+                }
+                if (!(obj instanceof Map.Entry<?,?> other)) {
+                    return false;
+                }
+                return Objects.equals(this.key, other.getKey()) && Objects.equals(getValue(), other.getValue());
             }
 
             @Override
             public int hashCode() {
-                return this.key.hashCode();
+                // As required by Map.Entry
+                return Objects.hashCode(this.key) ^ Objects.hashCode(getValue());
             }
 
         }

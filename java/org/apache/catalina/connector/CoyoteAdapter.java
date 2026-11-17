@@ -258,6 +258,7 @@ public class CoyoteAdapter implements Adapter {
                 if (request.isAsyncCompleting() || request.isAsyncDispatching()) {
                     // Connection will be forcibly closed which will prevent completion/dispatch happening at the usual
                     // point. Trigger post-processing here.
+                    finishResponseIfIoAllowed(request, response, res);
                     res.action(ActionCode.ASYNC_POST_PROCESS, null);
                 }
                 success = false;
@@ -367,9 +368,16 @@ public class CoyoteAdapter implements Adapter {
 
                 // If an async request was started, is not going to end once
                 // this container thread finishes and an error occurred, trigger
-                // the async error process
-                if (!request.isAsyncCompleting() && throwable != null) {
-                    request.getAsyncContextInternal().setErrorState(throwable, true);
+                // the async error process. The error may have been reported
+                // without an exception (e.g. the connection being closed after
+                // the response had been committed) in which case the async
+                // state machine is already in the error state.
+                if (!request.isAsyncCompleting()) {
+                    AtomicBoolean asyncError = new AtomicBoolean(false);
+                    res.action(ActionCode.ASYNC_IS_ERROR, asyncError);
+                    if (throwable != null || asyncError.get()) {
+                        request.getAsyncContextInternal().setErrorState(throwable, true);
+                    }
                 }
             } else {
                 request.finishRequest();
@@ -382,10 +390,12 @@ public class CoyoteAdapter implements Adapter {
             AtomicBoolean error = new AtomicBoolean(false);
             res.action(ActionCode.IS_ERROR, error);
 
-            if (request.isAsyncCompleting() && error.get()) {
+            if ((request.isAsyncCompleting() || request.isAsyncDispatching()) && error.get()) {
                 // Connection will be forcibly closed which will prevent
-                // completion happening at the usual point. Need to trigger
-                // call to onComplete() here.
+                // completion or the dispatch requested during error handling
+                // from happening at the usual point. Need to trigger the call
+                // to onComplete() here.
+                finishResponseIfIoAllowed(request, response, res);
                 res.action(ActionCode.ASYNC_POST_PROCESS, null);
                 async = false;
             }
@@ -424,6 +434,26 @@ public class CoyoteAdapter implements Adapter {
                 updateWrapperErrorCount(request, response);
                 request.recycle();
                 response.recycle();
+            }
+        }
+    }
+
+
+    /*
+     * Called when the processor is in an error state and the connection will be closed before an async complete or
+     * dispatch can take place at the usual point. If the error state still permits IO (e.g. CLOSE_CLEAN) the current
+     * response can be completed before the connection is closed. Output that is still held in the response buffer
+     * would be discarded when the response is recycled so write it now, as the normal completion path would have done.
+     */
+    private void finishResponseIfIoAllowed(Request request, Response response, org.apache.coyote.Response res) {
+        AtomicBoolean ioAllowed = new AtomicBoolean(false);
+        res.action(ActionCode.IS_IO_ALLOWED, ioAllowed);
+        if (ioAllowed.get()) {
+            try {
+                request.finishRequest();
+                response.finishResponse();
+            } catch (IOException ignore) {
+                // Issues that should be logged will have already been logged
             }
         }
     }
@@ -840,10 +870,13 @@ public class CoyoteAdapter implements Adapter {
                     }
                 }
             }
-            if (header != null) {
+            if (header == null) {
+                // No header, means no wrapper which means no matching resource so need to return 404.
+                response.sendError(404);
+            } else {
                 res.addHeader("Allow", header.toString());
+                response.sendError(405, sm.getString("coyoteAdapter.trace"));
             }
-            response.sendError(405, sm.getString("coyoteAdapter.trace"));
             // Safe to skip the remainder of this method.
             return true;
         }

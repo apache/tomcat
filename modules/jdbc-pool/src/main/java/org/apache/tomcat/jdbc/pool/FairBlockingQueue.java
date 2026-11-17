@@ -35,11 +35,13 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
- * A simple implementation of a blocking queue with fairness waiting. invocations to method poll(...) will get handed
- * out in the order they were received. Locking is fine grained, a shared lock is only used during the first level of
- * contention, waiting is done in a lock per thread basis so that order is guaranteed once the thread goes into a
- * suspended monitor state. <br>
- * Not all of the methods of the {@link java.util.concurrent.BlockingQueue} are implemented.
+ * A simple implementation of a blocking queue with fairness waiting. Waiters of method poll(...) are handed items in
+ * the order in which they registered as waiters. Locking is fine grained: a shared lock is only used during the first
+ * level of contention, while waiting is done on a per-waiter {@link java.util.concurrent.CountDownLatch}, so order is
+ * guaranteed once a thread has registered itself as a waiter - a caller that has not registered yet may still barge
+ * ahead when it races for the shared lock. <br>
+ * Not all of the methods of the {@link java.util.concurrent.BlockingQueue} are supported: the ones that are not throw
+ * {@link UnsupportedOperationException}.
  *
  * @param <E> Type of element in the queue
  */
@@ -49,16 +51,16 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
     /**
      * This little sucker is used to reorder the way to do {@link java.util.concurrent.locks.Lock#lock()},
      * {@link java.util.concurrent.locks.Lock#unlock()} and {@link java.util.concurrent.CountDownLatch#countDown()}
-     * during the {@link #poll(long, TimeUnit)} operation. On Linux, it performs much better if we count down while we
-     * hold the global lock, on Solaris its the other way around. Until we have tested other platforms we only check for
-     * Linux.
+     * when {@link #offer(Object)} wakes a waiter whose {@link #poll(long, TimeUnit)} wait the offer completes. On
+     * Linux, it performs much better if we count down while we hold the global lock, on Solaris its the other way
+     * around. Until we have tested other platforms we only check for Linux.
      */
     static final boolean isLinux = "Linux".equals(System.getProperty("os.name")) &&
             (!Boolean.getBoolean(FairBlockingQueue.class.getName() + ".ignoreOS"));
 
     /**
-     * Phase one entry lock in order to give out per-thread-locks for the waiting phase we have a phase one lock during
-     * the contention period.
+     * Phase one entry lock: held only during the contention period, in order to register the per-waiter latch that
+     * the waiting phase then parks on.
      */
     final ReentrantLock lock = new ReentrantLock(false);
 
@@ -101,14 +103,11 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
         // item to the waiter it is given to. Like the JDK queue
         // implementations, reject null elements.
         Objects.requireNonNull(e);
-        // During the offer, we will grab the main lock
         final ReentrantLock lock = this.lock;
         lock.lock();
         ExchangeCountDownLatch<E> c = null;
         try {
-            // Check to see if threads are waiting for an object
             if (!waiters.isEmpty()) {
-                // If threads are waiting grab the latch for that thread
                 c = waiters.poll();
                 // Give the object to the thread instead of adding it to the pool
                 c.setItem(e);
@@ -131,18 +130,11 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
     }
 
     /**
-     * Will never timeout, as it invokes the {@link #offer(Object)} method. Once a lock has been acquired, the
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean offer(E e, long timeout, TimeUnit unit) throws InterruptedException {
-        return offer(e);
-    }
-
-    /**
      * Fair retrieval of an object in the queue. Objects are returned in the order the threads requested them. If the
      * wait is interrupted but an object was handed over to this waiter all the same, the object is returned and the
-     * interrupt status of the calling thread is restored instead of being cleared.
+     * interrupt status of the calling thread is restored instead of being cleared. On a queue whose waiters the
+     * {@link #cancelWaiters()} method has failed, an empty queue hands back no item right away instead of parking the
+     * caller: such a queue is never fed again, so waiting could only end in the same empty-handed return.
      * {@inheritDoc}
      */
     @Override
@@ -152,19 +144,15 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
         // Acquire the global lock until we know what to do
         lock.lock();
         try {
-            // Check to see if we have objects
             result = items.poll();
-            if (result == null && timeout > 0) {
+            if (result == null && timeout > 0 && !waitersCancelled) {
                 // The queue is empty we will wait for an object
                 ExchangeCountDownLatch<E> c = new ExchangeCountDownLatch<>(1);
-                // Add to the bottom of the wait list
                 waiters.addLast(c);
-                // Unlock the global lock
                 lock.unlock();
                 boolean didtimeout = true;
                 InterruptedException interruptedException = null;
                 try {
-                    // Wait for the specified timeout
                     didtimeout = !c.await(timeout, unit);
                 } catch (InterruptedException ix) {
                     interruptedException = ix;
@@ -196,7 +184,8 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
                     }
                 }
             } else {
-                // We have an object, release
+                // We have an object, or there is none and none can arrive on
+                // a queue whose waiters are failed; either way, do not park
                 lock.unlock();
             }
         } finally {
@@ -223,15 +212,12 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
     public Future<E> pollAsync() {
         Future<E> result = null;
         final ReentrantLock lock = this.lock;
-        // Grab the global lock
         lock.lock();
         try {
-            // Check to see if we have objects in the queue
             E item = items.poll();
             if (item == null) {
                 // Queue is empty, add ourselves as waiters
                 ExchangeCountDownLatch<E> c = new ExchangeCountDownLatch<>(1);
-                // Return a future that will wait for the object
                 ItemFuture<E> future = new ItemFuture<>(c);
                 // Tell the latch which future its item is meant for, before the
                 // waiter becomes visible to cancelWaiters()
@@ -247,7 +233,6 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
                 }
                 result = future;
             } else {
-                // Return a future with the item
                 result = new ItemFuture<>(item);
             }
         } finally {
@@ -257,17 +242,19 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
     }
 
     /**
-     * Cancel the futures of all the asynchronous polls that are waiting for an item on this queue. A thread that is
-     * blocked in one of the {@link Future#get()} methods of such a future observes a {@link CancellationException}
-     * instead of waiting for an item that will never be offered, and later calls to {@link #pollAsync()} do not
-     * register a waiter at all. A future an item has already been handed over to is not cancelled, it completes with
-     * that item as usual. <br>
+     * Fail all the polls that are waiting for an item on this queue. A thread blocked in one of the
+     * {@link Future#get()} methods of an asynchronous poll observes a {@link CancellationException}, and a waiter of a
+     * timed {@link #poll(long, TimeUnit)} is woken without an item, the way its timeout ends the wait. Later calls to
+     * {@link #pollAsync()} and {@link #poll(long, TimeUnit)} do not register a waiter at all. A poll an item has
+     * already been handed over to is not failed, it completes with that item as usual. <br>
      * This makes a queue that is never fed again terminate the callers that wait on it, instead of leaving them parked
-     * forever.
+     * forever - including the timed waiters, whose own timeout the caller cannot know: the pool hands out waits of
+     * unbounded length, where waiting for the timeout would be waiting forever.
      */
     public void cancelWaiters() {
         final ReentrantLock lock = this.lock;
         List<ItemFuture<E>> futures;
+        List<ExchangeCountDownLatch<E>> timedWaiters;
         lock.lock();
         try {
             // The caller that cancels the waiters offers no further item from
@@ -275,21 +262,52 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
             // served either
             waitersCancelled = true;
             futures = new ArrayList<>(waiters.size());
-            for (ExchangeCountDownLatch<E> c : waiters) {
+            timedWaiters = new ArrayList<>(waiters.size());
+            for (Iterator<ExchangeCountDownLatch<E>> it = waiters.iterator(); it.hasNext();) {
+                ExchangeCountDownLatch<E> c = it.next();
                 ItemFuture<E> future = c.getFuture();
                 if (future != null) {
-                    // Only the asynchronous polls have a future to cancel, the
-                    // waiters of poll(long,TimeUnit) time out on their own
+                    // The asynchronous polls are failed through their future
                     futures.add(future);
+                } else {
+                    // A timed poll has no future to cancel: deregister its
+                    // waiter here, so no offer hands an item to a caller that
+                    // is being failed, and wake it below with the item still
+                    // null, so its poll returns null as a timeout does
+                    it.remove();
+                    timedWaiters.add(c);
                 }
             }
         } finally {
             lock.unlock();
         }
-        // Cancel outside of the lock, as the cancellation wakes up the callers
-        // and deregisters their waiter itself
+        // Cancel and wake outside of the lock, as both wake up the callers; a
+        // cancelled future deregisters its waiter itself
         for (ItemFuture<E> future : futures) {
             future.cancel(false);
+        }
+        for (ExchangeCountDownLatch<E> c : timedWaiters) {
+            c.countDown();
+        }
+    }
+
+    /**
+     * Reports whether any caller is registered on this queue waiting for an
+     * item - through a timed poll or an asynchronous one. A releaser that
+     * decides whether an offered item has a prospective consumer cannot see
+     * these registrations through the pool's wait counter, which counts only
+     * the synchronous borrow waits.
+     *
+     * @return <code>true</code> if at least one caller is registered waiting
+     *             for an item
+     */
+    public boolean hasRegisteredWaiter() {
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            return !waiters.isEmpty();
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -342,10 +360,25 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
         }
     }
 
+    @Override
+    public boolean isEmpty() {
+        return size() == 0;
+    }
+
 
     // The queue methods below are not used by the connection pool implementation.
     @Override
     public boolean add(E e) {
+        return offer(e);
+    }
+
+    /**
+     * Will never time out, as it invokes the {@link #offer(Object)} method: the element is always inserted, so the
+     * timeout is never applied and, despite the declaration, {@link InterruptedException} is never thrown.
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean offer(E e, long timeout, TimeUnit unit) throws InterruptedException {
         return offer(e);
     }
 
@@ -380,6 +413,10 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
         return Integer.MAX_VALUE - size();
     }
 
+    /**
+     * Delegates to {@link #poll(long, TimeUnit)} with an effectively unbounded timeout, so the wait also ends the way
+     * that method documents for a queue whose waiters {@link #cancelWaiters()} has failed. {@inheritDoc}
+     */
     @Override
     public E take() throws InterruptedException {
         return this.poll(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
@@ -415,11 +452,6 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
     @Override
     public boolean containsAll(Collection<?> c) {
         throw new UnsupportedOperationException(MessageFactory.get("fairBlockingQueue.unsupportedContainsAll"));
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return size() == 0;
     }
 
     /**

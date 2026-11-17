@@ -91,6 +91,11 @@ public final class Out implements TagPlugin {
         ctxt.generateJavaSource(
                 "boolean " + strSkipBodyName + " = " + "org.apache.jasper.tagplugins.jstl.core.Out.output(out, " +
                         strObjectName + ", " + strValName + ", " + strDefName + ", " + strEscapeXmlName + ");");
+        if (!ctxt.hasBody()) {
+            // There is no body to use as a fallback, so there is nothing to
+            // buffer. Avoid allocating a BodyContent for every null value.
+            return;
+        }
         ctxt.generateJavaSource("if(!" + strSkipBodyName + ") {");
         // Neither the value nor the default produced output. As in the
         // standard tag handler, capture the body content, then output it

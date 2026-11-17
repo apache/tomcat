@@ -90,8 +90,10 @@ public class Upgrade {
     public static List<Upgrade> parse(Enumeration<String> headerValues) {
         try {
             List<Upgrade> result = new ArrayList<>();
+            boolean sawHeader = false;
 
             while (headerValues.hasMoreElements()) {
+                sawHeader = true;
                 String headerValue = headerValues.nextElement();
                 if (headerValue == null) {
                     // Invalid
@@ -101,6 +103,17 @@ public class Upgrade {
                 Reader r = new StringReader(headerValue);
                 SkipResult skipComma;
                 do {
+                    // Empty list elements must be ignored (RFC 9110, section 5.6.1.2)
+                    SkipResult skipEmpty = HttpParser.skipConstant(r, ",");
+                    while (skipEmpty == SkipResult.FOUND) {
+                        skipEmpty = HttpParser.skipConstant(r, ",");
+                    }
+                    if (skipEmpty == SkipResult.EOF) {
+                        // Nothing left in this header value once any empty
+                        // list elements are skipped. This header contributes
+                        // no protocols, whether or not earlier headers did.
+                        break;
+                    }
                     // Skip any leading whitespace
                     HttpParser.skipWhitespace(r);
                     String protocolName = HttpParser.readToken(r);
@@ -127,6 +140,15 @@ public class Upgrade {
                     result.add(new Upgrade(protocolName, protocolVersion));
                     // SkipResult.EOF will exit this inner loop
                 } while (skipComma == SkipResult.FOUND);
+            }
+
+            if (sawHeader && result.isEmpty()) {
+                // An Upgrade header must name at least one protocol (RFC
+                // 9110, section 7.8). One or more headers that reduce to an
+                // empty list once empty list elements are discarded is
+                // invalid. No Upgrade header at all is not an error; it
+                // yields the empty list below, as before this change.
+                return null;
             }
 
             return result;

@@ -49,6 +49,8 @@ public class JarFileUrlNestedJar extends AbstractInputStreamJar {
         // causes jarConn.getJarFile() above to throw.
         jarEntry = jarConn.getJarEntry();
         if (jarEntry == null) {
+            // The constructor is not going to complete so the caller can't close the JarFile
+            warFile.close();
             throw new FileNotFoundException(url.toExternalForm());
         }
     }

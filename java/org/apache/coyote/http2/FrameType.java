@@ -25,7 +25,7 @@ enum FrameType {
     DATA            (  0, false,  true, null,              false),
     HEADERS         (  1, false,  true, null,               true),
     PRIORITY        (  2, false,  true, (x) -> x == 5,     false),
-    RST             (  3, false,  true, (x) -> x == 4,     false),
+    RST             (  3, false,  true, (x) -> x == 4,      true),
     SETTINGS        (  4,  true, false, (x) -> x % 6 == 0,  true),
     PUSH_PROMISE    (  5, false,  true, (x) -> x >= 4,      true),
     PING            (  6,  true, false, (x) -> x == 8,     false),

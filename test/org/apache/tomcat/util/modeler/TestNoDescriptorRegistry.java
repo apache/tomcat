@@ -63,6 +63,20 @@ public class TestNoDescriptorRegistry {
     }
 
     @Test
+    public void testGetClassLoaderWithNullName() throws Exception {
+        MBeanServer server = new NoDescriptorRegistry().getMBeanServer();
+        // A null name requests the server's own loader rather than a registered MBean.
+        ClassLoader loader = server.getClassLoader(null);
+        Assert.assertSame(server.getClass(), Class.forName(server.getClass().getName(), false, loader));
+    }
+
+    @Test
+    public void testGetClassLoaderWithObjectNameThrows() throws Exception {
+        MBeanServer server = new NoDescriptorRegistry().getMBeanServer();
+        Assert.assertThrows(InstanceNotFoundException.class, () -> server.getClassLoader(ONAME));
+    }
+
+    @Test
     public void testRegistryGetMethodInfoThrows() throws Exception {
         Registry registry = new NoDescriptorRegistry();
         Assert.assertThrows(InstanceNotFoundException.class, () -> registry.getMethodInfo(ONAME, "test", 0));

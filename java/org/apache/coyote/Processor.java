@@ -90,6 +90,19 @@ public interface Processor {
     void recycle();
 
     /**
+     * Whether this processor may be returned to the shared processor pool
+     * after {@link #recycle()}. A processor must not be reused if a
+     * non-container thread may still be using its request, response or
+     * output state (for example after an asynchronous timeout or error
+     * while an application thread was blocked in a write).
+     *
+     * @return {@code true} if the processor may be pooled for reuse
+     */
+    default boolean isReusable() {
+        return true;
+    }
+
+    /**
      * Set the SSL information for this HTTP connection.
      *
      * @param sslSupport The SSL support object to use for this connection

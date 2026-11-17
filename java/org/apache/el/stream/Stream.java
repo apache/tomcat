@@ -186,7 +186,12 @@ public class Stream {
                 while (iterator.hasNext()) {
                     list.add(iterator.next());
                 }
-                Collections.sort(list);
+                try {
+                    Collections.sort(list);
+                } catch (ClassCastException cce) {
+                    // The elements are not Comparable or are not Comparable with each other
+                    throw new ELException(MessageFactory.get("stream.compare.sortFailed"), cce);
+                }
                 sorted = list.iterator();
             }
         };
@@ -309,7 +314,9 @@ public class Stream {
      * is less than or equal to zero.
      *
      * @param start the number of elements to skip
-     * @param end the end position (exclusive)
+     * @param end used to calculate the number of elements to include, which is {@code end - start}. This is the
+     *                exclusive end position only if {@code start} is greater than or equal to zero. If
+     *                {@code end - start} is less than or equal to zero, no elements are included.
      * @return the new substream
      */
     public Stream substream(final Number start, final Number end) {
@@ -604,9 +611,16 @@ public class Stream {
         while (iterator.hasNext()) {
             Object obj = iterator.next();
             if ((obj instanceof Comparable)) {
-                if (isMax && ((Comparable) obj).compareTo(result) > 0) {
+                int comparison;
+                try {
+                    comparison = ((Comparable) obj).compareTo(result);
+                } catch (ClassCastException cce) {
+                    // The elements are Comparable but not with each other
+                    throw new ELException(MessageFactory.get("error.compare", obj, result), cce);
+                }
+                if (isMax && comparison > 0) {
                     result = (Comparable) obj;
-                } else if (!isMax && ((Comparable) obj).compareTo(result) < 0) {
+                } else if (!isMax && comparison < 0) {
                     result = (Comparable) obj;
                 }
             } else {

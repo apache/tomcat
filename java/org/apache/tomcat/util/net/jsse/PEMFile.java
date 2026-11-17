@@ -246,7 +246,11 @@ public class PEMFile {
     public PEMFile(String filename, InputStream fileStream, String password, String passwordFilename,
             InputStream passwordFileStream, String keyAlgorithm) throws IOException, GeneralSecurityException {
         List<Part> parts = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(fileStream, StandardCharsets.US_ASCII))) {
+        String passwordToUse;
+        // Both streams are already open. Close the password stream even if scanning the PEM data fails.
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(fileStream, StandardCharsets.US_ASCII));
+                BufferedReader passwordReader = passwordFileStream == null ? null :
+                        new BufferedReader(new InputStreamReader(passwordFileStream, StandardCharsets.UTF_8))) {
             Part part = null;
             String line;
             while ((line = reader.readLine()) != null) {
@@ -291,16 +295,12 @@ public class PEMFile {
             if (part != null) {
                 throw new IOException(sm.getString("pemFile.startWithoutEnd", filename, part.type));
             }
-        }
 
-        String passwordToUse;
-        if (passwordFileStream != null) {
-            try (BufferedReader reader =
-                    new BufferedReader(new InputStreamReader(passwordFileStream, StandardCharsets.UTF_8))) {
-                passwordToUse = reader.readLine();
+            if (passwordReader != null) {
+                passwordToUse = passwordReader.readLine();
+            } else {
+                passwordToUse = password;
             }
-        } else {
-            passwordToUse = password;
         }
 
         for (Part part : parts) {

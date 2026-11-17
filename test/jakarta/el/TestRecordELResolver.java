@@ -72,4 +72,21 @@ public class TestRecordELResolver {
 
         Assert.assertEquals(LONG_DATA, result.longValue());
     }
+
+
+    @Test
+    public void testRecordFallBackToBean() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        StandardELContext context = new StandardELContext(factory);
+
+        TesterBeanCImpl beanC = new TesterBeanCImpl();
+
+        ValueExpression varBeanC = factory.createValueExpression(beanC, TesterBeanCImpl.class);
+        context.getVariableMapper().setVariable("beanC", varBeanC);
+
+        ValueExpression ve = factory.createValueExpression(context, "${beanC.valid}", Boolean.class);
+        Boolean result = ve.getValue(context);
+
+        Assert.assertEquals(Boolean.TRUE, result);
+    }
 }

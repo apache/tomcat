@@ -834,7 +834,7 @@ public class HttpParser {
         if (c == -1 || c == delimiter) {
             // No q value just whitespace
             return 1;
-        } else if (c != 'q') {
+        } else if (c != 'q' && c != 'Q') {
             // Malformed. Use quality of -1 so it is dropped.
             skipUntil(input, c, delimiter);
             return -1;

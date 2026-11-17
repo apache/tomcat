@@ -22,6 +22,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.Socket;
+import java.net.SocketTimeoutException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -239,5 +243,65 @@ public class TestSendFile extends TomcatBaseTest {
             }
         }
 
+    }
+
+    /*
+     * If sendfile does not complete inline, the idle connection must wait for the next request using
+     * keepAliveTimeout, not connectionTimeout.
+     *
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=70287
+     */
+    @Test
+    public void testKeepAliveTimeoutAfterPendingSendfile() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.getConnector().setProperty("connectionTimeout", "3000");
+        tomcat.getConnector().setProperty("keepAliveTimeout", "20000");
+
+        Context ctx = tomcat.addContext("", TEMP_DIR);
+        // Large enough that sendfile can't complete while the client isn't reading
+        File file = generateFile(TEMP_DIR, "-keepalive", 64 * 1024 * 1024);
+        addDeleteOnTearDown(file);
+        Tomcat.addServlet(ctx, "test", new WritingServlet(file));
+        ctx.addServletMapping("/", "test");
+
+        tomcat.start();
+
+        try (Socket s = new Socket("localhost", getPort())) {
+            long requestTime = System.nanoTime();
+            s.getOutputStream().write(("GET /test HTTP/1.1\r\nHost: localhost\r\n\r\n").getBytes(
+                    StandardCharsets.ISO_8859_1));
+            s.getOutputStream().flush();
+
+            // Let the server block on a pending sendfile, then drain the response
+            Thread.sleep(1000);
+            InputStream is = s.getInputStream();
+            s.setSoTimeout(10000);
+            byte[] buf = new byte[65536];
+            long total = 0;
+            long expected = file.length();
+            StringBuilder hdr = new StringBuilder();
+            // Read headers
+            int b;
+            while (!hdr.toString().endsWith("\r\n\r\n") && (b = is.read()) != -1) {
+                hdr.append((char) b);
+            }
+            while (total < expected) {
+                int n = is.read(buf);
+                Assert.assertTrue("Premature EOF after [" + total + "] bytes", n > 0);
+                total += n;
+            }
+
+            // Response complete. Connection is idle. connectionTimeout (3s) has been exceeded (measured from the
+            // request) after 4s but keepAliveTimeout (20s) has not. The connection must still be open.
+            long remaining = 5000 - TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - requestTime);
+            Thread.sleep(Math.max(remaining, 0));
+            s.setSoTimeout(500);
+            try {
+                int r = is.read();
+                Assert.fail("Unexpected data/close: server closed idle connection early (read returned " + r + ")");
+            } catch (SocketTimeoutException expectedTimeout) {
+                // Connection still open - expected
+            }
+        }
     }
 }

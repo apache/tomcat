@@ -18,6 +18,7 @@ package org.apache.tomcat.util.modeler;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.net.URL;
@@ -79,7 +80,8 @@ public class Registry implements RegistryMBean, MBeanRegistration {
      */
     private final Map<String,ManagedBean> descriptorsByClass = new ConcurrentHashMap<>();
 
-    // map to avoid duplicated searching or loading descriptors
+    // Map to avoid duplicated searching or loading descriptors. Its monitor also guards loading and checking the
+    // search records, so another thread cannot treat an in-progress load as a completed search.
     private final Map<String,URL> searchedPaths = new ConcurrentHashMap<>();
 
     private Object guard;
@@ -168,9 +170,11 @@ public class Registry implements RegistryMBean, MBeanRegistration {
      */
     @Override
     public void stop() {
-        descriptorsByClass.clear();
-        descriptors.clear();
-        searchedPaths.clear();
+        synchronized (searchedPaths) {
+            descriptorsByClass.clear();
+            descriptors.clear();
+            searchedPaths.clear();
+        }
     }
 
 
@@ -533,6 +537,8 @@ public class Registry implements RegistryMBean, MBeanRegistration {
      * @param value String value to be converted
      *
      * @return Converted value
+     *
+     * @throws NumberFormatException If the value is null or is not valid for a numeric or character type
      */
     public Object convertValue(String type, String value) {
         Object objValue = value;
@@ -552,24 +558,44 @@ public class Registry implements RegistryMBean, MBeanRegistration {
         } else if ("java.lang.Boolean".equals(type) || "boolean".equals(type)) {
             objValue = Boolean.valueOf(value);
         } else if ("java.lang.Double".equals(type) || "double".equals(type)) {
-            objValue = Double.valueOf(value);
+            objValue = Double.valueOf(requireValue(type, value));
         } else if ("java.lang.Float".equals(type) || "float".equals(type)) {
-            objValue = Float.valueOf(value);
+            objValue = Float.valueOf(requireValue(type, value));
         } else if ("java.lang.Short".equals(type) || "short".equals(type)) {
             objValue = Short.valueOf(value);
         } else if ("java.lang.Byte".equals(type) || "byte".equals(type)) {
             objValue = Byte.valueOf(value);
-        } else if (("java.lang.Character".equals(type) || "char".equals(type)) &&
-                value != null && !value.isEmpty()) {
-            // A null or empty string cannot be converted to a character
+        } else if ("java.lang.Character".equals(type) || "char".equals(type)) {
+            requireValue(type, value);
+            if (value.length() != 1) {
+                throw new NumberFormatException(sm.getString("registry.invalidCharValue", value));
+            }
             objValue = Character.valueOf(value.charAt(0));
         }
         return objValue;
     }
 
 
+    /*
+     * Double.valueOf() and Float.valueOf() throw a NullPointerException for a null value. Report it the same way as
+     * the integral types do.
+     */
+    private String requireValue(String type, String value) {
+        if (value == null) {
+            throw new NumberFormatException(sm.getString("registry.nullValue", type));
+        }
+        return value;
+    }
+
+
     /**
      * Load descriptors.
+     *
+     * <p>
+     * If the source is a {@link URL} or a {@link File}, the stream opened to read it is closed before this method
+     * returns. If the source is an {@link InputStream}, that stream is closed before this method returns as well. In
+     * both cases the stream is closed whether or not loading succeeds, so the caller must not use a stream passed to
+     * this method after the call.
      *
      * @param sourceType The source type
      * @param source     The bean
@@ -577,7 +603,8 @@ public class Registry implements RegistryMBean, MBeanRegistration {
      *
      * @return List of object names. The sources provided with Tomcat
      *         register the descriptors with this registry instead of
-     *         returning object names, so the returned list is empty.
+     *         returning object names, so the returned list is empty and
+     *         unmodifiable.
      *
      * @throws Exception Error loading descriptors
      */
@@ -621,12 +648,27 @@ public class Registry implements RegistryMBean, MBeanRegistration {
             case null, default -> throw new IllegalArgumentException(sm.getString("registry.invalidSource"));
         }
 
-        if (sourceType == null) {
-            sourceType = "MbeansDescriptorsDigesterSource";
-        }
-        ModelerSource ds = getModelerSource(sourceType);
+        try {
+            if (sourceType == null) {
+                sourceType = "MbeansDescriptorsDigesterSource";
+            }
+            ModelerSource ds = getModelerSource(sourceType);
 
-        return ds.loadDescriptors(this, type, inputsource);
+            return ds.loadDescriptors(this, type, inputsource);
+        } finally {
+            // The source does not keep the stream. Close it here, whichever way loading ended, since this method opened
+            // it or was given it.
+            if (inputsource instanceof InputStream stream) {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                    // Do not hide the outcome of the load
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("registry.closeSourceError"), e);
+                    }
+                }
+            }
+        }
     }
 
 
@@ -685,6 +727,15 @@ public class Registry implements RegistryMBean, MBeanRegistration {
      * @param classLoader The class loader
      */
     public void loadDescriptors(String packageName, ClassLoader classLoader) {
+        // Hold the lock until the descriptors have been registered. A concurrent caller must wait for the load,
+        // rather than returning early and falling back to introspection while the metadata is still unavailable.
+        synchronized (searchedPaths) {
+            loadDescriptorsInternal(packageName, classLoader);
+        }
+    }
+
+
+    private void loadDescriptorsInternal(String packageName, ClassLoader classLoader) {
         String res = packageName.replace('.', '/');
 
         if (log.isTraceEnabled()) {
@@ -705,10 +756,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
         if (log.isTraceEnabled()) {
             log.trace("Found " + dURL);
         }
-        if (searchedPaths.putIfAbsent(packageName, dURL) != null) {
-            // Another thread claimed this package first and is loading it
-            return;
-        }
+        searchedPaths.put(packageName, dURL);
         try {
             load("MbeansDescriptorsDigesterSource", dURL, null);
         } catch (Exception e) {
@@ -742,8 +790,10 @@ public class Registry implements RegistryMBean, MBeanRegistration {
                 return;
             }
             pkg = pkg.substring(0, lastComp);
-            if (searchedPaths.get(pkg) != null) {
-                return;
+            synchronized (searchedPaths) {
+                if (searchedPaths.get(pkg) != null) {
+                    return;
+                }
             }
             loadDescriptors(pkg, classLoader);
         }

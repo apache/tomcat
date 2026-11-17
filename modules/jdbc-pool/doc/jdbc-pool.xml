@@ -154,12 +154,51 @@
       and it propagates the registration to the underlying pool. To do this you would call <code>mBeanServer.registerMBean(dataSource.getPool().getJmxPool(),objectname)</code>.
       Prior to this call, ensure that the pool has been created by calling <code>dataSource.createPool()</code>.
     </p>
+    <p>
+      The propagation of the registration to the connection pool MBean happens once,
+      at the moment the data source is registered. If the pool has not been created
+      at that point, no connection pool MBean is published, nothing is published
+      later when the pool is created, and the registration is not retried; a warning
+      is logged at registration time. Ensure the pool exists before the data source
+      is registered - in a container the resource factory creates it up front - or
+      deregister and register the data source again afterwards.
+    </p>
+    <p>
+      Only a registration propagated through the data source is taken back when the
+      data source is closed or deregistered. A connection pool MBean registered
+      directly, as in the call above, is not unregistered by <code>close()</code>;
+      unregister it yourself when you close the data source. (Inside Tomcat the
+      container registers the data source through its own wrapper, and the pool
+      MBean's lifecycle is managed for you.)
+    </p>
+  </subsection>
+  <subsection name="Closing the data source">
+    <p>
+      Calling <code>close()</code> or <code>close(false)</code> on the data source
+      closes the connection pool and is terminal: later calls to
+      <code>getConnection()</code> or <code>createPool()</code> fail with a
+      <code>SQLException</code> instead of silently recreating the pool. Connections
+      that are currently borrowed are not disconnected by <code>close(false)</code>;
+      they keep their database sessions and stay usable until their holders close
+      them. <code>close(true)</code> additionally disconnects the database sessions
+      of the connections that are still in use. JMX monitoring of the pool ends when
+      <code>close()</code> returns, including for connections that are still in use.
+    </p>
   </subsection>
 
 </section>
 <section name="Attributes">
   <p>To provide a very simple switch to and from commons-dbcp and tomcat-jdbc-pool,
      Most attributes are the same and have the same meaning.</p>
+  <p>When the pool is configured through the JNDI resource factory, an attribute whose
+     value is blank leaves its property at the default: clearing an attribute in a
+     resource definition switches the property off rather than configuring it to the
+     empty value. A value the property cannot take - an unparseable number, an unknown
+     boolean or transaction isolation level - fails the creation of the pool with an
+     error naming the attribute, rather than being silently ignored. Numeric, boolean
+     and keyword values, class names and JNDI names are read ignoring surrounding
+     whitespace; names, queries and URLs are stored verbatim, since a space can be
+     part of such a value.</p>
   <subsection name="JNDI Factory and Type">
     <attributes>
       <attribute name="factory" required="true">
@@ -169,8 +208,12 @@
         <p>Type should always be <code>javax.sql.DataSource</code> or <code>javax.sql.XADataSource</code></p>
         <p>Depending on the type a <code>org.apache.tomcat.jdbc.pool.DataSource</code> or a <code>org.apache.tomcat.jdbc.pool.XADataSource</code> will be created.</p>
         <p>Note that the <code>javax.sql.XADataSource</code> type only provides XA connections if the pool is backed
-        by an XA data source: the <code>dataSource</code> or <code>dataSourceJNDI</code> attribute must name a
-        <code>javax.sql.XADataSource</code> provided by the JDBC driver. A pool configured with
+        by an XA data source: the data source the pool takes its connections from - supplied through the
+        <code>dataSourceJNDI</code> or <code>dataSource</code> attribute - must implement
+        <code>javax.sql.XADataSource</code>. In an XML resource definition an attribute can only carry text,
+        while the <code>dataSource</code> attribute takes the data source object itself, so the XML route to a
+        backing data source is <code>dataSourceJNDI</code>, naming a <code>javax.sql.XADataSource</code>
+        provided by the JDBC driver and bound in JNDI. A pool configured with
         <code>driverClassName</code> and <code>url</code> pools plain JDBC connections, and a request for an XA
         connection from such a pool fails with an explicit error.</p>
       </attribute>
@@ -201,11 +244,13 @@
   <attributes>
 
     <attribute name="defaultAutoCommit" required="false">
-      <p>(boolean) The default auto-commit state of connections created by this pool. If not set, default is JDBC driver default (If not set then the <code>setAutoCommit</code> method will not be called.)</p>
+      <p>(boolean) The default auto-commit state of connections created by this pool. If not set, default is JDBC driver default (If not set then the <code>setAutoCommit</code> method will not be called.)
+      When the <code>ConnectionState</code> interceptor is configured, it applies this setting on every borrow instead of at connection creation, and re-applies it whenever a borrower has changed it.</p>
     </attribute>
 
     <attribute name="defaultReadOnly" required="false">
-      <p>(boolean) The default read-only state of connections created by this pool. If not set then the <code>setReadOnly</code> method will not be called. (Some drivers don't support read only mode, ex: Informix)</p>
+      <p>(boolean) The default read-only state of connections created by this pool. If not set then the <code>setReadOnly</code> method will not be called. (Some drivers don't support read only mode, ex: Informix)
+      When the <code>ConnectionState</code> interceptor is configured, it applies this setting on every borrow instead of at connection creation, and re-applies it whenever a borrower has changed it.</p>
     </attribute>
 
     <attribute name="defaultTransactionIsolation" required="false">
@@ -217,11 +262,15 @@
            <li><code>REPEATABLE_READ</code></li>
            <li><code>SERIALIZABLE</code></li>
          </ul>
-         <p>If not set, the method will not be called and it defaults to the JDBC driver.</p>
+         <p>The numeric transaction isolation level of <code>java.sql.Connection</code>, for example
+         <code>2</code> for <code>READ_COMMITTED</code>, is accepted in place of the name. The name or number
+         is matched ignoring surrounding whitespace, and any value other than the names above, their numbers
+         or a blank value fails the creation of the pool with an error naming the attribute.</p>
+         <p>If not set, or set to a blank value, the method will not be called and it defaults to the JDBC driver. When the <code>ConnectionState</code> interceptor is configured, it applies this setting on every borrow instead of at connection creation, and re-applies it whenever a borrower has changed it.</p>
     </attribute>
 
     <attribute name="defaultCatalog" required="false">
-      <p>(String) The default catalog of connections created by this pool.</p>
+      <p>(String) The default catalog of connections created by this pool. When the <code>ConnectionState</code> interceptor is configured, it applies this setting on every borrow instead of at connection creation, and re-applies it whenever a borrower has changed it.</p>
     </attribute>
 
     <attribute name="driverClassName" required="true">
@@ -314,7 +363,9 @@
       <p>(String) The SQL query that will be used to validate connections from this pool before returning them to the caller.
          If specified, this query does not have to return any data, it just can't throw an <code>SQLException</code>.
          The default value is <code>null</code>.
-         If not specified, connections will be validation by the isValid() method.
+         If not specified, or set to a blank value, connections will be validated by the
+         <code>isValid()</code> method of <code>java.sql.Connection</code>: a blank query is not sent to the
+         database as an empty statement.
          Example values are <code>SELECT 1</code>(mysql), <code>select 1 from dual</code>(oracle), <code>SELECT 1</code>(MS Sql Server)
       </p>
     </attribute>
@@ -445,6 +496,21 @@
          The default value is <code>true</code>.</p>
     </attribute>
 
+    <attribute name="object_name" required="false">
+      <p>(String) The pool's name, used as the <code>name</code> key property of the JMX registrations of the
+         pool's MBean and of interceptors that register with the pool, such as
+         <code>SlowQueryReportJmx</code>. When the attribute is set through the JNDI resource factory,
+         surrounding whitespace is not stripped - the name is stored as it is written - and a blank value
+         leaves the pool with its generated name. Note that this attribute of the pool is spelled with an
+         underscore, unlike the <code>objectName</code> attribute of the <code>SlowQueryReportJmx</code>
+         interceptor described below, which overrides only that interceptor's registration.</p>
+      <p>When the attribute is left unset on a container-managed JNDI resource whose data source is built
+         by the Tomcat JDBC connection pool factory, the container passes a generated, container-unique
+         name: <code>&lt;domain&gt;/&lt;host&gt;/&lt;context&gt;/&lt;JNDI-name&gt;</code> for a webapp
+         resource and <code>&lt;domain&gt;/&lt;JNDI-name&gt;</code> for a global resource. An explicitly
+         configured value always overrides the container-passed one.</p>
+    </attribute>
+
     <attribute name="fairQueue" required="false">
       <p>(boolean) Set to true if you wish that calls to getConnection should be treated
          fairly in a true FIFO fashion. This uses the <code>org.apache.tomcat.jdbc.pool.FairBlockingQueue</code>
@@ -494,6 +560,15 @@
          The default value is <code>true</code>.
       </p>
     </attribute>
+    <attribute name="useLock" required="false">
+      <p>(boolean) Set to true if a lock should be used when operations are performed on the connection object.
+         Should be set to <code>false</code> unless you plan to have a background thread of your own doing idle
+         and abandon checking, such as a JMX client. If the pool sweeper is enabled - the pool's own background
+         maintenance thread, started by <code>timeBetweenEvictionRunsMillis</code> together with one of the
+         checks it runs - the lock is used regardless of this setting.
+         The default value is <code>false</code>.
+      </p>
+    </attribute>
     <attribute name="suspectTimeout" required="false">
       <p>(int) Timeout value in seconds. Default value is <code>0</code>.<br/>
            Similar to to the <code>removeAbandonedTimeout</code> value but instead of treating the connection
@@ -538,9 +613,16 @@
       <p>(javax.sql.DataSource) Inject a data source to the connection pool, and the pool will use the data source to retrieve connections instead of establishing them using the <code>java.sql.Driver</code> interface.
          This is useful when you wish to pool XA connections or connections established using a data source instead of a connection string. Default value is <code>null</code>
       </p>
+      <p>When the pool is configured through the JNDI resource factory, this attribute carries the
+         data source object itself, and the object must be a <code>javax.sql.DataSource</code>, a
+         <code>javax.sql.XADataSource</code> or a <code>javax.sql.ConnectionPoolDataSource</code> provided by
+         the JDBC driver - and not another connection pool, which the pool refuses to wrap. A resource
+         definition can only give attributes as text, and text cannot carry a live object; a text value here
+         fails the creation of the pool. In a resource definition, use this attribute's JNDI counterpart,
+         <code>dataSourceJNDI</code>, to back the pool with a data source.</p>
     </attribute>
     <attribute name="dataSourceJNDI" required="false">
-      <p>(String) The JNDI name for a data source to be looked up in JNDI and then used to establish connections to the database. See the <code>dataSource</code> attribute. Default value is <code>null</code>. If the name cannot be resolved when the pool is created, the creation fails with an error naming the unresolved name rather than producing a pool that cannot provide connections.
+      <p>(String) The JNDI name for a data source to be looked up in JNDI and then used to establish connections to the database. See the <code>dataSource</code> attribute. Default value is <code>null</code>. Surrounding whitespace around the name is ignored. If the name cannot be resolved when the pool is created, or resolves to an object the pool cannot establish connections from, the creation fails with an error naming the unresolved name rather than producing a pool that cannot provide connections.
       </p>
     </attribute>
     <attribute name="useDisposableConnectionFacade" required="false">
@@ -602,8 +684,8 @@
   <subsection name="JDBC interceptors">
     <p>To see an example of how to use an interceptor, take a look at
     <code>org.apache.tomcat.jdbc.pool.interceptor.ConnectionState</code>.
-    This simple interceptor is a cache of three attributes, transaction isolation level, auto commit and read only state,
-    in order for the system to avoid not needed roundtrips to the database.
+    This simple interceptor is a cache of four attributes - transaction isolation level, auto commit, read only state
+    and catalog - in order for the system to avoid not needed roundtrips to the database.
     </p>
     <p>Further interceptors will be added to the core of the pool as the need arises. Contributions are always welcome!</p>
     <p>Interceptors are of course not limited to just <code>java.sql.Connection</code> but can be used to wrap any
@@ -655,7 +737,16 @@
   <subsection name="org.apache.tomcat.jdbc.pool.interceptor.ConnectionState">
     <p>Caches the connection for the following attributes <code>autoCommit</code>, <code>readOnly</code>,
        <code>transactionIsolation</code> and <code>catalog</code>.
-       It is a performance enhancement to avoid roundtrip to the database when getters are called or setters are called with an already set value.
+       It is a performance enhancement to avoid roundtrip to the database when getters are called;
+       setters always reach the driver, and only a successful call updates the cache.
+    </p>
+    <p>Once this interceptor is configured, the pool also leaves the enforcement of its configured defaults -
+       <code>defaultAutoCommit</code>, <code>defaultReadOnly</code>, <code>defaultTransactionIsolation</code> and
+       <code>defaultCatalog</code> - to it: they are no longer applied at connection creation, the interceptor applies
+       them on every borrow and restores any of them a previous borrower changed, terminating a transaction left open
+       by that borrower first. A restore the driver refuses for the read only, auto commit or catalog state fails the
+       borrow and the pool takes the connection out of service. A refused transaction isolation level is the one
+       exception: the connection stays in service and that level is not retried on it.
     </p>
     <attributes>
     </attributes>
@@ -676,6 +767,12 @@
        unless an interceptor listed after this one recycles the statement
        instead of closing it, as a <code>StatementCache</code> beneath this
        interceptor does.
+    </p>
+    <p>The tracking covers the statements created through the pooled connection
+       handle. A statement created on the driver&#8217;s own connection &#8211; the
+       object <code>Connection.unwrap(Connection.class)</code> hands back &#8211;
+       never reaches this interceptor, so it is neither tracked nor closed when
+       the connection is returned to the pool.
     </p>
     <attributes>
       <attribute name="trace" required="false">
@@ -701,7 +798,11 @@
        driver defaults. Interceptors listed <em>after</em> the cache in
        <code>jdbcInterceptors</code> do not see reused statements &#8211; for example,
        <code>QueryTimeoutInterceptor</code> must be listed <em>before</em> the cache to keep
-       its timeout on cached statements.
+       its timeout on cached statements. An interceptor that tracks statements in order to
+       close them when the connection is returned, such as <code>StatementFinalizer</code>,
+       must also be listed <em>before</em> the cache: a parked statement is deliberately
+       left open, so a tracker beneath the cache would close entries out from under a live
+       cache, and the cache therefore refuses to park statements at all in that order.
     </p>
     <attributes>
       <attribute name="prepared" required="false">
@@ -742,24 +843,38 @@
        to zero, so an interceptor listed after the cache does not see cached statements on reuse and those
        statements execute with no timeout.
     </p>
+    <p><strong>Note:</strong> the timeout is applied by an interceptor, so it only covers statements that pass
+       through the interceptor chain. Statements created from a connection reached through
+       <code>XAConnection.getConnection()</code>, <code>PooledConnection.getConnection()</code> or
+       <code>unwrap()</code> are created outside the chain and keep whatever timeout the driver gives them. On a
+       pool backed by an <code>XADataSource</code> the first of these is the normal route an application takes to
+       its connection, so the pool logs a warning at startup when a positive query timeout is configured on such
+       a pool.
+    </p>
     <attributes>
-      <attribute name="queryTimeout" required="true">
+      <attribute name="queryTimeout" required="false">
         <p>(int as String) The number of seconds to set for the query timeout.
            A value less than or equal to zero will disable this feature.
-           The default value is <code>1</code> seconds.
-           A value that is not an integer is not applied: the pool logs a
-           warning and the default stays in effect.
+           The default value is <code>1</code> seconds, and omitting the
+           attribute still arms that default: any query that needs longer than
+           one second will be cancelled by the driver, so set the attribute
+           deliberately. The attribute name is matched exactly: an unrecognized
+           name is not applied and is logged as a warning, leaving the default
+           in effect. A value that is not an integer is likewise not applied:
+           the pool logs a warning and the default stays in effect.
         </p>
       </attribute>
     </attributes>
   </subsection>
   <subsection name="org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport">
-    <p>Keeps track of query performance and issues log entries when queries exceed a time threshold of fail.
+    <p>Keeps track of query performance and issues log entries when queries exceed a time threshold or fail.
        The log level used is <code>WARN</code>
     </p>
     <attributes>
       <attribute name="threshold" required="false">
         <p>(int as String) The number of milliseconds a query has to exceed before issuing a log alert.
+           A negative value (conventionally <code>-1</code>) records every execution as measured and
+           reports none as slow, so nothing is ever logged or notified as a slow query.
            The default value is <code>1000</code> milliseconds.
         </p>
       </attribute>
@@ -785,13 +900,17 @@
   <subsection name="org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx">
     <p>Extends the <code>SlowQueryReport</code> and in addition to log entries it issues JMX notification
        for monitoring tools to react to. Inherits all the attributes from its parent class.
-       This class uses Tomcat's JMX engine so it won't work outside of the Tomcat container.
-       By default, JMX notifications are sent through the ConnectionPool mbean if it is enabled.
-       The <code>SlowQueryReportJmx</code> can also register an MBean if <code>notifyPool=false</code>
+       This class registers with the JVM's platform MBeanServer, so it works in any JVM, inside or
+       outside a Tomcat container. By default, JMX notifications are sent through the ConnectionPool
+       mbean if it is enabled; with <code>notifyPool=false</code> the <code>SlowQueryReportJmx</code>
+       instead publishes an MBean of its own, one per pool - published on the first
+       connection that pool lends, under the name that pool started with, and given up
+       when that pool closes - and sends the notifications through it.
     </p>
     <attributes>
       <attribute name="notifyPool" required="false">
-        <p>(boolean as String) Set to false if you want JMX notifications to go to the <code>SlowQueryReportJmx</code> MBean
+        <p>(boolean as String) Set to false if you want JMX notifications to go to the <code>SlowQueryReportJmx</code>
+           MBean rather than to the pool's own MBean. Doing so also publishes that interceptor's MBean, described above.
            The default value is <code>true</code>.
         </p>
       </attribute>
@@ -799,6 +918,12 @@
         <p>(String) Define a valid <code>javax.management.ObjectName</code> string that will be used to register this object with the platform mbean server
            The default value is <code>null</code> and the object will be registered using
            tomcat.jdbc:type=org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx,name=the-name-of-the-pool
+           Note this interceptor attribute is spelled <code>objectName</code>, unlike the pool's own
+           <code>object_name</code> attribute, which names the pool in the registrations; a
+           <code>objectName</code> attribute on the pool itself is not a pool property and will be reported
+           as ignored. Registration by the default name is collision-free for container-built pools, since
+           a container-managed pool that does not set <code>object_name</code> carries a container-generated
+           unique pool name.
         </p>
       </attribute>
     </attributes>
@@ -809,8 +934,10 @@
         This means if you have a 30second timeout and run 10x10second queries using the connection
         it will be marked abandoned and potentially reclaimed depending on the <code>abandonWhenPercentageFull</code>
         attribute.
-        Using this interceptor it will reset the checkout timer every time you perform an operation on the connection or execute a
-        query successfully.
+        Using this interceptor it will reset the checkout timer every time you perform an operation on the
+        connection or attempt to execute a query, whether the attempt succeeds or fails, and on every read of a
+        result set returned through the connection. Iterating a large result set therefore keeps the connection
+        alive through the fetch phase, rather than only until the query returns.
     </p>
     <attributes>
     </attributes>
@@ -935,8 +1062,9 @@
     <p>Interceptors are a powerful way to enable, disable or modify functionality on a specific connection or its sub components.
        There are many different use cases for when interceptors are useful. By default, and for performance reasons, the connection pool is stateless.
        The only state the pool itself inserts are <code>defaultAutoCommit</code>, <code>defaultReadOnly</code>, <code>defaultTransactionIsolation</code>, <code>defaultCatalog</code> if
-       these are set. These 4 properties are only set upon connection creation. Should these properties be modified during the usage of the connection,
-       the pool itself will not reset them.</p>
+       these are set. Without a state interceptor these 4 properties are only set upon connection creation; should they be modified during the usage of the connection,
+       the pool itself will not reset them. When the <code>ConnectionState</code> interceptor is configured, it applies the 4 properties on every borrow
+       instead of at connection creation, and restores them whenever a borrower has changed them.</p>
     <p>An interceptor has to extend the <code>org.apache.tomcat.jdbc.pool.JdbcInterceptor</code> class. This class is fairly simple,
        You will need to have a no arg constructor</p>
 <source><![CDATA[  public JdbcInterceptor() {

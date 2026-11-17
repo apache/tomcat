@@ -55,6 +55,11 @@ public class MappingData {
      */
     public Wrapper wrapper = null;
     /**
+     * The wrapper for the current request dispatcher target. Only set when required so may be null even during the
+     * processing of a dispatched request.
+     */
+    public Wrapper requestDispatcherWrapper = null;
+    /**
      * Whether this is a JSP wildcard mapping.
      */
     public boolean jspWildCard = false;
@@ -92,6 +97,7 @@ public class MappingData {
         contextSlashCount = 0;
         contexts = null;
         wrapper = null;
+        requestDispatcherWrapper = null;
         jspWildCard = false;
         requestPath.recycle();
         wrapperPath.recycle();

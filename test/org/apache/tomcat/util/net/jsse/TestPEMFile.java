@@ -18,6 +18,7 @@ package org.apache.tomcat.util.net.jsse;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -256,18 +257,67 @@ public class TestPEMFile {
     }
 
 
+    @Test
+    public void testStreamsClosedAfterSuccessfulParse() throws Exception {
+        TrackingInputStream pemStream =
+                new TrackingInputStream(Files.readAllBytes(new File(getPath(CERTIFICATE)).toPath()));
+        TrackingInputStream passwordStream = new TrackingInputStream(KEY_PASSWORD.getBytes(StandardCharsets.UTF_8));
+
+        PEMFile pemFile = new PEMFile("certificate", pemStream, null, "password", passwordStream, null);
+
+        Assert.assertEquals(1, pemFile.getCertificates().size());
+        Assert.assertTrue(pemStream.closed);
+        Assert.assertTrue(passwordStream.closed);
+    }
+
+
+    @Test
+    public void testStreamsClosedAfterPemReadError() throws Exception {
+        TrackingInputStream pemStream = new TrackingInputStream(new byte[0]) {
+            @Override
+            public int read(byte[] bytes, int offset, int length) throws IOException {
+                throw new IOException("PEM read failed");
+            }
+        };
+        TrackingInputStream passwordStream = new TrackingInputStream(KEY_PASSWORD.getBytes(StandardCharsets.UTF_8));
+
+        IOException exception = Assert.assertThrows(IOException.class,
+                () -> new PEMFile("unreadable", pemStream, null, "password", passwordStream, null));
+
+        Assert.assertEquals("PEM read failed", exception.getMessage());
+        Assert.assertTrue(pemStream.closed);
+        Assert.assertTrue(passwordStream.closed);
+    }
+
+
     /*
      * The structure of the file is checked while it is scanned, before any of the content is decoded, so these
      * malformed structures must be rejected even though the content is not valid PEM encoded data.
      */
     private void assertInvalidPem(String content) throws Exception {
-        ByteArrayInputStream stream = new ByteArrayInputStream(content.getBytes(StandardCharsets.US_ASCII));
-        try {
-            @SuppressWarnings("unused")
-            PEMFile pf = new PEMFile("invalid", stream, null, null);
-            Assert.fail("Expected the malformed PEM to be rejected");
-        } catch (IOException ioe) {
-            // Expected
+        TrackingInputStream pemStream = new TrackingInputStream(content.getBytes(StandardCharsets.US_ASCII));
+        TrackingInputStream passwordStream = new TrackingInputStream(KEY_PASSWORD.getBytes(StandardCharsets.UTF_8));
+
+        Assert.assertThrows(IOException.class,
+                () -> new PEMFile("invalid", pemStream, null, "password", passwordStream, null));
+
+        // Both streams are opened before scanning, so structural errors must close the password stream too.
+        Assert.assertTrue(pemStream.closed);
+        Assert.assertTrue(passwordStream.closed);
+    }
+
+
+    private static class TrackingInputStream extends FilterInputStream {
+        private boolean closed;
+
+        TrackingInputStream(byte[] content) {
+            super(new ByteArrayInputStream(content));
+        }
+
+        @Override
+        public void close() throws IOException {
+            closed = true;
+            super.close();
         }
     }
 

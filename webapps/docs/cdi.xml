@@ -23,7 +23,7 @@
     &project;
 
   <properties>
-    <title>CDI, JAX-RS and dependent libraries support</title>
+    <title>CDI and dependent libraries support</title>
   </properties>
 
 <body>
@@ -35,9 +35,9 @@
   <section name="Introduction">
 
   <p>
-    CDI and JAX-RS are dependencies for many other APIs and libraries. This
-    guide explains how to add support for them in Tomcat using two optional
-    modules that are provided in the Tomcat sources.
+    CDI is a dependency for many other APIs and libraries. This guide explains
+    how to add support for it in Tomcat using the optional module that is
+    provided in the Tomcat sources.
   </p>
 
   </section>
@@ -46,10 +46,21 @@
 
   <p>
     CDI support is provided by the <code>modules/owb</code> optional module.
-    It packages the Apache OpenWebBeans project and allows adding CDI support
-    to the Tomcat container. The build process of the module uses Apache Maven,
-    and is not available as a binary bundle as it is built using a number of
-    publicly available JARs.
+    It packages Apache OpenWebBeans and allows adding CDI support
+    to the Tomcat container. The build process of the module uses Apache
+    Maven, and is not available as a binary bundle as it is built using a
+    number of publicly available JARs.
+  </p>
+
+  </section>
+
+  <section name="Building">
+
+  <p>
+    Building the module requires Apache Maven, a JDK supported by the Tomcat
+    version used by the module, and the Tomcat artifacts for that version in
+    the local Maven repository. Tomcat 12 requires Java 21; Tomcat 11 requires
+    Java 17. The CDI APIs used by the module require Java 17.
   </p>
 
   <p>
@@ -58,54 +69,95 @@
 mvn clean && mvn package]]></source>
     The resulting JAR at
     <code>target/tomcat-owb-x.y.z.jar</code> (where x.y.z depends on the
-    Apache OpenWebBeans version used during the build)
-    should be processed by the Tomcat migration tool for Jakarta EE, and
-    then be placed into the <code>lib</code> folder of the Tomcat
-    installation.<br/>
-    CDI support can then be enabled for all webapps in the container by adding
+    Apache OpenWebBeans version used during the build) can be placed directly
+    into the <code>lib</code> folder of the Tomcat installation. The JAR is
+    built against Jakarta EE APIs. The Tomcat migration tool for Jakarta EE is
+    only required for applications that still use <code>javax</code> APIs.
+  </p>
+
+  </section>
+
+  <section name="Testing">
+
+  <p>
+    The module integration tests use an embedded Tomcat server and run
+    against the shaded module JAR. They are Failsafe integration tests and
+    are not run by <code>mvn package</code>.
+  </p>
+
+  <p>
+    To build the module and run all integration tests:
+    <source><![CDATA[cd $TOMCAT_SRC/modules/owb
+mvn clean verify]]></source>
+    A single integration test can be run with:
+    <source><![CDATA[mvn -Dit.test=OpenWebBeansSecurityIT verify]]></source>
+  </p>
+
+  <p>
+    The tests cover CDI APIs, both supported listener configuration modes,
+    <code>beans.xml</code> discovery, security integration, lifecycle
+    callbacks and JSP/EL integration. See
+    <code>modules/owb/README.md</code> for the test architecture and for the
+    prerequisites needed when Tomcat snapshot artifacts are used.
+  </p>
+
+  </section>
+
+  <section name="Enabling CDI support">
+
+  <p>
+    CDI support can be enabled for all webapps in the container by adding
     the following listener in <code>server.xml</code> nested inside the
     <code>Server</code> element:
     <source><![CDATA[<Listener className="org.apache.webbeans.web.tomcat.OpenWebBeansListener" optional="true" startWithoutBeansXml="false" />]]></source>
     The listener will produce a non fatal error if the CDI container loading
     fails.<br/>
+    The listener supports the following properties:
+  </p>
+
+  <ul>
+    <li><code>startWithoutBeansXml</code> - if <code>true</code>, CDI is
+    started even when no <code>beans.xml</code> is present. The default is
+    <code>true</code>.</li>
+    <li><code>addSecurityValve</code> - if <code>true</code>, the
+    <code>OpenWebBeansSecurityValve</code> is added to each context pipeline.
+    The default is <code>true</code>.</li>
+  </ul>
+
+  <p>
     CDI support can also be enabled at the individual webapp level by adding
     the following listener to the webapp <code>context.xml</code> file nested
-    inside the <code>Server</code> element:
+    inside the <code>Context</code> element:
     <source><![CDATA[<Listener className="org.apache.webbeans.web.tomcat.OpenWebBeansContextLifecycleListener" />]]></source>
+    The context-level listener supports the same properties as the server-level
+    listener.
+  </p>
+
+  <p>
+    When security integration is required, the listener can add the
+    <code>OpenWebBeansSecurityValve</code> automatically. Alternatively, the
+    <code>OpenWebBeansSecurityFilter</code> can be configured in the webapp
+    <code>WEB-INF/web.xml</code> file.
   </p>
 
   </section>
 
-  <section name="JAX-RS support">
+  <section name="Known limitations">
 
   <p>
-    JAX-RS support is provided by the <code>modules/cxf</code> optional module.
-    It packages the Apache CXF project and allows adding JAX-RS support
-    to individual webapps. The build process of the module uses Apache Maven,
-    and is not available as a binary bundle as it is built using a number of
-    publicly available JARs. The support depends on CDI support, which should
-    have previously been installed at either the container or webapp level.
+    Servlet, filter and <code>ServletContextListener</code> field injection
+    are supported when CDI support is enabled.
   </p>
 
   <p>
-    The process to build JAX-RS support is the following.
-    <source><![CDATA[cd $TOMCAT_SRC/modules/cxf
-mvn clean && mvn package]]></source>
-    The resulting JAR at
-    <code>target/tomcat-cxf-x.y.z.jar</code> (where x.y.z depends on the
-    Apache CXF version used during the build)
-    should then be placed into the <code>/WEB-INF/lib</code> folder of the
-    desired web application.
+    EL method invocation against a normal-scoped CDI proxy bean is not
+    supported; use property access or a dependent bean instead.
   </p>
 
   <p>
-    If the CDI support is available at the container
-    level, the JAR can also be placed in the Tomcat <code>lib</code> folder,
-    but in that case the CXF Servlet declaration must be individually added
-    in each webapp as needed (it is normally loaded by the web fragment that is
-    present in the JAR). The CXF Servlet class that should be used is
-    <code>org.apache.cxf.cdi.CXFCdiServlet</code> and should be mapped to the
-    desired root path where JAX-RS resources will be available.
+    Support for features that depend on optional CDI EL APIs or on CDI
+    features not implemented by OpenWebBeans may vary. See
+    <code>modules/owb/README.md</code> for the currently tested feature set.
   </p>
 
   </section>

@@ -92,6 +92,7 @@ public class UniqueAttributesImpl extends AttributesImpl {
 
     @Override
     public void setAttribute(int index, String uri, String localName, String qName, String type, String value) {
+        checkIndex(index);
         String oldQName = super.getQName(index);
         qNames.remove(oldQName);
         if (qNames.add(qName)) {
@@ -113,6 +114,7 @@ public class UniqueAttributesImpl extends AttributesImpl {
 
     @Override
     public void setQName(int index, String qName) {
+        checkIndex(index);
         String oldQName = super.getQName(index);
         qNames.remove(oldQName);
         if (qNames.add(qName)) {
@@ -123,6 +125,14 @@ public class UniqueAttributesImpl extends AttributesImpl {
             // restore its name in the tracking set
             qNames.add(oldQName);
             handleDuplicate(qName, super.getValue(index));
+        }
+    }
+
+    private void checkIndex(int index) {
+        // Reject a bad index before touching the tracking set, so that a
+        // failed call leaves it in step with the attributes
+        if (index < 0 || index >= getLength()) {
+            throw new ArrayIndexOutOfBoundsException("Attempt to modify attribute at illegal index: " + index);
         }
     }
 

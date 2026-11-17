@@ -69,8 +69,7 @@ public final class ForEach implements TagPlugin {
         }
         ctxt.generateJavaSource(";");
         if (hasBegin) {
-            ctxt.generateJavaSource("if (" + beginName + " < 0) {" +
-                    "throw new jakarta.servlet.jsp.JspTagException(\"'begin' < 0\");}");
+            LoopAttributeChecks.generateBeginCheck(ctxt, beginName);
         }
 
         String endName = ctxt.getTemporaryVariableName();
@@ -84,8 +83,7 @@ public final class ForEach implements TagPlugin {
         }
         ctxt.generateJavaSource(";");
         if (hasEnd) {
-            ctxt.generateJavaSource("if (" + endName + " < 0) {" +
-                    "throw new jakarta.servlet.jsp.JspTagException(\"'end' < 0\");}");
+            LoopAttributeChecks.generateEndCheck(ctxt, endName);
         }
 
         String stepName = null;
@@ -94,8 +92,7 @@ public final class ForEach implements TagPlugin {
             ctxt.generateJavaSource("int " + stepName + " = ");
             ctxt.generateAttribute("step");
             ctxt.generateJavaSource(";");
-            ctxt.generateJavaSource("if (" + stepName + " <= 0) {" +
-                    "throw new jakarta.servlet.jsp.JspTagException(\"'step' <= 0\");}");
+            LoopAttributeChecks.generateStepCheck(ctxt, stepName);
         }
 
         ctxt.generateJavaSource("for (int " + index + " = " + beginName + "; " + index + " <= " + endName + ";");
@@ -136,8 +133,7 @@ public final class ForEach implements TagPlugin {
             ctxt.generateJavaSource("int " + beginV + " = ");
             ctxt.generateAttribute("begin");
             ctxt.generateJavaSource(";");
-            ctxt.generateJavaSource("if (" + beginV + " < 0) {" +
-                    "throw new jakarta.servlet.jsp.JspTagException(\"'begin' < 0\");}");
+            LoopAttributeChecks.generateBeginCheck(ctxt, beginV);
         }
         if (hasEnd) {
             indexV = ctxt.getTemporaryVariableName();
@@ -146,16 +142,19 @@ public final class ForEach implements TagPlugin {
             ctxt.generateJavaSource("int " + endV + " = ");
             ctxt.generateAttribute("end");
             ctxt.generateJavaSource(";");
-            ctxt.generateJavaSource("if (" + endV + " < 0) {" +
-                    "throw new jakarta.servlet.jsp.JspTagException(\"'end' < 0\");}");
+            LoopAttributeChecks.generateEndCheck(ctxt, endV);
         }
         if (hasStep) {
             stepV = ctxt.getTemporaryVariableName();
             ctxt.generateJavaSource("int " + stepV + " = ");
             ctxt.generateAttribute("step");
             ctxt.generateJavaSource(";");
-            ctxt.generateJavaSource("if (" + stepV + " <= 0) {" +
-                    "throw new jakarta.servlet.jsp.JspTagException(\"'step' <= 0\");}");
+            LoopAttributeChecks.generateStepCheck(ctxt, stepV);
+        }
+
+        // An empty range must not execute the body or consume any items.
+        if (hasBegin && hasEnd) {
+            ctxt.generateJavaSource("if (" + beginV + " <= " + endV + ") {");
         }
 
         String iterV = ctxt.getTemporaryVariableName();
@@ -248,6 +247,9 @@ public final class ForEach implements TagPlugin {
         }
         ctxt.generateJavaSource("}"); // while
         ctxt.generateJavaSource("}"); // Not Null
+        if (hasBegin && hasEnd) {
+            ctxt.generateJavaSource("}"); // Non-empty range
+        }
     }
 
     /**

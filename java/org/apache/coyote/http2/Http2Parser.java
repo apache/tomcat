@@ -202,7 +202,7 @@ class Http2Parser {
         } else {
             synchronized (dest) {
                 if (dest.remaining() < dataLength) {
-                    // Client has sent more data than permitted by Window size
+                    // Client has sent more data than permitted by the stream flow-control window.
                     swallowPayload(streamId, FrameType.DATA.getId(), dataLength, false, buffer);
                     if (Flags.hasPadding(flags)) {
                         swallowPayload(streamId, FrameType.DATA.getId(), padLength, true, buffer);
@@ -721,10 +721,11 @@ class Http2Parser {
                     Integer.toString(flags), Integer.toString(payloadSize)));
         }
 
-        if (expected != null && frameType != expected) {
-            throw new StreamException(sm.getString("http2Parser.processFrame.unexpectedType", expected, frameType),
-                    Http2Error.PROTOCOL_ERROR, streamId);
-        }
+        /*
+         * Frames with multiple errors may trigger multiple failures. Check the things that can trigger the more serious
+         * ConnectionException first so such errors are not masked by a less serious error that triggers a
+         * StreamException.
+         */
 
         int maxFrameSize = input.getMaxFrameSize();
         if (payloadSize > maxFrameSize) {
@@ -737,17 +738,21 @@ class Http2Parser {
                 throw new ConnectionException(
                         sm.getString("http2Parser.headers.wrongStream", connectionId,
                                 Integer.toString(headersCurrentStream), Integer.toString(streamId)),
-                        Http2Error.COMPRESSION_ERROR);
+                        Http2Error.PROTOCOL_ERROR);
             }
-            if (frameType == FrameType.RST) {
-                // NO-OP: RST is OK here
-            } else if (frameType != FrameType.CONTINUATION) {
+            if (frameType != FrameType.CONTINUATION) {
                 throw new ConnectionException(sm.getString("http2Parser.headers.wrongFrameType", connectionId,
-                        Integer.toString(headersCurrentStream), frameType), Http2Error.COMPRESSION_ERROR);
+                        Integer.toString(headersCurrentStream), frameType), Http2Error.PROTOCOL_ERROR);
             }
         }
 
+        // May throw StreamException or ConnectionException
         frameType.check(streamId, payloadSize);
+
+        if (expected != null && frameType != expected) {
+            throw new StreamException(sm.getString("http2Parser.processFrame.unexpectedType", expected, frameType),
+                    Http2Error.PROTOCOL_ERROR, streamId);
+        }
     }
 
 

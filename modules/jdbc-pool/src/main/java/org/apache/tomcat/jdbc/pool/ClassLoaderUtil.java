@@ -19,6 +19,7 @@ package org.apache.tomcat.jdbc.pool;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.jdbc.pool.util.ExceptionUtils;
 import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 
 /**
@@ -27,6 +28,17 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
 public class ClassLoaderUtil {
     private static final Log log = LogFactory.getLog(ClassLoaderUtil.class);
 
+    static {
+        // handleThrowable() first runs inside a catch block below; load and
+        // initialize the class up front so a failure to load it cannot mask
+        // the error it is called to handle.
+        ExceptionUtils.preload();
+    }
+
+    /**
+     * The kill switch is sampled once at class initialization: setting the
+     * property after the pool classes have loaded has no effect.
+     */
     private static final boolean onlyAttemptFirstLoader = Boolean
             .getBoolean("org.apache.tomcat.jdbc.pool.onlyAttemptCurrentClassLoader");
 
@@ -38,16 +50,27 @@ public class ClassLoaderUtil {
 
     /**
      * Attempts to load the specified class using the given class loaders in order.
+     * <p>
+     * A loader that cannot see the class, or that sees a copy which fails to
+     * link or initialize, does not end the search: the next loader is tried
+     * and the fallback is logged. Fatal errors propagated by
+     * {@code ExceptionUtils.handleThrowable} abort the chain.
      *
      * @param className    the fully qualified class name
      * @param classLoaders the class loaders to attempt, in order
      *
      * @return the loaded class
      *
-     * @throws ClassNotFoundException if the class cannot be found by any of the loaders
+     * @throws ClassNotFoundException if no class loader was supplied, or none
+     *         of them could load the class; the failure of the last loader
+     *         attempted is the cause
      */
     public static Class<?> loadClass(String className, ClassLoader... classLoaders) throws ClassNotFoundException {
-        ClassNotFoundException last = null;
+        if (classLoaders == null || classLoaders.length == 0) {
+            throw new ClassNotFoundException(
+                    MessageFactory.get("classLoaderUtil.classLoadersNone", className));
+        }
+        Throwable last = null;
         StringBuilder errorMsg = null;
         for (ClassLoader cl : classLoaders) {
             try {
@@ -61,13 +84,14 @@ public class ClassLoaderUtil {
                 }
             } catch (ClassNotFoundException x) {
                 last = x;
-                if (errorMsg == null) {
-                    errorMsg = new StringBuilder();
-                } else {
-                    errorMsg.append(';');
-                }
-                errorMsg.append("ClassLoader:");
-                errorMsg.append(cl);
+                errorMsg = appendFailure(errorMsg, cl, null);
+            } catch (Throwable x) {
+                // A visible but broken copy does not end the search: record
+                // the failure and try the remaining loaders.
+                ExceptionUtils.handleThrowable(x);
+                last = x;
+                errorMsg = appendFailure(errorMsg, cl, x);
+                log.warn(MessageFactory.get("classLoaderUtil.classLoadError", className, cl), x);
             }
             if (onlyAttemptFirstLoader) {
                 break;
@@ -77,5 +101,27 @@ public class ClassLoaderUtil {
                 last);
     }
 
-
+    /**
+     * Records one loader's failure for the summary message of the eventual
+     * ClassNotFoundException.
+     *
+     * @param errorMsg The summary built so far, or null
+     * @param cl The loader that failed
+     * @param failure The failure if the class was visible but broken, or null
+     *
+     * @return The updated summary
+     */
+    private static StringBuilder appendFailure(StringBuilder errorMsg, ClassLoader cl, Throwable failure) {
+        if (errorMsg == null) {
+            errorMsg = new StringBuilder();
+        } else {
+            errorMsg.append(';');
+        }
+        errorMsg.append("ClassLoader:");
+        errorMsg.append(cl);
+        if (failure != null) {
+            errorMsg.append(" -> ").append(failure);
+        }
+        return errorMsg;
+    }
 }

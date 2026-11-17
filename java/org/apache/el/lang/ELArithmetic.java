@@ -431,6 +431,9 @@ public abstract class ELArithmetic {
      * @param obj1 The second factor
      *
      * @return The result of the multiplication
+     *
+     * @throws ELException if the operands cannot be coerced to numbers or if the multiplication cannot be computed,
+     *                     for example overflow with extreme BigDecimal values
      */
     public static Number multiply(final Object obj0, final Object obj1) {
         final ELArithmetic delegate = findDelegate(obj0, obj1);
@@ -438,10 +441,14 @@ public abstract class ELArithmetic {
             return Long.valueOf(0);
         }
 
-        Number num0 = delegate.coerce(obj0);
-        Number num1 = delegate.coerce(obj1);
+        try {
+            Number num0 = delegate.coerce(obj0);
+            Number num1 = delegate.coerce(obj1);
 
-        return delegate.multiply(num0, num1);
+            return delegate.multiply(num0, num1);
+        } catch (ArithmeticException ae) {
+            throw new ELException(MessageFactory.get("error.multiply", obj0, obj1), ae);
+        }
     }
 
     private static ELArithmetic findDelegate(final Object obj0, final Object obj1) {

@@ -1,0 +1,44 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.apache.juli.logging.provider;
+
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.TesterLogStringConstructor;
+
+/**
+ * Named-module service provider whose factory declares the service interface as its return type.
+ */
+public class TesterLogFactoryProvider {
+
+    public static Log provider() {
+        return new NamedLog("initial");
+    }
+
+    public static class BaseFactory {
+
+        public static TesterLogStringConstructor provider() {
+            return new NamedLog("initial");
+        }
+    }
+
+    public static class NamedLog extends TesterLogStringConstructor {
+
+        public NamedLog(String name) {
+            super(name);
+        }
+    }
+}

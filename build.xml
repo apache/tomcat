@@ -218,6 +218,11 @@
   <!-- set above.                                                            -->
   <property name="test.jvmarg.egd" value="-Dignore" />
 
+  <!-- Flag for building FFM and associated tests -->
+  <condition property="has-ffm">
+    <javaversion atleast="${release.java.version}" />
+  </condition>
+
   <!-- Location of OpenSSL binary (file name, not directory) -->
   <!-- The OpenSSL tests cases be disabled by specifying an invalid path here -->
   <property name="test.openssl.path" value="" />
@@ -303,6 +308,7 @@
     <filter token="GIT_BRANCH" value="${git.branch}"/>
     <filter token="MIN_JAVA_VERSION" value="${min.java.version}"/>
     <filter token="BUILD_JAVA_VERSION" value="${build.java.version}"/>
+    <filter token="RELEASE_JAVA_VERSION" value="${release.java.version}"/>
     <filter token="ANT_VERSION_REQUIRED" value="${ant.version.required}"/>
     <filter token="SERVLET_SPEC_VERSION" value="${servlet.spec.version}"/>
     <filter token="JSP_SPEC_VERSION" value="${jsp.spec.version}"/>
@@ -1053,9 +1059,6 @@
       <exclude name="org/apache/tomcat/util/openssl/**"/>
     </javac>
     <!-- Compile internal server components that use FFM -->
-    <condition property="has-ffm">
-      <javaversion atleast="${release.java.version}" />
-    </condition>
     <javac srcdir="java" destdir="${tomcat.classes}"
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
@@ -1554,6 +1557,9 @@
          <include name="**/*.bat"/>
       </fileset>
     </copy>
+    <!-- Correct line endings and permissions on "bin" scripts -->
+    <fixcrlf srcdir="${tomcat.build}/bin" includes="*.sh"  eol="lf"   encoding="ISO-8859-1" fixlast="false" />
+    <fixcrlf srcdir="${tomcat.build}/bin" includes="*.bat" eol="crlf" encoding="ISO-8859-1" fixlast="false" />
     <!-- Copy doesn't retain permissions -->
     <chmod dir="${tomcat.build}/bin" includes="*.sh" perm="+x"/>
 
@@ -1947,6 +1953,24 @@
       <!-- Exclude these by default as Gump can't run them because the -->
       <!-- classes on which they depend are not in any output JAR.     -->
       <exclude name="org/apache/tomcat/buildutil/**" unless="test.includeBuildutil"/>
+      <!-- Exclude FFM tests as they are compiled below -->
+      <exclude name="org/apache/tomcat/util/net/openssl/panama/**"/>
+      <exclude name="org/apache/tomcat/util/openssl/**"/>
+    </javac>
+    <!-- Compile tests that use FFM -->
+    <javac srcdir="test" destdir="${test.classes}"
+           debug="${compile.debug}"
+           deprecation="${compile.deprecation}"
+           release="${release.java.version}"
+           encoding="ISO-8859-1"
+           includeAntRuntime="true"
+           if:set="has-ffm" >
+      <!-- Uncomment this to show unchecked warnings:
+      <compilerarg value="-Xlint:unchecked"/>
+      -->
+      <classpath refid="tomcat.test.classpath" />
+      <include name="org/apache/tomcat/util/net/openssl/panama/**"/>
+      <include name="org/apache/tomcat/util/openssl/**"/>
     </javac>
     <copy todir="${test.classes}">
       <fileset dir="test">
@@ -2291,6 +2315,9 @@
               <exclude name="**/integration/**" unless="test.includeIntegration" />
               <!-- Exclude tests that require large heaps -->
               <exclude name="**/*LargeHeap.java" unless="${test.includeLargeHeap}" />
+              <!-- Exclude FFM tests unless FFM has been compiled -->
+              <exclude name="org/apache/tomcat/util/net/openssl/panama/**" unless="has-ffm"/>
+              <exclude name="org/apache/tomcat/util/openssl/**" unless="has-ffm"/>
             </fileset>
           </batchtest>
         </junit>
@@ -2398,9 +2425,8 @@
 
     <touch file="${tomcat.dist}/temp/safeToDelete.tmp" />
 
-    <!-- Correct permissions and line endings on "bin" scripts -->
-    <fixcrlf srcdir="${tomcat.dist}/bin" includes="*.sh"  eol="lf"   encoding="ISO-8859-1" fixlast="false" />
-    <fixcrlf srcdir="${tomcat.dist}/bin" includes="*.bat" eol="crlf" encoding="ISO-8859-1" fixlast="false" />
+    <!-- Correct permissions on "bin" scripts. Line endings were set when the -->
+    <!-- scripts were copied to ${tomcat.build}/bin.                          -->
     <chmod      dir="${tomcat.dist}/bin" includes="*.sh"  perm="+x"/>
 
     <!-- Windows binaries -->
@@ -2708,6 +2734,7 @@
       <fileset dir="${basedir}" defaultexcludes="true">
         <not>
           <or>
+            <filename name="**/.ant-targets-build.xml" />
             <filename name="**/.settings/**" />
             <filename name="**/.classpath"/>
             <filename name="**/.checkstyle"/>
@@ -2745,6 +2772,7 @@
             <filename name="work/**" />
             <filename name="modules/jdbc-pool/bin/**" />
             <filename name="modules/jdbc-pool/includes/**" />
+            <filename name="modules/jdbc-pool/target/**" />
             <and>
               <!-- exclude all modules except jdbc-pool -->
               <filename name="modules/**" />
@@ -2840,7 +2868,7 @@ You may need a custom build of makensis. Instructions for this may be found in B
   </target>
 
   <target name="-installer-prep"
-      depends="dist-static,-installer-checks"
+      depends="dist-static,-dist-eol-crlf,-installer-checks"
       unless="${skip.installer}">
     <copy todir="${tomcat.dist}">
       <fileset dir="res/install-win">
@@ -2862,8 +2890,12 @@ You may need a custom build of makensis. Instructions for this may be found in B
         <filter token="OS.CMD.COPY" value="${os.cmd.copy}"/>
       </filterset>
     </copy>
+    <!-- The files above were added after -dist-eol-crlf ran so their line -->
+    <!-- endings need to be fixed here.                                    -->
     <fixcrlf srcdir="${tomcat.dist}" eol="crlf" encoding="ISO-8859-1" fixlast="false">
-      <patternset refid="text.files"/>
+      <include name="INSTALLLICENSE"/>
+      <include name="tomcat-users_*.xml"/>
+      <include name="tomcat.nsi"/>
     </fixcrlf>
     <!-- Reproducible builds: consistent timestamps for installer files -->
     <touch datetime="${tstamp.file}" pattern="yyyy-MM-dd HH:mm:ss">
@@ -3155,8 +3187,12 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
 </echo>
   </target>
 
+  <!-- ORDER IS IMPORTANT: The targets that convert line endings to CRLF -->
+  <!-- (installer, package-zip, package-winzip, package-deployer-zip)    -->
+  <!-- must be listed before those that convert them to LF               -->
+  <!-- (package-tgz, package-deployer-tgz). See -dist-eol-crlf.          -->
   <target name="release"
-    depends="clean,release-init,dist-deployer,installer,package-zip,package-winzip,package-tgz,package-deployer-zip,package-deployer-tgz,javadoc,package-docs-tgz,package-src-zip,package-src-tgz,package-src-jar"
+    depends="clean,release-init,dist-deployer,installer,package-zip,package-winzip,package-deployer-zip,package-tgz,package-deployer-tgz,javadoc,package-docs-tgz,package-src-zip,package-src-tgz,package-src-jar"
     description="Create a Tomcat packaged distribution">
 
     <copy file="KEYS"
@@ -3232,13 +3268,56 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
     </exec>
   </target>
 
-  <!-- Packages the core zip distro -->
-  <target name="package-zip" depends="dist-static">
+  <!--
+    Line endings for the shared ${tomcat.dist} and ${tomcat.deployer} trees.
+    The CRLF and LF targets convert the trees in place. Ant runs a target at
+    most once per invocation so, in a release build, the files are converted
+    to CRLF once (installer and zip packages) and then to LF once (tar.gz
+    packages).
+    #### ORDER IS IMPORTANT ####
+    The targets that depend on -dist-eol-crlf (-deployer-eol-crlf) and those
+    that depend on -dist-eol-lf (-deployer-eol-lf) must be grouped, not
+    interleaved, in the "release" target. A package that depends on a
+    conversion that has already run is not converted again and will see
+    whatever line endings the most recent conversion left behind.
+    The CRLF group comes first because the javadoc is generated into
+    ${tomcat.dist}/webapps/docs and must be added after the binary packages
+    have been created. package-docs-tgz therefore fixes the line endings of
+    the javadoc itself.
+    The text.files patternset does not include *.sh or *.bat so the line
+    endings of those files are not changed here. They are set when the
+    scripts are copied to ${tomcat.build}/bin (*.sh use LF, *.bat use CRLF).
+  -->
+  <target name="-dist-eol-crlf" depends="dist-static">
     <fixcrlf srcdir="${tomcat.dist}" eol="crlf"
         encoding="ISO-8859-1" fixlast="false" >
       <patternset refid="text.files" />
     </fixcrlf>
+  </target>
 
+  <target name="-deployer-eol-crlf" depends="dist-deployer">
+    <fixcrlf srcdir="${tomcat.deployer}" eol="crlf"
+        encoding="ISO-8859-1" fixlast="false" >
+      <patternset refid="text.files" />
+    </fixcrlf>
+  </target>
+
+  <target name="-dist-eol-lf" depends="dist-static">
+    <fixcrlf srcdir="${tomcat.dist}" eol="lf"
+        encoding="ISO-8859-1" fixlast="false" >
+      <patternset refid="text.files" />
+    </fixcrlf>
+  </target>
+
+  <target name="-deployer-eol-lf" depends="dist-deployer">
+    <fixcrlf srcdir="${tomcat.deployer}" eol="lf"
+        encoding="ISO-8859-1" fixlast="false" >
+      <patternset refid="text.files" />
+    </fixcrlf>
+  </target>
+
+  <!-- Packages the core zip distro -->
+  <target name="package-zip" depends="dist-static,-dist-eol-crlf">
     <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}.zip"
          modificationtime="${tstamp.iso.release}"
          encoding="UTF8">
@@ -3276,12 +3355,7 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
   </target>
 
   <!-- Packages the core windows zip distros -->
-  <target name="package-winzip" depends="dist-static">
-    <fixcrlf srcdir="${tomcat.dist}" eol="crlf"
-        encoding="ISO-8859-1" fixlast="false" >
-      <patternset refid="text.files" />
-    </fixcrlf>
-
+  <target name="package-winzip" depends="dist-static,-dist-eol-crlf">
     <!-- Windows x64 package -->
     <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-windows-x64.zip"
          modificationtime="${tstamp.iso.release}"
@@ -3310,16 +3384,7 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
   </target>
 
   <!-- Packages the deployer distribution in zip format -->
-  <target name="package-deployer-zip">
-    <fixcrlf srcdir="${tomcat.dist}" eol="crlf"
-        encoding="ISO-8859-1" fixlast="false" >
-      <patternset refid="text.files" />
-    </fixcrlf>
-    <fixcrlf srcdir="${tomcat.deployer}" eol="crlf"
-        encoding="ISO-8859-1" fixlast="false" >
-      <patternset refid="text.files" />
-    </fixcrlf>
-
+  <target name="package-deployer-zip" depends="-dist-eol-crlf,-deployer-eol-crlf">
     <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-deployer.zip"
          modificationtime="${tstamp.iso.release}"
          encoding="UTF8">
@@ -3335,12 +3400,7 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
   </target>
 
   <!-- Packages the core tar.gz distro -->
-  <target name="package-tgz" depends="dist-static">
-    <fixcrlf srcdir="${tomcat.dist}" eol="lf"
-        encoding="ISO-8859-1" fixlast="false" >
-      <patternset refid="text.files" />
-    </fixcrlf>
-
+  <target name="package-tgz" depends="dist-static,-dist-eol-lf">
     <!-- Reproducible builds: consistent timestamps for distributed files -->
     <touch datetime="${tstamp.file}" pattern="yyyy-MM-dd HH:mm:ss">
       <fileset dir="${tomcat.dist}"/>
@@ -3383,16 +3443,7 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
   </target>
 
   <!-- Packages the deployer Tomcat distro in tar.gz format -->
-  <target name="package-deployer-tgz">
-    <fixcrlf srcdir="${tomcat.dist}" eol="lf"
-        encoding="ISO-8859-1" fixlast="false" >
-      <patternset refid="text.files" />
-    </fixcrlf>
-    <fixcrlf srcdir="${tomcat.deployer}" eol="lf"
-        encoding="ISO-8859-1" fixlast="false" >
-      <patternset refid="text.files" />
-    </fixcrlf>
-
+  <target name="package-deployer-tgz" depends="-dist-eol-lf,-deployer-eol-lf">
     <!-- Reproducible builds: consistent timestamps for distributed files -->
     <touch datetime="${tstamp.file}" pattern="yyyy-MM-dd HH:mm:ss">
       <fileset dir="${tomcat.dist}"/>
@@ -3416,8 +3467,10 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
   </target>
 
   <!-- Packages the documentation distro in tar.gz format -->
-  <target name="package-docs-tgz" depends="dist-static">
-    <fixcrlf srcdir="${tomcat.dist}" eol="lf"
+  <target name="package-docs-tgz" depends="dist-static,-dist-eol-lf">
+    <!-- The javadoc is generated after -dist-eol-lf has run so its text files -->
+    <!-- need their line endings fixing here.                                  -->
+    <fixcrlf srcdir="${tomcat.dist}/webapps/docs" eol="lf"
         encoding="ISO-8859-1" fixlast="false" >
       <patternset refid="text.files" />
     </fixcrlf>
@@ -3465,13 +3518,9 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
     <fixcrlf srcdir="${tomcat.dist}/src" eol="crlf"
         encoding="ISO-8859-1" fixlast="false" >
       <patternset refid="text.files"/>
-      <include name="bin/*.bat" />
-      <include name="bin/*.sh" />
-      <include name=".travis/*.sh" />
-      <include name="res/graal/*.sh" />
-      <include name="res/openssl/*.sh" />
-      <include name="test/org/apache/tomcat/util/net/*.sh" />
-      <include name="test/org/apache/tomcat/util/net/ocsp/*.sh" />
+      <include name="**/*.bat" />
+      <include name="**/*.sh" />
+      <include name="**/*.py" />
     </fixcrlf>
 
     <zip zipfile="${tomcat.release}/v${version}/src/${final-src.name}.zip"
@@ -3489,13 +3538,9 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
     <fixcrlf srcdir="${tomcat.dist}/src" eol="lf"
         encoding="ISO-8859-1" fixlast="false" >
       <patternset refid="text.files"/>
-      <include name="bin/*.bat" />
-      <include name="bin/*.sh" />
-      <include name=".travis/*.sh" />
-      <include name="res/graal/*.sh" />
-      <include name="res/openssl/*.sh" />
-      <include name="test/org/apache/tomcat/util/net/*.sh" />
-      <include name="test/org/apache/tomcat/util/net/ocsp/*.sh" />
+      <include name="**/*.bat" />
+      <include name="**/*.sh" />
+      <include name="**/*.py" />
     </fixcrlf>
 
     <!-- Reproducible builds: consistent timestamps for distributed files -->
@@ -4280,22 +4325,42 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
           description="Creates project directory .idea for IntelliJ IDEA">
 
     <copy todir="${tomcat.home}/.idea" overwrite="true">
-      <fileset dir="${tomcat.home}/res/ide-support/idea"/>
+      <fileset dir="${tomcat.home}/res/ide-support/idea">
+        <exclude name="tomcat-ffm.iml" unless:set="has-ffm"/>
+      </fileset>
       <filterset refid="classpath.filters"/>
       <filterset refid="version.filters"/>
+      <filterset>
+        <!-- The SDK is named after the Java version this runs on, as the build compiles with that JDK -->
+        <filter token="ANT_JAVA_VERSION" value="${ant.java.version}"/>
+      </filterset>
+      <filterchain>
+        <!-- As for the build, the code that uses the FFM API is only included when this runs on a Java version
+             that supports it. It then belongs to the tomcat-ffm module rather than being excluded. -->
+        <linecontains negate="true" if:set="has-ffm">
+          <contains value="IDEA-FFM-EXCLUDE"/>
+        </linecontains>
+        <linecontains negate="true" unless:set="has-ffm">
+          <contains value="IDEA-FFM-MODULE"/>
+        </linecontains>
+      </filterchain>
     </copy>
 
     <mkdir dir="${tomcat.home}/lib"/>
 
     <echo>IntelliJ IDEA project directory created.
 
-The SDK was set to &quot;${build.java.version}&quot; so make sure that your IDE has an SDK with that name,
+The SDK was set to &quot;${ant.java.version}&quot;, the Java version that ran this build.
+Make sure that your IDE has an SDK with that name,
 or update the Project Settings accordingly. Choose [File &gt; Project Structure] to open the settings dialog
-and set the SDK level, language level, etc. as needed.
-
-Some folders have been excluded by default as they require the latest SDK version and enabling of preview
-features. You can remove or comment out the exclusions to enable the directories in the .idea/tomcat.iml
-file, or via the IDEA UI by right-clicking folders, and choosing [Mark Directory as &gt; Cancel Exclusion]</echo>
+and set the SDK level, language level, etc. as needed.</echo>
+    <echo if:set="has-ffm">
+The code that uses the FFM API and its tests are in a separate module, tomcat-ffm. Its language level
+follows the SDK, while the build compiles that code for Java ${release.java.version}. The rest of the project
+does not depend on that module.</echo>
+    <echo unless:set="has-ffm">
+The code that uses the FFM API has been excluded as it requires Java ${release.java.version} or later.
+Run ant ide-intellij with Java ${release.java.version} or later to include it in a separate module, tomcat-ffm.</echo>
   </target>
 
   <!-- ============================ NetBeans =============================== -->

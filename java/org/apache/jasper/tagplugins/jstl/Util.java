@@ -163,7 +163,9 @@ public class Util {
                 end = input.length();
             }
         }
-        return input.substring(begin, end).strip();
+        String value = input.substring(begin, end).strip();
+        // An empty value (e.g. charset="" or charset=;foo=bar) is treated the same as an absent attribute
+        return value.isEmpty() ? null : value;
     }
 
     /**

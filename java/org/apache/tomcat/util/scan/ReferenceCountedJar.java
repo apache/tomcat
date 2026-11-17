@@ -27,6 +27,11 @@ import org.apache.tomcat.Jar;
 /**
  * This class provides a wrapper around {@link Jar} that uses reference counting to close and re-create the wrapped
  * {@link Jar} instance as required.
+ * <p>
+ * Each stream returned by {@link #getInputStream(String)} or {@link #getEntryInputStream()} holds a reference to the
+ * wrapped {@link Jar} until it is closed. The wrapped {@link Jar}, and its underlying file handle, therefore remains
+ * open until every returned stream has been closed, even if all other references have been released. Callers are
+ * responsible for closing every stream they obtain.
  */
 public class ReferenceCountedJar implements Jar {
 

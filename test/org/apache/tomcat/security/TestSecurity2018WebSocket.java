@@ -17,7 +17,6 @@
 
 package org.apache.tomcat.security;
 
-import java.io.File;
 import java.net.URI;
 
 import javax.net.ssl.SSLContext;
@@ -34,7 +33,6 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.tomcat.util.net.TesterKeystoreGenerator;
 import org.apache.tomcat.util.net.TesterSupport;
 import org.apache.tomcat.websocket.TesterEchoServer;
 import org.apache.tomcat.websocket.TesterMessageCountClient;
@@ -45,13 +43,9 @@ public class TestSecurity2018WebSocket extends WebSocketBaseTest {
     // https://www.cve.org/CVERecord?id=CVE-2018-8034
     @Test(expected = DeploymentException.class)
     public void testCVE_2018_8034() throws Exception {
-        File keystoreFile = TesterKeystoreGenerator.generateKeystore(
-                "localhost", "tomcat",
-                new String[]{"localhost"}, null);
-
         Tomcat tomcat = getTomcatInstance();
 
-        TesterSupport.initSsl(tomcat, keystoreFile.getAbsolutePath(), false);
+        TesterSupport.initSsl(tomcat, TesterSupport.LOCALHOST_RSA_DNSONLY_JKS, false);
 
         Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());

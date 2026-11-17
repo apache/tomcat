@@ -21,17 +21,19 @@ import javax.management.openmbean.OpenDataException;
 /**
  * JMX MBean interface for exposing slow query statistics via JMX.
  * <p>
- * {@link SlowQueryReportJmx} is published as a <em>Standard</em> MBean, so this interface is the whole management
- * surface: a public method of the resource that is not declared here stays invisible to a JMX client - only the
- * notification methods contributed by {@link javax.management.NotificationEmitter} come on top. Everything an operator
- * needs, and everything the interceptor's {@code mbeans-descriptors.xml} advertises, therefore has to be declared here.
+ * The resource published for a pool name is {@link SlowQueryReportJmx.Registration}, exposed as a <em>Standard</em>
+ * MBean, so this interface is the whole management surface: a public method of the resource that is not declared here
+ * stays invisible to a JMX client - only the notification methods contributed by
+ * {@link javax.management.NotificationEmitter} come on top. Everything an operator needs, and everything the
+ * interceptor's {@code mbeans-descriptors.xml} advertises, therefore has to be declared here.
  * </p>
  * <p>
- * The MBean is published once per connection pool name - under
+ * Each pool publishes its own MBean, under
  * {@code tomcat.jdbc:type=org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx,name=<pool>} unless the
- * {@code objectName} interceptor property overrides it - and only when the interceptor is configured with
+ * {@code objectName} interceptor property overrides it, and only when the interceptor is configured with
  * {@code notifyPool=false}. With the default {@code notifyPool=true} no MBean is registered and the statistics are only
- * observable through the connection pool's own MBean.
+ * observable through the connection pool's own MBean. A second live pool trying to publish under a name that is already
+ * occupied is refused by the MBean server; sharing one name between live pools is not supported.
  * </p>
  * <p>
  * {@code notifyPool} itself is deliberately not part of this interface. It is a per-interceptor-instance configuration
@@ -45,12 +47,15 @@ import javax.management.openmbean.OpenDataException;
  */
 public interface SlowQueryReportJmxMBean {
     /**
-     * Returns the name of the connection pool this MBean reports for, as the {@code PoolName} attribute. The
-     * registration, the notifications and the statistics are all keyed by pool name, so every live pool configured with
-     * the same name shares the one MBean reporting that name.
+     * Returns the registration name of the connection pool this MBean reports for, as the {@code PoolName} attribute.
+     * The registration, the notifications and the statistics belong to that one pool; a second live pool configured
+     * with the same name does not share this MBean, and its registration is refused while this one holds the name.
+     * <p>
+     * The value is recorded when the pool starts. It is not cleared when the pool's chain is released, so it can remain
+     * non-null after the MBean has been given up; only an instance that was never bound to a pool answers
+     * {@code null}.
      *
-     * @return the name of the pool, unique within the JVM; {@code null} when this interceptor instance is not bound to
-     *             a pool yet - an instance registered with the MBeanServer always is
+     * @return the pool's recorded registration name, or {@code null} before this instance is bound to a pool
      */
     String getPoolName();
 
@@ -67,9 +72,10 @@ public interface SlowQueryReportJmxMBean {
 
     /**
      * Removes all query statistics recorded for the pool this MBean reports for, so an operator can start from a clean
-     * slate instead of restarting the pool. Statistics are keyed by pool name, so this clears the map shared by every
-     * live pool configured with that name. Only the recorded content is dropped: the pool stays monitored and keeps
-     * accumulating statistics afterwards, and a query recorded again starts from empty counters.
+     * slate instead of restarting the pool. Only that pool's store is cleared; another live pool's statistics are
+     * untouched, even if it shares the name (a configuration the pool does not support for JMX publication). Only the
+     * recorded content is dropped: the pool stays monitored and keeps accumulating statistics afterwards, and a query
+     * recorded again starts from empty counters.
      */
     void resetStats();
 

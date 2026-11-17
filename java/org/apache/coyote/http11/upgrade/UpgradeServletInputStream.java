@@ -17,6 +17,8 @@
 package org.apache.coyote.http11.upgrade;
 
 import java.io.IOException;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletInputStream;
@@ -72,7 +74,7 @@ public class UpgradeServletInputStream extends ServletInputStream {
      * Whether the error call-back has been triggered. No further call-backs
      * are permitted once the error call-back has been triggered.
      */
-    private volatile boolean errorReported = false;
+    private final AtomicBoolean errorReported = new AtomicBoolean();
 
     /**
      * Whether the all data read call-back has been triggered. It is only
@@ -127,10 +129,12 @@ public class UpgradeServletInputStream extends ServletInputStream {
 
         try {
             ready = Boolean.valueOf(socketWrapper.isReadyForRead());
+            return ready.booleanValue();
         } catch (IOException ioe) {
+            this.ready = Boolean.FALSE;
             onError(ioe);
         }
-        return ready.booleanValue();
+        return false;
     }
 
 
@@ -173,10 +177,12 @@ public class UpgradeServletInputStream extends ServletInputStream {
     @Override
     public final int readLine(byte[] b, int off, int len) throws IOException {
         preReadChecks();
+        Objects.checkFromIndexSize(off, len, b.length);
 
-        if (len <= 0) {
+        if (len == 0) {
             return 0;
         }
+
         int count = 0, c;
 
         while ((c = readInternal()) != -1) {
@@ -198,9 +204,10 @@ public class UpgradeServletInputStream extends ServletInputStream {
     @Override
     public final int read(byte[] b, int off, int len) throws IOException {
         preReadChecks();
+        Objects.checkFromIndexSize(off, len, b.length);
 
         // The input must not be touched if the caller requested zero bytes.
-        if (len <= 0) {
+        if (len == 0) {
             return 0;
         }
 
@@ -262,7 +269,7 @@ public class UpgradeServletInputStream extends ServletInputStream {
 
 
     final void onDataAvailable() {
-        if (errorReported || allDataReadReported) {
+        if (errorReported.get() || allDataReadReported) {
             // No further call-backs are permitted once an error has been
             // reported or once the end of the data has been reported.
             return;
@@ -283,7 +290,7 @@ public class UpgradeServletInputStream extends ServletInputStream {
             if (!eof) {
                 listener.onDataAvailable();
             }
-            if (eof && !errorReported) {
+            if (eof && !errorReported.get()) {
                 allDataReadReported = true;
                 listener.onAllDataRead();
             }
@@ -297,10 +304,9 @@ public class UpgradeServletInputStream extends ServletInputStream {
 
 
     final void onError(Throwable t) {
-        if (listener == null || errorReported) {
+        if (listener == null || !errorReported.compareAndSet(false, true)) {
             return;
         }
-        errorReported = true;
         ClassLoader oldCL = processor.getUpgradeToken().contextBind().bind(null);
         try {
             listener.onError(t);
@@ -323,5 +329,10 @@ public class UpgradeServletInputStream extends ServletInputStream {
 
     final boolean isClosed() {
         return closed;
+    }
+
+
+    final boolean isEof() {
+        return eof;
     }
 }

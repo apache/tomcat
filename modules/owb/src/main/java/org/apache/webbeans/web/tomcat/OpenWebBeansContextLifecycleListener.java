@@ -18,8 +18,6 @@
  */
 package org.apache.webbeans.web.tomcat;
 
-import java.util.LinkedList;
-
 import org.apache.catalina.Context;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
@@ -27,7 +25,6 @@ import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Pipeline;
 import org.apache.catalina.Valve;
 import org.apache.tomcat.InstanceManager;
-import org.apache.webbeans.servlet.WebBeansConfigurationListener;
 
 
 /**
@@ -84,17 +81,10 @@ public class OpenWebBeansContextLifecycleListener implements LifecycleListener {
                         || context.getResources().getResource("/WEB-INF/classes/META-INF/beans.xml").exists()) {
                     // Registering ELResolver with JSP container
                     System.setProperty("org.apache.webbeans.application.jsp", "true");
-                    // Add Listeners
-                    String[] oldListeners = context.findApplicationListeners();
-                    LinkedList<String> listeners = new LinkedList<>();
-                    listeners.addFirst(WebBeansConfigurationListener.class.getName());
-                    for (String listener : oldListeners) {
-                        listeners.add(listener);
-                        context.removeApplicationListener(listener);
-                    }
-                    for (String listener : listeners) {
-                        context.addApplicationListener(listener);
-                    }
+                    // Start the CDI container from the ServletContainerInitializer.
+                    // This happens before listeners are instantiated, allowing
+                    // listener field injection to work.
+                    context.addParameter("openwebbeans.web.sci.active", "true");
                     Pipeline pipeline = context.getPipeline();
                     // Add to the corresponding pipeline to get a notification once configure is done
                     if (pipeline instanceof Lifecycle) {

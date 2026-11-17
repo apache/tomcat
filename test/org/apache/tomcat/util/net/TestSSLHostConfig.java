@@ -165,9 +165,26 @@ public class TestSSLHostConfig {
     public void testCiphersuite05() {
         SSLHostConfig hc = new SSLHostConfig();
 
-        // Null should be handled without an error, as it is for setCiphers()
+        // Null restores the default, as it does for setCiphers()
+        hc.setCipherSuites(Cipher.TLS_AES_128_CCM_SHA256.getOpenSSLAlias());
         hc.setCipherSuites(null);
-        Assert.assertNull(hc.getCipherSuites());
+        Assert.assertEquals(SSLHostConfig.DEFAULT_TLS_CIPHERS_13, hc.getCipherSuites());
+        // and the derived values must be usable
+        Assert.assertFalse(hc.getJsseCipherNames().isEmpty());
+    }
+
+
+    @Test
+    public void testCiphersNull() {
+        SSLHostConfig hc = new SSLHostConfig();
+
+        // Null restores the default
+        hc.setCiphers(Cipher.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256.getOpenSSLAlias());
+        hc.setCiphers(null);
+        Assert.assertEquals(SSLHostConfig.DEFAULT_TLS_CIPHERS_12, hc.getCiphers());
+        // and the derived values must be usable
+        Assert.assertFalse(hc.getCipherList().isEmpty());
+        Assert.assertFalse(hc.getJsseCipherNames().isEmpty());
     }
 
 

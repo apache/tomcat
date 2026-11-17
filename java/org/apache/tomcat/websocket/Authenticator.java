@@ -109,7 +109,7 @@ public abstract class Authenticator {
             String qtedValue = m.group(3);
             String value = m.group(4);
 
-            parameterMap.put(key, qtedValue != null ? qtedValue : value);
+            parameterMap.put(key, qtedValue != null ? qtedValue : value.trim());
 
         }
 

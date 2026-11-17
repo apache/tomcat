@@ -224,12 +224,13 @@ public class LoadBalancerDrainingValve extends ValveBase {
                 response.addCookie(sessionCookie);
             }
 
-            String uri = collapseLeadingSlashes(request.getRequestURI());
+            String uri = request.getRequestURI();
             // Re-write the URI if it contains a ;jsessionid parameter
             String sessionURIParamName = SessionConfig.getSessionUriParamName(context);
             if (uri.contains(";" + sessionURIParamName + "=")) {
                 uri = uri.replaceFirst(";" + sessionURIParamName + "=[^;/]*", "");
             }
+            uri = collapseLeadingSlashes(uri);
 
             String queryString = request.getQueryString();
 

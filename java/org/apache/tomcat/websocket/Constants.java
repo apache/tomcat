@@ -148,6 +148,14 @@ public class Constants {
      */
     public static final String WS_VERSION_HEADER_VALUE = "13";
     /**
+     * Sec-WebSocket-Accept header name.
+     */
+    public static final String WS_ACCEPT_HEADER_NAME = "Sec-WebSocket-Accept";
+    /**
+     * GUID that is appended to the Sec-WebSocket-Key header value to compute the Sec-WebSocket-Accept header value.
+     */
+    public static final String WS_ACCEPT_GUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+    /**
      * Sec-WebSocket-Key HTTP header name.
      */
     public static final String WS_KEY_HEADER_NAME = "Sec-WebSocket-Key";

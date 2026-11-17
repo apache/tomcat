@@ -17,14 +17,27 @@
 package org.apache.juli.logging;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.module.Configuration;
+import java.lang.module.ModuleFinder;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Set;
+
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import org.apache.juli.logging.provider.TesterLogFactoryProvider;
 
 public class TestLogFactory {
 
@@ -101,6 +114,150 @@ public class TestLogFactory {
     }
 
 
+    @Test
+    public void testResourceLookupFailureStopsDiscovery() throws Exception {
+        doTestResourceLookupFailureStopsDiscovery(false);
+    }
+
+
+    @Test
+    public void testDeniedResourceLookupStopsDiscovery() throws Exception {
+        doTestResourceLookupFailureStopsDiscovery(true);
+    }
+
+
+    private void doTestResourceLookupFailureStopsDiscovery(boolean denied) throws Exception {
+        URL[] urls = { codeSourceOf(LogFactory.class), codeSourceOf(TestLogFactory.class) };
+        int[] lookups = new int[1];
+        try (URLClassLoader loader = new URLClassLoader(urls, ClassLoader.getPlatformClassLoader()) {
+            @Override
+            public Enumeration<URL> getResources(String name) throws IOException {
+                if (name.equals("META-INF/services/" + Log.class.getName())) {
+                    // Fail a repeated lookup immediately rather than letting a broken implementation loop forever.
+                    Assert.assertEquals("The failing resource enumeration was retried", 1, ++lookups[0]);
+                    if (denied) {
+                        throw new SecurityException("Test resource lookup denial");
+                    }
+                    throw new IOException("Test resource lookup failure");
+                }
+                return super.getResources(name);
+            }
+        }) {
+            Assert.assertEquals(DIRECT_JDK_LOG, getLogFromFactory(loader).getClass().getName());
+            Assert.assertEquals(1, lookups[0]);
+        }
+    }
+
+
+    @Test
+    public void testUnreadableServiceFilesDoNotHideUsableProvider() throws Exception {
+        Path tempDir = Files.createTempDirectory("juli-logfactory-unreadable-test");
+        try {
+            Path service = tempDir.resolve("readable.services");
+            Files.writeString(service, STRING_CONSTRUCTOR + System.lineSeparator(), StandardCharsets.UTF_8);
+            List<URL> resources = List.of(tempDir.resolve("missing.services").toUri().toURL(),
+                    tempDir.resolve("also-missing.services").toUri().toURL(), service.toUri().toURL());
+            URL[] urls = { codeSourceOf(LogFactory.class), codeSourceOf(TestLogFactory.class) };
+            try (URLClassLoader loader = new URLClassLoader(urls, ClassLoader.getPlatformClassLoader()) {
+                @Override
+                public Enumeration<URL> getResources(String name) throws IOException {
+                    if (name.equals("META-INF/services/" + Log.class.getName())) {
+                        return Collections.enumeration(resources);
+                    }
+                    return super.getResources(name);
+                }
+            }) {
+                Assert.assertEquals(STRING_CONSTRUCTOR, getLogFromFactory(loader).getClass().getName());
+            }
+        } finally {
+            deleteRecursively(tempDir.toFile());
+        }
+    }
+
+
+    @Test
+    public void testModuleFactoryProviderIsDiscovered() throws Exception {
+        doTestModuleFactoryProvider(TesterLogFactoryProvider.class, true);
+    }
+
+
+    @Test
+    public void testModuleFactoryProviderReturningBaseClassIsDiscovered() throws Exception {
+        doTestModuleFactoryProvider(TesterLogFactoryProvider.BaseFactory.class, true);
+    }
+
+
+    /*
+     * A provider whose package is not exported to the logging module cannot be instantiated by it, so it must be
+     * ignored at discovery rather than make every later call to getLog() fail.
+     */
+    @Test
+    public void testModuleProviderInUnexportedPackageIsIgnored() throws Exception {
+        doTestModuleFactoryProvider(TesterLogFactoryProvider.class, false);
+    }
+
+
+    private void doTestModuleFactoryProvider(Class<?> providerClass, boolean exported) throws Exception {
+        Path tempDir = Files.createTempDirectory("juli-logfactory-module-test");
+        try {
+            Path modules = tempDir.resolve("modules");
+            Path juli = modules.resolve("test.juli");
+            copyClasses(juli, Log.class, LogFactory.class, LogConfigurationException.class, DirectJDKLog.class,
+                    TesterLogStringConstructor.class);
+            copyClasses(juli, LogFactory.class.getDeclaredClasses());
+            compileModule(tempDir.resolve("juli-src"), juli, "test.juli",
+                    "module test.juli { requires java.logging; exports org.apache.juli.logging; " +
+                            "uses org.apache.juli.logging.Log; }", modules);
+
+            Path provider = modules.resolve("test.provider");
+            copyClasses(provider, TesterLogFactoryProvider.class, TesterLogFactoryProvider.NamedLog.class,
+                    TesterLogFactoryProvider.BaseFactory.class);
+            compileModule(tempDir.resolve("provider-src"), provider, "test.provider",
+                    "module test.provider { requires test.juli; " +
+                            (exported ? "exports org.apache.juli.logging.provider; " : "") +
+                            "provides org.apache.juli.logging.Log with " + providerClass.getCanonicalName() +
+                            "; }", modules);
+
+            ModuleFinder finder = ModuleFinder.of(modules);
+            Configuration configuration = ModuleLayer.boot().configuration().resolve(finder, ModuleFinder.of(),
+                    Set.of("test.provider"));
+            ModuleLayer layer = ModuleLayer.boot().defineModulesWithOneLoader(configuration,
+                    ClassLoader.getPlatformClassLoader());
+            Object log = getLogFromFactory(layer.findLoader("test.provider"));
+            Assert.assertEquals(exported ? TesterLogFactoryProvider.NamedLog.class.getName() : DIRECT_JDK_LOG,
+                    log.getClass().getName());
+        } finally {
+            deleteRecursively(tempDir.toFile());
+        }
+    }
+
+
+    private static void copyClasses(Path directory, Class<?>... classes) throws IOException {
+        for (Class<?> clazz : classes) {
+            String resource = clazz.getName().replace('.', '/') + ".class";
+            Path target = directory.resolve(resource);
+            Files.createDirectories(target.getParent());
+            try (InputStream input = clazz.getResourceAsStream('/' + resource)) {
+                Assert.assertNotNull(resource, input);
+                Files.copy(input, target);
+            }
+        }
+    }
+
+
+    private static void compileModule(Path sources, Path output, String name, String descriptor, Path modules)
+            throws IOException {
+        Files.createDirectories(sources);
+        Path source = sources.resolve("module-info.java");
+        Files.writeString(source, descriptor, StandardCharsets.UTF_8);
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        Assert.assertNotNull("A JDK compiler is required", compiler);
+        Assert.assertEquals("Module compilation failed", 0, compiler.run(null, null, null,
+                "--module-path", modules.toString(), "--patch-module", name + '=' + output,
+                "-d", output.toString(), source.toString()));
+    }
+
+
     /*
      * Loads a fresh copy of the LogFactory in an isolated class loader in which the given
      * names are registered as the only providers of the Log service, calls getLog() twice
@@ -125,25 +282,30 @@ public class TestLogFactory {
             URL[] urls = { codeSourceOf(LogFactory.class), codeSourceOf(TestLogFactory.class),
                     tempDir.toUri().toURL() };
             try (URLClassLoader isolatedLoader = new URLClassLoader(urls, ClassLoader.getPlatformClassLoader())) {
-                Thread currentThread = Thread.currentThread();
-                ClassLoader originalLoader = currentThread.getContextClassLoader();
-                // The ServiceLoader used by LogFactory looks at the context class loader
-                currentThread.setContextClassLoader(isolatedLoader);
-                try {
-                    Class<?> isolatedFactory = isolatedLoader.loadClass(LogFactory.class.getName());
-                    Object result = null;
-                    // Call twice, the second call must not fail with NoClassDefFoundError
-                    for (int i = 0; i < 2; i++) {
-                        result = isolatedFactory.getMethod("getLog", String.class).invoke(null, "tester");
-                        Assert.assertNotNull(result);
-                    }
-                    return result;
-                } finally {
-                    currentThread.setContextClassLoader(originalLoader);
-                }
+                return getLogFromFactory(isolatedLoader);
             }
         } finally {
             deleteRecursively(tempDir.toFile());
+        }
+    }
+
+
+    private static Object getLogFromFactory(ClassLoader loader) throws Exception {
+        Thread currentThread = Thread.currentThread();
+        ClassLoader originalLoader = currentThread.getContextClassLoader();
+        // The ServiceLoader used by LogFactory looks at the context class loader.
+        currentThread.setContextClassLoader(loader);
+        try {
+            Class<?> isolatedFactory = loader.loadClass(LogFactory.class.getName());
+            Object result = null;
+            // Call twice, the second call must not fail with NoClassDefFoundError.
+            for (int i = 0; i < 2; i++) {
+                result = isolatedFactory.getMethod("getLog", String.class).invoke(null, "tester");
+                Assert.assertNotNull(result);
+            }
+            return result;
+        } finally {
+            currentThread.setContextClassLoader(originalLoader);
         }
     }
 

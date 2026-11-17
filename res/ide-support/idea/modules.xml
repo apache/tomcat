@@ -19,6 +19,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/tomcat.iml" filepath="$PROJECT_DIR$/.idea/tomcat.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/tomcat-ffm.iml" filepath="$PROJECT_DIR$/.idea/tomcat-ffm.iml" /><!-- IDEA-FFM-MODULE -->
     </modules>
   </component>
 </project>

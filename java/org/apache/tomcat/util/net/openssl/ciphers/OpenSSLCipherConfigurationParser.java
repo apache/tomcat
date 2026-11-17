@@ -789,6 +789,8 @@ public class OpenSSLCipherConfigurationParser {
                 String alias = element.substring(1);
                 if (aliases.containsKey(alias)) {
                     remove(ciphers, alias);
+                } else {
+                    log.warn(sm.getString("opensslCipherConfigurationParser.unknownElement", alias));
                 }
             } else if (element.startsWith(EXCLUDE)) {
                 String alias = element.substring(1);
@@ -802,6 +804,8 @@ public class OpenSSLCipherConfigurationParser {
                 if (aliases.containsKey(alias)) {
                     moveToEnd(ciphers, alias);
                     moveToEnd(orderedAllAddedCiphers, alias);
+                } else {
+                    log.warn(sm.getString("opensslCipherConfigurationParser.unknownElement", alias));
                 }
             } else if ("@STRENGTH".equals(element)) {
                 ciphers = strengthSort(ciphers);
@@ -828,6 +832,10 @@ public class OpenSSLCipherConfigurationParser {
                 if (result != null) {
                     add(ciphers, result, orderedAllAddedCiphers);
                 }
+            } else if (!element.isEmpty() && !element.startsWith("PROFILE=") && !element.startsWith("@SECLEVEL=")) {
+                // OpenSSL ignores unknown elements. Do the same but, since it is most likely a typo, warn about it.
+                // PROFILE= is reported separately above and @SECLEVEL= is valid for OpenSSL but is not used here.
+                log.warn(sm.getString("opensslCipherConfigurationParser.unknownElement", element));
             }
         }
         ciphers.removeAll(excludedCiphers);

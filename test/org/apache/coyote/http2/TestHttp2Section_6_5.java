@@ -16,6 +16,7 @@
  */
 package org.apache.coyote.http2;
 
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
 import org.junit.Assert;
@@ -48,12 +49,20 @@ public class TestHttp2Section_6_5 extends Http2TestBase {
         readSimpleGetResponse();
         output.clearTrace();
 
-        // Unsolicited, empty SETTINGS ACK frames
-        for (int i = 0; i < 100; i++) {
-            sendSettings(0, true);
-        }
+        /*
+         * Unsolicited, empty SETTINGS ACK frames. The server may close the connection before all of the frames (or the
+         * following GET request) have been written so a write failure is not an error. The GOAWAY check below is what
+         * determines the test result.
+         */
+        try {
+            for (int i = 0; i < 100; i++) {
+                sendSettings(0, true);
+            }
 
-        sendSimpleGetRequest(5);
+            sendSimpleGetRequest(5);
+        } catch (SocketException se) {
+            // Expected if the server closed the connection early
+        }
 
         /*
          * Expect the server to close the connection with ENHANCE_YOUR_CALM. The response to the second GET request may
@@ -156,4 +165,33 @@ public class TestHttp2Section_6_5 extends Http2TestBase {
     }
 
     // delayed ACKs. Requires an API (TBD) for applications to send settings.
+
+
+    @Test
+    public void testSettingsLargeHeaderTableSize() throws Exception {
+        // RFC 9113, section 6.5.2: SETTINGS_HEADER_TABLE_SIZE has no protocol-defined upper
+        // bound. The encoder selects any size equal to or less than the advertised value.
+        // A value above the implementation limit must be accepted, not rejected.
+        http2Connect();
+
+        sendSettings(0, false, new SettingValue(0x1, 65537));
+
+        parser.readFrame();
+
+        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith("0-Settings-Ack"));
+    }
+
+
+    @Test
+    public void testSettingsMaxUnsignedHeaderTableSize() throws Exception {
+        // RFC 9113, section 6.5.2: any value up to 2^32-1 is valid for
+        // SETTINGS_HEADER_TABLE_SIZE. The maximum unsigned 32-bit value must be accepted.
+        http2Connect();
+
+        sendSettings(0, false, new SettingValue(0x1, 0xFFFFFFFFL));
+
+        parser.readFrame();
+
+        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith("0-Settings-Ack"));
+    }
 }

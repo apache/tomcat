@@ -493,7 +493,7 @@ public class TestWsServerContainer extends WebSocketBaseTest {
 
     @Test
     public void testUpgradeHttpToWebSocket01() throws Exception {
-        TesterHttpServletRequest request = new TesterHttpServletRequest();
+        TesterHttpServletRequest request = new UpgradeRequest("HTTP/1.1");
 
         request.setScheme("http");
 
@@ -522,7 +522,7 @@ public class TestWsServerContainer extends WebSocketBaseTest {
 
     @Test(expected = DeploymentException.class)
     public void testUpgradeHttpToWebSocket02() throws Exception {
-        TesterHttpServletRequest request = new TesterHttpServletRequest();
+        TesterHttpServletRequest request = new UpgradeRequest("HTTP/1.1");
 
         request.setHeader(Constants.CONNECTION_HEADER_NAME, Constants.CONNECTION_HEADER_VALUE);
         request.setHeader(Constants.WS_VERSION_HEADER_NAME, Constants.WS_VERSION_HEADER_VALUE);
@@ -539,6 +539,43 @@ public class TestWsServerContainer extends WebSocketBaseTest {
 
         container.upgradeHttpToWebSocket(request, response, sec, new HashMap<>());
     }
+
+
+    @Test
+    public void testUpgradeHttpToWebSocket03() throws Exception {
+        TesterHttpServletRequest request = new UpgradeRequest("HTTP/1.0");
+        TesterHttpServletResponse response = new UpgradeResponse();
+
+        WsServerContainer container = new WsServerContainer(new TesterServletContext());
+
+        container.upgradeHttpToWebSocket(request, response,
+                ServerEndpointConfig.Builder.create(Object.class, "/").build(), new HashMap<>());
+
+        Assert.assertEquals(HttpServletResponse.SC_BAD_REQUEST, response.getStatus());
+    }
+
+
+    private static class UpgradeRequest extends TesterHttpServletRequest {
+        private final String protocol;
+
+        UpgradeRequest(String protocol) {
+            this.protocol = protocol;
+        }
+
+        @Override
+        public String getProtocol() {
+            return protocol;
+        }
+    }
+
+
+    private static class UpgradeResponse extends TesterHttpServletResponse {
+        @Override
+        public void sendError(int status) {
+            setStatus(status);
+        }
+    }
+
 
     private static class DummyDecoder implements Decoder {
         @SuppressWarnings("unused")
