@@ -73,8 +73,7 @@ public class TestDigestAuthenticator {
         Assert.assertEquals("00000001", nc);
 
         // Calculate the expected response independently of the code under
-        // test, in the same way as a server would, per RFC 2617 section
-        // 3.2.2.1 and RFC 7616 section 3.4.2.
+        // test, in the same way as a server would, per RFC 7616 section 3.4.2.
         String a1 = userName + ":" + realm + ":" + password;
         String a2 = method + ":" + requestUri;
         if ("auth-int".equals(qop)) {

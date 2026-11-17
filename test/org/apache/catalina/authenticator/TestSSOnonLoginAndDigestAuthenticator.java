@@ -339,9 +339,20 @@ public class TestSSOnonLoginAndDigestAuthenticator extends TomcatBaseTest {
     }
 
     /*
-     * Notes from RFC2617 H(data) = MD5(data) KD(secret, data) = H(concat(secret, ":", data)) A1 = unq(username-value)
-     * ":" unq(realm-value) ":" passwd A2 = Method ":" digest-uri-value request-digest = <"> < KD ( H(A1),
-     * unq(nonce-value) ":" nc-value ":" unq(cnonce-value) ":" unq(qop-value) ":" H(A2) ) <">
+     * @formatter:off
+     *
+     * Notes from RFC 7616
+     * H(data) = hash-algorithm(data)
+     * KD(secret, data) = H(concat(secret, ":", data))
+     * A1 = unq(username-value) ":" unq(realm-value) ":" passwd
+     * A2 = Method ":" request-uri
+     * request-digest  = <"> < KD ( H(A1),     unq(nonce-value)
+     *                              ":" nc-value
+     *                              ":" unq(cnonce-value)
+     *                              ":" unq(qop-value)
+     *                              ":" H(A2)
+     *                             ) <">
+     * @formatter:on
      */
     private static String buildDigestResponse(String user, String pwd, String uri, String realm, String nonce,
             String opaque, String nc, String cnonce, String qop) {
