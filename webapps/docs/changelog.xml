@@ -376,6 +376,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <docs>
+        Expand the Tribes transport documentation to describe the current NIO
+        sender and receiver pipeline, TCP and UDP selection, delivery options,
+        configuration and security considerations. (sainadh777)
+      </docs>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <update>
