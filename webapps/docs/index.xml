@@ -187,10 +187,10 @@ are responsible for installing, configuring, and operating an Apache Tomcat serv
     <a href="https://jakarta.ee/specifications/websocket/2.1/apidocs/server">
     <strong>server</strong></a>)
     </li>
-<li>Authentication 2.0
-    <a href="https://jakarta.ee/specifications/authentication/2.0/">
+<li>Authentication 2.1
+    <a href="https://jakarta.ee/specifications/authentication/2.1/">
     <strong>Specification</strong></a> and
-    <a href="https://jakarta.ee/specifications/authentication/2.0/apidocs">
+    <a href="https://jakarta.ee/specifications/authentication/2.1/apidocs">
     <strong>Javadoc</strong></a>
     </li>
 </ul>
