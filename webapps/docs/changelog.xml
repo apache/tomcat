@@ -343,6 +343,15 @@
         <code>IOException</code>. Pull request <pr>1157</pr> provided by
         Pranav N V. (markt)
       </fix>
+      <fix>
+        When using HTTP/2 with asynchronous IO, close the connection if a
+        sendfile write fails or times out. (markt)
+      </fix>
+      <fix>
+        When using HTTP/2 with asynchronous IO, return the unused part of the
+        connection flow control window reserved for a sendfile response if the
+        stream is reset before the response is complete.  (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

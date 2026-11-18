@@ -390,10 +390,33 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 } catch (IOException ioe) {
                     return SendfileState.ERROR;
                 }
+            } else {
+                // Nothing will be written so there is nothing pending. Return the unused reservation.
+                releaseReservation(sendfile);
+                return SendfileState.ERROR;
             }
             return SendfileState.PENDING;
         } else {
             return SendfileState.DONE;
+        }
+    }
+
+
+    /*
+     * Returns the part of the connection window that was reserved for a sendfile operation but has not been used,
+     * typically because the stream was reset part way through. Without this, the capacity of the connection window is
+     * permanently reduced.
+     */
+    private void releaseReservation(SendfileData sendfile) {
+        int unused = sendfile.connectionReservation;
+        sendfile.connectionReservation = 0;
+        sendfile.streamReservation = 0;
+        if (unused > 0) {
+            try {
+                incrementWindowSize(unused);
+            } catch (Http2Exception e) {
+                closeConnection(e);
+            }
         }
     }
 
@@ -440,7 +463,14 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                                 reserveWindowSize(sendfile.stream, sendfile.streamReservation, true);
                     }
                 } catch (IOException ioe) {
-                    failed(ioe, sendfile);
+                    if (sendfile.stream.canWrite()) {
+                        // Not a stream level failure (e.g. interrupted).
+                        failed(ioe, sendfile);
+                    } else {
+                        // The stream has been cancelled (reset by the client or timed out). That is a stream level
+                        // failure that does not affect the connection.
+                        releaseReservation(sendfile);
+                    }
                     return;
                 }
 
@@ -485,6 +515,10 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                         failed(ioe, sendfile);
                         return;
                     }
+                } else {
+                    // The stream has been reset. Nothing more will be written so return the unused reservation.
+                    releaseReservation(sendfile);
+                    return;
                 }
                 // Update bytesWritten for start of next loop iteration
                 bytesWritten = frameSize;
@@ -494,6 +528,13 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
         @Override
         public void failed(Throwable t, SendfileData sendfile) {
             applicationErrorCompletion.failed(t, null);
+            /*
+             * Sendfile writes are asynchronous. The application thread has already returned so no other thread will
+             * check for the recorded error. A failed or timed out write is fatal for the connection (the timeout also
+             * removes the socket from the poller) so close it. This also resets the stream, releasing the connection
+             * slot and file descriptor.
+             */
+            close();
         }
     }
 
