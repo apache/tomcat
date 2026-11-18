@@ -95,6 +95,9 @@ public final class ForEach implements TagPlugin {
             LoopAttributeChecks.generateStepCheck(ctxt, stepName);
         }
 
+        if (hasVar) {
+            ctxt.generateJavaSource("try {");
+        }
         ctxt.generateJavaSource("for (int " + index + " = " + beginName + "; " + index + " <= " + endName + ";");
         if (hasStep) {
             ctxt.generateJavaSource(" " + index + " += " + stepName + ") {");
@@ -111,6 +114,9 @@ public final class ForEach implements TagPlugin {
         }
         ctxt.generateBody();
         ctxt.generateJavaSource("}");
+        if (hasVar) {
+            generateRemoveVar(ctxt);
+        }
     }
 
     /**
@@ -152,6 +158,9 @@ public final class ForEach implements TagPlugin {
             LoopAttributeChecks.generateStepCheck(ctxt, stepV);
         }
 
+        if (hasVar) {
+            ctxt.generateJavaSource("try {");
+        }
         // An empty range must not execute the body or consume any items.
         if (hasBegin && hasEnd) {
             ctxt.generateJavaSource("if (" + beginV + " <= " + endV + ") {");
@@ -250,6 +259,23 @@ public final class ForEach implements TagPlugin {
         if (hasBegin && hasEnd) {
             ctxt.generateJavaSource("}"); // Non-empty range
         }
+        if (hasVar) {
+            generateRemoveVar(ctxt);
+        }
+    }
+
+
+    /**
+     * Close the {@code try} block that surrounds the loop and generate the code that removes the loop variable. The
+     * variable has nested visibility so, as with the standard tag handler, it is removed from the page scope when the
+     * loop ends, including when the body throws an exception.
+     */
+    private void generateRemoveVar(TagPluginContext ctxt) {
+        ctxt.generateJavaSource("} finally {");
+        ctxt.generateJavaSource("_jspx_page_context.removeAttribute(");
+        ctxt.generateAttribute("var");
+        ctxt.generateJavaSource(", jakarta.servlet.jsp.PageContext.PAGE_SCOPE);");
+        ctxt.generateJavaSource("}");
     }
 
     /**
