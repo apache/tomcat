@@ -175,18 +175,18 @@ are responsible for installing, configuring, and operating an Apache Tomcat serv
     <a href="https://jakarta.ee/specifications/expression-language/6.0/apidocs">
     <strong>Javadoc</strong></a>
     </li>
-<li>WebSocket 2.1
-    <a href="https://jakarta.ee/specifications/websocket/2.1/">
+<li>WebSocket 2.2
+    <a href="https://jakarta.ee/specifications/websocket/2.2/">
     <strong>Specification</strong></a> and
-    Javadoc (<a href="https://jakarta.ee/specifications/websocket/2.1/apidocs/client">
+    Javadoc (<a href="https://jakarta.ee/specifications/websocket/2.2/apidocs/client">
     <strong>client</strong></a>,
-    <a href="https://jakarta.ee/specifications/websocket/2.1/apidocs/server">
+    <a href="https://jakarta.ee/specifications/websocket/2.2/apidocs/server">
     <strong>server</strong></a>)
     </li>
-<li>Authentication 2.0
-    <a href="https://jakarta.ee/specifications/authentication/2.0/">
+<li>Authentication 3.0
+    <a href="https://jakarta.ee/specifications/authentication/3.0/">
     <strong>Specification</strong></a> and
-    <a href="https://jakarta.ee/specifications/authentication/2.0/apidocs">
+    <a href="https://jakarta.ee/specifications/authentication/3.0/apidocs">
     <strong>Javadoc</strong></a>
     </li>
 </ul>
