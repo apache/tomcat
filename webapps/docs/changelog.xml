@@ -456,6 +456,11 @@
   <subsection name="Tribes">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <docs>
+        Add documentation for multicast, static and cloud membership in Apache
+        Tribes, including failure detection, security and troubleshooting
+        guidance. (sainadh777)
+      </docs>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
