@@ -143,6 +143,42 @@
      processing are started.</p>
 </section>
 
+<section name="Combining dynamic and static membership">
+  <p><code>StaticMembershipInterceptor</code> provides a second way to add
+     static members. Unlike <code>StaticMembershipService</code>, it does not
+     replace the configured membership service. It adds its configured members
+     to the members discovered by <code>McastService</code>,
+     <code>CloudMembershipService</code>, or another membership service. This
+     is useful when most nodes can be discovered dynamically but some nodes
+     must be configured explicitly.</p>
+
+  <source><![CDATA[<Membership className="org.apache.catalina.tribes.membership.McastService"
+            address="228.0.0.4"
+            port="45564"
+            frequency="500"
+            dropTime="3000"/>
+
+<Interceptor className="org.apache.catalina.tribes.group.interceptors.TcpFailureDetector"/>
+<Interceptor className="org.apache.catalina.tribes.group.interceptors.StaticMembershipInterceptor">
+  <Member className="org.apache.catalina.tribes.membership.StaticMember"
+          host="tomcat-remote.example.net"
+          port="4000"
+          uniqueId="{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}"/>
+</Interceptor>]]></source>
+
+  <p>Place the <code>StaticMembershipInterceptor</code> after the
+     <code>TcpFailureDetector</code> in the channel configuration so the
+     detector verifies the configured nodes and reports their availability in
+     the same way as dynamically discovered nodes. If dynamic discovery later
+     reports the same host and enabled ports, the dynamically discovered
+     member replaces the configured entry to prevent messages being sent to
+     the node twice. The static entry is restored if that dynamic member
+     disappears. See the
+     <a href="../config/cluster-interceptor.html#Static_Membership">cluster
+     interceptor configuration reference</a> for the complete member
+     attributes and local-member configuration.</p>
+</section>
+
 <section name="Cloud membership">
   <p><code>CloudMembershipService</code> discovers nodes through a pluggable
      cloud provider. Its default provider queries the Kubernetes API and can
@@ -197,12 +233,16 @@
      traffic. Cloud discovery is also a source of addresses rather than an
      authorization mechanism.</p>
 
-  <p>Restrict membership and receiver traffic at the network layer. When
-     confidentiality and integrity are required, configure the receiver's
-     secure port and TLS for the cluster transport. See the
+  <p>Restrict membership and receiver traffic at the network layer. If a
+     trusted network is not available, configure the channel to use TLS with a
+     pre-shared key and configure the secure port for the receiver and every
+     statically configured member. TLS protects the point-to-point cluster
+     traffic, not multicast discovery. See the
+     <a href="../cluster-howto.html#Security">cluster security
+     configuration</a> and the
      <a href="https://tomcat.apache.org/security-model.html">Tomcat security
-     model</a> and the cluster configuration documentation before exposing any
-     Tribes endpoint outside a trusted network.</p>
+     model</a> before exposing any Tribes endpoint outside a trusted
+     network.</p>
 </section>
 
 <section name="Operations and troubleshooting">
