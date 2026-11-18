@@ -395,7 +395,7 @@
     <a href="#Proxies_Support">Proxies Support</a> and the
     <a href="../proxy-howto.html">Proxy How-To</a>. For reverse proxies that
     use mod_jk, see the <a
-    href="https://tomcat.apache.org/connectors-doc/generic_howto/proxy.html">generic
+    href="https://tomcat.apache.org/connectors-doc/common_howto/proxy.html">generic
     proxy</a> documentation. For other reverse proxies, consult their
     documentation.</p>
   </subsection>
