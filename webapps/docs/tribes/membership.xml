@@ -158,6 +158,7 @@
             frequency="500"
             dropTime="3000"/>
 
+<Interceptor className="org.apache.catalina.tribes.group.interceptors.TcpPingInterceptor"/>
 <Interceptor className="org.apache.catalina.tribes.group.interceptors.TcpFailureDetector"/>
 <Interceptor className="org.apache.catalina.tribes.group.interceptors.StaticMembershipInterceptor">
   <Member className="org.apache.catalina.tribes.membership.StaticMember"
@@ -169,8 +170,11 @@
   <p>Place the <code>StaticMembershipInterceptor</code> after the
      <code>TcpFailureDetector</code> in the channel configuration so the
      detector verifies the configured nodes and reports their availability in
-     the same way as dynamically discovered nodes. If dynamic discovery later
-     reports the same host and enabled ports, the dynamically discovered
+     the same way as dynamically discovered nodes. Place
+     <code>TcpPingInterceptor</code> before <code>TcpFailureDetector</code> to
+     trigger periodic liveness checks, including when no application messages
+     are being sent. If dynamic discovery later reports the same host and
+     enabled ports, the dynamically discovered
      member replaces the configured entry to prevent messages being sent to
      the node twice. The static entry is restored if that dynamic member
      disappears. See the
