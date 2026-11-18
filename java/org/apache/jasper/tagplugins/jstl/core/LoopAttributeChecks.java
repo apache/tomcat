@@ -21,7 +21,8 @@ import org.apache.jasper.compiler.tagplugin.TagPluginContext;
 /**
  * Generates the validation of the <code>begin</code>, <code>end</code> and <code>step</code> loop control attributes
  * shared by the &lt;c:forEach&gt; and &lt;c:forTokens&gt; tag plugins. The checks and messages match the setters of the
- * reference implementation, <code>LoopTagSupport</code>.
+ * reference implementation, <code>LoopTagSupport</code>. It also generates the code that removes the loop variable from
+ * the page scope once the loop has ended.
  */
 final class LoopAttributeChecks {
 
@@ -59,6 +60,31 @@ final class LoopAttributeChecks {
      */
     static void generateStepCheck(TagPluginContext ctxt, String variable) {
         generateCheck(ctxt, variable, "<=", "'step' <= 0");
+    }
+
+    /**
+     * Generates the start of a <code>try</code> block that must surround the loop so that the loop variable is removed
+     * when the loop ends. Must be paired with a call to {@link #generateRemoveVar(TagPluginContext)} after the loop.
+     *
+     * @param ctxt The tag plugin context
+     */
+    static void generateTryStart(TagPluginContext ctxt) {
+        ctxt.generateJavaSource("try {");
+    }
+
+    /**
+     * Closes the <code>try</code> block opened by {@link #generateTryStart(TagPluginContext)} and generates the code
+     * that removes the <code>var</code> attribute from the page scope. The variable has nested visibility so, as with
+     * the standard tag handlers, it is removed when the loop ends, including when the body throws an exception.
+     *
+     * @param ctxt The tag plugin context
+     */
+    static void generateRemoveVar(TagPluginContext ctxt) {
+        ctxt.generateJavaSource("} finally {");
+        ctxt.generateJavaSource("_jspx_page_context.removeAttribute(");
+        ctxt.generateAttribute("var");
+        ctxt.generateJavaSource(", jakarta.servlet.jsp.PageContext.PAGE_SCOPE);");
+        ctxt.generateJavaSource("}");
     }
 
     private static void generateCheck(TagPluginContext ctxt, String variable, String operator, String message) {
