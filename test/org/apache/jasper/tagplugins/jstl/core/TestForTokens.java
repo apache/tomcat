@@ -55,4 +55,25 @@ public class TestForTokens extends AbstractTestTag {
         Assert.assertTrue(res.toString(), res.toString()
                 .contains("jakarta.servlet.jsp.JspTagException: " + message));
     }
+
+
+    /*
+     * The loop variable has nested visibility so it must not be visible after the loop and must not hide an attribute
+     * in another scope.
+     */
+    @Test
+    public void testVarNotVisibleAfterLoop() throws Exception {
+        ByteChunk res = new ByteChunk();
+
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/test/jstl/fortokens-var-visibility.jsp", res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+
+        String body = res.toString();
+        Assert.assertTrue(body, body.contains("token=a"));
+        Assert.assertTrue(body, body.contains("token=b"));
+        Assert.assertTrue(body, body.contains("afterTokens=outerT"));
+        Assert.assertTrue(body, body.contains("afterNone=</p>"));
+    }
 }
