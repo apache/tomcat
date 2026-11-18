@@ -1625,7 +1625,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
-    private void close() {
+    void close() {
         ConnectionState previous = connectionState.getAndSet(ConnectionState.CLOSED);
         if (previous == ConnectionState.CLOSED) {
             // Already closed
