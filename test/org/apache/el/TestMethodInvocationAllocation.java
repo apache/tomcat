@@ -67,7 +67,7 @@ public class TestMethodInvocationAllocation {
     private static ELContext createContext(ExpressionFactory factory) {
         StandardELContext context = new StandardELContext(factory);
         context.getVariableMapper().setVariable("map",
-                factory.createValueExpression(new ConcurrentHashMap<String,String>(), Object.class));
+                factory.createValueExpression(new ConcurrentHashMap<>(), Object.class));
         return context;
     }
 
