@@ -234,6 +234,15 @@
       </docs>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <docs>
+        Add documentation for multicast, static and cloud membership in Apache
+        Tribes, including failure detection, security and troubleshooting
+        guidance. (sainadh777)
+      </docs>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
