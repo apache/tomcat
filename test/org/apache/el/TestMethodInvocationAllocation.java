@@ -67,7 +67,7 @@ public class TestMethodInvocationAllocation {
     private static ELContext createContext(ExpressionFactory factory) {
         StandardELContext context = new StandardELContext(factory);
         context.getVariableMapper().setVariable("map",
-                factory.createValueExpression(new ConcurrentHashMap<String,String>(), Object.class));
+                factory.createValueExpression(new ConcurrentHashMap<>(), Object.class));
         return context;
     }
 
@@ -77,7 +77,7 @@ public class TestMethodInvocationAllocation {
         Assume.assumeTrue(bean instanceof com.sun.management.ThreadMXBean);
         com.sun.management.ThreadMXBean allocationBean = (com.sun.management.ThreadMXBean) bean;
         Assume.assumeTrue(allocationBean.isThreadAllocatedMemorySupported());
-        long threadId = Thread.currentThread().getId();
+        long threadId = Thread.currentThread().threadId();
 
         // The memory allocated each time Class.getMethods() copies the public methods of the class
         Class<?> clazz = ConcurrentHashMap.class;
