@@ -157,36 +157,36 @@ are responsible for installing, configuring, and operating an Apache Tomcat serv
     - Complete documentation and HOWTOs on the JK native webserver connector,
       used to interface Apache Tomcat with servers like Apache HTTPd, IIS
       and others.</li>
-<li>Servlet 6.0
-    <a href="https://jakarta.ee/specifications/servlet/6.0/">
+<li>Servlet 6.2
+    <a href="https://jakarta.ee/specifications/servlet/6.2/">
     <strong>Specification</strong></a> and
-    <a href="https://jakarta.ee/specifications/servlet/6.0/apidocs">
+    <a href="https://jakarta.ee/specifications/servlet/6.2/apidocs">
     <strong>Javadoc</strong></a>
     </li>
-<li>JSP 4.0
-    <a href="https://jakarta.ee/specifications/pages/4.0/">
+<li>JSP 4.1
+    <a href="https://jakarta.ee/specifications/pages/4.1/">
     <strong>Specification</strong></a> and
-    <a href="https://jakarta.ee/specifications/pages/4.0/apidocs">
+    <a href="https://jakarta.ee/specifications/pages/4.1/apidocs">
     <strong>Javadoc</strong></a>
     </li>
-<li>EL 6.0
-    <a href="https://jakarta.ee/specifications/expression-language/6.0/">
+<li>EL 6.1
+    <a href="https://jakarta.ee/specifications/expression-language/6.1/">
     <strong>Specification</strong></a> and
-    <a href="https://jakarta.ee/specifications/expression-language/6.0/apidocs">
+    <a href="https://jakarta.ee/specifications/expression-language/6.1/apidocs">
     <strong>Javadoc</strong></a>
     </li>
-<li>WebSocket 2.1
-    <a href="https://jakarta.ee/specifications/websocket/2.1/">
+<li>WebSocket 2.3
+    <a href="https://jakarta.ee/specifications/websocket/2.3/">
     <strong>Specification</strong></a> and
-    Javadoc (<a href="https://jakarta.ee/specifications/websocket/2.1/apidocs/client">
+    Javadoc (<a href="https://jakarta.ee/specifications/websocket/2.3/apidocs/client">
     <strong>client</strong></a>,
-    <a href="https://jakarta.ee/specifications/websocket/2.1/apidocs/server">
+    <a href="https://jakarta.ee/specifications/websocket/2.3/apidocs/server">
     <strong>server</strong></a>)
     </li>
 <li>Authentication 2.0
-    <a href="https://jakarta.ee/specifications/authentication/2.0/">
+    <a href="https://jakarta.ee/specifications/authentication/3.1/">
     <strong>Specification</strong></a> and
-    <a href="https://jakarta.ee/specifications/authentication/2.0/apidocs">
+    <a href="https://jakarta.ee/specifications/authentication/3.1/apidocs">
     <strong>Javadoc</strong></a>
     </li>
 </ul>
