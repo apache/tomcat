@@ -1705,13 +1705,43 @@ public class DefaultServlet extends HttpServlet {
             return FULL;
         }
 
-        if (!validate(ranges, fileLength)) {
+        Ranges satisfiableRanges = getSatisfiableRanges(ranges, fileLength);
+
+        if (satisfiableRanges == null || !validate(satisfiableRanges, fileLength)) {
             response.addHeader("Content-Range", "bytes */" + fileLength);
             response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
             return null;
         }
 
-        return ranges;
+        return satisfiableRanges;
+    }
+
+
+    /*
+     * RFC 9110, section 14.1.1: a ranges-specifier is satisfiable if at least one of its range-specs is satisfiable.
+     * Unsatisfiable range-specs are skipped (section 15.3.7.2). Invalid range-specs (last-pos less than first-pos) are
+     * retained so validate() rejects them.
+     */
+    private static Ranges getSatisfiableRanges(Ranges ranges, long length) {
+        List<Ranges.Entry> satisfiable = new ArrayList<>(ranges.getEntries().size());
+        for (Ranges.Entry range : ranges.getEntries()) {
+            long start = range.getStart();
+            long end = range.getEnd();
+            boolean invalid = start != -1 && end != -1 && end < start;
+            // RFC 9110, section 14.1.2: an int-range is satisfiable if first-pos is less than the length and a
+            // suffix-range is satisfiable if suffix-length is non-zero
+            boolean isSatisfiable = start == -1 ? end > 0 : start < length;
+            if (invalid || isSatisfiable) {
+                satisfiable.add(range);
+            }
+        }
+        if (satisfiable.isEmpty()) {
+            return null;
+        }
+        if (satisfiable.size() == ranges.getEntries().size()) {
+            return ranges;
+        }
+        return new Ranges(ranges.getUnits(), satisfiable);
     }
 
 
