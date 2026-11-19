@@ -16,21 +16,27 @@
  */
 package org.apache.catalina.tribes.transport.nio;
 
+import java.io.FileInputStream;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyStore;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLHandshakeException;
 
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.catalina.tribes.transport.TribesSslContext;
+import org.apache.tomcat.util.net.TesterSupport;
 
 public class TestTlsChannel {
 
@@ -81,6 +87,55 @@ public class TestTlsChannel {
                 }
                 throw e;
             }
+        }
+    }
+
+    /*
+     * A TLS 1.3 server is free to ignore the offered PSK and authenticate with a certificate. The client must not
+     * complete the handshake (and therefore must not send any data) in that case.
+     */
+    @Test
+    public void testServerIgnoresPskTls13() throws Exception {
+        KeyStore keyStore = KeyStore.getInstance("JKS");
+        try (FileInputStream fis = new FileInputStream(TesterSupport.LOCALHOST_RSA_JKS)) {
+            keyStore.load(fis, TesterSupport.JKS_PASS.toCharArray());
+        }
+        KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        kmf.init(keyStore, TesterSupport.JKS_PASS.toCharArray());
+        SSLContext serverContext = SSLContext.getInstance("TLSv1.3");
+        serverContext.init(kmf.getKeyManagers(), null, null);
+
+        try (TribesSslContext context = createContext("SHA256", "TLSv1.3");
+                ServerSocketChannel server = ServerSocketChannel.open()) {
+            server.bind(new InetSocketAddress("localhost", 0));
+            // The JSSE server knows nothing of the PSK so will present its certificate
+            FutureTask<String> serverTask = new FutureTask<>(() -> {
+                SSLEngine engine = serverContext.createSSLEngine();
+                engine.setUseClientMode(false);
+                try (SocketChannel socket = server.accept()) {
+                    socket.socket().setSoTimeout(5000);
+                    try (TlsChannel tls = new TlsChannel(socket.socket(), engine)) {
+                        // Only reached if the client wrongly proceeded
+                        return read(tls);
+                    } catch (Exception | AssertionError e) {
+                        // Expected. The client aborts the connection so the server sees an alert or EOF.
+                        // (read() reports EOF via an AssertionError)
+                        return null;
+                    }
+                }
+            });
+            new Thread(serverTask).start();
+
+            try (SocketChannel socket = SocketChannel.open(server.getLocalAddress())) {
+                socket.socket().setSoTimeout(5000);
+                try (TlsChannel tls = new TlsChannel(socket.socket(), context.createClientEngine())) {
+                    tls.write(ByteBuffer.wrap("secret".getBytes(StandardCharsets.UTF_8)));
+                    Assert.fail("Handshake with a server that ignored the PSK should have been rejected");
+                } catch (SSLHandshakeException expected) {
+                    // Expected
+                }
+            }
+            Assert.assertNull("The server must not receive any data", serverTask.get(10, TimeUnit.SECONDS));
         }
     }
 
