@@ -357,6 +357,9 @@
         client protocol version is unknown. Default to HTTP/1.1 for the error
         response. (markt)
       </fix>
+      <fix>
+        Refactor the strict SNI check for consistency. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
