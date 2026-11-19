@@ -23,13 +23,20 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
+import java.security.cert.Certificate;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
 import javax.net.ssl.SSLEngineResult.HandshakeStatus;
 import javax.net.ssl.SSLEngineResult.Status;
+import javax.net.ssl.SSLHandshakeException;
+import javax.net.ssl.SSLPeerUnverifiedException;
+
+import org.apache.catalina.tribes.util.StringManager;
 
 final class TlsChannel implements ByteChannel {
+
+    private static final StringManager sm = StringManager.getManager(TlsChannel.class);
 
     private static final ByteBuffer EMPTY = ByteBuffer.allocate(0);
 
@@ -53,6 +60,32 @@ final class TlsChannel implements ByteChannel {
         applicationInput.flip();
         engine.beginHandshake();
         handshake();
+        verifyPskAuthentication();
+    }
+
+    /*
+     * Tribes authenticates peers solely through the pre-shared key. In TLS 1.3 the PSK is only offered and the peer is
+     * free to ignore it and fall back to a certificate based handshake. Certificate verification is not configured
+     * so such a peer would be accepted. A handshake authenticated with a PSK never includes a peer certificate so
+     * treat the presence of one as evidence that the PSK was not used and reject the connection.
+     */
+    private void verifyPskAuthentication() throws IOException {
+        Certificate[] peerCertificates;
+        try {
+            peerCertificates = engine.getSession().getPeerCertificates();
+        } catch (SSLPeerUnverifiedException e) {
+            // No peer certificate. Expected when the PSK was used.
+            return;
+        }
+        if (peerCertificates != null && peerCertificates.length > 0) {
+            try {
+                engine.closeOutbound();
+                engine.closeInbound();
+            } catch (IOException ignore) {
+                // Closing anyway
+            }
+            throw new SSLHandshakeException(sm.getString("tlsChannel.pskNotUsed"));
+        }
     }
 
     private void handshake() throws IOException {
