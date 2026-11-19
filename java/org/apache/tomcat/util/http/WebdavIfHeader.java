@@ -585,7 +585,7 @@ public class WebdavIfHeader {
          * matches.
          * <p>
          * This helper method can be called by implementations to evaluate the concrete match on the correct value
-         * parameter. See {@link #match(String, String)} for the external API method.
+         * parameter. See {@link #match(List, String)} for the external API method.
          *
          * @param value The string value to compare to the {@link #value} field.
          *
@@ -598,17 +598,17 @@ public class WebdavIfHeader {
         }
 
         /**
-         * Matches the entry's value to the token or etag. Depending on the concrete implementation, only one of the
-         * parameters may be evaluated while the other may be ignored.
+         * Matches the entry's value to the tokens or etag of the resource. Depending on the concrete implementation,
+         * only one of the parameters may be evaluated while the other may be ignored.
          * <p>
          * Implementing METHODS may call the helper method {@link #match(String)} for the actual matching.
          *
-         * @param token The token value to compare
-         * @param etag  The etag value to compare
+         * @param tokens The lock tokens of the resource
+         * @param etag   The etag value to compare
          *
-         * @return <code>true</code> if the token/etag matches the <em>IfList</em> entry.
+         * @return <code>true</code> if the tokens/etag match the <em>IfList</em> entry.
          */
-        public abstract boolean match(String token, String etag);
+        public abstract boolean match(List<String> tokens, String etag);
 
         /**
          * Returns a short type name for the implementation. This method is used by the {@link #toString} method to
@@ -657,17 +657,18 @@ public class WebdavIfHeader {
         }
 
         /**
-         * Matches the token parameter to the stored token value and returns <code>true</code> if the values match and
-         * if the match is positive. <code>true</code> is also returned for negative matches if the values do not match.
+         * Returns <code>true</code> if the stored token value is one of the tokens of the resource and the match is
+         * positive. <code>true</code> is also returned for negative matches if the stored token value is not one of
+         * the tokens of the resource.
          *
-         * @param token The token value to compare
-         * @param etag  The etag value to compare, which is ignored in this implementation.
+         * @param tokens The lock tokens of the resource
+         * @param etag   The etag value to compare, which is ignored in this implementation.
          *
-         * @return <code>true</code> if the token matches the <em>IfList</em> entry's token value.
+         * @return <code>true</code> if the tokens match the <em>IfList</em> entry's token value.
          */
         @Override
-        public boolean match(String token, String etag) {
-            return token == null || super.match(token);
+        public boolean match(List<String> tokens, String etag) {
+            return positive == tokens.contains(value);
         }
 
         /**
@@ -701,13 +702,13 @@ public class WebdavIfHeader {
          * Matches the etag parameter to the stored etag value and returns <code>true</code> if the values match and if
          * the match is positive. <code>true</code> is also returned for negative matches if the values do not match.
          *
-         * @param token The token value to compare, which is ignored in this implementation.
-         * @param etag  The etag value to compare
+         * @param tokens The lock tokens of the resource, which are ignored in this implementation.
+         * @param etag   The etag value to compare
          *
          * @return <code>true</code> if the etag matches the <em>IfList</em> entry's etag value.
          */
         @Override
-        public boolean match(String token, String etag) {
+        public boolean match(List<String> tokens, String etag) {
             return super.match(etag);
         }
 
@@ -777,13 +778,7 @@ public class WebdavIfHeader {
             }
             for (int i = 0; i < size(); i++) {
                 IfListEntry ile = get(i);
-                boolean match = false;
-                for (String token : tokens) {
-                    if (ile.match(token, etag)) {
-                        match = true;
-                    }
-                }
-                if (!match) {
+                if (!ile.match(tokens, etag)) {
                     if (log.isTraceEnabled()) {
                         log.trace("match: Entry " + i + "-" + ile + " does not match");
                     }
