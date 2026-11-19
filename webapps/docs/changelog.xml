@@ -352,6 +352,11 @@
         connection flow control window reserved for a sendfile response if the
         stream is reset before the response is complete.  (markt)
       </fix>
+      <fix>
+        When an HTTP/1.x request is received with an invalid request line, the
+        client protocol version is unknown. Default to HTTP/1.1 for the error
+        response. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
