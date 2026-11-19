@@ -276,13 +276,24 @@ public class Http11Processor extends AbstractProcessor {
 
             // Parsing the request header
             try {
-                if (!inputBuffer.parseRequestLine(keptAlive, protocol.getConnectionTimeout(),
-                        protocol.getKeepAliveTimeout())) {
-                    if (inputBuffer.getParsingRequestLinePhase() == -1) {
-                        return SocketState.UPGRADING;
-                    } else if (handleIncompleteRequestLineRead()) {
-                        break;
+                try {
+                    if (!inputBuffer.parseRequestLine(keptAlive, protocol.getConnectionTimeout(),
+                            protocol.getKeepAliveTimeout())) {
+                        if (inputBuffer.getParsingRequestLinePhase() == -1) {
+                            return SocketState.UPGRADING;
+                        } else if (handleIncompleteRequestLineRead()) {
+                            break;
+                        }
                     }
+                } catch (Throwable t) {
+                    /*
+                     * Failed to read the request line. The protocol is therefore unknown at this point. Need to set
+                     * the protocol before reporting the error.
+                     */
+                    http09 = false;
+                    http11 = true;
+                    // Then re-throw the error
+                    throw t;
                 }
 
                 // Process the Protocol component of the request line
