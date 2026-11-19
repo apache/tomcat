@@ -512,6 +512,32 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
                 + "Hello World!" + CRLF, 10, 10);
     }
 
+    @Test
+    public void testChunkSizeBwsBeforeExtension() throws Exception {
+        // RFC 9112, section 7.1.1: chunk-ext = *( BWS ";" BWS chunk-ext-name [ BWS "=" BWS chunk-ext-val ] )
+        doTestChunkSize(true, true, "C ;a=b" + CRLF + "Hello World!" + CRLF, 20, 12);
+    }
+
+    @Test
+    public void testChunkSizeBwsTabBeforeExtension() throws Exception {
+        doTestChunkSize(true, true, "C \t ;a" + CRLF + "Hello World!" + CRLF, 20, 12);
+    }
+
+    @Test
+    public void testChunkSizeBwsWithoutExtension() throws Exception {
+        doTestChunkSize(false, false, "C " + CRLF + "Hello World!" + CRLF, 20, 12);
+    }
+
+    @Test
+    public void testChunkSizeBwsBeforeChunkSize() throws Exception {
+        doTestChunkSize(false, false, " C;a" + CRLF + "Hello World!" + CRLF, 20, 12);
+    }
+
+    @Test
+    public void testChunkSizeBwsWithinChunkSize() throws Exception {
+        doTestChunkSize(false, false, "C C;a" + CRLF + "Hello World!" + CRLF, 20, 12);
+    }
+
     /**
      * @param expectPass
      *            If the servlet is expected to process the request

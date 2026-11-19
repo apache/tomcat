@@ -114,6 +114,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
     private volatile ParseState parseState = ParseState.CHUNK_HEADER;
     private volatile boolean crFound = false;
     private volatile int chunkSizeDigitsRead = 0;
+    private volatile boolean chunkSizeBws = false;
     private volatile State extensionState = null;
     private final AtomicLong extensionSize = new AtomicLong(0);
     private final HttpHeaderParser httpHeaderParser;
@@ -270,6 +271,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
         parseState = ParseState.CHUNK_HEADER;
         crFound = false;
         chunkSizeDigitsRead = 0;
+        chunkSizeBws = false;
         extensionState = null;
         extensionSize.set(0);
         httpHeaderParser.recycle();
@@ -394,6 +396,11 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
                         throwBadRequestException(sm.getString("chunkedInputFilter.maxExtension"));
                     }
                 }
+            } else if ((chr == Constants.SP || chr == Constants.HT) && chunkSizeDigitsRead > 0) {
+                // RFC 9112, section 7.1.1: BWS is permitted between the chunk size and the first chunk extension
+                chunkSizeBws = true;
+            } else if (chunkSizeBws && chr != Constants.SEMI_COLON) {
+                throwBadRequestException(sm.getString("chunkedInputFilter.invalidHeader"));
             } else if (chr == Constants.CR || chr == Constants.LF) {
                 if (!parseCRLF()) {
                     return false;
@@ -404,6 +411,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
                  * First semicolon marks the start of the extension. ChunkedExtension parser takes over for the
                  * remainder of the extension.
                  */
+                chunkSizeBws = false;
                 extensionState = State.PRE_NAME;
                 long extSize = extensionSize.incrementAndGet();
                 if (maxExtensionSize > -1 && extSize > maxExtensionSize) {
@@ -477,6 +485,11 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
                         return false;
                     }
                 }
+            } else if ((chr == Constants.SP || chr == Constants.HT) && chunkSizeDigitsRead > 0) {
+                // RFC 9112, section 7.1.1: BWS is permitted between the chunk size and the first chunk extension
+                chunkSizeBws = true;
+            } else if (chunkSizeBws && chr != Constants.SEMI_COLON) {
+                return false;
             } else if (chr == Constants.CR || chr == Constants.LF) {
                 if (!skipCRLF()) {
                     return false;
@@ -487,6 +500,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
                  * First semicolon marks the start of the extension. ChunkedExtension parser takes over for the
                  * remainder of the extension.
                  */
+                chunkSizeBws = false;
                 extensionState = State.PRE_NAME;
                 long extSize = extensionSize.incrementAndGet();
                 if (maxExtensionSize > -1 && extSize > maxExtensionSize) {
