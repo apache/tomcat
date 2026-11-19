@@ -240,6 +240,11 @@
         Remove the loop variable after the ForEach and ForTokens tag plugins.
         Pull request <pr>1158</pr> provided by Arturo Bernal. (markt)
       </fix>
+      <fix>
+        Align evaluation of expressions with section 1.6 of the expression
+        language specification when <code>expr-a</code> is a literal
+        <code>null</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
