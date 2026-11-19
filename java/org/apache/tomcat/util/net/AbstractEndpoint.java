@@ -676,10 +676,16 @@ public abstract class AbstractEndpoint<S, U> {
         if (protocolHostName != null && protocolHostName.endsWith(".")) {
             protocolHostName = protocolHostName.substring(0, protocolHostName.length() - 1);
         }
+        /*
+         * String.toLowerCase(Locale.ENGLISH) has slightly different behaviour to String.equalsIgnoreCase(String) so for
+         * consistency convert both host names to lower case first.
+         */
+        String lcProtocolHostName = protocolHostName != null ? protocolHostName.toLowerCase(Locale.ENGLISH) : null;
+        String lcSniHostName = sniHostName != null ? sniHostName.toLowerCase(Locale.ENGLISH) : null;
+
         return (!strictSni || !isSSLEnabled()
-                || (sniHostName != null && sniHostName.equalsIgnoreCase(protocolHostName))
-                || getSSLHostConfig(sniHostName) == getSSLHostConfig(
-                        protocolHostName != null ? protocolHostName.toLowerCase(Locale.ENGLISH) : null));
+                || (lcSniHostName != null && lcSniHostName.equals(lcProtocolHostName))
+                || getSSLHostConfig(lcSniHostName) == getSSLHostConfig(lcProtocolHostName));
     }
 
 
