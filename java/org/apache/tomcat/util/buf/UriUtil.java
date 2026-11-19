@@ -235,7 +235,8 @@ public final class UriUtil {
         }
         URI uri;
         try {
-            uri = new URI("jar", file, null);
+            // The file is already encoded. Use the single argument constructor as it doesn't escape input.
+            uri = new URI("jar:" + file);
         } catch (URISyntaxException e) {
             throw new IOException(e);
         }
