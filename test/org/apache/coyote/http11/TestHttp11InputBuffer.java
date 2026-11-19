@@ -201,6 +201,35 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
 
 
     @Test
+    public void testObsFoldBeforeValue() {
+        // RFC 9110, section 5.5: leading whitespace is not part of the field value
+        doTestObsFoldBeforeValue("X-Bug51557Fold:" + CRLF + " one", "oneabcd");
+    }
+
+
+    @Test
+    public void testObsFoldBeforeValueWithSpace() {
+        doTestObsFoldBeforeValue("X-Bug51557Fold: " + CRLF + "\t one", "oneabcd");
+    }
+
+
+    @Test
+    public void testObsFoldOnlyWhitespace() {
+        doTestObsFoldBeforeValue("X-Bug51557Fold:" + CRLF + "  ", "abcd");
+    }
+
+
+    private void doTestObsFoldBeforeValue(String headerLine, String expected) {
+        Bug51557Client client = new Bug51557Client("X-Bug51557Fold");
+        client.headerLine = headerLine;
+
+        client.doRequest();
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertEquals(expected, client.getResponseBody());
+    }
+
+
+    @Test
     public void testBug51557Valid() {
 
         Bug51557Client client = new Bug51557Client("X-Bug51557Valid", "1234");
@@ -355,7 +384,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
     private class Bug51557Client extends SimpleHttpClient {
 
         private final String headerName;
-        private final String headerLine;
+        private String headerLine;
 
         Bug51557Client(String headerName) {
             this.headerName = headerName;
