@@ -487,6 +487,11 @@
         Tribes, including failure detection, security and troubleshooting
         guidance. Based on pull request <pr>153</pr> by sainadh777. (markt)
       </docs>
+      <fix>
+        When using TLS-PSK with TLS 1.3 ensure that a node does not accept a
+        connection from a peer that presents a certificate rather than the PSK.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
