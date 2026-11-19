@@ -132,7 +132,11 @@ public final class AstValue extends SimpleNode {
         int i = 1;
         Object suffix = null;
         ELResolver resolver = ctx.getELResolver();
-        while (base != null && i < propCount) {
+        while (i < propCount) {
+            if (base == null) {
+                ctx.setPropertyResolved(true);
+                break;
+            }
             suffix = this.children[i].getValue(ctx);
             if (i + 1 < propCount && (this.children[i + 1] instanceof AstMethodParameters)) {
                 AstMethodParameters mps = (AstMethodParameters) this.children[i + 1];
@@ -156,6 +160,9 @@ public final class AstValue extends SimpleNode {
                 ctx.setPropertyResolved(false);
                 base = resolver.getValue(ctx, base, suffix);
                 i++;
+            }
+            if (!ctx.isPropertyResolved()) {
+                break;
             }
         }
         if (!ctx.isPropertyResolved()) {
