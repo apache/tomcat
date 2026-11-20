@@ -2403,6 +2403,50 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
     }
 
 
+    /*
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=70362
+     */
+    @Test
+    public void testSendErrorOnAsyncDispatchCompletesOnce() throws Exception {
+        resetTracker();
+        Tomcat tomcat = getTomcatInstance();
+        Context context = getProgrammaticRootContext();
+        Wrapper wrapper = Tomcat.addServlet(context, "bug70362", new Bug70362Servlet());
+        wrapper.setAsyncSupported(true);
+        context.addServletMapping("/bug70362", "bug70362");
+        tomcat.start();
+
+        int rc = getUrl("http://localhost:" + getPort() + "/bug70362", new ByteChunk(), null);
+        Assert.assertEquals(HttpServletResponse.SC_SERVICE_UNAVAILABLE, rc);
+
+        int count = 0;
+        while (getTrack().isEmpty() && count < 100) {
+            Thread.sleep(50);
+            count++;
+        }
+        // Allow time for any further, unexpected, listener events
+        Thread.sleep(500);
+        Assert.assertEquals("onComplete-", getTrack());
+    }
+
+
+    public static class Bug70362Servlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            if (req.getDispatcherType() == DispatcherType.ASYNC) {
+                resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            } else {
+                AsyncContext asyncContext = req.startAsync();
+                asyncContext.addListener(new TrackingListener(false, false, null));
+                asyncContext.dispatch();
+            }
+        }
+    }
+
+
     public static class Bug58751AsyncServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
