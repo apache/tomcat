@@ -126,6 +126,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     private volatile boolean hasOriginalRequestAndResponse = true;
     private final AtomicBoolean hasErrorProcessingStarted = new AtomicBoolean(false);
     private final AtomicBoolean hasOnErrorReturned = new AtomicBoolean(false);
+    private volatile boolean completedByDispatch = false;
 
     /*
      * ThreadLocal for passing over-ridden URL encoding state when dispatching.
@@ -362,6 +363,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         timeout = -1;
         hasErrorProcessingStarted.set(false);
         hasOnErrorReturned.set(false);
+        completedByDispatch = false;
     }
 
     private void clearServletRequestResponse() {
@@ -402,6 +404,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             this.servletResponse = response;
             this.hasOriginalRequestAndResponse = originalRequestResponse;
             this.event = new AsyncEvent(this, request, response);
+            this.completedByDispatch = false;
 
             List<AsyncListenerWrapper> listenersCopy = new ArrayList<>(listeners);
             listeners.clear();
@@ -444,6 +447,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             dispatch = null;
             runnable.run();
             if (!request.isAsync()) {
+                completedByDispatch = true;
                 fireOnComplete();
             }
         } catch (RuntimeException x) {
@@ -466,6 +470,17 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             }
             throw new ServletException(x);
         }
+    }
+
+
+    /**
+     * Has the most recent dispatch completed the asynchronous processing? If it has, the listeners have been notified
+     * that the processing is complete.
+     *
+     * @return {@code true} if the most recent dispatch completed the asynchronous processing, otherwise {@code false}
+     */
+    public boolean isCompletedByDispatch() {
+        return completedByDispatch;
     }
 
 

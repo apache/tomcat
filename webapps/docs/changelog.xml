@@ -237,6 +237,14 @@
         <code>ClassValue</code> to cache the result of calling
         <code>Class.getMethods()</code>. (markt)
       </scode>
+      <fix>
+        <bug>70362</bug>: When an asynchronous dispatch completes the
+        asynchronous processing after calling <code>sendError()</code>, do not
+        start asynchronous error handling, which notified the
+        <code>AsyncListener</code>s of an error and of completion again after
+        they had been notified of completion. Regression in the fix for
+        <bug>66875</bug>. Patch provided by Scott Murphy Heiberg.
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
