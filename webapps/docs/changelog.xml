@@ -370,6 +370,20 @@
         that is in asynchronous mode are released if the connection thread
         raises a stream error for that stream. (markt)
       </fix>
+      <fix>
+        Treat the value of the <code>Expect</code> header as case insensitive
+        for HTTP/2 requests, as required by RFC 9110, section 10.1.1, so that a
+        <code>100 (Continue)</code> response is sent for
+        <code>Expect: 100-Continue</code>. Pull request <pr>1263</pr> provided
+        by Arturo Bernal.
+      </fix>
+      <fix>
+        Treat the value of the <code>Expect</code> header as a list of
+        expectations for HTTP/2 requests, as required by RFC 9110, section
+        10.1.1, so that a <code>100 (Continue)</code> response is sent when the
+        list contains <code>100-continue</code>. Pull request <pr>1265</pr>
+        provided by Arturo Bernal.
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

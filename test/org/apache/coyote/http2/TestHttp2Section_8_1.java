@@ -152,6 +152,43 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
 
     @Test
     public void testSendAck() throws Exception {
+        doTestSendAck("100-continue", true);
+    }
+
+
+    @Test
+    public void testSendAckMixedCase() throws Exception {
+        // RFC 9110, section 10.1.1: the Expect field value is case-insensitive
+        doTestSendAck("100-Continue", true);
+    }
+
+
+    @Test
+    public void testSendAckList() throws Exception {
+        // RFC 9110, section 10.1.1: the Expect field value is a list of expectations
+        doTestSendAck("foo, 100-continue", true);
+    }
+
+
+    @Test
+    public void testSendAckListWithEmptyElements() throws Exception {
+        doTestSendAck(",100-continue, ,foo", true);
+    }
+
+
+    @Test
+    public void testNoAckForOtherExpectation() throws Exception {
+        doTestSendAck("foo", false);
+    }
+
+
+    @Test
+    public void testNoAckForContinueWithParameter() throws Exception {
+        doTestSendAck("100-continue=1", false);
+    }
+
+
+    private void doTestSendAck(String expectation, boolean ack) throws Exception {
         // makes a request that expects a 100 Continue response and verifies
         // that the 100 Continue response is received. This does not check
         // that the correct ContinueHandlingResponsePolicy was followed, just
@@ -167,16 +204,19 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         byte[] dataFrameHeader = new byte[9];
         ByteBuffer dataPayload = ByteBuffer.allocate(256);
 
-        buildPostRequest(headersFrameHeader, headersPayload, true, null, -1, "/simple", dataFrameHeader, dataPayload,
-                null, false, 3);
+        buildPostRequest(headersFrameHeader, headersPayload, expectation, null, -1, "/simple", dataFrameHeader,
+                dataPayload, null, false, 3);
 
         // Write the headers
         writeFrame(headersFrameHeader, headersPayload);
 
-        parser.readFrame();
+        if (ack) {
+            parser.readFrame();
 
-        Assert.assertEquals("3-HeadersStart\n" + "3-Header-[:status]-[100]\n" + "3-HeadersEnd\n", output.getTrace());
-        output.clearTrace();
+            Assert.assertEquals("3-HeadersStart\n" + "3-Header-[:status]-[100]\n" + "3-HeadersEnd\n",
+                    output.getTrace());
+            output.clearTrace();
+        }
 
         // Write the body
         writeFrame(dataFrameHeader, dataPayload);
