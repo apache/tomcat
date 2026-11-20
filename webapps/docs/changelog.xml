@@ -360,6 +360,16 @@
       <fix>
         Refactor the strict SNI check for consistency. (markt)
       </fix>
+      <fix>
+        When using HTTP/2, do not send a second reset for a stream that has
+        already been reset when the request finishes processing with the
+        request body not fully read. (markt)
+      </fix>
+      <fix>
+        When using HTTP/2, ensure that the resources associated with a request
+        that is in asynchronous mode are released if the connection thread
+        raises a stream error for that stream. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
