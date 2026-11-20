@@ -38,6 +38,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.net.ssl.SSLException;
+
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.group.GroupChannel;
 import org.apache.catalina.tribes.io.ChannelData;
@@ -186,12 +188,12 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
                     }
                 }
             }
+        } catch (RuntimeException | SSLException e) {
+            log.warn(sm.getString("nioReceiver.requestError"), e);
         } catch (IOException ioe) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("nioReceiver.requestError"), ioe);
             }
-        } catch (RuntimeException re) {
-            log.warn(sm.getString("nioReceiver.requestError"), re);
         }
     }
 
