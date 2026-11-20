@@ -18,14 +18,19 @@ package org.apache.catalina.realm;
 
 import java.security.Principal;
 import java.security.cert.X509Certificate;
+import java.text.Normalizer;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.HexUtils;
 import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
@@ -48,6 +53,21 @@ public class LockOutRealm extends CombinedRealm {
     }
 
     private static final Log log = LogFactory.getLog(LockOutRealm.class);
+
+    private static final String DEFAULT_CHARACTERS_TO_IGNORE;
+
+    private static final Set<Integer> DEFAULT_CODE_POINTS_TO_IGNORE;
+
+    static {
+        StringBuilder sb = new StringBuilder();
+        for (int cp = 0; cp <= Character.MAX_CODE_POINT; cp++) {
+            if (isIgnoredByDefault(cp)) {
+                sb.appendCodePoint(cp);
+            }
+        }
+        DEFAULT_CHARACTERS_TO_IGNORE = sb.toString();
+        DEFAULT_CODE_POINTS_TO_IGNORE = toCodePointSet(DEFAULT_CHARACTERS_TO_IGNORE);
+    }
 
     /**
      * The number of times in a row a user has to fail authentication to be locked out. Defaults to 5.
@@ -92,6 +112,44 @@ public class LockOutRealm extends CombinedRealm {
      * Should user names (the keys) in the failedUsers Map have trailing space removed. The default is true.
      */
     private boolean stripTrailingSpace = true;
+
+    /*
+     * Characters that, if present in a user name, will be treated as if they are not present in the user name for the
+     * purposes of this realm. The default is the set of characters that LDAP servers and most databases ignore when
+     * comparing user names (see isIgnoredByDefault()). This is the actual characters, not the escaped form.
+     */
+    private volatile String charactersToIgnore = DEFAULT_CHARACTERS_TO_IGNORE;
+
+    /*
+     * Further characters that are treated as if they are not present in the user name. These are in addition to
+     * charactersToIgnore. The default is none. This is the actual characters, not the escaped form.
+     */
+    private volatile String additionalCharactersToIgnore = "";
+
+    /*
+     * The code points of the characters in charactersToIgnore and additionalCharactersToIgnore. Derived from them when
+     * either is set so it does not need to be derived each time a user name is normalized.
+     */
+    private volatile Set<Integer> codePointsToIgnore = DEFAULT_CODE_POINTS_TO_IGNORE;
+
+    /*
+     * Should user names (the keys) in the failedUsers Map be converted to Unicode Normalization Form KC (NFKC). This
+     * is the form used by LDAP servers (RFC 4518, RFC 4013) when comparing user names. The default is true.
+     */
+    private volatile boolean normalizeUnicode = true;
+
+    /*
+     * Should combining marks (Unicode category Mn) be removed from user names (the keys) in the failedUsers Map. This
+     * matches the behaviour of accent insensitive database collations. The default is true.
+     */
+    private volatile boolean stripCombiningMarks = true;
+
+    /*
+     * Should runs of space characters within user names (the keys) in the failedUsers Map be replaced with a single
+     * space. The default is true.
+     */
+    private volatile boolean collapseInternalSpace = true;
+
 
     @Override
     protected void startInternal() throws LifecycleException {
@@ -424,36 +482,408 @@ public class LockOutRealm extends CombinedRealm {
     }
 
 
+    /**
+     * Get the characters that are ignored in user names when making locking decisions. This does not include the
+     * additional characters to ignore.
+     * <p>
+     * The value is returned in escaped form so it can be passed to {@link #setCharactersToIgnore(String)}. Characters
+     * other than the printable ASCII characters (U+0021 to U+007E) are returned as {@code \}{@code uXXXX} (four hex
+     * digits) or, for characters outside the Basic Multilingual Plane, {@code \}{@code u{X...X}}. A backslash is
+     * returned as two backslashes.
+     *
+     * @return the characters that are ignored in escaped form
+     */
+    public String getCharactersToIgnore() {
+        return escape(charactersToIgnore);
+    }
+
+
+    /**
+     * Set the characters that are ignored in user names when making locking decisions. Each Unicode character
+     * (code point) in the provided value is removed from user names. The provided value replaces the default value in
+     * its entirety. A {@code null} value is treated as an empty String, meaning that no characters are ignored. The
+     * characters set with {@link #setAdditionalCharactersToIgnore(String)} are ignored as well.
+     * <p>
+     * Characters that are difficult to specify directly may be escaped. The supported escape sequences are:
+     * <ul>
+     * <li>{@code \}{@code \} - a backslash</li>
+     * <li>{@code \}{@code uXXXX} - the UTF-16 code unit with the four digit hex value XXXX (a pair of these escape
+     * sequences may be used to specify a character outside the Basic Multilingual Plane)</li>
+     * <li>{@code \}{@code u{X...X}} - the character with the one to six digit hex value X...X</li>
+     * </ul>
+     * Any other use of a backslash is an error as is an unpaired surrogate.
+     * <p>
+     * The default value is every Unicode format character (category Cf, includes soft hyphen and the zero width
+     * characters), every control character (category Cc) that is not a space character, and the following characters
+     * that LDAP servers and many databases also ignore when comparing values: U+034F, U+1806, U+180B to U+180D,
+     * U+FE00 to U+FE0F and U+FFFC.
+     *
+     * @param charactersToIgnore the characters to ignore, optionally containing escape sequences
+     *
+     * @throws IllegalArgumentException if the provided value contains an invalid escape sequence or an unpaired
+     *                                      surrogate
+     */
+    public void setCharactersToIgnore(String charactersToIgnore) {
+        String characters = unescape(charactersToIgnore);
+        synchronized (this) {
+            this.charactersToIgnore = characters;
+            updateCodePointsToIgnore();
+        }
+    }
+
+
+    /**
+     * Get the additional characters that are ignored in user names when making locking decisions.
+     * <p>
+     * The value is returned in escaped form so it can be passed to {@link #setAdditionalCharactersToIgnore(String)}.
+     * See {@link #getCharactersToIgnore()} for the form used.
+     *
+     * @return the additional characters that are ignored in escaped form
+     */
+    public String getAdditionalCharactersToIgnore() {
+        return escape(additionalCharactersToIgnore);
+    }
+
+
+    /**
+     * Set the additional characters that are ignored in user names when making locking decisions. These characters are
+     * ignored in addition to those set with {@link #setCharactersToIgnore(String)} (or the default value of that
+     * attribute if it has not been set). A {@code null} value is treated as an empty String, meaning that there are no
+     * additional characters. The same escape sequences are supported as for {@link #setCharactersToIgnore(String)}.
+     *
+     * @param additionalCharactersToIgnore the additional characters to ignore, optionally containing escape sequences
+     *
+     * @throws IllegalArgumentException if the provided value contains an invalid escape sequence or an unpaired
+     *                                      surrogate
+     */
+    public void setAdditionalCharactersToIgnore(String additionalCharactersToIgnore) {
+        String characters = unescape(additionalCharactersToIgnore);
+        synchronized (this) {
+            this.additionalCharactersToIgnore = characters;
+            updateCodePointsToIgnore();
+        }
+    }
+
+
+    private void updateCodePointsToIgnore() {
+        codePointsToIgnore = toCodePointSet(charactersToIgnore.concat(additionalCharactersToIgnore));
+    }
+
+
+    /**
+     * Get the Unicode normalization flag for user name matching.
+     *
+     * @return {@code true} if user names are converted to Unicode Normalization Form KC (NFKC)
+     */
+    public boolean getNormalizeUnicode() {
+        return normalizeUnicode;
+    }
+
+
+    /**
+     * Set the Unicode normalization flag for user name matching. If {@code true}, user names are converted to Unicode
+     * Normalization Form KC (NFKC) when making locking decisions. This is the form used by LDAP servers.
+     *
+     * @param normalizeUnicode the normalizeUnicode to set
+     */
+    public void setNormalizeUnicode(boolean normalizeUnicode) {
+        this.normalizeUnicode = normalizeUnicode;
+    }
+
+
+    /**
+     * Get the strip combining marks flag for user name matching.
+     *
+     * @return {@code true} if combining marks are removed from user names
+     */
+    public boolean getStripCombiningMarks() {
+        return stripCombiningMarks;
+    }
+
+
+    /**
+     * Set the strip combining marks flag for user name matching. If {@code true}, nonspacing combining marks (Unicode
+     * category Mn, such as accents) are removed from user names when making locking decisions. Accent insensitive
+     * database collations treat user names that differ only by such marks as the same user name.
+     *
+     * @param stripCombiningMarks the stripCombiningMarks to set
+     */
+    public void setStripCombiningMarks(boolean stripCombiningMarks) {
+        this.stripCombiningMarks = stripCombiningMarks;
+    }
+
+
+    /**
+     * Get the collapse internal space flag for user name matching.
+     *
+     * @return {@code true} if runs of space within user names are replaced with a single space
+     */
+    public boolean getCollapseInternalSpace() {
+        return collapseInternalSpace;
+    }
+
+
+    /**
+     * Set the collapse internal space flag for user name matching. If {@code true}, each run of one or more space
+     * characters (see {@link #setStripLeadingSpace(boolean)}) between other characters in a user name is replaced by a
+     * single space when making locking decisions. Leading and trailing space is controlled by the strip leading space
+     * and strip trailing space flags.
+     *
+     * @param collapseInternalSpace the collapseInternalSpace to set
+     */
+    public void setCollapseInternalSpace(boolean collapseInternalSpace) {
+        this.collapseInternalSpace = collapseInternalSpace;
+    }
+
+
     private String normalizeUsername(String username) {
         if (username == null) {
             return null;
         }
+
+        // Remove ignored characters first so they can't prevent characters being combined or collapsed below
+        Set<Integer> remove = codePointsToIgnore;
+        if (!remove.isEmpty()) {
+            username = username.codePoints().filter(cp -> !remove.contains(Integer.valueOf(cp)))
+                    .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append).toString();
+        }
+
+        // Normalize before changing case since normalization can change the case of a character
+        if (getNormalizeUnicode()) {
+            username = Normalizer.normalize(username, Normalizer.Form.NFKC);
+        }
+
         if (!getCaseSensitive()) {
             username = username.toLowerCase(Locale.ROOT);
         }
 
-        // String.strip() only covers Character.isWhitespace(). Character.isSpaceChar() is also needed here.
+        if (getStripCombiningMarks()) {
+            username = removeCombiningMarks(username);
+        }
+
+        if (getCollapseInternalSpace()) {
+            username = collapseInternalSpace(username);
+        }
+
         int start = 0;
         int end = username.length();
         if (getStripLeadingSpace()) {
             while (start < end) {
-                char c = username.charAt(start);
-                if (!Character.isSpaceChar(c) && !Character.isWhitespace(c)) {
+                int cp = username.codePointAt(start);
+                if (!isSpace(cp)) {
                     break;
                 }
-                start++;
+                start += Character.charCount(cp);
             }
         }
         if (getStripTrailingSpace()) {
             while (end > start) {
-                char c = username.charAt(end - 1);
-                if (!Character.isSpaceChar(c) && !Character.isWhitespace(c)) {
+                int cp = username.codePointBefore(end);
+                if (!isSpace(cp)) {
                     break;
                 }
-                end--;
+                end -= Character.charCount(cp);
             }
         }
         return username.substring(start, end);
+    }
+
+
+    private String removeCombiningMarks(String username) {
+        String decomposed = Normalizer.normalize(username, Normalizer.Form.NFD);
+        StringBuilder sb = new StringBuilder(decomposed.length());
+        decomposed.codePoints().filter(cp -> Character.getType(cp) != Character.NON_SPACING_MARK)
+                .forEach(sb::appendCodePoint);
+        // Recompose what is left
+        return Normalizer.normalize(sb, getNormalizeUnicode() ? Normalizer.Form.NFKC : Normalizer.Form.NFC);
+    }
+
+
+    private String collapseInternalSpace(String username) {
+        int length = username.length();
+
+        // Leading and trailing space is not internal space. It is left for the strip options to deal with.
+        int start = 0;
+        while (start < length) {
+            int cp = username.codePointAt(start);
+            if (!isSpace(cp)) {
+                break;
+            }
+            start += Character.charCount(cp);
+        }
+        if (start == length) {
+            return username;
+        }
+        int end = length;
+        while (end > start) {
+            int cp = username.codePointBefore(end);
+            if (!isSpace(cp)) {
+                break;
+            }
+            end -= Character.charCount(cp);
+        }
+
+        StringBuilder sb = new StringBuilder(length);
+        sb.append(username, 0, start);
+        boolean inSpace = false;
+        int i = start;
+        while (i < end) {
+            int cp = username.codePointAt(i);
+            if (isSpace(cp)) {
+                if (!inSpace) {
+                    sb.append(' ');
+                    inSpace = true;
+                }
+            } else {
+                sb.appendCodePoint(cp);
+                inSpace = false;
+            }
+            i += Character.charCount(cp);
+        }
+        sb.append(username, end, length);
+        return sb.toString();
+    }
+
+
+    /*
+     * Character.isWhitespace() only covers some space characters. Character.isSpaceChar() is also needed. U+0085 (NEL)
+     * is neither but LDAP servers treat it as a space.
+     */
+    private static boolean isSpace(int cp) {
+        return Character.isWhitespace(cp) || Character.isSpaceChar(cp) || cp == 0x0085;
+    }
+
+
+    /*
+     * The characters that are ignored by default. These are characters that LDAP servers ignore when comparing values
+     * (see the "map to nothing" characters in RFC 3454, table B.1, and the control and format characters in RFC 4518)
+     * and that many databases ignore. They are all effectively invisible.
+     */
+    private static boolean isIgnoredByDefault(int cp) {
+        switch (Character.getType(cp)) {
+            case Character.FORMAT:
+                return true;
+            case Character.CONTROL:
+                // Control characters that are space (tab, new line etc.) are dealt with as space
+                return !isSpace(cp);
+            default:
+                break;
+        }
+        return cp == 0x034F || cp == 0x1806 || cp >= 0x180B && cp <= 0x180D || cp >= 0xFE00 && cp <= 0xFE0F ||
+                cp == 0xFFFC;
+    }
+
+
+    /*
+     * Convert the escaped form of a set of characters to the characters.
+     */
+    private String unescape(String escaped) {
+        if (escaped == null) {
+            return "";
+        }
+
+        int length = escaped.length();
+        StringBuilder sb = new StringBuilder(length);
+        int i = 0;
+        while (i < length) {
+            char c = escaped.charAt(i++);
+            if (c != '\\') {
+                sb.append(c);
+                continue;
+            }
+            if (i == length) {
+                throw invalidEscape(escaped);
+            }
+            char type = escaped.charAt(i++);
+            if (type == '\\') {
+                sb.append('\\');
+            } else if (type == 'u') {
+                if (i < length && escaped.charAt(i) == '{') {
+                    int close = escaped.indexOf('}', i);
+                    if (close < 0) {
+                        throw invalidEscape(escaped);
+                    }
+                    int cp = parseHex(escaped, i + 1, close, 6);
+                    if (cp > Character.MAX_CODE_POINT) {
+                        throw invalidEscape(escaped);
+                    }
+                    sb.appendCodePoint(cp);
+                    i = close + 1;
+                } else {
+                    if (i + 4 > length) {
+                        throw invalidEscape(escaped);
+                    }
+                    sb.append((char) parseHex(escaped, i, i + 4, 4));
+                    i += 4;
+                }
+            } else {
+                throw invalidEscape(escaped);
+            }
+        }
+
+        // Surrogates are only valid if paired. Pairs are always read as a single code point.
+        String result = sb.toString();
+        int j = 0;
+        while (j < result.length()) {
+            int cp = result.codePointAt(j);
+            if (Character.isSurrogate((char) cp) && cp <= 0xFFFF) {
+                throw invalidEscape(escaped);
+            }
+            j += Character.charCount(cp);
+        }
+        return result;
+    }
+
+
+    /*
+     * Parse the hex digits in value from start (inclusive) to end (exclusive). At least one digit is required and no
+     * more than maxDigits are permitted. Only the ASCII hex digits are permitted.
+     */
+    private int parseHex(String value, int start, int end, int maxDigits) {
+        if (end <= start || end - start > maxDigits) {
+            throw invalidEscape(value);
+        }
+        int result = 0;
+        for (int i = start; i < end; i++) {
+            int digit = HexUtils.getDec(value.charAt(i));
+            if (digit < 0) {
+                throw invalidEscape(value);
+            }
+            result = result * 16 + digit;
+        }
+        return result;
+    }
+
+
+    private IllegalArgumentException invalidEscape(String value) {
+        return new IllegalArgumentException(sm.getString("lockOutRealm.invalidEscape", value));
+    }
+
+
+    /*
+     * Convert a set of characters to the escaped form. Only the printable ASCII characters other than the backslash
+     * are not escaped. This avoids any ambiguity when displaying or editing the value.
+     */
+    private static String escape(String characters) {
+        StringBuilder sb = new StringBuilder(characters.length());
+        characters.codePoints().forEach(cp -> {
+            if (cp == '\\') {
+                sb.append("\\\\");
+            } else if (cp >= 0x21 && cp <= 0x7E) {
+                sb.appendCodePoint(cp);
+            } else if (cp <= 0xFFFF) {
+                String hex = Integer.toHexString(cp).toUpperCase(Locale.ROOT);
+                sb.append("\\u").append("0000", hex.length(), 4).append(hex);
+            } else {
+                sb.append("\\u{").append(Integer.toHexString(cp).toUpperCase(Locale.ROOT)).append('}');
+            }
+        });
+        return sb.toString();
+    }
+
+
+    private static Set<Integer> toCodePointSet(String characters) {
+        return Collections.unmodifiableSet(characters.codePoints().boxed().collect(Collectors.toSet()));
     }
 
 
