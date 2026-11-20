@@ -1000,6 +1000,17 @@
         one of those roles.</p>
       </attribute>
 
+      <attribute name="additionalCharactersToIgnore" required="false">
+        <p>Further characters that will be removed from user names when making
+        locking decisions. These are removed in addition to the characters
+        specified by <strong>charactersToIgnore</strong>, so the default value
+        of that attribute can be extended without having to list every
+        character it contains. The same format and escape sequences are
+        supported as for <strong>charactersToIgnore</strong>. If not specified,
+        the default value of an empty string will be used, meaning that no
+        additional characters are ignored.</p>
+      </attribute>
+
       <attribute name="cacheRemovalWarningTime" required="false">
        <p>If a failed user is removed from the cache because the cache is too
        big before it has been in the cache for at least this period of time (in
@@ -1018,6 +1029,55 @@
        treated in a case insensitive manner.</p>
       </attribute>
 
+      <attribute name="charactersToIgnore" required="false">
+        <p>The characters that will be removed from user names when making
+        locking decisions. Each Unicode character in the value is treated
+        individually; ranges are not supported. The characters are removed
+        before any other changes are made to the user name. This is used to
+        stop a user name that contains characters that the authentication
+        back-end ignores (such as zero width characters) being treated as a
+        different user to the same name without those characters. Specifying a
+        value replaces the default value in its entirety. Specify an empty
+        value to ignore no characters. To ignore characters in addition to the
+        default value, use <strong>additionalCharactersToIgnore</strong>.</p>
+        <p>Characters that are difficult to specify directly (including the
+        control characters, which can not be used in an XML attribute value
+        even as a numeric character reference) may be written as escape
+        sequences:</p>
+        <ul>
+          <li><code>\\</code> - a backslash.</li>
+          <li><code>\uXXXX</code> - the UTF-16 code unit with the four digit hex
+              value <code>XXXX</code>. A pair of these may be used to specify
+              a character outside the Basic Multilingual Plane.</li>
+          <li><code>\u{X...X}</code> - the character with the one to six digit
+              hex value <code>X...X</code>.</li>
+        </ul>
+        <p>Any other use of a backslash, or an unpaired surrogate, is an error.
+        When the value is read, it is always returned in this escaped form,
+        where every character other than the printable ASCII characters
+        (U+0021 to U+007E) is escaped, so the value read can be used to set
+        the value.</p>
+        <p>The default value is every Unicode format character (category
+        <code>Cf</code>, which includes the soft hyphen and the zero width
+        characters), every control character (category <code>Cc</code>) that is
+        not a space character and the characters U+034F, U+1806, U+180B to
+        U+180D, U+FE00 to U+FE0F and U+FFFC. These are the characters that LDAP
+        servers ignore when comparing values and that many databases also
+        ignore.</p>
+      </attribute>
+
+      <attribute name="collapseInternalSpace" required="false">
+        <p>Will each run of one or more space characters
+        (<code>Character.isWhitespace()</code> or
+        <code>Character.isSpaceChar()</code> returns <code>true</code>, or the
+        character is U+0085) between other characters in a user name be
+        replaced by a single space when making locking decisions. Leading and
+        trailing space is not affected by this setting; see
+        <strong>stripLeadingSpace</strong> and
+        <strong>stripTrailingSpace</strong>. Defaults to <code>true</code>,
+        meaning that runs of space will be collapsed.</p>
+      </attribute>
+
       <attribute name="failureCount" required="false">
        <p>The number of times in a row a user has to fail authentication to be
        locked out. Defaults to 5.</p>
@@ -1032,18 +1092,38 @@
        will also not reset the lock out time.</p>
       </attribute>
 
+      <attribute name="normalizeUnicode" required="false">
+        <p>Will user names be converted to Unicode Normalization Form KC (NFKC)
+        when making locking decisions. This is the form used by LDAP servers
+        when comparing user names. It means that, for example, full width and
+        half width forms of a character and the precomposed and decomposed
+        forms of an accented character are treated as the same character.
+        Defaults to <code>true</code>, meaning that user names will be
+        normalized.</p>
+      </attribute>
+
+      <attribute name="stripCombiningMarks" required="false">
+        <p>Will nonspacing combining marks (Unicode category <code>Mn</code>,
+        such as accents) be removed from user names when making locking
+        decisions. Accent insensitive database collations treat user names that
+        differ only by such marks as the same user name. Defaults to
+        <code>true</code>, meaning that combining marks will be removed.</p>
+      </attribute>
+
       <attribute name="stripLeadingSpace" required="false">
         <p>Will leading space (<code>Character.isWhitespace()</code> or
-        <code>Character.isSpaceChar()</code> returns <code>true</code>) be
-        removed from user names when making locking decisions. Defaults to
-        <code>true</code>, meaning leading space will be removed.</p>
+        <code>Character.isSpaceChar()</code> returns <code>true</code>, or the
+        character is U+0085) be removed from user names when making locking
+        decisions. Defaults to <code>true</code>, meaning leading space will be
+        removed.</p>
       </attribute>
 
       <attribute name="stripTrailingSpace" required="false">
         <p>Will trailing space (<code>Character.isWhitespace()</code> or
-        <code>Character.isSpaceChar()</code> returns <code>true</code>) be
-        removed from user names when making locking decisions. Defaults to
-        <code>true</code>, meaning leading space will be removed.</p>
+        <code>Character.isSpaceChar()</code> returns <code>true</code>, or the
+        character is U+0085) be removed from user names when making locking
+        decisions. Defaults to <code>true</code>, meaning trailing space will
+        be removed.</p>
       </attribute>
 
       <attribute name="transportGuaranteeRedirectStatus" required="false">
@@ -1054,6 +1134,14 @@
       </attribute>
 
     </attributes>
+
+    <p>When making locking decisions, the user name is processed in the
+    following order: characters to ignore are removed, the user name is
+    converted to Unicode Normalization Form KC (if enabled), the user name is
+    converted to lower case (unless case sensitive), combining marks are removed
+    (if enabled), runs of internal space are collapsed (if enabled) and leading
+    and trailing space is removed (if enabled). The user name that is passed to
+    the nested Realms is not changed.</p>
 
     <p>See the <a href="../realm-howto.html">Container-Managed Security
     Guide</a> for more information on setting up container managed security
