@@ -237,6 +237,10 @@
         <code>ClassValue</code> to cache the result of calling
         <code>Class.getMethods()</code>. (markt)
       </scode>
+      <fix>
+        Expand the user name normalisation options available in the
+        <code>LockOutRealm</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
