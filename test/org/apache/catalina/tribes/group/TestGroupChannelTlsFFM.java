@@ -32,21 +32,22 @@ public class TestGroupChannelTlsFFM extends GroupChannelTlsTestBase {
     @Before
     public void setup() throws Exception {
         Assume.assumeTrue("FFM requires Java 22+", JreCompat.isJre22Available());
-        Assume.assumeTrue("TLS-PSK support requires OpenSSL", OpenSSLStatus.isOpenSSL3());
-        if (explicit) {
-            // Models starting cluster when OpenSSLLifecycleListener has configured FFM support.
+        try {
             openSSLLibraryInit();
-            Assume.assumeTrue(OpenSSLStatus.isAvailable());
-        } else {
-            // Test FFM is available but leave it uninitialized so Tribes performs initialization
-            try {
-                openSSLLibraryInit();
-            } catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
-                // Ignore
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            // Ignore
+        }
+        try {
+            // Need to check both as only available is reset with init/destroy
+            Assume.assumeTrue("TLS-PSK support requires OpenSSL", OpenSSLStatus.isAvailable());
+            Assume.assumeTrue("TLS-PSK support requires OpenSSL 3", OpenSSLStatus.isOpenSSL3());
+        } finally {
+            if (!explicit || !OpenSSLStatus.isOpenSSL3()) {
+                // If not explicit, leave OpenSSL-FFM uninitialized so Tribes performs initialization.
+                // Clean-up if not OpenSSL 3
+                openSSLLibraryDestroy();
             }
-            Assume.assumeTrue(OpenSSLStatus.isAvailable());
-            openSSLLibraryDestroy();
         }
     }
 
