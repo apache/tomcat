@@ -52,6 +52,7 @@ import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.parser.Host;
 import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.http.parser.Priority;
+import org.apache.tomcat.util.http.parser.TokenList;
 import org.apache.tomcat.util.net.ApplicationBufferHandler;
 import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.WriteBuffer;
@@ -552,8 +553,21 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 break;
             }
             default: {
-                if ("expect".equals(name) && "100-continue".equalsIgnoreCase(value)) {
-                    coyoteRequest.setExpectation(true);
+                if ("expect".equals(name)) {
+                    // RFC 9110, section 10.1.1: the field value is a case-insensitive list of expectations
+                    if ("100-continue".equalsIgnoreCase(value)) {
+                        coyoteRequest.setExpectation(true);
+                    } else {
+                        Set<String> expectations = new HashSet<>();
+                        try {
+                            TokenList.parseTokenList(new StringReader(value), expectations);
+                        } catch (IOException ioe) {
+                            // Not possible with StringReader
+                        }
+                        if (expectations.contains("100-continue")) {
+                            coyoteRequest.setExpectation(true);
+                        }
+                    }
                 }
                 if (pseudoHeader) {
                     headerException = new StreamException(
