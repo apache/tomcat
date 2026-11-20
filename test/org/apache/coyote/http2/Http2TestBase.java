@@ -383,6 +383,13 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     protected void buildPostRequest(byte[] headersFrameHeader, ByteBuffer headersPayload, boolean useExpectation,
             String contentType, long contentLength, String path, byte[] dataFrameHeader, ByteBuffer dataPayload,
             byte[] padding, boolean withTrailers, int streamId) {
+        buildPostRequest(headersFrameHeader, headersPayload, useExpectation ? "100-continue" : null, contentType,
+                contentLength, path, dataFrameHeader, dataPayload, padding, withTrailers, streamId);
+    }
+
+    protected void buildPostRequest(byte[] headersFrameHeader, ByteBuffer headersPayload, String expectation,
+            String contentType, long contentLength, String path, byte[] dataFrameHeader, ByteBuffer dataPayload,
+            byte[] padding, boolean withTrailers, int streamId) {
 
         MimeHeaders headers = new MimeHeaders();
         headers.addValue(":method").setString(Method.POST);
@@ -393,8 +400,8 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         }
         headers.addValue(":path").setString(path);
         headers.addValue(":authority").setString("localhost:" + getPort());
-        if (useExpectation) {
-            headers.addValue("expect").setString("100-continue");
+        if (expectation != null) {
+            headers.addValue("expect").setString(expectation);
         }
         if (contentType != null) {
             headers.addValue("content-type").setString(contentType);
