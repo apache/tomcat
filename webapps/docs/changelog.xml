@@ -262,6 +262,10 @@
         Improve reporting of faulty members when sending of cluster messages
         fails. (markt)
       </fix>
+      <fix>
+        Increase visibility of TLS errors when receiving cluster messages.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
