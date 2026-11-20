@@ -258,6 +258,10 @@
         configuration and security considerations. Based on pull request
         <pr>1134</pr> by sainadh777. (markt)
       </docs>
+      <fix>
+        Improve reporting of faulty members when sending of cluster messages
+        fails. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
