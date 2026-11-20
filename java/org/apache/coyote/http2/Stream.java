@@ -891,7 +891,6 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
      *
      * @param streamException The stream error
      */
-    @SuppressWarnings("null") // processor is not null when it is referenced
     final void closeOnStreamError(StreamException streamException) {
         StreamProcessor processor = streamProcessor;
         close(streamException);
