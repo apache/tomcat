@@ -57,6 +57,12 @@ class WindowAllocationManager {
     private final Stream stream;
 
     private int waitingFor = NONE;
+    /*
+     * Set if the current wait was registered by non-blocking I/O. No thread is blocked in that case so a dispatch is
+     * required to resume writing. The write listener can't be used to make this decision as it is cleared when
+     * asynchronous processing completes, which may be before all the buffered data has been written.
+     */
+    private boolean nonBlockingWait;
 
     WindowAllocationManager(Stream stream) {
         this.stream = stream;
@@ -147,6 +153,7 @@ class WindowAllocationManager {
             }
 
             waitingFor = waitTarget;
+            nonBlockingWait = false;
             long startNanos = -1;
 
             // Loop to handle spurious wake-ups
@@ -182,6 +189,7 @@ class WindowAllocationManager {
         try {
             if (waitingFor == NONE) {
                 waitingFor = waitTarget;
+                nonBlockingWait = true;
             } else if (waitingFor == waitTarget) {
                 // NO-OP
                 // Non-blocking post-processing may attempt to flush
@@ -213,7 +221,7 @@ class WindowAllocationManager {
                 waitingFor = NONE;
                 Response response = stream.getCoyoteResponse();
                 if (response != null) {
-                    if (response.getWriteListener() == null) {
+                    if (!nonBlockingWait) {
                         // Blocking, so use notify to release StreamOutputBuffer
                         if (log.isDebugEnabled()) {
                             log.debug(sm.getString("windowAllocationManager.notified", stream.getConnectionId(),
