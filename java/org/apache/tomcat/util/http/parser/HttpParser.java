@@ -271,6 +271,27 @@ public class HttpParser {
 
 
     /**
+     * Converts a string to a quoted-string (RFC 9110, section 5.6.4). Only DQUOTE and backslash are escaped.
+     *
+     * @param input the string to quote
+     * @return the quoted string
+     */
+    public static String quote(String input) {
+        StringBuilder result = new StringBuilder(input.length() + 2);
+        result.append('"');
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+            if (c == '"' || c == '\\') {
+                result.append('\\');
+            }
+            result.append(c);
+        }
+        result.append('"');
+        return result.toString();
+    }
+
+
+    /**
      * Checks if the given character is a valid HTTP token character as per RFC 7230.
      *
      * @param c the character to check
