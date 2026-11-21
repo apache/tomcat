@@ -20,18 +20,252 @@
 ]>
 <document url="interceptors.html">
 
-    &project;
+  &project;
 
-    <properties>
-        <title>Apache Tribes - Interceptors</title>
-    </properties>
+  <properties>
+    <title>Apache Tribes - Interceptors</title>
+  </properties>
 
 <body>
 
-
-<section name="Interceptors">
-    <p>TODO</p>
+<section name="Table of Contents">
+<toc/>
 </section>
+
+<section name="Overview">
+  <p>
+    A Tribes channel uses a chain of interceptors between the application-facing
+    <code>GroupChannel</code> and the transport and membership components. An
+    interceptor can transform a message, change how it is delivered, observe
+    traffic, or filter membership events. This keeps each concern independent
+    of the channel and transport implementations.
+  </p>
+  <p>
+    Interceptors are added with nested <code>Interceptor</code> elements in the
+    order in which they should process outbound messages. Inbound messages and
+    membership events travel through the same chain in reverse order. For the
+    following stack, outbound messages pass through <code>A</code>, then
+    <code>B</code>, while inbound messages pass through <code>B</code>, then
+    <code>A</code>:
+  </p>
+  <source><![CDATA[<Channel className="org.apache.catalina.tribes.group.GroupChannel">
+  <Interceptor className="example.A"/>
+  <Interceptor className="example.B"/>
+</Channel>]]></source>
+  <p>
+    An interceptor normally calls the next interceptor when sending and the
+    previous interceptor when receiving. It may instead consume a message,
+    create additional messages, delay delivery, or report an error. Therefore,
+    both the selected interceptors and their order are part of the cluster
+    protocol and should be consistent on every member.
+  </p>
+</section>
+
+<section name="Selecting messages">
+  <p>
+    A channel message carries a bit mask of send options. An interceptor with
+    an <code>optionFlag</code> of zero processes every message. A non-zero flag
+    allows the interceptor to process only messages that contain all of its
+    configured bits. Some interceptors use a fixed or internal option bit. For
+    example, <code>MessageDispatchInterceptor</code> reacts to
+    <code>SEND_OPTIONS_ASYNCHRONOUS</code>, while
+    <code>GzipInterceptor</code> marks compressed messages so that the receiver
+    knows to decompress them.
+  </p>
+  <p>
+    Custom option bits must not overlap. Set <code>optionCheck="true"</code> on
+    the channel during configuration to make startup fail when two
+    interceptors claim the same non-zero flag. The standard delivery options
+    are described in the <a href="transport.html#Delivery_options">transport
+    guide</a>.
+  </p>
+</section>
+
+<section name="Message processing interceptors">
+  <subsection name="Asynchronous dispatch">
+    <p>
+      <code>MessageDispatchInterceptor</code> queues messages marked with
+      <code>SEND_OPTIONS_ASYNCHRONOUS</code> and sends them from its worker
+      pool. A queue size limit bounds the retained message data. When the queue
+      is full, <code>alwaysSend</code> determines whether the caller sends the
+      message synchronously or receives an error.
+    </p>
+    <p>
+      Its position controls which outbound work is asynchronous. Interceptors
+      before it run on the caller's thread; interceptors after it run on a
+      dispatch worker. If no interceptors are configured,
+      <code>GroupChannel</code> adds this interceptor automatically. Once an
+      explicit stack is configured, include it explicitly when asynchronous
+      delivery is required.
+    </p>
+  </subsection>
+
+  <subsection name="Fragmentation">
+    <p>
+      <code>FragmentationInterceptor</code> splits messages larger than
+      <code>maxSize</code> and reassembles the fragments at the destination.
+      Incomplete fragment sets are discarded after <code>expire</code>. This
+      can prevent one large message from monopolising a connection, but it also
+      retains fragments in memory until the message is complete or expires.
+    </p>
+  </subsection>
+
+  <subsection name="Compression">
+    <p>
+      <code>GzipInterceptor</code> compresses outbound payloads with GZIP when
+      they exceed <code>compressionMinSize</code> and decompresses marked
+      inbound payloads. Compression reduces network traffic for suitable data
+      at the cost of CPU time. Place it before
+      <code>FragmentationInterceptor</code> to compress a complete message
+      before splitting it; the reverse inbound path then reassembles the
+      message before decompression.
+    </p>
+  </subsection>
+
+  <subsection name="Ordering">
+    <p>
+      <code>OrderInterceptor</code> adds a sequence number per destination and
+      queues out-of-order inbound messages. The <code>expire</code>,
+      <code>maxQueue</code> and <code>forwardExpired</code> settings bound how
+      long and how many messages it retains, and determine whether gaps result
+      in late messages being forwarded or discarded. Ordering can reduce
+      throughput when many threads send concurrently, so enable it only for
+      messages whose semantics require it.
+    </p>
+  </subsection>
+
+  <subsection name="Two-phase delivery">
+    <p>
+      <code>TwoPhaseCommitInterceptor</code> sends a confirmation after each
+      message. The receiver releases the original only after the confirmation
+      arrives. It does not retransmit a lost message or confirmation, so it is
+      a delivery-ordering mechanism rather than a transaction manager.
+    </p>
+    <p>
+      When it is combined with <code>FragmentationInterceptor</code>, declare
+      <code>TwoPhaseCommitInterceptor</code> first. This makes it confirm the
+      complete message rather than individual fragments that share the same
+      message identifier.
+    </p>
+  </subsection>
+</section>
+
+<section name="Membership interceptors">
+  <subsection name="Failure detection">
+    <p>
+      <code>TcpFailureDetector</code> checks a member over TCP before accepting
+      a disappearance event, and also reacts to message send failures. It helps
+      distinguish an unavailable member from delayed or lost membership
+      announcements. Connection and optional read tests have independent
+      timeouts so that failure confirmation can be tuned for the network.
+    </p>
+    <p>
+      <code>TcpPingInterceptor</code> actively sends periodic pings. It may use
+      the channel heartbeat or a dedicated thread, and it can limit checks to
+      statically configured members. Place it before
+      <code>TcpFailureDetector</code> so it can use the detector's membership
+      checks.
+    </p>
+  </subsection>
+
+  <subsection name="Static membership">
+    <p>
+      <code>StaticMembershipInterceptor</code> adds configured local and remote
+      members to the view without requiring dynamic discovery. It may be used
+      alone or with a dynamic membership service. Place it after
+      <code>TcpFailureDetector</code> so the configured members receive the
+      same failure checks as dynamically discovered members. The
+      <a href="membership.html#Static_membership">membership guide</a>
+      contains complete examples and ordering guidance.
+    </p>
+  </subsection>
+
+  <subsection name="Domain filtering">
+    <p>
+      <code>DomainFilterInterceptor</code> exposes only members and messages
+      whose member domain matches its configured domain. It provides logical
+      separation when discovery traffic is shared. It is not a security
+      boundary: untrusted cluster traffic still requires the network and TLS
+      protections described in the
+      <a href="../config/cluster.html#Security">cluster security reference</a>.
+    </p>
+  </subsection>
+
+  <subsection name="Coordination">
+    <p>
+      <code>SimpleCoordinator</code> derives a stable, sorted member view and
+      selects its first member as coordinator.
+      <code>NonBlockingCoordinator</code> adds a distributed view-merging and
+      leader-election protocol. These are specialised building blocks for
+      applications using Tribes directly and are not normally required for
+      Tomcat session replication.
+    </p>
+  </subsection>
+</section>
+
+<section name="Monitoring">
+  <p>
+    <code>ThroughputInterceptor</code> counts transmitted and received messages,
+    bytes and send failures, and periodically logs transfer rates. It does not
+    change message delivery. The interceptor and several other built-ins
+    expose runtime state through JMX when channel JMX registration is enabled.
+    See the <a href="status.html">status and monitoring guide</a> for object
+    names and useful attributes.
+  </p>
+  <p>
+    The channel also invokes <code>heartbeat()</code> periodically. Interceptors
+    use this callback to expire fragments, ordering queues, confirmations and
+    other temporary state. If the channel's internal heartbeat is disabled,
+    the embedding application or container must provide the equivalent
+    periodic callback.
+  </p>
+</section>
+
+<section name="Configuration example">
+  <p>
+    The following stack checks member failures, permits asynchronous sends,
+    compresses larger messages and fragments the compressed representation.
+    Each cluster member should use the same message-processing stack and
+    compatible settings.
+  </p>
+  <source><![CDATA[<Channel className="org.apache.catalina.tribes.group.GroupChannel"
+         optionCheck="true">
+  <Interceptor className="org.apache.catalina.tribes.group.interceptors.TcpFailureDetector"/>
+  <Interceptor className="org.apache.catalina.tribes.group.interceptors.MessageDispatchInterceptor"
+               maxQueueSize="67108864"/>
+  <Interceptor className="org.apache.catalina.tribes.group.interceptors.GzipInterceptor"
+               compressionMinSize="4096"/>
+  <Interceptor className="org.apache.catalina.tribes.group.interceptors.FragmentationInterceptor"
+               maxSize="102400"/>
+</Channel>]]></source>
+  <p>
+    The <a href="../config/cluster-interceptor.html">interceptor configuration
+    reference</a> lists the supported attributes and defaults for interceptors
+    intended for Tomcat cluster configurations. The
+    <a href="../api/org/apache/catalina/tribes/group/interceptors/package-summary.html">interceptor
+    package API</a> covers the specialised implementations.
+  </p>
+</section>
+
+<section name="Writing an interceptor">
+  <p>
+    Custom interceptors should extend <code>ChannelInterceptorBase</code> and
+    override only the callbacks they need. Outbound processing must normally
+    finish by calling <code>super.sendMessage()</code>; inbound processing and
+    membership notifications must normally finish by calling the corresponding
+    superclass method. Omitting that call intentionally consumes the event.
+  </p>
+  <p>
+    A single interceptor instance is shared by sending threads, receiver worker
+    threads and heartbeat processing. Mutable state must therefore be safe for
+    concurrent access, callbacks should avoid blocking the stack unnecessarily,
+    and retained messages must be cloned if their buffers may be reused by the
+    caller. Release temporary state during heartbeat or shutdown, and use an
+    application-specific, non-conflicting bit when the interceptor needs an
+    <code>optionFlag</code>.
+  </p>
+</section>
+
 </body>
 
 </document>
