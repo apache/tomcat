@@ -1544,6 +1544,96 @@ public class TestWebdavServlet extends TomcatBaseTest {
      * If processing the header is ignored, as for any other invalid If header syntax.
      */
     @Test
+    public void testDepthZeroCollectionLock() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // Create a temp webapp that can be safely written to
+        File tempWebapp = new File(getTemporaryDirectory(), "webdav-depth0");
+        tempWebapp.deleteOnExit();
+        File folder = new File(tempWebapp, "/locked");
+        Assert.assertTrue(folder.mkdirs());
+        try (FileOutputStream fos = new FileOutputStream(new File(folder, "member.txt"))) {
+            fos.write(CONTENT.getBytes());
+        }
+        try (FileOutputStream fos = new FileOutputStream(new File(tempWebapp, "outside.txt"))) {
+            fos.write(CONTENT.getBytes());
+        }
+        Context ctxt = tomcat.addContext("", tempWebapp.getAbsolutePath());
+        Wrapper webdavServlet = Tomcat.addServlet(ctxt, "webdav", new WebdavServlet());
+        webdavServlet.addInitParameter("readonly", "false");
+        ctxt.addServletMapping("/*", "webdav");
+        tomcat.start();
+
+        Client client = new Client();
+        client.setPort(getPort());
+
+        String lockToken = null;
+        // @formatter:off
+        client.setRequest(new String[] {
+                "LOCK /locked HTTP/1.1" + CRLF +
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Depth: 0" + CRLF +
+                    "Content-Length: " + LOCK_BODY.length() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    LOCK_BODY
+                });
+        // @formatter:on
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+        for (String header : client.getResponseHeaders()) {
+            if (header.startsWith("Lock-Token: ")) {
+                lockToken = header.substring("Lock-Token: ".length());
+            }
+        }
+        Assert.assertNotNull(lockToken);
+
+        // RFC 4918, section 7.4: the lock protects the internal member URLs of the collection
+        String destination = "Destination: http://localhost:" + getPort();
+        Assert.assertEquals(WebdavStatus.SC_LOCKED, doRequest(client, "PUT /locked/new.txt", null, CONTENT));
+        Assert.assertEquals(WebdavStatus.SC_LOCKED, doRequest(client, "MKCOL /locked/new", null, null));
+        Assert.assertEquals(WebdavStatus.SC_LOCKED, doRequest(client, "DELETE /locked/member.txt", null, null));
+        Assert.assertEquals(WebdavStatus.SC_LOCKED,
+                doRequest(client, "MOVE /locked/member.txt", destination + "/moved.txt", null));
+        Assert.assertEquals(WebdavStatus.SC_LOCKED,
+                doRequest(client, "MOVE /locked/member.txt", destination + "/locked/renamed.txt", null));
+        Assert.assertEquals(WebdavStatus.SC_LOCKED,
+                doRequest(client, "MOVE /outside.txt", destination + "/locked/moved.txt", null));
+        Assert.assertEquals(WebdavStatus.SC_LOCKED,
+                doRequest(client, "COPY /outside.txt", destination + "/locked/copy.txt", null));
+        Assert.assertTrue(new File(folder, "member.txt").isFile());
+        Assert.assertEquals(1, folder.list().length);
+
+        // A depth 0 lock does not protect the content of existing members
+        Assert.assertEquals(HttpServletResponse.SC_NO_CONTENT,
+                doRequest(client, "PUT /locked/member.txt", null, CONTENT));
+
+        // The lock token of the collection allows new members
+        Assert.assertEquals(HttpServletResponse.SC_CREATED, doRequest(client, "PUT /locked/new.txt",
+                "If: <http://localhost:" + getPort() + "/locked> (" + lockToken + ")", CONTENT));
+    }
+
+
+    private int doRequest(Client client, String requestLine, String header, String body) throws Exception {
+        // @formatter:off
+        client.setRequest(new String[] {
+                requestLine + " HTTP/1.1" + CRLF +
+                    "Host: localhost:" + getPort() + CRLF +
+                    (header == null ? "" : header + CRLF) +
+                    "Content-Length: " + (body == null ? 0 : body.length()) + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    (body == null ? "" : body)
+                });
+        // @formatter:on
+        client.connect();
+        client.processRequest(true);
+        return client.getStatusCode();
+    }
+
+
+    @Test
     public void testIfHeaderEmptyListStrict() throws Exception {
         Client client = doTestIfHeaderEmptyList("webdav-emptyif-strict", true);
         client.setRequest(new String[] {

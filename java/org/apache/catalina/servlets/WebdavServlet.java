@@ -1109,7 +1109,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             return;
         }
 
-        if (isLocked(path, req)) {
+        if (isLocked(path, req, false)) {
             resp.sendError(WebdavStatus.SC_LOCKED);
             return;
         }
@@ -1291,7 +1291,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             return;
         }
 
-        if (isLocked(path, req)) {
+        if (isLocked(path, req, true)) {
             resp.sendError(WebdavStatus.SC_LOCKED);
             return;
         }
@@ -1340,7 +1340,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             return;
         }
 
-        if (isLocked(path, req)) {
+        if (isLocked(path, req, !resource.exists())) {
             resp.sendError(WebdavStatus.SC_LOCKED);
             return;
         }
@@ -1393,7 +1393,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         String path = getRelativePath(req);
 
-        if (isLocked(path, req)) {
+        if (isLocked(path, req, true)) {
             resp.sendError(WebdavStatus.SC_LOCKED);
             return;
         }
@@ -2020,13 +2020,15 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      * Check to see if a resource is currently write locked. The method will look at the "If" header to make sure the
      * client has demonstrated knowledge of the appropriate lock tokens.
      *
-     * @param path The relative path
-     * @param req  Servlet request
+     * @param path         The relative path
+     * @param req          Servlet request
+     * @param memberChange {@code true} if the request adds or removes the resource as an internal member of its parent
+     *                         collection
      *
      * @return <code>true</code> if the resource is locked (and no appropriate lock token has been found for at least
      *             one of the non-shared locks which are present on the resource).
      */
-    private boolean isLocked(String path, HttpServletRequest req) {
+    private boolean isLocked(String path, HttpServletRequest req, boolean memberChange) {
 
         if (path == null) {
             path = getRelativePath(req);
@@ -2037,25 +2039,29 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             ifHeader = "";
         }
 
-        return isLocked(path, req.getRemoteUser(), ifHeader);
+        return isLocked(path, req.getRemoteUser(), ifHeader, memberChange);
     }
 
 
     /**
      * Check to see if a resource is currently write locked.
      *
-     * @param path      Path of the resource
-     * @param principal The authenticated principal name
-     * @param ifHeader  "If" HTTP header which was included in the request
+     * @param path         Path of the resource
+     * @param principal    The authenticated principal name
+     * @param ifHeader     "If" HTTP header which was included in the request
+     * @param memberChange {@code true} if the request adds or removes the resource as an internal member of its parent
+     *                         collection
      *
      * @return <code>true</code> if the resource is locked (and no appropriate lock token has been found for at least
      *             one of the non-shared locks which are present on the resource).
      */
-    private boolean isLocked(String path, String principal, String ifHeader) {
+    private boolean isLocked(String path, String principal, String ifHeader, boolean memberChange) {
 
         boolean unmatchedSharedLock = false;
         // Check if the resource or a parent is already locked
         String parentPath = path;
+        // RFC 4918, section 7.4: a write lock on a collection, including a depth 0 lock, protects its internal members
+        boolean directParent = false;
         do {
             LockInfo parentLock = resourceLocks.get(parentPath);
             if (parentLock != null) {
@@ -2063,7 +2069,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                     resourceLocks.remove(parentPath);
                 } else {
                     // parentPath == path is a check for the first loop
-                    if (parentPath == path || parentLock.depth > 0) {
+                    if (parentPath == path || parentLock.depth > 0 || directParent) {
                         if (parentLock.isExclusive()) {
                             return !ifHeader.contains(":" + parentLock.token + ">") ||
                                     (parentLock.principal != null && !parentLock.principal.equals(principal));
@@ -2072,7 +2078,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                                 LockInfo lock = sharedLocks.get(token);
                                 if (lock != null) {
                                     // The shared lock might not have the same depth
-                                    if (parentPath == path || lock.depth > 0) {
+                                    if (parentPath == path || lock.depth > 0 || directParent) {
                                         if (ifHeader.contains(":" + token + ">") &&
                                                 (lock.principal == null || lock.principal.equals(principal))) {
                                             return false;
@@ -2091,6 +2097,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             if (slash < 0) {
                 break;
             }
+            directParent = memberChange && parentPath == path;
             parentPath = parentPath.substring(0, slash);
         } while (true);
 
@@ -2213,7 +2220,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         }
 
         // Check if destination is locked
-        if (isLocked(destinationPath, req)) {
+        if (isLocked(destinationPath, req, true)) {
             resp.sendError(WebdavStatus.SC_LOCKED);
             return false;
         }
@@ -2381,7 +2388,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     private boolean deleteResource(String path, HttpServletRequest req, HttpServletResponse resp, boolean setStatus)
             throws IOException {
 
-        if (isLocked(path, req)) {
+        if (isLocked(path, req, true)) {
             resp.sendError(WebdavStatus.SC_LOCKED);
             return false;
         }
@@ -2469,7 +2476,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             }
             childName += entry;
 
-            if (isLocked(childName, req.getRemoteUser(), ifHeader)) {
+            if (isLocked(childName, req.getRemoteUser(), ifHeader, false)) {
 
                 errorList.put(childName, Integer.valueOf(WebdavStatus.SC_LOCKED));
 
