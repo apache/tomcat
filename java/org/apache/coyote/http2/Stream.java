@@ -1151,6 +1151,19 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 if (closed) {
                     throw new IOException(sm.getString("stream.closed", getConnectionId(), getIdAsString()));
                 }
+                // Do not send more data than the content-length header field of the response states. As for HTTP/1.1,
+                // the data that is beyond it is discarded. Otherwise the response is malformed (RFC 9113, section
+                // 8.1.1).
+                long contentLength = coyoteResponse.getContentLengthLong();
+                if (contentLength > -1) {
+                    long remaining = contentLength - written;
+                    if (remaining <= 0) {
+                        chunk.position(chunk.limit());
+                        return 0;
+                    } else if (chunk.remaining() > remaining) {
+                        chunk.limit(chunk.position() + (int) remaining);
+                    }
+                }
                 // chunk is always fully written
                 int result = chunk.remaining();
                 if (writeBuffer.isEmpty()) {
