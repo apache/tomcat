@@ -374,6 +374,14 @@
         that is in asynchronous mode are released if the connection thread
         raises a stream error for that stream. (markt)
       </fix>
+      <fix>
+        <bug>70366</bug>: When using HTTP/2, determine the content length of a
+        request once the request headers have been received rather than reading
+        the request headers while the container thread may be modifying them.
+        This could cause valid requests to be reset if the headers were modified
+        by a component such as the <code>RemoteIpValve</code>. Pull request
+        <pr>1266</pr> provided by Arturo Bernal.
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

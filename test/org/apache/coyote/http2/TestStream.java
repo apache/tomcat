@@ -42,9 +42,13 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.connector.Response;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.catalina.valves.ValveBase;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.AsyncContextCallback;
+import org.apache.tomcat.util.http.Method;
+import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.easymock.EasyMock;
@@ -405,6 +409,100 @@ public class TestStream extends Http2TestBase {
         int spins = ThreadLocalRandom.current().nextInt(maxSpins);
         for (int i = 0; i < spins; i++) {
             Thread.onSpinWait();
+        }
+    }
+
+
+    /*
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=70366
+     *
+     * The declared content length must not depend on the request headers once they have been passed to the container
+     * thread, as components such as RemoteIpValve modify the headers while request body DATA frames are still being
+     * received. The test removes the header so the declared length is not found, which disabled the check that the
+     * request body does not exceed the declared length.
+     */
+    @Test
+    public void testContentLengthIndependentOfHeaderChanges() throws Exception {
+
+        enableHttp2();
+
+        Tomcat tomcat = getTomcatInstance();
+
+        CountDownLatch headerRemoved = new CountDownLatch(1);
+        Context ctxt = getProgrammaticRootContext();
+        ctxt.getPipeline().addValve(new ValveBase() {
+            @Override
+            public void invoke(org.apache.catalina.connector.Request request, Response response)
+                    throws IOException, ServletException {
+                request.getCoyoteRequest().getMimeHeaders().removeHeader("content-length");
+                headerRemoved.countDown();
+                getNext().invoke(request, response);
+            }
+        });
+        Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
+        ctxt.addServletMapping("/simple", "simple");
+        Tomcat.addServlet(ctxt, "readBody", new ReadBody());
+        ctxt.addServletMapping("/readBody", "readBody");
+
+        tomcat.start();
+
+        openClientConnection();
+        doHttpUpgrade();
+        sendClientPreface();
+        validateHttp2InitialResponse();
+
+        byte[] headersFrameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+        MimeHeaders headers = new MimeHeaders();
+        headers.addValue(":method").setString(Method.POST);
+        headers.addValue(":scheme").setString("http");
+        headers.addValue(":path").setString("/readBody");
+        headers.addValue(":authority").setString("localhost:" + getPort());
+        headers.addValue("content-length").setLong(128);
+        hpackEncoder.encode(headers, headersPayload);
+        headersPayload.flip();
+        ByteUtil.setThreeBytes(headersFrameHeader, 0, headersPayload.limit());
+        headersFrameHeader[3] = FrameType.HEADERS.getIdByte();
+        // Flags. end of headers (0x04)
+        headersFrameHeader[4] = 0x04;
+        ByteUtil.set31Bits(headersFrameHeader, 5, 3);
+        writeFrame(headersFrameHeader, headersPayload);
+
+        Assert.assertTrue(headerRemoved.await(10, TimeUnit.SECONDS));
+
+        // More data than the declared content length
+        byte[] dataFrameHeader = new byte[9];
+        ByteBuffer dataPayload = ByteBuffer.allocate(256);
+        while (dataPayload.hasRemaining()) {
+            dataPayload.put((byte) 'x');
+        }
+        dataPayload.flip();
+        ByteUtil.setThreeBytes(dataFrameHeader, 0, dataPayload.limit());
+        // Flags. end of stream (0x01)
+        dataFrameHeader[4] = 0x01;
+        ByteUtil.set31Bits(dataFrameHeader, 5, 3);
+        writeFrame(dataFrameHeader, dataPayload);
+
+        // Expect a reset due to a protocol error. Window updates and other frames may be seen first.
+        do {
+            parser.readFrame();
+        } while (!output.getTrace().contains("3-RST-") && !output.getTrace().contains("3-EndOfStream"));
+        String trace = output.getTrace();
+        Assert.assertTrue(trace, trace.contains("3-RST-[1]"));
+    }
+
+
+    private static final class ReadBody extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doPost(HttpServletRequest request, HttpServletResponse response)
+                throws ServletException, IOException {
+            byte[] body = request.getInputStream().readAllBytes();
+            response.setContentType("text/plain");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write(Integer.toString(body.length));
         }
     }
 
