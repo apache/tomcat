@@ -67,6 +67,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     private static final int HEADER_STATE_REGULAR = 2;
     private static final int HEADER_STATE_TRAILER = 3;
 
+    private static final long CONTENT_LENGTH_UNRESOLVED = -2;
+
     private static final MimeHeaders ACK_HEADERS;
 
     private static final Integer HTTP_UPGRADE_STREAM = Integer.valueOf(1);
@@ -87,6 +89,12 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     }
 
     private volatile long contentLengthReceived = 0;
+    /*
+     * Content length declared by the request headers. Resolved on the connection thread once the request headers are
+     * complete because the container thread may modify the request headers (e.g. RemoteIpValve) while the connection
+     * thread is still checking received DATA frames against the declared length.
+     */
+    private volatile long contentLengthHeader = CONTENT_LENGTH_UNRESOLVED;
 
     private final Http2UpgradeHandler handler;
     private final WindowAllocationManager allocationManager = new WindowAllocationManager(this);
@@ -674,7 +682,13 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         if (cookieHeader != null) {
             coyoteRequest.getMimeHeaders().addValue("cookie").setString(cookieHeader.toString());
         }
-        return headerState == HEADER_STATE_REGULAR || headerState == HEADER_STATE_PSEUDO;
+
+        if (headerState == HEADER_STATE_REGULAR || headerState == HEADER_STATE_PSEUDO) {
+            // Request headers (not trailers). Must be resolved before the stream is passed to a container thread.
+            contentLengthHeader = getContentLengthLong();
+            return true;
+        }
+        return false;
     }
 
 
@@ -814,7 +828,11 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         inputBuffer.notifyEof();
     }
 
-    final long getContentLengthLong() throws Http2Exception {
+    final long getContentLengthLong() throws StreamException {
+        long contentLength = contentLengthHeader;
+        if (contentLength != CONTENT_LENGTH_UNRESOLVED) {
+            return contentLength;
+        }
         try {
             return coyoteRequest.getContentLengthLong();
         } catch (Exception e) {
