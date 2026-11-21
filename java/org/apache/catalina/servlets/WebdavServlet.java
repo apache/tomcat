@@ -1372,7 +1372,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         String path = getRelativePath(req);
 
-        copyResource(path, req, resp);
+        copyResource(path, req, resp, false);
     }
 
 
@@ -1398,7 +1398,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             return;
         }
 
-        if (copyResource(path, req, resp)) {
+        if (copyResource(path, req, resp, true)) {
             deleteResource(path, req, resp, false);
         }
     }
@@ -2104,12 +2104,14 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      * @param path Path of the resource to copy
      * @param req  Servlet request
      * @param resp Servlet response
+     * @param move {@code true} if the copy is the first step of a MOVE
      *
      * @return boolean true if the copy is successful
      *
      * @throws IOException If an IO error occurs
      */
-    private boolean copyResource(String path, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    private boolean copyResource(String path, HttpServletRequest req, HttpServletResponse resp, boolean move)
+            throws IOException {
 
         // Check the source exists
         WebResource source = resources.getResource(path);
@@ -2218,6 +2220,25 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             return false;
         }
 
+        // Validate Depth before the destination may be deleted
+        boolean infiniteCopy = true;
+        String depthHeader = req.getHeader("Depth");
+        if (depthHeader != null) {
+            if (depthHeader.equals("infinity")) {
+                // NO-OP - this is the default
+            } else if (depthHeader.equals("0")) {
+                infiniteCopy = false;
+            } else {
+                resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+                return false;
+            }
+        }
+        // RFC 4918 9.9.2: MOVE on a collection acts as Depth: infinity. Reject other values, as httpd mod_dav does.
+        if (move && !infiniteCopy && source.isDirectory()) {
+            resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+            return false;
+        }
+
         boolean overwrite = true;
         String overwriteHeader = req.getHeader("Overwrite");
         if (overwriteHeader != null) {
@@ -2246,19 +2267,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         // Copying source to destination
 
         Map<String,Integer> errorList = new LinkedHashMap<>();
-
-        boolean infiniteCopy = true;
-        String depthHeader = req.getHeader("Depth");
-        if (depthHeader != null) {
-            if (depthHeader.equals("infinity")) {
-                // NO-OP - this is the default
-            } else if (depthHeader.equals("0")) {
-                infiniteCopy = false;
-            } else {
-                resp.sendError(WebdavStatus.SC_BAD_REQUEST);
-                return false;
-            }
-        }
 
         boolean result = copyResource(errorList, path, destinationPath, infiniteCopy);
 
