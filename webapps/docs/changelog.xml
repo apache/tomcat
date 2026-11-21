@@ -220,6 +220,12 @@
         been removed so classes that implement the <code>Context</code>
         interface must implement this method. (markt)
       </fix>
+      <add>
+        Add the <code>minRequestDuration</code> attribute to the access log
+        valves. Requests that take less time than the configured value are not
+        logged, which allows a separate log to be kept of the slow requests.
+        (abernal)
+      </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
         Accept one or more space characters between the authentication scheme

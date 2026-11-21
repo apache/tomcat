@@ -526,6 +526,12 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     protected String conditionIf = null;
 
     /**
+     * The minimum time taken to process a request, in nanoseconds, for the request to be logged. The default of zero
+     * means that every request is logged. It can be changed while requests are being processed, e.g. with JMX.
+     */
+    private volatile long minRequestDurationNanos = 0;
+
+    /**
      * Name of locale used to format timestamps in log entries and in log file name suffix.
      */
     protected String localeName = Locale.getDefault().toString();
@@ -736,6 +742,33 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
+     * Return the minimum time taken to process a request, in milliseconds, for the request to be logged. If zero,
+     * every request is logged.
+     *
+     * @return the minimum request duration in milliseconds
+     */
+    public int getMinRequestDuration() {
+        return (int) TimeUnit.NANOSECONDS.toMillis(minRequestDurationNanos);
+    }
+
+
+    /**
+     * Set the minimum time taken to process a request, in milliseconds, for the request to be logged. Requests that
+     * take less time are not logged. Set to zero to log every request.
+     *
+     * @param minRequestDuration the minimum request duration in milliseconds
+     *
+     * @throws IllegalArgumentException if the duration is negative
+     */
+    public void setMinRequestDuration(int minRequestDuration) {
+        if (minRequestDuration < 0) {
+            throw new IllegalArgumentException(
+                    sm.getString("accessLogValve.invalidMinRequestDuration", Integer.valueOf(minRequestDuration)));
+        }
+        this.minRequestDurationNanos = TimeUnit.MILLISECONDS.toNanos(minRequestDuration);
+    }
+
+    /**
      * Return the locale used to format timestamps in log entries and in log file name suffix.
      *
      * @return the locale
@@ -781,6 +814,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     @Override
     public void log(Request request, Response response, long time) {
         if (!getState().isAvailable() || !getEnabled() || logElements == null ||
+                minRequestDurationNanos > 0 && time < minRequestDurationNanos ||
                 condition != null && null != request.getRequest().getAttribute(condition) ||
                 conditionIf != null && null == request.getRequest().getAttribute(conditionIf)) {
             return;
