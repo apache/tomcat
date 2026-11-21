@@ -1132,6 +1132,14 @@ public class Http11Processor extends AbstractProcessor {
 
             int size = headers.size();
             for (int i = 0; i < size; i++) {
+                // RFC 9110, section 5.1 requires a field name to be a token
+                if (!HttpParser.isToken(headers.getName(i).toString())) {
+                    log.warn(sm.getString("http11processor.response.invalidHeader", headers.getName(i),
+                            headers.getValue(i)));
+                    headers.removeHeader(i--);
+                    size--;
+                    continue;
+                }
                 try {
                     outputBuffer.sendHeader(headers.getName(i), headers.getValue(i));
                 } catch (IllegalArgumentException iae) {
