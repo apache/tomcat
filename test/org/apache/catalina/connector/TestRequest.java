@@ -796,8 +796,8 @@ public class TestRequest extends TomcatBaseTest {
      */
     @Test
     public void testAcceptLanguageLocaleLimitConfigurable() throws Exception {
-        // Connector default of 10 permits exactly 10 locales
-        Assert.assertEquals(10, localeCount(new Connector(), buildAcceptLanguage(10)));
+        // Connector default of 20 permits exactly 20 locales
+        Assert.assertEquals(20, localeCount(new Connector(), buildAcceptLanguage(20)));
 
         // Explicit limit is enforced
         Connector connector = new Connector();
@@ -809,7 +809,7 @@ public class TestRequest extends TomcatBaseTest {
         // No limit
         connector = new Connector();
         connector.setMaxLocaleCount(-1);
-        Assert.assertEquals(20, localeCount(connector, buildAcceptLanguage(20)));
+        Assert.assertEquals(30, localeCount(connector, buildAcceptLanguage(30)));
     }
 
     private static String buildAcceptLanguage(int localeCount) {
@@ -844,13 +844,13 @@ public class TestRequest extends TomcatBaseTest {
      */
     @Test
     public void testAcceptLanguageLocaleLimitMultipleHeaders() throws Exception {
-        // 5 + 5 = 10, within the default limit
-        Assert.assertEquals(10, localeCount(new Connector(), "aa-000,aa-001,aa-002,aa-003,aa-004",
-                "aa-005,aa-006,aa-007,aa-008,aa-009"));
+        // 10 + 10 = 20, within the default limit
+        Assert.assertEquals(20, localeCount(new Connector(), buildAcceptLanguage(10),
+                buildAcceptLanguage(10)));
 
-        // 5 + 6 = 11, exceeds the default limit
-        Assert.assertEquals(10, localeCount(new Connector(), "aa-000,aa-001,aa-002,aa-003,aa-004",
-                    "aa-005,aa-006,aa-007,aa-008,aa-009,aa-010"));
+        // 10 + 11 = 21, exceeds the default limit
+        Assert.assertEquals(20, localeCount(new Connector(), buildAcceptLanguage(10),
+                buildAcceptLanguage(11)));
     }
 
     private static int localeCount(Connector connector, String... acceptLanguages) {
