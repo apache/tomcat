@@ -16,8 +16,6 @@
  */
 package org.apache.jasper.tagplugins.jstl.core;
 
-import java.io.File;
-
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
@@ -26,11 +24,6 @@ import org.junit.Test;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestImport extends AbstractTestTag {
-
-    @Override
-    protected File getTagPluginsFile() {
-        return new File("test/org/apache/jasper/tagplugins/jstl/core/import-tagPlugins.xml");
-    }
 
     /*
      * The <c:param> plugin must add its parameters to the URL of its own
