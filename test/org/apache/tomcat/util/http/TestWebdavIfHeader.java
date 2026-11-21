@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.http;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -100,6 +101,27 @@ public class TestWebdavIfHeader {
         Assert.assertTrue(header.hasValue());
         Assert.assertFalse(header.matches("/myfolder/", TOKENS, "etag"));
         Assert.assertTrue(header.matches("/myfolder/", Collections.singletonList("other"), "etag"));
+    }
+
+    @Test
+    public void testNotMatchesWithoutLocks() throws Exception {
+        // RFC 4918, section 10.4.3: "Not" reverses the result of the evaluation
+        WebdavIfHeader header = new WebdavIfHeader(URI_PREFIX, "(Not <" + TOKEN + ">)");
+        Assert.assertTrue(header.matches("/myfolder/", Collections.emptyList(), "etag"));
+        // RFC 4918, section 10.4.8: always evaluates to true
+        header = new WebdavIfHeader(URI_PREFIX, "(Not <DAV:no-lock>)");
+        Assert.assertTrue(header.matches("/myfolder/", Collections.emptyList(), "etag"));
+        header = new WebdavIfHeader(URI_PREFIX, "(<" + TOKEN + ">)");
+        Assert.assertFalse(header.matches("/myfolder/", Collections.emptyList(), "etag"));
+        header = new WebdavIfHeader(URI_PREFIX, "([etag])");
+        Assert.assertTrue(header.matches("/myfolder/", Collections.emptyList(), "etag"));
+    }
+
+    @Test
+    public void testNotMatchesWithSeveralLocks() throws Exception {
+        WebdavIfHeader header = new WebdavIfHeader(URI_PREFIX, "(Not <" + TOKEN + ">)");
+        Assert.assertFalse(header.matches("/myfolder/", Arrays.asList("other", TOKEN), "etag"));
+        Assert.assertTrue(header.matches("/myfolder/", Arrays.asList("other", "another"), "etag"));
     }
 
     /*
