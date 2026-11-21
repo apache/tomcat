@@ -552,7 +552,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 break;
             }
             default: {
-                if ("expect".equals(name) && "100-continue".equals(value)) {
+                if ("expect".equals(name) && "100-continue".equalsIgnoreCase(value)) {
                     coyoteRequest.setExpectation(true);
                 }
                 if (pseudoHeader) {

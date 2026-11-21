@@ -152,6 +152,18 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
 
     @Test
     public void testSendAck() throws Exception {
+        doTestSendAck("100-continue");
+    }
+
+
+    @Test
+    public void testSendAckMixedCase() throws Exception {
+        // RFC 9110, section 10.1.1: the Expect field value is case-insensitive
+        doTestSendAck("100-Continue");
+    }
+
+
+    private void doTestSendAck(String expectation) throws Exception {
         // makes a request that expects a 100 Continue response and verifies
         // that the 100 Continue response is received. This does not check
         // that the correct ContinueHandlingResponsePolicy was followed, just
@@ -167,8 +179,8 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         byte[] dataFrameHeader = new byte[9];
         ByteBuffer dataPayload = ByteBuffer.allocate(256);
 
-        buildPostRequest(headersFrameHeader, headersPayload, true, null, -1, "/simple", dataFrameHeader, dataPayload,
-                null, false, 3);
+        buildPostRequest(headersFrameHeader, headersPayload, expectation, null, -1, "/simple", dataFrameHeader,
+                dataPayload, null, false, 3);
 
         // Write the headers
         writeFrame(headersFrameHeader, headersPayload);
