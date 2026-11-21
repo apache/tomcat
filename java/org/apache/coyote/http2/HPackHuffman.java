@@ -17,9 +17,8 @@
 package org.apache.coyote.http2;
 
 import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.tomcat.util.res.StringManager;
 
@@ -42,17 +41,14 @@ public class HPackHuffman {
     private static final HuffmanCode[] HUFFMAN_CODES;
 
     /**
-     * Array based tree representation of the Huffman codes.
-     * <p/>
-     * Each entry consists of two 16-bit halves: the high half is the branch to follow when the current bit is 1 and
-     * the low half is the branch to follow when the current bit is 0. Within each half, the top bit flags a terminal
-     * node and the remaining 15 bits hold either the symbol to append or the position of the next node in this array.
+     * Byte-at-a-time decoding table. Node {@code n} occupies the 256 entries starting at {@code n * 256}, indexed by the
+     * next eight bits of input. An entry is either a terminal (the {@link #TERMINAL} flag, the code length in bits 16 to
+     * 23 and the symbol in the low 16 bits) or the index of the child node that consumes all eight bits.
      */
     private static final int[] DECODING_TABLE;
 
-    private static final int LOW_TERMINAL_BIT = (0b10000000) << 8;
-    private static final int HIGH_TERMINAL_BIT = (0b10000000) << 24;
-    private static final int LOW_MASK = 0b0111111111111111;
+    private static final int TERMINAL = 1 << 31;
+    private static final int EOS = 256;
 
 
     static {
@@ -318,61 +314,33 @@ public class HPackHuffman {
         codes[256] = new HuffmanCode(0x3fffffff, 30);
         HUFFMAN_CODES = codes;
 
-        // lengths determined by experimentation, just set it to something large then see how large it actually ends up
-        int[] codingTree = new int[256];
-        // the current position in the tree
-        int pos = 0;
-        int allocated = 1; // the next position to allocate to
-        // map of the current state at a given position
-        // only used while building the tree
-        HuffmanCode[] currentCode = new HuffmanCode[256];
-        currentCode[0] = new HuffmanCode(0, 0);
-
-        final Set<HuffmanCode> allCodes = new HashSet<>(Arrays.asList(HUFFMAN_CODES));
-
-        while (!allCodes.isEmpty()) {
-            int length = currentCode[pos].length;
-            int code = currentCode[pos].value;
-
-            int newLength = length + 1;
-            HuffmanCode high = new HuffmanCode(code << 1 | 1, newLength);
-            HuffmanCode low = new HuffmanCode(code << 1, newLength);
-            int newVal;
-            boolean highTerminal = allCodes.remove(high);
-            if (highTerminal) {
-                // bah, linear search
-                int i;
-                for (i = 0; i < codes.length; ++i) {
-                    if (codes[i].equals(high)) {
-                        break;
-                    }
+        // Each code longer than eight bits passes through one child node per complete byte
+        List<int[]> nodes = new ArrayList<>();
+        nodes.add(new int[256]);
+        for (int symbol = 0; symbol < codes.length; symbol++) {
+            int code = codes[symbol].value;
+            int length = codes[symbol].length;
+            int[] node = nodes.get(0);
+            while (length > 8) {
+                length -= 8;
+                int i = (code >>> length) & 0xFF;
+                if (node[i] == 0) {
+                    node[i] = nodes.size();
+                    nodes.add(new int[256]);
                 }
-                newVal = LOW_TERMINAL_BIT | i;
-            } else {
-                int highPos = allocated++;
-                currentCode[highPos] = high;
-                newVal = highPos;
+                node = nodes.get(node[i]);
             }
-            newVal <<= 16;
-            boolean lowTerminal = allCodes.remove(low);
-            if (lowTerminal) {
-                // bah, linear search
-                int i;
-                for (i = 0; i < codes.length; ++i) {
-                    if (codes[i].equals(low)) {
-                        break;
-                    }
-                }
-                newVal |= LOW_TERMINAL_BIT | i;
-            } else {
-                int lowPos = allocated++;
-                currentCode[lowPos] = low;
-                newVal |= lowPos;
+            int shift = 8 - length;
+            int first = (code << shift) & 0xFF;
+            for (int i = first; i < first + (1 << shift); i++) {
+                node[i] = TERMINAL | (length << 16) | symbol;
             }
-            codingTree[pos] = newVal;
-            pos++;
         }
-        DECODING_TABLE = codingTree;
+        int[] table = new int[nodes.size() * 256];
+        for (int n = 0; n < nodes.size(); n++) {
+            System.arraycopy(nodes.get(n), 0, table, n * 256, 256);
+        }
+        DECODING_TABLE = table;
     }
 
     /**
@@ -385,61 +353,67 @@ public class HPackHuffman {
      *
      * @throws HpackException If the Huffman encoded value in HPACK headers did not end with EOS padding
      */
-    public static void decode(ByteBuffer data, int length, StringBuilder target)
-            throws HpackException {
+    public static void decode(ByteBuffer data, int length, StringBuilder target) throws HpackException {
 
         assert data.remaining() >= length;
-        int treePos = 0;
-        boolean eosBits = true;
-        int eosBitCount = 0;
+        int node = 0;
+        // Bits read but not yet decoded are the low order bits (fewer than 16) of current
+        int current = 0;
+        int bits = 0;
+        // Bits of the code currently being decoded that are held in child nodes rather than in current
+        int pending = 0;
+        boolean pendingOnes = true;
         for (int i = 0; i < length; ++i) {
-            byte b = data.get();
-            int bitPos = 7;
-            while (bitPos >= 0) {
-                int val = DECODING_TABLE[treePos];
-                if (((1 << bitPos) & b) == 0) {
-                    // bit not set, we want the lower part of the tree
-                    if ((val & LOW_TERMINAL_BIT) == 0) {
-                        treePos = val & LOW_MASK;
-                        eosBits = false;
-                        // Found a zero, can't be counting EOS bits
-                        eosBitCount = 0;
-                    } else {
-                        target.append((char) (val & LOW_MASK));
-                        treePos = 0;
-                        eosBits = true;
-                        // Output a character, reset eosBitCount
-                        eosBitCount = 0;
-                    }
+            current = (current << 8) | (data.get() & 0xFF);
+            bits += 8;
+            while (bits >= 8) {
+                int index = (current >>> (bits - 8)) & 0xFF;
+                int entry = DECODING_TABLE[(node << 8) | index];
+                if ((entry & TERMINAL) == 0) {
+                    node = entry;
+                    bits -= 8;
+                    pending += 8;
+                    pendingOnes &= index == 0xFF;
                 } else {
-                    if (eosBits) {
-                        eosBitCount++;
-                    }
-                    // bit not set, we want the lower part of the tree
-                    if ((val & HIGH_TERMINAL_BIT) == 0) {
-                        treePos = (val >> 16) & LOW_MASK;
-                    } else {
-                        if (eosBitCount != 0) {
-                            // This must be the EOS symbol which MUST be treated
-                            // as an error
-                            throw new HpackException(sm.getString("hpackhuffman.stringLiteralEOS"));
-                        }
-                        target.append((char) ((val >> 16) & LOW_MASK));
-                        treePos = 0;
-                        eosBits = true;
-                        // Output a character, reset eosBitCount
-                        eosBitCount = 0;
-                    }
+                    emit(entry, target);
+                    bits -= (entry >>> 16) & 0xFF;
+                    node = 0;
+                    pending = 0;
+                    pendingOnes = true;
                 }
-                bitPos--;
             }
         }
-        if (eosBitCount > 7) {
-            throw new HpackException(sm.getString("hpackhuffman.stringLiteralTooMuchPadding"));
+        // Fewer than eight bits remain. They may still complete short codes.
+        while (bits > 0) {
+            int entry = DECODING_TABLE[(node << 8) | ((current << (8 - bits)) & 0xFF)];
+            if ((entry & TERMINAL) == 0 || ((entry >>> 16) & 0xFF) > bits) {
+                break;
+            }
+            emit(entry, target);
+            bits -= (entry >>> 16) & 0xFF;
+            node = 0;
+            pending = 0;
+            pendingOnes = true;
         }
-        if (!eosBits) {
+        // RFC 7541, section 5.2: padding is the most significant bits of EOS and is strictly shorter than eight bits
+        int mask = (1 << bits) - 1;
+        if (pendingOnes && (current & mask) == mask) {
+            if (pending + bits > 7) {
+                throw new HpackException(sm.getString("hpackhuffman.stringLiteralTooMuchPadding"));
+            }
+        } else {
             throw new HpackException(sm.getString("hpackhuffman.huffmanEncodedHpackValueDidNotEndWithEOS"));
         }
+    }
+
+
+    private static void emit(int entry, StringBuilder target) throws HpackException {
+        int symbol = entry & 0xFFFF;
+        if (symbol == EOS) {
+            // This must be the EOS symbol which MUST be treated as an error
+            throw new HpackException(sm.getString("hpackhuffman.stringLiteralEOS"));
+        }
+        target.append((char) symbol);
     }
 
 
