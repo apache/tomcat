@@ -1295,6 +1295,20 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             }
             if (!closed) {
                 closed = true;
+                /*
+                 * Ending the stream with less data than the content-length header field of the response states
+                 * would present a truncated response as a complete one. Reset the stream instead. A response that is
+                 * defined to have no body has already closed the buffer so it never gets here (RFC 9113, section
+                 * 8.1.1).
+                 */
+                long contentLength = coyoteResponse.getContentLengthLong();
+                if (contentLength > -1 && written < contentLength) {
+                    reset = new StreamException(
+                            sm.getString("stream.outputBuffer.contentLength", getConnectionId(), getIdAsString(),
+                                    Long.valueOf(contentLength), Long.valueOf(written)),
+                            Http2Error.PROTOCOL_ERROR, getIdAsInt());
+                    throw new CloseNowException(reset);
+                }
                 flush(true);
                 writeTrailers();
             }
