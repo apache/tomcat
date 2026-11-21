@@ -989,10 +989,11 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
      */
     final void replace() {
         int remaining;
-        // May be null if stream was closed before any DATA frames were processed.
+        // Will be null if stream was closed before any DATA frames were processed. In that case the client has not yet
+        // used any of the stream flow control window so it still has all of it available.
         ByteBuffer inputByteBuffer = getInputByteBuffer(false);
         if (inputByteBuffer == null) {
-            remaining = 0;
+            remaining = handler.getLocalSettings().getInitialWindowSize();
         } else {
             remaining = inputByteBuffer.remaining();
         }

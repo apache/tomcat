@@ -102,6 +102,41 @@ public class TestCancelledUpload extends Http2TestBase {
 
 
     /*
+     * RFC 9113, section 5.1 requires an endpoint that has reset a stream to minimally process and then discard the
+     * frames it receives on it. Here the server resets the stream before any DATA frame has been received so the client
+     * still has its whole flow control window available and has done nothing wrong by sending DATA.
+     */
+    @Test
+    public void testDataAfterResetBeforeAnyData() throws Exception {
+        http2Connect();
+
+        byte[] headersFrameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+        byte[] dataFrameHeader = new byte[9];
+        ByteBuffer dataPayload = ByteBuffer.allocate(16);
+
+        buildPostRequest(headersFrameHeader, headersPayload, false, null, -1, "/reject", dataFrameHeader, dataPayload,
+                null, false, 3);
+        writeFrame(headersFrameHeader, headersPayload);
+
+        // The servlet rejects the request without reading the body so the server resets the stream (NO_ERROR)
+        while (!output.getTrace().contains("3-RST-[0]")) {
+            parser.readFrame();
+        }
+        output.clearTrace();
+
+        // DATA that was already on its way. It is well within the flow control window.
+        sendData(3, new byte[100]);
+        sendPing(0, false, new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 });
+        while (!output.getTrace().contains("0-Ping-Ack-[1,2,3,4,5,6,7,8]")) {
+            parser.readFrame();
+        }
+
+        Assert.assertFalse(output.getTrace(), output.getTrace().contains("3-RST-"));
+    }
+
+
+    /*
      * Looking for a RST frame with error type 3 (flow control error).
      *
      * If there is a flow control window update for stream 0 it may be followed by one for stream 3.
@@ -142,6 +177,8 @@ public class TestCancelledUpload extends Http2TestBase {
         Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "cancel", new CancelServlet());
         ctxt.addServletMapping("/simple", "cancel");
+        Tomcat.addServlet(ctxt, "reject", new RejectServlet());
+        ctxt.addServletMapping("/reject", "reject");
 
         tomcat.start();
     }
@@ -170,6 +207,18 @@ public class TestCancelledUpload extends Http2TestBase {
             } else {
                 resp.setStatus(HttpServletResponse.SC_OK);
             }
+        }
+    }
+
+
+    private static class RejectServlet extends SimpleServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            // Reject the request without reading the body
+            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
         }
     }
 }
