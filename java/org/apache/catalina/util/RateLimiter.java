@@ -88,6 +88,26 @@ public interface RateLimiter {
     void setPolicyName(String name);
 
     /**
+     * Returns the number of seconds a client has to wait until the time window in which a request was just counted by
+     * {@link #increment(String)} has ended.
+     * <p>
+     * The default implementation returns <code>-1</code>, which means that the delay is not known. It is also not
+     * known if the time window changed while the request was being counted, as the window that counted the request
+     * can not be told.
+     *
+     * @param timestamp The time in milliseconds, as returned by {@link System#currentTimeMillis()}, read immediately
+     *                      before the call to {@link #increment(String)}
+     *
+     * @return the delay in seconds, which is always at least <code>1</code>, or <code>-1</code> if the delay is not
+     *             known
+     *
+     * @see <a href="https://www.rfc-editor.org/rfc/rfc9110#section-10.2.3">RFC 9110, section 10.2.3</a>
+     */
+    default int getRetryAfter(long timestamp) {
+        return -1;
+    }
+
+    /**
      * Returns the full representation of the current rate limit policy in the
      * format defined by the IETF draft for RateLimit header fields.
      *
