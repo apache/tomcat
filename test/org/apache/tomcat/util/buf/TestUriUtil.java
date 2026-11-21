@@ -19,9 +19,12 @@ package org.apache.tomcat.util.buf;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory;
 
 public class TestUriUtil {
 
@@ -63,5 +66,27 @@ public class TestUriUtil {
         String target = "../../target.xml";
         URI result = UriUtil.resolve(base, target);
         Assert.assertEquals(new URI("jar:file:/aaa/bbb!/target.xml"), result);
+    }
+
+
+    @Test
+    public void testWarToJar() throws Exception {
+        doTestWarToJar("war:file:/aaa/bbb.war*/WEB-INF/lib/ccc.jar", "jar:file:/aaa/bbb.war!/WEB-INF/lib/ccc.jar");
+    }
+
+
+    @Test
+    public void testWarToJarPercentEncoded() throws Exception {
+        // The path is already percent-encoded and must not be encoded again
+        doTestWarToJar("war:file:/aaa%20bbb/ccc.war*/WEB-INF/lib/ddd.jar",
+                "jar:file:/aaa%20bbb/ccc.war!/WEB-INF/lib/ddd.jar");
+    }
+
+
+    @SuppressWarnings("deprecation")
+    private void doTestWarToJar(String warUrl, String expected) throws Exception {
+        TomcatURLStreamHandlerFactory.getInstance();
+        URL result = UriUtil.warToJar(new URL(warUrl));
+        Assert.assertEquals(expected, result.toString());
     }
 }
