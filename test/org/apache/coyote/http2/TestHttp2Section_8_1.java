@@ -702,4 +702,73 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         actual = filteredTrace.toString();
         Assert.assertEquals(actual, getSimpleResponseTrace(5), actual);
     }
+
+
+    @Test
+    public void testContentLengthValid() throws Exception {
+        doTestContentLength("0", true);
+    }
+
+
+    @Test
+    public void testContentLengthLeadingZeros() throws Exception {
+        doTestContentLength("00", true);
+    }
+
+
+    @Test
+    public void testContentLengthPlusSign() throws Exception {
+        doTestContentLength("+0", false);
+    }
+
+
+    @Test
+    public void testContentLengthMinusZero() throws Exception {
+        doTestContentLength("-0", false);
+    }
+
+
+    @Test
+    public void testContentLengthNegative() throws Exception {
+        doTestContentLength("-1", false);
+    }
+
+
+    @Test
+    public void testContentLengthEmpty() throws Exception {
+        doTestContentLength("", false);
+    }
+
+
+    /*
+     * RFC 9110, section 8.6 defines the value of a content-length header field as one or more digits. RFC 9113,
+     * section 8.1.1 requires that a request that is malformed is treated as a stream error of type PROTOCOL_ERROR.
+     */
+    private void doTestContentLength(String value, boolean valid) throws Exception {
+        http2Connect();
+
+        byte[] frameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+
+        List<Header> headers = new ArrayList<>(5);
+        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":scheme", "http"));
+        headers.add(new Header(":path", "/simple"));
+        headers.add(new Header(":authority", "localhost:" + getPort()));
+        headers.add(new Header("content-length", value));
+
+        buildGetRequest(frameHeader, headersPayload, null, headers, 3);
+        writeFrame(frameHeader, headersPayload);
+
+        // Read first response frame
+        parser.readFrame();
+
+        if (valid) {
+            // Normal response. There will be a data frame with the body too.
+            parser.readFrame();
+            Assert.assertEquals(output.getTrace(), getSimpleResponseTrace(3));
+        } else {
+            Assert.assertEquals("3-RST-[1]\n", output.getTrace());
+        }
+    }
 }
