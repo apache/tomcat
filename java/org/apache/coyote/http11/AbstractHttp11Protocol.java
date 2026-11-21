@@ -497,6 +497,26 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
 
     /**
+     * Get the quality used for Brotli compression.
+     *
+     * @return The quality from 0 (fastest) to 11 (smallest) or -1 if Brotli is not used
+     */
+    public int getCompressionBrotliQuality() {
+        return compressionConfig.getCompressionBrotliQuality();
+    }
+
+
+    /**
+     * Set the quality used for Brotli compression.
+     *
+     * @param compressionBrotliQuality The quality from 0 (fastest) to 11 (smallest) or -1 to disable Brotli
+     */
+    public void setCompressionBrotliQuality(int compressionBrotliQuality) {
+        compressionConfig.setCompressionBrotliQuality(compressionBrotliQuality);
+    }
+
+
+    /**
      * Get the content encodings that should not be used.
      *
      * @return The content encodings that should not be used

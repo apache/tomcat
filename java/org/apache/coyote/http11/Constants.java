@@ -149,6 +149,12 @@ public final class Constants {
 
 
     /**
+     * Brotli filter (output).
+     */
+    public static final int BROTLI_FILTER = 4;
+
+
+    /**
      * Buffered filter (input)
      */
     public static final int BUFFERED_FILTER = 3;
