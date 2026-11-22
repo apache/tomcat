@@ -2408,25 +2408,52 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
      */
     @Test
     public void testSendErrorOnAsyncDispatchCompletesOnce() throws Exception {
+        doTestBug70362(false, false, HttpServletResponse.SC_SERVICE_UNAVAILABLE, "onComplete-");
+    }
+
+
+    /*
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=70362
+     */
+    @Test
+    public void testSendErrorOnAsyncDispatchFromStartCompletesOnce() throws Exception {
+        doTestBug70362(true, false, HttpServletResponse.SC_SERVICE_UNAVAILABLE, "onComplete-");
+    }
+
+
+    /*
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=70362
+     *
+     * An exception thrown by the dispatch must still start async error handling.
+     */
+    @Test
+    public void testExceptionOnAsyncDispatchStartsErrorHandling() throws Exception {
+        doTestBug70362(false, true, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "onError-onComplete-");
+    }
+
+
+    private void doTestBug70362(boolean dispatchFromStart, boolean throwOnDispatch, int expectedStatus,
+            String expectedTrack) throws Exception {
         resetTracker();
         Tomcat tomcat = getTomcatInstance();
         Context context = getProgrammaticRootContext();
-        Wrapper wrapper = Tomcat.addServlet(context, "bug70362", new Bug70362Servlet());
+        Wrapper wrapper =
+                Tomcat.addServlet(context, "bug70362", new Bug70362Servlet(dispatchFromStart, throwOnDispatch));
         wrapper.setAsyncSupported(true);
         context.addServletMapping("/bug70362", "bug70362");
         tomcat.start();
 
         int rc = getUrl("http://localhost:" + getPort() + "/bug70362", new ByteChunk(), null);
-        Assert.assertEquals(HttpServletResponse.SC_SERVICE_UNAVAILABLE, rc);
+        Assert.assertEquals(expectedStatus, rc);
 
         int count = 0;
-        while (getTrack().isEmpty() && count < 100) {
+        while (!getTrack().endsWith("onComplete-") && count < 100) {
             Thread.sleep(50);
             count++;
         }
         // Allow time for any further, unexpected, listener events
         Thread.sleep(500);
-        Assert.assertEquals("onComplete-", getTrack());
+        Assert.assertEquals(expectedTrack, getTrack());
     }
 
 
@@ -2434,14 +2461,29 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         private static final long serialVersionUID = 1L;
 
+        private final boolean dispatchFromStart;
+        private final boolean throwOnDispatch;
+
+        public Bug70362Servlet(boolean dispatchFromStart, boolean throwOnDispatch) {
+            this.dispatchFromStart = dispatchFromStart;
+            this.throwOnDispatch = throwOnDispatch;
+        }
+
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             if (req.getDispatcherType() == DispatcherType.ASYNC) {
+                if (throwOnDispatch) {
+                    throw new ServletException("Bug70362");
+                }
                 resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
             } else {
                 AsyncContext asyncContext = req.startAsync();
                 asyncContext.addListener(new TrackingListener(false, false, null));
-                asyncContext.dispatch();
+                if (dispatchFromStart) {
+                    asyncContext.start(asyncContext::dispatch);
+                } else {
+                    asyncContext.dispatch();
+                }
             }
         }
     }
