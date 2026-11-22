@@ -18,7 +18,9 @@ package org.apache.catalina.core;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -2405,55 +2407,200 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
     /*
      * https://bz.apache.org/bugzilla/show_bug.cgi?id=70362
+     *
+     * dispatch() is called on the request thread.
      */
     @Test
     public void testSendErrorOnAsyncDispatchCompletesOnce() throws Exception {
-        doTestBug70362(false, false, HttpServletResponse.SC_SERVICE_UNAVAILABLE, "onComplete-");
-    }
-
-
-    /*
-     * https://bz.apache.org/bugzilla/show_bug.cgi?id=70362
-     */
-    @Test
-    public void testSendErrorOnAsyncDispatchFromStartCompletesOnce() throws Exception {
-        doTestBug70362(true, false, HttpServletResponse.SC_SERVICE_UNAVAILABLE, "onComplete-");
+        doTestBug70362(Bug70362Mode.SEND_ERROR, HttpServletResponse.SC_SERVICE_UNAVAILABLE, "onComplete-", null);
     }
 
 
     /*
      * https://bz.apache.org/bugzilla/show_bug.cgi?id=70362
      *
-     * An exception thrown by the dispatch must still start async error handling.
+     * dispatch() is called from start() before the request thread exits service().
      */
     @Test
-    public void testExceptionOnAsyncDispatchStartsErrorHandling() throws Exception {
-        doTestBug70362(false, true, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "onError-onComplete-");
+    public void testSendErrorOnAsyncDispatchFromStartBeforeExitCompletesOnce() throws Exception {
+        doTestBug70362(Bug70362Mode.SEND_ERROR_START_BEFORE_EXIT, HttpServletResponse.SC_SERVICE_UNAVAILABLE,
+                "onComplete-", null);
     }
 
 
-    private void doTestBug70362(boolean dispatchFromStart, boolean throwOnDispatch, int expectedStatus,
-            String expectedTrack) throws Exception {
+    /*
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=70362
+     *
+     * dispatch() is called from start() after the request thread has exited service().
+     */
+    @Test
+    public void testSendErrorOnAsyncDispatchFromStartAfterExitCompletesOnce() throws Exception {
+        doTestBug70362(Bug70362Mode.SEND_ERROR_START_AFTER_EXIT, HttpServletResponse.SC_SERVICE_UNAVAILABLE,
+                "onComplete-", null);
+    }
+
+
+    /*
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=70362
+     *
+     * The dispatch calls sendError(), starts a new asynchronous cycle and completes it.
+     */
+    @Test
+    public void testSendErrorThenCompleteOnAsyncDispatchCompletesOnce() throws Exception {
+        doTestBug70362(Bug70362Mode.SEND_ERROR_RESTART_COMPLETE, HttpServletResponse.SC_SERVICE_UNAVAILABLE,
+                "onComplete-", null);
+    }
+
+
+    /*
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=70362
+     *
+     * The dispatch calls sendError(), starts a new asynchronous cycle and dispatches it.
+     */
+    @Test
+    public void testSendErrorThenDispatchOnAsyncDispatchCompletesOnce() throws Exception {
+        doTestBug70362(Bug70362Mode.SEND_ERROR_RESTART_DISPATCH, HttpServletResponse.SC_SERVICE_UNAVAILABLE,
+                "onComplete-", null);
+    }
+
+
+    /*
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=70362
+     *
+     * An exception thrown by the dispatch is reported to the listeners before completion.
+     */
+    @Test
+    public void testExceptionOnAsyncDispatchStartsErrorHandling() throws Exception {
+        doTestBug70362(Bug70362Mode.THROW, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "onError-onComplete-",
+                ServletException.class);
+    }
+
+
+    /*
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=70362
+     *
+     * A failure recorded on the request by a dispatch that then returns normally (as InputBuffer does for a read
+     * failure the application swallows) is reported to the listeners before completion.
+     */
+    @Test
+    public void testRecordedFailureOnAsyncDispatchStartsErrorHandling() throws Exception {
+        doTestBug70362(Bug70362Mode.RECORDED_FAILURE, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                "onError-onComplete-", IOException.class);
+    }
+
+
+    /*
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=66875
+     *
+     * A failure the dispatch handled itself, writing the response, does not start async error handling.
+     */
+    @Test
+    public void testHandledFailureOnAsyncDispatchCompletesOnce() throws Exception {
+        doTestBug70362(Bug70362Mode.HANDLED_FAILURE, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "onComplete-",
+                null);
+    }
+
+
+    /*
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=70362
+     *
+     * The client has gone when the dispatch writes the response and the dispatch throws the resulting IOException.
+     */
+    @Test
+    public void testIoErrorOnAsyncDispatchStartsErrorHandling() throws Exception {
+        doTestBug70362(Bug70362Mode.IO_ERROR, -1, "onError-onComplete-", IOException.class);
+    }
+
+
+    private void doTestBug70362(Bug70362Mode mode, int expectedStatus, String expectedTrack,
+            Class<? extends Throwable> expectedThrowable) throws Exception {
         resetTracker();
+        bug70362Throwable = null;
         Tomcat tomcat = getTomcatInstance();
         Context context = getProgrammaticRootContext();
-        Wrapper wrapper =
-                Tomcat.addServlet(context, "bug70362", new Bug70362Servlet(dispatchFromStart, throwOnDispatch));
+        Bug70362Servlet servlet = new Bug70362Servlet(mode);
+        Wrapper wrapper = Tomcat.addServlet(context, "bug70362", servlet);
         wrapper.setAsyncSupported(true);
         context.addServletMapping("/bug70362", "bug70362");
+        TesterAccessLogValve alv = new TesterAccessLogValve();
+        context.getPipeline().addValve(alv);
         tomcat.start();
 
-        int rc = getUrl("http://localhost:" + getPort() + "/bug70362", new ByteChunk(), null);
-        Assert.assertEquals(expectedStatus, rc);
+        if (mode == Bug70362Mode.IO_ERROR) {
+            try (Socket socket = new Socket("localhost", getPort())) {
+                OutputStream os = socket.getOutputStream();
+                os.write(("GET /bug70362 HTTP/1.1" + CRLF + "Host: localhost" + CRLF + CRLF)
+                        .getBytes(StandardCharsets.ISO_8859_1));
+                os.flush();
+                Assert.assertTrue(servlet.asyncStartedLatch.await(10, TimeUnit.SECONDS));
+                // Reset the connection on close so the writes of the dispatch fail
+                socket.setSoLinger(true, 0);
+            }
+            servlet.clientClosedLatch.countDown();
+        } else {
+            int rc = getUrl("http://localhost:" + getPort() + "/bug70362", new ByteChunk(), null);
+            Assert.assertEquals(expectedStatus, rc);
+        }
 
+        // The access log entry is made once processing of the request has ended, after all listener events
         int count = 0;
-        while (!getTrack().endsWith("onComplete-") && count < 100) {
+        while (alv.getEntryCount() < 1 && count < 200) {
             Thread.sleep(50);
             count++;
         }
-        // Allow time for any further, unexpected, listener events
-        Thread.sleep(500);
+        Assert.assertEquals(1, alv.getEntryCount());
         Assert.assertEquals(expectedTrack, getTrack());
+        Assert.assertEquals(0, ((StandardContext) context).getInProgressAsyncCount());
+        if (expectedThrowable == null) {
+            Assert.assertNull(bug70362Throwable);
+        } else {
+            Assert.assertNotNull(bug70362Throwable);
+            Assert.assertTrue(bug70362Throwable.toString(), expectedThrowable.isInstance(bug70362Throwable));
+            if (mode != Bug70362Mode.IO_ERROR) {
+                Assert.assertEquals(Bug70362Servlet.MESSAGE, bug70362Throwable.getMessage());
+            }
+        }
+    }
+
+
+    private enum Bug70362Mode {
+        SEND_ERROR,
+        SEND_ERROR_START_BEFORE_EXIT,
+        SEND_ERROR_START_AFTER_EXIT,
+        SEND_ERROR_RESTART_COMPLETE,
+        SEND_ERROR_RESTART_DISPATCH,
+        THROW,
+        RECORDED_FAILURE,
+        HANDLED_FAILURE,
+        IO_ERROR
+    }
+
+
+    private static volatile Throwable bug70362Throwable;
+
+
+    public static class Bug70362Listener implements AsyncListener {
+
+        @Override
+        public void onComplete(AsyncEvent event) throws IOException {
+            track("onComplete-");
+        }
+
+        @Override
+        public void onTimeout(AsyncEvent event) throws IOException {
+            track("onTimeout-");
+        }
+
+        @Override
+        public void onError(AsyncEvent event) throws IOException {
+            track("onError-");
+            bug70362Throwable = event.getThrowable();
+        }
+
+        @Override
+        public void onStartAsync(AsyncEvent event) throws IOException {
+            // NO-OP
+        }
     }
 
 
@@ -2461,29 +2608,109 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         private static final long serialVersionUID = 1L;
 
-        private final boolean dispatchFromStart;
-        private final boolean throwOnDispatch;
+        static final String MESSAGE = "Bug70362";
 
-        public Bug70362Servlet(boolean dispatchFromStart, boolean throwOnDispatch) {
-            this.dispatchFromStart = dispatchFromStart;
-            this.throwOnDispatch = throwOnDispatch;
+        private final Bug70362Mode mode;
+        final transient CountDownLatch asyncStartedLatch = new CountDownLatch(1);
+        final transient CountDownLatch clientClosedLatch = new CountDownLatch(1);
+
+        Bug70362Servlet(Bug70362Mode mode) {
+            this.mode = mode;
         }
 
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             if (req.getDispatcherType() == DispatcherType.ASYNC) {
-                if (throwOnDispatch) {
-                    throw new ServletException("Bug70362");
+                switch (mode) {
+                    case THROW:
+                        throw new ServletException(MESSAGE);
+                    case RECORDED_FAILURE:
+                        req.setAttribute(RequestDispatcher.ERROR_EXCEPTION, new IOException(MESSAGE));
+                        resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                        break;
+                    case HANDLED_FAILURE:
+                        // The application handled the failure and wrote the response itself, as in BZ 66875
+                        req.setAttribute(RequestDispatcher.ERROR_EXCEPTION, new IOException(MESSAGE));
+                        resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                        resp.getWriter().print(MESSAGE);
+                        break;
+                    case SEND_ERROR_RESTART_COMPLETE: {
+                        resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+                        AsyncContext asyncContext = req.startAsync();
+                        asyncContext.addListener(new Bug70362Listener());
+                        asyncContext.complete();
+                        break;
+                    }
+                    case SEND_ERROR_RESTART_DISPATCH: {
+                        if (req.getAttribute(MESSAGE) == null) {
+                            req.setAttribute(MESSAGE, Boolean.TRUE);
+                            resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+                            AsyncContext asyncContext = req.startAsync();
+                            asyncContext.addListener(new Bug70362Listener());
+                            asyncContext.dispatch();
+                        }
+                        break;
+                    }
+                    case IO_ERROR: {
+                        OutputStream os = resp.getOutputStream();
+                        byte[] data = TestCoyoteAdapter.TEXT_8K.getBytes(StandardCharsets.UTF_8);
+                        for (int i = 0; i < 1024; i++) {
+                            os.write(data);
+                            os.flush();
+                        }
+                        break;
+                    }
+                    default:
+                        resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
                 }
-                resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-            } else {
-                AsyncContext asyncContext = req.startAsync();
-                asyncContext.addListener(new TrackingListener(false, false, null));
-                if (dispatchFromStart) {
-                    asyncContext.start(asyncContext::dispatch);
-                } else {
+                return;
+            }
+
+            AsyncContext asyncContext = req.startAsync();
+            asyncContext.setTimeout(0);
+            asyncContext.addListener(new Bug70362Listener());
+            switch (mode) {
+                case SEND_ERROR_START_BEFORE_EXIT: {
+                    // dispatch() is called while the request is still in the STARTING state
+                    CountDownLatch dispatchedLatch = new CountDownLatch(1);
+                    asyncContext.start(() -> {
+                        asyncContext.dispatch();
+                        dispatchedLatch.countDown();
+                    });
+                    try {
+                        Assert.assertTrue(dispatchedLatch.await(10, TimeUnit.SECONDS));
+                    } catch (InterruptedException e) {
+                        throw new ServletException(e);
+                    }
+                    break;
+                }
+                case SEND_ERROR_START_AFTER_EXIT:
+                    asyncContext.start(() -> {
+                        try {
+                            /*
+                             * There is no signal for the request moving from STARTING to STARTED after service()
+                             * exits so wait, as TestAsyncContextStateChanges does.
+                             */
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            // Ignore
+                        }
+                        asyncContext.dispatch();
+                    });
+                    break;
+                case IO_ERROR:
+                    asyncContext.start(() -> {
+                        try {
+                            clientClosedLatch.await(10, TimeUnit.SECONDS);
+                        } catch (InterruptedException e) {
+                            // Ignore
+                        }
+                        asyncContext.dispatch();
+                    });
+                    asyncStartedLatch.countDown();
+                    break;
+                default:
                     asyncContext.dispatch();
-                }
             }
         }
     }

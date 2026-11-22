@@ -127,6 +127,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     private final AtomicBoolean hasErrorProcessingStarted = new AtomicBoolean(false);
     private final AtomicBoolean hasOnErrorReturned = new AtomicBoolean(false);
     private volatile boolean completedByDispatch = false;
+    private volatile boolean completionDeferred = false;
 
     /*
      * ThreadLocal for passing over-ridden URL encoding state when dispatching.
@@ -364,6 +365,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         hasErrorProcessingStarted.set(false);
         hasOnErrorReturned.set(false);
         completedByDispatch = false;
+        completionDeferred = false;
     }
 
     private void clearServletRequestResponse() {
@@ -405,6 +407,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             this.hasOriginalRequestAndResponse = originalRequestResponse;
             this.event = new AsyncEvent(this, request, response);
             this.completedByDispatch = false;
+            this.completionDeferred = false;
 
             List<AsyncListenerWrapper> listenersCopy = new ArrayList<>(listeners);
             listeners.clear();
@@ -447,8 +450,16 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             dispatch = null;
             runnable.run();
             if (!request.isAsync()) {
-                completedByDispatch = true;
-                fireOnComplete();
+                if (isUnreportedFailure()) {
+                    /*
+                     * The dispatch recorded a failure and returned. CoyoteAdapter starts async error handling which
+                     * notifies the listeners of the failure before it completes the async processing.
+                     */
+                    completionDeferred = true;
+                } else {
+                    completedByDispatch = true;
+                    fireOnComplete();
+                }
             }
         } catch (RuntimeException x) {
             AtomicBoolean result = new AtomicBoolean();
@@ -460,7 +471,16 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
              * information required to determine that onComplete() needs to be called.
              */
             if (!result.get()) {
-                fireOnComplete();
+                if (hasErrorProcessingStarted.get()) {
+                    completedByDispatch = true;
+                    fireOnComplete();
+                } else {
+                    /*
+                     * CoyoteAdapter starts async error handling for the exception, which notifies the listeners of it
+                     * before it completes the async processing. If it does not, it calls fireDeferredOnComplete().
+                     */
+                    completionDeferred = true;
+                }
             }
             if (x.getCause() instanceof ServletException) {
                 throw (ServletException) x.getCause();
@@ -473,6 +493,16 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     }
 
 
+    /*
+     * Has the dispatch recorded a failure (an error response with an exception) that will start async error handling
+     * once the dispatch returns?
+     */
+    private boolean isUnreportedFailure() {
+        return !hasErrorProcessingStarted.get() && request.getResponse().isError() &&
+                request.getAttribute(RequestDispatcher.ERROR_EXCEPTION) != null;
+    }
+
+
     /**
      * Has the most recent dispatch completed the asynchronous processing? If it has, the listeners have been notified
      * that the processing is complete.
@@ -481,6 +511,19 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
      */
     public boolean isCompletedByDispatch() {
         return completedByDispatch;
+    }
+
+
+    /**
+     * Notifies the listeners that the most recent dispatch completed the asynchronous processing if that notification
+     * was deferred for async error handling that has not started. Called once the dispatch has returned.
+     */
+    public void fireDeferredOnComplete() {
+        if (completionDeferred) {
+            completionDeferred = false;
+            completedByDispatch = true;
+            fireOnComplete();
+        }
     }
 
 
@@ -524,6 +567,8 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             // Skip duplicate error processing
             return;
         }
+        // The error processing completes the async processing
+        completionDeferred = false;
         if (t != null) {
             request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
         }

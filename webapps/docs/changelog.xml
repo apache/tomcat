@@ -242,11 +242,15 @@
         <code>LockOutRealm</code>. (markt)
       </fix>
       <fix>
-        <bug>70362</bug>: When an asynchronous dispatch completes the
-        asynchronous processing after calling <code>sendError()</code>, do not
-        start asynchronous error handling, which notified the
-        <code>AsyncListener</code>s of an error and of completion again after
-        they had been notified of completion. Regression in the fix for
+        <bug>70362</bug>: Do not notify <code>AsyncListener</code>s of an error
+        after they have been notified of completion by an asynchronous dispatch,
+        and do not start asynchronous error handling for an error response
+        without an exception (e.g. from <code>sendError()</code>) when the
+        dispatch completed the asynchronous processing or started a new
+        asynchronous cycle and ended it with <code>complete()</code> or
+        <code>dispatch()</code>. A failure that an asynchronous dispatch
+        records, or an exception it throws after an I/O error, is reported to
+        the listeners before completion. Regression in the fix for
         <bug>66875</bug>. Patch provided by Scott Murphy Heiberg.
       </fix>
     </changelog>
