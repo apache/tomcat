@@ -479,7 +479,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                                 if (stream == null) {
                                     sendStreamReset(null, se);
                                 } else {
-                                    stream.close(se);
+                                    stream.closeOnStreamError(se);
                                 }
                             } finally {
                                 if (isOverheadLimitExceeded()) {

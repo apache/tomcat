@@ -63,6 +63,8 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
     private final Lock processLock = new ReentrantLock();
     private final Http2UpgradeHandler handler;
     private final Stream stream;
+    // True while this processor is registered as a waiting processor. Only modified while holding processLock.
+    private volatile boolean waiting = false;
     private SendfileData sendfileData = null;
     private SendfileState sendfileState = null;
 
@@ -77,6 +79,7 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
         super(adapter, stream.getCoyoteRequest(), stream.getCoyoteResponse());
         this.handler = handler;
         this.stream = stream;
+        stream.setStreamProcessor(this);
         setSocketWrapper(socketWrapper);
     }
 
@@ -93,7 +96,13 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
                  * replaced it should not be used for processing any further events. When it is known that processing is
                  * going to be a NO-OP, exit early.
                  */
-                if (!stream.equals(handler.getStream(stream.getIdAsInt()))) {
+                /*
+                 * The exception is a processor that is registered as a waiting processor (asynchronous processing).
+                 * The connection thread replaces the stream when it raises a stream error. A waiting processor can only
+                 * complete its clean-up (remove itself from the waiting processors and recycle itself) by processing
+                 * an event so it must not ignore events just because the stream has been replaced.
+                 */
+                if (!waiting && !stream.equals(handler.getStream(stream.getIdAsInt()))) {
                     return;
                 }
                 // Avoid duplicate timeout events
@@ -103,6 +112,17 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
                 SocketState state = SocketState.CLOSED;
                 boolean reuseRequestAndResponse = false;
                 try {
+                    if (event == SocketEvent.ERROR) {
+                        /*
+                         * If the connection thread raised a stream error while the request was being processed, make
+                         * the error visible to the application. It is set here, on the thread that owns the request,
+                         * and not by the connection thread, since the attributes of the request are not thread-safe.
+                         */
+                        StreamException streamError = stream.getStreamError();
+                        if (streamError != null && request.getAttribute(RequestDispatcher.ERROR_EXCEPTION) == null) {
+                            request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, streamError);
+                        }
+                    }
                     state = process(socketWrapper, event);
                     /*
                      * The request and response may only be returned to the pool for re-use if the stream ended cleanly.
@@ -117,14 +137,20 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
                     }
 
                     if (state == SocketState.LONG) {
+                        waiting = true;
                         handler.getProtocol().getHttp11Protocol().addWaitingProcessor(this);
+                        // The connection thread may have raised a stream error before the request became async
+                        stream.notifyProcessorOfStreamError(this);
                     } else if (state == SocketState.CLOSED) {
+                        waiting = false;
                         handler.getProtocol().getHttp11Protocol().removeWaitingProcessor(this);
-                        if (!stream.isInputFinished() && getErrorState().isIoAllowed()) {
+                        if (!stream.isInputFinished() && getErrorState().isIoAllowed() && stream.canReset()) {
                             // The request has been processed but the request body has not been
                             // fully read. This typically occurs when Tomcat rejects an upload
                             // of some form (e.g. PUT or POST). Need to tell the client not to
-                            // send any more data on this stream (reset).
+                            // send any more data on this stream (reset). If the stream can no
+                            // longer be reset (e.g. a reset has already been sent) there is
+                            // nothing to send. The final else block performs the clean-up.
                             StreamException se =
                                     new StreamException(sm.getString("streamProcessor.cancel", stream.getConnectionId(),
                                             stream.getIdAsString()), Http2Error.NO_ERROR, stream.getIdAsInt());

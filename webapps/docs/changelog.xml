@@ -238,6 +238,10 @@
         <code>Class.getMethods()</code>. (markt)
       </scode>
       <fix>
+        Expand the user name normalisation options available in the
+        <code>LockOutRealm</code>. (markt)
+      </fix>
+      <fix>
         <bug>70362</bug>: When an asynchronous dispatch completes the
         asynchronous processing after calling <code>sendError()</code>, do not
         start asynchronous error handling, which notified the
@@ -368,6 +372,16 @@
       <fix>
         Refactor the strict SNI check for consistency. (markt)
       </fix>
+      <fix>
+        When using HTTP/2, do not send a second reset for a stream that has
+        already been reset when the request finishes processing with the
+        request body not fully read. (markt)
+      </fix>
+      <fix>
+        When using HTTP/2, ensure that the resources associated with a request
+        that is in asynchronous mode are released if the connection thread
+        raises a stream error for that stream. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -440,6 +454,14 @@
         configuration and security considerations. Based on pull request
         <pr>1134</pr> by sainadh777. (markt)
       </docs>
+      <fix>
+        Improve reporting of faulty members when sending of cluster messages
+        fails. (markt)
+      </fix>
+      <fix>
+        Increase visibility of TLS errors when receiving cluster messages.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

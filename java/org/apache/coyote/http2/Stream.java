@@ -53,6 +53,7 @@ import org.apache.tomcat.util.http.parser.Host;
 import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.http.parser.Priority;
 import org.apache.tomcat.util.net.ApplicationBufferHandler;
+import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.WriteBuffer;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -111,6 +112,11 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
     private final Object recycledLock = new Object();
     private volatile boolean recycled = false;
+    // The processor handling the request for this stream. Set when the processor is created.
+    private volatile StreamProcessor streamProcessor = null;
+    // A stream error raised by the connection thread while the processor was still processing the request.
+    private volatile StreamException streamError = null;
+    private final AtomicBoolean streamErrorNotified = new AtomicBoolean(false);
 
 
     Stream(Integer identifier, Http2UpgradeHandler handler) {
@@ -872,6 +878,73 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
     final boolean isInputFinished() {
         return !state.isFrameTypePermitted(FrameType.DATA);
+    }
+
+
+    /**
+     * Closes the stream following a stream error detected by the connection thread while processing incoming frames.
+     * <p>
+     * If a {@link StreamProcessor} is still processing the request, the request is, or may become, asynchronous. A
+     * waiting processor can only complete its clean-up (remove itself from the waiting processors and recycle itself)
+     * when it processes an event so it must be notified of the error. If the request is already in asynchronous mode
+     * that is done here. Otherwise it is done by the processor once the request becomes asynchronous.
+     *
+     * @param streamException The stream error
+     */
+    final void closeOnStreamError(StreamException streamException) {
+        StreamProcessor processor = streamProcessor;
+        close(streamException);
+        if (processor != null && !recycled) {
+            /*
+             * Record the error before checking if the request is asynchronous. The processor checks for a recorded
+             * error after it has started asynchronous processing (see notifyProcessorOfStreamError()). With both
+             * fields volatile, at least one of the two threads is guaranteed to see the other's update so the processor
+             * is always notified, whichever thread wins the race.
+             */
+            streamError = streamException;
+            if (processor.isAsync()) {
+                notifyProcessorOfStreamError(processor);
+            }
+        }
+    }
+
+
+    /**
+     * Called by the {@link StreamProcessor} once the request has started asynchronous processing. If the connection
+     * thread raised a stream error before asynchronous processing started it will not have notified the processor, so
+     * do so now. Without the notification, nothing would clean up the processor until the asynchronous timeout fired
+     * (or never, if there is no timeout).
+     *
+     * @param processor The processor for this stream
+     */
+    final void notifyProcessorOfStreamError(StreamProcessor processor) {
+        // Notify once only, whichever thread gets here first
+        if (streamError != null && !recycled && streamErrorNotified.compareAndSet(false, true)) {
+            /*
+             * The request is deliberately not touched here. This may be called from a thread that does not own the
+             * request and the attributes of the request are not thread-safe. The processor sets the error attribute on
+             * the request when it processes the event (see StreamProcessor.process()).
+             *
+             * If the processor has already cleaned up before the event is processed, it ignores the event.
+             */
+            processor.processSocketEvent(SocketEvent.ERROR, true);
+        }
+    }
+
+
+    /**
+     * Obtain the stream error, if any, that was raised by the connection thread while the request for this stream was
+     * still being processed.
+     *
+     * @return The stream error or {@code null}
+     */
+    final StreamException getStreamError() {
+        return streamError;
+    }
+
+
+    final void setStreamProcessor(StreamProcessor streamProcessor) {
+        this.streamProcessor = streamProcessor;
     }
 
 

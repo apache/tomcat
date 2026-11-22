@@ -115,7 +115,17 @@ public class ChannelException extends Exception {
                 } else {
                     buf.append("; ");
                 }
+                buf.append("[[");
                 buf.append(mbr.getMember().getName());
+                buf.append("],[");
+                if (mbr.cause == null || mbr.cause.getMessage() == null) {
+                    buf.append("unknown cause");
+                } else if (mbr.cause.getMessage() == null) {
+                    buf.append(mbr.cause.toString());
+                } else {
+                    buf.append(mbr.cause.getMessage());
+                }
+                buf.append("]]");
             }
         }
         return buf.toString();
