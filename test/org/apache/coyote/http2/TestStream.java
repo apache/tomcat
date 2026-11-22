@@ -18,6 +18,7 @@ package org.apache.coyote.http2;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Collections;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
@@ -45,6 +46,8 @@ import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.AsyncContextCallback;
+import org.apache.tomcat.util.http.Method;
+import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.easymock.EasyMock;
@@ -405,6 +408,114 @@ public class TestStream extends Http2TestBase {
         int spins = ThreadLocalRandom.current().nextInt(maxSpins);
         for (int i = 0; i < spins; i++) {
             Thread.onSpinWait();
+        }
+    }
+
+
+    /*
+     * Trailer fields must not be processed as request headers. The merged cookie header must not be added again when
+     * the trailers are received.
+     */
+    @Test
+    public void testCookieHeaderWithTrailers() throws Exception {
+        doTestCookieWithTrailers(false, "[a=1; b=2]", "null");
+    }
+
+
+    /*
+     * An allowed cookie trailer field is a trailer field. It must not be merged into the request cookie header.
+     */
+    @Test
+    public void testCookieTrailerAllowed() throws Exception {
+        doTestCookieWithTrailers(true, "[a=1; b=2]", "c=3");
+    }
+
+
+    private void doTestCookieWithTrailers(boolean cookieTrailer, String expectedCookieHeaders,
+            String expectedCookieTrailer) throws Exception {
+
+        enableHttp2();
+
+        Tomcat tomcat = getTomcatInstance();
+        if (cookieTrailer) {
+            Assert.assertTrue(tomcat.getConnector().setProperty("allowedTrailerHeaders", "cookie"));
+        }
+
+        Context ctxt = getProgrammaticRootContext();
+        Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
+        ctxt.addServletMapping("/simple", "simple");
+        Tomcat.addServlet(ctxt, "cookieHeaders", new CookieHeaders());
+        ctxt.addServletMapping("/cookieHeaders", "cookieHeaders");
+
+        tomcat.start();
+
+        openClientConnection();
+        doHttpUpgrade();
+        sendClientPreface();
+        validateHttp2InitialResponse();
+
+        byte[] headersFrameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+        MimeHeaders headers = new MimeHeaders();
+        headers.addValue(":method").setString(Method.POST);
+        headers.addValue(":scheme").setString("http");
+        headers.addValue(":path").setString("/cookieHeaders");
+        headers.addValue(":authority").setString("localhost:" + getPort());
+        headers.addValue("cookie").setString("a=1");
+        headers.addValue("cookie").setString("b=2");
+        hpackEncoder.encode(headers, headersPayload);
+        headersPayload.flip();
+        ByteUtil.setThreeBytes(headersFrameHeader, 0, headersPayload.limit());
+        headersFrameHeader[3] = FrameType.HEADERS.getIdByte();
+        // Flags. end of headers (0x04)
+        headersFrameHeader[4] = 0x04;
+        ByteUtil.set31Bits(headersFrameHeader, 5, 3);
+        writeFrame(headersFrameHeader, headersPayload);
+
+        byte[] dataFrameHeader = new byte[9];
+        ByteBuffer dataPayload = ByteBuffer.allocate(8);
+        while (dataPayload.hasRemaining()) {
+            dataPayload.put((byte) 'x');
+        }
+        dataPayload.flip();
+        ByteUtil.setThreeBytes(dataFrameHeader, 0, dataPayload.limit());
+        // No flags. Trailers follow.
+        ByteUtil.set31Bits(dataFrameHeader, 5, 3);
+        writeFrame(dataFrameHeader, dataPayload);
+
+        byte[] trailersFrameHeader = new byte[9];
+        ByteBuffer trailersPayload = ByteBuffer.allocate(64);
+        MimeHeaders trailers = new MimeHeaders();
+        trailers.addValue("cookie").setString("c=3");
+        hpackEncoder.encode(trailers, trailersPayload);
+        trailersPayload.flip();
+        ByteUtil.setThreeBytes(trailersFrameHeader, 0, trailersPayload.limit());
+        trailersFrameHeader[3] = FrameType.HEADERS.getIdByte();
+        // Flags. end of headers (0x04) and end of stream (0x01)
+        trailersFrameHeader[4] = 0x05;
+        ByteUtil.set31Bits(trailersFrameHeader, 5, 3);
+        writeFrame(trailersFrameHeader, trailersPayload);
+
+        do {
+            parser.readFrame();
+        } while (!output.getTrace().contains("3-EndOfStream") && !output.getTrace().contains("3-RST-"));
+        String trace = output.getTrace();
+        Assert.assertTrue(trace, trace.contains("3-Header-[x-cookie-headers]-[" + expectedCookieHeaders + "]"));
+        Assert.assertTrue(trace, trace.contains("3-Header-[x-cookie-trailer]-[" + expectedCookieTrailer + "]"));
+    }
+
+
+    private static final class CookieHeaders extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doPost(HttpServletRequest request, HttpServletResponse response)
+                throws ServletException, IOException {
+            // Read the body so the trailers have been received
+            request.getInputStream().readAllBytes();
+            response.setHeader("x-cookie-headers", Collections.list(request.getHeaders("cookie")).toString());
+            response.setHeader("x-cookie-trailer", String.valueOf(request.getTrailerFields().get("cookie")));
         }
     }
 
