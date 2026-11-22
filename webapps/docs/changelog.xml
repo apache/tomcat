@@ -374,6 +374,14 @@
         that is in asynchronous mode are released if the connection thread
         raises a stream error for that stream. (markt)
       </fix>
+      <fix>
+        When using HTTP/2, do not process request trailer fields as request
+        headers. Previously, the merged <code>cookie</code> request header was
+        added a second time when trailer fields were received, and an allowed
+        <code>cookie</code> trailer field was merged into the request
+        <code>cookie</code> header. Pull request <pr>1267</pr> provided by
+        Arturo Bernal.
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

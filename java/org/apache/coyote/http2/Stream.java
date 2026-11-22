@@ -429,8 +429,12 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             headerState = HEADER_STATE_REGULAR;
         }
 
-        if (headerState == HEADER_STATE_TRAILER && !handler.getProtocol().isTrailerHeaderAllowed(name)) {
-            // Processing trailers and the header is not in the allowed list
+        if (headerState == HEADER_STATE_TRAILER) {
+            // Trailer fields are never processed as request headers
+            if (handler.getProtocol().isTrailerHeaderAllowed(name)) {
+                // HTTP/2 headers are already always lower case
+                coyoteRequest.getMimeTrailerFields().addValue(name).setString(value);
+            }
             return;
         }
 
@@ -559,9 +563,6 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                     headerException = new StreamException(
                             sm.getString("stream.header.unknownPseudoHeader", getConnectionId(), getIdAsString(), name),
                             Http2Error.PROTOCOL_ERROR, getIdAsInt());
-                } else if (headerState == HEADER_STATE_TRAILER) {
-                    // HTTP/2 headers are already always lower case
-                    coyoteRequest.getMimeTrailerFields().addValue(name).setString(value);
                 } else {
                     coyoteRequest.getMimeHeaders().addValue(name).setString(value);
                 }
@@ -641,6 +642,11 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
 
     final boolean receivedEndOfHeaders() throws StreamException {
+        if (headerState == HEADER_STATE_TRAILER) {
+            // The request has already been passed to the container
+            return false;
+        }
+
         boolean missingHeader = false;
 
         if (coyoteRequest.getMethod() == null) {
@@ -674,7 +680,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         if (cookieHeader != null) {
             coyoteRequest.getMimeHeaders().addValue("cookie").setString(cookieHeader.toString());
         }
-        return headerState == HEADER_STATE_REGULAR || headerState == HEADER_STATE_PSEUDO;
+        return true;
     }
 
 
