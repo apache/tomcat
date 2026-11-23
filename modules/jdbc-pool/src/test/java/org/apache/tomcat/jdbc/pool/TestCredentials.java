@@ -42,4 +42,8 @@ class TestCredentials {
     class CredentialSnapshotDuringConnect extends CredentialSnapshotDuringConnectBase {
     }
 
+    @Nested
+    class ConnectionPropertiesCredentialAliases extends ConnectionPropertiesCredentialAliasesBase {
+    }
+
 }

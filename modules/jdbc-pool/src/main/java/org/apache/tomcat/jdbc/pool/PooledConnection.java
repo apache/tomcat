@@ -610,10 +610,19 @@ public class PooledConnection implements PooledConnectionMBean {
                 getAttributes().put(PROP_PASSWORD, pwd);
             }
         }
+        // The overlay is the credential setters' every-spelling rule at the
+        // last boundary: while a credential field is set its value replaces
+        // every spelling of the key, so a superseded pass, pwd, PASSWORD or
+        // USER entry in the live collection cannot reach the driver next to
+        // the canonical one. With the field unset nothing is removed: the
+        // entry in the collection is then the one the driver gets, as
+        // documented.
         if (usr != null) {
+            PoolUtilities.removeUsernameKeys(properties);
             properties.setProperty(PROP_USER, usr);
         }
         if (pwd != null) {
+            PoolUtilities.removeCredentialKeys(properties);
             properties.setProperty(PROP_PASSWORD, pwd);
         }
 
