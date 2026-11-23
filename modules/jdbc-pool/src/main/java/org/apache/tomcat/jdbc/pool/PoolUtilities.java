@@ -111,6 +111,48 @@ public class PoolUtilities {
     }
 
     /**
+     * Whether {@code key} names the user name, ignoring case and surrounding whitespace. The credential setters
+     * replace every spelling of the key, so the connect path recognizes the same spellings when it normalizes the
+     * properties it hands to the driver.
+     *
+     * @param key the property key to test, possibly {@code null}
+     *
+     * @return {@code true} when the key names the user name
+     */
+    static boolean isUsernameKey(String key) {
+        return key != null && PROP_USER.equalsIgnoreCase(key.trim());
+    }
+
+    /**
+     * Removes every entry whose key is recognized by {@link #isCredentialKey(String)} from the given properties. The
+     * caller passes a defaults-free copy - the properties the connect path hands to the driver are one - so a plain
+     * removal reaches every credential entry.
+     *
+     * @param properties the properties to normalize
+     */
+    static void removeCredentialKeys(Properties properties) {
+        for (Object key : properties.keySet().toArray()) {
+            if (key instanceof String && isCredentialKey((String) key)) {
+                properties.remove(key);
+            }
+        }
+    }
+
+    /**
+     * Removes every entry whose key is recognized by {@link #isUsernameKey(String)} from the given properties. The
+     * caller passes a defaults-free copy, as for {@link #removeCredentialKeys(Properties)}.
+     *
+     * @param properties the properties to normalize
+     */
+    static void removeUsernameKeys(Properties properties) {
+        for (Object key : properties.keySet().toArray()) {
+            if (key instanceof String && isUsernameKey((String) key)) {
+                properties.remove(key);
+            }
+        }
+    }
+
+    /**
      * Creates a copy of the given properties as {@link #clone(Properties)}
      * does, with every credential entry removed. A credential entry is one
      * whose key is recognised by {@link #isCredentialKey(String)}:
