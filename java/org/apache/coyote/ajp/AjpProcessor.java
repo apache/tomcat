@@ -342,6 +342,8 @@ public class AjpProcessor extends AbstractProcessor {
         // Expected to block on the first read as there should be at least one
         // AJP message to read.
         boolean firstRead = true;
+        // recycle() resets the error state so track separately if the connection must be closed
+        boolean closeConnection = false;
 
         while (!getErrorState().isError() && !protocol.isPaused()) {
             // Parsing the request header
@@ -468,12 +470,21 @@ public class AjpProcessor extends AbstractProcessor {
             // Set keep alive timeout for next request
             socketWrapper.setReadTimeout(protocol.getKeepAliveTimeout());
 
+            /*
+             * Recycling resets the error state. If the request ended in error, the connection must be closed without
+             * reading any further messages. Any unread body packet is still on the connection and must not be parsed
+             * as the start of the next request.
+             */
+            closeConnection = getErrorState().isError();
             recycle();
+            if (closeConnection) {
+                break;
+            }
         }
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
-        if (getErrorState().isError() || protocol.isPaused()) {
+        if (closeConnection || getErrorState().isError() || protocol.isPaused()) {
             return SocketState.CLOSED;
         } else {
             if (isAsync()) {

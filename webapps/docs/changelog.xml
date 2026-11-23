@@ -384,6 +384,12 @@
         get body chunk message or flush message so that the messages cannot be
         written part way through a response body message. (markt)
       </fix>
+      <fix>
+        Fix the AJP connector so that it closes the connection, rather than
+        reading further messages, once a request has ended in error.
+        Previously, a body packet that had not been read could be processed as
+        the start of a new AJP request. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
