@@ -363,19 +363,26 @@ public class PooledConnection implements PooledConnectionMBean {
      * @throws SQLException if unable to obtain a connection from the DataSource
      */
     protected void connectUsingDataSource() throws SQLException {
-        String usr = null;
-        String pwd = null;
-        if (getAttributes().containsKey(PROP_USER)) {
-            usr = (String) getAttributes().get(PROP_USER);
-        } else {
-            usr = poolProperties.getUsername();
-            getAttributes().put(PROP_USER, usr);
-        }
-        if (getAttributes().containsKey(PROP_PASSWORD)) {
-            pwd = (String) getAttributes().get(PROP_PASSWORD);
-        } else {
-            pwd = poolProperties.getPassword();
-            getAttributes().put(PROP_PASSWORD, pwd);
+        String usr;
+        String pwd;
+        // The credential setters publish the field and its database-properties
+        // entry together under this configuration's monitor, which is the
+        // snapshot boundary for the pair. Reading the configured values outside
+        // it can take a user name and a password from two different generations
+        // of the configuration, so both are read under that monitor.
+        synchronized (poolProperties) {
+            if (getAttributes().containsKey(PROP_USER)) {
+                usr = (String) getAttributes().get(PROP_USER);
+            } else {
+                usr = poolProperties.getUsername();
+                getAttributes().put(PROP_USER, usr);
+            }
+            if (getAttributes().containsKey(PROP_PASSWORD)) {
+                pwd = (String) getAttributes().get(PROP_PASSWORD);
+            } else {
+                pwd = poolProperties.getPassword();
+                getAttributes().put(PROP_PASSWORD, pwd);
+            }
         }
         if (poolProperties.getDataSource() instanceof javax.sql.XADataSource) {
             javax.sql.XADataSource xds = (javax.sql.XADataSource) poolProperties.getDataSource();
@@ -560,27 +567,20 @@ public class PooledConnection implements PooledConnectionMBean {
             throw ex;
         }
         String driverURL = poolProperties.getUrl();
-        String usr = null;
-        String pwd = null;
-        if (getAttributes().containsKey(PROP_USER)) {
-            usr = (String) getAttributes().get(PROP_USER);
-        } else {
-            usr = poolProperties.getUsername();
-            getAttributes().put(PROP_USER, usr);
-        }
-        if (getAttributes().containsKey(PROP_PASSWORD)) {
-            pwd = (String) getAttributes().get(PROP_PASSWORD);
-        } else {
-            pwd = poolProperties.getPassword();
-            getAttributes().put(PROP_PASSWORD, pwd);
-        }
+        String usr;
+        String pwd;
         // A null database-properties collection becomes an empty one: the URL
         // and credentials are enough for the driver. The configured
         // connectionProperties string is a source of driver properties in its
         // own right and must still reach the driver, so it is parsed here when
         // there is no collection to hold its pairs; the string and the null
         // collection are read under the same monitor, so the driver cannot
-        // receive a torn mix of two configurations.
+        // receive a torn mix of two configurations. The credential fields and
+        // the database-properties collection are published together under that
+        // monitor, which is their snapshot boundary, so the credentials are
+        // read there as well: a rotation that lands between an unlocked field
+        // read and the copy would otherwise be undone by overlaying the
+        // superseded value on the new collection.
         Properties properties;
         synchronized (poolProperties) {
             Properties dbProperties = poolProperties.getDbProperties();
@@ -596,6 +596,18 @@ public class PooledConnection implements PooledConnectionMBean {
                 }
             } else {
                 properties = PoolUtilities.clone(dbProperties);
+            }
+            if (getAttributes().containsKey(PROP_USER)) {
+                usr = (String) getAttributes().get(PROP_USER);
+            } else {
+                usr = poolProperties.getUsername();
+                getAttributes().put(PROP_USER, usr);
+            }
+            if (getAttributes().containsKey(PROP_PASSWORD)) {
+                pwd = (String) getAttributes().get(PROP_PASSWORD);
+            } else {
+                pwd = poolProperties.getPassword();
+                getAttributes().put(PROP_PASSWORD, pwd);
             }
         }
         if (usr != null) {
