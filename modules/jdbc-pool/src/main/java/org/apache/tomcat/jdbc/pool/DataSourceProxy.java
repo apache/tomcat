@@ -62,6 +62,14 @@ public class DataSourceProxy implements PoolConfiguration {
     private volatile boolean closed = false;
 
     /**
+     * Whether a pool construction is in progress, guarded by this data source's monitor. The start-time setters take
+     * that monitor as well, so a write racing the construction is rejected instead of landing in a configuration the
+     * constructor has already read. The construction itself runs outside the monitor, as recorded at
+     * {@link #poolCreationLock}: it can block in the driver.
+     */
+    private boolean constructing = false;
+
+    /**
      * Serializes pool construction away from this proxy's monitor. The constructor pre-connects the initial
      * connections and can block in the driver, so it must not run under the monitor {@link #close(boolean)} takes.
      * This lock is taken before the proxy monitor and never while holding it.
@@ -232,11 +240,41 @@ public class DataSourceProxy implements PoolConfiguration {
             if (existing != null) {
                 return existing;
             }
+            // Mark the construction and sample the configuration in one step
+            // under the monitor the start-time setters take. From here until
+            // the pool is published, a setter that decides what this
+            // construction builds - or which configuration object it builds
+            // from - is rejected instead of landing too late. The construction
+            // itself keeps running outside the monitor: it can block in the
+            // driver during the pre-load.
+            final PoolConfiguration configuration;
+            synchronized (this) {
+                constructing = true;
+                configuration = poolProperties;
+            }
             // The constructor - and with it the driver connects of the
             // initial pre-load - runs with the close monitor free. A failure
             // here propagates directly: an init that fails after starting
             // anything tears its pool down itself before throwing.
-            final ConnectionPool fresh = new ConnectionPool(poolProperties);
+            final ConnectionPool fresh;
+            try {
+                fresh = new ConnectionPool(configuration);
+            } catch (Throwable x) {
+                synchronized (this) {
+                    constructing = false;
+                }
+                ExceptionUtils.handleThrowable(x);
+                if (x instanceof SQLException) {
+                    throw (SQLException) x;
+                } else if (x instanceof RuntimeException) {
+                    throw (RuntimeException) x;
+                } else if (x instanceof Error) {
+                    throw (Error) x;
+                }
+                SQLException sx = new SQLException(x.getMessage());
+                sx.initCause(x);
+                throw sx;
+            }
             final boolean rejected;
             try {
                 synchronized (this) {
@@ -254,13 +292,23 @@ public class DataSourceProxy implements PoolConfiguration {
                         // but skips that correction, because the setters run it
                         // only once a pool is reachable. The check has to come
                         // before the cleaner is looked over: it decides the
-                        // interval the cleaner should be running on.
-                        fresh.checkPoolConfiguration(poolProperties);
-                        fresh.reconcilePoolCleaner(poolProperties);
+                        // interval the cleaner should be running on. Both use
+                        // the configuration this construction was built from, not
+                        // whatever the shared field might hold by now.
+                        fresh.checkPoolConfiguration(configuration);
+                        fresh.reconcilePoolCleaner(configuration);
                         pool = fresh;
                     }
+                    // The construction is over on this path as well: a start-time
+                    // setter queued behind this monitor is answered by the
+                    // published pool or by the closure, never by the stale
+                    // construction state.
+                    constructing = false;
                 }
             } catch (Throwable x) {
+                synchronized (this) {
+                    constructing = false;
+                }
                 // What handleThrowable lets through is not recoverable, so
                 // check that first. Otherwise the constructor has already
                 // pre-loaded sessions and may have armed the cleaner, so close
@@ -540,7 +588,8 @@ public class DataSourceProxy implements PoolConfiguration {
      *
      * @throws NullPointerException if the configuration is null
      * @throws IllegalArgumentException if the configuration is a display-only bean/JMX view
-     * @throws UnsupportedOperationException if the pool has already been created or this data source has been closed
+     * @throws UnsupportedOperationException if the pool is being created, has already been created or this data source
+     *                                          has been closed
      */
     public synchronized void setPoolProperties(PoolConfiguration poolProperties) {
         if (poolProperties == null) {
@@ -572,7 +621,11 @@ public class DataSourceProxy implements PoolConfiguration {
      */
     @Override
     public synchronized void setInitialSize(int initialSize) {
-        checkPoolNotStarted("initialSize");
+        // A write that lands while the pool is being built is deliberately
+        // accepted: the pre-load array bounds the count where it is allocated,
+        // so the write cannot make the construction die on it. The other
+        // start-time setters decide a choice that cannot be corrected later.
+        checkPoolNotStarted("initialSize", false);
         this.poolProperties.setInitialSize(initialSize);
     }
 
@@ -773,14 +826,34 @@ public class DataSourceProxy implements PoolConfiguration {
      *
      * @param property the property name
      *
-     * @throws UnsupportedOperationException if the pool exists or this data source is closed
+     * @throws UnsupportedOperationException if the pool is being created, has already been created, or this data
+     *                                          source has been closed
      */
     private void checkPoolNotStarted(String property) {
+        checkPoolNotStarted(property, true);
+    }
+
+
+    /**
+     * Rejects a write to a property that is read only while the pool is being
+     * created.
+     *
+     * @param property           the property name
+     * @param rejectConstructing whether a write that lands while the pool is
+     *                               being built is rejected; {@code initialSize}
+     *                               is deliberately not, as its consumption is
+     *                               bounded where the pre-load array is allocated
+     *
+     * @throws UnsupportedOperationException if the pool exists, the construction
+     *                                          rejects start-time writes, or this
+     *                                          data source is closed
+     */
+    private void checkPoolNotStarted(String property, boolean rejectConstructing) {
         if (closed) {
             throw new UnsupportedOperationException(
                     MessageFactory.get("dataSourceProxy.startTimePropertyAfterClose", property));
         }
-        if (pool != null) {
+        if ((rejectConstructing && constructing) || pool != null) {
             throw new UnsupportedOperationException(
                     MessageFactory.get("dataSourceProxy.startTimePropertyAfterStart", property));
         }
@@ -795,14 +868,15 @@ public class DataSourceProxy implements PoolConfiguration {
      *
      * @param enabled whether JMX is enabled
      *
-     * @throws UnsupportedOperationException if the pool has already been created or this data source has been closed
+     * @throws UnsupportedOperationException if the pool is being created, has already been created or this data source
+     *                                          has been closed
      */
     @Override
     public synchronized void setJmxEnabled(boolean enabled) {
         if (closed) {
             throw new UnsupportedOperationException(MessageFactory.get("dataSourceProxy.jmxEnabledAfterClose"));
         }
-        if (pool != null) {
+        if (constructing || pool != null) {
             throw new UnsupportedOperationException(MessageFactory.get("dataSourceProxy.jmxEnabledAfterStart"));
         }
         this.getPoolProperties().setJmxEnabled(enabled);
@@ -815,7 +889,8 @@ public class DataSourceProxy implements PoolConfiguration {
      *
      * @param fairQueue {@code true} to use a fair idle queue
      *
-     * @throws UnsupportedOperationException if the pool has already been created or this data source has been closed
+     * @throws UnsupportedOperationException if the pool is being created, has already been created or this data source
+     *                                          has been closed
      */
     @Override
     public synchronized void setFairQueue(boolean fairQueue) {
@@ -1642,7 +1717,8 @@ public class DataSourceProxy implements PoolConfiguration {
      *
      * @param ignoreExceptionOnPreLoad {@code true} to ignore pre-load failures
      *
-     * @throws UnsupportedOperationException if the pool has already been created or this data source has been closed
+     * @throws UnsupportedOperationException if the pool is being created, has already been created or this data source
+     *                                          has been closed
      */
     @Override
     public synchronized void setIgnoreExceptionOnPreLoad(boolean ignoreExceptionOnPreLoad) {
