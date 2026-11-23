@@ -31,6 +31,10 @@ class TestPoolCloseAndShutdown {
     }
 
     @Nested
+    class ClosedPoolBorrowConnect extends ClosedPoolBorrowConnectBase {
+    }
+
+    @Nested
     class CloseVsConcurrentRelease extends CloseVsConcurrentReleaseBase {
     }
 
