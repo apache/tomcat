@@ -38,4 +38,8 @@ class TestCredentials {
     class DataSourceProxyCredentials extends DataSourceProxyCredentialsBase {
     }
 
+    @Nested
+    class CredentialSnapshotDuringConnect extends CredentialSnapshotDuringConnectBase {
+    }
+
 }
