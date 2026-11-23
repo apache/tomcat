@@ -38,4 +38,8 @@ class TestPoolConfiguration {
     class NullConnectionFromDataSource extends NullConnectionFromDataSourceBase {
     }
 
+    @Nested
+    class DataSourceProxyConstructionSetters extends DataSourceProxyConstructionSettersBase {
+    }
+
 }
