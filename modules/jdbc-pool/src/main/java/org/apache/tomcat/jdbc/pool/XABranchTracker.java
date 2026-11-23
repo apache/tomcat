@@ -305,6 +305,11 @@ final class XABranchTracker implements XAConnection {
 
         @Override
         public boolean isSameRM(XAResource xares) throws XAException {
+            // Comparison is branch work too: a transaction manager holding a
+            // resource captured from a retired session must get the pool's
+            // clean resource-manager-unavailable answer, not an arbitrary
+            // failure from the closed driver object.
+            refuseRetiredSession();
             // Two tracked resources are of the same resource manager exactly
             // when the resources underneath them are; an unwrapped resource
             // is compared against the driver's own object directly.
