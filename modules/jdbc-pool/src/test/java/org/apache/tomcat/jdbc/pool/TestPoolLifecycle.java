@@ -51,6 +51,10 @@ class TestPoolLifecycle {
     }
 
     @Nested
+    class FailedCleanerSchedule extends FailedCleanerScheduleBase {
+    }
+
+    @Nested
     class PoolSweeperSetters extends PoolSweeperSettersBase {
     }
 
