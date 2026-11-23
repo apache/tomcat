@@ -1001,7 +1001,12 @@ public class ConnectionPool {
             throw ex;
         }
 
-        closed = false;
+        // The closed flag starts false for a new object and is not reset here:
+        // a close performed while this initialization was running (from a
+        // subclass or a startup hook holding the pool reference) has already
+        // torn down the queues, cleaner, MBean and interceptor state, and
+        // overwriting that closure would leave a pool that says it is open
+        // over state that is gone.
     }
 
     /**
