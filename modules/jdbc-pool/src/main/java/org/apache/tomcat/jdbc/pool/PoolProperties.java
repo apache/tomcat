@@ -1191,6 +1191,17 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                         m = getClass().getMethod(name);
                     } catch (NoSuchMethodException nm) {
                         continue;
+                    } catch (Throwable x) {
+                        // A lookup failure other than the method being absent -
+                        // an access-control SecurityException, for instance - is
+                        // this field's failure, not the dump's: report it in the
+                        // field and keep printing the rest.
+                        ExceptionUtils.handleThrowable(x);
+                        buf.append(field);
+                        buf.append('=');
+                        appendError(buf, x);
+                        buf.append("; ");
+                        break;
                     }
                     buf.append(field);
                     buf.append('=');
@@ -1243,15 +1254,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                     } catch (ReflectiveOperationException | RuntimeException | Error x) {
                         Throwable cause = ExceptionUtils.unwrapInvocationTargetException(x);
                         ExceptionUtils.handleThrowable(cause);
-                        try {
-                            buf.append("<error: ").append(sanitizeForLog(String.valueOf(cause))).append('>');
-                        } catch (Throwable hostile) {
-                            // A Throwable whose own toString() throws must
-                            // cost only its own field, not every field after
-                            // it: fall back to its class name.
-                            ExceptionUtils.handleThrowable(hostile);
-                            buf.append("<error: ").append(cause.getClass().getName()).append('>');
-                        }
+                        appendError(buf, cause);
                     }
                     buf.append("; ");
                     break;
@@ -1286,6 +1289,27 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             return value;
         }
         return value.replace('\r', ' ').replace('\n', ' ');
+    }
+
+
+    /**
+     * Appends the failure of one configuration field to the dump, cost only to
+     * that field. A throwable whose own {@code toString()} throws falls back to
+     * its class name, so the failure cannot take the rest of the dump with it
+     * either.
+     *
+     * @param buf     the dump under construction
+     * @param failure the field's failure
+     */
+    private static void appendError(StringBuilder buf, Throwable failure) {
+        try {
+            buf.append("<error: ").append(sanitizeForLog(String.valueOf(failure))).append('>');
+        } catch (Throwable hostile) {
+            // A Throwable whose own toString() throws must cost only its own
+            // field, not every field after it: fall back to its class name.
+            ExceptionUtils.handleThrowable(hostile);
+            buf.append("<error: ").append(failure.getClass().getName()).append('>');
+        }
     }
 
 
