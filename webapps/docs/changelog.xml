@@ -130,6 +130,13 @@
         Expand the user name normalisation options available in the
         <code>LockOutRealm</code>. (markt)
       </fix>
+      <fix>
+        <bug>70375</bug>: Restore support for resource names that start with
+        <code>/</code> in <code>WebappClassLoaderBase.getResources()</code> and
+        <code>findResources()</code>, so that they find the same resources as
+        <code>getResource()</code> and <code>getResourceAsStream()</code>.
+        Pull request <pr>1269</pr> provided by Arturo Bernal.
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
