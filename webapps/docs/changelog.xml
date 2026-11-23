@@ -301,6 +301,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <add>
+        Revert pull request <pr>677</pr> which added request hints from JDBC
+        4.3, causing statement cache issues on many databases. (remm)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
