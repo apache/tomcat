@@ -153,6 +153,9 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     // Simple state machine (sequence of states)
     private final AtomicReference<ConnectionState> connectionState = new AtomicReference<>(ConnectionState.NEW);
     private volatile long pausedNanoTime = Long.MAX_VALUE;
+    // Set once the client's connection preface has been received. When the preface is read asynchronously, a call to
+    // upgradeDispatch() may be made before this is the case.
+    private volatile boolean prefaceReceived = false;
 
     /**
      * Remote settings are settings defined by the client and sent to Tomcat that Tomcat must use when communicating
@@ -316,8 +319,11 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         // Send the initial settings frame
         writeSettings();
 
-        // Make sure the client has sent a valid connection preface before we
-        // send the response to the original request over HTTP/2.
+        /*
+         * Make sure the client has sent a valid connection preface before we send the response to the original request
+         * over HTTP/2. Note that in the async case, the call below will return immediately and there will be a call
+         * back once the preface has been fully read.
+         */
         try {
             parser.readConnectionPreface(webConnection, stream);
         } catch (Http2Exception e) {
@@ -331,10 +337,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             log.trace(sm.getString("upgradeHandler.prefaceReceived", connectionId));
         }
 
-        // Allow streams and connection to determine timeouts
-        socketWrapper.setReadTimeout(-1);
-        socketWrapper.setWriteTimeout(-1);
-
         processConnection(webConnection, stream);
     }
 
@@ -345,6 +347,17 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
      * @param stream        the initial stream
      */
     protected void processConnection(WebConnection webConnection, Stream stream) {
+        /*
+         * The connection preface has been received. Allow streams and connection to determine timeouts.
+         *
+         * This must not be done before the preface has been received. If the preface is read asynchronously,
+         * init() returns before the preface has been received and the read and write timeouts must remain in place
+         * until it has.
+         */
+        socketWrapper.setReadTimeout(-1);
+        socketWrapper.setWriteTimeout(-1);
+        prefaceReceived = true;
+
         // Send a ping to get an idea of round trip time as early as possible
         try {
             pingManager.sendPing(true);
@@ -435,6 +448,19 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         try {
             switch (status) {
                 case OPEN_READ:
+                    if (!prefaceReceived) {
+                        /*
+                         * The connection preface is being read asynchronously (a direct HTTP/2 connection or a
+                         * connection that used ALPN) and has not been received yet. The read for it is already
+                         * pending and, once it has completed, frame processing will be started by a further call to
+                         * this method.
+                         *
+                         * Do not start reading frames now. Starting a read here would replace the read timeout that
+                         * applies while waiting for the preface.
+                         */
+                        result = SocketState.ASYNC_IO;
+                        break;
+                    }
                     socketWrapper.getLock().lock();
                     try {
                         if (socketWrapper.canWrite()) {
