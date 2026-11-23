@@ -585,7 +585,9 @@ public class ConnectionPool {
             // optimises per-request session handling knows the unit of work
             // begins here. The matching endRequest() is sent at the return,
             // in returnConnection().
-            invokeRequestHint(BEGIN_REQUEST, con.getConnection());
+            if (sendRequestHints(con)) {
+                invokeRequestHint(BEGIN_REQUEST, con.getConnection());
+            }
         } catch (Throwable x) {
             ExceptionUtils.handleThrowable(x);
             SQLException s = new SQLException();
@@ -678,6 +680,30 @@ public class ConnectionPool {
             // reasons likewise has none the pool may use.
             return null;
         }
+    }
+
+    /**
+     * Determines whether the JDBC 4.3 request boundary hints are sent for a pooled connection.
+     *
+     * @param con the pooled connection, with its interceptor chain already built
+     *
+     * @return {@code true} if the hints are enabled and no statement cache is part of the connection's interceptor
+     *             chain
+     */
+    private boolean sendRequestHints(PooledConnection con) {
+        if (!getPoolProperties().isUseRequestBoundaries()) {
+            return false;
+        }
+        // The driver may close the statements of a request in endRequest() - the behaviour of the hints is vendor
+        // specific - while a statement cache hands a statement of one borrow to the next borrow of the session.
+        JdbcInterceptor interceptor = con.getHandler();
+        while (interceptor != null) {
+            if (interceptor instanceof StatementCache) {
+                return false;
+            }
+            interceptor = interceptor.getNext();
+        }
+        return true;
     }
 
     /**
@@ -2224,7 +2250,9 @@ public class ConnectionPool {
                             // discarded instead of going back to the pool is
                             // not hinted; it is about to be closed, which
                             // subsumes the hint.
-                            invokeRequestHint(END_REQUEST, con.getConnection());
+                            if (sendRequestHints(con)) {
+                                invokeRequestHint(END_REQUEST, con.getConnection());
+                            }
                             if (isClosed()) {
                                 // The pool closed while this return was in
                                 // flight: the checks above each read the flag

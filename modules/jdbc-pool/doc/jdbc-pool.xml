@@ -584,6 +584,16 @@
           Default value is <code>false</code>.<br/>
       </p>
     </attribute>
+    <attribute name="useRequestBoundaries" required="false">
+      <p>(boolean) If <code>true</code>, the pool sends the JDBC 4.3 request boundary hints to the driver:
+          <code>Connection.beginRequest()</code> when a connection is borrowed and
+          <code>Connection.endRequest()</code> when it is returned. The behaviour of these hints is vendor specific
+          and some drivers close the statements created during the request in <code>endRequest()</code>, so the
+          hints are not sent for a connection that uses the <code>StatementCache</code> interceptor. Do not enable
+          this attribute if a custom interceptor or the application keeps statements across borrows.
+          Default value is <code>false</code>.<br/>
+      </p>
+    </attribute>
     <attribute name="commitOnReturn" required="false">
       <p>(boolean) If <code>autoCommit==false</code> then the pool can complete the transaction by calling commit on the connection as it is returned to the pool
           If <code>rollbackOnReturn==true</code> then this attribute is ignored.

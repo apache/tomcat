@@ -23,8 +23,13 @@ import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverPropertyInfo;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
@@ -36,7 +41,7 @@ import org.junit.jupiter.api.Test;
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 
 /**
- * The JDBC 4.3 request boundary hints: the pool is expected to call
+ * The JDBC 4.3 request boundary hints: when {@code useRequestBoundaries} is enabled, the pool is expected to call
  * {@code Connection.beginRequest()} on the physical connection as it hands
  * that connection to the application and {@code Connection.endRequest()}
  * as the application returns it, so a driver that optimises session
@@ -80,10 +85,17 @@ abstract class RequestBoundariesBase extends JdbcPoolBaseTest {
      */
     private DataSource hintCountingDataSource(Class<? extends Driver> driverClass)
             throws SQLException {
+        return hintCountingDataSource(driverClass, true, null);
+    }
+
+    private DataSource hintCountingDataSource(Class<? extends Driver> driverClass, boolean useRequestBoundaries,
+            String jdbcInterceptors) throws SQLException {
         BEGIN_REQUEST_COUNT.set(0);
         END_REQUEST_COUNT.set(0);
         DataSource ds = newDataSource();
         ds.setDriverClassName(driverClass.getName());
+        ds.getPoolProperties().setUseRequestBoundaries(useRequestBoundaries);
+        ds.getPoolProperties().setJdbcInterceptors(jdbcInterceptors);
         // start empty: no physical connection, so no pool-start traffic to
         // discount from the counts asserted below
         ds.getPoolProperties().setInitialSize(0);
@@ -122,6 +134,30 @@ abstract class RequestBoundariesBase extends JdbcPoolBaseTest {
     }
 
     @Test
+    void hintsAreNotSentByDefault() throws Exception {
+        assumeRequestHintsExist();
+        DataSource ds = hintCountingDataSource(HintCountingDriver.class, false, null);
+
+        try (@SuppressWarnings("unused") Connection con = ds.getConnection()) {
+            Assertions.assertEquals(0, BEGIN_REQUEST_COUNT.get(), "the hints are disabled by default");
+        }
+        Assertions.assertEquals(0, END_REQUEST_COUNT.get(), "the hints are disabled by default");
+    }
+
+    @Test
+    void hintsAreNotSentWithAStatementCache() throws Exception {
+        assumeRequestHintsExist();
+        DataSource ds = hintCountingDataSource(HintCountingDriver.class, true, "StatementCache");
+
+        try (@SuppressWarnings("unused") Connection con = ds.getConnection()) {
+            Assertions.assertEquals(0, BEGIN_REQUEST_COUNT.get(),
+                    "a cached statement outlives the request, so no request is started");
+        }
+        Assertions.assertEquals(0, END_REQUEST_COUNT.get(),
+                "a cached statement outlives the request, so no request is ended");
+    }
+
+    @Test
     void aDriverThatRefusesTheHintsNeitherFailsTheBorrowNorTheReturn() throws Exception {
         assumeRequestHintsExist();
         DataSource ds = hintCountingDataSource(FailingHintDriver.class);
@@ -142,6 +178,47 @@ abstract class RequestBoundariesBase extends JdbcPoolBaseTest {
         Assertions.assertEquals(1, poolSessions(),
                 "the refused hints must not have cost the pool its session");
     }
+
+    /*
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=70370
+     *
+     * The JDBC 4.3 hints leave the behaviour of endRequest() to the driver, and some drivers (e.g. the Microsoft SQL
+     * Server driver) close every statement created during the request. A statement parked by StatementCache outlives
+     * the request it was prepared in, so the next borrower must not be handed a statement the driver has closed.
+     */
+    @Test
+    void aStatementCacheSurvivesADriverThatClosesTheStatementsOfTheRequest() throws Exception {
+        doTestStatementCacheWithStatementClosingDriver(false);
+    }
+
+    @Test
+    void aStatementCacheSurvivesADriverThatClosesTheStatementsOfTheRequestWithHintsEnabled() throws Exception {
+        doTestStatementCacheWithStatementClosingDriver(true);
+    }
+
+    private void doTestStatementCacheWithStatementClosingDriver(boolean useRequestBoundaries) throws Exception {
+        assumeRequestHintsExist();
+        DataSource ds = newDataSource();
+        ds.setDriverClassName(StatementClosingDriver.class.getName());
+        ds.getPoolProperties().setUseRequestBoundaries(useRequestBoundaries);
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setJdbcInterceptors("StatementCache(prepared=true,callable=false,max=50)");
+        ds.createPool();
+
+        for (int i = 0; i < 3; i++) {
+            try (Connection con = ds.getConnection();
+                    PreparedStatement ps = con.prepareStatement("SELECT ?")) {
+                ps.setInt(1, i);
+                try (ResultSet rs = ps.executeQuery()) {
+                    Assertions.assertTrue(rs.next());
+                    Assertions.assertEquals(i, rs.getInt(1));
+                }
+            }
+        }
+        Assertions.assertEquals(1, poolSessions(), "all borrows ran on the same physical session");
+    }
+
 
     /**
      * Driver that counts the request boundary hints reaching the physical
@@ -213,6 +290,83 @@ abstract class RequestBoundariesBase extends JdbcPoolBaseTest {
             return true;
         }
     }
+
+    /**
+     * Driver that behaves like a driver whose endRequest() closes the statements created since beginRequest(), as the
+     * Microsoft SQL Server driver does. Configured through {@code driverClassName}, so it must stay a public static
+     * class with a no-arg constructor.
+     */
+    public static class StatementClosingDriver extends HintCountingDriver {
+
+        @Override
+        public Connection connect(String url, Properties info) throws SQLException {
+            Connection connection = new org.h2.Driver().connect(url, info);
+            if (connection == null) {
+                return null;
+            }
+            return (Connection) Proxy.newProxyInstance(
+                    StatementClosingDriver.class.getClassLoader(),
+                    new Class<?>[] { Connection.class },
+                    statementCloser(connection));
+        }
+    }
+
+    private static Object statementOf(Statement vendor, Class<?> type, Connection connection) {
+        return Proxy.newProxyInstance(StatementClosingDriver.class.getClassLoader(), new Class<?>[] { type },
+                new InvocationHandler() {
+                    @Override
+                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                        if ("getConnection".equals(method.getName())) {
+                            return connection;
+                        }
+                        try {
+                            return method.invoke(vendor, args);
+                        } catch (InvocationTargetException x) {
+                            throw x.getCause();
+                        }
+                    }
+                });
+    }
+
+    private static InvocationHandler statementCloser(Connection vendor) {
+        return new InvocationHandler() {
+            private List<Statement> requestStatements = null;
+
+            @Override
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                String name = method.getName();
+                if ("beginRequest".equals(name)) {
+                    if (requestStatements == null) {
+                        requestStatements = new ArrayList<>();
+                    }
+                    return null;
+                } else if ("endRequest".equals(name)) {
+                    if (requestStatements != null) {
+                        for (Statement statement : requestStatements) {
+                            statement.close();
+                        }
+                        requestStatements = null;
+                    }
+                    return null;
+                }
+                Object result;
+                try {
+                    result = method.invoke(vendor, args);
+                } catch (InvocationTargetException x) {
+                    throw x.getCause();
+                }
+                if (result instanceof Statement) {
+                    // A driver's statement answers getConnection() with the driver's connection, here the proxy
+                    result = statementOf((Statement) result, method.getReturnType(), (Connection) proxy);
+                    if (requestStatements != null) {
+                        requestStatements.add((Statement) result);
+                    }
+                }
+                return result;
+            }
+        };
+    }
+
 
     /*
      * Counts the two hint methods by name and delegates everything, the

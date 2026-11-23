@@ -1078,6 +1078,27 @@ public interface PoolConfiguration {
     boolean getRollbackOnReturn();
 
     /**
+     * Set to true if you want the connection pool to send the JDBC 4.3 request boundary hints to the driver:
+     * {@link java.sql.Connection#beginRequest()} when a connection is borrowed and
+     * {@link java.sql.Connection#endRequest()} when it is returned. The behaviour of these hints is vendor specific and
+     * some drivers close the statements created during the request in {@code endRequest()}, so the hints are never
+     * sent for a connection whose interceptor chain includes a
+     * {@link org.apache.tomcat.jdbc.pool.interceptor.StatementCache}. The hints are not sent on a runtime that
+     * predates JDBC 4.3. The default value is false.
+     *
+     * @param useRequestBoundaries set to true if the pool should send the request boundary hints
+     */
+    void setUseRequestBoundaries(boolean useRequestBoundaries);
+
+    /**
+     * Returns whether the pool sends the JDBC 4.3 request boundary hints. See
+     * {@link PoolConfiguration#setUseRequestBoundaries(boolean)} for details.
+     *
+     * @return {@code true} if the pool should send the request boundary hints
+     */
+    boolean isUseRequestBoundaries();
+
+    /**
      * Stores the value of the deprecated {@code useDisposableConnectionFacade} property. The pool always wraps the
      * connection handle in a facade that disallows use of the connection after {@link java.sql.Connection#close()} has
      * been called, whatever value is stored here.

@@ -181,6 +181,8 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     private volatile boolean commitOnReturn = false;
     /** Whether to rollback on connection return. */
     private volatile boolean rollbackOnReturn = false;
+    /** Whether to send the JDBC 4.3 request boundary hints. */
+    private volatile boolean useRequestBoundaries = false;
     /**
      * Whether to use a disposable connection facade.
      *
@@ -2286,6 +2288,16 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     @Override
     public boolean getRollbackOnReturn() {
         return this.rollbackOnReturn;
+    }
+
+    @Override
+    public void setUseRequestBoundaries(boolean useRequestBoundaries) {
+        this.useRequestBoundaries = useRequestBoundaries;
+    }
+
+    @Override
+    public boolean isUseRequestBoundaries() {
+        return this.useRequestBoundaries;
     }
 
     /**

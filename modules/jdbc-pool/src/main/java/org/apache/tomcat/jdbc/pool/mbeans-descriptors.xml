@@ -277,6 +277,12 @@
                     is="false"
              writeable="false"/>
 
+    <attribute    name="useRequestBoundaries"
+           description="If true the pool sends the JDBC 4.3 request boundary hints to the driver when a connection is borrowed and returned"
+                  type="java.lang.Boolean"
+                    is="true"
+             writeable="false"/>
+
     <attribute    name="commitOnReturn"
            description="If autoCommit==false then the pool can complete the transaction by calling commit on the connection as it is returned to the pool"
                   type="java.lang.Boolean"

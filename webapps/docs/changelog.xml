@@ -524,6 +524,15 @@
   <subsection name="jdbc-pool">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        <bug>70370</bug>: Only send the JDBC 4.3 request boundary hints when the
+        new <code>useRequestBoundaries</code> attribute is enabled, and never
+        for a connection that uses the <code>StatementCache</code> interceptor.
+        Some drivers, such as the Microsoft SQL Server driver, close the
+        statements created during a request when the request ends, so a
+        statement cached by <code>StatementCache</code> was closed before it
+        was used again. Pull request <pr>1268</pr> provided by Arturo Bernal.
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

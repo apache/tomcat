@@ -207,6 +207,9 @@ public class DataSourceFactory implements ObjectFactory {
     /** The {@code rollbackOnReturn} property name. */
     protected static final String PROP_ROLLBACKONRETURN = "rollbackOnReturn";
 
+    /** The {@code useRequestBoundaries} property name. */
+    protected static final String PROP_USEREQUESTBOUNDARIES = "useRequestBoundaries";
+
     /**
      * Property name for useDisposableConnectionFacade. The property is deprecated and has no effect; the disposable
      * connection facade is always used.
@@ -254,7 +257,7 @@ public class DataSourceFactory implements ObjectFactory {
             PROP_ABANDONWHENPERCENTAGEFULL, PROP_MAXAGE, PROP_USE_LOCK, PROP_DATASOURCE, PROP_DATASOURCE_JNDI,
             PROP_SUSPECT_TIMEOUT, PROP_ALTERNATE_USERNAME_ALLOWED, PROP_COMMITONRETURN, PROP_ROLLBACKONRETURN,
             PROP_USEDISPOSABLECONNECTIONFACADE, PROP_LOGVALIDATIONERRORS, PROP_PROPAGATEINTERRUPTSTATE,
-            PROP_IGNOREEXCEPTIONONPRELOAD, PROP_USESTATEMENTFACADE };
+            PROP_IGNOREEXCEPTIONONPRELOAD, PROP_USESTATEMENTFACADE, PROP_USEREQUESTBOUNDARIES };
 
     /**
      * Names of the reference addresses that the JNDI container itself places
@@ -914,6 +917,14 @@ public class DataSourceFactory implements ObjectFactory {
             Boolean b = parseBoolean(PROP_ROLLBACKONRETURN, value);
             if (b != null) {
                 poolProperties.setRollbackOnReturn(b.booleanValue());
+            }
+        }
+
+        value = properties.getProperty(PROP_USEREQUESTBOUNDARIES);
+        if (value != null) {
+            Boolean b = parseBoolean(PROP_USEREQUESTBOUNDARIES, value);
+            if (b != null) {
+                poolProperties.setUseRequestBoundaries(b.booleanValue());
             }
         }
 

@@ -1589,6 +1589,16 @@ public class DataSourceProxy implements PoolConfiguration {
         return getPoolProperties().getRollbackOnReturn();
     }
 
+    @Override
+    public void setUseRequestBoundaries(boolean useRequestBoundaries) {
+        getPoolProperties().setUseRequestBoundaries(useRequestBoundaries);
+    }
+
+    @Override
+    public boolean isUseRequestBoundaries() {
+        return getPoolProperties().isUseRequestBoundaries();
+    }
+
     /**
      * {@inheritDoc}
      *

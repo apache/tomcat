@@ -679,6 +679,7 @@ abstract class AbortEndsTheBorrowBase extends JdbcPoolBaseTest {
         DataSource ds = newDataSource();
         ds.setDriverClassName(SpecAbortDriver.class.getName());
         ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setUseRequestBoundaries(true);
         ds.getPoolProperties().setJdbcInterceptors(
                 DisconnectRecordingInterceptor.class.getName());
         ds.createPool();
