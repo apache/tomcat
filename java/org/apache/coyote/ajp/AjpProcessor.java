@@ -625,6 +625,8 @@ public class AjpProcessor extends AbstractProcessor {
 
         // Request more data immediately
         if (!waitingForBodyMessage) {
+            // Make sure the non-blocking write buffer is empty before sending the get body chunk message.
+            socketWrapper.flush(true);
             socketWrapper.write(true, getBodyMessageArray, 0, getBodyMessageArray.length);
             socketWrapper.flush(true);
             waitingForBodyMessage = true;
@@ -1037,11 +1039,13 @@ public class AjpProcessor extends AbstractProcessor {
         // Calling code should ensure that there is no data in the buffers for
         // non-blocking writes.
         if (!responseFinished && getErrorState().isIoAllowed()) {
+            // Make sure the non-blocking write buffer is empty before sending the flush message.
+            socketWrapper.flush(true);
             if (protocol.getAjpFlush()) {
                 // Send the flush message
                 socketWrapper.write(true, flushMessageArray, 0, flushMessageArray.length);
+                socketWrapper.flush(true);
             }
-            socketWrapper.flush(true);
         }
     }
 
