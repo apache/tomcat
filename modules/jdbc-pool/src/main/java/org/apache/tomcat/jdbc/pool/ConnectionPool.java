@@ -1667,6 +1667,16 @@ public class ConnectionPool {
         boolean error = false;
         try {
             con.lock();
+            // A closed pool must not open a new physical session: the borrow
+            // loop's previous pass can observe the closure only through the
+            // connection it was setting up, and the slot it reserved for this
+            // creation would then be spent on a full connect against a pool
+            // that has already shut down - a connect that can block against a
+            // hung database. The check after the connect below stays for a
+            // close that lands during the call itself.
+            if (isClosed()) {
+                throw new SQLException(MessageFactory.get("connectionPool.poolClosed"));
+            }
             con.connect();
             if (isClosed()) {
                 // The pool was closed while this physical connection was
