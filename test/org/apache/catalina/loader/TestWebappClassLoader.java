@@ -256,6 +256,9 @@ public class TestWebappClassLoader extends TomcatBaseTest {
         Enumeration<URL> urls = cl.findResources("/org/apache/tomcat/Bug58096.java");
         Assert.assertNotNull(urls);
 
+        // Consistent with findResource()
+        Assert.assertTrue(urls.hasMoreElements());
+        Assert.assertEquals(cl.findResource("/org/apache/tomcat/Bug58096.java"), urls.nextElement());
         Assert.assertFalse(urls.hasMoreElements());
     }
 
@@ -270,6 +273,9 @@ public class TestWebappClassLoader extends TomcatBaseTest {
         Enumeration<URL> urls = cl.getResources("/org/apache/tomcat/Bug58096.java");
         Assert.assertNotNull(urls);
 
+        // Consistent with getResource()
+        Assert.assertTrue(urls.hasMoreElements());
+        Assert.assertEquals(cl.getResource("/org/apache/tomcat/Bug58096.java"), urls.nextElement());
         Assert.assertFalse(urls.hasMoreElements());
     }
 }
