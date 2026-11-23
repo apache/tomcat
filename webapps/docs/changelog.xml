@@ -236,6 +236,11 @@
         that is in asynchronous mode are released if the connection thread
         raises a stream error for that stream. (markt)
       </fix>
+      <fix>
+        When using HTTP/2 with asynchronous IO, apply the configured read and
+        write timeouts while waiting for the client to send the HTTP/2
+        connection preface. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
