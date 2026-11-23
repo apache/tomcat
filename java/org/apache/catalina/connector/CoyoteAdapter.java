@@ -238,10 +238,20 @@ public class CoyoteAdapter implements Adapter {
             }
 
             if (request.isAsyncDispatching()) {
-                connector.getService().getContainer().getPipeline().getFirst().invoke(request, response);
-                if (response.isError()) {
+                try {
+                    connector.getService().getContainer().getPipeline().getFirst().invoke(request, response);
                     Throwable t = (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
-                    asyncConImpl.setErrorState(t, true);
+                    /*
+                     * An error response does not start async error handling if the listeners have already been
+                     * notified that the dispatch completed the async processing, or if it has no exception and the
+                     * dispatch started a new async cycle and ended it with complete() or dispatch() (BZ 70362).
+                     */
+                    if (response.isError() && !asyncConImpl.isCompletedByDispatch() &&
+                            (t != null || !(request.isAsyncCompleting() || request.isAsyncDispatching()))) {
+                        asyncConImpl.setErrorState(t, true);
+                    }
+                } finally {
+                    asyncConImpl.fireDeferredOnComplete();
                 }
             }
 
