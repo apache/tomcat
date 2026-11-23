@@ -699,19 +699,26 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         // when this string named the key - DataSourceFactory injects the
         // configured username/password over the string's pairs, so a
         // reconfigure that drops the keys from the string must not strip
-        // credentials the configuration still carries. With the field unset
-        // this parse re-asserts nothing and the entry is the string's own
-        // again. The entry can also be missing here although the string names
-        // the key, because clearing a credential takes the entry away whatever
-        // contributed it; this parse hands the pair back - writing the string
-        // is a fresh declaration of what it contributes.
+        // credentials the configuration still carries. The rule covers every
+        // spelling of the credential, as the credential setters themselves do:
+        // a pass, pwd, PASSWORD or USER pair the string carries must not
+        // survive next to the canonical entry the field sets, or a driver that
+        // recognizes one of those aliases can authenticate with the superseded
+        // value. With the field unset this parse re-asserts nothing and the
+        // entry is the string's own again. The entry can also be missing here
+        // although the string names the key, because clearing a credential
+        // takes the entry away whatever contributed it; this parse hands the
+        // pair back - writing the string is a fresh declaration of what it
+        // contributes.
+        dbProperties = writable;
         if (username != null) {
-            writable.setProperty(PoolUtilities.PROP_USER, username);
+            removeUsernameDbProperties(false);
+            dbProperties.setProperty(PoolUtilities.PROP_USER, username);
         }
         if (password != null) {
-            writable.setProperty(PoolUtilities.PROP_PASSWORD, password);
+            removeCredentialDbProperties(false);
+            dbProperties.setProperty(PoolUtilities.PROP_PASSWORD, password);
         }
-        dbProperties = writable;
         connectionPropertyKeys = keys;
     }
 
@@ -900,7 +907,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             return;
         }
         for (String key : allPropertyKeys(props)) {
-            if (PoolUtilities.PROP_USER.equalsIgnoreCase(key.trim())) {
+            if (PoolUtilities.isUsernameKey(key)) {
                 removeDbProperty(key);
                 if (warnStringEntries) {
                     warnStringStillNamesCredential(key);
