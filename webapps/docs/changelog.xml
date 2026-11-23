@@ -241,6 +241,11 @@
         write timeouts while waiting for the client to send the HTTP/2
         connection preface. (markt)
       </fix>
+      <fix>
+        Ensure that the non-blocking write buffer is empty before sending an AJP
+        get body chunk message or flush message so that the messages cannot be
+        written part way through a response body message. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
