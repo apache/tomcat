@@ -35,9 +35,8 @@ import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
 /**
  * A close can set the pooled connection's released flag and begin the physical close while a borrow is still in
  * {@link ConnectionPool#setupConnection(PooledConnection)}. The setup used to finish building a handle from that
- * released connection, and the only thing that failed such a borrow on a current JDK was the JDBC 4.3 beginRequest hint
- * receiving the nulled physical connection by accident; where that hint is absent or the physical close has not nulled
- * the field yet, the caller received an inert handle instead of an {@link SQLException}.
+ * released connection and hand the caller an inert handle instead of an {@link SQLException}; it must now fail the
+ * borrow whenever the connection it is setting up has been released.
  */
 abstract class SetupVsCloseRaceBase extends JdbcPoolBaseTest {
 

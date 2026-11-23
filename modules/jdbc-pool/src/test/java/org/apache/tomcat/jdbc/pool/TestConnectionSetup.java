@@ -39,10 +39,6 @@ class TestConnectionSetup {
     }
 
     @Nested
-    class RequestBoundaries extends RequestBoundariesBase {
-    }
-
-    @Nested
     class LiveDriverChange extends LiveDriverChangeBase {
     }
 

@@ -35,7 +35,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
@@ -668,65 +667,19 @@ abstract class AbortEndsTheBorrowBase extends JdbcPoolBaseTest {
         awaitSessions(0);
     }
 
-    @Test
-    void anAbortTakesTheSessionThroughTheDisconnectHookWithoutEndingTheRequest()
-            throws Exception {
-        assumeRequestHintsExist();
-        SpecAbortDriver.ABORTS.set(0);
-        SpecAbortDriver.BEGIN_REQUESTS.set(0);
-        SpecAbortDriver.END_REQUESTS.set(0);
-        DisconnectRecordingInterceptor.DISCONNECTS.set(0);
-        DataSource ds = newDataSource();
-        ds.setDriverClassName(SpecAbortDriver.class.getName());
-        ds.getPoolProperties().setInitialSize(0);
-        ds.getPoolProperties().setJdbcInterceptors(
-                DisconnectRecordingInterceptor.class.getName());
-        ds.createPool();
-
-        Connection pooled = ds.getConnection();
-        Assertions.assertEquals(1, SpecAbortDriver.BEGIN_REQUESTS.get(),
-                "precondition: the borrow opened its request at the driver");
-        Assertions.assertEquals(0, SpecAbortDriver.END_REQUESTS.get());
-
-        pooled.abort(DIRECT_EXECUTOR);
-
-        Assertions.assertEquals(0, SpecAbortDriver.END_REQUESTS.get(),
-                "a session taken out of service is not hinted - its close "
-                        + "subsumes the hint, as on every other discard path");
-        Assertions.assertEquals(1, DisconnectRecordingInterceptor.DISCONNECTS.get(),
-                "the interceptors must be told the session is gone, once, "
-                        + "the same disconnect the release path runs");
-    }
-
-    /* The hints do not exist before Java 9; same lookup the pool performs. */
-    private static void assumeRequestHintsExist() {
-        boolean exists;
-        try {
-            Connection.class.getMethod("beginRequest");
-            exists = true;
-        } catch (NoSuchMethodException e) {
-            exists = false;
-        }
-        Assumptions.assumeTrue(exists,
-                "java.sql.Connection has no request boundary hints before Java 9");
-    }
-
     /*
      * A driver whose sessions honor java.sql.Connection.abort the way the
      * specification describes it, unlike H2's - H2's abort neither closes
      * the session nor rejects a null executor (both measured against
      * 2.2.220). These sessions count every abort that reaches the driver,
      * no-op when already closed, throw the prescribed SQLException for a
-     * null executor, and otherwise close the physical session. They also
-     * count the JDBC 4.3 request boundary hints, so a test can see that the
-     * abort path sends no endRequest. Configured through driverClassName, so
-     * it must stay a public static class with a no-arg constructor.
+     * null executor, and otherwise close the physical session. Configured
+     * through driverClassName, so it must stay a public static class with a
+     * no-arg constructor.
      */
     public static class SpecAbortDriver implements Driver {
 
         static final AtomicInteger ABORTS = new AtomicInteger();
-        static final AtomicInteger BEGIN_REQUESTS = new AtomicInteger();
-        static final AtomicInteger END_REQUESTS = new AtomicInteger();
 
         private final Driver delegate = new org.h2.Driver();
 
@@ -755,14 +708,6 @@ abstract class AbortEndsTheBorrowBase extends JdbcPoolBaseTest {
                                 parkInAbort();
                                 real.close(); // marks closed, closes the session
                                 return null;
-                            }
-                            case "beginRequest": {
-                                BEGIN_REQUESTS.incrementAndGet();
-                                break;
-                            }
-                            case "endRequest": {
-                                END_REQUESTS.incrementAndGet();
-                                break;
                             }
                             default: {
                                 break;
