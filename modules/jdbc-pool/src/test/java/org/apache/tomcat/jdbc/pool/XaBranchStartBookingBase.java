@@ -146,6 +146,8 @@ abstract class XaBranchStartBookingBase {
                 tracker.getXAResource()::getTransactionTimeout));
         assertRetired(Assertions.assertThrows(XAException.class,
                 () -> tracker.getXAResource().setTransactionTimeout(10)));
+        assertRetired(Assertions.assertThrows(XAException.class,
+                () -> tracker.getXAResource().isSameRM(resource)));
         Assertions.assertEquals(0, delegateCalls.get(),
                 "none of the retired-session calls may reach the closed driver resource");
     }
