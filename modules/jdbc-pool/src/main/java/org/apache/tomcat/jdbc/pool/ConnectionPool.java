@@ -1174,8 +1174,22 @@ public class ConnectionPool {
             // stay registered on the shared timer with no reference left to
             // stop it, duplicating maintenance work for the pool's lifetime
             terminatePoolCleaner();
-            poolCleaner = new PoolCleaner(this, properties.getTimeBetweenEvictionRunsMillis());
-            poolCleaner.start();
+            PoolCleaner cleaner = new PoolCleaner(this, properties.getTimeBetweenEvictionRunsMillis());
+            try {
+                cleaner.start();
+            } catch (RuntimeException x) {
+                // A task whose schedule was refused must not stay in the
+                // registry or be published as the pool's cleaner: a non-null
+                // poolCleaner would tell reconcilePoolCleaner that a task of
+                // this interval is running, so the pool would silently lose
+                // its maintenance until close or a different interval was
+                // configured. Leaving the field null makes the next
+                // reconciliation retry.
+                cleaner.stopRunning();
+                throw x;
+            }
+            // Publish only a task that was actually registered
+            poolCleaner = cleaner;
         }
     }
 
