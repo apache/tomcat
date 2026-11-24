@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -229,7 +230,7 @@ abstract class InitialSizeBelowZeroBase extends JdbcPoolBaseTest {
      * that never learns to run.
      */
     @Test
-    void aNegativeInitialSizeStoredWhileThePoolIsBeingBuiltDoesNotAbortTheCreation() throws Exception {
+    void anInitialSizeWriteRacingTheConstructionIsRejected() throws Exception {
         LifecycleInterceptor.started.set(0);
         LifecycleInterceptor.closed.set(0);
         DataSource ds = new DataSource();
@@ -249,6 +250,7 @@ abstract class InitialSizeBelowZeroBase extends JdbcPoolBaseTest {
 
         CountDownLatch release = new CountDownLatch(1);
         CountDownLatch finished = new CountDownLatch(1);
+        AtomicReference<Throwable> writeFailure = new AtomicReference<>();
         properties.release = release;
         properties.finished = finished;
         Thread racer = new Thread(() -> {
@@ -258,8 +260,13 @@ abstract class InitialSizeBelowZeroBase extends JdbcPoolBaseTest {
                 Thread.currentThread().interrupt();
                 return;
             }
-            ds.setInitialSize(-1);
-            finished.countDown();
+            try {
+                ds.setInitialSize(-1);
+            } catch (Throwable x) {
+                writeFailure.set(x);
+            } finally {
+                finished.countDown();
+            }
         }, "store-during-construction");
         racer.setDaemon(true);
         racer.start();
@@ -268,16 +275,17 @@ abstract class InitialSizeBelowZeroBase extends JdbcPoolBaseTest {
         ds.createPool();
         racer.join(TimeUnit.SECONDS.toMillis(10));
 
-        Assertions.assertEquals(0, ds.getPoolProperties().getInitialSize(),
-                "the pool must bound a pre-load count that raced in after the construction check, "
-                        + "not die on it");
+        Assertions.assertInstanceOf(UnsupportedOperationException.class, writeFailure.get(),
+                "a write to the pre-load count must be rejected while the pool is being built");
+        Assertions.assertEquals(1, ds.getPoolProperties().getInitialSize(),
+                "a rejected write must leave the configured pre-load count untouched");
         Assertions.assertEquals(1, LifecycleInterceptor.started.get(),
                 "precondition: the pool's interceptors were told it started");
         Assertions.assertEquals(0, LifecycleInterceptor.closed.get(),
                 "a pool that is running has not been closed");
         try (Connection pooled = ds.getConnection()) {
             Assertions.assertTrue(pooled.isValid(1),
-                    "a pool whose pre-load count arrived negative mid-creation still hands out sessions");
+                    "a pool whose pre-load write was refused still hands out sessions");
         }
         ds.close();
         Assertions.assertEquals(1, LifecycleInterceptor.closed.get(),

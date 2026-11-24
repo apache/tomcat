@@ -522,6 +522,18 @@ public class DataSourceFactory implements ObjectFactory {
                                 "dataSourceFactory.invalidTransactionIsolation", trimmed,
                                 PROP_DEFAULTTRANSACTIONISOLATION), e);
                     }
+                    if (level != Connection.TRANSACTION_NONE
+                            && level != Connection.TRANSACTION_READ_UNCOMMITTED
+                            && level != Connection.TRANSACTION_READ_COMMITTED
+                            && level != Connection.TRANSACTION_REPEATABLE_READ
+                            && level != Connection.TRANSACTION_SERIALIZABLE) {
+                        // A number the driver will refuse at connection time
+                        // fails the lookup here, naming the property, rather
+                        // than being stored and failing every connect later.
+                        throw new IllegalArgumentException(MessageFactory.get(
+                                "dataSourceFactory.invalidTransactionIsolation", trimmed,
+                                PROP_DEFAULTTRANSACTIONISOLATION));
+                    }
                 }
                 poolProperties.setDefaultTransactionIsolation(level);
             }

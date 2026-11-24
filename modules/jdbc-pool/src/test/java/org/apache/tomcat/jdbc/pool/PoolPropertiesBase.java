@@ -665,6 +665,20 @@ abstract class PoolPropertiesBase {
     }
 
     @Test
+    void interceptorPropertyParsersAcceptTrimmedAndMixedCaseValues() {
+        PoolProperties.InterceptorProperty bool =
+                new PoolProperties.InterceptorProperty("flag", " TRUE ");
+        Assertions.assertTrue(bool.getValueAsBoolean(false),
+                "a boolean property must be case-insensitive and tolerate whitespace");
+
+        PoolProperties.InterceptorProperty number =
+                new PoolProperties.InterceptorProperty("size", " 42 ");
+        Assertions.assertEquals(42, number.getValueAsInt(-1),
+                "a numeric property must tolerate surrounding whitespace");
+        Assertions.assertEquals(42L, number.getValueAsLong(-1L));
+    }
+
+    @Test
     void blankConnectionPropertiesNormalizeToNull() {
         PoolProperties properties = new PoolProperties();
         properties.setConnectionProperties("keep=yes");

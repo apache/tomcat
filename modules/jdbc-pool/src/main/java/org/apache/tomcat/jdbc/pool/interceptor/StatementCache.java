@@ -213,7 +213,8 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
      */
     private void warnInvalidBoolean(String name, InterceptorProperty property, boolean current) {
         String value = property.getValue();
-        if (value != null && !"true".equals(value) && !"false".equals(value)) {
+        if (value != null && !"true".equalsIgnoreCase(value.trim())
+                && !"false".equalsIgnoreCase(value.trim())) {
             log.warn(MessageFactory.get("interceptor.invalidBooleanProperty", name, value,
                     Boolean.valueOf(current)));
         }
@@ -231,7 +232,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
         String value = property.getValue();
         if (value != null) {
             try {
-                Integer.parseInt(value);
+                Integer.parseInt(value.trim());
             } catch (NumberFormatException x) {
                 log.warn(MessageFactory.get("interceptor.invalidIntegerProperty", name, value,
                         Integer.valueOf(current)));
