@@ -3414,6 +3414,12 @@ public class ConnectionPool {
                 // The pool closed and cancelled the queued poll.
                 done = true;
                 throw x;
+            } catch (InterruptedException x) {
+                // The queue waiter deregisters and fails itself when its
+                // caller is interrupted; no setup has claimed a connection
+                // here, so the future is complete from this caller's side.
+                done = true;
+                throw x;
             }
             if (pc != null) {
                 // A result the setup has already published belongs to the caller that takes

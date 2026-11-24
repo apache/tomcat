@@ -602,6 +602,32 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
             return true;
         }
 
+        /**
+         * Deregisters this future's waiter after its waiting caller was interrupted. A waiter left registered would
+         * consume the next offered item into a latch nobody retrieves, starving the borrower that comes after it. When
+         * an item has already been committed to the latch the future is complete and keeps it for a later retrieval;
+         * a cancelled future has already been deregistered by {@link #cancel(boolean)}.
+         */
+        private void abandonWaiterAfterInterrupt() {
+            final ReentrantLock lock = FairBlockingQueue.this.lock;
+            boolean wake = false;
+            lock.lock();
+            try {
+                if (latch.getItem() == null && !canceled) {
+                    waiters.remove(latch);
+                    abandoned = true;
+                    wake = true;
+                }
+            } finally {
+                lock.unlock();
+            }
+            if (wake) {
+                // Wake any other caller blocked on this latch so it observes
+                // the abandonment instead of waiting forever.
+                latch.countDown();
+            }
+        }
+
         @Override
         public T get() throws InterruptedException, ExecutionException {
             if (item != null) {
@@ -613,7 +639,12 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
                 if (abandoned) {
                     throw abandonedFailure();
                 }
-                latch.await();
+                try {
+                    latch.await();
+                } catch (InterruptedException x) {
+                    abandonWaiterAfterInterrupt();
+                    throw x;
+                }
                 // The latch is counted down by the offer() that hands over
                 // the item, by cancel(), or by a timed get() call that
                 // abandoned this future - check for each of them
@@ -641,7 +672,13 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
                 if (abandoned) {
                     throw abandonedTimeout();
                 }
-                boolean timedout = !latch.await(timeout, unit);
+                boolean timedout;
+                try {
+                    timedout = !latch.await(timeout, unit);
+                } catch (InterruptedException x) {
+                    abandonWaiterAfterInterrupt();
+                    throw x;
+                }
                 if (canceled) {
                     throw new CancellationException();
                 }
