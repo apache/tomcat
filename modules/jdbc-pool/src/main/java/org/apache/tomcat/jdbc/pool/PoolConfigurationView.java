@@ -29,11 +29,24 @@ import java.util.Properties;
  * seeing the values their setters stored. A write is applied to a private candidate copy of that builder, then handed
  * to the pool's single {@link ConnectionPool#applyConfigurationChange(PoolConfiguration)} path, which validates and
  * corrects the candidate, adopts it as the builder and publishes the immutable snapshot the connect and credential
- * paths read. Operational readers therefore never observe the requested value before it has been validated. A mutable
- * value handed out by a getter is a copy: changing it does not reconfigure the pool.
+ * paths read. Operational readers therefore never observe the requested value before it has been validated.
  * <p>
- * Start-time properties are rejected by the bean and JMX setters; a direct write here changes only the reported
- * value, not the pool shape already fixed at creation.
+ * {@link #toString()} renders the published snapshot rather than the live builder, so a write that has just replaced
+ * the builder can briefly show a different configuration through {@code toString()} than through the getters.
+ * <p>
+ * The mutable collections handed out by getters are copies: changing the returned database properties or interceptor
+ * definitions does not reconfigure the pool. {@link PoolConfiguration#getDataSource()} and
+ * {@link PoolConfiguration#getValidator()} return the configured objects themselves, because they are runtime objects
+ * rather than configuration values.
+ * <p>
+ * The programmatic getters answer from the live configuration and return raw values, including credentials. The bean
+ * and JMX surfaces that publish this configuration separately mask those values for display. This view is therefore a
+ * trusted programmatic API, not a display surface; code that crosses a security boundary should use the masked bean or
+ * JMX accessors.
+ * <p>
+ * Start-time properties are rejected by the bean and JMX setters; a direct write here changes only the reported value,
+ * not the pool shape already fixed at creation. A live {@code jdbcInterceptors} write through this view is accepted
+ * and affects chains built for later borrows; the pool's JMX MBean refuses that attribute instead.
  */
 final class PoolConfigurationView {
 

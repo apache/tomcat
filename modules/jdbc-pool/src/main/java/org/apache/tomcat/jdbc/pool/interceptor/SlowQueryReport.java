@@ -908,9 +908,11 @@ public class SlowQueryReport extends AbstractQueryReport {
 
         static final String[] FIELD_DESCRIPTIONS = new String[] { "The SQL query",
                 "The number of query invocations, a call to executeXXX",
-                "The longest time for this query in milliseconds, 0 while no execution has been recorded yet",
+                "The longest time for this query in milliseconds, 0 while no execution has been recorded yet "
+                        + "in this composite view (the Java getter returns Long.MIN_VALUE until then)",
                 "The time and date for when the longest query took place",
-                "The shortest time for this query in milliseconds, 0 while no execution has been recorded yet",
+                "The shortest time for this query in milliseconds, 0 while no execution has been recorded yet "
+                        + "in this composite view (the Java getter returns Long.MAX_VALUE until then)",
                 "The time and date for when the shortest query took place",
                 "The total amount of milliseconds spent executing this query", "The number of failures for this query",
                 "The number of times this query was prepared (prepareStatement/prepareCall)",
