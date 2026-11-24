@@ -25,6 +25,7 @@ import java.security.PrivilegedAction;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.HashSet;
@@ -183,6 +184,26 @@ public class ConnectionPool {
      */
     private final Set<PoolProperties.InterceptorDefinition> chainDefinitions =
             ConcurrentHashMap.newKeySet();
+
+    /**
+     * Serializes the interceptor start callbacks with the pool's close notifications. A close performed from a start
+     * callback re-enters this monitor on the same thread; a close running on another thread waits until the callback
+     * returns, so no later start can run after its close.
+     */
+    private final Object interceptorStartLock = new Object();
+
+    /**
+     * Whether {@link #init(PoolConfiguration)} is still establishing the pool. A close during initialization must only
+     * notify the interceptors that have actually been told about the start; the current interceptor list and chains
+     * may contain definitions that have not run {@code poolStarted} yet.
+     */
+    private volatile boolean initializing = false;
+
+    /**
+     * Number of leading entries of {@link #startedInterceptors} whose start callback has been invoked (a callback
+     * that fails or closes during its own run counts as invoked, so its partial state is released).
+     */
+    private volatile int startedInterceptorCount = 0;
 
     /**
      * Since newProxyInstance performs the same operation, over and over again, it is much more optimized if we simply
@@ -826,31 +847,54 @@ public class ConnectionPool {
         // definitions from the start come first, then the current list, then
         // the definitions the connection chains were actually built from, so a
         // definition added or removed after the start is still covered.
+        //
+        // A close that lands while the pool is still being initialized must
+        // only tell the definitions whose start callback has already run, and
+        // must not tell definitions in the current list that have not started:
+        // initialization stops at the close, and a later start callback must
+        // not register state that this close has already been delivered past.
+        // The same monitor serializes the start callbacks, so an external close
+        // waits for a running callback and no new start can slip in afterwards.
+        boolean closingDuringInit = initializing;
         PoolProperties.InterceptorDefinition[] started = startedInterceptors;
-        if (started != null) {
-            for (int i = 0; i < started.length; i++) {
+        int startedLimit = started == null ? 0
+                : (closingDuringInit ? Math.min(startedInterceptorCount, started.length) : started.length);
+        // The definitions actually told during a close that interrupted the
+        // start are only the prefix of startedInterceptors, not the complete
+        // parsed array: later entries have not run and must not suppress the
+        // notification of a chain definition that happened to use the same
+        // configuration.
+        PoolProperties.InterceptorDefinition[] toldStarted = closingDuringInit && started != null
+                ? Arrays.copyOf(started, startedLimit) : started;
+        synchronized (interceptorStartLock) {
+            for (int i = 0; i < startedLimit; i++) {
                 informInterceptorOfPoolClosure(started[i]);
             }
-        }
-        PoolProperties.InterceptorDefinition[] proxies;
-        try {
-            proxies = poolProperties.getJdbcInterceptorsAsArray();
-        } catch (Throwable x) {
-            // A malformed list must not abort the close or skip the
-            // notifications already recorded.
-            ExceptionUtils.handleThrowable(x);
-            log.warn(MessageFactory.get("connectionPool.unableToParseInterceptorChain"),
-                    PoolUtilities.maskCredentials(x));
-            proxies = new PoolProperties.InterceptorDefinition[0];
-        }
-        for (int i = 0; i < proxies.length; i++) {
-            if (!isToldAlready(proxies[i], started)) {
-                informInterceptorOfPoolClosure(proxies[i]);
+            PoolProperties.InterceptorDefinition[] proxies = new PoolProperties.InterceptorDefinition[0];
+            if (!closingDuringInit) {
+                try {
+                    proxies = poolProperties.getJdbcInterceptorsAsArray();
+                } catch (Throwable x) {
+                    // A malformed list must not abort the close or skip the
+                    // notifications already recorded.
+                    ExceptionUtils.handleThrowable(x);
+                    log.warn(MessageFactory.get("connectionPool.unableToParseInterceptorChain"),
+                            PoolUtilities.maskCredentials(x));
+                }
+                for (int i = 0; i < proxies.length; i++) {
+                    if (!isToldAlready(proxies[i], toldStarted)) {
+                        informInterceptorOfPoolClosure(proxies[i]);
+                    }
+                }
             }
-        }
-        for (PoolProperties.InterceptorDefinition chainDefinition : chainDefinitions) {
-            if (!isToldAlready(chainDefinition, started) && !isToldAlready(chainDefinition, proxies)) {
-                informInterceptorOfPoolClosure(chainDefinition);
+            // Chain definitions were actually used even if they were not in
+            // the start list (a chain can be built while initialization is
+            // still running), so a close during initialization must release
+            // them too.
+            for (PoolProperties.InterceptorDefinition chainDefinition : chainDefinitions) {
+                if (!isToldAlready(chainDefinition, toldStarted) && !isToldAlready(chainDefinition, proxies)) {
+                    informInterceptorOfPoolClosure(chainDefinition);
+                }
             }
         }
     }
@@ -943,143 +987,186 @@ public class ConnectionPool {
      */
     protected void init(PoolConfiguration properties) throws SQLException {
         mutableConfiguration = properties;
-
-        // Make sure the pool is properly configured
-        checkPoolConfiguration(properties);
-
-        // Take the immutable snapshot the connect and credential paths read,
-        // and publish the live view the rest of the pool and the management
-        // surfaces use. The builder stays mutable for compatibility; the
-        // snapshot is replaced atomically by the apply path.
-        configurationSnapshot = copyConfiguration(properties);
-        configurationView = PoolConfigurationView.create(this);
-        poolProperties = configurationView;
-
-        // Record the name this pool starts under before its MBean or the
-        // interceptors are told about the pool, so that everything the start
-        // registers under the name and everything a later lookup of it
-        // resolves through one record (see the field).
-        registrationName = properties.getPoolName();
-
-        // Both queues are unbounded by design: membership is bounded by the
-        // maxActive/size bookkeeping, not by queue capacity.
-        busy = new LinkedBlockingQueue<>();
-        if (properties.isFairQueue()) {
-            idle = new FairBlockingQueue<>();
-        } else {
-            idle = new LinkedBlockingQueue<>();
-        }
-
-        if (this.poolProperties.isJmxEnabled()) {
-            createMBean();
-        }
-
-        // Parse the interceptor definitions and tell a throwaway instance of
-        // each that the pool has started. These instances get no connection.
-        PoolProperties.InterceptorDefinition[] proxies = poolProperties.getJdbcInterceptorsAsArray();
-        startedInterceptors = proxies;
-        for (int i = 0; i < proxies.length; i++) {
-            try {
-                if (log.isDebugEnabled()) {
-                    log.debug("Creating interceptor instance of class:" + proxies[i].getInterceptorClass());
-                }
-                JdbcInterceptor interceptor = proxies[i].getInterceptorClass().getConstructor().newInstance();
-                interceptor.setProperties(proxies[i].getProperties());
-                interceptor.poolStarted(this);
-            } catch (Throwable x) {
-                ExceptionUtils.handleThrowable(ExceptionUtils.unwrapInvocationTargetException(x));
-                log.error(MessageFactory.get("connectionPool.unableToInformInterceptorOfPoolStart"),
-                        PoolUtilities.maskCredentials(x));
-                org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = jmxPool;
-                if (jmx != null) {
-                    jmx.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.NOTIFY_INIT, getStackTrace(x));
-                }
-                close(true);
-                SQLException ex = new SQLException();
-                ex.initCause(x);
-                throw ex;
-            }
-        }
-        // Every interceptor class has now been loaded and instantiated above,
-        // so the parsed definitions can be compared against each other. The
-        // relative order of two interceptors in the chain is not something a
-        // single interceptor can see; only the pool holds the ordered list.
-        checkInterceptorOrder(proxies);
-
-        // The startup callbacks above can still change the builder while the
-        // pool is not published. Take that final startup state before the
-        // pre-load and the cleaner read the configuration.
-        checkPoolConfiguration(properties);
-        configurationSnapshot = copyConfiguration(properties);
-        poolProperties = configurationView;
-
-        // Initialize the pool with its initial set of members
-        // The count is bounded at the reading that consumes it, not only in
-        // the check: a writer of this attribute holds no monitor the
-        // construction takes, so a store can land between the check above
-        // (which repairs and reads) and this allocation (which builds).
-        PooledConnection[] initialPool =
-                new PooledConnection[Math.max(0, poolProperties.getInitialSize())];
+        initializing = true;
+        startedInterceptorCount = 0;
         try {
-            for (int i = 0; i < initialPool.length; i++) {
-                initialPool[i] = this.borrowConnection(0, null, null); // Don't wait, should be no contention
+
+            // Make sure the pool is properly configured
+            checkPoolConfiguration(properties);
+
+            // Take the immutable snapshot the connect and credential paths read,
+            // and publish the live view the rest of the pool and the management
+            // surfaces use. The builder stays mutable for compatibility; the
+            // snapshot is replaced atomically by the apply path.
+            configurationSnapshot = copyConfiguration(properties);
+            configurationView = PoolConfigurationView.create(this);
+            poolProperties = configurationView;
+
+            // Record the name this pool starts under before its MBean or the
+            // interceptors are told about the pool, so that everything the start
+            // registers under the name and everything a later lookup of it
+            // resolves through one record (see the field).
+            registrationName = properties.getPoolName();
+
+            // Both queues are unbounded by design: membership is bounded by the
+            // maxActive/size bookkeeping, not by queue capacity.
+            busy = new LinkedBlockingQueue<>();
+            if (properties.isFairQueue()) {
+                idle = new FairBlockingQueue<>();
+            } else {
+                idle = new LinkedBlockingQueue<>();
             }
 
-        } catch (Throwable x) {
-            ExceptionUtils.handleThrowable(x);
-            log.error(MessageFactory.get("connectionPool.unableToCreateInitialConnections"),
-                    PoolUtilities.maskCredentials(x));
-            if (!poolProperties.isIgnoreExceptionOnPreLoad()) {
-                org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = jmxPool;
-                if (jmx != null) {
-                    jmx.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.NOTIFY_INIT, getStackTrace(x));
+            if (this.poolProperties.isJmxEnabled()) {
+                createMBean();
+            }
+            // A close may already have run from a construction hook. Its cleanup is
+            // complete; starting interceptors now would register state no later
+            // close would release.
+            if (isClosed()) {
+                return;
+            }
+
+            // Parse the interceptor definitions and tell a throwaway instance of
+            // each that the pool has started. These instances get no connection.
+            PoolProperties.InterceptorDefinition[] proxies = poolProperties.getJdbcInterceptorsAsArray();
+            startedInterceptors = proxies;
+            for (int i = 0; i < proxies.length; i++) {
+                // Hold this monitor across the callback so an external close cannot
+                // deliver its notifications past a start that has not run yet.
+                // A close from the callback itself re-enters it on the same thread.
+                synchronized (interceptorStartLock) {
+                    if (isClosed()) {
+                        break;
+                    }
+                    // The callback may fail or close during its own run; count it
+                    // as told so a close still releases whatever it registered
+                    // before failing.
+                    startedInterceptorCount = i + 1;
+                    try {
+                        if (log.isDebugEnabled()) {
+                            log.debug("Creating interceptor instance of class:" + proxies[i].getInterceptorClass());
+                        }
+                        JdbcInterceptor interceptor = proxies[i].getInterceptorClass().getConstructor().newInstance();
+                        interceptor.setProperties(proxies[i].getProperties());
+                        interceptor.poolStarted(this);
+                    } catch (Throwable x) {
+                        ExceptionUtils.handleThrowable(ExceptionUtils.unwrapInvocationTargetException(x));
+                        log.error(MessageFactory.get("connectionPool.unableToInformInterceptorOfPoolStart"),
+                                PoolUtilities.maskCredentials(x));
+                        org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = jmxPool;
+                        if (jmx != null) {
+                            jmx.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.NOTIFY_INIT, getStackTrace(x));
+                        }
+                        close(true);
+                        SQLException ex = new SQLException();
+                        ex.initCause(x);
+                        throw ex;
+                    }
                 }
+                if (isClosed()) {
+                    break;
+                }
+            }
+            // The close has already torn the pool down and told the interceptors
+            // that actually started. Do not continue with the startup state, the
+            // pre-load or the cleaner.
+            if (isClosed()) {
+                return;
+            }
+            // Every interceptor class has now been loaded and instantiated above,
+            // so the parsed definitions can be compared against each other. The
+            // relative order of two interceptors in the chain is not something a
+            // single interceptor can see; only the pool holds the ordered list.
+            checkInterceptorOrder(proxies);
+
+            // The startup callbacks above can still change the builder while the
+            // pool is not published. Take that final startup state before the
+            // pre-load and the cleaner read the configuration.
+            checkPoolConfiguration(properties);
+            configurationSnapshot = copyConfiguration(properties);
+            poolProperties = configurationView;
+            if (isClosed()) {
+                return;
+            }
+
+            // Initialize the pool with its initial set of members
+            // The count is bounded at the reading that consumes it, not only in
+            // the check: a writer of this attribute holds no monitor the
+            // construction takes, so a store can land between the check above
+            // (which repairs and reads) and this allocation (which builds).
+            PooledConnection[] initialPool =
+                    new PooledConnection[Math.max(0, poolProperties.getInitialSize())];
+            try {
+                for (int i = 0; i < initialPool.length; i++) {
+                    initialPool[i] = this.borrowConnection(0, null, null); // Don't wait, should be no contention
+                }
+
+            } catch (Throwable x) {
+                ExceptionUtils.handleThrowable(x);
+                log.error(MessageFactory.get("connectionPool.unableToCreateInitialConnections"),
+                        PoolUtilities.maskCredentials(x));
+                if (!poolProperties.isIgnoreExceptionOnPreLoad()) {
+                    org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = jmxPool;
+                    if (jmx != null) {
+                        jmx.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.NOTIFY_INIT, getStackTrace(x));
+                    }
+                    close(true);
+                    if (x instanceof SQLException) {
+                        throw (SQLException) x;
+                    }
+                    SQLException ex = new SQLException(x.getMessage());
+                    ex.initCause(x);
+                    throw ex;
+                }
+            } finally {
+                // Return the members as idle to the pool. These hand-backs are
+                // not counted as returns: no borrower ever received them, and
+                // counting them would inflate the returned statistic for the
+                // pool's whole life
+                for (int i = 0; i < initialPool.length; i++) {
+                    if (initialPool[i] != null) {
+                        try {
+                            this.returnConnection(initialPool[i], false);
+                        } catch (Exception x) {
+                            /* NOOP */}
+                    }
+                }
+            }
+
+            // A close may have landed during the pre-load; it has already torn the
+            // pool down and told the started interceptors. Do not arm a cleaner for
+            // a pool that is no longer open.
+            if (isClosed()) {
+                return;
+            }
+
+            // Arm the sweeper last: an interceptor's poolStarted() callback and the
+            // initial pre-load can still change its configuration while the pool is
+            // being built and is not yet published.
+            try {
+                initializePoolCleaner(poolProperties);
+            } catch (Throwable x) {
+                // The constructor has already acquired resources that no caller can
+                // reach once it fails, so close the partially built pool first.
+                ExceptionUtils.handleThrowable(x);
+                log.error(MessageFactory.get("connectionPool.unableToInitializePoolCleaner"),
+                        PoolUtilities.maskCredentials(x));
                 close(true);
-                if (x instanceof SQLException) {
-                    throw (SQLException) x;
-                }
                 SQLException ex = new SQLException(x.getMessage());
                 ex.initCause(x);
                 throw ex;
             }
+
+            // The closed flag starts false for a new object and is not reset here:
+            // a close performed while this initialization was running (from a
+            // subclass or a startup hook holding the pool reference) has already
+            // torn down the queues, cleaner, MBean and interceptor state, and
+            // overwriting that closure would leave a pool that says it is open
+            // over state that is gone.
         } finally {
-            // Return the members as idle to the pool. These hand-backs are
-            // not counted as returns: no borrower ever received them, and
-            // counting them would inflate the returned statistic for the
-            // pool's whole life
-            for (int i = 0; i < initialPool.length; i++) {
-                if (initialPool[i] != null) {
-                    try {
-                        this.returnConnection(initialPool[i], false);
-                    } catch (Exception x) {
-                        /* NOOP */}
-                }
-            }
+            initializing = false;
         }
-
-        // Arm the sweeper last: an interceptor's poolStarted() callback and the
-        // initial pre-load can still change its configuration while the pool is
-        // being built and is not yet published.
-        try {
-            initializePoolCleaner(poolProperties);
-        } catch (Throwable x) {
-            // The constructor has already acquired resources that no caller can
-            // reach once it fails, so close the partially built pool first.
-            ExceptionUtils.handleThrowable(x);
-            log.error(MessageFactory.get("connectionPool.unableToInitializePoolCleaner"),
-                    PoolUtilities.maskCredentials(x));
-            close(true);
-            SQLException ex = new SQLException(x.getMessage());
-            ex.initCause(x);
-            throw ex;
-        }
-
-        // The closed flag starts false for a new object and is not reset here:
-        // a close performed while this initialization was running (from a
-        // subclass or a startup hook holding the pool reference) has already
-        // torn down the queues, cleaner, MBean and interceptor state, and
-        // overwriting that closure would leave a pool that says it is open
-        // over state that is gone.
     }
 
     /**
