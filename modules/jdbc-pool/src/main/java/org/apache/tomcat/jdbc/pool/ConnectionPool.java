@@ -804,6 +804,14 @@ public class ConnectionPool {
         // at the same time would otherwise both run the drain and deliver the
         // interceptor close notifications twice.
         if (!closed.compareAndSet(false, true)) {
+            if (force) {
+                // The one-time terminal work belongs to the claim winner. A
+                // forced request that loses the claim - or that arrives after a
+                // graceful close - still asks for every in-use session to be
+                // taken away, so it drains the busy queue without repeating the
+                // notifications or the MBean release.
+                drainConnections(idle, true);
+            }
             return;
         }
         // Publish the closure: operations that observe it fail fast - this
@@ -819,47 +827,9 @@ public class ConnectionPool {
             ((FairBlockingQueue<PooledConnection>) idle).cancelWaiters();
         }
 
-        // Release all idle connections
-        BlockingQueue<PooledConnection> pool = (!idle.isEmpty()) ? idle : (force ? busy : idle);
-        boolean interrupted = false;
-        while (!pool.isEmpty()) {
-            try {
-                PooledConnection con = pool.poll(1000, TimeUnit.MILLISECONDS);
-                while (con != null) {
-                    // A forced shutdown releases busy connections the same way
-                    // as idle ones; it does not record an abandonment.
-                    try {
-                        release(con);
-                    } catch (Throwable x) {
-                        ExceptionUtils.handleThrowable(x);
-                        // One failing connection must not leave the
-                        // remaining idle and busy connections undisconnected
-                        log.warn(MessageFactory.get("connectionPool.unableToClosePooledConnection"),
-                                PoolUtilities.maskCredentials(x));
-                    }
-                    if (!pool.isEmpty()) {
-                        con = pool.poll(1000, TimeUnit.MILLISECONDS);
-                    } else {
-                        break;
-                    }
-                }
-            } catch (InterruptedException ex) {
-                // Do not restore the interrupt status here. A poll on a queue
-                // that checks the status before inspecting its elements would
-                // then throw again immediately, removing no connection, and
-                // the loop would spin without progress. Clear the status so
-                // the polls keep working and remember that we were interrupted
-                // so the status can be propagated once the drain completes.
-                Thread.interrupted();
-                interrupted = true;
-            }
-            if (pool.isEmpty() && force && pool != busy) {
-                pool = busy;
-            }
-        }
-        if (interrupted && poolProperties.getPropagateInterruptState()) {
-            Thread.currentThread().interrupt();
-        }
+        // Release all idle connections, and for a forced close the busy ones
+        // after them.
+        drainConnections((!idle.isEmpty()) ? idle : (force ? busy : idle), force);
         // Release the pool MBean and every connection/interceptor MBean
         // published below it before forgetting the JMX wrapper. A
         // container-managed DataSource has already released these before
@@ -932,6 +902,61 @@ public class ConnectionPool {
                     informInterceptorOfPoolClosure(chainDefinition);
                 }
             }
+        }
+    }
+
+
+    /**
+     * Releases every connection in one queue, optionally continuing into the busy queue after the idle one.
+     * A forced close drains in-use sessions the same way as idle ones; it does not record an abandonment.
+     * The caller may invoke this again after a close has already claimed the pool - the per-connection release
+     * claim makes a repeated drain harmless - so an escalation request that lost the close claim still takes the
+     * busy sessions away without repeating the one-time terminal work.
+     *
+     * @param pool        the queue to start with
+     * @param includeBusy whether to continue into the busy queue after the starting queue is empty
+     */
+    private void drainConnections(BlockingQueue<PooledConnection> pool, boolean includeBusy) {
+        boolean interrupted = false;
+        while (true) {
+            while (!pool.isEmpty()) {
+                try {
+                    PooledConnection con = pool.poll(1000, TimeUnit.MILLISECONDS);
+                    while (con != null) {
+                        try {
+                            release(con);
+                        } catch (Throwable x) {
+                            ExceptionUtils.handleThrowable(x);
+                            // One failing connection must not leave the
+                            // remaining idle and busy connections undisconnected
+                            log.warn(MessageFactory.get("connectionPool.unableToClosePooledConnection"),
+                                    PoolUtilities.maskCredentials(x));
+                        }
+                        if (!pool.isEmpty()) {
+                            con = pool.poll(1000, TimeUnit.MILLISECONDS);
+                        } else {
+                            break;
+                        }
+                    }
+                } catch (InterruptedException ex) {
+                    // Do not restore the interrupt status here. A poll on a queue
+                    // that checks the status before inspecting its elements would
+                    // then throw again immediately, removing no connection, and
+                    // the loop would spin without progress. Clear the status so
+                    // the polls keep working and remember that we were interrupted
+                    // so the status can be propagated once the drain completes.
+                    Thread.interrupted();
+                    interrupted = true;
+                }
+            }
+            if (includeBusy && pool != busy) {
+                pool = busy;
+                continue;
+            }
+            break;
+        }
+        if (interrupted && poolProperties.getPropagateInterruptState()) {
+            Thread.currentThread().interrupt();
         }
     }
 

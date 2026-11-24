@@ -20,6 +20,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javax.management.Notification;
 import javax.management.NotificationListener;
@@ -122,5 +124,74 @@ abstract class ForcedShutdownDoesNotAbandonBase extends JdbcPoolBaseTest {
                 "returning an already released handle must not move the pool size");
         Assertions.assertEquals(0, pool.getRemoveAbandonedCount(),
                 "a late return to a closed pool must not be counted as abandoned");
+    }
+
+    @Test
+    void aForcedCloseAfterAGracefulCloseDisconnectsBusyConnections() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setInitialSize(0);
+        ds.createPool();
+        ConnectionPool pool = ds.getPool();
+        Connection held = ds.getConnection();
+
+        ds.close(false);
+        Assertions.assertTrue(pool.isClosed(), "precondition: the graceful close claimed the pool");
+        Assertions.assertFalse(held.isClosed(),
+                "a graceful close must leave the in-use session in service");
+        try (java.sql.Statement st = held.createStatement()) {
+            Assertions.assertTrue(st.execute("SELECT 1"),
+                    "the busy handle must still work after a graceful close");
+        }
+
+        ds.close(true);
+
+        Assertions.assertTrue(held.isClosed(),
+                "a forced close that arrives after a graceful one must disconnect the busy session");
+        awaitSessions(0);
+        Assertions.assertEquals(0, pool.getSize(),
+                "the forced escalation must release every connection it drained");
+        held.close();
+    }
+
+    @Test
+    void aForcedCloseRacingAGracefulCloseStillDisconnectsBusyConnections() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setInitialSize(0);
+        ds.createPool();
+        ConnectionPool pool = ds.getPool();
+        Connection held = ds.getConnection();
+
+        CountDownLatch start = new CountDownLatch(1);
+        Thread graceful = new Thread(() -> {
+            try {
+                start.await();
+            } catch (InterruptedException x) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+            ds.close(false);
+        }, "graceful-close");
+        Thread forced = new Thread(() -> {
+            try {
+                start.await();
+            } catch (InterruptedException x) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+            ds.close(true);
+        }, "forced-close");
+        graceful.start();
+        forced.start();
+        start.countDown();
+        graceful.join(TimeUnit.SECONDS.toMillis(10));
+        forced.join(TimeUnit.SECONDS.toMillis(10));
+        Assertions.assertFalse(graceful.isAlive(), "the graceful close must finish");
+        Assertions.assertFalse(forced.isAlive(), "the forced close must finish");
+
+        Assertions.assertTrue(held.isClosed(),
+                "whichever close wins the claim, the forced request must take the busy session away");
+        awaitSessions(0);
+        Assertions.assertEquals(0, pool.getSize());
+        held.close();
     }
 }
