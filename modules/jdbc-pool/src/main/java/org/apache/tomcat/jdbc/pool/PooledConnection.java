@@ -809,8 +809,12 @@ public class PooledConnection implements PooledConnectionMBean {
      */
     @Override
     public boolean isMaxAgeExpired() {
-        if (getPoolProperties().getMaxAge() > 0) {
-            return (System.currentTimeMillis() - getLastConnected()) > getPoolProperties().getMaxAge();
+        // Read the configured value once: a concurrent live change between a
+        // guard read and a calculation read would make the expiry decision
+        // describe a configuration that never existed.
+        long maxAge = getPoolProperties().getMaxAge();
+        if (maxAge > 0) {
+            return (System.currentTimeMillis() - getLastConnected()) > maxAge;
         } else {
             return false;
         }
@@ -1244,11 +1248,14 @@ public class PooledConnection implements PooledConnectionMBean {
      * @return abandon timeout in milliseconds
      */
     public long getAbandonTimeout() {
-        PoolConfiguration configuration = configuration();
-        if (configuration.getRemoveAbandonedTimeout() <= 0) {
+        // Read the configured timeout once: a concurrent live change between
+        // the guard read and the multiplication would turn a guard that passed
+        // on a positive value into a zero or negative abandon timeout.
+        int removeAbandonedTimeout = configuration().getRemoveAbandonedTimeout();
+        if (removeAbandonedTimeout <= 0) {
             return Long.MAX_VALUE;
         } else {
-            return configuration.getRemoveAbandonedTimeout() * 1000L;
+            return removeAbandonedTimeout * 1000L;
         }
     }
 
