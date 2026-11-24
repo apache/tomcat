@@ -154,25 +154,39 @@ public class PoolUtilities {
 
     /**
      * Creates a copy of the given properties as {@link #clone(Properties)}
-     * does, with every credential entry removed. A credential entry is one
-     * whose key is recognised by {@link #isCredentialKey(String)}:
-     * {@code password}, {@code pass} and {@code pwd}, ignoring case and
-     * surrounding whitespace. The copy carries no defaults table, so the
+     * does, with every credential entry removed and every credential embedded
+     * in a string value masked. A credential entry is one whose key is
+     * recognised by {@link #isCredentialKey(String)}: {@code password},
+     * {@code pass} and {@code pwd}, ignoring case and surrounding whitespace.
+     * A value can itself carry a credential - a {@code url} property whose
+     * value is a URL with a userinfo password, or a value holding a
+     * credential pair - so string values are passed through the same masking
+     * the configuration dump uses. The copy carries no defaults table, so the
      * removal also reaches a credential the source only resolved through its
      * defaults - a reference copy would let the remove walk past the defaults
      * table and leave the credential resolvable.
      *
      * @param p the properties to clone, not {@code null}
      *
-     * @return a new Properties instance with all entries except the credentials
+     * @return a new Properties instance with credentials removed or masked
      *
      * @throws NullPointerException if the source is {@code null}
      */
     public static Properties cloneWithoutPassword(Properties p) {
         Properties result = clone(p);
         for (Object key : result.keySet().toArray()) {
-            if (key instanceof String && isCredentialKey((String) key)) {
-                result.remove(key);
+            if (key instanceof String) {
+                if (isCredentialKey((String) key)) {
+                    result.remove(key);
+                    continue;
+                }
+                Object value = result.get(key);
+                if (value instanceof String) {
+                    String masked = PoolProperties.maskCredentials((String) value);
+                    if (!masked.equals(value)) {
+                        result.put(key, masked);
+                    }
+                }
             }
         }
         return result;

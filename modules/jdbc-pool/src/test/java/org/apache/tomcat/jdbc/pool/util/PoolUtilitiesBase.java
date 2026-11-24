@@ -188,6 +188,33 @@ abstract class PoolUtilitiesBase {
     }
 
     @Test
+    void cloneWithoutPasswordMasksCredentialsEmbeddedInPropertyValues() {
+        Properties source = new Properties();
+        source.setProperty("url", "jdbc:mysql://user:url-secret@host/db");
+        source.setProperty("logUrl", "http://admin:log-secret@host/path");
+        source.setProperty("connectionString", "user=bob&password=value-secret");
+        source.setProperty("applicationName", "plain-value");
+
+        Properties masked = PoolUtilities.cloneWithoutPassword(source);
+
+        Assertions.assertEquals("jdbc:mysql://user:********@host/db",
+                masked.getProperty("url"),
+                "a credential in a URL-shaped property value must be masked");
+        Assertions.assertEquals("http://admin:********@host/path",
+                masked.getProperty("logUrl"),
+                "a credential in any URL-shaped value must be masked");
+        Assertions.assertEquals("user=bob&password=********",
+                masked.getProperty("connectionString"),
+                "a credential pair inside a value must be masked");
+        Assertions.assertEquals("plain-value", masked.getProperty("applicationName"),
+                "an ordinary value must be unchanged");
+
+        Assertions.assertEquals("jdbc:mysql://user:url-secret@host/db",
+                source.getProperty("url"),
+                "masking the copy must leave the source alone");
+    }
+
+    @Test
     void cloneWithoutPasswordMasksADirectlyPresentPassword() {
         Properties source = new Properties();
         source.setProperty(PoolUtilities.PROP_USER, "bob");
