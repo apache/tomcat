@@ -557,7 +557,8 @@ abstract class PoolSweeperSettersBase extends JdbcPoolBaseTest {
 
         ds.setMaxActive(4);
 
-        Assertions.assertEquals(3000, live.getTimeBetweenEvictionRunsMillis(),
+        Assertions.assertEquals(3000,
+                ds.getPool().getMutableConfiguration().getTimeBetweenEvictionRunsMillis(),
                 "precondition: the count write triggered the correction");
         Assertions.assertEquals(3000, registeredCleanerPeriod(),
                 "a count write is not the moment to leave the cleaner running on an "
@@ -590,7 +591,8 @@ abstract class PoolSweeperSettersBase extends JdbcPoolBaseTest {
 
         jmx.setMaxActive(4);
 
-        Assertions.assertEquals(3000, live.getTimeBetweenEvictionRunsMillis(),
+        Assertions.assertEquals(3000,
+                ds.getPool().getMutableConfiguration().getTimeBetweenEvictionRunsMillis(),
                 "precondition: the count write triggered the correction");
         Assertions.assertEquals(3000, registeredCleanerPeriod(),
                 "the MBean and the data source run the same check, so neither may leave the "

@@ -26,10 +26,11 @@ import java.util.Properties;
  * The live configuration surface of a running pool.
  * <p>
  * Reads are answered from the mutable builder the bean and JMX surfaces have always written, so existing callers keep
- * seeing the values their setters stored. Writes are applied to that builder, then handed to the pool's single
- * {@link ConnectionPool#applyConfigurationChange(PoolConfiguration)} path, which validates the candidate and
- * publishes the immutable snapshot the connect and credential paths read. A mutable value handed out by a getter is
- * a copy: changing it does not reconfigure the pool.
+ * seeing the values their setters stored. A write is applied to a private candidate copy of that builder, then handed
+ * to the pool's single {@link ConnectionPool#applyConfigurationChange(PoolConfiguration)} path, which validates and
+ * corrects the candidate, adopts it as the builder and publishes the immutable snapshot the connect and credential
+ * paths read. Operational readers therefore never observe the requested value before it has been validated. A mutable
+ * value handed out by a getter is a copy: changing it does not reconfigure the pool.
  * <p>
  * Start-time properties are rejected by the bean and JMX setters; a direct write here changes only the reported
  * value, not the pool shape already fixed at creation.
@@ -77,11 +78,15 @@ final class PoolConfigurationView {
             if (name.startsWith("set")) {
                 // A read-modify-write of the builder has to be serialized with
                 // every other writer, and the pool's monitor is the one both
-                // management surfaces reach.
+                // management surfaces reach. The write is applied to a private
+                // candidate, never to the live builder: an operational reader
+                // must not observe the requested value before the apply path
+                // has validated and corrected it.
                 synchronized (pool) {
                     PoolConfiguration mutable = pool.getMutableConfiguration();
-                    invokeTarget(method, mutable, args);
-                    pool.applyConfigurationChange(mutable);
+                    PoolConfiguration candidate = ConnectionPool.copyMutableConfiguration(mutable);
+                    invokeTarget(method, candidate, args);
+                    pool.applyConfigurationChange(candidate);
                 }
                 return defaultValue(method.getReturnType());
             }
