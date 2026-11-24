@@ -17,6 +17,7 @@
 package org.apache.tomcat.jdbc.pool;
 
 import java.sql.SQLException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -51,6 +52,59 @@ abstract class CloseDuringInitBase extends JdbcPoolBaseTest {
         public void poolStarted(ConnectionPool pool) {
             pool.close(true);
             super.poolStarted(pool);
+        }
+    }
+
+    /**
+     * Records whether its start callback ran. A close performed by an earlier
+     * definition must stop initialization before this later definition starts,
+     * or the state this callback registers would never be told about the
+     * close.
+     */
+    public static class RegisterAfterClosingStartInterceptor extends JdbcInterceptor {
+
+        static final AtomicBoolean started = new AtomicBoolean();
+
+        @Override
+        public void reset(ConnectionPool parent, PooledConnection con) {
+            // Nothing to reset: this interceptor only acts on pool lifecycle
+        }
+
+        @Override
+        public void poolStarted(ConnectionPool pool) {
+            started.set(true);
+        }
+
+        @Override
+        public void poolClosed(ConnectionPool pool) {
+            started.set(false);
+        }
+    }
+
+    @Test
+    void aLaterStartCallbackDoesNotRunAfterACloseDuringInitialization() throws Exception {
+        RegisterAfterClosingStartInterceptor.started.set(false);
+        PoolProperties properties = new PoolProperties();
+        properties.setUrl(getUrl());
+        properties.setDriverClassName("org.h2.Driver");
+        properties.setUsername("sa");
+        properties.setPassword("");
+        properties.setJmxEnabled(false);
+        properties.setInitialSize(0);
+        properties.setMinIdle(0);
+        properties.setTimeBetweenEvictionRunsMillis(-1);
+        properties.setJdbcInterceptors(ClosingOnStartInterceptor.class.getName() + ";"
+                + RegisterAfterClosingStartInterceptor.class.getName());
+
+        ConnectionPool pool = new ConnectionPool(properties);
+        try {
+            Assertions.assertTrue(pool.isClosed(),
+                    "the close performed by the first start callback must stay in effect");
+            Assertions.assertFalse(RegisterAfterClosingStartInterceptor.started.get(),
+                    "a start callback after the close must not run and register state the close already passed");
+        } finally {
+            RegisterAfterClosingStartInterceptor.started.set(false);
+            pool.close(true);
         }
     }
 
