@@ -164,6 +164,70 @@ abstract class ConnectionPropertiesCredentialAliasesBase extends JdbcPoolBaseTes
     }
 
     @Test
+    void clearingCredentialsRemovesThemFromANullDatabasePropertiesString() throws Exception {
+        PoolProperties props = new PoolProperties();
+        props.setJmxEnabled(false);
+        props.setInitialSize(0);
+        props.setMinIdle(0);
+        props.setUrl("jdbc:tomcat-jdbc-test:null-database-properties-credential-clear");
+        props.setDriverClassName(AliasRecordingDriver.class.getName());
+        props.setDbProperties(null);
+        props.setConnectionProperties("keep=yes;user=alice;password=secret");
+        props.setUsername(null);
+        props.setPassword(null);
+        AliasRecordingDriver.lastConnectInfo.set(null);
+
+        ConnectionPool pool = new ConnectionPool(props);
+        PooledConnection con = new PooledConnection(props, pool);
+        try {
+            Assertions.assertThrows(SQLException.class, con::connect,
+                    "the recording driver declines the connect after recording the properties");
+            Properties handed = AliasRecordingDriver.lastConnectInfo.get();
+            Assertions.assertNotNull(handed, "the driver must have been offered the properties");
+            Assertions.assertEquals("yes", handed.getProperty("keep"),
+                    "non-credential entries from the string must still be applied");
+            Assertions.assertNull(handed.getProperty("user"),
+                    "clearing the user name must remove the string-provided user");
+            Assertions.assertNull(handed.getProperty("password"),
+                    "clearing the password must remove the string-provided password");
+        } finally {
+            con.release();
+            pool.close(true);
+        }
+    }
+
+    @Test
+    void aStringWrittenAfterAClearDeclaresTheCredentialAgain() throws Exception {
+        PoolProperties props = new PoolProperties();
+        props.setJmxEnabled(false);
+        props.setInitialSize(0);
+        props.setMinIdle(0);
+        props.setUrl("jdbc:tomcat-jdbc-test:null-database-properties-credential-redeclare");
+        props.setDriverClassName(AliasRecordingDriver.class.getName());
+        props.setDbProperties(null);
+        props.setUsername(null);
+        props.setPassword(null);
+        props.setConnectionProperties("keep=yes;user=alice;password=secret");
+        AliasRecordingDriver.lastConnectInfo.set(null);
+
+        ConnectionPool pool = new ConnectionPool(props);
+        PooledConnection con = new PooledConnection(props, pool);
+        try {
+            Assertions.assertThrows(SQLException.class, con::connect,
+                    "the recording driver declines the connect after recording the properties");
+            Properties handed = AliasRecordingDriver.lastConnectInfo.get();
+            Assertions.assertNotNull(handed, "the driver must have been offered the properties");
+            Assertions.assertEquals("alice", handed.getProperty("user"),
+                    "a string written after a clear is a fresh declaration of the user name");
+            Assertions.assertEquals("secret", handed.getProperty("password"),
+                    "a string written after a clear is a fresh declaration of the password");
+        } finally {
+            con.release();
+            pool.close(true);
+        }
+    }
+
+    @Test
     void aDatabasePropertiesWriteCannotSneakAnAliasPastARotation() throws Exception {
         PoolProperties props = new PoolProperties();
         props.setJmxEnabled(false);

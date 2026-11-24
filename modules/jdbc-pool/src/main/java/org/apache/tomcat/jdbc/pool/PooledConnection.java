@@ -614,6 +614,8 @@ public class PooledConnection implements PooledConnectionMBean {
         // is an immutable snapshot, so for it this block only makes the read
         // atomic for a direct caller's mutable configuration.
         Properties properties;
+        boolean clearedUsername = false;
+        boolean clearedPassword = false;
         synchronized (configuration) {
             Properties dbProperties = configuration.getDbProperties();
             if (dbProperties == null) {
@@ -625,6 +627,14 @@ public class PooledConnection implements PooledConnectionMBean {
                             MessageFactory.get("pooledConnection.invalidConnectionProperties"));
                     ex.initCause(x);
                     throw ex;
+                }
+                if (configuration instanceof PoolProperties) {
+                    // The string is the only place a credential can now come
+                    // from, so an explicit clear has to be applied to the parse
+                    // rather than to a collection that does not exist.
+                    PoolProperties poolProperties = (PoolProperties) configuration;
+                    clearedUsername = poolProperties.isUsernameCleared();
+                    clearedPassword = poolProperties.isPasswordCleared();
                 }
             } else {
                 properties = PoolUtilities.clone(dbProperties);
@@ -648,14 +658,21 @@ public class PooledConnection implements PooledConnectionMBean {
         // USER entry in the live collection cannot reach the driver next to
         // the canonical one. With the field unset nothing is removed: the
         // entry in the collection is then the one the driver gets, as
-        // documented.
+        // documented. The one exception is a credential explicitly cleared by
+        // a setter while there was no collection to remove it from: the parsed
+        // connectionProperties string is the remaining source of the
+        // superseded value and must be stripped as well.
         if (usr != null) {
             PoolUtilities.removeUsernameKeys(properties);
             properties.setProperty(PROP_USER, usr);
+        } else if (clearedUsername) {
+            PoolUtilities.removeUsernameKeys(properties);
         }
         if (pwd != null) {
             PoolUtilities.removeCredentialKeys(properties);
             properties.setProperty(PROP_PASSWORD, pwd);
+        } else if (clearedPassword) {
+            PoolUtilities.removeCredentialKeys(properties);
         }
 
         try {
