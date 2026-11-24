@@ -381,7 +381,9 @@ public class DataSourceProxy implements PoolConfiguration {
      * <p>
      * A future for a connection that was already available completes while this method runs. Such a future cannot
      * be cancelled; its caller must retrieve the connection and close it to return it to the pool. Cancelling a
-     * future that is still waiting returns its queued connection request to the pool.
+     * future that is still waiting returns its queued connection request to the pool. The future is
+     * single-consumption: the first retrieval takes the connection, and a later {@link Future#get()} fails with an
+     * {@link IllegalStateException} rather than handing the same handle to a second caller.
      *
      * @return a Future containing a reference to the connection when it becomes available
      *

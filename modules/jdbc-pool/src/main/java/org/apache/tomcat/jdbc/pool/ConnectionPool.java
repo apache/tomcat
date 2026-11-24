@@ -299,6 +299,10 @@ public class ConnectionPool {
      * instead. Closing the pool cancels a future that has not received a connection yet, so a thread blocked in
      * {@link Future#get()} observes a {@link java.util.concurrent.CancellationException} instead of waiting for a
      * connection that can no longer be handed out.
+     * <p>
+     * The future is single-consumption: the pool lease it carries has one owner, so the first retrieval takes the
+     * connection and a later {@link Future#get()} fails with an {@link IllegalStateException} rather than handing the
+     * same handle to a second caller.
      *
      * @return a Future containing a reference to the connection or the future connection
      *
@@ -3177,9 +3181,10 @@ public class ConnectionPool {
     }
 
     /**
-     * Thread safe wrapper around a future for the regular queue This one retrieves the pooled connection object and
+     * Thread safe wrapper around a future for the regular queue. This one retrieves the pooled connection object and
      * performs the initialization according to interceptors and validation rules. This class is thread safe and is
-     * cancellable
+     * cancellable. The connection it produces has one owner: the first caller to retrieve it takes the lease, and a
+     * later retrieval is refused with an {@link IllegalStateException}.
      */
     protected class ConnectionFuture implements Future<Connection>, Runnable {
         final Future<PooledConnection> pcFuture;
@@ -3209,10 +3214,12 @@ public class ConnectionPool {
          */
         volatile boolean abandoned = false;
         /**
-         * Whether a caller has observed the result published by the setup. Once true, a timed
-         * get() that subsequently gives up must not clear and close that result: it belongs to
-         * the caller that already took it. Guarded by this future's monitor, together with
-         * {@link #result}.
+         * Whether a caller has observed the result published by the setup. The future hands its
+         * connection to one owner only: taking the result clears {@link #result} and sets this
+         * flag, so a later retrieval is refused instead of returning the same handle to a second
+         * caller. Once true, a timed get() that subsequently gives up must not clear and close
+         * that result either: it belongs to the caller that already took it. Guarded by this
+         * future's monitor, together with {@link #result}.
          */
         private boolean resultTaken = false;
         /**
@@ -3249,6 +3256,9 @@ public class ConnectionPool {
             this.pc = pc;
             result = ConnectionPool.this.setupConnection(pc);
             configured.set(true);
+            // The synchronous future has no setup worker to release the
+            // callers waiting on the latch, and the setup is already complete.
+            latch.countDown();
         }
 
         /**
@@ -3305,6 +3315,13 @@ public class ConnectionPool {
         @Override
         public Connection get(long timeout, TimeUnit unit)
                 throws InterruptedException, ExecutionException, TimeoutException {
+            if (isResultTaken()) {
+                // The connection has one owner, and that owner has already
+                // taken it; fail fast rather than waiting for a queue future
+                // to hand the same pooled connection out again.
+                throw new IllegalStateException(
+                        MessageFactory.get("connectionPool.connectionFutureAlreadyTaken"));
+            }
             boolean timed = timeout != Long.MAX_VALUE;
             long deadline = 0;
             if (timed) {
@@ -3339,6 +3356,14 @@ public class ConnectionPool {
                 Connection published = takePublishedResult();
                 if (published != null) {
                     return published;
+                }
+                if (isResultTaken()) {
+                    // The one owner of this future's connection has already
+                    // taken it. A pool lease has a single owner, so a later
+                    // retrieval must fail rather than hand the same handle to
+                    // a second caller.
+                    throw new IllegalStateException(
+                            MessageFactory.get("connectionPool.connectionFutureAlreadyTaken"));
                 }
                 if (configured.compareAndSet(false, true)) {
                     if (timed) {
@@ -3507,9 +3532,21 @@ public class ConnectionPool {
             if (result == null) {
                 return null;
             }
+            Connection taken = result;
+            result = null;
             countBorrowForHandoff();
             resultTaken = true;
-            return result;
+            return taken;
+        }
+
+        /**
+         * Returns whether the one owner of this future's connection has already
+         * taken it.
+         *
+         * @return {@code true} once a caller has taken the published result
+         */
+        private synchronized boolean isResultTaken() {
+            return resultTaken;
         }
 
         /**
@@ -3523,6 +3560,9 @@ public class ConnectionPool {
                 configuredPooled.setBorrowCounted(true);
                 borrowedCount.incrementAndGet();
             }
+            // The hand-off is the last time this future needs the pooled
+            // connection; do not retain it for the future's whole lifetime.
+            configuredPooled = null;
         }
 
         /**
@@ -3540,9 +3580,18 @@ public class ConnectionPool {
         private synchronized Connection takeTerminalResult()
                 throws TimeoutException, CancellationException, ExecutionException {
             if (result != null) {
+                Connection taken = result;
+                result = null;
                 countBorrowForHandoff();
                 resultTaken = true;
-                return result;
+                return taken;
+            }
+            if (resultTaken) {
+                // The one owner of this future's connection has already taken
+                // it; a second retrieval would hand the same lease to another
+                // caller.
+                throw new IllegalStateException(
+                        MessageFactory.get("connectionPool.connectionFutureAlreadyTaken"));
             }
             if (abandoned) {
                 // This future was abandoned after a timed get() expired;

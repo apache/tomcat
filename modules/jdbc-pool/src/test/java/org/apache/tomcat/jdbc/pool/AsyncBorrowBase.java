@@ -417,6 +417,49 @@ abstract class AsyncBorrowBase extends JdbcPoolBaseTest {
     }
 
     @Test
+    void anImmediatelyAvailableFutureHandsItsConnectionToOneCaller() throws Exception {
+        DataSource ds = newDataSource();
+        ds.createPool();
+        Future<Connection> future = ds.getConnectionAsync();
+
+        Connection first = future.get(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        Assertions.assertNotNull(first, "the future must hand out its connection");
+        Assertions.assertEquals(1, ds.getActive(), "the borrow must count as active");
+        Assertions.assertThrows(IllegalStateException.class,
+                () -> future.get(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
+                "a second retrieval must be refused rather than hand the same lease out twice");
+
+        first.close();
+        Assertions.assertEquals(0, ds.getActive(), "the one owner returned the connection");
+        Assertions.assertEquals(1, ds.getIdle());
+        ds.close();
+    }
+
+    @Test
+    void anAsyncFutureHandsItsConnectionToOneCaller() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setFairQueue(true);
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setMinIdle(0);
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setMaxIdle(1);
+        ds.createPool();
+
+        Future<Connection> future = ds.getConnectionAsync();
+        Connection first = future.get(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        Assertions.assertNotNull(first, "the future must hand out its connection");
+        Assertions.assertEquals(1, ds.getActive(), "the borrow must count as active");
+        Assertions.assertThrows(IllegalStateException.class,
+                () -> future.get(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
+                "a second retrieval must be refused rather than hand the same lease out twice");
+
+        first.close();
+        Assertions.assertEquals(0, ds.getActive(), "the one owner returned the connection");
+        Assertions.assertEquals(1, ds.getIdle());
+        ds.close();
+    }
+
+    @Test
     void cancellingAnAsyncPollAfterThePoolClosedReportsNothingCancelled() throws Exception {
         DataSource ds = newDataSource();
         ds.getPoolProperties().setFairQueue(true);
