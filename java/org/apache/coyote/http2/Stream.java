@@ -109,6 +109,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
     private volatile int urgency = Priority.DEFAULT_URGENCY;
     private volatile boolean incremental = Priority.DEFAULT_INCREMENTAL;
+    // Priority received in a PRIORITY_UPDATE frame while this stream was idle
+    private Priority idleStreamPriority;
 
     private final Object recycledLock = new Object();
     private volatile boolean recycled = false;
@@ -641,6 +643,16 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
 
     final boolean receivedEndOfHeaders() throws StreamException {
+        /*
+         * RFC 9218, section 7. A PRIORITY_UPDATE frame received while the stream was idle is more recent than the
+         * priority header field so it is applied once all the header fields have been processed.
+         */
+        if (idleStreamPriority != null) {
+            setUrgency(idleStreamPriority.getUrgency());
+            setIncremental(idleStreamPriority.getIncremental());
+            idleStreamPriority = null;
+        }
+
         boolean missingHeader = false;
 
         if (coyoteRequest.getMethod() == null) {
@@ -1107,6 +1119,11 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
     public void setIncremental(boolean incremental) {
         this.incremental = incremental;
+    }
+
+
+    void setIdleStreamPriority(Priority idleStreamPriority) {
+        this.idleStreamPriority = idleStreamPriority;
     }
 
 

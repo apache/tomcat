@@ -397,6 +397,13 @@
         Previously, a body packet that had not been read could be processed as
         the start of a new AJP request. (markt)
       </fix>
+      <fix>
+        Do not close an HTTP/2 connection when a <code>PRIORITY_UPDATE</code>
+        frame references a stream that has not yet been opened or has been
+        closed. The priority for a stream that has not yet been opened is
+        retained and applied when the stream is opened, as recommended by RFC
+        9218. Pull request <pr>1272</pr> provided by Arturo Bernal.
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

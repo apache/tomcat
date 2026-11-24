@@ -24,6 +24,7 @@ import java.util.Base64;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.NavigableMap;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -172,6 +173,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     private HpackEncoder hpackEncoder;
 
     private final ConcurrentNavigableMap<Integer,AbstractNonZeroStream> streams = new ConcurrentSkipListMap<>();
+    // Priorities received in PRIORITY_UPDATE frames for streams that are still idle (RFC 9218, section 7)
+    private final ConcurrentNavigableMap<Integer,Priority> idleStreamPriorities = new ConcurrentSkipListMap<>();
 
     /**
      * Count of currently active remote-initiated streams.
@@ -1943,6 +1946,15 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             if (stream == null) {
                 // New stream
 
+                /*
+                 * The stream is no longer idle and any lower numbered idle streams are implicitly closed. Remove any
+                 * priorities retained for them.
+                 */
+                NavigableMap<Integer,Priority> closedIdleStreamPriorities =
+                        idleStreamPriorities.headMap(Integer.valueOf(streamId), true);
+                Priority idleStreamPriority = closedIdleStreamPriorities.get(Integer.valueOf(streamId));
+                closedIdleStreamPriorities.clear();
+
                 // Check the pause state before processing headers since the pause state
                 // determines if a new stream is created or if this stream is ignored.
                 checkPauseState();
@@ -1950,6 +1962,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 if (connectionState.get().isNewStreamAllowed()) {
                     if (streamId > maxProcessedStreamId) {
                         stream = createRemoteStream(streamId);
+                        stream.setIdleStreamPriority(idleStreamPriority);
                         activeRemoteStreamCount.incrementAndGet();
                         maxProcessedStreamId = streamId;
                     } else {
@@ -2201,10 +2214,33 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     @Override
     public void priorityUpdate(int prioritizedStreamID, Priority p) throws Http2Exception {
         increaseOverheadCount(FrameType.PRIORITY_UPDATE);
-        AbstractNonZeroStream abstractNonZeroStream = getAbstractNonZeroStream(prioritizedStreamID, true);
+        AbstractNonZeroStream abstractNonZeroStream = getAbstractNonZeroStream(prioritizedStreamID);
         if (abstractNonZeroStream instanceof Stream stream) {
             stream.setUrgency(p.getUrgency());
             stream.setIncremental(p.getIncremental());
+        } else if (abstractNonZeroStream == null) {
+            if (prioritizedStreamID % 2 == 0) {
+                // Server push is not supported so any push stream is idle
+                throw new ConnectionException(sm.getString("upgradeHandler.priorityUpdate.idlePush", connectionId,
+                        Integer.toString(prioritizedStreamID)), Http2Error.PROTOCOL_ERROR);
+            }
+            if (prioritizedStreamID > maxProcessedStreamId) {
+                /*
+                 * The stream is idle. Retain the priority until the stream is opened. RFC 9218, section 7.1 limits the
+                 * prioritized idle streams plus the active streams to the maximum number of concurrent streams.
+                 */
+                Integer key = Integer.valueOf(prioritizedStreamID);
+                if (!idleStreamPriorities.containsKey(key) && idleStreamPriorities.size() +
+                        activeRemoteStreamCount.get() >= localSettings.getMaxConcurrentStreams()) {
+                    throw new ConnectionException(
+                            sm.getString("upgradeHandler.priorityUpdate.tooManyStreams", connectionId,
+                                    Integer.toString(prioritizedStreamID),
+                                    Long.toString(localSettings.getMaxConcurrentStreams())),
+                            Http2Error.PROTOCOL_ERROR);
+                }
+                idleStreamPriorities.put(key, p);
+            }
+            // Otherwise the stream is closed and the frame is ignored
         }
     }
 

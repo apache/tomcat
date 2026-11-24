@@ -17,10 +17,15 @@
 package org.apache.coyote.http2;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import org.apache.tomcat.util.http.Method;
 
 public class TestRfc9218 extends Http2TestBase {
 
@@ -193,7 +198,154 @@ public class TestRfc9218 extends Http2TestBase {
      * 19 - 8k body left
      * 21 - 8k body left
      */
+    @Test
+    public void testPriorityUpdateIdleStream() throws Exception {
+        http2Connect();
+
+        // RFC 9218, section 7 allows a PRIORITY_UPDATE frame to be sent before the stream it references is opened
+        sendPriorityUpdate(3, 0, false);
+        sendSimpleGetRequest(3);
+        readSimpleGetResponse();
+
+        Assert.assertEquals(getSimpleResponseTrace(3), output.getTrace());
+    }
+
+
+    @Test
+    public void testPriorityUpdateIdleStreamApplied() throws Exception {
+        blockStreams(true);
+
+        /*
+         * Stream 21 was given the highest urgency while idle. That overrides the lowest urgency in its priority header
+         * field so it is allocated the window ahead of stream 17.
+         */
+        sendWindowUpdate(0, 1024);
+        parser.readFrame();
+
+        String trace = output.getTrace();
+        Assert.assertEquals("21-Body-1024\n", trace);
+        output.clearTrace();
+    }
+
+
+    @Test
+    public void testPriorityUpdateIdleStreamLimit() throws Exception {
+        connectWithMaxConcurrentStreams(2);
+
+        sendPriorityUpdate(3, 0, false);
+        sendPriorityUpdate(5, 0, false);
+        // Updating a stream that has already been prioritized does not count towards the limit
+        sendPriorityUpdate(3, 1, false);
+
+        // The connection is still open
+        sendPing();
+        parser.readFrame();
+        Assert.assertEquals("0-Ping-Ack-[0,0,0,0,0,0,0,0]\n", output.getTrace());
+        output.clearTrace();
+
+        // Two prioritized idle streams plus zero active streams is the limit. A third must be rejected.
+        sendPriorityUpdate(7, 0, false);
+
+        handleGoAwayResponse(1);
+    }
+
+
+    @Test
+    public void testPriorityUpdateIdlePushStream() throws Exception {
+        http2Connect();
+
+        // An idle request stream is accepted
+        sendPriorityUpdate(3, 0, false);
+        sendPing();
+        parser.readFrame();
+        Assert.assertEquals("0-Ping-Ack-[0,0,0,0,0,0,0,0]\n", output.getTrace());
+        output.clearTrace();
+
+        // Server push is not supported so a push stream is always idle
+        sendPriorityUpdate(2, 0, false);
+
+        handleGoAwayResponse(1);
+    }
+
+
+    @Test
+    public void testPriorityUpdateClosedStream() throws Exception {
+        /*
+         * Closed streams are pruned once there are more than five times the maximum concurrent streams. A limit of two
+         * rather than one allows for the previous stream still being counted as active when the next one starts.
+         */
+        connectWithMaxConcurrentStreams(2);
+        // Each response uses 8k of the connection window
+        sendWindowUpdate(0, 1024 * 1024);
+
+        // Use enough streams that the earliest closed streams are pruned
+        for (int i = 3; i < 43; i += 2) {
+            sendSimpleGetRequest(i);
+            readSimpleGetResponse();
+            output.clearTrace();
+        }
+
+        // A PRIORITY_UPDATE frame for a closed stream is ignored
+        sendPriorityUpdate(3, 0, false);
+        sendSimpleGetRequest(43);
+        readSimpleGetResponse();
+
+        Assert.assertEquals(getSimpleResponseTrace(43), output.getTrace());
+    }
+
+
+    @Test
+    public void testPriorityUpdateIdleStreamMalformedRequest() throws Exception {
+        connectWithMaxConcurrentStreams(2);
+
+        sendPriorityUpdate(3, 0, false);
+
+        // A connection-specific header field makes the request malformed so the stream is reset
+        List<Header> headers = new ArrayList<>(5);
+        headers.add(new Header(":method", Method.GET));
+        headers.add(new Header(":scheme", "http"));
+        headers.add(new Header(":path", "/simple"));
+        headers.add(new Header(":authority", "localhost:" + getPort()));
+        headers.add(new Header("connection", "keep-alive"));
+        sendGetRequest(3, headers);
+        parser.readFrame();
+        Assert.assertEquals("3-RST-[1]\n", output.getTrace());
+        output.clearTrace();
+
+        // Stream 3 is closed so it no longer counts towards the limit
+        sendPriorityUpdate(5, 0, false);
+        sendPriorityUpdate(7, 0, false);
+        sendSimpleGetRequest(5);
+        readSimpleGetResponse();
+
+        Assert.assertEquals(getSimpleResponseTrace(5), output.getTrace());
+    }
+
+
+    private void sendGetRequest(int streamId, List<Header> headers) throws IOException {
+        byte[] frameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+        buildGetRequest(frameHeader, headersPayload, null, headers, streamId);
+        writeFrame(frameHeader, headersPayload);
+    }
+
+
+    private void connectWithMaxConcurrentStreams(long maxConcurrentStreams) throws Exception {
+        enableHttp2(maxConcurrentStreams);
+        configureAndStartWebApplication();
+        openClientConnection();
+        doHttpUpgrade();
+        sendClientPreface();
+        validateHttp2InitialResponse(maxConcurrentStreams);
+    }
+
+
     private void blockStreams() throws Exception {
+        blockStreams(false);
+    }
+
+
+    private void blockStreams(boolean prioritizeIdleStream) throws Exception {
         http2Connect();
 
         /*
@@ -229,7 +381,19 @@ public class TestRfc9218 extends Http2TestBase {
 
         // Send additional requests. Connection window is empty so only headers will be returned.
         sendSimpleGetRequest(19);
-        sendSimpleGetRequest(21);
+        if (prioritizeIdleStream) {
+            // Stream 21 is idle at this point
+            sendPriorityUpdate(21, 0, false);
+            List<Header> headers = new ArrayList<>(5);
+            headers.add(new Header(":method", Method.GET));
+            headers.add(new Header(":scheme", "http"));
+            headers.add(new Header(":path", "/simple"));
+            headers.add(new Header(":authority", "localhost:" + getPort()));
+            headers.add(new Header("priority", "u=7"));
+            sendGetRequest(21, headers);
+        } else {
+            sendSimpleGetRequest(21);
+        }
 
         // 19-headers, 21-headers
         parser.readFrame();
