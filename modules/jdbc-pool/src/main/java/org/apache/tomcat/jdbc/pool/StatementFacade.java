@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.jdbc.pool;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -55,13 +56,34 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
     private volatile boolean borrowEnded = false;
 
     /**
-     * Constructs a StatementFacade.
+     * The pooled connection this borrow serves, used to record that a statement or result set change may have opened
+     * or joined a transaction, so that the state interceptor can decide whether a rollback is needed. Held weakly: a
+     * statement handle the application retains past the borrow must not keep the pooled connection - and through it
+     * the pool, its sessions and its driver class loader - reachable. While the borrow is live the connection proxy the
+     * statement holds keeps the pooled connection strongly reachable, so the marker is always written during a borrow.
+     * {@code null} when the facade is built without a pooled connection, in which case no marker is kept.
+     */
+    private final WeakReference<PooledConnection> pooledConnection;
+
+    /**
+     * Constructs a StatementFacade without transaction tracking.
      *
      * @param interceptor the next interceptor in the chain
      */
     protected StatementFacade(JdbcInterceptor interceptor) {
+        this(interceptor, null);
+    }
+
+    /**
+     * Constructs a StatementFacade.
+     *
+     * @param interceptor      the next interceptor in the chain
+     * @param pooledConnection the pooled connection this borrow serves, or {@code null} for no transaction tracking
+     */
+    protected StatementFacade(JdbcInterceptor interceptor, PooledConnection pooledConnection) {
         setUseEquals(interceptor.isUseEquals());
         setNext(interceptor);
+        this.pooledConnection = new WeakReference<>(pooledConnection);
     }
 
     @Override
@@ -283,6 +305,16 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
             if (compare(GETCONNECTION_VAL, method)) {
                 return connection;
             }
+            if (method.getName().startsWith("execute")) {
+                PooledConnection pooled = pooledConnection.get();
+                if (pooled != null) {
+                    // The execution may open or join a transaction. Recording
+                    // it before the call means a failed execution, whose
+                    // transaction state is unknown, still makes the next borrow
+                    // terminate the session's transaction.
+                    pooled.markTransactionDirty();
+                }
+            }
 
             Object result;
             try {
@@ -417,6 +449,15 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
 
             if (compare(GET_STATEMENT, method)) {
                 return parent;
+            }
+            String name = method.getName();
+            if (name.startsWith("update") || "insertRow".equals(name) || "deleteRow".equals(name)) {
+                PooledConnection pooled = pooledConnection.get();
+                if (pooled != null) {
+                    // A row change may open or join a transaction, as for a
+                    // statement execution.
+                    pooled.markTransactionDirty();
+                }
             }
 
             Object result;

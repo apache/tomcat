@@ -148,6 +148,38 @@ abstract class PendingTransactionAcrossBorrowersBase extends JdbcPoolBaseTest {
     }
 
     @Test
+    void anOpenTransactionUnderTheMatchingDefaultIsStillTerminated() throws Exception {
+        // defaultAutoCommit=false is the configured state, so a borrower that
+        // leaves auto-commit alone does not trigger a state restore; the
+        // pending transaction must still not be handed to the next borrower.
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setJdbcInterceptors(ConnectionState.class.getSimpleName());
+        ds.getPoolProperties().setDefaultAutoCommit(Boolean.FALSE);
+        String t = createTable(ds);
+
+        Connection first = ds.getConnection();
+        Assertions.assertFalse(first.getAutoCommit(),
+                "precondition: the configured auto-commit default applies");
+        setSessionMarker(first, 35);
+        try (Statement st = first.createStatement()) {
+            st.executeUpdate("INSERT INTO " + t + " VALUES (1)");
+        }
+        first.close(); // still in a transaction, auto-commit already at its default
+
+        try (Connection second = ds.getConnection()) {
+            Assertions.assertEquals(Integer.valueOf(35), sessionMarker(second),
+                    "the same physical session must have been reused");
+            Assertions.assertFalse(second.getAutoCommit(),
+                    "the configured auto-commit default must still apply");
+            Assertions.assertEquals(0, rowCount(second, t),
+                    "the next borrower must not find itself inside the "
+                            + "previous borrower's transaction");
+        }
+        Assertions.assertEquals(0, adminRowCount(t),
+                "the abandoned work must not have survived");
+    }
+
+    @Test
     void aRestoreNeededOnlyForTheIsolationLevelStillTerminatesTheTransaction()
             throws Exception {
         DataSource ds = newDataSource();
