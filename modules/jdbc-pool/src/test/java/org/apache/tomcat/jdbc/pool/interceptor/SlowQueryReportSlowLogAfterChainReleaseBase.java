@@ -185,10 +185,7 @@ abstract class SlowQueryReportSlowLogAfterChainReleaseBase extends JdbcPoolBaseT
             // half of the reported disagreement. The fix must not silence
             // it, and the log channel must join it: one reported slow
             // query, both channels.
-            Assertions.assertTrue(received.stream().anyMatch(n ->
-                            SlowQueryReportJmx.SLOW_QUERY_NOTIFICATION.equals(n.getType())
-                                    && n.getMessage() != null
-                                    && n.getMessage().contains("SELECT 2 FROM")),
+            Assertions.assertTrue(awaitNotificationMessage(received, "SELECT 2 FROM"),
                     "the slow query must still notify through the name's broadcaster"
                             + " in this window, received: " + received);
             logs.assertSlowQueryWarned("SELECT 2 FROM");
