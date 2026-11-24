@@ -319,6 +319,20 @@ public class PooledConnection implements PooledConnectionMBean {
             if (parent.getJmxPool() != null) {
                 createMBean();
             }
+            // A release may have won while the driver connect was in flight.
+            // The release claim is taken under this monitor; check it after
+            // the session has been installed so a connect that passed the
+            // entry check cannot leave a live session behind in a released
+            // object. The monitor is only held for the check, never across
+            // the driver call.
+            boolean releasedAfterConnect;
+            synchronized (this) {
+                releasedAfterConnect = released.get();
+            }
+            if (releasedAfterConnect) {
+                disconnect(true);
+                throw new SQLException(MessageFactory.get("pooledConnection.cannotReestablish"));
+            }
         } catch (Throwable x) {
             ExceptionUtils.handleThrowable(x);
             // The attempt did not establish the replacement session, or it failed after establishing it. Either
@@ -780,18 +794,54 @@ public class PooledConnection implements PooledConnectionMBean {
 
         // The state a refused attempt has to hand back: the session this
         // connection is serving and the identity that session was opened
-        // with.
-        java.sql.Connection served = connection;
-        javax.sql.XAConnection servedXa = xaConnection;
-        javax.sql.PooledConnection servedCpds = cpdsConnection;
-        long servedLastConnected = lastConnected;
-        long servedLastValidated = lastValidated;
-        boolean servedDiscarded = discarded;
+        // with. Capture and detach it under the same monitor as the release
+        // claim, so a release that arrives after this block cannot close the
+        // served session from underneath the attempt; a release that arrived
+        // before the block owns the session and this attempt refuses without
+        // touching it.
+        java.sql.Connection served;
+        javax.sql.XAConnection servedXa;
+        javax.sql.PooledConnection servedCpds;
+        long servedLastConnected;
+        long servedLastValidated;
+        boolean servedDiscarded;
         HashMap<Object, Object> sessionAttributes = getAttributes();
-        boolean hadUser = sessionAttributes.containsKey(PROP_USER);
-        Object servedUser = sessionAttributes.get(PROP_USER);
-        boolean hadPassword = sessionAttributes.containsKey(PROP_PASSWORD);
-        Object servedPassword = sessionAttributes.get(PROP_PASSWORD);
+        boolean hadUser;
+        Object servedUser;
+        boolean hadPassword;
+        Object servedPassword;
+        boolean stagedServed;
+        synchronized (this) {
+            if (released.get()) {
+                throw new SQLException(MessageFactory.get("pooledConnection.cannotReestablish"));
+            }
+            served = connection;
+            servedXa = xaConnection;
+            servedCpds = cpdsConnection;
+            servedLastConnected = lastConnected;
+            servedLastValidated = lastValidated;
+            servedDiscarded = discarded;
+            hadUser = sessionAttributes.containsKey(PROP_USER);
+            servedUser = sessionAttributes.get(PROP_USER);
+            hadPassword = sessionAttributes.containsKey(PROP_PASSWORD);
+            servedPassword = sessionAttributes.get(PROP_PASSWORD);
+            stagedServed = served != null || servedXa != null || servedCpds != null;
+            // Set the session being replaced out of reach of the connect
+            // below, which closes any session it finds before it opens the new
+            // one. This one has to stay open until the attempt that replaces it
+            // is known to have succeeded. The connected timestamp goes with it:
+            // while the fields read null, the published LastConnected must read
+            // -1 like in every other no-session state, as the per-connection
+            // MBean stays registered across this window.
+            connection = null;
+            xaConnection = null;
+            cpdsConnection = null;
+            lastConnected = -1;
+            // The validation timestamp belongs to the session being replaced too. Clear it with the other
+            // session fields so the per-connection MBean, which stays registered across this window, does
+            // not report a timestamp for a session that is no longer current.
+            lastValidated = 0;
+        }
 
         // Stage the credentials the attempt is made under. A null stands for
         // the pool's default, which the connect substitutes the same way it
@@ -807,21 +857,6 @@ public class PooledConnection implements PooledConnectionMBean {
             sessionAttributes.put(PROP_PASSWORD, password);
         }
 
-        // Set the session being replaced out of reach of the connect below,
-        // which closes any session it finds before it opens the new one. This
-        // one has to stay open until the attempt that replaces it is known to
-        // have succeeded. The connected timestamp goes with it: while the
-        // fields read null, the published LastConnected must read -1 like in
-        // every other no-session state, as the per-connection MBean stays
-        // registered across this window.
-        connection = null;
-        xaConnection = null;
-        cpdsConnection = null;
-        lastConnected = -1;
-        // The validation timestamp belongs to the session being replaced too. Clear it with the other
-        // session fields so the per-connection MBean, which stays registered across this window, does
-        // not report a timestamp for a session that is no longer current.
-        lastValidated = 0;
         try {
             connect();
         } catch (Throwable x) {
@@ -833,30 +868,60 @@ public class PooledConnection implements PooledConnectionMBean {
             // served anyone, and the state the chain holds belongs to the
             // session that is about to be back in service.
             ExceptionUtils.handleThrowable(x);
+            java.sql.Connection partial;
+            javax.sql.XAConnection partialXa;
+            javax.sql.PooledConnection partialCpds;
+            boolean releasedNow;
+            synchronized (this) {
+                partial = connection;
+                partialXa = xaConnection;
+                partialCpds = cpdsConnection;
+                connection = null;
+                xaConnection = null;
+                cpdsConnection = null;
+                lastConnected = -1;
+                lastValidated = 0;
+                releasedNow = released.get();
+                if (releasedNow) {
+                    // Release owns the terminal lifecycle. Do not restore the
+                    // served session into a released object.
+                    discarded = true;
+                } else {
+                    // Restore even if the partial session could not be closed:
+                    // the served session is what the pool still owns, and a
+                    // null field would leave it open but unreachable.
+                    connection = served;
+                    xaConnection = servedXa;
+                    cpdsConnection = servedCpds;
+                    lastConnected = servedLastConnected;
+                    lastValidated = servedLastValidated;
+                    discarded = servedDiscarded;
+                    if (hadUser) {
+                        sessionAttributes.put(PROP_USER, servedUser);
+                    } else {
+                        sessionAttributes.remove(PROP_USER);
+                    }
+                    if (hadPassword) {
+                        sessionAttributes.put(PROP_PASSWORD, servedPassword);
+                    } else {
+                        sessionAttributes.remove(PROP_PASSWORD);
+                    }
+                }
+            }
             try {
-                closeSession(connection, xaConnection, cpdsConnection);
+                closeSession(partial, partialXa, partialCpds);
             } catch (Throwable closeFailure) {
                 ExceptionUtils.handleThrowable(closeFailure);
                 x.addSuppressed(closeFailure);
-            } finally {
-                // Restore even if the partial session could not be closed:
-                // the served session is what the pool still owns, and a null
-                // field would leave it open but unreachable.
-                connection = served;
-                xaConnection = servedXa;
-                cpdsConnection = servedCpds;
-                lastConnected = servedLastConnected;
-                lastValidated = servedLastValidated;
-                discarded = servedDiscarded;
-                if (hadUser) {
-                    sessionAttributes.put(PROP_USER, servedUser);
-                } else {
-                    sessionAttributes.remove(PROP_USER);
-                }
-                if (hadPassword) {
-                    sessionAttributes.put(PROP_PASSWORD, servedPassword);
-                } else {
-                    sessionAttributes.remove(PROP_PASSWORD);
+            }
+            if (releasedNow && stagedServed) {
+                // The release could not see the served session: it was staged
+                // out of the fields before the release claim was settled.
+                try {
+                    closeSession(served, servedXa, servedCpds);
+                } catch (Throwable closeFailure) {
+                    ExceptionUtils.handleThrowable(closeFailure);
+                    x.addSuppressed(closeFailure);
                 }
             }
             if (x instanceof SQLException) {
@@ -882,18 +947,80 @@ public class PooledConnection implements PooledConnectionMBean {
         // can be given up now. The fields are turned back to it while it is
         // retired, so that the chain is told - as it is for every other
         // retirement - about the session it has been serving rather than
-        // about the one that takes its place.
-        java.sql.Connection accepted = connection;
-        javax.sql.XAConnection acceptedXa = xaConnection;
-        javax.sql.PooledConnection acceptedCpds = cpdsConnection;
-        connection = served;
-        xaConnection = servedXa;
-        cpdsConnection = servedCpds;
-        notifyDisconnected(false);
+        // about the one that takes its place. The release claim and this
+        // retirement share the monitor; the served session is removed from the
+        // fields before it is closed outside the monitor, so a release arriving
+        // after this block cannot close it a second time.
+        java.sql.Connection accepted;
+        javax.sql.XAConnection acceptedXa;
+        javax.sql.PooledConnection acceptedCpds;
+        long acceptedLastConnected;
+        long acceptedLastValidated;
+        boolean releasedNow;
+        boolean acceptedOwned = false;
+        synchronized (this) {
+            accepted = connection;
+            acceptedXa = xaConnection;
+            acceptedCpds = cpdsConnection;
+            acceptedLastConnected = lastConnected;
+            acceptedLastValidated = lastValidated;
+            releasedNow = released.get();
+            if (!releasedNow && accepted != null) {
+                connection = served;
+                xaConnection = servedXa;
+                cpdsConnection = servedCpds;
+                notifyDisconnected(false);
+                connection = null;
+                xaConnection = null;
+                cpdsConnection = null;
+                lastConnected = -1;
+                lastValidated = 0;
+            } else if (releasedNow) {
+                // A release won while the replacement was being established.
+                // If the fields still hold the accepted session, take it out
+                // of the released object and close it; otherwise the release
+                // already captured it.
+                if (accepted != null && connection == accepted) {
+                    connection = null;
+                    xaConnection = null;
+                    cpdsConnection = null;
+                    lastConnected = -1;
+                    lastValidated = 0;
+                    discarded = true;
+                    acceptedOwned = true;
+                }
+            }
+        }
+        if (releasedNow) {
+            closeSession(served, servedXa, servedCpds);
+            if (acceptedOwned) {
+                closeSession(accepted, acceptedXa, acceptedCpds);
+            }
+            throw new SQLException(MessageFactory.get("pooledConnection.cannotReestablish"));
+        }
         closeSession(served, servedXa, servedCpds);
-        connection = accepted;
-        xaConnection = acceptedXa;
-        cpdsConnection = acceptedCpds;
+
+        // Publish the accepted session only if a release did not land while
+        // the served session was being retired. If it did, the accepted
+        // session is not the released connection's to keep.
+        synchronized (this) {
+            releasedNow = released.get();
+            if (!releasedNow) {
+                connection = accepted;
+                xaConnection = acceptedXa;
+                cpdsConnection = acceptedCpds;
+                lastConnected = acceptedLastConnected;
+                lastValidated = acceptedLastValidated;
+            } else if (accepted != null) {
+                acceptedOwned = true;
+            }
+        }
+        if (releasedNow) {
+            if (acceptedOwned) {
+                closeSession(accepted, acceptedXa, acceptedCpds);
+            }
+            throw new SQLException(MessageFactory.get("pooledConnection.cannotReestablish"));
+        }
     }
 
     /**
@@ -903,28 +1030,46 @@ public class PooledConnection implements PooledConnectionMBean {
      *                     teardown reset is performed once by {@link ConnectionPool#release(PooledConnection)}
      */
     private void disconnect(boolean finalize) {
-        if (isDiscarded() && connection == null && xaConnection == null && cpdsConnection == null) {
-            return;
-        }
-        setDiscarded(true);
-        if (connection != null || xaConnection != null || cpdsConnection != null) {
-            if (connection != null) {
-                notifyDisconnected(finalize);
+        java.sql.Connection session;
+        javax.sql.XAConnection xa;
+        javax.sql.PooledConnection cpds;
+        // Take the terminal session out of the fields under the monitor shared
+        // with the release claim and the connect completion check. Only this
+        // call captures it, so a concurrent release/connect/post-connect
+        // discard cannot close the same session twice, and a session that is
+        // installed after the capture is caught by the connect completion
+        // check instead. The physical close itself runs outside the monitor.
+        synchronized (this) {
+            if (isDiscarded() && connection == null && xaConnection == null && cpdsConnection == null) {
+                return;
             }
+            setDiscarded(true);
+            session = connection;
+            xa = xaConnection;
+            cpds = cpdsConnection;
+            connection = null;
+            xaConnection = null;
+            cpdsConnection = null;
+            lastConnected = -1;
+            // The validation timestamp belongs to the session that was just given
+            // up. Clearing it here keeps the published value at the documented 0
+            // for a connection whose current session has not been validated, even
+            // across the reconnect window while the per-connection MBean stays
+            // registered.
+            lastValidated = 0;
+        }
+        if (session != null) {
+            // The session fields have already been cleared, so this notification
+            // does not leave the terminal session reachable from the object. It
+            // runs outside the monitor, so a listener or interceptor hook that
+            // blocks cannot hold up another release/connect transition.
+            notifyDisconnected(finalize);
+        }
+        if (session != null || xa != null || cpds != null) {
             // Close any handle too: an XA/CPDS handle owns the physical
             // session even when obtaining its logical connection failed.
-            closeSession(connection, xaConnection, cpdsConnection);
+            closeSession(session, xa, cpds);
         }
-        connection = null;
-        xaConnection = null;
-        cpdsConnection = null;
-        lastConnected = -1;
-        // The validation timestamp belongs to the session that was just given
-        // up. Clearing it here keeps the published value at the documented 0
-        // for a connection whose current session has not been validated, even
-        // across the reconnect window while the per-connection MBean stays
-        // registered.
-        lastValidated = 0;
         // The chain's teardown reset is delivered once, by the release that
         // clears the handler after it has freed the pool slot - see
         // ConnectionPool.release(). The disconnect event above is a separate
