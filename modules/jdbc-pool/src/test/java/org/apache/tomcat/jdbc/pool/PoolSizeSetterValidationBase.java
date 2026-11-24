@@ -105,6 +105,48 @@ abstract class PoolSizeSetterValidationBase extends JdbcPoolBaseTest {
      * of two parked in that read is reached only if both writers are inside the
      * check together; a serialised pair leaves the first one waiting alone.
      */
+    /**
+     * Parks the validation read of a write, after the setter has stored its
+     * value but before the check has corrected it. The object the pool reads
+     * is the private builder copy, so a value the write has not had validated
+     * must not be visible there while the write is parked.
+     */
+    private static final class SetterGateProperties extends PoolProperties {
+
+        private static final long serialVersionUID = 1L;
+
+        volatile boolean armed;
+        final CountDownLatch entered = new CountDownLatch(1);
+        final CountDownLatch release = new CountDownLatch(1);
+
+        @Override
+        public int getMaxActive() {
+            if (armed && fromCheck()) {
+                armed = false;
+                int before = super.getMaxActive();
+                entered.countDown();
+                try {
+                    release.await(10, TimeUnit.SECONDS);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                // Answer the hooked read with the value it saw, before the
+                // concurrent reader could have changed anything.
+                return before;
+            }
+            return super.getMaxActive();
+        }
+
+        private boolean fromCheck() {
+            for (StackTraceElement frame : new Throwable().getStackTrace()) {
+                if ("checkPoolConfiguration".equals(frame.getMethodName())) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
     private static final class OverlapDetectingProperties extends PoolProperties {
 
         private static final long serialVersionUID = 1L;
@@ -350,5 +392,66 @@ abstract class PoolSizeSetterValidationBase extends JdbcPoolBaseTest {
                 "a max active below one was published: the racing write landed while the "
                         + "publication check was reading the counts, its setter found the pool "
                         + "field null and reconciled nothing, and nothing repaired it later");
+    }
+
+    /*
+     * A setter must not expose its requested value to operational readers
+     * before the check has validated and corrected it. maxActive=0 makes
+     * shouldAbandon() compute an infinite percentage, so a borrow path that
+     * saw the requested value would abandon a connection the corrected
+     * configuration protects. The setter is parked inside its check, after
+     * the requested value was stored but before the correction replaced it;
+     * the pool's own operational reader must still see the applied value.
+     */
+    @Test
+    void aSetterDoesNotPublishItsUnvalidatedValueToOperationalReaders() throws Exception {
+        SetterGateProperties properties = new SetterGateProperties();
+        DataSource ds = manage(new DataSource());
+        properties.setUrl(getUrl());
+        properties.setDriverClassName("org.h2.Driver");
+        properties.setUsername("sa");
+        properties.setPassword("");
+        properties.setJmxEnabled(false);
+        properties.setInitialSize(1);
+        properties.setMinIdle(0);
+        properties.setMaxActive(10);
+        properties.setMaxIdle(10);
+        properties.setRemoveAbandoned(true);
+        properties.setRemoveAbandonedTimeout(1);
+        properties.setAbandonWhenPercentageFull(20);
+        properties.setTimeBetweenEvictionRunsMillis(-1);
+        ds.setPoolProperties(properties);
+        ds.createPool();
+
+        Connection held = ds.getConnection();
+        Assertions.assertEquals(1, ds.getPool().getActive(), "precondition: one connection is in use");
+        sleep(1500);
+
+        ((SetterGateProperties) ds.getPool().getMutableConfiguration()).armed = true;
+        Thread writer = new Thread(() -> ds.setMaxActive(0), "max-active-writer");
+        writer.start();
+        Assertions.assertTrue(properties.entered.await(10, TimeUnit.SECONDS),
+                "the setter must have reached the validation of the requested value");
+
+        // The live configuration still carries maxActive=10, so one in use is
+        // below the threshold. The requested 0 must not have been published
+        // to the operational reader that computes the percentage.
+        ds.getPool().checkAbandoned();
+
+        Assertions.assertEquals(1, ds.getPool().getActive(),
+                "a value a setter has not validated yet must not abandon a connection");
+        Assertions.assertFalse(held.isClosed(), "the borrower's handle must stay usable");
+        Assertions.assertEquals(10, ds.getPoolProperties().getMaxActive(),
+                "the management getter must still report the applied value");
+
+        properties.release.countDown();
+        writer.join(TimeUnit.SECONDS.toMillis(10));
+        Assertions.assertFalse(writer.isAlive(), "the setter must finish");
+        Assertions.assertEquals(PoolProperties.DEFAULT_MAX_ACTIVE, ds.getPoolProperties().getMaxActive(),
+                "the setter must publish the corrected value once its check completes");
+        Assertions.assertEquals(1, ds.getPool().getActive(),
+                "the connection must still be in use after the setter completes");
+
+        held.close();
     }
 }
