@@ -50,8 +50,8 @@ abstract class DiscardedStateRaceBase extends JdbcPoolBaseTest {
         }
 
         @Override
-        protected void connectUsingDriver() throws SQLException {
-            super.connectUsingDriver();
+        protected void connectUsingDriver(PoolConfiguration configuration) throws SQLException {
+            super.connectUsingDriver(configuration);
             setDiscarded(true);
         }
     }
