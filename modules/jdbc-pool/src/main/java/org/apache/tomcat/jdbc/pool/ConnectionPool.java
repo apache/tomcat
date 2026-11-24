@@ -137,9 +137,10 @@ public class ConnectionPool {
     private PoolCleaner poolCleaner;
 
     /**
-     * Pool closed flag
+     * Pool closed flag. The claim of the closure is an atomic compare-and-set so a second close caller that observes
+     * the open state at the same time cannot also run the drain and the interceptor close notifications.
      */
-    private volatile boolean closed = false;
+    private final AtomicBoolean closed = new AtomicBoolean(false);
 
     /**
      * The pool name recorded when this pool started, written by {@link #init(PoolConfiguration)} before anything is
@@ -495,7 +496,7 @@ public class ConnectionPool {
      * @return boolean
      */
     public boolean isClosed() {
-        return this.closed;
+        return closed.get();
     }
 
 
@@ -764,14 +765,15 @@ public class ConnectionPool {
      * @param force - true to even close the active connections
      */
     protected void close(boolean force) {
-        // Are we already closed
-        if (this.closed) {
+        // Claim the closure atomically. Two callers that observe the open state
+        // at the same time would otherwise both run the drain and deliver the
+        // interceptor close notifications twice.
+        if (!closed.compareAndSet(false, true)) {
             return;
         }
         // Publish the closure: operations that observe it fail fast - this
-        // write itself blocks nothing, the detailed comment below covers
-        // what each kind of concurrent operation does once it sees it
-        this.closed = true;
+        // compare-and-set itself blocks nothing, the detailed comment below
+        // covers what each kind of concurrent operation does once it sees it
         // Stop background thread
         terminatePoolCleaner();
 
@@ -1333,7 +1335,7 @@ public class ConnectionPool {
                 ExceptionUtils.handleThrowable(x);
             }
         }
-        if (closed) {
+        if (closed.get()) {
             terminatePoolCleaner();
         } else {
             // The cleaner is reconciled against the mutable configuration so
@@ -1372,7 +1374,7 @@ public class ConnectionPool {
      */
     public synchronized void initializePoolCleaner(PoolConfiguration properties) {
         // If the evictor thread is supposed to run, start it now
-        if (properties.isPoolSweeperEnabled() && !closed) {
+        if (properties.isPoolSweeperEnabled() && !closed.get()) {
             // Never overwrite a running cleaner: the replaced task would
             // stay registered on the shared timer with no reference left to
             // stop it, duplicating maintenance work for the pool's lifetime

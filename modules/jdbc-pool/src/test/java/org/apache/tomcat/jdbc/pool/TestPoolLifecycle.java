@@ -90,4 +90,8 @@ class TestPoolLifecycle {
     class LoginTimeoutMapping extends LoginTimeoutMappingBase {
     }
 
+    @Nested
+    class ConcurrentClose extends ConcurrentCloseBase {
+    }
+
 }
