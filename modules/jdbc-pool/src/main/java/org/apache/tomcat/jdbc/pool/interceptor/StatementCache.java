@@ -799,7 +799,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
          * Poolable hint set by the application. Tracked here as some drivers (e.g. H2) always return false from
          * {@code isPoolable()}.
          */
-        private boolean poolable = true;
+        private volatile boolean poolable = true;
         /**
          * Whether the application set a cursor name on this statement. A
          * cached statement must not hand a previous borrower's cursor name to

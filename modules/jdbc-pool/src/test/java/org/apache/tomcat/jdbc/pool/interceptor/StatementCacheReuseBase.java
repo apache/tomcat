@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.jdbc.pool.interceptor;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -409,5 +411,12 @@ abstract class StatementCacheReuseBase extends JdbcPoolBaseTest {
                         "and the cached one must be handed out again");
             }
         }
+    }
+
+    @Test
+    void thePoolableHintIsPublishedToAThreadThatClosesTheStatement() throws Exception {
+        Field poolable = StatementCache.CachedStatement.class.getDeclaredField("poolable");
+        Assertions.assertTrue(Modifier.isVolatile(poolable.getModifiers()),
+                "setPoolable() is recorded on the application thread while closeInvoked() may read the flag on another thread");
     }
 }
