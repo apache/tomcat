@@ -2412,6 +2412,17 @@ public class ConnectionPool {
                     return false;
                 }
             } catch (Exception e) {
+                if (isClosed()) {
+                    // A close that landed after the entry check makes the
+                    // reconnect fail with the pool-closed refusal. That is a
+                    // normal shutdown race, not a failed max-age renewal, so
+                    // it is not reported at error level.
+                    if (log.isDebugEnabled()) {
+                        log.debug(MessageFactory.get("connectionPool.reconnectExpiredPoolClosed", con),
+                                PoolUtilities.maskCredentials(e));
+                    }
+                    return false;
+                }
                 // The pattern names a connection, so the argument is the
                 // connection that expired and failed - the pool identity
                 // would send operators chasing one session to the wrong
@@ -2608,7 +2619,11 @@ public class ConnectionPool {
      */
     public void checkAbandoned() {
         try {
-            if (busy.isEmpty()) {
+            if (isClosed() || busy.isEmpty()) {
+                // A pool that has been closed has no borrowers left to
+                // account for: the shutdown drain owns the busy sessions, and
+                // a check that ran past the close must not record one of them
+                // as an application leak.
                 return;
             }
             Iterator<PooledConnection> locked = busy.iterator();
@@ -2623,6 +2638,12 @@ public class ConnectionPool {
                     if (idle.contains(con) || con.isReleased()) {
                         continue;
                     }
+                    if (isClosed()) {
+                        // The close landed after this call's entry check: the
+                        // shutdown drain owns the connection now and must not
+                        // be charged as an abandonment or a suspect.
+                        continue;
+                    }
                     long time = con.getTimestamp();
                     long now = System.currentTimeMillis();
                     if (shouldAbandon() && (now - time) > con.getAbandonTimeout()) {
@@ -2633,9 +2654,23 @@ public class ConnectionPool {
                         if (!busy.remove(con)) {
                             continue;
                         }
+                        if (isClosed()) {
+                            // The shutdown claim landed while this check held
+                            // the connection: release it as a plain shutdown
+                            // release, never as an abandonment.
+                            release(con);
+                            setToNull = true;
+                            continue;
+                        }
                         abandon(con);
                         setToNull = true;
                     } else if (sto > 0 && (now - time) > (sto * 1000L)) {
+                        if (isClosed()) {
+                            // As for the abandonment above, a closure that
+                            // landed here must not report the session as a
+                            // suspect the application abandoned.
+                            continue;
+                        }
                         suspect(con);
                     } else {
                         // Do nothing
@@ -2831,10 +2866,20 @@ public class ConnectionPool {
                     }
                     boolean keep;
                     try {
-                        if (checkMaxAgeOnly) {
-                            keep = reconnectIfExpired(con);
-                        } else {
-                            keep = reconnectIfExpired(con) && con.validate(PooledConnection.VALIDATE_IDLE);
+                        keep = reconnectIfExpired(con);
+                        if (keep && !checkMaxAgeOnly) {
+                            if (isClosed()) {
+                                // The close landed after the reconnect started
+                                // and before the validation: the shutdown drain
+                                // has already passed the queues, so release the
+                                // claimed connection instead of running a
+                                // validation query for a closed pool.
+                                if (release(con)) {
+                                    releasedIdleCount.incrementAndGet();
+                                }
+                                continue;
+                            }
+                            keep = con.validate(PooledConnection.VALIDATE_IDLE);
                         }
                     } catch (Throwable x) {
                         // The module's fatal policy runs first, as everywhere
