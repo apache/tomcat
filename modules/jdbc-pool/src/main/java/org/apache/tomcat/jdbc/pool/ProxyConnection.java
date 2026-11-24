@@ -39,6 +39,15 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  */
 public class ProxyConnection extends JdbcInterceptor {
 
+    /*
+     * Connection methods that end or start a transaction on the session. They maintain the pooled connection's dirty
+     * marker, which the state interceptor consults before it rolls a pending transaction back.
+     */
+    private static final String COMMIT_VAL = "commit";
+    private static final String ROLLBACK_VAL = "rollback";
+    private static final String SET_AUTO_COMMIT_VAL = "setAutoCommit";
+    private static final String SET_SAVEPOINT_VAL = "setSavepoint";
+
     /**
      * The underlying pooled connection. Volatile because writes that end or re-arm a borrow have no synchronization on
      * the reader's side.
@@ -668,7 +677,21 @@ public class ProxyConnection extends JdbcInterceptor {
             throw new SQLException(MessageFactory.get("proxyConnection.connectionClosed"));
         }
         try {
-            return method.invoke(physical, args);
+            Object result = method.invoke(physical, args);
+            if (compare(COMMIT_VAL, method) ||
+                    (compare(ROLLBACK_VAL, method) && (args == null || args.length == 0)) ||
+                    (compare(SET_AUTO_COMMIT_VAL, method) && args != null && args.length > 0 &&
+                            Boolean.TRUE.equals(args[0]))) {
+                // The driver accepted an operation that ended the transaction;
+                // the state interceptor no longer needs to roll anything back
+                // for the next borrower.
+                poolc.clearTransactionDirty();
+            } else if (compare(SET_SAVEPOINT_VAL, method)) {
+                // A savepoint can start a transaction even with no statement
+                // executed yet, so record it conservatively.
+                poolc.markTransactionDirty();
+            }
+            return result;
         } catch (Throwable t) {
             if (t instanceof InvocationTargetException) {
                 throw t.getCause() != null ? t.getCause() : t;
