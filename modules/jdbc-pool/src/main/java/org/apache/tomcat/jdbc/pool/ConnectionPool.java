@@ -1093,8 +1093,9 @@ public class ConnectionPool {
             // the check: a writer of this attribute holds no monitor the
             // construction takes, so a store can land between the check above
             // (which repairs and reads) and this allocation (which builds).
-            PooledConnection[] initialPool =
-                    new PooledConnection[Math.max(0, poolProperties.getInitialSize())];
+            int maxActive = Math.max(0, poolProperties.getMaxActive());
+            int initialSize = Math.min(Math.max(0, poolProperties.getInitialSize()), maxActive);
+            PooledConnection[] initialPool = new PooledConnection[initialSize];
             try {
                 for (int i = 0; i < initialPool.length; i++) {
                     initialPool[i] = this.borrowConnection(0, null, null); // Don't wait, should be no contention
