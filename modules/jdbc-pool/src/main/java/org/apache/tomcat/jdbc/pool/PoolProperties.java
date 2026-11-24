@@ -712,6 +712,13 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
      */
     @Override
     public synchronized void setConnectionProperties(String connectionProperties) {
+        // A blank string is the unset value, as the JNDI factory has always
+        // treated it: storing it would make the getter report a value that was
+        // never configured while the effective behaviour is "no pairs".
+        if (connectionProperties != null && connectionProperties.trim().isEmpty()) {
+            connectionProperties = null;
+        }
+        String previousConnectionProperties = this.connectionProperties;
         Properties dbProps = getDbProperties();
         // Parse into a fresh collection before anything is mutated: that is
         // what tells apart the keys this string contributes from the ones
@@ -761,14 +768,29 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         Properties writable = dbProps;
         // A configuration serialized before this field existed deserializes
         // with it null, as field initializers do not run on deserialization.
-        if (connectionPropertyKeys != null) {
-            for (String key : connectionPropertyKeys) {
-                writable.remove(key);
-                if (writable.getProperty(key) != null) {
-                    Properties copy = PoolUtilities.clone(writable);
-                    copy.remove(key);
-                    writable = copy;
+        // The previous string is still part of that serialized state, so the
+        // keys it contributed can be rebuilt from it instead of leaving them
+        // in the collection for the life of the reconfiguration.
+        if (connectionPropertyKeys == null) {
+            if (previousConnectionProperties != null) {
+                try {
+                    Properties previous = getProperties(previousConnectionProperties, new Properties());
+                    connectionPropertyKeys = new HashSet<>(previous.stringPropertyNames());
+                } catch (RuntimeException x) {
+                    // The old string is malformed and cannot name its keys; no
+                    // tracking can be reconstructed for it.
+                    connectionPropertyKeys = Collections.emptySet();
                 }
+            } else {
+                connectionPropertyKeys = Collections.emptySet();
+            }
+        }
+        for (String key : connectionPropertyKeys) {
+            writable.remove(key);
+            if (writable.getProperty(key) != null) {
+                Properties copy = PoolUtilities.clone(writable);
+                copy.remove(key);
+                writable = copy;
             }
         }
         @SuppressWarnings("null")
@@ -2484,7 +2506,14 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                 // charset conversion takes place at all.
                 props.load(new StringReader(propText.replace(';', '\n')));
             } catch (IOException ioe) {
-                throw new RuntimeException(ioe);
+                throw new IllegalArgumentException(MessageFactory.get(
+                        "poolProperties.invalidConnectionProperties", ioe.getMessage()), ioe);
+            } catch (RuntimeException x) {
+                // Properties.load rejects a malformed Unicode escape with a
+                // bare IllegalArgumentException that does not name the value's
+                // owner; identify it as the connection properties string.
+                throw new IllegalArgumentException(MessageFactory.get(
+                        "poolProperties.invalidConnectionProperties", x.getMessage()), x);
             }
         }
         return props;
