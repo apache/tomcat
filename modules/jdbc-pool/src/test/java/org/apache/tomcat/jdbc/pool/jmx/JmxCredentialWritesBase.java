@@ -311,6 +311,32 @@ abstract class JmxCredentialWritesBase extends JdbcPoolBaseTest {
     }
 
     /**
+     * A URL-shaped driver property can carry its credential in the value
+     * itself, and the published DbProperties attribute must mask that too,
+     * not only the entries whose key is a password alias.
+     */
+    @Test
+    void theDbPropertiesAttributeMasksACredentialInsideAUrlValue() throws Exception {
+        DataSource ds = newDataSource();
+        ds.setDriverClassName(RecordingDriver.class.getName());
+        ds.getPoolProperties().setJmxEnabled(true);
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().getDbProperties().setProperty("url",
+                "jdbc:mysql://user:url-secret@host/db");
+        ds.createPool();
+
+        ObjectName poolOname = publish(ds);
+        try {
+            Properties read = (Properties) server().getAttribute(poolOname, "DbProperties");
+            Assertions.assertEquals("jdbc:mysql://user:********@host/db",
+                    read.getProperty("url"),
+                    "a credential embedded in a URL value must be masked in the JMX attribute");
+        } finally {
+            unpublish(ds, poolOname);
+        }
+    }
+
+    /**
      * The database properties attribute is published read-write, and unlike the masked strings beside it the masked
      * value it reads is a whole configuration: an operator who reads it, changes one entry and writes it back hands
      * the pool a set with the password taken out, and because the write replaces the live collection, that is the
