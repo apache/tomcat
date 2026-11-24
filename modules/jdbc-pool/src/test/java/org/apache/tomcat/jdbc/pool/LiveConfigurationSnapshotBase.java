@@ -367,6 +367,41 @@ abstract class LiveConfigurationSnapshotBase {
                 "the snapshot copy must wait for the source monitor and capture the completed generation");
     }
 
+    /**
+     * A reconnect stages credentials for the connect it immediately performs,
+     * so both must come from the same generation. A direct builder write ahead
+     * of snapshot publication must not put a new password on a session
+     * established with the older URL and driver properties.
+     */
+    @Test
+    void aReconnectUsesTheCredentialGenerationItsConnectReads() throws Exception {
+        PoolProperties props = properties();
+        Properties generation = new Properties();
+        generation.setProperty("generation", "old");
+        props.setDbProperties(generation);
+        ConnectionPool pool = new ConnectionPool(props);
+        PooledConnection con = new PooledConnection(pool.getPoolProperties(), pool);
+        try {
+            // Simulate a builder write that has not reached the snapshot yet.
+            pool.getMutableConfiguration().setPassword("newpass");
+            SnapshotRecordingDriver.LAST_CONNECT_INFO.set(null);
+
+            Assertions.assertThrows(SQLException.class, () -> con.reconnectWith(null, null),
+                    "the recording driver declines the connect after recording the properties");
+
+            Properties handed = SnapshotRecordingDriver.LAST_CONNECT_INFO.get();
+            Assertions.assertNotNull(handed, "the driver must have been offered the connect generation");
+            Assertions.assertEquals("oldpass", handed.getProperty("password"),
+                    "the reconnect must use the password of the snapshot its connect reads");
+            Assertions.assertEquals("olduser", handed.getProperty("user"));
+            Assertions.assertEquals("old", handed.getProperty("generation"),
+                    "URL and driver properties must come from the same generation as the credentials");
+        } finally {
+            con.release();
+            pool.close(true);
+        }
+    }
+
     @Test
     void aConnectKeepsTheConfigurationGenerationItsRouteWasChosenFrom() throws Exception {
         ParkingConnection.entered = new CountDownLatch(1);
