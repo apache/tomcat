@@ -392,6 +392,22 @@ public abstract class NamingFactoryBase extends JdbcPoolBaseTest {
     }
 
     @Test
+    void unsupportedNumericIsolationLevelFailsTheParseNamingTheProperty() {
+        java.util.Properties attrs = new java.util.Properties();
+        attrs.setProperty("defaultTransactionIsolation", "999");
+
+        IllegalArgumentException e = Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> DataSourceFactory.parsePoolProperties(attrs),
+                "a numeric value no Connection.TRANSACTION_* constant names must fail the parse");
+
+        Assertions.assertTrue(e.getMessage().contains("defaultTransactionIsolation"),
+                "the failure must name the misconfigured attribute, was: " + e.getMessage());
+        Assertions.assertTrue(e.getMessage().contains("999"),
+                "the failure must show the offending value, was: " + e.getMessage());
+    }
+
+    @Test
     void emptyIsolationLevelAttributeLeavesThePropertyUnset() {
         java.util.Properties attrs = new java.util.Properties();
         attrs.setProperty("defaultTransactionIsolation", "");

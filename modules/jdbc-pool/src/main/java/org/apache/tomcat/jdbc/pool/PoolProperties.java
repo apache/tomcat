@@ -2265,10 +2265,11 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             if (value == null) {
                 return def;
             }
-            if ("true".equals(value)) {
+            String trimmed = value.trim();
+            if ("true".equalsIgnoreCase(trimmed)) {
                 return true;
             }
-            if ("false".equals(value)) {
+            if ("false".equalsIgnoreCase(trimmed)) {
                 return false;
             }
             return def;
@@ -2286,7 +2287,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                 return def;
             }
             try {
-                int v = Integer.parseInt(value);
+                int v = Integer.parseInt(value.trim());
                 return v;
             } catch (NumberFormatException nfe) {
                 return def;
@@ -2305,7 +2306,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                 return def;
             }
             try {
-                return Long.parseLong(value);
+                return Long.parseLong(value.trim());
             } catch (NumberFormatException nfe) {
                 return def;
             }
@@ -2323,7 +2324,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                 return def;
             }
             try {
-                return Byte.parseByte(value);
+                return Byte.parseByte(value.trim());
             } catch (NumberFormatException nfe) {
                 return def;
             }
@@ -2341,7 +2342,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                 return def;
             }
             try {
-                return Short.parseShort(value);
+                return Short.parseShort(value.trim());
             } catch (NumberFormatException nfe) {
                 return def;
             }
@@ -2359,7 +2360,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                 return def;
             }
             try {
-                return Float.parseFloat(value);
+                return Float.parseFloat(value.trim());
             } catch (NumberFormatException nfe) {
                 return def;
             }
@@ -2377,7 +2378,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                 return def;
             }
             try {
-                return Double.parseDouble(value);
+                return Double.parseDouble(value.trim());
             } catch (NumberFormatException nfe) {
                 return def;
             }
