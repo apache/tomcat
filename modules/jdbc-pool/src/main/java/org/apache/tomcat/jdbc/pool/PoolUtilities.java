@@ -203,11 +203,21 @@ public class PoolUtilities {
      * @return the masked and flattened text, or {@code null} when the input is {@code null}
      */
     public static String maskAndFlatten(String value) {
-        String masked = PoolProperties.maskCredentials(value);
-        if (masked == null || (masked.indexOf('\r') < 0 && masked.indexOf('\n') < 0)) {
-            return masked;
+        return flatten(PoolProperties.maskCredentials(value));
+    }
+
+    /**
+     * Replaces carriage returns and line feeds with spaces, so text carrying them cannot forge additional log lines.
+     *
+     * @param value the text, possibly {@code null}
+     *
+     * @return the flattened text, or {@code null} when the input is {@code null}
+     */
+    private static String flatten(String value) {
+        if (value == null || (value.indexOf('\r') < 0 && value.indexOf('\n') < 0)) {
+            return value;
         }
-        return masked.replace('\r', ' ').replace('\n', ' ');
+        return value.replace('\r', ' ').replace('\n', ' ');
     }
 
     /**
@@ -228,7 +238,10 @@ public class PoolUtilities {
         if (previous != null) {
             return previous;
         }
-        String message = PoolProperties.maskCredentials(value.getMessage());
+        // The throwable's text is third-party: mask it and flatten line breaks,
+        // as the string diagnostics do, so a driver message cannot forge a log
+        // line through a Throwable-carrying log record.
+        String message = flatten(PoolProperties.maskCredentials(value.getMessage()));
         Throwable copy;
         if (value instanceof SQLException) {
             SQLException sql = (SQLException) value;
