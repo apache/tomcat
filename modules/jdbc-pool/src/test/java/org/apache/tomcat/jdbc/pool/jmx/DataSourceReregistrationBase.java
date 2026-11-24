@@ -142,6 +142,22 @@ abstract class DataSourceReregistrationBase extends JdbcPoolBaseTest {
     }
 
     @Test
+    void aDirectRegistrationCallOutsideTheLifecyclePublishesNothing() throws Exception {
+        MBeanServer server = server();
+        ProbeDataSource ds = newProbeDataSource();
+        ds.createPool();
+
+        Set<ObjectName> before = server.queryNames(new ObjectName("tomcat.jdbc:*"), null);
+        ds.registerAgain();
+        Set<ObjectName> after = server.queryNames(new ObjectName("tomcat.jdbc:*"), null);
+
+        Assertions.assertEquals(before, after,
+                "a direct registerJmx() call has no registration name to derive from and "
+                        + "must publish nothing");
+        ds.close();
+    }
+
+    @Test
     void aSecondRegistrationNeitherOrphansTheFirstPublishNorTakesItsName() throws Exception {
         MBeanServer server = server();
         ProbeDataSource ds = newProbeDataSource();
