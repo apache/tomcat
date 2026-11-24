@@ -270,6 +270,11 @@ public class SlowQueryReport extends AbstractQueryReport {
      * line the report owns. The length is not bounded here: surfacing the slow statement in full is what this
      * interceptor is configured for. The JMX notification for the same event sanitises it the same way, because a
      * listener may log the text it receives; the statistics store keeps the statement as executed.
+     * <p>
+     * The SQL text is not masked: literals can contain application data, tenant data or credentials typed into
+     * statements such as {@code CREATE USER} or {@code SET PASSWORD}. Slow and failed query logging deliberately
+     * exposes the statement text, and the {@code logSlow}/{@code logFailed} options should only be enabled where that
+     * exposure is acceptable. This flattening only prevents log-line forgery; it is not a data-protection measure.
      * </p>
      *
      * @param sql the SQL text to report, possibly {@code null}

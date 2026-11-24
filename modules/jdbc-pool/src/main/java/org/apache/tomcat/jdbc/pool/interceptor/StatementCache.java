@@ -729,6 +729,10 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
      * Renders SQL text for interpolation into a log message. JULI writes message text without newline escaping, and
      * SQL is application- and user-shaped data, so embedded CR/LF would forge additional log lines. They are replaced
      * by spaces, keeping the statement readable in the one line the log entry owns.
+     * <p>
+     * The text is not masked or truncated. This cache only reports SQL on a debug diagnostic, but SQL literals can
+     * still carry application or credential data; enable debug logging for this interceptor only where that exposure
+     * is acceptable.
      *
      * @param sql the SQL text, possibly null
      *
