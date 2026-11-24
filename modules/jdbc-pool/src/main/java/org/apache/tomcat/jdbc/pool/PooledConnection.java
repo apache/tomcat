@@ -1002,19 +1002,22 @@ public class PooledConnection implements PooledConnectionMBean {
         }
 
         // The database accepted the credentials, so the session they replace
-        // can be given up now. The fields are turned back to it while it is
-        // retired, so that the chain is told - as it is for every other
-        // retirement - about the session it has been serving rather than
-        // about the one that takes its place. The release claim and this
-        // retirement share the monitor; the served session is removed from the
-        // fields before it is closed outside the monitor, so a release arriving
-        // after this block cannot close it a second time.
+        // can be given up now. The chain is told about it - as it is for every
+        // other retirement - before the session is closed. The release claim
+        // and this retirement share the monitor, which is held only for the
+        // state transitions: the served session is removed from the fields
+        // under it, and the notification that may run interceptor and driver
+        // code runs outside it, the same split disconnect() uses. A release
+        // arriving after the transition therefore cannot capture the served
+        // session and close it a second time, and a hook that blocks cannot
+        // hold up release, connect or JMX work on this connection.
         java.sql.Connection accepted;
         javax.sql.XAConnection acceptedXa;
         javax.sql.PooledConnection acceptedCpds;
         long acceptedLastConnected;
         long acceptedLastValidated;
         boolean releasedNow;
+        boolean notifyServed;
         boolean acceptedOwned = false;
         synchronized (this) {
             accepted = connection;
@@ -1023,11 +1026,11 @@ public class PooledConnection implements PooledConnectionMBean {
             acceptedLastConnected = lastConnected;
             acceptedLastValidated = lastValidated;
             releasedNow = released.get();
-            if (!releasedNow && accepted != null) {
-                connection = served;
-                xaConnection = servedXa;
-                cpdsConnection = servedCpds;
-                notifyDisconnected(false);
+            notifyServed = !releasedNow && accepted != null;
+            if (notifyServed) {
+                // Clear the fields before leaving the monitor: the notification
+                // below must not leave the terminal session reachable, and a
+                // release that captures from the fields must not find it.
                 connection = null;
                 xaConnection = null;
                 cpdsConnection = null;
@@ -1048,6 +1051,9 @@ public class PooledConnection implements PooledConnectionMBean {
                     acceptedOwned = true;
                 }
             }
+        }
+        if (notifyServed) {
+            notifyDisconnected(false);
         }
         if (releasedNow) {
             closeSession(served, servedXa, servedCpds);
