@@ -842,7 +842,12 @@ public class PooledConnection implements PooledConnectionMBean {
      *                         before the call.
      */
     public void reconnectWith(String username, String password) throws SQLException {
-        PoolConfiguration configuration = configuration();
+        // The credentials staged here are consumed by the connect this method
+        // performs immediately afterwards, so they must come from the same
+        // configuration generation that connect reads for the URL and driver
+        // properties. Reading the live view here would let a credential write
+        // that has not been published yet be paired with the older generation.
+        PoolConfiguration configuration = connectConfiguration();
         if (username == null) {
             username = configuration.getUsername();
         }
