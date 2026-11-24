@@ -34,6 +34,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
+import org.apache.tomcat.jdbc.test.support.LogCapture;
 
 /**
  * Expected functionality of borrowing with credentials other than the
@@ -154,6 +156,38 @@ abstract class AlternateCredentialsBase extends JdbcPoolBaseTest {
         try (Connection c = ds.getConnection()) {
             Assertions.assertEquals(DEFAULT_USER, sessionUser(c),
                     "and the pool keeps serving under its own identity afterwards");
+        }
+    }
+
+    @Test
+    void ignoredCredentialWarningsFlattenLineBreaksInTheUsername() throws Exception {
+        String username = "user\nforged";
+        String flattened = "user forged";
+        try (LogCapture logs = new LogCapture("alternate-username-canary", DataSourceProxy.class,
+                DataSourceProxy.class, ConnectionPool.class)) {
+            logs.clear();
+
+            DataSource proxy = alternatePool(false);
+            proxy.createPool();
+            try (Connection c = proxy.getConnection(username, "secret")) {
+                Assertions.assertNotNull(c, "the ignored credentials still yield the default session");
+            } finally {
+                proxy.close();
+            }
+            Assertions.assertTrue(
+                    logs.hasMessage(MessageFactory.get("dataSourceProxy.alternateUsernameIgnored", flattened)),
+                    "the data source warning must flatten the username it names");
+
+            DataSource poolBacked = alternatePool(false);
+            poolBacked.createPool();
+            try (Connection c = poolBacked.getPool().getConnection(username, "secret")) {
+                Assertions.assertNotNull(c, "the ignored credentials still yield the default session");
+            } finally {
+                poolBacked.close();
+            }
+            Assertions.assertTrue(
+                    logs.hasMessage(MessageFactory.get("connectionPool.alternateUsernameIgnored", flattened)),
+                    "the pool warning must flatten the username it names");
         }
     }
 
