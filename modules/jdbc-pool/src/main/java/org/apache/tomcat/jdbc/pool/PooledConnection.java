@@ -1877,7 +1877,9 @@ public class PooledConnection implements PooledConnectionMBean {
      * Returns the timestamp at which the last successful validation completed on the current physical session. While
      * the session has not been validated it reports 0, so a validation inherited from the session a reconnect replaced
      * cannot be mistaken for one of this session. Before any session has been established, it reports the time this
-     * pooled connection was created; disconnecting the session clears the timestamp with it.
+     * pooled connection was created: a placeholder that no borrower has taken yet carries its creation stamp, while a
+     * pooled connection that has been connected and then disconnected reports 0. Disconnecting the session clears the
+     * timestamp with it.
      *
      * @return the timestamp at which the last successful validation completed as defined by
      *             {@link System#currentTimeMillis()}, or 0 while the current session has not been validated
