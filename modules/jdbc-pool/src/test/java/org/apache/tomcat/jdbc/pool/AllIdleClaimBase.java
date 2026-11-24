@@ -110,6 +110,89 @@ abstract class AllIdleClaimBase extends JdbcPoolBaseTest {
         lastConnected.setLong(pc, System.currentTimeMillis() - 120000L);
     }
 
+    private static volatile CountDownLatch RECONNECT_ENTERED = new CountDownLatch(1);
+    private static volatile CountDownLatch RECONNECT_RELEASE = new CountDownLatch(1);
+
+    /**
+     * Parks the idle pass between the decision that the connection is expired and the reconnect itself, so the test can
+     * close the pool before the reconnect work starts.
+     */
+    private static final class ParkingReconnectPool extends ConnectionPool {
+
+        ParkingReconnectPool(PoolProperties properties) throws SQLException {
+            super(properties);
+        }
+
+        @Override
+        protected boolean reconnectIfExpired(PooledConnection con) {
+            if (con.isMaxAgeExpired()) {
+                RECONNECT_ENTERED.countDown();
+                try {
+                    RECONNECT_RELEASE.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+                } catch (InterruptedException x) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+            return super.reconnectIfExpired(con);
+        }
+    }
+
+    @Test
+    void aPoolClosedBeforeAnIdleReconnectStopsTheDriverConnect() throws Exception {
+        resetDriver();
+        RECONNECT_ENTERED = new CountDownLatch(1);
+        RECONNECT_RELEASE = new CountDownLatch(1);
+        PoolProperties properties = new PoolProperties();
+        properties.setUrl(getUrl());
+        properties.setDriverClassName(LatchingDriver.class.getName());
+        properties.setUsername("sa");
+        properties.setPassword("");
+        properties.setJmxEnabled(false);
+        properties.setInitialSize(1);
+        properties.setMinIdle(0);
+        properties.setMaxActive(1);
+        properties.setMaxIdle(1);
+        properties.setMaxAge(60000);
+        properties.setTimeBetweenEvictionRunsMillis(0);
+        properties.setMaxWait(15000);
+        ParkingReconnectPool pool = new ParkingReconnectPool(properties);
+        try {
+            Assertions.assertEquals(1, pool.getIdle(), "precondition: the pool holds one idle connection");
+            PooledConnection pc;
+            try (Connection borrowed = pool.getConnection()) {
+                pc = internalOf(borrowed);
+            }
+            awaitUntil(() -> pool.getIdle() == 1);
+            forceExpired(pc);
+
+            Thread sweep = new Thread(() -> pool.testAllIdle(true), "idle-reconnect");
+            sweep.setDaemon(true);
+            sweep.start();
+            try {
+                Assertions.assertTrue(RECONNECT_ENTERED.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
+                        "the idle pass must reach the reconnect decision");
+                Assertions.assertEquals(1, CONNECTS.get(),
+                        "precondition: only the initial physical session exists");
+
+                pool.close(true);
+                RECONNECT_RELEASE.countDown();
+                sweep.join(AWAIT_TIMEOUT_MS);
+                Assertions.assertFalse(sweep.isAlive(), "the idle pass must finish after the close");
+                Assertions.assertEquals(0, pool.getReconnectedCount(),
+                        "a reconnect for a closed pool must not be counted as successful");
+                Assertions.assertEquals(1, CONNECTS.get(),
+                        "the idle pass must not open a new physical session after the pool closed");
+            } finally {
+                RECONNECT_RELEASE.countDown();
+                sweep.join(AWAIT_TIMEOUT_MS);
+            }
+            awaitSessions(0);
+        } finally {
+            RECONNECT_RELEASE.countDown();
+            pool.close(true);
+        }
+    }
+
     @Test
     void aConnectionTheIdleTestIsReconnectingIsOutOfTheQueueAndUnborrowable() throws Exception {
         resetDriver();

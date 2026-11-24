@@ -254,6 +254,9 @@ public class PooledConnection implements PooledConnectionMBean {
         if (released.get()) {
             throw new SQLException(MessageFactory.get("pooledConnection.cannotReestablish"));
         }
+        if (parent != null && parent.isClosed()) {
+            throw new SQLException(MessageFactory.get("connectionPool.poolClosed"));
+        }
         PoolConfiguration configuration = connectConfiguration();
         if (connection != null || xaConnection != null || cpdsConnection != null) {
             try {
@@ -326,12 +329,15 @@ public class PooledConnection implements PooledConnectionMBean {
             // object. The monitor is only held for the check, never across
             // the driver call.
             boolean releasedAfterConnect;
+            boolean poolClosedAfterConnect;
             synchronized (this) {
                 releasedAfterConnect = released.get();
+                poolClosedAfterConnect = parent != null && parent.isClosed();
             }
-            if (releasedAfterConnect) {
+            if (releasedAfterConnect || poolClosedAfterConnect) {
                 disconnect(true);
-                throw new SQLException(MessageFactory.get("pooledConnection.cannotReestablish"));
+                throw new SQLException(MessageFactory.get(releasedAfterConnect
+                        ? "pooledConnection.cannotReestablish" : "connectionPool.poolClosed"));
             }
         } catch (Throwable x) {
             ExceptionUtils.handleThrowable(x);
