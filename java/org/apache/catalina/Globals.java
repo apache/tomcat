@@ -176,6 +176,13 @@ public final class Globals {
     public static final String SSL_SESSION_MGR_ATTR = "javax.servlet.request.ssl_session_mgr";
 
 
+    /**
+     * The request attribute used to force preemptive authentication irrespective of whether the authorization header
+     * is correct for the currently configured authentication mechanism.
+     */
+    public static final String FORCE_PREEMPTIVE_AUTHENTICATION = "org.apache.catalina.authenticator.force_preemptive";
+
+
     // ------------------------------------------------- Session attribute names
 
     /**

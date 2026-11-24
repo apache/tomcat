@@ -371,6 +371,9 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
     @Override
     protected boolean isPreemptiveAuthPossible(Request request) {
         MessageBytes authorizationHeader = request.getCoyoteRequest().getMimeHeaders().getValue("authorization");
-        return authorizationHeader != null && authorizationHeader.startsWithIgnoreCase("negotiate ", 0);
+        if (authorizationHeader != null && authorizationHeader.startsWithIgnoreCase("negotiate ", 0)) {
+            return true;
+        }
+        return isPreemptiveAuthRequired(request);
     }
 }
