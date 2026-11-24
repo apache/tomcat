@@ -110,7 +110,7 @@ public class ConnectionPool {
      * never changes the builder directly: writes go through the live view and the apply path, which validates the
      * candidate and publishes the immutable snapshot.
      */
-    private PoolConfiguration mutableConfiguration;
+    private volatile PoolConfiguration mutableConfiguration;
 
     /**
      * The immutable configuration snapshot the connect and credential paths read. It is replaced atomically by the
@@ -482,7 +482,7 @@ public class ConnectionPool {
      *
      * @return the builder copy
      */
-    private static PoolConfiguration copyMutableConfiguration(PoolConfiguration source) {
+    static PoolConfiguration copyMutableConfiguration(PoolConfiguration source) {
         if (source instanceof PoolProperties) {
             try {
                 return (PoolConfiguration) ((PoolProperties) source).clone();
@@ -1347,11 +1347,12 @@ public class ConnectionPool {
      * Validates a candidate configuration, publishes it as the pool's immutable snapshot and brings the pool cleaner
      * in line with the result, all as one step under this pool's monitor.
      * <p>
-     * This is the only path through which a running pool changes its configuration. The bean and JMX surfaces write
-     * the mutable builder, then hand it here; the view returned by {@link #getPoolProperties()} does both steps. The
-     * candidate is validated and corrected on the builder so the existing management surfaces keep seeing the
-     * corrected values, and the corrections are captured in the snapshot published for the connect and credential
-     * paths.
+     * This is the only path through which a running pool changes its configuration. The bean and JMX surfaces route
+     * their writes here; the view returned by {@link #getPoolProperties()} copies the builder, applies the write to the
+     * copy and hands it here. The configuration handed here is copied again into a private candidate, validated and
+     * corrected, then adopted as the builder so the existing management surfaces keep seeing the corrected values,
+     * and captured in the snapshot published for the connect and credential paths. The candidate is never the live
+     * builder while it is being checked, so operational readers cannot observe a value before it has been validated.
      * <p>
      * Properties that decide the pool's shape - its initial pre-load, queue type, JMX registration and pre-load error
      * policy - were fixed when the pool was created. The bean and JMX setters reject writes to them on a running
@@ -1366,10 +1367,18 @@ public class ConnectionPool {
         if (properties == configurationView) {
             return;
         }
+        // Validate and correct a private candidate, then adopt it as the
+        // builder and publish it, all under this monitor. The candidate is a
+        // copy of the caller's object, so a caller that keeps the object it
+        // handed here cannot change the live configuration afterwards; and it
+        // is never the live builder, so operational readers cannot observe a
+        // value before this method has checked it.
+        PoolConfiguration candidate = copyMutableConfiguration(properties);
         String previousInterceptors = configurationSnapshot == null
                 ? null : configurationSnapshot.getJdbcInterceptors();
-        checkPoolConfiguration(properties);
-        configurationSnapshot = copyConfiguration(properties);
+        checkPoolConfiguration(candidate);
+        mutableConfiguration = candidate;
+        configurationSnapshot = copyConfiguration(candidate);
         // A live interceptor change must get the same order diagnostic the
         // start got. Only a changed list is checked, so unrelated writes do
         // not repeat a warning. A malformed list is left for the borrow that
@@ -1384,10 +1393,10 @@ public class ConnectionPool {
         if (closed.get()) {
             terminatePoolCleaner();
         } else {
-            // The cleaner is reconciled against the mutable configuration so
-            // the existing management hooks and their ordering remain the same;
+            // The cleaner is reconciled against the adopted builder so the
+            // existing management hooks and their ordering remain the same;
             // its values are the ones just captured in the snapshot.
-            reconcilePoolCleaner(properties);
+            reconcilePoolCleaner(candidate);
         }
     }
 
