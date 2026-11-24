@@ -145,8 +145,22 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     private volatile String name = "Tomcat Connection Pool[" + (poolCounter.addAndGet(1)) + "]";
     /** The database password. */
     private volatile String password;
+    /**
+     * Whether {@link #setPassword(String)} explicitly cleared the password. A
+     * cleared password must also stop a password supplied by the
+     * {@code connectionProperties} string from authenticating connections when
+     * there is no database-properties collection to remove it from.
+     */
+    private volatile boolean passwordCleared = false;
     /** The database username. */
     private volatile String username;
+    /**
+     * Whether {@link #setUsername(String)} explicitly cleared the user name. A
+     * cleared user name must also stop a user name supplied by the
+     * {@code connectionProperties} string from authenticating connections when
+     * there is no database-properties collection to remove it from.
+     */
+    private volatile boolean usernameCleared = false;
     /** The validation interval in milliseconds. */
     private volatile long validationInterval = 3000;
     /** Whether JMX registration is enabled. */
@@ -336,6 +350,18 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     }
 
 
+    /**
+     * Whether the password was explicitly cleared with {@link #setPassword(String)}. The connect path uses this to
+     * remove a password carried by the {@code connectionProperties} string when there is no database-properties
+     * collection to remove it from.
+     *
+     * @return {@code true} if the password was explicitly cleared
+     */
+    boolean isPasswordCleared() {
+        return passwordCleared;
+    }
+
+
     @Override
     public String getPoolName() {
         return getName();
@@ -387,6 +413,18 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     @Override
     public String getUsername() {
         return username;
+    }
+
+
+    /**
+     * Whether the user name was explicitly cleared with {@link #setUsername(String)}. The connect path uses this to
+     * remove a user name carried by the {@code connectionProperties} string when there is no database-properties
+     * collection to remove it from.
+     *
+     * @return {@code true} if the user name was explicitly cleared
+     */
+    boolean isUsernameCleared() {
+        return usernameCleared;
     }
 
 
@@ -661,9 +699,37 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         // Parse into a fresh collection before anything is mutated: that is
         // what tells apart the keys this string contributes from the ones
         // dbProperties holds from elsewhere, and a string the parse rejects
-        // must not have cost the previous configuration its pairs yet.
-        Properties parsed = dbProps == null ? null : getProperties(connectionProperties, new Properties());
+        // must not have cost the previous configuration its pairs yet. When
+        // there is no collection, the parse is only needed to see whether the
+        // string declares a credential again, which clears the explicit-clear
+        // marker; the connect path performs the parse that matters and reports
+        // a malformed string there.
+        Properties parsed;
+        if (dbProps == null) {
+            try {
+                parsed = getProperties(connectionProperties, new Properties());
+            } catch (RuntimeException x) {
+                // The string is stored raw. A connect parses it and reports the
+                // malformed value; the clear markers are left as they stand.
+                parsed = null;
+            }
+        } else {
+            parsed = getProperties(connectionProperties, new Properties());
+        }
         this.connectionProperties = connectionProperties;
+        if (parsed != null) {
+            // Writing a string that names a credential is a fresh declaration
+            // of that credential, so it re-enables a credential that was
+            // explicitly cleared before the string was written.
+            for (String key : parsed.stringPropertyNames()) {
+                if (PoolUtilities.isUsernameKey(key)) {
+                    usernameCleared = false;
+                }
+                if (PoolUtilities.isCredentialKey(key)) {
+                    passwordCleared = false;
+                }
+            }
+        }
         if (dbProps == null) {
             // The pairs have no collection to land in; nothing was contributed,
             // so there is nothing to track for a later removal either.
@@ -852,6 +918,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     @Override
     public synchronized void setPassword(String password) {
         this.password = password;
+        this.passwordCleared = password == null;
         if (this.dbProperties != null) {
             // A non-null password replaces every spelling of the credential, not only the canonical
             // lower-case key: an older pass, pwd or PASSWORD entry must not keep authenticating
@@ -992,6 +1059,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     @Override
     public synchronized void setUsername(String username) {
         this.username = username;
+        this.usernameCleared = username == null;
         if (this.dbProperties != null) {
             // A non-null user name replaces every spelling of the key, so an older USER entry cannot keep
             // authenticating connections with the superseded identity.
@@ -2443,7 +2511,9 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         copy.logAbandoned = from.logAbandoned;
         copy.name = from.name;
         copy.password = from.password;
+        copy.passwordCleared = from.passwordCleared;
         copy.username = from.username;
+        copy.usernameCleared = from.usernameCleared;
         copy.validationInterval = from.validationInterval;
         copy.jmxEnabled = from.jmxEnabled;
         copy.initSQL = from.initSQL;
