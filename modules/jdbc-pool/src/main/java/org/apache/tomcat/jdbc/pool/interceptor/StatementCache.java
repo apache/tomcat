@@ -176,6 +176,12 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
     @Override
     public void setProperties(Map<String, InterceptorProperty> properties) {
         super.setProperties(properties);
+        for (Map.Entry<String, InterceptorProperty> entry : properties.entrySet()) {
+            if (!isKnownProperty(entry.getKey())) {
+                log.warn(MessageFactory.get("statementCache.unknownProperty", entry.getKey(),
+                        entry.getValue().getValue()));
+            }
+        }
         InterceptorProperty p = properties.get("prepared");
         if (p != null) {
             warnInvalidBoolean("prepared", p, cachePrepared);
@@ -201,6 +207,19 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
             this.types = NO_TYPE;
         }
 
+    }
+
+    /**
+     * Whether this interceptor configuration reads the named property. {@code useEquals} belongs to the base class;
+     * the rest are this interceptor's own names.
+     *
+     * @param name the property name to test
+     *
+     * @return {@code true} if the name configures this interceptor
+     */
+    protected boolean isKnownProperty(String name) {
+        return "prepared".equals(name) || "callable".equals(name) || "max".equals(name)
+                || "useEquals".equals(name);
     }
 
     /**

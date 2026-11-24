@@ -26,12 +26,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Wrapper;
+import java.util.Map;
 
 import javax.management.ObjectName;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
+import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
 import org.apache.tomcat.jdbc.pool.PoolUtilities;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
@@ -80,6 +82,23 @@ public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAba
      * Default constructor.
      */
     public ResetAbandonedTimer() {
+    }
+
+    /**
+     * Reads no properties of its own. {@code useEquals} belongs to the base class; any other name is reported rather
+     * than ignored silently, as the other configurable interceptors do.
+     *
+     * @param properties map of interceptor properties
+     */
+    @Override
+    public void setProperties(Map<String, InterceptorProperty> properties) {
+        super.setProperties(properties);
+        for (Map.Entry<String, InterceptorProperty> entry : properties.entrySet()) {
+            if (!"useEquals".equals(entry.getKey())) {
+                log.warn(MessageFactory.get("resetAbandonedTimer.unknownProperty", entry.getKey(),
+                        entry.getValue().getValue()));
+            }
+        }
     }
 
     @Override
