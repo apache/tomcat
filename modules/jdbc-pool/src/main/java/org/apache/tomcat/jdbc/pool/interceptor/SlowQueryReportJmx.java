@@ -21,6 +21,10 @@ import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.InstanceAlreadyExistsException;
@@ -86,6 +90,28 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
             new String[] { SLOW_QUERY_NOTIFICATION, FAILED_QUERY_NOTIFICATION },
             Notification.class.getName(),
             "A slow or failed query was detected by the slow query report.") };
+
+    /**
+     * How many delivery tasks the notification thread accepts before further notifications of a
+     * {@code notifyPool=false} interceptor are dropped and logged rather than queued. The bound keeps a flooded event
+     * source - a pool notifying once per slow or failed query while its listeners are blocked - from growing the queue
+     * without limit.
+     */
+    private static final int NOTIFY_QUEUE_CAPACITY = 2000;
+
+    /**
+     * The single thread that delivers the notifications of a {@code notifyPool=false} interceptor. Delivery goes
+     * through here rather than running on the thread that executes the query, so a slow or blocked JMX listener cannot
+     * delay the query completion. The thread is a daemon, starts on the first notification and dies when idle; it
+     * keeps the module's class loader so a borrowing web application's loader is not pinned.
+     */
+    private static final ThreadPoolExecutor NOTIFIER = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<>(NOTIFY_QUEUE_CAPACITY), r -> {
+                Thread t = new Thread(r, "JDBC-Pool-Slow-Query-JMX-Notifier");
+                t.setDaemon(true);
+                t.setContextClassLoader(SlowQueryReportJmx.class.getClassLoader());
+                return t;
+            });
 
     /**
      * Property key for overriding the JMX object name.
@@ -529,8 +555,26 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
                 if (target != null) {
                     Notification notification = new Notification(type, getNotificationSource(), sequence,
                             System.currentTimeMillis(), sqlForLog(query));
-
-                    target.sendNotification(notification);
+                    try {
+                        // Hand the notification to the shared delivery thread:
+                        // a listener or filter that is slow or blocked must
+                        // not delay the query that raised the notification.
+                        NOTIFIER.execute(() -> {
+                            try {
+                                target.sendNotification(notification);
+                            } catch (RuntimeOperationsException e) {
+                                if (log.isDebugEnabled()) {
+                                    log.debug("Unable to send failed query notification.",
+                                            PoolUtilities.maskCredentials(e));
+                                }
+                            }
+                        });
+                    } catch (RejectedExecutionException e) {
+                        // The queue is full; dropping the notification is the
+                        // point of the bound and must not fail the query.
+                        log.warn(MessageFactory.get("slowQueryReportJmx.droppingNotification",
+                                type, getNotificationSource(), Integer.valueOf(NOTIFY_QUEUE_CAPACITY)));
+                    }
                 }
             }
         } catch (RuntimeOperationsException e) {

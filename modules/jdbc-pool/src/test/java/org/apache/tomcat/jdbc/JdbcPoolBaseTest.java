@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.BooleanSupplier;
 
+import javax.management.Notification;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -323,6 +325,37 @@ public abstract class JdbcPoolBaseTest {
             }
             sleep(25);
         }
+    }
+
+    /*
+     * Polls a notification list until it carries the wanted count. JMX
+     * notifications of the interceptor's own broadcaster are delivered on a
+     * separate thread, so a test asserts after the delivery, not after the
+     * query that raised it.
+     */
+    protected static void awaitNotificationCount(List<Notification> received, int expected) {
+        long deadline = System.currentTimeMillis() + AWAIT_TIMEOUT_MS;
+        while (received.size() < expected) {
+            if (System.currentTimeMillis() > deadline) {
+                return;
+            }
+            sleep(10);
+        }
+    }
+
+    /*
+     * Polls a notification list until one of its messages contains the given
+     * text, returning whether it arrived before the timeout.
+     */
+    protected static boolean awaitNotificationMessage(List<Notification> received, String text) {
+        long deadline = System.currentTimeMillis() + AWAIT_TIMEOUT_MS;
+        while (received.stream().noneMatch(n -> n.getMessage() != null && n.getMessage().contains(text))) {
+            if (System.currentTimeMillis() > deadline) {
+                return false;
+            }
+            sleep(10);
+        }
+        return true;
     }
 
     protected static void sleep(long millis) {
