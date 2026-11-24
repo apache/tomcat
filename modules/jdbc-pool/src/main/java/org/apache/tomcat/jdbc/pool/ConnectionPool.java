@@ -2300,6 +2300,12 @@ public class ConnectionPool {
      */
     protected boolean reconnectIfExpired(PooledConnection con) {
         if (con.isMaxAgeExpired()) {
+            if (isClosed()) {
+                // The pool closed while the caller held this connection out
+                // of the queues; starting a new session now would open it for
+                // a pool that has already shut down.
+                return false;
+            }
             try {
                 if (log.isDebugEnabled()) {
                     log.debug("Connection [" + con + "] expired because of maxAge, trying to reconnect");
@@ -2712,6 +2718,16 @@ public class ConnectionPool {
                     // pre-purge session in a pool that already drained the
                     // other idle entries.
                     if (con.getConnectionVersion() < getPoolVersion()) {
+                        if (release(con)) {
+                            releasedIdleCount.incrementAndGet();
+                        }
+                        continue;
+                    }
+                    if (isClosed()) {
+                        // A close may have landed after the claim: the drain
+                        // has already passed the queues, so release the
+                        // connection directly instead of validating or
+                        // reconnecting a session for a closed pool.
                         if (release(con)) {
                             releasedIdleCount.incrementAndGet();
                         }
