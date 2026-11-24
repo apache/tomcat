@@ -137,6 +137,13 @@
         <code>getResource()</code> and <code>getResourceAsStream()</code>.
         Pull request <pr>1269</pr> provided by Arturo Bernal.
       </fix>
+      <fix>
+        Harden the <code>RequestFilterValve</code>. If
+        <code>invalidAuthenticationWhenDeny</code> is configured and allows a
+        request through to be authenticated but the authenticator that processes
+        the request does not support preemptive authentication, then the request
+        is denied. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

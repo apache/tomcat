@@ -136,7 +136,10 @@ public class BasicAuthenticator extends AuthenticatorBase {
     @Override
     protected boolean isPreemptiveAuthPossible(Request request) {
         MessageBytes authorizationHeader = request.getCoyoteRequest().getMimeHeaders().getValue("authorization");
-        return authorizationHeader != null && authorizationHeader.startsWithIgnoreCase("basic ", 0);
+        if (authorizationHeader != null && authorizationHeader.startsWithIgnoreCase("basic ", 0)) {
+            return true;
+        }
+        return isPreemptiveAuthRequired(request);
     }
 
 

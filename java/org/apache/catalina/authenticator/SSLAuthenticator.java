@@ -122,7 +122,10 @@ public class SSLAuthenticator extends AuthenticatorBase {
     @Override
     protected boolean isPreemptiveAuthPossible(Request request) {
         X509Certificate[] certs = getRequestCertificates(request);
-        return certs != null && certs.length > 0;
+        if (certs != null && certs.length > 0) {
+            return true;
+        }
+        return isPreemptiveAuthRequired(request);
     }
 
 

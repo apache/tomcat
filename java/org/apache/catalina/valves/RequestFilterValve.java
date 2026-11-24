@@ -24,6 +24,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Globals;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
@@ -395,6 +396,7 @@ public abstract class RequestFilterValve extends ValveBase {
                 if (request.getCoyoteRequest().getMimeHeaders().getValue("authorization") == null) {
                     request.getCoyoteRequest().getMimeHeaders().addValue("authorization").setString("invalid");
                 }
+                request.setAttribute(Globals.FORCE_PREEMPTIVE_AUTHENTICATION, Boolean.TRUE);
                 getNext().invoke(request, response);
                 return;
             }
