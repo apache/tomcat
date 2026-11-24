@@ -190,6 +190,33 @@ abstract class DefaultStateAtConnectBase extends JdbcPoolBaseTest {
     }
 
     @Test
+    void addingConnectionStateAtRuntimeMakesAReconnectApplyTheDefaults() throws Exception {
+        resetCounters();
+        DataSource ds = configuredPool(null);
+        ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(-1);
+        ds.createPool();
+        // The pool's one pre-loaded connection is created without a state
+        // interceptor, so connect() applies the defaults directly and the
+        // handler built for the connection has no ConnectionState entry.
+        PooledConnection internal;
+        try (Connection first = ds.getConnection()) {
+            internal = internalOf(first);
+            assertBorrowerSeesTheDefaults(first);
+        }
+
+        resetCounters();
+        ds.getPoolProperties().setJdbcInterceptors("ConnectionState");
+        internal.reconnect();
+
+        assertDefaultsAppliedExactlyOnce("reconnect() after ConnectionState was added at runtime");
+        assertNoRollbackReachedTheDriver();
+        try (Connection second = ds.getConnection()) {
+            assertDefaultsAppliedExactlyOnce("the borrow after the reconnect must not repeat the application");
+            assertBorrowerSeesTheDefaults(second);
+        }
+    }
+
+    @Test
     void anInterceptorNamedAfterTheStateInterceptorButNotExtendingItDoesNotTakeOverItsJob() throws Exception {
         resetCounters();
         DataSource ds = configuredPool(ConnectionStateLookalike.class.getName());
