@@ -669,19 +669,17 @@ public class DataSourceProxy implements PoolConfiguration {
 
     /**
      * Sets the number of connections pre-loaded when the pool starts. The value is used when the pool is created; a
-     * later write would only change the configuration without pre-loading any connection.
+     * later write would only change the configuration without pre-loading any connection, so it is rejected like the
+     * other start-time properties.
      *
      * @param initialSize the number of connections to pre-load
      *
-     * @throws UnsupportedOperationException if the pool has already been created or this data source has been closed
+     * @throws UnsupportedOperationException if the pool is being created, has already been created or this data source
+     *                                          has been closed
      */
     @Override
     public synchronized void setInitialSize(int initialSize) {
-        // A write that lands while the pool is being built is deliberately
-        // accepted: the pre-load array bounds the count where it is allocated,
-        // so the write cannot make the construction die on it. The other
-        // start-time setters decide a choice that cannot be corrected later.
-        checkPoolNotStarted("initialSize", false);
+        checkPoolNotStarted("initialSize");
         this.poolProperties.setInitialSize(initialSize);
     }
 
