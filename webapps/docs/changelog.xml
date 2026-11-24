@@ -536,6 +536,13 @@
         and JMX surfaces continue to expose the live configuration with
         start-time properties fixed when the pool is created. (remm)
       </update>
+      <fix>
+        <code>PooledConnection</code>/<code>XAConnection</code>: Answer
+        <code>getConnection()</code> with the pooled logical handle instead of
+        the raw driver session, so closing it returns the connection to the pool,
+        statements created through it use the pool's interceptors, and the
+        physical session is not discarded. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
