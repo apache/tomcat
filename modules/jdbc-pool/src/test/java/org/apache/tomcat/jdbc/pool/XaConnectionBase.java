@@ -141,6 +141,32 @@ abstract class XaConnectionBase extends JdbcPoolBaseTest {
     }
 
     @Test
+    void closingTheLogicalConnectionReturnsTheSessionToThePool() throws Exception {
+        XADataSource ds = newXaPool();
+        XAConnection xc = ds.getXAConnection();
+        Connection logical = xc.getConnection();
+        Assertions.assertSame(xc, logical,
+                "getConnection() must answer the pooled handle itself, not the raw driver session");
+        setSessionMarker(logical, 61);
+        try (Statement st = logical.createStatement()) {
+            st.execute("SELECT 1");
+        }
+
+        logical.close();
+
+        Assertions.assertEquals(0, ds.getActive(),
+                "closing the handle's logical connection must return the borrow");
+        Assertions.assertEquals(1, ds.getIdle());
+        Assertions.assertEquals(1, poolSessions(),
+                "the physical session must stay in the pool");
+        try (Connection again = ds.getConnection()) {
+            Assertions.assertEquals(Integer.valueOf(61), sessionMarker(again),
+                    "the session returned through the logical connection must be reused");
+        }
+        Assertions.assertEquals(1, poolSessions());
+    }
+
+    @Test
     void plainPoolRefusesXaConnections() throws Exception {
         DataSource ds = newDataSource(); // non-XA pool
         Assertions.assertThrows(SQLException.class, ds::getXAConnection,

@@ -245,6 +245,33 @@ abstract class ConnectionPoolDataSourceLeakBase extends JdbcPoolBaseTest {
     }
 
     @Test
+    void closingThePooledHandlesLogicalConnectionReturnsTheSessionToThePool() throws Exception {
+        TestCpds cpds = new TestCpds(getUrl());
+        DataSource ds = newCpdsDataSource(cpds);
+        javax.sql.PooledConnection handle = ds.getPooledConnection();
+        Connection logical = handle.getConnection();
+        Assertions.assertSame(handle, logical,
+                "getConnection() must answer the pooled handle itself, not the provider's logical session");
+        setSessionMarker(logical, 62);
+        try (Statement st = logical.createStatement()) {
+            st.execute("SELECT 1");
+        }
+
+        logical.close();
+
+        Assertions.assertFalse(cpds.handles.get(0).logicalClosed.get(),
+                "the pool handle's close must return the borrow, not close the provider's logical session");
+        Assertions.assertEquals(1, poolSessions(), "the physical session must stay in the pool");
+        try (Connection again = ds.getConnection()) {
+            Assertions.assertEquals(Integer.valueOf(62), sessionMarker(again),
+                    "the session returned through the logical connection must be reused");
+        }
+        awaitSessions(1);
+        ds.close();
+        awaitSessions(0);
+    }
+
+    @Test
     void releasingAConnectionClosesThePhysicalConnection() throws Exception {
         TestCpds cpds = new TestCpds(getUrl());
         DataSource ds = newCpdsDataSource(cpds);
