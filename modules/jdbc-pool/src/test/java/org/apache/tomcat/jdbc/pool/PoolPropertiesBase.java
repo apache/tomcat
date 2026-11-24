@@ -899,6 +899,50 @@ abstract class PoolPropertiesBase {
     }
 
     @Test
+    void toStringMasksUserinfoPasswordsCarryingUrlOrPropertiesSeparators() {
+        String[][] cases = {
+                { "jdbc:mysql://u:ab?cd@h/db", "jdbc:mysql://u:********@h/db", "ab?cd" },
+                { "jdbc:mysql://u:ab&cd@h/db", "jdbc:mysql://u:********@h/db", "ab&cd" },
+                { "jdbc:mysql://u:ab;cd@h/db", "jdbc:mysql://u:********@h/db", "ab;cd" },
+                { "jdbc:oracle:thin:user/pass?word@host:1521:sid",
+                        "jdbc:oracle:thin:user/********@host:1521:sid", "pass?word" },
+                { "jdbc:oracle:thin:user/pass&word@host:1521:sid",
+                        "jdbc:oracle:thin:user/********@host:1521:sid", "pass&word" },
+                { "jdbc:oracle:thin:user/pass;word@host:1521:sid",
+                        "jdbc:oracle:thin:user/********@host:1521:sid", "pass;word" },
+        };
+        for (String[] c : cases) {
+            PoolProperties properties = new PoolProperties();
+            properties.setUrl(c[0]);
+
+            String asString = properties.toString();
+
+            Assertions.assertFalse(asString.contains(c[2]),
+                    "the password carrying a separator must not leak: " + c[0] + ", was: " + asString);
+            Assertions.assertTrue(asString.contains("url=" + c[1]),
+                    "the user and host must stay readable around the mask: " + c[0] + ", was: " + asString);
+        }
+    }
+
+    @Test
+    void toStringDoesNotMistakeAFragmentOrQueryAtSignForAUserinfoPassword() {
+        String[] urls = {
+                "jdbc:mysql://host:80#frag@x",
+                "jdbc:postgresql://host:5432/db?mail=admin@corp.com",
+        };
+        for (String url : urls) {
+            PoolProperties properties = new PoolProperties();
+            properties.setUrl(url);
+
+            String asString = properties.toString();
+
+            Assertions.assertTrue(asString.contains("url=" + url),
+                    "an '@' after the authority, in a fragment or query, must not be masked as a "
+                            + "userinfo password: " + url + ", was: " + asString);
+        }
+    }
+
+    @Test
     void toStringLeavesUrlAuthoritiesWithoutAUserinfoPasswordUntouched() {
         String[] urls = {
                 "jdbc:mysql://host:3306/db",

@@ -1712,54 +1712,51 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         List<int[]> ranges = new ArrayList<>(2);
         // Every scheme:// authority in the string: a failover or logging URL
         // carried in a value is as credential-bearing as the URL in front of
-        // it, and the authority never contains "://" itself (the scan of one
-        // authority ends at the first '/'), so the search resumes after it.
+        // it. The scan of one URL runs until the next URL, a space, or the
+        // first path/query/host delimiter that follows a candidate userinfo;
+        // a delimiter before the '@' is part of the password, not the end of
+        // the authority, because a driver can accept those characters
+        // unencoded in a credential.
         int from = 0;
         int schemeEnd;
         while ((schemeEnd = value.indexOf("://", from)) >= 0) {
             int authorityStart = schemeEnd + 3;
-            int authorityEnd = authorityStart;
-            while (authorityEnd < value.length() && !isAuthorityTerminator(value.charAt(authorityEnd))) {
-                authorityEnd++;
-            }
-            // An unencoded '@' inside the password itself can only extend the
-            // userinfo, so the credential runs up to the last '@' of the
-            // authority, if any.
-            int at = value.lastIndexOf('@', authorityEnd - 1);
-            if (at >= authorityStart) {
+            int scanEnd = scanAuthority(value, authorityStart);
+            int at = lastUserinfoAt(value, authorityStart, scanEnd);
+            if (at >= 0 && at + 1 < scanEnd) {
                 int colon = value.indexOf(':', authorityStart);
                 if (colon >= 0 && colon < at) {
-                    ranges.add(new int[] { colon + 1, at });
+                    String secret = value.substring(colon + 1, at);
+                    // A '/', '#' or white space before the '@' means the scan
+                    // crossed into a path, fragment or another value rather
+                    // than reading userinfo.
+                    if (secret.indexOf('/') < 0 && secret.indexOf('#') < 0
+                            && !containsWhitespace(secret)) {
+                        ranges.add(new int[] { colon + 1, at });
+                    }
                 }
             }
-            from = authorityEnd;
+            from = Math.max(scanEnd, authorityStart + 1);
         }
         // Legacy Oracle form, e.g. jdbc:oracle:thin:user/password@host:1521:sid,
         // wherever it appears in the string - as the URL itself or as the
-        // value of a pair. Its scan is bounded by the segment the prefix
-        // starts in, so an '@' of a later URL cannot drag the mask across it.
+        // value of a pair. Its scan is bounded the same way, so an '@' of a
+        // later URL cannot drag the mask across it.
         String oraclePrefix = "jdbc:oracle:";
         for (int p = indexOfIgnoreCase(value, oraclePrefix, 0); p >= 0;
                 p = indexOfIgnoreCase(value, oraclePrefix, p + 1)) {
             int prefixEnd = p + oraclePrefix.length();
-            int segmentEnd = prefixEnd;
-            while (segmentEnd < value.length() && !isCredentialSegmentSeparator(value.charAt(segmentEnd))) {
-                segmentEnd++;
-            }
-            int firstAt = value.indexOf('@', prefixEnd);
-            if (firstAt >= 0 && firstAt < segmentEnd) {
-                int slash = value.indexOf('/', prefixEnd);
-                if (slash >= 0 && slash < firstAt) {
-                    // The section opens with the user/password pair. An
-                    // unencoded '@' inside the password itself can only
-                    // extend the credential, so as in the scheme:// pass
-                    // above it runs up to the last '@' of the segment; the
-                    // at-sign-only connect forms, which carry neither a user
-                    // nor a password, are already excluded by the slash
-                    // lying behind the first '@'.
-                    int at = value.lastIndexOf('@', segmentEnd - 1);
-                    ranges.add(new int[] { slash + 1, at });
-                }
+            int scanEnd = scanOracleAuthority(value, oraclePrefix, p, prefixEnd);
+            int slash = value.indexOf('/', prefixEnd);
+            int at = lastUserinfoAt(value, prefixEnd, scanEnd);
+            if (at >= 0 && slash >= 0 && slash < at && at + 1 < scanEnd) {
+                // The section opens with the user/password pair. An
+                // unencoded '@' inside the password itself can only extend
+                // the credential, so as in the scheme:// pass above it runs
+                // up to the last '@' of the section; the at-sign-only connect
+                // forms, which carry neither a user nor a password, are
+                // already excluded by the slash lying behind the first '@'.
+                ranges.add(new int[] { slash + 1, at });
             }
         }
         if (ranges.isEmpty()) {
@@ -1786,6 +1783,131 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
 
     /**
+     * Finds the end of one scheme:// URL scan. The scan runs until white space,
+     * a line break, a nested {@code ://}, the end of the string, or a
+     * path/query/fragment delimiter that follows a candidate '@'. Separators
+     * before that '@' are password characters: a URL password may carry them
+     * unencoded, and ending the authority at one would leave the password
+     * tail unmasked.
+     *
+     * @param value the raw configuration string
+     * @param start the first character after the {@code ://}
+     *
+     * @return the exclusive end of the scan
+     */
+    private static int scanAuthority(String value, int start) {
+        int at = -1;
+        int i = start;
+        while (i < value.length()) {
+            char c = value.charAt(i);
+            if (isWhitespace(c) || (i > start && value.startsWith("://", i))) {
+                return i;
+            }
+            if (c == '@') {
+                at = i;
+            } else if (at >= 0 && isAuthorityDelimiter(c)) {
+                return i;
+            }
+            i++;
+        }
+        return value.length();
+    }
+
+
+    /**
+     * Finds the end of one legacy Oracle URL scan. The same delimiters end it,
+     * with one exception: an additional {@code /} before the candidate '@' is
+     * part of the password, while the first {@code /} is the user/password
+     * separator.
+     *
+     * @param value        the raw configuration string
+     * @param oraclePrefix the legacy prefix
+     * @param prefixStart  the index of the prefix in the string
+     * @param start        the first character after the prefix
+     *
+     * @return the exclusive end of the scan
+     */
+    private static int scanOracleAuthority(String value, String oraclePrefix, int prefixStart, int start) {
+        int at = -1;
+        int i = start;
+        while (i < value.length()) {
+            char c = value.charAt(i);
+            if (isWhitespace(c) ||
+                    (i > prefixStart && value.regionMatches(true, i, oraclePrefix, 0, oraclePrefix.length()))) {
+                return i;
+            }
+            if (c == '@') {
+                at = i;
+            } else if (at >= 0 && isAuthorityDelimiter(c)) {
+                return i;
+            }
+            i++;
+        }
+        return value.length();
+    }
+
+
+    /**
+     * Returns the last '@' of a URL scan, or {@code -1} when the scan carries
+     * none.
+     *
+     * @param value the raw configuration string
+     * @param start the first character of the scanned section
+     * @param end   the exclusive end of the scan
+     *
+     * @return the index of the last '@', or {@code -1}
+     */
+    private static int lastUserinfoAt(String value, int start, int end) {
+        int at = value.lastIndexOf('@', end - 1);
+        return at >= start ? at : -1;
+    }
+
+
+    /**
+     * Whether the character ends the host/port part of a URL once a candidate
+     * userinfo has been seen. Before that candidate the same characters can be
+     * part of the password and do not end the scan.
+     *
+     * @param c the character to test
+     *
+     * @return {@code true} when the character is an authority delimiter
+     */
+    private static boolean isAuthorityDelimiter(char c) {
+        return c == '/' || c == '?' || c == ';' || c == '&' || c == '#' || c == ',' || c == '|';
+    }
+
+
+    /**
+     * Whether the character is white space or a line break for the URL scan.
+     *
+     * @param c the character to test
+     *
+     * @return {@code true} when the character separates values
+     */
+    private static boolean isWhitespace(char c) {
+        return c == ' ' || c == '\t' || c == '\f' || c == '\n' || c == '\r';
+    }
+
+
+    /**
+     * Whether a candidate credential contains white space, which means the
+     * scan crossed into a later value rather than reading userinfo.
+     *
+     * @param value the candidate credential
+     *
+     * @return {@code true} when it contains white space
+     */
+    private static boolean containsWhitespace(String value) {
+        for (int i = 0; i < value.length(); i++) {
+            if (isWhitespace(value.charAt(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    /**
      * Finds the first occurrence of {@code needle} in {@code value} at or
      * after {@code from}, ignoring case.
      *
@@ -1802,19 +1924,6 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             }
         }
         return -1;
-    }
-
-
-    /**
-     * Whether {@code c} ends the authority section of a URL, covering the path,
-     * query and the semicolon used as a parameter separator by some drivers.
-     *
-     * @param c the character to test
-     *
-     * @return {@code true} when the character ends the authority section
-     */
-    private static boolean isAuthorityTerminator(char c) {
-        return c == '/' || c == '?' || c == ';';
     }
 
 
