@@ -20,6 +20,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -661,6 +662,51 @@ abstract class PoolPropertiesBase {
                 "a reconfigure after a rejected write must remove the old pairs");
         Assertions.assertNull(properties.getDbProperties().getProperty("stale"),
                 "a reconfigure after a rejected write must remove the old pairs");
+    }
+
+    @Test
+    void blankConnectionPropertiesNormalizeToNull() {
+        PoolProperties properties = new PoolProperties();
+        properties.setConnectionProperties("keep=yes");
+
+        properties.setConnectionProperties("   ");
+
+        Assertions.assertNull(properties.getConnectionProperties(),
+                "a blank string means the unset value, not an empty configured string");
+        Assertions.assertTrue(properties.getDbProperties().isEmpty(),
+                "the previous string's pairs must be removed with the blank reconfiguration");
+    }
+
+    @Test
+    void aDeserializedConfigurationRebuildsThePreviousStringsKeys() throws Exception {
+        PoolProperties properties = new PoolProperties();
+        properties.setConnectionProperties("stale=leftover");
+        properties.getDbProperties().setProperty("user", DEFAULT_USER);
+        Field keys = PoolProperties.class.getDeclaredField("connectionPropertyKeys");
+        keys.setAccessible(true);
+        keys.set(properties, null); // the state a pre-field serialized stream produces
+
+        properties.setConnectionProperties("fresh=value");
+
+        Assertions.assertEquals("value", properties.getDbProperties().getProperty("fresh"));
+        Assertions.assertNull(properties.getDbProperties().getProperty("stale"),
+                "a reconfiguration must still remove the keys the previous string contributed, "
+                        + "even when the tracking field was absent from a deserialized configuration");
+        Assertions.assertEquals(DEFAULT_USER, properties.getDbProperties().getProperty("user"),
+                "a credential outside the string must survive the reconfiguration");
+    }
+
+    @Test
+    void aMalformedConnectionPropertiesAttributeFailsTheFactoryNamingIt() {
+        Properties attrs = new Properties();
+        attrs.setProperty("connectionProperties", "good=1;bad=\\uZZ");
+
+        IllegalArgumentException failure = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> DataSourceFactory.parsePoolProperties(attrs),
+                "a malformed connectionProperties value must fail the lookup");
+
+        Assertions.assertTrue(failure.getMessage().contains("connectionProperties"),
+                "the refusal must name the attribute, was: " + failure.getMessage());
     }
 
     @Test

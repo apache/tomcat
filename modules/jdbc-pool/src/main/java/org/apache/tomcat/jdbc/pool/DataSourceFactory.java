@@ -765,8 +765,15 @@ public class DataSourceFactory implements ObjectFactory {
         if (value != null && !value.trim().isEmpty()) {
             // The canonical setter parses the pairs into the driver
             // properties and keeps the string round-tripping through
-            // getConnectionProperties().
-            poolProperties.setConnectionProperties(value);
+            // getConnectionProperties(). A malformed value fails the lookup
+            // naming the attribute, as the factory's strict parsing contract
+            // promises.
+            try {
+                poolProperties.setConnectionProperties(value);
+            } catch (IllegalArgumentException x) {
+                throw new IllegalArgumentException(MessageFactory.get(
+                        "dataSourceFactory.invalidConnectionProperties", x.getMessage()), x);
+            }
         } else if (value != null) {
             // A blank attribute means the default, null: storing "" would
             // make the configuration dump and the getter report a value that
