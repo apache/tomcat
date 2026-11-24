@@ -144,6 +144,10 @@
         the request does not support preemptive authentication, then the request
         is denied. (markt)
       </fix>
+      <fix>
+        Make handling of <code>allowSpecialPaths</code> within the WebDAV
+        servlet consistent for all WebDAV methods. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
