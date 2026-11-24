@@ -34,7 +34,8 @@ abstract class InterceptorPropertyWarningsBase {
 
     private static final class LogCapture extends org.apache.tomcat.jdbc.test.support.LogCapture {
         LogCapture() {
-            super("interceptor-property-warning-canary", StatementCache.class, StatementCache.class, StatementFinalizer.class);
+            super("interceptor-property-warning-canary", StatementCache.class, StatementCache.class,
+                    StatementFinalizer.class, ResetAbandonedTimer.class);
         clear();
         }
 
@@ -82,6 +83,36 @@ abstract class InterceptorPropertyWarningsBase {
             finalizer.setProperties(properties("trace", "perhaps"));
 
             log.assertWarned("trace", "perhaps");
+        }
+    }
+
+    @Test
+    void statementCacheWarnsAboutAnUnknownProperty() {
+        try (LogCapture log = new LogCapture()) {
+            StatementCache cache = new StatementCache();
+            cache.setProperties(properties("cachePrepared", "true"));
+
+            log.assertWarned("cachePrepared", "true");
+        }
+    }
+
+    @Test
+    void statementFinalizerWarnsAboutAnUnknownProperty() {
+        try (LogCapture log = new LogCapture()) {
+            StatementFinalizer finalizer = new StatementFinalizer();
+            finalizer.setProperties(properties("cacheStatements", "true"));
+
+            log.assertWarned("cacheStatements", "true");
+        }
+    }
+
+    @Test
+    void resetAbandonedTimerWarnsAboutAnUnknownProperty() {
+        try (LogCapture log = new LogCapture()) {
+            ResetAbandonedTimer timer = new ResetAbandonedTimer();
+            timer.setProperties(properties("resetOnRead", "true"));
+
+            log.assertWarned("resetOnRead", "true");
         }
     }
 }
