@@ -71,6 +71,21 @@
     can&apos;t change the Tomcat configuration, deploy new web applications or
     modify existing web applications. The Tomcat process runs with a umask of
     007 to maintain these permissions.</p>
+    <p>Tomcat expects to be running on an operating system, file system and Java
+    combination where <code>File.getCanonicalPath()</code> always returns the
+    same value (including case) for any given file. That requirement is met for
+    standard Linux and Windows production environments. Some non-standard (for
+    production) file systems where this is not the case include:</p>
+    <ul>
+    <li>kernel CIFS mount of an SMB share</li>
+    <li>vfat</li>
+    <li>ext4 casefold</li>
+    </ul>
+    <p>Running Tomcat in an enviroment where
+    <code>File.getCanonicalPath()</code> does not always returns the same value
+    for a given file will disable a number of security measures and allow, among
+    other things, bypassing of security constraints, viewing of JSP source code
+    and direct access to the WEB-INF directory.</p>
     <p>At the network level, consider using a firewall to limit both incoming
     and outgoing connections to only those connections you  expect to be
     present.</p>
@@ -435,8 +450,9 @@
       the links will be followed when deleting the context resources. Changing
       this setting from the default of <code>false</code> on case insensitive
       operating systems (this includes Windows) will disable a number of
-      security measures and allow, among other things, direct access to the
-      WEB-INF directory.</p>
+      security measures and allow, among other things, bypassing of security
+      constraints, viewing of JSP source code and direct access to the WEB-INF
+      directory.</p>
 
       <p>The <strong>sessionCookiePathUsesTrailingSlash</strong> can be used to
       work around a bug in a number of browsers (Internet Explorer, Safari and
