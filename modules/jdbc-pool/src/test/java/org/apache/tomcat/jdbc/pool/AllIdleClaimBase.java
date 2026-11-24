@@ -300,6 +300,85 @@ abstract class AllIdleClaimBase extends JdbcPoolBaseTest {
         awaitSessions(0);
     }
 
+    private static volatile CountDownLatch VERSION_READ = new CountDownLatch(1);
+    private static volatile CountDownLatch VERSION_RELEASE = new CountDownLatch(1);
+    private static volatile boolean versionReadArmed;
+
+    private static final class VersionReadingConnection extends PooledConnection {
+
+        VersionReadingConnection(PoolConfiguration properties, ConnectionPool parent) {
+            super(properties, parent);
+        }
+
+        @Override
+        public long getConnectionVersion() {
+            if (versionReadArmed) {
+                versionReadArmed = false;
+                VERSION_READ.countDown();
+                try {
+                    VERSION_RELEASE.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+                } catch (InterruptedException x) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+            return super.getConnectionVersion();
+        }
+    }
+
+    private static final class VersionReadingPool extends ConnectionPool {
+
+        VersionReadingPool(PoolProperties properties) throws SQLException {
+            super(properties);
+        }
+
+        @Override
+        protected PooledConnection create(boolean incrementCounter) {
+            return new VersionReadingConnection(getPoolProperties(), this);
+        }
+    }
+
+    @Test
+    void aPurgeRacingAnIdleValidationDoesNotLeaveTheStaleConnectionIdle() throws Exception {
+        VERSION_READ = new CountDownLatch(1);
+        VERSION_RELEASE = new CountDownLatch(1);
+        // Do not arm the hook until the pool is built: the pre-load returns
+        // its connection through the same version check this test parks.
+        versionReadArmed = false;
+        PoolProperties properties = new PoolProperties();
+        properties.setUrl(getUrl());
+        properties.setDriverClassName("org.h2.Driver");
+        properties.setUsername("sa");
+        properties.setPassword("");
+        properties.setJmxEnabled(false);
+        properties.setInitialSize(1);
+        properties.setMinIdle(0);
+        properties.setMaxActive(1);
+        properties.setMaxIdle(1);
+        properties.setTimeBetweenEvictionRunsMillis(0);
+        VersionReadingPool pool = new VersionReadingPool(properties);
+        try {
+            Assertions.assertEquals(1, pool.getIdle(), "precondition: the pool has one idle connection");
+            versionReadArmed = true;
+            Thread test = new Thread(() -> pool.testAllIdle(), "idle-validator");
+            test.setDaemon(true);
+            test.start();
+            Assertions.assertTrue(VERSION_READ.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
+                    "the idle validation must reach the claimed connection's version check");
+
+            pool.purge();
+            VERSION_RELEASE.countDown();
+            test.join(AWAIT_TIMEOUT_MS);
+            Assertions.assertFalse(test.isAlive(), "the idle validation must finish");
+            Assertions.assertEquals(0, pool.getSize(),
+                    "a connection marked stale by a purge during idle validation must be released");
+            Assertions.assertEquals(0, pool.getIdle(),
+                    "a purge-stale connection must not be offered back to the idle queue");
+        } finally {
+            VERSION_RELEASE.countDown();
+            pool.close(true);
+        }
+    }
+
     /**
      * Driver handing out the real H2 connections, with every connect after
      * the first one either parked on the release latch or failed, per the

@@ -2686,6 +2686,18 @@ public class ConnectionPool {
                     if (!idle.remove(con)) {
                         continue;
                     }
+                    // The connection may have been marked stale by a purge
+                    // that ran after this pass claimed it. checkIdle() releases
+                    // such a connection, and the idle validation must do the
+                    // same: revalidating and offering it back would leave a
+                    // pre-purge session in a pool that already drained the
+                    // other idle entries.
+                    if (con.getConnectionVersion() < getPoolVersion()) {
+                        if (release(con)) {
+                            releasedIdleCount.incrementAndGet();
+                        }
+                        continue;
+                    }
                     boolean keep;
                     try {
                         if (checkMaxAgeOnly) {
