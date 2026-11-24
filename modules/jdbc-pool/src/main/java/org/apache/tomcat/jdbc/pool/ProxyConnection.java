@@ -679,9 +679,13 @@ public class ProxyConnection extends JdbcInterceptor {
     }
 
     /**
-     * Returns true if the underlying connection has been closed or discarded.
+     * Returns whether this facade is closed for the pool: the pooled connection has been discarded, or the facade holds
+     * no delegate. This reports the pool's lifecycle state and does not query the driver's physical session; a session
+     * closed behind the pool's back is detected by the pool's own return path, while some drivers can block in
+     * {@code isClosed()}. The proxy's {@link java.sql.Connection#isClosed()} also answers true for a handle whose own
+     * borrow has ended.
      *
-     * @return true if closed or discarded
+     * @return true if the pooled connection is discarded or the facade has no delegate
      */
     public boolean isClosed() {
         // Read the field once: this is the state the closed guard of invoke()
