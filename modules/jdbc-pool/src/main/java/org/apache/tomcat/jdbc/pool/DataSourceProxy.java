@@ -297,7 +297,12 @@ public class DataSourceProxy implements PoolConfiguration {
                         // whatever the shared field might hold by now.
                         fresh.checkPoolConfiguration(configuration);
                         fresh.reconcilePoolCleaner(configuration);
+                        fresh.publishConfiguration(configuration);
                         pool = fresh;
+                        // The bean surface now reads and writes through the
+                        // pool's live view: reads come from the immutable
+                        // snapshot, writes through the single apply path.
+                        poolProperties = fresh.getPoolProperties();
                     }
                     // The construction is over on this path as well: a start-time
                     // setter queued behind this monitor is answered by the
@@ -522,6 +527,14 @@ public class DataSourceProxy implements PoolConfiguration {
         closed = true;
         final ConnectionPool p = pool;
         pool = null;
+        if (p != null && poolProperties == p.getPoolProperties()) {
+            // The live view holds the pool it belongs to. Keeping it in this
+            // field after the pool is taken would keep the closed pool and its
+            // busy sessions reachable from a data source that is itself being
+            // dropped. Keep the configuration values instead: reads after close
+            // still answer, and nothing of the pool is pinned.
+            poolProperties = ConnectionPool.copyConfiguration(p.getCurrentConfiguration());
+        }
         return p;
     }
 
