@@ -28,6 +28,7 @@ import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.sql.Statement;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
@@ -73,6 +74,9 @@ abstract class InitSqlCommittedAtInitializationBase extends JdbcPoolBaseTest {
      */
     private static final AtomicReference<String> FAIL_FROM = new AtomicReference<>();
 
+    /** Whether the armed failure is the checked SQLException shape instead of the unchecked one. */
+    private static final AtomicBoolean CHECKED_FAILURE = new AtomicBoolean();
+
     /*
      * Driver-level commit()/rollback() counters. The tests are sequential
      * and reset what they observe.
@@ -84,6 +88,7 @@ abstract class InitSqlCommittedAtInitializationBase extends JdbcPoolBaseTest {
         COMMITS.set(0);
         ROLLBACKS.set(0);
         FAIL_FROM.set(null);
+        CHECKED_FAILURE.set(false);
     }
 
     private static void resetCommitCounter() {
@@ -323,6 +328,32 @@ abstract class InitSqlCommittedAtInitializationBase extends JdbcPoolBaseTest {
     }
 
     @Test
+    void aCheckedCommitFailureIsReportedWhenValidationErrorsAreLogged() throws Exception {
+        resetCounters();
+        String table = createTable(uniqueTable());
+        DataSource ds = autoCommitOffPool("INSERT INTO " + table + " VALUES (1)");
+        ds.getPoolProperties().setLogValidationErrors(true);
+        ds.createPool();
+        try (ValidationLogCapture logs = new ValidationLogCapture()) {
+            Connection borrower = ds.getConnection();
+            try {
+                CHECKED_FAILURE.set(true);
+                FAIL_FROM.set("commit");
+                try {
+                    Assertions.assertFalse(pooled(borrower).validate(PooledConnection.VALIDATE_INIT),
+                            "a checked commit refusal must fail the initialization");
+                } finally {
+                    FAIL_FROM.set(null);
+                    CHECKED_FAILURE.set(false);
+                }
+            } finally {
+                borrower.close();
+            }
+            logs.assertErroredAbout("Failed to commit transaction", "checked boom from commit()");
+        }
+    }
+
+    @Test
     void anUnreportableAutoCommitStateFailsTheInitCommitAndTheHelperOwnsIt() throws Exception {
         resetCounters();
         String table = createTable(uniqueTable());
@@ -465,6 +496,9 @@ abstract class InitSqlCommittedAtInitializationBase extends JdbcPoolBaseTest {
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             String armed = FAIL_FROM.get();
             if (armed != null && method.getName().equals(armed)) {
+                if (CHECKED_FAILURE.get()) {
+                    throw new SQLException("checked boom from " + armed + "()");
+                }
                 throw new IllegalStateException("boom from " + armed + "()");
             }
             if ("commit".equals(method.getName())) {
@@ -502,6 +536,24 @@ abstract class InitSqlCommittedAtInitializationBase extends JdbcPoolBaseTest {
          * owned the failure: the commit and the rollback helper report the
          * same armed call under different messages.
          */
+        void assertErroredAbout(String logText, String thrownMessage) {
+            boolean matched = false;
+            synchronized (records) {
+                for (LogRecord record : records) {
+                    Throwable thrown = record.getThrown();
+                    if (thrown != null && String.valueOf(record.getMessage()).contains(logText)
+                            && String.valueOf(thrown.getMessage()).contains(thrownMessage)) {
+                        Assertions.assertEquals(Level.SEVERE, record.getLevel(),
+                                "a validation-context failure must be reported at error level "
+                                        + "when logValidationErrors is set: " + record);
+                        matched = true;
+                    }
+                }
+            }
+            Assertions.assertTrue(matched, "expected an error about " + logText + " carrying the"
+                    + " driver failure (" + thrownMessage + "), records: " + records);
+        }
+
         void assertWarnedAbout(String logText, String thrownMessage) {
             boolean matched = false;
             synchronized (records) {
