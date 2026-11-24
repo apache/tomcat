@@ -578,6 +578,11 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
             authRequired = true;
         }
 
+        if (!authRequired && isPreemptiveAuthRequired(request)) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+
         if ((authRequired || constraints != null) && allowCorsPreflightBypass(request)) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("authenticator.corsBypass"));
@@ -1407,6 +1412,20 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
      */
     protected boolean isPreemptiveAuthPossible(Request request) {
         return false;
+    }
+
+
+    /**
+     * Is preemptive authentication required for this request. Typically triggered by a component earlier in the
+     * processing chain.
+     *
+     * @param request The request to check
+     *
+     * @return {@code true} if preemptive authentication is required, otherwise {@code false}
+     */
+    protected boolean isPreemptiveAuthRequired(Request request) {
+        Object flag = request.getAttribute(Globals.FORCE_PREEMPTIVE_AUTHENTICATION);
+        return Boolean.TRUE.equals(flag);
     }
 
 

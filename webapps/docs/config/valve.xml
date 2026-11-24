@@ -863,13 +863,20 @@
 
       <attribute name="invalidAuthenticationWhenDeny" required="false">
         <p>When a request should be denied, do not deny but instead
-        set an invalid <code>authentication</code> header. This only works
-        if the context has the attribute <code>preemptiveAuthentication="true"</code>
-        set. An already existing <code>authentication</code> header will not be
-        overwritten. In effect this will trigger authentication instead of deny
-        even if the application does not have a security constraint configured.</p>
-        <p>This can be combined with <code>addConnectorPort</code> to trigger authentication
-        depending on the client and the connector that is used to access an application.</p>
+        set an invalid <code>authorization</code> header that triggers
+        pre-emptive authentication. An already existing
+        <code>authorization</code> header will not be overwritten. This feature
+        triggers authentication instead of deny even if the application does not
+        have a security constraint configured.</p>
+        <p>This feature requires that the context has the attribute
+        <code>preemptiveAuthentication="true"</code> set and is configured with
+        an authentication mechanism (BASIC, DIGEST, SPNEGO or CLIENT-CERT) that
+        supports pre-emptive authentication. If this is not the case, the Tomcat
+        provided authenticators will deny the request. Custom authenticators may
+        allow the request.</p>
+        <p>This feature can be combined with <code>addConnectorPort</code> to
+        trigger authentication depending on the client and the connector that is
+        used to access an application.</p>
       </attribute>
 
     </attributes>

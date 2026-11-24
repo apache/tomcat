@@ -17,22 +17,35 @@
 package org.apache.catalina.valves;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.authenticator.BasicAuthenticator;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.realm.NullRealm;
+import org.apache.catalina.startup.Tomcat;
+import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.descriptor.web.LoginConfig;
 
 /**
  * {@link RequestFilterValve} Tests
  */
-public class TestRequestFilterValve {
+public class TestRequestFilterValve extends TomcatBaseTest {
 
     private static final int OK = 200;
     private static final int FORBIDDEN = 403;
@@ -393,5 +406,96 @@ public class TestRequestFilterValve {
                 CIDR6_NO_ALLOW_NO_DENY, false, "CIDR");
         standardTests(CIDR6_ALLOW_PROP, CIDR6_DENY_PROP, CIDR6_ONLY_ALLOW, CIDR6_ONLY_DENY, CIDR6_ALLOW_AND_DENY,
                 CIDR6_NO_ALLOW_NO_DENY, true, "CIDR");
+    }
+
+
+    // Matches the loopback address however the client connects
+    private static final String DENY_LOOPBACK = "127.0.0.0/8,::1/128";
+    private static final String DENY_OTHER = "192.0.2.0/24";
+
+
+    @Test
+    public void testDeniedNoAuthorizationHeader() throws Exception {
+        CountingServlet servlet = doTest(DENY_LOOPBACK, null);
+        Assert.assertEquals("Denied client must have been challenged", 401, getLastStatus());
+        Assert.assertEquals("Denied client must not reach the resource", 0, servlet.getCount());
+    }
+
+
+    @Test
+    public void testDeniedNonBasicAuthorizationHeader() throws Exception {
+        CountingServlet servlet = doTest(DENY_LOOPBACK, "Bearer abc");
+        Assert.assertEquals("Denied client must have been challenged", 401, getLastStatus());
+        Assert.assertEquals("Denied client must not reach the resource", 0, servlet.getCount());
+    }
+
+
+    @Test
+    public void testAllowed() throws Exception {
+        CountingServlet servlet = doTest(DENY_OTHER, null);
+        Assert.assertEquals(200, getLastStatus());
+        Assert.assertEquals(1, servlet.getCount());
+    }
+
+
+    private int lastStatus;
+
+    private int getLastStatus() {
+        return lastStatus;
+    }
+
+
+    private CountingServlet doTest(String deny, String authorizationHeader) throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = getProgrammaticRootContext();
+        ctx.setPreemptiveAuthentication(true);
+        ctx.setRealm(new NullRealm());
+
+        LoginConfig loginConfig = new LoginConfig();
+        loginConfig.setAuthMethod("BASIC");
+        ctx.setLoginConfig(loginConfig);
+
+        RemoteCIDRValve valve = new RemoteCIDRValve();
+        valve.setDeny(deny);
+        valve.setInvalidAuthenticationWhenDeny(true);
+        ctx.getPipeline().addValve(valve);
+        ctx.getPipeline().addValve(new BasicAuthenticator());
+
+        // Deliberately no security constraint
+        CountingServlet servlet = new CountingServlet();
+        Tomcat.addServlet(ctx, "counting", servlet);
+        ctx.addServletMapping("/", "counting");
+
+        tomcat.start();
+
+        Map<String,List<String>> reqHead = null;
+        if (authorizationHeader != null) {
+            reqHead = Collections.singletonMap("Authorization", Collections.singletonList(authorizationHeader));
+        }
+        ByteChunk bc = new ByteChunk();
+        lastStatus = getUrl("http://localhost:" + getPort() + "/", bc, reqHead, null);
+
+        return servlet;
+    }
+
+
+    private static final class CountingServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private final AtomicInteger count = new AtomicInteger();
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+            count.incrementAndGet();
+            resp.setContentType("text/plain");
+            resp.getWriter().print("OK");
+        }
+
+        int getCount() {
+            return count.get();
+        }
     }
 }
