@@ -1207,7 +1207,9 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
      * return and re-borrow does not rebuild it. The pool's lifecycle notifications follow the start, not the moment: the
      * close is delivered for the definitions configured when the pool started, whatever this property lists by then,
      * so removing a definition from a live pool does not strand what its registration at the pool's start put in
-     * place.
+     * place. A definition added on a live pool does not receive {@code poolStarted}: the start-time setup hooks are
+     * for the configuration the pool was created with. It is still told about the close, which is where a registration
+     * made by a chain it served is released.
      * </p>
      *
      * @param jdbcInterceptors the semicolon separated interceptor configuration,
