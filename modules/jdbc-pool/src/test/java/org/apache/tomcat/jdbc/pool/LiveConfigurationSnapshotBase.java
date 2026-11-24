@@ -22,6 +22,8 @@ import java.sql.DriverPropertyInfo;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 
@@ -185,5 +187,69 @@ abstract class LiveConfigurationSnapshotBase {
         } finally {
             pool.close(true);
         }
+    }
+
+    @Test
+    void aSnapshotCopyWaitsForTheSourceConfigurationMonitor() throws Exception {
+        PoolProperties props = properties();
+        Properties oldGeneration = new Properties();
+        oldGeneration.setProperty("generation", "old");
+        props.setDbProperties(oldGeneration);
+
+        CountDownLatch locked = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
+        CountDownLatch started = new CountDownLatch(1);
+        AtomicReference<PoolProperties> copied = new AtomicReference<>();
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+
+        Thread writer = new Thread(() -> {
+            synchronized (props) {
+                locked.countDown();
+                try {
+                    release.await(10, TimeUnit.SECONDS);
+                } catch (InterruptedException x) {
+                    Thread.currentThread().interrupt();
+                    return;
+                }
+                Properties newGeneration = new Properties();
+                newGeneration.setProperty("generation", "new");
+                props.setDbProperties(newGeneration);
+            }
+        }, "snapshot-writer");
+        writer.setDaemon(true);
+        writer.start();
+
+        Thread copier = new Thread(() -> {
+            started.countDown();
+            try {
+                copied.set(PoolProperties.copyOf(props));
+            } catch (Throwable x) {
+                failure.set(x);
+            }
+        }, "snapshot-copier");
+        copier.setDaemon(true);
+
+        try {
+            Assertions.assertTrue(locked.await(10, TimeUnit.SECONDS),
+                    "the writer must hold the source configuration monitor");
+            copier.start();
+            Assertions.assertTrue(started.await(10, TimeUnit.SECONDS),
+                    "the copier must have started its snapshot");
+            long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
+            while (System.nanoTime() < deadline && copier.isAlive()
+                    && copier.getState() != Thread.State.BLOCKED) {
+                Thread.sleep(1);
+            }
+        } finally {
+            release.countDown();
+        }
+
+        writer.join(TimeUnit.SECONDS.toMillis(10));
+        copier.join(TimeUnit.SECONDS.toMillis(10));
+        Assertions.assertFalse(writer.isAlive(), "the writer must finish");
+        Assertions.assertFalse(copier.isAlive(), "the copier must finish");
+        Assertions.assertNull(failure.get(), () -> "the snapshot copy failed: " + failure.get());
+        Assertions.assertEquals("new", copied.get().getDbProperties().getProperty("generation"),
+                "the snapshot copy must wait for the source monitor and capture the completed generation");
     }
 }
