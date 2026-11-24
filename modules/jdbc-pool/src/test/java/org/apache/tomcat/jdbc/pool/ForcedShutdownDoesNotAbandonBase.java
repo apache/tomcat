@@ -127,6 +127,40 @@ abstract class ForcedShutdownDoesNotAbandonBase extends JdbcPoolBaseTest {
     }
 
     @Test
+    void aCheckAbandonedAfterAGracefulCloseDoesNotRecordTheBusySessionAsAbandoned()
+            throws Exception {
+        DataSource ds = newDataSource();
+        PoolConfiguration properties = ds.getPoolProperties();
+        properties.setInitialSize(0);
+        properties.setRemoveAbandoned(true);
+        properties.setRemoveAbandonedTimeout(1);
+        properties.setAbandonWhenPercentageFull(0);
+        properties.setSuspectTimeout(0);
+        properties.setTimeBetweenEvictionRunsMillis(-1);
+        ds.createPool();
+        ConnectionPool pool = ds.getPool();
+
+        Connection held = ds.getConnection();
+        sleep(1500);
+        ds.close(false);
+        Assertions.assertTrue(pool.isClosed(), "precondition: the graceful close claimed the pool");
+        Assertions.assertFalse(held.isClosed(),
+                "precondition: the graceful close left the busy session in service");
+
+        pool.checkAbandoned();
+
+        Assertions.assertEquals(0, pool.getRemoveAbandonedCount(),
+                "a closed pool must not record its shutting-down sessions as application leaks");
+        Assertions.assertFalse(held.isClosed(),
+                "the closed pool's abandonment check must not take the busy session away");
+
+        ds.close(true);
+        Assertions.assertTrue(held.isClosed(), "the forced escalation must disconnect the busy session");
+        awaitSessions(0);
+        held.close();
+    }
+
+    @Test
     void aForcedCloseAfterAGracefulCloseDisconnectsBusyConnections() throws Exception {
         DataSource ds = newDataSource();
         ds.getPoolProperties().setInitialSize(0);

@@ -112,6 +112,45 @@ abstract class AllIdleClaimBase extends JdbcPoolBaseTest {
 
     private static volatile CountDownLatch RECONNECT_ENTERED = new CountDownLatch(1);
     private static volatile CountDownLatch RECONNECT_RELEASE = new CountDownLatch(1);
+    private static volatile CountDownLatch RECONNECTED = new CountDownLatch(1);
+    private static volatile CountDownLatch RECONNECTED_RELEASE = new CountDownLatch(1);
+
+    /** Counts the validation calls made by the idle pass. */
+    private static final class CountingValidator implements Validator {
+        final AtomicInteger actions = new AtomicInteger();
+
+        @Override
+        public boolean validate(Connection connection, int validateAction) {
+            actions.incrementAndGet();
+            return true;
+        }
+    }
+
+    /**
+     * Parks the idle pass after the reconnect has completed and before the
+     * validation would start, so the test can close the pool in that window.
+     */
+    private static final class ParkingAfterReconnectPool extends ConnectionPool {
+
+        ParkingAfterReconnectPool(PoolProperties properties) throws SQLException {
+            super(properties);
+        }
+
+        @Override
+        protected boolean reconnectIfExpired(PooledConnection con) {
+            boolean expired = con.isMaxAgeExpired();
+            boolean result = super.reconnectIfExpired(con);
+            if (expired && result) {
+                RECONNECTED.countDown();
+                try {
+                    RECONNECTED_RELEASE.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+                } catch (InterruptedException x) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+            return result;
+        }
+    }
 
     /**
      * Parks the idle pass between the decision that the connection is expired and the reconnect itself, so the test can
@@ -189,6 +228,64 @@ abstract class AllIdleClaimBase extends JdbcPoolBaseTest {
             awaitSessions(0);
         } finally {
             RECONNECT_RELEASE.countDown();
+            pool.close(true);
+        }
+    }
+
+    @Test
+    void aCloseBetweenTheIdleReconnectAndItsValidationSkipsTheValidation() throws Exception {
+        resetDriver();
+        RECONNECTED = new CountDownLatch(1);
+        RECONNECTED_RELEASE = new CountDownLatch(1);
+        CountingValidator validator = new CountingValidator();
+        PoolProperties properties = new PoolProperties();
+        properties.setUrl(getUrl());
+        properties.setDriverClassName(LatchingDriver.class.getName());
+        properties.setUsername("sa");
+        properties.setPassword("");
+        properties.setJmxEnabled(false);
+        properties.setInitialSize(1);
+        properties.setMinIdle(0);
+        properties.setMaxActive(1);
+        properties.setMaxIdle(1);
+        properties.setMaxAge(60000);
+        properties.setTimeBetweenEvictionRunsMillis(0);
+        properties.setTestWhileIdle(true);
+        properties.setValidator(validator);
+        properties.setMaxWait(15000);
+        ParkingAfterReconnectPool pool = new ParkingAfterReconnectPool(properties);
+        try {
+            Assertions.assertEquals(1, pool.getIdle(), "precondition: the pool holds one idle connection");
+            PooledConnection pc;
+            try (Connection borrowed = pool.getConnection()) {
+                pc = internalOf(borrowed);
+            }
+            awaitUntil(() -> pool.getIdle() == 1);
+            forceExpired(pc);
+
+            Thread sweep = new Thread(() -> pool.testAllIdle(false), "idle-validation");
+            sweep.setDaemon(true);
+            sweep.start();
+            try {
+                Assertions.assertTrue(RECONNECTED.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
+                        "the idle pass must reach the point after its reconnect");
+                Assertions.assertEquals(1, pool.getReconnectedCount(),
+                        "precondition: the reconnect completed");
+
+                pool.close(true);
+                RECONNECTED_RELEASE.countDown();
+                sweep.join(AWAIT_TIMEOUT_MS);
+                Assertions.assertFalse(sweep.isAlive(), "the idle pass must finish after the close");
+                Assertions.assertEquals(0, validator.actions.get(),
+                        "a close landing between the reconnect and the validation must skip the "
+                                + "validation query for the closed pool");
+            } finally {
+                RECONNECTED_RELEASE.countDown();
+                sweep.join(AWAIT_TIMEOUT_MS);
+            }
+            awaitSessions(0);
+        } finally {
+            RECONNECTED_RELEASE.countDown();
             pool.close(true);
         }
     }
