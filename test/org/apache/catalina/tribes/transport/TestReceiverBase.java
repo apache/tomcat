@@ -63,7 +63,7 @@ public class TestReceiverBase {
         ReceiverBaseImpl receiver = new ReceiverBaseImpl();
         receiver.setAddress(UNRESOLVABLE_HOST);
         try (ServerSocket socket = new ServerSocket()) {
-            IOException ioe = Assert.assertThrows(IOException.class, () -> receiver.bind(socket, 0, 3));
+            IOException ioe = Assert.assertThrows(IOException.class, () -> receiver.bind(socket, 0, 3, false));
             Assert.assertTrue(ioe.getMessage().contains(UNRESOLVABLE_HOST));
         } catch (IOException ioe) {
             Assert.fail(ioe.getMessage());
@@ -89,7 +89,7 @@ public class TestReceiverBase {
         receiver.setAddress("127.0.0.1");
         Assert.assertEquals(InetAddress.getByName("127.0.0.1"), receiver.getBind());
         try (ServerSocket socket = new ServerSocket()) {
-            receiver.bind(socket, 0, 1);
+            receiver.bind(socket, 0, 1, false);
             // A resolved address must be used, never the wildcard address
             Assert.assertFalse(socket.getInetAddress().isAnyLocalAddress());
         } catch (IOException ioe) {
@@ -118,9 +118,9 @@ public class TestReceiverBase {
         ReceiverBaseImpl receiver = new ReceiverBaseImpl();
         receiver.setAddress(UNRESOLVABLE_HOST);
         try (ServerSocket socket = new ServerSocket()) {
-            Assert.assertThrows(IOException.class, () -> receiver.bind(socket, 0, 1));
+            Assert.assertThrows(IOException.class, () -> receiver.bind(socket, 0, 1, false));
             receiver.setAddress("127.0.0.1");
-            receiver.bind(socket, 0, 1);
+            receiver.bind(socket, 0, 1, false);
             Assert.assertFalse(socket.getInetAddress().isAnyLocalAddress());
         } catch (IOException ioe) {
             Assert.fail(ioe.getMessage());
