@@ -2394,6 +2394,89 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     }
 
     /**
+     * Creates the pool-private {@link PoolProperties} snapshot a pool reads from a configuration.
+     * <p>
+     * The snapshot is always a plain {@code PoolProperties}, never the subclass instance the caller supplied: a
+     * configuration subclass can override getters (the test fixtures use that to observe when a value is read) and
+     * carry instance fields that do not belong to the configuration. Copying the base fields directly keeps the
+     * snapshot values and the class stable while leaving the caller's builder untouched and still usable.
+     *
+     * @param source the configuration to copy
+     *
+     * @return a plain PoolProperties copy
+     */
+    static PoolProperties copyOf(PoolConfiguration source) {
+        if (!(source instanceof PoolProperties)) {
+            throw new IllegalArgumentException(MessageFactory.get(
+                    "connectionPool.unsupportedConfiguration", source.getClass().getName()));
+        }
+        PoolProperties from = (PoolProperties) source;
+        PoolProperties copy = new PoolProperties();
+        copy.dbProperties = from.dbProperties == null ? null : PoolUtilities.clone(from.dbProperties);
+        copy.url = from.url;
+        copy.driverClassName = from.driverClassName;
+        copy.defaultAutoCommit = from.defaultAutoCommit;
+        copy.defaultReadOnly = from.defaultReadOnly;
+        copy.defaultTransactionIsolation = from.defaultTransactionIsolation;
+        copy.defaultCatalog = from.defaultCatalog;
+        copy.connectionProperties = from.connectionProperties;
+        copy.connectionPropertyKeys = from.connectionPropertyKeys == null ? null
+                : new HashSet<>(from.connectionPropertyKeys);
+        copy.initialSize = from.initialSize;
+        copy.maxActive = from.maxActive;
+        copy.maxIdle = from.maxIdle;
+        copy.minIdle = from.minIdle;
+        copy.maxWait = from.maxWait;
+        copy.validationQuery = from.validationQuery;
+        copy.validationQueryTimeout = from.validationQueryTimeout;
+        copy.validatorClassName = from.validatorClassName;
+        copy.validator = from.validator;
+        copy.testOnBorrow = from.testOnBorrow;
+        copy.testOnReturn = from.testOnReturn;
+        copy.testWhileIdle = from.testWhileIdle;
+        copy.timeBetweenEvictionRunsMillis = from.timeBetweenEvictionRunsMillis;
+        copy.numTestsPerEvictionRun = from.numTestsPerEvictionRun;
+        copy.minEvictableIdleTimeMillis = from.minEvictableIdleTimeMillis;
+        copy.accessToUnderlyingConnectionAllowed = from.accessToUnderlyingConnectionAllowed;
+        copy.removeAbandoned = from.removeAbandoned;
+        copy.removeAbandonedTimeout = from.removeAbandonedTimeout;
+        copy.logAbandoned = from.logAbandoned;
+        copy.name = from.name;
+        copy.password = from.password;
+        copy.username = from.username;
+        copy.validationInterval = from.validationInterval;
+        copy.jmxEnabled = from.jmxEnabled;
+        copy.initSQL = from.initSQL;
+        copy.testOnConnect = from.testOnConnect;
+        copy.jdbcInterceptors = from.jdbcInterceptors;
+        copy.fairQueue = from.fairQueue;
+        copy.useEquals = from.useEquals;
+        copy.abandonWhenPercentageFull = from.abandonWhenPercentageFull;
+        copy.maxAge = from.maxAge;
+        copy.useLock = from.useLock;
+        if (from.interceptors != null) {
+            InterceptorDefinition[] copies = new InterceptorDefinition[from.interceptors.length];
+            for (int i = 0; i < from.interceptors.length; i++) {
+                copies[i] = from.interceptors[i] == null ? null : from.interceptors[i].copy();
+            }
+            copy.interceptors = copies;
+        }
+        copy.suspectTimeout = from.suspectTimeout;
+        copy.dataSource = from.dataSource;
+        copy.dataSourceJNDI = from.dataSourceJNDI;
+        copy.alternateUsernameAllowed = from.alternateUsernameAllowed;
+        copy.commitOnReturn = from.commitOnReturn;
+        copy.rollbackOnReturn = from.rollbackOnReturn;
+        copy.useDisposableConnectionFacade = from.useDisposableConnectionFacade;
+        copy.logValidationErrors = from.logValidationErrors;
+        copy.propagateInterruptState = from.propagateInterruptState;
+        copy.ignoreExceptionOnPreLoad = from.ignoreExceptionOnPreLoad;
+        copy.useStatementFacade = from.useStatementFacade;
+        return copy;
+    }
+
+
+    /**
      * Returns a copy of the configuration, including a copy of the driver-properties collection so a defaults-backed
      * property resolves on the copy too, and independent copies of the parsed interceptor definitions and their
      * property maps. A property added to or replaced on a definition in one copy therefore cannot reconfigure the

@@ -42,4 +42,8 @@ class TestPoolConfiguration {
     class DataSourceProxyConstructionSetters extends DataSourceProxyConstructionSettersBase {
     }
 
+    @Nested
+    class LiveConfigurationSnapshot extends LiveConfigurationSnapshotBase {
+    }
+
 }
