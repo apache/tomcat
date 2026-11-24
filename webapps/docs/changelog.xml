@@ -336,6 +336,13 @@
         Revert pull request <pr>677</pr> which added request hints from JDBC
         4.3, causing statement cache issues on many databases. (remm)
       </add>
+      <update>
+        Introduce an immutable configuration snapshot and a single validated
+        apply path for live pool reconfiguration. Connection establishment and
+        credential handling read the snapshot atomically, while the data source
+        and JMX surfaces continue to expose the live configuration with
+        start-time properties fixed when the pool is created. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">

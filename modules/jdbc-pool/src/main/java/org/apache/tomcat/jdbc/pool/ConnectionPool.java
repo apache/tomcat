@@ -96,9 +96,30 @@ public class ConnectionPool {
     private AtomicInteger size = new AtomicInteger(0);
 
     /**
-     * All the information about the connection pool These are the properties the pool got instantiated with
+     * The live configuration view the pool's ordinary operations read. It answers getters from the mutable builder
+     * and routes writes through {@link #applyConfigurationChange(PoolConfiguration)}; the connect and credential paths
+     * read {@link #configurationSnapshot} instead.
      */
     private PoolConfiguration poolProperties;
+
+    /**
+     * The mutable configuration builder the bean and JMX surfaces still write, kept for compatibility. The pool never
+     * changes it directly: writes go through the live view and the apply path, which validates the candidate and
+     * publishes the immutable snapshot.
+     */
+    private PoolConfiguration mutableConfiguration;
+
+    /**
+     * The immutable configuration snapshot the connect and credential paths read. It is replaced atomically by the
+     * apply path and carries the values the mutable builder had when the update was applied.
+     */
+    private volatile PoolConfiguration configurationSnapshot;
+
+    /**
+     * The live configuration view handed to the data source, the JMX MBean and the pooled connections. It reads the
+     * mutable builder and routes writes through the single apply path.
+     */
+    private PoolConfiguration configurationView;
 
     /**
      * Contains all the connections that are in use. Unbounded: membership is bounded by the maxActive/size
@@ -351,7 +372,7 @@ public class ConnectionPool {
      * @return String - the name of the pool
      */
     public String getName() {
-        return getPoolProperties().getPoolName();
+        return poolProperties.getPoolName();
     }
 
     /**
@@ -378,12 +399,47 @@ public class ConnectionPool {
     }
 
     /**
-     * Returns the pool properties associated with this connection pool
+     * Returns the live configuration view associated with this connection pool.
+     * <p>
+     * The view answers reads from the mutable configuration builder the bean and JMX surfaces write, and routes writes
+     * through {@link #applyConfigurationChange(PoolConfiguration)}. The connect and credential paths read the
+     * immutable snapshot the apply publishes, so a rotation or other update is atomic for a connection being
+     * established. A mutable value returned by one of the view's getters is a copy: changing it does not reconfigure
+     * the pool.
      *
-     * @return PoolProperties
+     * @return PoolConfiguration
      */
     public PoolConfiguration getPoolProperties() {
-        return this.poolProperties;
+        return this.configurationView;
+    }
+
+    /**
+     * Returns the configuration snapshot the connect and credential paths read.
+     *
+     * @return the current snapshot
+     */
+    PoolConfiguration getCurrentConfiguration() {
+        return this.configurationSnapshot;
+    }
+
+    /**
+     * Returns the mutable builder the bean and JMX surfaces write.
+     *
+     * @return the mutable configuration
+     */
+    PoolConfiguration getMutableConfiguration() {
+        return this.mutableConfiguration;
+    }
+
+    /**
+     * Copies a configuration into a private, deep-copied {@link PoolProperties} object.
+     *
+     * @param source the configuration to copy
+     *
+     * @return the copy
+     */
+    static PoolProperties copyConfiguration(PoolConfiguration source) {
+        return PoolProperties.copyOf(source);
     }
 
     /**
@@ -468,13 +524,13 @@ public class ConnectionPool {
             // management channel is unavailable.
             //
             // Build the proxy handler
-            handler = new ProxyConnection(this, con, getPoolProperties().isUseEquals());
+            handler = new ProxyConnection(this, con, poolProperties.isUseEquals());
             // Set up the interceptor chain. The property is mutable on a live
             // pool, so a malformed value is a failure of this borrow that must
             // still give the connection back.
             PoolProperties.InterceptorDefinition[] proxies;
             try {
-                proxies = getPoolProperties().getJdbcInterceptorsAsArray();
+                proxies = poolProperties.getJdbcInterceptorsAsArray();
             } catch (Throwable x) {
                 ExceptionUtils.handleThrowable(x);
                 SQLException sx = new SQLException(MessageFactory.get("connectionPool.unableToParseInterceptorChain"));
@@ -744,7 +800,7 @@ public class ConnectionPool {
                 pool = busy;
             }
         }
-        if (interrupted && getPoolProperties().getPropagateInterruptState()) {
+        if (interrupted && poolProperties.getPropagateInterruptState()) {
             Thread.currentThread().interrupt();
         }
         // Release the pool MBean and every connection/interceptor MBean
@@ -778,7 +834,7 @@ public class ConnectionPool {
         }
         PoolProperties.InterceptorDefinition[] proxies;
         try {
-            proxies = getPoolProperties().getJdbcInterceptorsAsArray();
+            proxies = poolProperties.getJdbcInterceptorsAsArray();
         } catch (Throwable x) {
             // A malformed list must not abort the close or skip the
             // notifications already recorded.
@@ -886,10 +942,18 @@ public class ConnectionPool {
      * @throws SQLException if initialization fails
      */
     protected void init(PoolConfiguration properties) throws SQLException {
-        poolProperties = properties;
+        mutableConfiguration = properties;
 
         // Make sure the pool is properly configured
         checkPoolConfiguration(properties);
+
+        // Take the immutable snapshot the connect and credential paths read,
+        // and publish the live view the rest of the pool and the management
+        // surfaces use. The builder stays mutable for compatibility; the
+        // snapshot is replaced atomically by the apply path.
+        configurationSnapshot = copyConfiguration(properties);
+        configurationView = PoolConfigurationView.create(this);
+        poolProperties = configurationView;
 
         // Record the name this pool starts under before its MBean or the
         // interceptors are told about the pool, so that everything the start
@@ -906,13 +970,13 @@ public class ConnectionPool {
             idle = new LinkedBlockingQueue<>();
         }
 
-        if (this.getPoolProperties().isJmxEnabled()) {
+        if (this.poolProperties.isJmxEnabled()) {
             createMBean();
         }
 
         // Parse the interceptor definitions and tell a throwaway instance of
         // each that the pool has started. These instances get no connection.
-        PoolProperties.InterceptorDefinition[] proxies = getPoolProperties().getJdbcInterceptorsAsArray();
+        PoolProperties.InterceptorDefinition[] proxies = poolProperties.getJdbcInterceptorsAsArray();
         startedInterceptors = proxies;
         for (int i = 0; i < proxies.length; i++) {
             try {
@@ -941,6 +1005,13 @@ public class ConnectionPool {
         // relative order of two interceptors in the chain is not something a
         // single interceptor can see; only the pool holds the ordered list.
         checkInterceptorOrder(proxies);
+
+        // The startup callbacks above can still change the builder while the
+        // pool is not published. Take that final startup state before the
+        // pre-load and the cleaner read the configuration.
+        checkPoolConfiguration(properties);
+        configurationSnapshot = copyConfiguration(properties);
+        poolProperties = configurationView;
 
         // Initialize the pool with its initial set of members
         // The count is bounded at the reading that consumes it, not only in
@@ -990,7 +1061,7 @@ public class ConnectionPool {
         // initial pre-load can still change its configuration while the pool is
         // being built and is not yet published.
         try {
-            initializePoolCleaner(properties);
+            initializePoolCleaner(poolProperties);
         } catch (Throwable x) {
             // The constructor has already acquired resources that no caller can
             // reach once it fails, so close the partially built pool first.
@@ -1138,21 +1209,48 @@ public class ConnectionPool {
     }
 
     /**
-     * Validates a running pool's configuration and brings the pool cleaner in line with the result as one step under
-     * this pool's monitor.
+     * Validates a candidate configuration, publishes it as the pool's immutable snapshot and brings the pool cleaner
+     * in line with the result, all as one step under this pool's monitor.
      * <p>
-     * The two halves belong together: the validation corrects values the caller did not write - the eviction interval
-     * among them - and the cleaner's period is fixed when its task is built, so validating without then looking the
-     * cleaner over leaves a task on the interval the correction replaced. Running them under one monitor is what makes
-     * the pair atomic against the other management surface: the data source holds its own monitor while it writes the
-     * shared configuration, and the pool's MBean holds none, so this object's monitor is the only thing both writers
-     * are certain to serialise on.
+     * This is the only path through which a running pool changes its configuration. The bean and JMX surfaces write
+     * the mutable builder, then hand it here; the view returned by {@link #getPoolProperties()} does both steps. The
+     * candidate is validated and corrected on the builder so the existing management surfaces keep seeing the
+     * corrected values, and the corrections are captured in the snapshot published for the connect and credential
+     * paths.
+     * <p>
+     * Properties that decide the pool's shape - its initial pre-load, queue type, JMX registration and pre-load error
+     * policy - were fixed when the pool was created. The bean and JMX setters reject writes to them on a running
+     * pool; a direct write to the view changes only the reported value and cannot rebuild the pool's shape.
      *
-     * @param properties the pool configuration to validate and reconcile the cleaner with
+     * @param properties the pool configuration to validate and publish
      */
     public synchronized void applyConfigurationChange(PoolConfiguration properties) {
+        // A view write has already gone through the builder and this method
+        // applies it below. A hook that hands the view back here must not
+        // start the validation again.
+        if (properties == configurationView) {
+            return;
+        }
         checkPoolConfiguration(properties);
-        reconcilePoolCleaner(properties);
+        configurationSnapshot = copyConfiguration(properties);
+        if (closed) {
+            terminatePoolCleaner();
+        } else {
+            // The cleaner is reconciled against the mutable configuration so
+            // the existing management hooks and their ordering remain the same;
+            // its values are the ones just captured in the snapshot.
+            reconcilePoolCleaner(properties);
+        }
+    }
+
+    /**
+     * Replaces the pool's immutable snapshot with a copy of the supplied configuration. Used by the construction and
+     * publication steps, where the builder carries the corrections made while the pool was being built.
+     *
+     * @param properties the configuration to publish
+     */
+    synchronized void publishConfiguration(PoolConfiguration properties) {
+        configurationSnapshot = copyConfiguration(properties);
     }
 
     /**
@@ -1227,7 +1325,7 @@ public class ConnectionPool {
         // the configuration asks for now, so a pool that has closed in the
         // meantime, or has had its sweeper switched off, is left as it is.
         terminatePoolCleaner();
-        initializePoolCleaner(getPoolProperties());
+        initializePoolCleaner(poolProperties);
     }
 
     /**
@@ -1289,7 +1387,7 @@ public class ConnectionPool {
         try {
             con.lock();
             String trace = con.getStackTrace();
-            if (getPoolProperties().isLogAbandoned()) {
+            if (poolProperties.isLogAbandoned()) {
                 log.warn(MessageFactory.get("connectionPool.connectionAbandoned", con, trace));
             }
             org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = jmxPool;
@@ -1331,7 +1429,7 @@ public class ConnectionPool {
                 return;
             }
             String trace = con.getStackTrace();
-            if (getPoolProperties().isLogAbandoned()) {
+            if (poolProperties.isLogAbandoned()) {
                 log.warn(MessageFactory.get("connectionPool.connectionSuspect",
                         con, Long.valueOf(System.currentTimeMillis() - con.getTimestamp()), trace));
             }
@@ -1458,7 +1556,7 @@ public class ConnectionPool {
      * @return <code>true</code> if a slot was claimed
      */
     private boolean claimSlot() {
-        int maxActive = getPoolProperties().getMaxActive();
+        int maxActive = poolProperties.getMaxActive();
         int current = size.get();
         while (current < maxActive) {
             if (size.compareAndSet(current, current + 1)) {
@@ -1550,9 +1648,9 @@ public class ConnectionPool {
             // this is not 100% accurate since it doesn't use a shared
             // atomic variable - a connection can become idle while we are creating
             // a new connection
-            if (size.get() < getPoolProperties().getMaxActive()) {
+            if (size.get() < poolProperties.getMaxActive()) {
                 // Atomic duplicate check
-                if (size.addAndGet(1) > getPoolProperties().getMaxActive()) {
+                if (size.addAndGet(1) > poolProperties.getMaxActive()) {
                     // If we got here, two threads passed through the first if
                     size.decrementAndGet();
                 } else {
@@ -1565,7 +1663,7 @@ public class ConnectionPool {
             long maxWait = wait;
             // If the passed in wait time is -1, means we should use the pool property value
             if (wait == -1) {
-                maxWait = (getPoolProperties().getMaxWait() <= 0) ? Long.MAX_VALUE : getPoolProperties().getMaxWait();
+                maxWait = (poolProperties.getMaxWait() <= 0) ? Long.MAX_VALUE : poolProperties.getMaxWait();
             }
 
             long timetowait = Math.max(0, maxWait - (System.currentTimeMillis() - now));
@@ -1577,9 +1675,9 @@ public class ConnectionPool {
                 // re-check the limit now rather than wait for a notification
                 // that may never arrive. Skip the case where a connection (or
                 // a wake-up placeholder) is already queued to be taken.
-                if (idle.isEmpty() && size.get() < getPoolProperties().getMaxActive()) {
+                if (idle.isEmpty() && size.get() < poolProperties.getMaxActive()) {
                     // Atomic duplicate check
-                    if (size.addAndGet(1) > getPoolProperties().getMaxActive()) {
+                    if (size.addAndGet(1) > poolProperties.getMaxActive()) {
                         size.decrementAndGet();
                     } else {
                         return createConnection(con, username, password);
@@ -1613,7 +1711,7 @@ public class ConnectionPool {
                     con = idle.poll(timetowait, TimeUnit.MILLISECONDS);
                 }
             } catch (InterruptedException ex) {
-                if (getPoolProperties().getPropagateInterruptState()) {
+                if (poolProperties.getPropagateInterruptState()) {
                     Thread.currentThread().interrupt();
                 }
                 SQLException sx = new SQLException(MessageFactory.get("connectionPool.poolWaitInterrupted"));
@@ -1716,7 +1814,7 @@ public class ConnectionPool {
                 // end of a long wait must not be born already past the
                 // abandon timeout.
                 con.setTimestamp(System.currentTimeMillis());
-                if (getPoolProperties().isLogAbandoned()) {
+                if (poolProperties.isLogAbandoned()) {
                     con.setStackTraceElements(getThreadDumpElements());
                 }
                 if (!busy.offer(con)) {
@@ -1807,7 +1905,7 @@ public class ConnectionPool {
                     // time since here, and a borrower that queued longer
                     // than the abandon timeout must not be born abandoned.
                     con.setTimestamp(System.currentTimeMillis());
-                    if (getPoolProperties().isLogAbandoned()) {
+                    if (poolProperties.isLogAbandoned()) {
                         con.setStackTraceElements(getThreadDumpElements());
                     }
                     if (!busy.offer(con)) {
@@ -1875,7 +1973,7 @@ public class ConnectionPool {
                     // above: the abandoned check measures the time since this
                     // moment, not since the borrow loop's entry.
                     con.setTimestamp(System.currentTimeMillis());
-                    if (getPoolProperties().isLogAbandoned()) {
+                    if (poolProperties.isLogAbandoned()) {
                         con.setStackTraceElements(getThreadDumpElements());
                     }
                     if (!busy.offer(con)) {
@@ -1979,8 +2077,8 @@ public class ConnectionPool {
         // would send a freshly re-established session down the init-check
         // path - which an unset statement makes a check that runs nothing -
         // instead of the borrow check the configuration did ask for.
-        return getPoolProperties().isTestOnConnect() ||
-                PoolProperties.configuredStatement(getPoolProperties().getInitSQL()) != null;
+        return poolProperties.isTestOnConnect() ||
+                PoolProperties.configuredStatement(poolProperties.getInitSQL()) != null;
     }
 
     /**
@@ -1999,8 +2097,8 @@ public class ConnectionPool {
             // interceptor chief among them. The pool-level defaultAutoCommit
             // property must not gate this; the connection's own state is what
             // matters.
-            boolean doRollback = getPoolProperties().getRollbackOnReturn();
-            boolean doCommit = !doRollback && getPoolProperties().getCommitOnReturn();
+            boolean doRollback = poolProperties.getRollbackOnReturn();
+            boolean doCommit = !doRollback && poolProperties.getCommitOnReturn();
             if (doRollback || doCommit) {
                 Connection raw = con.getConnection();
                 if (raw == null) {
@@ -2307,7 +2405,7 @@ public class ConnectionPool {
                 return;
             }
             Iterator<PooledConnection> locked = busy.iterator();
-            int sto = getPoolProperties().getSuspectTimeout();
+            int sto = poolProperties.getSuspectTimeout();
             while (locked.hasNext()) {
                 PooledConnection con = locked.next();
                 boolean setToNull = false;
@@ -2451,7 +2549,7 @@ public class ConnectionPool {
             return true;
         }
         return (con.getReleaseTime() > 0) && ((now - time) > con.getReleaseTime()) &&
-                (ignoreMinSize || getSize() > getPoolProperties().getMinIdle());
+                (ignoreMinSize || getSize() > poolProperties.getMinIdle());
     }
 
     /**
@@ -3634,20 +3732,20 @@ public class ConnectionPool {
                 stopRunning();
             } else if (!pool.isClosed()) {
                 try {
-                    if (pool.getPoolProperties().isRemoveAbandoned() ||
-                            pool.getPoolProperties().getSuspectTimeout() > 0) {
+                    if (pool.poolProperties.isRemoveAbandoned() ||
+                            pool.poolProperties.getSuspectTimeout() > 0) {
                         pool.checkAbandoned();
                     }
                     // The eviction predicate in checkIdle() compares
                     // against the total pool size, not the idle count: a
                     // busy pool can be over the min-idle floor while idle
                     // stays at or below it
-                    if (pool.getPoolProperties().getMinIdle() < pool.getSize()) {
+                    if (pool.poolProperties.getMinIdle() < pool.getSize()) {
                         pool.checkIdle();
                     }
-                    if (pool.getPoolProperties().isTestWhileIdle()) {
+                    if (pool.poolProperties.isTestWhileIdle()) {
                         pool.testAllIdle(false);
-                    } else if (pool.getPoolProperties().getMaxAge() > 0) {
+                    } else if (pool.poolProperties.getMaxAge() > 0) {
                         pool.testAllIdle(true);
                     }
                 } catch (Throwable x) {

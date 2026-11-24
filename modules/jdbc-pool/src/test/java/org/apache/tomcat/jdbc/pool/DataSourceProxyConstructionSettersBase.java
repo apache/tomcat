@@ -133,9 +133,12 @@ abstract class DataSourceProxyConstructionSettersBase extends JdbcPoolBaseTest {
             Assertions.assertFalse(creator.isAlive(), "the pool creation must have ended");
             Assertions.assertNull(failure.get(), "the pool creation must succeed");
             Assertions.assertNotNull(created.get(), "the pool creation must publish a pool");
-            Assertions.assertSame(props, created.get().getPoolProperties(),
-                    "the pool must be built from the configuration the data source still reports");
-            Assertions.assertSame(props, ds.getPoolProperties());
+            Assertions.assertSame(created.get().getPoolProperties(), ds.getPoolProperties(),
+                    "the data source and the pool must share the live configuration view");
+            Assertions.assertEquals(0, ds.getPoolProperties().getInitialSize());
+            Assertions.assertFalse(ds.getPoolProperties().isFairQueue());
+            Assertions.assertFalse(ds.getPoolProperties().isJmxEnabled());
+            Assertions.assertFalse(ds.getPoolProperties().isIgnoreExceptionOnPreLoad());
         } finally {
             props.resume.countDown();
             ds.close(true);
