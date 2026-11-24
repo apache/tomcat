@@ -286,6 +286,16 @@ public class DataSourceProxy implements PoolConfiguration {
                     // is never neither - that was the leak - and never both.
                     rejected = closed;
                     if (!rejected) {
+                        // A startup callback can close the pool while it is
+                        // still being constructed. Publishing it would leave
+                        // the data source holding a pool that already refused
+                        // every borrow and whose cleanup no longer runs from
+                        // this construction path. Treat that as a failed
+                        // creation instead.
+                        if (fresh.isClosed()) {
+                            throw new SQLException(
+                                    MessageFactory.get("dataSourceProxy.poolClosedDuringCreation"));
+                        }
                         // Finish the configuration before the pool can be read
                         // from. A write of one of the attributes the check
                         // corrects lands its value in the shared configuration
