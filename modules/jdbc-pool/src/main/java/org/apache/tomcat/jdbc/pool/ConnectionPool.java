@@ -2035,7 +2035,7 @@ public class ConnectionPool {
                 // The driver's message can carry the URL and its credential,
                 // so log it masked and without the raw exception.
                 log.debug("Unable to create a new JDBC connection. " + e.getClass().getName() + ": " +
-                        PoolProperties.maskCredentials(e.getMessage()));
+                        PoolUtilities.maskAndFlatten(e.getMessage()));
             }
             if (e instanceof SQLException) {
                 throw (SQLException) e;
@@ -3047,8 +3047,8 @@ public class ConnectionPool {
         try {
             jmxPool = new org.apache.tomcat.jdbc.pool.jmx.ConnectionPool(this);
         } catch (Exception x) {
-            log.warn(MessageFactory.get("connectionPool.unableToStartJmx", getName()),
-                    PoolUtilities.maskCredentials(x));
+            log.warn(MessageFactory.get("connectionPool.unableToStartJmx",
+                    PoolUtilities.maskAndFlatten(getName())), PoolUtilities.maskCredentials(x));
         }
     }
 
