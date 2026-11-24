@@ -761,10 +761,14 @@ public class SlowQueryReport extends AbstractQueryReport {
      *             read as false
      */
     protected static Boolean flagValue(String value) {
-        if ("true".equalsIgnoreCase(value)) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        if ("true".equalsIgnoreCase(trimmed)) {
             return Boolean.TRUE;
         }
-        if ("false".equalsIgnoreCase(value)) {
+        if ("false".equalsIgnoreCase(trimmed)) {
             return Boolean.FALSE;
         }
         return null;
